@@ -14,12 +14,9 @@
  * limitations under the License.
  */
 
-@file:OptIn(ExperimentalPointerInput::class)
-
 package androidx.compose.foundation.gestures
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.ExperimentalPointerInput
 import androidx.compose.ui.input.pointer.anyPositionChangeConsumed
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import org.junit.Assert.assertEquals
@@ -31,7 +28,6 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
 @RunWith(Parameterized::class)
-@OptIn(ExperimentalPointerInput::class)
 class MultitouchGestureDetectorTest(val panZoomLock: Boolean) {
     companion object {
         @JvmStatic

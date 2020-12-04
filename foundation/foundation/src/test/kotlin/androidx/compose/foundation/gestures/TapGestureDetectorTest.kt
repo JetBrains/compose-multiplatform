@@ -14,12 +14,9 @@
  * limitations under the License.
  */
 
-@file:OptIn(ExperimentalPointerInput::class)
-
 package androidx.compose.foundation.gestures
 
 import androidx.compose.ui.gesture.DoubleTapTimeout
-import androidx.compose.ui.gesture.ExperimentalPointerInput
 import androidx.compose.ui.gesture.LongPressTimeout
 import androidx.compose.ui.input.pointer.consumeDownChange
 import androidx.compose.ui.input.pointer.consumePositionChange
@@ -34,7 +31,6 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
-@OptIn(ExperimentalPointerInput::class)
 class TapGestureDetectorTest {
     private var pressed = false
     private var released = false

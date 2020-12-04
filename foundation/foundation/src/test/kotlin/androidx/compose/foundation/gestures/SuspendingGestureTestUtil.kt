@@ -29,7 +29,6 @@ import androidx.compose.runtime.dispatch.MonotonicFrameClock
 import androidx.compose.runtime.withRunningRecomposer
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.ExperimentalPointerInput
 import androidx.compose.ui.input.pointer.ConsumedData
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
@@ -59,7 +58,6 @@ import kotlinx.coroutines.yield
  * [gestureDetector]. The [width] and [height] of the LayoutNode may
  * be provided.
  */
-@OptIn(ExperimentalPointerInput::class)
 internal class SuspendingGestureTestUtil(
     val width: Int = 10,
     val height: Int = 10,

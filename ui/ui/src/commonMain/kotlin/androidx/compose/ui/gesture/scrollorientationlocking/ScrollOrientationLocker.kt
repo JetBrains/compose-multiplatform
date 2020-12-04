@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.gesture.scrollorientationlocking
 
-import androidx.compose.ui.gesture.ExperimentalPointerInput
 import androidx.compose.ui.input.pointer.CustomEvent
 import androidx.compose.ui.input.pointer.CustomEventDispatcher
 import androidx.compose.ui.input.pointer.PointerEventPass
@@ -46,7 +45,6 @@ enum class Orientation {
  * [onCancel] to use
  * this correctly.
  */
-@ExperimentalPointerInput
 class ScrollOrientationLocker(private val customEventDispatcher: CustomEventDispatcher) {
 
     private var locker: InternalScrollOrientationLocker? = null

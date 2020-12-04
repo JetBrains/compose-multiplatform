@@ -37,12 +37,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.ExperimentalPointerInput
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 @Sampled
 fun DetectMultitouchGestures() {
@@ -72,7 +70,6 @@ fun DetectMultitouchGestures() {
     )
 }
 
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 @Sampled
 fun CalculateRotation() {
@@ -97,7 +94,6 @@ fun CalculateRotation() {
     )
 }
 
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 @Sampled
 fun CalculateZoom() {
@@ -121,7 +117,6 @@ fun CalculateZoom() {
     )
 }
 
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 @Sampled
 fun CalculatePan() {
@@ -149,7 +144,6 @@ fun CalculatePan() {
     )
 }
 
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 @Sampled
 fun CalculateCentroidSize() {

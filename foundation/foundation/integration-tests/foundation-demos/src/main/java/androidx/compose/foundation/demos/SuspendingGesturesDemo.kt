@@ -51,7 +51,6 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.gesture.ExperimentalPointerInput
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
@@ -107,7 +106,6 @@ fun anotherRandomHue(hue: Float): Float {
 /**
  * Gesture detector for tap, double-tap, and long-press.
  */
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 fun CoroutineTapDemo() {
     var tapHue by remember { mutableStateOf(randomHue()) }
@@ -212,7 +210,6 @@ fun CoroutineTapDemo() {
     }
 }
 
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 fun TouchSlopDragGestures() {
     Column {
@@ -290,7 +287,6 @@ fun TouchSlopDragGestures() {
     }
 }
 
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 fun OrientationLockDragGestures() {
     var size by remember { mutableStateOf(IntSize.Zero) }
@@ -335,7 +331,6 @@ fun OrientationLockDragGestures() {
     }
 }
 
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 fun Drag2DGestures() {
     var size by remember { mutableStateOf(IntSize.Zero) }
@@ -365,7 +360,6 @@ fun Drag2DGestures() {
     }
 }
 
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 fun MultitouchArea(
     text: String,
@@ -440,7 +434,6 @@ fun MultitouchArea(
  * This is a multi-touch gesture detector, including pan, zoom, and rotation.
  * The user can pan, zoom, and rotate once touch slop has been reached.
  */
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 fun MultitouchGestureDetector() {
     MultitouchArea(
@@ -458,7 +451,6 @@ fun MultitouchGestureDetector() {
  * It is common to want to lean toward zoom over rotation, so this gesture detector will
  * lock into zoom if the first unless the rotation passes touch slop first.
  */
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 fun MultitouchLockGestureDetector() {
     MultitouchArea(

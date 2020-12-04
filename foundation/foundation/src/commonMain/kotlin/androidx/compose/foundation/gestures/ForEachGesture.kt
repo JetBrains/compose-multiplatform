@@ -15,7 +15,6 @@
  */
 package androidx.compose.foundation.gestures
 
-import androidx.compose.ui.gesture.ExperimentalPointerInput
 import androidx.compose.ui.input.pointer.HandlePointerInputScope
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputScope
@@ -37,7 +36,6 @@ class GestureCancellationException(message: String? = null) : CancellationExcept
  * exits if [isActive] is `false`.
  */
 @OptIn(InternalCoroutinesApi::class, ExperimentalStdlibApi::class)
-@ExperimentalPointerInput
 suspend fun PointerInputScope.forEachGesture(block: suspend PointerInputScope.() -> Unit) {
     while (isActive) {
         try {
@@ -59,14 +57,12 @@ suspend fun PointerInputScope.forEachGesture(block: suspend PointerInputScope.()
  * Returns `true` if the current state of the pointer events has all pointers up and `false`
  * if any of the pointers are down.
  */
-@ExperimentalPointerInput
 internal fun HandlePointerInputScope.allPointersUp(): Boolean =
     !currentEvent.changes.fastAny { it.current.down }
 
 /**
  * Waits for all pointers to be up before returning.
  */
-@ExperimentalPointerInput
 internal suspend fun PointerInputScope.awaitAllPointersUp() {
     handlePointerInput { awaitAllPointersUp() }
 }
@@ -74,7 +70,6 @@ internal suspend fun PointerInputScope.awaitAllPointersUp() {
 /**
  * Waits for all pointers to be up before returning.
  */
-@ExperimentalPointerInput
 internal suspend fun HandlePointerInputScope.awaitAllPointersUp() {
     if (!allPointersUp()) {
         do {
