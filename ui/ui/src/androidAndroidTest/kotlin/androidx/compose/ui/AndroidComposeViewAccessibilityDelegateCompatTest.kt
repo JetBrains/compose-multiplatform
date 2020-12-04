@@ -50,7 +50,6 @@ import androidx.compose.ui.semantics.verticalAccessibilityScrollState
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextRange
-import androidx.core.os.BuildCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
@@ -142,7 +141,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
             )
         )
         val stateDescription = when {
-            BuildCompat.isAtLeastR() -> {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
                 info.unwrap().stateDescription
             }
             Build.VERSION.SDK_INT >= 19 -> {
