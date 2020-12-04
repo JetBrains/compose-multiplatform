@@ -47,7 +47,7 @@ internal class ModifiedFocusNode(
      */
     fun requestFocus(propagateFocus: Boolean = true) {
         when (modifier.focusState) {
-            Active, Captured, Disabled -> wrappedBy?.propagateFocusStateChange(modifier.focusState)
+            Active, Captured, Disabled -> wrappedBy?.propagateFocusEvent(modifier.focusState)
             ActiveParent -> {
                 val focusedChild = modifier.focusedChild
                 requireNotNull(focusedChild)
@@ -261,12 +261,12 @@ internal class ModifiedFocusNode(
 
     override fun onModifierChanged() {
         super.onModifierChanged()
-        wrappedBy?.propagateFocusStateChange(modifier.focusState)
+        wrappedBy?.propagateFocusEvent(modifier.focusState)
     }
 
     override fun attach() {
         super.attach()
-        wrappedBy?.propagateFocusStateChange(modifier.focusState)
+        wrappedBy?.propagateFocusEvent(modifier.focusState)
     }
 
     override fun detach() {
@@ -282,9 +282,9 @@ internal class ModifiedFocusNode(
                     ?: layoutNode.searchChildrenForFocusNode()
                 if (nextFocusNode != null) {
                     findParentFocusNode()?.modifier?.focusedChild = nextFocusNode
-                    wrappedBy?.propagateFocusStateChange(nextFocusNode.modifier.focusState)
+                    wrappedBy?.propagateFocusEvent(nextFocusNode.modifier.focusState)
                 } else {
-                    wrappedBy?.propagateFocusStateChange(Inactive)
+                    wrappedBy?.propagateFocusEvent(Inactive)
                 }
             }
             // TODO(b/155212782): Implement this after adding support for disabling focus modifiers.
@@ -300,7 +300,7 @@ internal class ModifiedFocusNode(
 
     override fun findNextFocusWrapper() = this
 
-    override fun propagateFocusStateChange(focusState: FocusState) {
+    override fun propagateFocusEvent(focusState: FocusState) {
         // Do nothing. Stop propagating the focus change (since we hit another focus node).
     }
 

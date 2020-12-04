@@ -26,7 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.focus
 import androidx.compose.ui.focus.isFocused
-import androidx.compose.ui.focusObserver
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.semantics.focused
 import androidx.compose.ui.semantics.semantics
@@ -67,7 +67,7 @@ fun Modifier.focusable(
             .semantics {
                 this.focused = isFocused
             }
-            .focusObserver {
+            .onFocusChanged {
                 isFocused = it.isFocused
                 if (isFocused) {
                     interactionState?.addInteraction(Interaction.Focused)

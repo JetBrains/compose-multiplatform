@@ -38,7 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.isFocused
-import androidx.compose.ui.focusObserver
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -115,7 +115,7 @@ class TextFieldTest {
             ) {
                 BasicTextField(
                     value = state.value,
-                    modifier = Modifier.fillMaxSize().focusObserver { isFocused = it.isFocused },
+                    modifier = Modifier.fillMaxSize().onFocusChanged { isFocused = it.isFocused },
                     onValueChange = { state.value = it }
                 )
             }

@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.node
 
-import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.nestedscroll.NestedScrollDelegatingWrapper
 import androidx.compose.ui.graphics.Canvas
@@ -58,10 +57,6 @@ internal class InnerPlaceable(
     override fun findNextFocusWrapper(): ModifiedFocusNode? = null
 
     override fun findLastFocusWrapper(): ModifiedFocusNode? = findPreviousFocusWrapper()
-
-    override fun propagateFocusStateChange(focusState: FocusState) {
-        wrappedBy?.propagateFocusStateChange(focusState)
-    }
 
     override fun findPreviousKeyInputWrapper() = wrappedBy?.findPreviousKeyInputWrapper()
 

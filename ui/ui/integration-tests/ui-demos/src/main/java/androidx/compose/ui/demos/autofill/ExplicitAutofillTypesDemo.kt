@@ -34,7 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.AutofillNode
 import androidx.compose.ui.autofill.AutofillType
 import androidx.compose.ui.focus.isFocused
-import androidx.compose.ui.focusObserver
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.toComposeRect
 import androidx.compose.ui.layout.LayoutCoordinates
@@ -61,7 +61,7 @@ fun ExplicitAutofillTypesDemo() {
             onFill = { nameState.value = it }
         ) { autofillNode ->
             BasicTextField(
-                modifier = Modifier.focusObserver {
+                modifier = Modifier.onFocusChanged {
                     autofill?.apply {
                         if (it.isFocused) {
                             requestAutofillForNode(autofillNode)
@@ -88,7 +88,7 @@ fun ExplicitAutofillTypesDemo() {
             onFill = { emailState.value = it }
         ) { autofillNode ->
             BasicTextField(
-                modifier = Modifier.focusObserver {
+                modifier = Modifier.onFocusChanged {
                     autofill?.run {
                         if (it.isFocused) {
                             requestAutofillForNode(autofillNode)
