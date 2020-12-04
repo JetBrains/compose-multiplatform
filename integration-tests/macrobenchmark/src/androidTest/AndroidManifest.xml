@@ -28,4 +28,5 @@
     <queries>
         <package android:name="androidx.compose.integration.macrobenchmark.target" />
     </queries>
+    <application android:requestLegacyExternalStorage="true"/>
 </manifest>
