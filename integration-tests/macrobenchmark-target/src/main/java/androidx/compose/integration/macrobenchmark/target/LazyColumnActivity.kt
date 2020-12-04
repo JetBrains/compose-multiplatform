@@ -21,11 +21,15 @@ import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumnFor
+import androidx.compose.material.Card
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.unit.dp
 
 class LazyColumnActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,21 +43,31 @@ class LazyColumnActivity : ComponentActivity() {
                     Entry("Item $it")
                 },
                 modifier = Modifier.fillMaxWidth(),
-                itemContent = { item ->
-                    Row {
-                        Text(text = item.contents)
-                        Spacer(modifier = Modifier.weight(1f, fill = true))
-                        Checkbox(checked = false, onCheckedChange = {})
-                    }
-                }
+                itemContent = { ListRow(it) }
             )
         }
-
-        reportFullyDrawn()
     }
 
     companion object {
         const val EXTRA_ITEM_COUNT = "ITEM_COUNT"
+    }
+}
+
+@Composable
+private fun ListRow(entry: Entry) {
+    Card(modifier = Modifier.padding(8.dp)) {
+        Row {
+            Text(
+                text = entry.contents,
+                modifier = Modifier.padding(16.dp)
+            )
+            Spacer(modifier = Modifier.weight(1f, fill = true))
+            Checkbox(
+                checked = false,
+                onCheckedChange = {},
+                modifier = Modifier.padding(16.dp)
+            )
+        }
     }
 }
 
