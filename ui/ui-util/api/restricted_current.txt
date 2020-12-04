@@ -34,10 +34,6 @@ package androidx.compose.ui.util {
     method public static Object nativeClass(Object);
   }
 
-  public final class JvmSynchronizationHelperKt {
-    method public static <T> T! synchronized(Object lock, kotlin.jvm.functions.Function0<? extends T> block);
-  }
-
   public final class ListUtilsKt {
     method public static inline <T> boolean fastAll(java.util.List<? extends T>, kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> predicate);
     method public static inline <T> boolean fastAny(java.util.List<? extends T>, kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> predicate);
