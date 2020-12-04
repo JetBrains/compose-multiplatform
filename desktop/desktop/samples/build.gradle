@@ -18,6 +18,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 import androidx.build.SupportConfigKt
 
+import static androidx.build.AndroidXPlugin.BUILD_ON_SERVER_TASK
 import static androidx.build.dependencies.DependenciesKt.*
 
 plugins {
@@ -90,4 +91,9 @@ task run4(type: JavaExec) {
 
 task run {
     dependsOn("run1")
+}
+
+def projectPath = project.path
+rootProject.tasks.named(BUILD_ON_SERVER_TASK).configure {
+    dependsOn("$projectPath:jvmJar")
 }
