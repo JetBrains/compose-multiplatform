@@ -58,7 +58,6 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.core.os.BuildCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -174,7 +173,7 @@ class AndroidAccessibilityTest {
         var accessibilityNodeInfo = provider.createAccessibilityNodeInfo(toggleableNode.id)
         assertEquals("android.view.View", accessibilityNodeInfo.className)
         val stateDescription = when {
-            BuildCompat.isAtLeastR() -> {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
                 accessibilityNodeInfo.stateDescription
             }
             Build.VERSION.SDK_INT >= 19 -> {
