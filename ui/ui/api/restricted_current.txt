@@ -2328,10 +2328,6 @@ package androidx.compose.ui.platform {
   public final class JvmActualsKt {
   }
 
-  public final class SubcompositionKt {
-    method @MainThread public static androidx.compose.runtime.Composition subcomposeInto(androidx.compose.ui.node.LayoutNode container, androidx.compose.runtime.CompositionReference parent, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
-  }
-
   public final class TestTagKt {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier testTag(androidx.compose.ui.Modifier, String tag);
   }
