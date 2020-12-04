@@ -328,7 +328,6 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
         parent?.requestRemeasure()
         innerLayoutNodeWrapper.attach()
         forEachDelegate { it.attach() }
-        updateInnerLayerWrapper()
         onAttach?.invoke(owner)
     }
 
@@ -358,7 +357,6 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
         }
         owner.onDetach(this)
         this.owner = null
-        _innerLayerWrapper = null
         depth = 0
         _foldedChildren.forEach { child ->
             child.detach()
@@ -586,7 +584,20 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
      * The inner-most layer wrapper. Used for performance for LayoutNodeWrapper.findLayer().
      */
     private var _innerLayerWrapper: LayoutNodeWrapper? = null
+    internal var innerLayerWrapperIsDirty = true
     internal val innerLayerWrapper: LayoutNodeWrapper? get() {
+        if (innerLayerWrapperIsDirty) {
+            var delegate: LayoutNodeWrapper? = innerLayoutNodeWrapper
+            val final = outerLayoutNodeWrapper.wrappedBy
+            _innerLayerWrapper = null
+            while (delegate != final) {
+                if (delegate?.layer != null) {
+                    _innerLayerWrapper = delegate
+                    break
+                }
+                delegate = delegate?.wrappedBy
+            }
+        }
         val layerWrapper = _innerLayerWrapper
         if (layerWrapper != null) {
             requireNotNull(layerWrapper.layer)
@@ -696,9 +707,6 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
                 // call detach() on all removed LayoutNodeWrappers
                 wrapperCache.forEach {
                     it.detach()
-                    if (_innerLayerWrapper === it) {
-                        _innerLayerWrapper = null
-                    }
                 }
 
                 // attach() all new LayoutNodeWrappers
@@ -839,28 +847,10 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
     }
 
     /**
-     * Find the current inner layer.
-     */
-    private fun updateInnerLayerWrapper() {
-        var delegate: LayoutNodeWrapper? = innerLayoutNodeWrapper
-        val final = outerLayoutNodeWrapper.wrappedBy
-        _innerLayerWrapper = null
-        while (delegate != final) {
-            if (delegate?.layer != null) {
-                _innerLayerWrapper = delegate
-                break
-            }
-            delegate = delegate?.wrappedBy
-        }
-    }
-
-    /**
      * Invoked when the parent placed the node. It will trigger the layout.
      */
     internal fun onNodePlaced() {
         val parent = parent
-
-        updateInnerLayerWrapper()
 
         var newZIndex = innerLayoutNodeWrapper.zIndex
         forEachDelegate {
@@ -1250,17 +1240,14 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
     }
 
     private fun shouldInvalidateParentLayer(): Boolean {
-        if (innerLayerWrapper == null) {
-            return true
-        }
         forEachDelegateIncludingInner {
-            if (it is ModifiedDrawNode) {
-                return true
-            } else if (it.layer != null) {
+            if (it.layer != null) {
                 return false
+            } else if (it is ModifiedDrawNode) {
+                return true
             }
         }
-        error("innerLayerWrapper should have been reached.")
+        return true
     }
 
     /**

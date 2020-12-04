@@ -66,7 +66,8 @@ internal abstract class LayoutNodeWrapper(
 
     private var isClipping: Boolean = false
 
-    private var layerBlock: (GraphicsLayerScope.() -> Unit)? = null
+    protected var layerBlock: (GraphicsLayerScope.() -> Unit)? = null
+        private set
 
     private var _isAttached = false
     override val isAttached: Boolean
@@ -160,9 +161,7 @@ internal abstract class LayoutNodeWrapper(
         zIndex: Float,
         layerBlock: (GraphicsLayerScope.() -> Unit)?
     ) {
-        if (wrappedBy?.isShallowPlacing != true) {
-            onLayerBlockUpdated(layerBlock)
-        }
+        onLayerBlockUpdated(layerBlock)
         if (this.position != position) {
             this.position = position
             val layer = layer
@@ -224,6 +223,7 @@ internal abstract class LayoutNodeWrapper(
                     move(position)
                 }
                 updateLayerParameters()
+                layoutNode.innerLayerWrapperIsDirty = true
                 invalidateParentLayer()
             } else if (blockHasBeenChanged) {
                 updateLayerParameters()
@@ -231,7 +231,7 @@ internal abstract class LayoutNodeWrapper(
         } else {
             layer?.let {
                 it.destroy()
-
+                layoutNode.innerLayerWrapperIsDirty = true
                 invalidateParentLayer()
             }
             layer = null
