@@ -32,7 +32,7 @@ dependencies {
     implementation project(":compose:runtime:runtime")
     implementation project(":compose:ui:ui")
 
-    implementation "androidx.preference:preference-ktx:1.1.0"
+    implementation "androidx.preference:preference-ktx:1.1.1"
 
     androidTestImplementation project(":compose:ui:ui-test-junit4")
 
