@@ -241,7 +241,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             semanticsNode.config.getOrNull(SemanticsProperties.ContentDescription)
         // Note editable is not added to semantics properties api.
         info.isEditable = semanticsNode.config.contains(SemanticsActions.SetText)
-        info.isEnabled = (semanticsNode.config.getOrNull(SemanticsProperties.Disabled) == null)
+        info.isEnabled = semanticsNode.enabled()
         info.isFocusable = semanticsNode.config.contains(SemanticsProperties.Focused)
         if (info.isFocusable) {
             info.isFocused = semanticsNode.config[SemanticsProperties.Focused]
@@ -250,41 +250,31 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         info.isClickable = false
         semanticsNode.config.getOrNull(SemanticsActions.OnClick)?.let {
             info.isClickable = true
-            info.addAction(
-                AccessibilityNodeInfoCompat.AccessibilityActionCompat(
-                    AccessibilityNodeInfoCompat.ACTION_CLICK,
-                    it.label
+            if (semanticsNode.enabled()) {
+                info.addAction(
+                    AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+                        AccessibilityNodeInfoCompat.ACTION_CLICK,
+                        it.label
+                    )
                 )
-            )
+            }
         }
         info.isLongClickable = false
         semanticsNode.config.getOrNull(SemanticsActions.OnLongClick)?.let {
             info.isLongClickable = true
-            info.addAction(
-                AccessibilityNodeInfoCompat.AccessibilityActionCompat(
-                    AccessibilityNodeInfoCompat.ACTION_LONG_CLICK,
-                    it.label
+            if (semanticsNode.enabled()) {
+                info.addAction(
+                    AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+                        AccessibilityNodeInfoCompat.ACTION_LONG_CLICK,
+                        it.label
+                    )
                 )
-            )
-        }
-        semanticsNode.config.getOrNull(SemanticsActions.SetText)?.let {
-            info.className = "android.widget.EditText"
-            info.addAction(
-                AccessibilityNodeInfoCompat.AccessibilityActionCompat(
-                    AccessibilityNodeInfoCompat.ACTION_SET_TEXT,
-                    it.label
-                )
-            )
-        }
-        semanticsNode.config.getOrNull(SemanticsActions.SetSelection)?.let {
-            info.addAction(
-                AccessibilityNodeInfoCompat.AccessibilityActionCompat(
-                    AccessibilityNodeInfoCompat.ACTION_SET_SELECTION,
-                    it.label
-                )
-            )
+            }
         }
 
+        semanticsNode.config.getOrNull(SemanticsActions.SetText)?.let {
+            info.className = "android.widget.EditText"
+        }
         // The config will contain this action only if there is a text selection at the moment.
         semanticsNode.config.getOrNull(SemanticsActions.CopyText)?.let {
             info.addAction(
@@ -294,27 +284,45 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 )
             )
         }
-
-        // The config will contain this action only if there is a text selection at the moment.
-        semanticsNode.config.getOrNull(SemanticsActions.CutText)?.let {
-            info.addAction(
-                AccessibilityNodeInfoCompat.AccessibilityActionCompat(
-                    AccessibilityNodeInfoCompat.ACTION_CUT,
-                    it.label
-                )
-            )
-        }
-
-        // The config will contain the action anyway, therefore we check the clipboard text to
-        // decide whether to add the action to the node or not.
-        semanticsNode.config.getOrNull(SemanticsActions.PasteText)?.let {
-            if (info.isFocused && view.clipboardManager.hasText()) {
+        if (semanticsNode.enabled()) {
+            semanticsNode.config.getOrNull(SemanticsActions.SetText)?.let {
                 info.addAction(
                     AccessibilityNodeInfoCompat.AccessibilityActionCompat(
-                        AccessibilityNodeInfoCompat.ACTION_PASTE,
+                        AccessibilityNodeInfoCompat.ACTION_SET_TEXT,
                         it.label
                     )
                 )
+            }
+            semanticsNode.config.getOrNull(SemanticsActions.SetSelection)?.let {
+                info.addAction(
+                    AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+                        AccessibilityNodeInfoCompat.ACTION_SET_SELECTION,
+                        it.label
+                    )
+                )
+            }
+
+            // The config will contain this action only if there is a text selection at the moment.
+            semanticsNode.config.getOrNull(SemanticsActions.CutText)?.let {
+                info.addAction(
+                    AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+                        AccessibilityNodeInfoCompat.ACTION_CUT,
+                        it.label
+                    )
+                )
+            }
+
+            // The config will contain the action anyway, therefore we check the clipboard text to
+            // decide whether to add the action to the node or not.
+            semanticsNode.config.getOrNull(SemanticsActions.PasteText)?.let {
+                if (info.isFocused && view.clipboardManager.hasText()) {
+                    info.addAction(
+                        AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+                            AccessibilityNodeInfoCompat.ACTION_PASTE,
+                            it.label
+                        )
+                    )
+                }
             }
         }
 
@@ -324,8 +332,10 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 getAccessibilitySelectionStart(semanticsNode),
                 getAccessibilitySelectionEnd(semanticsNode)
             )
-
-            if (semanticsNode.config.getOrNull(SemanticsActions.SetSelection) == null) {
+            if (semanticsNode.config.getOrNull(SemanticsActions.SetSelection) == null ||
+                !semanticsNode.enabled()
+            ) {
+                // Note this is the default set selection action provided by the framework.
                 info.addAction(AccessibilityNodeInfoCompat.ACTION_SET_SELECTION)
             }
             info.addAction(AccessibilityNodeInfoCompat.ACTION_NEXT_AT_MOVEMENT_GRANULARITY)
@@ -363,7 +373,9 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 rangeInfo.range.endInclusive,
                 rangeInfo.current
             )
-            if (semanticsNode.config.contains(SemanticsActions.SetProgress)) {
+            if (semanticsNode.config.contains(SemanticsActions.SetProgress) &&
+                semanticsNode.enabled()
+            ) {
                 if (rangeInfo.current <
                     rangeInfo.range.endInclusive.coerceAtLeast(rangeInfo.range.start)
                 )
@@ -392,7 +404,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             if (xScrollState.maxValue > 0f) {
                 info.isScrollable = true
             }
-            if (xScrollState.value < xScrollState.maxValue) {
+            if (semanticsNode.enabled() && xScrollState.value < xScrollState.maxValue) {
                 info.addAction(
                     AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_FORWARD
                 )
@@ -406,7 +418,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     )
                 }
             }
-            if (xScrollState.value > 0f) {
+            if (semanticsNode.enabled() && xScrollState.value > 0f) {
                 info.addAction(
                     AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_BACKWARD
                 )
@@ -430,7 +442,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             if (yScrollState.maxValue > 0f) {
                 info.isScrollable = true
             }
-            if (yScrollState.value < yScrollState.maxValue) {
+            if (semanticsNode.enabled() && yScrollState.value < yScrollState.maxValue) {
                 info.addAction(
                     AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_FORWARD
                 )
@@ -444,7 +456,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     )
                 }
             }
-            if (yScrollState.value > 0f) {
+            if (semanticsNode.enabled() && yScrollState.value > 0f) {
                 info.addAction(
                     AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_BACKWARD
                 )
@@ -460,72 +472,74 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             }
         }
 
-        semanticsNode.config.getOrNull(SemanticsActions.Dismiss)?.let {
-            info.addAction(
-                AccessibilityNodeInfoCompat.AccessibilityActionCompat(
-                    AccessibilityNodeInfoCompat.ACTION_DISMISS,
-                    it.label
-                )
-            )
-        }
-
-        if (semanticsNode.config.contains(CustomActions)) {
-            val customActions = semanticsNode.config[CustomActions]
-            if (customActions.size >= AccessibilityActionsResourceIds.size) {
-                throw IllegalStateException(
-                    "Can't have more than " +
-                        "${AccessibilityActionsResourceIds.size} custom actions for one widget"
+        if (semanticsNode.enabled()) {
+            semanticsNode.config.getOrNull(SemanticsActions.Dismiss)?.let {
+                info.addAction(
+                    AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+                        AccessibilityNodeInfoCompat.ACTION_DISMISS,
+                        it.label
+                    )
                 )
             }
-            val currentActionIdToLabel = SparseArrayCompat<CharSequence>()
-            val currentLabelToActionId = mutableMapOf<CharSequence, Int>()
-            // If this virtual node had custom action id assignment before, we try to keep the id
-            // unchanged for the same action (identified by action label). This way, we can
-            // minimize the influence of custom action change between custom actions are
-            // presented to the user and actually performed.
-            if (labelToActionId.containsKey(virtualViewId)) {
-                val oldLabelToActionId = labelToActionId[virtualViewId]
-                val availableIds = AccessibilityActionsResourceIds.toMutableList()
-                val unassignedActions = mutableListOf<CustomAccessibilityAction>()
-                for (action in customActions) {
-                    if (oldLabelToActionId!!.contains(action.label)) {
-                        val actionId = oldLabelToActionId[action.label]
-                        currentActionIdToLabel.put(actionId!!, action.label)
+
+            if (semanticsNode.config.contains(CustomActions)) {
+                val customActions = semanticsNode.config[CustomActions]
+                if (customActions.size >= AccessibilityActionsResourceIds.size) {
+                    throw IllegalStateException(
+                        "Can't have more than " +
+                            "${AccessibilityActionsResourceIds.size} custom actions for one widget"
+                    )
+                }
+                val currentActionIdToLabel = SparseArrayCompat<CharSequence>()
+                val currentLabelToActionId = mutableMapOf<CharSequence, Int>()
+                // If this virtual node had custom action id assignment before, we try to keep the id
+                // unchanged for the same action (identified by action label). This way, we can
+                // minimize the influence of custom action change between custom actions are
+                // presented to the user and actually performed.
+                if (labelToActionId.containsKey(virtualViewId)) {
+                    val oldLabelToActionId = labelToActionId[virtualViewId]
+                    val availableIds = AccessibilityActionsResourceIds.toMutableList()
+                    val unassignedActions = mutableListOf<CustomAccessibilityAction>()
+                    for (action in customActions) {
+                        if (oldLabelToActionId!!.contains(action.label)) {
+                            val actionId = oldLabelToActionId[action.label]
+                            currentActionIdToLabel.put(actionId!!, action.label)
+                            currentLabelToActionId[action.label] = actionId
+                            availableIds.remove(actionId)
+                            info.addAction(
+                                AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+                                    actionId, action.label
+                                )
+                            )
+                        } else {
+                            unassignedActions.add(action)
+                        }
+                    }
+                    for ((index, action) in unassignedActions.withIndex()) {
+                        val actionId = availableIds[index]
+                        currentActionIdToLabel.put(actionId, action.label)
                         currentLabelToActionId[action.label] = actionId
-                        availableIds.remove(actionId)
                         info.addAction(
                             AccessibilityNodeInfoCompat.AccessibilityActionCompat(
                                 actionId, action.label
                             )
                         )
-                    } else {
-                        unassignedActions.add(action)
+                    }
+                } else {
+                    for ((index, action) in customActions.withIndex()) {
+                        val actionId = AccessibilityActionsResourceIds[index]
+                        currentActionIdToLabel.put(actionId, action.label)
+                        currentLabelToActionId[action.label] = actionId
+                        info.addAction(
+                            AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+                                actionId, action.label
+                            )
+                        )
                     }
                 }
-                for ((index, action) in unassignedActions.withIndex()) {
-                    val actionId = availableIds[index]
-                    currentActionIdToLabel.put(actionId, action.label)
-                    currentLabelToActionId[action.label] = actionId
-                    info.addAction(
-                        AccessibilityNodeInfoCompat.AccessibilityActionCompat(
-                            actionId, action.label
-                        )
-                    )
-                }
-            } else {
-                for ((index, action) in customActions.withIndex()) {
-                    val actionId = AccessibilityActionsResourceIds[index]
-                    currentActionIdToLabel.put(actionId, action.label)
-                    currentLabelToActionId[action.label] = actionId
-                    info.addAction(
-                        AccessibilityNodeInfoCompat.AccessibilityActionCompat(
-                            actionId, action.label
-                        )
-                    )
-                }
+                actionIdToLabel.put(virtualViewId, currentActionIdToLabel)
+                labelToActionId.put(virtualViewId, currentLabelToActionId)
             }
-            actionIdToLabel.put(virtualViewId, currentActionIdToLabel)
-            labelToActionId.put(virtualViewId, currentLabelToActionId)
         }
     }
 
@@ -695,11 +709,62 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             } else {
                 view.semanticsOwner.rootSemanticsNode.findChildById(virtualViewId) ?: return false
             }
+
+        // Actions can be performed when disabled.
         when (action) {
             AccessibilityNodeInfoCompat.ACTION_ACCESSIBILITY_FOCUS ->
                 return requestAccessibilityFocus(virtualViewId)
             AccessibilityNodeInfoCompat.ACTION_CLEAR_ACCESSIBILITY_FOCUS ->
                 return clearAccessibilityFocus(virtualViewId)
+            AccessibilityNodeInfoCompat.ACTION_NEXT_AT_MOVEMENT_GRANULARITY,
+            AccessibilityNodeInfoCompat.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY -> {
+                if (arguments != null) {
+                    val granularity = arguments.getInt(
+                        AccessibilityNodeInfoCompat.ACTION_ARGUMENT_MOVEMENT_GRANULARITY_INT
+                    )
+                    val extendSelection = arguments.getBoolean(
+                        AccessibilityNodeInfoCompat.ACTION_ARGUMENT_EXTEND_SELECTION_BOOLEAN
+                    )
+                    return traverseAtGranularity(
+                        node, granularity,
+                        action == AccessibilityNodeInfoCompat.ACTION_NEXT_AT_MOVEMENT_GRANULARITY,
+                        extendSelection
+                    )
+                }
+                return false
+            }
+            AccessibilityNodeInfoCompat.ACTION_SET_SELECTION -> {
+                val start = arguments?.getInt(
+                    AccessibilityNodeInfoCompat.ACTION_ARGUMENT_SELECTION_START_INT, -1
+                ) ?: -1
+                val end = arguments?.getInt(
+                    AccessibilityNodeInfoCompat.ACTION_ARGUMENT_SELECTION_END_INT, -1
+                ) ?: -1
+                // Note: This is a little different from current android framework implementation.
+                val success = setAccessibilitySelection(node, start, end, false)
+                // Text selection changed event already updates the cache. so this may not be
+                // necessary.
+                if (success) {
+                    sendEventForVirtualView(
+                        semanticsNodeIdToAccessibilityVirtualNodeId(node.id),
+                        AccessibilityEvent.CONTENT_CHANGE_TYPE_UNDEFINED
+                    )
+                }
+                return success
+            }
+            AccessibilityNodeInfoCompat.ACTION_COPY -> {
+                return node.config.getOrNull(SemanticsActions.CopyText)?.let {
+                    it.action()
+                } ?: false
+            }
+        }
+
+        if (!node.enabled()) {
+            return false
+        }
+
+        // Actions can't be performed when disabled.
+        when (action) {
             AccessibilityNodeInfoCompat.ACTION_CLICK -> {
                 return if (node.config.contains(SemanticsActions.OnClick)) {
                     node.config[SemanticsActions.OnClick].action()
@@ -841,53 +906,12 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     false
                 }
             }
-            AccessibilityNodeInfoCompat.ACTION_NEXT_AT_MOVEMENT_GRANULARITY,
-            AccessibilityNodeInfoCompat.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY -> {
-                if (arguments != null) {
-                    val granularity = arguments.getInt(
-                        AccessibilityNodeInfoCompat.ACTION_ARGUMENT_MOVEMENT_GRANULARITY_INT
-                    )
-                    val extendSelection = arguments.getBoolean(
-                        AccessibilityNodeInfoCompat.ACTION_ARGUMENT_EXTEND_SELECTION_BOOLEAN
-                    )
-                    return traverseAtGranularity(
-                        node, granularity,
-                        action == AccessibilityNodeInfoCompat.ACTION_NEXT_AT_MOVEMENT_GRANULARITY,
-                        extendSelection
-                    )
-                }
-                return false
-            }
-            AccessibilityNodeInfoCompat.ACTION_SET_SELECTION -> {
-                val start = arguments?.getInt(
-                    AccessibilityNodeInfoCompat.ACTION_ARGUMENT_SELECTION_START_INT, -1
-                ) ?: -1
-                val end = arguments?.getInt(
-                    AccessibilityNodeInfoCompat.ACTION_ARGUMENT_SELECTION_END_INT, -1
-                ) ?: -1
-                // Note: This is a little different from current android framework implementation.
-                val success = setAccessibilitySelection(node, start, end, false)
-                // Text selection changed event already updates the cache. so this may not be
-                // necessary.
-                if (success) {
-                    sendEventForVirtualView(
-                        semanticsNodeIdToAccessibilityVirtualNodeId(node.id),
-                        AccessibilityEvent.CONTENT_CHANGE_TYPE_UNDEFINED
-                    )
-                }
-                return success
-            }
             AccessibilityNodeInfoCompat.ACTION_SET_TEXT -> {
                 val text = arguments?.getString(
                     AccessibilityNodeInfoCompat.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE
                 )
                 return node.config.getOrNull(SemanticsActions.SetText)?.let {
                     it.action(AnnotatedString(text ?: ""))
-                } ?: false
-            }
-            AccessibilityNodeInfoCompat.ACTION_COPY -> {
-                return node.config.getOrNull(SemanticsActions.CopyText)?.let {
-                    it.action()
                 } ?: false
             }
             AccessibilityNodeInfoCompat.ACTION_PASTE -> {
@@ -1461,7 +1485,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     ): Boolean {
         // Any widget which has custom action_set_selection needs to provide cursor
         // positions, so events will be sent when cursor position change.
-        if (node.config.contains(SemanticsActions.SetSelection)) {
+        // When the node is disabled, only the default/virtual set selection can performed.
+        if (node.config.contains(SemanticsActions.SetSelection) && node.enabled()) {
             // Hide all selection controllers used for adjusting selection
             // since we are doing so explicitly by other means and these
             // controllers interact with how selection behaves. From TextView.java.
@@ -1625,13 +1650,15 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 info: AccessibilityNodeInfoCompat,
                 semanticsNode: SemanticsNode
             ) {
-                semanticsNode.config.getOrNull(SemanticsActions.SetProgress)?.let {
-                    info.addAction(
-                        AccessibilityNodeInfoCompat.AccessibilityActionCompat(
-                            android.R.id.accessibilityActionSetProgress,
-                            it.label
+                if (semanticsNode.enabled()) {
+                    semanticsNode.config.getOrNull(SemanticsActions.SetProgress)?.let {
+                        info.addAction(
+                            AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+                                android.R.id.accessibilityActionSetProgress,
+                                it.label
+                            )
                         )
-                    )
+                    }
                 }
             }
         }
@@ -1647,3 +1674,5 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         }
     }
 }
+
+private fun SemanticsNode.enabled() = (config.getOrNull(SemanticsProperties.Disabled) == null)

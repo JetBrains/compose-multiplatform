@@ -27,4 +27,5 @@ object Strings {
     val NotSelected = "Not selected"
     val InProgress = "In progress"
     val TemplatePercent = "%d percent"
+    val Toggle = "Toggle"
 }

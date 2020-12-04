@@ -34,12 +34,17 @@ import androidx.compose.ui.semantics.SemanticsModifierCore
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.semantics.SemanticsWrapper
+import androidx.compose.ui.semantics.copyText
+import androidx.compose.ui.semantics.cutText
+import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.stateDescriptionRange
 import androidx.compose.ui.semantics.dismiss
 import androidx.compose.ui.semantics.focused
 import androidx.compose.ui.semantics.getTextLayoutResult
+import androidx.compose.ui.semantics.horizontalAccessibilityScrollState
 import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.onLongClick
 import androidx.compose.ui.semantics.pasteText
 import androidx.compose.ui.semantics.setProgress
 import androidx.compose.ui.semantics.setSelection
@@ -156,6 +161,89 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
         assertEquals(stateDescription, stateDescriptionResult)
         assertTrue(info.isClickable)
         assertTrue(info.isVisibleToUser)
+    }
+
+    @Test
+    fun testPopulateAccessibilityNodeInfoProperties_disabled() {
+        val info = AccessibilityNodeInfoCompat.obtain()
+        val semanticsNode = createSemanticsNodeWithProperties(1, true) {
+            disabled()
+            text = AnnotatedString("text")
+            horizontalAccessibilityScrollState = AccessibilityScrollState(0f, 5f)
+            onClick { true }
+            onLongClick { true }
+            copyText { true }
+            pasteText { true }
+            cutText { true }
+            setText { true }
+            setSelection { _, _, _ -> true }
+            dismiss { true }
+        }
+        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
+        assertTrue(info.isClickable)
+        assertFalse(
+            containsAction(
+                info,
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_CLICK
+            )
+        )
+        assertTrue(info.isLongClickable)
+        assertFalse(
+            containsAction(
+                info,
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_LONG_CLICK
+            )
+        )
+        assertTrue(
+            containsAction(
+                info,
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_COPY
+            )
+        )
+        assertFalse(
+            containsAction(
+                info,
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_PASTE
+            )
+        )
+        assertFalse(
+            containsAction(
+                info,
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_CUT
+            )
+        )
+        assertFalse(
+            containsAction(
+                info,
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SET_TEXT
+            )
+        )
+        // This is the default ACTION_SET_SELECTION.
+        assertTrue(
+            containsAction(
+                info,
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SET_SELECTION
+            )
+        )
+        assertFalse(
+            containsAction(
+                info,
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_DISMISS
+            )
+        )
+        assertFalse(
+            containsAction(
+                info,
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_FORWARD
+            )
+        )
+        assertFalse(
+            containsAction(
+                info,
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_RIGHT
+            )
+        )
+        info.recycle()
     }
 
     @Test

@@ -46,26 +46,13 @@ class ErrorMessagesTest {
     val rule = createComposeRule()
 
     @Test
-    fun findByTag_assertHasClickAction_predicateShouldFail() {
+    fun findByTag_assertHasClickAction() {
         rule.setContent {
             ComposeSimpleCase()
         }
 
-        expectErrorMessageMatches(
-            "" +
-                "Failed to assert the following: \\(OnClick is defined\\)\n" +
-                "Semantics of the node:\n" +
-                "Node #X at \\(X, X, X, X\\)px, Tag: 'MyButton'\n" +
-                "Disabled = 'kotlin\\.Unit'\n" +
-                "Text = 'Toggle'\n" +
-                "GetTextLayoutResult = 'AccessibilityAction\\(label=null, action=.*\\)'\n" +
-                "MergeDescendants = 'true'\n" +
-                "Has 1 sibling\n" +
-                "Selector used: \\(TestTag = 'MyButton'\\)"
-        ) {
-            rule.onNodeWithTag("MyButton")
-                .assertHasClickAction()
-        }
+        rule.onNodeWithTag("MyButton")
+            .assertHasClickAction()
     }
 
     @Test
@@ -135,22 +122,6 @@ class ErrorMessagesTest {
         ) {
             rule.onNodeWithText("Toggle")
                 .performClick()
-        }
-    }
-
-    @Test
-    fun findByTag_callNonExistentSemanticsAction() {
-        rule.setContent {
-            ComposeSimpleCase()
-        }
-
-        expectErrorMessageStartsWith(
-            "" +
-                "Failed to perform OnClick action as it is not defined on the node.\n" +
-                "Semantics of the node:"
-        ) {
-            rule.onNodeWithTag("MyButton")
-                .performSemanticsAction(SemanticsActions.OnClick)
         }
     }
 

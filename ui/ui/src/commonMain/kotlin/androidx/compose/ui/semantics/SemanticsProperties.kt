@@ -65,7 +65,8 @@ object SemanticsProperties {
         SemanticsPropertyKey<AccessibilityRangeInfo>("AccessibilityRangeInfo")
 
     /**
-     * Whether this semantics node is disabled.
+     * Whether this semantics node is disabled. Note that proper [SemanticsActions] should still
+     * be added when this property is set.
      *
      * @see SemanticsPropertyReceiver.disabled
      */

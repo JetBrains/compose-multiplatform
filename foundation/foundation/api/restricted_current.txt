@@ -165,6 +165,7 @@ package androidx.compose.foundation {
     method public String getNotSelected();
     method public String getSelected();
     method public String getTemplatePercent();
+    method public String getToggle();
     method public String getUnchecked();
     property public final String Checked;
     property public final String InProgress;
@@ -172,6 +173,7 @@ package androidx.compose.foundation {
     property public final String NotSelected;
     property public final String Selected;
     property public final String TemplatePercent;
+    property public final String Toggle;
     property public final String Unchecked;
     field public static final androidx.compose.foundation.Strings INSTANCE;
   }
