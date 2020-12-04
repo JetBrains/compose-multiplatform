@@ -118,7 +118,7 @@ class LazyListState constructor(
     val firstVisibleItemScrollOffset: Int get() = scrollPosition.observableScrollOffset
 
     /**
-     * whether this [LazyListState] is currently scrolling via [scroll] or via an
+     * Whether this [LazyListState] is currently scrolling via [scroll] or via an
      * animation/fling.
      *
      * Note: **all** scrolls initiated via [scroll] are considered to be animations, regardless of
@@ -126,6 +126,15 @@ class LazyListState constructor(
      */
     val isAnimationRunning
         get() = scrollableController.isAnimationRunning
+
+    /** Backing state for [layoutInfo] */
+    private val layoutInfoState = mutableStateOf<LazyListLayoutInfo>(EmptyLazyListLayoutInfo)
+
+    /**
+     * The object of [LazyListLayoutInfo] calculated during the last layout pass. For example,
+     * you can use it to calculate what items are currently visible.
+     */
+    val layoutInfo: LazyListLayoutInfo get() = layoutInfoState.value
 
     /**
      * The amount of scroll to be consumed in the next layout pass.  Scrolling forward is negative
@@ -282,6 +291,7 @@ class LazyListState constructor(
             canScrollForward = measureResult.canScrollForward
         )
         scrollToBeConsumed -= measureResult.consumedScroll
+        layoutInfoState.value = measureResult
         numMeasurePasses++
     }
 
@@ -352,4 +362,11 @@ private class ItemRelativeScrollPosition(
         scrollOffsetState.value = scrollOffset
         this.canScrollForward = canScrollForward
     }
+}
+
+private object EmptyLazyListLayoutInfo : LazyListLayoutInfo {
+    override val visibleItemsInfo = emptyList<LazyListItemInfo>()
+    override val viewportStartOffset = 0
+    override val viewportEndOffset = 0
+    override val totalItemsCount = 0
 }

@@ -35,5 +35,10 @@ internal class LazyListMeasureResult(
     /** True if there is some space available to continue scrolling in the forward direction.*/
     val canScrollForward: Boolean,
     /** The amount of scroll consumed during the measure pass.*/
-    val consumedScroll: Float
-)
+    val consumedScroll: Float,
+    override val viewportStartOffset: Int,
+    override val viewportEndOffset: Int,
+    override val totalItemsCount: Int
+) : LazyListLayoutInfo {
+    override val visibleItemsInfo: List<LazyListItemInfo> get() = items
+}
