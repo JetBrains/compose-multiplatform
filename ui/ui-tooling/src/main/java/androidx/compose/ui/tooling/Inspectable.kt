@@ -59,6 +59,7 @@ internal fun Inspectable(
     content: @Composable () -> Unit
 ) {
     currentComposer.collectKeySourceInformation()
+    currentComposer.collectParameterInformation()
     val store = (slotTableRecord as SlotTableRecordImpl).store
     store.add(currentComposer.slotTable)
     Providers(

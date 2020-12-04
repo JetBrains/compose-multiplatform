@@ -236,7 +236,12 @@ private class WrappedComposition(
                         val inspectionTable =
                             owner.getTag(R.id.inspection_slot_table_set) as?
                                 MutableSet<SlotTable>
-                        inspectionTable?.add(currentComposer.slotTable)
+                                ?: (owner.parent as? View)?.getTag(R.id.inspection_slot_table_set)
+                                    as? MutableSet<SlotTable>
+                        if (inspectionTable != null) {
+                            inspectionTable.add(currentComposer.slotTable)
+                            currentComposer.collectParameterInformation()
+                        }
                         Providers(InspectionTables provides inspectionTable) {
                             ProvideAndroidAmbients(owner, content)
                         }
