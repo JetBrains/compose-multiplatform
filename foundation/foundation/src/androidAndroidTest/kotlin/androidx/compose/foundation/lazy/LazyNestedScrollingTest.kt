@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.gesture.TouchSlop
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.down
@@ -34,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -45,6 +47,15 @@ class LazyNestedScrollingTest {
 
     @get:Rule
     val rule = createComposeRule()
+
+    var expectedDragOffset = Float.MAX_VALUE
+
+    @Before
+    fun test() {
+        expectedDragOffset = with(rule.density) {
+            TouchSlop.toPx() + 20
+        }
+    }
 
     @Test
     fun column_nestedScrollingBackwardInitially() {
@@ -109,12 +120,12 @@ class LazyNestedScrollingTest {
             .performGesture {
                 draggedOffset = 0f
                 down(Offset(x = 10f, y = 10f))
-                moveBy(Offset(x = 0f, y = 50f))
+                moveBy(Offset(x = 0f, y = expectedDragOffset))
                 up()
             }
 
         rule.runOnIdle {
-            Truth.assertThat(draggedOffset).isEqualTo(50f)
+            Truth.assertThat(draggedOffset).isEqualTo(expectedDragOffset)
         }
     }
 
@@ -140,12 +151,12 @@ class LazyNestedScrollingTest {
         rule.onNodeWithTag(LazyTag)
             .performGesture {
                 down(Offset(x = 10f, y = 10f))
-                moveBy(Offset(x = 0f, y = -50f))
+                moveBy(Offset(x = 0f, y = -expectedDragOffset))
                 up()
             }
 
         rule.runOnIdle {
-            Truth.assertThat(draggedOffset).isEqualTo(-50f)
+            Truth.assertThat(draggedOffset).isEqualTo(-expectedDragOffset)
         }
     }
 
@@ -176,12 +187,12 @@ class LazyNestedScrollingTest {
             .performGesture {
                 draggedOffset = 0f
                 down(Offset(x = 10f, y = 10f))
-                moveBy(Offset(x = 0f, y = -50f))
+                moveBy(Offset(x = 0f, y = -expectedDragOffset))
                 up()
             }
 
         rule.runOnIdle {
-            Truth.assertThat(draggedOffset).isEqualTo(-50f)
+            Truth.assertThat(draggedOffset).isEqualTo(-expectedDragOffset)
         }
     }
 
@@ -207,12 +218,12 @@ class LazyNestedScrollingTest {
         rule.onNodeWithTag(LazyTag)
             .performGesture {
                 down(Offset(x = 10f, y = 10f))
-                moveBy(Offset(x = 100f, y = 0f))
+                moveBy(Offset(x = expectedDragOffset, y = 0f))
                 up()
             }
 
         rule.runOnIdle {
-            Truth.assertThat(draggedOffset).isEqualTo(100f)
+            Truth.assertThat(draggedOffset).isEqualTo(expectedDragOffset)
         }
     }
 
@@ -248,12 +259,12 @@ class LazyNestedScrollingTest {
             .performGesture {
                 draggedOffset = 0f
                 down(Offset(x = 10f, y = 10f))
-                moveBy(Offset(x = 50f, y = 0f))
+                moveBy(Offset(x = expectedDragOffset, y = 0f))
                 up()
             }
 
         rule.runOnIdle {
-            Truth.assertThat(draggedOffset).isEqualTo(50f)
+            Truth.assertThat(draggedOffset).isEqualTo(expectedDragOffset)
         }
     }
 
@@ -279,12 +290,12 @@ class LazyNestedScrollingTest {
         rule.onNodeWithTag(LazyTag)
             .performGesture {
                 down(Offset(x = 10f, y = 10f))
-                moveBy(Offset(x = -50f, y = 0f))
+                moveBy(Offset(x = -expectedDragOffset, y = 0f))
                 up()
             }
 
         rule.runOnIdle {
-            Truth.assertThat(draggedOffset).isEqualTo(-50f)
+            Truth.assertThat(draggedOffset).isEqualTo(-expectedDragOffset)
         }
     }
 
@@ -315,12 +326,12 @@ class LazyNestedScrollingTest {
             .performGesture {
                 draggedOffset = 0f
                 down(Offset(x = 10f, y = 10f))
-                moveBy(Offset(x = -50f, y = 0f))
+                moveBy(Offset(x = -expectedDragOffset, y = 0f))
                 up()
             }
 
         rule.runOnIdle {
-            Truth.assertThat(draggedOffset).isEqualTo(-50f)
+            Truth.assertThat(draggedOffset).isEqualTo(-expectedDragOffset)
         }
     }
 }
