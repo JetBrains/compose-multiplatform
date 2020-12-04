@@ -194,8 +194,7 @@ class TextFieldTest {
 
     @Test
     fun testTextField_showHideKeyboardBasedOnFocus() {
-        val parentFocusRequester = FocusRequester()
-        val focusRequester = FocusRequester()
+        val (focusRequester, parentFocusRequester) = FocusRequester.createRefs()
         lateinit var hostView: View
         rule.setMaterialContent {
             hostView = AmbientView.current
@@ -224,8 +223,7 @@ class TextFieldTest {
 
     @Test
     fun testTextField_clickingOnTextAfterDismissingKeyboard_showsKeyboard() {
-        val parentFocusRequester = FocusRequester()
-        val focusRequester = FocusRequester()
+        val (focusRequester, parentFocusRequester) = FocusRequester.createRefs()
         lateinit var softwareKeyboardController: SoftwareKeyboardController
         lateinit var hostView: View
         rule.setMaterialContent {

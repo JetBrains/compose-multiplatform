@@ -343,6 +343,31 @@ package androidx.compose.ui.focus {
     method public boolean captureFocus();
     method public boolean freeFocus();
     method public void requestFocus();
+    field public static final androidx.compose.ui.focus.FocusRequester.Companion Companion;
+  }
+
+  public static final class FocusRequester.Companion {
+    method public androidx.compose.ui.focus.FocusRequester.Companion.FocusRequesterFactory createRefs();
+  }
+
+  public static final class FocusRequester.Companion.FocusRequesterFactory {
+    method public operator androidx.compose.ui.focus.FocusRequester component1();
+    method public operator androidx.compose.ui.focus.FocusRequester component10();
+    method public operator androidx.compose.ui.focus.FocusRequester component11();
+    method public operator androidx.compose.ui.focus.FocusRequester component12();
+    method public operator androidx.compose.ui.focus.FocusRequester component13();
+    method public operator androidx.compose.ui.focus.FocusRequester component14();
+    method public operator androidx.compose.ui.focus.FocusRequester component15();
+    method public operator androidx.compose.ui.focus.FocusRequester component16();
+    method public operator androidx.compose.ui.focus.FocusRequester component2();
+    method public operator androidx.compose.ui.focus.FocusRequester component3();
+    method public operator androidx.compose.ui.focus.FocusRequester component4();
+    method public operator androidx.compose.ui.focus.FocusRequester component5();
+    method public operator androidx.compose.ui.focus.FocusRequester component6();
+    method public operator androidx.compose.ui.focus.FocusRequester component7();
+    method public operator androidx.compose.ui.focus.FocusRequester component8();
+    method public operator androidx.compose.ui.focus.FocusRequester component9();
+    field public static final androidx.compose.ui.focus.FocusRequester.Companion.FocusRequesterFactory INSTANCE;
   }
 
   public final class FocusRequesterKt {

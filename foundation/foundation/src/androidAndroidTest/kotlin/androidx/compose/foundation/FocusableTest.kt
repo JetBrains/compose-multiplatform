@@ -98,8 +98,7 @@ class FocusableTest {
 
     @Test
     fun focusableTest_focusAcquire() {
-        val requester = FocusRequester()
-        val otherRequester = FocusRequester()
+        val (requester, otherRequester) = FocusRequester.createRefs()
         rule.setContent {
             Box {
                 BasicText(
@@ -139,8 +138,7 @@ class FocusableTest {
     @Test
     fun focusableTest_interactionState() {
         val interactionState = InteractionState()
-        val requester = FocusRequester()
-        val otherRequester = FocusRequester()
+        val (requester, otherRequester) = FocusRequester.createRefs()
         rule.setContent {
             Box {
                 BasicText(
