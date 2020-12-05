@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.dispatch.AndroidUiDispatcher
 import androidx.compose.testutils.ComposeTestCase
 import androidx.compose.testutils.createAndroidComposeBenchmarkRunner
@@ -29,6 +30,7 @@ import androidx.compose.ui.platform.setContent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
@@ -51,6 +53,9 @@ class MemoryLeakTest {
         class SimpleTestCase : ComposeTestCase {
             @Composable
             override fun Content() {
+                // The following line adds coverage for delayed coroutine memory leaks.
+                LaunchedEffect(Unit) { delay(10000) }
+
                 Column {
                     repeat(3) {
                         Box {
