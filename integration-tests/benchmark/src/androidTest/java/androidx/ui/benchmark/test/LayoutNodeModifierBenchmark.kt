@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION_ERROR")
+
 package androidx.ui.benchmark.test
 
-import android.view.ViewGroup
 import androidx.activity.ComponentActivity
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -28,14 +28,14 @@ import androidx.compose.ui.gesture.pressIndicatorGestureFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.keyInputFilter
+import androidx.compose.ui.layout.TestModifierUpdater
+import androidx.compose.ui.layout.TestModifierUpdaterLayout
 import androidx.compose.ui.layout.layoutId
-import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.test.junit4.DisableTransitionsTestRule
 import androidx.compose.ui.test.InternalTestingApi
+import androidx.compose.ui.test.junit4.DisableTransitionsTestRule
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.test.filters.LargeTest
@@ -50,7 +50,7 @@ import org.junit.runners.Parameterized
 import org.junit.runners.model.Statement
 
 /**
- * Benchmark that sets the [LayoutNode.modifier].
+ * Benchmark that sets the LayoutNode.modifier.
  */
 @LargeTest
 @RunWith(Parameterized::class)
@@ -68,7 +68,7 @@ class LayoutNodeModifierBenchmark(
 
     var modifiers = emptyList<Modifier>()
     var combinedModifier: Modifier = Modifier
-    lateinit var layoutNode: LayoutNode
+    lateinit var testModifierUpdater: TestModifierUpdater
 
     @Before
     @OptIn(ExperimentalKeyInput::class)
@@ -91,14 +91,11 @@ class LayoutNodeModifierBenchmark(
         }
 
         rule.activityTestRule.runOnUiThread {
-            rule.activityTestRule.activity.setContent { Box(Modifier) }
-        }
-        rule.activityTestRule.runOnUiThread {
-            val composeView = rule.findViewRootForTest()
-            val root = composeView.root
-            check(root.children.size == 1) { "Expecting only a Box" }
-            layoutNode = root.children[0]
-            check(layoutNode.children.isEmpty()) { "Box should be empty" }
+            rule.activityTestRule.activity.setContent {
+                TestModifierUpdaterLayout {
+                    testModifierUpdater = it
+                }
+            }
         }
     }
 
@@ -106,8 +103,8 @@ class LayoutNodeModifierBenchmark(
     fun setAndClearModifiers() {
         rule.activityTestRule.runOnUiThread {
             rule.benchmarkRule.measureRepeated {
-                layoutNode.modifier = combinedModifier
-                layoutNode.modifier = Modifier
+                testModifierUpdater.updateModifier(combinedModifier)
+                testModifierUpdater.updateModifier(Modifier)
             }
         }
     }
@@ -116,11 +113,11 @@ class LayoutNodeModifierBenchmark(
     fun smallModifierChange() {
         rule.activityTestRule.runOnUiThread {
             val altModifier = Modifier.padding(10.dp).then(combinedModifier)
-            layoutNode.modifier = altModifier
+            testModifierUpdater.updateModifier(altModifier)
 
             rule.benchmarkRule.measureRepeated {
-                layoutNode.modifier = combinedModifier
-                layoutNode.modifier = altModifier
+                testModifierUpdater.updateModifier(combinedModifier)
+                testModifierUpdater.updateModifier(altModifier)
             }
         }
     }
@@ -139,11 +136,6 @@ class LayoutNodeModifierBenchmark(
                 .around(benchmarkRule)
                 .around(activityTestRule)
                 .apply(base, description)
-        }
-
-        fun findViewRootForTest(): ViewRootForTest {
-            return activityTestRule.activity.findViewById<ViewGroup>(android.R.id.content)
-                .getChildAt(0) as ViewRootForTest
         }
     }
 }
