@@ -185,8 +185,8 @@ sealed class BaseAnimatedValue<T, V : AnimationVector>(
         }
 
         lastFrameTime = timeMillis
-        value = anim.getValue(playtime)
         velocityVector = anim.getVelocityVector(playtime)
+        value = anim.getValue(playtime)
 
         checkFinished(playtime)
     }

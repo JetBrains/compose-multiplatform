@@ -123,7 +123,7 @@ internal class AndroidFlingCalculator(
         fun velocity(time: Long): Float {
             val splinePos = if (duration > 0) time / duration.toFloat() else 1f
             return AndroidFlingSpline.flingPosition(splinePos).velocityCoefficient *
-                distance / duration * 1000.0f
+                sign(initialVelocity) * distance / duration * 1000.0f
         }
     }
 }
