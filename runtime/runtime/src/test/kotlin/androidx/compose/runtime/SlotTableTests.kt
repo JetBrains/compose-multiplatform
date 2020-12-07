@@ -3047,6 +3047,26 @@ class SlotTableTests {
             }
         }
     }
+
+    @Test
+    fun canRepositionReaderPastEndOfTable() {
+        val slots = SlotTable().also {
+            it.write { writer ->
+                // Create exactly 256 groups
+                repeat(256) {
+                    writer.insert {
+                        writer.startGroup(0)
+                        writer.endGroup()
+                    }
+                }
+            }
+        }
+
+        slots.read { reader ->
+            reader.reposition(reader.size)
+            // Expect the above not to crash.
+        }
+    }
 }
 
 @OptIn(InternalComposeApi::class)

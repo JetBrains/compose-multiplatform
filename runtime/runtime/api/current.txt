@@ -98,6 +98,7 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.ComposeCompilerApi public boolean changed(double value);
     method @androidx.compose.runtime.ComposeCompilerApi public boolean changed(int value);
     method @androidx.compose.runtime.InternalComposeApi public void collectKeySourceInformation();
+    method @androidx.compose.runtime.InternalComposeApi public void collectParameterInformation();
     method @androidx.compose.runtime.InternalComposeApi public void composeInitial(kotlin.jvm.functions.Function0<kotlin.Unit> block);
     method @androidx.compose.runtime.ComposeCompilerApi public void endDefaults();
     method @androidx.compose.runtime.ComposeCompilerApi public void endMovableGroup();

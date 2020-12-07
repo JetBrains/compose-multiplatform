@@ -22,6 +22,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.material.Button
 import androidx.compose.material.ModalDrawerLayout
 import androidx.compose.material.Surface
@@ -33,6 +34,8 @@ import androidx.compose.runtime.resetSourceInfo
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.node.OwnedLayer
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.Group
 import androidx.compose.ui.tooling.Inspectable
 import androidx.compose.ui.tooling.R
@@ -459,6 +462,30 @@ class LayoutInspectorTreeTest : ToolingTest() {
 
         // Spacer should show up in the Compose tree:
         assertThat(node).isNotNull()
+    }
+
+    @Test // regression test b/174855322
+    fun testBasicText() {
+        val slotTableRecord = SlotTableRecord.create()
+
+        view.setTag(R.id.inspection_slot_table_set, slotTableRecord.store)
+        show {
+            Column {
+                BasicText(
+                    text = "Some text",
+                    style = TextStyle(textDecoration = TextDecoration.Underline)
+                )
+            }
+        }
+
+        val builder = LayoutInspectorTree()
+        val node = builder.convert(view)
+            .flatMap { flatten(it) }
+            .firstOrNull { it.name == "BasicText" }
+
+        assertThat(node).isNotNull()
+
+        assertThat(node?.parameters).isNotEmpty()
     }
 
     @SdkSuppress(minSdkVersion = 29) // Render id is not returned for api < 29:  b/171519437

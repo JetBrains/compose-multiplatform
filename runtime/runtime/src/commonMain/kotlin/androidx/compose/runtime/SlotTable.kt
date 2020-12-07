@@ -773,7 +773,7 @@ class SlotReader(
     fun reposition(index: Int) {
         require(emptyCount == 0) { "Cannot reposition while in an empty region" }
         currentGroup = index
-        val parent = groups.parentAnchor(index)
+        val parent = if (index < groupsSize) groups.parentAnchor(index) else -1
         this.parent = parent
         if (parent < 0)
             this.currentEnd = groupsSize

@@ -379,7 +379,7 @@ class Composer<N>(
     private var nodeCountOverrides: IntArray? = null
     private var nodeCountVirtualOverrides: HashMap<Int, Int>? = null
     private var collectKeySources = false
-
+    private var collectParameterInformation = false
     private var nodeExpected = false
     private val observations: MutableList<Any> = mutableListOf()
     private val observationsProcessed: MutableList<Any> = mutableListOf()
@@ -554,6 +554,7 @@ class Composer<N>(
         providersInvalidStack.push(providersInvalid.asInt())
         providersInvalid = changed(parentProvider)
         collectKeySources = parentReference.collectingKeySources
+        collectParameterInformation = parentReference.collectingParameterInformation
         resolveAmbient(InspectionTables, parentProvider)?.let {
             it.add(slotTable)
             parentReference.recordInspectionTable(it)
@@ -629,6 +630,15 @@ class Composer<N>(
     @InternalComposeApi
     fun collectKeySourceInformation() {
         collectKeySources = true
+    }
+
+    /**
+     * Start collecting parameter information. This enables the tools API to always be able to
+     * determine the parameter values of composable calls.
+     */
+    @InternalComposeApi
+    fun collectParameterInformation() {
+        collectParameterInformation = true
     }
 
     /**
@@ -1291,7 +1301,12 @@ class Composer<N>(
             val scope = invalidateStack.peek()
             scope.used = true
             ref = CompositionReferenceHolder(
-                CompositionReferenceImpl(scope, currentCompoundKeyHash, collectKeySources)
+                CompositionReferenceImpl(
+                    scope,
+                    currentCompoundKeyHash,
+                    collectKeySources,
+                    collectParameterInformation
+                )
             )
             updateValue(ref)
         }
@@ -1998,7 +2013,7 @@ class Composer<N>(
         val scope = if (invalidateStack.isNotEmpty()) invalidateStack.pop()
         else null
         scope?.requiresRecompose = false
-        val result = if (scope != null && (scope.used || collectKeySources)) {
+        val result = if (scope != null && (scope.used || collectParameterInformation)) {
             if (scope.anchor == null) {
                 scope.anchor = if (inserting) {
                     writer.anchor(writer.parent)
@@ -2430,7 +2445,8 @@ class Composer<N>(
     private inner class CompositionReferenceImpl(
         val scope: RecomposeScope,
         override val compoundHashKey: Int,
-        override val collectingKeySources: Boolean
+        override val collectingKeySources: Boolean,
+        override val collectingParameterInformation: Boolean
     ) : CompositionReference() {
         var inspectionTables: MutableSet<MutableSet<SlotTable>>? = null
         val composers = mutableSetOf<Composer<*>>()
