@@ -143,7 +143,7 @@ class ComposableLambdaParameterDetector : Detector(), SourceCodeScanner {
             "Primary composable lambda parameter not named `content`",
             "Composable functions with only one composable lambda parameter should use the name " +
                 "`content` for the parameter.",
-            Category.CORRECTNESS, 3, Severity.WARNING,
+            Category.CORRECTNESS, 3, Severity.IGNORE,
             Implementation(
                 ComposableLambdaParameterDetector::class.java,
                 EnumSet.of(Scope.JAVA_FILE, Scope.TEST_SOURCES)
@@ -156,7 +156,7 @@ class ComposableLambdaParameterDetector : Detector(), SourceCodeScanner {
             "Composable functions with only one composable lambda parameter should place the " +
                 "parameter at the end of the parameter list, so it can be used as a trailing " +
                 "lambda.",
-            Category.CORRECTNESS, 3, Severity.WARNING,
+            Category.CORRECTNESS, 3, Severity.IGNORE,
             Implementation(
                 ComposableLambdaParameterDetector::class.java,
                 EnumSet.of(Scope.JAVA_FILE, Scope.TEST_SOURCES)
