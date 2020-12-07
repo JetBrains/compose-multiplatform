@@ -181,13 +181,6 @@ internal class AndroidComposeView(context: Context) :
     @OptIn(InternalCoreApi::class)
     override var showLayoutBounds = false
 
-    private val clearInvalidObservations: Runnable = Runnable {
-        if (observationClearRequested) {
-            observationClearRequested = false
-            snapshotObserver.clearInvalidObservations()
-        }
-    }
-
     private var _androidViewsHandler: AndroidViewsHandler? = null
     private val androidViewsHandler: AndroidViewsHandler
         get() {
@@ -336,10 +329,28 @@ internal class AndroidComposeView(context: Context) :
     }
 
     fun requestClearInvalidObservations() {
-        val handler = handler
-        if (!observationClearRequested && handler != null) {
-            observationClearRequested = true
-            handler.postAtFrontOfQueue(clearInvalidObservations)
+        observationClearRequested = true
+    }
+
+    internal fun clearInvalidObservations() {
+        if (observationClearRequested) {
+            snapshotObserver.clearInvalidObservations()
+            observationClearRequested = false
+        }
+        val childAndroidViews = _androidViewsHandler
+        if (childAndroidViews != null) {
+            clearChildInvalidObservations(childAndroidViews)
+        }
+    }
+
+    private fun clearChildInvalidObservations(viewGroup: ViewGroup) {
+        for (i in 0 until viewGroup.childCount) {
+            val child = viewGroup.getChildAt(i)
+            if (child is AndroidComposeView) {
+                child.clearInvalidObservations()
+            } else if (child is ViewGroup) {
+                clearChildInvalidObservations(child)
+            }
         }
     }
 
@@ -602,14 +613,6 @@ internal class AndroidComposeView(context: Context) :
         }
         viewTreeObserver.removeOnGlobalLayoutListener(globalLayoutListener)
         viewTreeObserver.removeOnScrollChangedListener(scrollChangedListener)
-
-        // In case of benchmarks, the handler callbacks will never get executed as benchmarks block
-        // the main thread. However this callback holds references that point to this view which
-        // effectively prevents it from being garbage collected in benchmarks.
-        if (observationClearRequested) {
-            observationClearRequested = false
-            handler.removeCallbacks(clearInvalidObservations)
-        }
     }
 
     override fun onProvideAutofillVirtualStructure(structure: ViewStructure?, flags: Int) {
