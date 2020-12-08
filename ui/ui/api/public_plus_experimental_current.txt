@@ -2665,9 +2665,8 @@ package androidx.compose.ui.semantics {
   }
 
   public final class SemanticsProperties {
-    method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> getAccessibilityLabel();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityRangeInfo> getAccessibilityRangeInfo();
-    method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> getAccessibilityValue();
+    method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> getContentDescription();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> getDisabled();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> getFocused();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> getHidden();
@@ -2676,14 +2675,14 @@ package androidx.compose.ui.semantics {
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> getIsDialog();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> getIsPopup();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> getSelected();
+    method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> getStateDescription();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> getTestTag();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.text.AnnotatedString> getText();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.text.TextRange> getTextSelectionRange();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.state.ToggleableState> getToggleableState();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityScrollState> getVerticalAccessibilityScrollState();
-    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> AccessibilityLabel;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityRangeInfo> AccessibilityRangeInfo;
-    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> AccessibilityValue;
+    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> ContentDescription;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> Disabled;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> Focused;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> Hidden;
@@ -2692,6 +2691,7 @@ package androidx.compose.ui.semantics {
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> IsDialog;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> IsPopup;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> Selected;
+    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> StateDescription;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> TestTag;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.text.AnnotatedString> Text;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.text.TextRange> TextSelectionRange;
@@ -2706,14 +2706,16 @@ package androidx.compose.ui.semantics {
     method public static void dialog(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static void disabled(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static void dismiss(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean> action);
-    method public static String getAccessibilityLabel(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
-    method public static String getAccessibilityValue(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
-    method public static androidx.compose.ui.semantics.AccessibilityRangeInfo getAccessibilityValueRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
+    method @Deprecated public static String getAccessibilityLabel(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
+    method @Deprecated public static String getAccessibilityValue(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
+    method public static String getContentDescription(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static java.util.List<androidx.compose.ui.semantics.CustomAccessibilityAction> getCustomActions(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static boolean getFocused(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static androidx.compose.ui.semantics.AccessibilityScrollState getHorizontalAccessibilityScrollState(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static androidx.compose.ui.text.input.ImeAction getImeAction(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static boolean getSelected(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
+    method public static String getStateDescription(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
+    method public static androidx.compose.ui.semantics.AccessibilityRangeInfo getStateDescriptionRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static String getTestTag(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static androidx.compose.ui.text.AnnotatedString getText(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static void getTextLayoutResult(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function1<? super java.util.List<androidx.compose.ui.text.TextLayoutResult>,java.lang.Boolean> action);
@@ -2726,9 +2728,9 @@ package androidx.compose.ui.semantics {
     method public static void pasteText(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean> action);
     method public static void popup(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static void scrollBy(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,java.lang.Boolean> action);
-    method public static void setAccessibilityLabel(androidx.compose.ui.semantics.SemanticsPropertyReceiver, String p);
-    method public static void setAccessibilityValue(androidx.compose.ui.semantics.SemanticsPropertyReceiver, String p);
-    method public static void setAccessibilityValueRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.AccessibilityRangeInfo p);
+    method @Deprecated public static void setAccessibilityLabel(androidx.compose.ui.semantics.SemanticsPropertyReceiver, String p);
+    method @Deprecated public static void setAccessibilityValue(androidx.compose.ui.semantics.SemanticsPropertyReceiver, String p);
+    method public static void setContentDescription(androidx.compose.ui.semantics.SemanticsPropertyReceiver, String p);
     method public static void setCustomActions(androidx.compose.ui.semantics.SemanticsPropertyReceiver, java.util.List<androidx.compose.ui.semantics.CustomAccessibilityAction> p);
     method public static void setFocused(androidx.compose.ui.semantics.SemanticsPropertyReceiver, boolean p);
     method public static void setHorizontalAccessibilityScrollState(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.AccessibilityScrollState p);
@@ -2736,6 +2738,8 @@ package androidx.compose.ui.semantics {
     method public static void setProgress(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Boolean> action);
     method public static void setSelected(androidx.compose.ui.semantics.SemanticsPropertyReceiver, boolean p);
     method public static void setSelection(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function3<? super java.lang.Integer,? super java.lang.Integer,? super java.lang.Boolean,java.lang.Boolean> action);
+    method public static void setStateDescription(androidx.compose.ui.semantics.SemanticsPropertyReceiver, String p);
+    method public static void setStateDescriptionRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.AccessibilityRangeInfo p);
     method public static void setTestTag(androidx.compose.ui.semantics.SemanticsPropertyReceiver, String p);
     method public static void setText(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.text.AnnotatedString p);
     method public static void setText(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.AnnotatedString,java.lang.Boolean> action);

@@ -59,8 +59,8 @@ import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.semantics.AccessibilityRangeInfo
-import androidx.compose.ui.semantics.accessibilityValue
-import androidx.compose.ui.semantics.accessibilityValueRange
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.semantics.stateDescriptionRange
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.setProgress
 import androidx.compose.ui.unit.LayoutDirection
@@ -383,8 +383,8 @@ private fun Modifier.sliderSemantics(
         else -> (fraction * 100).roundToInt().coerceIn(1, 99)
     }
     return semantics(mergeDescendants = true) {
-        accessibilityValue = Strings.TemplatePercent.format(percent)
-        accessibilityValueRange = AccessibilityRangeInfo(coerced, valueRange, steps)
+        stateDescription = Strings.TemplatePercent.format(percent)
+        stateDescriptionRange = AccessibilityRangeInfo(coerced, valueRange, steps)
         setProgress(
             action = { targetValue ->
                 val newValue = targetValue.coerceIn(position.startValue, position.endValue)

@@ -24,7 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.AccessibilityAction
 import androidx.compose.ui.semantics.SemanticsPropertyKey
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
-import androidx.compose.ui.semantics.accessibilityLabel
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.filters.MediumTest
@@ -46,18 +46,18 @@ class CallSemanticsActionTest {
             val state = remember { mutableStateOf("Nothing") }
             BoundaryNode {
                 setString("SetString") { state.value = it; return@setString true }
-                accessibilityLabel = state.value
+                contentDescription = state.value
             }
         }
 
-        rule.onNodeWithLabel("Nothing")
+        rule.onNodeWithContentDescription("Nothing")
             .assertExists()
             .performSemanticsAction(MyActions.SetString) { it("Hello") }
 
-        rule.onNodeWithLabel("Nothing")
+        rule.onNodeWithContentDescription("Nothing")
             .assertDoesNotExist()
 
-        rule.onNodeWithLabel("Hello")
+        rule.onNodeWithContentDescription("Hello")
             .assertExists()
     }
 
