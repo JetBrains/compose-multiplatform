@@ -33,6 +33,7 @@ import androidx.compose.material.AmbientTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldPadding
 import androidx.compose.material.runOnIdleWithDensity
 import androidx.compose.material.setMaterialContent
 import androidx.compose.material.setMaterialContentForSizeAssertions
@@ -255,6 +256,48 @@ class TextFieldTest {
     }
 
     @Test
+    fun testTextField_labelPosition_initial_singleLine() {
+        val labelSize = Ref<IntSize>()
+        val labelPosition = Ref<Offset>()
+        rule.setMaterialContent {
+            Box {
+                TextField(
+                    value = "",
+                    onValueChange = {},
+                    singleLine = true,
+                    label = {
+                        Text(
+                            text = "label",
+                            fontSize = 10.sp,
+                            modifier = Modifier
+                                .onGloballyPositioned {
+                                    labelPosition.value = it.positionInRoot
+                                    labelSize.value = it.size
+                                }
+                        )
+                    },
+                    modifier = Modifier.preferredHeight(56.dp)
+                )
+            }
+        }
+
+        rule.runOnIdleWithDensity {
+            // size
+            assertThat(labelSize.value).isNotNull()
+            assertThat(labelSize.value?.height).isGreaterThan(0)
+            assertThat(labelSize.value?.width).isGreaterThan(0)
+            // centered position
+            assertThat(labelPosition.value?.x).isEqualTo(
+                ExpectedPadding.toIntPx().toFloat()
+            )
+            assertThat(labelPosition.value?.y).isEqualTo(
+                ((ExpectedMinimumTextFieldHeight.toIntPx() - labelSize.value!!.height) / 2f)
+                    .roundToInt().toFloat()
+            )
+        }
+    }
+
+    @Test
     fun testTextField_labelPosition_initial_withDefaultHeight() {
         val labelSize = Ref<IntSize>()
         val labelPosition = Ref<Offset>()
@@ -289,8 +332,7 @@ class TextFieldTest {
                 ExpectedPadding.toIntPx().toFloat()
             )
             assertThat(labelPosition.value?.y).isEqualTo(
-                ((ExpectedMinimumTextFieldHeight.toIntPx() - labelSize.value!!.height) / 2f)
-                    .roundToInt().toFloat()
+                TextFieldPadding.toIntPx()
             )
         }
     }
@@ -329,7 +371,7 @@ class TextFieldTest {
                 ExpectedPadding.toIntPx().toFloat()
             )
             assertThat(labelPosition.value?.y).isEqualTo(
-                ((height.toIntPx() - labelSize.value!!.height) / 2f).roundToInt().toFloat()
+                TextFieldPadding.toIntPx()
             )
         }
     }
@@ -501,9 +543,7 @@ class TextFieldTest {
                 ExpectedPadding.toIntPx().toFloat()
             )
             assertThat(placeholderPosition.value?.y).isEqualTo(
-                ((height.toIntPx().toFloat() - placeholderSize.value!!.height) / 2f)
-                    .roundToInt()
-                    .toFloat()
+                TextFieldPadding.toIntPx()
             )
         }
     }

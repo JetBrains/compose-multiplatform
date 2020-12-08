@@ -112,7 +112,7 @@ internal fun TextFieldImpl(
         else -> InputPhase.UnfocusedNotEmpty
     }
 
-    val decoratedTextField = @Composable { tagModifier: Modifier ->
+    val decoratedTextField: @Composable (Modifier) -> Unit = @Composable { tagModifier ->
         Decoration(
             contentColor = inactiveColor,
             typography = MaterialTheme.typography.subtitle1,
@@ -223,6 +223,7 @@ internal fun TextFieldImpl(
                     decoratedLabel = decoratedLabel,
                     leading = leading,
                     trailing = trailing,
+                    singleLine = singleLine,
                     leadingColor = leadingColor,
                     trailingColor = trailingColor,
                     labelProgress = labelProgress,
@@ -246,6 +247,7 @@ internal fun TextFieldImpl(
                     decoratedLabel = decoratedLabel,
                     leading = leading,
                     trailing = trailing,
+                    singleLine = singleLine,
                     leadingColor = leadingColor,
                     trailingColor = trailingColor,
                     labelProgress = labelProgress,

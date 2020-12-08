@@ -91,7 +91,8 @@ val MaterialDemos = DemoCategory(
             "TextFields",
             listOf(
                 ComposableDemo("FilledTextField/OutlinedTextField") { MaterialTextFieldDemo() },
-                ComposableDemo("Multiple text fields") { TextFieldsDemo() }
+                ComposableDemo("Multiple text fields") { TextFieldsDemo() },
+                ComposableDemo("Alignment inside text fields") { VerticalAlignmentsInTextField() }
             )
         )
     )

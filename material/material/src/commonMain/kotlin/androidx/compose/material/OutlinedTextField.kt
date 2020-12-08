@@ -281,6 +281,7 @@ internal fun OutlinedTextFieldLayout(
     decoratedLabel: @Composable (() -> Unit)?,
     leading: @Composable (() -> Unit)?,
     trailing: @Composable (() -> Unit)?,
+    singleLine: Boolean,
     leadingColor: Color,
     trailingColor: Color,
     labelProgress: Float,
@@ -306,6 +307,7 @@ internal fun OutlinedTextFieldLayout(
         textField = decoratedTextField,
         leading = leading,
         trailing = trailing,
+        singleLine = singleLine,
         leadingColor = leadingColor,
         trailingColor = trailingColor,
         onLabelMeasured = {
@@ -334,6 +336,7 @@ private fun IconsWithTextFieldLayout(
     label: @Composable (() -> Unit)?,
     leading: @Composable (() -> Unit)?,
     trailing: @Composable (() -> Unit)?,
+    singleLine: Boolean,
     leadingColor: Color,
     trailingColor: Color,
     animationProgress: Float,
@@ -399,7 +402,9 @@ private fun IconsWithTextFieldLayout(
         )
         val labelPlaceable =
             measurables.find { it.layoutId == LabelId }?.measure(labelConstraints)
-        onLabelMeasured(labelPlaceable?.width ?: 0)
+        labelPlaceable?.let {
+            onLabelMeasured(it.width)
+        }
 
         // measure text field
         // on top we offset either by default padding or by label's half height if its too big
@@ -446,6 +451,7 @@ private fun IconsWithTextFieldLayout(
                 labelPlaceable,
                 placeholderPlaceable,
                 animationProgress,
+                singleLine,
                 density
             )
         }
@@ -524,8 +530,11 @@ private fun Placeable.PlacementScope.place(
     labelPlaceable: Placeable?,
     placeholderPlaceable: Placeable?,
     animationProgress: Float,
+    singleLine: Boolean,
     density: Float
 ) {
+    val topBottomPadding = (TextFieldPadding.value * density).roundToInt()
+
     // placed center vertically and to the start edge horizontally
     leadingPlaceable?.placeRelative(
         0,
@@ -538,31 +547,39 @@ private fun Placeable.PlacementScope.place(
         Alignment.CenterVertically.align(trailingPlaceable.height, height)
     )
 
-    // if animation progress is 0, the label will be centered vertically
-    // if animation progress is 1, vertically it will be centered to the container's top edge
-    // horizontally it is placed after the leading icon
-    if (labelPlaceable != null) {
-        val labelPositionY =
-            Alignment.CenterVertically.align(labelPlaceable.height, height) * (
-                1 -
-                    animationProgress
-                ) - (labelPlaceable.height / 2) * animationProgress
-        val labelPositionX = (TextFieldPadding.value * density) +
+    // label position is animated
+    // in single line text field label is centered vertically before animation starts
+    labelPlaceable?.let {
+        val startPositionY = if (singleLine) {
+            Alignment.CenterVertically.align(it.height, height)
+        } else {
+            topBottomPadding
+        }
+        val positionY =
+            startPositionY * (1 - animationProgress) - (it.height / 2) * animationProgress
+        val positionX = (TextFieldPadding.value * density) +
             widthOrZero(leadingPlaceable) * (1 - animationProgress)
-        labelPlaceable.placeRelative(labelPositionX.roundToInt(), labelPositionY.roundToInt())
+        it.placeRelative(positionX.roundToInt(), positionY.roundToInt())
     }
 
-    // placed center vertically and after the leading icon horizontally
-    textFieldPlaceable.placeRelative(
-        widthOrZero(leadingPlaceable),
+    // placed center vertically and after the leading icon horizontally if single line text field
+    // placed to the top with padding for multi line text field
+    val textVerticalPosition = if (singleLine) {
         Alignment.CenterVertically.align(textFieldPlaceable.height, height)
-    )
+    } else {
+        topBottomPadding
+    }
+    textFieldPlaceable.placeRelative(widthOrZero(leadingPlaceable), textVerticalPosition)
 
-    // placed center vertically and after the leading icon horizontally
-    placeholderPlaceable?.placeRelative(
-        widthOrZero(leadingPlaceable),
-        Alignment.CenterVertically.align(placeholderPlaceable.height, height)
-    )
+    // placed similar to the input text above
+    placeholderPlaceable?.let {
+        val placeholderVerticalPosition = if (singleLine) {
+            Alignment.CenterVertically.align(it.height, height)
+        } else {
+            topBottomPadding
+        }
+        it.placeRelative(widthOrZero(leadingPlaceable), placeholderVerticalPosition)
+    }
 }
 
 /**
