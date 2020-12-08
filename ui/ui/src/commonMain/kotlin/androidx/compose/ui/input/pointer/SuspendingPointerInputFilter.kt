@@ -42,7 +42,7 @@ import kotlin.coroutines.resume
  * Receiver scope for awaiting pointer events in a call to [PointerInputScope.handlePointerInput].
  *
  * This is a restricted suspension scope. Code in this scope is always called undispatched and
- * may only suspend for calls to [awaitPointerEvent] or [awaitCustomEvent]. These functions
+ * may only suspend for calls to [awaitPointerEvent]. These functions
  * resume synchronously and the caller may mutate the result **before** the next await call to
  * affect the next stage of the input processing pipeline.
  */
@@ -78,25 +78,11 @@ interface HandlePointerInputScope : Density {
     suspend fun awaitPointerEvent(
         pass: PointerEventPass = PointerEventPass.Main
     ): PointerEvent
-
-    /**
-     * Suspend until a [CustomEvent] is reported to the specified input [pass].
-     * [pass] defaults to [PointerEventPass.Main].
-     *
-     * [awaitCustomEvent] resumes **synchronously** in the restricted suspension scope. This
-     * means that callers can react immediately to input after [awaitCustomEvent] returns
-     * and affect both the current frame and the next handler or phase of the input processing
-     * pipeline. Callers should mutate the returned [CustomEvent] before awaiting
-     * another event to consume aspects of the event before the next stage of input processing runs.     */
-    suspend fun awaitCustomEvent(
-        pass: PointerEventPass = PointerEventPass.Main
-    ): CustomEvent
 }
 
 /**
  * Receiver scope for [Modifier.pointerInput] that permits
- * [handling pointer input][handlePointerInput] and
- * [sending custom input events][customEventDispatcher].
+ * [handling pointer input][handlePointerInput].
  */
 // Design note: this interface does _not_ implement CoroutineScope, even though doing so
 // would more easily permit the use of launch {} inside Modifier.pointerInput {} blocks without
@@ -111,13 +97,6 @@ interface PointerInputScope : Density {
      * (0, 0) indicating the upper left corner.
      */
     val size: IntSize
-
-    /**
-     * [customEventDispatcher] permits dispatching custom input events to the rest of the UI
-     * in response to handling lower-level pointer input events. Accessing [customEventDispatcher]
-     * before the first pointer input event is reported will throw [IllegalStateException].
-     */
-    val customEventDispatcher: CustomEventDispatcher
 
     /**
      * The [ViewConfiguration] used to tune gesture detectors.
@@ -191,21 +170,9 @@ internal class SuspendingPointerInputFilter(
     override val pointerInputFilter: PointerInputFilter
         get() = this
 
-    private var _customEventDispatcher: CustomEventDispatcher? = null
-
     private var currentEvent: PointerEvent? = null
 
-    /**
-     * TODO: work out whether this is actually a race or not.
-     * It shouldn't be, as we will have attached the [PointerInputModifier] during
-     * composition-apply by the time the [LaunchedEffect] that would access this property
-     * is dispatched and begins running.
-     */
-    override val customEventDispatcher: CustomEventDispatcher
-        get() = _customEventDispatcher ?: error("customEventDispatcher not yet available")
-
     override fun onInit(customEventDispatcher: CustomEventDispatcher) {
-        _customEventDispatcher = customEventDispatcher
     }
 
     /**
@@ -323,9 +290,6 @@ internal class SuspendingPointerInputFilter(
     }
 
     override fun onCustomEvent(customEvent: CustomEvent, pass: PointerEventPass) {
-        forEachCurrentPointerHandler(pass) {
-            it.offerCustomEvent(customEvent, pass)
-        }
     }
 
     override suspend fun <R> handlePointerInput(
@@ -368,7 +332,6 @@ internal class SuspendingPointerInputFilter(
         private val completion: Continuation<R>,
     ) : HandlePointerInputScope, Density by this@SuspendingPointerInputFilter, Continuation<R> {
         private var pointerAwaiter: CancellableContinuation<PointerEvent>? = null
-        private var customAwaiter: CancellableContinuation<CustomEvent>? = null
         private var awaitPass: PointerEventPass = PointerEventPass.Main
 
         override val currentEvent: PointerEvent
@@ -389,21 +352,10 @@ internal class SuspendingPointerInputFilter(
             }
         }
 
-        fun offerCustomEvent(event: CustomEvent, pass: PointerEventPass) {
-            if (pass == awaitPass) {
-                customAwaiter?.run {
-                    customAwaiter = null
-                    resume(event)
-                }
-            }
-        }
-
         // Called to run any finally blocks in the handlePointerInput block
         fun cancel(cause: Throwable?) {
             pointerAwaiter?.cancel(cause)
             pointerAwaiter = null
-            customAwaiter?.cancel(cause)
-            customAwaiter = null
         }
 
         // context must be EmptyCoroutineContext for restricted suspension coroutines
@@ -422,13 +374,6 @@ internal class SuspendingPointerInputFilter(
         ): PointerEvent = suspendCancellableCoroutine { continuation ->
             awaitPass = pass
             pointerAwaiter = continuation
-        }
-
-        override suspend fun awaitCustomEvent(
-            pass: PointerEventPass
-        ): CustomEvent = suspendCancellableCoroutine { continuation ->
-            awaitPass = pass
-            customAwaiter = continuation
         }
     }
 }

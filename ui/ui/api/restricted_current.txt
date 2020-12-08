@@ -1502,7 +1502,6 @@ package androidx.compose.ui.input.pointer {
   }
 
   @kotlin.coroutines.RestrictsSuspension public interface HandlePointerInputScope extends androidx.compose.ui.unit.Density {
-    method public suspend Object? awaitCustomEvent(optional androidx.compose.ui.input.pointer.PointerEventPass pass, optional kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.CustomEvent> p);
     method public suspend Object? awaitPointerEvent(optional androidx.compose.ui.input.pointer.PointerEventPass pass, optional kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerEvent> p);
     method public androidx.compose.ui.input.pointer.PointerEvent getCurrentEvent();
     method public long getSize-YbymL2g();
@@ -1630,11 +1629,9 @@ package androidx.compose.ui.input.pointer {
   }
 
   public interface PointerInputScope extends androidx.compose.ui.unit.Density {
-    method public androidx.compose.ui.input.pointer.CustomEventDispatcher getCustomEventDispatcher();
     method public long getSize-YbymL2g();
     method public androidx.compose.ui.platform.ViewConfiguration getViewConfiguration();
     method public suspend <R> Object? handlePointerInput(kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.HandlePointerInputScope,? super kotlin.coroutines.Continuation<? super R>,?> handler, kotlin.coroutines.Continuation<? super R> p);
-    property public abstract androidx.compose.ui.input.pointer.CustomEventDispatcher customEventDispatcher;
     property public abstract long size;
     property public abstract androidx.compose.ui.platform.ViewConfiguration viewConfiguration;
   }
