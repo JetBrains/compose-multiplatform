@@ -66,7 +66,7 @@ internal class ModifiedLayoutNode(
         }
         // Place our wrapped to obtain their position inside ourselves.
         isShallowPlacing = true
-        placeAt(this.position, zIndex = 0f, null)
+        placeAt(this.position, this.zIndex, this.layerBlock)
         isShallowPlacing = false
         return if (line is HorizontalAlignmentLine) {
             positionInWrapped + wrapped.position.y
