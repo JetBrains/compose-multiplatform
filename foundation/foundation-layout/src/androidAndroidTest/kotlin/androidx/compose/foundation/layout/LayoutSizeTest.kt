@@ -17,6 +17,7 @@
 package androidx.compose.foundation.layout
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.emptyContent
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
@@ -1283,10 +1284,16 @@ class LayoutSizeTest : LayoutTest() {
         expectedConstraints: Constraints
     ) {
         val latch = CountDownLatch(1)
+        // Capture constraints and assert on test thread
+        var actualConstraints: Constraints? = null
+        // Clear contents before each test so that we don't recompose the WithConstraints call;
+        // doing so would recompose the old subcomposition with old constraints in the presence of
+        // new content before the measurement performs explicit composition the new constraints.
+        show(emptyContent())
         show {
             Layout({
                 WithConstraints(modifier) {
-                    assertEquals(expectedConstraints, constraints)
+                    actualConstraints = constraints
                     latch.countDown()
                 }
             }) { measurables, _ ->
@@ -1295,6 +1302,7 @@ class LayoutSizeTest : LayoutTest() {
             }
         }
         assertTrue(latch.await(1, TimeUnit.SECONDS))
+        assertEquals(expectedConstraints, actualConstraints)
     }
 
     private fun verifyIntrinsicMeasurements(expandedModifier: Modifier) = with(density) {
