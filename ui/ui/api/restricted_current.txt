@@ -2001,6 +2001,9 @@ package androidx.compose.ui.layout {
     method public java.util.List<androidx.compose.ui.layout.Measurable> subcompose(Object? slotId, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
+  public final class TestModifierUpdaterKt {
+  }
+
   public final class VerticalAlignmentLine extends androidx.compose.ui.layout.AlignmentLine {
     ctor public VerticalAlignmentLine(kotlin.jvm.functions.Function2<? super java.lang.Integer,? super java.lang.Integer,java.lang.Integer> merger);
   }
@@ -2041,15 +2044,10 @@ package androidx.compose.ui.node {
   }
 
   public final class LayoutNode implements androidx.compose.ui.layout.LayoutInfo androidx.compose.ui.layout.Measurable androidx.compose.ui.node.OwnerScope androidx.compose.ui.layout.Remeasurement {
-    ctor public LayoutNode();
     method public void forceRemeasure();
-    method public java.util.List<androidx.compose.ui.node.LayoutNode> getChildren();
     method public androidx.compose.ui.layout.LayoutCoordinates getCoordinates();
     method public int getHeight();
-    method public androidx.compose.ui.Modifier getModifier();
     method public java.util.List<androidx.compose.ui.layout.ModifierInfo> getModifierInfo();
-    method public androidx.compose.ui.node.Owner? getOwner();
-    method public androidx.compose.ui.node.LayoutNode? getParent();
     method public Object? getParentData();
     method public androidx.compose.ui.layout.LayoutInfo? getParentInfo();
     method public int getWidth();
@@ -2061,16 +2059,11 @@ package androidx.compose.ui.node {
     method public androidx.compose.ui.layout.Placeable measure-BRTryo0(long constraints);
     method public int minIntrinsicHeight(int width);
     method public int minIntrinsicWidth(int height);
-    method public void setModifier(androidx.compose.ui.Modifier value);
-    property public final java.util.List<androidx.compose.ui.node.LayoutNode> children;
     property public androidx.compose.ui.layout.LayoutCoordinates coordinates;
     property public int height;
     property public boolean isAttached;
     property public boolean isPlaced;
     property public boolean isValid;
-    property public final androidx.compose.ui.Modifier modifier;
-    property public final androidx.compose.ui.node.Owner? owner;
-    property public final androidx.compose.ui.node.LayoutNode? parent;
     property public Object? parentData;
     property public androidx.compose.ui.layout.LayoutInfo? parentInfo;
     property public int width;

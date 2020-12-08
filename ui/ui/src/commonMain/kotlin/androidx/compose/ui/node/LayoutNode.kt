@@ -80,7 +80,7 @@ internal val sharedDrawScope = LayoutNodeDrawScope()
 @OptIn(ExperimentalFocus::class)
 class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
 
-    constructor() : this(false)
+    internal constructor() : this(false)
 
     internal constructor(isVirtual: Boolean) {
         this.isVirtual = isVirtual
@@ -143,13 +143,13 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
     /**
      * The children of this LayoutNode, controlled by [insertAt], [move], and [removeAt].
      */
-    val children: List<LayoutNode> get() = _children.asMutableList()
+    internal val children: List<LayoutNode> get() = _children.asMutableList()
 
     /**
      * The parent node in the LayoutNode hierarchy. This is `null` when the [LayoutNode]
      * is not attached attached to a hierarchy or is the root of the hierarchy.
      */
-    var parent: LayoutNode? = null
+    internal var parent: LayoutNode? = null
         get() {
             val parent = field
             return if (parent != null && parent.isVirtual) parent.parent else parent
@@ -159,7 +159,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
     /**
      * The view system [Owner]. This `null` until [attach] is called
      */
-    var owner: Owner? = null
+    internal var owner: Owner? = null
         private set
 
     /**
@@ -612,7 +612,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
     /**
      * The [Modifier] currently applied to this node.
      */
-    var modifier: Modifier = Modifier
+    internal var modifier: Modifier = Modifier
         set(value) {
             if (value == field) return
             if (modifier != Modifier) {
