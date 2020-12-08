@@ -52,7 +52,9 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
     var selection: Selection? = null
         set(value) {
             field = value
-            updateHandleOffsets()
+            if (value != null) {
+                updateHandleOffsets()
+            }
         }
 
     /**
@@ -151,6 +153,14 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
 
         selectionRegistrar.onSelectionUpdateEndCallback = {
             showSelectionToolbar()
+        }
+
+        selectionRegistrar.onSelectableChangeCallback = { selectable ->
+            if (selectable in selectionRegistrar.selectables) {
+                // clear the selection range of each Selectable.
+                onRelease()
+                selection = null
+            }
         }
     }
 

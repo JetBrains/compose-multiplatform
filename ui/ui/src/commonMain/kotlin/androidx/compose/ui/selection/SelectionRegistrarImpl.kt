@@ -59,6 +59,11 @@ internal class SelectionRegistrarImpl : SelectionRegistrar {
      */
     internal var onSelectionUpdateEndCallback: (() -> Unit)? = null
 
+    /**
+     * The callback to be invoked when one of the selectable has changed.
+     */
+    internal var onSelectableChangeCallback: ((Selectable) -> Unit)? = null
+
     override fun subscribe(selectable: Selectable): Selectable {
         _selectables.add(selectable)
         sorted = false
@@ -128,5 +133,9 @@ internal class SelectionRegistrarImpl : SelectionRegistrar {
 
     override fun notifySelectionUpdateEnd() {
         onSelectionUpdateEndCallback?.invoke()
+    }
+
+    override fun notifySelectableChange(selectable: Selectable) {
+        onSelectableChangeCallback?.invoke(selectable)
     }
 }

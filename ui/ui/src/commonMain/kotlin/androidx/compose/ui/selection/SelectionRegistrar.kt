@@ -92,6 +92,14 @@ interface SelectionRegistrar {
      * @see notifySelectionUpdate
      */
     fun notifySelectionUpdateEnd()
+
+    /**
+     * Call this method to notify the [SelectionContainer] that the content of the passed
+     * selectable has been changed.
+     *
+     * @param selectable the selectable whose the content has been updated.
+     */
+    fun notifySelectableChange(selectable: Selectable)
 }
 
 /**
