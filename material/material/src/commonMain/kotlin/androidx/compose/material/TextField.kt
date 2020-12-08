@@ -93,6 +93,12 @@ import kotlin.math.roundToInt
  * @param onValueChange the callback that is triggered when the input service updates the text. An
  * updated text comes as a parameter of the callback
  * @param modifier a [Modifier] for this text field
+ * @param enabled controls the enabled state of the [TextField]. When `false`, the text field will
+ * be neither editable nor focusable, the input of the text field will not be selectable,
+ * visually text field will appear in the disabled UI state
+ * @param readOnly controls the editable state of the [TextField]. When `true`, the text fields
+ * will not be editable but otherwise operable. Read-only text fields are usually used to display
+ * the pre-filled text that user cannot edit
  * @param textStyle the style to be applied to the input text. The default [textStyle] uses the
  * [AmbientTextStyle] defined by the theme
  * @param label the optional label to be displayed inside the text field container. The default
@@ -144,6 +150,8 @@ fun TextField(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    readOnly: Boolean = false,
     textStyle: TextStyle = AmbientTextStyle.current,
     label: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
@@ -169,6 +177,8 @@ fun TextField(
 
     TextFieldImpl(
         type = TextFieldType.Filled,
+        enabled = enabled,
+        readOnly = readOnly,
         value = textFieldValue,
         onValueChange = {
             textFieldValueState = it
@@ -215,6 +225,12 @@ fun TextField(
  * @param onValueChange the callback that is triggered when the input service updates values in
  * [TextFieldValue]. An updated [TextFieldValue] comes as a parameter of the callback
  * @param modifier a [Modifier] for this text field
+ * @param enabled controls the enabled state of the [TextField]. When `false`, the text field will
+ * be neither editable nor focusable, the input of the text field will not be selectable,
+ * visually text field will appear in the disabled UI state
+ * @param readOnly controls the editable state of the [TextField]. When `true`, the text fields
+ * will not be editable but otherwise operable. Read-only text fields are usually used to display
+ * the pre-filled text that user cannot edit
  * @param textStyle the style to be applied to the input text. The default [textStyle] uses the
  * [AmbientTextStyle] defined by the theme
  * @param label the optional label to be displayed inside the text field container. The default
@@ -266,6 +282,8 @@ fun TextField(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    readOnly: Boolean = false,
     textStyle: TextStyle = AmbientTextStyle.current,
     label: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
@@ -288,6 +306,8 @@ fun TextField(
 ) {
     TextFieldImpl(
         type = TextFieldType.Filled,
+        enabled = enabled,
+        readOnly = readOnly,
         value = value,
         onValueChange = onValueChange,
         modifier = modifier,

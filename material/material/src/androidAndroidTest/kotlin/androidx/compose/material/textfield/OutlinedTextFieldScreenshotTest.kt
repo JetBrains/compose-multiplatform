@@ -19,6 +19,7 @@ package androidx.compose.material.textfield
 import android.os.Build
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.GOLDEN_MATERIAL
 import androidx.compose.material.OutlinedTextField
@@ -31,6 +32,7 @@ import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.center
 import androidx.compose.ui.test.down
@@ -38,7 +40,9 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.move
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.up
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -54,6 +58,14 @@ import org.junit.runner.RunWith
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
 class OutlinedTextFieldScreenshotTest {
     private val TextFieldTag = "OutlinedTextField"
+
+    private val longText = TextFieldValue(
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do " +
+            "eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam," +
+            " quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. " +
+            "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu " +
+            "fugiat nulla pariatur."
+    )
 
     @get:Rule
     val rule = createComposeRule()
@@ -103,10 +115,7 @@ class OutlinedTextFieldScreenshotTest {
             }
         }
 
-        rule.onNodeWithTag(TextFieldTag)
-            // split click into (down) and (move, up) to enforce a composition in between
-            .performGesture { down(center) }
-            .performGesture { move(); up() }
+        rule.onNodeWithTag(TextFieldTag).focus()
 
         assertAgainstGolden("outlined_textField_focused")
     }
@@ -125,10 +134,7 @@ class OutlinedTextFieldScreenshotTest {
             }
         }
 
-        rule.onNodeWithTag(TextFieldTag)
-            // split click into (down) and (move, up) to enforce a composition in between
-            .performGesture { down(center) }
-            .performGesture { move(); up() }
+        rule.onNodeWithTag(TextFieldTag).focus()
 
         assertAgainstGolden("outlined_textField_focused_rtl")
     }
@@ -146,10 +152,7 @@ class OutlinedTextFieldScreenshotTest {
             }
         }
 
-        rule.onNodeWithTag(TextFieldTag)
-            // split click into (down) and (move, up) to enforce a composition in between
-            .performGesture { down(center) }
-            .performGesture { move(); up() }
+        rule.onNodeWithTag(TextFieldTag).focus()
 
         assertAgainstGolden("outlined_textField_focused_errorState")
     }
@@ -224,10 +227,7 @@ class OutlinedTextFieldScreenshotTest {
             )
         }
 
-        rule.onNodeWithTag(TextFieldTag)
-            // split click into (down) and (move, up) to enforce a composition in between
-            .performGesture { down(center) }
-            .performGesture { move(); up() }
+        rule.onNodeWithTag(TextFieldTag).focus()
 
         assertAgainstGolden("outlined_textField_multiLine_withLabel_placeholderAlignedToTop")
     }
@@ -243,10 +243,7 @@ class OutlinedTextFieldScreenshotTest {
             )
         }
 
-        rule.onNodeWithTag(TextFieldTag)
-            // split click into (down) and (move, up) to enforce a composition in between
-            .performGesture { down(center) }
-            .performGesture { move(); up() }
+        rule.onNodeWithTag(TextFieldTag).focus()
 
         assertAgainstGolden("outlined_textField_multiLine_withoutLabel_placeholderAlignedToTop")
     }
@@ -307,10 +304,7 @@ class OutlinedTextFieldScreenshotTest {
             )
         }
 
-        rule.onNodeWithTag(TextFieldTag)
-            // split click into (down) and (move, up) to enforce a composition in between
-            .performGesture { down(center) }
-            .performGesture { move(); up() }
+        rule.onNodeWithTag(TextFieldTag).focus()
 
         assertAgainstGolden("outlined_textField_singleLine_withLabel_placeholderAlignedToTop")
     }
@@ -327,10 +321,7 @@ class OutlinedTextFieldScreenshotTest {
             )
         }
 
-        rule.onNodeWithTag(TextFieldTag)
-            // split click into (down) and (move, up) to enforce a composition in between
-            .performGesture { down(center) }
-            .performGesture { move(); up() }
+        rule.onNodeWithTag(TextFieldTag).focus()
 
         assertAgainstGolden(
             "outlined_textField_singleLine_withoutLabel_placeholderCenteredVertically"
@@ -349,6 +340,114 @@ class OutlinedTextFieldScreenshotTest {
         }
 
         assertAgainstGolden("outlined_textField_singleLine_labelCenteredVetically")
+    }
+
+    @Test
+    fun outlinedTextField_disabled() {
+        rule.setMaterialContent {
+            Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
+                OutlinedTextField(
+                    value = TextFieldValue("Text"),
+                    onValueChange = {},
+                    singleLine = true,
+                    enabled = false
+                )
+            }
+        }
+
+        assertAgainstGolden("outlinedTextField_disabled")
+    }
+
+    @Test
+    fun outlinedTextField_disabled_notFocusable() {
+        rule.setMaterialContent {
+            Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
+                OutlinedTextField(
+                    value = TextFieldValue("Text"),
+                    onValueChange = {},
+                    singleLine = true,
+                    enabled = false
+                )
+            }
+        }
+
+        rule.onNodeWithTag(TextFieldTag).focus()
+
+        assertAgainstGolden("outlinedTextField_disabled_notFocusable")
+    }
+
+    @Test
+    fun outlinedTextField_disabled_notScrolled() {
+        rule.setMaterialContent {
+            Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
+                OutlinedTextField(
+                    value = longText,
+                    onValueChange = { },
+                    singleLine = true,
+                    modifier = Modifier.width(300.dp),
+                    enabled = false
+                )
+            }
+        }
+
+        rule.onNodeWithTag(TextFieldTag).performGesture { swipeLeft() }
+
+        assertAgainstGolden("outlinedTextField_disabled_notScrolled")
+    }
+
+    @Test
+    fun outlinedTextField_readOnly() {
+        rule.setMaterialContent {
+            OutlinedTextField(
+                value = TextFieldValue("Text"),
+                onValueChange = {},
+                modifier = Modifier.testTag(TextFieldTag),
+                enabled = true,
+                readOnly = true
+            )
+        }
+
+        assertAgainstGolden("outlinedTextField_readOnly")
+    }
+
+    @Test
+    fun outlinedTextField_readOnly_focused() {
+        rule.setMaterialContent {
+            OutlinedTextField(
+                value = TextFieldValue("Text"),
+                onValueChange = {},
+                modifier = Modifier.testTag(TextFieldTag),
+                enabled = true,
+                readOnly = true
+            )
+        }
+
+        rule.onNodeWithTag(TextFieldTag).focus()
+
+        assertAgainstGolden("outlinedTextField_readOnly_focused")
+    }
+
+    @Test
+    fun outlinedTextField_readOnly_scrolled() {
+        rule.setMaterialContent {
+            OutlinedTextField(
+                value = longText,
+                onValueChange = { },
+                modifier = Modifier.testTag(TextFieldTag).width(300.dp),
+                singleLine = true,
+                enabled = true,
+                readOnly = true
+            )
+        }
+
+        rule.onNodeWithTag(TextFieldTag).performGesture { swipeLeft() }
+
+        assertAgainstGolden("outlinedTextField_readOnly_scrolled")
+    }
+
+    private fun SemanticsNodeInteraction.focus() {
+        // split click into (down) and (move, up) to enforce a composition in between
+        this.performGesture { down(center) }.performGesture { move(); up() }
     }
 
     private fun assertAgainstGolden(goldenIdentifier: String) {

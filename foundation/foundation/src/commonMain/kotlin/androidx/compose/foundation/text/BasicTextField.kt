@@ -74,6 +74,11 @@ import androidx.compose.ui.text.input.VisualTransformation
  * @param onValueChange the callback that is triggered when the input service updates the text. An
  * updated text comes as a parameter of the callback
  * @param modifier optional [Modifier] for this text field.
+ * @param enabled controls the enabled state of the [BasicTextField]. When `false`, the text
+ * field will be neither editable nor focusable, the input of the text field will not be selectable
+ * @param readOnly controls the editable state of the [BasicTextField]. When `true`, the text
+ * fields will not be editable but otherwise operable. Read-only text fields are usually used to
+ * display the pre-filled text that user cannot edit
  * @param textStyle Style configuration that applies at character level such as color, font etc.
  * @param keyboardOptions software keyboard options that contains configuration such as
  * [KeyboardType] and [ImeAction].
@@ -106,6 +111,8 @@ fun BasicTextField(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    readOnly: Boolean = false,
     textStyle: TextStyle = TextStyle.Default,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     singleLine: Boolean = false,
@@ -129,6 +136,8 @@ fun BasicTextField(
             }
         },
         modifier = modifier,
+        enabled = enabled,
+        readOnly = readOnly,
         textStyle = textStyle,
         keyboardOptions = keyboardOptions,
         maxLines = maxLines,
@@ -176,6 +185,11 @@ fun BasicTextField(
  * [BasicTextField].
  * @param onValueChange Called when the input service updates the values in [TextFieldValue].
  * @param modifier optional [Modifier] for this text field.
+ * @param enabled controls the enabled state of the [BasicTextField]. When `false`, the text
+ * field will be neither editable nor focusable, the input of the text field will not be selectable
+ * @param readOnly controls the editable state of the [BasicTextField]. When `true`, the text
+ * fields will not be editable but otherwise operable. Read-only text fields are usually used to
+ * display the pre-filled text that user cannot edit
  * @param textStyle Style configuration that applies at character level such as color, font etc.
  * @param keyboardOptions software keyboard options that contains configuration such as
  * [KeyboardType] and [ImeAction].
@@ -208,6 +222,8 @@ fun BasicTextField(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    readOnly: Boolean = false,
     textStyle: TextStyle = TextStyle.Default,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     singleLine: Boolean = false,
@@ -219,38 +235,58 @@ fun BasicTextField(
     interactionState: InteractionState = remember { InteractionState() },
     cursorColor: Color = Color.Black
 ) {
-    // We use it to get the cursor position
-    val textLayoutResult: Ref<TextLayoutResult?> = remember { Ref() }
-
     val orientation = if (singleLine) Orientation.Horizontal else Orientation.Vertical
     val scrollerPosition = rememberSavedInstanceState(saver = TextFieldScrollerPosition.Saver) {
         TextFieldScrollerPosition()
     }
 
-    CoreTextField(
-        value = value,
-        onValueChange = onValueChange,
-        textStyle = textStyle,
-        onImeActionPerformed = onImeActionPerformed,
-        visualTransformation = visualTransformation,
-        onTextLayout = {
-            textLayoutResult.value = it
-            onTextLayout(it)
-        },
-        interactionState = interactionState,
-        onTextInputStarted = onTextInputStarted,
-        cursorColor = cursorColor,
-        imeOptions = keyboardOptions.toImeOptions(singleLine = singleLine),
-        softWrap = !singleLine,
-        modifier = modifier
-            .maxLinesHeight(if (singleLine) 1 else maxLines, textStyle)
-            .textFieldScroll(
-                orientation,
-                scrollerPosition,
-                value,
-                visualTransformation,
-                interactionState,
-                textLayoutResult
-            )
-    )
+    // We use it to get the cursor position
+    val textLayoutResult: Ref<TextLayoutResult?> = remember { Ref() }
+
+    val textFieldModifier = modifier
+        .maxLinesHeight(if (singleLine) 1 else maxLines, textStyle)
+        .textFieldScroll(
+            orientation,
+            scrollerPosition,
+            value,
+            visualTransformation,
+            interactionState,
+            textLayoutResult,
+            enabled
+        )
+
+    if (enabled && !readOnly) {
+        CoreTextField(
+            value = value,
+            onValueChange = onValueChange,
+            textStyle = textStyle,
+            onImeActionPerformed = onImeActionPerformed,
+            visualTransformation = visualTransformation,
+            onTextLayout = {
+                textLayoutResult.value = it
+                onTextLayout(it)
+            },
+            interactionState = interactionState,
+            onTextInputStarted = onTextInputStarted,
+            cursorColor = cursorColor,
+            imeOptions = keyboardOptions.toImeOptions(singleLine = singleLine),
+            softWrap = !singleLine,
+            modifier = textFieldModifier
+        )
+    } else {
+        InactiveTextField(
+            value = value,
+            modifier = textFieldModifier,
+            enabled = enabled,
+            textStyle = textStyle,
+            singleLine = singleLine,
+            maxLines = maxLines,
+            visualTransformation = visualTransformation,
+            onTextLayout = {
+                textLayoutResult.value = it
+                onTextLayout(it)
+            },
+            interactionState = interactionState
+        )
+    }
 }

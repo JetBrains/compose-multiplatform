@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation
+package androidx.compose.foundation.textfield
 
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
