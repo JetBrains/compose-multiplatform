@@ -57,9 +57,10 @@ import kotlin.math.abs
 fun SwipeToDismissDemo() {
     Column {
         var index by remember { mutableStateOf(0) }
-        Box(Modifier.height(500.dp).fillMaxWidth()) {
+        val dismissState = remember { DismissState() }
+        Box(Modifier.height(300.dp).fillMaxWidth()) {
             Box(
-                Modifier.swipeToDismiss(index).align(Alignment.BottomCenter).size(300.dp)
+                Modifier.swipeToDismiss(dismissState).align(Alignment.BottomCenter).size(150.dp)
                     .background(pastelColors[index])
             )
         }
@@ -71,6 +72,8 @@ fun SwipeToDismissDemo() {
         Button(
             onClick = {
                 index = (index + 1) % pastelColors.size
+                dismissState.alpha = 1f
+                dismissState.offset = 0f
             },
             modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
@@ -79,20 +82,13 @@ fun SwipeToDismissDemo() {
     }
 }
 
-private fun Modifier.swipeToDismiss(index: Int): Modifier = composed {
+private fun Modifier.swipeToDismiss(dismissState: DismissState): Modifier = composed {
     val mutatorMutex = remember { MutatorMutex() }
-    var alpha by remember { mutableStateOf(1f) }
-    var offset by remember { mutableStateOf(0f) }
 
-    remember(index) {
-        // Reset internal states if index has been updated
-        alpha = 1f
-        offset = 0f
-    }
     this.pointerInput {
         fun updateOffset(value: Float) {
-            offset = value
-            alpha = 1f - abs(offset / size.height)
+            dismissState.offset = value
+            dismissState.alpha = 1f - abs(dismissState.offset / size.height)
         }
         coroutineScope {
             while (true) {
@@ -104,7 +100,7 @@ private fun Modifier.swipeToDismiss(index: Int): Modifier = composed {
                 mutatorMutex.mutate(MutatePriority.UserInput) {
                     handlePointerInput {
                         verticalDrag(pointerId) {
-                            updateOffset(offset + it.positionChange().y)
+                            updateOffset(dismissState.offset + it.positionChange().y)
                             velocityTracker.addPosition(
                                 it.current.uptime,
                                 it.current.position
@@ -118,9 +114,9 @@ private fun Modifier.swipeToDismiss(index: Int): Modifier = composed {
                     // animation job.
                     mutatorMutex.mutate {
                         // Either fling out of the sight, or snap back
-                        val animationState = AnimationState(offset, velocity)
+                        val animationState = AnimationState(dismissState.offset, velocity)
                         val decay = AndroidFlingDecaySpec(this@pointerInput)
-                        if (decay.getTarget(offset, velocity) >= -size.height) {
+                        if (decay.getTarget(dismissState.offset, velocity) >= -size.height) {
                             // Not enough velocity to be dismissed
                             animationState.animateTo(0f) {
                                 updateOffset(value)
@@ -140,7 +136,12 @@ private fun Modifier.swipeToDismiss(index: Int): Modifier = composed {
                 }
             }
         }
-    }.offset(y = { offset }).graphicsLayer(alpha = alpha)
+    }.offset(y = { dismissState.offset }).graphicsLayer(alpha = dismissState.alpha)
+}
+
+private class DismissState {
+    var alpha by mutableStateOf(1f)
+    var offset by mutableStateOf(0f)
 }
 
 internal val pastelColors = listOf(

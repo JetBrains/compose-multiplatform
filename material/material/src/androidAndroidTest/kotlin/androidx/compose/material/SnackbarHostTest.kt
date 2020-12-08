@@ -16,8 +16,8 @@
 
 package androidx.compose.material
 
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -52,7 +52,7 @@ class SnackbarHostTest {
         rule.setContent {
             scope = rememberCoroutineScope()
             SnackbarHost(hostState) { data ->
-                remember(data) {
+                LaunchedEffect(data) {
                     resultedInvocation += data.message
                     data.dismiss()
                 }
@@ -79,9 +79,9 @@ class SnackbarHostTest {
         rule.setContent {
             scope = rememberCoroutineScope()
             SnackbarHost(hostState) { data ->
-                remember(data) {
+                LaunchedEffect(data) {
                     resultedInvocation += data.message
-                    scope.launch {
+                    launch {
                         delay(30L)
                         data.dismiss()
                     }

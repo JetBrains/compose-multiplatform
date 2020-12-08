@@ -25,5 +25,9 @@ import org.jetbrains.uast.UMethod
 @Suppress("DEPRECATION")
 val UMethod.isComposable get() = annotations.any { it.qualifiedName == ComposableFqn }
 
-const val ComposableFqn = "androidx.compose.runtime.Composable"
+const val RuntimePackageName = "androidx.compose.runtime"
+
+const val ComposableFqn = "$RuntimePackageName.Composable"
 val ComposableShortName = ComposableFqn.split(".").last()
+
+const val RememberShortName = "remember"
