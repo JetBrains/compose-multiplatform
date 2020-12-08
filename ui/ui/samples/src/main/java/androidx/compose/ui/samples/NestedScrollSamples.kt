@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -134,11 +133,13 @@ fun NestedScrollSample() {
                     .nestedScroll(connection, dispatcher = nestedScrollDispatcher)
             ) {
                 // hypothetical scrollable child which we will listen in connection above
-                LazyColumnFor(listOf(1, 2, 3, 4, 5)) {
-                    Text(
-                        "Magenta text above will change first when you scroll me",
-                        modifier = Modifier.padding(5.dp)
-                    )
+                LazyColumn {
+                    items(listOf(1, 2, 3, 4, 5)) {
+                        Text(
+                            "Magenta text above will change first when you scroll me",
+                            modifier = Modifier.padding(5.dp)
+                        )
+                    }
                 }
                 // simply show our value. It will change when we scroll child list above, taking
                 // child's scroll delta until we reach maxValue or minValue

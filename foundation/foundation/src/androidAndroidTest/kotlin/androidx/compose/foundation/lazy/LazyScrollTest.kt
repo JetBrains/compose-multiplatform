@@ -90,12 +90,16 @@ class LazyScrollTest(private val orientation: Orientation) {
     @Composable
     private fun TestContent() {
         if (vertical) {
-            LazyColumnFor(items, Modifier.preferredHeight(300.dp), state) {
-                ItemContent()
+            LazyColumn(Modifier.preferredHeight(300.dp), state) {
+                items(items) {
+                    ItemContent()
+                }
             }
         } else {
-            LazyRowFor(items, Modifier.preferredWidth(300.dp), state) {
-                ItemContent()
+            LazyRow(Modifier.preferredWidth(300.dp), state) {
+                items(items) {
+                    ItemContent()
+                }
             }
         }
     }

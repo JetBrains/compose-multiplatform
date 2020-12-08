@@ -29,7 +29,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumnFor
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Button
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
@@ -137,8 +137,10 @@ private object LayoutSnippet7 {
         onSelected: (Artist) -> Unit
     ) {
         Surface(Modifier.fillMaxSize()) {
-            LazyColumnFor(feedItems) { item ->
-                ArtistCard(item, onSelected)
+            LazyColumn {
+                items(feedItems) { item ->
+                    ArtistCard(item, onSelected)
+                }
             }
         }
     }

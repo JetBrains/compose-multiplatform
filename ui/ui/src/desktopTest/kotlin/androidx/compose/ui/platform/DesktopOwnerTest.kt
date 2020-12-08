@@ -29,7 +29,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumnFor
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -288,10 +288,12 @@ class DesktopOwnerTest {
         var height by mutableStateOf(10.dp)
         setContent {
             Box(Modifier.padding(10.dp)) {
-                LazyColumnFor(
-                    listOf(Color.Red, Color.Green, Color.Blue, Color.Black, Color.Gray)
-                ) { color ->
-                    Box(Modifier.size(width = 30.dp, height = height).background(color))
+                LazyColumn {
+                    items(
+                        listOf(Color.Red, Color.Green, Color.Blue, Color.Black, Color.Gray)
+                    ) { color ->
+                        Box(Modifier.size(width = 30.dp, height = height).background(color))
+                    }
                 }
             }
         }

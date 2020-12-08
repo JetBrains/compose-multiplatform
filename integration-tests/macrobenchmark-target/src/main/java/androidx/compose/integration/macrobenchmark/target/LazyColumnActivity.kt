@@ -22,7 +22,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumnFor
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Card
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Text
@@ -38,13 +38,11 @@ class LazyColumnActivity : ComponentActivity() {
         val itemCount = intent.getIntExtra(EXTRA_ITEM_COUNT, 1000)
 
         setContent {
-            LazyColumnFor(
-                items = List(itemCount) {
-                    Entry("Item $it")
-                },
-                modifier = Modifier.fillMaxWidth(),
-                itemContent = { ListRow(it) }
-            )
+            LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                items(List(itemCount) { Entry("Item $it") }) {
+                    ListRow(it)
+                }
+            }
         }
     }
 

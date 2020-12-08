@@ -22,7 +22,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumnFor
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Card
 import androidx.compose.material.DismissDirection.EndToStart
 import androidx.compose.material.DismissDirection.StartToEnd
@@ -78,57 +78,63 @@ fun SwipeToDismissListItems() {
     // will animate to red if you're swiping left or green if you're swiping right. When you let
     // go, the item will animate out of the way if you're swiping left (like deleting an email) or
     // back to its default position if you're swiping right (like marking an email as read/unread).
-    LazyColumnFor(items) { item ->
-        var unread by remember { mutableStateOf(false) }
-        val dismissState = rememberDismissState(
-            confirmStateChange = {
-                if (it == DismissedToEnd) unread = !unread
-                it != DismissedToEnd
-            }
-        )
-        SwipeToDismiss(
-            state = dismissState,
-            modifier = Modifier.padding(vertical = 4.dp),
-            directions = setOf(StartToEnd, EndToStart),
-            dismissThresholds = { direction ->
-                FractionalThreshold(if (direction == StartToEnd) 0.25f else 0.5f)
-            },
-            background = {
-                val direction = dismissState.dismissDirection ?: return@SwipeToDismiss
-                val color = animate(
-                    when (dismissState.targetValue) {
-                        Default -> Color.LightGray
-                        DismissedToEnd -> Color.Green
-                        DismissedToStart -> Color.Red
-                    }
-                )
-                val alignment = when (direction) {
-                    StartToEnd -> Alignment.CenterStart
-                    EndToStart -> Alignment.CenterEnd
+    LazyColumn {
+        items(items) { item ->
+            var unread by remember { mutableStateOf(false) }
+            val dismissState = rememberDismissState(
+                confirmStateChange = {
+                    if (it == DismissedToEnd) unread = !unread
+                    it != DismissedToEnd
                 }
-                val icon = when (direction) {
-                    StartToEnd -> Icons.Default.Done
-                    EndToStart -> Icons.Default.Delete
-                }
-                val scale = animate(if (dismissState.targetValue == Default) 0.75f else 1f)
-
-                Box(
-                    modifier = Modifier.fillMaxSize().background(color).padding(horizontal = 20.dp),
-                    contentAlignment = alignment
-                ) {
-                    Icon(icon, Modifier.scale(scale))
-                }
-            },
-            dismissContent = {
-                Card(
-                    elevation = animate(if (dismissState.dismissDirection != null) 4.dp else 0.dp)
-                ) {
-                    ListItem(
-                        text = { Text(item, fontWeight = if (unread) FontWeight.Bold else null) },
-                        secondaryText = { Text("Swipe me left or right!") }
+            )
+            SwipeToDismiss(
+                state = dismissState,
+                modifier = Modifier.padding(vertical = 4.dp),
+                directions = setOf(StartToEnd, EndToStart),
+                dismissThresholds = { direction ->
+                    FractionalThreshold(if (direction == StartToEnd) 0.25f else 0.5f)
+                },
+                background = {
+                    val direction = dismissState.dismissDirection ?: return@SwipeToDismiss
+                    val color = animate(
+                        when (dismissState.targetValue) {
+                            Default -> Color.LightGray
+                            DismissedToEnd -> Color.Green
+                            DismissedToStart -> Color.Red
+                        }
                     )
+                    val alignment = when (direction) {
+                        StartToEnd -> Alignment.CenterStart
+                        EndToStart -> Alignment.CenterEnd
+                    }
+                    val icon = when (direction) {
+                        StartToEnd -> Icons.Default.Done
+                        EndToStart -> Icons.Default.Delete
+                    }
+                    val scale = animate(if (dismissState.targetValue == Default) 0.75f else 1f)
+
+                    Box(
+                        Modifier.fillMaxSize().background(color).padding(horizontal = 20.dp),
+                        contentAlignment = alignment
+                    ) {
+                        Icon(icon, Modifier.scale(scale))
+                    }
+                },
+                dismissContent = {
+                    Card(
+                        elevation = animate(
+                            if (dismissState.dismissDirection != null) 4.dp else 0.dp
+                        )
+                    ) {
+                        ListItem(
+                            text = {
+                                Text(item, fontWeight = if (unread) FontWeight.Bold else null)
+                            },
+                            secondaryText = { Text("Swipe me left or right!") }
+                        )
+                    }
                 }
-            }
-        )
+            )
+        }
     }
 }

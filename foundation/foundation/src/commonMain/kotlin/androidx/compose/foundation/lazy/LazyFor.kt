@@ -31,8 +31,6 @@ import androidx.compose.ui.unit.dp
  * See [LazyColumnForIndexed] if you need to have both item and index params in [itemContent].
  * See [LazyRowFor] if you are looking for a horizontally scrolling version.
  *
- * @sample androidx.compose.foundation.samples.LazyColumnForSample
- *
  * @param items the backing list of data to display
  * @param modifier the modifier to apply to this layout
  * @param state the state object to be used to control or observe the list's state
@@ -55,6 +53,14 @@ import androidx.compose.ui.unit.dp
  */
 @OptIn(InternalLayoutApi::class)
 @Composable
+@Deprecated(
+    "Use LazyColumn instead",
+    ReplaceWith(
+        "LazyColumn(modifier, state, contentPadding, horizontalAlignment = " +
+            "horizontalAlignment) { \n items(items, itemContent) \n }",
+        "androidx.compose.foundation.lazy.LazyColumn"
+    )
+)
 fun <T> LazyColumnFor(
     items: List<T>,
     modifier: Modifier = Modifier,
@@ -86,8 +92,6 @@ fun <T> LazyColumnFor(
  *
  * See [LazyRowForIndexed] if you are looking for a horizontally scrolling version.
  *
- * @sample androidx.compose.foundation.samples.LazyColumnForIndexedSample
- *
  * @param items the backing list of data to display
  * @param modifier the modifier to apply to this layout
  * @param state the state object to be used to control or observe the list's state
@@ -111,6 +115,14 @@ fun <T> LazyColumnFor(
  */
 @OptIn(InternalLayoutApi::class)
 @Composable
+@Deprecated(
+    "Use LazyColumn instead",
+    ReplaceWith(
+        "LazyColumn(modifier, state, contentPadding, horizontalAlignment = " +
+            "horizontalAlignment) { \n itemsIndexed(items, itemContent) \n }",
+        "androidx.compose.foundation.lazy.LazyColumn"
+    )
+)
 fun <T> LazyColumnForIndexed(
     items: List<T>,
     modifier: Modifier = Modifier,
@@ -140,8 +152,6 @@ fun <T> LazyColumnForIndexed(
  * See [LazyRowForIndexed] if you need to have both item and index params in [itemContent].
  * See [LazyColumnFor] if you are looking for a vertically scrolling version.
  *
- * @sample androidx.compose.foundation.samples.LazyRowForSample
- *
  * @param items the backing list of data to display.
  * @param modifier the modifier to apply to this layout.
  * @param state the state object to be used to control or observe the list's state.
@@ -164,6 +174,14 @@ fun <T> LazyColumnForIndexed(
  */
 @OptIn(InternalLayoutApi::class)
 @Composable
+@Deprecated(
+    "Use LazyRow instead",
+    ReplaceWith(
+        "LazyRow(modifier, state, contentPadding, verticalAlignment = " +
+            "verticalAlignment) { \n items(items, itemContent) \n }",
+        "androidx.compose.foundation.lazy.LazyColumn"
+    )
+)
 fun <T> LazyRowFor(
     items: List<T>,
     modifier: Modifier = Modifier,
@@ -194,8 +212,6 @@ fun <T> LazyRowFor(
  *
  * See [LazyColumnForIndexed] if you are looking for a vertically scrolling version.
  *
- * @sample androidx.compose.foundation.samples.LazyRowForIndexedSample
- *
  * @param items the backing list of data to display.
  * @param modifier the modifier to apply to this layout.
  * @param state the state object to be used to control or observe the list's state.
@@ -219,6 +235,14 @@ fun <T> LazyRowFor(
  */
 @OptIn(InternalLayoutApi::class)
 @Composable
+@Deprecated(
+    "Use LazyRow instead",
+    ReplaceWith(
+        "LazyRow(modifier, state, contentPadding, verticalAlignment = " +
+            "verticalAlignment) { \n itemsIndexed(items, itemContent) \n }",
+        "androidx.compose.foundation.lazy.LazyColumn"
+    )
+)
 fun <T> LazyRowForIndexed(
     items: List<T>,
     modifier: Modifier = Modifier,

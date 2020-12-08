@@ -19,7 +19,6 @@ package androidx.compose.material.samples
 import androidx.annotation.Sampled
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.material.BackdropScaffold
 import androidx.compose.material.BackdropValue
 import androidx.compose.material.ExperimentalMaterialApi
@@ -86,14 +85,16 @@ fun BackdropScaffoldSample() {
             )
         },
         backLayerContent = {
-            LazyColumnFor((1..5).toList()) {
-                ListItem(
-                    Modifier.clickable {
-                        selection.value = it
-                        scaffoldState.conceal()
-                    },
-                    text = { Text("Select $it") }
-                )
+            LazyColumn {
+                for (i in 1..5) item {
+                    ListItem(
+                        Modifier.clickable {
+                            selection.value = i
+                            scaffoldState.conceal()
+                        },
+                        text = { Text("Select $i") }
+                    )
+                }
             }
         },
         frontLayerContent = {

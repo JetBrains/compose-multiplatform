@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 
 /**
  * The DSL implementation of a lazy grid layout. It composes only visible rows of the grid.
- * This API is not stable, please consider using stable components like [LazyColumnFor] and [Row]
+ * This API is not stable, please consider using stable components like [LazyColumn] and [Row]
  * to achieve the same result.
  *
  * @param columns a fixed number of columns of the grid
