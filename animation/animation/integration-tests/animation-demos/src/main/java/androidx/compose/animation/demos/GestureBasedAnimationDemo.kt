@@ -16,69 +16,10 @@
 
 package androidx.compose.animation.demos
 
-import androidx.compose.animation.ColorPropKey
-import androidx.compose.animation.core.FloatPropKey
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.transitionDefinition
-import androidx.compose.animation.transition
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.animation.core.samples.GestureAnimationSample
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.gesture.pressIndicatorGestureFilter
-import androidx.compose.ui.graphics.Color
-
-private const val halfSize = 200f
-
-private enum class ComponentState { Pressed, Released }
-
-private val scale = FloatPropKey()
-private val color = ColorPropKey()
-
-private val definition = transitionDefinition<ComponentState> {
-    state(ComponentState.Released) {
-        this[scale] = 1f
-        this[color] = Color(red = 0, green = 200, blue = 0, alpha = 255)
-    }
-    state(ComponentState.Pressed) {
-        this[scale] = 3f
-        this[color] = Color(red = 0, green = 100, blue = 0, alpha = 255)
-    }
-    transition {
-        scale using spring(
-            stiffness = 50f
-        )
-        color using spring(
-            stiffness = 50f
-        )
-    }
-}
 
 @Composable
 fun GestureBasedAnimationDemo() {
-    val toState = remember { mutableStateOf(ComponentState.Released) }
-    val pressIndicator =
-        Modifier.pressIndicatorGestureFilter(
-            onStart = { toState.value = ComponentState.Pressed },
-            onStop = { toState.value = ComponentState.Released },
-            onCancel = { toState.value = ComponentState.Released }
-        )
-
-    val state = transition(definition = definition, toState = toState.value)
-    ScaledColorRect(pressIndicator, scale = state[scale], color = state[color])
-}
-
-@Composable
-private fun ScaledColorRect(modifier: Modifier = Modifier, scale: Float, color: Color) {
-    Canvas(modifier.fillMaxSize()) {
-        drawRect(
-            color,
-            topLeft = Offset(center.x - halfSize * scale, center.y - halfSize * scale),
-            size = Size(halfSize * 2 * scale, halfSize * 2 * scale)
-        )
-    }
+    GestureAnimationSample()
 }

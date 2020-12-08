@@ -18,18 +18,28 @@ package androidx.compose.animation
 
 import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.AnimationVector
+import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.animation.core.PropKey
+import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.TransitionAnimation
 import androidx.compose.animation.core.TransitionDefinition
 import androidx.compose.animation.core.TransitionState
+import androidx.compose.animation.core.animateValue
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.keyframes
+import androidx.compose.animation.core.repeatable
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.util.annotation.VisibleForTesting
 
@@ -130,6 +140,7 @@ class TransitionModel<T>(
 ) : TransitionState {
 
     private var animationPulse by mutableStateOf(0L)
+
     @InternalAnimationApi
     val anim: TransitionAnimation<T> =
         TransitionAnimation(transitionDef, clock, initState, label).apply {
@@ -144,4 +155,42 @@ class TransitionModel<T>(
         val pulse = animationPulse
         return anim[propKey]
     }
+}
+
+/**
+ * Creates a [Color] animation as a part of the given [Transition]. This means the lifecycle
+ * of this animation will be managed by the [Transition].
+ *
+ * [targetValueByState] is used as a mapping from a target state to the target value of this
+ * animation. [Transition] will be using this mapping to determine what value to target this
+ * animation towards. __Note__ that [targetValueByState] is a composable function. This means the
+ * mapping function could access states, ambient, themes, etc. If the targetValue changes outside
+ * of a [Transition] run (i.e. when the [Transition] already reached its targetState), the
+ * [Transition] will start running again to ensure this animation reaches its new target smoothly.
+ *
+ * An optional [transitionSpec] can be provided to specify (potentially different) animation for
+ * each pair of initialState and targetState. [FiniteAnimationSpec] includes any non-infinite
+ * animation, such as [tween], [spring], [keyframes] and even [repeatable], but not
+ * [infiniteRepeatable]. By default, [transitionSpec] uses a [spring] animation for all transition
+ * destinations.
+ *
+ * @return A [State] object, the value of which is updated by animation
+ *
+ * @see animateValue
+ * @see androidx.compose.animation.core.animateFloat
+ * @see androidx.compose.animation.core.Transition
+ * @see androidx.compose.animation.core.updateTransition
+ */
+@Composable
+inline fun <S> Transition<S>.animateColor(
+    noinline transitionSpec:
+        @Composable (states: Transition.States<S>) -> FiniteAnimationSpec<Color> = { spring() },
+    targetValueByState: @Composable (state: S) -> Color
+): State<Color> {
+    val colorSpace = targetValueByState(targetState).colorSpace
+    val typeConverter = remember(colorSpace) {
+        Color.VectorConverter(colorSpace)
+    }
+
+    return animateValue(typeConverter, transitionSpec, targetValueByState)
 }

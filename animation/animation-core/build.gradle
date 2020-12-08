@@ -17,7 +17,6 @@
 
 import androidx.build.AndroidXUiPlugin
 import androidx.build.LibraryGroups
-import androidx.build.LibraryVersions
 import androidx.build.Publish
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -56,7 +55,10 @@ dependencies {
 
         androidTestImplementation(ANDROIDX_TEST_RULES)
         androidTestImplementation(ANDROIDX_TEST_RUNNER)
+        androidTestImplementation(ANDROIDX_TEST_CORE)
         androidTestImplementation(JUNIT)
+        androidTestImplementation(project(":compose:animation:animation"))
+        androidTestImplementation(project(":compose:ui:ui-test-junit4"))
     }
 }
 
@@ -96,7 +98,10 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             androidAndroidTest.dependencies {
                 implementation(ANDROIDX_TEST_RULES)
                 implementation(ANDROIDX_TEST_RUNNER)
+                implementation(ANDROIDX_TEST_CORE)
                 implementation(JUNIT)
+                implementation project(":compose:animation:animation")
+                implementation project(":compose:ui:ui-test-junit4")
             }
         }
     }
@@ -117,5 +122,16 @@ tasks.withType(KotlinCompile).configureEach {
             "-Xuse-experimental=kotlin.Experimental",
             "-Xallow-jvm-ir-dependencies"
         ]
+    }
+}
+
+android {
+    defaultConfig {
+        minSdkVersion 21
+    }
+    tasks.withType(KotlinCompile).configureEach {
+        kotlinOptions {
+            useIR = true
+        }
     }
 }
