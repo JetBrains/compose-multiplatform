@@ -73,7 +73,7 @@ fun AwaitHorizontalDragOrCancellationSample() {
                 .background(Color.Blue)
                 .pointerInput {
                     forEachGesture {
-                        handlePointerInput {
+                        awaitPointerEventScope {
                             val down = awaitFirstDown()
                             var change =
                                 awaitHorizontalTouchSlopOrCancellation(down.id) { change, over ->
@@ -117,7 +117,7 @@ fun HorizontalDragSample() {
                 .background(Color.Blue)
                 .pointerInput {
                     forEachGesture {
-                        handlePointerInput {
+                        awaitPointerEventScope {
                             val down = awaitFirstDown()
                             val change =
                                 awaitHorizontalTouchSlopOrCancellation(down.id) { change, over ->
@@ -187,7 +187,7 @@ fun AwaitVerticalDragOrCancellationSample() {
                 .background(Color.Blue)
                 .pointerInput {
                     forEachGesture {
-                        handlePointerInput {
+                        awaitPointerEventScope {
                             val down = awaitFirstDown()
                             var change =
                                 awaitVerticalTouchSlopOrCancellation(down.id) { change, over ->
@@ -231,7 +231,7 @@ fun VerticalDragSample() {
                 .background(Color.Blue)
                 .pointerInput {
                     forEachGesture {
-                        handlePointerInput {
+                        awaitPointerEventScope {
                             val down = awaitFirstDown()
                             val change =
                                 awaitVerticalTouchSlopOrCancellation(down.id) { change, over ->
@@ -300,7 +300,7 @@ fun AwaitDragOrCancellationSample() {
                 .background(Color.Blue)
                 .pointerInput {
                     forEachGesture {
-                        handlePointerInput {
+                        awaitPointerEventScope {
                             val down = awaitFirstDown()
                             var change = awaitTouchSlopOrCancellation(down.id) { change, over ->
                                 val original = Offset(offsetX.value, offsetY.value)
@@ -356,7 +356,7 @@ fun DragSample() {
                 .background(Color.Blue)
                 .pointerInput {
                     forEachGesture {
-                        handlePointerInput {
+                        awaitPointerEventScope {
                             val down = awaitFirstDown()
                             val change = awaitTouchSlopOrCancellation(down.id) { change, over ->
                                 val original = Offset(offsetX.value, offsetY.value)

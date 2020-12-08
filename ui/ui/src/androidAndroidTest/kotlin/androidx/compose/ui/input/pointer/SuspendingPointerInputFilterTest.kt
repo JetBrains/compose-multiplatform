@@ -62,7 +62,7 @@ class SuspendingPointerInputFilterTest {
         val result = CompletableDeferred<PointerEvent>()
         launch {
             with(filter) {
-                handlePointerInput {
+                awaitPointerEventScope {
                     result.complete(awaitPointerEvent())
                 }
             }
@@ -90,7 +90,7 @@ class SuspendingPointerInputFilterTest {
         val results = Channel<PointerEvent>(Channel.UNLIMITED)
         launch {
             with(filter) {
-                handlePointerInput {
+                awaitPointerEventScope {
                     repeat(3) {
                         results.offer(awaitPointerEvent())
                     }
@@ -125,7 +125,7 @@ class SuspendingPointerInputFilterTest {
         val results = Channel<PointerEvent>(Channel.UNLIMITED)
         launch {
             with(filter) {
-                handlePointerInput {
+                awaitPointerEventScope {
                     repeat(3) {
                         results.offer(awaitPointerEvent())
                     }
@@ -198,7 +198,7 @@ class SuspendingPointerInputFilterTest {
         val handler = launch {
             with(filter) {
                 try {
-                    handlePointerInput {
+                    awaitPointerEventScope {
                         try {
                             counter.expect(1, "about to call awaitPointerEvent")
                             awaitPointerEvent()

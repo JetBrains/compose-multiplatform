@@ -17,7 +17,7 @@
 package androidx.compose.foundation.gestures
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.pointer.HandlePointerInputScope
+import androidx.compose.ui.input.pointer.AwaitPointerEventScope
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerId
@@ -55,7 +55,7 @@ import kotlin.math.sign
  * @see awaitHorizontalTouchSlopOrCancellation
  * @see awaitVerticalTouchSlopOrCancellation
  */
-suspend fun HandlePointerInputScope.awaitTouchSlopOrCancellation(
+suspend fun AwaitPointerEventScope.awaitTouchSlopOrCancellation(
     pointerId: PointerId,
     onTouchSlopReached: (change: PointerInputChange, overSlop: Offset) -> Unit
 ): PointerInputChange? {
@@ -122,7 +122,7 @@ suspend fun HandlePointerInputScope.awaitTouchSlopOrCancellation(
  * @see horizontalDrag
  * @see verticalDrag
  */
-suspend fun HandlePointerInputScope.drag(
+suspend fun AwaitPointerEventScope.drag(
     pointerId: PointerId,
     onDrag: (PointerInputChange) -> Unit
 ): Boolean {
@@ -156,7 +156,7 @@ suspend fun HandlePointerInputScope.drag(
  * @see awaitHorizontalDragOrCancellation
  * @see drag
  */
-suspend fun HandlePointerInputScope.awaitDragOrCancellation(
+suspend fun AwaitPointerEventScope.awaitDragOrCancellation(
     pointerId: PointerId,
 ): PointerInputChange? {
     if (currentEvent.isPointerUp(pointerId)) {
@@ -186,7 +186,7 @@ suspend fun PointerInputScope.detectDragGestures(
     onDrag: (change: PointerInputChange, dragAmount: Offset) -> Unit
 ) {
     forEachGesture {
-        handlePointerInput {
+        awaitPointerEventScope {
             val down = awaitFirstDown()
             var drag: PointerInputChange?
             do {
@@ -230,7 +230,7 @@ suspend fun PointerInputScope.detectDragGestures(
  * @see awaitHorizontalTouchSlopOrCancellation
  * @see awaitTouchSlopOrCancellation
  */
-suspend fun HandlePointerInputScope.awaitVerticalTouchSlopOrCancellation(
+suspend fun AwaitPointerEventScope.awaitVerticalTouchSlopOrCancellation(
     pointerId: PointerId,
     onTouchSlopReached: (change: PointerInputChange, overSlop: Float) -> Unit
 ) = awaitTouchSlopOrCancellation(
@@ -259,7 +259,7 @@ suspend fun HandlePointerInputScope.awaitVerticalTouchSlopOrCancellation(
  * @see horizontalDrag
  * @see drag
  */
-suspend fun HandlePointerInputScope.verticalDrag(
+suspend fun AwaitPointerEventScope.verticalDrag(
     pointerId: PointerId,
     onDrag: (PointerInputChange) -> Unit
 ): Boolean = drag(
@@ -286,7 +286,7 @@ suspend fun HandlePointerInputScope.verticalDrag(
  * @see awaitDragOrCancellation
  * @see verticalDrag
  */
-suspend fun HandlePointerInputScope.awaitVerticalDragOrCancellation(
+suspend fun AwaitPointerEventScope.awaitVerticalDragOrCancellation(
     pointerId: PointerId,
 ): PointerInputChange? {
     if (currentEvent.isPointerUp(pointerId)) {
@@ -320,7 +320,7 @@ suspend fun PointerInputScope.detectVerticalDragGestures(
     onVerticalDrag: (change: PointerInputChange, dragAmount: Float) -> Unit
 ) {
     forEachGesture {
-        handlePointerInput {
+        awaitPointerEventScope {
             val down = awaitFirstDown()
             val drag = awaitVerticalTouchSlopOrCancellation(down.id, onVerticalDrag)
             if (drag != null) {
@@ -360,7 +360,7 @@ suspend fun PointerInputScope.detectVerticalDragGestures(
  * @see awaitVerticalTouchSlopOrCancellation
  * @see awaitTouchSlopOrCancellation
  */
-suspend fun HandlePointerInputScope.awaitHorizontalTouchSlopOrCancellation(
+suspend fun AwaitPointerEventScope.awaitHorizontalTouchSlopOrCancellation(
     pointerId: PointerId,
     onTouchSlopReached: (change: PointerInputChange, overSlop: Float) -> Unit
 ) = awaitTouchSlopOrCancellation(
@@ -386,7 +386,7 @@ suspend fun HandlePointerInputScope.awaitHorizontalTouchSlopOrCancellation(
  * @see verticalDrag
  * @see drag
  */
-suspend fun HandlePointerInputScope.horizontalDrag(
+suspend fun AwaitPointerEventScope.horizontalDrag(
     pointerId: PointerId,
     onDrag: (PointerInputChange) -> Unit
 ): Boolean = drag(
@@ -413,7 +413,7 @@ suspend fun HandlePointerInputScope.horizontalDrag(
  * @see awaitVerticalDragOrCancellation
  * @see awaitDragOrCancellation
  */
-suspend fun HandlePointerInputScope.awaitHorizontalDragOrCancellation(
+suspend fun AwaitPointerEventScope.awaitHorizontalDragOrCancellation(
     pointerId: PointerId,
 ): PointerInputChange? {
     if (currentEvent.isPointerUp(pointerId)) {
@@ -447,7 +447,7 @@ suspend fun PointerInputScope.detectHorizontalDragGestures(
     onHorizontalDrag: (change: PointerInputChange, dragAmount: Float) -> Unit
 ) {
     forEachGesture {
-        handlePointerInput {
+        awaitPointerEventScope {
             val down = awaitFirstDown()
             val drag = awaitHorizontalTouchSlopOrCancellation(down.id, onHorizontalDrag)
             if (drag != null) {
@@ -475,7 +475,7 @@ suspend fun PointerInputScope.detectHorizontalDragGestures(
  * @return `true` when the gesture ended with all pointers up and `false` when the gesture
  * was canceled.
  */
-private suspend inline fun HandlePointerInputScope.drag(
+private suspend inline fun AwaitPointerEventScope.drag(
     pointerId: PointerId,
     onDrag: (PointerInputChange) -> Unit,
     motionFromChange: (PointerInputChange) -> Float,
@@ -508,7 +508,7 @@ private suspend inline fun HandlePointerInputScope.drag(
  * returned. When a drag is detected, that [PointerInputChange] is returned. A drag is
  * only detected when [hasDragged] returns `true`.
  */
-private suspend inline fun HandlePointerInputScope.awaitDragOrUp(
+private suspend inline fun AwaitPointerEventScope.awaitDragOrUp(
     pointerId: PointerId,
     hasDragged: (PointerInputChange) -> Boolean
 ): PointerInputChange {
@@ -553,7 +553,7 @@ private suspend inline fun HandlePointerInputScope.awaitDragOrUp(
  * `null` if all pointers are raised or the position change was consumed by another gesture
  * detector.
  */
-private suspend inline fun HandlePointerInputScope.awaitTouchSlopOrCancellation(
+private suspend inline fun AwaitPointerEventScope.awaitTouchSlopOrCancellation(
     pointerId: PointerId,
     onTouchSlopReached: (PointerInputChange, Float) -> Unit,
     getDragDirectionValue: (Offset) -> Float,
