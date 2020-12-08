@@ -38,15 +38,14 @@ class ShaderTest {
         val imageBitmap = ImageBitmap(100, 100)
         imageBitmap.drawInto {
             drawRect(
-                brush = LinearGradient(
+                brush = Brush.linearGradient(
                     0.0f to Color.Red,
                     0.5f to Color.Red,
                     0.5f to Color.Blue,
                     1.0f to Color.Blue,
-                    startX = 0.0f,
-                    startY = 0.0f,
-                    endX = 0.0f,
-                    endY = 100f
+                    start = Offset.Zero,
+                    end = Offset(0.0f, 100f),
+                    tileMode = TileMode.Clamp
                 )
             )
         }
@@ -68,14 +67,14 @@ class ShaderTest {
 
         imageBitmap.drawInto {
             drawCircle(
-                brush = RadialGradient(
+                brush = Brush.radialGradient(
                     0.0f to Color.Red,
                     0.5f to Color.Red,
                     0.5f to Color.Blue,
                     1.0f to Color.Blue,
-                    centerX = 50f,
-                    centerY = 50f,
-                    radius = 50f
+                    center = Offset(50f, 50f),
+                    radius = 50f,
+                    tileMode = TileMode.Clamp
                 )
             )
         }
@@ -100,12 +99,12 @@ class ShaderTest {
         val center = Offset(50f, 50f)
         imageBitmap.drawInto {
             drawRect(
-                brush = SweepGradient(
+                brush = Brush.sweepGradient(
                     0.0f to Color.Red,
                     0.5f to Color.Red,
                     0.5f to Color.Blue,
                     1.0f to Color.Blue,
-                    center = center,
+                    center = center
                 )
             )
         }
