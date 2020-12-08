@@ -95,9 +95,8 @@ internal constructor(
     }
 
     /**
-     * Starts polling the resources until all resources are idle. Won't start polling if all
-     * resources are already idle when this method is invoked, or if polling has already been
-     * started.
+     * Like [isIdleNow], but starts a poll job if the registry is not idle and no poll job is yet
+     * running.
      */
     internal fun isIdleOrEnsurePolling(): Boolean {
         @Suppress("DEPRECATION_ERROR")
