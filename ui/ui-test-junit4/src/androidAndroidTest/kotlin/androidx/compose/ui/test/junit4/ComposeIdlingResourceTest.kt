@@ -114,7 +114,7 @@ class ComposeIdlingResourceTest {
     }
 
     /**
-     * Detailed test to verify if [ComposeIdlingResource.isIdle] reports idleness correctly at
+     * Detailed test to verify if [ComposeIdlingResource.isIdleNow] reports idleness correctly at
      * key moments during the animation kick-off process.
      */
     @Test
@@ -138,28 +138,28 @@ class ComposeIdlingResourceTest {
 
         val wasIdleAfterRecompose = rule.runOnIdle {
             // Record idleness before kickoff of animation
-            wasIdleBeforeKickOff = composeIdlingResource.isIdle()
+            wasIdleBeforeKickOff = composeIdlingResource.isIdleNow
 
             // Kick off the animation
             animationRunning = true
             animationState.value = AnimationStates.To
 
             // Record idleness after kickoff of animation, but before the snapshot is applied
-            wasIdleBeforeApplySnapshot = composeIdlingResource.isIdle()
+            wasIdleBeforeApplySnapshot = composeIdlingResource.isIdleNow
 
             // Apply the snapshot
             @OptIn(ExperimentalComposeApi::class)
             Snapshot.sendApplyNotifications()
 
             // Record idleness after this snapshot is applied
-            wasIdleAfterApplySnapshot = composeIdlingResource.isIdle()
+            wasIdleAfterApplySnapshot = composeIdlingResource.isIdleNow
 
             // Record idleness after the first recomposition
             @OptIn(ExperimentalCoroutinesApi::class)
             scope.async(start = CoroutineStart.UNDISPATCHED) {
                 // Await a single recomposition
                 withFrameNanos {}
-                composeIdlingResource.isIdle()
+                composeIdlingResource.isIdleNow
             }
         }.let {
             runBlocking {
