@@ -16,15 +16,14 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.core.AnimationConstants.Infinite
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.FloatPropKey
 import androidx.compose.animation.core.IntPropKey
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.SpringSpec
+import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.keyframes
-import androidx.compose.animation.core.repeatable
 import androidx.compose.animation.core.transitionDefinition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.transition
@@ -412,32 +411,28 @@ private val LinearIndeterminateTransition = transitionDefinition<Int> {
     }
 
     transition(fromState = 0, toState = 1) {
-        FirstLineHeadProp using repeatable(
-            iterations = Infinite,
+        FirstLineHeadProp using infiniteRepeatable(
             animation = keyframes {
                 durationMillis = LinearAnimationDuration
                 0f at FirstLineHeadDelay with FirstLineHeadEasing
                 1f at FirstLineHeadDuration + FirstLineHeadDelay
             }
         )
-        FirstLineTailProp using repeatable(
-            iterations = Infinite,
+        FirstLineTailProp using infiniteRepeatable(
             animation = keyframes {
                 durationMillis = LinearAnimationDuration
                 0f at FirstLineTailDelay with FirstLineTailEasing
                 1f at FirstLineTailDuration + FirstLineTailDelay
             }
         )
-        SecondLineHeadProp using repeatable(
-            iterations = Infinite,
+        SecondLineHeadProp using infiniteRepeatable(
             animation = keyframes {
                 durationMillis = LinearAnimationDuration
                 0f at SecondLineHeadDelay with SecondLineHeadEasing
                 1f at SecondLineHeadDuration + SecondLineHeadDelay
             }
         )
-        SecondLineTailProp using repeatable(
-            iterations = Infinite,
+        SecondLineTailProp using infiniteRepeatable(
             animation = keyframes {
                 durationMillis = LinearAnimationDuration
                 0f at SecondLineTailDelay with SecondLineTailEasing
@@ -501,30 +496,26 @@ private val CircularIndeterminateTransition = transitionDefinition<Int> {
     }
 
     transition(fromState = 0, toState = 1) {
-        IterationProp using repeatable(
-            iterations = Infinite,
+        IterationProp using infiniteRepeatable(
             animation = tween(
                 durationMillis = RotationDuration * RotationsPerCycle,
                 easing = LinearEasing
             )
         )
-        BaseRotationProp using repeatable(
-            iterations = Infinite,
+        BaseRotationProp using infiniteRepeatable(
             animation = tween(
                 durationMillis = RotationDuration,
                 easing = LinearEasing
             )
         )
-        HeadRotationProp using repeatable(
-            iterations = Infinite,
+        HeadRotationProp using infiniteRepeatable(
             animation = keyframes {
                 durationMillis = HeadAndTailAnimationDuration + HeadAndTailDelayDuration
                 0f at 0 with CircularEasing
                 JumpRotationAngle at HeadAndTailAnimationDuration
             }
         )
-        TailRotationProp using repeatable(
-            iterations = Infinite,
+        TailRotationProp using infiniteRepeatable(
             animation = keyframes {
                 durationMillis = HeadAndTailAnimationDuration + HeadAndTailDelayDuration
                 0f at HeadAndTailDelayDuration with CircularEasing
