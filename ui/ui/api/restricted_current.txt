@@ -205,7 +205,7 @@ package androidx.compose.ui {
     ctor public TransformOrigin();
     method @androidx.compose.runtime.Stable public static inline operator float component1-impl(long $this);
     method @androidx.compose.runtime.Stable public static inline operator float component2-impl(long $this);
-    method public static long constructor-impl(internal long packedValue);
+    method public static long constructor-impl(long packedValue);
     method public static long copy-gtC0eh8(long $this, optional float pivotFractionX, optional float pivotFractionY);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
     method public static boolean equals-impl0(long p1, long p2);
@@ -1822,7 +1822,7 @@ package androidx.compose.ui.layout {
 
   public final inline class Measured {
     ctor public Measured();
-    method public static androidx.compose.ui.layout.Placeable! constructor-impl(internal androidx.compose.ui.layout.Placeable placeable);
+    method public static androidx.compose.ui.layout.Placeable! constructor-impl(androidx.compose.ui.layout.Placeable placeable);
     method public static inline boolean equals-impl(androidx.compose.ui.layout.Placeable! p, Object? p1);
     method public static boolean equals-impl0(androidx.compose.ui.layout.Placeable p1, androidx.compose.ui.layout.Placeable p2);
     method public static operator int get-impl(androidx.compose.ui.layout.Placeable $this, androidx.compose.ui.layout.AlignmentLine alignmentLine);
@@ -1896,7 +1896,7 @@ package androidx.compose.ui.layout {
     ctor public ScaleFactor();
     method @androidx.compose.runtime.Stable public static inline operator float component1-impl(long $this);
     method @androidx.compose.runtime.Stable public static inline operator float component2-impl(long $this);
-    method public static long constructor-impl(internal long packedValue);
+    method public static long constructor-impl(long packedValue);
     method public static long copy-_hLwfpc(long $this, optional float scaleX, optional float scaleY);
     method @androidx.compose.runtime.Stable public static operator long div-_hLwfpc(long $this, float operand);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
@@ -2794,7 +2794,7 @@ package androidx.compose.ui.semantics {
   }
 
   public final class SemanticsPropertyKey<T> {
-    ctor public SemanticsPropertyKey(String name, internal kotlin.jvm.functions.Function2<? super T,? super T,? extends T> mergePolicy);
+    ctor public SemanticsPropertyKey(String name, kotlin.jvm.functions.Function2<? super T,? super T,? extends T> mergePolicy);
     method public String getName();
     method public operator T! getValue(androidx.compose.ui.semantics.SemanticsPropertyReceiver thisRef, kotlin.reflect.KProperty<?> property);
     method public T? merge(T? parentValue, T? childValue);

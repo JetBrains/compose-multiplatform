@@ -622,7 +622,7 @@ package androidx.compose.material {
   }
 
   @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public class SwipeableState<T> {
-    ctor public SwipeableState(T? initialValue, androidx.compose.animation.core.AnimationClockObservable clock, internal androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, internal kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> confirmStateChange);
+    ctor public SwipeableState(T? initialValue, androidx.compose.animation.core.AnimationClockObservable clock, androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> confirmStateChange);
     method @androidx.compose.material.ExperimentalMaterialApi public final void animateTo(T? targetValue, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> anim, optional kotlin.jvm.functions.Function2<? super androidx.compose.animation.core.AnimationEndReason,? super T,kotlin.Unit>? onEnd);
     method public final float getDirection();
     method public final androidx.compose.runtime.State<java.lang.Float> getOffset();
