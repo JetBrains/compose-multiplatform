@@ -38,7 +38,6 @@ import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.subcomposeInto
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.util.fastForEach
 
 /**
  * Analogue of [Layout] which allows to subcompose the actual content during the measuring stage
@@ -78,8 +77,6 @@ fun SubcomposeLayout(
             set(AmbientLayoutDirection.current, LayoutEmitHelper.setLayoutDirection)
         }
     )
-
-    state.subcomposeIfRemeasureNotScheduled()
 }
 
 /**
@@ -156,15 +153,6 @@ private class SubcomposeLayoutState :
             subcompose(node, nodeState)
         }
         return node.children
-    }
-
-    fun subcomposeIfRemeasureNotScheduled() {
-        val root = root!!
-        if (root.layoutState != LayoutState.NeedsRemeasure && root.isAttached) {
-            root.foldedChildren.fastForEach {
-                subcompose(it, nodeToNodeState.getValue(it))
-            }
-        }
     }
 
     private fun subcompose(node: LayoutNode, nodeState: NodeState) {
