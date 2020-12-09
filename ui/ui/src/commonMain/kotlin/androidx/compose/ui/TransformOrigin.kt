@@ -17,6 +17,7 @@
 package androidx.compose.ui
 
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.util.packFloats
 import androidx.compose.ui.util.unpackFloat1
 import androidx.compose.ui.util.unpackFloat2
@@ -53,6 +54,14 @@ inline class TransformOrigin(@PublishedApi internal val packedValue: Long) {
      */
     val pivotFractionY: Float
         get() = unpackFloat2(packedValue)
+
+    @Suppress("NOTHING_TO_INLINE")
+    @Stable
+    inline operator fun component1(): Float = pivotFractionX
+
+    @Suppress("NOTHING_TO_INLINE")
+    @Stable
+    inline operator fun component2(): Float = pivotFractionY
 
     /**
      * Returns a copy of this TransformOrigin instance optionally overriding the
