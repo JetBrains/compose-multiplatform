@@ -20,6 +20,7 @@ import androidx.benchmark.macro.CompilationMode
 import androidx.benchmark.macro.MacrobenchmarkConfig
 import androidx.benchmark.macro.MacrobenchmarkRule
 import androidx.benchmark.macro.MacrobenchmarkScope
+import androidx.benchmark.macro.StartupMode
 import androidx.benchmark.macro.StartupTimingMetric
 
 /**
@@ -29,12 +30,11 @@ import androidx.benchmark.macro.StartupTimingMetric
 fun MacrobenchmarkRule.measureStartup(
     profileCompiled: Boolean,
     coldLaunch: Boolean,
-    setupBlock: MacrobenchmarkScope.() -> Unit = {},
-    measureBlock: MacrobenchmarkScope.() -> Unit = {
+    performStartup: MacrobenchmarkScope.() -> Unit = {
         pressHome()
         launchPackageAndWait()
     }
-) = measureRepeated(
+) = measureStartupRepeated(
     MacrobenchmarkConfig(
         packageName = "androidx.compose.integration.demos",
         metrics = listOf(StartupTimingMetric()),
@@ -43,9 +43,8 @@ fun MacrobenchmarkRule.measureStartup(
         } else {
             CompilationMode.None
         },
-        killProcessEachIteration = coldLaunch,
         iterations = 10
     ),
-    setupBlock,
-    measureBlock
+    startupMode = if (coldLaunch) StartupMode.COLD else StartupMode.WARM,
+    performStartup
 )
