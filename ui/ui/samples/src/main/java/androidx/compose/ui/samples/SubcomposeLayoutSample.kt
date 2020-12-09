@@ -27,7 +27,8 @@ fun SubcomposeLayoutSample(
     mainContent: @Composable () -> Unit,
     dependentContent: @Composable (IntSize) -> Unit
 ) {
-    SubcomposeLayout<SlotsEnum> { constraints ->
+    // enum class SlotsEnum { Main, Dependent }
+    SubcomposeLayout { constraints ->
         val mainPlaceables = subcompose(SlotsEnum.Main, mainContent).map {
             it.measure(constraints)
         }
@@ -48,7 +49,4 @@ fun SubcomposeLayoutSample(
     }
 }
 
-enum class SlotsEnum {
-    Main,
-    Dependent
-}
+enum class SlotsEnum { Main, Dependent }

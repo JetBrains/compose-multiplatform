@@ -225,7 +225,7 @@ private fun ScaffoldLayout(
     fab: @Composable () -> Unit,
     bottomBar: @Composable () -> Unit
 ) {
-    SubcomposeLayout<ScaffoldLayoutContent> { constraints ->
+    SubcomposeLayout { constraints ->
         val layoutWidth = constraints.maxWidth
         val layoutHeight = constraints.maxHeight
 

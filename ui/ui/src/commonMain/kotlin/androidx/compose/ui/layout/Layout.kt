@@ -537,7 +537,7 @@ fun WithConstraints(
     modifier: Modifier = Modifier,
     content: @Composable WithConstraintsScope.() -> Unit
 ) {
-    SubcomposeLayout<Unit>(modifier) { constraints ->
+    SubcomposeLayout(modifier) { constraints ->
         val scope = WithConstraintsScopeImpl(this, constraints)
         val placeables = subcompose(Unit) { scope.content() }
             .fastMap { it.measure(constraints) }
