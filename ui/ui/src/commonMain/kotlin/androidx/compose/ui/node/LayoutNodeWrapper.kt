@@ -548,7 +548,9 @@ internal abstract class LayoutNodeWrapper(
      * that wraps it. The focus state change must be propagated to the parents until we reach
      * another [focus node][ModifiedFocusNode].
      */
-    abstract fun propagateFocusStateChange(focusState: FocusState)
+    open fun propagateFocusEvent(focusState: FocusState) {
+        wrappedBy?.propagateFocusEvent(focusState)
+    }
 
     /**
      * Find the first ancestor that is a [ModifiedFocusNode].

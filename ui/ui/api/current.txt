@@ -139,13 +139,13 @@ package androidx.compose.ui {
     method public static androidx.compose.ui.Modifier focus(androidx.compose.ui.Modifier);
   }
 
-  public interface FocusObserverModifier extends androidx.compose.ui.Modifier.Element {
-    method public kotlin.jvm.functions.Function1<androidx.compose.ui.focus.FocusState,kotlin.Unit> getOnFocusChange();
+  @Deprecated public interface FocusObserverModifier extends androidx.compose.ui.Modifier.Element {
+    method @Deprecated public kotlin.jvm.functions.Function1<androidx.compose.ui.focus.FocusState,kotlin.Unit> getOnFocusChange();
     property public abstract kotlin.jvm.functions.Function1<androidx.compose.ui.focus.FocusState,kotlin.Unit> onFocusChange;
   }
 
   public final class FocusObserverModifierKt {
-    method public static androidx.compose.ui.Modifier focusObserver(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.focus.FocusState,kotlin.Unit> onFocusChange);
+    method @Deprecated public static androidx.compose.ui.Modifier focusObserver(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.focus.FocusState,kotlin.Unit> onFocusChange);
   }
 
   public interface FocusRequesterModifier extends androidx.compose.ui.Modifier.Element {
@@ -330,6 +330,18 @@ package androidx.compose.ui.draw {
 }
 
 package androidx.compose.ui.focus {
+
+  public final class FocusChangedModifierKt {
+    method public static androidx.compose.ui.Modifier onFocusChanged(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.focus.FocusState,kotlin.Unit> onFocusChanged);
+  }
+
+  public interface FocusEventModifier extends androidx.compose.ui.Modifier.Element {
+    method public void onFocusEvent(androidx.compose.ui.focus.FocusState focusState);
+  }
+
+  public final class FocusEventModifierKt {
+    method public static androidx.compose.ui.Modifier onFocusEvent(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.focus.FocusState,kotlin.Unit> onFocusEvent);
+  }
 
   public interface FocusManager {
     method public void clearFocus(optional boolean forcedClear);

@@ -17,7 +17,6 @@
 package androidx.compose.ui.node
 
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.GraphicsLayerScope
@@ -133,10 +132,6 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
             next = next.wrapped.findNextFocusWrapper()
         }
         return lastFocusWrapper
-    }
-
-    override fun propagateFocusStateChange(focusState: FocusState) {
-        wrappedBy?.propagateFocusStateChange(focusState)
     }
 
     override fun findPreviousNestedScrollWrapper() = wrappedBy?.findPreviousNestedScrollWrapper()

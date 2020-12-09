@@ -28,7 +28,7 @@ import androidx.compose.testutils.assertPixels
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.isFocused
-import androidx.compose.ui.focusObserver
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.RectangleShape
@@ -82,7 +82,7 @@ class TextFieldCursorTest {
                 modifier = Modifier
                     .preferredSize(width, height)
                     .background(Color.White)
-                    .focusObserver { if (it.isFocused) latch.countDown() },
+                    .onFocusChanged { if (it.isFocused) latch.countDown() },
                 cursorColor = Color.Red
             )
         }
@@ -117,7 +117,7 @@ class TextFieldCursorTest {
                     modifier = Modifier
                         .preferredSize(width, height)
                         .background(Color.White)
-                        .focusObserver { if (it.isFocused) latch.countDown() },
+                        .onFocusChanged { if (it.isFocused) latch.countDown() },
                     cursorColor = Color.Red
                 )
             }
@@ -167,7 +167,7 @@ class TextFieldCursorTest {
                     modifier = Modifier
                         .preferredSize(width, height)
                         .background(Color.White)
-                        .focusObserver { if (it.isFocused) latch.countDown() },
+                        .onFocusChanged { if (it.isFocused) latch.countDown() },
                     cursorColor = Color.Unspecified
                 )
             }
@@ -222,8 +222,7 @@ class TextFieldCursorTest {
                     modifier = Modifier
                         .preferredSize(width, height)
                         .background(Color.White)
-                        .focusObserver { if (it.isFocused) latch.countDown() },
-
+                        .onFocusChanged { if (it.isFocused) latch.countDown() },
                     cursorColor = Color.Red
                 )
             }

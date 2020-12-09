@@ -32,7 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.isFocused
-import androidx.compose.ui.focusObserver
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -84,7 +84,7 @@ private fun Circle(modifier: Modifier = Modifier, nextShape: () -> Unit) {
     val radius = size / 2
     Canvas(
         modifier
-            .focusObserver { isFocused = it.isFocused }
+            .onFocusChanged { isFocused = it.isFocused }
             .fillMaxSize()
             .focus()
     ) {
@@ -107,7 +107,7 @@ private fun Square(modifier: Modifier = Modifier, nextShape: () -> Unit) {
     val side = size
     Canvas(
         modifier
-            .focusObserver { isFocused = it.isFocused }
+            .onFocusChanged { isFocused = it.isFocused }
             .fillMaxSize()
             .focus()
     ) {

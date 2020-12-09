@@ -27,7 +27,7 @@ import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.isFocused
-import androidx.compose.ui.focusObserver
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Red
@@ -60,7 +60,7 @@ private fun TextFieldWithFocusRequesters(
     BasicTextField(
         value = state.value,
         modifier = demoTextFieldModifiers
-            .focusObserver { color = if (it.isFocused) Red else Black }
+            .onFocusChanged { color = if (it.isFocused) Red else Black }
             .focusRequester(focusRequester),
         textStyle = TextStyle(color = color, fontSize = 32.sp),
         onValueChange = { state.value = it },

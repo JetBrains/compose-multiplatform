@@ -24,7 +24,6 @@ import androidx.compose.ui.focus.FocusState.ActiveParent
 import androidx.compose.ui.focus.FocusState.Captured
 import androidx.compose.ui.focus.FocusState.Disabled
 import androidx.compose.ui.focus.FocusState.Inactive
-import androidx.compose.ui.focusObserver
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -48,7 +47,7 @@ class FreeFocusTest {
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
-                    .focusObserver { focusState = it }
+                    .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
                     .then(FocusModifier(focusState))
             )
@@ -72,7 +71,7 @@ class FreeFocusTest {
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
-                    .focusObserver { focusState = it }
+                    .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
                     .then(FocusModifier(focusState))
             )
@@ -96,7 +95,7 @@ class FreeFocusTest {
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
-                    .focusObserver { focusState = it }
+                    .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
                     .then(FocusModifier(focusState))
             )
@@ -120,7 +119,7 @@ class FreeFocusTest {
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
-                    .focusObserver { focusState = it }
+                    .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
                     .then(FocusModifier(focusState))
             )
@@ -144,7 +143,7 @@ class FreeFocusTest {
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
-                    .focusObserver { focusState = it }
+                    .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
                     .then(FocusModifier(focusState))
             )

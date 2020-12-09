@@ -44,7 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.isFocused
-import androidx.compose.ui.focusObserver
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -133,7 +133,7 @@ class TextFieldTest {
             Column {
                 TextField(
                     modifier = Modifier
-                        .focusObserver { textField1Focused = it.isFocused }
+                        .onFocusChanged { textField1Focused = it.isFocused }
                         .testTag(textField1Tag),
                     value = "input1",
                     onValueChange = {},
@@ -141,7 +141,7 @@ class TextFieldTest {
                 )
                 TextField(
                     modifier = Modifier
-                        .focusObserver { textField2Focused = it.isFocused }
+                        .onFocusChanged { textField2Focused = it.isFocused }
                         .testTag(textField2Tag),
                     value = "input2",
                     onValueChange = {},
@@ -172,7 +172,7 @@ class TextFieldTest {
             Box {
                 TextField(
                     modifier = Modifier
-                        .focusObserver { focused = it.isFocused }
+                        .onFocusChanged { focused = it.isFocused }
                         .testTag(TextfieldTag),
                     value = "input",
                     onValueChange = {},
@@ -820,7 +820,7 @@ class TextFieldTest {
             Box(Modifier.background(color = Color.White)) {
                 TextField(
                     modifier = Modifier
-                        .focusObserver { if (it.isFocused) latch.countDown() }
+                        .onFocusChanged { if (it.isFocused) latch.countDown() }
                         .testTag(TextfieldTag),
                     value = "",
                     onValueChange = {},

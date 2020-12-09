@@ -40,7 +40,7 @@ internal class FocusModifier(
     var focusState: FocusState = initialFocus
         set(value) {
             field = value
-            focusNode.wrappedBy?.propagateFocusStateChange(value)
+            focusNode.wrappedBy?.propagateFocusEvent(value)
         }
 
     var focusedChild: ModifiedFocusNode? = null
