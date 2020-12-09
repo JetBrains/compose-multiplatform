@@ -244,4 +244,10 @@ private fun StringBuilder.appendConfigInfo(config: SemanticsConfiguration, inden
         append(indent)
         append("MergeDescendants = 'true'")
     }
+
+    if (config.isClearingSemantics) {
+        appendLine()
+        append(indent)
+        append("ReplaceSemantics = 'true'")
+    }
 }

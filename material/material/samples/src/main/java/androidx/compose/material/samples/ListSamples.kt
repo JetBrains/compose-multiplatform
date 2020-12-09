@@ -19,12 +19,16 @@ package androidx.compose.material.samples
 import androidx.annotation.Sampled
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Divider
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.ListItem
+import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,6 +39,57 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.clearAndSetSemantics
+
+@Sampled
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun ClickableListItems() {
+    Column {
+        var switched by remember { mutableStateOf(false) }
+        val onSwitchedChange: (Boolean) -> Unit = { switched = it }
+        ListItem(
+            text = { Text("Switch ListItem") },
+            trailing = {
+                // The [clearAndSetSemantics] causes the switch's redundant
+                // toggleable semantics to be cleared in favor of the [ListItem]
+                // toggleable's, to improve usability with screen-readers.
+                Box(Modifier.clearAndSetSemantics {}) {
+                    Switch(
+                        checked = switched,
+                        onCheckedChange = onSwitchedChange
+                    )
+                }
+            },
+            modifier = Modifier.toggleable(
+                value = switched,
+                onValueChange = onSwitchedChange
+            )
+        )
+        Divider()
+        var checked by remember { mutableStateOf(true) }
+        val onCheckedChange: (Boolean) -> Unit = { checked = it }
+        ListItem(
+            text = { Text("Checkbox ListItem") },
+            trailing = {
+                // The [clearAndSetSemantics] causes the checkbox's redundant
+                // toggleable semantics to be cleared in favor of the [ListItem]
+                // toggleable's, to improve usability with screen-readers.
+                Box(Modifier.clearAndSetSemantics {}) {
+                    Checkbox(
+                        checked = checked,
+                        onCheckedChange = onCheckedChange
+                    )
+                }
+            },
+            modifier = Modifier.toggleable(
+                value = checked,
+                onValueChange = onCheckedChange
+            )
+        )
+        Divider()
+    }
+}
 
 @Sampled
 @Composable
@@ -128,21 +183,6 @@ fun TwoLineListItems(icon24x24: ImageBitmap, icon40x40: ImageBitmap) {
                     icon40x40,
                     colorFilter = ColorFilter.tint(AmbientContentColor.current)
                 )
-            }
-        )
-        Divider()
-        var checked by remember { mutableStateOf(false) }
-        ListItem(
-            text = { Text("Two line list item") },
-            secondaryText = { Text("Secondary text") },
-            icon = {
-                Image(
-                    icon40x40,
-                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
-                )
-            },
-            trailing = {
-                Checkbox(checked, onCheckedChange = { checked = !checked })
             }
         )
         Divider()
@@ -263,22 +303,6 @@ fun TwoLineRtlLtrListItems(icon40x40: ImageBitmap) {
                     colorFilter = ColorFilter.tint(AmbientContentColor.current)
                 )
             }
-        )
-        Divider()
-        ListItem(
-            text = { Text("Clickable two line item") },
-            secondaryText = { Text("Secondary text") },
-            icon = {
-                Image(
-                    icon40x40,
-                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
-                )
-            },
-            trailing = {
-                var checked by remember { mutableStateOf(false) }
-                Checkbox(checked, onCheckedChange = { checked = !checked })
-            },
-            modifier = Modifier.clickable { }
         )
         Divider()
         ListItem(

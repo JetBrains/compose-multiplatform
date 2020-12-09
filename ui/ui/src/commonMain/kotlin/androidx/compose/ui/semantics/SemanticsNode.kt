@@ -139,9 +139,7 @@ class SemanticsNode internal constructor(
         get() {
             if (isMergingSemanticsOfDescendants) {
                 val mergedConfig = unmergedConfig.copy()
-                unmergedChildren().fastForEach { child ->
-                    child.mergeConfig(mergedConfig)
-                }
+                mergeConfig(mergedConfig)
                 return mergedConfig
             } else {
                 return unmergedConfig
@@ -149,15 +147,17 @@ class SemanticsNode internal constructor(
         }
 
     private fun mergeConfig(mergedConfig: SemanticsConfiguration) {
-        // Don't merge children that themselves merge all their descendants (because that
-        // indicates they're independently screen-reader-focusable).
-        if (isMergingSemanticsOfDescendants) {
-            return
-        }
+        if (!unmergedConfig.isClearingSemantics) {
+            unmergedChildren().fastForEach { child ->
+                // Don't merge children that themselves merge all their descendants (because that
+                // indicates they're independently screen-reader-focusable).
+                if (child.isMergingSemanticsOfDescendants) {
+                    return
+                }
 
-        mergedConfig.mergeChild(unmergedConfig)
-        unmergedChildren().fastForEach { child ->
-            child.mergeConfig(mergedConfig)
+                mergedConfig.mergeChild(child.unmergedConfig)
+                child.mergeConfig(mergedConfig)
+            }
         }
     }
 
@@ -184,6 +184,11 @@ class SemanticsNode internal constructor(
     //               optimize this when the merging algorithm is improved.
     val children: List<SemanticsNode>
         get() {
+            // Replacing semantics never appear to have any children in the merged tree.
+            if (mergingEnabled && unmergedConfig.isClearingSemantics) {
+                return listOf()
+            }
+
             if (isMergingSemanticsOfDescendants) {
                 // In most common merging scenarios like Buttons, this will return nothing.
                 // In cases like a clickable Row itself containing a Button, this will
@@ -258,7 +263,9 @@ class SemanticsNode internal constructor(
             if (child.isMergingSemanticsOfDescendants == true) {
                 list.add(child)
             } else {
-                child.findOneLayerOfMergingSemanticsNodes(list)
+                if (child.unmergedConfig.isClearingSemantics == false) {
+                    child.findOneLayerOfMergingSemanticsNodes(list)
+                }
             }
         }
         return list
