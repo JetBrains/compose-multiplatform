@@ -139,7 +139,8 @@ internal class ComposeIdlingResource : IdlingResource, IdlingResourceWithDiagnos
     private var hadNoRecomposerChanges = true
     private var lastCompositionAwaiters = 0
     private var hadNoPendingMeasureLayout = true
-    private var hadNoPendingDraw = true
+    // TODO(b/174244530): Include hadNoPendingDraw when it is reliable
+//    private var hadNoPendingDraw = true
 
     private var compositionAwaiters = AtomicInteger(0)
 
@@ -156,10 +157,11 @@ internal class ComposeIdlingResource : IdlingResource, IdlingResourceWithDiagnos
             lastCompositionAwaiters = compositionAwaiters.get()
             val owners = androidOwnerRegistry.getUnfilteredOwners()
             hadNoPendingMeasureLayout = !owners.any { it.hasPendingMeasureOrLayout }
-            hadNoPendingDraw = !owners.any {
-                val hasContent = it.view.measuredWidth != 0 && it.view.measuredHeight != 0
-                it.view.isDirty && (hasContent || it.view.isLayoutRequested)
-            }
+            // TODO(b/174244530): Include hadNoPendingDraw when it is reliable
+//            hadNoPendingDraw = !owners.any {
+//                val hasContent = it.view.measuredWidth != 0 && it.view.measuredHeight != 0
+//                it.view.isDirty && (hasContent || it.view.isLayoutRequested)
+//            }
 
             check(lastCompositionAwaiters >= 0) {
                 "More CompositionAwaiters were removed then added ($lastCompositionAwaiters)"
@@ -169,8 +171,9 @@ internal class ComposeIdlingResource : IdlingResource, IdlingResourceWithDiagnos
                 hadNoRecomposerChanges &&
                 hadAnimationClocksIdle &&
                 lastCompositionAwaiters == 0 &&
-                hadNoPendingMeasureLayout &&
-                hadNoPendingDraw
+                // TODO(b/174244530): Include hadNoPendingDraw when it is reliable
+                hadNoPendingMeasureLayout /*&&
+                hadNoPendingDraw*/
         }
     }
 
@@ -255,7 +258,8 @@ internal class ComposeIdlingResource : IdlingResource, IdlingResourceWithDiagnos
         val numCompositionAwaiters = lastCompositionAwaiters
         val wasAwaitingCompositions = numCompositionAwaiters > 0
         val hadPendingMeasureLayout = !hadNoPendingMeasureLayout
-        val hadPendingDraw = !hadNoPendingDraw
+        // TODO(b/174244530): Include hadNoPendingDraw when it is reliable
+//        val hadPendingDraw = !hadNoPendingDraw
 
         val wasIdle = !hadSnapshotChanges && !hadRecomposerChanges &&
             !hadRunningAnimations && !wasAwaitingCompositions
@@ -280,8 +284,9 @@ internal class ComposeIdlingResource : IdlingResource, IdlingResourceWithDiagnos
             message += "- Debug: hadRecomposerChanges = $hadRecomposerChanges, "
             message += "hadSnapshotChanges = $hadSnapshotChanges, "
             message += "numCompositionAwaiters = $numCompositionAwaiters, "
-            message += "hadPendingMeasureLayout = $hadPendingMeasureLayout, "
-            message += "hadPendingDraw = $hadPendingDraw"
+            message += "hadPendingMeasureLayout = $hadPendingMeasureLayout"
+            // TODO(b/174244530): Include hadNoPendingDraw when it is reliable
+//            message += ", hadPendingDraw = $hadPendingDraw"
         }
         return message
     }
