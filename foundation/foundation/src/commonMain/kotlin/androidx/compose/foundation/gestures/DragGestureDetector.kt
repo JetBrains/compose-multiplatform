@@ -25,7 +25,6 @@ import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.anyPositionChangeConsumed
 import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
-import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.input.pointer.positionChangeIgnoreConsumed
 import androidx.compose.ui.input.pointer.positionChangedIgnoreConsumed
@@ -236,11 +235,7 @@ suspend fun HandlePointerInputScope.awaitVerticalTouchSlopOrCancellation(
 ) = awaitTouchSlopOrCancellation(
     pointerId = pointerId,
     onTouchSlopReached = onTouchSlopReached,
-    getDragDirectionValue = { it.y },
-    consumeMotion = { change, consumed ->
-        change.consumePositionChange(0f, consumed)
-    },
-    getCrossDirectionValue = { it.x }
+    getDragDirectionValue = { it.y }
 )
 
 /**
@@ -366,11 +361,7 @@ suspend fun HandlePointerInputScope.awaitHorizontalTouchSlopOrCancellation(
 ) = awaitTouchSlopOrCancellation(
     pointerId = pointerId,
     onTouchSlopReached = onTouchSlopReached,
-    getDragDirectionValue = { it.x },
-    consumeMotion = { change, consumed ->
-        change.consumePositionChange(consumed, 0f)
-    },
-    getCrossDirectionValue = { it.y }
+    getDragDirectionValue = { it.x }
 )
 
 /**
@@ -539,15 +530,12 @@ private suspend inline fun HandlePointerInputScope.awaitDragOrUp(
  *
  * When touch slop is detected, [onTouchSlopReached] is called with the change and the distance
  * beyond the touch slop. [getDragDirectionValue] should return the position change in the direction
- * of the drag and [getCrossDirectionValue] should return the position change along the
- * perpendicular axis. If [onTouchSlopReached] does not consume the position change, touch slop
+ * of the drag axis. If [onTouchSlopReached] does not consume the position change, touch slop
  * will not have been considered detected and the detection will continue or, if it is consumed,
  * the [PointerInputChange] that was consumed will be returned.
  *
  * This works with [awaitTouchSlopOrCancellation] for the other axis to ensure that only horizontal
  * or vertical dragging is done, but not both.
- *
- * [consumeMotion] should consume the position change along the drag axis.
  *
  * @return The [PointerInputChange] of the event that was consumed in [onTouchSlopReached] or
  * `null` if all pointers are raised or the position change was consumed by another gesture
@@ -556,9 +544,7 @@ private suspend inline fun HandlePointerInputScope.awaitDragOrUp(
 private suspend inline fun HandlePointerInputScope.awaitTouchSlopOrCancellation(
     pointerId: PointerId,
     onTouchSlopReached: (PointerInputChange, Float) -> Unit,
-    getDragDirectionValue: (Offset) -> Float,
-    consumeMotion: (PointerInputChange, Float) -> Unit,
-    getCrossDirectionValue: (Offset) -> Float
+    getDragDirectionValue: (Offset) -> Float
 ): PointerInputChange? {
     if (currentEvent.isPointerUp(pointerId)) {
         return null // The pointer has already been lifted, so the gesture is canceled
@@ -566,7 +552,6 @@ private suspend inline fun HandlePointerInputScope.awaitTouchSlopOrCancellation(
     val touchSlop = viewConfiguration.touchSlop
     var pointer: PointerId = pointerId
     var totalPositionChange = 0f
-    var totalCrossPositionChange = 0f
 
     while (true) {
         val event = awaitPointerEvent()
@@ -587,11 +572,8 @@ private suspend inline fun HandlePointerInputScope.awaitTouchSlopOrCancellation(
             val positionChange = getDragDirectionValue(currentPosition) -
                 getDragDirectionValue(previousPosition)
             totalPositionChange += positionChange
-            totalCrossPositionChange +=
-                getCrossDirectionValue(currentPosition) - getCrossDirectionValue(previousPosition)
 
             val inDirection = abs(totalPositionChange)
-            val crossDirection = abs(totalCrossPositionChange)
             if (inDirection < touchSlop) {
                 // verify that nothing else consumed the drag event
                 awaitPointerEvent(PointerEventPass.Final)
@@ -599,22 +581,6 @@ private suspend inline fun HandlePointerInputScope.awaitTouchSlopOrCancellation(
                     return null
                 }
             } else {
-                if (crossDirection > inDirection) {
-                    // Consume the position change in the direction that we care about
-                    consumeMotion(dragEvent, positionChange)
-
-                    // give the other direction a chance to consume
-                    awaitPointerEvent(PointerEventPass.Final)
-
-                    // Unconsume the position change
-                    consumeMotion(dragEvent, -positionChange)
-
-                    if (dragEvent.anyPositionChangeConsumed()) {
-                        return null
-                    } else {
-                        totalCrossPositionChange = 0f
-                    }
-                }
                 onTouchSlopReached(
                     dragEvent,
                     totalPositionChange - (sign(totalPositionChange) * touchSlop)
