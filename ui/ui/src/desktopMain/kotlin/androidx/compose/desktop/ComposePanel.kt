@@ -27,12 +27,6 @@ import javax.swing.JPanel
  * ComposePanel is panel for building UI using Compose for Desktop.
  */
 class ComposePanel : JPanel {
-    companion object {
-        init {
-            initCompose()
-        }
-    }
-
     constructor() : super() {
         setLayout(GridLayout(1, 1))
     }

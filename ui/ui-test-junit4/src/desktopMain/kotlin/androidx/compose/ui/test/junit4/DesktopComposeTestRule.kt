@@ -32,7 +32,6 @@ import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.SemanticsNodeInteractionCollection
 import androidx.compose.ui.test.TestOwner
 import androidx.compose.ui.test.createTestContext
-import androidx.compose.ui.test.initCompose
 import androidx.compose.ui.text.input.EditOperation
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.Density
@@ -53,10 +52,6 @@ actual fun createComposeRule(): ComposeTestRule = DesktopComposeTestRule()
 class DesktopComposeTestRule : ComposeTestRule {
 
     companion object {
-        init {
-            initCompose()
-        }
-
         var current: DesktopComposeTestRule? = null
     }
 

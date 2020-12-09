@@ -18,8 +18,6 @@
 
 package androidx.compose.desktop
 
-import org.jetbrains.skiko.Library
-
 /**
  * Can be called multiple times.
  *
@@ -35,16 +33,6 @@ import org.jetbrains.skiko.Library
  *     }
  * }
  */
-fun initCompose() {
-    // call object initializer only once
-    ComposeInit
-}
-
-private object ComposeInit {
-    init {
-        Library.load("/", "skiko")
-        // Until https://github.com/Kotlin/kotlinx.coroutines/issues/2039 is resolved
-        // we have to set this property manually for coroutines to work.
-        System.getProperties().setProperty("kotlinx.coroutines.fast.service.loader", "false")
-    }
-}
+@Suppress("DeprecatedCallableAddReplaceWith")
+@Deprecated("We don't need to init Compose explicitly now")
+fun initCompose() = Unit
