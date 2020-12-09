@@ -45,11 +45,11 @@ class EditProcessorTest {
         val model = TextFieldValue("ABCDE", TextRange.Zero)
         proc.onNewState(model, tis, inputSessionToken)
 
-        assertEquals(model, proc.mPreviousValue)
+        assertEquals(model, proc.mBufferState)
         val captor = argumentCaptor<TextFieldValue>()
         verify(tis, times(1)).onStateUpdated(
             eq(inputSessionToken),
-            eq(null),
+            eq(TextFieldValue("", TextRange.Zero)),
             captor.capture()
         )
         assertEquals(1, captor.allValues.size)
