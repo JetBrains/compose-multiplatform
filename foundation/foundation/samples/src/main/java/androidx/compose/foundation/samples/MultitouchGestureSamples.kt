@@ -48,19 +48,23 @@ import androidx.compose.ui.input.pointer.pointerInput
 fun DetectMultitouchGestures() {
     var angle by remember { mutableStateOf(0f) }
     var zoom by remember { mutableStateOf(1f) }
-    val offsetX = remember { mutableStateOf(0f) }
-    val offsetY = remember { mutableStateOf(0f) }
+    var offsetX by remember { mutableStateOf(0f) }
+    var offsetY by remember { mutableStateOf(0f) }
     Box(
-        Modifier.offset({ offsetX.value }, { offsetY.value })
-            .graphicsLayer(scaleX = zoom, scaleY = zoom, rotationZ = angle)
+        Modifier.offset({ offsetX }, { offsetY })
+            .graphicsLayer(
+                scaleX = zoom,
+                scaleY = zoom,
+                rotationZ = angle
+            )
             .background(Color.Blue)
             .pointerInput {
                 detectMultitouchGestures(
-                    onRotate = { angle += it },
-                    onZoom = { zoom *= it },
-                    onPan = {
-                        offsetX.value += it.x
-                        offsetY.value += it.y
+                    onGesture = { _, pan, gestureZoom, gestureRotate ->
+                        angle += gestureRotate
+                        zoom *= gestureZoom
+                        offsetX += pan.x
+                        offsetY += pan.y
                     }
                 )
             }

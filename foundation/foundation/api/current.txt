@@ -265,7 +265,7 @@ package androidx.compose.foundation.gestures {
     method public static long calculatePan(androidx.compose.ui.input.pointer.PointerEvent);
     method public static float calculateRotation(androidx.compose.ui.input.pointer.PointerEvent);
     method public static float calculateZoom(androidx.compose.ui.input.pointer.PointerEvent);
-    method @androidx.compose.ui.gesture.ExperimentalPointerInput public static suspend Object? detectMultitouchGestures(androidx.compose.ui.input.pointer.PointerInputScope, optional boolean panZoomLock, optional kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit> onRotate, optional kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit> onZoom, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onPan, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method @androidx.compose.ui.gesture.ExperimentalPointerInput public static suspend Object? detectMultitouchGestures(androidx.compose.ui.input.pointer.PointerInputScope, optional boolean panZoomLock, kotlin.jvm.functions.Function4<? super androidx.compose.ui.geometry.Offset,? super androidx.compose.ui.geometry.Offset,? super java.lang.Float,? super java.lang.Float,kotlin.Unit> onGesture, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
   }
 
   public interface PressGestureScope extends androidx.compose.ui.unit.Density {
