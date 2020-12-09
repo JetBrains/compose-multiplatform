@@ -16,7 +16,6 @@
 
 package androidx.compose.desktop
 
-import androidx.compose.ui.test.TestThread
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
