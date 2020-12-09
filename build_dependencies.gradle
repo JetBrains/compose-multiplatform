@@ -23,7 +23,7 @@ build_versions.agp = build_versions.studio["agp"]
 build_versions.lint = build_versions.studio["lint"]
 
 build_versions.kotlin = "1.4.0"
-build_versions.kotlin_coroutines = "1.3.9"
+build_versions.kotlin_coroutines = "1.4.1"
 
 build_versions.hilt = "2.29.1-alpha"
 
