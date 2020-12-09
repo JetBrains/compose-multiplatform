@@ -21,10 +21,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.ui.DrawModifier
+import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawLayer
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.OwnedLayer
@@ -51,7 +51,9 @@ class ModifierInfoTest : ToolingTest() {
                     val px10 = 10f.toDp()
                     val px5 = 5f.toDp()
                     Box {
-                        Column(Modifier.padding(px10).drawLayer().background(color = Color.Blue)) {
+                        Column(
+                            Modifier.padding(px10).graphicsLayer().background(color = Color.Blue)
+                        ) {
                             Box(Modifier.padding(px5).size(px5))
                         }
                     }

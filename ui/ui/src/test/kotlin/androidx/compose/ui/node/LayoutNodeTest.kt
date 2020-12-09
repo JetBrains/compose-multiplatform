@@ -16,19 +16,19 @@
 package androidx.compose.ui.node
 
 import androidx.compose.ui.ContentDrawScope
-import androidx.compose.ui.DrawModifier
+import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.TransformOrigin
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
-import androidx.compose.ui.drawBehind
-import androidx.compose.ui.drawLayer
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.KeyEvent
@@ -737,7 +737,7 @@ class LayoutNodeTest {
         layoutNode.attach(MockOwner())
         assertTrue(oldLayoutNodeWrapper.isAttached)
 
-        layoutNode.modifier = Modifier.drawLayer()
+        layoutNode.modifier = Modifier.graphicsLayer()
         val newLayoutNodeWrapper = layoutNode.outerLayoutNodeWrapper
         assertTrue(newLayoutNodeWrapper.isAttached)
         assertFalse(oldLayoutNodeWrapper.isAttached)

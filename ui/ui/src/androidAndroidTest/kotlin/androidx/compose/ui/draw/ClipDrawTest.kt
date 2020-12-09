@@ -25,8 +25,6 @@ import androidx.compose.ui.Padding
 import androidx.compose.ui.assertColorsEqual
 import androidx.compose.ui.assertRect
 import androidx.compose.ui.background
-import androidx.compose.ui.drawBehind
-import androidx.compose.ui.drawLayer
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -39,6 +37,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.padding
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.runOnUiThreadIR
@@ -393,7 +392,7 @@ class ClipDrawTest {
             drawLatch.countDown()
         }
 
-        val clip = Modifier.drawLayer {
+        val clip = Modifier.graphicsLayer {
             shape = model.value
             clip = true
         }

@@ -28,7 +28,7 @@ import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.dispatch.MonotonicFrameClock
 import androidx.compose.runtime.withRunningRecomposer
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.TransformOrigin
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.focus.ExperimentalFocus

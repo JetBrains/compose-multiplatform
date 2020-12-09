@@ -27,8 +27,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.background
-import androidx.compose.ui.drawLayer
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.assertCenterPixelColor
 import androidx.compose.ui.platform.testTag
@@ -62,7 +62,7 @@ class InvalidatingNotPlacedChildTest {
             ) {
                 Spacer(
                     Modifier.size(5.dp)
-                        .drawLayer()
+                        .graphicsLayer()
                         .background(Color.Red)
                 )
             }
@@ -94,7 +94,7 @@ class InvalidatingNotPlacedChildTest {
                 MeasureInLayoutBlock {
                     Spacer(
                         Modifier.fillMaxSize()
-                            .drawLayer()
+                            .graphicsLayer()
                             .background(Color.Gray)
                     )
                 }
@@ -128,7 +128,7 @@ class InvalidatingNotPlacedChildTest {
                 MeasureInLayoutBlock {
                     Spacer(
                         Modifier.fillMaxSize()
-                            .drawLayer()
+                            .graphicsLayer()
                             .background(color)
                     )
                 }

@@ -35,11 +35,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawBehind
-import androidx.compose.ui.drawLayer
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.ExperimentalPointerInput
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 
 @OptIn(ExperimentalPointerInput::class)
@@ -52,11 +52,8 @@ fun DetectMultitouchGestures() {
     val offsetY = remember { mutableStateOf(0f) }
     Box(
         Modifier.offset({ offsetX.value }, { offsetY.value })
-            .drawLayer(
-                scaleX = zoom,
-                scaleY = zoom,
-                rotationZ = angle
-            ).background(Color.Blue)
+            .graphicsLayer(scaleX = zoom, scaleY = zoom, rotationZ = angle)
+            .background(Color.Blue)
             .pointerInput {
                 detectMultitouchGestures(
                     onRotate = { angle += it },
@@ -78,7 +75,7 @@ fun CalculateRotation() {
     var angle by remember { mutableStateOf(0f) }
     Box(
         Modifier
-            .drawLayer(rotationZ = angle)
+            .graphicsLayer(rotationZ = angle)
             .background(Color.Blue)
             .pointerInput {
                 forEachGesture {
@@ -103,7 +100,7 @@ fun CalculateZoom() {
     var zoom by remember { mutableStateOf(1f) }
     Box(
         Modifier
-            .drawLayer(scaleX = zoom, scaleY = zoom)
+            .graphicsLayer(scaleX = zoom, scaleY = zoom)
             .background(Color.Blue)
             .pointerInput {
                 forEachGesture {
@@ -129,7 +126,7 @@ fun CalculatePan() {
     Box(
         Modifier
             .offset({ offsetX.value }, { offsetY.value })
-            .drawLayer()
+            .graphicsLayer()
             .background(Color.Blue)
             .pointerInput {
                 forEachGesture {

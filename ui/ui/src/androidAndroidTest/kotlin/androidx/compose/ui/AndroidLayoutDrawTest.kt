@@ -47,6 +47,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.testutils.assertPixels
+import androidx.compose.ui.draw.DrawModifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -54,10 +57,12 @@ import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.HorizontalAlignmentLine
 import androidx.compose.ui.layout.IntrinsicMeasurable
@@ -760,7 +765,7 @@ class AndroidLayoutDrawTest {
                         AtLeastSize(size = 10) {
                             AtLeastSize(
                                 size = 10,
-                                modifier = Modifier.drawLayer().fillColor(Color.Cyan)
+                                modifier = Modifier.graphicsLayer().fillColor(Color.Cyan)
                             ) {
                             }
                         }
@@ -1646,16 +1651,16 @@ class AndroidLayoutDrawTest {
                 layout(
                     Modifier
                         .assertLines(30, 30)
-                        .drawLayer()
+                        .graphicsLayer()
                         .offset(20.toDp(), 10.toDp())
                 )
                 layout(
                     Modifier
                         .assertLines(30, 30)
                         .background(Color.Blue)
-                        .drawLayer()
+                        .graphicsLayer()
                         .offset(20.toDp(), 10.toDp())
-                        .drawLayer()
+                        .graphicsLayer()
                         .background(Color.Blue)
                 )
                 layout(
@@ -1663,9 +1668,9 @@ class AndroidLayoutDrawTest {
                         .background(Color.Blue)
                         .assertLines(30, 30)
                         .background(Color.Blue)
-                        .drawLayer()
+                        .graphicsLayer()
                         .offset(20.toDp(), 10.toDp())
-                        .drawLayer()
+                        .graphicsLayer()
                         .background(Color.Blue)
                 )
                 Wrap(
@@ -1673,9 +1678,9 @@ class AndroidLayoutDrawTest {
                         .background(Color.Blue)
                         .assertLines(30, 30)
                         .background(Color.Blue)
-                        .drawLayer()
+                        .graphicsLayer()
                         .offset(20.toDp(), 10.toDp())
-                        .drawLayer()
+                        .graphicsLayer()
                         .background(Color.Blue)
                 ) {
                     layout(Modifier)
@@ -1685,9 +1690,9 @@ class AndroidLayoutDrawTest {
                         .background(Color.Blue)
                         .assertLines(40, 50)
                         .background(Color.Blue)
-                        .drawLayer()
+                        .graphicsLayer()
                         .offset(20.toDp(), 10.toDp())
-                        .drawLayer()
+                        .graphicsLayer()
                         .background(Color.Blue)
                 ) {
                     layout(Modifier.offset(10.toDp(), 20.toDp()))
@@ -1837,7 +1842,10 @@ class AndroidLayoutDrawTest {
             activity.setContent {
                 Layout(
                     content = {
-                        Layout(modifier = Modifier.drawLayer(), content = emptyContent()) { _, _ ->
+                        Layout(
+                            modifier = Modifier.graphicsLayer(),
+                            content = emptyContent()
+                        ) { _, _ ->
                             latch.countDown()
                             layout(model.size, model.size) {}
                         }
@@ -1883,7 +1891,7 @@ class AndroidLayoutDrawTest {
             activity.setContent {
                 AtLeastSize(
                     100,
-                    Modifier.padding(10).drawLayer()
+                    Modifier.padding(10).graphicsLayer()
                         .drawBehind {
                             assertEquals(100.0f, size.width)
                             assertEquals(100.0f, size.height)
@@ -2068,7 +2076,7 @@ class AndroidLayoutDrawTest {
                 FixedSize(30, Modifier.background(Color.Green)) {
                     FixedSize(
                         10,
-                        Modifier.drawLayer()
+                        Modifier.graphicsLayer()
                             .padding(10)
                             .background(model, true)
                             .drawLatchModifier()
@@ -2187,7 +2195,7 @@ class AndroidLayoutDrawTest {
                 ) {
                     FixedSize(
                         offset.value,
-                        modifier = AlignTopLeft.drawLayer()
+                        modifier = AlignTopLeft.graphicsLayer()
                             .drawBehind {
                                 drawLatch.countDown()
                                 drawRect(blue)
@@ -2418,7 +2426,7 @@ class AndroidLayoutDrawTest {
     @Test
     fun layerModifier_scaleChange() {
         val scale = mutableStateOf(1f)
-        val layerModifier = Modifier.drawLayer {
+        val layerModifier = Modifier.graphicsLayer {
             scaleX = scale.value
             scaleY = scale.value
         }
@@ -2472,7 +2480,7 @@ class AndroidLayoutDrawTest {
                     FixedSize(
                         size = 10,
                         modifier = Modifier.padding(10)
-                            .drawLayer(shape = triangleShape)
+                            .graphicsLayer(shape = triangleShape)
                             .drawBehind {
                                 drawRect(
                                     Color.Blue,
@@ -2499,7 +2507,7 @@ class AndroidLayoutDrawTest {
                     @Composable {
                         FixedSize(
                             size = 10,
-                            modifier = Modifier.drawLayer()
+                            modifier = Modifier.graphicsLayer()
                                 .padding(10)
                                 .background(innerColor.value)
                                 .latch(drawLatch)
@@ -2508,11 +2516,11 @@ class AndroidLayoutDrawTest {
                 }
                 FixedSize(
                     size = 30,
-                    modifier = Modifier.drawLayer().background(Color.Blue)
+                    modifier = Modifier.graphicsLayer().background(Color.Blue)
                 ) {
                     FixedSize(
                         size = 30,
-                        modifier = Modifier.drawLayer(),
+                        modifier = Modifier.graphicsLayer(),
                         content = content
                     )
                 }
@@ -2537,7 +2545,7 @@ class AndroidLayoutDrawTest {
             activity.setContent {
                 FixedSize(
                     30,
-                    Modifier.drawBehind { outerLatch.countDown() }.drawLayer()
+                    Modifier.drawBehind { outerLatch.countDown() }.graphicsLayer()
                 ) {
                     FixedSize(
                         10,
@@ -2571,7 +2579,7 @@ class AndroidLayoutDrawTest {
     fun detachChildWithLayer() {
         activityTestRule.runOnUiThread {
             val composition = activity.setContent {
-                FixedSize(10, Modifier.drawLayer()) {
+                FixedSize(10, Modifier.graphicsLayer()) {
                     FixedSize(8)
                 }
             }
@@ -2589,7 +2597,7 @@ class AndroidLayoutDrawTest {
             activity.setContent {
                 val yellowSquare = @Composable {
                     FixedSize(
-                        10, Modifier.drawLayer().background(Color.Yellow).drawLatchModifier()
+                        10, Modifier.graphicsLayer().background(Color.Yellow).drawLatchModifier()
                     ) {
                     }
                 }
@@ -2641,7 +2649,7 @@ class AndroidLayoutDrawTest {
                     FixedSize(
                         10,
                         Modifier.padding(10)
-                            .drawLayer {
+                            .graphicsLayer {
                                 translationLatch.countDown()
                                 translationX = offset.value
                                 translationY = offset.value
@@ -2789,7 +2797,7 @@ class AndroidLayoutDrawTest {
                     size = 10,
                     modifier = Modifier.background(color = color).drawLatchModifier().then(
                         Modifier.padding(10)
-                            .drawLayer()
+                            .graphicsLayer()
                             .background(Color.White)
                     )
                 )
@@ -2818,7 +2826,7 @@ class AndroidLayoutDrawTest {
                         FixedSize(
                             size = 10,
                             modifier = Modifier
-                                .drawLayer()
+                                .graphicsLayer()
                                 .zIndex(zIndex)
                                 .padding(10.toDp())
                                 .background(Color.White)
@@ -2826,7 +2834,7 @@ class AndroidLayoutDrawTest {
                         FixedSize(
                             size = 10,
                             modifier = Modifier
-                                .drawLayer()
+                                .graphicsLayer()
                                 .zIndex(0f)
                                 .padding(10.toDp())
                                 .background(Color.Yellow)
@@ -2905,7 +2913,7 @@ class AndroidLayoutDrawTest {
                     size = 10,
                     modifier = Modifier.background(Color.Blue)
                         .padding(10)
-                        .drawLayer()
+                        .graphicsLayer()
                         .then(if (showInner) Modifier.background(Color.White) else Modifier)
                         .drawLatchModifier()
                 )
@@ -3349,11 +3357,11 @@ class AndroidLayoutDrawTest {
                 Padding(
                     size = model.size,
                     modifier = Modifier.fillColor(model, isInner = false, doCountDown = false)
-                        .drawLayer()
+                        .graphicsLayer()
                 ) {
                     AtLeastSize(
                         size = model.size,
-                        modifier = Modifier.drawLayer().fillColor(model, isInner = true)
+                        modifier = Modifier.graphicsLayer().fillColor(model, isInner = true)
                     ) {
                     }
                 }
@@ -3371,7 +3379,7 @@ class AndroidLayoutDrawTest {
                 ) {
                     AtLeastSize(
                         size = model.size,
-                        modifier = Modifier.drawLayer().fillColor(model, isInner = true)
+                        modifier = Modifier.graphicsLayer().fillColor(model, isInner = true)
                     ) {
                     }
                 }
@@ -4015,7 +4023,7 @@ class LayoutAndDrawModifier(val color: Color) : LayoutModifier, DrawModifier {
 }
 
 fun Modifier.scale(scale: Float) = then(LayoutScale(scale))
-    .drawLayer(scaleX = scale, scaleY = scale)
+    .graphicsLayer(scaleX = scale, scaleY = scale)
 
 class LayoutScale(val scale: Float) : LayoutModifier {
     override fun MeasureScope.measure(

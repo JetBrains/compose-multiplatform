@@ -106,17 +106,6 @@ package androidx.compose.ui {
     method @androidx.compose.runtime.Immutable public androidx.compose.ui.BiasAlignment.Vertical copy(float bias);
   }
 
-  public final class CacheDrawScope implements androidx.compose.ui.unit.Density {
-    method public float getDensity();
-    method public float getFontScale();
-    method public long getSize-NH-jbRc();
-    method public androidx.compose.ui.DrawResult onDrawBehind(kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
-    method public androidx.compose.ui.DrawResult onDrawWithContent(kotlin.jvm.functions.Function1<? super androidx.compose.ui.ContentDrawScope,kotlin.Unit> block);
-    property public float density;
-    property public float fontScale;
-    property public final long size;
-  }
-
   public final class CombinedModifier implements androidx.compose.ui.Modifier {
     ctor public CombinedModifier(androidx.compose.ui.Modifier outer, androidx.compose.ui.Modifier inner);
     method public boolean all(kotlin.jvm.functions.Function1<? super androidx.compose.ui.Modifier.Element,java.lang.Boolean> predicate);
@@ -134,26 +123,14 @@ package androidx.compose.ui {
     method public void drawContent();
   }
 
-  public interface DrawCacheModifier extends androidx.compose.ui.DrawModifier {
-    method public void onBuildCache-lwCvPpU(long size, androidx.compose.ui.unit.Density density);
-  }
-
   public final class DrawLayerModifierKt {
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier drawLayer(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.GraphicsLayerScope,kotlin.Unit> block);
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier drawLayer-qyIa3ak(androidx.compose.ui.Modifier, optional float scaleX, optional float scaleY, optional float alpha, optional float translationX, optional float translationY, optional float shadowElevation, optional float rotationX, optional float rotationY, optional float rotationZ, optional float cameraDistance, optional long transformOrigin, optional androidx.compose.ui.graphics.Shape shape, optional boolean clip);
-  }
-
-  public interface DrawModifier extends androidx.compose.ui.Modifier.Element {
-    method public void draw(androidx.compose.ui.ContentDrawScope);
+    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier drawLayer-i_P0lGk(androidx.compose.ui.Modifier, optional float scaleX, optional float scaleY, optional float alpha, optional float translationX, optional float translationY, optional float shadowElevation, optional float rotationX, optional float rotationY, optional float rotationZ, optional float cameraDistance, optional long transformOrigin, optional androidx.compose.ui.graphics.Shape shape, optional boolean clip);
   }
 
   public final class DrawModifierKt {
-    method public static androidx.compose.ui.Modifier drawBehind(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> onDraw);
-    method public static androidx.compose.ui.Modifier drawWithCache(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.CacheDrawScope,androidx.compose.ui.DrawResult> onBuildDrawCache);
-    method public static androidx.compose.ui.Modifier drawWithContent(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.ContentDrawScope,kotlin.Unit> onDraw);
-  }
-
-  public final class DrawResult {
+    method @Deprecated public static androidx.compose.ui.Modifier drawBehind(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> onDraw);
+    method @Deprecated public static androidx.compose.ui.Modifier drawWithCache(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.draw.CacheDrawScope,androidx.compose.ui.draw.DrawResult> onBuildDrawCache);
+    method @Deprecated public static androidx.compose.ui.Modifier drawWithContent(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.ContentDrawScope,kotlin.Unit> onDraw);
   }
 
   public final class FocusModifierKt {
@@ -199,30 +176,6 @@ package androidx.compose.ui {
     method public default boolean any(kotlin.jvm.functions.Function1<? super androidx.compose.ui.Modifier.Element,java.lang.Boolean> predicate);
     method public default <R> R! foldIn(R? initial, kotlin.jvm.functions.Function2<? super R,? super androidx.compose.ui.Modifier.Element,? extends R> operation);
     method public default <R> R! foldOut(R? initial, kotlin.jvm.functions.Function2<? super androidx.compose.ui.Modifier.Element,? super R,? extends R> operation);
-  }
-
-  @androidx.compose.runtime.Immutable public final inline class TransformOrigin {
-    ctor public TransformOrigin();
-    method @androidx.compose.runtime.Stable public static inline operator float component1-impl(long $this);
-    method @androidx.compose.runtime.Stable public static inline operator float component2-impl(long $this);
-    method public static long constructor-impl(long packedValue);
-    method public static long copy-gtC0eh8(long $this, optional float pivotFractionX, optional float pivotFractionY);
-    method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
-    method public static boolean equals-impl0(long p1, long p2);
-    method public static float getPivotFractionX-impl(long $this);
-    method public static float getPivotFractionY-impl(long $this);
-    method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(long p);
-    method @androidx.compose.runtime.Immutable public static inline String! toString-impl(long p);
-    field public static final androidx.compose.ui.TransformOrigin.Companion Companion;
-  }
-
-  public static final class TransformOrigin.Companion {
-    method public long getCenter-gtC0eh8();
-    property public final long Center;
-  }
-
-  public final class TransformOriginKt {
-    method public static inline long TransformOrigin(float pivotFractionX, float pivotFractionY);
   }
 
   public final class ZIndexModifierKt {
@@ -321,9 +274,37 @@ package androidx.compose.ui.draw {
     method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier drawOpacity(androidx.compose.ui.Modifier, @FloatRange(from=0.0, to=1.0) float opacity);
   }
 
+  public final class CacheDrawScope implements androidx.compose.ui.unit.Density {
+    method public float getDensity();
+    method public float getFontScale();
+    method public long getSize-NH-jbRc();
+    method public androidx.compose.ui.draw.DrawResult onDrawBehind(kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
+    method public androidx.compose.ui.draw.DrawResult onDrawWithContent(kotlin.jvm.functions.Function1<? super androidx.compose.ui.ContentDrawScope,kotlin.Unit> block);
+    property public float density;
+    property public float fontScale;
+    property public final long size;
+  }
+
   public final class ClipKt {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier clip(androidx.compose.ui.Modifier, androidx.compose.ui.graphics.Shape shape);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier clipToBounds(androidx.compose.ui.Modifier);
+  }
+
+  public interface DrawCacheModifier extends androidx.compose.ui.draw.DrawModifier {
+    method public void onBuildCache-lwCvPpU(long size, androidx.compose.ui.unit.Density density);
+  }
+
+  public interface DrawModifier extends androidx.compose.ui.Modifier.Element {
+    method public void draw(androidx.compose.ui.ContentDrawScope);
+  }
+
+  public final class DrawModifierKt {
+    method public static androidx.compose.ui.Modifier drawBehind(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> onDraw);
+    method public static androidx.compose.ui.Modifier drawWithCache(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.draw.CacheDrawScope,androidx.compose.ui.draw.DrawResult> onBuildDrawCache);
+    method public static androidx.compose.ui.Modifier drawWithContent(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.ContentDrawScope,kotlin.Unit> onDraw);
+  }
+
+  public final class DrawResult {
   }
 
   public final class PainterModifierKt {
@@ -575,6 +556,11 @@ package androidx.compose.ui.gesture.util {
 
 package androidx.compose.ui.graphics {
 
+  public final class GraphicsLayerModifierKt {
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier graphicsLayer(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.GraphicsLayerScope,kotlin.Unit> block);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier graphicsLayer-i_P0lGk(androidx.compose.ui.Modifier, optional float scaleX, optional float scaleY, optional float alpha, optional float translationX, optional float translationY, optional float shadowElevation, optional float rotationX, optional float rotationY, optional float rotationZ, optional float cameraDistance, optional long transformOrigin, optional androidx.compose.ui.graphics.Shape shape, optional boolean clip);
+  }
+
   public interface GraphicsLayerScope {
     method public float getAlpha();
     method public float getCameraDistance();
@@ -586,7 +572,7 @@ package androidx.compose.ui.graphics {
     method public float getScaleY();
     method public float getShadowElevation();
     method public androidx.compose.ui.graphics.Shape getShape();
-    method public long getTransformOrigin-gtC0eh8();
+    method public long getTransformOrigin-SzJe1aQ();
     method public float getTranslationX();
     method public float getTranslationY();
     method public void setAlpha(float p);
@@ -599,7 +585,7 @@ package androidx.compose.ui.graphics {
     method public void setScaleY(float p);
     method public void setShadowElevation(float p);
     method public void setShape(androidx.compose.ui.graphics.Shape p);
-    method public void setTransformOrigin-tsypLIc(long p);
+    method public void setTransformOrigin-__ExYCQ(long p);
     method public void setTranslationX(float p);
     method public void setTranslationY(float p);
     property public abstract float alpha;
@@ -620,6 +606,30 @@ package androidx.compose.ui.graphics {
   public final class GraphicsLayerScopeKt {
     method public static androidx.compose.ui.graphics.GraphicsLayerScope GraphicsLayerScope();
     field public static final float DefaultCameraDistance = 8.0f;
+  }
+
+  @androidx.compose.runtime.Immutable public final inline class TransformOrigin {
+    ctor public TransformOrigin();
+    method @androidx.compose.runtime.Stable public static inline operator float component1-impl(long $this);
+    method @androidx.compose.runtime.Stable public static inline operator float component2-impl(long $this);
+    method public static long constructor-impl(long packedValue);
+    method public static long copy-SzJe1aQ(long $this, optional float pivotFractionX, optional float pivotFractionY);
+    method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
+    method public static boolean equals-impl0(long p1, long p2);
+    method public static float getPivotFractionX-impl(long $this);
+    method public static float getPivotFractionY-impl(long $this);
+    method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(long p);
+    method @androidx.compose.runtime.Immutable public static inline String! toString-impl(long p);
+    field public static final androidx.compose.ui.graphics.TransformOrigin.Companion Companion;
+  }
+
+  public static final class TransformOrigin.Companion {
+    method public long getCenter-SzJe1aQ();
+    property public final long Center;
+  }
+
+  public final class TransformOriginKt {
+    method public static inline long TransformOrigin(float pivotFractionX, float pivotFractionY);
   }
 
 }
@@ -2021,7 +2031,7 @@ package androidx.compose.ui.node {
     method public void move--gyyYBs(long position);
     method public void resize-ozmzZPI(long size);
     method public void updateDisplayList();
-    method public void updateLayerProperties-EAWP0Yk(float scaleX, float scaleY, float alpha, float translationX, float translationY, float shadowElevation, float rotationX, float rotationY, float rotationZ, float cameraDistance, long transformOrigin, androidx.compose.ui.graphics.Shape shape, boolean clip);
+    method public void updateLayerProperties-LsE73-w(float scaleX, float scaleY, float alpha, float translationX, float translationY, float shadowElevation, float rotationX, float rotationY, float rotationZ, float cameraDistance, long transformOrigin, androidx.compose.ui.graphics.Shape shape, boolean clip);
     property public abstract long layerId;
   }
 

@@ -18,7 +18,7 @@ package androidx.compose.ui.platform
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.ui.TransformOrigin
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
@@ -52,7 +52,7 @@ internal class RenderNodeLayer(
     private val canvasHolder = CanvasHolder()
 
     /**
-     * Local copy of the transform origin as DrawLayerModifier can be implemented
+     * Local copy of the transform origin as GraphicsLayerModifier can be implemented
      * as a model object. Update this field within [updateLayerProperties] and use it
      * in [resize] or other methods
      */
