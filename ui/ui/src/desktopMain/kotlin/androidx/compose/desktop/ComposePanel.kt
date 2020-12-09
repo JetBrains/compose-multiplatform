@@ -15,14 +15,13 @@
  */
 package androidx.compose.desktop
 
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.Density
 import java.awt.Graphics
 import java.awt.GridLayout
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
-import javax.swing.JFrame
 import javax.swing.JPanel
-import javax.swing.SwingUtilities.getRoot
 
 /**
  * ComposePanel is panel for building UI using Compose for Desktop.
@@ -34,53 +33,90 @@ class ComposePanel : JPanel {
         }
     }
 
-    private var init: Boolean = false
-
-    internal val layer = ComposeLayer()
-
-    val density get() = layer.density
-
-    fun onDensityChanged(action: ((Density) -> Unit)?) {
-        layer.onDensityChanged = action
-    }
-
-    internal var onDispose: (() -> Unit)? = null
-
     constructor() : super() {
         setLayout(GridLayout(1, 1))
-        add(layer.wrapped)
-
-        addComponentListener(object : ComponentAdapter() {
-            override fun componentResized(e: ComponentEvent) {
-                layer.reinit()
-                needRedrawLayer()
-            }
-        })
     }
 
-    internal fun needRedrawLayer() {
-        if (isWindowReady()) {
-            if (!init) {
-                layer.updateLayer()
-                init = true
-            }
-            layer.needRedrawLayer()
+    private var init: Boolean = false
+
+    private var layer: ComposeLayer? = null
+    private var content: (@Composable () -> Unit)? = null
+
+    /**
+     * Sets Compose content of the ComposePanel.
+     *
+     * @param content Composable content of the ComposePanel.
+     */
+    fun setContent(content: @Composable () -> Unit) {
+        // The window (or root container) may not be ready to render composable content, so we need
+        // to keep the lambda describing composable content and set the content only when
+        // everything is ready to avoid accidental crashes and memory leaks on all supported OS
+        // types.
+        this.content = content
+        initContent()
+    }
+
+    private fun initContent() {
+        if (layer != null && content != null) {
+            layer!!.setContent(
+                parent = this,
+                invalidate = this::needRedrawLayer,
+                content = content!!
+            )
         }
     }
 
+    val density: Density
+        get() = if (layer == null) {
+            Density(graphicsConfiguration.defaultTransform.scaleX.toFloat(), 1f)
+        } else {
+            layer!!.density
+        }
+
+    internal var onDispose: (() -> Unit)? = null
+
+    private fun needRedrawLayer() {
+        if (isShowing) {
+            if (!init) {
+                layer!!.updateLayer()
+                init = true
+            }
+            layer!!.needRedrawLayer()
+        }
+    }
+
+    override fun addNotify() {
+        super.addNotify()
+
+        // After [super.addNotify] is called we can safely initialize the layer and composable
+        // content.
+        layer = ComposeLayer()
+        add(layer!!.wrapped)
+        addComponentListener(object : ComponentAdapter() {
+            override fun componentResized(e: ComponentEvent) {
+                layer?.reinit()
+                needRedrawLayer()
+            }
+        })
+
+        initContent()
+    }
+
     override fun removeNotify() {
-        remove(layer.wrapped)
+        super.removeNotify()
+
         onDispose?.invoke()
-        layer.dispose()
+        if (layer != null) {
+            remove(layer!!.wrapped)
+            layer!!.dispose()
+        }
+        init = false
     }
 
     override fun requestFocus() {
-        layer.wrapped.requestFocus()
-    }
-
-    private fun isWindowReady(): Boolean {
-        val window = getRoot(this)
-        return if (window is JFrame) window.isVisible else false
+        if (layer != null) {
+            layer!!.wrapped.requestFocus()
+        }
     }
 
     override fun paint(g: Graphics?) {
