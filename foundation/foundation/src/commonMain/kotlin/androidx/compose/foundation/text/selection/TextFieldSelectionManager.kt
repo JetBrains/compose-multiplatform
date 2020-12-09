@@ -20,7 +20,7 @@ import androidx.compose.foundation.text.TextFieldDelegate
 import androidx.compose.foundation.text.TextFieldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.FocusReference
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.gesture.DragObserver
@@ -90,9 +90,9 @@ internal class TextFieldSelectionManager() {
     var hapticFeedBack: HapticFeedback? = null
 
     /**
-     * [FocusRequester] used to request focus for the TextField.
+     * [FocusReference] used to request focus for the TextField.
      */
-    var focusRequester: FocusRequester? = null
+    var focusReference: FocusReference? = null
 
     /**
      * The beginning position of the drag gesture. Every time a new drag gesture starts, it wil be
@@ -283,7 +283,7 @@ internal class TextFieldSelectionManager() {
      */
     internal fun enterSelectionMode() {
         if (state?.hasFocus == false) {
-            focusRequester?.requestFocus()
+            focusReference?.requestFocus()
         }
         oldValue = value
         state?.showFloatingToolbar = true

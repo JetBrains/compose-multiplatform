@@ -20,8 +20,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus
-import androidx.compose.ui.focusRequester
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -51,17 +49,15 @@ class SetRootFocusTest {
         rule.setContent {
             Column {
                 // TODO(b/163725615): Remove this after clickable is made focusable.
-                val focusRequester = FocusRequester()
+                val focusReference = FocusReference()
                 BasicText(
                     text = "ClickableText",
                     modifier = Modifier
                         .testTag(focusable)
-                        .clickable {
-                            focusRequester.requestFocus()
-                        }
-                        .focusRequester(focusRequester)
+                        .clickable { focusReference.requestFocus() }
+                        .focusReference(focusReference)
                         .onFocusChanged { isFocused = it.isFocused }
-                        .focus()
+                        .focusModifier()
                 )
                 BasicText(
                     text = "Non Clickable Text",

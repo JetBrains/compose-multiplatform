@@ -17,7 +17,7 @@
 package androidx.compose.foundation.text.selection
 
 import androidx.compose.foundation.text.TextFieldState
-import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.FocusReference
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.hapticfeedback.HapticFeedback
@@ -75,7 +75,7 @@ class TextFieldSelectionManagerTest {
     private val clipboardManager = mock<ClipboardManager>()
     private val textToolbar = mock<TextToolbar>()
     private val hapticFeedback = mock<HapticFeedback>()
-    private val focusRequester = mock<FocusRequester>()
+    private val focusReference = mock<FocusReference>()
 
     @Before
     fun setup() {
@@ -86,7 +86,7 @@ class TextFieldSelectionManagerTest {
         manager.clipboardManager = clipboardManager
         manager.textToolbar = textToolbar
         manager.hapticFeedBack = hapticFeedback
-        manager.focusRequester = focusRequester
+        manager.focusReference = focusReference
 
         state.layoutResult = mock()
         state.textDelegate = mock()
@@ -140,7 +140,7 @@ class TextFieldSelectionManagerTest {
         ).performHapticFeedback(HapticFeedbackType.TextHandleMove)
 
         verify(
-            focusRequester,
+            focusReference,
             times(1)
         ).requestFocus()
     }
@@ -169,7 +169,7 @@ class TextFieldSelectionManagerTest {
         ).performHapticFeedback(HapticFeedbackType.TextHandleMove)
 
         verify(
-            focusRequester,
+            focusReference,
             times(1)
         ).requestFocus()
     }

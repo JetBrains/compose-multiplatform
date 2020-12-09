@@ -22,10 +22,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.FocusReference
+import androidx.compose.ui.focus.focusReference
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.focusRequester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -48,7 +48,7 @@ class TextFieldFocusTest {
             BasicTextField(
                 value = editor.value,
                 modifier = Modifier
-                    .focusRequester(data.focusRequester)
+                    .focusReference(data.focusReference)
                     .onFocusChanged { data.focused = it.isFocused }
                     .width(10.dp),
                 onValueChange = {
@@ -58,7 +58,7 @@ class TextFieldFocusTest {
         }
     }
 
-    data class FocusTestData(val focusRequester: FocusRequester, var focused: Boolean = false)
+    data class FocusTestData(val focusReference: FocusReference, var focused: Boolean = false)
 
     @Test
     fun requestFocus() {
@@ -67,16 +67,16 @@ class TextFieldFocusTest {
         rule.runOnUiThread {
             rule.setContent {
                 testDataList = listOf(
-                    FocusTestData(FocusRequester()),
-                    FocusTestData(FocusRequester()),
-                    FocusTestData(FocusRequester())
+                    FocusTestData(FocusReference()),
+                    FocusTestData(FocusReference()),
+                    FocusTestData(FocusReference())
                 )
 
                 TextFieldApp(testDataList)
             }
         }
 
-        rule.runOnIdle { testDataList[0].focusRequester.requestFocus() }
+        rule.runOnIdle { testDataList[0].focusReference.requestFocus() }
 
         rule.runOnIdle {
             assertThat(testDataList[0].focused).isTrue()
@@ -84,14 +84,14 @@ class TextFieldFocusTest {
             assertThat(testDataList[2].focused).isFalse()
         }
 
-        rule.runOnIdle { testDataList[1].focusRequester.requestFocus() }
+        rule.runOnIdle { testDataList[1].focusReference.requestFocus() }
         rule.runOnIdle {
             assertThat(testDataList[0].focused).isFalse()
             assertThat(testDataList[1].focused).isTrue()
             assertThat(testDataList[2].focused).isFalse()
         }
 
-        rule.runOnIdle { testDataList[2].focusRequester.requestFocus() }
+        rule.runOnIdle { testDataList[2].focusReference.requestFocus() }
         rule.runOnIdle {
             assertThat(testDataList[0].focused).isFalse()
             assertThat(testDataList[1].focused).isFalse()
