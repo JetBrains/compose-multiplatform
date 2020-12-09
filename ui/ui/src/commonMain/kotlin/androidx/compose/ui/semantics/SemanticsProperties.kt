@@ -289,6 +289,13 @@ object SemanticsActions {
     val PasteText = SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>("PasteText")
 
     /**
+     * Action to dismiss a dismissible node.
+     *
+     * @see SemanticsPropertyReceiver.dismiss
+     */
+    val Dismiss = SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>("Dismiss")
+
+    /**
      * Custom actions which are defined by app developers.
      *
      * @see SemanticsPropertyReceiver.customActions
@@ -665,4 +672,17 @@ fun SemanticsPropertyReceiver.pasteText(
     action: () -> Boolean
 ) {
     this[SemanticsActions.PasteText] = AccessibilityAction(label, action)
+}
+
+/**
+ * This function adds the [SemanticsActions.Dismiss] to the [SemanticsPropertyReceiver].
+ *
+ * @param label Optional label for this action.
+ * @param action Action to be performed when the [SemanticsActions.Dismiss] is called.
+ */
+fun SemanticsPropertyReceiver.dismiss(
+    label: String? = null,
+    action: () -> Boolean
+) {
+    this[SemanticsActions.Dismiss] = AccessibilityAction(label, action)
 }
