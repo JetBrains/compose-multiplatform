@@ -18,14 +18,23 @@ package androidx.compose.animation
 
 import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.AnimationState
 import androidx.compose.animation.core.AnimationVector
+import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.AnimationVector4D
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.TwoWayConverter
 import androidx.compose.animation.core.VectorConverter
+import androidx.compose.animation.core.animateTo
+import androidx.compose.animation.core.isFinished
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
@@ -64,7 +73,7 @@ private val defaultAnimation = SpringSpec<Float>()
  * positionally memoized, like other @[Composable]s. To trigger the animation, or alter the
  * course of the animation, simply supply a different [target] to the [Composable].
  *
- * Note, [animate] is for simple animations that cannot be canceled. For cancellable animations
+ * Note, [animateTo] is for simple animations that cannot be canceled. For cancellable animations
  * see [animatedFloat].
  *
  * @sample androidx.compose.animation.samples.VisibilityTransitionSample
@@ -83,30 +92,27 @@ fun animate(
     visibilityThreshold: Float = 0.01f,
     endListener: ((Float) -> Unit)? = null
 ): Float {
-    val clock = AmbientAnimationClock.current.asDisposableClock()
-    val anim = remember {
-        AnimatedFloatModel(target, clock, visibilityThreshold)
-    }
-
     val resolvedAnimSpec =
-        if (animSpec == defaultAnimation) {
+        if (animSpec === defaultAnimation) {
             remember(visibilityThreshold) { SpringSpec(visibilityThreshold = visibilityThreshold) }
         } else {
             animSpec
         }
-    // TODO: Support changing animation while keeping the same target
-    onCommit(target) {
-        if (endListener != null) {
-            anim.animateTo(target, resolvedAnimSpec) { reason, value ->
-                if (reason == AnimationEndReason.TargetReached) {
-                    endListener.invoke(value)
-                }
-            }
-        } else {
-            anim.animateTo(target, resolvedAnimSpec)
-        }
+    var animationState: AnimationState<Float, AnimationVector1D> by remember {
+        mutableStateOf(AnimationState(target))
     }
-    return anim.value
+
+    val currentEndListener by rememberUpdatedState(endListener)
+    LaunchedEffect(target, animSpec) {
+        animationState.animateTo(
+            target,
+            resolvedAnimSpec,
+            // If the previous animation was interrupted (i.e. not finished), make it sequential.
+            !animationState.isFinished
+        )
+        currentEndListener?.invoke(animationState.value)
+    }
+    return animationState.value
 }
 
 /**
@@ -114,7 +120,7 @@ fun animate(
  * positionally memoized, like other @[Composable]s. To trigger the animation, or alter the
  * course of the animation, simply supply a different [target] to the [Composable].
  *
- * Note, [animate] is for simple animations that cannot be canceled. For cancellable animations
+ * Note, [animateTo] is for simple animations that cannot be canceled. For cancellable animations
  * see [animatedColor].
  *
  * @sample androidx.compose.animation.samples.ColorTransitionSample
@@ -139,7 +145,7 @@ fun animate(
  * positionally memoized, like other @[Composable]s. To trigger the animation, or alter the
  * course of the animation, simply supply a different [target] to the [Composable].
  *
- * Note, [animate] is for simple animations that cannot be canceled. For cancellable animations
+ * Note, [animateTo] is for simple animations that cannot be canceled. For cancellable animations
  * see [animatedValue].
  *
  * @sample androidx.compose.animation.samples.DpAnimationSample
@@ -165,7 +171,7 @@ fun animate(
  * be positionally memoized, like other @[Composable]s. To trigger the animation, or alter the
  * course of the animation, simply supply a different [target] to the [Composable].
  *
- * Note, [animate] is for simple animations that cannot be canceled. For cancellable animations
+ * Note, [animateTo] is for simple animations that cannot be canceled. For cancellable animations
  * see [animatedValue].
  *
  *     val position : Position = animate(
@@ -196,7 +202,7 @@ fun animate(
  * positionally memoized, like other @[Composable]s. To trigger the animation, or alter the
  * course of the animation, simply supply a different [target] to the [Composable].
  *
- * Note, [animate] is for simple animations that cannot be canceled. For cancellable animations
+ * Note, [animateTo] is for simple animations that cannot be canceled. For cancellable animations
  * see [animatedValue].
  *
  *     val size : Size = animate(
@@ -223,7 +229,7 @@ fun animate(
  * positionally memoized, like other @[Composable]s. To trigger the animation, or alter the
  * course of the animation, simply supply a different [target] to the [Composable].
  *
- * Note, [animate] is for simple animations that cannot be canceled. For cancellable animations
+ * Note, [animateTo] is for simple animations that cannot be canceled. For cancellable animations
  * see [animatedValue].
  *
  *    val bounds : Bounds = animate(
@@ -258,7 +264,7 @@ fun animate(
  * will be positionally memoized, like other @[Composable]s. To trigger the animation, or alter the
  * course of the animation, simply supply a different [target] to the [Composable].
  *
- * Note, [animate] is for simple animations that cannot be canceled. For cancellable animations
+ * Note, [animateTo] is for simple animations that cannot be canceled. For cancellable animations
  * see [animatedValue].
  *
  * @sample androidx.compose.animation.samples.AnimateOffsetSample
@@ -286,7 +292,7 @@ fun animate(
  * be positionally memoized, like other @[Composable]s. To trigger the animation, or alter the
  * course of the animation, simply supply a different [target] to the [Composable].
  *
- * Note, [animate] is for simple animations that cannot be canceled. For cancellable animations
+ * Note, [animateTo] is for simple animations that cannot be canceled. For cancellable animations
  * see [animatedValue].
  *
  *    val bounds : Rect = animate(
@@ -318,7 +324,7 @@ fun animate(
  * will be positionally memoized, like other @[Composable]s. To trigger the animation, or alter the
  * course of the animation, simply supply a different [target] to the [Composable].
  *
- * Note, [animate] is for simple animations that cannot be canceled. For cancellable animations
+ * Note, [animateTo] is for simple animations that cannot be canceled. For cancellable animations
  * see [animatedValue].
  *
  * @param target Target value of the animation
@@ -344,7 +350,7 @@ fun animate(
  * will be positionally memoized, like other @[Composable]s. To trigger the animation, or alter the
  * course of the animation, simply supply a different [target] to the [Composable].
  *
- * Note, [animate] is for simple animations that cannot be canceled. For cancellable animations
+ * Note, [animateTo] is for simple animations that cannot be canceled. For cancellable animations
  * see [animatedValue].
  *
  * @sample androidx.compose.animation.samples.AnimateOffsetSample
@@ -372,7 +378,7 @@ fun animate(
  * will be positionally memoized, like other @[Composable]s. To trigger the animation, or alter the
  * course of the animation, simply supply a different [target] to the [Composable].
  *
- * Note, [animate] is for simple animations that cannot be canceled. For cancellable animations
+ * Note, [animateTo] is for simple animations that cannot be canceled. For cancellable animations
  * see [animatedValue].
  *
  * @param target Target value of the animation
@@ -398,7 +404,7 @@ fun animate(
  * it will be positionally memoized, like other @[Composable]s. To trigger the animation, or alter
  * the course of the animation, simply supply a different [target] to the [Composable].
  *
- * Note, [animate] is for simple animations that cannot be canceled. For cancellable animations
+ * Note, [animateTo] is for simple animations that cannot be canceled. For cancellable animations
  * see [animatedValue].
  *
  * @param target Target value of the animation
@@ -430,7 +436,7 @@ fun <T : AnimationVector> animate(
  * will be positionally memoized, like other @[Composable]s. To trigger the animation, or alter
  * the course of the animation, simply supply a different [target] to the [Composable].
  *
- * Note, [animate] is for simple animations that cannot be canceled. For cancellable animations
+ * Note, [animateTo] is for simple animations that cannot be canceled. For cancellable animations
  * see [animatedValue].
  *
  * @sample androidx.compose.animation.samples.ArbitraryValueTypeTransitionSample

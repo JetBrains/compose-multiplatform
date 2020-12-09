@@ -23,10 +23,14 @@ import androidx.compose.animation.core.FloatSpringSpec
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.TweenSpec
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.dispatch.withFrameNanos
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -59,9 +63,7 @@ class SingleValueAnimationTest {
         val startVal = 20f
         val endVal = 250f
 
-        var floatValue = startVal
         var dpValue = startVal.dp
-        var pxValue = startVal
 
         fun <T> tween(): TweenSpec<T> =
             TweenSpec(
@@ -70,18 +72,8 @@ class SingleValueAnimationTest {
             )
 
         val content: @Composable (Boolean) -> Unit = { enabled ->
-            floatValue = animate(
-                if (enabled) endVal else startVal,
-                tween()
-            )
-
             dpValue = animate(
                 if (enabled) endVal.dp else startVal.dp,
-                tween()
-            )
-
-            pxValue = animate(
-                if (enabled) endVal else startVal,
                 tween()
             )
         }
@@ -89,18 +81,50 @@ class SingleValueAnimationTest {
         val verify: () -> Unit = {
             for (i in 0..100 step 50) {
                 val value = lerp(
-                    startVal.toFloat(), endVal.toFloat(),
+                    startVal, endVal,
                     FastOutSlowInEasing.invoke(i / 100f)
                 )
-                assertEquals(value, floatValue)
                 assertEquals(value.dp, dpValue)
-                assertEquals(value, pxValue)
                 rule.clockTestRule.advanceClock(50)
                 rule.waitForIdle()
             }
         }
 
         animateTest(content, verify)
+    }
+
+    @Test
+    fun animate1DOnCoroutineTest() {
+        var enabled by mutableStateOf(false)
+        rule.setContent {
+            Box {
+                var animationValue by remember { mutableStateOf(250f) }
+                // Animate from 250f to 50f when enable flips to true
+                animationValue = animate(
+                    if (enabled) 50f else 250f, tween(200, easing = FastOutLinearInEasing)
+                )
+                // TODO: Properly test this with a deterministic clock when the test framework is
+                // ready
+                if (enabled) {
+                    LaunchedEffect(Unit) {
+                        assertEquals(250f, animationValue)
+                        val startTime = withFrameNanos { it }
+                        var frameTime = startTime
+                        do {
+                            val playTime = (frameTime - startTime) / 1_000_000L
+                            val fraction = FastOutLinearInEasing.invoke(playTime / 200f)
+                            val expected = lerp(250f, 50f, fraction)
+                            assertEquals(expected, animationValue)
+                            frameTime = withFrameNanos { it }
+                        } while (frameTime - startTime <= 200_000_000L)
+                        // Animation is finished at this point
+                        assertEquals(50f, animationValue)
+                    }
+                }
+            }
+        }
+        rule.runOnIdle { enabled = true }
+        rule.waitForIdle()
     }
 
     @Test
@@ -309,7 +333,6 @@ class SingleValueAnimationTest {
     @Test
     fun visibilityThresholdTest() {
 
-        var floatValue = 0f
         var vectorValue = AnimationVector(0f)
         var offsetValue = Offset(0f, 0f)
         var boundsValue = Bounds(0.dp, 0.dp, 0.dp, 0.dp)
@@ -320,8 +343,6 @@ class SingleValueAnimationTest {
         val specForBounds = FloatSpringSpec(visibilityThreshold = DpVisibilityThreshold)
 
         val content: @Composable (Boolean) -> Unit = { enabled ->
-            floatValue = animate(if (enabled) 100f else 0f)
-
             vectorValue = animate(
                 if (enabled) AnimationVector(100f) else AnimationVector(0f),
                 visibilityThreshold = AnimationVector(PxVisibilityThreshold)
@@ -348,8 +369,6 @@ class SingleValueAnimationTest {
         val durationForBounds = specForBounds.getDurationMillis(0f, 100f, 0f)
         val verify: () -> Unit = {
             for (i in 0..durationForFloat step 50) {
-                val expectFloat = specForFloat.getValue(i, 0f, 100f, 0f)
-                assertEquals("play time: $i", expectFloat, floatValue)
 
                 if (i < durationForVector) {
                     val expectVector = specForVector.getValue(i, 0f, 100f, 0f)

@@ -26,6 +26,7 @@ object AnimationConstants {
      * The default duration used in [VectorizedAnimationSpec]s and [AnimationSpec].
      */
     const val DefaultDurationMillis: Int = 300
+
     /**
      * Used as a iterations count for [VectorizedRepeatableSpec] to create an infinity repeating animation.
      */
@@ -79,6 +80,19 @@ class TweenSpec<T>(
 
     override fun <V : AnimationVector> vectorize(converter: TwoWayConverter<T, V>) =
         VectorizedTweenSpec<V>(durationMillis, delay, easing)
+
+    override fun equals(other: Any?): Boolean =
+        if (other is TweenSpec<*>) {
+            other.durationMillis == this.durationMillis &&
+                other.delay == this.delay &&
+                other.easing == this.easing
+        } else {
+            false
+        }
+
+    override fun hashCode(): Int {
+        return (durationMillis * 31 + easing.hashCode()) * 31 + delay
+    }
 }
 
 /**
@@ -109,6 +123,18 @@ class SpringSpec<T>(
 
     override fun <V : AnimationVector> vectorize(converter: TwoWayConverter<T, V>) =
         VectorizedSpringSpec(dampingRatio, stiffness, converter.convert(visibilityThreshold))
+
+    override fun equals(other: Any?): Boolean =
+        if (other is SpringSpec<*>) {
+            other.dampingRatio == this.dampingRatio &&
+                other.stiffness == this.stiffness &&
+                other.visibilityThreshold == this.visibilityThreshold
+        } else {
+            false
+        }
+
+    override fun hashCode(): Int =
+        (visibilityThreshold.hashCode() * 31 + dampingRatio.hashCode()) * 31 + stiffness.hashCode()
 }
 
 private fun <T, V : AnimationVector> TwoWayConverter<T, V>.convert(data: T?): V? {
@@ -143,6 +169,19 @@ class RepeatableSpec<T>(
     ): VectorizedAnimationSpec<V> {
         return VectorizedRepeatableSpec(iterations, animation.vectorize(converter), repeatMode)
     }
+
+    override fun equals(other: Any?): Boolean =
+        if (other is RepeatableSpec<*>) {
+            other.iterations == this.iterations &&
+                other.animation == this.animation &&
+                other.repeatMode == this.repeatMode
+        } else {
+            false
+        }
+
+    override fun hashCode(): Int {
+        return (iterations * 31 + animation.hashCode()) * 31 + repeatMode.hashCode()
+    }
 }
 
 /**
@@ -153,6 +192,7 @@ enum class RepeatMode {
      * [Restart] will restart the animation and animate from the start value to the end value.
      */
     Restart,
+
     /**
      * [Reverse] will reverse the last iteration as the animation repeats.
      */
@@ -171,6 +211,17 @@ class SnapSpec<T>(val delay: Int = 0) : AnimationSpec<T> {
     override fun <V : AnimationVector> vectorize(
         converter: TwoWayConverter<T, V>
     ): VectorizedDurationBasedAnimationSpec<V> = VectorizedSnapSpec(delay)
+
+    override fun equals(other: Any?): Boolean =
+        if (other is SnapSpec<*>) {
+            other.delay == this.delay
+        } else {
+            false
+        }
+
+    override fun hashCode(): Int {
+        return delay
+    }
 }
 
 /**
@@ -237,6 +288,24 @@ class KeyframesSpec<T>(val config: KeyframesSpecConfig<T>) : DurationBasedAnimat
         infix fun KeyframeEntity<T>.with(easing: Easing) {
             this.easing = easing
         }
+
+        override fun equals(other: Any?): Boolean {
+            return other is KeyframesSpecConfig<*> && delayMillis == other.delayMillis &&
+                durationMillis == other.durationMillis && keyframes == other.keyframes
+        }
+
+        override fun hashCode(): Int {
+            return (durationMillis * 31 + delayMillis) * 31 + keyframes.hashCode()
+        }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return other is KeyframesSpec<*> &&
+            config == other.config
+    }
+
+    override fun hashCode(): Int {
+        return config.hashCode()
     }
 
     override fun <V : AnimationVector> vectorize(
@@ -259,5 +328,13 @@ class KeyframesSpec<T>(val config: KeyframesSpecConfig<T>) : DurationBasedAnimat
     ) {
         internal fun <V : AnimationVector> toPair(convertToVector: (T) -> V) =
             convertToVector.invoke(value) to easing
+
+        override fun equals(other: Any?): Boolean {
+            return other is KeyframeEntity<*> && other.value == value && other.easing == easing
+        }
+
+        override fun hashCode(): Int {
+            return value.hashCode() * 31 + easing.hashCode()
+        }
     }
 }
