@@ -37,12 +37,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.Saver
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.WithConstraints
+import androidx.compose.ui.gesture.nestedscroll.nestedScroll
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientDensity
@@ -151,6 +152,8 @@ class BottomSheetState(
             }
         )
     }
+
+    internal val nestedScrollConnection = this.PreUpPostDownNestedScrollConnection
 }
 
 /**
@@ -299,16 +302,18 @@ fun BottomSheetScaffold(
         val peekHeightPx = with(AmbientDensity.current) { sheetPeekHeight.toPx() }
         var bottomSheetHeight by remember { mutableStateOf(fullHeight) }
 
-        val swipeable = Modifier.swipeable(
-            state = scaffoldState.bottomSheetState,
-            anchors = mapOf(
-                fullHeight - peekHeightPx to BottomSheetValue.Collapsed,
-                fullHeight - bottomSheetHeight to BottomSheetValue.Expanded
-            ),
-            orientation = Orientation.Vertical,
-            enabled = sheetGesturesEnabled,
-            resistance = null
-        )
+        val swipeable = Modifier
+            .nestedScroll(scaffoldState.bottomSheetState.nestedScrollConnection)
+            .swipeable(
+                state = scaffoldState.bottomSheetState,
+                anchors = mapOf(
+                    fullHeight - peekHeightPx to BottomSheetValue.Collapsed,
+                    fullHeight - bottomSheetHeight to BottomSheetValue.Expanded
+                ),
+                orientation = Orientation.Vertical,
+                enabled = sheetGesturesEnabled,
+                resistance = null
+            )
 
         val child = @Composable {
             BottomSheetScaffoldStack(
