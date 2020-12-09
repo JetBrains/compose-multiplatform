@@ -167,11 +167,11 @@ fun SemanticsNodeInteraction.assertIsInMutuallyExclusiveGroup(): SemanticsNodeIn
 
 /**
  * Asserts the node's label equals the given String.
- * For further details please check [SemanticsProperties.AccessibilityLabel].
+ * For further details please check [SemanticsProperties.ContentDescription].
  * Throws [AssertionError] if the node's value is not equal to `value`, or if the node has no value
  */
 fun SemanticsNodeInteraction.assertLabelEquals(value: String): SemanticsNodeInteraction =
-    assert(hasLabel(value))
+    assert(hasContentDescription(value))
 
 /**
  * Asserts the node's text equals the given String.
@@ -184,7 +184,7 @@ fun SemanticsNodeInteraction.assertTextEquals(value: String): SemanticsNodeInter
 /**
  * Asserts the node's value equals the given value.
  *
- * For further details please check [SemanticsProperties.AccessibilityValue].
+ * For further details please check [SemanticsProperties.StateDescription].
  * Throws [AssertionError] if the node's value is not equal to `value`, or if the node has no value
  */
 fun SemanticsNodeInteraction.assertValueEquals(value: String): SemanticsNodeInteraction =

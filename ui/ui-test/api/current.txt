@@ -86,9 +86,9 @@ package androidx.compose.ui.test {
     method public static androidx.compose.ui.test.SemanticsMatcher hasAnyDescendant(androidx.compose.ui.test.SemanticsMatcher matcher);
     method public static androidx.compose.ui.test.SemanticsMatcher hasAnySibling(androidx.compose.ui.test.SemanticsMatcher matcher);
     method public static androidx.compose.ui.test.SemanticsMatcher hasClickAction();
+    method public static androidx.compose.ui.test.SemanticsMatcher hasContentDescription(String label, optional boolean ignoreCase);
     method public static androidx.compose.ui.test.SemanticsMatcher hasImeAction(androidx.compose.ui.text.input.ImeAction actionType);
     method @Deprecated public static androidx.compose.ui.test.SemanticsMatcher hasInputMethodsSupport();
-    method public static androidx.compose.ui.test.SemanticsMatcher hasLabel(String label, optional boolean ignoreCase);
     method public static androidx.compose.ui.test.SemanticsMatcher hasNoClickAction();
     method public static androidx.compose.ui.test.SemanticsMatcher hasNoScrollAction();
     method public static androidx.compose.ui.test.SemanticsMatcher hasParent(androidx.compose.ui.test.SemanticsMatcher matcher);
@@ -120,11 +120,11 @@ package androidx.compose.ui.test {
   }
 
   public final class FindersKt {
-    method public static androidx.compose.ui.test.SemanticsNodeInteractionCollection onAllNodesWithLabel(androidx.compose.ui.test.SemanticsNodeInteractionsProvider, String label, optional boolean ignoreCase, optional boolean useUnmergedTree);
+    method public static androidx.compose.ui.test.SemanticsNodeInteractionCollection onAllNodesWithContentDescription(androidx.compose.ui.test.SemanticsNodeInteractionsProvider, String label, optional boolean ignoreCase, optional boolean useUnmergedTree);
     method public static androidx.compose.ui.test.SemanticsNodeInteractionCollection onAllNodesWithSubstring(androidx.compose.ui.test.SemanticsNodeInteractionsProvider, String text, optional boolean ignoreCase, optional boolean useUnmergedTree);
     method public static androidx.compose.ui.test.SemanticsNodeInteractionCollection onAllNodesWithTag(androidx.compose.ui.test.SemanticsNodeInteractionsProvider, String testTag, optional boolean useUnmergedTree);
     method public static androidx.compose.ui.test.SemanticsNodeInteractionCollection onAllNodesWithText(androidx.compose.ui.test.SemanticsNodeInteractionsProvider, String text, optional boolean ignoreCase, optional boolean useUnmergedTree);
-    method public static androidx.compose.ui.test.SemanticsNodeInteraction onNodeWithLabel(androidx.compose.ui.test.SemanticsNodeInteractionsProvider, String label, optional boolean ignoreCase, optional boolean useUnmergedTree);
+    method public static androidx.compose.ui.test.SemanticsNodeInteraction onNodeWithContentDescription(androidx.compose.ui.test.SemanticsNodeInteractionsProvider, String label, optional boolean ignoreCase, optional boolean useUnmergedTree);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction onNodeWithSubstring(androidx.compose.ui.test.SemanticsNodeInteractionsProvider, String text, optional boolean ignoreCase, optional boolean useUnmergedTree);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction onNodeWithTag(androidx.compose.ui.test.SemanticsNodeInteractionsProvider, String testTag, optional boolean useUnmergedTree);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction onNodeWithText(androidx.compose.ui.test.SemanticsNodeInteractionsProvider, String text, optional boolean ignoreCase, optional boolean useUnmergedTree);

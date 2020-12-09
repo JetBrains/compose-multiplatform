@@ -236,9 +236,9 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             ParcelSafeTextLength
         )
         info.stateDescription =
-            semanticsNode.config.getOrNull(SemanticsProperties.AccessibilityValue)
+            semanticsNode.config.getOrNull(SemanticsProperties.StateDescription)
         info.contentDescription =
-            semanticsNode.config.getOrNull(SemanticsProperties.AccessibilityLabel)
+            semanticsNode.config.getOrNull(SemanticsProperties.ContentDescription)
         // Note editable is not added to semantics properties api.
         info.isEditable = semanticsNode.config.contains(SemanticsActions.SetText)
         info.isEnabled = (semanticsNode.config.getOrNull(SemanticsProperties.Disabled) == null)
@@ -334,7 +334,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_CHARACTER or
                 AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_WORD or
                 AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_PARAGRAPH
-            // We only traverse the text when accessibilityLabel is not set.
+            // We only traverse the text when contentDescription is not set.
             if (info.contentDescription.isNullOrEmpty() &&
                 semanticsNode.config.contains(SemanticsActions.GetTextLayoutResult)
             ) {
@@ -1186,13 +1186,13 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     continue
                 }
                 when (entry.key) {
-                    SemanticsProperties.AccessibilityValue ->
+                    SemanticsProperties.StateDescription ->
                         sendEventForVirtualView(
                             semanticsNodeIdToAccessibilityVirtualNodeId(id),
                             AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED,
                             AccessibilityEvent.CONTENT_CHANGE_TYPE_STATE_DESCRIPTION
                         )
-                    SemanticsProperties.AccessibilityLabel ->
+                    SemanticsProperties.ContentDescription ->
                         sendEventForVirtualView(
                             semanticsNodeIdToAccessibilityVirtualNodeId(id),
                             AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED,
@@ -1489,8 +1489,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     }
 
     private fun getAccessibilitySelectionStart(node: SemanticsNode): Int {
-        // If there is AccessibilityLabel, it will be used instead of text during traversal.
-        if (!node.config.contains(SemanticsProperties.AccessibilityLabel) &&
+        // If there is ContentDescription, it will be used instead of text during traversal.
+        if (!node.config.contains(SemanticsProperties.ContentDescription) &&
             node.config.contains(SemanticsProperties.TextSelectionRange)
         ) {
             return node.config[SemanticsProperties.TextSelectionRange].start
@@ -1499,8 +1499,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     }
 
     private fun getAccessibilitySelectionEnd(node: SemanticsNode): Int {
-        // If there is AccessibilityLabel, it will be used instead of text during traversal.
-        if (!node.config.contains(SemanticsProperties.AccessibilityLabel) &&
+        // If there is ContentDescription, it will be used instead of text during traversal.
+        if (!node.config.contains(SemanticsProperties.ContentDescription) &&
             node.config.contains(SemanticsProperties.TextSelectionRange)
         ) {
             return node.config[SemanticsProperties.TextSelectionRange].end
@@ -1510,7 +1510,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
 
     private fun isAccessibilitySelectionExtendable(node: SemanticsNode): Boolean {
         // Currently only TextField is extendable. Static text may become extendable later.
-        return !node.config.contains(SemanticsProperties.AccessibilityLabel) &&
+        return !node.config.contains(SemanticsProperties.ContentDescription) &&
             node.config.contains(SemanticsProperties.Text)
     }
 
@@ -1584,8 +1584,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         }
         // Note in android framework, TextView set this to its text. This is changed to
         // prioritize content description, even for Text.
-        if (node.config.contains(SemanticsProperties.AccessibilityLabel)) {
-            return node.config[SemanticsProperties.AccessibilityLabel]
+        if (node.config.contains(SemanticsProperties.ContentDescription)) {
+            return node.config[SemanticsProperties.ContentDescription]
         }
         if (node.config.contains(SemanticsProperties.Text)) {
             return node.config[SemanticsProperties.Text].text
