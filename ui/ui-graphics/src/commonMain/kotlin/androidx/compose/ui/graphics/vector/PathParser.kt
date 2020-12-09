@@ -36,7 +36,6 @@ import androidx.compose.ui.graphics.vector.PathNode.RelativeReflectiveCurveTo
 import androidx.compose.ui.graphics.vector.PathNode.RelativeReflectiveQuadTo
 import androidx.compose.ui.graphics.vector.PathNode.RelativeVerticalTo
 import androidx.compose.ui.graphics.vector.PathNode.VerticalTo
-import androidx.compose.ui.util.toRadians
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.atan2
@@ -639,4 +638,7 @@ class PathParser {
         var endPosition: Int = 0,
         var endWithNegativeOrDot: Boolean = false
     )
+
+    private fun Float.toRadians(): Float = this / 180f * PI.toFloat()
+    private fun Double.toRadians(): Double = this / 180 * PI
 }
