@@ -112,7 +112,7 @@ class GestureScope(node: SemanticsNode, testContext: TestContext) {
 
     // TODO(b/133217292): Better error: explain which gesture couldn't be performed
     private var _inputDispatcher: InputDispatcher? =
-        InputDispatcher(testContext, checkNotNull(owner))
+        createInputDispatcher(testContext, checkNotNull(owner))
     internal val inputDispatcher
         get() = checkNotNull(_inputDispatcher) {
             "Can't send gesture, (Partial)GestureScope has already been disposed"
