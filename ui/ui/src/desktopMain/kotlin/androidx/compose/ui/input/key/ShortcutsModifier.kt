@@ -26,7 +26,7 @@ import java.util.TreeMap
  * Defines a set of keys. Can be used in keys handlers, see
  * [androidx.compose.ui.platform.Keyboard] and [Modifier.shortcuts]
  */
-class KeysSet(internal val keys: Set<Key>) {
+class KeysSet(internal val keys: Set<Key>) : Comparable<KeysSet> {
     /**
      * Returns a new [KeysSet] consists of current keys set + additional key
      *
@@ -54,6 +54,14 @@ class KeysSet(internal val keys: Set<Key>) {
     override fun toString(): String {
         return "KeysSet(keys=$keys)"
     }
+
+    override fun compareTo(other: KeysSet): Int {
+        return when {
+            other.keys == keys -> 0
+            other.keys.size < keys.size -> 1
+            else -> -1
+        }
+    }
 }
 
 /**
@@ -70,7 +78,7 @@ fun KeysSet(key: Key): KeysSet {
     return KeysSet(setOf(key))
 }
 
-private fun makeHandlers() = TreeMap<KeysSet, () -> Unit>(compareByDescending { it.keys.size })
+private fun makeHandlers() = TreeMap<KeysSet, () -> Unit>()
 
 @ExperimentalKeyInput
 internal class ShortcutsInstance(
@@ -110,7 +118,7 @@ internal class ShortcutsInstance(
     }
 
     private fun findHandler(): (() -> Unit)? {
-        handlers.forEach { (keysSet, handler) ->
+        handlers.descendingMap().forEach { (keysSet, handler) ->
             if (pressedKeys.containsAll(keysSet.keys)) {
                 return handler
             }
