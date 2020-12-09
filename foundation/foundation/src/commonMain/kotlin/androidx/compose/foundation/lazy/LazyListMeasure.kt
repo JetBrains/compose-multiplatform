@@ -16,12 +16,21 @@
 
 package androidx.compose.foundation.lazy
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.InternalLayoutApi
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.constrainHeight
+import androidx.compose.ui.unit.constrainWidth
+import androidx.compose.ui.util.fastForEach
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.math.sign
 
 /**
- * Measures and positions currently visible items using [LazyMeasuredItemProvider].
+ * Measures and calculates the positions for the currently visible items. The result is produced
+ * as a [LazyListMeasureResult] which contains all the calculations.
  */
 internal fun measureLazyList(
     itemsCount: Int,
@@ -210,5 +219,62 @@ internal fun measureLazyList(
             canScrollForward = mainAxisUsed > maxOffset,
             consumedScroll = consumedScroll
         )
+    }
+}
+
+/**
+ * Lays out [LazyMeasuredItem]s based on the [LazyListMeasureResult] and the passed arrangement.
+ */
+@OptIn(InternalLayoutApi::class)
+internal fun MeasureScope.layoutLazyList(
+    constraints: Constraints,
+    isVertical: Boolean,
+    verticalArrangement: Arrangement.Vertical?,
+    horizontalArrangement: Arrangement.Horizontal?,
+    measureResult: LazyListMeasureResult,
+    reverseLayout: Boolean
+): MeasureResult {
+    val layoutWidth = constraints.constrainWidth(
+        if (isVertical) measureResult.crossAxisSize else measureResult.mainAxisSize
+    )
+    val layoutHeight = constraints.constrainHeight(
+        if (isVertical) measureResult.mainAxisSize else measureResult.crossAxisSize
+    )
+    val mainAxisLayoutSize = if (isVertical) layoutHeight else layoutWidth
+    val hasSpareSpace = measureResult.mainAxisSize < mainAxisLayoutSize
+    if (hasSpareSpace) {
+        check(measureResult.itemsScrollOffset == 0)
+    }
+    val density = this
+
+    return layout(layoutWidth, layoutHeight) {
+        var currentMainAxis = measureResult.itemsScrollOffset
+        if (hasSpareSpace) {
+            val items = if (reverseLayout) measureResult.items.reversed() else measureResult.items
+            val sizes = IntArray(items.size) { index ->
+                items[index].let { it.mainAxisSize - it.extraMainAxisSize }
+            }
+            val positions = IntArray(items.size) { 0 }
+            if (isVertical) {
+                requireNotNull(verticalArrangement)
+                    .arrange(mainAxisLayoutSize, sizes, density, positions)
+            } else {
+                requireNotNull(horizontalArrangement)
+                    .arrange(mainAxisLayoutSize, sizes, layoutDirection, density, positions)
+            }
+            positions.forEachIndexed { index, position ->
+                items[index].place(this, layoutWidth, layoutHeight, position, reverseLayout)
+            }
+        } else {
+            measureResult.items.fastForEach {
+                val offset = if (reverseLayout) {
+                    mainAxisLayoutSize - currentMainAxis - (it.mainAxisSize - it.extraMainAxisSize)
+                } else {
+                    currentMainAxis
+                }
+                it.place(this, layoutWidth, layoutHeight, offset, reverseLayout)
+                currentMainAxis += it.mainAxisSize
+            }
+        }
     }
 }
