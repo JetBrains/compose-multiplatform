@@ -40,7 +40,7 @@ class SynchronizationMethodsTest {
     // Note: don't add `@get:Rule` to avoid the Rule from being applied. Except for the
     // AndroidOwnerRegistry, it doesn't need to be initialized in these tests.
     private val rule = createAndroidComposeRule<ComponentActivity>()
-    private val androidOwnerRegistry = rule.composeIdlingResource.androidOwnerRegistry
+    private val androidOwnerRegistry = rule.androidOwnerRegistry
 
     @get:Rule
     val registryRule: TestRule = RuleChain.outerRule { base, _ ->

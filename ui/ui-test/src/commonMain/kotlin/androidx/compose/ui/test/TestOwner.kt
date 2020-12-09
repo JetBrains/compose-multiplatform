@@ -29,7 +29,6 @@ import androidx.compose.ui.text.input.ImeAction
  */
 @InternalTestApi
 interface TestOwner {
-
     /**
      * Sends the given list of text commands to the given semantics node.
      */
@@ -57,6 +56,12 @@ interface TestOwner {
      * surfaces only in incorrect tests.
      */
     fun getOwners(): Set<Owner>
+
+    /**
+     * Advances time if and only if this [TestOwner] uses a [MainTestClock]
+     */
+    // TODO(b/176898053): Once mainClock become the standard provide them here and remove this method.
+    fun advanceTimeBy(millis: Long)
 }
 
 /**

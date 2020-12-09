@@ -16,19 +16,13 @@
 
 package androidx.compose.ui.test.junit4.android
 
-import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.snapshots.Snapshot
-import androidx.compose.ui.node.Owner
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.IdlingResource
 import androidx.compose.ui.test.TestAnimationClock
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.junit4.isOnUiThread
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import org.junit.runners.model.Statement
 
 /**
  * Register compose's idling check to Espresso.
@@ -102,10 +96,9 @@ fun unregisterTestClock(clock: TestAnimationClock): Unit = throw UnsupportedOper
  * resource is automatically registered when any compose testing APIs are used including
  * [createAndroidComposeRule].
  */
-internal class ComposeIdlingResource : IdlingResource {
-
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    internal val androidOwnerRegistry = AndroidOwnerRegistry()
+internal class ComposeIdlingResource(
+    private val androidOwnerRegistry: AndroidOwnerRegistry
+) : IdlingResource {
 
     @OptIn(ExperimentalTestApi::class)
     private val clocks = mutableSetOf<TestAnimationClock>()
@@ -199,58 +192,5 @@ internal class ComposeIdlingResource : IdlingResource {
             message += "hadSnapshotChanges = $hadSnapshotChanges"
         }
         return message
-    }
-
-    fun waitForIdle() {
-        check(!isOnUiThread()) {
-            "Functions that involve synchronization (Assertions, Actions, Synchronization; " +
-                "e.g. assertIsSelected(), doClick(), runOnIdle()) cannot be run " +
-                "from the main thread. Did you nest such a function inside " +
-                "runOnIdle {}, runOnUiThread {} or setContent {}?"
-        }
-
-        // First wait until we have an AndroidOwner (in case an Activity is being started)
-        androidOwnerRegistry.waitForAndroidOwners()
-        // Then await composition(s)
-        runEspressoOnIdle()
-
-        // TODO(b/155774664): waitForAndroidOwners() may be satisfied by an AndroidOwner from an
-        //  Activity that is about to be paused, in cases where a new Activity is being started.
-        //  That means that AndroidOwnerRegistry.getOwners() may still return an empty list
-        //  between now and when the new Activity has created its AndroidOwner, even though
-        //  waitForAndroidOwners() suggests that we are now guaranteed one.
-    }
-
-    @ExperimentalTestApi
-    suspend fun awaitIdle() {
-        // TODO(b/169038516): when we can query AndroidOwners for measure or layout, remove
-        //  runEspressoOnIdle() and replace it with a suspend fun that loops while the
-        //  snapshot or the recomposer has pending changes, clocks are busy or owners have
-        //  pending measures or layouts; and do the await on AndroidUiDispatcher.Main
-        // We use Espresso to wait for composition, measure, layout and draw,
-        // and Espresso needs to be called from a non-ui thread; so use Dispatchers.IO
-        withContext(Dispatchers.IO) {
-            // First wait until we have an AndroidOwner (in case an Activity is being started)
-            androidOwnerRegistry.awaitAndroidOwners()
-            // Then await composition(s)
-            runEspressoOnIdle()
-        }
-    }
-
-    fun getOwners(): Set<Owner> {
-        // TODO(pavlis): Instead of returning a flatMap, let all consumers handle a tree
-        //  structure. In case of multiple AndroidOwners, add a fake root
-        waitForIdle()
-
-        return androidOwnerRegistry.getOwners().also {
-            // TODO(b/153632210): This check should be done by callers of collectOwners
-            check(it.isNotEmpty()) {
-                "No compose views found in the app. Is your Activity resumed?"
-            }
-        }
-    }
-
-    fun getStatementFor(base: Statement): Statement {
-        return androidOwnerRegistry.getStatementFor(base)
     }
 }

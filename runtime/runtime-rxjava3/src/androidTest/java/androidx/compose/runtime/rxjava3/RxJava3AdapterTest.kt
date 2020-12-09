@@ -36,8 +36,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
 @MediumTest
 @RunWith(Parameterized::class)
@@ -154,14 +152,10 @@ class RxJava3AdapterTest(private val factory: () -> Stream) {
     @Test
     fun weReceiveValueSubmittedOnBackgroundThread() {
         val stream = factory()
-        val latch = CountDownLatch(1)
 
         var realValue: String? = null
         rule.setContent {
             realValue = stream.subscribeAsState(null).value
-            if (realValue != null) {
-                latch.countDown()
-            }
         }
 
         Thread(
@@ -170,11 +164,7 @@ class RxJava3AdapterTest(private val factory: () -> Stream) {
             }
         ).start()
 
-        assertThat(latch.await(5, TimeUnit.SECONDS)).isTrue()
-
-        rule.runOnUiThread {
-            assertThat(realValue).isEqualTo("value")
-        }
+        rule.waitUntil(5_000) { realValue == "value" }
     }
 }
 

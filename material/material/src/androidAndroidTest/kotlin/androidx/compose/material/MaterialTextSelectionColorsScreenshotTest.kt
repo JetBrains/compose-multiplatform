@@ -28,7 +28,7 @@ import androidx.compose.ui.selection.TextSelectionColors
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.height
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.createComposeRuleLegacy
 import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -55,8 +55,9 @@ import org.junit.runner.RunWith
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
 class MaterialTextSelectionColorsScreenshotTest {
 
+    @Suppress("DEPRECATION")
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createComposeRuleLegacy()
 
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL)

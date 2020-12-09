@@ -82,6 +82,8 @@ class CoreTextFieldSoftWrapTest {
             }
         }
 
+        rule.waitUntil { width != null }
+
         with(density) {
             assertThat(textLayout).isNotNull()
             assertThat(width).isNotNull()
@@ -116,6 +118,8 @@ class CoreTextFieldSoftWrapTest {
                 )
             }
         }
+
+        rule.waitUntil { width != null }
 
         with(density) {
             assertThat(textLayout).isNotNull()

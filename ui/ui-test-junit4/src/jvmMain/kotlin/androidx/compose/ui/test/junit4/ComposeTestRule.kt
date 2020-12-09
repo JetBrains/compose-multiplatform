@@ -18,7 +18,9 @@ package androidx.compose.ui.test.junit4
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.ComposeTimeoutException
 import androidx.compose.ui.test.IdlingResource
+import androidx.compose.ui.test.MainTestClock
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
@@ -44,10 +46,27 @@ interface ComposeTestRule : TestRule, SemanticsNodeInteractionsProvider {
     val displaySize: IntSize get
 
     /**
-     * A test rule that allows you to control the animation clock
+     * A test rule that allows you to control the animation clock.
+     *
+     * Important: this clock is now deprecated and should not be used. Please migrate to
+     * [mainClock]. If this need to be used the rule needs to be created via
+     * createComposeRuleLegacy method that enables it.
      */
+    @Deprecated(
+        "clockTestRule was replaced with mainClock. As a temporary remedy, there are " +
+            "createComposeRuleLegacy methods and via those this property is still usable.",
+        ReplaceWith("mainClock", "androidx.compose.ui.test.junit4.ComposeTestRule")
+    )
     @OptIn(ExperimentalTestApi::class)
     val clockTestRule: AnimationClockTestRule
+
+    /**
+     * Clock that drives frames and recompositions in compose tests.
+     *
+     * This is replacement for [clockTestRule]. When using this clock the original [clockTestRule]
+     * is no longer available.
+     */
+    val mainClock: MainTestClock
 
     /**
      * Runs the given action on the UI thread.
@@ -62,6 +81,10 @@ interface ComposeTestRule : TestRule, SemanticsNodeInteractionsProvider {
      * variables.
      *
      * This method is blocking until the action is complete.
+     *
+     * In case the main clock auto advancement is enabled (by default is) this will also keep
+     * advancing the clock until it is idle (meaning there are no recompositions, animations, etc.
+     * pending). If not, this will wait only for other idling resources.
      */
     fun <T> runOnIdle(action: () -> T): T
 
@@ -69,6 +92,10 @@ interface ComposeTestRule : TestRule, SemanticsNodeInteractionsProvider {
      * Waits for compose to be idle.
      *
      * This is a blocking call. Returns only after compose is idle.
+     *
+     * In case the main clock auto advancement is enabled (by default is) this will also keep
+     * advancing the clock until it is idle (meaning there are no recompositions, animations, etc.
+     * pending). If not, this will wait only for other idling resources.
      *
      * Can crash in case there is a time out. This is not supposed to be handled as it
      * surfaces only in incorrect tests.
@@ -78,9 +105,36 @@ interface ComposeTestRule : TestRule, SemanticsNodeInteractionsProvider {
     /**
      * Suspends until compose is idle. Compose is idle if there are no pending compositions, no
      * pending changes that could lead to another composition, and no pending draw calls.
+     *
+     * In case the main clock auto advancement is enabled (by default is) this will also keep
+     * advancing the clock until it is idle (meaning there are no recompositions, animations, etc.
+     * pending). If not, this will wait only for other idling resources.
      */
     @ExperimentalTestApi
     suspend fun awaitIdle()
+
+    /**
+     * Blocks until the given condition is satisfied.
+     *
+     * In case the main clock auto advancement is enabled (by default is), this will also keep
+     * advancing the clock on a frame by frame basis and yield for other async work at the end of
+     * each frame. If the advancement of the main clock is not enabled this will work as a
+     * countdown latch without any other advancements.
+     *
+     * There is also [MainTestClock.advanceTimeUntil] which is faster as it does not yield back
+     * the UI thread.
+     *
+     * This method should be used in cases where [MainTestClock.advanceTimeUntil]
+     * is not enough.
+     *
+     * @param timeoutMillis The time after which this method throws an exception if the given
+     * condition is not satisfied. This is the wall clock time not the main clock one.
+     * @param condition Condition that must be satisfied in order for this method to successfully
+     * finish.
+     *
+     * @throws ComposeTimeoutException If the condition is not satisfied after [timeoutMillis].
+     */
+    fun waitUntil(timeoutMillis: Long = 1_000, condition: () -> Boolean)
 
     /**
      * Registers an [IdlingResource] in this test.

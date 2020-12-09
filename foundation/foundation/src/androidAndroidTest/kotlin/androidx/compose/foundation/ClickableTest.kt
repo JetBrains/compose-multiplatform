@@ -53,8 +53,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -278,9 +276,9 @@ class ClickableTest {
 
     @Test
     fun clickableTest_click_withDoubleClick() {
-        val clickLatch = CountDownLatch(1)
+        var clickCounter = 0
         var doubleClickCounter = 0
-        val onClick: () -> Unit = { clickLatch.countDown() }
+        val onClick: () -> Unit = { ++clickCounter }
         val onDoubleClick: () -> Unit = { ++doubleClickCounter }
 
         rule.setContent {
@@ -300,10 +298,10 @@ class ClickableTest {
         rule.onNodeWithTag("myClickable")
             .performClick()
 
-        val res = clickLatch.await(1000, TimeUnit.MILLISECONDS)
+        rule.mainClock.advanceTimeUntil { clickCounter == 1 }
         rule.runOnIdle {
+            assertThat(clickCounter).isEqualTo(1)
             assertThat(doubleClickCounter).isEqualTo(0)
-            assertThat(res).isTrue()
         }
 
         rule.onNodeWithTag("myClickable")
@@ -313,17 +311,17 @@ class ClickableTest {
 
         rule.runOnIdle {
             assertThat(doubleClickCounter).isEqualTo(1)
-            assertThat(clickLatch.await(1000, TimeUnit.MILLISECONDS)).isTrue()
+            assertThat(clickCounter).isEqualTo(1)
         }
     }
 
     @Test
     @LargeTest
     fun clickableTest_click_withDoubleClick_andLongClick() {
-        val clickLatch = CountDownLatch(1)
+        var clickCounter = 0
         var doubleClickCounter = 0
         var longClickCounter = 0
-        val onClick: () -> Unit = { clickLatch.countDown() }
+        val onClick: () -> Unit = { ++clickCounter }
         val onDoubleClick: () -> Unit = { ++doubleClickCounter }
         val onLongClick: () -> Unit = { ++longClickCounter }
 
@@ -345,11 +343,11 @@ class ClickableTest {
         rule.onNodeWithTag("myClickable")
             .performClick()
 
-        val res = clickLatch.await(1000, TimeUnit.MILLISECONDS)
+        rule.mainClock.advanceTimeUntil { clickCounter == 1 }
         rule.runOnIdle {
             assertThat(doubleClickCounter).isEqualTo(0)
             assertThat(longClickCounter).isEqualTo(0)
-            assertThat(res).isTrue()
+            assertThat(clickCounter).isEqualTo(1)
         }
 
         rule.onNodeWithTag("myClickable")
@@ -357,10 +355,11 @@ class ClickableTest {
                 doubleClick()
             }
 
+        rule.mainClock.advanceTimeUntil { doubleClickCounter == 1 }
         rule.runOnIdle {
             assertThat(doubleClickCounter).isEqualTo(1)
             assertThat(longClickCounter).isEqualTo(0)
-            assertThat(clickLatch.await(1000, TimeUnit.MILLISECONDS)).isTrue()
+            assertThat(clickCounter).isEqualTo(1)
         }
 
         rule.onNodeWithTag("myClickable")
@@ -368,10 +367,11 @@ class ClickableTest {
                 longClick()
             }
 
+        rule.mainClock.advanceTimeUntil { longClickCounter == 1 }
         rule.runOnIdle {
             assertThat(doubleClickCounter).isEqualTo(1)
             assertThat(longClickCounter).isEqualTo(1)
-            assertThat(clickLatch.await(1000, TimeUnit.MILLISECONDS)).isTrue()
+            assertThat(clickCounter).isEqualTo(1)
         }
     }
 
@@ -396,18 +396,14 @@ class ClickableTest {
                 doubleClick()
             }
 
-        rule.runOnIdle {
-            assertThat(counter).isEqualTo(1)
-        }
+        rule.mainClock.advanceTimeUntil { counter == 1 }
 
         rule.onNodeWithTag("myClickable")
             .performGesture {
                 doubleClick()
             }
 
-        rule.runOnIdle {
-            assertThat(counter).isEqualTo(2)
-        }
+        rule.mainClock.advanceTimeUntil { counter == 2 }
     }
 
     @Test
@@ -487,10 +483,10 @@ class ClickableTest {
     @LargeTest
     fun clickableTest_click_withDoubleClick_andLongClick_disabled() {
         val enabled = mutableStateOf(false)
-        val clickLatch = CountDownLatch(1)
+        var clickCounter = 0
         var doubleClickCounter = 0
         var longClickCounter = 0
-        val onClick: () -> Unit = { clickLatch.countDown() }
+        val onClick: () -> Unit = { ++clickCounter }
         val onDoubleClick: () -> Unit = { ++doubleClickCounter }
         val onLongClick: () -> Unit = { ++longClickCounter }
 
@@ -513,10 +509,13 @@ class ClickableTest {
         rule.onNodeWithTag("myClickable")
             .performClick()
 
+        // Process gestures
+        rule.mainClock.advanceTimeBy(1000)
+
         rule.runOnIdle {
             assertThat(doubleClickCounter).isEqualTo(0)
             assertThat(longClickCounter).isEqualTo(0)
-            assertThat(clickLatch.count).isEqualTo(1)
+            assertThat(clickCounter).isEqualTo(0)
         }
 
         rule.onNodeWithTag("myClickable")
@@ -524,10 +523,13 @@ class ClickableTest {
                 doubleClick()
             }
 
+        // Process gestures
+        rule.mainClock.advanceTimeBy(1000)
+
         rule.runOnIdle {
             assertThat(doubleClickCounter).isEqualTo(0)
             assertThat(longClickCounter).isEqualTo(0)
-            assertThat(clickLatch.count).isEqualTo(1)
+            assertThat(clickCounter).isEqualTo(0)
         }
 
         rule.onNodeWithTag("myClickable")
@@ -535,21 +537,25 @@ class ClickableTest {
                 longClick()
             }
 
+        // Process gestures
+        rule.mainClock.advanceTimeBy(1000)
+
         rule.runOnIdle {
             assertThat(doubleClickCounter).isEqualTo(0)
             assertThat(longClickCounter).isEqualTo(0)
-            assertThat(clickLatch.count).isEqualTo(1)
+            assertThat(clickCounter).isEqualTo(0)
             enabled.value = true
         }
 
         rule.onNodeWithTag("myClickable")
             .performClick()
 
-        val res = clickLatch.await(1000, TimeUnit.MILLISECONDS)
+        rule.mainClock.advanceTimeUntil { clickCounter == 1 }
+
         rule.runOnIdle {
             assertThat(doubleClickCounter).isEqualTo(0)
             assertThat(longClickCounter).isEqualTo(0)
-            assertThat(res).isTrue()
+            assertThat(clickCounter).isEqualTo(1)
         }
 
         rule.onNodeWithTag("myClickable")
@@ -557,10 +563,12 @@ class ClickableTest {
                 doubleClick()
             }
 
+        rule.mainClock.advanceTimeUntil { doubleClickCounter == 1 }
+
         rule.runOnIdle {
             assertThat(doubleClickCounter).isEqualTo(1)
             assertThat(longClickCounter).isEqualTo(0)
-            assertThat(clickLatch.await(1000, TimeUnit.MILLISECONDS)).isTrue()
+            assertThat(clickCounter).isEqualTo(1)
         }
 
         rule.onNodeWithTag("myClickable")
@@ -568,10 +576,12 @@ class ClickableTest {
                 longClick()
             }
 
+        rule.mainClock.advanceTimeUntil { longClickCounter == 1 }
+
         rule.runOnIdle {
             assertThat(doubleClickCounter).isEqualTo(1)
             assertThat(longClickCounter).isEqualTo(1)
-            assertThat(clickLatch.await(1000, TimeUnit.MILLISECONDS)).isTrue()
+            assertThat(clickCounter).isEqualTo(1)
         }
     }
 

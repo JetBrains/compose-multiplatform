@@ -19,7 +19,7 @@ package androidx.compose.material
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.createComposeRuleLegacy
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -41,8 +41,9 @@ import org.junit.runner.RunWith
 @OptIn(ExperimentalMaterialApi::class)
 class SnackbarHostTest {
 
+    @Suppress("DEPRECATION")
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createComposeRuleLegacy()
 
     @Test
     fun snackbarHost_observePushedData() {

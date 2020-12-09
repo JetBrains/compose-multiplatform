@@ -52,7 +52,7 @@ import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRuleLegacy
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performSemanticsAction
@@ -94,8 +94,9 @@ import java.util.concurrent.TimeUnit
     ExperimentalComposeApi::class
 )
 class AndroidAccessibilityTest {
+    @Suppress("DEPRECATION")
     @get:Rule
-    val rule = createAndroidComposeRule<ComponentActivity>()
+    val rule = createAndroidComposeRuleLegacy<ComponentActivity>()
 
     private lateinit var androidComposeView: AndroidComposeView
     private lateinit var container: OpenComposeView

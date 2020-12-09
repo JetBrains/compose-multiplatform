@@ -21,7 +21,7 @@ import androidx.compose.testutils.assertMeasureSizeIsPositive
 import androidx.compose.testutils.assertNoPendingChanges
 import androidx.compose.testutils.forGivenTestCase
 import androidx.compose.ui.test.ExperimentalTestApi
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRuleLegacy
 import androidx.test.filters.MediumTest
 import androidx.ui.integration.test.material.CheckboxesInRowsTestCase
 import org.junit.Rule
@@ -43,8 +43,9 @@ class CheckboxesInRowsTest(private val numberOfCheckboxes: Int) {
         fun initParameters(): Array<Any> = arrayOf(1, 10)
     }
 
+    @Suppress("DEPRECATION")
     @get:Rule
-    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    val composeTestRule = createAndroidComposeRuleLegacy<ComponentActivity>()
 
     @Test
     fun toggleRectangleColor_compose() {

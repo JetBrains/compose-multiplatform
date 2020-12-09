@@ -29,7 +29,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.AmbientFocusManager
 import androidx.compose.ui.platform.AmbientView
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.createComposeRuleLegacy
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.text.InternalTextApi
@@ -49,8 +49,9 @@ import java.util.concurrent.TimeUnit
 @OptIn(InternalTextApi::class)
 class CoreTextFieldSoftKeyboardTest {
 
+    @Suppress("DEPRECATION")
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createComposeRuleLegacy()
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.R)
     @Test

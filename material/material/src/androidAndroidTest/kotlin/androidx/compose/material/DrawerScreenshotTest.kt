@@ -43,6 +43,7 @@ import org.junit.runner.RunWith
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
 class DrawerScreenshotTest {
 
+    @Suppress("DEPRECATION")
     @get:Rule
     val rule = createComposeRule()
 

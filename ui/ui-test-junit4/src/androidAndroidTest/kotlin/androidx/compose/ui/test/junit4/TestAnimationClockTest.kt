@@ -63,8 +63,10 @@ class TestAnimationClockTest {
     private val recordedAnimatedValues = mutableListOf<Float>()
     private var hasRecomposed = false
 
+    @Suppress("DEPRECATION")
     @get:Rule
-    val rule = createAndroidComposeRule<ComponentActivity>()
+    val rule = createAndroidComposeRuleLegacy<ComponentActivity>()
+    @Suppress("DEPRECATION")
     private val clockTestRule = rule.clockTestRule
     private val composeIdlingResource = rule.composeIdlingResource
 

@@ -65,8 +65,6 @@ import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
 @MediumTest
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
@@ -404,8 +402,8 @@ class ImageTest {
         val boxWidth = 240
         val boxHeight = 240
 
-        // latch used to wait until vector resource is loaded asynchronously
-        val vectorLatch = CountDownLatch(1)
+        // used to wait until vector resource is loaded asynchronously
+        var vectorDrawn = false
         rule.setContent {
             val density = AmbientDensity.current.density
             val size = (boxWidth * 2 / density).dp
@@ -426,13 +424,13 @@ class ImageTest {
                             minWidth = minWidth,
                             minHeight = minHeight
                         )
-                            .drawBehind { vectorLatch.countDown() }
+                            .drawBehind { vectorDrawn = true }
                     )
                 }
             }
         }
 
-        Assert.assertTrue(vectorLatch.await(5, TimeUnit.SECONDS))
+        rule.waitUntil { vectorDrawn }
 
         val imageColor = Color.Red.toArgb()
         val containerBgColor = Color.White.toArgb()
