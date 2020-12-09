@@ -172,6 +172,7 @@ private fun Element.parseGradient(): ShaderBrush? {
     }
 }
 
+@Suppress("CHANGING_ARGUMENTS_EXECUTION_ORDER_FOR_NAMED_VARARGS")
 private fun Element.parseLinearGradient() = LinearGradient(
     colorStops = parseColorStops(),
     startX = attributeOrNull(ANDROID_NS, "startX")?.toFloat() ?: 0f,
@@ -181,6 +182,7 @@ private fun Element.parseLinearGradient() = LinearGradient(
     tileMode = attributeOrNull(ANDROID_NS, "tileMode")?.let(::parseTileMode) ?: TileMode.Clamp
 )
 
+@Suppress("CHANGING_ARGUMENTS_EXECUTION_ORDER_FOR_NAMED_VARARGS")
 private fun Element.parseRadialGradient() = RadialGradient(
     colorStops = parseColorStops(),
     centerX = attributeOrNull(ANDROID_NS, "centerX")?.toFloat() ?: 0f,
@@ -189,6 +191,7 @@ private fun Element.parseRadialGradient() = RadialGradient(
     tileMode = attributeOrNull(ANDROID_NS, "tileMode")?.let(::parseTileMode) ?: TileMode.Clamp
 )
 
+@Suppress("CHANGING_ARGUMENTS_EXECUTION_ORDER_FOR_NAMED_VARARGS")
 private fun Element.parseSweepGradient() = SweepGradient(
     colorStops = parseColorStops(),
     center = Offset(
