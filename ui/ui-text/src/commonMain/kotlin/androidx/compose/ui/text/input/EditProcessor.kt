@@ -60,7 +60,7 @@ class EditProcessor {
                 initialSelection = value.selection
             )
         } else if (oldValue.selection != value.selection) {
-            mBuffer.setSelection(value.selection.start, value.selection.end)
+            mBuffer.setSelection(value.selection.min, value.selection.max)
         }
 
         if (value.composition == null) {
