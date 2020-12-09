@@ -167,7 +167,7 @@ fun BottomNavigationItem(
                 )
                 .weight(1f)
         },
-        alignment = Alignment.Center
+        contentAlignment = Alignment.Center
     ) {
         BottomNavigationTransition(
             selectedContentColor,

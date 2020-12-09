@@ -71,7 +71,7 @@ fun IconButton(
                 indication = rememberRippleIndication(bounded = false, radius = RippleRadius)
             )
             .then(IconButtonSizeModifier),
-        alignment = Alignment.Center
+        contentAlignment = Alignment.Center
     ) { content() }
 }
 
@@ -110,7 +110,7 @@ fun IconToggleButton(
             interactionState = interactionState,
             indication = rememberRippleIndication(bounded = false, radius = RippleRadius)
         ).then(IconButtonSizeModifier),
-        alignment = Alignment.Center
+        contentAlignment = Alignment.Center
     ) { content() }
 }
 

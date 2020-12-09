@@ -81,7 +81,7 @@ fun PopupDemo() {
 
             Box(
                 modifier = Modifier.weight(1f),
-                alignment = Alignment.Center
+                contentAlignment = Alignment.Center
             ) {
                 val description: String = {
                     when (exampleIndex.value) {
@@ -215,7 +215,7 @@ private fun ColumnScope.PopupToggle() {
                 Popup(alignment = Alignment.Center) {
                     Box(
                         Modifier.preferredSize(70.dp).background(Color.Green, CircleShape),
-                        alignment = Alignment.Center
+                        contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = "This is a popup!",
@@ -285,7 +285,7 @@ private fun ColumnScope.PopupWithChangingParent() {
     Column(Modifier.align(Alignment.CenterHorizontally)) {
         Box(
             Modifier.preferredSize(containerWidth, containerHeight),
-            alignment = parentAlignment.value
+            contentAlignment = parentAlignment.value
         ) {
             Box(
                 Modifier.preferredSize(parentWidth.value, parentHeight.value)
@@ -335,7 +335,7 @@ private fun ColumnScope.PopupAlignmentDemo() {
         val popupAlignment = remember { mutableStateOf(Alignment.TopStart) }
         Box(
             modifier = Modifier.preferredSize(widthSize, heightSize).background(Color.Red),
-            alignment = Alignment.BottomCenter
+            contentAlignment = Alignment.BottomCenter
         ) {
             Popup(popupAlignment.value) {
                 ClickableTextWithBackground(

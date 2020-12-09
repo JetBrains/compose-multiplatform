@@ -132,7 +132,7 @@ private fun Card(index: Int) {
     Box(
         Modifier.padding(25.dp).fillMaxWidth().preferredHeight(150.dp)
             .background(shapeColor, RoundedCornerShape(10.dp)),
-        alignment = Alignment.Center
+        contentAlignment = Alignment.Center
     ) {
         Text("Card ${index + 1}", color = textColor)
     }

@@ -102,7 +102,7 @@ fun FloatingActionButton(
                     modifier = Modifier
                         .defaultMinSizeConstraints(minWidth = FabSize, minHeight = FabSize)
                         .indication(interactionState, AmbientIndication.current()),
-                    alignment = Alignment.Center
+                    contentAlignment = Alignment.Center
                 ) { content() }
             }
         }
@@ -170,7 +170,7 @@ fun ExtendedFloatingActionButton(
                 start = ExtendedFabTextPadding,
                 end = ExtendedFabTextPadding
             ),
-            alignment = Alignment.Center
+            contentAlignment = Alignment.Center
         ) {
             if (icon == null) {
                 text()

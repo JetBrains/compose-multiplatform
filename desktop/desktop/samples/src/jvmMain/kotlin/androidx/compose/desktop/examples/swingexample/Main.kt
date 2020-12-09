@@ -218,7 +218,7 @@ fun ListItem(text: String = "Item", color: Color = Color(0, 0, 0, 20), width: In
             .width(width.dp)
             .background(color = color)
             .padding(start = 10.dp),
-        alignment = Alignment.CenterStart
+        contentAlignment = Alignment.CenterStart
     ) {
         Text(text = text)
     }
@@ -228,7 +228,7 @@ fun ListItem(text: String = "Item", color: Color = Color(0, 0, 0, 20), width: In
 fun TextBox(text: String = "") {
     Box(
         modifier = Modifier.height(30.dp),
-        alignment = Alignment.Center
+        contentAlignment = Alignment.Center
     ) {
         Text(
             text = text,
@@ -277,7 +277,7 @@ fun WindowContent(amount: MutableState<Int>) {
     val window = AppWindowAmbient.current
     Box(
         Modifier.fillMaxSize().background(color = Color(55, 55, 55)),
-        alignment = Alignment.Center
+        contentAlignment = Alignment.Center
     ) {
         Column {
             TextBox(text = "Increment NorthClicks?")

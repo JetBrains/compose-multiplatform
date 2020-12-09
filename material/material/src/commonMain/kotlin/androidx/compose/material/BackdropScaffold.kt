@@ -354,7 +354,7 @@ fun BackdropScaffold(
                             revealedHeight == fullHeight - headerHeightPx
                         ) headerHeight else 0.dp
                     ),
-                alignment = Alignment.BottomCenter
+                contentAlignment = Alignment.BottomCenter
             ) {
                 snackbarHost(scaffoldState.snackbarHostState)
             }
