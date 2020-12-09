@@ -385,12 +385,8 @@ package androidx.compose.runtime {
   }
 
   public final class SkippableUpdater<T> {
-    ctor public SkippableUpdater(androidx.compose.runtime.Composer<?> composer, T? node);
-    method public androidx.compose.runtime.Composer<?> getComposer();
-    method public T! getNode();
+    ctor @kotlin.PublishedApi internal SkippableUpdater(@kotlin.PublishedApi androidx.compose.runtime.Composer<?> composer, @kotlin.PublishedApi T? node);
     method public inline void update(kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,kotlin.Unit> block);
-    property public final androidx.compose.runtime.Composer<?> composer;
-    property public final T! node;
   }
 
   @androidx.compose.runtime.InternalComposeApi public final class SlotReader {
@@ -573,16 +569,12 @@ package androidx.compose.runtime {
   }
 
   public final class Updater<T> {
-    ctor public Updater(androidx.compose.runtime.Composer<?> composer, T? node);
-    method public androidx.compose.runtime.Composer<?> getComposer();
-    method public T! getNode();
+    ctor @kotlin.PublishedApi internal Updater(@kotlin.PublishedApi androidx.compose.runtime.Composer<?> composer, @kotlin.PublishedApi T? node);
     method public inline void reconcile(kotlin.jvm.functions.Function1<? super T,kotlin.Unit> block);
     method public inline void set(int value, kotlin.jvm.functions.Function2<? super T,? super java.lang.Integer,kotlin.Unit> block);
     method public inline <reified V> void set(V? value, kotlin.jvm.functions.Function2<? super T,? super V,? extends kotlin.Unit> block);
     method public inline void update(int value, kotlin.jvm.functions.Function2<? super T,? super java.lang.Integer,kotlin.Unit> block);
     method public inline <reified V> void update(V? value, kotlin.jvm.functions.Function2<? super T,? super V,? extends kotlin.Unit> block);
-    property public final androidx.compose.runtime.Composer<?> composer;
-    property public final T! node;
   }
 
 }
