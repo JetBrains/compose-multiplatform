@@ -667,6 +667,7 @@ package androidx.compose.runtime.internal {
   }
 
   public final class LiveLiteralKt {
+    method @androidx.compose.runtime.InternalComposeApi public static void enableLiveLiterals();
     method public static boolean isLiveLiteralsEnabled();
     method @androidx.compose.runtime.InternalComposeApi public static <T> androidx.compose.runtime.State<T> liveLiteral(String key, T? value);
     method @androidx.compose.runtime.InternalComposeApi public static void updateLiveLiteralValue(String key, Object? value);
