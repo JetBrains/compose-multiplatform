@@ -141,12 +141,14 @@ internal class ComposeLayer {
 
     private fun initCanvas() {
         wrapped.addInputMethodListener(object : InputMethodListener {
-            override fun caretPositionChanged(p0: InputMethodEvent?) {
-                TODO("Implement input method caret change")
+            override fun caretPositionChanged(event: InputMethodEvent?) {
+                if (event != null) {
+                    owners?.onInputMethodEvent(event)
+                }
             }
 
             override fun inputMethodTextChanged(event: InputMethodEvent) = events.post {
-                owners?.onInputMethodTextChanged(event)
+                owners?.onInputMethodEvent(event)
             }
         })
 

@@ -156,8 +156,19 @@ class DesktopOwners(
         platformInputService.onKeyTyped(event.keyChar)
     }
 
-    fun onInputMethodTextChanged(event: InputMethodEvent) {
-        platformInputService.onInputMethodTextChanged(event)
+    fun onInputMethodEvent(event: InputMethodEvent) {
+        if (!event.isConsumed()) {
+            when (event.id) {
+                InputMethodEvent.INPUT_METHOD_TEXT_CHANGED -> {
+                    platformInputService.replaceInputMethodText(event)
+                    event.consume()
+                }
+                InputMethodEvent.CARET_POSITION_CHANGED -> {
+                    platformInputService.inputMethodCaretPositionChanged(event)
+                    event.consume()
+                }
+            }
+        }
     }
 
     private fun pointerInputEvent(x: Int, y: Int, down: Boolean): PointerInputEvent {
