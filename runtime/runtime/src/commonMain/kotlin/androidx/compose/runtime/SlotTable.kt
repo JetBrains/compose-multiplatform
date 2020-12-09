@@ -1829,22 +1829,22 @@ class SlotWriter internal constructor(
                         endIndex = groupPhysicalAddress + groupPhysicalGapLen
                     )
                 }
+            }
 
-                // Gap has moved so the anchor for the groups that moved have changed so the parent
-                // anchors that refer to these groups must be updated.
-                var groupAddress = if (index < gapStart) index + gapLen else gapStart
-                val capacity = capacity
-                check(groupAddress < capacity)
-                while (groupAddress < capacity) {
-                    val oldAnchor = groups.parentAnchor(groupAddress)
-                    val oldIndex = parentAnchorToIndex(oldAnchor)
-                    val newAnchor = parentIndexToAnchor(oldIndex, index)
-                    if (newAnchor != oldAnchor) {
-                        groups.updateParentAnchor(groupAddress, newAnchor)
-                    }
-                    groupAddress++
-                    if (groupAddress == index) groupAddress += gapLen
+            // Gap has moved so the anchor for the groups that moved have changed so the parent
+            // anchors that refer to these groups must be updated.
+            var groupAddress = if (index < gapStart) index + gapLen else gapStart
+            val capacity = capacity
+            check(groupAddress < capacity)
+            while (groupAddress < capacity) {
+                val oldAnchor = groups.parentAnchor(groupAddress)
+                val oldIndex = parentAnchorToIndex(oldAnchor)
+                val newAnchor = parentIndexToAnchor(oldIndex, index)
+                if (newAnchor != oldAnchor) {
+                    groups.updateParentAnchor(groupAddress, newAnchor)
                 }
+                groupAddress++
+                if (groupAddress == index) groupAddress += gapLen
             }
         }
         this.groupGapStart = index
