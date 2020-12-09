@@ -21,8 +21,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.selection.SelectionContainer
+import androidx.compose.ui.selection.TextSelectionColors
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.height
@@ -36,6 +38,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
+import com.google.common.truth.Truth
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -57,6 +60,29 @@ class MaterialTextSelectionColorsScreenshotTest {
 
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL)
+
+    @Test
+    fun rememberTextSelectionColors() {
+        var lightTextSelectionColors: TextSelectionColors? = null
+        var darkTextSelectionColors: TextSelectionColors? = null
+        var lightPrimary: Color = Color.Unspecified
+        var darkPrimary: Color = Color.Unspecified
+        rule.setContent {
+            val lightColors = lightColors()
+            val darkColors = darkColors()
+            lightPrimary = lightColors.primary
+            darkPrimary = darkColors.primary
+            lightTextSelectionColors = rememberTextSelectionColors(lightColors)
+            darkTextSelectionColors = rememberTextSelectionColors(darkColors)
+        }
+
+        Truth.assertThat(lightTextSelectionColors!!.handleColor).isEqualTo(lightPrimary)
+        Truth.assertThat(darkTextSelectionColors!!.handleColor).isEqualTo(darkPrimary)
+        Truth.assertThat(lightTextSelectionColors!!.backgroundColor)
+            .isEqualTo(lightPrimary.copy(alpha = 0.325f))
+        Truth.assertThat(darkTextSelectionColors!!.backgroundColor)
+            .isEqualTo(darkPrimary.copy(alpha = 0.375f))
+    }
 
     @Test
     fun text_lightThemeSelectionColors() {
