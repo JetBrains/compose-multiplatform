@@ -26,8 +26,7 @@ import kotlin.math.max
  * A [MutableList]-like structure with a simplified interface that offers faster access than
  * [ArrayList].
  */
-@OptIn(ExperimentalContracts::class, ExperimentalCollectionApi::class)
-@ExperimentalCollectionApi
+@OptIn(ExperimentalContracts::class)
 class MutableVector<T> @PublishedApi internal constructor(
     @PublishedApi internal var content: Array<T?>,
     size: Int
@@ -1001,7 +1000,6 @@ class MutableVector<T> @PublishedApi internal constructor(
  *
  * @see MutableVector.ensureCapacity
  */
-@ExperimentalCollectionApi
 inline fun <reified T> MutableVector(capacity: Int = 16) =
     MutableVector<T>(arrayOfNulls<T>(capacity), 0)
 
@@ -1013,7 +1011,6 @@ inline fun <reified T> MutableVector(capacity: Int = 16) =
  * return the value to be assigned to the element at its given index.
  */
 @OptIn(ExperimentalContracts::class)
-@ExperimentalCollectionApi
 inline fun <reified T> MutableVector(size: Int, noinline init: (Int) -> T): MutableVector<T> {
     contract { callsInPlace(init) }
     val arr = Array(size, init)
@@ -1023,7 +1020,6 @@ inline fun <reified T> MutableVector(size: Int, noinline init: (Int) -> T): Muta
 /**
  * Creates an empty [MutableVector] with a [capacity][MutableVector.ensureCapacity] of 16.
  */
-@ExperimentalCollectionApi
 inline fun <reified T> mutableVectorOf() =
     MutableVector<T>()
 
@@ -1031,7 +1027,6 @@ inline fun <reified T> mutableVectorOf() =
  * Creates a [MutableVector] with the given values. This will use the passed vararg [elements]
  * storage.
  */
-@ExperimentalCollectionApi
 inline fun <reified T> mutableVectorOf(vararg elements: T): MutableVector<T> {
     return MutableVector(
         elements as Array<T?>,

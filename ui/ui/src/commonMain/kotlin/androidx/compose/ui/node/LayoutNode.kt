@@ -15,7 +15,6 @@
  */
 package androidx.compose.ui.node
 
-import androidx.compose.runtime.collection.ExperimentalCollectionApi
 import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.ui.ContentDrawScope
@@ -82,7 +81,6 @@ internal val sharedDrawScope = LayoutNodeDrawScope()
  */
 @ExperimentalLayoutNodeApi
 @OptIn(
-    ExperimentalCollectionApi::class,
     ExperimentalFocus::class,
     ExperimentalLayoutNodeApi::class
 )

@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.node
 
-import androidx.compose.runtime.collection.ExperimentalCollectionApi
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.ui.util.identityHashCode
 
@@ -24,7 +23,7 @@ import androidx.compose.ui.util.identityHashCode
  * Tracks the nodes being positioned and dispatches OnPositioned callbacks when we finished
  * the measure/layout pass.
  */
-@OptIn(ExperimentalLayoutNodeApi::class, ExperimentalCollectionApi::class)
+@OptIn(ExperimentalLayoutNodeApi::class)
 internal class OnPositionedDispatcher {
     private val layoutNodes = mutableVectorOf<LayoutNode>()
 

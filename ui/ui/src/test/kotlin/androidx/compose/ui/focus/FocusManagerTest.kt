@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.focus
 
-import androidx.compose.runtime.collection.ExperimentalCollectionApi
 import androidx.compose.ui.FocusModifier
 import androidx.compose.ui.focus.FocusState.Active
 import androidx.compose.ui.focus.FocusState.ActiveParent
@@ -35,7 +34,6 @@ import org.junit.runners.Parameterized
 import kotlin.jvm.JvmStatic
 
 @OptIn(
-    ExperimentalCollectionApi::class,
     ExperimentalFocus::class,
     ExperimentalLayoutNodeApi::class
 )

@@ -17,13 +17,11 @@
 package androidx.compose.runtime.snapshots
 
 import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.collection.ExperimentalCollectionApi
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.TestOnly
 import androidx.compose.runtime.collection.IdentityScopeMap
 
 @ExperimentalComposeApi
-@OptIn(ExperimentalCollectionApi::class)
 @Suppress("DEPRECATION_ERROR")
 class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit) -> Unit) {
     private val applyObserver: SnapshotApplyObserver = { applied, _ ->
