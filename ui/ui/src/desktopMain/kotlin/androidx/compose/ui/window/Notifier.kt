@@ -21,15 +21,37 @@ import java.awt.image.BufferedImage
 import java.awt.TrayIcon
 import java.awt.TrayIcon.MessageType
 
+/**
+ * Notifier is a class that can send system notifications.
+ */
 class Notifier {
+
+    /**
+     * Sends a regular notification with the given title and message.
+     *
+     * @param title Notification title.
+     * @param message Notification message.
+     */
     fun notify(title: String, message: String) {
         send(title, message, MessageType.INFO)
     }
 
+    /**
+     * Sends a warning notification with the given title and message.
+     *
+     * @param title Notification title.
+     * @param message Notification message.
+     */
     fun warn(title: String, message: String) {
         send(title, message, MessageType.WARNING)
     }
 
+    /**
+     * Sends a error notification with the given title and message.
+     *
+     * @param title Notification title.
+     * @param message Notification message.
+     */
     fun error(title: String, message: String) {
         send(title, message, MessageType.ERROR)
     }
