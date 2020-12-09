@@ -70,7 +70,7 @@ class DesktopOwner(
     val container: DesktopOwners,
     density: Density = Density(1f, 1f)
 ) : Owner {
-    private var size: IntSize = IntSize(0, 0)
+    internal var size by mutableStateOf(IntSize(0, 0))
 
     override var density by mutableStateOf(density)
 

@@ -54,7 +54,9 @@ abstract class AppFrame {
     var events: WindowEvents = WindowEvents()
         internal set
 
-    val onDismissEvents = mutableListOf<() -> Unit>()
+    internal var onDispose: (() -> Unit)? = null
+
+    internal var onDismiss: (() -> Unit)? = null
 
     abstract fun setTitle(title: String)
 
