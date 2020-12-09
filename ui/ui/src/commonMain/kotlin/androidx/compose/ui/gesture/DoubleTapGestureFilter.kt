@@ -130,7 +130,7 @@ internal class DoubleTapGestureFilter(
 
             if (state == State.SecondDown && changes.all { it.changedToUp() }) {
                 state = State.Idle
-                onDoubleTap.invoke(changes[0].previous.position!!)
+                onDoubleTap.invoke(changes[0].previous.position)
                 changes.fastForEach {
                     it.consumeDownChange()
                 }

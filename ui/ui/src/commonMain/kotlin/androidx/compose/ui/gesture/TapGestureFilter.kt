@@ -130,7 +130,7 @@ internal class TapGestureFilter : PointerInputFilter() {
             if (primed &&
                 changes.all { it.changedToUp() }
             ) {
-                val pointerPxPosition: Offset = changes[0].previous.position!!
+                val pointerPxPosition: Offset = changes[0].previous.position
                 if (changes.fastAny { !upBlockedPointers.contains(it.id) }) {
                     // If we are primed, all pointers went up, and at least one of the pointers is
                     // not blocked, we can fire, reset, and consume all of the up events.

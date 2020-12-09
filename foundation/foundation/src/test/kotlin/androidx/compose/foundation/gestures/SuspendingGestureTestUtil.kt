@@ -167,7 +167,11 @@ internal class SuspendingGestureTestUtil(
                 Offset(x, y),
                 true
             ),
-            PointerInputData(null, null, false),
+            PointerInputData(
+                Uptime.Boot + lastTime,
+                Offset(x, y),
+                false
+            ),
             ConsumedData(Offset.Zero, false)
         )
         activePointers[change.id] = change
@@ -208,7 +212,7 @@ internal class SuspendingGestureTestUtil(
             previous = current,
             current = PointerInputData(
                 Uptime.Boot + lastTime,
-                null,
+                current.position,
                 false
             ),
             consumed = ConsumedData()
@@ -273,8 +277,8 @@ internal class SuspendingGestureTestUtil(
         final: PointerInputChange.() -> Unit = {},
         initial: PointerInputChange.() -> Unit = {}
     ): PointerInputChange = moveTo(
-        current.position!!.x + offset.x,
-        current.position!!.y + offset.y,
+        current.position.x + offset.x,
+        current.position.y + offset.y,
         timeDiff,
         main,
         final,

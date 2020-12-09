@@ -142,8 +142,8 @@ fun PointerEvent.calculateRotation(): Float {
 
     changes.fastForEach { change ->
         if (change.current.down && change.previous.down) {
-            val currentPosition = change.current.position!!
-            val previousPosition = change.previous.position!!
+            val currentPosition = change.current.position
+            val previousPosition = change.previous.position
             val previousOffset = previousPosition - previousCentroid
             val currentOffset = currentPosition - currentCentroid
 
@@ -228,7 +228,7 @@ fun PointerEvent.calculateCentroidSize(useCurrent: Boolean = true): Float {
     changes.fastForEach { change ->
         if (change.current.down && change.previous.down) {
             val data = if (useCurrent) change.current else change.previous
-            distanceToCentroid += (data.position!! - centroid).getDistance()
+            distanceToCentroid += (data.position - centroid).getDistance()
             distanceWeight++
         }
     }
@@ -255,7 +255,7 @@ fun PointerEvent.calculateCentroid(
     changes.fastForEach { change ->
         if (change.current.down && change.previous.down) {
             val data = if (useCurrent) change.current else change.previous
-            centroid += data.position!!
+            centroid += data.position
             centroidWeight++
         }
     }

@@ -164,7 +164,7 @@ internal class PressIndicatorGestureFilter : PointerInputFilter() {
                 // If we have not yet started and all of the changes changed to down, we are
                 // starting.
                 state = State.Started
-                onStart?.invoke(changes.first().current.position!!)
+                onStart?.invoke(changes.first().current.position)
             } else if (state == State.Started) {
                 if (changes.all { it.changedToUpIgnoreConsumed() }) {
                     // If we have started and all of the changes changed to up, we are stopping.

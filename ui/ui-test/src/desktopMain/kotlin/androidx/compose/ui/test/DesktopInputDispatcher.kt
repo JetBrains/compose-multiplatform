@@ -66,7 +66,7 @@ internal class DesktopInputDispatcher(
 
     private fun PartialGesture.pointerInputEvent(down: Boolean): PointerInputEvent {
         val time = Uptime(lastEventTime * 1_000_000)
-        val offset = lastPositions[lastPositions.keys.sorted()[0]]
+        val offset = lastPositions[lastPositions.keys.sorted()[0]]!!
         val event = PointerInputEvent(
             time,
             listOf(
