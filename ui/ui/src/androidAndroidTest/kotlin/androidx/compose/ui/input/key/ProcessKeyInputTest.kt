@@ -56,7 +56,7 @@ class ProcessKeyInputTest {
     fun noFocusModifier_throwsException() {
         // Arrange.
         rule.setFocusableContent {
-            Box(modifier = Modifier.keyInputFilter { true })
+            Box(modifier = Modifier.onKeyEvent { true })
         }
 
         // Act.
@@ -68,7 +68,7 @@ class ProcessKeyInputTest {
 
         // Arrange.
         rule.setFocusableContent {
-            Box(modifier = Modifier.focus().keyInputFilter { true })
+            Box(modifier = Modifier.focus().onKeyEvent { true })
         }
 
         // Act.
@@ -85,7 +85,7 @@ class ProcessKeyInputTest {
                 modifier = Modifier
                     .focusRequester(focusRequester)
                     .focus()
-                    .keyInputFilter {
+                    .onKeyEvent {
                         receivedKeyEvent = it
                         true
                     }
@@ -115,7 +115,7 @@ class ProcessKeyInputTest {
                 modifier = Modifier
                     .focusRequester(focusRequester)
                     .focus()
-                    .previewKeyInputFilter {
+                    .onPreviewKeyEvent {
                         receivedKeyEvent = it
                         true
                     }
@@ -146,11 +146,11 @@ class ProcessKeyInputTest {
                 modifier = Modifier
                     .focusRequester(focusRequester)
                     .focus()
-                    .keyInputFilter {
+                    .onKeyEvent {
                         receivedKeyEvent = it
                         true
                     }
-                    .previewKeyInputFilter {
+                    .onPreviewKeyEvent {
                         receivedPreviewKeyEvent = it
                         true
                     }
@@ -182,11 +182,11 @@ class ProcessKeyInputTest {
                 modifier = Modifier
                     .focusRequester(focusRequester)
                     .focus()
-                    .keyInputFilter {
+                    .onKeyEvent {
                         onKeyEventTrigger = triggerIndex++
                         true
                     }
-                    .previewKeyInputFilter {
+                    .onPreviewKeyEvent {
                         onPreviewKeyEventTrigger = triggerIndex++
                         false
                     }
@@ -219,11 +219,11 @@ class ProcessKeyInputTest {
             Box(
                 modifier = Modifier
                     .focus()
-                    .keyInputFilter {
+                    .onKeyEvent {
                         parentOnKeyEventTrigger = triggerIndex++
                         false
                     }
-                    .previewKeyInputFilter {
+                    .onPreviewKeyEvent {
                         parentOnPreviewKeyEventTrigger = triggerIndex++
                         false
                     }
@@ -232,11 +232,11 @@ class ProcessKeyInputTest {
                     modifier = Modifier
                         .focusRequester(focusRequester)
                         .focus()
-                        .keyInputFilter {
+                        .onKeyEvent {
                             childOnKeyEventTrigger = triggerIndex++
                             false
                         }
-                        .previewKeyInputFilter {
+                        .onPreviewKeyEvent {
                             childOnPreviewKeyEventTrigger = triggerIndex++
                             false
                         }
@@ -271,11 +271,11 @@ class ProcessKeyInputTest {
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
-                    .keyInputFilter {
+                    .onKeyEvent {
                         parentOnKeyEventTrigger = triggerIndex++
                         false
                     }
-                    .previewKeyInputFilter {
+                    .onPreviewKeyEvent {
                         parentOnPreviewKeyEventTrigger = triggerIndex++
                         false
                     }
@@ -284,11 +284,11 @@ class ProcessKeyInputTest {
                     modifier = Modifier
                         .focusRequester(focusRequester)
                         .focus()
-                        .keyInputFilter {
+                        .onKeyEvent {
                             childOnKeyEventTrigger = triggerIndex++
                             false
                         }
-                        .previewKeyInputFilter {
+                        .onPreviewKeyEvent {
                             childOnPreviewKeyEventTrigger = triggerIndex++
                             false
                         }
@@ -326,11 +326,11 @@ class ProcessKeyInputTest {
             Box(
                 modifier = Modifier
                     .focus()
-                    .keyInputFilter {
+                    .onKeyEvent {
                         grandParentOnKeyEventTrigger = triggerIndex++
                         false
                     }
-                    .previewKeyInputFilter {
+                    .onPreviewKeyEvent {
                         grandParentOnPreviewKeyEventTrigger = triggerIndex++
                         false
                     }
@@ -338,11 +338,11 @@ class ProcessKeyInputTest {
                 Box(
                     modifier = Modifier
                         .focus()
-                        .keyInputFilter {
+                        .onKeyEvent {
                             parentOnKeyEventTrigger = triggerIndex++
                             false
                         }
-                        .previewKeyInputFilter {
+                        .onPreviewKeyEvent {
                             parentOnPreviewKeyEventTrigger = triggerIndex++
                             false
                         }
@@ -351,11 +351,11 @@ class ProcessKeyInputTest {
                         modifier = Modifier
                             .focusRequester(focusRequester)
                             .focus()
-                            .keyInputFilter {
+                            .onKeyEvent {
                                 childOnKeyEventTrigger = triggerIndex++
                                 false
                             }
-                            .previewKeyInputFilter {
+                            .onPreviewKeyEvent {
                                 childOnPreviewKeyEventTrigger = triggerIndex++
                                 false
                             }

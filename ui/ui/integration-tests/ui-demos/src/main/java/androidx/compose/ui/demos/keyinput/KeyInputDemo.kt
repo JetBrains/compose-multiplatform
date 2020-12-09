@@ -36,7 +36,7 @@ import androidx.compose.ui.focusRequester
 import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.KeyEventType.KeyDown
-import androidx.compose.ui.input.key.keyInputFilter
+import androidx.compose.ui.input.key.onKeyEvent
 
 @Composable
 fun KeyInputDemo() {
@@ -70,7 +70,7 @@ private fun FocusableText(text: MutableState<String>) {
             .onFocusChanged { color = if (it.isFocused) Color.Green else Color.Black }
             .focus()
             .tapGestureFilter { focusRequester.requestFocus() }
-            .keyInputFilter {
+            .onKeyEvent {
                 if (it.type == KeyDown) {
                     text.value = StringBuilder(text.value)
                         .appendCodePoint(it.utf16CodePoint)
