@@ -36,10 +36,6 @@ private val DisabledRules = listOf(
     "import-ordering",
     // not useful for our projects
     "final-newline",
-    // Paren spacing doesn't understand @Composable () -> Unit, as it thinks the () is part of the
-    //  annotation and not the function type of the lambda, so disabling this for now.
-    // TODO: https://github.com/pinterest/ktlint/issues/737
-    "paren-spacing"
 ).joinToString(",")
 
 fun Project.configureKtlint() {

@@ -579,23 +579,23 @@ class AndroidXPlugin : Plugin<Project> {
         }
     }
 
-    private fun Project.createVerifyDependencyVersionsTask(
-    ): TaskProvider<VerifyDependencyVersionsTask>? {
-        /**
-         * Ignore -PuseMaxDepVersions when verifying dependency versions because it is a
-         * hypothetical build which is only intended to check for forward compatibility.
-         */
-        if (hasProperty(USE_MAX_DEP_VERSIONS)) {
-            return null
-        }
+    private fun Project.createVerifyDependencyVersionsTask():
+        TaskProvider<VerifyDependencyVersionsTask>? {
+            /**
+             * Ignore -PuseMaxDepVersions when verifying dependency versions because it is a
+             * hypothetical build which is only intended to check for forward compatibility.
+             */
+            if (hasProperty(USE_MAX_DEP_VERSIONS)) {
+                return null
+            }
 
-        val taskProvider = tasks.register(
-            "verifyDependencyVersions",
-            VerifyDependencyVersionsTask::class.java
-        )
-        addToBuildOnServer(taskProvider)
-        return taskProvider
-    }
+            val taskProvider = tasks.register(
+                "verifyDependencyVersions",
+                VerifyDependencyVersionsTask::class.java
+            )
+            addToBuildOnServer(taskProvider)
+            return taskProvider
+        }
 
     // Task that creates a json file of a project's dependencies
     private fun Project.addCreateLibraryBuildInfoFileTask(extension: AndroidXExtension) {
