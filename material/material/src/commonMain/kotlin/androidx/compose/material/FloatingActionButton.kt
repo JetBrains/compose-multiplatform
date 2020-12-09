@@ -17,10 +17,10 @@
 package androidx.compose.material
 
 import androidx.compose.animation.AnimatedValueModel
-import androidx.compose.animation.VectorConverter
 import androidx.compose.animation.asDisposableClock
 import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.AnimationVector1D
+import androidx.compose.animation.core.VectorConverter
 import androidx.compose.foundation.AmbientIndication
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState

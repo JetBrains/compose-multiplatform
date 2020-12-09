@@ -408,8 +408,6 @@ package androidx.compose.animation.core {
 
   public final class PropKeyKt {
     method public static <T, V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.TwoWayConverter<T,V> TwoWayConverter(kotlin.jvm.functions.Function1<? super T,? extends V> convertToVector, kotlin.jvm.functions.Function1<? super V,? extends T> convertFromVector);
-    method @Deprecated public static androidx.compose.animation.core.TwoWayConverter<java.lang.Float,androidx.compose.animation.core.AnimationVector1D> getFloatToVectorConverter();
-    method @Deprecated public static androidx.compose.animation.core.TwoWayConverter<java.lang.Integer,androidx.compose.animation.core.AnimationVector1D> getIntToVectorConverter();
     method public static androidx.compose.animation.core.TwoWayConverter<java.lang.Float,androidx.compose.animation.core.AnimationVector1D> getVectorConverter(kotlin.jvm.internal.FloatCompanionObject);
     method public static androidx.compose.animation.core.TwoWayConverter<java.lang.Integer,androidx.compose.animation.core.AnimationVector1D> getVectorConverter(kotlin.jvm.internal.IntCompanionObject);
   }
@@ -631,14 +629,14 @@ package androidx.compose.animation.core {
   }
 
   public final class VectorConvertersKt {
-    field @kotlin.PublishedApi internal static final androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.Bounds,androidx.compose.animation.core.AnimationVector4D> BoundsToVector;
-    field @kotlin.PublishedApi internal static final androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.Dp,androidx.compose.animation.core.AnimationVector1D> DpToVector;
-    field @kotlin.PublishedApi internal static final androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.IntOffset,androidx.compose.animation.core.AnimationVector2D> IntOffsetToVector;
-    field @kotlin.PublishedApi internal static final androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.IntSize,androidx.compose.animation.core.AnimationVector2D> IntSizeToVector;
-    field @kotlin.PublishedApi internal static final androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.geometry.Offset,androidx.compose.animation.core.AnimationVector2D> OffsetToVector;
-    field @kotlin.PublishedApi internal static final androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.Position,androidx.compose.animation.core.AnimationVector2D> PositionToVector;
-    field @kotlin.PublishedApi internal static final androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.geometry.Rect,androidx.compose.animation.core.AnimationVector4D> RectToVector;
-    field @kotlin.PublishedApi internal static final androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.geometry.Size,androidx.compose.animation.core.AnimationVector2D> SizeToVector;
+    method public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.geometry.Rect,androidx.compose.animation.core.AnimationVector4D> getVectorConverter(androidx.compose.ui.geometry.Rect.Companion);
+    method public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.Dp,androidx.compose.animation.core.AnimationVector1D> getVectorConverter(androidx.compose.ui.unit.Dp.Companion);
+    method public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.Position,androidx.compose.animation.core.AnimationVector2D> getVectorConverter(androidx.compose.ui.unit.Position.Companion);
+    method public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.geometry.Size,androidx.compose.animation.core.AnimationVector2D> getVectorConverter(androidx.compose.ui.geometry.Size.Companion);
+    method public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.Bounds,androidx.compose.animation.core.AnimationVector4D> getVectorConverter(androidx.compose.ui.unit.Bounds.Companion);
+    method public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.geometry.Offset,androidx.compose.animation.core.AnimationVector2D> getVectorConverter(androidx.compose.ui.geometry.Offset.Companion);
+    method public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.IntOffset,androidx.compose.animation.core.AnimationVector2D> getVectorConverter(androidx.compose.ui.unit.IntOffset.Companion);
+    method public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.IntSize,androidx.compose.animation.core.AnimationVector2D> getVectorConverter(androidx.compose.ui.unit.IntSize.Companion);
   }
 
   public interface VectorizedAnimationSpec<V extends androidx.compose.animation.core.AnimationVector> {
