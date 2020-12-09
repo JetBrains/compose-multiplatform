@@ -1,7 +1,7 @@
 // Signature format: 4.0
 package androidx.compose.runtime {
 
-  @androidx.compose.runtime.ExperimentalComposeApi public abstract class AbstractApplier<T> implements androidx.compose.runtime.Applier<T> {
+  public abstract class AbstractApplier<T> implements androidx.compose.runtime.Applier<T> {
     ctor public AbstractApplier(T? root);
     method public final void clear();
     method public void down(T? node);
@@ -41,7 +41,7 @@ package androidx.compose.runtime {
     property public final boolean valid;
   }
 
-  @androidx.compose.runtime.ExperimentalComposeApi public interface Applier<N> {
+  public interface Applier<N> {
     method public void clear();
     method public void down(N? node);
     method public N! getCurrent();
