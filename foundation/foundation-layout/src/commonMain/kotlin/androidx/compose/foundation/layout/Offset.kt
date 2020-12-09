@@ -30,6 +30,7 @@ import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 
@@ -86,7 +87,7 @@ fun Modifier.absoluteOffset(x: Dp = 0.dp, y: Dp = 0.dp) = this.then(
 )
 
 /**
- * Offset the content by ([x] px, [y] px). The offsets can be positive as well as non-positive.
+ * Offset the content by [offset] px. The offsets can be positive as well as non-positive.
  * Applying an offset only changes the position of the content, without interfering with
  * its size measurement.
  * This modifier is designed to be used for offsets that change, possibly due to user interactions.
@@ -100,34 +101,33 @@ fun Modifier.absoluteOffset(x: Dp = 0.dp, y: Dp = 0.dp) = this.then(
  * Example usage:
  * @sample androidx.compose.foundation.layout.samples.OffsetPxModifier
  */
-fun Modifier.offset(
-    x: Density.() -> Float = { 0f },
-    y: Density.() -> Float = { 0f }
-) = this.then(
+fun Modifier.offset(offset: Density.() -> IntOffset) = this.then(
     OffsetPxModifier(
-        x = x,
-        y = y,
+        offset = offset,
         rtlAware = true,
         inspectorInfo = debugInspectorInfo {
             name = "offset"
-            properties["x"] = x
-            properties["y"] = y
+            properties["offset"] = offset
         }
     )
 )
 
 @Deprecated(
     "offsetPx was deprecated. Please use offset with lambda parameters instead.",
-    ReplaceWith("offset({x.value}, {y.value})", "androidx.compose.foundation.layout.offset")
+    ReplaceWith(
+        "offset({x.value}, {y.value})",
+        "androidx.compose.foundation.layout.offset",
+        "kotlin.math.roundToInt()"
+    )
 )
 @Suppress("ModifierInspectorInfo")
 fun Modifier.offsetPx(
     x: State<Float> = mutableStateOf(0f),
     y: State<Float> = mutableStateOf(0f)
-) = this.offset({ x.value }, { y.value })
+) = this.offset { IntOffset(x.value.roundToInt(), y.value.roundToInt()) }
 
 /**
- * Offset the content by ([x] px, [y] px). The offsets can be positive as well as non-positive.
+ * Offset the content by [offset] px. The offsets can be positive as well as non-positive.
  * Applying an offset only changes the position of the content, without interfering with
  * its size measurement.
  * This modifier is designed to be used for offsets that change, possibly due to user interactions.
@@ -142,17 +142,14 @@ fun Modifier.offsetPx(
  * @sample androidx.compose.foundation.layout.samples.AbsoluteOffsetPxModifier
  */
 fun Modifier.absoluteOffset(
-    x: Density.() -> Float = { 0f },
-    y: Density.() -> Float = { 0f }
+    offset: Density.() -> IntOffset
 ) = this.then(
     OffsetPxModifier(
-        x = x,
-        y = y,
+        offset = offset,
         rtlAware = false,
         inspectorInfo = debugInspectorInfo {
             name = "absoluteOffset"
-            properties["x"] = x
-            properties["y"] = y
+            properties["offset"] = offset
         }
     )
 )
@@ -160,15 +157,16 @@ fun Modifier.absoluteOffset(
 @Deprecated(
     "absoluteOffsetPx was deprecated. Please use absoluteOffset with lambda parameters instead.",
     ReplaceWith(
-        "absoluteOffset({x.value}, {y.value})",
-        "androidx.compose.foundation.layout.absoluteOffset"
+        "absoluteOffset({x.value.roundToInt()}, {y.value.roundToInt()})",
+        "androidx.compose.foundation.layout.absoluteOffset",
+        "kotlin.math.roundToInt"
     )
 )
 @Suppress("ModifierInspectorInfo")
 fun Modifier.absoluteOffsetPx(
     x: State<Float> = mutableStateOf(0f),
     y: State<Float> = mutableStateOf(0f)
-) = this.absoluteOffset({ x.value }, { y.value })
+) = this.absoluteOffset { IntOffset(x.value.roundToInt(), y.value.roundToInt()) }
 
 private class OffsetModifier(
     val x: Dp,
@@ -210,8 +208,7 @@ private class OffsetModifier(
 }
 
 private class OffsetPxModifier(
-    val x: Density.() -> Float,
-    val y: Density.() -> Float,
+    val offset: Density.() -> IntOffset,
     val rtlAware: Boolean,
     inspectorInfo: InspectorInfo.() -> Unit
 ) : LayoutModifier, InspectorValueInfo(inspectorInfo) {
@@ -221,10 +218,11 @@ private class OffsetPxModifier(
     ): MeasureResult {
         val placeable = measurable.measure(constraints)
         return layout(placeable.width, placeable.height) {
+            val offsetValue = offset()
             if (rtlAware) {
-                placeable.placeRelativeWithLayer(x().roundToInt(), y().roundToInt())
+                placeable.placeRelativeWithLayer(offsetValue.x, offsetValue.y)
             } else {
-                placeable.placeWithLayer(x().roundToInt(), y().roundToInt())
+                placeable.placeWithLayer(offsetValue.x, offsetValue.y)
             }
         }
     }
@@ -233,17 +231,15 @@ private class OffsetPxModifier(
         if (this === other) return true
         val otherModifier = other as? OffsetPxModifier ?: return false
 
-        return x == otherModifier.x &&
-            y == otherModifier.y &&
+        return offset == otherModifier.offset &&
             rtlAware == otherModifier.rtlAware
     }
 
     override fun hashCode(): Int {
-        var result = x.hashCode()
-        result = 31 * result + y.hashCode()
+        var result = offset.hashCode()
         result = 31 * result + rtlAware.hashCode()
         return result
     }
 
-    override fun toString(): String = "OffsetPxModifier(x=$x, y=$y, rtlAware=$rtlAware)"
+    override fun toString(): String = "OffsetPxModifier(offset=$offset, rtlAware=$rtlAware)"
 }

@@ -40,6 +40,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.IntOffset
+import kotlin.math.roundToInt
 
 @Composable
 @Sampled
@@ -49,7 +51,7 @@ fun DetectMultitouchGestures() {
     var offsetX by remember { mutableStateOf(0f) }
     var offsetY by remember { mutableStateOf(0f) }
     Box(
-        Modifier.offset({ offsetX }, { offsetY })
+        Modifier.offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
             .graphicsLayer(
                 scaleX = zoom,
                 scaleY = zoom,
@@ -124,7 +126,7 @@ fun CalculatePan() {
     val offsetY = remember { mutableStateOf(0f) }
     Box(
         Modifier
-            .offset({ offsetX.value }, { offsetY.value })
+            .offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
             .graphicsLayer()
             .background(Color.Blue)
             .pointerInput {

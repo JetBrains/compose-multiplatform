@@ -60,6 +60,7 @@ import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import kotlin.math.atan2
@@ -342,7 +343,7 @@ fun Drag2DGestures() {
         }.fillMaxSize()
     ) {
         Box(
-            Modifier.offset({ offsetX.value }, { offsetY.value })
+            Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .background(Color.Blue)
                 .size(50.dp)
                 .pointerInput {
@@ -394,7 +395,7 @@ fun MultitouchArea(
         }
     ) {
         Box(
-            Modifier.offset({ offsetX }, { offsetY })
+            Modifier.offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
                 .graphicsLayer(
                     scaleX = zoom,
                     scaleY = zoom,
