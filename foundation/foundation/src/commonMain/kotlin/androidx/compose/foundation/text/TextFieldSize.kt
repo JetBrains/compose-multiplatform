@@ -84,7 +84,7 @@ private class TextFieldSize(
     }
 
     private fun computeMinSize(): IntSize {
-        return computeSizeForEmptyText(
+        return computeSizeForDefaultText(
             style = resolveDefaults(style, layoutDirection),
             density = density,
             resourceLoader = resourceLoader
