@@ -116,10 +116,10 @@ PublicationContainer.metaClass.jvmOs = { name, skikoDeps ->
 afterEvaluate {
     publishing {
         publications {
-            it.jvmOs("linux", [SKIKO_LINUX])
-            it.jvmOs("macos", [SKIKO_MACOS])
-            it.jvmOs("windows", [SKIKO_WINDOWS])
-            it.jvmOs("all", [SKIKO_LINUX, SKIKO_MACOS, SKIKO_WINDOWS])
+            it.jvmOs("linux-x64", [SKIKO_LINUX_X64])
+            it.jvmOs("macos-x64", [SKIKO_MACOS_X64])
+            it.jvmOs("macos-arm64", [SKIKO_MACOS_ARM64])
+            it.jvmOs("windows-x64", [SKIKO_WINDOWS_X64])
         }
     }
 }
