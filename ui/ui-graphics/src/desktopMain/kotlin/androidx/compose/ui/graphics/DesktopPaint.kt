@@ -114,9 +114,19 @@ class DesktopPaint : Paint {
             field = value
         }
 
-    override var nativePathEffect: NativePathEffect? = null
+    override var nativePathEffect: NativePathEffect?
+        get() = pathEffect?.asDesktopPathEffect()
         set(value) {
-            skija.pathEffect = value
+            pathEffect = if (value == null) {
+                null
+            } else {
+                DesktopPathEffect(value)
+            }
+        }
+
+    override var pathEffect: PathEffect? = null
+        set(value) {
+            skija.pathEffect = (value as DesktopPathEffect).asDesktopPathEffect()
             field = value
         }
 
