@@ -242,7 +242,7 @@ class MultiParagraphIntegrationTextDirectionTest {
      * Helper function which creates an AnnotatedString where each input string becomes a paragraph.
      */
     private fun createAnnotatedString(paragraphs: List<String>): AnnotatedString {
-        return annotatedString {
+        return buildAnnotatedString {
             for (paragraph in paragraphs) {
                 pushStyle(ParagraphStyle())
                 append(paragraph)

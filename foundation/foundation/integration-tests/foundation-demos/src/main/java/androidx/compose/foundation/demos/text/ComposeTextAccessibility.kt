@@ -22,7 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.VerbatimTtsAnnotation
-import androidx.compose.ui.text.annotatedString
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.intl.LocaleList
 
 @Composable
@@ -30,7 +30,7 @@ fun TextAccessibilityDemo() {
     Column {
         TagLine("Text to speech with different locales.")
         Text(
-            text = annotatedString {
+            text = buildAnnotatedString {
                 pushStyle(SpanStyle(localeList = LocaleList("en-us")))
                 append("Hello!\n")
                 pop()
@@ -55,7 +55,7 @@ fun TextAccessibilityDemo() {
 
         TagLine("VerbatimTtsAnnotation ")
         Text(
-            text = annotatedString {
+            text = buildAnnotatedString {
                 append("This word is read verbatim: ")
                 pushTtsAnnotation(VerbatimTtsAnnotation(verbatim = "hello"))
                 append("hello\n")

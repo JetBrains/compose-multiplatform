@@ -28,14 +28,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
-import androidx.compose.ui.text.annotatedString
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.em
 
 @Sampled
 @Composable
 fun InlineTextContentSample() {
     val myId = "inlineContent"
-    val text = annotatedString {
+    val text = buildAnnotatedString {
         append("Hello")
         // Append a placeholder string "[myBox]" and attach an annotation "inlineContent" on it.
         appendInlineContent(myId, "[myBox]")

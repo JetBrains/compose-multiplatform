@@ -62,8 +62,8 @@ package androidx.compose.ui.text {
   public final class AnnotatedStringKt {
     method public static androidx.compose.ui.text.AnnotatedString AnnotatedString(String text, androidx.compose.ui.text.SpanStyle spanStyle, optional androidx.compose.ui.text.ParagraphStyle? paragraphStyle);
     method public static androidx.compose.ui.text.AnnotatedString AnnotatedString(String text, androidx.compose.ui.text.ParagraphStyle paragraphStyle);
-    method @Deprecated public static inline androidx.compose.ui.text.AnnotatedString AnnotatedString(kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.AnnotatedString.Builder,kotlin.Unit> builder);
-    method public static inline androidx.compose.ui.text.AnnotatedString annotatedString(kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.AnnotatedString.Builder,kotlin.Unit> builder);
+    method @Deprecated public static inline androidx.compose.ui.text.AnnotatedString annotatedString(kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.AnnotatedString.Builder,kotlin.Unit> builder);
+    method public static inline androidx.compose.ui.text.AnnotatedString buildAnnotatedString(kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.AnnotatedString.Builder,kotlin.Unit> builder);
     method public static androidx.compose.ui.text.AnnotatedString capitalize(androidx.compose.ui.text.AnnotatedString, optional androidx.compose.ui.text.intl.LocaleList localeList);
     method public static androidx.compose.ui.text.AnnotatedString decapitalize(androidx.compose.ui.text.AnnotatedString, optional androidx.compose.ui.text.intl.LocaleList localeList);
     method public static int getLength(androidx.compose.ui.text.AnnotatedString);
