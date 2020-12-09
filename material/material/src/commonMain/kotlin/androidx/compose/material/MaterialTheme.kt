@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposableContract
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.remember
+import androidx.compose.ui.selection.AmbientTextSelectionColors
 
 /**
  * A MaterialTheme defines the styling principles from the Material design specification.
@@ -64,12 +65,14 @@ fun MaterialTheme(
     val indicationFactory: @Composable () -> Indication = remember {
         { rememberRippleIndication() }
     }
+    val selectionColors = rememberTextSelectionColors(rememberedColors)
     Providers(
         AmbientColors provides rememberedColors,
+        AmbientContentAlpha provides ContentAlpha.high,
         AmbientIndication provides indicationFactory,
-        AmbientTypography provides typography,
+        AmbientTextSelectionColors provides selectionColors,
         AmbientShapes provides shapes,
-        AmbientContentAlpha provides ContentAlpha.high
+        AmbientTypography provides typography
     ) {
         ProvideTextStyle(value = typography.body1, content = content)
     }

@@ -20,7 +20,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.text.AnnotatedString
@@ -139,7 +138,7 @@ class TextFieldDelegate {
          * @param canvas The target canvas.
          * @param value The editor state
          * @param offsetMap The offset map
-         * @param selectionColor The selection color
+         * @param selectionPaint The selection paint
          */
         @JvmStatic
         internal fun draw(
@@ -147,14 +146,14 @@ class TextFieldDelegate {
             value: TextFieldValue,
             offsetMap: OffsetMap,
             textLayoutResult: TextLayoutResult,
-            selectionColor: Color
+            selectionPaint: Paint
         ) {
             if (!value.selection.collapsed) {
                 val start = offsetMap.originalToTransformed(value.selection.min)
                 val end = offsetMap.originalToTransformed(value.selection.max)
                 if (start != end) {
                     val selectionPath = textLayoutResult.getPathForRange(start, end)
-                    canvas.drawPath(selectionPath, Paint().apply { this.color = selectionColor })
+                    canvas.drawPath(selectionPath, selectionPaint)
                 }
             }
             TextPainter.paint(canvas, textLayoutResult)

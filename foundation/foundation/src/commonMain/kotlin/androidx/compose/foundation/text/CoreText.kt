@@ -33,7 +33,6 @@ import androidx.compose.ui.drawLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.LongPressDragObserver
 import androidx.compose.ui.gesture.longPressDragGestureFilter
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.layout.FirstBaseline
@@ -47,6 +46,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AmbientFontLoader
 import androidx.compose.ui.selection.AmbientSelectionRegistrar
+import androidx.compose.ui.selection.AmbientTextSelectionColors
 import androidx.compose.ui.selection.Selectable
 import androidx.compose.ui.selection.SelectionRegistrar
 import androidx.compose.ui.semantics.getTextLayoutResult
@@ -71,8 +71,6 @@ import androidx.compose.ui.util.fastForEach
 import kotlin.math.floor
 import kotlin.math.roundToInt
 
-/** The default selection color if none is specified. */
-internal val DefaultSelectionColor = Color(0x6633B5E5)
 private typealias PlaceholderRange = AnnotatedString.Range<Placeholder>
 private typealias InlineContentRange = AnnotatedString.Range<@Composable (String) -> Unit>
 
@@ -114,6 +112,7 @@ fun CoreText(
     val selectionRegistrar = AmbientSelectionRegistrar.current
     val density = AmbientDensity.current
     val resourceLoader = AmbientFontLoader.current
+    val selectionBackgroundColor = AmbientTextSelectionColors.current.backgroundColor
 
     val (placeholders, inlineComposables) = resolveInlineContent(text, inlineContent)
 
@@ -143,6 +142,7 @@ fun CoreText(
         placeholders = placeholders
     )
     state.onTextLayout = onTextLayout
+    state.selectionPaint.color = selectionBackgroundColor
 
     val controller = remember { TextController(state) }
     controller.update(selectionRegistrar)
@@ -356,10 +356,7 @@ internal class TextState(
     /** The global position calculated during the last onPositioned callback */
     var previousGlobalPosition: Offset = Offset.Zero
     /** The paint used to draw highlight background for selected text. */
-    val selectionPaint: Paint = Paint().apply {
-        isAntiAlias = true
-        color = DefaultSelectionColor
-    }
+    val selectionPaint: Paint = Paint()
 }
 
 /**
