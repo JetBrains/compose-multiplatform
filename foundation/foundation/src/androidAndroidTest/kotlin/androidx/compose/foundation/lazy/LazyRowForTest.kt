@@ -32,6 +32,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.SemanticsNodeInteraction
@@ -50,6 +51,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.Ignore
@@ -813,6 +815,67 @@ class LazyRowForTest {
             }
             assertThat(state.firstVisibleItemIndex).isEqualTo(3)
             assertThat(state.firstVisibleItemScrollOffset).isEqualTo(10)
+        }
+    }
+
+    @Test
+    fun itemsAreNotRedrawnDuringScroll() {
+        val items = (0..20).toList()
+        val redrawCount = Array(6) { 0 }
+        rule.setContent {
+            LazyRowFor(
+                items = items,
+                modifier = Modifier.size(100.dp).testTag(LazyRowForTag)
+            ) {
+                Spacer(
+                    Modifier.size(20.dp)
+                        .drawBehind { redrawCount[it]++ }
+                )
+            }
+        }
+
+        rule.onNodeWithTag(LazyRowForTag)
+            .scrollBy(x = 10.dp, density = rule.density)
+
+        rule.runOnIdle {
+            redrawCount.forEachIndexed { index, i ->
+                Truth.assertWithMessage("Item with index $index was redrawn $i times")
+                    .that(i).isEqualTo(1)
+            }
+        }
+    }
+
+    @Test
+    fun itemInvalidationIsNotCausingAnotherItemToRedraw() {
+        val items = (0..1).toList()
+        val redrawCount = Array(2) { 0 }
+        var stateUsedInDrawScope by mutableStateOf(false)
+        rule.setContent {
+            LazyRowFor(
+                items = items,
+                modifier = Modifier.size(100.dp).testTag(LazyRowForTag)
+            ) {
+                Spacer(
+                    Modifier.size(50.dp)
+                        .drawBehind {
+                            redrawCount[it]++
+                            if (it == 1) {
+                                stateUsedInDrawScope.hashCode()
+                            }
+                        }
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            stateUsedInDrawScope = true
+        }
+
+        rule.runOnIdle {
+            Truth.assertWithMessage("First items is not expected to be redrawn")
+                .that(redrawCount[0]).isEqualTo(1)
+            Truth.assertWithMessage("Second items is expected to be redrawn")
+                .that(redrawCount[1]).isEqualTo(2)
         }
     }
 }
