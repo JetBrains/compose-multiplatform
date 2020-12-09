@@ -3210,6 +3210,118 @@ class AndroidLayoutDrawTest {
             }
     }
 
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun layoutUsesPlaceWithLayer() {
+        val yellow = Color(0xFFFFFF00)
+        val red = Color(0xFF800000)
+
+        activityTestRule.runOnUiThreadIR {
+            activity.setContent {
+                Layout(
+                    content = {
+                        AtLeastSize(
+                            size = 10,
+                            modifier = Modifier.drawBehind {
+                                drawRect(red)
+                            }
+                        )
+                    },
+                    modifier = Modifier.drawBehind {
+                        drawRect(yellow)
+                        drawLatch.countDown()
+                    }
+                ) { measurables, constraints ->
+                    val placeable = measurables.first().measure(constraints)
+                    layout(30, 30) {
+                        placeable.placeWithLayer(10, 10)
+                    }
+                }
+            }
+        }
+
+        validateSquareColors(outerColor = yellow, innerColor = red, size = 10)
+    }
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun layoutUsesPlaceWithLayerWithScale() {
+        val yellow = Color(0xFFFFFF00)
+        val red = Color(0xFF800000)
+
+        activityTestRule.runOnUiThreadIR {
+            activity.setContent {
+                Layout(
+                    content = {
+                        AtLeastSize(
+                            size = 20,
+                            modifier = Modifier.drawBehind {
+                                drawRect(red)
+                            }
+                        )
+                    },
+                    modifier = Modifier.drawBehind {
+                        drawRect(yellow)
+                        drawLatch.countDown()
+                    }
+                ) { measurables, constraints ->
+                    val placeable = measurables.first().measure(constraints)
+                    layout(30, 30) {
+                        placeable.placeWithLayer(5, 5) {
+                            scaleX = 0.5f
+                            scaleY = 0.5f
+                        }
+                    }
+                }
+            }
+        }
+
+        validateSquareColors(outerColor = yellow, innerColor = red, size = 10)
+    }
+
+    @Test
+    fun layoutMovesPlacedWithLayerChild_noInvalidations() {
+        var parentInvalidationCount = 0
+        var childInvalidationCount = 0
+        var offset by mutableStateOf(0)
+
+        activityTestRule.runOnUiThreadIR {
+            activity.setContent {
+                Layout(
+                    content = {
+                        AtLeastSize(
+                            size = 20,
+                            modifier = Modifier.drawBehind {
+                                childInvalidationCount++
+                            }
+                        )
+                    },
+                    modifier = Modifier.drawWithContent {
+                        drawContent()
+                        parentInvalidationCount++
+                        drawLatch.countDown()
+                    }
+                ) { measurables, constraints ->
+                    val placeable = measurables.first().measure(constraints)
+                    layout(30, 30) {
+                        placeable.placeWithLayer(offset, offset)
+                    }
+                }
+            }
+        }
+
+        assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
+        assertEquals(1, parentInvalidationCount)
+        assertEquals(1, childInvalidationCount)
+
+        drawLatch = CountDownLatch(1)
+        offset = 10
+
+        assertFalse(drawLatch.await(300, TimeUnit.MILLISECONDS))
+        assertEquals(1, parentInvalidationCount)
+        assertEquals(1, childInvalidationCount)
+    }
+
     private fun composeSquares(model: SquareModel) {
         activityTestRule.runOnUiThreadIR {
             activity.setContent {

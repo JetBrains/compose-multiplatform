@@ -28,6 +28,7 @@ import androidx.compose.runtime.resetSourceInfo
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.WithConstraints
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -35,6 +36,7 @@ import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import org.junit.Assert
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
@@ -127,6 +129,7 @@ class BoundsTest : ToolingTest() {
         }
     }
 
+    @Ignore("b/174030267")
     @Test
     @LargeTest
     fun testDisposeWithComposeTables() {
@@ -137,6 +140,7 @@ class BoundsTest : ToolingTest() {
             Inspectable(slotTableRecord) {
                 key(value) {
                     WithConstraints {
+                        requireNotNull(AmbientDensity.current)
                         Text("Hello")
                     }
                 }

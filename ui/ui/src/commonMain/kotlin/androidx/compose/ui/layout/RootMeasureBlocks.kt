@@ -42,7 +42,7 @@ internal object RootMeasureBlocks : LayoutNode.NoIntrinsicsMeasureBlocks(
                     constraints.constrainWidth(placeable.width),
                     constraints.constrainHeight(placeable.height)
                 ) {
-                    placeable.placeRelative(0, 0)
+                    placeable.placeRelativeWithLayer(0, 0)
                 }
             }
             else -> {
@@ -60,7 +60,7 @@ internal object RootMeasureBlocks : LayoutNode.NoIntrinsicsMeasureBlocks(
                     constraints.constrainHeight(maxHeight)
                 ) {
                     placeables.fastForEach { placeable ->
-                        placeable.placeRelative(0, 0)
+                        placeable.placeRelativeWithLayer(0, 0)
                     }
                 }
             }

@@ -18,8 +18,6 @@
 
 package androidx.compose.ui.node
 
-import androidx.compose.ui.layout.MeasureScope
-import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.geometry.MutableRect
@@ -27,17 +25,24 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.graphics.GraphicsLayerScope
+import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.ReusableGraphicsLayerScope
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.layout.globalPosition
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.minus
 import androidx.compose.ui.unit.plus
 import androidx.compose.ui.unit.toOffset
+import androidx.compose.ui.util.annotation.CallSuper
 
 /**
  * Measurable and Placeable type that has a position.
@@ -45,7 +50,7 @@ import androidx.compose.ui.unit.toOffset
 @OptIn(ExperimentalLayoutNodeApi::class)
 internal abstract class LayoutNodeWrapper(
     internal val layoutNode: LayoutNode
-) : Placeable(), Measurable, LayoutCoordinates {
+) : Placeable(), Measurable, LayoutCoordinates, OwnerScope, (Canvas) -> Unit {
     internal open val wrapped: LayoutNodeWrapper? = null
     internal var wrappedBy: LayoutNodeWrapper? = null
 
@@ -59,28 +64,37 @@ internal abstract class LayoutNodeWrapper(
     // Size exposed to LayoutCoordinates.
     final override val size: IntSize get() = measuredSize
 
-    open val invalidateLayerOnBoundsChange = true
+    private var isClipping: Boolean = false
+
+    private var layerBlock: (GraphicsLayerScope.() -> Unit)? = null
+
+    private var _isAttached = false
+    override val isAttached: Boolean
+        get() {
+            if (_isAttached) {
+                require(layoutNode.isAttached())
+            }
+            return _isAttached
+        }
 
     private var _measureResult: MeasureResult? = null
     open var measureResult: MeasureResult
         get() = _measureResult ?: error(UnmeasuredError)
         internal set(value) {
-            if (invalidateLayerOnBoundsChange &&
-                (value.width != _measureResult?.width || value.height != _measureResult?.height)
-            ) {
-                invalidateLayer()
+            if (value.width != _measureResult?.width || value.height != _measureResult?.height) {
+                val layer = layer
+                if (layer != null) {
+                    layer.resize(IntSize(value.width, value.height))
+                } else {
+                    wrappedBy?.invalidateLayer()
+                }
             }
             _measureResult = value
             measuredSize = IntSize(measureResult.width, measureResult.height)
         }
 
     var position: IntOffset = IntOffset.Zero
-        internal set(value) {
-            if (invalidateLayerOnBoundsChange && value != field) {
-                invalidateLayer()
-            }
-            field = value
-        }
+        private set
 
     var zIndex: Float = 0f
         protected set
@@ -99,6 +113,13 @@ internal abstract class LayoutNodeWrapper(
     private val rectCache: MutableRect get() = _rectCache ?: MutableRect(0f, 0f, 0f, 0f).also {
         _rectCache = it
     }
+
+    private val snapshotObserver get() = layoutNode.requireOwner().snapshotObserver
+
+    // TODO (njawad): This cache matrix is not thread safe
+    private var _matrixCache: Matrix? = null
+    private val matrixCache: Matrix
+        get() = _matrixCache ?: Matrix().also { _matrixCache = it }
 
     /**
      * Whether a pointer that is relative to the device screen is in the bounds of this
@@ -124,18 +145,144 @@ internal abstract class LayoutNodeWrapper(
      */
     final override fun measure(constraints: Constraints): Placeable {
         measurementConstraints = constraints
-        return performMeasure(constraints)
+        val result = performMeasure(constraints)
+        layer?.resize(measuredSize)
+        return result
     }
 
     /**
      * Places the modified child.
      */
-    abstract override fun placeAt(position: IntOffset, zIndex: Float)
+    @CallSuper
+    override fun placeAt(
+        position: IntOffset,
+        zIndex: Float,
+        layerBlock: (GraphicsLayerScope.() -> Unit)?
+    ) {
+        if (wrappedBy?.isShallowPlacing != true) {
+            onLayerBlockUpdated(layerBlock)
+        }
+        if (this.position != position) {
+            this.position = position
+            val layer = layer
+            if (layer != null) {
+                layer.move(position)
+            } else {
+                wrappedBy?.invalidateLayer()
+            }
+        }
+        this.zIndex = zIndex
+    }
 
     /**
      * Draws the content of the LayoutNode
      */
-    abstract fun draw(canvas: Canvas)
+    fun draw(canvas: Canvas) {
+        val layer = layer
+        if (layer != null) {
+            layer.drawLayer(canvas)
+        } else {
+            val x = position.x.toFloat()
+            val y = position.y.toFloat()
+            canvas.translate(x, y)
+            performDraw(canvas)
+            canvas.translate(-x, -y)
+        }
+    }
+
+    protected abstract fun performDraw(canvas: Canvas)
+
+    // implementation of draw block passed to the OwnedLayer
+    @ExperimentalLayoutNodeApi
+    override fun invoke(canvas: Canvas) {
+        if (layoutNode.isPlaced) {
+            require(layoutNode.layoutState == LayoutNode.LayoutState.Ready) {
+                "Layer is redrawn for LayoutNode in state ${layoutNode.layoutState} [$layoutNode]"
+            }
+            snapshotObserver.observeReads(this, onCommitAffectingLayer) {
+                performDraw(canvas)
+            }
+            lastLayerDrawingWasSkipped = false
+        } else {
+            // The invalidation is requested even for nodes which are not placed. As we are not
+            // going to display them we skip the drawing. It is safe to just draw nothing as the
+            // layer will be invalidated again when the node will be finally placed.
+            lastLayerDrawingWasSkipped = true
+        }
+    }
+
+    fun onLayerBlockUpdated(layerBlock: (GraphicsLayerScope.() -> Unit)?) {
+        val blockHasBeenChanged = this.layerBlock !== layerBlock
+        this.layerBlock = layerBlock
+        if (isAttached && layerBlock != null) {
+            if (layer == null) {
+                layer = layoutNode.requireOwner().createLayer(
+                    this,
+                    invalidateParentLayer
+                ).apply {
+                    resize(measuredSize)
+                    move(position)
+                }
+                updateLayerParameters()
+                invalidateParentLayer()
+            } else if (blockHasBeenChanged) {
+                updateLayerParameters()
+            }
+        } else {
+            layer?.let {
+                it.destroy()
+
+                invalidateParentLayer()
+            }
+            layer = null
+        }
+    }
+
+    private fun updateLayerParameters() {
+        val layer = layer
+        if (layer != null) {
+            val layerBlock = requireNotNull(layerBlock)
+            graphicsLayerScope.reset()
+            snapshotObserver.observeReads(this, onCommitAffectingLayerParams) {
+                layerBlock.invoke(graphicsLayerScope)
+            }
+            layer.updateLayerProperties(
+                scaleX = graphicsLayerScope.scaleX,
+                scaleY = graphicsLayerScope.scaleY,
+                alpha = graphicsLayerScope.alpha,
+                translationX = graphicsLayerScope.translationX,
+                translationY = graphicsLayerScope.translationY,
+                shadowElevation = graphicsLayerScope.shadowElevation,
+                rotationX = graphicsLayerScope.rotationX,
+                rotationY = graphicsLayerScope.rotationY,
+                rotationZ = graphicsLayerScope.rotationZ,
+                cameraDistance = graphicsLayerScope.cameraDistance,
+                transformOrigin = graphicsLayerScope.transformOrigin,
+                shape = graphicsLayerScope.shape,
+                clip = graphicsLayerScope.clip
+            )
+            isClipping = graphicsLayerScope.clip
+        } else {
+            require(layerBlock == null)
+        }
+    }
+
+    private val invalidateParentLayer: () -> Unit = {
+        wrappedBy?.invalidateLayer()
+    }
+
+    /**
+     * True when the last drawing of this layer didn't draw the real content as the LayoutNode
+     * containing this layer was not placed by the parent.
+     */
+    internal var lastLayerDrawingWasSkipped = false
+        private set
+
+    var layer: OwnedLayer? = null
+        private set
+
+    override val isValid: Boolean
+        get() = layer != null
 
     /**
      * Executes a hit test on any appropriate type associated with this [LayoutNodeWrapper].
@@ -193,25 +340,37 @@ internal abstract class LayoutNodeWrapper(
         return position
     }
 
-    protected inline fun withPositionTranslation(canvas: Canvas, block: (Canvas) -> Unit) {
-        val x = position.x.toFloat()
-        val y = position.y.toFloat()
-        canvas.translate(x, y)
-        block(canvas)
-        canvas.translate(-x, -y)
-    }
-
     /**
      * Converts [position] in the local coordinate system to a [Offset] in the
      * [parentCoordinates] coordinate system.
      */
-    open fun toParentPosition(position: Offset): Offset = position + this.position
+    open fun toParentPosition(position: Offset): Offset {
+        val layer = layer
+        val targetPosition = if (layer == null) {
+            position
+        } else {
+            val matrix = matrixCache
+            matrix.map(position)
+        }
+        return targetPosition + this.position
+    }
 
     /**
      * Converts [position] in the [parentCoordinates] coordinate system to a [Offset] in the
      * local coordinate system.
      */
-    open fun fromParentPosition(position: Offset): Offset = position - this.position
+    open fun fromParentPosition(position: Offset): Offset {
+        val layer = layer
+        val targetPosition = if (layer == null) {
+            position
+        } else {
+            val inverse = matrixCache
+            layer.getMatrix(inverse)
+            inverse.invert()
+            inverse.map(position)
+        }
+        return targetPosition - this.position
+    }
 
     protected fun drawBorder(canvas: Canvas, paint: Paint) {
         val rect = Rect(
@@ -233,7 +392,10 @@ internal abstract class LayoutNodeWrapper(
      * It is also called whenever the modifier chain is replaced and the [LayoutNodeWrapper]s are
      * recreated.
      */
-    abstract fun attach()
+    open fun attach() {
+        _isAttached = true
+        onLayerBlockUpdated(layerBlock)
+    }
 
     /**
      * Detaches the [LayoutNodeWrapper] and its wrapped [LayoutNodeWrapper] from an active
@@ -245,13 +407,35 @@ internal abstract class LayoutNodeWrapper(
      * It is also called whenever the modifier chain is replaced and the [LayoutNodeWrapper]s are
      * recreated.
      */
-    abstract fun detach()
+    open fun detach() {
+        _isAttached = false
+        onLayerBlockUpdated(layerBlock)
+        // The layer has been removed and we need to invalidate the containing layer. We've lost
+        // which layer contained this one, but all layers in this modifier chain will be invalidated
+        // in onModifierChanged(). Therefore the only possible layer that won't automatically be
+        // invalidated is the parent's layer. We'll invalidate it here:
+        @OptIn(ExperimentalLayoutNodeApi::class)
+        layoutNode.parent?.invalidateLayer()
+    }
 
     /**
      * Modifies bounds to be in the parent LayoutNodeWrapper's coordinates, including clipping,
      * scaling, etc.
      */
     protected open fun rectInParent(bounds: MutableRect) {
+        val layer = layer
+        if (layer != null) {
+            if (isClipping) {
+                bounds.intersect(0f, 0f, size.width.toFloat(), size.height.toFloat())
+                if (bounds.isEmpty) {
+                    return
+                }
+            }
+            val matrix = matrixCache
+            layer.getMatrix(matrix)
+            matrix.map(bounds)
+        }
+
         val x = position.x
         bounds.left += x
         bounds.right += x
@@ -285,14 +469,35 @@ internal abstract class LayoutNodeWrapper(
         return bounds.toRect()
     }
 
+    protected fun withinLayerBounds(pointerPositionRelativeToScreen: Offset): Boolean {
+        if (layer != null && isClipping) {
+            val l = globalPosition.x
+            val t = globalPosition.y
+            val r = l + width
+            val b = t + height
+
+            val localBoundsRelativeToScreen = Rect(l, t, r, b)
+            if (!localBoundsRelativeToScreen.contains(pointerPositionRelativeToScreen)) {
+                // If we should clip pointer input hit testing to our bounds, and the pointer is
+                // not in our bounds, then return false now.
+                return false
+            }
+        }
+
+        // If we are here, either we aren't clipping to bounds or we are and the pointer was in
+        // bounds.
+        return true
+    }
+
     /**
      * Invalidates the layer that this wrapper will draw into.
      */
     open fun invalidateLayer() {
-        if (layoutNode.innerLayerWrapper != null) {
-            wrappedBy?.invalidateLayer()
+        val layer = layer
+        if (layer != null) {
+            layer.invalidate()
         } else {
-            layoutNode.invalidateLayer()
+            wrappedBy?.invalidateLayer()
         }
     }
 
@@ -390,11 +595,22 @@ internal abstract class LayoutNodeWrapper(
      * Called when [LayoutNode.modifier] has changed and all the LayoutNodeWrappers have been
      * configured.
      */
-    open fun onModifierChanged() {}
+    open fun onModifierChanged() {
+        layer?.invalidate()
+    }
 
     internal companion object {
         const val ExpectAttachedLayoutCoordinates = "LayoutCoordinate operations are only valid " +
             "when isAttached is true"
         const val UnmeasuredError = "Asking for measurement result of unmeasured layout modifier"
+        private val onCommitAffectingLayerParams: (LayoutNodeWrapper) -> Unit = { wrapper ->
+            if (wrapper.isValid) {
+                wrapper.updateLayerParameters()
+            }
+        }
+        private val onCommitAffectingLayer: (LayoutNodeWrapper) -> Unit = { wrapper ->
+            wrapper.layer?.invalidate()
+        }
+        private val graphicsLayerScope = ReusableGraphicsLayerScope()
     }
 }

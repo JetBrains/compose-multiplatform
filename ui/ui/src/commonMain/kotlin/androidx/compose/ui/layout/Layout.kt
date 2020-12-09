@@ -27,6 +27,7 @@ import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.emit
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.materialize
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutEmitHelper
@@ -293,8 +294,14 @@ private class FixedSizeIntrinsicsPlaceable(width: Int, height: Int) : Placeable(
     init {
         measuredSize = IntSize(width, height)
     }
+
     override fun get(line: AlignmentLine): Int = AlignmentLine.Unspecified
-    override fun placeAt(position: IntOffset, zIndex: Float) { }
+    override fun placeAt(
+        position: IntOffset,
+        zIndex: Float,
+        layerBlock: (GraphicsLayerScope.() -> Unit)?
+    ) {
+    }
 }
 
 /**
