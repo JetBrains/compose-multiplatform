@@ -26,6 +26,7 @@ import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
+import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -58,7 +59,7 @@ class AppBarTest {
                 TopAppBar(title = { Text("Title") })
             }
             .assertHeightIsEqualTo(appBarHeight)
-            .assertWidthFillsRoot()
+            .assertWidthIsEqualTo(rule.rootWidth())
     }
 
     @Test
@@ -169,7 +170,7 @@ class AppBarTest {
                 BottomAppBar {}
             }
             .assertHeightIsEqualTo(appBarHeight)
-            .assertWidthFillsRoot()
+            .assertWidthIsEqualTo(rule.rootWidth())
     }
 
     @Test
