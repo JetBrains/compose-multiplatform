@@ -172,11 +172,11 @@ private sealed class PaddingTestCase : ComposeTestCase, ToggleableTestCase {
         paddingState = padding
 
         FillerContainer {
-            emitPaddedContainer(padding.value) {
-                emitPaddedContainer(padding.value) {
-                    emitPaddedContainer(padding.value) {
-                        emitPaddedContainer(padding.value) {
-                            emitPaddedContainer(padding.value) {}
+            PaddedContainer(padding.value) {
+                PaddedContainer(padding.value) {
+                    PaddedContainer(padding.value) {
+                        PaddedContainer(padding.value) {
+                            PaddedContainer(padding.value) {}
                         }
                     }
                 }
@@ -185,7 +185,7 @@ private sealed class PaddingTestCase : ComposeTestCase, ToggleableTestCase {
     }
 
     @Composable
-    abstract fun emitPaddedContainer(padding: Dp, content: @Composable () -> Unit)
+    abstract fun PaddedContainer(padding: Dp, content: @Composable () -> Unit)
 }
 
 @Composable
@@ -210,7 +210,7 @@ fun FillerContainer(modifier: Modifier = Modifier, content: @Composable () -> Un
 private class ModifierTestCase : PaddingTestCase() {
 
     @Composable
-    override fun emitPaddedContainer(padding: Dp, content: @Composable () -> Unit) {
+    override fun PaddedContainer(padding: Dp, content: @Composable () -> Unit) {
         FillerContainer(Modifier.padding(padding), content)
     }
 }
@@ -218,7 +218,7 @@ private class ModifierTestCase : PaddingTestCase() {
 private class NoModifierTestCase : PaddingTestCase() {
 
     @Composable
-    override fun emitPaddedContainer(padding: Dp, content: @Composable () -> Unit) {
+    override fun PaddedContainer(padding: Dp, content: @Composable () -> Unit) {
         FillerContainer {
             Padding(all = padding, content = content)
         }

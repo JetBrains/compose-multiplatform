@@ -200,11 +200,29 @@ class RtlLayoutTest {
         Providers(AmbientLayoutDirection provides testLayoutDirection) {
             Layout(
                 content = @Composable {
-                    FixedSize(size, modifier = saveLayoutInfo(position[0], countDownLatch)) {
+                    FixedSize(
+                        size,
+                        modifier = Modifier.saveLayoutInfo(
+                            position[0],
+                            countDownLatch
+                        )
+                    ) {
                     }
-                    FixedSize(size, modifier = saveLayoutInfo(position[1], countDownLatch)) {
+                    FixedSize(
+                        size,
+                        modifier = Modifier.saveLayoutInfo(
+                            position[1],
+                            countDownLatch
+                        )
+                    ) {
                     }
-                    FixedSize(size, modifier = saveLayoutInfo(position[2], countDownLatch)) {
+                    FixedSize(
+                        size,
+                        modifier = Modifier.saveLayoutInfo(
+                            position[2],
+                            countDownLatch
+                        )
+                    ) {
                     }
                 }
             ) { measurables, constraints ->
@@ -228,11 +246,10 @@ class RtlLayoutTest {
         }
     }
 
-    @Composable
-    private fun saveLayoutInfo(
+    private fun Modifier.saveLayoutInfo(
         position: Ref<Offset>,
         countDownLatch: CountDownLatch
-    ): Modifier = Modifier.onGloballyPositioned {
+    ): Modifier = onGloballyPositioned {
         position.value = it.localToRoot(Offset(0f, 0f))
         countDownLatch.countDown()
     }

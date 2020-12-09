@@ -95,7 +95,7 @@ class VectorTest {
         val latch2 = CountDownLatch(1)
         val testCase = VectorInvalidationTestCase(latch1)
         rule.setContent {
-            testCase.createTestVector()
+            testCase.TestVector()
         }
 
         latch1.await()

@@ -193,9 +193,9 @@ class ListItemTest {
         rule.setMaterialContent {
             Box {
                 ListItem(
-                    text = { Text("Primary text", saveLayout(textPosition, textSize)) },
+                    text = { Text("Primary text", Modifier.saveLayout(textPosition, textSize)) },
                     trailing = {
-                        Image(icon24x24, saveLayout(trailingPosition, trailingSize))
+                        Image(icon24x24, Modifier.saveLayout(trailingPosition, trailingSize))
                     }
                 )
             }
@@ -233,8 +233,8 @@ class ListItemTest {
         rule.setMaterialContent {
             Box {
                 ListItem(
-                    text = { Text("Primary text", saveLayout(textPosition, textSize)) },
-                    icon = { Image(icon24x24, saveLayout(iconPosition, iconSize)) }
+                    text = { Text("Primary text", Modifier.saveLayout(textPosition, textSize)) },
+                    icon = { Image(icon24x24, Modifier.saveLayout(iconPosition, iconSize)) }
                 )
             }
         }
@@ -276,12 +276,15 @@ class ListItemTest {
             Box {
                 ListItem(
                     text = {
-                        Text("Primary text", saveLayout(textPosition, textSize, textBaseline))
+                        Text(
+                            "Primary text",
+                            Modifier.saveLayout(textPosition, textSize, textBaseline)
+                        )
                     },
                     secondaryText = {
                         Text(
                             "Secondary text",
-                            saveLayout(
+                            Modifier.saveLayout(
                                 secondaryTextPosition,
                                 secondaryTextSize,
                                 secondaryTextBaseline
@@ -289,7 +292,10 @@ class ListItemTest {
                         )
                     },
                     trailing = {
-                        Text("meta", saveLayout(trailingPosition, trailingSize, trailingBaseline))
+                        Text(
+                            "meta",
+                            Modifier.saveLayout(trailingPosition, trailingSize, trailingBaseline)
+                        )
                     }
                 )
             }
@@ -339,12 +345,15 @@ class ListItemTest {
             Box {
                 ListItem(
                     text = {
-                        Text("Primary text", saveLayout(textPosition, textSize, textBaseline))
+                        Text(
+                            "Primary text",
+                            Modifier.saveLayout(textPosition, textSize, textBaseline)
+                        )
                     },
                     secondaryText = {
                         Text(
                             "Secondary text",
-                            saveLayout(
+                            Modifier.saveLayout(
                                 secondaryTextPosition,
                                 secondaryTextSize,
                                 secondaryTextBaseline
@@ -352,7 +361,7 @@ class ListItemTest {
                         )
                     },
                     icon = {
-                        Image(icon24x24, saveLayout(iconPosition, iconSize))
+                        Image(icon24x24, Modifier.saveLayout(iconPosition, iconSize))
                     }
                 )
             }
@@ -407,12 +416,15 @@ class ListItemTest {
             Box {
                 ListItem(
                     text = {
-                        Text("Primary text", saveLayout(textPosition, textSize, textBaseline))
+                        Text(
+                            "Primary text",
+                            Modifier.saveLayout(textPosition, textSize, textBaseline)
+                        )
                     },
                     secondaryText = {
                         Text(
                             "Secondary text",
-                            saveLayout(
+                            Modifier.saveLayout(
                                 secondaryTextPosition,
                                 secondaryTextSize,
                                 secondaryTextBaseline
@@ -420,10 +432,10 @@ class ListItemTest {
                         )
                     },
                     icon = {
-                        Image(icon40x40, saveLayout(iconPosition, iconSize))
+                        Image(icon40x40, Modifier.saveLayout(iconPosition, iconSize))
                     },
                     trailing = {
-                        Image(icon24x24, saveLayout(trailingPosition, trailingSize))
+                        Image(icon24x24, Modifier.saveLayout(trailingPosition, trailingSize))
                     }
                 )
             }
@@ -485,12 +497,15 @@ class ListItemTest {
             Box {
                 ListItem(
                     text = {
-                        Text("Primary text", saveLayout(textPosition, textSize, textBaseline))
+                        Text(
+                            "Primary text",
+                            Modifier.saveLayout(textPosition, textSize, textBaseline)
+                        )
                     },
                     secondaryText = {
                         Text(
                             "Secondary text",
-                            saveLayout(
+                            Modifier.saveLayout(
                                 secondaryTextPosition,
                                 secondaryTextSize,
                                 secondaryTextBaseline
@@ -499,10 +514,10 @@ class ListItemTest {
                     },
                     singleLineSecondaryText = false,
                     icon = {
-                        Image(icon24x24, saveLayout(iconPosition, iconSize))
+                        Image(icon24x24, Modifier.saveLayout(iconPosition, iconSize))
                     },
                     trailing = {
-                        Image(icon24x24, saveLayout(trailingPosition, trailingSize))
+                        Image(icon24x24, Modifier.saveLayout(trailingPosition, trailingSize))
                     }
                 )
             }
@@ -568,7 +583,7 @@ class ListItemTest {
                     overlineText = {
                         Text(
                             "OVERLINE",
-                            saveLayout(
+                            Modifier.saveLayout(
                                 overlineTextPosition,
                                 overlineTextSize,
                                 overlineTextBaseline
@@ -576,12 +591,15 @@ class ListItemTest {
                         )
                     },
                     text = {
-                        Text("Primary text", saveLayout(textPosition, textSize, textBaseline))
+                        Text(
+                            "Primary text",
+                            Modifier.saveLayout(textPosition, textSize, textBaseline)
+                        )
                     },
                     secondaryText = {
                         Text(
                             "Secondary text",
-                            saveLayout(
+                            Modifier.saveLayout(
                                 secondaryTextPosition,
                                 secondaryTextSize,
                                 secondaryTextBaseline
@@ -591,13 +609,13 @@ class ListItemTest {
                     icon = {
                         Image(
                             icon40x40,
-                            saveLayout(iconPosition, iconSize)
+                            Modifier.saveLayout(iconPosition, iconSize)
                         )
                     },
                     trailing = {
                         Text(
                             "meta",
-                            saveLayout(
+                            Modifier.saveLayout(
                                 trailingPosition,
                                 trailingSize,
                                 trailingBaseline
@@ -654,11 +672,11 @@ class ListItemTest {
 
     private fun Dp.toIntPx() = (this.value * rule.density.density).roundToInt()
 
-    private fun saveLayout(
+    private fun Modifier.saveLayout(
         coords: Ref<Offset>,
         size: Ref<IntSize>,
         baseline: Ref<Float> = Ref()
-    ): Modifier = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
+    ): Modifier = onGloballyPositioned { coordinates: LayoutCoordinates ->
         coords.value = coordinates.localToRoot(Offset.Zero)
         baseline.value = coordinates[FirstBaseline].toFloat() + coords.value!!.y
         size.value = coordinates.size

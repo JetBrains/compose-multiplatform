@@ -71,7 +71,7 @@ class TimeOutTest {
     }
 
     @Composable
-    fun infiniteCase() {
+    fun InfiniteCase() {
         Box {
             val infiniteCounter = remember { mutableStateOf(0) }
             Box(
@@ -92,7 +92,7 @@ class TimeOutTest {
 
         expectError<ComposeNotIdleException>(expectedMessage = expectedErrorDueToRecompositions) {
             rule.setContent {
-                infiniteCase()
+                InfiniteCase()
             }
         }
     }
@@ -103,7 +103,7 @@ class TimeOutTest {
 
         expectError<ComposeNotIdleException>(expectedMessage = expectedErrorDueToRecompositions) {
             rule.setContent {
-                infiniteCase()
+                InfiniteCase()
             }
         }
     }
@@ -154,7 +154,7 @@ class TimeOutTest {
         IdlingPolicies.setMasterPolicyTimeout(300, TimeUnit.MILLISECONDS)
         expectError<ComposeNotIdleException> {
             rule.setContent {
-                infiniteCase()
+                InfiniteCase()
             }
         }
 

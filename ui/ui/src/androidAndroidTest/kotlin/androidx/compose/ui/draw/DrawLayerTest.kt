@@ -24,7 +24,6 @@ import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.FixedSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Padding
-import androidx.compose.ui.PaddingModifier
 import androidx.compose.ui.TransformOrigin
 import androidx.compose.ui.background
 import androidx.compose.ui.drawLayer
@@ -42,6 +41,7 @@ import androidx.compose.ui.layout.globalBounds
 import androidx.compose.ui.layout.globalPosition
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.padding
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.captureToImage
@@ -76,7 +76,7 @@ class DrawLayerTest {
         rule.setContent {
             FixedSize(
                 30,
-                PaddingModifier(10).drawLayer().onGloballyPositioned {
+                Modifier.padding(10).drawLayer().onGloballyPositioned {
                     coords = it
                 }
             ) { /* no-op */ }
@@ -280,7 +280,7 @@ class DrawLayerTest {
                 FixedSize(10, Modifier.drawLayer(clip = true)) {
                     FixedSize(
                         10,
-                        PaddingModifier(20).onGloballyPositioned {
+                        Modifier.padding(20).onGloballyPositioned {
                             coords = it
                         }
                     ) {

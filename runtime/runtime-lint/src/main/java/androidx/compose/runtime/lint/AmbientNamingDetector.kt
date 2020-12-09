@@ -31,6 +31,7 @@ import com.android.tools.lint.detector.api.SourceCodeScanner
 import com.intellij.psi.util.InheritanceUtil
 import org.jetbrains.uast.UElement
 import org.jetbrains.uast.UVariable
+import java.util.EnumSet
 import java.util.Locale
 
 /**
@@ -82,7 +83,7 @@ class AmbientNamingDetector : Detector(), SourceCodeScanner {
             Category.CORRECTNESS, 3, Severity.ERROR,
             Implementation(
                 AmbientNamingDetector::class.java,
-                Scope.JAVA_FILE_SCOPE
+                EnumSet.of(Scope.JAVA_FILE, Scope.TEST_SOURCES)
             )
         )
     }

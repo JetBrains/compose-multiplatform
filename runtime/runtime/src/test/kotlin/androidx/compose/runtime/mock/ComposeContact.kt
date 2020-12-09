@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 //  <text text="Name: ${contact.name}" />
 //  <text text="email: ${contact.email" />
 // </linear>
+@Suppress("ComposableNaming")
 @Composable
 fun MockComposeScope.contact(contact: Contact) {
     linear {
@@ -44,6 +45,7 @@ fun MockViewValidator.contact(contact: Contact) {
 //    <selectBox>
 //   </repeat>
 // </linear>
+@Suppress("ComposableNaming")
 @Composable
 fun MockComposeScope.contacts(contacts: Collection<Contact>, selected: Contact?) {
     linear {
@@ -75,6 +77,7 @@ fun MockViewValidator.contacts(contacts: Collection<Contact>, selected: Contact?
 //     <contacts contacts=model.filtered selected=model.selected />
 //   </linear>
 // </linear>
+@Suppress("ComposableNaming")
 @Composable
 fun MockComposeScope.selectContact(model: ContactModel) {
     linear {

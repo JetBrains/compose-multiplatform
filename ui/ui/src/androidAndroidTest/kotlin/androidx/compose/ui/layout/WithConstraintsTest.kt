@@ -202,7 +202,7 @@ class WithConstraintsTest {
         rule.runOnUiThreadIR {
             activity.setContent {
                 Scroller(
-                    modifier = countdownLatchBackgroundModifier(Color.Yellow),
+                    modifier = Modifier.countdownLatchBackground(Color.Yellow),
                     onScrollPositionChanged = { position, _ ->
                         offset.value = position
                     },
@@ -377,7 +377,7 @@ class WithConstraintsTest {
 
         rule.runOnUiThreadIR {
             activity.setContent {
-                Container(100, 100, backgroundModifier(Color.Red)) {
+                Container(100, 100, Modifier.background(Color.Red)) {
                     ChangingConstraintsLayout(model) {
                         WithConstraints {
                             val receivedConstraints = constraints
@@ -385,7 +385,7 @@ class WithConstraintsTest {
                                 Container(100, 100) {
                                     Layout(
                                         {},
-                                        countdownLatchBackgroundModifier(Color.Yellow)
+                                        Modifier.countdownLatchBackground(Color.Yellow)
                                     ) { _, _ ->
                                         // the same as the value inside ValueModel
                                         val size = receivedConstraints.maxWidth
@@ -450,7 +450,7 @@ class WithConstraintsTest {
             activity.setContent {
                 Container(
                     100, 100,
-                    modifier = countdownLatchBackgroundModifier(Color.Red)
+                    modifier = Modifier.countdownLatchBackground(Color.Red)
                 ) {
                     // this component changes the constraints which triggers subcomposition
                     // within onMeasure block
@@ -464,7 +464,7 @@ class WithConstraintsTest {
                                 Container(100, 100) {
                                     Layout(
                                         content = {},
-                                        modifier = countdownLatchBackgroundModifier(Color.Yellow)
+                                        modifier = Modifier.countdownLatchBackground(Color.Yellow)
                                     ) { _, _ ->
                                         layout(model.value, model.value) {}
                                     }
@@ -588,7 +588,7 @@ class WithConstraintsTest {
                     WithConstraints {
                         Layout(
                             content = {},
-                            modifier = countdownLatchBackgroundModifier(Color.Transparent)
+                            modifier = Modifier.countdownLatchBackground(Color.Transparent)
                         ) { _, _ ->
                             // read and write once inside measureBlock
                             if (state.value == 0) {
@@ -717,11 +717,10 @@ class WithConstraintsTest {
         return bitmap
     }
 
-    private fun countdownLatchBackgroundModifier(color: Color) =
-        Modifier.drawBehind {
-            drawRect(color)
-            drawLatch.countDown()
-        }
+    private fun Modifier.countdownLatchBackground(color: Color): Modifier = drawBehind {
+        drawRect(color)
+        drawLatch.countDown()
+    }
 }
 
 @Composable
@@ -745,7 +744,7 @@ private fun TestLayout(@Suppress("UNUSED_PARAMETER") someInput: Int) {
 private fun NeedsOtherMeasurementComposable(foo: Int) {
     Layout(
         content = {},
-        modifier = backgroundModifier(Color.Red)
+        modifier = Modifier.background(Color.Red)
     ) { _, _ ->
         layout(foo, foo) { }
     }
@@ -811,7 +810,7 @@ private fun ChangingConstraintsLayout(size: State<Int>, content: @Composable () 
     }
 }
 
-fun backgroundModifier(color: Color) = Modifier.drawBehind {
+fun Modifier.background(color: Color): Modifier = drawBehind {
     drawRect(color)
 }
 

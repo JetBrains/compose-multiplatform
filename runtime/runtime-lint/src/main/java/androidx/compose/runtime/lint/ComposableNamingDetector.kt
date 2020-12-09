@@ -30,6 +30,7 @@ import com.android.tools.lint.detector.api.Severity
 import com.android.tools.lint.detector.api.SourceCodeScanner
 import com.intellij.psi.PsiType
 import org.jetbrains.uast.UMethod
+import java.util.EnumSet
 import java.util.Locale
 
 /**
@@ -101,7 +102,7 @@ class ComposableNamingDetector : Detector(), SourceCodeScanner {
             Category.CORRECTNESS, 3, Severity.WARNING,
             Implementation(
                 ComposableNamingDetector::class.java,
-                Scope.JAVA_FILE_SCOPE
+                EnumSet.of(Scope.JAVA_FILE, Scope.TEST_SOURCES)
             )
         )
     }
