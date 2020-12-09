@@ -16,17 +16,29 @@
 
 package androidx.compose.runtime.dispatch
 
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.yield
+import java.awt.GraphicsEnvironment
 
-// TODO(demin): how to implement this clock in case we have multiple windows on different
-//  monitors? This clock is using by Recomposer to sync composition with frame rendering.
-//  Also this clock is available to use in coroutines in client code.
+// TODO implement local Recomposer in each Window, so each Window can have own MonotonicFrameClock.
+//  It is needed for smooth animations and for the case when user have multiple windows on multiple
+//  monitors with different refresh rates.
+//  see https://github.com/JetBrains/compose-jb/issues/137
 actual val DefaultMonotonicFrameClock: MonotonicFrameClock by lazy {
     object : MonotonicFrameClock {
         override suspend fun <R> withFrameNanos(
             onFrame: (Long) -> R
         ): R {
-            yield()
+            if (GraphicsEnvironment.isHeadless()) {
+                yield()
+            } else {
+                val defaultRefreshRate = GraphicsEnvironment
+                    .getLocalGraphicsEnvironment()
+                    .defaultScreenDevice
+                    .displayMode
+                    .refreshRate
+                delay(1000L / defaultRefreshRate)
+            }
             return onFrame(System.nanoTime())
         }
     }
