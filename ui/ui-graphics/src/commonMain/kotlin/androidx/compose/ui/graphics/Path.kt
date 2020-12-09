@@ -217,7 +217,7 @@ expect class NativePathEffect
     /**
      * Clears the [Path] object of all subpaths, returning it to the
      * same state it had when it was created. The _current point_ is
-     * reset to the origin.
+     * reset to the origin. This does NOT change the fill-type setting.
      */
     fun reset()
 
