@@ -80,7 +80,7 @@ fun CalculateRotation() {
             .background(Color.Blue)
             .pointerInput {
                 forEachGesture {
-                    handlePointerInput {
+                    awaitPointerEventScope {
                         awaitFirstDown()
                         do {
                             val event = awaitPointerEvent()
@@ -104,7 +104,7 @@ fun CalculateZoom() {
             .background(Color.Blue)
             .pointerInput {
                 forEachGesture {
-                    handlePointerInput {
+                    awaitPointerEventScope {
                         awaitFirstDown()
                         do {
                             val event = awaitPointerEvent()
@@ -129,7 +129,7 @@ fun CalculatePan() {
             .background(Color.Blue)
             .pointerInput {
                 forEachGesture {
-                    handlePointerInput {
+                    awaitPointerEventScope {
                         awaitFirstDown()
                         do {
                             val event = awaitPointerEvent()
@@ -157,7 +157,7 @@ fun CalculateCentroidSize() {
             }
             .pointerInput {
                 forEachGesture {
-                    handlePointerInput {
+                    awaitPointerEventScope {
                         awaitFirstDown().also {
                             position = it.current.position
                         }

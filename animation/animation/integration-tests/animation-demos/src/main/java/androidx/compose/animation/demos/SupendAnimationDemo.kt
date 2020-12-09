@@ -57,7 +57,7 @@ fun SuspendAnimationDemo() {
         Modifier.fillMaxSize().background(Color(0xffb99aff)).pointerInput {
             coroutineScope {
                 while (true) {
-                    val offset = handlePointerInput {
+                    val offset = awaitPointerEventScope {
                         awaitFirstDown().current.position
                     }
                     val x = offset.x

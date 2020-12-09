@@ -52,7 +52,7 @@ suspend fun PointerInputScope.detectMultitouchGestures(
     onGesture: (centroid: Offset, pan: Offset, zoom: Float, rotation: Float) -> Unit
 ) {
     forEachGesture {
-        handlePointerInput {
+        awaitPointerEventScope {
             var rotation = 0f
             var zoom = 1f
             var pan = Offset.Zero

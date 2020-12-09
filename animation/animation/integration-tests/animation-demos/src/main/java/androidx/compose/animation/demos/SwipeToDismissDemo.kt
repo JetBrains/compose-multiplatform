@@ -92,13 +92,13 @@ private fun Modifier.swipeToDismiss(dismissState: DismissState): Modifier = comp
         }
         coroutineScope {
             while (true) {
-                val pointerId = handlePointerInput {
+                val pointerId = awaitPointerEventScope {
                     awaitFirstDown().id
                 }
                 val velocityTracker = VelocityTracker()
                 // Set a high priority on the mutatorMutex for gestures
                 mutatorMutex.mutate(MutatePriority.UserInput) {
-                    handlePointerInput {
+                    awaitPointerEventScope {
                         verticalDrag(pointerId) {
                             updateOffset(dismissState.offset + it.positionChange().y)
                             velocityTracker.addPosition(

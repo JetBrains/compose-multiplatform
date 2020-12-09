@@ -97,7 +97,7 @@ class DragGestureDetectorTest(dragType: GestureType) {
 
     private val AwaitVerticalDragUtil = SuspendingGestureTestUtil(width = 100, height = 100) {
         forEachGesture {
-            handlePointerInput {
+            awaitPointerEventScope {
                 val down = awaitFirstDown()
                 val slopChange = awaitVerticalTouchSlopOrCancellation(down.id) { change, overSlop ->
                     if (change.positionChange().y > 0f || !consumePositiveOnly) {
@@ -128,7 +128,7 @@ class DragGestureDetectorTest(dragType: GestureType) {
 
     private val AwaitHorizontalDragUtil = SuspendingGestureTestUtil(width = 100, height = 100) {
         forEachGesture {
-            handlePointerInput {
+            awaitPointerEventScope {
                 val down = awaitFirstDown()
                 val slopChange =
                     awaitHorizontalTouchSlopOrCancellation(down.id) { change, overSlop ->
@@ -160,7 +160,7 @@ class DragGestureDetectorTest(dragType: GestureType) {
 
     private val AwaitDragUtil = SuspendingGestureTestUtil(width = 100, height = 100) {
         forEachGesture {
-            handlePointerInput {
+            awaitPointerEventScope {
                 val down = awaitFirstDown()
                 val slopChange = awaitTouchSlopOrCancellation(down.id) { change, overSlop ->
                     val positionChange = change.positionChange()

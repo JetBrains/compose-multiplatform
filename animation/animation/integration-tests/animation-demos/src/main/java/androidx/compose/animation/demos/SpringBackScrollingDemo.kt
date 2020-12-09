@@ -70,12 +70,12 @@ fun SpringBackScrollingDemo() {
         val gesture = Modifier.pointerInput {
             coroutineScope {
                 while (true) {
-                    val pointerId = handlePointerInput {
+                    val pointerId = awaitPointerEventScope {
                         awaitFirstDown().id
                     }
                     val velocityTracker = VelocityTracker()
                     mutatorMutex.mutate(MutatePriority.UserInput) {
-                        handlePointerInput {
+                        awaitPointerEventScope {
                             horizontalDrag(pointerId) {
                                 scrollPosition += it.positionChange().x
                                 velocityTracker.addPosition(
