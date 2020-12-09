@@ -29,6 +29,7 @@ import androidx.compose.foundation.Strings
 import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.animation.defaultFlingConfig
 import androidx.compose.foundation.animation.fling
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.layout.Box
@@ -257,13 +258,15 @@ private fun SliderImpl(
                 shape = CircleShape,
                 color = thumbColor,
                 elevation = elevation,
-                modifier = Modifier.indication(
-                    interactionState = interactionState,
-                    indication = rememberRippleIndication(
-                        bounded = false,
-                        radius = ThumbRippleRadius
+                modifier = Modifier
+                    .focusable(interactionState = interactionState)
+                    .indication(
+                        interactionState = interactionState,
+                        indication = rememberRippleIndication(
+                            bounded = false,
+                            radius = ThumbRippleRadius
+                        )
                     )
-                )
             ) {
                 Spacer(Modifier.preferredSize(thumbSize, thumbSize))
             }
@@ -357,7 +360,7 @@ private fun Modifier.sliderSemantics(
         1f -> 100
         else -> (fraction * 100).roundToInt().coerceIn(1, 99)
     }
-    return semantics {
+    return semantics(mergeDescendants = true) {
         accessibilityValue = Strings.TemplatePercent.format(percent)
         accessibilityValueRange = AccessibilityRangeInfo(coerced, valueRange, steps)
         setProgress(
