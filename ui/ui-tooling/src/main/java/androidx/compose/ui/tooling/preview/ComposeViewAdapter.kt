@@ -255,6 +255,7 @@ internal class ComposeViewAdapter : FrameLayout {
             throw exception
         }
 
+        processViewInfos()
         if (composableName.isNotEmpty()) {
             // TODO(b/160126628): support other APIs, e.g. animate
             findAndSubscribeTransitions()
@@ -423,7 +424,6 @@ internal class ComposeViewAdapter : FrameLayout {
 
         previewComposition = @Composable {
             onCommit {
-                processViewInfos()
                 onCommit()
             }
 

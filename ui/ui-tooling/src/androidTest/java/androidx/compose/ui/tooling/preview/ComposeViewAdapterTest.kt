@@ -53,17 +53,30 @@ class ComposeViewAdapterTest {
      * Asserts that the given Composable method executes correct and outputs some [ViewInfo]s.
      */
     private fun assertRendersCorrectly(className: String, methodName: String): List<ViewInfo> {
-        val committed = CountDownLatch(1)
+        val committedAndDrawn = CountDownLatch(1)
+        val committed = AtomicBoolean(false)
         activityTestRule.runOnUiThread {
             composeViewAdapter.init(
                 className, methodName, debugViewInfos = true,
                 onCommit = {
-                    committed.countDown()
+                    committed.set(true)
+                },
+                onDraw = {
+                    if (committed.get()) {
+                        committedAndDrawn.countDown()
+                    }
                 }
             )
         }
 
-        committed.await()
+        // Workaround for a problem described in b/174291742 where onLayout will not be called
+        // after composition for the first test in the test suite.
+        activityTestRule.runOnUiThread {
+            composeViewAdapter.requestLayout()
+        }
+
+        // Wait for the first draw after the Composable has been committed.
+        committedAndDrawn.await()
         activityTestRule.runOnUiThread {
             assertTrue(composeViewAdapter.viewInfos.isNotEmpty())
         }
