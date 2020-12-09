@@ -166,14 +166,14 @@ fun TextField(
     shape: Shape =
         MaterialTheme.shapes.small.copy(bottomLeft = ZeroCornerSize, bottomRight = ZeroCornerSize)
 ) {
-    var textFieldValue by remember { mutableStateOf(TextFieldValue(text = value)) }
-    textFieldValue = textFieldValue.copy(text = value)
+    var textFieldValueState by remember { mutableStateOf(TextFieldValue(text = value)) }
+    val textFieldValue = textFieldValueState.copy(text = value)
 
     TextFieldImpl(
         type = TextFieldType.Filled,
         value = textFieldValue,
         onValueChange = {
-            textFieldValue = it
+            textFieldValueState = it
             if (value != it.text) {
                 onValueChange(it.text)
             }

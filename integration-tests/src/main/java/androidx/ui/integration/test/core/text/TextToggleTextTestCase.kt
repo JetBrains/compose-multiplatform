@@ -39,26 +39,24 @@ class TextToggleTextTestCase(
     private val fontSize: TextUnit
 ) : ComposeTestCase, ToggleableTestCase {
 
-    private val texts = mutableStateOf(
-        List(textNumber) {
-            textGenerator.nextParagraph(length = textLength)
-        }
-    )
+    private val texts = List(textNumber) {
+        mutableStateOf(textGenerator.nextParagraph(length = textLength))
+    }
 
     @Composable
     override fun Content() {
         Column(
             modifier = Modifier.wrapContentSize(Alignment.Center).preferredWidth(width)
         ) {
-            for (text in texts.value) {
-                Text(text = text, color = Color.Black, fontSize = fontSize)
+            for (text in texts) {
+                Text(text = text.value, color = Color.Black, fontSize = fontSize)
             }
         }
     }
 
     override fun toggleState() {
-        texts.value = List(textNumber) {
-            textGenerator.nextParagraph(length = textLength)
+        texts.forEach {
+            it.value = textGenerator.nextParagraph(length = textLength)
         }
     }
 }
