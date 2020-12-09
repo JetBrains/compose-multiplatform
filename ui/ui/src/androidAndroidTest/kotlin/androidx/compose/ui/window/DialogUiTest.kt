@@ -33,7 +33,6 @@ import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.UiDevice
 import org.junit.Assert.assertEquals
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -148,6 +147,34 @@ class DialogUiTest {
     }
 
     @Test
+    fun dialogTest_isNotDismissed_whenDismissOnClickOutsideIsFalse() {
+        rule.setContent {
+            val showDialog = remember { mutableStateOf(true) }
+
+            if (showDialog.value) {
+                Dialog(
+                    onDismissRequest = {
+                        showDialog.value = false
+                    },
+                    properties = AndroidDialogProperties(dismissOnClickOutside = false)
+                ) {
+                    BasicText(defaultText)
+                }
+            }
+        }
+
+        rule.onNodeWithText(defaultText).assertIsDisplayed()
+
+        // Click outside the dialog to try to dismiss it
+        val outsideX = 0
+        val outsideY = rule.displaySize.height / 2
+        UiDevice.getInstance(getInstrumentation()).click(outsideX, outsideY)
+
+        // The Dialog should still be visible
+        rule.onNodeWithText(defaultText).assertIsDisplayed()
+    }
+
+    @Test
     fun dialogTest_isDismissed_whenSpecified_backButtonPressed() {
         rule.setContent {
             val showDialog = remember { mutableStateOf(true) }
@@ -171,9 +198,6 @@ class DialogUiTest {
         rule.onNodeWithText(defaultText).assertDoesNotExist()
     }
 
-    // TODO(pavlis): Espresso loses focus on the dialog after back press. That makes the
-    // subsequent query to fails.
-    @Ignore
     @Test
     fun dialogTest_isNotDismissed_whenNotSpecified_backButtonPressed() {
         rule.setContent {
@@ -181,6 +205,32 @@ class DialogUiTest {
 
             if (showDialog.value) {
                 Dialog(onDismissRequest = {}) {
+                    BasicText(defaultText)
+                }
+            }
+        }
+
+        rule.onNodeWithText(defaultText).assertIsDisplayed()
+
+        // Click the back button to try to dismiss the dialog
+        Espresso.pressBack()
+
+        // The Dialog should still be visible
+        rule.onNodeWithText(defaultText).assertIsDisplayed()
+    }
+
+    @Test
+    fun dialogTest_isNotDismissed_whenDismissOnBackPressIsFalse() {
+        rule.setContent {
+            val showDialog = remember { mutableStateOf(true) }
+
+            if (showDialog.value) {
+                Dialog(
+                    onDismissRequest = {
+                        showDialog.value = false
+                    },
+                    properties = AndroidDialogProperties(dismissOnBackPress = false)
+                ) {
                     BasicText(defaultText)
                 }
             }

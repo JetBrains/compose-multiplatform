@@ -2898,11 +2898,17 @@ package androidx.compose.ui.window {
   }
 
   @androidx.compose.runtime.Immutable public final class AndroidDialogProperties implements androidx.compose.ui.window.DialogProperties {
-    ctor public AndroidDialogProperties(androidx.compose.ui.window.SecureFlagPolicy securePolicy);
+    ctor public AndroidDialogProperties(boolean dismissOnBackPress, boolean dismissOnClickOutside, androidx.compose.ui.window.SecureFlagPolicy securePolicy);
     ctor public AndroidDialogProperties();
-    method public androidx.compose.ui.window.SecureFlagPolicy component1();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.window.AndroidDialogProperties copy(androidx.compose.ui.window.SecureFlagPolicy securePolicy);
+    method public boolean component1();
+    method public boolean component2();
+    method public androidx.compose.ui.window.SecureFlagPolicy component3();
+    method @androidx.compose.runtime.Immutable public androidx.compose.ui.window.AndroidDialogProperties copy(boolean dismissOnBackPress, boolean dismissOnClickOutside, androidx.compose.ui.window.SecureFlagPolicy securePolicy);
+    method public boolean getDismissOnBackPress();
+    method public boolean getDismissOnClickOutside();
     method public androidx.compose.ui.window.SecureFlagPolicy getSecurePolicy();
+    property public final boolean dismissOnBackPress;
+    property public final boolean dismissOnClickOutside;
     property public final androidx.compose.ui.window.SecureFlagPolicy securePolicy;
   }
 
