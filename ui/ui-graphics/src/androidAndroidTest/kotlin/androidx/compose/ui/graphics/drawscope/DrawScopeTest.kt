@@ -19,15 +19,20 @@ package androidx.compose.ui.graphics.drawscope
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.LinearGradientShader
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PointMode
+import androidx.compose.ui.graphics.RadialGradientShader
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.SweepGradientShader
+import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.unit.Density
@@ -970,6 +975,545 @@ class DrawScopeTest {
             scale(0.5f, 0.5f)
             assertEquals(center, this.pivot)
         }
+    }
+
+    @Test
+    fun testLinearGradient() {
+        testDrawScopeAndCanvasAreEquivalent(
+            100,
+            100,
+            {
+                drawRect(Brush.linearGradient(listOf(Color.Red, Color.Green, Color.Blue)))
+            },
+            { canvas ->
+                val paint = Paint().apply {
+                    shader = LinearGradientShader(
+                        Offset.Zero,
+                        Offset(100f, 100f),
+                        listOf(Color.Red, Color.Green, Color.Blue)
+                    )
+                }
+                canvas.drawRect(0f, 0f, 100f, 100f, paint)
+            }
+        )
+    }
+
+    @Test
+    fun testLinearGradientBottomEnd() {
+        testDrawScopeAndCanvasAreEquivalent(
+            100,
+            100,
+            {
+                drawRect(
+                    Brush.linearGradient(
+                        listOf(Color.Red, Color.Green, Color.Blue),
+                        end = Offset(0f, Float.POSITIVE_INFINITY)
+                    )
+                )
+            },
+            { canvas ->
+                val paint = Paint().apply {
+                    shader = LinearGradientShader(
+                        Offset.Zero,
+                        Offset(0f, 100f),
+                        listOf(Color.Red, Color.Green, Color.Blue)
+                    )
+                }
+                canvas.drawRect(0f, 0f, 100f, 100f, paint)
+            }
+        )
+    }
+
+    @Test
+    fun testLinearGradientRightEnd() {
+        testDrawScopeAndCanvasAreEquivalent(
+            100,
+            100,
+            {
+                drawRect(
+                    Brush.linearGradient(
+                        listOf(Color.Red, Color.Green, Color.Blue),
+                        end = Offset(Float.POSITIVE_INFINITY, 0f)
+                    )
+                )
+            },
+            { canvas ->
+                val paint = Paint().apply {
+                    shader = LinearGradientShader(
+                        Offset.Zero,
+                        Offset(100f, 0f),
+                        listOf(Color.Red, Color.Green, Color.Blue)
+                    )
+                }
+                canvas.drawRect(0f, 0f, 100f, 100f, paint)
+            }
+        )
+    }
+
+    @Test
+    fun testLinearGradientBottomStart() {
+        testDrawScopeAndCanvasAreEquivalent(
+            100,
+            100,
+            {
+                drawRect(
+                    Brush.linearGradient(
+                        listOf(Color.Red, Color.Green, Color.Blue),
+                        start = Offset(0f, Float.POSITIVE_INFINITY)
+                    )
+                )
+            },
+            { canvas ->
+                val paint = Paint().apply {
+                    shader = LinearGradientShader(
+                        Offset(0f, 100f),
+                        Offset(100f, 100f),
+                        listOf(Color.Red, Color.Green, Color.Blue)
+                    )
+                }
+                canvas.drawRect(0f, 0f, 100f, 100f, paint)
+            }
+        )
+    }
+
+    @Test
+    fun testLinearGradientRightStart() {
+        testDrawScopeAndCanvasAreEquivalent(
+            100,
+            100,
+            {
+                drawRect(
+                    Brush.linearGradient(
+                        listOf(Color.Red, Color.Green, Color.Blue),
+                        start = Offset(Float.POSITIVE_INFINITY, 0f)
+                    )
+                )
+            },
+            { canvas ->
+                val paint = Paint().apply {
+                    shader = LinearGradientShader(
+                        Offset(100f, 0f),
+                        Offset(100f, 100f),
+                        listOf(Color.Red, Color.Green, Color.Blue)
+                    )
+                }
+                canvas.drawRect(0f, 0f, 100f, 100f, paint)
+            }
+        )
+    }
+
+    @Test
+    fun testLinearGradientWithStops() {
+        testDrawScopeAndCanvasAreEquivalent(
+            100,
+            100,
+            {
+                drawRect(
+                    Brush.linearGradient(
+                        0.0f to Color.Red,
+                        0.1f to Color.Green,
+                        0.8f to Color.Blue,
+                        start = Offset(10.0f, 10f),
+                        tileMode = TileMode.Repeated
+                    )
+                )
+            },
+            { canvas ->
+                val paint = Paint().apply {
+                    shader = LinearGradientShader(
+                        Offset(10f, 10f),
+                        Offset(100f, 100f),
+                        colors = listOf(Color.Red, Color.Green, Color.Blue),
+                        colorStops = listOf(0.0f, 0.1f, 0.8f),
+                        tileMode = TileMode.Repeated
+                    )
+                }
+                canvas.drawRect(0f, 0f, 100f, 100f, paint)
+            }
+        )
+    }
+
+    @Test
+    fun testHorizontalGradient() {
+        testDrawScopeAndCanvasAreEquivalent(
+            100,
+            100,
+            {
+                drawRect(Brush.horizontalGradient(listOf(Color.Red, Color.Green, Color.Blue)))
+            },
+            { canvas ->
+                val paint = Paint().apply {
+                    shader = LinearGradientShader(
+                        Offset.Zero,
+                        Offset(100f, 0f),
+                        listOf(Color.Red, Color.Green, Color.Blue)
+                    )
+                }
+                canvas.drawRect(0f, 0f, 100f, 100f, paint)
+            }
+        )
+    }
+
+    @Test
+    fun testHorizontalGradientWithStops() {
+        testDrawScopeAndCanvasAreEquivalent(
+            100,
+            100,
+            {
+                drawRect(
+                    Brush.horizontalGradient(
+                        0.0f to Color.Red,
+                        0.1f to Color.Green,
+                        0.8f to Color.Blue,
+                        startX = 10f,
+                        tileMode = TileMode.Repeated
+                    )
+                )
+            },
+            { canvas ->
+                val paint = Paint().apply {
+                    shader = LinearGradientShader(
+                        Offset(10f, 0f),
+                        Offset(100f, 0f),
+                        colors = listOf(Color.Red, Color.Green, Color.Blue),
+                        colorStops = listOf(0.0f, 0.1f, 0.8f),
+                        tileMode = TileMode.Repeated
+                    )
+                }
+                canvas.drawRect(0f, 0f, 100f, 100f, paint)
+            }
+        )
+    }
+
+    @Test
+    fun testVerticalGradient() {
+        testDrawScopeAndCanvasAreEquivalent(
+            100,
+            100,
+            {
+                drawRect(Brush.verticalGradient(listOf(Color.Red, Color.Green, Color.Blue)))
+            },
+            { canvas ->
+                val paint = Paint().apply {
+                    shader = LinearGradientShader(
+                        Offset.Zero,
+                        Offset(0f, 100f),
+                        listOf(Color.Red, Color.Green, Color.Blue)
+                    )
+                }
+                canvas.drawRect(0f, 0f, 100f, 100f, paint)
+            }
+        )
+    }
+
+    @Test
+    fun testVerticalGradientWithStops() {
+        testDrawScopeAndCanvasAreEquivalent(
+            100,
+            100,
+            {
+                drawRect(
+                    Brush.verticalGradient(
+                        0.0f to Color.Red,
+                        0.1f to Color.Green,
+                        0.8f to Color.Blue,
+                        startY = 10f,
+                        tileMode = TileMode.Repeated
+                    )
+                )
+            },
+            { canvas ->
+                val paint = Paint().apply {
+                    shader = LinearGradientShader(
+                        Offset(0f, 10f),
+                        Offset(0f, 100f),
+                        colors = listOf(Color.Red, Color.Green, Color.Blue),
+                        colorStops = listOf(0.0f, 0.1f, 0.8f),
+                        tileMode = TileMode.Repeated
+                    )
+                }
+                canvas.drawRect(0f, 0f, 100f, 100f, paint)
+            }
+        )
+    }
+
+    @Test
+    fun testRadialGradient() {
+        testDrawScopeAndCanvasAreEquivalent(
+            100,
+            100,
+            {
+                drawRect(
+                    Brush.radialGradient(listOf(Color.Red, Color.Green, Color.Blue))
+                )
+            },
+            { canvas ->
+                val paint = Paint().apply {
+                    shader = RadialGradientShader(
+                        Offset(50f, 50f),
+                        50f,
+                        colors = listOf(Color.Red, Color.Green, Color.Blue)
+                    )
+                }
+                canvas.drawRect(0f, 0f, 100f, 100f, paint)
+            }
+        )
+    }
+
+    @Test
+    fun testRadialGradientOutsideDrawingBounds() {
+        testDrawScopeAndCanvasAreEquivalent(
+            100,
+            100,
+            {
+                val offsetRadialGradient = Brush.radialGradient(
+                    listOf(Color.Red, Color.Blue),
+                    center = Offset(150f, 150f),
+                    radius = 50f
+                )
+                drawRect(offsetRadialGradient)
+            },
+            { canvas ->
+                val paint = Paint().apply {
+                    shader = RadialGradientShader(
+                        Offset(150f, 150f),
+                        radius = 50f,
+                        colors = listOf(Color.Red, Color.Blue)
+                    )
+                }
+                canvas.drawRect(0f, 0f, 100f, 100f, paint)
+            }
+        )
+    }
+
+    @Test
+    fun testRadialGradientBottomRight() {
+        testDrawScopeAndCanvasAreEquivalent(
+            100,
+            100,
+            {
+                val offsetRadialGradient = Brush.radialGradient(
+                    listOf(Color.Red, Color.Blue),
+                    center = Offset.Infinite
+                )
+                drawRect(offsetRadialGradient)
+            },
+            { canvas ->
+                val paint = Paint().apply {
+                    shader = RadialGradientShader(
+                        Offset(100f, 100f),
+                        radius = 50f,
+                        colors = listOf(Color.Red, Color.Blue)
+                    )
+                }
+                canvas.drawRect(0f, 0f, 100f, 100f, paint)
+            }
+        )
+    }
+
+    @Test
+    fun testRadialGradientRight() {
+        testDrawScopeAndCanvasAreEquivalent(
+            100,
+            100,
+            {
+                val offsetRadialGradient = Brush.radialGradient(
+                    listOf(Color.Red, Color.Blue),
+                    center = Offset(Float.POSITIVE_INFINITY, 0f)
+                )
+                drawRect(offsetRadialGradient)
+            },
+            { canvas ->
+                val paint = Paint().apply {
+                    shader = RadialGradientShader(
+                        Offset(100f, 0f),
+                        radius = 50f,
+                        colors = listOf(Color.Red, Color.Blue)
+                    )
+                }
+                canvas.drawRect(0f, 0f, 100f, 100f, paint)
+            }
+        )
+    }
+
+    @Test
+    fun testRadialGradientBottom() {
+        testDrawScopeAndCanvasAreEquivalent(
+            100,
+            100,
+            {
+                val offsetRadialGradient = Brush.radialGradient(
+                    listOf(Color.Red, Color.Blue),
+                    center = Offset(0f, Float.POSITIVE_INFINITY)
+                )
+                drawRect(offsetRadialGradient)
+            },
+            { canvas ->
+                val paint = Paint().apply {
+                    shader = RadialGradientShader(
+                        Offset(0f, 100f),
+                        radius = 50f,
+                        colors = listOf(Color.Red, Color.Blue)
+                    )
+                }
+                canvas.drawRect(0f, 0f, 100f, 100f, paint)
+            }
+        )
+    }
+
+    @Test
+    fun testRadialGradientWithStops() {
+        testDrawScopeAndCanvasAreEquivalent(
+            100,
+            100,
+            {
+                drawRect(
+                    Brush.radialGradient(
+                        0.0f to Color.Red,
+                        0.1f to Color.Green,
+                        0.8f to Color.Blue,
+                        radius = 10f,
+                        tileMode = TileMode.Mirror
+                    )
+                )
+            },
+            { canvas ->
+                val paint = Paint().apply {
+                    shader = RadialGradientShader(
+                        Offset(50f, 50f),
+                        10f,
+                        colors = listOf(Color.Red, Color.Green, Color.Blue),
+                        colorStops = listOf(0.0f, 0.1f, 0.8f),
+                        tileMode = TileMode.Mirror
+                    )
+                }
+                canvas.drawRect(0f, 0f, 100f, 100f, paint)
+            }
+        )
+    }
+
+    @Test
+    fun testSweepGradient() {
+        testDrawScopeAndCanvasAreEquivalent(
+            100,
+            100,
+            {
+                drawRect(
+                    Brush.sweepGradient(listOf(Color.Red, Color.Green, Color.Blue))
+                )
+            },
+            { canvas ->
+                val paint = Paint().apply {
+                    shader = SweepGradientShader(
+                        Offset(50f, 50f),
+                        colors = listOf(Color.Red, Color.Green, Color.Blue)
+                    )
+                }
+                canvas.drawRect(0f, 0f, 100f, 100f, paint)
+            }
+        )
+    }
+
+    @Test
+    fun testSweepGradientBottomRight() {
+        testDrawScopeAndCanvasAreEquivalent(
+            100,
+            100,
+            {
+                drawRect(
+                    Brush.sweepGradient(
+                        listOf(Color.Red, Color.Green, Color.Blue),
+                        center = Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
+                    )
+                )
+            },
+            { canvas ->
+                val paint = Paint().apply {
+                    shader = SweepGradientShader(
+                        Offset(100f, 100f),
+                        colors = listOf(Color.Red, Color.Green, Color.Blue)
+                    )
+                }
+                canvas.drawRect(0f, 0f, 100f, 100f, paint)
+            }
+        )
+    }
+
+    @Test
+    fun testSweepGradientBottom() {
+        testDrawScopeAndCanvasAreEquivalent(
+            100,
+            100,
+            {
+                drawRect(
+                    Brush.sweepGradient(
+                        listOf(Color.Red, Color.Green, Color.Blue),
+                        center = Offset(0f, Float.POSITIVE_INFINITY)
+                    )
+                )
+            },
+            { canvas ->
+                val paint = Paint().apply {
+                    shader = SweepGradientShader(
+                        Offset(0f, 100f),
+                        colors = listOf(Color.Red, Color.Green, Color.Blue)
+                    )
+                }
+                canvas.drawRect(0f, 0f, 100f, 100f, paint)
+            }
+        )
+    }
+
+    @Test
+    fun testSweepGradientRight() {
+        testDrawScopeAndCanvasAreEquivalent(
+            100,
+            100,
+            {
+                drawRect(
+                    Brush.sweepGradient(
+                        listOf(Color.Red, Color.Green, Color.Blue),
+                        center = Offset(Float.POSITIVE_INFINITY, 0f)
+                    )
+                )
+            },
+            { canvas ->
+                val paint = Paint().apply {
+                    shader = SweepGradientShader(
+                        Offset(100f, 0f),
+                        colors = listOf(Color.Red, Color.Green, Color.Blue)
+                    )
+                }
+                canvas.drawRect(0f, 0f, 100f, 100f, paint)
+            }
+        )
+    }
+
+    @Test
+    fun testSweepGradientWithStops() {
+        testDrawScopeAndCanvasAreEquivalent(
+            100,
+            100,
+            {
+                drawRect(
+                    Brush.sweepGradient(
+                        0.0f to Color.Red,
+                        0.1f to Color.Green,
+                        0.8f to Color.Blue
+                    )
+                )
+            },
+            { canvas ->
+                val paint = Paint().apply {
+                    shader = SweepGradientShader(
+                        Offset(50f, 50f),
+                        colors = listOf(Color.Red, Color.Green, Color.Blue),
+                        colorStops = listOf(0.0f, 0.1f, 0.8f)
+                    )
+                }
+                canvas.drawRect(0f, 0f, 100f, 100f, paint)
+            }
+        )
     }
 
     private inline fun testDrawTransformDefault(block: WrappedDrawTransform.() -> Unit) {

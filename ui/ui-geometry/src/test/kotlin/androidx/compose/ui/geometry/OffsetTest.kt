@@ -17,6 +17,8 @@
 package androidx.compose.ui.geometry
 
 import org.junit.Assert
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -43,5 +45,65 @@ class OffsetTest {
         val copy = offset.copy(y = 300f)
         Assert.assertEquals(100f, copy.x)
         Assert.assertEquals(300f, copy.y)
+    }
+
+    @Test
+    fun testUnspecifiedWidthQueryThrows() {
+        try {
+            Offset.Unspecified.x
+            Assert.fail("Offset.Unspecified.x is not allowed")
+        } catch (t: Throwable) {
+            // no-op
+        }
+    }
+
+    @Test
+    fun testUnspecifiedHeightQueryThrows() {
+        try {
+            Offset.Unspecified.y
+            Assert.fail("Offset.Unspecified.y is not allowed")
+        } catch (t: Throwable) {
+            // no-op
+        }
+    }
+
+    @Test
+    fun testUnspecifiedCopyThrows() {
+        try {
+            Offset.Unspecified.copy(x = 100f)
+            Offset.Unspecified.copy(y = 70f)
+            Assert.fail("Offset.Unspecified.copy is not allowed")
+        } catch (t: Throwable) {
+            // no-op
+        }
+    }
+
+    @Test
+    fun testUnspecifiedComponentAssignmentThrows() {
+        try {
+            val (_, _) = Offset.Unspecified
+            Assert.fail("Size.Unspecified component assignment is not allowed")
+        } catch (t: Throwable) {
+            // no-op
+        }
+    }
+
+    @Test
+    fun testIsSpecified() {
+        val offset = Offset(10f, 20f)
+        assertTrue(offset.isSpecified)
+        assertFalse(offset.isUnspecified)
+    }
+
+    @Test
+    fun testIsUnspecified() {
+        assertTrue(Offset.Unspecified.isUnspecified)
+        assertFalse(Offset.Unspecified.isSpecified)
+    }
+
+    @Test
+    fun testUnspecifiedEquals() {
+        // Verify that verifying equality here does not crash
+        assertTrue(Offset.Unspecified == Offset.Unspecified)
     }
 }

@@ -203,20 +203,36 @@ package androidx.compose.ui.graphics {
   }
 
   @androidx.compose.runtime.Immutable public abstract sealed class Brush {
-    method public abstract void applyTo(androidx.compose.ui.graphics.Paint p, float alpha);
+    method @Deprecated public void applyTo(androidx.compose.ui.graphics.Paint p, float alpha);
+    method public abstract void applyTo-TJof4Gw(long size, androidx.compose.ui.graphics.Paint p, float alpha);
+    field public static final androidx.compose.ui.graphics.Brush.Companion Companion;
+  }
+
+  public static final class Brush.Companion {
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.graphics.Brush horizontalGradient(java.util.List<androidx.compose.ui.graphics.Color> colors, optional float startX, optional float endX, optional androidx.compose.ui.graphics.TileMode tileMode);
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.graphics.Brush horizontalGradient(kotlin.Pair<java.lang.Float,androidx.compose.ui.graphics.Color>![] colorStops, optional float startX, optional float endX, optional androidx.compose.ui.graphics.TileMode tileMode);
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.graphics.Brush linearGradient-7_sGemo(java.util.List<androidx.compose.ui.graphics.Color> colors, optional long start, optional long end, optional androidx.compose.ui.graphics.TileMode tileMode);
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.graphics.Brush linearGradient-K4jYFb0(kotlin.Pair<java.lang.Float,androidx.compose.ui.graphics.Color>![] colorStops, optional long start, optional long end, optional androidx.compose.ui.graphics.TileMode tileMode);
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.graphics.Brush radialGradient-YU3LRu0(java.util.List<androidx.compose.ui.graphics.Color> colors, optional long center, optional float radius, optional androidx.compose.ui.graphics.TileMode tileMode);
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.graphics.Brush radialGradient-g04MWJE(kotlin.Pair<java.lang.Float,androidx.compose.ui.graphics.Color>![] colorStops, optional long center, optional float radius, optional androidx.compose.ui.graphics.TileMode tileMode);
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.graphics.Brush sweepGradient-PvDSl28(kotlin.Pair<java.lang.Float,androidx.compose.ui.graphics.Color>![] colorStops, optional long center);
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.graphics.Brush sweepGradient-acbAMd8(java.util.List<androidx.compose.ui.graphics.Color> colors, optional long center);
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.graphics.Brush verticalGradient(java.util.List<androidx.compose.ui.graphics.Color> colors, optional float startY, optional float endY, optional androidx.compose.ui.graphics.TileMode tileMode);
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.graphics.Brush verticalGradient(kotlin.Pair<java.lang.Float,androidx.compose.ui.graphics.Color>![] colorStops, optional float startY, optional float endY, optional androidx.compose.ui.graphics.TileMode tileMode);
   }
 
   public final class BrushKt {
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.LinearGradient HorizontalGradient(java.util.List<androidx.compose.ui.graphics.Color> colors, float startX, float endX, optional androidx.compose.ui.graphics.TileMode tileMode);
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.LinearGradient HorizontalGradient(kotlin.Pair<java.lang.Float,androidx.compose.ui.graphics.Color>![] colorStops, float startX, float endX, optional androidx.compose.ui.graphics.TileMode tileMode);
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.LinearGradient LinearGradient(java.util.List<androidx.compose.ui.graphics.Color> colors, float startX, float startY, float endX, float endY, optional androidx.compose.ui.graphics.TileMode tileMode);
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.LinearGradient LinearGradient(kotlin.Pair<java.lang.Float,androidx.compose.ui.graphics.Color>![] colorStops, float startX, float startY, float endX, float endY, optional androidx.compose.ui.graphics.TileMode tileMode);
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.RadialGradient RadialGradient(kotlin.Pair<java.lang.Float,androidx.compose.ui.graphics.Color>![] colorStops, float centerX, float centerY, float radius, optional androidx.compose.ui.graphics.TileMode tileMode);
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.RadialGradient RadialGradient(java.util.List<androidx.compose.ui.graphics.Color> colors, float centerX, float centerY, float radius, optional androidx.compose.ui.graphics.TileMode tileMode);
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.SweepGradient SweepGradient-PvDSl28(kotlin.Pair<java.lang.Float,androidx.compose.ui.graphics.Color>![] colorStops, long center);
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.SweepGradient SweepGradient-acbAMd8(java.util.List<androidx.compose.ui.graphics.Color> colors, long center);
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.LinearGradient VerticalGradient(java.util.List<androidx.compose.ui.graphics.Color> colors, float startY, float endY, optional androidx.compose.ui.graphics.TileMode tileMode);
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.LinearGradient VerticalGradient(kotlin.Pair<java.lang.Float,androidx.compose.ui.graphics.Color>![] colorStops, float startY, float endY, optional androidx.compose.ui.graphics.TileMode tileMode);
+    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.LinearGradient HorizontalGradient(java.util.List<androidx.compose.ui.graphics.Color> colors, float startX, float endX, optional androidx.compose.ui.graphics.TileMode tileMode);
+    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.LinearGradient HorizontalGradient(kotlin.Pair<java.lang.Float,androidx.compose.ui.graphics.Color>![] colorStops, float startX, float endX, optional androidx.compose.ui.graphics.TileMode tileMode);
+    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.LinearGradient LinearGradient(java.util.List<androidx.compose.ui.graphics.Color> colors, float startX, float startY, float endX, float endY, optional androidx.compose.ui.graphics.TileMode tileMode);
+    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.LinearGradient LinearGradient(kotlin.Pair<java.lang.Float,androidx.compose.ui.graphics.Color>![] colorStops, float startX, float startY, float endX, float endY, optional androidx.compose.ui.graphics.TileMode tileMode);
+    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.RadialGradient RadialGradient(kotlin.Pair<java.lang.Float,androidx.compose.ui.graphics.Color>![] colorStops, float centerX, float centerY, float radius, optional androidx.compose.ui.graphics.TileMode tileMode);
+    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.RadialGradient RadialGradient(java.util.List<androidx.compose.ui.graphics.Color> colors, float centerX, float centerY, float radius, optional androidx.compose.ui.graphics.TileMode tileMode);
+    method public static androidx.compose.ui.graphics.ShaderBrush ShaderBrush(android.graphics.Shader shader);
+    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.SweepGradient SweepGradient-PvDSl28(kotlin.Pair<java.lang.Float,androidx.compose.ui.graphics.Color>![] colorStops, long center);
+    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.SweepGradient SweepGradient-acbAMd8(java.util.List<androidx.compose.ui.graphics.Color> colors, long center);
+    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.LinearGradient VerticalGradient(java.util.List<androidx.compose.ui.graphics.Color> colors, float startY, float endY, optional androidx.compose.ui.graphics.TileMode tileMode);
+    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.LinearGradient VerticalGradient(kotlin.Pair<java.lang.Float,androidx.compose.ui.graphics.Color>![] colorStops, float startY, float endY, optional androidx.compose.ui.graphics.TileMode tileMode);
   }
 
   public interface Canvas {
@@ -398,6 +414,7 @@ package androidx.compose.ui.graphics {
   }
 
   @androidx.compose.runtime.Immutable public final class LinearGradient extends androidx.compose.ui.graphics.ShaderBrush {
+    method public android.graphics.Shader createShader-uvyYCjk(long size);
   }
 
   public final inline class Matrix {
@@ -607,6 +624,7 @@ package androidx.compose.ui.graphics {
   }
 
   @androidx.compose.runtime.Immutable public final class RadialGradient extends androidx.compose.ui.graphics.ShaderBrush {
+    method public android.graphics.Shader createShader-uvyYCjk(long size);
   }
 
   public final class RectHelperKt {
@@ -619,11 +637,10 @@ package androidx.compose.ui.graphics {
     method public static androidx.compose.ui.graphics.Shape getRectangleShape();
   }
 
-  @androidx.compose.runtime.Immutable public class ShaderBrush extends androidx.compose.ui.graphics.Brush {
-    ctor public ShaderBrush(android.graphics.Shader shader);
-    method public final void applyTo(androidx.compose.ui.graphics.Paint p, float alpha);
-    method public final android.graphics.Shader getShader();
-    property public final android.graphics.Shader shader;
+  @androidx.compose.runtime.Immutable public abstract class ShaderBrush extends androidx.compose.ui.graphics.Brush {
+    ctor public ShaderBrush();
+    method public final void applyTo-TJof4Gw(long size, androidx.compose.ui.graphics.Paint p, float alpha);
+    method public abstract android.graphics.Shader createShader-uvyYCjk(long size);
   }
 
   public final class ShaderKt {
@@ -661,7 +678,7 @@ package androidx.compose.ui.graphics {
   }
 
   @androidx.compose.runtime.Immutable public final class SolidColor extends androidx.compose.ui.graphics.Brush {
-    method public void applyTo(androidx.compose.ui.graphics.Paint p, float alpha);
+    method public void applyTo-TJof4Gw(long size, androidx.compose.ui.graphics.Paint p, float alpha);
     method public long getValue-0d7_KjU();
     property public final long value;
   }
@@ -685,6 +702,7 @@ package androidx.compose.ui.graphics {
   }
 
   @androidx.compose.runtime.Immutable public final class SweepGradient extends androidx.compose.ui.graphics.ShaderBrush {
+    method public android.graphics.Shader createShader-uvyYCjk(long size);
   }
 
   public enum TileMode {
