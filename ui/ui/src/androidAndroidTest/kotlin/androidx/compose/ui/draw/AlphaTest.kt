@@ -49,7 +49,7 @@ import kotlin.math.max
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-class OpacityTest {
+class AlphaTest {
 
     @Suppress("DEPRECATION")
     @get:Rule
@@ -67,14 +67,14 @@ class OpacityTest {
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
-    fun drawFullOpacity() {
+    fun drawFullAlpha() {
         val color = Color.LightGray
         rule.runOnUiThreadIR {
             activity.setContent {
                 AtLeastSize(
                     size = 10,
                     modifier = Modifier.background(Color.White)
-                        .drawOpacity(1f)
+                        .alpha(1f)
                         .background(color)
                         .then(unlatch)
                 ) {
@@ -89,14 +89,14 @@ class OpacityTest {
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
-    fun drawZeroOpacity() {
+    fun drawZeroAlpha() {
         val color = Color.LightGray
         rule.runOnUiThreadIR {
             activity.setContent {
                 AtLeastSize(
                     size = 10,
                     modifier = Modifier.background(Color.White)
-                        .drawOpacity(0f)
+                        .alpha(0f)
                         .background(color)
                         .then(unlatch)
                 ) {
@@ -111,7 +111,7 @@ class OpacityTest {
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
-    fun drawHalfOpacity() {
+    fun drawHalfAlpha() {
         val color = Color.Red
         rule.runOnUiThreadIR {
             activity.setContent {
@@ -119,7 +119,7 @@ class OpacityTest {
                     AtLeastSize(
                         size = 10,
                         modifier = Modifier.background(Color.White)
-                            .drawOpacity(0.5f)
+                            .alpha(0.5f)
                             .background(color)
                             .then(unlatch)
                     ) {
@@ -140,16 +140,16 @@ class OpacityTest {
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
-    fun switchFromHalfOpacityToFull() {
+    fun switchFromHalfAlphaToFull() {
         val color = Color.Green
-        val opacity = mutableStateOf(0.5f)
+        val alpha = mutableStateOf(0.5f)
 
         rule.runOnUiThreadIR {
             activity.setContent {
                 AtLeastSize(
                     size = 10,
                     modifier = Modifier.background(Color.White)
-                        .drawOpacity(opacity.value)
+                        .alpha(alpha.value)
                         .then(unlatch)
                         .background(color)
                 ) {
@@ -159,7 +159,7 @@ class OpacityTest {
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
         rule.runOnUiThreadIR {
-            opacity.value = 1f
+            alpha.value = 1f
         }
 
         takeScreenShot(10).apply {
@@ -169,17 +169,17 @@ class OpacityTest {
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
-    fun switchFromZeroOpacityToFullWithNestedRepaintBoundaries() {
+    fun switchFromZeroAlphaToFullWithNestedRepaintBoundaries() {
         val color = Color.Green
-        var opacity by mutableStateOf(0f)
+        var alpha by mutableStateOf(0f)
 
         rule.runOnUiThreadIR {
             activity.setContent {
                 AtLeastSize(
                     size = 10,
                     modifier = Modifier.background(Color.White)
-                        .drawOpacity(1f)
-                        .drawOpacity(opacity)
+                        .alpha(1f)
+                        .alpha(alpha)
                         .then(unlatch)
                         .background(color)
                 ) {
@@ -189,7 +189,7 @@ class OpacityTest {
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
 
         rule.runOnUiThreadIR {
-            opacity = 1f
+            alpha = 1f
         }
 
         takeScreenShot(10).apply {
@@ -199,7 +199,7 @@ class OpacityTest {
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
-    fun emitDrawWithOpacityLater() {
+    fun emitDrawWithAlphaLater() {
         val model = mutableStateOf(false)
 
         rule.runOnUiThreadIR {
@@ -208,7 +208,7 @@ class OpacityTest {
                     size = 10,
                     modifier = Modifier.background(Color.White)
                         .run {
-                            if (model.value) drawOpacity(0f).background(Color.Green) else this
+                            if (model.value) alpha(0f).background(Color.Green) else this
                         }
                         .then(unlatch)
                 ) {

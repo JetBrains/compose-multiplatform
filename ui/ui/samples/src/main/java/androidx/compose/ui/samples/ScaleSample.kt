@@ -14,22 +14,30 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.draw
+package androidx.compose.ui.samples
 
-import androidx.compose.runtime.Stable
+import androidx.annotation.Sampled
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawLayer
-import androidx.compose.ui.util.annotation.FloatRange
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.unit.dp
 
-/**
- * Draw content with modified opacity (alpha) that may be less than 1.
- *
- * Example usage:
- * @sample androidx.compose.ui.samples.OpacitySample
- *
- * @param opacity the fraction of children's alpha value.
- */
-@Stable
-fun Modifier.drawOpacity(
-    @FloatRange(from = 0.0, to = 1.0) opacity: Float
-) = drawLayer(alpha = opacity, clip = true)
+@Sampled
+@Composable
+fun ScaleUniformSample() {
+    Box(
+        Modifier.scale(2f)
+            .preferredSize(100.dp, 100.dp)
+    )
+}
+
+@Sampled
+@Composable
+fun ScaleNonUniformSample() {
+    Box(
+        Modifier.scale(scaleX = 2f, scaleY = 3f)
+            .preferredSize(100.dp, 100.dp)
+    )
+}

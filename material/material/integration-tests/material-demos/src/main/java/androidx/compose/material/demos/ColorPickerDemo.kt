@@ -50,7 +50,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawOpacity
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.RoundRect
@@ -178,10 +178,10 @@ private fun Magnifier(visible: Boolean, position: Offset, color: Color) {
         MagnifierWidth,
         SelectionCircleDiameter
     ) { labelWidth: Dp, selectionDiameter: Dp,
-        opacity: Float ->
+        alpha: Float ->
         Column(
             offset.preferredSize(width = MagnifierWidth, height = MagnifierHeight)
-                .drawOpacity(opacity)
+                .alpha(alpha)
         ) {
             Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 MagnifierLabel(Modifier.preferredSize(labelWidth, MagnifierLabelHeight), color)
@@ -204,36 +204,36 @@ private val SelectionCircleDiameter = 30.dp
 
 /**
  * [transition] that animates between [visible] states of the magnifier by animating the width of
- * the label, diameter of the selection circle, and opacity of the overall magnifier
+ * the label, diameter of the selection circle, and alpha of the overall magnifier
  */
 @Composable
 private fun MagnifierTransition(
     visible: Boolean,
     maxWidth: Dp,
     maxDiameter: Dp,
-    content: @Composable (labelWidth: Dp, selectionDiameter: Dp, opacity: Float) -> Unit
+    content: @Composable (labelWidth: Dp, selectionDiameter: Dp, alpha: Float) -> Unit
 ) {
     val transitionDefinition = remember {
         transitionDefinition<Boolean> {
             state(false) {
                 this[LabelWidthPropKey] = 0.dp
                 this[MagnifierDiameterPropKey] = 0.dp
-                this[OpacityPropKey] = 0f
+                this[AlphaPropKey] = 0f
             }
             state(true) {
                 this[LabelWidthPropKey] = maxWidth
                 this[MagnifierDiameterPropKey] = maxDiameter
-                this[OpacityPropKey] = 1f
+                this[AlphaPropKey] = 1f
             }
             transition(false to true) {
                 LabelWidthPropKey using tween()
                 MagnifierDiameterPropKey using tween()
-                OpacityPropKey using tween()
+                AlphaPropKey using tween()
             }
             transition(true to false) {
                 LabelWidthPropKey using tween()
                 MagnifierDiameterPropKey using tween()
-                OpacityPropKey using tween(
+                AlphaPropKey using tween(
                     delayMillis = 100,
                     durationMillis = 200
                 )
@@ -241,12 +241,12 @@ private fun MagnifierTransition(
         }
     }
     val state = transition(transitionDefinition, visible)
-    content(state[LabelWidthPropKey], state[MagnifierDiameterPropKey], state[OpacityPropKey])
+    content(state[LabelWidthPropKey], state[MagnifierDiameterPropKey], state[AlphaPropKey])
 }
 
 private val LabelWidthPropKey = DpPropKey()
 private val MagnifierDiameterPropKey = DpPropKey()
-private val OpacityPropKey = FloatPropKey()
+private val AlphaPropKey = FloatPropKey()
 
 /**
  * Label representing the currently selected [color], with [Text] representing the hex code and a
