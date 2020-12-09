@@ -16,33 +16,24 @@
 
 package androidx.compose.foundation
 
-import androidx.compose.runtime.remember
-import androidx.compose.ui.ContentDrawScope
-import androidx.compose.ui.DrawModifier
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.drawWithCache
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.geometry.boundingRect
 import androidx.compose.ui.geometry.isSimple
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.addOutline
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.platform.debugInspectorInfo
-import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.util.nativeClass
 
 /**
  * Modify element to add border with appearance specified with a [border] and a [shape], pad the
@@ -80,7 +71,142 @@ fun Modifier.border(width: Dp, color: Color, shape: Shape = RectangleShape) =
  * @param shape shape of the border
  */
 fun Modifier.border(width: Dp, brush: Brush, shape: Shape): Modifier = composed(
-    factory = { BorderModifier(remember { BorderModifierCache() }, shape, width, brush) },
+    factory = {
+        this.then(
+            Modifier.drawWithCache {
+                val outline: Outline = shape.createOutline(size, this)
+                val borderSize = if (width == Dp.Hairline) 1f else width.toPx()
+
+                var insetOutline: Outline? = null // outline used for roundrect/generic shapes
+                var stroke: Stroke? = null // stroke to draw border for all outline types
+                var pathClip: Path? = null // path to clip roundrect/generic shapes
+                var inset = 0f // inset to translate before drawing the inset outline
+                // path to draw generic shapes or roundrects with different corner radii
+                var insetPath: Path? = null
+
+                if (borderSize > 0 && size.minDimension > 0f) {
+                    if (outline is Outline.Rectangle) {
+                        stroke = Stroke(borderSize)
+                    } else {
+                        // Multiplier to apply to the border size to get a stroke width that is
+                        // large enough to cover the corners while not being too large to overly
+                        // square off the internal shape. The resultant shape will be
+                        // clipped to the desired shape. Any value lower will show artifacts in
+                        // the corners of shapes. A value too large will always square off
+                        // the internal shape corners. For example, for a rounded rect border
+                        // a large multiplier will always have squared off edges within the
+                        // inner section of the stroke, however, having a smaller multiplier
+                        // will still keep the rounded effect for the inner section of the
+                        // border
+                        val strokeWidth = 1.2f * borderSize
+                        inset = borderSize - strokeWidth / 2
+                        val insetSize = Size(
+                            size.width - inset * 2,
+                            size.height - inset * 2
+                        )
+                        insetOutline = shape.createOutline(insetSize, this)
+                        stroke = Stroke(strokeWidth)
+                        pathClip = if (outline is Outline.Rounded) {
+                            Path().apply { addRoundRect(outline.roundRect) }
+                        } else if (outline is Outline.Generic) {
+                            outline.path
+                        } else {
+                            // should not get here because we check for Outline.Rectangle
+                            // above
+                            null
+                        }
+
+                        insetPath =
+                            if (insetOutline is Outline.Rounded &&
+                                !insetOutline.roundRect.isSimple
+                            ) {
+                                // Rounded rect with non equal corner radii needs a path
+                                // to be pre-translated
+                                Path().apply {
+                                    addRoundRect(insetOutline.roundRect)
+                                    translate(Offset(inset, inset))
+                                }
+                            } else if (insetOutline is Outline.Generic) {
+                                // Generic paths must be created and pre-translated
+                                Path().apply {
+                                    addPath(insetOutline.path, Offset(inset, inset))
+                                }
+                            } else {
+                                // Drawing a round rect with equal corner radii without
+                                // usage of a path
+                                null
+                            }
+                    }
+                }
+
+                onDrawWithContent {
+                    drawContent()
+                    // Only draw the border if a have a valid stroke parameter. If we have
+                    // an invalid border size we will just draw the content
+                    if (stroke != null) {
+                        if (insetOutline != null && pathClip != null) {
+                            val isSimpleRoundRect = insetOutline is Outline.Rounded &&
+                                insetOutline.roundRect.isSimple
+                            withTransform({
+                                clipPath(pathClip)
+                                // we are drawing the round rect not as a path so we must
+                                // translate ourselves othe
+                                if (isSimpleRoundRect) {
+                                    translate(inset, inset)
+                                }
+                            }) {
+                                if (isSimpleRoundRect) {
+                                    // If we don't have an insetPath then we are drawing
+                                    // a simple round rect with the corner radii all identical
+                                    val rrect = (insetOutline as Outline.Rounded).roundRect
+                                    drawRoundRect(
+                                        brush = brush,
+                                        topLeft = Offset(rrect.left, rrect.top),
+                                        size = Size(rrect.width, rrect.height),
+                                        cornerRadius = rrect.topLeftCornerRadius,
+                                        style = stroke
+                                    )
+                                } else if (insetPath != null) {
+                                    drawPath(insetPath, brush, style = stroke)
+                                }
+                            }
+                            // Clip rect to ensure the stroke does not extend the bounds
+                            // of the composable.
+                            clipRect {
+                                // Draw a hairline stroke to cover up non-anti-aliased pixels
+                                // generated from the clip
+                                if (isSimpleRoundRect) {
+                                    val rrect = (outline as Outline.Rounded).roundRect
+                                    drawRoundRect(
+                                        brush = brush,
+                                        topLeft = Offset(rrect.left, rrect.top),
+                                        size = Size(rrect.width, rrect.height),
+                                        cornerRadius = rrect.topLeftCornerRadius,
+                                        style = HairlineBorderStroke
+                                    )
+                                } else {
+                                    drawPath(pathClip, brush = brush, style = HairlineBorderStroke)
+                                }
+                            }
+                        } else {
+                            // Rectangular border fast path
+                            val strokeWidth = stroke.width
+                            val halfStrokeWidth = strokeWidth / 2
+                            drawRect(
+                                brush = brush,
+                                topLeft = Offset(halfStrokeWidth, halfStrokeWidth),
+                                size = Size(
+                                    size.width - strokeWidth,
+                                    size.height - strokeWidth
+                                ),
+                                style = stroke
+                            )
+                        }
+                    }
+                }
+            }
+        )
+    },
     inspectorInfo = debugInspectorInfo {
         name = "border"
         properties["width"] = width
@@ -94,154 +220,5 @@ fun Modifier.border(width: Dp, brush: Brush, shape: Shape): Modifier = composed(
     }
 )
 
-private class BorderModifier(
-    private val cache: BorderModifierCache,
-    private val shape: Shape,
-    private val borderWidth: Dp,
-    private val brush: Brush
-) : DrawModifier {
-
-    // put params to constructor to ensure proper equals and update cache after construction
-    init {
-        cache.lastShape = shape
-        cache.borderSize = borderWidth
-    }
-
-    override fun ContentDrawScope.draw() {
-        val density = this
-        with(cache) {
-            drawContent()
-            modifierSize = size
-            val outline = modifierSizeOutline(density)
-            val borderSize =
-                if (borderWidth == Dp.Hairline) 1f else borderWidth.value * density.density
-            if (borderSize <= 0 || size.minDimension <= 0.0f) {
-                return
-            } else if (outline is Outline.Rectangle) {
-                // shortcut to make rectangle shapes draw faster
-                drawRoundRectBorder(borderSize, outline.rect, 0f, brush)
-            } else if (outline is Outline.Rounded && outline.roundRect.isSimple) {
-                // shortcut to make rounded rectangles draw faster
-                val radius = outline.roundRect.bottomLeftCornerRadius.y
-                drawRoundRectBorder(
-                    borderSize,
-                    outline.roundRect.boundingRect,
-                    radius,
-                    brush
-                )
-            } else {
-                // general path-difference (rect-difference) implementation for the rest
-                drawPath(borderPath(density, borderSize), brush)
-            }
-        }
-    }
-
-    private fun DrawScope.drawRoundRectBorder(
-        borderSize: Float,
-        rect: Rect,
-        radius: Float,
-        brush: Brush
-    ) {
-        val fillWithBorder = borderSize * 2 >= rect.minDimension
-        val style = if (fillWithBorder) Fill else Stroke(borderSize)
-
-        val delta = if (fillWithBorder) 0f else borderSize / 2
-        drawRoundRect(
-            brush,
-            topLeft = Offset(rect.left + delta, rect.top + delta),
-            size = Size(rect.width - 2 * delta, rect.height - 2 * delta),
-            cornerRadius = CornerRadius(radius),
-            style = style
-        )
-    }
-
-    // cannot make DrawBorder data class because of the cache, though need hashcode/equals
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (this.nativeClass() != other?.nativeClass()) return false
-
-        other as BorderModifier
-
-        if (shape != other.shape) return false
-        if (borderWidth != other.borderWidth) return false
-        if (brush != other.brush) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = shape.hashCode()
-        result = 31 * result + borderWidth.hashCode()
-        result = 31 * result + brush.hashCode()
-        return result
-    }
-}
-
-private class BorderModifierCache {
-    private val outerPath = Path()
-    private val innerPath = Path()
-    private val diffPath = Path()
-    private var dirtyPath = true
-    private var dirtyOutline = true
-    private var outline: Outline? = null
-
-    var lastShape: Shape? = null
-        set(value) {
-            if (value != field) {
-                field = value
-                dirtyPath = true
-                dirtyOutline = true
-            }
-        }
-
-    var borderSize: Dp = Dp.Unspecified
-        set(value) {
-            if (value != field) {
-                field = value
-                dirtyPath = true
-            }
-        }
-
-    var modifierSize: Size? = null
-        set(value) {
-            if (value != field) {
-                field = value
-                dirtyPath = true
-                dirtyOutline = true
-            }
-        }
-
-    fun modifierSizeOutline(density: Density): Outline {
-        if (dirtyOutline) {
-            outline = lastShape?.createOutline(modifierSize!!, density)
-            dirtyOutline = false
-        }
-        return outline!!
-    }
-
-    fun borderPath(density: Density, borderPixelSize: Float): Path {
-        if (dirtyPath) {
-            val size = modifierSize!!
-            diffPath.reset()
-            outerPath.reset()
-            innerPath.reset()
-            if (borderPixelSize * 2 >= size.minDimension) {
-                diffPath.addOutline(modifierSizeOutline(density))
-            } else {
-                outerPath.addOutline(lastShape!!.createOutline(size, density))
-                val sizeMinusBorder =
-                    Size(
-                        size.width - borderPixelSize * 2,
-                        size.height - borderPixelSize * 2
-                    )
-                innerPath.addOutline(lastShape!!.createOutline(sizeMinusBorder, density))
-                innerPath.translate(Offset(borderPixelSize, borderPixelSize))
-
-                // now we calculate the diff between the inner and the outer paths
-                diffPath.op(outerPath, innerPath, PathOperation.difference)
-            }
-            dirtyPath = false
-        }
-        return diffPath
-    }
-}
+// Hairline stroke to cover aliasing of clipping
+private val HairlineBorderStroke = Stroke(Stroke.HairlineWidth)
