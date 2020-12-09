@@ -29,9 +29,11 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.shape.ZeroCornerSize
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -73,6 +75,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -224,6 +227,16 @@ class ParameterFactoryTest {
     }
 
     @Test
+    fun testComposableLambda() = runBlocking {
+        val c: @Composable () -> Unit = { Text(text = "Hello World") }
+        val result = lookup(c as Any) ?: error("Lookup of ComposableLambda failed")
+        assertThat(result.first).isEqualTo(ParameterType.Lambda)
+        assertThat(result.second!!.javaClass.name).isEqualTo(
+            "${ParameterFactoryTest::class.java.name}\$testComposableLambda\$1\$c\$1"
+        )
+    }
+
+    @Test
     fun testCornerBasedShape() {
         validate(
             factory.create(
@@ -352,6 +365,12 @@ class ParameterFactoryTest {
     }
 
     @Test
+    fun testLambda() {
+        val a: (Int) -> Int = { it }
+        assertThat(lookup(a)).isEqualTo(ParameterType.Lambda to a)
+    }
+
+    @Test
     fun testLocale() {
         assertThat(lookup(Locale("fr-CA"))).isEqualTo(ParameterType.String to "fr-CA")
         assertThat(lookup(Locale("fr-BE"))).isEqualTo(ParameterType.String to "fr-BE")
@@ -413,6 +432,7 @@ class ParameterFactoryTest {
                     parameter("painter", ParameterType.String, "TestPainter") {
                         parameter("alpha", ParameterType.Float, 1.0f)
                         parameter("color", ParameterType.Color, Color.Red.toArgb())
+                        parameter("drawLambda", ParameterType.Lambda, null)
                         parameter("height", ParameterType.Float, 20.0f)
                         parameter("intrinsicSize", ParameterType.String, "Size") {
                             parameter("height", ParameterType.Float, 20.0f)
@@ -650,7 +670,9 @@ class ParameterValidationReceiver(val parameterIterator: Iterator<NodeParameter>
         val parameter = parameterIterator.next()
         assertThat(parameter.name).isEqualTo(name)
         assertWithMessage(name).that(parameter.type).isEqualTo(type)
-        assertWithMessage(name).that(parameter.value).isEqualTo(value)
+        if (type != ParameterType.Lambda || value != null) {
+            assertWithMessage(name).that(parameter.value).isEqualTo(value)
+        }
         var elements: List<NodeParameter> = parameter.elements
         if (name != "modifier") {
             // Do not sort modifiers: the order is important
