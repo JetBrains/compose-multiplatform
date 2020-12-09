@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import org.jetbrains.skija.Paint
+import org.jetbrains.skija.Typeface
 import org.jetbrains.skija.paragraph.Alignment as SkAlignment
 import org.jetbrains.skija.paragraph.BaselineMode
 import org.jetbrains.skija.paragraph.LineMetrics
@@ -68,6 +69,7 @@ import org.jetbrains.skija.Rect as SkRect
 import org.jetbrains.skija.paragraph.Paragraph as SkParagraph
 import org.jetbrains.skija.paragraph.TextStyle as SkTextStyle
 import org.jetbrains.skija.FontStyle as SkFontStyle
+import org.jetbrains.skija.Font as SkFont
 import org.jetbrains.skija.paragraph.DecorationLineStyle as SkDecorationLineStyle
 import org.jetbrains.skija.paragraph.DecorationStyle as SkDecorationStyle
 import org.jetbrains.skija.paragraph.Shadow as SkShadow
@@ -184,7 +186,7 @@ internal class DesktopParagraph(
             Rect(box.rect.left, box.rect.top, box.rect.left + cursorWidth, box.rect.bottom)
         } ?: getBoxBackwardByOffset(offset)?.let { box ->
             Rect(box.rect.right, box.rect.top, box.rect.right + cursorWidth, box.rect.bottom)
-        } ?: Rect(0f, 0f, cursorWidth, para.height)
+        } ?: Rect(0f, 0f, cursorWidth, paragraphIntrinsics.builder.defaultHeight)
 
     override fun getLineLeft(lineIndex: Int): Float {
         println("Paragraph.getLineLeft $lineIndex")
@@ -511,6 +513,8 @@ internal class ParagraphBuilder(
     val placeholders: List<AnnotatedString.Range<Placeholder>>,
     val density: Density
 ) {
+    private lateinit var initialStyle: SpanStyle
+    private lateinit var defaultStyle: ComputedStyle
     private lateinit var ops: List<Op>
 
     /**
@@ -524,10 +528,11 @@ internal class ParagraphBuilder(
      * of active styles is being compiled into single SkParagraph's style for every chunk of text
      */
     fun build(): SkParagraph {
+        initialStyle = textStyle.toSpanStyle().withDefaultFontSize()
+        defaultStyle = ComputedStyle(density, initialStyle)
         ops = makeOps(
             spanStyles,
-            placeholders,
-            textStyle.toSpanStyle().withDefaultFontSize()
+            placeholders
         )
 
         var pos = 0
@@ -626,8 +631,7 @@ internal class ParagraphBuilder(
 
     private fun makeOps(
         spans: List<SpanStyleRange>,
-        placeholders: List<AnnotatedString.Range<Placeholder>>,
-        initialStyle: SpanStyle
+        placeholders: List<AnnotatedString.Range<Placeholder>>
     ): List<Op> {
         val cuts = mutableListOf<Cut>()
         for (span in spans) {
@@ -640,7 +644,7 @@ internal class ParagraphBuilder(
             cuts.add(Cut.EndPlaceholder(placeholder.end))
         }
 
-        val ops = mutableListOf<Op>(Op.StyleAdd(0, ComputedStyle(density, initialStyle)))
+        val ops = mutableListOf<Op>(Op.StyleAdd(0, defaultStyle))
         cuts.sortBy { it.position }
         val activeStyles = mutableListOf(initialStyle)
         for (cut in cuts) {
@@ -716,6 +720,17 @@ internal class ParagraphBuilder(
         return skTextStylesCache.getOrPut(style) {
             style.toSkTextStyle(fontLoader)
         }
+    }
+
+    internal val defaultFont by lazy {
+        val typeface = textStyle.fontFamily?.let {
+            fontLoader.defaultTypeface(it)
+        } ?: Typeface.makeDefault()
+        SkFont(typeface, defaultStyle.fontSize)
+    }
+
+    internal val defaultHeight by lazy {
+        defaultFont.metrics.height
     }
 }
 
