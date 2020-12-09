@@ -30,7 +30,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.material.ripple.rememberRippleIndication
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.emptyContent
@@ -153,7 +153,7 @@ fun BottomNavigationItem(
     // The color of the Ripple should always the selected color, as we want to show the color
     // before the item is considered selected, and hence before the new contentColor is
     // provided by BottomNavigationTransition.
-    val ripple = rememberRippleIndication(bounded = false, color = selectedContentColor)
+    val ripple = rememberRipple(bounded = false, color = selectedContentColor)
 
     // TODO This composable has magic behavior within a Row; reconsider this behavior later
     Box(

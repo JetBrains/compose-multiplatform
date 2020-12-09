@@ -765,32 +765,3 @@ package androidx.compose.material {
 
 }
 
-package androidx.compose.material.ripple {
-
-  public final class RippleAnimationKt {
-  }
-
-  @androidx.compose.runtime.Stable public final class RippleIndication implements androidx.compose.foundation.Indication {
-    method public androidx.compose.foundation.IndicationInstance createInstance();
-  }
-
-  public final class RippleIndicationKt {
-    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.material.ripple.RippleIndication RippleIndication-DudYJDg(optional boolean bounded, optional androidx.compose.ui.unit.Dp? radius, optional long color);
-    method @androidx.compose.runtime.Composable public static androidx.compose.material.ripple.RippleIndication rememberRippleIndication-DudYJDg(optional boolean bounded, optional androidx.compose.ui.unit.Dp? radius, optional long color);
-  }
-
-  @androidx.compose.material.ExperimentalMaterialApi public interface RippleOpacity {
-    method public float opacityForInteraction(androidx.compose.foundation.Interaction interaction);
-  }
-
-  @androidx.compose.material.ExperimentalMaterialApi public interface RippleTheme {
-    method @androidx.compose.runtime.Composable public long defaultColor-0d7_KjU();
-    method @androidx.compose.runtime.Composable public androidx.compose.material.ripple.RippleOpacity rippleOpacity();
-  }
-
-  public final class RippleThemeKt {
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.material.ripple.RippleTheme> getAmbientRippleTheme();
-  }
-
-}
-

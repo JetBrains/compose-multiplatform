@@ -33,7 +33,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSizeIn
 import androidx.compose.foundation.layout.preferredWidth
-import androidx.compose.material.ripple.rememberRippleIndication
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Providers
@@ -179,7 +179,7 @@ fun DropdownMenuItem(
                 enabled = enabled,
                 onClick = onClick,
                 interactionState = interactionState,
-                indication = rememberRippleIndication(true)
+                indication = rememberRipple(true)
             )
             .fillMaxWidth()
             // Preferred min and max width used during the intrinsic measurement.
