@@ -2401,6 +2401,10 @@ package androidx.compose.ui.res {
     ctor public LoadedResource(T? resource);
   }
 
+  public final class PainterResourcesKt {
+    method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.painter.Painter painterResource(@DrawableRes int id);
+  }
+
   public final class PendingResource<T> extends androidx.compose.ui.res.Resource<T> {
     ctor public PendingResource(T? resource);
   }
