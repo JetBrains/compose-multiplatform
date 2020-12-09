@@ -50,7 +50,7 @@ import kotlin.math.roundToInt
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-class LayoutOffsetTest : LayoutTest() {
+class OffsetTest : LayoutTest() {
     @get:Rule
     val rule = createComposeRule()
 

@@ -18,9 +18,11 @@ package androidx.compose.foundation.layout
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
@@ -450,6 +452,46 @@ class BoxTest : LayoutTest() {
             }
         }
         assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
+    }
+
+    @Test
+    fun testBox_childAffectsBoxSize() {
+        var layoutLatch = CountDownLatch(2)
+        val size = mutableStateOf(10.dp)
+        var measure = 0
+        var layout = 0
+        show {
+            Box {
+                Layout(
+                    content = {
+                        Box {
+                            Box(
+                                Modifier.size(size.value, 10.dp).onGloballyPositioned {
+                                    layoutLatch.countDown()
+                                }
+                            )
+                        }
+                    }
+                ) { measurables, constraints ->
+                    val placeable = measurables.first().measure(constraints)
+                    ++measure
+                    layout(placeable.width, placeable.height) {
+                        placeable.place(0, 0)
+                        ++layout
+                        layoutLatch.countDown()
+                    }
+                }
+            }
+        }
+        assertTrue(layoutLatch.await(1, TimeUnit.SECONDS))
+        assertEquals(1, measure)
+        assertEquals(1, layout)
+
+        layoutLatch = CountDownLatch(2)
+        activityTestRule.runOnUiThread { size.value = 20.dp }
+        assertTrue(layoutLatch.await(1, TimeUnit.SECONDS))
+        assertEquals(2, measure)
+        assertEquals(2, layout)
     }
 
     @Test

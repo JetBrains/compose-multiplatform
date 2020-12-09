@@ -50,7 +50,7 @@ import kotlin.math.roundToInt
 
 @SmallTest
 @RunWith(AndroidJUnit4::class)
-class LayoutPaddingTest : LayoutTest() {
+class PaddingTest : LayoutTest() {
 
     @Before
     fun before() {

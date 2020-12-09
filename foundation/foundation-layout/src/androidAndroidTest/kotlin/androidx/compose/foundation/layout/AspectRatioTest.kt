@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit
 
 @SmallTest
 @RunWith(AndroidJUnit4::class)
-class LayoutAspectRatioTest : LayoutTest() {
+class AspectRatioTest : LayoutTest() {
     @Before
     fun before() {
         isDebugInspectorInfoEnabled = true
