@@ -399,7 +399,7 @@ inline fun <S> Transition<S>.animateDp(
     },
     targetValueByState: @Composable (state: S) -> Dp
 ): State<Dp> =
-    animateValue(DpToVector, transitionSpec, targetValueByState)
+    animateValue(Dp.VectorConverter, transitionSpec, targetValueByState)
 
 /**
  * Creates an [Offset] animation as a part of the given [Transition]. This means the states
@@ -427,7 +427,7 @@ inline fun <S> Transition<S>.animateOffset(
     },
     targetValueByState: @Composable (state: S) -> Offset
 ): State<Offset> =
-    animateValue(OffsetToVector, transitionSpec, targetValueByState)
+    animateValue(Offset.VectorConverter, transitionSpec, targetValueByState)
 
 /**
  * Creates a [Position] animation as a part of the given [Transition]. This means the states
@@ -455,7 +455,7 @@ inline fun <S> Transition<S>.animatePosition(
     },
     targetValueByState: @Composable (state: S) -> Position
 ): State<Position> =
-    animateValue(PositionToVector, transitionSpec, targetValueByState)
+    animateValue(Position.VectorConverter, transitionSpec, targetValueByState)
 
 /**
  * Creates a [Size] animation as a part of the given [Transition]. This means the states
@@ -483,7 +483,7 @@ inline fun <S> Transition<S>.animateSize(
     },
     targetValueByState: @Composable (state: S) -> Size
 ): State<Size> =
-    animateValue(SizeToVector, transitionSpec, targetValueByState)
+    animateValue(Size.VectorConverter, transitionSpec, targetValueByState)
 
 /**
  * Creates a [IntOffset] animation as a part of the given [Transition]. This means the states
@@ -510,7 +510,7 @@ inline fun <S> Transition<S>.animateIntOffset(
         { spring(visibilityThreshold = IntOffset(1, 1)) },
     targetValueByState: @Composable (state: S) -> IntOffset
 ): State<IntOffset> =
-    animateValue(IntOffsetToVector, transitionSpec, targetValueByState)
+    animateValue(IntOffset.VectorConverter, transitionSpec, targetValueByState)
 
 /**
  * Creates a [Int] animation as a part of the given [Transition]. This means the states
@@ -566,7 +566,7 @@ inline fun <S> Transition<S>.animateIntSize(
     },
     targetValueByState: @Composable (state: S) -> IntSize
 ): State<IntSize> =
-    animateValue(IntSizeToVector, transitionSpec, targetValueByState)
+    animateValue(IntSize.VectorConverter, transitionSpec, targetValueByState)
 
 /**
  * Creates a [Bounds] animation as a part of the given [Transition]. This means the states
@@ -594,7 +594,7 @@ inline fun <S> Transition<S>.animateBounds(
     },
     targetValueByState: @Composable (state: S) -> Bounds
 ): State<Bounds> =
-    animateValue(BoundsToVector, transitionSpec, targetValueByState)
+    animateValue(Bounds.VectorConverter, transitionSpec, targetValueByState)
 
 /**
  * Creates a [Rect] animation as a part of the given [Transition]. This means the states
@@ -621,4 +621,4 @@ inline fun <S> Transition<S>.animateRect(
         { spring(visibilityThreshold = Rect.VisibilityThreshold) },
     targetValueByState: @Composable (state: S) -> Rect
 ): State<Rect> =
-    animateValue(RectToVector, transitionSpec, targetValueByState)
+    animateValue(Rect.VectorConverter, transitionSpec, targetValueByState)
