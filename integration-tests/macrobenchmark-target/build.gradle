@@ -1,0 +1,30 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+import static androidx.build.dependencies.DependenciesKt.*
+
+plugins {
+    id("AndroidXPlugin")
+    id("AndroidXUiPlugin")
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+}
+
+dependencies {
+    kotlinPlugin project(":compose:compiler:compiler")
+
+    implementation(KOTLIN_STDLIB)
+
+    implementation project(":compose:foundation:foundation-layout")
+    implementation project(":compose:material:material")
+    implementation project(":compose:runtime:runtime")
+    implementation project(":compose:ui:ui")
+    implementation project(":compose:ui:ui-tooling")
+}
+
+android.defaultConfig.minSdkVersion 21
+
+tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions {
+        useIR = true
+    }
+}
