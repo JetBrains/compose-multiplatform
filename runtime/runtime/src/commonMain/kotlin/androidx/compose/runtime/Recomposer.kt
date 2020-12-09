@@ -33,6 +33,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ClosedSendChannelException
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -201,8 +202,21 @@ class Recomposer(
             var framesRemaining = frameCount
             val toRecompose = mutableListOf<Composer<*>>()
 
+            // Due to a breaking change in Coroutines 1.4.0, some update events might be dropped.
+            // see: https://github.com/Kotlin/kotlinx.coroutines/releases/tag/1.4.0-M1
+            // For Compose, we prefer them not to be lost hence we try to re-offer them back to
+            // the channel.
+            // see: https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.channels/-channel/
+            var addChangeBack: ((value: Set<Any>) -> Unit)? = null
+            val appliedChanges = Channel<Set<Any>>(Channel.UNLIMITED) { undeliveredChanges ->
+                addChangeBack?.invoke(undeliveredChanges)
+            }
+            addChangeBack = {
+                try {
+                    appliedChanges.offer(it)
+                } catch (ignored: ClosedSendChannelException) {}
+            }
             // unregisterApplyObserver is called as part of the big finally below
-            val appliedChanges = Channel<Set<Any>>(Channel.UNLIMITED)
             val unregisterApplyObserver = Snapshot.registerApplyObserver { changed, _ ->
                 appliedChanges.offer(changed)
             }
