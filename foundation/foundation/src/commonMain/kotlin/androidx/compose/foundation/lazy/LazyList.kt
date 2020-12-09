@@ -45,6 +45,8 @@ internal fun LazyList(
     val cachingItemContentFactory = remember { CachingItemContentFactory(itemContentFactory) }
     cachingItemContentFactory.itemContentFactory = itemContentFactory
 
+    val startContentPadding = if (isVertical) contentPadding.top else contentPadding.start
+    val endContentPadding = if (isVertical) contentPadding.bottom else contentPadding.end
     SubcomposeLayout(
         modifier
             .scrollable(
@@ -66,6 +68,8 @@ internal fun LazyList(
             isVertical,
             horizontalAlignment,
             verticalAlignment,
+            startContentPadding.toIntPx(),
+            endContentPadding.toIntPx(),
             itemsCount,
             cachingItemContentFactory
         )

@@ -292,11 +292,15 @@ class LazyListState constructor(
         isVertical: Boolean,
         horizontalAlignment: Alignment.Horizontal,
         verticalAlignment: Alignment.Vertical,
+        startContentPadding: Int,
+        endContentPadding: Int,
         itemsCount: Int,
         itemContentFactory: (Int) -> @Composable () -> Unit
     ): MeasureResult = with(scope) {
         numMeasurePasses++
         constraints.assertNotNestingScrollableContainers(isVertical)
+        require(startContentPadding >= 0)
+        require(endContentPadding >= 0)
         if (itemsCount <= 0) {
             // empty data set. reset the current scroll and report zero size
             scrollPosition.update(
@@ -340,27 +344,35 @@ class LazyListState constructor(
             var goingForwardInitialScrollOffset = currentFirstItemScrollOffset
 
             // this will contain all the placeables representing the visible items
-            val visibleItemsPlaceables = mutableListOf<Placeable>()
+            val visibleItemsPlaceables = mutableListOf<List<Placeable>>()
 
-            // we had scrolled backward, which means items before current firstItemScrollOffset
-            // became visible. compose them and update firstItemScrollOffset
+            // include the start padding so we compose items in the padding area. in the end we
+            // will remove it back from the currentFirstItemScrollOffset calculation
+            currentFirstItemScrollOffset -= startContentPadding
+
+            // define min and max offsets (min offset currently includes startPadding)
+            val minOffset = -startContentPadding
+            val maxOffset = (if (isVertical) constraints.maxHeight else constraints.maxWidth)
+
+            // we had scrolled backward or we compose items in the start padding area, which means
+            // items before current firstItemScrollOffset should be visible. compose them and update
+            // firstItemScrollOffset
             while (currentFirstItemScrollOffset < 0 && currentFirstItemIndex > DataIndex(0)) {
                 val previous = DataIndex(currentFirstItemIndex.value - 1)
                 val placeables =
                     subcompose(previous, itemContentFactory(previous.value)).fastMap {
                         it.measure(childConstraints)
                     }
-                visibleItemsPlaceables.addAll(0, placeables)
-                val size = placeables.fastSumBy { if (isVertical) it.height else it.width }
-                currentFirstItemScrollOffset += size
+                visibleItemsPlaceables.add(0, placeables)
+                currentFirstItemScrollOffset += placeables.mainAxisSize(isVertical)
                 currentFirstItemIndex = previous
             }
             // if we were scrolled backward, but there were not enough items before. this means
             // not the whole scroll was consumed
-            if (currentFirstItemScrollOffset < 0) {
+            if (currentFirstItemScrollOffset < minOffset) {
                 scrollDelta += currentFirstItemScrollOffset
                 goingForwardInitialScrollOffset += currentFirstItemScrollOffset
-                currentFirstItemScrollOffset = 0
+                currentFirstItemScrollOffset = minOffset
             }
 
             // remembers the composed placeables which we are not currently placing as they are out
@@ -371,7 +383,7 @@ class LazyListState constructor(
             // composing visible items starting from goingForwardInitialIndex until we fill the
             // whole viewport
             var index = goingForwardInitialIndex
-            val maxMainAxis = if (isVertical) constraints.maxHeight else constraints.maxWidth
+            val maxMainAxis = maxOffset + endContentPadding
             var mainAxisUsed = -goingForwardInitialScrollOffset
             var maxCrossAxis = 0
             while (mainAxisUsed <= maxMainAxis && index.value < itemsCount) {
@@ -386,7 +398,7 @@ class LazyListState constructor(
                 }
                 mainAxisUsed += size
 
-                if (mainAxisUsed < 0f) {
+                if (mainAxisUsed < minOffset) {
                     // this item is offscreen and will not be placed. advance firstVisibleItemIndex
                     currentFirstItemIndex = index + 1
                     currentFirstItemScrollOffset -= size
@@ -397,7 +409,7 @@ class LazyListState constructor(
                     }
                     notUsedButComposedItems.add(placeables)
                 } else {
-                    visibleItemsPlaceables.addAll(placeables)
+                    visibleItemsPlaceables.add(placeables)
                 }
 
                 index++
@@ -405,8 +417,8 @@ class LazyListState constructor(
 
             // we didn't fill the whole viewport with items starting from firstVisibleItemIndex.
             // lets try to scroll back if we have enough items before firstVisibleItemIndex.
-            if (mainAxisUsed < maxMainAxis) {
-                val toScrollBack = maxMainAxis - mainAxisUsed
+            if (mainAxisUsed < maxOffset) {
+                val toScrollBack = maxOffset - mainAxisUsed
                 currentFirstItemScrollOffset -= toScrollBack
                 mainAxisUsed += toScrollBack
                 while (currentFirstItemScrollOffset < 0 && currentFirstItemIndex > DataIndex(0)) {
@@ -419,16 +431,16 @@ class LazyListState constructor(
                             it.measure(childConstraints)
                         }
                     }
-                    visibleItemsPlaceables.addAll(0, placeables)
-                    val size = placeables.fastSumBy { if (isVertical) it.height else it.width }
+                    visibleItemsPlaceables.add(0, placeables)
+                    val size = placeables.mainAxisSize(isVertical)
                     currentFirstItemScrollOffset += size
                     currentFirstItemIndex = previous
                 }
                 scrollDelta += toScrollBack
-                if (currentFirstItemScrollOffset < 0) {
+                if (currentFirstItemScrollOffset < minOffset) {
                     scrollDelta += currentFirstItemScrollOffset
                     mainAxisUsed += currentFirstItemScrollOffset
-                    currentFirstItemScrollOffset = 0
+                    currentFirstItemScrollOffset = minOffset
                 }
             }
 
@@ -446,39 +458,70 @@ class LazyListState constructor(
 
             // Wrap the content of the children
             val layoutWidth = constraints.constrainWidth(
-                if (isVertical) maxCrossAxis else mainAxisUsed
+                if (isVertical) maxCrossAxis else mainAxisUsed + startContentPadding
             )
             val layoutHeight = constraints.constrainHeight(
-                if (!isVertical) maxCrossAxis else mainAxisUsed
+                if (!isVertical) maxCrossAxis else mainAxisUsed + startContentPadding
             )
+
+            // the initial offset for placeables in visibleItemsPlaceables
+            val firstPlaceableOffset = -(currentFirstItemScrollOffset + startContentPadding)
+
+            // compensate the content padding we initially added in currentFirstItemScrollOffset.
+            // if the item is fully located in the start padding area we  need to use the next
+            // item as a value for currentFirstItemIndex
+            if (startContentPadding > 0) {
+                currentFirstItemScrollOffset += startContentPadding
+                var startPaddingItems = 0
+                while (startPaddingItems < visibleItemsPlaceables.lastIndex) {
+                    val size = visibleItemsPlaceables[startPaddingItems].mainAxisSize(isVertical)
+                    if (size <= currentFirstItemScrollOffset) {
+                        startPaddingItems++
+                        currentFirstItemScrollOffset -= size
+                        currentFirstItemIndex++
+                    } else {
+                        break
+                    }
+                }
+            }
 
             // update state with the new calculated scroll position
             scrollPosition.update(
                 index = currentFirstItemIndex,
                 scrollOffset = currentFirstItemScrollOffset,
-                canScrollForward = mainAxisUsed > maxMainAxis
+                canScrollForward = mainAxisUsed > maxOffset
             )
 
             return layout(layoutWidth, layoutHeight) {
-                var currentMainAxis = -currentFirstItemScrollOffset
-                visibleItemsPlaceables.fastForEach {
-                    if (isVertical) {
-                        val x = horizontalAlignment.align(it.width, layoutWidth, layoutDirection)
-                        if (currentMainAxis + it.height > 0 && currentMainAxis < layoutHeight) {
-                            it.placeWithLayer(x, currentMainAxis)
+                var currentMainAxis = firstPlaceableOffset
+                visibleItemsPlaceables.fastForEach { placeables ->
+                    placeables.fastForEach {
+                        if (isVertical) {
+                            val x =
+                                horizontalAlignment.align(it.width, layoutWidth, layoutDirection)
+                            if (currentMainAxis + it.height > minOffset &&
+                                currentMainAxis < layoutHeight + endContentPadding
+                            ) {
+                                it.placeWithLayer(x, currentMainAxis)
+                            }
+                            currentMainAxis += it.height
+                        } else {
+                            val y = verticalAlignment.align(it.height, layoutHeight)
+                            if (currentMainAxis + it.width > minOffset &&
+                                currentMainAxis < layoutWidth + endContentPadding
+                            ) {
+                                it.placeRelativeWithLayer(currentMainAxis, y)
+                            }
+                            currentMainAxis += it.width
                         }
-                        currentMainAxis += it.height
-                    } else {
-                        val y = verticalAlignment.align(it.height, layoutHeight)
-                        if (currentMainAxis + it.width > 0 && currentMainAxis < layoutWidth) {
-                            it.placeRelativeWithLayer(currentMainAxis, y)
-                        }
-                        currentMainAxis += it.width
                     }
                 }
             }
         }
     }
+
+    private fun List<Placeable>.mainAxisSize(isVertical: Boolean) =
+        fastSumBy { if (isVertical) it.height else it.width }
 
     companion object {
         /**
