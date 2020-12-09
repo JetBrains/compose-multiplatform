@@ -25,6 +25,7 @@ import androidx.compose.animation.core.transitionDefinition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.transition
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -35,16 +36,11 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.isFocused
-import androidx.compose.ui.focusObserver
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -113,7 +109,7 @@ internal fun TextFieldImpl(
 
     val keyboardController: Ref<SoftwareKeyboardController> = remember { Ref() }
 
-    var isFocused by remember { mutableStateOf(false) }
+    val isFocused = interactionState.contains(Interaction.Focused)
     val inputState = when {
         isFocused -> InputPhase.Focused
         value.text.isEmpty() -> InputPhase.UnfocusedEmpty
@@ -135,6 +131,7 @@ internal fun TextFieldImpl(
                 visualTransformation = visualTransformation,
                 keyboardOptions = keyboardOptions,
                 maxLines = maxLines,
+                interactionState = interactionState,
                 onImeActionPerformed = {
                     onImeActionPerformed(it, keyboardController.value)
                 },
@@ -150,7 +147,6 @@ internal fun TextFieldImpl(
     val focusRequester = FocusRequester()
     val textFieldModifier = modifier
         .focusRequester(focusRequester)
-        .focusObserver { isFocused = it.isFocused }
         .let {
             it.clickable(interactionState = interactionState, indication = null) {
                 focusRequester.requestFocus()
