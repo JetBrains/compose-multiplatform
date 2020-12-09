@@ -336,7 +336,10 @@ internal class SuspendingGestureTestUtil(
         override val current: Unit = Unit
         override fun down(node: Unit) {}
         override fun up() {}
-        override fun insert(index: Int, instance: Unit) {
+        override fun insertTopDown(index: Int, instance: Unit) {
+            error("Unexpected")
+        }
+        override fun insertBottomUp(index: Int, instance: Unit) {
             error("Unexpected")
         }
         override fun remove(index: Int, count: Int) {

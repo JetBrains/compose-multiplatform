@@ -24,7 +24,11 @@ import androidx.compose.ui.node.LayoutNode
 internal class DesktopUiApplier(
     root: LayoutNode
 ) : AbstractApplier<LayoutNode>(root) {
-    override fun insert(index: Int, instance: LayoutNode) {
+    override fun insertTopDown(index: Int, instance: LayoutNode) {
+        // ignored. Building tree bottom-up
+    }
+
+    override fun insertBottomUp(index: Int, instance: LayoutNode) {
         current.insertAt(index, instance)
     }
 

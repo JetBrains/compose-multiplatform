@@ -33,7 +33,11 @@ class ViewApplier(root: View) : AbstractApplier<View>(root) {
     var onEndChangesCalled = 0
         private set
 
-    override fun insert(index: Int, instance: View) {
+    override fun insertTopDown(index: Int, instance: View) {
+        // Ignored as the tree is built bottom-up.
+    }
+
+    override fun insertBottomUp(index: Int, instance: View) {
         current.addAt(index, instance)
     }
 

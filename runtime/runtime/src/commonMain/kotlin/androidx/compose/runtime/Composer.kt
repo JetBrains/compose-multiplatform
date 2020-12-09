@@ -77,7 +77,9 @@ private class Pending(
         val result = hashMapOf<Int, GroupInfo>()
         for (index in 0 until keyInfos.size) {
             val keyInfo = keyInfos[index]
+            @OptIn(InternalComposeApi::class)
             result[keyInfo.location] = GroupInfo(index, runningNodeIndex, keyInfo.nodes)
+            @OptIn(InternalComposeApi::class)
             runningNodeIndex += keyInfo.nodes
         }
         result
@@ -146,6 +148,7 @@ private class Pending(
         }
     }
 
+    @OptIn(InternalComposeApi::class)
     fun registerInsert(keyInfo: KeyInfo, insertIndex: Int) {
         groupInfos[keyInfo.location] = GroupInfo(-1, insertIndex, 0)
     }
@@ -167,8 +170,13 @@ private class Pending(
         return false
     }
 
+    @OptIn(InternalComposeApi::class)
     fun slotPositionOf(keyInfo: KeyInfo) = groupInfos[keyInfo.location]?.slotIndex ?: -1
+
+    @OptIn(InternalComposeApi::class)
     fun nodePositionOf(keyInfo: KeyInfo) = groupInfos[keyInfo.location]?.nodeIndex ?: -1
+
+    @OptIn(InternalComposeApi::class)
     fun updatedNodeCountOf(keyInfo: KeyInfo) =
         groupInfos[keyInfo.location]?.nodeCount ?: keyInfo.nodes
 }
@@ -535,6 +543,7 @@ class Composer<N>(
      * Start the composition. This should be called, and only be called, as the first group in
      * the composition.
      */
+    @OptIn(InternalComposeApi::class)
     private fun startRoot() {
         reader = slotTable.openReader()
         startGroup(rootKey)
@@ -556,6 +565,7 @@ class Composer<N>(
      * End the composition. This should be called, and only be called, to end the first group in
      * the composition.
      */
+    @OptIn(InternalComposeApi::class)
     private fun endRoot() {
         endGroup()
         parentReference.doneComposing()
@@ -569,6 +579,7 @@ class Composer<N>(
     /**
      * Discard a pending composition because an error was encountered during composition
      */
+    @OptIn(InternalComposeApi::class, ExperimentalComposeApi::class)
     private fun abortRoot() {
         cleanUpCompose()
         pendingStack.clear()
@@ -756,6 +767,7 @@ class Composer<N>(
      * Apply the changes to the tree that were collected during the last composition.
      */
     @InternalComposeApi
+    @OptIn(ExperimentalComposeApi::class)
     fun applyChanges() {
         trace("Compose:applyChanges") {
             invalidateStack.clear()
@@ -804,6 +816,7 @@ class Composer<N>(
     }
 
     @ExperimentalComposeApi
+    @OptIn(InternalComposeApi::class)
     internal fun dispose() {
         trace("Compose:Composer.dispose") {
             parentReference.unregisterComposer(this)
@@ -845,6 +858,7 @@ class Composer<N>(
      */
     internal fun endGroup() = end(false)
 
+    @OptIn(InternalComposeApi::class)
     private fun skipGroup() {
         groupNodeCount += reader.skipGroup()
     }
@@ -867,6 +881,7 @@ class Composer<N>(
      * call when the composer is inserting.
      */
     @Suppress("UNUSED")
+    @OptIn(ExperimentalComposeApi::class)
     internal fun <T : N> createNode(factory: () -> T) {
         validateNodeExpected()
         check(inserting) { "createNode() can only be called when inserting" }
@@ -876,8 +891,13 @@ class Composer<N>(
         recordFixup { applier, slots, _ ->
             val node = factory()
             slots.node = node
-            applier.insert(insertIndex, node)
+            applier.insertTopDown(insertIndex, node)
             applier.down(node)
+        }
+        recordInsertUp { applier, _, _ ->
+            val nodeToInsert = applier.current
+            applier.up()
+            applier.insertBottomUp(insertIndex, nodeToInsert)
         }
     }
 
@@ -886,6 +906,7 @@ class Composer<N>(
      * inserting.
      */
     @PublishedApi
+    @OptIn(ExperimentalComposeApi::class)
     internal fun emitNode(node: Any?) {
         validateNodeExpected()
         check(inserting) { "emitNode() called when not inserting" }
@@ -895,8 +916,13 @@ class Composer<N>(
         @Suppress("UNCHECKED_CAST")
         writer.node = node as N
         recordApplierOperation { applier, _, _ ->
-            applier.insert(insertIndex, node)
+            applier.insertTopDown(insertIndex, node)
             applier.down(node)
+        }
+        recordInsertUp { applier, _, _ ->
+            val nodeToInsert = applier.current
+            applier.up()
+            applier.insertBottomUp(insertIndex, nodeToInsert)
         }
     }
 
@@ -906,6 +932,7 @@ class Composer<N>(
      * location as [emitNode] or [createNode] as called even if the value is unused.
      */
     @PublishedApi
+    @OptIn(InternalComposeApi::class)
     internal fun useNode(): N {
         validateNodeExpected()
         check(!inserting) { "useNode() called while inserting" }
@@ -925,6 +952,7 @@ class Composer<N>(
      * node that is the current node in the tree which was either created by [createNode],
      * emitted by [emitNode] or returned by [useNode].
      */
+    @OptIn(ExperimentalComposeApi::class)
     internal fun <V, T> apply(value: V, block: T.(V) -> Unit) {
         recordApplierOperation { applier, _, _ ->
             @Suppress("UNCHECKED_CAST")
@@ -937,6 +965,7 @@ class Composer<N>(
      * use the key stored at the current location in the slot table to avoid allocating a new key.
      */
     @ComposeCompilerApi
+    @OptIn(InternalComposeApi::class)
     fun joinKey(left: Any?, right: Any?): Any =
         getKey(reader.groupObjectKey, left, right) ?: JoinedKey(left, right)
 
@@ -944,6 +973,7 @@ class Composer<N>(
      * Return the next value in the slot table and advance the current location.
      */
     @PublishedApi
+    @OptIn(InternalComposeApi::class)
     internal fun nextSlot(): Any? = if (inserting) {
         validateNodeNotExpected()
         EMPTY
@@ -1081,6 +1111,7 @@ class Composer<N>(
      * @param value the value to schedule to be written to the slot table.
      */
     @PublishedApi
+    @OptIn(InternalComposeApi::class)
     internal fun updateValue(value: Any?) {
         if (inserting) {
             writer.update(value)
@@ -1567,7 +1598,7 @@ class Composer<N>(
         val inserting = inserting
         if (inserting) {
             if (isNode) {
-                recordInsertUp()
+                registerInsertUp()
                 expectedNodeCount = 1
             }
             reader.endEmpty()
@@ -1588,8 +1619,8 @@ class Composer<N>(
             if (isNode) recordUp()
             recordEndGroup()
             val parentGroup = reader.parent
-            val parentNodecount = updatedNodeCount(parentGroup)
-            if (expectedNodeCount != parentNodecount) {
+            val parentNodeCount = updatedNodeCount(parentGroup)
+            if (expectedNodeCount != parentNodeCount) {
                 updateNodeCountOverrides(parentGroup, expectedNodeCount)
             }
             if (isNode) {
@@ -2038,11 +2069,14 @@ class Composer<N>(
     internal fun hasInvalidations() = invalidations.isNotEmpty()
 
     @Suppress("UNCHECKED_CAST")
+    @OptIn(InternalComposeApi::class)
     private var SlotWriter.node
         get() = node(currentGroup) as N
         set(value) { updateParentNode(value) }
+
     @Suppress("UNCHECKED_CAST")
     private val SlotReader.node get() = node(parent) as N
+
     @Suppress("UNCHECKED_CAST")
     private fun SlotReader.nodeAt(index: Int) = node(index) as N
 
@@ -2145,18 +2179,30 @@ class Composer<N>(
         }
     }
 
-    private var pendingInsertUps = 0
+    private var insertUpRequests = Stack<Change<N>>()
 
-    private fun recordInsertUp() {
-        pendingInsertUps++
+    private var pendingInsertUps = mutableListOf<Change<N>>()
+
+    private fun registerInsertUp() {
+        pendingInsertUps.add(insertUpRequests.pop())
     }
 
     private fun realizeInsertUps() {
-        if (pendingInsertUps > 0) {
-            val count = pendingInsertUps
-            record { applier, _, _ -> repeat(count) { applier.up() } }
-            pendingInsertUps = 0
+        if (pendingInsertUps.isNotEmpty()) {
+            pendingInsertUps.forEach { record(it) }
+            pendingInsertUps.clear()
         }
+    }
+
+    /**
+     * Record a change that will be added after all the changes for the node and all its children
+     * have been performed.
+     *
+     * This is used to implement calling [Applier.insertBottomUp] to allow a tree to be built
+     * bottom-up instead of top-down.
+     */
+    private fun recordInsertUp(change: Change<N>) {
+        insertUpRequests.push(change)
     }
 
     // Navigating the writer slot is performed relatively as the location of a group in the writer
@@ -2618,7 +2664,7 @@ private fun getKey(value: Any?, left: Any?, right: Any?): Any? = (value as? Join
 
 // Observation helpers
 
-// These helpers enable storing observaction pairs of value to scope instances in a list sorted by
+// These helpers enable storing observation pairs of value to scope instances in a list sorted by
 // the value hash as a primary key and the scope hash as the secondary key. This results in a
 // multi-set that allows finding an observation/scope pairs in O(log N) and a worst case of
 // insert into and remove from the array of O(log N) + O(N) where N is the number of total pairs.
