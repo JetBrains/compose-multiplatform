@@ -29,7 +29,6 @@ import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastAll
-import androidx.compose.ui.util.fastMapTo
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.ContinuationInterceptor
@@ -58,9 +57,9 @@ interface HandlePointerInputScope : Density {
     val size: IntSize
 
     /**
-     * The state of the pointers as of the most recent event
+     * The [PointerEvent] from the most recent touch event.
      */
-    val currentPointers: List<PointerInputData>
+    val currentEvent: PointerEvent
 
     /**
      * The [ViewConfiguration] used to tune gesture detectors.
@@ -198,7 +197,7 @@ internal class SuspendingPointerInputFilter(
 
     private var _customEventDispatcher: CustomEventDispatcher? = null
 
-    val currentPointers = mutableListOf<PointerInputData>()
+    private var currentEvent: PointerEvent? = null
 
     /**
      * TODO: work out whether this is actually a race or not.
@@ -291,8 +290,7 @@ internal class SuspendingPointerInputFilter(
     ) {
         boundsSize = bounds
         if (pass == PointerEventPass.Initial) {
-            currentPointers.clear()
-            pointerEvent.changes.fastMapTo(currentPointers) { it.current }
+            currentEvent = pointerEvent
         }
         dispatchPointerEvent(pointerEvent, pass)
 
@@ -337,13 +335,7 @@ internal class SuspendingPointerInputFilter(
     override suspend fun <R> handlePointerInput(
         handler: suspend HandlePointerInputScope.() -> R
     ): R = suspendCancellableCoroutine { continuation ->
-        val handlerCoroutine = PointerEventHandlerCoroutine(
-            continuation,
-            currentPointers,
-            boundsSize,
-            viewConfiguration,
-            this
-        )
+        val handlerCoroutine = PointerEventHandlerCoroutine(continuation, this)
         synchronized(pointerHandlers) {
             pointerHandlers += handlerCoroutine
 
@@ -374,14 +366,16 @@ internal class SuspendingPointerInputFilter(
      */
     private inner class PointerEventHandlerCoroutine<R>(
         private val completion: Continuation<R>,
-        override val currentPointers: List<PointerInputData>,
-        override val size: IntSize,
-        override val viewConfiguration: ViewConfiguration,
-        density: Density
-    ) : HandlePointerInputScope, Density by density, Continuation<R> {
+        private val pointerInputFilter: SuspendingPointerInputFilter,
+    ) : HandlePointerInputScope, Density by pointerInputFilter, Continuation<R> {
         private var pointerAwaiter: Continuation<PointerEvent>? = null
         private var customAwaiter: Continuation<CustomEvent>? = null
         private var awaitPass: PointerEventPass = PointerEventPass.Main
+
+        override val currentEvent: PointerEvent get() = pointerInputFilter.currentEvent!!
+        override val size: IntSize get() = pointerInputFilter.boundsSize
+        override val viewConfiguration: ViewConfiguration
+            get() = pointerInputFilter.viewConfiguration
 
         fun offerPointerEvent(event: PointerEvent, pass: PointerEventPass) {
             if (pass == awaitPass) {

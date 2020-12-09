@@ -1475,10 +1475,10 @@ package androidx.compose.ui.input.pointer {
   @androidx.compose.ui.gesture.ExperimentalPointerInput @kotlin.coroutines.RestrictsSuspension public interface HandlePointerInputScope extends androidx.compose.ui.unit.Density {
     method public suspend Object? awaitCustomEvent(optional androidx.compose.ui.input.pointer.PointerEventPass pass, optional kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.CustomEvent> p);
     method public suspend Object? awaitPointerEvent(optional androidx.compose.ui.input.pointer.PointerEventPass pass, optional kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerEvent> p);
-    method public java.util.List<androidx.compose.ui.input.pointer.PointerInputData> getCurrentPointers();
+    method public androidx.compose.ui.input.pointer.PointerEvent getCurrentEvent();
     method public long getSize-YbymL2g();
     method public androidx.compose.ui.platform.ViewConfiguration getViewConfiguration();
-    property public abstract java.util.List<androidx.compose.ui.input.pointer.PointerInputData> currentPointers;
+    property public abstract androidx.compose.ui.input.pointer.PointerEvent currentEvent;
     property public abstract long size;
     property public abstract androidx.compose.ui.platform.ViewConfiguration viewConfiguration;
   }

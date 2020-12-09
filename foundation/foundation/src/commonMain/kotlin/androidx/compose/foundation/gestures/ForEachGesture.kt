@@ -60,7 +60,8 @@ suspend fun PointerInputScope.forEachGesture(block: suspend PointerInputScope.()
  * if any of the pointers are down.
  */
 @ExperimentalPointerInput
-internal fun HandlePointerInputScope.allPointersUp(): Boolean = !currentPointers.fastAny { it.down }
+internal fun HandlePointerInputScope.allPointersUp(): Boolean =
+    !currentEvent.changes.fastAny { it.current.down }
 
 /**
  * Waits for all pointers to be up before returning.
