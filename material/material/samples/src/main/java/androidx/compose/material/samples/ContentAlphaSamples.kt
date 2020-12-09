@@ -27,16 +27,24 @@ import androidx.compose.runtime.Providers
 @Sampled
 @Composable
 fun ContentAlphaSample() {
+    // Note the alpha values listed below are the values for light theme. The values are slightly
+    // different in dark theme to provide proper contrast against the background.
     Column {
-        Text("No alpha applied - 100% opacity")
+        Text(
+            "No content alpha applied - uses the default content alpha set by MaterialTheme - " +
+                "87% alpha"
+        )
+        Providers(AmbientContentAlpha provides 1.00f) {
+            Text("1.00f alpha applied - 100% alpha")
+        }
         Providers(AmbientContentAlpha provides ContentAlpha.high) {
-            Text("High content alpha applied - 87% opacity")
+            Text("High content alpha applied - 87% alpha")
         }
         Providers(AmbientContentAlpha provides ContentAlpha.medium) {
-            Text("Medium content alpha applied - 60% opacity")
+            Text("Medium content alpha applied - 60% alpha")
         }
         Providers(AmbientContentAlpha provides ContentAlpha.disabled) {
-            Text("Disabled content alpha applied - 38% opacity")
+            Text("Disabled content alpha applied - 38% alpha")
         }
     }
 }
