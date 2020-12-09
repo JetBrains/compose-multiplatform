@@ -20,7 +20,6 @@ import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtraPropertiesExtension
 import java.io.File
-import java.util.Locale
 import java.util.Properties
 
 /**
@@ -76,16 +75,11 @@ fun Project.getSdkPath(): File {
         return getSdkPathFromEnvironmentVariable()
     }
 
-    val osName = System.getProperty("os.name").toLowerCase(Locale.US)
-    val isMacOsX = osName.contains("mac os x") ||
-        osName.contains("darwin") ||
-        osName.contains("osx")
-    val isWindows = osName.startsWith("win")
-
-    return if (isWindows) {
+    val os = getOperatingSystem()
+    return if (os == OperatingSystem.WINDOWS) {
         getSdkPathFromEnvironmentVariable()
     } else {
-        val platform = if (isMacOsX) "darwin" else "linux"
+        val platform = if (os == OperatingSystem.MAC) "darwin" else "linux"
 
         // By convention, the SDK prebuilts live under the root checkout directory.
         File(project.getCheckoutRoot(), "prebuilts/fullsdk-$platform")

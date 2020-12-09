@@ -16,6 +16,9 @@
 
 package androidx.build.dependencies
 
+import androidx.build.OperatingSystem
+import androidx.build.getOperatingSystem
+
 const val ANDROIDX_TEST_CORE = "androidx.test:core:1.3.0"
 const val ANDROIDX_TEST_EXT_JUNIT = "androidx.test.ext:junit:1.1.2"
 const val ANDROIDX_TEST_EXT_KTX = "androidx.test.ext:junit-ktx:1.1.2"
@@ -102,16 +105,15 @@ val SKIKO_MACOS_X64 = "org.jetbrains.skiko:skiko-jvm-runtime-macos-x64:$SKIKO_VE
 val SKIKO_MACOS_ARM64 = "org.jetbrains.skiko:skiko-jvm-runtime-macos-arm64:$SKIKO_VERSION"
 val SKIKO_WINDOWS_X64 = "org.jetbrains.skiko:skiko-jvm-runtime-windows-x64:$SKIKO_VERSION"
 val SKIKO_CURRENT_OS by lazy {
-    val os = System.getProperty("os.name")
+    val os = getOperatingSystem()
     val arch = System.getProperty("os.arch")
-    when {
-        os == "Mac OS X" -> when (arch) {
+    when (os) {
+        OperatingSystem.MAC -> when (arch) {
             "aarch64" -> SKIKO_MACOS_ARM64
             else -> SKIKO_MACOS_X64
         }
-        os.startsWith("Win") -> SKIKO_WINDOWS_X64
-        os.startsWith("Linux") -> SKIKO_LINUX_X64
-        else -> throw Error("Unsupported OS $os")
+        OperatingSystem.WINDOWS -> SKIKO_WINDOWS_X64
+        OperatingSystem.LINUX -> SKIKO_LINUX_X64
     }
 }
 const val TRUTH = "com.google.truth:truth:1.0.1"
