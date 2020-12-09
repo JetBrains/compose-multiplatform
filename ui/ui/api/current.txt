@@ -865,15 +865,6 @@ package androidx.compose.ui.hapticfeedback {
 
 package androidx.compose.ui.input.key {
 
-  @Deprecated public interface Alt {
-    method @Deprecated public boolean isLeftAltPressed();
-    method @Deprecated public default boolean isPressed();
-    method @Deprecated public boolean isRightAltPressed();
-    property public abstract boolean isLeftAltPressed;
-    property public default boolean isPressed;
-    property public abstract boolean isRightAltPressed;
-  }
-
   public final inline class Key {
     ctor public Key();
     method public static int constructor-impl(int keyCode);
@@ -1468,7 +1459,6 @@ package androidx.compose.ui.input.key {
   }
 
   public interface KeyEvent {
-    method @Deprecated public androidx.compose.ui.input.key.Alt getAlt();
     method public int getKey-EK5gGoQ();
     method public androidx.compose.ui.input.key.KeyEventType getType();
     method public int getUtf16CodePoint();
@@ -1476,7 +1466,6 @@ package androidx.compose.ui.input.key {
     method public boolean isCtrlPressed();
     method public boolean isMetaPressed();
     method public boolean isShiftPressed();
-    property @Deprecated public abstract androidx.compose.ui.input.key.Alt alt;
     property public abstract boolean isAltPressed;
     property public abstract boolean isCtrlPressed;
     property public abstract boolean isMetaPressed;
