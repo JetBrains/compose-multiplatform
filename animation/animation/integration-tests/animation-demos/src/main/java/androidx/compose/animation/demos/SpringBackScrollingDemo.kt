@@ -21,6 +21,8 @@ import androidx.compose.animation.core.ExponentialDecay
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.animateDecay
 import androidx.compose.animation.core.animateTo
+import androidx.compose.animation.core.isFinished
+import androidx.compose.animation.core.velocity
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.MutatorMutex
@@ -64,7 +66,6 @@ fun SpringBackScrollingDemo() {
 
         var scrollPosition by remember { mutableStateOf(0f) }
         val itemWidth = remember { mutableStateOf(0f) }
-        val isFlinging = remember { mutableStateOf(false) }
         val mutatorMutex = remember { MutatorMutex() }
         var animation by remember { mutableStateOf(AnimationState(scrollPosition)) }
 
@@ -91,31 +92,35 @@ fun SpringBackScrollingDemo() {
                     launch {
                         mutatorMutex.mutate {
                             animation = AnimationState(scrollPosition, velocity)
+                            val target = ExponentialDecay().getTarget(scrollPosition, velocity)
+                            val springBackTarget: Float = calculateSpringBackTarget(
+                                target,
+                                velocity,
+                                itemWidth.value
+                            )
+
                             animation.animateDecay(ExponentialDecay()) {
                                 scrollPosition = this.value
-
-                                val springBackTarget = calculateSpringBackTarget(
-                                    targetValue,
-                                    this.velocityVector.value, itemWidth.value
-                                )
-
                                 // Spring back as soon as the target position is crossed.
-                                if ((this.velocityVector.value > 0 && value > springBackTarget) ||
-                                    (this.velocityVector.value < 0 && value < springBackTarget)
+                                if ((this.velocity > 0 && value > springBackTarget) ||
+                                    (this.velocity < 0 && value < springBackTarget)
                                 ) {
                                     cancelAnimation()
-                                    launch {
-                                        animation.animateTo(
-                                            springBackTarget,
-                                            SpringSpec(
-                                                dampingRatio = 0.8f,
-                                                stiffness = 200f
-                                            ),
-                                            sequentialAnimation = true
-                                        ) {
-                                            scrollPosition = this.value
-                                        }
-                                    }
+                                }
+                            }
+
+                            // The previous animation is either finished or interrupted (via
+                            // cancelAnimation(). If interrupted, spring back.
+                            if (!animation.isFinished) {
+                                animation.animateTo(
+                                    springBackTarget,
+                                    SpringSpec(
+                                        dampingRatio = 0.8f,
+                                        stiffness = 200f
+                                    ),
+                                    sequentialAnimation = true
+                                ) {
+                                    scrollPosition = this.value
                                 }
                             }
                         }
@@ -125,9 +130,6 @@ fun SpringBackScrollingDemo() {
         }
         Canvas(gesture.fillMaxWidth().preferredHeight(400.dp)) {
             itemWidth.value = size.width / 2f
-            if (isFlinging.value) {
-                // Figure out what position to spring back to
-            }
             if (DEBUG) {
                 println(
                     "Anim, Spring back scrolling, redrawing with new" +
