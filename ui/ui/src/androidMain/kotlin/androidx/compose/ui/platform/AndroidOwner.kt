@@ -19,7 +19,6 @@ import android.content.res.Configuration
 import android.graphics.Canvas
 import android.view.View
 import androidx.annotation.RestrictTo
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.viewinterop.AndroidViewHolder
@@ -44,7 +43,6 @@ interface AndroidOwner : Owner {
      * to the hierarchy.
      */
     @OptIn(InternalInteropApi::class)
-    @ExperimentalLayoutNodeApi
     fun addAndroidView(view: AndroidViewHolder, layoutNode: LayoutNode)
 
     /**

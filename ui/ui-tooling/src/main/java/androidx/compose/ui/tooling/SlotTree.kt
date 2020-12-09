@@ -23,7 +23,6 @@ import androidx.compose.runtime.SlotReader
 import androidx.compose.runtime.SlotTable
 import androidx.compose.runtime.keySourceInfoOf
 import androidx.compose.ui.layout.globalPosition
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.ModifierInfo
 import androidx.compose.ui.unit.IntBounds
@@ -433,7 +432,7 @@ private fun sourceInformationContextOf(
 /**
  * Iterate the slot table and extract a group tree that corresponds to the content of the table.
  */
-@OptIn(ExperimentalLayoutNodeApi::class, InternalComposeApi::class)
+@OptIn(InternalComposeApi::class)
 private fun SlotReader.getGroup(parentContext: SourceInformationContext?): Group {
     val key = convertKey(groupKey)
     val groupData = groupAux
@@ -492,7 +491,6 @@ private fun SlotReader.getGroup(parentContext: SourceInformationContext?): Group
         )
 }
 
-@OptIn(ExperimentalLayoutNodeApi::class)
 private fun boundsOfLayoutNode(node: LayoutNode): IntBounds {
     if (node.owner == null) {
         return IntBounds(

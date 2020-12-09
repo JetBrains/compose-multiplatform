@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.input.pointer
 
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.util.fastForEach
@@ -24,7 +23,7 @@ import androidx.compose.ui.util.fastForEach
 /**
  * The core element that receives [PointerInputEvent]s and process them in Compose UI.
  */
-@OptIn(ExperimentalLayoutNodeApi::class, InternalCoreApi::class)
+@OptIn(InternalCoreApi::class)
 internal class PointerInputEventProcessor(val root: LayoutNode) {
 
     private val hitPathTracker = HitPathTracker()

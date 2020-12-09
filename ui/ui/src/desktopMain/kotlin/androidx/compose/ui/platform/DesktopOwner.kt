@@ -41,7 +41,6 @@ import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerMoveEventFilter
 import androidx.compose.ui.layout.RootMeasureBlocks
 import androidx.compose.ui.layout.globalBounds
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.MeasureAndLayoutDelegate
@@ -60,7 +59,6 @@ import androidx.compose.ui.unit.LayoutDirection
 @OptIn(
     ExperimentalFocus::class,
     ExperimentalKeyInput::class,
-    ExperimentalLayoutNodeApi::class,
     ExperimentalComposeApi::class,
     InternalCoreApi::class
 )

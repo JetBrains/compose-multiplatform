@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.layout
 
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import org.junit.Test
@@ -26,7 +25,6 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class AlignmentLineTest {
     @Test
-    @OptIn(ExperimentalLayoutNodeApi::class)
     fun queryingLinesOfUnmeasuredChild() {
         val root = root {
             queryAlignmentLineDuringMeasure()

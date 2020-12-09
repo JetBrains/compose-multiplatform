@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 
-@OptIn(ExperimentalLayoutNodeApi::class)
 internal class OuterMeasurablePlaceable(
     private val layoutNode: LayoutNode,
     var outerWrapper: LayoutNodeWrapper

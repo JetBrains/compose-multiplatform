@@ -19,10 +19,8 @@ package androidx.compose.ui.platform
 
 import androidx.compose.runtime.AbstractApplier
 import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
 
-@OptIn(ExperimentalLayoutNodeApi::class)
 internal class DesktopUiApplier(
     root: LayoutNode
 ) : AbstractApplier<LayoutNode>(root) {

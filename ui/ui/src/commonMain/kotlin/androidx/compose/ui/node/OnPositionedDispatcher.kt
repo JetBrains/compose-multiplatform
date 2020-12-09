@@ -23,7 +23,6 @@ import androidx.compose.ui.util.identityHashCode
  * Tracks the nodes being positioned and dispatches OnPositioned callbacks when we finished
  * the measure/layout pass.
  */
-@OptIn(ExperimentalLayoutNodeApi::class)
 internal class OnPositionedDispatcher {
     private val layoutNodes = mutableVectorOf<LayoutNode>()
 

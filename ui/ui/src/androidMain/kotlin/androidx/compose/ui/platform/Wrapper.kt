@@ -35,7 +35,6 @@ import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.tooling.InspectionTables
 import androidx.compose.ui.R
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.UiApplier
 import androidx.lifecycle.Lifecycle
@@ -111,7 +110,7 @@ fun Activity.setViewContent(composable: @Composable () -> Unit): Composition {
 // nextFrame() inside recompose() doesn't really start a new frame, but a new subframe
 // instead.
 @MainThread
-@OptIn(ExperimentalComposeApi::class, ExperimentalLayoutNodeApi::class)
+@OptIn(ExperimentalComposeApi::class)
 internal actual fun actualSubcomposeInto(
     container: LayoutNode,
     parent: CompositionReference,

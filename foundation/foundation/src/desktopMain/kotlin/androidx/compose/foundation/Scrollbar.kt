@@ -42,7 +42,6 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.MeasuringIntrinsicsMeasureBlocks
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
@@ -169,7 +168,6 @@ fun HorizontalScrollbar(
 
 // TODO(demin): do we need to stop dragging if cursor is beyond constraints?
 // TODO(demin): add Interaction.Hovered to interactionState
-@OptIn(ExperimentalLayoutNodeApi::class)
 @Composable
 private fun Scrollbar(
     adapter: ScrollbarAdapter,

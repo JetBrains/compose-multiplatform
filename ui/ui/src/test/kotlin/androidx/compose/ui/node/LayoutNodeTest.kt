@@ -66,7 +66,6 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
-@OptIn(ExperimentalLayoutNodeApi::class)
 class LayoutNodeTest {
     @get:Rule
     val thrown = ExpectedException.none()!!
@@ -1657,7 +1656,6 @@ class LayoutNodeTest {
 
 @OptIn(
     ExperimentalFocus::class,
-    ExperimentalLayoutNodeApi::class,
     InternalCoreApi::class
 )
 private class MockOwner(
@@ -1781,7 +1779,6 @@ private class MockOwner(
         get() = TODO("Not yet implemented")
 }
 
-@OptIn(ExperimentalLayoutNodeApi::class)
 fun LayoutNode(x: Int, y: Int, x2: Int, y2: Int, modifier: Modifier = Modifier) =
     LayoutNode().apply {
         this.modifier = modifier

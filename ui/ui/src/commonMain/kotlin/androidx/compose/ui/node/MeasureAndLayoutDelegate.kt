@@ -36,7 +36,6 @@ import androidx.compose.ui.util.fastForEach
  * dispatch [OnPositionedModifier] callbacks for the nodes affected by the previous
  * [measureAndLayout] execution.
  */
-@OptIn(ExperimentalLayoutNodeApi::class)
 internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
     /**
      * LayoutNodes that need measure or layout.

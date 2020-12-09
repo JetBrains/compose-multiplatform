@@ -40,7 +40,6 @@ private class Stack<T> {
     fun clear() = backing.clear()
 }
 
-@OptIn(ExperimentalLayoutNodeApi::class)
 class UiApplier(
     private val root: Any
 ) : Applier<Any> {

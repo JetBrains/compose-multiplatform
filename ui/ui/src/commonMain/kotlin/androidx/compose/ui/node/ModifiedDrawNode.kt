@@ -23,7 +23,6 @@ import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.unit.toSize
 
-@OptIn(ExperimentalLayoutNodeApi::class)
 internal class ModifiedDrawNode(
     wrapped: LayoutNodeWrapper,
     drawModifier: DrawModifier

@@ -17,7 +17,6 @@
 package androidx.compose.ui.test.junit4
 
 import android.annotation.SuppressLint
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.platform.AndroidOwner
 import androidx.compose.ui.semantics.SemanticsNode
@@ -34,8 +33,7 @@ internal class AndroidTestOwner(
 
     @SuppressLint("DocumentExceptions")
     override fun sendTextInputCommand(node: SemanticsNode, command: List<EditOperation>) {
-        @OptIn(ExperimentalLayoutNodeApi::class)
-        val owner = node.componentNode.owner as AndroidOwner
+        val owner = node.layoutNode.owner as AndroidOwner
 
         @Suppress("DEPRECATION")
         runOnUiThread {
@@ -48,8 +46,7 @@ internal class AndroidTestOwner(
 
     @SuppressLint("DocumentExceptions")
     override fun sendImeAction(node: SemanticsNode, actionSpecified: ImeAction) {
-        @OptIn(ExperimentalLayoutNodeApi::class)
-        val owner = node.componentNode.owner as AndroidOwner
+        val owner = node.layoutNode.owner as AndroidOwner
 
         @Suppress("DEPRECATION")
         runOnUiThread {

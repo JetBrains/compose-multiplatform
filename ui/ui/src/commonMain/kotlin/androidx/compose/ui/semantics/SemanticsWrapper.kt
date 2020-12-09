@@ -17,10 +17,8 @@
 package androidx.compose.ui.semantics
 
 import androidx.compose.ui.node.DelegatingLayoutNodeWrapper
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNodeWrapper
 
-@OptIn(ExperimentalLayoutNodeApi::class)
 internal class SemanticsWrapper(
     wrapped: LayoutNodeWrapper,
     semanticsModifier: SemanticsModifier
