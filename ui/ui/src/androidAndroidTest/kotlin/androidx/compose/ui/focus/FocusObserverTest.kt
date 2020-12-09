@@ -68,8 +68,7 @@ class FocusObserverTest {
     fun activeParent_requestFocus() {
         // Arrange.
         lateinit var focusState: FocusState
-        val focusRequester = FocusRequester()
-        val childFocusRequester = FocusRequester()
+        val (focusRequester, childFocusRequester) = FocusRequester.createRefs()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
