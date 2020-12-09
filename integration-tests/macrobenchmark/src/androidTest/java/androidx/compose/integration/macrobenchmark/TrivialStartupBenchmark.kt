@@ -32,7 +32,7 @@ class TrivialStartupBenchmark(private val startupMode: StartupMode) {
 
     @Test
     fun startup() = benchmarkRule.measureStartup(
-        profileCompiled = false,
+        profileCompiled = true,
         startupMode = startupMode
     ) {
         action = "androidx.compose.integration.macrobenchmark.target.TRIVIAL_STARTUP_ACTIVITY"
