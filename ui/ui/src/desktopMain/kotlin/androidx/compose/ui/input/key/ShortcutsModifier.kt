@@ -129,14 +129,14 @@ internal class ShortcutsInstance(
 /**
  * [KeyEvent] handler which tracks pressed keys and triggers matched callbacks
  *
- * @see [keyInputFilter]
+ * @see [onKeyEvent]
  * @see [androidx.compose.ui.platform.Keyboard] to define window-scoped shortcuts
  */
 @Composable
 fun Modifier.shortcuts(builder: (ShortcutsBuilderScope).() -> Unit) = composed {
     val instance = remember { ShortcutsInstance() }
     instance.handlers = ShortcutsBuilderScope().also(builder).handlers
-    keyInputFilter(instance::process)
+    onKeyEvent(instance::process)
 }
 
 class ShortcutsBuilderScope {

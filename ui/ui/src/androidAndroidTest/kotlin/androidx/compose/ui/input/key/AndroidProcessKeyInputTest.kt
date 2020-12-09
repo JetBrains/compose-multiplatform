@@ -67,7 +67,7 @@ class AndroidProcessKeyInputTest(val keyEventAction: Int) {
                 modifier = Modifier
                     .focusRequester(focusRequester)
                     .focus()
-                    .keyInputFilter {
+                    .onKeyEvent {
                         receivedKeyEvent = it
                         true
                     }

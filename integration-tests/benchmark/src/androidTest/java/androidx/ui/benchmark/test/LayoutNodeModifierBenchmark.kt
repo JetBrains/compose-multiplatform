@@ -26,7 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.gesture.pressIndicatorGestureFilter
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.key.keyInputFilter
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.layout.TestModifierUpdater
 import androidx.compose.ui.layout.TestModifierUpdaterLayout
 import androidx.compose.ui.layout.layoutId
@@ -75,7 +75,7 @@ class LayoutNodeModifierBenchmark(
             Modifier.padding(10.dp),
             Modifier.drawBehind { },
             Modifier.graphicsLayer(),
-            Modifier.keyInputFilter { _ -> true },
+            Modifier.onKeyEvent { true },
             Modifier.semantics { },
             Modifier.pressIndicatorGestureFilter(),
             Modifier.layoutId("Hello"),
