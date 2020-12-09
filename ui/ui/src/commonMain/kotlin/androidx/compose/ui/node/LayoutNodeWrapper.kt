@@ -24,6 +24,7 @@ import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.toRect
+import androidx.compose.ui.gesture.nestedscroll.NestedScrollDelegatingWrapper
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.graphics.Matrix
@@ -109,9 +110,10 @@ internal abstract class LayoutNodeWrapper(
     var isShallowPlacing = false
 
     private var _rectCache: MutableRect? = null
-    private val rectCache: MutableRect get() = _rectCache ?: MutableRect(0f, 0f, 0f, 0f).also {
-        _rectCache = it
-    }
+    private val rectCache: MutableRect
+        get() = _rectCache ?: MutableRect(0f, 0f, 0f, 0f).also {
+            _rectCache = it
+        }
 
     private val snapshotObserver get() = layoutNode.requireOwner().snapshotObserver
 
@@ -499,14 +501,40 @@ internal abstract class LayoutNodeWrapper(
     }
 
     /**
+     * Returns the first [NestedScrollDelegatingWrapper] in the wrapper list that wraps this
+     * [LayoutNodeWrapper].
+     *
+     * Note: This method tried to find [NestedScrollDelegatingWrapper] in the
+     * modifiers before the one wrapped with this [LayoutNodeWrapper] and goes up the hierarchy of
+     * [LayoutNode]s if needed.
+     */
+    abstract fun findPreviousNestedScrollWrapper(): NestedScrollDelegatingWrapper?
+
+    /**
+     * Returns the first [NestedScrollDelegatingWrapper] in the wrapper list that is wrapped by this
+     * [LayoutNodeWrapper].
+     *
+     * Note: This method only goes to the modifiers that follow the one wrapped by
+     * this [LayoutNodeWrapper], it doesn't to the children [LayoutNode]s.
+     */
+    abstract fun findNextNestedScrollWrapper(): NestedScrollDelegatingWrapper?
+
+    /**
      * Returns the first [focus node][ModifiedFocusNode] in the wrapper list that wraps this
      * [LayoutNodeWrapper].
+     *
+     * Note: This method tried to find [NestedScrollDelegatingWrapper] in the
+     * modifiers before the one wrapped with this [LayoutNodeWrapper] and goes up the hierarchy of
+     * [LayoutNode]s if needed.
      */
     abstract fun findPreviousFocusWrapper(): ModifiedFocusNode?
 
     /**
      * Returns the next [focus node][ModifiedFocusNode] in the wrapper list that is wrapped by
      * this [LayoutNodeWrapper].
+     *
+     * Note: This method only goes to the modifiers that follow the one wrapped by
+     * this [LayoutNodeWrapper], it doesn't to the children [LayoutNode]s.
      */
     abstract fun findNextFocusWrapper(): ModifiedFocusNode?
 
@@ -573,12 +601,19 @@ internal abstract class LayoutNodeWrapper(
     /**
      * Returns the first [ModifiedKeyInputNode] in the wrapper list that wraps this
      * [LayoutNodeWrapper].
+     *
+     * Note: This method tried to find [NestedScrollDelegatingWrapper] in the
+     * modifiers before the one wrapped with this [LayoutNodeWrapper] and goes up the hierarchy of
+     * [LayoutNode]s if needed.
      */
     abstract fun findPreviousKeyInputWrapper(): ModifiedKeyInputNode?
 
     /**
      * Returns the next [ModifiedKeyInputNode] in the wrapper list that is wrapped by this
      * [LayoutNodeWrapper].
+     *
+     * Note: This method only goes to the modifiers that follow the one wrapped by
+     * this [LayoutNodeWrapper], it doesn't to the children [LayoutNode]s.
      */
     abstract fun findNextKeyInputWrapper(): ModifiedKeyInputNode?
 

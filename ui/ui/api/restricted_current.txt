@@ -517,6 +517,37 @@ package androidx.compose.ui.gesture.customevents {
 
 }
 
+package androidx.compose.ui.gesture.nestedscroll {
+
+  public interface NestedScrollConnection {
+    method public default void onPostFling-Pv53iXo(long consumed, long available, kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.Velocity,kotlin.Unit> onFinished);
+    method public default long onPostScroll-l-UAZDg(long consumed, long available, androidx.compose.ui.gesture.nestedscroll.NestedScrollSource source);
+    method public default long onPreFling-TH1AsA0(long available);
+    method public default long onPreScroll-vG6bCaM(long available, androidx.compose.ui.gesture.nestedscroll.NestedScrollSource source);
+  }
+
+  public final class NestedScrollDelegatingWrapperKt {
+  }
+
+  public final class NestedScrollDispatcher {
+    ctor public NestedScrollDispatcher();
+    method public void dispatchPostFling-uYzo7IE(long consumed, long available);
+    method public long dispatchPostScroll-l-UAZDg(long consumed, long available, androidx.compose.ui.gesture.nestedscroll.NestedScrollSource source);
+    method public long dispatchPreFling-TH1AsA0(long available);
+    method public long dispatchPreScroll-vG6bCaM(long available, androidx.compose.ui.gesture.nestedscroll.NestedScrollSource source);
+  }
+
+  public final class NestedScrollModifierKt {
+    method public static androidx.compose.ui.Modifier nestedScroll(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.nestedscroll.NestedScrollConnection connection, optional androidx.compose.ui.gesture.nestedscroll.NestedScrollDispatcher? dispatcher);
+  }
+
+  public enum NestedScrollSource {
+    enum_constant public static final androidx.compose.ui.gesture.nestedscroll.NestedScrollSource Drag;
+    enum_constant public static final androidx.compose.ui.gesture.nestedscroll.NestedScrollSource Fling;
+  }
+
+}
+
 package androidx.compose.ui.gesture.scrollorientationlocking {
 
   public enum Orientation {
