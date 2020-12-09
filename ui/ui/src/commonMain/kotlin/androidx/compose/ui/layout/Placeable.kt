@@ -51,7 +51,7 @@ abstract class Placeable {
 
     /**
      * Returns the position of an [alignment line][AlignmentLine],
-     * or `null` if the line is not provided.
+     * or [AlignmentLine.Unspecified] if the line is not provided.
      */
     abstract operator fun get(line: AlignmentLine): Int
 
