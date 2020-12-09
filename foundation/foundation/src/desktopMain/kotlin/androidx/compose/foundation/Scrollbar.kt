@@ -390,19 +390,26 @@ private class LazyScrollbarAdapter(
     private val itemCount: Int,
     private val averageItemSize: Float
 ) : ScrollbarAdapter {
+    init {
+        require(itemCount >= 0f) { "itemCount should be non-negative ($itemCount)" }
+        require(averageItemSize > 0f) { "averageItemSize should be positive ($averageItemSize)" }
+    }
+
     override val scrollOffset: Float
         get() = scrollState.firstVisibleItemIndex * averageItemSize +
             scrollState.firstVisibleItemScrollOffset
 
     override suspend fun scrollTo(containerSize: Int, scrollOffset: Float) {
-        val index = (scrollOffset / averageItemSize)
+        val scrollOffsetCoerced = scrollOffset.coerceIn(0f, maxScrollOffset(containerSize))
+
+        val index = (scrollOffsetCoerced / averageItemSize)
             .toInt()
             .coerceAtLeast(0)
             .coerceAtMost(itemCount - 1)
 
         scrollState.snapToItemIndex(
             index = index,
-            scrollOffset = (scrollOffset - index * averageItemSize).toInt()
+            scrollOffset = (scrollOffsetCoerced - index * averageItemSize).toInt()
         )
     }
 
