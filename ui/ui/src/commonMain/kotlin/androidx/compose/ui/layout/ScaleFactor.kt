@@ -19,8 +19,8 @@ package androidx.compose.ui.layout
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.util.format
 import androidx.compose.ui.util.packFloats
-import androidx.compose.ui.util.toStringAsFixed
 import androidx.compose.ui.util.unpackFloat1
 import androidx.compose.ui.util.unpackFloat2
 
@@ -95,8 +95,7 @@ inline class ScaleFactor(@PublishedApi internal val packedValue: Long) {
     @Stable
     operator fun div(operand: Float) = ScaleFactor(scaleX / operand, scaleY / operand)
 
-    override fun toString() = "ScaleFactor(${scaleX.toStringAsFixed(1)}, " +
-        "${scaleY.toStringAsFixed(1)})"
+    override fun toString() = "ScaleFactor(${"%.1f".format(scaleX)}, ${"%.1f".format(scaleY)})"
 
     companion object {
 

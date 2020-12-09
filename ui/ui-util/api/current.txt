@@ -23,10 +23,6 @@ package androidx.compose.ui.util {
     method public static int findPrecedingBreak(String, int index);
   }
 
-  public final class JvmMathHelpersKt {
-    method public static String toStringAsFixed(float, int digits);
-  }
-
   public final class JvmMiscHelpersKt {
     method public static StringBuilder deleteAt(StringBuilder, int index);
     method public static String format(String, java.lang.Object?... args);

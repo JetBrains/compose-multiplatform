@@ -20,7 +20,6 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.util.lerp
 import androidx.compose.ui.util.packFloats
-import androidx.compose.ui.util.toStringAsFixed
 import androidx.compose.ui.util.unpackFloat1
 import androidx.compose.ui.util.unpackFloat2
 import kotlin.math.sqrt
