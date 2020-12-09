@@ -28,7 +28,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offsetPx
+import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.Saver
@@ -230,7 +230,7 @@ fun ModalBottomSheetLayout(
         Surface(
             Modifier
                 .fillMaxWidth()
-                .offsetPx(y = sheetState.offset),
+                .offset(y = { sheetState.offset.value }),
             shape = sheetShape,
             elevation = sheetElevation,
             color = sheetBackgroundColor,

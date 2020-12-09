@@ -24,7 +24,7 @@ import androidx.compose.foundation.indication
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offsetPx
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -168,7 +168,7 @@ private fun BoxScope.SwitchImpl(
         elevation = elevation,
         modifier = Modifier
             .align(Alignment.CenterStart)
-            .offsetPx(x = thumbValue)
+            .offset(x = { thumbValue.value })
             .indication(
                 interactionState = interactionState,
                 indication = rememberRippleIndication(bounded = false, radius = ThumbRippleRadius)

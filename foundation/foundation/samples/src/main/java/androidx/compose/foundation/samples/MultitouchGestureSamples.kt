@@ -28,7 +28,7 @@ import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offsetPx
+import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,7 +51,7 @@ fun DetectMultitouchGestures() {
     val offsetX = remember { mutableStateOf(0f) }
     val offsetY = remember { mutableStateOf(0f) }
     Box(
-        Modifier.offsetPx(offsetX, offsetY)
+        Modifier.offset({ offsetX.value }, { offsetY.value })
             .drawLayer(
                 scaleX = zoom,
                 scaleY = zoom,
@@ -128,7 +128,7 @@ fun CalculatePan() {
     val offsetY = remember { mutableStateOf(0f) }
     Box(
         Modifier
-            .offsetPx(offsetX, offsetY)
+            .offset({ offsetX.value }, { offsetY.value })
             .drawLayer()
             .background(Color.Blue)
             .pointerInput {
