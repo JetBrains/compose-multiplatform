@@ -144,7 +144,7 @@ class MenuTest {
         )
 
         assertThat(ltrPosition.x).isEqualTo(
-            anchorPosition.x + anchorSize.width + offsetX
+            anchorPosition.x + offsetX
         )
         assertThat(ltrPosition.y).isEqualTo(
             anchorPosition.y + anchorSize.height + offsetY
@@ -161,7 +161,7 @@ class MenuTest {
         )
 
         assertThat(rtlPosition.x).isEqualTo(
-            anchorPosition.x - popupSize.width - offsetX
+            anchorPosition.x + anchorSize.width - offsetX - popupSize.width
         )
         assertThat(rtlPosition.y).isEqualTo(
             anchorPosition.y + anchorSize.height + offsetY
@@ -192,7 +192,7 @@ class MenuTest {
         )
 
         assertThat(ltrPosition.x).isEqualTo(
-            anchorPosition.x - popupSize.width - offsetX
+            anchorPosition.x + anchorSize.width - offsetX - popupSize.width
         )
         assertThat(ltrPosition.y).isEqualTo(
             anchorPosition.y - popupSize.height - offsetY
@@ -209,7 +209,7 @@ class MenuTest {
         )
 
         assertThat(rtlPosition.x).isEqualTo(
-            anchorPositionRtl.x + anchorSize.width + offsetX
+            anchorPositionRtl.x + offsetX
         )
         assertThat(rtlPosition.y).isEqualTo(
             anchorPositionRtl.y - popupSize.height - offsetY
@@ -275,9 +275,9 @@ class MenuTest {
         assertThat(obtainedParentBounds).isEqualTo(IntBounds(anchorPosition, anchorSize))
         assertThat(obtainedMenuBounds).isEqualTo(
             IntBounds(
-                anchorPosition.x + anchorSize.width + offsetX,
+                anchorPosition.x + offsetX,
                 anchorPosition.y + anchorSize.height + offsetY,
-                anchorPosition.x + anchorSize.width + offsetX + popupSize.width,
+                anchorPosition.x + offsetX + popupSize.width,
                 anchorPosition.y + anchorSize.height + offsetY + popupSize.height
             )
         )
