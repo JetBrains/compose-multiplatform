@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.foundation.layout
 
 import androidx.compose.runtime.Composable
@@ -34,10 +36,6 @@ import kotlin.math.max
  *
  * Note that just like [Row], flex values cannot be used with [FlowRow].
  *
- * Example usage:
- *
- * @sample androidx.compose.foundation.layout.samples.SimpleFlowRow
- *
  * @param mainAxisSize The size of the layout in the main axis direction.
  * @param mainAxisAlignment The alignment of each row's children in the main axis direction.
  * @param mainAxisSpacing The main axis spacing between the children of each row.
@@ -47,6 +45,7 @@ import kotlin.math.max
  */
 @ExperimentalLayout
 @Composable
+@Deprecated("FlowRow is deprecated and will be removed. Replace it with a custom layout.")
 fun FlowRow(
     mainAxisSize: SizeMode = SizeMode.Wrap,
     mainAxisAlignment: FlowMainAxisAlignment = FlowMainAxisAlignment.Start,
@@ -74,10 +73,6 @@ fun FlowRow(
  *
  * Note that just like [Column], flex values cannot be used with [FlowColumn].
  *
- * Example usage:
- *
- * @sample androidx.compose.foundation.layout.samples.SimpleFlowColumn
- *
  * @param mainAxisSize The size of the layout in the main axis direction.
  * @param mainAxisAlignment The alignment of each column's children in the main axis direction.
  * @param mainAxisSpacing The main axis spacing between the children of each column.
@@ -87,6 +82,7 @@ fun FlowRow(
  */
 @ExperimentalLayout
 @Composable
+@Deprecated("FlowColumn is deprecated and will be removed. Replace it with a custom layout.")
 fun FlowColumn(
     mainAxisSize: SizeMode = SizeMode.Wrap,
     mainAxisAlignment: FlowMainAxisAlignment = FlowMainAxisAlignment.Start,
@@ -111,6 +107,7 @@ fun FlowColumn(
 /**
  * Used to specify the alignment of a layout's children, in cross axis direction.
  */
+@Deprecated("Flow layouts are deprecated and will be removed. Replace them with a custom layout.")
 enum class FlowCrossAxisAlignment {
     /**
      * Place children such that their center is in the middle of the cross axis.
@@ -126,6 +123,7 @@ enum class FlowCrossAxisAlignment {
     End,
 }
 
+@Deprecated("Flow layouts are deprecated and will be removed. Replace them with a custom layout.")
 typealias FlowMainAxisAlignment = MainAxisAlignment
 
 /**

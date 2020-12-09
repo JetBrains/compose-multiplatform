@@ -90,6 +90,7 @@ fun AlertDialog(
             // TODO: move the modifiers to FlowRow when it supports a modifier parameter
             Box(Modifier.fillMaxWidth().padding(all = 8.dp)) {
                 @OptIn(ExperimentalLayout::class)
+                @Suppress("DEPRECATION")
                 FlowRow(
                     mainAxisSize = SizeMode.Expand,
                     mainAxisAlignment = MainAxisAlignment.End,
