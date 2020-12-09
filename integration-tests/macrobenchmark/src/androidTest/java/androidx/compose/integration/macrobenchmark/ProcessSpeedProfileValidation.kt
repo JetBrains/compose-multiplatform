@@ -21,7 +21,7 @@ import androidx.benchmark.macro.MacrobenchmarkConfig
 import androidx.benchmark.macro.MacrobenchmarkRule
 import androidx.benchmark.macro.StartupTimingMetric
 import androidx.test.filters.LargeTest
-import org.junit.Ignore
+import androidx.test.filters.SdkSuppress
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,6 +31,7 @@ import org.junit.runners.Parameterized
  * Macrobenchmark used for local validation of performance numbers coming from MacrobenchmarkRule.
  */
 @LargeTest
+@SdkSuppress(minSdkVersion = 29)
 @RunWith(Parameterized::class)
 class ProcessSpeedProfileValidation(
     private val compilationMode: CompilationMode,
@@ -40,7 +41,6 @@ class ProcessSpeedProfileValidation(
     val benchmarkRule = MacrobenchmarkRule()
 
     @Test
-    @Ignore("Not running the test in CI")
     fun start() {
         val config = MacrobenchmarkConfig(
             packageName = PACKAGE_NAME,
