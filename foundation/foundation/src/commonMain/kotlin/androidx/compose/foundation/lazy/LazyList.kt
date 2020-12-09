@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.lazy
 
+import androidx.compose.foundation.assertNotNestingScrollableContainers
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -28,6 +29,9 @@ import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.constrainHeight
+import androidx.compose.ui.unit.constrainWidth
+import androidx.compose.ui.util.fastForEach
 
 @Composable
 internal fun LazyList(
@@ -59,19 +63,57 @@ internal fun LazyList(
             .padding(contentPadding)
             .then(state.remeasurementModifier)
     ) { constraints ->
+        constraints.assertNotNestingScrollableContainers(isVertical)
+
         // this will update the scope object if the constrains have been changed
         cachingItemContentFactory.updateItemScope(this, constraints)
 
-        state.measure(
-            this,
+        val startContentPaddingPx = startContentPadding.toIntPx()
+        val endContentPaddingPx = endContentPadding.toIntPx()
+        val mainAxisMaxSize = (if (isVertical) constraints.maxHeight else constraints.maxWidth)
+
+        val itemProvider = LazyMeasuredItemProvider(
             constraints,
             isVertical,
-            horizontalAlignment,
-            verticalAlignment,
-            startContentPadding.toIntPx(),
-            endContentPadding.toIntPx(),
-            itemsCount,
+            this,
             cachingItemContentFactory
+        ) { placeables ->
+            LazyMeasuredItem(
+                placeables = placeables,
+                isVertical = isVertical,
+                horizontalAlignment = horizontalAlignment,
+                verticalAlignment = verticalAlignment,
+                layoutDirection = layoutDirection,
+                startContentPadding = startContentPaddingPx,
+                endContentPadding = endContentPaddingPx
+            )
+        }
+
+        val measureResult = measureLazyList(
+            itemsCount,
+            itemProvider,
+            mainAxisMaxSize,
+            startContentPaddingPx,
+            endContentPaddingPx,
+            state.firstVisibleItemIndexNonObservable,
+            state.firstVisibleItemScrollOffsetNonObservable,
+            state.scrollToBeConsumed
         )
+
+        state.applyMeasureResult(measureResult)
+
+        val layoutWidth = constraints.constrainWidth(
+            if (isVertical) measureResult.crossAxisSize else measureResult.mainAxisSize
+        )
+        val layoutHeight = constraints.constrainHeight(
+            if (isVertical) measureResult.mainAxisSize else measureResult.crossAxisSize
+        )
+        layout(layoutWidth, layoutHeight) {
+            var currentMainAxis = measureResult.itemsScrollOffset
+            measureResult.items.fastForEach {
+                it.place(this, layoutWidth, layoutHeight, currentMainAxis)
+                currentMainAxis += it.mainAxisSize
+            }
+        }
     }
 }

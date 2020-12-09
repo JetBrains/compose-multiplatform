@@ -343,6 +343,9 @@ package androidx.compose.foundation.lazy {
   public final class LazyListKt {
   }
 
+  public final class LazyListMeasureKt {
+  }
+
   public interface LazyListScope {
     method public void item(kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyItemScope,kotlin.Unit> content);
     method public <T> void items(java.util.List<? extends T> items, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyItemScope,? super T,kotlin.Unit> itemContent);

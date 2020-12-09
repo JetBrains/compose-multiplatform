@@ -18,6 +18,7 @@ package androidx.compose.foundation.lazy
 
 import androidx.compose.animation.core.ExponentialDecay
 import androidx.compose.animation.core.ManualAnimationClock
+import androidx.compose.animation.core.snap
 import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -1040,8 +1041,71 @@ class LazyColumnForTest {
         }
     }
 
+    @Test
+    fun notVisibleAnymoreItemNotAffectingCrossAxisSize() {
+        val items = (0..1).toList()
+        val itemSize = with(rule.density) { 30.toDp() }
+        val itemSizeMinusOne = with(rule.density) { 29.toDp() }
+        lateinit var state: LazyListState
+        rule.setContent {
+            LazyColumnFor(
+                items = items,
+                state = rememberLazyListState().also { state = it },
+                modifier = Modifier.height(itemSizeMinusOne).testTag(LazyColumnForTag)
+            ) {
+                Spacer(
+                    if (it == 0) {
+                        Modifier.width(30.dp).height(itemSizeMinusOne)
+                    } else {
+                        Modifier.width(20.dp).height(itemSize)
+                    }
+                )
+            }
+        }
+
+        state.scrollBy(itemSize)
+
+        rule.onNodeWithTag(LazyColumnForTag)
+            .assertWidthIsEqualTo(20.dp)
+    }
+
+    @Test
+    fun itemStillVisibleAfterOverscrollIsAffectingCrossAxisSize() {
+        val items = (0..2).toList()
+        val itemSize = with(rule.density) { 30.toDp() }
+        lateinit var state: LazyListState
+        rule.setContent {
+            LazyColumnFor(
+                items = items,
+                state = rememberLazyListState().also { state = it },
+                modifier = Modifier.height(itemSize * 1.75f).testTag(LazyColumnForTag)
+            ) {
+                Spacer(
+                    if (it == 0) {
+                        Modifier.width(30.dp).height(itemSize / 2)
+                    } else if (it == 1) {
+                        Modifier.width(20.dp).height(itemSize / 2)
+                    } else {
+                        Modifier.width(20.dp).height(itemSize)
+                    }
+                )
+            }
+        }
+
+        state.scrollBy(itemSize)
+
+        rule.onNodeWithTag(LazyColumnForTag)
+            .assertWidthIsEqualTo(30.dp)
+    }
+
     private fun SemanticsNodeInteraction.assertTopPositionIsAlmost(expected: Dp) {
         getUnclippedBoundsInRoot().top.assertIsEqualTo(expected, tolerance = 1.dp)
+    }
+
+    private fun LazyListState.scrollBy(offset: Dp) {
+        runBlocking {
+            smoothScrollBy(with(rule.density) { offset.toIntPx().toFloat() }, snap())
+        }
     }
 }
 
