@@ -24,7 +24,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material.TabConstants.defaultTabIndicatorOffset
+import androidx.compose.material.TabDefaults.tabIndicatorOffset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.remember
@@ -69,7 +69,7 @@ import androidx.compose.ui.util.fastMaxBy
  *
  * @sample androidx.compose.material.samples.FancyIndicator
  *
- * We can reuse [TabConstants.defaultTabIndicatorOffset] and just provide this indicator,
+ * We can reuse [TabDefaults.tabIndicatorOffset] and just provide this indicator,
  * as we aren't changing how the size and position of the indicator changes between tabs:
  *
  * @sample androidx.compose.material.samples.FancyIndicatorTabs
@@ -96,9 +96,9 @@ import androidx.compose.ui.util.fastMaxBy
  * Defaults to either the matching `onFoo` color for [backgroundColor], or if [backgroundColor] is
  * not a color from the theme, this will keep the same value set above this TabRow.
  * @param indicator the indicator that represents which tab is currently selected. By default this
- * will be a [TabConstants.DefaultIndicator], using a [TabConstants.defaultTabIndicatorOffset]
+ * will be a [TabDefaults.Indicator], using a [TabDefaults.tabIndicatorOffset]
  * modifier to animate its position. Note that this indicator will be forced to fill up the
- * entire TabRow, so you should use [TabConstants.defaultTabIndicatorOffset] or similar to
+ * entire TabRow, so you should use [TabDefaults.tabIndicatorOffset] or similar to
  * animate the actual drawn indicator inside this space, and provide an offset from the start.
  * @param divider the divider displayed at the bottom of the TabRow. This provides a layer of
  * separation between the TabRow and the content displayed underneath.
@@ -113,12 +113,12 @@ fun TabRow(
     backgroundColor: Color = MaterialTheme.colors.primarySurface,
     contentColor: Color = contentColorFor(backgroundColor),
     indicator: @Composable (tabPositions: List<TabPosition>) -> Unit = { tabPositions ->
-        TabConstants.DefaultIndicator(
-            Modifier.defaultTabIndicatorOffset(tabPositions[selectedTabIndex])
+        TabDefaults.Indicator(
+            Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex])
         )
     },
     divider: @Composable () -> Unit = {
-        TabConstants.DefaultDivider()
+        TabDefaults.Divider()
     },
     tabs: @Composable () -> Unit
 ) {
@@ -176,9 +176,9 @@ fun TabRow(
  * the tabs inside the ScrollableTabRow. This padding helps inform the user that this tab row can
  * be scrolled, unlike a [TabRow].
  * @param indicator the indicator that represents which tab is currently selected. By default this
- * will be a [TabConstants.DefaultIndicator], using a [TabConstants.defaultTabIndicatorOffset]
+ * will be a [TabDefaults.Indicator], using a [TabDefaults.tabIndicatorOffset]
  * modifier to animate its position. Note that this indicator will be forced to fill up the
- * entire ScrollableTabRow, so you should use [TabConstants.defaultTabIndicatorOffset] or similar to
+ * entire ScrollableTabRow, so you should use [TabDefaults.tabIndicatorOffset] or similar to
  * animate the actual drawn indicator inside this space, and provide an offset from the start.
  * @param divider the divider displayed at the bottom of the ScrollableTabRow. This provides a layer
  * of separation between the ScrollableTabRow and the content displayed underneath.
@@ -192,14 +192,14 @@ fun ScrollableTabRow(
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.colors.primarySurface,
     contentColor: Color = contentColorFor(backgroundColor),
-    edgePadding: Dp = TabConstants.DefaultScrollableTabRowPadding,
+    edgePadding: Dp = TabDefaults.ScrollableTabRowPadding,
     indicator: @Composable (tabPositions: List<TabPosition>) -> Unit = { tabPositions ->
-        TabConstants.DefaultIndicator(
-            Modifier.defaultTabIndicatorOffset(tabPositions[selectedTabIndex])
+        TabDefaults.Indicator(
+            Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex])
         )
     },
     divider: @Composable () -> Unit = {
-        TabConstants.DefaultDivider()
+        TabDefaults.Divider()
     },
     tabs: @Composable () -> Unit
 ) {

@@ -41,7 +41,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ScrollableTabRow
 import androidx.compose.material.Tab
-import androidx.compose.material.TabConstants.defaultTabIndicatorOffset
+import androidx.compose.material.TabDefaults.tabIndicatorOffset
 import androidx.compose.material.TabPosition
 import androidx.compose.material.TabRow
 import androidx.compose.material.Text
@@ -189,7 +189,7 @@ fun FancyIndicatorTabs() {
 
     // Reuse the default offset animation modifier, but use our own indicator
     val indicator = @Composable { tabPositions: List<TabPosition> ->
-        FancyIndicator(Color.White, Modifier.defaultTabIndicatorOffset(tabPositions[state]))
+        FancyIndicator(Color.White, Modifier.tabIndicatorOffset(tabPositions[state]))
     }
 
     Column {

@@ -79,7 +79,7 @@ enum class BottomSheetValue {
 class BottomSheetState(
     initialValue: BottomSheetValue,
     clock: AnimationClockObservable,
-    animationSpec: AnimationSpec<Float> = SwipeableConstants.DefaultAnimationSpec,
+    animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
     confirmStateChange: (BottomSheetValue) -> Boolean = { true }
 ) : SwipeableState<BottomSheetValue>(
     initialValue = initialValue,
@@ -164,7 +164,7 @@ class BottomSheetState(
 @ExperimentalMaterialApi
 fun rememberBottomSheetState(
     initialValue: BottomSheetValue,
-    animationSpec: AnimationSpec<Float> = SwipeableConstants.DefaultAnimationSpec,
+    animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
     confirmStateChange: (BottomSheetValue) -> Boolean = { true }
 ): BottomSheetState {
     val disposableClock = AmbientAnimationClock.current.asDisposableClock()
@@ -279,17 +279,17 @@ fun BottomSheetScaffold(
     floatingActionButtonPosition: FabPosition = FabPosition.End,
     sheetGesturesEnabled: Boolean = true,
     sheetShape: Shape = MaterialTheme.shapes.large,
-    sheetElevation: Dp = BottomSheetScaffoldConstants.DefaultSheetElevation,
+    sheetElevation: Dp = BottomSheetScaffoldDefaults.SheetElevation,
     sheetBackgroundColor: Color = MaterialTheme.colors.surface,
     sheetContentColor: Color = contentColorFor(sheetBackgroundColor),
-    sheetPeekHeight: Dp = BottomSheetScaffoldConstants.DefaultSheetPeekHeight,
+    sheetPeekHeight: Dp = BottomSheetScaffoldDefaults.SheetPeekHeight,
     drawerContent: @Composable (ColumnScope.() -> Unit)? = null,
     drawerGesturesEnabled: Boolean = true,
     drawerShape: Shape = MaterialTheme.shapes.large,
-    drawerElevation: Dp = DrawerConstants.DefaultElevation,
+    drawerElevation: Dp = DrawerDefaults.Elevation,
     drawerBackgroundColor: Color = MaterialTheme.colors.surface,
     drawerContentColor: Color = contentColorFor(drawerBackgroundColor),
-    drawerScrimColor: Color = DrawerConstants.defaultScrimColor,
+    drawerScrimColor: Color = DrawerDefaults.scrimColor,
     backgroundColor: Color = MaterialTheme.colors.background,
     contentColor: Color = contentColorFor(backgroundColor),
     bodyContent: @Composable (PaddingValues) -> Unit
@@ -422,6 +422,13 @@ private val FabEndSpacing = 16.dp
 /**
  * Contains useful constants for [BottomSheetScaffold].
  */
+@Deprecated(
+    message = "BottomSheetScaffoldConstants has been replaced with BottomSheetScaffoldDefaults",
+    ReplaceWith(
+        "BottomSheetScaffoldDefaults",
+        "androidx.compose.material.BottomSheetScaffoldDefaults"
+    )
+)
 object BottomSheetScaffoldConstants {
 
     /**
@@ -433,4 +440,20 @@ object BottomSheetScaffoldConstants {
      * The default peek height used by [BottomSheetScaffold].
      */
     val DefaultSheetPeekHeight = 56.dp
+}
+
+/**
+ * Contains useful defaults for [BottomSheetScaffold].
+ */
+object BottomSheetScaffoldDefaults {
+
+    /**
+     * The default elevation used by [BottomSheetScaffold].
+     */
+    val SheetElevation = 8.dp
+
+    /**
+     * The default peek height used by [BottomSheetScaffold].
+     */
+    val SheetPeekHeight = 56.dp
 }

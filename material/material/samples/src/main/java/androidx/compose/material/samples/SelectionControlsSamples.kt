@@ -25,7 +25,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.Checkbox
-import androidx.compose.material.CheckboxConstants
+import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RadioButton
 import androidx.compose.material.Switch
@@ -66,7 +66,7 @@ fun TriStateCheckboxSample() {
         TriStateCheckbox(
             state = parentState,
             onClick = onParentClick,
-            colors = CheckboxConstants.defaultColors(
+            colors = CheckboxDefaults.colors(
                 checkedColor = MaterialTheme.colors.primary
             )
         )

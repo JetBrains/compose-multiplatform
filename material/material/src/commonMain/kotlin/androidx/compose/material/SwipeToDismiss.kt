@@ -28,8 +28,8 @@ import androidx.compose.material.DismissDirection.StartToEnd
 import androidx.compose.material.DismissValue.Default
 import androidx.compose.material.DismissValue.DismissedToEnd
 import androidx.compose.material.DismissValue.DismissedToStart
-import androidx.compose.material.SwipeableConstants.StandardResistanceFactor
-import androidx.compose.material.SwipeableConstants.StiffResistanceFactor
+import androidx.compose.material.SwipeableDefaults.StandardResistanceFactor
+import androidx.compose.material.SwipeableDefaults.StiffResistanceFactor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.Saver

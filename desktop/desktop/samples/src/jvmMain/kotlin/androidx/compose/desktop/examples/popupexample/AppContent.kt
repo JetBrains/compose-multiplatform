@@ -36,7 +36,7 @@ import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Text
 import androidx.compose.material.Button
-import androidx.compose.material.ButtonConstants
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Checkbox
 import androidx.compose.material.RadioButton
 import androidx.compose.material.Surface
@@ -317,7 +317,7 @@ fun Button(
     val buttonHover = remember { mutableStateOf(false) }
     Button(
         onClick = onClick,
-        colors = ButtonConstants.defaultButtonColors(
+        colors = ButtonDefaults.buttonColors(
             backgroundColor =
                 if (buttonHover.value)
                     Color(color.red / 1.3f, color.green / 1.3f, color.blue / 1.3f)

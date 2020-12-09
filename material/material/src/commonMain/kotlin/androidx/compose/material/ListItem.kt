@@ -111,20 +111,20 @@ fun ListItem(
 private object OneLine {
     // TODO(popam): support wide icons
     // TODO(popam): convert these to sp
-    // List item related constants.
+    // List item related defaults.
     private val MinHeight = 48.dp
     private val MinHeightWithIcon = 56.dp
 
-    // Icon related constants.
+    // Icon related defaults.
     private val IconMinPaddedWidth = 40.dp
     private val IconLeftPadding = 16.dp
     private val IconVerticalPadding = 8.dp
 
-    // Content related constants.
+    // Content related defaults.
     private val ContentLeftPadding = 16.dp
     private val ContentRightPadding = 16.dp
 
-    // Trailing related constants.
+    // Trailing related defaults.
     private val TrailingRightPadding = 16.dp
 
     @Composable
@@ -166,16 +166,16 @@ private object OneLine {
 }
 
 private object TwoLine {
-    // List item related constants.
+    // List item related defaults.
     private val MinHeight = 64.dp
     private val MinHeightWithIcon = 72.dp
 
-    // Icon related constants.
+    // Icon related defaults.
     private val IconMinPaddedWidth = 40.dp
     private val IconLeftPadding = 16.dp
     private val IconVerticalPadding = 16.dp
 
-    // Content related constants.
+    // Content related defaults.
     private val ContentLeftPadding = 16.dp
     private val ContentRightPadding = 16.dp
     private val OverlineBaselineOffset = 24.dp
@@ -185,7 +185,7 @@ private object TwoLine {
     private val PrimaryToSecondaryBaselineOffsetNoIcon = 20.dp
     private val PrimaryToSecondaryBaselineOffsetWithIcon = 20.dp
 
-    // Trailing related constants.
+    // Trailing related defaults.
     private val TrailingRightPadding = 16.dp
 
     @Composable
@@ -267,15 +267,15 @@ private object TwoLine {
 }
 
 private object ThreeLine {
-    // List item related constants.
+    // List item related defaults.
     private val MinHeight = 88.dp
 
-    // Icon related constants.
+    // Icon related defaults.
     private val IconMinPaddedWidth = 40.dp
     private val IconLeftPadding = 16.dp
     private val IconThreeLineVerticalPadding = 16.dp
 
-    // Content related constants.
+    // Content related defaults.
     private val ContentLeftPadding = 16.dp
     private val ContentRightPadding = 16.dp
     private val ThreeLineBaselineFirstOffset = 28.dp
@@ -283,7 +283,7 @@ private object ThreeLine {
     private val ThreeLineBaselineThirdOffset = 20.dp
     private val ThreeLineTrailingTopPadding = 16.dp
 
-    // Trailing related constants.
+    // Trailing related defaults.
     private val TrailingRightPadding = 16.dp
 
     @Composable

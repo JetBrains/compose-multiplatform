@@ -98,7 +98,7 @@ class SwitchScreenshotTest {
                 Switch(
                     checked = true,
                     onCheckedChange = { },
-                    colors = SwitchConstants.defaultColors(checkedThumbColor = Color.Red)
+                    colors = SwitchDefaults.colors(checkedThumbColor = Color.Red)
                 )
             }
         }

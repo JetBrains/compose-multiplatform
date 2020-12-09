@@ -30,7 +30,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.integration.demos.common.DemoCategory
 import androidx.compose.material.Button
-import androidx.compose.material.ButtonConstants
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -120,7 +120,7 @@ private fun ColorButton() {
         }
     Button(
         onClick = { state.value = !state.value },
-        colors = ButtonConstants.defaultButtonColors(backgroundColor = color)
+        colors = ButtonDefaults.buttonColors(backgroundColor = color)
     ) {
         Text("Click me")
     }
