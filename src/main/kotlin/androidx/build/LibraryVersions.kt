@@ -114,7 +114,7 @@ object LibraryVersions {
     val TESTSCREENSHOT = Version("1.0.0-alpha01")
     val TEXT = Version("1.0.0-alpha01")
     val TEXTCLASSIFIER = Version("1.0.0-alpha03")
-    val TRACING = Version("1.0.0")
+    val TRACING = Version("1.1.0-alpha01")
     val TRANSITION = Version("1.4.0-rc01")
     val TVPROVIDER = Version("1.1.0-alpha02")
     val VECTORDRAWABLE = Version("1.2.0-alpha03")
