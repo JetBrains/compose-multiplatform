@@ -17,8 +17,10 @@
 package androidx.compose.foundation.samples
 
 import androidx.annotation.Sampled
+import androidx.compose.foundation.animation.smoothScrollBy
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Scrollable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,12 +34,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 
 private val colors = listOf(
     Color(0xFFffd7d7.toInt()),
@@ -83,6 +87,7 @@ fun VerticalScrollExample() {
 fun ControlledScrollableRowSample() {
     // Create ScrollState to own it and be able to control scroll behaviour of scrollable Row below
     val scrollState = rememberScrollState()
+    val scope = rememberCoroutineScope()
     Column {
         Row(Modifier.horizontalScroll(scrollState)) {
             repeat(1000) { index ->
@@ -101,10 +106,18 @@ fun ControlledScrollableRowSample() {
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Smooth Scroll")
-            Button(onClick = { scrollState.smoothScrollTo(scrollState.value - 1000) }) {
+            Button(
+                onClick = {
+                    scope.launch { scrollState.smoothScrollTo(scrollState.value - 1000) }
+                }
+            ) {
                 Text("< -")
             }
-            Button(onClick = { scrollState.smoothScrollBy(10000f) }) {
+            Button(
+                onClick = {
+                    scope.launch { (scrollState as Scrollable).smoothScrollBy(10000f) }
+                }
+            ) {
                 Text("--- >")
             }
         }

@@ -146,8 +146,9 @@ package androidx.compose.foundation {
     method public suspend Object? scroll(kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.ScrollScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public void scrollBy(float value);
     method public void scrollTo(float value);
-    method public void smoothScrollBy(float value, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> spec, optional kotlin.jvm.functions.Function2<? super androidx.compose.animation.core.AnimationEndReason,? super java.lang.Float,kotlin.Unit> onEnd);
-    method public void smoothScrollTo(float value, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> spec, optional kotlin.jvm.functions.Function2<? super androidx.compose.animation.core.AnimationEndReason,? super java.lang.Float,kotlin.Unit> onEnd);
+    method @Deprecated public void smoothScrollBy(float value, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> spec, optional kotlin.jvm.functions.Function2<? super androidx.compose.animation.core.AnimationEndReason,? super java.lang.Float,kotlin.Unit> onEnd);
+    method @Deprecated public void smoothScrollTo(float value, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> spec, optional kotlin.jvm.functions.Function2<? super androidx.compose.animation.core.AnimationEndReason,? super java.lang.Float,kotlin.Unit> onEnd);
+    method public suspend Object? smoothScrollTo(float value, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> spec, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public void stopAnimation();
     property public final boolean isAnimationRunning;
     property public final float maxValue;
@@ -275,7 +276,7 @@ package androidx.compose.foundation.gestures {
     ctor public ScrollableController(kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> consumeScrollDelta, androidx.compose.foundation.animation.FlingConfig flingConfig, androidx.compose.animation.core.AnimationClockObservable animationClock, androidx.compose.foundation.InteractionState? interactionState);
     method public boolean isAnimationRunning();
     method public suspend Object? scroll(kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.ScrollScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public void smoothScrollBy(float value, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> spec, optional kotlin.jvm.functions.Function2<? super androidx.compose.animation.core.AnimationEndReason,? super java.lang.Float,kotlin.Unit> onEnd);
+    method @Deprecated public void smoothScrollBy(float value, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> spec, optional kotlin.jvm.functions.Function2<? super androidx.compose.animation.core.AnimationEndReason,? super java.lang.Float,kotlin.Unit> onEnd);
     method public void stopAnimation();
     property public final boolean isAnimationRunning;
   }
