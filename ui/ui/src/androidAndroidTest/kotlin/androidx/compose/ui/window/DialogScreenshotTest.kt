@@ -74,7 +74,7 @@ class DialogScreenshotTest {
     fun dialogWithElevation() {
         rule.setContent {
             Dialog(onDismissRequest = {}) {
-                val elevation = with (AmbientDensity.current) { 16.dp.toPx() }
+                val elevation = with(AmbientDensity.current) { 16.dp.toPx() }
                 Box(
                     Modifier
                         .drawLayer(

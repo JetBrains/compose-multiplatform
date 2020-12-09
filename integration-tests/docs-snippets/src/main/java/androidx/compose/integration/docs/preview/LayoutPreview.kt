@@ -39,7 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 private object PreviewSnippet1 {
     @Composable
     fun Greeting(name: String) {
-        Text (text = "Hello $name!")
+        Text(text = "Hello $name!")
     }
 }
 

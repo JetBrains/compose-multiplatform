@@ -59,14 +59,14 @@ actual fun createComposeRule(): ComposeTestRule = createAndroidComposeRule<Compo
  * If you don't care about specific activity and just want to test composables in general, see
  * [createComposeRule].
  */
-inline fun <reified A : ComponentActivity> createAndroidComposeRule(
-): AndroidComposeTestRule<ActivityScenarioRule<A>, A> {
-    // TODO(b/138993381): By launching custom activities we are losing control over what content is
-    //  already there. This is issue in case the user already set some compose content and decides
-    //  to set it again via our API. In such case we won't be able to dispose the old composition.
-    //  Other option would be to provide a smaller interface that does not expose these methods.
-    return createAndroidComposeRule(A::class.java)
-}
+inline fun <reified A : ComponentActivity> createAndroidComposeRule():
+    AndroidComposeTestRule<ActivityScenarioRule<A>, A> {
+        // TODO(b/138993381): By launching custom activities we are losing control over what content is
+        //  already there. This is issue in case the user already set some compose content and decides
+        //  to set it again via our API. In such case we won't be able to dispose the old composition.
+        //  Other option would be to provide a smaller interface that does not expose these methods.
+        return createAndroidComposeRule(A::class.java)
+    }
 
 /**
  * Factory method to provide android specific implementation of [createComposeRule], for a given

@@ -64,7 +64,7 @@ class OnSizeChangedTest {
 
         rule.runOnUiThread {
             activity.setContent {
-                with (AmbientDensity.current) {
+                with(AmbientDensity.current) {
                     Box(
                         Modifier.padding(10.toDp()).onSizeChanged {
                             changedSize = it
@@ -99,7 +99,7 @@ class OnSizeChangedTest {
 
         rule.runOnUiThread {
             activity.setContent {
-                with (AmbientDensity.current) {
+                with(AmbientDensity.current) {
                     Box(
                         Modifier.padding(sizePx.toDp()).onSizeChanged {
                             changedSize = it
@@ -132,7 +132,7 @@ class OnSizeChangedTest {
 
         rule.runOnUiThread {
             activity.setContent {
-                with (AmbientDensity.current) {
+                with(AmbientDensity.current) {
                     Box(
                         Modifier.padding(10.toDp()).onSizeChanged {
                             changedSize = it
@@ -171,7 +171,7 @@ class OnSizeChangedTest {
 
         rule.runOnUiThread {
             activity.setContent {
-                with (AmbientDensity.current) {
+                with(AmbientDensity.current) {
                     val mod = if (addModifier) Modifier.onSizeChanged {
                         changedSize2 = it
                         latch2.countDown()

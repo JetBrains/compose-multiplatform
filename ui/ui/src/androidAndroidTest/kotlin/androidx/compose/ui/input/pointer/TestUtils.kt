@@ -264,18 +264,18 @@ internal sealed class LogEntry
 
 internal class OnInitEntry : LogEntry()
 
-internal data class OnPointerEventEntry (
+internal data class OnPointerEventEntry(
     val pointerInputFilter: PointerInputFilter,
     val pointerEvent: PointerEvent,
     val pass: PointerEventPass,
     val bounds: IntSize
 ) : LogEntry()
 
-internal class OnCancelEntry (
+internal class OnCancelEntry(
     val pointerInputFilter: PointerInputFilter
 ) : LogEntry()
 
-internal data class OnCustomEventEntry (
+internal data class OnCustomEventEntry(
     val pointerInputFilter: PointerInputFilter,
     val customEvent: CustomEvent,
     val pass: PointerEventPass

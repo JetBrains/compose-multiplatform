@@ -114,7 +114,7 @@ import androidx.compose.ui.unit.dp
             // This method accepts a lambda of type DrawScope.() -> Unit
             // therefore in this lambda we can access properties and functions
             // available from DrawScope, such as the `drawRectangle` function.
-            drawRect( /*...*/ )
+            drawRect( /*...*/)
         }
     )
 }

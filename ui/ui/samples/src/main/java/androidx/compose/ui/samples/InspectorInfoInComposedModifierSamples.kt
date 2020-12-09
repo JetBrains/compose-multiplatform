@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.Dp
 fun InspectorInfoInComposedModifierSample() {
 
     // let's create you own custom stateful modifier
-    fun Modifier.myColorModifier(color: Color) = composed (
+    fun Modifier.myColorModifier(color: Color) = composed(
         // pass inspector information for debug
         inspectorInfo = debugInspectorInfo {
             // name should match the name of the modifier
@@ -50,7 +50,7 @@ fun InspectorInfoInComposedModifierSample() {
 fun InspectorInfoInComposedModifierWithArgumentsSample() {
 
     // let's create you own custom stateful modifier with multiple arguments
-    fun Modifier.myModifier(width: Dp, height: Dp, color: Color) = composed (
+    fun Modifier.myModifier(width: Dp, height: Dp, color: Color) = composed(
         // pass inspector information for debug
         inspectorInfo = debugInspectorInfo {
             // name should match the name of the modifier
