@@ -34,7 +34,7 @@ import kotlin.coroutines.resume
 import kotlin.time.ExperimentalTime
 
 @OptIn(InternalTestingApi::class)
-internal class IdleAwaiter {
+internal class IdleAwaiter(private val composeIdlingResource: ComposeIdlingResource) {
 
     fun waitForIdle() {
         check(!isOnUiThread()) {
@@ -105,7 +105,7 @@ internal class IdleAwaiter {
             throw e
         }
 
-        val compositionAwaiter = CompositionAwaiter()
+        val compositionAwaiter = CompositionAwaiter(composeIdlingResource)
         try {
             compositionAwaiter.start()
             Espresso.onIdle()

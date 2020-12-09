@@ -48,5 +48,11 @@ interface AnimationClockTestRule : TestRule {
     fun advanceClock(milliseconds: Long) = clock.advanceClock(milliseconds)
 }
 
+@Deprecated(
+    message = "AnimationClockTestRule is no longer supported as a standalone solution. Retrieve " +
+        "it from your ComposeTestRule instead",
+    level = DeprecationLevel.ERROR,
+    replaceWith = ReplaceWith("composeTestRule.clockTestRule")
+)
 @ExperimentalTesting
 expect fun createAnimationClockRule(): AnimationClockTestRule
