@@ -20,7 +20,7 @@ package androidx.build
  * The list of versions codes of all the libraries in this project.
  */
 object LibraryVersions {
-    val ACTIVITY = Version("1.2.0-beta02")
+    val ACTIVITY = Version("1.2.0-rc01")
     val ADS_IDENTIFIER = Version("1.0.0-alpha04")
     val ANNOTATION = Version("1.2.0-alpha02")
     val ANNOTATION_EXPERIMENTAL = Version("1.1.0-alpha02")
@@ -61,7 +61,7 @@ object LibraryVersions {
     val EMOJI = Version("1.2.0-alpha03")
     val ENTERPRISE = Version("1.1.0-rc01")
     val EXIFINTERFACE = Version("1.4.0-alpha01")
-    val FRAGMENT = Version("1.3.0-beta02")
+    val FRAGMENT = Version("1.3.0-rc01")
     val FUTURES = Version("1.2.0-alpha01")
     val GRIDLAYOUT = Version("1.1.0-alpha01")
     val HEIFWRITER = Version("1.1.0-alpha02")
