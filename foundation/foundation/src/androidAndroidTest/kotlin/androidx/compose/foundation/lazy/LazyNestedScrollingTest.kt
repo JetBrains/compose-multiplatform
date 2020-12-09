@@ -72,11 +72,10 @@ class LazyNestedScrollingTest {
                     }
                 )
             ) {
-                LazyColumnFor(
-                    items = items,
-                    modifier = Modifier.size(100.dp).testTag(LazyTag)
-                ) {
-                    Spacer(Modifier.size(50.dp).testTag("$it"))
+                LazyColumn(Modifier.size(100.dp).testTag(LazyTag)) {
+                    items(items) {
+                        Spacer(Modifier.size(50.dp).testTag("$it"))
+                    }
                 }
             }
         }
@@ -107,11 +106,10 @@ class LazyNestedScrollingTest {
                     }
                 )
             ) {
-                LazyColumnFor(
-                    items = items,
-                    modifier = Modifier.size(100.dp).testTag(LazyTag)
-                ) {
-                    Spacer(Modifier.size(50.dp).testTag("$it"))
+                LazyColumn(Modifier.size(100.dp).testTag(LazyTag)) {
+                    items(items) {
+                        Spacer(Modifier.size(50.dp).testTag("$it"))
+                    }
                 }
             }
         }
@@ -152,11 +150,10 @@ class LazyNestedScrollingTest {
                     }
                 )
             ) {
-                LazyColumnFor(
-                    items = items,
-                    modifier = Modifier.size(100.dp).testTag(LazyTag)
-                ) {
-                    Spacer(Modifier.size(40.dp).testTag("$it"))
+                LazyColumn(Modifier.size(100.dp).testTag(LazyTag)) {
+                    items(items) {
+                        Spacer(Modifier.size(40.dp).testTag("$it"))
+                    }
                 }
             }
         }
@@ -187,11 +184,10 @@ class LazyNestedScrollingTest {
                     }
                 )
             ) {
-                LazyColumnFor(
-                    items = items,
-                    modifier = Modifier.size(100.dp).testTag(LazyTag)
-                ) {
-                    Spacer(Modifier.size(50.dp).testTag("$it"))
+                LazyColumn(Modifier.size(100.dp).testTag(LazyTag)) {
+                    items(items) {
+                        Spacer(Modifier.size(50.dp).testTag("$it"))
+                    }
                 }
             }
         }
@@ -227,11 +223,12 @@ class LazyNestedScrollingTest {
                     }
                 )
             ) {
-                LazyRowFor(
-                    items = items,
+                LazyRow(
                     modifier = Modifier.size(100.dp).testTag(LazyTag)
                 ) {
-                    Spacer(Modifier.size(50.dp).testTag("$it"))
+                    items(items) {
+                        Spacer(Modifier.size(50.dp).testTag("$it"))
+                    }
                 }
             }
         }
@@ -262,11 +259,12 @@ class LazyNestedScrollingTest {
                     }
                 )
             ) {
-                LazyRowFor(
-                    items = items,
+                LazyRow(
                     modifier = Modifier.size(100.dp).testTag(LazyTag)
                 ) {
-                    Spacer(Modifier.size(50.dp).testTag("$it"))
+                    items(items) {
+                        Spacer(Modifier.size(50.dp).testTag("$it"))
+                    }
                 }
             }
         }
@@ -307,11 +305,12 @@ class LazyNestedScrollingTest {
                     }
                 )
             ) {
-                LazyRowFor(
-                    items = items,
+                LazyRow(
                     modifier = Modifier.size(100.dp).testTag(LazyTag)
                 ) {
-                    Spacer(Modifier.size(40.dp).testTag("$it"))
+                    items(items) {
+                        Spacer(Modifier.size(40.dp).testTag("$it"))
+                    }
                 }
             }
         }
@@ -342,11 +341,12 @@ class LazyNestedScrollingTest {
                     }
                 )
             ) {
-                LazyRowFor(
-                    items = items,
+                LazyRow(
                     modifier = Modifier.size(100.dp).testTag(LazyTag)
                 ) {
-                    Spacer(Modifier.size(50.dp).testTag("$it"))
+                    items(items) {
+                        Spacer(Modifier.size(50.dp).testTag("$it"))
+                    }
                 }
             }
         }
