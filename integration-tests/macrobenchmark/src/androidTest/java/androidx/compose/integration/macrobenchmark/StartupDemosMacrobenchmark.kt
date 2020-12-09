@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.ui.macrobenchmark
+package androidx.compose.integration.macrobenchmark
 
 import androidx.benchmark.macro.MacrobenchmarkRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
