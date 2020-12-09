@@ -18,9 +18,6 @@ package androidx.compose.ui.input.key
 
 import android.view.KeyEvent.ACTION_DOWN
 import android.view.KeyEvent.ACTION_UP
-import android.view.KeyEvent.META_ALT_LEFT_ON
-import android.view.KeyEvent.META_ALT_MASK
-import android.view.KeyEvent.META_ALT_RIGHT_ON
 import androidx.compose.ui.input.key.KeyEventType.KeyDown
 import androidx.compose.ui.input.key.KeyEventType.KeyUp
 import androidx.compose.ui.input.key.KeyEventType.Unknown
@@ -51,24 +48,4 @@ internal inline class KeyEventAndroid(val keyEvent: AndroidKeyEvent) : KeyEvent 
 
     override val isShiftPressed: Boolean
         get() = keyEvent.isShiftPressed
-
-    @Suppress("DEPRECATION", "OverridingDeprecatedMember")
-    override val alt: Alt
-        get() = AltAndroid(keyEvent)
-}
-
-@Suppress("DEPRECATION")
-internal inline class AltAndroid(val keyEvent: AndroidKeyEvent) : Alt {
-    override val isLeftAltPressed
-        get() = (keyEvent.metaState and META_ALT_LEFT_ON) != 0
-
-    override val isRightAltPressed
-        get() = (keyEvent.metaState and META_ALT_RIGHT_ON) != 0
-
-    /**
-     * We override [isPressed] because Android has some synthetic meta states (eg. META_ALT_LOCKED)
-     * and provides a META_ALT_MASK that can be used to check if the Alt key is pressed.
-     */
-    override val isPressed
-        get() = (keyEvent.metaState and META_ALT_MASK) != 0
 }
