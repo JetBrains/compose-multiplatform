@@ -32,7 +32,6 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
 @SmallTest
-@OptIn(ExperimentalFocus::class)
 @RunWith(Parameterized::class)
 class ClearFocusTest(val forcedClear: Boolean) {
     @get:Rule

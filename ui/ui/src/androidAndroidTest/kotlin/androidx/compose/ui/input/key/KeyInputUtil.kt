@@ -25,7 +25,6 @@ import android.view.KeyEvent as AndroidKeyEvent
  * The [KeyEvent] is usually created by the system. This function creates an instance of
  * [KeyEvent] that can be used in tests.
  */
-@OptIn(ExperimentalKeyInput::class)
 fun keyEvent(key: Key, keyEventType: KeyEventType, androidMetaKeys: Int = 0): KeyEvent {
     val action = when (keyEventType) {
         KeyEventType.KeyDown -> ACTION_DOWN
@@ -40,7 +39,6 @@ fun keyEvent(key: Key, keyEventType: KeyEventType, androidMetaKeys: Int = 0): Ke
  *  [KeyEventAndroid] inline classes do not allow
  *  overriding the equals() function.  So we use this util function to compare KeyEvents.
  */
-@OptIn(ExperimentalKeyInput::class)
 fun KeyEvent.assertEqualTo(expected: KeyEvent) {
     Truth.assertThat(key).isEqualTo(expected.key)
     Truth.assertThat(type).isEqualTo(expected.type)

@@ -17,12 +17,10 @@
 package androidx.compose.ui.node
 
 import androidx.compose.ui.FocusObserverModifier
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.FocusState.Inactive
 import androidx.compose.ui.focus.searchChildrenForFocusNode
 
-@OptIn(ExperimentalFocus::class)
 internal class ModifiedFocusObserverNode(
     wrapped: LayoutNodeWrapper,
     modifier: FocusObserverModifier

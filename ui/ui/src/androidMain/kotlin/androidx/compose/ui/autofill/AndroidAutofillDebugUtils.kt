@@ -21,6 +21,7 @@ import android.util.Log
 import android.view.View
 import android.view.autofill.AutofillManager
 import androidx.annotation.RequiresApi
+import androidx.compose.ui.ExperimentalComposeUiApi
 
 /**
  * Autofill Manager callback.
@@ -58,6 +59,7 @@ private object AutofillCallback : AutofillManager.AutofillCallback() {
 /**
  * Registers the autofill debug callback.
  */
+@ExperimentalComposeUiApi
 @RequiresApi(Build.VERSION_CODES.O)
 internal fun AndroidAutofill.registerCallback() {
     autofillManager.registerCallback(AutofillCallback)
@@ -66,6 +68,7 @@ internal fun AndroidAutofill.registerCallback() {
 /**
  * Unregisters the autofill debug callback.
  */
+@ExperimentalComposeUiApi
 @RequiresApi(Build.VERSION_CODES.O)
 internal fun AndroidAutofill.unregisterCallback() {
     autofillManager.unregisterCallback(AutofillCallback)

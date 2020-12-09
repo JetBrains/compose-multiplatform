@@ -16,7 +16,6 @@
 
 package androidx.compose.ui
 
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.ValueElement
@@ -37,7 +36,6 @@ class FocusObserverModifierTest {
         isDebugInspectorInfoEnabled = false
     }
 
-    @OptIn(ExperimentalFocus::class)
     @Test
     fun testInspectorValue() {
         val onFocusChange: (FocusState) -> Unit = {}

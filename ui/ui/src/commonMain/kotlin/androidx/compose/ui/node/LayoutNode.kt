@@ -22,7 +22,6 @@ import androidx.compose.ui.FocusObserverModifier
 import androidx.compose.ui.FocusRequesterModifier
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.DrawModifier
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.nestedscroll.NestedScrollDelegatingWrapper
 import androidx.compose.ui.gesture.nestedscroll.NestedScrollModifier
@@ -77,7 +76,6 @@ internal val sharedDrawScope = LayoutNodeDrawScope()
 /**
  * An element in the layout hierarchy, built with compose UI.
  */
-@OptIn(ExperimentalFocus::class)
 class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
 
     internal constructor() : this(false)

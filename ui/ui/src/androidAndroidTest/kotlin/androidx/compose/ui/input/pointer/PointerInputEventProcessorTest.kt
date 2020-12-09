@@ -16,15 +16,14 @@
 
 package androidx.compose.ui.input.pointer
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.hapticfeedback.HapticFeedback
-import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
@@ -3131,20 +3130,14 @@ private fun mockOwner(
     targetRoot: LayoutNode = LayoutNode()
 ): Owner = MockOwner(position, targetRoot)
 
-@OptIn(
-    ExperimentalFocus::class,
-    InternalCoreApi::class
-)
+@OptIn(ExperimentalComposeUiApi::class, InternalCoreApi::class)
 private class MockOwner(
     private val position: IntOffset,
     private val targetRoot: LayoutNode
 ) : Owner {
     override fun calculatePosition(): IntOffset = position
     override fun requestFocus(): Boolean = false
-
-    @ExperimentalKeyInput
     override fun sendKeyEvent(keyEvent: KeyEvent): Boolean = false
-
     override val root: LayoutNode
         get() = targetRoot
     override val hapticFeedBack: HapticFeedback

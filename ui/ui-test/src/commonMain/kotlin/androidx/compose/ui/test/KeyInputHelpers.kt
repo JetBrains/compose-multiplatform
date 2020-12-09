@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.test
 
-import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.KeyEvent
 
 /**
@@ -24,7 +23,6 @@ import androidx.compose.ui.input.key.KeyEvent
  *
  * @return true if the event was consumed. False otherwise.
  */
-@OptIn(ExperimentalKeyInput::class)
 fun SemanticsNodeInteraction.performKeyPress(keyEvent: KeyEvent): Boolean {
     val semanticsNode = fetchSemanticsNode("Failed to send key Event (${keyEvent.key})")
     val owner = semanticsNode.owner

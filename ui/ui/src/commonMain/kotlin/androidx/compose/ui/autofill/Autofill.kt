@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.autofill
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.util.annotation.GuardedBy
 
@@ -26,6 +27,7 @@ import androidx.compose.ui.util.annotation.GuardedBy
  * or cancel autofill as required. For instance, the [TextField] can call [requestAutofillForNode]
  * when it gains focus, and [cancelAutofillForNode] when it loses focus.
  */
+@ExperimentalComposeUiApi
 interface Autofill {
 
     /**
@@ -66,6 +68,7 @@ interface Autofill {
  *
  * @property id A virtual id that is automatically generated for each node.
  */
+@ExperimentalComposeUiApi
 data class AutofillNode(
     val autofillTypes: List<AutofillType> = listOf(),
     var boundingBox: Rect? = null,

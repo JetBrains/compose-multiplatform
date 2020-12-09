@@ -31,7 +31,6 @@ private val focusRequesterNotInitialized = "FocusRequester is not initialized. O
  *
  * @see androidx.compose.ui.focusRequester
  */
-@ExperimentalFocus
 class FocusRequester {
 
     internal val focusRequesterNodes: MutableVector<ModifiedFocusRequesterNode> = mutableVectorOf()

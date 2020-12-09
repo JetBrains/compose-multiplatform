@@ -21,7 +21,6 @@ package androidx.compose.ui.input.key
  *
  * @param keyCode an integer code representing the key pressed.
  */
-@ExperimentalKeyInput
 expect inline class Key(val keyCode: Int) {
     companion object {
         /** Unknown key. */

@@ -25,7 +25,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.focus
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focusObserver
 import androidx.compose.ui.platform.debugInspectorInfo
@@ -43,7 +42,6 @@ import androidx.compose.ui.semantics.semantics
  * @param interactionState [InteractionState] that will be updated to contain [Interaction.Focused]
  * when this focusable is focused
  */
-@OptIn(ExperimentalFocus::class)
 fun Modifier.focusable(
     enabled: Boolean = true,
     interactionState: InteractionState? = null,
