@@ -101,7 +101,7 @@ object LibraryVersions {
     val SECURITY_BIOMETRIC = Version("1.0.0-alpha01")
     val SECURITY_IDENTITY_CREDENTIAL = Version("1.0.0-alpha01")
     val SERIALIZATION = Version("1.0.0-alpha01")
-    val SHARETARGET = Version("1.1.0-rc01")
+    val SHARETARGET = Version("1.2.0-alpha01")
     val SLICE = Version("1.1.0-alpha02")
     val SLICE_BENCHMARK = Version("1.1.0-alpha02")
     val SLICE_BUILDERS_KTX = Version("1.0.0-alpha08")
