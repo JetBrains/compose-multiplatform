@@ -113,7 +113,7 @@ class TextFieldTest {
 
         var isFocused = false
         rule.setContent {
-            val state = remember { mutableStateOf(TextFieldValue("")) }
+            val state = remember { mutableStateOf("") }
             Providers(
                 AmbientTextInputService provides inputService
             ) {
@@ -134,7 +134,7 @@ class TextFieldTest {
 
     @Composable
     private fun TextFieldApp() {
-        val state = remember { mutableStateOf(TextFieldValue("")) }
+        val state = remember { mutableStateOf("") }
         BasicTextField(
             value = state.value,
             modifier = Modifier.fillMaxSize(),
@@ -203,12 +203,12 @@ class TextFieldTest {
 
     @Composable
     private fun OnlyDigitsApp() {
-        val state = remember { mutableStateOf(TextFieldValue("")) }
+        val state = remember { mutableStateOf("") }
         BasicTextField(
             value = state.value,
             modifier = Modifier.fillMaxSize(),
             onValueChange = {
-                if (it.text.all { it.isDigit() }) {
+                if (it.all { it.isDigit() }) {
                     state.value = it
                 }
             }
@@ -286,7 +286,7 @@ class TextFieldTest {
             Providers(
                 AmbientTextInputService provides textInputService
             ) {
-                val state = remember { mutableStateOf(TextFieldValue("")) }
+                val state = remember { mutableStateOf("") }
                 BasicTextField(
                     value = state.value,
                     modifier = Modifier.fillMaxSize(),
@@ -345,7 +345,7 @@ class TextFieldTest {
             Box(Modifier.preferredSize(parentSize)) {
                 Row {
                     BasicTextField(
-                        value = TextFieldValue(),
+                        value = "",
                         onValueChange = {},
                         modifier = Modifier
                             .weight(1f)
@@ -369,9 +369,7 @@ class TextFieldTest {
 
         val restorationTester = StateRestorationTester(rule)
         restorationTester.setContent {
-            state = savedInstanceState(saver = Saver) {
-                TextFieldValue()
-            }
+            state = savedInstanceState(saver = Saver) { TextFieldValue() }
         }
 
         rule.runOnIdle {
@@ -395,7 +393,7 @@ class TextFieldTest {
     fun textFieldNotFocused_cursorNotRendered() {
         rule.setContent {
             BasicTextField(
-                value = TextFieldValue(),
+                value = "",
                 onValueChange = {},
                 textStyle = TextStyle(color = Color.White),
                 modifier = Modifier.preferredSize(10.dp, 20.dp).background(color = Color.White),
@@ -419,7 +417,7 @@ class TextFieldTest {
         rule.setContent {
             BasicTextField(
                 modifier = Modifier.testTag("textField"),
-                value = TextFieldValue(),
+                value = "",
                 onValueChange = {}
             )
         }
@@ -449,7 +447,7 @@ class TextFieldTest {
     @Test
     fun semantics_clickAction() {
         rule.setContent {
-            var value by remember { mutableStateOf(TextFieldValue()) }
+            var value by remember { mutableStateOf("") }
             BasicTextField(
                 modifier = Modifier.testTag("textField"),
                 value = value,
@@ -467,7 +465,7 @@ class TextFieldTest {
     @Test
     fun semantics_setTextSetSelectionActions() {
         rule.setContent {
-            var value by remember { mutableStateOf(TextFieldValue()) }
+            var value by remember { mutableStateOf("") }
             BasicTextField(
                 modifier = Modifier.testTag(Tag),
                 value = value,
@@ -503,7 +501,7 @@ class TextFieldTest {
     fun setImeAction_isReflectedInSemantics() {
         rule.setContent {
             BasicTextField(
-                value = TextFieldValue(),
+                value = "",
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 onValueChange = {}
             )

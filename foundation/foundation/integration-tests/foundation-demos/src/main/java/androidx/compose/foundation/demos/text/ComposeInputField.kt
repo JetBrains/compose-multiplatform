@@ -36,7 +36,6 @@ import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 
@@ -74,7 +73,7 @@ internal fun EditLine(
     text: String = ""
 ) {
     val controller = remember { mutableStateOf<SoftwareKeyboardController?>(null) }
-    val state = savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue(text) }
+    val state = savedInstanceState { text }
     BasicTextField(
         modifier = demoTextFieldModifiers,
         value = state.value,

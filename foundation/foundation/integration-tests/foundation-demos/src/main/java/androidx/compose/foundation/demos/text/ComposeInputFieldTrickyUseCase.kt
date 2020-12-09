@@ -23,7 +23,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.sp
 
 @Composable
@@ -39,13 +38,13 @@ fun InputFieldTrickyUseCase() {
 
 @Composable
 private fun RejectNonDigits() {
-    val state = savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
+    val state = savedInstanceState { "" }
     BasicTextField(
         modifier = demoTextFieldModifiers,
         value = state.value,
         textStyle = TextStyle(fontSize = 32.sp),
         onValueChange = {
-            if (it.text.all { it.isDigit() }) {
+            if (it.all { text -> text.isDigit() }) {
                 state.value = it
             }
         },
@@ -55,7 +54,7 @@ private fun RejectNonDigits() {
 
 @Composable
 private fun RejectComposition() {
-    val state = savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
+    val state = savedInstanceState { "" }
     BasicTextField(
         modifier = demoTextFieldModifiers,
         value = state.value,

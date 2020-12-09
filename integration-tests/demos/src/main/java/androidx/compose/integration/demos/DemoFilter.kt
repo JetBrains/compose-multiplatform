@@ -45,7 +45,6 @@ import androidx.compose.ui.focusRequester
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.annotatedString
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 
@@ -73,8 +72,8 @@ fun DemoFilter(launchableDemos: List<Demo>, filterText: String, onNavigate: (Dem
  */
 @Composable
 fun FilterAppBar(
-    filterText: TextFieldValue,
-    onFilter: (TextFieldValue) -> Unit,
+    filterText: String,
+    onFilter: (String) -> Unit,
     onClose: () -> Unit
 ) {
     with(MaterialTheme.colors) {
@@ -107,8 +106,8 @@ fun FilterAppBar(
     ExperimentalFoundationApi::class
 )
 private fun FilterField(
-    filterText: TextFieldValue,
-    onFilter: (TextFieldValue) -> Unit,
+    filterText: String,
+    onFilter: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val focusRequester = FocusRequester()

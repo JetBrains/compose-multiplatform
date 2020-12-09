@@ -26,17 +26,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.text.input.TextFieldValue
 
 @OptIn(ExperimentalFoundationApi::class)
 @Sampled
 fun stateSample() {
     @Composable
     fun LoginScreen() {
-        var username by remember { mutableStateOf(TextFieldValue("user")) }
-        var password by remember { mutableStateOf(TextFieldValue("pass")) }
+        var username by remember { mutableStateOf("user") }
+        var password by remember { mutableStateOf("pass") }
 
-        fun login() = Api.login(username.text, password.text)
+        fun login() = Api.login(username, password)
 
         BasicTextField(
             value = username,

@@ -61,7 +61,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -602,7 +601,7 @@ class OutlinedTextFieldTest {
             Providers(
                 AmbientTextInputService provides textInputService
             ) {
-                var text = remember { mutableStateOf(TextFieldValue("")) }
+                var text = remember { mutableStateOf("") }
                 OutlinedTextField(
                     modifier = Modifier.testTag(TextfieldTag),
                     value = text.value,

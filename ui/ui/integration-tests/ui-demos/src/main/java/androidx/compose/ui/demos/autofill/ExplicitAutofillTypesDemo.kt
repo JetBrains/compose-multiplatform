@@ -43,7 +43,6 @@ import androidx.compose.ui.platform.AmbientAutofill
 import androidx.compose.ui.platform.AmbientAutofillTree
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -53,8 +52,8 @@ import androidx.compose.ui.unit.dp
 )
 fun ExplicitAutofillTypesDemo() {
     Column {
-        val nameState = remember { mutableStateOf(TextFieldValue("Enter name here")) }
-        val emailState = remember { mutableStateOf(TextFieldValue("Enter email here")) }
+        val nameState = remember { mutableStateOf("Enter name here") }
+        val emailState = remember { mutableStateOf("Enter email here") }
         val autofill = AmbientAutofill.current
         val labelStyle = MaterialTheme.typography.subtitle1
         val textStyle = MaterialTheme.typography.h6
@@ -62,7 +61,7 @@ fun ExplicitAutofillTypesDemo() {
         Text("Name", style = labelStyle)
         Autofill(
             autofillTypes = listOf(AutofillType.PersonFullName),
-            onFill = { nameState.value = TextFieldValue(it) }
+            onFill = { nameState.value = it }
         ) { autofillNode ->
             BasicTextField(
                 modifier = Modifier.focusObserver {
@@ -89,7 +88,7 @@ fun ExplicitAutofillTypesDemo() {
         Text("Email", style = labelStyle)
         Autofill(
             autofillTypes = listOf(AutofillType.EmailAddress),
-            onFill = { emailState.value = TextFieldValue(it) }
+            onFill = { emailState.value = it }
         ) { autofillNode ->
             BasicTextField(
                 modifier = Modifier.focusObserver {
