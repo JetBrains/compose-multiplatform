@@ -18,6 +18,7 @@ package androidx.compose.animation.demos
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.repeatable
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.core.tween
@@ -68,17 +69,18 @@ fun RepeatedRotationDemo() {
                 if (it.initialState == RotationStates.Original) {
                     repeatable(
                         iterations = 10,
-                        animation = tween(
-                            easing = LinearEasing,
+                        animation = keyframes {
                             durationMillis = 1000
-                        )
+                            0f at 0 with LinearEasing
+                            360f at 1000
+                        }
                     )
                 } else {
                     tween(durationMillis = 300)
                 }
             }
         ) {
-            if (it == RotationStates.Original) 0f else 360f
+            0f
         }
         Canvas(Modifier.preferredSize(100.dp)) {
             rotate(rotation, Offset.Zero) {

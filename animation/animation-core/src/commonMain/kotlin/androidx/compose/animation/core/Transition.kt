@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.Position
 import androidx.compose.ui.unit.Uptime
+import androidx.compose.ui.util.annotation.VisibleForTesting
 
 /**
  * This sets up a [Transition], and updates it with the target provided by [targetState]. When
@@ -121,14 +122,6 @@ class Transition<S> internal constructor(
         internal set
 
     /**
-     * Play time in nano-seconds. [playTimeNanos] is always non-negative. It starts from 0L at the
-     * beginning of the transition and increment until all child animations have finished.
-     */
-    var playTimeNanos by mutableStateOf(0L)
-        internal set
-        @Suppress("MethodNameUnits") get
-
-    /**
      * [transitionStates] contains the initial state and the target state of the currently on-going
      * transition.
      */
@@ -141,6 +134,12 @@ class Transition<S> internal constructor(
     val isRunning: Boolean
         get() = startTime != Uptime.Unspecified
 
+    /**
+     * Play time in nano-seconds. [playTimeNanos] is always non-negative. It starts from 0L at the
+     * beginning of the transition and increment until all child animations have finished.
+     */
+    @VisibleForTesting
+    internal var playTimeNanos by mutableStateOf(0L)
     internal var startRequested: Boolean by mutableStateOf(false)
     private var startTime = Uptime.Unspecified
     private val animations = mutableVectorOf<TransitionAnimationState<*, *>>()
@@ -207,6 +206,10 @@ class Transition<S> internal constructor(
                 startRequested = true
             }
             currentTargetState = targetState
+            // If target state is changed, reset all the animations to be re-created in the
+            // next frame w/ their new target value. Child animations target values are updated in
+            // the side effect that may not have happened when this function in invoked.
+            animations.forEach { it.resetAnimation() }
         }
     }
 
@@ -254,6 +257,12 @@ class Transition<S> internal constructor(
                 isFinished = true
                 offsetTimeNanos = 0
             }
+        }
+
+        internal fun resetAnimation() {
+            animation = null
+            offsetTimeNanos = 0
+            isFinished = false
         }
 
         @PublishedApi
