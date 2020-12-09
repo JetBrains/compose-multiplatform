@@ -2798,8 +2798,7 @@ private fun MutableList<Invalidation>.removeRange(start: Int, end: Int) {
 private fun Boolean.asInt() = if (this) 1 else 0
 private fun Int.asBool() = this != 0
 
-@Composable
-val currentComposer: Composer<*> get() {
+val currentComposer: Composer<*> @Composable get() {
     throw NotImplementedError("Implemented as an intrinsic")
 }
 

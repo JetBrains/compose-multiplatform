@@ -179,9 +179,8 @@ private object ThemingSnippet8 {
 }
 
 private object ThemingSnippet11 {
-    @Composable
     val Colors.snackbarAction: Color
-        get() = if (isLight) Red300 else Red700
+        @Composable get() = if (isLight) Red300 else Red700
 }
 
 @Composable private fun ThemingSnippet12() {

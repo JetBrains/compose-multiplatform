@@ -31,8 +31,8 @@ object ContentAlpha {
      * A high level of content alpha, used to represent high emphasis text such as input text in a
      * selected [TextField].
      */
-    @Composable
     val high: Float
+        @Composable
         get() = contentAlpha(
             highContrastAlpha = HighContrastContentAlpha.high,
             lowContrastAlpha = LowContrastContentAlpha.high
@@ -42,8 +42,8 @@ object ContentAlpha {
      * A medium level of content alpha, used to represent medium emphasis text such as
      * placeholder text in a [TextField].
      */
-    @Composable
     val medium: Float
+        @Composable
         get() = contentAlpha(
             highContrastAlpha = HighContrastContentAlpha.medium,
             lowContrastAlpha = LowContrastContentAlpha.medium
@@ -53,8 +53,8 @@ object ContentAlpha {
      * A low level of content alpha used to represent disabled components, such as text in a
      * disabled [Button].
      */
-    @Composable
     val disabled: Float
+        @Composable
         get() = contentAlpha(
             highContrastAlpha = HighContrastContentAlpha.disabled,
             lowContrastAlpha = LowContrastContentAlpha.disabled
