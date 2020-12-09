@@ -16,26 +16,43 @@
 
 package androidx.compose.ui.test.junit4
 
+import androidx.activity.ComponentActivity
 import androidx.compose.testutils.expectError
 import androidx.compose.ui.platform.AndroidOwner
-import androidx.compose.ui.test.junit4.android.AndroidOwnerRegistry
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
+import org.junit.rules.TestRule
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class SynchronizationMethodsTest {
 
-    val rule = createComposeRule()
+    // Note: don't add `@get:Rule` to avoid the Rule from being applied. Except for the
+    // AndroidOwnerRegistry, it doesn't need to be initialized in these tests.
+    private val rule = createAndroidComposeRule<ComponentActivity>()
+    private val androidOwnerRegistry = rule.composeIdlingResource.androidOwnerRegistry
+
+    @get:Rule
+    val registryRule: TestRule = RuleChain.outerRule { base, _ ->
+        androidOwnerRegistry.getStatementFor(base)
+    }
+
+    @Before
+    fun addMockResumedOwner() {
+        androidOwnerRegistry.registerOwner(mockResumedAndroidOwner())
+    }
 
     @Test
     fun runOnUiThread() {
@@ -58,69 +75,47 @@ class SynchronizationMethodsTest {
 
     @Test
     fun runOnIdle() {
-        withAndroidOwnerRegistry {
-            val result = rule.runOnIdle { "Hello" }
-            assertThat(result).isEqualTo("Hello")
-        }
+        val result = rule.runOnIdle { "Hello" }
+        assertThat(result).isEqualTo("Hello")
     }
 
     @Test
     fun runOnIdle_void() {
-        withAndroidOwnerRegistry {
-            var called = false
-            rule.runOnIdle { called = true }
-            assertThat(called).isTrue()
-        }
+        var called = false
+        rule.runOnIdle { called = true }
+        assertThat(called).isTrue()
     }
 
     @Test
     fun runOnIdle_nullable() {
-        withAndroidOwnerRegistry {
-            val result: String? = rule.runOnIdle { null }
-            assertThat(result).isEqualTo(null)
-        }
+        val result: String? = rule.runOnIdle { null }
+        assertThat(result).isEqualTo(null)
     }
 
     @Test
     fun runOnIdle_assert_fails() {
-        withAndroidOwnerRegistry {
-            rule.runOnIdle {
-                expectError<IllegalStateException> {
-                    rule.onNodeWithTag("dummy").assertExists()
-                }
+        rule.runOnIdle {
+            expectError<IllegalStateException> {
+                rule.onNodeWithTag("dummy").assertExists()
             }
         }
     }
 
     @Test
     fun runOnIdle_waitForIdle_fails() {
-        withAndroidOwnerRegistry {
-            rule.runOnIdle {
-                expectError<IllegalStateException> {
-                    rule.waitForIdle()
-                }
+        rule.runOnIdle {
+            expectError<IllegalStateException> {
+                rule.waitForIdle()
             }
         }
     }
 
     @Test
     fun runOnIdle_runOnIdle_fails() {
-        withAndroidOwnerRegistry {
-            rule.runOnIdle {
-                expectError<IllegalStateException> {
-                    rule.runOnIdle {}
-                }
+        rule.runOnIdle {
+            expectError<IllegalStateException> {
+                rule.runOnIdle {}
             }
-        }
-    }
-
-    private fun withAndroidOwnerRegistry(block: () -> Unit) {
-        try {
-            AndroidOwnerRegistry.setupRegistry()
-            AndroidOwnerRegistry.registerOwner(mockResumedAndroidOwner())
-            block()
-        } finally {
-            AndroidOwnerRegistry.tearDownRegistry()
         }
     }
 

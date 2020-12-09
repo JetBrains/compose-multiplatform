@@ -23,13 +23,14 @@ import androidx.compose.ui.platform.AndroidOwner
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.test.InternalTestingApi
 import androidx.compose.ui.test.TestOwner
-import androidx.compose.ui.test.junit4.android.AndroidOwnerRegistry
-import androidx.compose.ui.test.junit4.android.IdleAwaiter
+import androidx.compose.ui.test.junit4.android.ComposeIdlingResource
 import androidx.compose.ui.text.input.EditOperation
 import androidx.compose.ui.text.input.ImeAction
 
 @OptIn(InternalTestingApi::class)
-internal class AndroidTestOwner(private val idleAwaiter: IdleAwaiter) : TestOwner {
+internal class AndroidTestOwner(
+    private val composeIdlingResource: ComposeIdlingResource
+) : TestOwner {
 
     @SuppressLint("DocumentExceptions")
     override fun sendTextInputCommand(node: SemanticsNode, command: List<EditOperation>) {
@@ -65,16 +66,7 @@ internal class AndroidTestOwner(private val idleAwaiter: IdleAwaiter) : TestOwne
     }
 
     override fun getOwners(): Set<Owner> {
-        // TODO(pavlis): Instead of returning a flatMap, let all consumers handle a tree
-        //  structure. In case of multiple AndroidOwners, add a fake root
-        idleAwaiter.waitForIdle()
-
-        return AndroidOwnerRegistry.getOwners().also {
-            // TODO(b/153632210): This check should be done by callers of collectOwners
-            check(it.isNotEmpty()) {
-                "No compose views found in the app. Is your Activity resumed?"
-            }
-        }
+        return composeIdlingResource.getOwners()
     }
 
     private fun AndroidOwner.getTextInputServiceOrDie(): TextInputServiceForTests {

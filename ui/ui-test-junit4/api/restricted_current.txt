@@ -82,6 +82,9 @@ package androidx.compose.ui.test.junit4 {
 
 package androidx.compose.ui.test.junit4.android {
 
+  public final class AndroidOwnerRegistryKt {
+  }
+
   public final class ComposeIdlingResourceKt {
     method @Deprecated public static void registerComposeWithEspresso();
     method @Deprecated @androidx.compose.ui.test.ExperimentalTesting public static void registerTestClock(androidx.compose.ui.test.TestAnimationClock clock);

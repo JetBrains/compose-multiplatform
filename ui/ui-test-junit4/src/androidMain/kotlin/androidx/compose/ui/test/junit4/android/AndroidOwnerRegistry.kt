@@ -17,16 +17,25 @@
 package androidx.compose.ui.test.junit4.android
 
 import android.view.View
+import androidx.annotation.VisibleForTesting
 import androidx.compose.ui.platform.AndroidOwner
+import androidx.compose.ui.test.ExperimentalTesting
 import androidx.lifecycle.Lifecycle
+import kotlinx.coroutines.suspendCancellableCoroutine
+import org.junit.runners.model.Statement
 import java.util.Collections
 import java.util.WeakHashMap
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.coroutines.resume
+import kotlin.time.ExperimentalTime
 
 /**
  * Registry where all [AndroidOwner]s should be registered while they are attached to the window.
  * This registry is used by the testing library to query the owners's state.
  */
-internal object AndroidOwnerRegistry {
+internal class AndroidOwnerRegistry {
     private val owners = Collections.newSetFromMap(WeakHashMap<AndroidOwner, Boolean>())
     private val registryListeners = mutableSetOf<OnRegistrationChangedListener>()
 
@@ -39,13 +48,14 @@ internal object AndroidOwnerRegistry {
     /**
      * Sets up this registry to be notified of any [AndroidOwner] created
      */
-    internal fun setupRegistry() {
+    private fun setupRegistry() {
         AndroidOwner.onAndroidOwnerCreatedCallback = ::onAndroidOwnerCreated
     }
 
     /**
      * Cleans up the changes made by [setupRegistry]. Call this after your test has run.
      */
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     internal fun tearDownRegistry() {
         AndroidOwner.onAndroidOwnerCreatedCallback = null
         synchronized(owners) {
@@ -124,6 +134,19 @@ internal object AndroidOwnerRegistry {
         }
     }
 
+    fun getStatementFor(base: Statement): Statement {
+        return object : Statement() {
+            override fun evaluate() {
+                try {
+                    setupRegistry()
+                    base.evaluate()
+                } finally {
+                    tearDownRegistry()
+                }
+            }
+        }
+    }
+
     /**
      * Interface to be implemented by components that want to be notified when an [AndroidOwner]
      * registers or unregisters at this registry.
@@ -132,7 +155,7 @@ internal object AndroidOwnerRegistry {
         fun onRegistrationChanged(owner: AndroidOwner, registered: Boolean)
     }
 
-    private class OwnerAttachedListener(
+    private inner class OwnerAttachedListener(
         private val owner: AndroidOwner
     ) : View.OnAttachStateChangeListener {
 
@@ -145,6 +168,77 @@ internal object AndroidOwnerRegistry {
 
         override fun onViewDetachedFromWindow(view: View) {
             unregisterOwner(owner)
+        }
+    }
+}
+
+private val AndroidOwnerRegistry.hasAndroidOwners: Boolean get() = getOwners().isNotEmpty()
+
+private fun AndroidOwnerRegistry.ensureAndroidOwnerRegistryIsSetUp() {
+    check(isSetUp) {
+        "Test not setup properly. Use a ComposeTestRule in your test to be able to interact " +
+            "with composables"
+    }
+}
+
+internal fun AndroidOwnerRegistry.waitForAndroidOwners() {
+    ensureAndroidOwnerRegistryIsSetUp()
+
+    if (!hasAndroidOwners) {
+        val latch = CountDownLatch(1)
+        val listener = object : AndroidOwnerRegistry.OnRegistrationChangedListener {
+            override fun onRegistrationChanged(owner: AndroidOwner, registered: Boolean) {
+                if (hasAndroidOwners) {
+                    latch.countDown()
+                }
+            }
+        }
+        try {
+            addOnRegistrationChangedListener(listener)
+            if (!hasAndroidOwners) {
+                latch.await(2, TimeUnit.SECONDS)
+            }
+        } finally {
+            removeOnRegistrationChangedListener(listener)
+        }
+    }
+}
+
+@ExperimentalTesting
+@OptIn(ExperimentalTime::class)
+internal suspend fun AndroidOwnerRegistry.awaitAndroidOwners() {
+    ensureAndroidOwnerRegistryIsSetUp()
+
+    if (!hasAndroidOwners) {
+        suspendCancellableCoroutine<Unit> { continuation ->
+            // Make sure we only resume once
+            val didResume = AtomicBoolean(false)
+            fun resume(listener: AndroidOwnerRegistry.OnRegistrationChangedListener) {
+                if (didResume.compareAndSet(false, true)) {
+                    removeOnRegistrationChangedListener(listener)
+                    continuation.resume(Unit)
+                }
+            }
+
+            // Usually we resume if an AndroidOwner is registered while the listener is added
+            val listener = object : AndroidOwnerRegistry.OnRegistrationChangedListener {
+                override fun onRegistrationChanged(owner: AndroidOwner, registered: Boolean) {
+                    if (hasAndroidOwners) {
+                        resume(this)
+                    }
+                }
+            }
+
+            addOnRegistrationChangedListener(listener)
+            continuation.invokeOnCancellation {
+                removeOnRegistrationChangedListener(listener)
+            }
+
+            // Sometimes the AndroidOwner was registered before we added
+            // the listener, in which case we missed our signal
+            if (hasAndroidOwners) {
+                resume(listener)
+            }
         }
     }
 }
