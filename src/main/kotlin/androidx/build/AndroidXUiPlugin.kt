@@ -226,11 +226,9 @@ class AndroidXUiPlugin : Plugin<Project> {
          * resolved.
          */
         private fun Project.configureForMultiplatform() {
-            if (multiplatformExtension == null) {
-                throw IllegalStateException(
-                    "Unable to configureForMultiplatform() when " +
-                        "multiplatformExtension is null (multiplatform plugin not enabled?)"
-                )
+            val multiplatformExtension = checkNotNull(multiplatformExtension) {
+                "Unable to configureForMultiplatform() when " +
+                    "multiplatformExtension is null (multiplatform plugin not enabled?)"
             }
 
             /*
@@ -248,11 +246,20 @@ class AndroidXUiPlugin : Plugin<Project> {
             TODO: Consider changing unitTest to androidLocalTest and androidAndroidTest to
             androidDeviceTest when https://github.com/JetBrains/kotlin/pull/2829 rolls in.
             */
-            multiplatformExtension!!.sourceSets.all {
+            multiplatformExtension.sourceSets.all {
                 // Allow all experimental APIs, since MPP projects are themselves experimental
                 it.languageSettings.apply {
                     useExperimentalAnnotation("kotlin.Experimental")
                     useExperimentalAnnotation("kotlin.ExperimentalMultiplatform")
+                }
+            }
+
+            afterEvaluate {
+                if (multiplatformExtension.targets.findByName("jvm") != null) {
+                    tasks.named("jvmTestClasses").also(::addToBuildOnServer)
+                }
+                if (multiplatformExtension.targets.findByName("desktop") != null) {
+                    tasks.named("desktopTestClasses").also(::addToBuildOnServer)
                 }
             }
         }
