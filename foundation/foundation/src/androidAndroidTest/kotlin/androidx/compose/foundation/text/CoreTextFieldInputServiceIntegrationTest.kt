@@ -18,7 +18,7 @@ package androidx.compose.foundation.text
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.isFocused
-import androidx.compose.ui.focusObserver
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -80,7 +80,7 @@ class CoreTextFieldInputServiceIntegrationTest {
                 imeOptions = imeOptions,
                 modifier = Modifier
                     .testTag(testTag)
-                    .focusObserver { focused = it.isFocused },
+                    .onFocusChanged { focused = it.isFocused },
                 onValueChange = {}
             )
         }

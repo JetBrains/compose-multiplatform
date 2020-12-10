@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus
-import androidx.compose.ui.focusObserver
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -61,7 +60,7 @@ class SetRootFocusTest {
                             focusRequester.requestFocus()
                         }
                         .focusRequester(focusRequester)
-                        .focusObserver { isFocused = it.isFocused }
+                        .onFocusChanged { isFocused = it.isFocused }
                         .focus()
                 )
                 BasicText(

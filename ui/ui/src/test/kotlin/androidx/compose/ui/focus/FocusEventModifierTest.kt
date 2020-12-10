@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui
+package androidx.compose.ui.focus
 
-import androidx.compose.ui.focus.FocusState
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
@@ -25,7 +25,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
-class FocusObserverModifierTest {
+class FocusEventModifierTest {
     @Before
     fun before() {
         isDebugInspectorInfoEnabled = true
@@ -38,12 +38,12 @@ class FocusObserverModifierTest {
 
     @Test
     fun testInspectorValue() {
-        val onFocusChange: (FocusState) -> Unit = {}
-        val modifier = Modifier.focusObserver(onFocusChange) as InspectableValue
-        assertThat(modifier.nameFallback).isEqualTo("focusObserver")
+        val onFocusEvent: (FocusState) -> Unit = {}
+        val modifier = Modifier.onFocusEvent(onFocusEvent) as InspectableValue
+        assertThat(modifier.nameFallback).isEqualTo("onFocusEvent")
         assertThat(modifier.valueOverride).isNull()
         assertThat(modifier.inspectableElements.asIterable()).containsExactly(
-            ValueElement("onFocusChange", onFocusChange)
+            ValueElement("onFocusEvent", onFocusEvent)
         )
     }
 }

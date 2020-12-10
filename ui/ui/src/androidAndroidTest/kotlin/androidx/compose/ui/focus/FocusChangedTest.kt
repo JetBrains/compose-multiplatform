@@ -25,7 +25,6 @@ import androidx.compose.ui.focus.FocusState.ActiveParent
 import androidx.compose.ui.focus.FocusState.Captured
 import androidx.compose.ui.focus.FocusState.Disabled
 import androidx.compose.ui.focus.FocusState.Inactive
-import androidx.compose.ui.focusObserver
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -37,7 +36,7 @@ import org.junit.runner.RunWith
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-class FocusObserverTest {
+class FocusChangedTest {
     @get:Rule
     val rule = createComposeRule()
 
@@ -49,7 +48,7 @@ class FocusObserverTest {
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
-                    .focusObserver { focusState = it }
+                    .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
                     .then(FocusModifier(Active))
             )
@@ -72,7 +71,7 @@ class FocusObserverTest {
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
-                    .focusObserver { focusState = it }
+                    .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
                     .focus()
             ) {
@@ -105,7 +104,7 @@ class FocusObserverTest {
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
-                    .focusObserver { focusState = it }
+                    .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
                     .then(FocusModifier(Captured))
             )
@@ -128,7 +127,7 @@ class FocusObserverTest {
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
-                    .focusObserver { focusState = it }
+                    .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
                     .then(FocusModifier(Disabled))
             )
@@ -151,7 +150,7 @@ class FocusObserverTest {
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
-                    .focusObserver { focusState = it }
+                    .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
                     .then(FocusModifier(Inactive))
             )
@@ -179,19 +178,19 @@ class FocusObserverTest {
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
-                    .focusObserver { focusState1 = it }
-                    .focusObserver { focusState2 = it }
+                    .onFocusChanged { focusState1 = it }
+                    .onFocusChanged { focusState2 = it }
             ) {
                 Box {
                     Box(
                         modifier = Modifier
-                            .focusObserver { focusState3 = it }
-                            .focusObserver { focusState4 = it }
+                            .onFocusChanged { focusState3 = it }
+                            .onFocusChanged { focusState4 = it }
                     ) {
                         Box(
                             modifier = Modifier
-                                .focusObserver { focusState5 = it }
-                                .focusObserver { focusState6 = it }
+                                .onFocusChanged { focusState5 = it }
+                                .onFocusChanged { focusState6 = it }
                                 .focusRequester(focusRequester)
                                 .then(FocusModifier(Inactive))
                         )
@@ -225,21 +224,14 @@ class FocusObserverTest {
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
-                    .focusObserver { focusState1 = it }
-                    .focusObserver { focusState2 = it }
+                    .onFocusChanged { focusState1 = it }
+                    .onFocusChanged { focusState2 = it }
                     .focus()
-                    .focusObserver { focusState3 = it }
-                    .focusObserver { focusState4 = it }
+                    .onFocusChanged { focusState3 = it }
+                    .onFocusChanged { focusState4 = it }
                     .focusRequester(focusRequester)
                     .focus()
             )
-        }
-        rule.runOnIdle {
-            focusRequester.requestFocus()
-            focusState1 = null
-            focusState2 = null
-            focusState3 = null
-            focusState4 = null
         }
 
         rule.runOnIdle {
@@ -247,8 +239,8 @@ class FocusObserverTest {
             focusRequester.requestFocus()
 
             // Assert.
-            assertThat(focusState1).isNull()
-            assertThat(focusState2).isNull()
+            assertThat(focusState1).isEqualTo(ActiveParent)
+            assertThat(focusState2).isEqualTo(ActiveParent)
             assertThat(focusState3).isEqualTo(Active)
             assertThat(focusState4).isEqualTo(Active)
         }
