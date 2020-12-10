@@ -750,6 +750,8 @@ package androidx.compose.material {
     method public final T! getTargetValue();
     method public final T! getValue();
     method public final boolean isAnimationRunning();
+    method public final float performDrag(float delta);
+    method public final void performFling(float velocity, kotlin.jvm.functions.Function0<kotlin.Unit> onEnd);
     method @androidx.compose.material.ExperimentalMaterialApi public final void snapTo(T? targetValue);
     property public final float direction;
     property public final boolean isAnimationRunning;

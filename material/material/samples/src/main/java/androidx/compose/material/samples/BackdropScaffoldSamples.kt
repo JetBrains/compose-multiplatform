@@ -18,8 +18,7 @@ package androidx.compose.material.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.material.BackdropScaffold
 import androidx.compose.material.BackdropValue
@@ -40,7 +39,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -99,11 +97,14 @@ fun BackdropScaffoldSample() {
             }
         },
         frontLayerContent = {
-            Box(
-                Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("Selection: ${selection.value}")
+            Text("Selection: ${selection.value}")
+            LazyColumn {
+                for (i in 1..50) item {
+                    ListItem(
+                        text = { Text("Item $i") },
+                        icon = { Icon(Icons.Default.Favorite) }
+                    )
+                }
             }
         }
     )
