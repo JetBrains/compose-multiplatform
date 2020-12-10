@@ -59,7 +59,7 @@ internal class AndroidOwnerRegistry {
     internal fun tearDownRegistry() {
         ViewRootForTest.onViewCreatedCallback = null
         synchronized(owners) {
-            getUnfilteredOwners().forEach {
+            owners.toList().forEach {
                 unregisterOwner(it)
             }
             // Remove all listeners as well, now we've unregistered all owners
@@ -75,13 +75,13 @@ internal class AndroidOwnerRegistry {
      * Returns a copy of the set of all registered [ViewRootForTest]s, including ones that are
      * normally not relevant (like those whose lifecycle state is not RESUMED).
      */
-    fun getUnfilteredOwners(): Set<ViewRootForTest> {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    internal fun getUnfilteredOwners(): Set<ViewRootForTest> {
         return synchronized(owners) { owners.toSet() }
     }
 
     /**
      * Returns a copy of the set of all registered [ViewRootForTest]s that can be interacted with.
-     * This method is almost always preferred over [getUnfilteredOwners].
      */
     fun getOwners(): Set<ViewRootForTest> {
         return synchronized(owners) {
