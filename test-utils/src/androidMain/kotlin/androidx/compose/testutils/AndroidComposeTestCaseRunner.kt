@@ -34,7 +34,7 @@ import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.dispatch.MonotonicFrameClock
 import androidx.compose.runtime.snapshots.Snapshot
-import androidx.compose.ui.platform.AndroidOwner
+import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.TestMonotonicFrameClock
 import androidx.compose.ui.test.frameDelayMillis
@@ -134,7 +134,7 @@ internal class AndroidComposeTestCaseRunner<T : ComposeTestCase>(
         }
 
         composition = activity.setContent(recomposer) { testCase!!.Content() }
-        view = findAndroidOwner(activity)!!.view
+        view = findViewRootForTest(activity)!!.view
         @OptIn(ExperimentalComposeApi::class)
         Snapshot.notifyObjectsInitialized()
         simulationState = SimulationState.EmitContentDone
@@ -305,18 +305,18 @@ private enum class SimulationState {
     RecomposeDone
 }
 
-private fun findAndroidOwner(activity: Activity): AndroidOwner? {
-    return findAndroidOwner(activity.findViewById(android.R.id.content) as ViewGroup)
+private fun findViewRootForTest(activity: Activity): ViewRootForTest? {
+    return findViewRootForTest(activity.findViewById(android.R.id.content) as ViewGroup)
 }
 
-private fun findAndroidOwner(view: View): AndroidOwner? {
-    if (view is AndroidOwner) {
+private fun findViewRootForTest(view: View): ViewRootForTest? {
+    if (view is ViewRootForTest) {
         return view
     }
 
     if (view is ViewGroup) {
         for (i in 0 until view.childCount) {
-            val composeView = findAndroidOwner(view.getChildAt(i))
+            val composeView = findViewRootForTest(view.getChildAt(i))
             if (composeView != null) {
                 return composeView
             }

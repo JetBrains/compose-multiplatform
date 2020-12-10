@@ -20,7 +20,7 @@ import android.app.Activity
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.ComponentActivity
-import androidx.compose.ui.platform.AndroidOwner
+import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.junit4.android.AndroidOwnerRegistry
 import androidx.test.ext.junit.rules.ActivityScenarioRule
@@ -44,8 +44,8 @@ class AndroidOwnerRegistryTest {
 
     private val onRegistrationChangedListener =
         object : AndroidOwnerRegistry.OnRegistrationChangedListener {
-            val recordedChanges = mutableListOf<Pair<AndroidOwner, Boolean>>()
-            override fun onRegistrationChanged(owner: AndroidOwner, registered: Boolean) {
+            val recordedChanges = mutableListOf<Pair<ViewRootForTest, Boolean>>()
+            override fun onRegistrationChanged(owner: ViewRootForTest, registered: Boolean) {
                 recordedChanges.add(Pair(owner, registered))
             }
         }
@@ -67,7 +67,7 @@ class AndroidOwnerRegistryTest {
         activityRule.scenario.onActivity { activity ->
             // set the composable content and find an owner
             activity.setContent { }
-            val owner = activity.findOwner()
+            val owner = activity.findRootForTest()
 
             // Then it is registered
             assertThat(androidOwnerRegistry.getUnfilteredOwners()).isEqualTo(setOf(owner))
@@ -84,7 +84,7 @@ class AndroidOwnerRegistryTest {
         activityRule.scenario.onActivity { activity ->
             // set the composable content and find an owner
             activity.setContent { }
-            val owner = activity.findOwner()
+            val owner = activity.findRootForTest()
 
             // And remove it from the hierarchy
             activity.setContentView(View(activity))
@@ -107,7 +107,7 @@ class AndroidOwnerRegistryTest {
         activityRule.scenario.onActivity { activity ->
             // set the composable content and find an owner
             activity.setContent { }
-            val owner = activity.findOwner()
+            val owner = activity.findRootForTest()
 
             // When we tear down the registry
             androidOwnerRegistry.tearDownRegistry()
@@ -126,16 +126,16 @@ class AndroidOwnerRegistryTest {
     }
 }
 
-private fun Activity.findOwner(): AndroidOwner {
+private fun Activity.findRootForTest(): ViewRootForTest {
     val viewGroup = findViewById<ViewGroup>(android.R.id.content)
-    return requireNotNull(viewGroup.findOwner())
+    return requireNotNull(viewGroup.findRootForTest())
 }
 
-private fun View.findOwner(): AndroidOwner? {
-    if (this is AndroidOwner) return this
+private fun View.findRootForTest(): ViewRootForTest? {
+    if (this is ViewRootForTest) return this
     if (this is ViewGroup) {
         for (i in 0 until childCount) {
-            val owner = getChildAt(i).findOwner()
+            val owner = getChildAt(i).findRootForTest()
             if (owner != null) {
                 return owner
             }

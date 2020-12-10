@@ -114,11 +114,6 @@ interface Owner {
     fun onRequestRelayout(layoutNode: LayoutNode)
 
     /**
-     * Whether the Owner has pending layout work.
-     */
-    val hasPendingMeasureOrLayout: Boolean
-
-    /**
      * Called by [LayoutNode] when it is attached to the view system and now has an owner.
      * This is used by [Owner] to track which nodes are associated with it. It will only be
      * called when [node] is not already attached to an owner.

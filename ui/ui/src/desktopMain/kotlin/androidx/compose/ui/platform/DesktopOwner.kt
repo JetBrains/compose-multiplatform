@@ -177,9 +177,6 @@ class DesktopOwner(
         }
     }
 
-    override val hasPendingMeasureOrLayout
-        get() = measureAndLayoutDelegate.hasPendingMeasureOrLayout
-
     override fun createLayer(
         drawBlock: (Canvas) -> Unit,
         invalidateParentLayer: () -> Unit

@@ -31,7 +31,7 @@ import androidx.compose.ui.input.key.keyInputFilter
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.AndroidOwner
+import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.junit4.DisableTransitionsTestRule
@@ -94,7 +94,7 @@ class LayoutNodeModifierBenchmark(
             rule.activityTestRule.activity.setContent { Box(Modifier) }
         }
         rule.activityTestRule.runOnUiThread {
-            val composeView = rule.findAndroidOwner()
+            val composeView = rule.findViewRootForTest()
             val root = composeView.root
             check(root.children.size == 1) { "Expecting only a Box" }
             layoutNode = root.children[0]
@@ -141,9 +141,9 @@ class LayoutNodeModifierBenchmark(
                 .apply(base, description)
         }
 
-        fun findAndroidOwner(): AndroidOwner {
+        fun findViewRootForTest(): ViewRootForTest {
             return activityTestRule.activity.findViewById<ViewGroup>(android.R.id.content)
-                .getChildAt(0) as AndroidOwner
+                .getChildAt(0) as ViewRootForTest
         }
     }
 }

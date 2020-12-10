@@ -70,7 +70,7 @@ class LayoutAlignTest : LayoutTest() {
         }
         assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(IntSize(root.width, root.height), alignSize.value)
@@ -111,7 +111,7 @@ class LayoutAlignTest : LayoutTest() {
         }
         assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(IntSize(root.width, root.height), alignSize.value)
@@ -157,7 +157,7 @@ class LayoutAlignTest : LayoutTest() {
         }
         assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(
@@ -231,7 +231,7 @@ class LayoutAlignTest : LayoutTest() {
         }
         assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(IntSize(size, size), alignSize.value)
@@ -472,7 +472,7 @@ class LayoutAlignTest : LayoutTest() {
         }
         positionedLatch.await(1, TimeUnit.SECONDS)
 
-        val root = findOwnerView()
+        val root = findComposeView()
         waitForDraw(root)
 
         assertEquals(IntSize(childSizeIpx, childSizeIpx), childSize.value)

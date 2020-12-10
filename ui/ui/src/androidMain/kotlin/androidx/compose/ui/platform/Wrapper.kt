@@ -139,9 +139,9 @@ fun ComponentActivity.setContent(
     content: @Composable () -> Unit
 ): Composition {
     GlobalSnapshotManager.ensureStarted()
-    val composeView: AndroidOwner = window.decorView
+    val composeView: AndroidComposeView = window.decorView
         .findViewById<ViewGroup>(android.R.id.content)
-        .getChildAt(0) as? AndroidOwner
+        .getChildAt(0) as? AndroidComposeView
         ?: AndroidComposeView(this).also {
             setContentView(it.view, DefaultLayoutParams)
         }
@@ -168,7 +168,7 @@ fun ViewGroup.setContent(
     GlobalSnapshotManager.ensureStarted()
     val composeView =
         if (childCount > 0) {
-            getChildAt(0) as? AndroidOwner
+            getChildAt(0) as? AndroidComposeView
         } else {
             removeAllViews(); null
         } ?: AndroidComposeView(context).also { addView(it.view, DefaultLayoutParams) }
@@ -177,12 +177,12 @@ fun ViewGroup.setContent(
 
 @OptIn(InternalComposeApi::class)
 private fun doSetContent(
-    owner: AndroidOwner,
+    owner: AndroidComposeView,
     parent: CompositionReference,
     content: @Composable () -> Unit
 ): Composition {
     if (inspectionWanted(owner)) {
-        owner.view.setTag(
+        owner.setTag(
             R.id.inspection_slot_table_set,
             Collections.newSetFromMap(WeakHashMap<SlotTable, Boolean>())
         )
@@ -212,7 +212,7 @@ private fun enableDebugInspectorInfo() {
 }
 
 private class WrappedComposition(
-    val owner: AndroidOwner,
+    val owner: AndroidComposeView,
     val original: Composition
 ) : Composition, LifecycleEventObserver {
 
@@ -234,7 +234,7 @@ private class WrappedComposition(
                     original.setContent {
                         @Suppress("UNCHECKED_CAST")
                         val inspectionTable =
-                            owner.view.getTag(R.id.inspection_slot_table_set) as?
+                            owner.getTag(R.id.inspection_slot_table_set) as?
                                 MutableSet<SlotTable>
                         inspectionTable?.add(currentComposer.slotTable)
                         Providers(InspectionTables provides inspectionTable) {
@@ -283,6 +283,6 @@ private val DefaultLayoutParams = ViewGroup.LayoutParams(
  *
  * Instead check if the attributeSourceResourceMap is not empty.
  */
-private fun inspectionWanted(owner: AndroidOwner): Boolean =
+private fun inspectionWanted(owner: AndroidComposeView): Boolean =
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
-        owner.view.attributeSourceResourceMap.isNotEmpty()
+        owner.attributeSourceResourceMap.isNotEmpty()

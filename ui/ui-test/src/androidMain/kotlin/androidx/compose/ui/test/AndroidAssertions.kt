@@ -20,7 +20,7 @@ import androidx.test.espresso.matcher.ViewMatchers
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.node.LayoutNode
-import androidx.compose.ui.platform.AndroidOwner
+import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.semantics.SemanticsNode
 
 internal actual fun SemanticsNodeInteraction.checkIsDisplayed(): Boolean {
@@ -37,7 +37,7 @@ internal actual fun SemanticsNodeInteraction.checkIsDisplayed(): Boolean {
         return false
     }
 
-    (node.layoutNode.owner as? AndroidOwner)?.let {
+    (layoutNode.owner as? ViewRootForTest)?.let {
         if (!ViewMatchers.isDisplayed().matches(it.view)) {
             return false
         }
@@ -53,7 +53,7 @@ internal actual fun SemanticsNodeInteraction.checkIsDisplayed(): Boolean {
 }
 
 internal actual fun SemanticsNode.clippedNodeBoundsInWindow(): Rect {
-    val composeView = (layoutNode.owner as AndroidOwner).view
+    val composeView = (layoutNode.owner as ViewRootForTest).view
     val rootLocationInWindow = intArrayOf(0, 0).let {
         composeView.getLocationInWindow(it)
         Offset(it[0].toFloat(), it[1].toFloat())
@@ -62,7 +62,7 @@ internal actual fun SemanticsNode.clippedNodeBoundsInWindow(): Rect {
 }
 
 internal actual fun SemanticsNode.isInScreenBounds(): Boolean {
-    val composeView = (layoutNode.owner as AndroidOwner).view
+    val composeView = (layoutNode.owner as ViewRootForTest).view
 
     // Window relative bounds of our node
     val nodeBoundsInWindow = clippedNodeBoundsInWindow()

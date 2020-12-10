@@ -18,9 +18,8 @@ package androidx.compose.ui.test.junit4.android
 
 import android.view.View
 import androidx.annotation.VisibleForTesting
-import androidx.compose.ui.platform.AndroidOwner
+import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.test.ExperimentalTesting
-import androidx.lifecycle.Lifecycle
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.junit.runners.model.Statement
 import java.util.Collections
@@ -32,24 +31,25 @@ import kotlin.coroutines.resume
 import kotlin.time.ExperimentalTime
 
 /**
- * Registry where all [AndroidOwner]s should be registered while they are attached to the window.
- * This registry is used by the testing library to query the owners's state.
+ * Registry where all views implementing [ViewRootForTest] should be registered while they
+ * are attached to the window. This registry is used by the testing library to query the owners's
+ * state.
  */
 internal class AndroidOwnerRegistry {
-    private val owners = Collections.newSetFromMap(WeakHashMap<AndroidOwner, Boolean>())
+    private val owners = Collections.newSetFromMap(WeakHashMap<ViewRootForTest, Boolean>())
     private val registryListeners = mutableSetOf<OnRegistrationChangedListener>()
 
     /**
-     * Returns if the registry is setup to receive registrations from [AndroidOwner]s
+     * Returns if the registry is setup to receive registrations from [ViewRootForTest]s
      */
     val isSetUp: Boolean
-        get() = AndroidOwner.onAndroidOwnerCreatedCallback == ::onAndroidOwnerCreated
+        get() = ViewRootForTest.onViewCreatedCallback == ::onComposeViewCreated
 
     /**
-     * Sets up this registry to be notified of any [AndroidOwner] created
+     * Sets up this registry to be notified of any [ViewRootForTest] created
      */
     private fun setupRegistry() {
-        AndroidOwner.onAndroidOwnerCreatedCallback = ::onAndroidOwnerCreated
+        ViewRootForTest.onViewCreatedCallback = ::onComposeViewCreated
     }
 
     /**
@@ -57,7 +57,7 @@ internal class AndroidOwnerRegistry {
      */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     internal fun tearDownRegistry() {
-        AndroidOwner.onAndroidOwnerCreatedCallback = null
+        ViewRootForTest.onViewCreatedCallback = null
         synchronized(owners) {
             getUnfilteredOwners().forEach {
                 unregisterOwner(it)
@@ -67,33 +67,32 @@ internal class AndroidOwnerRegistry {
         }
     }
 
-    private fun onAndroidOwnerCreated(owner: AndroidOwner) {
+    private fun onComposeViewCreated(owner: ViewRootForTest) {
         owner.view.addOnAttachStateChangeListener(OwnerAttachedListener(owner))
     }
 
     /**
-     * Returns a copy of the set of all registered [AndroidOwner]s, including ones that are
+     * Returns a copy of the set of all registered [ViewRootForTest]s, including ones that are
      * normally not relevant (like those whose lifecycle state is not RESUMED).
      */
-    fun getUnfilteredOwners(): Set<AndroidOwner> {
+    fun getUnfilteredOwners(): Set<ViewRootForTest> {
         return synchronized(owners) { owners.toSet() }
     }
 
     /**
-     * Returns a copy of the set of all registered [AndroidOwner]s that can be interacted with.
+     * Returns a copy of the set of all registered [ViewRootForTest]s that can be interacted with.
      * This method is almost always preferred over [getUnfilteredOwners].
      */
-    fun getOwners(): Set<AndroidOwner> {
+    fun getOwners(): Set<ViewRootForTest> {
         return synchronized(owners) {
             owners.filterTo(mutableSetOf()) {
-                it.viewTreeOwners?.lifecycleOwner
-                    ?.lifecycle?.currentState == Lifecycle.State.RESUMED
+                it.isLifecycleInResumedState
             }
         }
     }
 
     /**
-     * Adds the given [listener], to be notified when an [AndroidOwner] registers or unregisters.
+     * Adds the given [listener], to be notified when an [ViewRootForTest] registers or unregisters.
      */
     fun addOnRegistrationChangedListener(listener: OnRegistrationChangedListener) {
         synchronized(registryListeners) { registryListeners.add(listener) }
@@ -106,7 +105,7 @@ internal class AndroidOwnerRegistry {
         synchronized(registryListeners) { registryListeners.remove(listener) }
     }
 
-    private fun dispatchOnRegistrationChanged(owner: AndroidOwner, isRegistered: Boolean) {
+    private fun dispatchOnRegistrationChanged(owner: ViewRootForTest, isRegistered: Boolean) {
         synchronized(registryListeners) { registryListeners.toList() }.forEach {
             it.onRegistrationChanged(owner, isRegistered)
         }
@@ -115,7 +114,7 @@ internal class AndroidOwnerRegistry {
     /**
      * Registers the [owner] in this registry. Must be called from [View.onAttachedToWindow].
      */
-    internal fun registerOwner(owner: AndroidOwner) {
+    internal fun registerOwner(owner: ViewRootForTest) {
         synchronized(owners) {
             if (owners.add(owner)) {
                 dispatchOnRegistrationChanged(owner, true)
@@ -126,7 +125,7 @@ internal class AndroidOwnerRegistry {
     /**
      * Unregisters the [owner] from this registry. Must be called from [View.onDetachedFromWindow].
      */
-    internal fun unregisterOwner(owner: AndroidOwner) {
+    internal fun unregisterOwner(owner: ViewRootForTest) {
         synchronized(owners) {
             if (owners.remove(owner)) {
                 dispatchOnRegistrationChanged(owner, false)
@@ -148,15 +147,15 @@ internal class AndroidOwnerRegistry {
     }
 
     /**
-     * Interface to be implemented by components that want to be notified when an [AndroidOwner]
+     * Interface to be implemented by components that want to be notified when an [ViewRootForTest]
      * registers or unregisters at this registry.
      */
     interface OnRegistrationChangedListener {
-        fun onRegistrationChanged(owner: AndroidOwner, registered: Boolean)
+        fun onRegistrationChanged(owner: ViewRootForTest, registered: Boolean)
     }
 
     private inner class OwnerAttachedListener(
-        private val owner: AndroidOwner
+        private val owner: ViewRootForTest
     ) : View.OnAttachStateChangeListener {
 
         // Note: owner.view === view, because the owner _is_ the view,
@@ -187,7 +186,7 @@ internal fun AndroidOwnerRegistry.waitForAndroidOwners() {
     if (!hasAndroidOwners) {
         val latch = CountDownLatch(1)
         val listener = object : AndroidOwnerRegistry.OnRegistrationChangedListener {
-            override fun onRegistrationChanged(owner: AndroidOwner, registered: Boolean) {
+            override fun onRegistrationChanged(owner: ViewRootForTest, registered: Boolean) {
                 if (hasAndroidOwners) {
                     latch.countDown()
                 }
@@ -220,9 +219,12 @@ internal suspend fun AndroidOwnerRegistry.awaitAndroidOwners() {
                 }
             }
 
-            // Usually we resume if an AndroidOwner is registered while the listener is added
+            // Usually we resume if an ComposeViewTestMarker is registered while the listener is added
             val listener = object : AndroidOwnerRegistry.OnRegistrationChangedListener {
-                override fun onRegistrationChanged(owner: AndroidOwner, registered: Boolean) {
+                override fun onRegistrationChanged(
+                    owner: ViewRootForTest,
+                    registered: Boolean
+                ) {
                     if (hasAndroidOwners) {
                         resume(this)
                     }
@@ -234,7 +236,7 @@ internal suspend fun AndroidOwnerRegistry.awaitAndroidOwners() {
                 removeOnRegistrationChangedListener(listener)
             }
 
-            // Sometimes the AndroidOwner was registered before we added
+            // Sometimes the ComposeViewTestMarker was registered before we added
             // the listener, in which case we missed our signal
             if (hasAndroidOwners) {
                 resume(listener)
