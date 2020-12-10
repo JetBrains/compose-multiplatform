@@ -340,7 +340,27 @@ package androidx.compose.foundation.lazy {
     method public androidx.compose.ui.Modifier fillParentMaxWidth(androidx.compose.ui.Modifier, optional @FloatRange(from=0.0, to=1.0) float fraction);
   }
 
+  public interface LazyListItemInfo {
+    method public int getIndex();
+    method public int getOffset();
+    method public int getSize();
+    property public abstract int index;
+    property public abstract int offset;
+    property public abstract int size;
+  }
+
   public final class LazyListKt {
+  }
+
+  public interface LazyListLayoutInfo {
+    method public int getTotalItemsCount();
+    method public int getViewportEndOffset();
+    method public int getViewportStartOffset();
+    method public java.util.List<androidx.compose.foundation.lazy.LazyListItemInfo> getVisibleItemsInfo();
+    property public abstract int totalItemsCount;
+    property public abstract int viewportEndOffset;
+    property public abstract int viewportStartOffset;
+    property public abstract java.util.List<androidx.compose.foundation.lazy.LazyListItemInfo> visibleItemsInfo;
   }
 
   public final class LazyListMeasureKt {
@@ -356,6 +376,7 @@ package androidx.compose.foundation.lazy {
     ctor public LazyListState(int firstVisibleItemIndex, int firstVisibleItemScrollOffset, androidx.compose.foundation.InteractionState? interactionState, androidx.compose.foundation.animation.FlingConfig flingConfig, androidx.compose.animation.core.AnimationClockObservable animationClock);
     method public int getFirstVisibleItemIndex();
     method public int getFirstVisibleItemScrollOffset();
+    method public androidx.compose.foundation.lazy.LazyListLayoutInfo getLayoutInfo();
     method public boolean isAnimationRunning();
     method public suspend Object? scroll(kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.ScrollScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public suspend Object? smoothScrollBy(float value, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> spec, optional kotlin.coroutines.Continuation<? super java.lang.Float> p);
@@ -363,6 +384,7 @@ package androidx.compose.foundation.lazy {
     property public final int firstVisibleItemIndex;
     property public final int firstVisibleItemScrollOffset;
     property public final boolean isAnimationRunning;
+    property public final androidx.compose.foundation.lazy.LazyListLayoutInfo layoutInfo;
     field public static final androidx.compose.foundation.lazy.LazyListState.Companion Companion;
   }
 
