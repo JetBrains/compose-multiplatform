@@ -17,9 +17,9 @@
 @file:OptIn(ExperimentalComposeApi::class)
 package androidx.compose.runtime
 
+import android.view.View
 import android.widget.TextView
-import androidx.compose.ui.node.LayoutNode
-import androidx.compose.ui.platform.subcomposeInto
+import androidx.compose.ui.node.UiApplier
 import androidx.compose.ui.viewinterop.emitView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -496,17 +496,20 @@ class AmbientTests : BaseComposeTest() {
     }
 
     @Composable fun deferredSubCompose(block: @Composable () -> Unit): () -> Unit {
-        val container = remember { LayoutNode() }
+        val container = remember { View(activity) }
         val ref = Ref<CompositionReference>()
         narrowInvalidateForReference(ref = ref)
         return {
             @OptIn(ExperimentalComposeApi::class)
             // TODO(b/150390669): Review use of @ComposableContract(tracked = false)
-            subcomposeInto(
+            compositionFor(
                 container,
+                UiApplier(container),
                 ref.value
-            ) @ComposableContract(tracked = false) {
-                block()
+            ).apply {
+                setContent @ComposableContract(tracked = false) {
+                    block()
+                }
             }
         }
     }
