@@ -16,6 +16,7 @@
 package androidx.compose.desktop
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionReference
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.ambientOf
 import androidx.compose.runtime.emptyContent
@@ -320,8 +321,11 @@ class AppWindow : AppFrame {
         window.setLocation(x, y)
     }
 
-    private fun onCreate(content: @Composable () -> Unit) {
-        window.setContent {
+    private fun onCreate(
+        parentComposition: CompositionReference? = null,
+        content: @Composable () -> Unit
+    ) {
+        window.setContent(parentComposition) {
             Providers(
                 AppWindowAmbient provides this,
                 content = content
@@ -332,15 +336,21 @@ class AppWindow : AppFrame {
     /**
      * Shows a window with the given Compose content.
      *
+     * @param parentComposition The parent composition reference to coordinate
+     *        scheduling of composition updates.
+     *        If null then default root composition will be used.
      * @param content Composable content of the window.
      */
-    override fun show(content: @Composable () -> Unit) {
+    fun show(
+        parentComposition: CompositionReference? = null,
+        content: @Composable () -> Unit
+    ) {
         if (invoker != null) {
             invoker!!.lockWindow()
             window.setAlwaysOnTop(true)
         }
 
-        onCreate {
+        onCreate(parentComposition) {
             window.layer.owners?.keyboard = keyboard
             content()
         }

@@ -15,7 +15,6 @@
  */
 package androidx.compose.desktop
 
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.window.MenuBar
@@ -142,12 +141,19 @@ abstract class AppFrame {
      */
     abstract fun setSize(width: Int, height: Int)
 
-    /**
-     * Shows a window with the given Compose content.
-     *
-     * @param content Composable content of the window.
-     */
-    abstract fun show(content: @Composable () -> Unit)
+    // TODO(demin): uncomment this after b/175234629 will be fixed
+//    /**
+//     * Shows a window with the given Compose content.
+//     *
+//     * @param parentComposition The parent composition reference to coordinate
+//     *        scheduling of composition updates.
+//     *        If null then default root composition will be used.
+//     * @param content Composable content of the window.
+//     */
+//    abstract fun show(
+//        parentComposition: CompositionReference? = null,
+//        content: @Composable () -> Unit
+//    )
 
     /**
      * Closes the window.
