@@ -24,9 +24,6 @@ import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.SpringSpec
-import androidx.compose.animation.core.VectorConverter
-import androidx.compose.animation.core.spring
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.animation.FlingConfig
@@ -34,7 +31,6 @@ import androidx.compose.foundation.animation.defaultFlingConfig
 import androidx.compose.foundation.animation.fling
 import androidx.compose.runtime.AtomicReference
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.dispatch.withFrameMillis
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onDispose
@@ -83,18 +79,6 @@ fun rememberScrollableController(
 }
 
 /**
- * Scope used for suspending scroll blocks
- */
-interface ScrollScope {
-    /**
-     * Attempts to scroll forward by [pixels] px.
-     *
-     * @return the amount of the requested scroll that was consumed (that is, how far it scrolled)
-     */
-    fun scrollBy(pixels: Float): Float
-}
-
-/**
  * Controller to control the [scrollable] modifier with. Contains necessary information about the
  * ongoing fling and provides smooth scrolling capabilities.
  *
@@ -112,7 +96,7 @@ class ScrollableController(
     internal val flingConfig: FlingConfig,
     animationClock: AnimationClockObservable,
     internal val interactionState: InteractionState? = null
-) {
+) : Scrollable {
     /**
      * Smooth scroll by [value] amount of pixels
      *
@@ -127,57 +111,6 @@ class ScrollableController(
     ) {
         val to = animatedFloat.value + value
         animatedFloat.animateTo(to, anim = spec, onEnd = onEnd)
-    }
-
-    /**
-     * Smooth scroll by [value] pixels.
-     *
-     * Cancels the currently running scroll, if any, and suspends until the cancellation is
-     * complete.
-     *
-     * @param value delta to scroll by
-     * @param spec [AnimationSpec] to be used for this smooth scrolling
-     *
-     * @return the amount of scroll consumed
-     */
-    @OptIn(ExperimentalFoundationApi::class)
-    suspend fun smoothScrollBy(
-        value: Float,
-        spec: AnimationSpec<Float> = spring()
-    ): Float {
-        val animSpec = spec.vectorize(Float.VectorConverter)
-        val conv = Float.VectorConverter
-        val zeroVector = conv.convertToVector(0f)
-        val targetVector = conv.convertToVector(value)
-        var previousValue = 0f
-
-        scroll {
-            val startTimeMillis = withFrameMillis { it }
-            do {
-                val finished = withFrameMillis { frameTimeMillis ->
-                    val newValue = conv.convertFromVector(
-                        animSpec.getValue(
-                            playTime = frameTimeMillis - startTimeMillis,
-                            start = zeroVector,
-                            end = targetVector,
-                            // TODO: figure out if/how we should incorporate existing velocity
-                            startVelocity = zeroVector
-                        )
-                    )
-                    val delta = newValue - previousValue
-                    val consumed = scrollBy(delta)
-
-                    if (consumed != delta) {
-                        previousValue += consumed
-                        true
-                    } else {
-                        previousValue = newValue
-                        previousValue == value
-                    }
-                }
-            } while (!finished)
-        }
-        return previousValue
     }
 
     private val scrollControlJob = AtomicReference<Job?>(null)
@@ -198,7 +131,7 @@ class ScrollableController(
      *
      * If [scroll] is called from elsewhere, this will be canceled.
      */
-    suspend fun scroll(
+    override suspend fun scroll(
         block: suspend ScrollScope.() -> Unit
     ): Unit = coroutineScope {
         stopFlingAnimation()
