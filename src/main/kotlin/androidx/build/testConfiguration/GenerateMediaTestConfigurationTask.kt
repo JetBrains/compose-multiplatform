@@ -147,10 +147,10 @@ abstract class GenerateMediaTestConfigurationTask : DefaultTask() {
             .testRunner(testRunner.get())
         when (affectedModuleDetectorSubset.get()) {
             ProjectSubset.CHANGED_PROJECTS, ProjectSubset.ALL_AFFECTED_PROJECTS -> {
-                configBuilder.isFullTest(true)
+                configBuilder.isPostsubmit(true)
             }
             ProjectSubset.DEPENDENT_PROJECTS -> {
-                configBuilder.isFullTest(false)
+                configBuilder.isPostsubmit(false)
             }
             else -> {
                 throw IllegalStateException(

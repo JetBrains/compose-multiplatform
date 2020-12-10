@@ -90,7 +90,7 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
                 .renameApkForTesting(projectPath.get(), hasBenchmarkPlugin.get())
             configBuilder.appApkName(appName)
         }
-        val isFullTest: Boolean = when (affectedModuleDetectorSubset.get()) {
+        val isPostsubmit: Boolean = when (affectedModuleDetectorSubset.get()) {
             ProjectSubset.CHANGED_PROJECTS, ProjectSubset.ALL_AFFECTED_PROJECTS -> {
                 true
             }
@@ -104,11 +104,14 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
                 )
             }
         }
-        configBuilder.isFullTest(isFullTest)
+        configBuilder.isPostsubmit(isPostsubmit)
         if (hasBenchmarkPlugin.get()) {
             configBuilder.isBenchmark(true)
-            if (isFullTest)
-                configBuilder.tag("MetricTests")
+            if (isPostsubmit) {
+                configBuilder.tag("microbenchmarks")
+            }
+        } else if (projectPath.get().endsWith("macrobenchmark")) {
+            configBuilder.tag("macrobenchmarks")
         }
         val testApk = testLoader.get().load(testFolder.get())
             ?: throw RuntimeException("Cannot load required APK for task: $name")
