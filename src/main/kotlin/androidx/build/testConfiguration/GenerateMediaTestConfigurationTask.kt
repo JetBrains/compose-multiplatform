@@ -106,15 +106,15 @@ abstract class GenerateMediaTestConfigurationTask : DefaultTask() {
         )
         writeConfigFileContent(
             clientToTApk, serviceToTApk, clientToTPath.get(),
-            serviceToTPath.get(), clientToTServiceToT
+            serviceToTPath.get(), clientToTServiceToT, false, false
         )
         writeConfigFileContent(
             clientToTApk, servicePreviousApk, clientToTPath.get(),
-            servicePreviousPath.get(), clientToTServicePrevious
+            servicePreviousPath.get(), clientToTServicePrevious, false, true
         )
         writeConfigFileContent(
             clientPreviousApk, serviceToTApk, clientPreviousPath.get(),
-            serviceToTPath.get(), clientPreviousServiceToT
+            serviceToTPath.get(), clientPreviousServiceToT, true, false
         )
     }
 
@@ -136,7 +136,9 @@ abstract class GenerateMediaTestConfigurationTask : DefaultTask() {
         serviceApk: BuiltArtifacts,
         clientPath: String,
         servicePath: String,
-        outputFile: RegularFileProperty
+        outputFile: RegularFileProperty,
+        isClientPrevious: Boolean,
+        isServicePrevious: Boolean
     ) {
         val configBuilder = MediaConfigBuilder()
         configBuilder.clientApkName(resolveName(clientApk, clientPath))
@@ -145,6 +147,8 @@ abstract class GenerateMediaTestConfigurationTask : DefaultTask() {
             .serviceApplicationId(serviceApk.applicationId)
             .minSdk(minSdk.get().toString())
             .testRunner(testRunner.get())
+            .isClientPrevious(isClientPrevious)
+            .isServicePrevious(isServicePrevious)
         when (affectedModuleDetectorSubset.get()) {
             ProjectSubset.CHANGED_PROJECTS, ProjectSubset.ALL_AFFECTED_PROJECTS -> {
                 configBuilder.isPostsubmit(true)
