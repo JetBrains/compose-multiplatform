@@ -478,7 +478,7 @@ internal fun Constraints.assertNotNestingScrollableContainers(isVertical: Boolea
     if (isVertical) {
         check(maxHeight != Constraints.Infinity) {
             "Nesting scrollable in the same direction layouts like ScrollableContainer and " +
-                "LazyColumnFor is not allowed. If you want to add a header before the list of" +
+                "LazyColumn is not allowed. If you want to add a header before the list of" +
                 " items please take a look on LazyColumn component which has a DSL api which" +
                 " allows to first add a header via item() function and then the list of " +
                 "items via items()."
@@ -486,7 +486,7 @@ internal fun Constraints.assertNotNestingScrollableContainers(isVertical: Boolea
     } else {
         check(maxWidth != Constraints.Infinity) {
             "Nesting scrollable in the same direction layouts like ScrollableRow and " +
-                "LazyRowFor is not allowed. If you want to add a header before the list of " +
+                "LazyRow is not allowed. If you want to add a header before the list of " +
                 "items please take a look on LazyRow component which has a DSL api which " +
                 "allows to first add a fixed element via item() function and then the " +
                 "list of items via items()."

@@ -68,11 +68,10 @@ class LazyListsContentPaddingTest {
         val smallPaddingSize = itemSize / 4
         val largePaddingSize = itemSize
         rule.setContent {
-            LazyColumnFor(
-                items = listOf(1),
-                state = rememberLazyListState().also { state = it },
+            LazyColumn(
                 modifier = Modifier.size(containerSize)
                     .testTag(LazyListTag),
+                state = rememberLazyListState().also { state = it },
                 contentPadding = PaddingValues(
                     start = smallPaddingSize,
                     top = largePaddingSize,
@@ -80,7 +79,9 @@ class LazyListsContentPaddingTest {
                     bottom = largePaddingSize
                 )
             ) {
-                Spacer(Modifier.fillParentMaxWidth().preferredHeight(itemSize).testTag(ItemTag))
+                items(listOf(1)) {
+                    Spacer(Modifier.fillParentMaxWidth().preferredHeight(itemSize).testTag(ItemTag))
+                }
             }
         }
 
@@ -101,17 +102,18 @@ class LazyListsContentPaddingTest {
     fun column_contentPaddingIsNotAffectingScrollPosition() {
         lateinit var state: LazyListState
         rule.setContent {
-            LazyColumnFor(
-                items = listOf(1),
-                state = rememberLazyListState().also { state = it },
+            LazyColumn(
                 modifier = Modifier.size(itemSize * 2)
                     .testTag(LazyListTag),
+                state = rememberLazyListState().also { state = it },
                 contentPadding = PaddingValues(
                     top = itemSize,
                     bottom = itemSize
                 )
             ) {
-                Spacer(Modifier.fillParentMaxWidth().preferredHeight(itemSize).testTag(ItemTag))
+                items(listOf(1)) {
+                    Spacer(Modifier.fillParentMaxWidth().preferredHeight(itemSize).testTag(ItemTag))
+                }
             }
         }
 
@@ -127,17 +129,18 @@ class LazyListsContentPaddingTest {
         lateinit var state: LazyListState
         val padding = itemSize * 1.5f
         rule.setContent {
-            LazyColumnFor(
-                items = (0..3).toList(),
-                state = rememberLazyListState().also { state = it },
+            LazyColumn(
                 modifier = Modifier.size(padding * 2 + itemSize)
                     .testTag(LazyListTag),
+                state = rememberLazyListState().also { state = it },
                 contentPadding = PaddingValues(
                     top = padding,
                     bottom = padding
                 )
             ) {
-                Spacer(Modifier.size(itemSize).testTag(it.toString()))
+                items((0..3).toList()) {
+                    Spacer(Modifier.size(itemSize).testTag(it.toString()))
+                }
             }
         }
 
@@ -167,17 +170,18 @@ class LazyListsContentPaddingTest {
         lateinit var state: LazyListState
         val padding = itemSize * 1.5f
         rule.setContent {
-            LazyColumnFor(
-                items = (0..3).toList(),
-                state = rememberLazyListState().also { state = it },
+            LazyColumn(
                 modifier = Modifier.size(itemSize + padding * 2)
                     .testTag(LazyListTag),
+                state = rememberLazyListState().also { state = it },
                 contentPadding = PaddingValues(
                     top = padding,
                     bottom = padding
                 )
             ) {
-                Spacer(Modifier.size(itemSize).testTag(it.toString()))
+                items((0..3).toList()) {
+                    Spacer(Modifier.size(itemSize).testTag(it.toString()))
+                }
             }
         }
 
@@ -201,17 +205,18 @@ class LazyListsContentPaddingTest {
         lateinit var state: LazyListState
         val padding = itemSize * 1.5f
         rule.setContent {
-            LazyColumnFor(
-                items = (0..3).toList(),
-                state = rememberLazyListState().also { state = it },
+            LazyColumn(
                 modifier = Modifier.size(padding * 2 + itemSize)
                     .testTag(LazyListTag),
+                state = rememberLazyListState().also { state = it },
                 contentPadding = PaddingValues(
                     top = padding,
                     bottom = padding
                 )
             ) {
-                Spacer(Modifier.size(itemSize).testTag(it.toString()))
+                items((0..3).toList()) {
+                    Spacer(Modifier.size(itemSize).testTag(it.toString()))
+                }
             }
         }
 
@@ -244,17 +249,18 @@ class LazyListsContentPaddingTest {
         lateinit var state: LazyListState
         val padding = itemSize * 1.5f
         rule.setContent {
-            LazyColumnFor(
-                items = (0..3).toList(),
-                state = rememberLazyListState().also { state = it },
+            LazyColumn(
                 modifier = Modifier.size(padding * 2 + itemSize)
                     .testTag(LazyListTag),
+                state = rememberLazyListState().also { state = it },
                 contentPadding = PaddingValues(
                     top = padding,
                     bottom = padding
                 )
             ) {
-                Spacer(Modifier.size(itemSize).testTag(it.toString()))
+                items((0..3).toList()) {
+                    Spacer(Modifier.size(itemSize).testTag(it.toString()))
+                }
             }
         }
 
@@ -275,8 +281,7 @@ class LazyListsContentPaddingTest {
     fun column_contentPaddingAndWrapContent() {
         rule.setContent {
             Box(modifier = Modifier.testTag(ContainerTag)) {
-                LazyColumnFor(
-                    items = listOf(1),
+                LazyColumn(
                     contentPadding = PaddingValues(
                         start = 2.dp,
                         top = 4.dp,
@@ -284,7 +289,9 @@ class LazyListsContentPaddingTest {
                         bottom = 8.dp
                     )
                 ) {
-                    Spacer(Modifier.size(itemSize).testTag(ItemTag))
+                    items(listOf(1)) {
+                        Spacer(Modifier.size(itemSize).testTag(ItemTag))
+                    }
                 }
             }
         }
@@ -306,8 +313,7 @@ class LazyListsContentPaddingTest {
     fun column_contentPaddingAndNoContent() {
         rule.setContent {
             Box(modifier = Modifier.testTag(ContainerTag)) {
-                LazyColumnFor(
-                    items = listOf(0),
+                LazyColumn(
                     contentPadding = PaddingValues(
                         start = 2.dp,
                         top = 4.dp,
@@ -315,6 +321,8 @@ class LazyListsContentPaddingTest {
                         bottom = 8.dp
                     )
                 ) {
+                    items(listOf(0)) {
+                    }
                 }
             }
         }
@@ -333,11 +341,10 @@ class LazyListsContentPaddingTest {
         val smallPaddingSize = itemSize / 4
         val largePaddingSize = itemSize
         rule.setContent {
-            LazyRowFor(
-                items = listOf(1),
-                state = rememberLazyListState().also { state = it },
+            LazyRow(
                 modifier = Modifier.size(containerSize)
                     .testTag(LazyListTag),
+                state = rememberLazyListState().also { state = it },
                 contentPadding = PaddingValues(
                     top = smallPaddingSize,
                     start = largePaddingSize,
@@ -345,7 +352,9 @@ class LazyListsContentPaddingTest {
                     end = largePaddingSize
                 )
             ) {
-                Spacer(Modifier.fillParentMaxHeight().preferredWidth(itemSize).testTag(ItemTag))
+                items(listOf(1)) {
+                    Spacer(Modifier.fillParentMaxHeight().preferredWidth(itemSize).testTag(ItemTag))
+                }
             }
         }
 
@@ -369,17 +378,18 @@ class LazyListsContentPaddingTest {
             50.dp.toIntPx().toDp()
         }
         rule.setContent {
-            LazyRowFor(
-                items = listOf(1),
-                state = rememberLazyListState().also { state = it },
+            LazyRow(
                 modifier = Modifier.size(itemSize * 2)
                     .testTag(LazyListTag),
+                state = rememberLazyListState().also { state = it },
                 contentPadding = PaddingValues(
                     start = itemSize,
                     end = itemSize
                 )
             ) {
-                Spacer(Modifier.fillParentMaxHeight().preferredWidth(itemSize).testTag(ItemTag))
+                items(listOf(1)) {
+                    Spacer(Modifier.fillParentMaxHeight().preferredWidth(itemSize).testTag(ItemTag))
+                }
             }
         }
 
@@ -395,17 +405,18 @@ class LazyListsContentPaddingTest {
         lateinit var state: LazyListState
         val padding = itemSize * 1.5f
         rule.setContent {
-            LazyRowFor(
-                items = (0..3).toList(),
-                state = rememberLazyListState().also { state = it },
+            LazyRow(
                 modifier = Modifier.size(padding * 2 + itemSize)
                     .testTag(LazyListTag),
+                state = rememberLazyListState().also { state = it },
                 contentPadding = PaddingValues(
                     start = padding,
                     end = padding
                 )
             ) {
-                Spacer(Modifier.size(itemSize).testTag(it.toString()))
+                items((0..3).toList()) {
+                    Spacer(Modifier.size(itemSize).testTag(it.toString()))
+                }
             }
         }
 
@@ -435,17 +446,18 @@ class LazyListsContentPaddingTest {
         lateinit var state: LazyListState
         val padding = itemSize * 1.5f
         rule.setContent {
-            LazyRowFor(
-                items = (0..3).toList(),
-                state = rememberLazyListState().also { state = it },
+            LazyRow(
                 modifier = Modifier.size(itemSize + padding * 2)
                     .testTag(LazyListTag),
+                state = rememberLazyListState().also { state = it },
                 contentPadding = PaddingValues(
                     start = padding,
                     end = padding
                 )
             ) {
-                Spacer(Modifier.size(itemSize).testTag(it.toString()))
+                items((0..3).toList()) {
+                    Spacer(Modifier.size(itemSize).testTag(it.toString()))
+                }
             }
         }
 
@@ -469,17 +481,18 @@ class LazyListsContentPaddingTest {
         lateinit var state: LazyListState
         val padding = itemSize * 1.5f
         rule.setContent {
-            LazyRowFor(
-                items = (0..3).toList(),
-                state = rememberLazyListState().also { state = it },
+            LazyRow(
                 modifier = Modifier.size(padding * 2 + itemSize)
                     .testTag(LazyListTag),
+                state = rememberLazyListState().also { state = it },
                 contentPadding = PaddingValues(
                     start = padding,
                     end = padding
                 )
             ) {
-                Spacer(Modifier.size(itemSize).testTag(it.toString()))
+                items((0..3).toList()) {
+                    Spacer(Modifier.size(itemSize).testTag(it.toString()))
+                }
             }
         }
 
@@ -512,17 +525,18 @@ class LazyListsContentPaddingTest {
         lateinit var state: LazyListState
         val padding = itemSize * 1.5f
         rule.setContent {
-            LazyRowFor(
-                items = (0..3).toList(),
-                state = rememberLazyListState().also { state = it },
+            LazyRow(
                 modifier = Modifier.size(padding * 2 + itemSize)
                     .testTag(LazyListTag),
+                state = rememberLazyListState().also { state = it },
                 contentPadding = PaddingValues(
                     start = padding,
                     end = padding
                 )
             ) {
-                Spacer(Modifier.size(itemSize).testTag(it.toString()))
+                items((0..3).toList()) {
+                    Spacer(Modifier.size(itemSize).testTag(it.toString()))
+                }
             }
         }
 
@@ -543,8 +557,7 @@ class LazyListsContentPaddingTest {
     fun row_contentPaddingAndWrapContent() {
         rule.setContent {
             Box(modifier = Modifier.testTag(ContainerTag)) {
-                LazyRowFor(
-                    items = listOf(1),
+                LazyRow(
                     contentPadding = PaddingValues(
                         start = 2.dp,
                         top = 4.dp,
@@ -552,7 +565,9 @@ class LazyListsContentPaddingTest {
                         bottom = 8.dp
                     )
                 ) {
-                    Spacer(Modifier.size(itemSize).testTag(ItemTag))
+                    items(listOf(1)) {
+                        Spacer(Modifier.size(itemSize).testTag(ItemTag))
+                    }
                 }
             }
         }
@@ -574,8 +589,7 @@ class LazyListsContentPaddingTest {
     fun row_contentPaddingAndNoContent() {
         rule.setContent {
             Box(modifier = Modifier.testTag(ContainerTag)) {
-                LazyRowFor(
-                    items = listOf(0),
+                LazyRow(
                     contentPadding = PaddingValues(
                         start = 2.dp,
                         top = 4.dp,
@@ -583,6 +597,7 @@ class LazyListsContentPaddingTest {
                         bottom = 8.dp
                     )
                 ) {
+                    items(listOf(0)) {}
                 }
             }
         }

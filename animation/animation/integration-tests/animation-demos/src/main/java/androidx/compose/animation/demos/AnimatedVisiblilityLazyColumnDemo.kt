@@ -27,7 +27,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumnForIndexed
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -62,13 +62,15 @@ fun AnimatedVisibilityLazyColumnDemo() {
                 Text("Remove")
             }
         }
-        LazyColumnForIndexed(turquoiseColors) { i, color ->
-            AnimatedVisibility(
-                (turquoiseColors.size - itemNum) <= i,
-                enter = expandVertically(),
-                exit = shrinkVertically()
-            ) {
-                Spacer(Modifier.fillMaxWidth().height(90.dp).background(color))
+        LazyColumn {
+            itemsIndexed(turquoiseColors) { i, color ->
+                AnimatedVisibility(
+                    (turquoiseColors.size - itemNum) <= i,
+                    enter = expandVertically(),
+                    exit = shrinkVertically()
+                ) {
+                    Spacer(Modifier.fillMaxWidth().height(90.dp).background(color))
+                }
             }
         }
 

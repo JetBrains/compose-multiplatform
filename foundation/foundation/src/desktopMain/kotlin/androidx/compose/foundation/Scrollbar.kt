@@ -88,7 +88,7 @@ fun defaultScrollbarStyle() = ScrollbarStyle(
 
 /**
  * Vertical scrollbar that can be attached to some scrollable
- * component (ScrollableColumn, LazyColumnFor) and share common state with it.
+ * component (ScrollableColumn, LazyColumn) and share common state with it.
  *
  * Can be placed independently.
  *
@@ -128,7 +128,7 @@ fun VerticalScrollbar(
 
 /**
  * Horizontal scrollbar that can be attached to some scrollable
- * component (ScrollableRow, LazyRowFor) and share common state with it.
+ * component (ScrollableRow, LazyRow) and share common state with it.
  *
  * Can be placed independently.
  *
