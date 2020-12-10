@@ -21,7 +21,7 @@ import androidx.compose.material.Text
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.Group
 import androidx.compose.ui.tooling.Inspectable
-import androidx.compose.ui.tooling.SlotTableRecord
+import androidx.compose.ui.tooling.CompositionDataRecord
 import androidx.compose.ui.tooling.ToolingTest
 import androidx.compose.ui.tooling.asTree
 import androidx.compose.ui.unit.Dp
@@ -38,7 +38,7 @@ class InlineClassConverterTest : ToolingTest() {
 
     @Test
     fun parameterValueTest() {
-        val slotTableRecord = SlotTableRecord.create()
+        val slotTableRecord = CompositionDataRecord.create()
         show {
             Inspectable(slotTableRecord) {
                 Surface {

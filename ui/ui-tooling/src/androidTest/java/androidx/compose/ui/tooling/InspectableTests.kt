@@ -25,7 +25,6 @@ import androidx.compose.material.ModalDrawerLayout
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.InternalComposeApi
-import androidx.compose.runtime.SlotTable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
@@ -50,7 +49,7 @@ import java.util.concurrent.TimeUnit
 class InspectableTests : ToolingTest() {
     @Test
     fun simpleInspection() {
-        val slotTableRecord = SlotTableRecord.create()
+        val slotTableRecord = CompositionDataRecord.create()
         show {
             Inspectable(slotTableRecord) {
                 Column {
@@ -77,7 +76,7 @@ class InspectableTests : ToolingTest() {
 
     @Test
     fun parametersTest() {
-        val slotTableRecord = SlotTableRecord.create()
+        val slotTableRecord = CompositionDataRecord.create()
         fun unknown(i: Int) = i
 
         show {
@@ -116,8 +115,8 @@ class InspectableTests : ToolingTest() {
 
         val tree = slotTableRecord.store.first().asTree()
         val list = tree.asList()
-        val parameters = list.filter {
-            it.parameters.isNotEmpty() && it.location.let {
+        val parameters = list.filter { group ->
+            group.parameters.isNotEmpty() && group.location.let {
                 it != null && it.sourceFile == "InspectableTests.kt"
             }
         }
@@ -295,7 +294,7 @@ class InspectableTests : ToolingTest() {
     fun inInspectionMode() {
         var displayed = false
         show {
-            Inspectable(SlotTableRecord.create()) {
+            Inspectable(CompositionDataRecord.create()) {
                 Column {
                     InInspectionModeOnly {
                         Box(Modifier.preferredSize(100.dp).background(color = Color(0xFF)))
@@ -326,7 +325,7 @@ class InspectableTests : ToolingTest() {
     @InternalComposeApi
     @Test // regression test for b/161839910
     fun textParametersAreCorrect() {
-        val slotTableRecord = SlotTableRecord.create()
+        val slotTableRecord = CompositionDataRecord.create()
         show {
             Inspectable(slotTableRecord) {
                 Text("Test")
@@ -334,8 +333,8 @@ class InspectableTests : ToolingTest() {
         }
         val tree = slotTableRecord.store.first().asTree()
         val list = tree.asList()
-        val parameters = list.filter {
-            it.parameters.isNotEmpty() && it.location.let {
+        val parameters = list.filter { group ->
+            group.parameters.isNotEmpty() && group.location.let {
                 it != null && it.sourceFile == "InspectableTests.kt"
             }
         }
@@ -430,15 +429,4 @@ internal fun Group.asList(): List<Group> {
         stack.addAll(next.children.reversed())
     }
     return result
-}
-
-internal fun SlotTableRecord.findGroupForFile(fileName: String) =
-    store.map { it.findGroupForFile(fileName) }.filterNotNull().firstOrNull()
-
-@OptIn(InternalComposeApi::class)
-fun SlotTable.findGroupForFile(fileName: String) = asTree().findGroupForFile(fileName)
-fun Group.findGroupForFile(fileName: String): Group? {
-    val position = position
-    if (position != null && position.contains(fileName)) return this
-    return children.map { it.findGroupForFile(fileName) }.filterNotNull().firstOrNull()
 }

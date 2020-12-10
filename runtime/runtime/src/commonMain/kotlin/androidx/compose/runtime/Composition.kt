@@ -73,7 +73,7 @@ fun compositionFor(
 ): Composition = Compositions.findOrCreate(key) {
     CompositionImpl(
         parent,
-        composerFactory = { slots, rcmpsr -> Composer(slots, applier, rcmpsr) },
+        composerFactory = { parent -> Composer(applier, parent) },
         onDispose = { Compositions.onDisposed(key) }
     ).also {
         onCreated()
@@ -87,11 +87,10 @@ fun compositionFor(
  */
 private class CompositionImpl(
     private val parent: CompositionReference,
-    composerFactory: (SlotTable, CompositionReference) -> Composer<*>,
+    composerFactory: (CompositionReference) -> Composer<*>,
     private val onDispose: () -> Unit
 ) : Composition {
-    private val slotTable: SlotTable = SlotTable()
-    private val composer: Composer<*> = composerFactory(slotTable, parent).also {
+    private val composer: Composer<*> = composerFactory(parent).also {
         parent.registerComposer(it)
     }
 

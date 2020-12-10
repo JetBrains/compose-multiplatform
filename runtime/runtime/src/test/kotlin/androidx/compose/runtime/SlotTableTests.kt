@@ -3070,34 +3070,34 @@ class SlotTableTests {
 }
 
 @OptIn(InternalComposeApi::class)
-private inline fun SlotWriter.group(block: () -> Unit) {
+internal inline fun SlotWriter.group(block: () -> Unit) {
     startGroup()
     block()
     endGroup()
 }
 
 @OptIn(InternalComposeApi::class)
-private inline fun SlotWriter.group(key: Int, block: () -> Unit) {
+internal inline fun SlotWriter.group(key: Int, block: () -> Unit) {
     startGroup(key)
     block()
     endGroup()
 }
 
 @OptIn(InternalComposeApi::class)
-private inline fun SlotWriter.nodeGroup(key: Int, node: Any, block: () -> Unit = { }) {
+internal inline fun SlotWriter.nodeGroup(key: Int, node: Any, block: () -> Unit = { }) {
     startNode(key, node)
     block()
     endGroup()
 }
 @OptIn(InternalComposeApi::class)
-private inline fun SlotWriter.insert(block: () -> Unit) {
+internal inline fun SlotWriter.insert(block: () -> Unit) {
     beginInsert()
     block()
     endInsert()
 }
 
 @OptIn(InternalComposeApi::class)
-private inline fun SlotReader.group(key: Int, block: () -> Unit) {
+internal inline fun SlotReader.group(key: Int, block: () -> Unit) {
     assertEquals(key, groupKey)
     startGroup()
     block()
@@ -3105,7 +3105,7 @@ private inline fun SlotReader.group(key: Int, block: () -> Unit) {
 }
 
 @OptIn(InternalComposeApi::class)
-private inline fun SlotReader.group(block: () -> Unit) {
+internal inline fun SlotReader.group(block: () -> Unit) {
     startGroup()
     block()
     endGroup()
@@ -3124,7 +3124,7 @@ private const val treeRoot = -1
 private const val elementKey = 100
 
 @OptIn(InternalComposeApi::class)
-fun testSlotsNumbered(): SlotTable {
+private fun testSlotsNumbered(): SlotTable {
     val slotTable = SlotTable()
     slotTable.write { writer ->
         writer.beginInsert()
@@ -3141,7 +3141,7 @@ fun testSlotsNumbered(): SlotTable {
 
 // Creates 0 until 10 items each with 10 elements numbered 0...n with 0..n slots
 @OptIn(InternalComposeApi::class)
-fun testItems(): SlotTable {
+private fun testItems(): SlotTable {
     val slots = SlotTable()
     slots.write { writer ->
         writer.beginInsert()
@@ -3178,7 +3178,7 @@ fun testItems(): SlotTable {
 }
 
 @OptIn(InternalComposeApi::class)
-fun validateItems(slots: SlotTable) {
+private fun validateItems(slots: SlotTable) {
     slots.read { reader ->
         check(reader.groupKey == treeRoot) { "Invalid root key" }
         reader.startGroup()
@@ -3229,7 +3229,7 @@ fun validateItems(slots: SlotTable) {
 }
 
 @OptIn(InternalComposeApi::class)
-fun narrowTrees(): Pair<SlotTable, List<Anchor>> {
+private fun narrowTrees(): Pair<SlotTable, List<Anchor>> {
     val slots = SlotTable()
     val anchors = mutableListOf<Anchor>()
     slots.write { writer ->
@@ -3278,13 +3278,13 @@ fun narrowTrees(): Pair<SlotTable, List<Anchor>> {
 }
 
 @OptIn(InternalComposeApi::class)
-fun SlotReader.expectGroup(key: Int): Int {
+private fun SlotReader.expectGroup(key: Int): Int {
     assertEquals(key, groupKey)
     return skipGroup()
 }
 
 @OptIn(InternalComposeApi::class)
-fun SlotReader.expectGroup(
+private fun SlotReader.expectGroup(
     key: Int,
     block: () -> Unit
 ) {
@@ -3295,12 +3295,12 @@ fun SlotReader.expectGroup(
 }
 
 @OptIn(InternalComposeApi::class)
-fun SlotReader.expectData(value: Any) {
+private fun SlotReader.expectData(value: Any) {
     assertEquals(value, next())
 }
 
 @OptIn(InternalComposeApi::class)
-fun SlotReader.expectGroup(
+private fun SlotReader.expectGroup(
     key: Int,
     objectKey: Any?,
     block: () -> Unit = { skipToGroupEnd() }

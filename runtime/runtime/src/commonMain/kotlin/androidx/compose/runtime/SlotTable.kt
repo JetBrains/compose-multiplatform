@@ -73,8 +73,7 @@ import kotlin.math.min
 
 // The public API refers only to Index values. Address values are internal.
 
-@InternalComposeApi
-class SlotTable {
+internal class SlotTable : CompositionData, Iterable<CompositionGroup> {
     /**
      * An array to store group information that is stored as groups of [Group_Fields_Size]
      * elements of the array. The [groups] array can be thought of as an array of an inline
@@ -113,7 +112,14 @@ class SlotTable {
     /**
      * Tracks whether there is an active writer.
      */
-    private var writer = false
+    internal var writer = false
+        private set
+
+    /**
+     * An internal version that is incremented whenever a writer is created. This is used to
+     * detect when an iterator created by [CompositionData] is invalid.
+     */
+    internal var version = 0
 
     /**
      * A list of currently active anchors.
@@ -123,7 +129,7 @@ class SlotTable {
     /**
      * Returns true if the slot table is empty
      */
-    val isEmpty get() = groupsSize == 0
+    override val isEmpty get() = groupsSize == 0
 
     /**
      * Read the slot table in [block]. Any number of readers can be created but a slot table cannot
@@ -178,6 +184,7 @@ class SlotTable {
         check(!writer) { "Cannot start a writer when another writer is pending" }
         check(readers <= 0) { "Cannot start a writer when a reader is pending" }
         writer = true
+        version++
         return SlotWriter(this)
     }
 
@@ -438,6 +445,11 @@ class SlotTable {
         val end = if (group + 1 < groupsSize) groups.dataAnchor(group + 1) else slots.size
         return slots.toList().subList(start, end)
     }
+
+    override val compositionGroups: Iterable<CompositionGroup> get() = this
+
+    override fun iterator(): Iterator<CompositionGroup> =
+        GroupIterator(this, 0, groupsSize)
 }
 
 /**
@@ -448,8 +460,7 @@ class SlotTable {
  * instead of the [SlotTable] as the anchor index could have shifted due to operations performed
  * on the writer.
  */
-@InternalComposeApi
-class Anchor internal constructor(loc: Int) {
+internal class Anchor(loc: Int) {
     internal var location: Int = loc
     val valid get() = location != Int.MIN_VALUE
     fun toIndexFor(slots: SlotTable) = slots.anchorIndex(this)
@@ -459,8 +470,7 @@ class Anchor internal constructor(loc: Int) {
 /**
  * A reader of a slot table. See [SlotTable]
  */
-@InternalComposeApi
-class SlotReader(
+internal class SlotReader(
     /**
      * The table for whom this is a reader.
      */
@@ -890,8 +900,7 @@ class KeyInfo internal constructor(
 /**
  * The writer for a slot table. See [SlotTable] for details.
  */
-@InternalComposeApi
-class SlotWriter internal constructor(
+internal class SlotWriter(
     /**
      * The [SlotTable] for whom this is writer.
      */
@@ -2350,6 +2359,79 @@ class SlotWriter internal constructor(
         if (index > parentAnchorPivot) index else size + index - parentAnchorPivot
 }
 
+private class GroupIterator(
+    val table: SlotTable,
+    start: Int,
+    val end: Int
+) : Iterator<CompositionGroup> {
+    private var index = start
+    private val version = table.version
+
+    init {
+        if (table.writer) throw ConcurrentModificationException()
+    }
+
+    override fun hasNext() = index < end
+
+    override fun next(): CompositionGroup {
+        validateRead()
+        val group = index
+        index += table.groups.groupSize(group)
+        return object : CompositionGroup, Iterable<CompositionGroup> {
+            override val isEmpty: Boolean get() = table.groups.groupSize(group) == 0
+
+            override val key: Any
+                get() = if (table.groups.hasObjectKey(group))
+                    table.slots[table.groups.objectKeyIndex(group)]!!
+                else table.groups.key(group)
+
+            override val sourceInfo: String?
+                get() = if (table.groups.hasAux(group))
+                    table.slots[table.groups.auxIndex(group)] as? String
+                else null
+
+            override val node: Any?
+                get() = if (table.groups.isNode(group))
+                    table.slots[table.groups.nodeIndex(group)] else
+                    null
+
+            override val data: Iterable<Any?> get() {
+                val start = table.groups.dataAnchor(group)
+                val end = if (group + 1 < table.groupsSize)
+                    table.groups.dataAnchor(group + 1) else table.slotsSize
+                return object : Iterable<Any?>, Iterator<Any?> {
+                    var index = start
+                    override fun iterator(): Iterator<Any?> = this
+                    override fun hasNext(): Boolean = index < end
+                    override fun next(): Any? =
+                        (
+                            if (index >= 0 && index < table.slots.size)
+                                table.slots[index]
+                            else null
+                            ).also { index++ }
+                }
+            }
+
+            override val compositionGroups: Iterable<CompositionGroup> get() = this
+
+            override fun iterator(): Iterator<CompositionGroup> {
+                validateRead()
+                return GroupIterator(
+                    table,
+                    group + 1,
+                    group + table.groups.groupSize(group)
+                )
+            }
+        }
+    }
+
+    private fun validateRead() {
+        if (table.version != version) {
+            throw ConcurrentModificationException()
+        }
+    }
+}
+
 // Parent -1 is reserved to be the root parent index so the anchor must pivot on -2.
 private const val parentAnchorPivot = -2
 
@@ -2539,7 +2621,6 @@ private inline fun ArrayList<Anchor>.getOrAdd(
 /**
  * This is inlined here instead to avoid allocating a lambda for the compare when this is used.
  */
-@OptIn(InternalComposeApi::class)
 private fun ArrayList<Anchor>.search(location: Int, effectiveSize: Int): Int {
     var low = 0
     var high = size - 1
