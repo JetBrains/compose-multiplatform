@@ -33,6 +33,8 @@ import androidx.build.gradle.isRoot
 import androidx.build.jacoco.Jacoco
 import androidx.build.license.configureExternalDependencyLicenseCheck
 import androidx.build.studio.StudioTask
+import androidx.build.testConfiguration.addAppApkToTestConfigGeneration
+import androidx.build.testConfiguration.configureTestConfigGeneration
 import com.android.build.api.extension.LibraryAndroidComponentsExtension
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin

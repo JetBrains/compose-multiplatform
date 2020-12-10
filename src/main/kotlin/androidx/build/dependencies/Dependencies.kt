@@ -77,7 +77,7 @@ const val KOTLINPOET_CLASSINSPECTOR_ELEMENTS =
     "com.squareup:kotlinpoet-classinspector-elements:1.4.0"
 const val KOTLIN_COMPILE_TESTING = "com.github.tschuchortdev:kotlin-compile-testing:1.3.1"
 const val KOTLIN_COMPILE_TESTING_KSP = "com.github.tschuchortdev:kotlin-compile-testing-ksp:1.3.1"
-const val KSP_VERSION = "1.4.10-dev-experimental-20201120"
+const val KSP_VERSION = "1.4.20-dev-experimental-20201204"
 const val KOTLIN_KSP_API = "com.google.devtools.ksp:symbol-processing-api:$KSP_VERSION"
 const val KOTLIN_KSP = "com.google.devtools.ksp:symbol-processing:$KSP_VERSION"
 const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.20"
@@ -98,7 +98,7 @@ const val PLAY_CORE = "com.google.android.play:core:1.8.0"
 const val REACTIVE_STREAMS = "org.reactivestreams:reactive-streams:1.0.0"
 const val RX_JAVA = "io.reactivex.rxjava2:rxjava:2.2.9"
 const val RX_JAVA3 = "io.reactivex.rxjava3:rxjava:3.0.0"
-val SKIKO_VERSION = System.getenv("SKIKO_VERSION") ?: "0.1.16"
+val SKIKO_VERSION = System.getenv("SKIKO_VERSION") ?: "0.1.18"
 val SKIKO = "org.jetbrains.skiko:skiko-jvm:$SKIKO_VERSION"
 val SKIKO_LINUX_X64 = "org.jetbrains.skiko:skiko-jvm-runtime-linux-x64:$SKIKO_VERSION"
 val SKIKO_MACOS_X64 = "org.jetbrains.skiko:skiko-jvm-runtime-macos-x64:$SKIKO_VERSION"
@@ -154,6 +154,12 @@ val KOTLIN_TEST_ANNOTATIONS_COMMON get() =
 val KOTLIN_TEST_JUNIT get() = "org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion"
 val KOTLIN_TEST_JS get() = "org.jetbrains.kotlin:kotlin-test-js:$kotlinVersion"
 val KOTLIN_REFLECT get() = "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+val KOTLIN_COMPILER_EMBEDDABLE
+    get() = "org.jetbrains.kotlin:kotlin-compiler-embeddable:$kotlinVersion"
+val KOTLIN_COMPILER_DAEMON_EMBEDDABLE
+    get() = "org.jetbrains.kotlin:kotlin-daemon-embeddable:$kotlinVersion"
+val KOTLIN_ANNOTATION_PROCESSING_EMBEDDABLE
+    get() = "org.jetbrains.kotlin:kotlin-annotation-processing-embeddable:$kotlinVersion"
 
 internal lateinit var kotlinCoroutinesVersion: String
 

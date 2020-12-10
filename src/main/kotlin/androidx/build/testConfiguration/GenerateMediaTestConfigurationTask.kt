@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package androidx.build
+package androidx.build.testConfiguration
 
+import androidx.build.dependencyTracker.ProjectSubset
+import androidx.build.renameApkForTesting
 import com.android.build.api.variant.BuiltArtifacts
 import com.android.build.api.variant.BuiltArtifactsLoader
 import org.gradle.api.DefaultTask
@@ -28,58 +30,6 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import java.io.File
-
-const val MEDIA_TEMPLATE = """<?xml version="1.0" encoding="utf-8"?>
-        <!-- Copyright (C) 2019 The Android Open Source Project
-        Licensed under the Apache License, Version 2.0 (the "License")
-        you may not use this file except in compliance with the License.
-        You may obtain a copy of the License at
-        http://www.apache.org/licenses/LICENSE-2.0
-
-        Unless required by applicable law or agreed to in writing, software
-        distributed under the License is distributed on an "AS IS" BASIS,
-        WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-        See the License for the specific language governing permissions and
-        limitations under the License.
-        -->
-        <configuration description="Runs tests for the module">
-        <object type="module_controller" class="com.android.tradefed.testtype.suite.module.MinApiLevelModuleController">
-            <option name="min-api-level" value="MIN_SDK" />
-        </object>
-        <option name="test-suite-tag" value="androidx_unit_tests_suite" />
-        <option name="config-descriptor:metadata" key="applicationId"
-            value="CLIENT_APPLICATION_ID;SERVICE_APPLICATION_ID" />
-        <option name="wifi:disable" value="true" />
-        <include name="google/unbundled/common/setup" />
-        <target_preparer class="com.android.tradefed.targetprep.suite.SuiteApkInstaller">
-        <option name="cleanup-apks" value="true" />
-        <option name="test-file-name" value="CLIENT_FILE_NAME" />
-        <option name="test-file-name" value="SERVICE_FILE_NAME" />
-        </target_preparer>
-        <test class="com.android.tradefed.testtype.AndroidJUnitTest">
-        <option name="runner" value="TEST_RUNNER"/>
-        <option name="package" value="CLIENT_APPLICATION_ID" />
-        INSTRUMENTATION_ARGS
-        </test>
-        <test class="com.android.tradefed.testtype.AndroidJUnitTest">
-        <option name="runner" value="TEST_RUNNER"/>
-        <option name="package" value="SERVICE_APPLICATION_ID" />
-        INSTRUMENTATION_ARGS
-        </test>
-        </configuration>"""
-
-const val CLIENT_PREVIOUS = """
-    <option name="instrumentation-arg" key="client_version" value="previous" />
-"""
-const val CLIENT_TOT = """
-    <option name="instrumentation-arg" key="client_version" value="tot" />
-"""
-const val SERVICE_PREVIOUS = """
-    <option name="instrumentation-arg" key="service_version" value="previous" />
-"""
-const val SERVICE_TOT = """
-    <option name="instrumentation-arg" key="service_version" value="tot" />
-"""
 
 /**
  * Writes three configuration files to test combinations of media client & service in
@@ -115,6 +65,9 @@ abstract class GenerateMediaTestConfigurationTask : DefaultTask() {
 
     @get:Internal
     abstract val servicePreviousLoader: Property<BuiltArtifactsLoader>
+
+    @get:Input
+    abstract val affectedModuleDetectorSubset: Property<ProjectSubset>
 
     @get:Input
     abstract val clientToTPath: Property<String>
@@ -153,15 +106,15 @@ abstract class GenerateMediaTestConfigurationTask : DefaultTask() {
         )
         writeConfigFileContent(
             clientToTApk, serviceToTApk, clientToTPath.get(),
-            serviceToTPath.get(), clientToTServiceToT
+            serviceToTPath.get(), clientToTServiceToT, false, false
         )
         writeConfigFileContent(
             clientToTApk, servicePreviousApk, clientToTPath.get(),
-            servicePreviousPath.get(), clientToTServicePrevious
+            servicePreviousPath.get(), clientToTServicePrevious, false, true
         )
         writeConfigFileContent(
             clientPreviousApk, serviceToTApk, clientPreviousPath.get(),
-            serviceToTPath.get(), clientPreviousServiceToT
+            serviceToTPath.get(), clientPreviousServiceToT, true, false
         )
     }
 
@@ -170,7 +123,7 @@ abstract class GenerateMediaTestConfigurationTask : DefaultTask() {
         apkLoader: Property<BuiltArtifactsLoader>
     ): BuiltArtifacts {
         return apkLoader.get().load(apkFolder.get())
-            ?: throw RuntimeException("Cannot load APK for $name")
+            ?: throw RuntimeException("Cannot load required APK for task: $name")
     }
 
     private fun resolveName(apk: BuiltArtifacts, path: String): String {
@@ -183,29 +136,34 @@ abstract class GenerateMediaTestConfigurationTask : DefaultTask() {
         serviceApk: BuiltArtifacts,
         clientPath: String,
         servicePath: String,
-        outputFile: RegularFileProperty
+        outputFile: RegularFileProperty,
+        isClientPrevious: Boolean,
+        isServicePrevious: Boolean
     ) {
-        val instrumentationArgs =
-            if (clientPath.contains("previous")) {
-                if (servicePath.contains("previous")) {
-                    CLIENT_PREVIOUS + SERVICE_PREVIOUS
-                } else {
-                    CLIENT_PREVIOUS + SERVICE_TOT
-                }
-            } else if (servicePath.contains("previous")) {
-                CLIENT_TOT + SERVICE_PREVIOUS
-            } else {
-                CLIENT_TOT + SERVICE_TOT
+        val configBuilder = MediaConfigBuilder()
+        configBuilder.clientApkName(resolveName(clientApk, clientPath))
+            .clientApplicationId(clientApk.applicationId)
+            .serviceApkName(resolveName(serviceApk, servicePath))
+            .serviceApplicationId(serviceApk.applicationId)
+            .minSdk(minSdk.get().toString())
+            .testRunner(testRunner.get())
+            .isClientPrevious(isClientPrevious)
+            .isServicePrevious(isServicePrevious)
+        when (affectedModuleDetectorSubset.get()) {
+            ProjectSubset.CHANGED_PROJECTS, ProjectSubset.ALL_AFFECTED_PROJECTS -> {
+                configBuilder.isPostsubmit(true)
             }
-        var configContent: String = MEDIA_TEMPLATE
-        configContent = configContent
-            .replace("CLIENT_FILE_NAME", resolveName(clientApk, clientPath))
-            .replace("SERVICE_FILE_NAME", resolveName(serviceApk, servicePath))
-            .replace("CLIENT_APPLICATION_ID", clientApk.applicationId)
-            .replace("SERVICE_APPLICATION_ID", serviceApk.applicationId)
-            .replace("MIN_SDK", minSdk.get().toString())
-            .replace("TEST_RUNNER", testRunner.get())
-            .replace("INSTRUMENTATION_ARGS", instrumentationArgs)
+            ProjectSubset.DEPENDENT_PROJECTS -> {
+                configBuilder.isPostsubmit(false)
+            }
+            else -> {
+                throw IllegalStateException(
+                    "$name should not be running if the AffectedModuleDetector is returning " +
+                        "${affectedModuleDetectorSubset.get()} for this project."
+                )
+            }
+        }
+
         val resolvedOutputFile: File = outputFile.asFile.get()
         if (!resolvedOutputFile.exists()) {
             if (!resolvedOutputFile.createNewFile()) {
@@ -214,6 +172,6 @@ abstract class GenerateMediaTestConfigurationTask : DefaultTask() {
                 )
             }
         }
-        resolvedOutputFile.writeText(configContent)
+        resolvedOutputFile.writeText(configBuilder.build())
     }
 }

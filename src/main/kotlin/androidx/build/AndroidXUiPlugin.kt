@@ -21,7 +21,6 @@ import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.TestedExtension
-import org.gradle.api.DomainObjectCollection
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.type.ArtifactTypeDefinition
@@ -32,7 +31,6 @@ import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.invoke
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 const val composeSourceOption =
@@ -194,7 +192,10 @@ class AndroidXUiPlugin : Plugin<Project> {
                         "src/commonMain/kotlin", "src/jvmMain/kotlin",
                         "src/androidMain/kotlin"
                     )
-                    res.srcDirs("src/androidMain/res")
+                    res.srcDirs(
+                        "src/commonMain/resources",
+                        "src/androidMain/res"
+                    )
 
                     // Keep Kotlin files in java source sets so the source set is not empty when
                     // running unit tests which would prevent the tests from running in CI.
@@ -225,11 +226,9 @@ class AndroidXUiPlugin : Plugin<Project> {
          * resolved.
          */
         private fun Project.configureForMultiplatform() {
-            if (multiplatformExtension == null) {
-                throw IllegalStateException(
-                    "Unable to configureForMultiplatform() when " +
-                        "multiplatformExtension is null (multiplatform plugin not enabled?)"
-                )
+            val multiplatformExtension = checkNotNull(multiplatformExtension) {
+                "Unable to configureForMultiplatform() when " +
+                    "multiplatformExtension is null (multiplatform plugin not enabled?)"
             }
 
             /*
@@ -247,13 +246,20 @@ class AndroidXUiPlugin : Plugin<Project> {
             TODO: Consider changing unitTest to androidLocalTest and androidAndroidTest to
             androidDeviceTest when https://github.com/JetBrains/kotlin/pull/2829 rolls in.
             */
-            multiplatformExtension!!.sourceSets {
+            multiplatformExtension.sourceSets.all {
                 // Allow all experimental APIs, since MPP projects are themselves experimental
-                (this as DomainObjectCollection<KotlinSourceSet>).all {
-                    it.languageSettings.apply {
-                        useExperimentalAnnotation("kotlin.Experimental")
-                        useExperimentalAnnotation("kotlin.ExperimentalMultiplatform")
-                    }
+                it.languageSettings.apply {
+                    useExperimentalAnnotation("kotlin.Experimental")
+                    useExperimentalAnnotation("kotlin.ExperimentalMultiplatform")
+                }
+            }
+
+            afterEvaluate {
+                if (multiplatformExtension.targets.findByName("jvm") != null) {
+                    tasks.named("jvmTestClasses").also(::addToBuildOnServer)
+                }
+                if (multiplatformExtension.targets.findByName("desktop") != null) {
+                    tasks.named("desktopTestClasses").also(::addToBuildOnServer)
                 }
             }
         }

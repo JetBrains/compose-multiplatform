@@ -470,12 +470,19 @@ class AffectedModuleDetectorImpl constructor(
         private val COBUILT_TEST_PATHS = setOf(
             // Install media tests together per b/128577735
             setOf(
+                // Making a change in :media:version-compat-tests makes
+                // mediaGenerateTestConfiguration run (an unfortunate but low priority bug). To
+                // prevent failures from missing apks, we make sure to build the
+                // version-compat-tests projects in that case. Same with media2-session below.
+                ":media:version-compat-tests",
                 ":media:version-compat-tests:client",
                 ":media:version-compat-tests:service",
                 ":media:version-compat-tests:client-previous",
                 ":media:version-compat-tests:service-previous"
             ),
             setOf(
+                ":media2:media2-session",
+                ":media2:media2-session:version-compat-tests",
                 ":media2:media2-session:version-compat-tests:client",
                 ":media2:media2-session:version-compat-tests:service",
                 ":media2:media2-session:version-compat-tests:client-previous",
@@ -486,17 +493,17 @@ class AffectedModuleDetectorImpl constructor(
                 ":compose:material:material"
             ),
             setOf(
-                ":benchmark:integration-tests:macrobenchmark",
-                ":benchmark:integration-tests:macrobenchmark-target"
-            ),
-            setOf(
                 ":benchmark:benchmark-macro",
                 ":benchmark:integration-tests:macrobenchmark-target"
-            ),
+            ), // link benchmark-macro's correctness test and its target
+            setOf(
+                ":benchmark:integration-tests:macrobenchmark",
+                ":benchmark:integration-tests:macrobenchmark-target"
+            ), // link benchmark's macrobenchmark and its target
             setOf(
                 ":compose:integration-tests:macrobenchmark",
-                ":compose:integration-tests:demos"
-            ),
+                ":compose:integration-tests:macrobenchmark-target"
+            ), // link compose's macrobenchmark and its target
         )
     }
 }

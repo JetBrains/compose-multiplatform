@@ -60,9 +60,7 @@ configurations {
     cacheableImplementation {
         extendsFrom(project.configurations.cacheableApi)
     }
-    cacheableRuntime {
-        extendsFrom(project.configurations.cacheableImplementation)
-    }
+    cacheableRuntimeOnly
 }
 
 dependencies {
@@ -74,12 +72,12 @@ dependencies {
     cacheableApi build_libs.dokka_gradle
     // needed by inspection plugin
     cacheableImplementation "com.google.protobuf:protobuf-gradle-plugin:0.8.13"
-    // TODO(aurimas): remove when b/173417030 is fixed
+    // TODO(aurimas): remove when b/174658825 is fixed
     cacheableImplementation "org.anarres.jarjar:jarjar-gradle:1.0.1"
     cacheableImplementation "com.github.jengelman.gradle.plugins:shadow:5.2.0"
     // dependencies that aren't used by buildSrc directly but that we resolve here so that the
     // root project doesn't need to re-resolve them and their dependencies on every build
-    cacheableRuntime build_libs.hilt_plugin
+    cacheableRuntimeOnly build_libs.hilt_plugin
     // dependencies whose resolutions we don't need to cache
     compileOnly(findGradleKotlinDsl()) // Only one file in this configuration, no need to cache it
     implementation project("jetpad-integration") // Doesn't have a .pom, so not slow to load
@@ -168,7 +166,7 @@ def loadConfigurationQuicklyInto(fromConf, toConf) {
 
 loadConfigurationQuicklyInto(configurations.cacheableApi, configurations.api)
 loadConfigurationQuicklyInto(configurations.cacheableImplementation, configurations.implementation)
-loadConfigurationQuicklyInto(configurations.cacheableRuntime, configurations.runtime)
+loadConfigurationQuicklyInto(configurations.cacheableRuntimeOnly, configurations.runtimeOnly)
 
 project.tasks.withType(Jar) { task ->
     task.reproducibleFileOrder = true
