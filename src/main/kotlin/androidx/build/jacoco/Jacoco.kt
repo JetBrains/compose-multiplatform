@@ -67,7 +67,8 @@ object Jacoco {
                     it.from(v.testedVariant.javaCompileProvider.get().destinationDir)
                     it.exclude("**/R.class", "**/R\$*.class", "**/BuildConfig.class")
                     it.destinationDirectory.set(project.buildDir)
-                    it.archiveFileName.set("${project.name}-${v.baseName}-allclasses.jar")
+                    val sanitizedPath = project.path.removePrefix(":").replace(':', '_')
+                    it.archiveFileName.set("$sanitizedPath-${v.baseName}-allclasses.jar")
                 }
                 project.rootProject.tasks.named(
                     "packageAllClassFilesForCoverageReport",
