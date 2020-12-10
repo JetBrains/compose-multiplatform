@@ -47,6 +47,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.isUnspecified
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import org.jetbrains.skija.Paint

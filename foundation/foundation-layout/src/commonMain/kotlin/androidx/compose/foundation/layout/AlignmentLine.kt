@@ -32,6 +32,7 @@ import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.isUnspecified
 import kotlin.math.max
 
 /**

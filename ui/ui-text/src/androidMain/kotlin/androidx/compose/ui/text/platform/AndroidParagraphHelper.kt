@@ -28,6 +28,7 @@ import androidx.compose.ui.text.platform.extensions.setTextIndent
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.isUnspecified
 
 @OptIn(InternalPlatformTextApi::class)
 internal fun createCharSequence(

@@ -19,6 +19,7 @@ package androidx.compose.ui.layout
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.util.format
 import androidx.compose.ui.util.packFloats
 import androidx.compose.ui.util.unpackFloat1
@@ -108,6 +109,27 @@ inline class ScaleFactor(@PublishedApi internal val packedValue: Long) {
         val Unspecified = ScaleFactor(Float.NaN, Float.NaN)
     }
 }
+
+/**
+ * `false` when this is [ScaleFactor.Unspecified].
+ */
+@Stable
+inline val ScaleFactor.isSpecified: Boolean
+    get() = packedValue != ScaleFactor.Unspecified.packedValue
+
+/**
+ * `true` when this is [ScaleFactor.Unspecified].
+ */
+@Stable
+inline val ScaleFactor.isUnspecified: Boolean
+    get() = packedValue == ScaleFactor.Unspecified.packedValue
+
+/**
+ * If this [ScaleFactor] [isSpecified] then this is returned, otherwise [block] is executed
+ * and its result is returned.
+ */
+inline fun ScaleFactor.useOrElse(block: () -> ScaleFactor): ScaleFactor =
+    if (isSpecified) this else block()
 
 /**
  * Multiplication operator with [Size].

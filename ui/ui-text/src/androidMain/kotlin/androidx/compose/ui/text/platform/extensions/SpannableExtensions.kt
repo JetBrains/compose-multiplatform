@@ -60,6 +60,7 @@ import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
+import androidx.compose.ui.unit.isUnspecified
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastForEach
 import kotlin.math.ceil

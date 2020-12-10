@@ -19,6 +19,7 @@ package androidx.compose.ui.unit
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.util.lerp
 
 /**
@@ -270,11 +271,6 @@ inline class TextUnit(val packedValue: Long) {
     val isInherit get() = isUnspecified
 
     /**
-     * True if this is [TextUnit.Unspecified], otherwise false.
-     */
-    val isUnspecified get() = rawType == UNIT_TYPE_UNSPECIFIED
-
-    /**
      * True if this is a SP unit type.
      */
     val isSp get() = rawType == UNIT_TYPE_SP
@@ -289,6 +285,27 @@ inline class TextUnit(val packedValue: Long) {
      */
     val value get() = Float.fromBits((packedValue and 0xFFFF_FFFFL).toInt())
 }
+
+/**
+ * `false` when this is [TextUnit.Unspecified].
+ */
+@Stable
+inline val TextUnit.isSpecified: Boolean
+    get() = !isUnspecified
+
+/**
+ * `true` when this is [TextUnit.Unspecified].
+ */
+@Stable
+val TextUnit.isUnspecified: Boolean
+    get() = rawType == UNIT_TYPE_UNSPECIFIED
+
+/**
+ * If this [TextUnit] [isSpecified] then this is returned, otherwise [block] is executed
+ * and its result is returned.
+ */
+inline fun TextUnit.useOrElse(block: () -> TextUnit): TextUnit =
+    if (isSpecified) this else block()
 
 /**
  * Creates a SP unit [TextUnit]
