@@ -20,7 +20,6 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.ambientOf
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.util.nativeClass
 
 /**
  * Represents the colors used for text selection by text and text field components.
@@ -42,9 +41,7 @@ class TextSelectionColors(
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (nativeClass() != other?.nativeClass()) return false
-
-        other as TextSelectionColors
+        if (other !is TextSelectionColors) return false
 
         if (handleColor != other.handleColor) return false
         if (backgroundColor != other.backgroundColor) return false

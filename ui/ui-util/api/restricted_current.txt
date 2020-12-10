@@ -31,7 +31,6 @@ package androidx.compose.ui.util {
     method public static StringBuilder deleteAt(StringBuilder, int index);
     method public static String format(String, java.lang.Object?... args);
     method public static int identityHashCode(Object?);
-    method public static Object nativeClass(Object);
   }
 
   public final class ListUtilsKt {
