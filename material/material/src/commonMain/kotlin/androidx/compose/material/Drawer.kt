@@ -46,9 +46,11 @@ import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.semantics.dismiss
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
+import kotlin.math.roundToInt
 
 /**
  * Possible values of [DrawerState].
@@ -397,7 +399,7 @@ fun ModalDrawerLayout(
                             dismiss(action = { drawerState.close(); true })
                         }
                     }
-                    .offset(x = { drawerState.offset.value })
+                    .offset { IntOffset(drawerState.offset.value.roundToInt(), 0) }
                     .padding(end = VerticalDrawerPadding),
                 shape = drawerShape,
                 color = drawerBackgroundColor,
@@ -519,8 +521,7 @@ fun BottomDrawerLayout(
                         if (drawerState.isOpen) {
                             dismiss(action = { drawerState.close(); true })
                         }
-                    }
-                    .offset(y = { drawerState.offset.value }),
+                    }.offset { IntOffset(0, drawerState.offset.value.roundToInt()) },
                 shape = drawerShape,
                 color = drawerBackgroundColor,
                 contentColor = drawerContentColor,

@@ -52,6 +52,7 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 
@@ -115,7 +116,7 @@ private fun DrawerLayout(drawerWidth: Dp, content: @Composable ColumnScope.() ->
             Modifier
                 .fillMaxHeight()
                 .width(drawerWidth)
-                .offset(x = { currentOffset.value })
+                .offset { IntOffset(currentOffset.value.roundToInt(), 0) }
                 .background(color = DefaultBackgroundColor)
         ) {
             Text(

@@ -33,8 +33,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlin.math.roundToInt
 
 @Sampled
 @Composable
@@ -62,7 +64,7 @@ fun SwipeableSample() {
     ) {
         Box(
             Modifier
-                .offset(x = { swipeableState.offset.value })
+                .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
                 .preferredSize(squareSize)
                 .background(Color.Red),
             contentAlignment = Alignment.Center

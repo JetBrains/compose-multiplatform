@@ -43,8 +43,10 @@ import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlin.math.max
+import kotlin.math.roundToInt
 
 /**
  * Possible values of [ModalBottomSheetState].
@@ -234,7 +236,7 @@ fun ModalBottomSheetLayout(
             Modifier
                 .fillMaxWidth()
                 .nestedScroll(sheetState.nestedScrollConnection)
-                .offset(y = { sheetState.offset.value }),
+                .offset { IntOffset(0, sheetState.offset.value.roundToInt()) },
             shape = sheetShape,
             elevation = sheetElevation,
             color = sheetBackgroundColor,

@@ -47,11 +47,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.abs
+import kotlin.math.roundToInt
 
 @Composable
 fun SwipeToDismissDemo() {
@@ -136,7 +138,9 @@ private fun Modifier.swipeToDismiss(dismissState: DismissState): Modifier = comp
                 }
             }
         }
-    }.offset(y = { dismissState.offset }).graphicsLayer(alpha = dismissState.alpha)
+    }
+        .offset { IntOffset(0, dismissState.offset.roundToInt()) }
+        .graphicsLayer(alpha = dismissState.alpha)
 }
 
 private class DismissState {
