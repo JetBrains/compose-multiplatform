@@ -20,6 +20,7 @@ import androidx.compose.animation.core.ExponentialDecay
 import androidx.compose.animation.core.ManualAnimationClock
 import androidx.compose.animation.core.snap
 import androidx.compose.foundation.animation.FlingConfig
+import androidx.compose.foundation.animation.smoothScrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer

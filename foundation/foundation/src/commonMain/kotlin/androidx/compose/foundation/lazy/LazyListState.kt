@@ -18,14 +18,13 @@ package androidx.compose.foundation.lazy
 
 import androidx.compose.animation.asDisposableClock
 import androidx.compose.animation.core.AnimationClockObservable
-import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.animation.defaultFlingConfig
 import androidx.compose.foundation.gestures.ScrollScope
+import androidx.compose.foundation.gestures.Scrollable
 import androidx.compose.foundation.gestures.ScrollableController
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -99,7 +98,7 @@ class LazyListState constructor(
     interactionState: InteractionState? = null,
     flingConfig: FlingConfig,
     animationClock: AnimationClockObservable
-) {
+) : Scrollable {
     /**
      * The holder class for the current scroll position.
      */
@@ -225,25 +224,9 @@ class LazyListState constructor(
      * If [scroll] is called from elsewhere, this will be canceled.
      */
     @OptIn(ExperimentalFoundationApi::class)
-    suspend fun scroll(
+    override suspend fun scroll(
         block: suspend ScrollScope.() -> Unit
     ): Unit = scrollableController.scroll(block)
-
-    /**
-     * Smooth scroll by [value] pixels.
-     *
-     * Cancels the currently running scroll, if any, and suspends until the cancellation is
-     * complete.
-     *
-     * @param value delta to scroll by
-     * @param spec [AnimationSpec] to be used for this smooth scrolling
-     *
-     * @return the amount of scroll consumed
-     */
-    suspend fun smoothScrollBy(
-        value: Float,
-        spec: AnimationSpec<Float> = spring()
-    ): Float = scrollableController.smoothScrollBy(value, spec)
 
     // TODO: Coroutine scrolling APIs will allow this to be private again once we have more
     //  fine-grained control over scrolling

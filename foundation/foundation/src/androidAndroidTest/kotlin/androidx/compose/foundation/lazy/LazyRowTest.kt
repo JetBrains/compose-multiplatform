@@ -17,6 +17,7 @@
 package androidx.compose.foundation.lazy
 
 import androidx.compose.animation.core.snap
+import androidx.compose.foundation.animation.smoothScrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
