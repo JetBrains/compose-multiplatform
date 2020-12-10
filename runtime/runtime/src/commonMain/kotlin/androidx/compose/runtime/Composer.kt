@@ -1297,7 +1297,7 @@ class Composer<N>(
         startGroup(referenceKey, reference)
 
         var ref = nextSlot() as? CompositionReferenceHolder<*>
-        if (ref == null || !inserting) {
+        if (ref == null) {
             val scope = invalidateStack.peek()
             scope.used = true
             ref = CompositionReferenceHolder(
@@ -2490,7 +2490,17 @@ class Composer<N>(
         }
 
         override fun invalidate(composer: Composer<*>) {
-            invalidate(scope)
+            // Invalidate ourselves with our parent before we invalidate a child composer.
+            // This ensures that when we are scheduling recompositions, parents always
+            // recompose before their children just in case a recomposition in the parent
+            // would also cause other recomposition in the child.
+            // If the parent ends up having no real invalidations to process we will skip work
+            // for that composer along a fast path later.
+            // This invalidation process could be made more efficient as it's currently N^2 with
+            // subcomposition meta-tree depth thanks to the double recursive parent walk
+            // performed here, but we currently assume a low N.
+            parentReference.invalidate(this@Composer)
+            parentReference.invalidate(composer)
         }
 
         override fun <T> getAmbient(key: Ambient<T>): T {
