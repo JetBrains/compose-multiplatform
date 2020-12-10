@@ -17,6 +17,7 @@
 package androidx.compose.foundation.samples
 
 import androidx.annotation.Sampled
+import androidx.compose.foundation.AmbientIndication
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
@@ -69,7 +70,10 @@ fun PriorityInteractionStateSample() {
         Box(
             Modifier
                 .fillMaxSize()
-                .clickable(interactionState = interactionState) { /* do nothing */ }
+                .clickable(
+                    interactionState = interactionState,
+                    indication = AmbientIndication.current()
+                ) { /* do nothing */ }
                 .then(draggable)
                 .border(BorderStroke(3.dp, color))
                 .padding(3.dp)
@@ -92,7 +96,10 @@ fun MultipleInteractionStateSample() {
         interactionState = interactionState
     ) { /* update some business state here */ }
 
-    val clickable = Modifier.clickable(interactionState = interactionState) {
+    val clickable = Modifier.clickable(
+        interactionState = interactionState,
+        indication = AmbientIndication.current()
+    ) {
         /* update some business state here */
     }
 

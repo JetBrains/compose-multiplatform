@@ -17,6 +17,7 @@
 package androidx.compose.foundation.samples
 
 import androidx.annotation.Sampled
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -52,6 +53,7 @@ fun ZoomableSample() {
                 .zoomable(zoomableController)
                 .clickable(
                     indication = null,
+                    interactionState = remember { InteractionState() },
                     onDoubleClick = { zoomableController.smoothScaleBy(4f) },
                     onClick = {}
                 )

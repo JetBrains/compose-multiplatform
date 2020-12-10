@@ -22,6 +22,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -65,7 +66,13 @@ fun MultiDimensionalAnimationDemo() {
             AnimState.PutAway -> Color(0xFFe3ffd9)
         }
     }
-    Canvas(modifier = Modifier.fillMaxSize().clickable(onClick = onClick, indication = null)) {
+    Canvas(
+        modifier = Modifier.fillMaxSize().clickable(
+            onClick = onClick,
+            indication = null,
+            interactionState = remember { InteractionState() }
+        )
+    ) {
         width = size.width
         height = size.height
 
