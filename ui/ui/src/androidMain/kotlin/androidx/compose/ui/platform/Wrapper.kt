@@ -27,6 +27,7 @@ import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionReference
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.InternalComposeApi
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.SlotTable
@@ -242,6 +243,9 @@ private class WrappedComposition(
                             inspectionTable.add(currentComposer.slotTable)
                             currentComposer.collectParameterInformation()
                         }
+
+                        LaunchedEffect(owner) { owner.keyboardVisibilityEventLoop() }
+
                         Providers(InspectionTables provides inspectionTable) {
                             ProvideAndroidAmbients(owner, content)
                         }
