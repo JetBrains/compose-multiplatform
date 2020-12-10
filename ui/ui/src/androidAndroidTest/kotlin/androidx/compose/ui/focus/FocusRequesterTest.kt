@@ -258,8 +258,7 @@ class FocusRequesterTest {
         // Arrange.
         lateinit var hostView: View
         var focusState = Inactive
-        val focusRequester1 = FocusRequester()
-        val focusRequester2 = FocusRequester()
+        val (focusRequester1, focusRequester2) = FocusRequester.createRefs()
         rule.setFocusableContent {
             hostView = AmbientView.current
             Column(
