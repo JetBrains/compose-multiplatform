@@ -102,4 +102,6 @@ internal class DesktopSelectionRegistrar : SelectionRegistrar {
     }
 
     override fun notifySelectionUpdateEnd() { /* do nothing */ }
+
+    override fun notifySelectableChange(selectable: Selectable) { /* do nothing */ }
 }
