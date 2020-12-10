@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
@@ -107,15 +108,22 @@ class ToggleableTest {
             SemanticsProperties.ToggleableState, ToggleableState.Indeterminate
         )
 
+        fun roleNotSet(): SemanticsMatcher = SemanticsMatcher.keyNotDefined(
+            SemanticsProperties.Role
+        )
+
         rule.onNodeWithTag("checkedToggleable")
+            .assert(roleNotSet())
             .assertIsEnabled()
             .assertIsOn()
             .assertHasClickAction()
         rule.onNodeWithTag("unCheckedToggleable")
+            .assert(roleNotSet())
             .assertIsEnabled()
             .assertIsOff()
             .assertHasClickAction()
         rule.onNodeWithTag("indeterminateToggleable")
+            .assert(roleNotSet())
             .assertIsEnabled()
             .assert(hasIndeterminateState())
             .assertHasClickAction()
@@ -288,6 +296,7 @@ class ToggleableTest {
             assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
                 "value",
                 "enabled",
+                "role",
                 "indication",
                 "interactionState",
                 "onValueChange",
@@ -305,6 +314,7 @@ class ToggleableTest {
             assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
                 "state",
                 "enabled",
+                "role",
                 "indication",
                 "interactionState",
                 "onClick",

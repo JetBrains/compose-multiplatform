@@ -52,6 +52,7 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
@@ -151,6 +152,7 @@ fun Tab(
                 .selectable(
                     selected = selected,
                     onClick = onClick,
+                    role = Role.Tab,
                     interactionState = interactionState,
                     indication = ripple
                 )

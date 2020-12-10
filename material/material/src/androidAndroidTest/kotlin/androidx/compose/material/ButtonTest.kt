@@ -46,6 +46,10 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertHeightIsAtLeast
 import androidx.compose.ui.test.assertHeightIsEqualTo
@@ -89,6 +93,7 @@ class ButtonTest {
         }
 
         rule.onNodeWithTag("myButton")
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button))
             .assertIsEnabled()
     }
 
@@ -103,6 +108,7 @@ class ButtonTest {
         }
 
         rule.onNodeWithTag("myButton")
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button))
             .assertIsNotEnabled()
     }
 
