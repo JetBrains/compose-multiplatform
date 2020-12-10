@@ -1,7 +1,7 @@
 // Signature format: 4.0
 package androidx.compose.runtime {
 
-  @androidx.compose.runtime.ExperimentalComposeApi public abstract class AbstractApplier<T> implements androidx.compose.runtime.Applier<T> {
+  public abstract class AbstractApplier<T> implements androidx.compose.runtime.Applier<T> {
     ctor public AbstractApplier(T? root);
     method public final void clear();
     method public void down(T? node);
@@ -24,8 +24,8 @@ package androidx.compose.runtime {
   }
 
   @androidx.compose.runtime.Stable public abstract sealed class Ambient<T> {
-    method public final inline T! getCurrent();
-    property public final inline T! current;
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(readonly=true) public final inline T! getCurrent();
+    property @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(readonly=true) public final inline T! current;
   }
 
   public final class AmbientKt {
@@ -34,18 +34,12 @@ package androidx.compose.runtime {
     method public static <T> androidx.compose.runtime.ProvidableAmbient<T> staticAmbientOf(optional kotlin.jvm.functions.Function0<? extends T>? defaultFactory);
   }
 
-  @androidx.compose.runtime.InternalComposeApi public final class Anchor {
-    method public boolean getValid();
-    method public int toIndexFor(androidx.compose.runtime.SlotTable slots);
-    method public int toIndexFor(androidx.compose.runtime.SlotWriter writer);
-    property public final boolean valid;
-  }
-
-  @androidx.compose.runtime.ExperimentalComposeApi public interface Applier<N> {
+  public interface Applier<N> {
     method public void clear();
     method public void down(N? node);
     method public N! getCurrent();
-    method public void insert(int index, N? instance);
+    method public void insertBottomUp(int index, N? instance);
+    method public void insertTopDown(int index, N? instance);
     method public void move(int from, int to, int count);
     method public default void onBeginChanges();
     method public default void onEndChanges();
@@ -61,10 +55,10 @@ package androidx.compose.runtime {
     method public void onDispose(kotlin.jvm.functions.Function0<kotlin.Unit> callback);
   }
 
-  @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface Composable {
+  @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface Composable {
   }
 
-  @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface ComposableContract {
+  @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface ComposableContract {
     method public abstract boolean preventCapture() default false;
     method public abstract boolean readonly() default false;
     method public abstract boolean restartable() default true;
@@ -84,7 +78,7 @@ package androidx.compose.runtime {
   }
 
   public final class Composer<N> {
-    ctor public Composer(androidx.compose.runtime.SlotTable slotTable, @androidx.compose.runtime.ComposeCompilerApi androidx.compose.runtime.Applier<N> applier, androidx.compose.runtime.CompositionReference parentReference);
+    ctor public Composer(@kotlin.PublishedApi androidx.compose.runtime.Applier<N> applier, androidx.compose.runtime.CompositionReference parentReference);
     method @androidx.compose.runtime.InternalComposeApi public void applyChanges();
     method @androidx.compose.runtime.ComposeCompilerApi public inline <T> T! cache(boolean invalid, kotlin.jvm.functions.Function0<? extends T> block);
     method @androidx.compose.runtime.ComposeCompilerApi public boolean changed(Object? value);
@@ -97,24 +91,22 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.ComposeCompilerApi public boolean changed(double value);
     method @androidx.compose.runtime.ComposeCompilerApi public boolean changed(int value);
     method @androidx.compose.runtime.InternalComposeApi public void collectKeySourceInformation();
+    method @androidx.compose.runtime.InternalComposeApi public void collectParameterInformation();
     method @androidx.compose.runtime.InternalComposeApi public void composeInitial(kotlin.jvm.functions.Function0<kotlin.Unit> block);
-    method @androidx.compose.runtime.ComposeCompilerApi @kotlin.PublishedApi internal <T> T! consume(androidx.compose.runtime.Ambient<T> key);
-    method @androidx.compose.runtime.ComposeCompilerApi public <T extends N> void createNode(kotlin.jvm.functions.Function0<? extends T> factory);
-    method @androidx.compose.runtime.ComposeCompilerApi public void emitNode(Object? node);
+    method @kotlin.PublishedApi internal <T> T! consume(androidx.compose.runtime.Ambient<T> key);
+    method @kotlin.PublishedApi internal void emitNode(Object? node);
     method @androidx.compose.runtime.ComposeCompilerApi public void endDefaults();
     method @androidx.compose.runtime.ComposeCompilerApi public void endMovableGroup();
-    method @androidx.compose.runtime.ComposeCompilerApi public void endNode();
+    method @kotlin.PublishedApi internal void endNode();
     method @androidx.compose.runtime.ComposeCompilerApi public void endReplaceableGroup();
     method @androidx.compose.runtime.ComposeCompilerApi public androidx.compose.runtime.ScopeUpdateScope? endRestartGroup();
-    method public androidx.compose.runtime.Applier<N> getApplier();
     method @org.jetbrains.annotations.TestOnly public kotlin.coroutines.CoroutineContext getApplyCoroutineContext();
+    method public androidx.compose.runtime.CompositionData getCompositionData();
     method public int getCurrentCompoundKeyHash();
     method public boolean getDefaultsInvalid();
-    method public boolean getInserting();
     method public boolean getSkipping();
-    method public androidx.compose.runtime.SlotTable getSlotTable();
     method @androidx.compose.runtime.ComposeCompilerApi public Object joinKey(Object? left, Object? right);
-    method @androidx.compose.runtime.ComposeCompilerApi public Object? nextSlot();
+    method @kotlin.PublishedApi internal Object? nextSlot();
     method @androidx.compose.runtime.InternalComposeApi public boolean recompose();
     method @androidx.compose.runtime.InternalComposeApi public void recordModificationsOf(java.util.Set<?> values);
     method @androidx.compose.runtime.InternalComposeApi public void recordReadOf(Object value);
@@ -124,24 +116,24 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.ComposeCompilerApi public void startDefaults();
     method @androidx.compose.runtime.ComposeCompilerApi public void startMovableGroup(int key, Object? dataKey);
     method @androidx.compose.runtime.ComposeCompilerApi public void startMovableGroup(int key, Object? dataKey, String? sourceInformation);
-    method @androidx.compose.runtime.ComposeCompilerApi public void startNode();
+    method @kotlin.PublishedApi internal void startNode();
     method @androidx.compose.runtime.ComposeCompilerApi public void startReplaceableGroup(int key);
     method @androidx.compose.runtime.ComposeCompilerApi public void startReplaceableGroup(int key, String? sourceInformation);
     method @androidx.compose.runtime.ComposeCompilerApi public void startRestartGroup(int key);
     method @androidx.compose.runtime.ComposeCompilerApi public void startRestartGroup(int key, String? sourceInformation);
-    method @androidx.compose.runtime.ComposeCompilerApi @kotlin.PublishedApi internal void updateValue(Object? value);
-    method @androidx.compose.runtime.ComposeCompilerApi public N! useNode();
-    property public final androidx.compose.runtime.Applier<N> applier;
+    method @kotlin.PublishedApi internal void updateValue(Object? value);
+    method @kotlin.PublishedApi internal N! useNode();
+    method @androidx.compose.runtime.InternalComposeApi public void verifyConsistent();
     property @org.jetbrains.annotations.TestOnly public final kotlin.coroutines.CoroutineContext applyCoroutineContext;
+    property public final androidx.compose.runtime.CompositionData compositionData;
     property public final int currentCompoundKeyHash;
     property public final boolean defaultsInvalid;
-    property public final boolean inserting;
     property public final boolean skipping;
-    property public final androidx.compose.runtime.SlotTable slotTable;
+    field @kotlin.PublishedApi internal boolean inserting;
   }
 
   public final class ComposerKt {
-    method public static androidx.compose.runtime.Composer<?> getCurrentComposer();
+    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.Composer<?> getCurrentComposer();
     field @kotlin.PublishedApi internal static final androidx.compose.runtime.OpaqueKey ambientMap;
     field @kotlin.PublishedApi internal static final int ambientMapKey = 202; // 0xca
     field @kotlin.PublishedApi internal static final androidx.compose.runtime.OpaqueKey invocation;
@@ -160,6 +152,24 @@ package androidx.compose.runtime {
     method public void dispose();
     method public boolean hasInvalidations();
     method public void setContent(kotlin.jvm.functions.Function0<kotlin.Unit> content);
+  }
+
+  public interface CompositionData {
+    method public Iterable<androidx.compose.runtime.CompositionGroup> getCompositionGroups();
+    method public boolean isEmpty();
+    property public abstract Iterable<androidx.compose.runtime.CompositionGroup> compositionGroups;
+    property public abstract boolean isEmpty;
+  }
+
+  public interface CompositionGroup extends androidx.compose.runtime.CompositionData {
+    method public Iterable<java.lang.Object> getData();
+    method public Object getKey();
+    method public Object? getNode();
+    method public String? getSourceInfo();
+    property public abstract Iterable<java.lang.Object> data;
+    property public abstract Object key;
+    property public abstract Object? node;
+    property public abstract String? sourceInfo;
   }
 
   public final class CompositionKt {
@@ -198,7 +208,7 @@ package androidx.compose.runtime {
 
   public final class EffectsKt {
     method @androidx.compose.runtime.Composable public static androidx.compose.runtime.CompositionReference compositionReference();
-    method public static kotlin.jvm.functions.Function0<kotlin.Unit> getInvalidate();
+    method @androidx.compose.runtime.Composable public static kotlin.jvm.functions.Function0<kotlin.Unit> getInvalidate();
     method @androidx.compose.runtime.Composable public static void onActive(kotlin.jvm.functions.Function1<? super androidx.compose.runtime.CommitScope,kotlin.Unit> callback);
     method @androidx.compose.runtime.Composable public static inline void onCommit(kotlin.jvm.functions.Function1<? super androidx.compose.runtime.CommitScope,kotlin.Unit> callback);
     method @androidx.compose.runtime.Composable public static <V1> void onCommit(V1? v1, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.CommitScope,kotlin.Unit> callback);
@@ -294,19 +304,6 @@ package androidx.compose.runtime {
   @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface NoLiveLiterals {
   }
 
-  public final class ObserverMap<K, V> {
-    ctor public ObserverMap();
-    method public void add(K key, V value);
-    method public void clear();
-    method public void clearValues(kotlin.jvm.functions.Function1<? super V,java.lang.Boolean> predicate);
-    method public boolean contains(K key, V value);
-    method public operator java.util.List<V> get(Iterable<? extends K> keys);
-    method public java.util.List<V> getValueOf(K key);
-    method public void remove(K key);
-    method public void remove(K key, V value);
-    method public void removeValue(V value);
-  }
-
   @kotlin.PublishedApi internal final class PreCommitScopeImpl implements androidx.compose.runtime.CommitScope androidx.compose.runtime.CompositionLifecycleObserver {
     ctor public PreCommitScopeImpl(kotlin.jvm.functions.Function1<? super androidx.compose.runtime.CommitScope,kotlin.Unit> onCommit);
     method public void onDispose(kotlin.jvm.functions.Function0<kotlin.Unit> callback);
@@ -385,157 +382,13 @@ package androidx.compose.runtime {
   }
 
   public final class SkippableUpdater<T> {
-    ctor public SkippableUpdater(androidx.compose.runtime.Composer<?> composer, T? node);
-    method public androidx.compose.runtime.Composer<?> getComposer();
-    method public T! getNode();
+    ctor @kotlin.PublishedApi internal SkippableUpdater(@kotlin.PublishedApi androidx.compose.runtime.Composer<?> composer, @kotlin.PublishedApi T? node);
     method public inline void update(kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,kotlin.Unit> block);
-    property public final androidx.compose.runtime.Composer<?> composer;
-    property public final T! node;
-  }
-
-  @androidx.compose.runtime.InternalComposeApi public final class SlotReader {
-    ctor public SlotReader(androidx.compose.runtime.SlotTable table);
-    method public androidx.compose.runtime.Anchor anchor(optional int index);
-    method public void beginEmpty();
-    method public void close();
-    method public void endEmpty();
-    method public void endGroup();
-    method public java.util.List<androidx.compose.runtime.KeyInfo> extractKeys();
-    method public Object? get(int index);
-    method public int getCurrentEnd();
-    method public int getCurrentGroup();
-    method public Object! getGroupAux();
-    method public int getGroupEnd();
-    method public int getGroupKey();
-    method public Object! getGroupNode();
-    method public Object! getGroupObjectKey();
-    method public int getGroupSize();
-    method public int getGroupSlotCount();
-    method public int getGroupSlotIndex();
-    method public boolean getInEmpty();
-    method public int getNodeCount();
-    method public int getParent();
-    method public int getParentNodes();
-    method public int getSize();
-    method public int getSlot();
-    method public Object? groupAux(int index);
-    method public int groupEnd(int index);
-    method public Object? groupGet(int index);
-    method public int groupKey(int index);
-    method public int groupKey(androidx.compose.runtime.Anchor anchor);
-    method public Object? groupObjectKey(int index);
-    method public int groupSize(int index);
-    method public boolean hasObjectKey(int index);
-    method public boolean isGroupEnd();
-    method public boolean isNode();
-    method public boolean isNode(int index);
-    method public Object? next();
-    method public Object? node(int index);
-    method public int nodeCount(int index);
-    method public int parent(int index);
-    method public int parentOf(int index);
-    method public void reposition(int index);
-    method public void restoreParent(int index);
-    method public int skipGroup();
-    method public void skipToGroupEnd();
-    method public void startGroup();
-    method public void startNode();
-    property public final int currentEnd;
-    property public final int currentGroup;
-    property public final Object! groupAux;
-    property public final int groupEnd;
-    property public final int groupKey;
-    property public final Object! groupNode;
-    property public final Object! groupObjectKey;
-    property public final int groupSize;
-    property public final int groupSlotCount;
-    property public final int groupSlotIndex;
-    property public final boolean inEmpty;
-    property public final boolean isGroupEnd;
-    property public final boolean isNode;
-    property public final int nodeCount;
-    property public final int parent;
-    property public final int parentNodes;
-    property public final int size;
-    property public final int slot;
-  }
-
-  @androidx.compose.runtime.InternalComposeApi public final class SlotTable {
-    ctor public SlotTable();
-    method public int anchorIndex(androidx.compose.runtime.Anchor anchor);
-    method public String asString();
-    method public int[] getGroups();
-    method public int getGroupsSize();
-    method public Object![] getSlots();
-    method public int getSlotsSize();
-    method public boolean isEmpty();
-    method public androidx.compose.runtime.SlotReader openReader();
-    method public androidx.compose.runtime.SlotWriter openWriter();
-    method public boolean ownsAnchor(androidx.compose.runtime.Anchor anchor);
-    method public inline <T> T! read(kotlin.jvm.functions.Function1<? super androidx.compose.runtime.SlotReader,? extends T> block);
-    method public void verifyWellFormed();
-    method public inline <T> T! write(kotlin.jvm.functions.Function1<? super androidx.compose.runtime.SlotWriter,? extends T> block);
-    property public final int[] groups;
-    property public final int groupsSize;
-    property public final boolean isEmpty;
-    property public final Object![] slots;
-    property public final int slotsSize;
   }
 
   public final class SlotTableKt {
     method public static java.util.List<java.lang.Integer> slice(int[], Iterable<java.lang.Integer> indices);
     field @kotlin.PublishedApi internal static final Object EMPTY;
-  }
-
-  @androidx.compose.runtime.InternalComposeApi public final class SlotWriter {
-    method public void advanceBy(int amount);
-    method public androidx.compose.runtime.Anchor anchor(optional int index);
-    method public int anchorIndex(androidx.compose.runtime.Anchor anchor);
-    method public void beginInsert();
-    method public void close();
-    method public int endGroup();
-    method public void endInsert();
-    method public void ensureStarted(int index);
-    method public void ensureStarted(androidx.compose.runtime.Anchor anchor);
-    method public boolean getClosed();
-    method public int getCurrentGroup();
-    method public int getParent();
-    method public Object? groupAux(int index);
-    method public int groupKey(int index);
-    method public Object? groupObjectKey(int index);
-    method public int groupSize(int index);
-    method public java.util.Iterator<java.lang.Object> groupSlots();
-    method public String groupsAsString();
-    method public boolean isGroupEnd();
-    method public boolean isNode();
-    method public java.util.List<androidx.compose.runtime.Anchor> moveFrom(androidx.compose.runtime.SlotTable table, int index);
-    method public void moveGroup(int offset);
-    method public Object? node(int index);
-    method public int parent(int index);
-    method public int parent(androidx.compose.runtime.Anchor anchor);
-    method public boolean removeGroup();
-    method public void seek(androidx.compose.runtime.Anchor anchor);
-    method public void set(Object? value);
-    method public Object? set(int index, Object? value);
-    method public Object? skip();
-    method public int skipGroup();
-    method public void skipToGroupEnd();
-    method public void startData(int key, Object? objectKey, Object? aux);
-    method public void startData(int key, Object? aux);
-    method public void startGroup();
-    method public void startGroup(int key);
-    method public void startGroup(int key, Object? dataKey);
-    method public void startNode(Object? key);
-    method public void startNode(Object? key, Object? node);
-    method public Object? update(Object? value);
-    method public void updateAux(Object? value);
-    method public void updateNode(Object? value);
-    method public void updateParentNode(Object? value);
-    property public final boolean closed;
-    property public final int currentGroup;
-    property public final boolean isGroupEnd;
-    property public final boolean isNode;
-    property public final int parent;
   }
 
   public interface SnapshotMutationPolicy<T> {
@@ -573,16 +426,12 @@ package androidx.compose.runtime {
   }
 
   public final class Updater<T> {
-    ctor public Updater(androidx.compose.runtime.Composer<?> composer, T? node);
-    method public androidx.compose.runtime.Composer<?> getComposer();
-    method public T! getNode();
+    ctor @kotlin.PublishedApi internal Updater(@kotlin.PublishedApi androidx.compose.runtime.Composer<?> composer, @kotlin.PublishedApi T? node);
     method public inline void reconcile(kotlin.jvm.functions.Function1<? super T,kotlin.Unit> block);
     method public inline void set(int value, kotlin.jvm.functions.Function2<? super T,? super java.lang.Integer,kotlin.Unit> block);
     method public inline <reified V> void set(V? value, kotlin.jvm.functions.Function2<? super T,? super V,? extends kotlin.Unit> block);
     method public inline void update(int value, kotlin.jvm.functions.Function2<? super T,? super java.lang.Integer,kotlin.Unit> block);
     method public inline <reified V> void update(V? value, kotlin.jvm.functions.Function2<? super T,? super V,? extends kotlin.Unit> block);
-    property public final androidx.compose.runtime.Composer<?> composer;
-    property public final T! node;
   }
 
 }
@@ -728,6 +577,7 @@ package androidx.compose.runtime.internal {
   }
 
   public final class LiveLiteralKt {
+    method @androidx.compose.runtime.InternalComposeApi public static void enableLiveLiterals();
     method public static boolean isLiveLiteralsEnabled();
     method @androidx.compose.runtime.InternalComposeApi public static <T> androidx.compose.runtime.State<T> liveLiteral(String key, T? value);
     method @androidx.compose.runtime.InternalComposeApi public static void updateLiveLiteralValue(String key, Object? value);
@@ -949,7 +799,7 @@ package androidx.compose.runtime.snapshots {
 package androidx.compose.runtime.tooling {
 
   public final class InspectionTablesKt {
-    method public static androidx.compose.runtime.ProvidableAmbient<java.util.Set<androidx.compose.runtime.SlotTable>> getInspectionTables();
+    method public static androidx.compose.runtime.ProvidableAmbient<java.util.Set<androidx.compose.runtime.CompositionData>> getInspectionTables();
   }
 
 }

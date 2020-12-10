@@ -61,7 +61,6 @@ internal interface LifecycleManager {
  * changed. It is used to determine how to update the nodes and the slot table when changes to the
  * structure of the tree is detected.
  */
-@OptIn(InternalComposeApi::class)
 private class Pending(
     val keyInfos: MutableList<KeyInfo>,
     val startIndex: Int
@@ -78,7 +77,9 @@ private class Pending(
         val result = hashMapOf<Int, GroupInfo>()
         for (index in 0 until keyInfos.size) {
             val keyInfo = keyInfos[index]
+            @OptIn(InternalComposeApi::class)
             result[keyInfo.location] = GroupInfo(index, runningNodeIndex, keyInfo.nodes)
+            @OptIn(InternalComposeApi::class)
             runningNodeIndex += keyInfo.nodes
         }
         result
@@ -147,6 +148,7 @@ private class Pending(
         }
     }
 
+    @OptIn(InternalComposeApi::class)
     fun registerInsert(keyInfo: KeyInfo, insertIndex: Int) {
         groupInfos[keyInfo.location] = GroupInfo(-1, insertIndex, 0)
     }
@@ -168,8 +170,13 @@ private class Pending(
         return false
     }
 
+    @OptIn(InternalComposeApi::class)
     fun slotPositionOf(keyInfo: KeyInfo) = groupInfos[keyInfo.location]?.slotIndex ?: -1
+
+    @OptIn(InternalComposeApi::class)
     fun nodePositionOf(keyInfo: KeyInfo) = groupInfos[keyInfo.location]?.nodeIndex ?: -1
+
+    @OptIn(InternalComposeApi::class)
     fun updatedNodeCountOf(keyInfo: KeyInfo) =
         groupInfos[keyInfo.location]?.nodeCount ?: keyInfo.nodes
 }
@@ -344,21 +351,16 @@ private fun ambientMapOf(values: Array<out ProvidedValue<*>>, parentScope: Ambie
  */
 class Composer<N>(
     /**
-     * Backing storage for the composition
-     */
-    val slotTable: SlotTable,
-
-    /**
      * An adapter that applies changes to the tree using the Applier abstraction.
      */
-    @ComposeCompilerApi
-    val applier: Applier<N>,
+    @PublishedApi internal val applier: Applier<N>,
 
     /**
      * Parent of this composition; a [Recomposer] for root-level compositions.
      */
     private val parentReference: CompositionReference
 ) {
+    private val slotTable: SlotTable = SlotTable()
     private val changes = mutableListOf<Change<N>>()
     private val lifecycleObservers = HashMap<
         CompositionLifecycleObserverHolder,
@@ -373,7 +375,7 @@ class Composer<N>(
     private var nodeCountOverrides: IntArray? = null
     private var nodeCountVirtualOverrides: HashMap<Int, Int>? = null
     private var collectKeySources = false
-
+    private var collectParameterInformation = false
     private var nodeExpected = false
     private val observations: MutableList<Any> = mutableListOf()
     private val observationsProcessed: MutableList<Any> = mutableListOf()
@@ -395,7 +397,6 @@ class Composer<N>(
 
     private var reader: SlotReader = slotTable.openReader().also { it.close() }
 
-    @OptIn(InternalComposeApi::class)
     internal val insertTable = SlotTable()
 
     private var writer: SlotWriter = insertTable.openWriter().also { it.close() }
@@ -538,7 +539,7 @@ class Composer<N>(
      * Start the composition. This should be called, and only be called, as the first group in
      * the composition.
      */
-    @OptIn(ComposeCompilerApi::class, InternalComposeApi::class)
+    @OptIn(InternalComposeApi::class)
     private fun startRoot() {
         reader = slotTable.openReader()
         startGroup(rootKey)
@@ -549,6 +550,7 @@ class Composer<N>(
         providersInvalidStack.push(providersInvalid.asInt())
         providersInvalid = changed(parentProvider)
         collectKeySources = parentReference.collectingKeySources
+        collectParameterInformation = parentReference.collectingParameterInformation
         resolveAmbient(InspectionTables, parentProvider)?.let {
             it.add(slotTable)
             parentReference.recordInspectionTable(it)
@@ -560,7 +562,6 @@ class Composer<N>(
      * End the composition. This should be called, and only be called, to end the first group in
      * the composition.
      */
-    @ComposeCompilerApi
     @OptIn(InternalComposeApi::class)
     private fun endRoot() {
         endGroup()
@@ -596,8 +597,8 @@ class Composer<N>(
      * first composition this is always true. During recomposition this is true when new nodes
      * are being scheduled to be added to the tree.
      */
-    @ComposeCompilerApi
-    var inserting: Boolean = false
+    @PublishedApi
+    internal var inserting: Boolean = false
         private set
 
     /**
@@ -625,6 +626,15 @@ class Composer<N>(
     @InternalComposeApi
     fun collectKeySourceInformation() {
         collectKeySources = true
+    }
+
+    /**
+     * Start collecting parameter information. This enables the tools API to always be able to
+     * determine the parameter values of composable calls.
+     */
+    @InternalComposeApi
+    fun collectParameterInformation() {
+        collectParameterInformation = true
     }
 
     /**
@@ -656,6 +666,31 @@ class Composer<N>(
             if (scope.invalidate() == InvalidationResult.IMMINENT) {
                 // If we process this during recordWriteOf, ignore it when recording modifications
                 observationsProcessed.insertIfMissing(value, scope)
+            }
+        }
+    }
+
+    /**
+     * Throw a diagnostic exception if the internal tracking tables are inconsistent.
+     */
+    @InternalComposeApi
+    fun verifyConsistent() {
+        if (!isComposing) {
+            slotTable.verifyWellFormed()
+            insertTable.verifyWellFormed()
+            validateRecomposeScopeAnchors(slotTable)
+        }
+    }
+
+    private fun validateRecomposeScopeAnchors(slotTable: SlotTable) {
+        val scopes = slotTable.slots.map { it as? RecomposeScope }.filterNotNull()
+        for (scope in scopes) {
+            scope.anchor?.let { anchor ->
+                check(scope in slotTable.slotsOf(anchor.toIndexFor(slotTable))) {
+                    val dataIndex = slotTable.slots.indexOf(scope)
+                    "Misaligned anchor $anchor in scope $scope encountered, scope found at " +
+                        "$dataIndex"
+                }
             }
         }
     }
@@ -763,7 +798,7 @@ class Composer<N>(
      * Apply the changes to the tree that were collected during the last composition.
      */
     @InternalComposeApi
-    @OptIn(ComposeCompilerApi::class)
+    @OptIn(ExperimentalComposeApi::class)
     fun applyChanges() {
         trace("Compose:applyChanges") {
             invalidateStack.clear()
@@ -812,7 +847,7 @@ class Composer<N>(
     }
 
     @ExperimentalComposeApi
-    @OptIn(ComposeCompilerApi::class, InternalComposeApi::class)
+    @OptIn(InternalComposeApi::class)
     internal fun dispose() {
         trace("Compose:Composer.dispose") {
             parentReference.unregisterComposer(this)
@@ -845,16 +880,13 @@ class Composer<N>(
      *
      *  @param key The key for the group
      */
-    @ComposeCompilerApi
     internal fun startGroup(key: Int) = start(key, null, false, null)
 
-    @ComposeCompilerApi
     internal fun startGroup(key: Int, dataKey: Any?) = start(key, dataKey, false, null)
 
     /**
      * End the current group.
      */
-    @ComposeCompilerApi
     internal fun endGroup() = end(false)
 
     @OptIn(InternalComposeApi::class)
@@ -869,8 +901,8 @@ class Composer<N>(
      * current position if found, if no such node is found the composition switches into insert
      * mode and a the node is scheduled to be inserted at the current location.
      */
-    @ComposeCompilerApi
-    fun startNode() {
+    @PublishedApi
+    internal fun startNode() {
         start(nodeKey, null, true, null)
         nodeExpected = true
     }
@@ -880,9 +912,8 @@ class Composer<N>(
      * call when the composer is inserting.
      */
     @Suppress("UNUSED")
-    @ComposeCompilerApi
-    @OptIn(ExperimentalComposeApi::class, InternalComposeApi::class)
-    fun <T : N> createNode(factory: () -> T) {
+    @OptIn(ExperimentalComposeApi::class)
+    internal fun <T : N> createNode(factory: () -> T) {
         validateNodeExpected()
         check(inserting) { "createNode() can only be called when inserting" }
         val insertIndex = nodeIndexStack.peek()
@@ -891,8 +922,13 @@ class Composer<N>(
         recordFixup { applier, slots, _ ->
             val node = factory()
             slots.node = node
-            applier.insert(insertIndex, node)
+            applier.insertTopDown(insertIndex, node)
             applier.down(node)
+        }
+        recordInsertUp { applier, _, _ ->
+            val nodeToInsert = applier.current
+            applier.up()
+            applier.insertBottomUp(insertIndex, nodeToInsert)
         }
     }
 
@@ -900,9 +936,9 @@ class Composer<N>(
      * Schedule the given node to be inserted. This is only valid to call when the composer is
      * inserting.
      */
-    @ComposeCompilerApi
+    @PublishedApi
     @OptIn(ExperimentalComposeApi::class)
-    fun emitNode(node: Any?) {
+    internal fun emitNode(node: Any?) {
         validateNodeExpected()
         check(inserting) { "emitNode() called when not inserting" }
         val insertIndex = nodeIndexStack.peek()
@@ -911,8 +947,13 @@ class Composer<N>(
         @Suppress("UNCHECKED_CAST")
         writer.node = node as N
         recordApplierOperation { applier, _, _ ->
-            applier.insert(insertIndex, node)
+            applier.insertTopDown(insertIndex, node)
             applier.down(node)
+        }
+        recordInsertUp { applier, _, _ ->
+            val nodeToInsert = applier.current
+            applier.up()
+            applier.insertBottomUp(insertIndex, nodeToInsert)
         }
     }
 
@@ -921,8 +962,9 @@ class Composer<N>(
      * valid to call when the composition is not inserting. This must be called at the same
      * location as [emitNode] or [createNode] as called even if the value is unused.
      */
-    @ComposeCompilerApi
-    fun useNode(): N {
+    @PublishedApi
+    @OptIn(InternalComposeApi::class)
+    internal fun useNode(): N {
         validateNodeExpected()
         check(!inserting) { "useNode() called while inserting" }
         val result = reader.node
@@ -933,8 +975,8 @@ class Composer<N>(
     /**
      * Called to end the node group.
      */
-    @ComposeCompilerApi
-    fun endNode() = end(true)
+    @PublishedApi
+    internal fun endNode() = end(true)
 
     /**
      * Schedule a change to be applied to a node's property. This change will be applied to the
@@ -961,9 +1003,9 @@ class Composer<N>(
     /**
      * Return the next value in the slot table and advance the current location.
      */
-    @ComposeCompilerApi
+    @PublishedApi
     @OptIn(InternalComposeApi::class)
-    fun nextSlot(): Any? = if (inserting) {
+    internal fun nextSlot(): Any? = if (inserting) {
         validateNodeNotExpected()
         EMPTY
     } else reader.next()
@@ -1099,9 +1141,8 @@ class Composer<N>(
      *
      * @param value the value to schedule to be written to the slot table.
      */
-    @OptIn(InternalComposeApi::class)
     @PublishedApi
-    @ComposeCompilerApi
+    @OptIn(InternalComposeApi::class)
     internal fun updateValue(value: Any?) {
         if (inserting) {
             writer.update(value)
@@ -1127,6 +1168,9 @@ class Composer<N>(
         }
     }
 
+    @InternalComposeApi
+    val compositionData: CompositionData get() = slotTable
+
     /**
      * Schedule a side effect to run when we apply composition changes.
      */
@@ -1137,8 +1181,6 @@ class Composer<N>(
     /**
      * Return the current ambient scope which was provided by a parent group.
      */
-    @ComposeCompilerApi
-    @OptIn(InternalComposeApi::class)
     private fun currentAmbientScope(): AmbientMap {
         if (inserting && hasProvider) {
             var current = writer.parent
@@ -1173,8 +1215,6 @@ class Composer<N>(
      * compose which might be inserting the sub-composition. In that case the current scope
      * is the correct scope.
      */
-    @ComposeCompilerApi
-    @OptIn(InternalComposeApi::class)
     private fun ambientScopeAt(location: Int): AmbientMap {
         if (isComposing) {
             // The sub-composer is being composed as part of a nested composition then use the
@@ -1204,7 +1244,6 @@ class Composer<N>(
      * scope followed by the map used to augment the parent scope. Both are needed to detect
      * inserts, updates and deletes to the providers.
      */
-    @ComposeCompilerApi
     private fun updateProviderMapGroup(
         parentScope: AmbientMap,
         currentProviders: AmbientMap
@@ -1217,8 +1256,6 @@ class Composer<N>(
         return providerScope
     }
 
-    @ComposeCompilerApi
-    @OptIn(InternalComposeApi::class)
     internal fun startProviders(values: Array<out ProvidedValue<*>>) {
         val parentScope = currentAmbientScope()
         startGroup(providerKey, provider)
@@ -1268,31 +1305,32 @@ class Composer<N>(
         start(ambientMapKey, ambientMap, false, providers)
     }
 
-    @ComposeCompilerApi
     internal fun endProviders() {
         endGroup()
         endGroup()
         providersInvalid = providersInvalidStack.pop().asBool()
     }
 
-    @ComposeCompilerApi
     @PublishedApi
     internal fun <T> consume(key: Ambient<T>): T = resolveAmbient(key, currentAmbientScope())
 
     /**
      * Create or use a memoized `CompositionReference` instance at this position in the slot table.
      */
-    @ComposeCompilerApi
-    @OptIn(ExperimentalComposeApi::class)
     internal fun buildReference(): CompositionReference {
         startGroup(referenceKey, reference)
 
         var ref = nextSlot() as? CompositionReferenceHolder<*>
-        if (ref == null || !inserting) {
+        if (ref == null) {
             val scope = invalidateStack.peek()
             scope.used = true
             ref = CompositionReferenceHolder(
-                CompositionReferenceImpl(scope, currentCompoundKeyHash, collectKeySources)
+                CompositionReferenceImpl(
+                    scope,
+                    currentCompoundKeyHash,
+                    collectKeySources,
+                    collectParameterInformation
+                )
             )
             updateValue(ref)
         }
@@ -1304,10 +1342,8 @@ class Composer<N>(
     private fun <T> resolveAmbient(key: Ambient<T>, scope: AmbientMap): T =
         if (scope.contains(key)) scope.getValueOf(key) else parentReference.getAmbient(key)
 
-    @ComposeCompilerApi
     internal fun <T> parentAmbient(key: Ambient<T>): T = resolveAmbient(key, currentAmbientScope())
 
-    @ComposeCompilerApi
     private fun <T> parentAmbient(key: Ambient<T>, location: Int): T =
         resolveAmbient(key, ambientScopeAt(location))
 
@@ -1324,7 +1360,6 @@ class Composer<N>(
             if (childrenComposing == 0 && it.isNotEmpty()) it.peek() else null
         }
 
-    @OptIn(InternalComposeApi::class)
     private fun ensureWriter() {
         if (writer.closed) {
             writer = insertTable.openWriter()
@@ -1337,7 +1372,6 @@ class Composer<N>(
     /**
      * Start the reader group updating the data of the group if necessary
      */
-    @OptIn(InternalComposeApi::class)
     private fun startReaderGroup(isNode: Boolean, data: Any?) {
         if (isNode) {
             reader.startNode()
@@ -1351,8 +1385,6 @@ class Composer<N>(
         }
     }
 
-    @ComposeCompilerApi
-    @OptIn(InternalComposeApi::class)
     private fun start(key: Int, objectKey: Any?, isNode: Boolean, data: Any?) {
         validateNodeNotExpected()
 
@@ -1478,7 +1510,6 @@ class Composer<N>(
         groupNodeCount = 0
     }
 
-    @OptIn(InternalComposeApi::class)
     private fun exitGroup(expectedNodeCount: Int, inserting: Boolean) {
         // Restore the parent's state updating them if they have changed based on changes in the
         // children. For example, if a group generates nodes then the number of generated nodes will
@@ -1493,8 +1524,6 @@ class Composer<N>(
         this.groupNodeCount = this.groupNodeCountStack.pop() + expectedNodeCount
     }
 
-    @ComposeCompilerApi
-    @OptIn(InternalComposeApi::class, ExperimentalComposeApi::class)
     private fun end(isNode: Boolean) {
         // All the changes to the group (or node) have been recorded. All new nodes have been
         // inserted but it has yet to determine which need to be removed or moved. Note that the
@@ -1608,7 +1637,7 @@ class Composer<N>(
         val inserting = inserting
         if (inserting) {
             if (isNode) {
-                recordInsertUp()
+                registerInsertUp()
                 expectedNodeCount = 1
             }
             reader.endEmpty()
@@ -1629,8 +1658,8 @@ class Composer<N>(
             if (isNode) recordUp()
             recordEndGroup()
             val parentGroup = reader.parent
-            val parentNodecount = updatedNodeCount(parentGroup)
-            if (expectedNodeCount != parentNodecount) {
+            val parentNodeCount = updatedNodeCount(parentGroup)
+            if (expectedNodeCount != parentNodeCount) {
                 updateNodeCountOverrides(parentGroup, expectedNodeCount)
             }
             if (isNode) {
@@ -1649,7 +1678,6 @@ class Composer<N>(
      * called instead of [skipReaderToGroupEnd] if any child groups are invalid. If no children
      * are invalid it will call [skipReaderToGroupEnd].
      */
-    @OptIn(InternalComposeApi::class, ExperimentalComposeApi::class)
     private fun recomposeToGroupEnd() {
         val wasComposing = isComposing
         isComposing = true
@@ -1738,7 +1766,6 @@ class Composer<N>(
      * updates that count and then updates any parent groups that include the nodes this group
      * emits.
      */
-    @OptIn(InternalComposeApi::class)
     private fun updateNodeCountOverrides(group: Int, newCount: Int) {
         // The value of group can be negative which indicates it is tracking an inserted group
         // instead of an existing group. The index is a virtual index calculated by
@@ -1778,7 +1805,6 @@ class Composer<N>(
      * [recomposeIndex] allows the calculation to exit early if there is no node group between
      * [group] and [recomposeGroup].
      */
-    @OptIn(InternalComposeApi::class)
     private fun nodeIndexOf(
         groupLocation: Int,
         group: Int,
@@ -1814,7 +1840,6 @@ class Composer<N>(
         return index
     }
 
-    @OptIn(InternalComposeApi::class)
     private fun updatedNodeCount(group: Int): Int {
         if (group < 0) return nodeCountVirtualOverrides?.let { it[group] } ?: 0
         val nodeCounts = nodeCountOverrides
@@ -1825,7 +1850,6 @@ class Composer<N>(
         return reader.nodeCount(group)
     }
 
-    @OptIn(InternalComposeApi::class)
     private fun updateNodeCount(group: Int, count: Int) {
         if (updatedNodeCount(group) != count) {
             if (group < 0) {
@@ -1856,7 +1880,6 @@ class Composer<N>(
      * Records the operations necessary to move the applier the node affected by the previous
      * group to the new group.
      */
-    @OptIn(InternalComposeApi::class)
     private fun recordUpsAndDowns(oldGroup: Int, newGroup: Int, commonRoot: Int) {
         val reader = reader
         val nearestCommonRoot = reader.nearestCommonRootOf(
@@ -1876,7 +1899,6 @@ class Composer<N>(
         doRecordDownsFor(newGroup, nearestCommonRoot)
     }
 
-    @OptIn(InternalComposeApi::class)
     private fun doRecordDownsFor(group: Int, nearestCommonRoot: Int) {
         if (group > 0 && group != nearestCommonRoot) {
             doRecordDownsFor(reader.parent(group), nearestCommonRoot)
@@ -1889,7 +1911,6 @@ class Composer<N>(
      * for [group]. Passing in the [recomposeGroup] and [recomposeKey] allows this method to exit
      * early.
      */
-    @OptIn(InternalComposeApi::class)
     private fun compoundKeyOf(group: Int, recomposeGroup: Int, recomposeKey: Int): Int {
         return if (group == recomposeGroup) recomposeKey else (
             compoundKeyOf(
@@ -1909,12 +1930,10 @@ class Composer<N>(
      * back into a known good state after a period of time when snapshot changes were not
      * being observed.
      */
-    @OptIn(InternalComposeApi::class)
     internal fun invalidateAll() {
         slotTable.slots.forEach { (it as? RecomposeScope)?.invalidate() }
     }
 
-    @OptIn(InternalComposeApi::class, ExperimentalComposeApi::class)
     internal fun invalidate(scope: RecomposeScope): InvalidationResult {
         if (scope.defaultsInScope) {
             scope.defaultsInvalid = true
@@ -1940,7 +1959,6 @@ class Composer<N>(
      * composition is not inserting.
      */
     @ComposeCompilerApi
-    @OptIn(InternalComposeApi::class, ExperimentalComposeApi::class)
     fun skipCurrentGroup() {
         if (invalidations.isEmpty()) {
             skipGroup()
@@ -1956,7 +1974,6 @@ class Composer<N>(
         }
     }
 
-    @OptIn(InternalComposeApi::class)
     private fun skipReaderToGroupEnd() {
         groupNodeCount = reader.parentNodes
         reader.skipToGroupEnd()
@@ -1994,8 +2011,6 @@ class Composer<N>(
         addRecomposeScope()
     }
 
-    @ComposeCompilerApi
-    @OptIn(InternalComposeApi::class)
     private fun addRecomposeScope() {
         if (inserting) {
             val scope = RecomposeScope(this)
@@ -2016,14 +2031,13 @@ class Composer<N>(
      * [endRestartGroup]).
      */
     @ComposeCompilerApi
-    @OptIn(InternalComposeApi::class)
     fun endRestartGroup(): ScopeUpdateScope? {
         // This allows for the invalidate stack to be out of sync since this might be called during exception stack
         // unwinding that might have not called the doneJoin/endRestartGroup in the wrong order.
         val scope = if (invalidateStack.isNotEmpty()) invalidateStack.pop()
         else null
         scope?.requiresRecompose = false
-        val result = if (scope != null && (scope.used || collectKeySources)) {
+        val result = if (scope != null && (scope.used || collectParameterInformation)) {
             if (scope.anchor == null) {
                 scope.anchor = if (inserting) {
                     writer.anchor(writer.parent)
@@ -2045,7 +2059,6 @@ class Composer<N>(
      * which must be applied by [applyChanges] to build the tree implied by [block].
      */
     @InternalComposeApi
-    @OptIn(ComposeCompilerApi::class)
     fun composeInitial(block: @Composable () -> Unit) {
         trace("Compose:recompose") {
             var complete = false
@@ -2070,7 +2083,6 @@ class Composer<N>(
      * applied by [applyChanges] to have an effect.
      */
     @InternalComposeApi
-    @OptIn(ComposeCompilerApi::class)
     fun recompose(): Boolean {
         if (invalidations.isNotEmpty()) {
             trace("Compose:recompose") {
@@ -2095,15 +2107,15 @@ class Composer<N>(
 
     internal fun hasInvalidations() = invalidations.isNotEmpty()
 
-    @OptIn(InternalComposeApi::class)
     @Suppress("UNCHECKED_CAST")
+    @OptIn(InternalComposeApi::class)
     private var SlotWriter.node
         get() = node(currentGroup) as N
         set(value) { updateParentNode(value) }
-    @OptIn(InternalComposeApi::class)
+
     @Suppress("UNCHECKED_CAST")
     private val SlotReader.node get() = node(parent) as N
-    @OptIn(InternalComposeApi::class)
+
     @Suppress("UNCHECKED_CAST")
     private fun SlotReader.nodeAt(index: Int) = node(index) as N
 
@@ -2169,7 +2181,6 @@ class Composer<N>(
     private var pendingUps = 0
     private var downNodes = Stack<N>()
 
-    @OptIn(ExperimentalComposeApi::class)
     private fun realizeUps() {
         val count = pendingUps
         if (count > 0) {
@@ -2178,7 +2189,6 @@ class Composer<N>(
         }
     }
 
-    @OptIn(ExperimentalComposeApi::class)
     private fun realizeDowns(nodes: Array<N>) {
         record { applier, _, _ ->
             for (index in nodes.indices) {
@@ -2208,19 +2218,30 @@ class Composer<N>(
         }
     }
 
-    private var pendingInsertUps = 0
+    private var insertUpRequests = Stack<Change<N>>()
 
-    private fun recordInsertUp() {
-        pendingInsertUps++
+    private var pendingInsertUps = mutableListOf<Change<N>>()
+
+    private fun registerInsertUp() {
+        pendingInsertUps.add(insertUpRequests.pop())
     }
 
-    @OptIn(ExperimentalComposeApi::class)
     private fun realizeInsertUps() {
-        if (pendingInsertUps > 0) {
-            val count = pendingInsertUps
-            record { applier, _, _ -> repeat(count) { applier.up() } }
-            pendingInsertUps = 0
+        if (pendingInsertUps.isNotEmpty()) {
+            pendingInsertUps.forEach { record(it) }
+            pendingInsertUps.clear()
         }
+    }
+
+    /**
+     * Record a change that will be added after all the changes for the node and all its children
+     * have been performed.
+     *
+     * This is used to implement calling [Applier.insertBottomUp] to allow a tree to be built
+     * bottom-up instead of top-down.
+     */
+    private fun recordInsertUp(change: Change<N>) {
+        insertUpRequests.push(change)
     }
 
     // Navigating the writer slot is performed relatively as the location of a group in the writer
@@ -2259,7 +2280,6 @@ class Composer<N>(
      */
     private val startedGroups = IntStack()
 
-    @OptIn(InternalComposeApi::class)
     private fun realizeOperationLocation(forParent: Boolean = false) {
         val location = if (forParent) reader.parent else reader.currentGroup
         val distance = location - writersReaderDelta
@@ -2270,7 +2290,6 @@ class Composer<N>(
         }
     }
 
-    @OptIn(InternalComposeApi::class)
     private fun recordInsert(anchor: Anchor) {
         if (insertFixups.isEmpty()) {
             recordSlotEditingOperation { _, slots, _ ->
@@ -2294,7 +2313,6 @@ class Composer<N>(
         }
     }
 
-    @OptIn(InternalComposeApi::class)
     private fun recordFixup(change: Change<N>) {
         realizeInsertUps()
         val anchor = insertAnchor
@@ -2312,7 +2330,6 @@ class Composer<N>(
      * writer and reader are tracking the same slot we advance the [writersReaderDelta] to
      * account for the removal.
      */
-    @OptIn(InternalComposeApi::class)
     private fun recordDelete() {
         recordSlotEditingOperation(change = removeCurrentGroupInstance)
         writersReaderDelta += reader.groupSize
@@ -2321,7 +2338,6 @@ class Composer<N>(
     /**
      * Called when reader current is moved directly, such as when a group moves, to [location].
      */
-    @OptIn(InternalComposeApi::class)
     private fun recordReaderMoving(location: Int) {
         val distance = reader.currentGroup - writersReaderDelta
 
@@ -2329,7 +2345,6 @@ class Composer<N>(
         writersReaderDelta = location - distance
     }
 
-    @OptIn(InternalComposeApi::class)
     private fun recordSlotEditing() {
         // During initial composition (when the slot table is empty), no group needs
         // to be started.
@@ -2350,7 +2365,6 @@ class Composer<N>(
         }
     }
 
-    @OptIn(InternalComposeApi::class)
     private fun recordEndGroup() {
         val location = reader.parent
         val currentStartedGroup = startedGroups.peekOr(-1)
@@ -2376,7 +2390,6 @@ class Composer<N>(
         cleanUpCompose()
     }
 
-    @OptIn(ExperimentalComposeApi::class)
     private fun cleanUpCompose() {
         pending = null
         nodeIndex = 0
@@ -2421,7 +2434,6 @@ class Composer<N>(
         }
     }
 
-    @OptIn(ExperimentalComposeApi::class)
     private fun realizeMovement() {
         val count = previousCount
         previousCount = 0
@@ -2457,9 +2469,10 @@ class Composer<N>(
     private inner class CompositionReferenceImpl(
         val scope: RecomposeScope,
         override val compoundHashKey: Int,
-        override val collectingKeySources: Boolean
+        override val collectingKeySources: Boolean,
+        override val collectingParameterInformation: Boolean
     ) : CompositionReference() {
-        var inspectionTables: MutableSet<MutableSet<SlotTable>>? = null
+        var inspectionTables: MutableSet<MutableSet<CompositionData>>? = null
         val composers = mutableSetOf<Composer<*>>()
 
         fun dispose() {
@@ -2501,11 +2514,19 @@ class Composer<N>(
         }
 
         override fun invalidate(composer: Composer<*>) {
-            invalidate(scope)
+            // Invalidate ourselves with our parent before we invalidate a child composer.
+            // This ensures that when we are scheduling recompositions, parents always
+            // recompose before their children just in case a recomposition in the parent
+            // would also cause other recomposition in the child.
+            // If the parent ends up having no real invalidations to process we will skip work
+            // for that composer along a fast path later.
+            // This invalidation process could be made more efficient as it's currently N^2 with
+            // subcomposition meta-tree depth thanks to the double recursive parent walk
+            // performed here, but we currently assume a low N.
+            parentReference.invalidate(this@Composer)
+            parentReference.invalidate(composer)
         }
 
-        @ComposeCompilerApi
-        @OptIn(InternalComposeApi::class)
         override fun <T> getAmbient(key: Ambient<T>): T {
             val anchor = scope.anchor
             return if (anchor != null && anchor.valid) {
@@ -2517,15 +2538,13 @@ class Composer<N>(
             }
         }
 
-        @ComposeCompilerApi
-        @OptIn(InternalComposeApi::class)
         override fun getAmbientScope(): AmbientMap {
             return ambientScopeAt(scope.anchor?.toIndexFor(slotTable) ?: 0)
         }
 
-        override fun recordInspectionTable(table: MutableSet<SlotTable>) {
+        override fun recordInspectionTable(table: MutableSet<CompositionData>) {
             (
-                inspectionTables ?: HashSet<MutableSet<SlotTable>>().also {
+                inspectionTables ?: HashSet<MutableSet<CompositionData>>().also {
                     inspectionTables = it
                 }
                 ).add(table)
@@ -2540,7 +2559,6 @@ class Composer<N>(
         }
     }
 
-    @OptIn(ExperimentalComposeApi::class)
     private fun updateCompoundKeyWhenWeEnterGroup(groupKey: Int, dataKey: Any?) {
         if (dataKey == null)
             updateCompoundKeyWhenWeEnterGroupKeyHash(groupKey)
@@ -2568,8 +2586,10 @@ class Composer<N>(
 }
 
 @Suppress("UNCHECKED_CAST")
-/*inline */ class Updater<T>(val composer: Composer<*>, val node: T) {
-    @OptIn(ComposeCompilerApi::class)
+/*inline */ class Updater<T> @PublishedApi internal constructor(
+    @PublishedApi internal val composer: Composer<*>,
+    @PublishedApi internal val node: T
+) {
     inline fun set(
         value: Int,
         /*crossinline*/
@@ -2583,7 +2603,6 @@ class Composer<N>(
         }
     }
 
-    @OptIn(ComposeCompilerApi::class)
     inline fun <reified V> set(
         value: V,
         /*crossinline*/
@@ -2597,7 +2616,6 @@ class Composer<N>(
         }
     }
 
-    @OptIn(ComposeCompilerApi::class)
     inline fun update(
         value: Int,
         /*crossinline*/
@@ -2611,7 +2629,6 @@ class Composer<N>(
         }
     }
 
-    @OptIn(ComposeCompilerApi::class)
     inline fun <reified V> update(
         value: V,
         /*crossinline*/
@@ -2632,8 +2649,10 @@ class Composer<N>(
     }
 }
 
-class SkippableUpdater<T>(val composer: Composer<*>, val node: T) {
-    @OptIn(ComposeCompilerApi::class)
+class SkippableUpdater<T> @PublishedApi internal constructor(
+    @PublishedApi internal val composer: Composer<*>,
+    @PublishedApi internal val node: T
+) {
     inline fun update(block: Updater<T>.() -> Unit) {
         composer.startReplaceableGroup(0x1e65194f)
         Updater(composer, node).block()
@@ -2641,7 +2660,6 @@ class SkippableUpdater<T>(val composer: Composer<*>, val node: T) {
     }
 }
 
-@OptIn(InternalComposeApi::class)
 private fun SlotWriter.removeCurrentGroup(lifecycleManager: LifecycleManager) {
     // Notify the lifecycle manager of any observers leaving the slot table
     // The notification order should ensure that listeners are notified of leaving
@@ -2696,7 +2714,7 @@ private fun getKey(value: Any?, left: Any?, right: Any?): Any? = (value as? Join
 
 // Observation helpers
 
-// These helpers enable storing observaction pairs of value to scope instances in a list sorted by
+// These helpers enable storing observation pairs of value to scope instances in a list sorted by
 // the value hash as a primary key and the scope hash as the secondary key. This results in a
 // multi-set that allows finding an observation/scope pairs in O(log N) and a worst case of
 // insert into and remove from the array of O(log N) + O(N) where N is the number of total pairs.
@@ -2876,8 +2894,7 @@ private fun MutableList<Invalidation>.removeRange(start: Int, end: Int) {
 private fun Boolean.asInt() = if (this) 1 else 0
 private fun Int.asBool() = this != 0
 
-@Composable
-val currentComposer: Composer<*> get() {
+val currentComposer: Composer<*> @Composable get() {
     throw NotImplementedError("Implemented as an intrinsic")
 }
 
@@ -2896,7 +2913,6 @@ internal fun <T> invokeComposableForResult(
     return realFn(composer, 1)
 }
 
-@OptIn(InternalComposeApi::class)
 private fun SlotReader.distanceFrom(index: Int, root: Int): Int {
     var count = 0
     var current = index
@@ -2908,7 +2924,6 @@ private fun SlotReader.distanceFrom(index: Int, root: Int): Int {
 }
 
 // find the nearest common root
-@OptIn(InternalComposeApi::class)
 private fun SlotReader.nearestCommonRootOf(a: Int, b: Int, common: Int): Int {
     // Early outs, to avoid calling distanceFrom in trivial cases
     if (a == b) return a // A group is the nearest common root of itself

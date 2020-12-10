@@ -34,6 +34,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.savedinstancestate.AmbientUiSavedStateRegistry
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticAmbientOf
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelStoreOwner
 
@@ -133,9 +134,9 @@ val ViewModelStoreOwnerAmbient get() = AmbientViewModelStoreOwner
 val AmbientViewModelStoreOwner = staticAmbientOf<ViewModelStoreOwner>()
 
 @Composable
-@OptIn(InternalAnimationApi::class)
-internal fun ProvideAndroidAmbients(owner: AndroidOwner, content: @Composable () -> Unit) {
-    val view = owner.view
+@OptIn(ExperimentalComposeUiApi::class, InternalAnimationApi::class)
+internal fun ProvideAndroidAmbients(owner: AndroidComposeView, content: @Composable () -> Unit) {
+    val view = owner
     val context = view.context
     val scope = rememberCoroutineScope()
     val rootAnimationClock = remember(scope) {

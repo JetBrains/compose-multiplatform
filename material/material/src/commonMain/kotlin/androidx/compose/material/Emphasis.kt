@@ -80,18 +80,15 @@ interface EmphasisLevels {
     /**
      * Emphasis used to express high emphasis, such as for selected text fields.
      */
-    @Composable
-    val high: Emphasis
+    val high: Emphasis @Composable get
     /**
      * Emphasis used to express medium emphasis, such as for placeholder text in a text field.
      */
-    @Composable
-    val medium: Emphasis
+    val medium: Emphasis @Composable get
     /**
      * Emphasis used to express disabled state, such as for a disabled button.
      */
-    @Composable
-    val disabled: Emphasis
+    val disabled: Emphasis @Composable get
 }
 
 /**
@@ -148,24 +145,24 @@ private object DefaultEmphasisLevels : EmphasisLevels {
         }
     }
 
-    @Composable
     override val high: Emphasis
+        @Composable
         get() = AlphaEmphasis(
             lightTheme = MaterialTheme.colors.isLight,
             highContrastAlpha = HighContrastAlphaLevels.high,
             reducedContrastAlpha = ReducedContrastAlphaLevels.high
         )
 
-    @Composable
     override val medium: Emphasis
+        @Composable
         get() = AlphaEmphasis(
             lightTheme = MaterialTheme.colors.isLight,
             highContrastAlpha = HighContrastAlphaLevels.medium,
             reducedContrastAlpha = ReducedContrastAlphaLevels.medium
         )
 
-    @Composable
     override val disabled: Emphasis
+        @Composable
         get() = AlphaEmphasis(
             lightTheme = MaterialTheme.colors.isLight,
             highContrastAlpha = HighContrastAlphaLevels.disabled,

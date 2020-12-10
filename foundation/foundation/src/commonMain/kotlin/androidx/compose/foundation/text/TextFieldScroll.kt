@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.text
 
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.gestures.rememberScrollableController
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.runtime.Stable
@@ -38,6 +39,7 @@ import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
@@ -52,17 +54,15 @@ internal fun Modifier.textFieldScroll(
     scrollerPosition: TextFieldScrollerPosition,
     textFieldValue: TextFieldValue,
     visualTransformation: VisualTransformation,
+    interactionState: InteractionState,
     textLayoutResult: Ref<TextLayoutResult?>
 ) = composed(
     factory = {
         // do not reverse direction only in case of RTL in horizontal orientation
         val rtl = AmbientLayoutDirection.current == LayoutDirection.Rtl
         val reverseDirection = orientation == Orientation.Vertical || !rtl
-        val scroll = Modifier.scrollable(
-            orientation = orientation,
-            canScroll = { scrollerPosition.maximum != 0f },
-            reverseDirection = reverseDirection,
-            controller = rememberScrollableController { delta ->
+        val controller =
+            rememberScrollableController(interactionState = interactionState) { delta ->
                 val newOffset = scrollerPosition.offset + delta
                 val consumedDelta = when {
                     newOffset > scrollerPosition.maximum ->
@@ -73,7 +73,15 @@ internal fun Modifier.textFieldScroll(
                 scrollerPosition.offset += consumedDelta
                 consumedDelta
             }
+        val scroll = Modifier.scrollable(
+            orientation = orientation,
+            canScroll = { scrollerPosition.maximum != 0f },
+            reverseDirection = reverseDirection,
+            controller = controller
         )
+
+        val cursorOffset = scrollerPosition.getOffsetToFollow(textFieldValue.selection)
+        scrollerPosition.previousSelection = textFieldValue.selection
 
         val transformedText = visualTransformation.filter(
             AnnotatedString(textFieldValue.text)
@@ -82,14 +90,14 @@ internal fun Modifier.textFieldScroll(
             Orientation.Vertical ->
                 VerticalScrollLayoutModifier(
                     scrollerPosition,
-                    textFieldValue,
+                    cursorOffset,
                     transformedText,
                     textLayoutResult
                 )
             Orientation.Horizontal ->
                 HorizontalScrollLayoutModifier(
                     scrollerPosition,
-                    textFieldValue,
+                    cursorOffset,
                     transformedText,
                     textLayoutResult
                 )
@@ -102,13 +110,14 @@ internal fun Modifier.textFieldScroll(
         properties["scrollerPosition"] = scrollerPosition
         properties["textFieldValue"] = textFieldValue
         properties["visualTransformation"] = visualTransformation
+        properties["interactionState"] = interactionState
         properties["textLayoutResult"] = textLayoutResult
     }
 )
 
 private data class VerticalScrollLayoutModifier(
     val scrollerPosition: TextFieldScrollerPosition,
-    val textFieldValue: TextFieldValue,
+    val cursorOffset: Int,
     val transformedText: TransformedText,
     val textLayoutResult: Ref<TextLayoutResult?>
 ) : LayoutModifier {
@@ -122,9 +131,9 @@ private data class VerticalScrollLayoutModifier(
 
         return layout(placeable.width, height) {
             val cursorRect = getCursorRectInScroller(
-                textFieldValue = textFieldValue,
+                cursorOffset = cursorOffset,
                 transformedText = transformedText,
-                textLayoutResult = textLayoutResult,
+                textLayoutResult = textLayoutResult.value,
                 rtl = false,
                 textFieldWidth = placeable.width
             )
@@ -144,7 +153,7 @@ private data class VerticalScrollLayoutModifier(
 
 private data class HorizontalScrollLayoutModifier(
     val scrollerPosition: TextFieldScrollerPosition,
-    val textFieldValue: TextFieldValue,
+    val cursorOffset: Int,
     val transformedText: TransformedText,
     val textLayoutResult: Ref<TextLayoutResult?>
 ) : LayoutModifier {
@@ -158,9 +167,9 @@ private data class HorizontalScrollLayoutModifier(
 
         return layout(width, placeable.height) {
             val cursorRect = getCursorRectInScroller(
-                textFieldValue = textFieldValue,
+                cursorOffset = cursorOffset,
                 transformedText = transformedText,
-                textLayoutResult = textLayoutResult,
+                textLayoutResult = textLayoutResult.value,
                 rtl = layoutDirection == LayoutDirection.Rtl,
                 textFieldWidth = placeable.width
             )
@@ -179,14 +188,14 @@ private data class HorizontalScrollLayoutModifier(
 }
 
 private fun Density.getCursorRectInScroller(
-    textFieldValue: TextFieldValue,
+    cursorOffset: Int,
     transformedText: TransformedText,
-    textLayoutResult: Ref<TextLayoutResult?>,
+    textLayoutResult: TextLayoutResult?,
     rtl: Boolean,
     textFieldWidth: Int
 ): Rect {
-    val cursorRect = textLayoutResult.value?.getCursorRect(
-        transformedText.offsetMap.originalToTransformed(textFieldValue.selection.min)
+    val cursorRect = textLayoutResult?.getCursorRect(
+        transformedText.offsetMap.originalToTransformed(cursorOffset)
     ) ?: Rect.Zero
     val thickness = DefaultCursorThickness.toIntPx()
 
@@ -226,6 +235,12 @@ internal class TextFieldScrollerPosition(initial: Float = 0f) {
      */
     private var previousCursorRect: Rect = Rect.Zero
 
+    /**
+     * Keeps the previous selection data in TextFieldValue in order to identify what has changed
+     * in the new selection, and decide which selection offset (start, end) to follow.
+     */
+    var previousSelection: TextRange = TextRange.Zero
+
     fun update(
         orientation: Orientation,
         cursorRect: Rect,
@@ -254,6 +269,14 @@ internal class TextFieldScrollerPosition(initial: Float = 0f) {
             offset -= startVisibleBound - cursorStart
         } else if (cursorEnd > endVisibleBound) {
             offset += cursorEnd - endVisibleBound
+        }
+    }
+
+    fun getOffsetToFollow(selection: TextRange): Int {
+        return when {
+            selection.start != previousSelection.start -> selection.start
+            selection.end != previousSelection.end -> selection.end
+            else -> selection.min
         }
     }
 

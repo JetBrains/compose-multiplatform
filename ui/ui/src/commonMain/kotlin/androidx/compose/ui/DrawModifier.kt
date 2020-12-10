@@ -117,6 +117,7 @@ typealias CacheDrawScope = androidx.compose.ui.draw.CacheDrawScope
 )
 typealias DrawResult = androidx.compose.ui.draw.DrawResult
 
+@Suppress("DEPRECATION")
 @Deprecated(
     "Use drawWithContent from the androidx.compose.ui.draw package instead",
     ReplaceWith(

@@ -39,7 +39,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.ExperimentalTesting
-import androidx.compose.ui.test.junit4.android.ComposeIdlingResource
 import androidx.test.espresso.Espresso.onIdle
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
@@ -67,6 +66,7 @@ class TestAnimationClockTest {
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>()
     private val clockTestRule = rule.clockTestRule
+    private val composeIdlingResource = rule.composeIdlingResource
 
     /**
      * Tests if advancing the clock manually works when the clock is paused, and that idleness is
@@ -87,7 +87,7 @@ class TestAnimationClockTest {
             animationState.value = AnimationStates.To
 
             // Changes need to trickle down the animation system, so compose should be non-idle
-            assertThat(ComposeIdlingResource.isIdle()).isFalse()
+            assertThat(composeIdlingResource.isIdleNow).isFalse()
         }
 
         // Await recomposition
@@ -101,7 +101,7 @@ class TestAnimationClockTest {
         // Advance first half of the animation (.5 sec)
         rule.runOnIdle {
             clockTestRule.advanceClock(halfDuration)
-            assertThat(ComposeIdlingResource.isIdle()).isFalse()
+            assertThat(composeIdlingResource.isIdleNow).isFalse()
         }
 
         // Await next animation frame
@@ -115,7 +115,7 @@ class TestAnimationClockTest {
         // Advance second half of the animation (.5 sec)
         rule.runOnIdle {
             clockTestRule.advanceClock(halfDuration)
-            assertThat(ComposeIdlingResource.isIdle()).isFalse()
+            assertThat(composeIdlingResource.isIdleNow).isFalse()
         }
 
         // Await next animation frame
@@ -150,7 +150,7 @@ class TestAnimationClockTest {
             animationState.value = AnimationStates.To
 
             // Changes need to trickle down the animation system, so compose should be non-idle
-            assertThat(ComposeIdlingResource.isIdle()).isFalse()
+            assertThat(composeIdlingResource.isIdleNow).isFalse()
         }
 
         // Perform a single recomposition by awaiting the same signal as the Recomposer

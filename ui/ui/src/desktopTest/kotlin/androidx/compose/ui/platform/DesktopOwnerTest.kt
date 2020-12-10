@@ -29,7 +29,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumnFor
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,12 +39,11 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
-import androidx.compose.ui.graphicsLayer
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.mouse.MouseScrollEvent
 import androidx.compose.ui.input.mouse.MouseScrollUnit
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.test.junit4.DesktopScreenshotTestRule
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -54,7 +53,6 @@ import org.junit.Rule
 import org.junit.Test
 
 @OptIn(
-    ExperimentalLayoutNodeApi::class,
     ExperimentalComposeApi::class,
     ExperimentalCoroutinesApi::class
 )
@@ -290,10 +288,12 @@ class DesktopOwnerTest {
         var height by mutableStateOf(10.dp)
         setContent {
             Box(Modifier.padding(10.dp)) {
-                LazyColumnFor(
-                    listOf(Color.Red, Color.Green, Color.Blue, Color.Black, Color.Gray)
-                ) { color ->
-                    Box(Modifier.size(width = 30.dp, height = height).background(color))
+                LazyColumn {
+                    items(
+                        listOf(Color.Red, Color.Green, Color.Blue, Color.Black, Color.Gray)
+                    ) { color ->
+                        Box(Modifier.size(width = 30.dp, height = height).background(color))
+                    }
                 }
             }
         }

@@ -18,6 +18,7 @@ package androidx.compose.desktop.examples.popupexample
 import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.AppWindow
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,9 +32,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Text
 import androidx.compose.material.Button
-import androidx.compose.material.ButtonConstants
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Checkbox
 import androidx.compose.material.RadioButton
 import androidx.compose.material.Surface
@@ -156,7 +159,8 @@ fun content() {
                         .background(color = Color(255, 255, 255, 10))
                         .fillMaxWidth()
                 ) {
-                    Spacer(modifier = Modifier.height(60.dp))
+                    ContextMenu()
+                    Spacer(modifier = Modifier.height(30.dp))
                     Spacer(modifier = Modifier.height(60.dp))
                     Row {
                         Checkbox(
@@ -313,7 +317,7 @@ fun Button(
     val buttonHover = remember { mutableStateOf(false) }
     Button(
         onClick = onClick,
-        colors = ButtonConstants.defaultButtonColors(
+        colors = ButtonDefaults.buttonColors(
             backgroundColor =
                 if (buttonHover.value)
                     Color(color.red / 1.3f, color.green / 1.3f, color.blue / 1.3f)
@@ -339,15 +343,54 @@ fun Button(
 }
 
 @Composable
-fun TextBox(text: String = "") {
+fun TextBox(text: String = "", modifier: Modifier = Modifier.height(30.dp)) {
     Box(
-        modifier = Modifier.height(30.dp),
+        modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = text,
             color = Color(200, 200, 200)
         )
+    }
+}
+
+@Composable
+fun ContextMenu() {
+    val items = listOf("Item A", "Item B", "Item C", "Item D", "Item E", "Item F")
+    val showMenu = remember { mutableStateOf(false) }
+    val selectedIndex = remember { mutableStateOf(0) }
+
+    Surface(
+        modifier = Modifier
+            .padding(start = 4.dp, top = 2.dp),
+        color = Color(255, 255, 255, 40),
+        shape = RoundedCornerShape(4.dp)
+    ) {
+        DropdownMenu(
+            toggle = {
+                TextBox(
+                    text = "Selected: ${items[selectedIndex.value]}",
+                    modifier = Modifier
+                        .height(26.dp)
+                        .padding(start = 4.dp, end = 4.dp)
+                        .clickable(onClick = { showMenu.value = true })
+                )
+            },
+            expanded = showMenu.value,
+            onDismissRequest = { showMenu.value = false }
+        ) {
+            items.forEachIndexed { index, name ->
+                DropdownMenuItem(
+                    onClick = {
+                        selectedIndex.value = index
+                        showMenu.value = false
+                    }
+                ) {
+                    Text(text = name)
+                }
+            }
+        }
     }
 }
 

@@ -23,8 +23,8 @@ import androidx.compose.animation.core.AnimationEndReason.Interrupted
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -38,6 +38,7 @@ import androidx.compose.runtime.savedinstancestate.Saver
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.gesture.nestedscroll.nestedScroll
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
@@ -48,6 +49,7 @@ import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.offset
 import androidx.compose.ui.util.fastForEach
@@ -86,7 +88,7 @@ enum class BackdropValue {
 class BackdropScaffoldState(
     initialValue: BackdropValue,
     clock: AnimationClockObservable,
-    animationSpec: AnimationSpec<Float> = SwipeableConstants.DefaultAnimationSpec,
+    animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
     confirmStateChange: (BackdropValue) -> Boolean = { true },
     val snackbarHostState: SnackbarHostState = SnackbarHostState()
 ) : SwipeableState<BackdropValue>(
@@ -139,6 +141,8 @@ class BackdropScaffoldState(
         )
     }
 
+    internal val nestedScrollConnection = this.PreUpPostDownNestedScrollConnection
+
     companion object {
         /**
          * The default [Saver] implementation for [BackdropScaffoldState].
@@ -177,7 +181,7 @@ class BackdropScaffoldState(
 fun rememberBackdropScaffoldState(
     initialValue: BackdropValue,
     clock: AnimationClockObservable = AmbientAnimationClock.current,
-    animationSpec: AnimationSpec<Float> = SwipeableConstants.DefaultAnimationSpec,
+    animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
     confirmStateChange: (BackdropValue) -> Boolean = { true },
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ): BackdropScaffoldState {
@@ -268,17 +272,17 @@ fun BackdropScaffold(
     modifier: Modifier = Modifier,
     scaffoldState: BackdropScaffoldState = rememberBackdropScaffoldState(Concealed),
     gesturesEnabled: Boolean = true,
-    peekHeight: Dp = BackdropScaffoldConstants.DefaultPeekHeight,
-    headerHeight: Dp = BackdropScaffoldConstants.DefaultHeaderHeight,
+    peekHeight: Dp = BackdropScaffoldDefaults.PeekHeight,
+    headerHeight: Dp = BackdropScaffoldDefaults.HeaderHeight,
     persistentAppBar: Boolean = true,
     stickyFrontLayer: Boolean = true,
     backLayerBackgroundColor: Color = MaterialTheme.colors.primary,
     backLayerContentColor: Color = contentColorFor(backLayerBackgroundColor),
-    frontLayerShape: Shape = BackdropScaffoldConstants.DefaultFrontLayerShape,
-    frontLayerElevation: Dp = BackdropScaffoldConstants.DefaultFrontLayerElevation,
+    frontLayerShape: Shape = BackdropScaffoldDefaults.frontLayerShape,
+    frontLayerElevation: Dp = BackdropScaffoldDefaults.FrontLayerElevation,
     frontLayerBackgroundColor: Color = MaterialTheme.colors.surface,
     frontLayerContentColor: Color = contentColorFor(frontLayerBackgroundColor),
-    frontLayerScrimColor: Color = BackdropScaffoldConstants.DefaultFrontLayerScrimColor,
+    frontLayerScrimColor: Color = BackdropScaffoldDefaults.frontLayerScrimColor,
     snackbarHost: @Composable (SnackbarHostState) -> Unit = { SnackbarHost(it) },
     appBar: @Composable () -> Unit,
     backLayerContent: @Composable () -> Unit,
@@ -317,19 +321,23 @@ fun BackdropScaffold(
                 revealedHeight = min(revealedHeight, backLayerHeight)
             }
 
-            val swipeable = Modifier.swipeable(
-                state = scaffoldState,
-                anchors = mapOf(
-                    peekHeightPx to Concealed,
-                    revealedHeight to Revealed
-                ),
-                orientation = Orientation.Vertical,
-                enabled = gesturesEnabled
-            )
+            val swipeable = Modifier
+                .nestedScroll(scaffoldState.nestedScrollConnection)
+                .swipeable(
+                    state = scaffoldState,
+                    anchors = mapOf(
+                        peekHeightPx to Concealed,
+                        revealedHeight to Revealed
+                    ),
+                    orientation = Orientation.Vertical,
+                    enabled = gesturesEnabled
+                )
 
             // Front layer
             Surface(
-                Modifier.offset(y = { scaffoldState.offset.value }).then(swipeable),
+                Modifier
+                    .offset { IntOffset(0, scaffoldState.offset.value.roundToInt()) }
+                    .then(swipeable),
                 shape = frontLayerShape,
                 elevation = frontLayerElevation,
                 color = frontLayerBackgroundColor,
@@ -461,6 +469,13 @@ private enum class BackdropLayers { Back, Front }
 /**
  * Contains useful constants for [BackdropScaffold].
  */
+@Deprecated(
+    "BackdropScaffoldConstants has been replaced with BackdropScaffoldDefaults",
+    ReplaceWith(
+        "BackdropScaffoldDefaults",
+        "androidx.compose.material.BackdropScaffoldDefaults"
+    )
+)
 object BackdropScaffoldConstants {
 
     /**
@@ -476,8 +491,8 @@ object BackdropScaffoldConstants {
     /**
      * The default shape of the front layer.
      */
-    @Composable
     val DefaultFrontLayerShape: Shape
+        @Composable
         get() = MaterialTheme.shapes.large
             .copy(topLeft = CornerSize(16.dp), topRight = CornerSize(16.dp))
 
@@ -489,9 +504,43 @@ object BackdropScaffoldConstants {
     /**
      * The default color of the scrim applied to the front layer.
      */
-    @Composable
     val DefaultFrontLayerScrimColor: Color
-        get() = MaterialTheme.colors.surface.copy(alpha = 0.60f)
+        @Composable get() = MaterialTheme.colors.surface.copy(alpha = 0.60f)
+}
+
+/**
+ * Contains useful defaults for [BackdropScaffold].
+ */
+object BackdropScaffoldDefaults {
+
+    /**
+     * The default peek height of the back layer.
+     */
+    val PeekHeight = 56.dp
+
+    /**
+     * The default header height of the front layer.
+     */
+    val HeaderHeight = 48.dp
+
+    /**
+     * The default shape of the front layer.
+     */
+    val frontLayerShape: Shape
+        @Composable
+        get() = MaterialTheme.shapes.large
+            .copy(topLeft = CornerSize(16.dp), topRight = CornerSize(16.dp))
+
+    /**
+     * The default elevation of the front layer.
+     */
+    val FrontLayerElevation = 1.dp
+
+    /**
+     * The default color of the scrim applied to the front layer.
+     */
+    val frontLayerScrimColor: Color
+        @Composable get() = MaterialTheme.colors.surface.copy(alpha = 0.60f)
 }
 
 private val AnimationSlideOffset = 20.dp

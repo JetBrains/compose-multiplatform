@@ -29,12 +29,12 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.AutofillNode
 import androidx.compose.ui.autofill.AutofillType
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.isFocused
-import androidx.compose.ui.focusObserver
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.toComposeRect
 import androidx.compose.ui.layout.LayoutCoordinates
@@ -46,10 +46,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 
 @Composable
-@OptIn(
-    ExperimentalFocus::class,
-    ExperimentalFoundationApi::class
-)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 fun ExplicitAutofillTypesDemo() {
     Column {
         val nameState = remember { mutableStateOf("Enter name here") }
@@ -64,7 +61,7 @@ fun ExplicitAutofillTypesDemo() {
             onFill = { nameState.value = it }
         ) { autofillNode ->
             BasicTextField(
-                modifier = Modifier.focusObserver {
+                modifier = Modifier.onFocusChanged {
                     autofill?.apply {
                         if (it.isFocused) {
                             requestAutofillForNode(autofillNode)
@@ -91,7 +88,7 @@ fun ExplicitAutofillTypesDemo() {
             onFill = { emailState.value = it }
         ) { autofillNode ->
             BasicTextField(
-                modifier = Modifier.focusObserver {
+                modifier = Modifier.onFocusChanged {
                     autofill?.run {
                         if (it.isFocused) {
                             requestAutofillForNode(autofillNode)
@@ -112,6 +109,7 @@ fun ExplicitAutofillTypesDemo() {
     }
 }
 
+@ExperimentalComposeUiApi
 @Composable
 private fun Autofill(
     autofillTypes: List<AutofillType>,

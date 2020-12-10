@@ -32,7 +32,6 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
 @SmallTest
-@OptIn(ExperimentalFocus::class)
 @RunWith(Parameterized::class)
 class RequestFocusTest(val propagateFocus: Boolean) {
     @get:Rule

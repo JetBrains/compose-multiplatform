@@ -75,15 +75,7 @@ class SemanticsConfiguration :
      * [SemanticsNode] representing the owning component.
      */
     var isMergingSemanticsOfDescendants: Boolean = false
-
-    /**
-     * Whether this configuration is empty.
-     *
-     * An empty configuration doesn't contain any semantic information that it
-     * wants to contribute to the semantics tree.
-     */
-    val isEmpty: Boolean
-        get() = props.isEmpty() && !isMergingSemanticsOfDescendants
+    var isClearingSemantics: Boolean = false
 
     // CONFIGURATION COMBINATION LOGIC
 
@@ -116,6 +108,9 @@ class SemanticsConfiguration :
         if (peer.isMergingSemanticsOfDescendants) {
             isMergingSemanticsOfDescendants = true
         }
+        if (peer.isClearingSemantics) {
+            isClearingSemantics = true
+        }
         for ((key, nextValue) in peer.props) {
             if (!props.contains(key)) {
                 props[key] = nextValue
@@ -127,6 +122,7 @@ class SemanticsConfiguration :
     fun copy(): SemanticsConfiguration {
         val copy = SemanticsConfiguration()
         copy.isMergingSemanticsOfDescendants = isMergingSemanticsOfDescendants
+        copy.isClearingSemantics = isClearingSemantics
         copy.props.putAll(props)
         return copy
     }
@@ -135,8 +131,9 @@ class SemanticsConfiguration :
         if (this === other) return true
         if (other !is SemanticsConfiguration) return false
 
-        if (isMergingSemanticsOfDescendants != other.isMergingSemanticsOfDescendants) return false
         if (props != other.props) return false
+        if (isMergingSemanticsOfDescendants != other.isMergingSemanticsOfDescendants) return false
+        if (isClearingSemantics != other.isClearingSemantics) return false
 
         return true
     }
@@ -144,6 +141,7 @@ class SemanticsConfiguration :
     override fun hashCode(): Int {
         var result = props.hashCode()
         result = 31 * result + isMergingSemanticsOfDescendants.hashCode()
+        result = 31 * result + isClearingSemantics.hashCode()
         return result
     }
 
@@ -154,6 +152,12 @@ class SemanticsConfiguration :
         if (isMergingSemanticsOfDescendants) {
             propsString.append(nextSeparator)
             propsString.append("mergeDescendants=true")
+            nextSeparator = ", "
+        }
+
+        if (isClearingSemantics) {
+            propsString.append(nextSeparator)
+            propsString.append("isClearingSemantics=true")
             nextSeparator = ", "
         }
 

@@ -433,7 +433,11 @@ class Recomposer(
     internal override val collectingKeySources: Boolean
         get() = false
 
-    internal override fun recordInspectionTable(table: MutableSet<SlotTable>) {
+    // Collecting parameter happens at the level of a composer; starts as false
+    internal override val collectingParameterInformation: Boolean
+        get() = false
+
+    internal override fun recordInspectionTable(table: MutableSet<CompositionData>) {
         // TODO: The root recomposer might be a better place to set up inspection
         // than the current configuration with an ambient
     }

@@ -20,9 +20,9 @@ import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.staticAmbientOf
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.node.Owner
@@ -52,19 +52,7 @@ val AmbientAnimationClock = staticAmbientOf<AnimationClockObservable>()
 /**
  * The ambient that can be used to trigger autofill actions. Eg. [Autofill.requestAutofillForNode].
  */
-@Suppress("AmbientNaming")
-@Deprecated(
-    "Renamed to AmbientAutofill",
-    replaceWith = ReplaceWith(
-        "AmbientAutofill",
-        "androidx.compose.ui.platform.AmbientAutofill"
-    )
-)
-val AutofillAmbient get() = AmbientAutofill
-
-/**
- * The ambient that can be used to trigger autofill actions. Eg. [Autofill.requestAutofillForNode].
- */
+@ExperimentalComposeUiApi
 val AmbientAutofill = staticAmbientOf<Autofill?>()
 
 /**
@@ -73,22 +61,7 @@ val AmbientAutofill = staticAmbientOf<Autofill?>()
  * [AutofillTree] is a temporary data structure that will be replaced by Autofill Semantics
  * (b/138604305).
  */
-@Suppress("AmbientNaming")
-@Deprecated(
-    "Renamed to AmbientAutofillTree",
-    replaceWith = ReplaceWith(
-        "AmbientAutofillTree",
-        "androidx.compose.ui.platform.AmbientAutofillTree"
-    )
-)
-val AutofillTreeAmbient get() = AmbientAutofillTree
-
-/**
- * The ambient that can be used to add
- * [AutofillNode][import androidx.compose.ui.autofill.AutofillNode]s to the autofill tree. The
- * [AutofillTree] is a temporary data structure that will be replaced by Autofill Semantics
- * (b/138604305).
- */
+@ExperimentalComposeUiApi
 val AmbientAutofillTree = staticAmbientOf<AutofillTree>()
 
 /**
@@ -146,13 +119,11 @@ val AmbientDensity = staticAmbientOf<Density>()
         "androidx.compose.ui.platform.AmbientFocusManager"
     )
 )
-@ExperimentalFocus
 val FocusManagerAmbient get() = AmbientFocusManager
 
 /**
  * The ambient that can be used to control focus within Compose.
  */
-@ExperimentalFocus
 val AmbientFocusManager = staticAmbientOf<FocusManager>()
 
 /**
@@ -292,7 +263,7 @@ val AmbientViewConfiguration = staticAmbientOf<ViewConfiguration>()
  */
 val AmbientWindowManager = staticAmbientOf<WindowManager>()
 
-@OptIn(ExperimentalFocus::class)
+@ExperimentalComposeUiApi
 @Composable
 internal fun ProvideCommonAmbients(
     owner: Owner,

@@ -26,7 +26,6 @@ import org.jetbrains.uast.UMethod
 val UMethod.isComposable get() = annotations.any { it.qualifiedName == ComposableFqn }
 
 const val ComposableFqn = "androidx.compose.runtime.Composable"
-val ComposableShortName = ComposableFqn.split(".").last()
 
 const val ModifierFqn = "androidx.compose.ui.Modifier"
 val ModifierShortName = ModifierFqn.split(".").last()

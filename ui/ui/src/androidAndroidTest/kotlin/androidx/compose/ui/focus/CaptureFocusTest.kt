@@ -19,7 +19,6 @@ package androidx.compose.ui.focus
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.FocusModifier
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focusObserver
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -30,7 +29,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @MediumTest
-@OptIn(ExperimentalFocus::class)
 @RunWith(AndroidJUnit4::class)
 class CaptureFocusTest {
     @get:Rule
@@ -44,7 +42,7 @@ class CaptureFocusTest {
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
-                    .focusObserver { focusState = it }
+                    .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
                     .then(FocusModifier(FocusState.Active))
             )
@@ -70,7 +68,7 @@ class CaptureFocusTest {
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
-                    .focusObserver { focusState = it }
+                    .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
                     .then(FocusModifier(focusState))
             )
@@ -96,7 +94,7 @@ class CaptureFocusTest {
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
-                    .focusObserver { focusState = it }
+                    .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
                     .then(FocusModifier(focusState))
             )
@@ -122,7 +120,7 @@ class CaptureFocusTest {
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
-                    .focusObserver { focusState = it }
+                    .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
                     .then(FocusModifier(focusState))
             )
@@ -148,7 +146,7 @@ class CaptureFocusTest {
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
-                    .focusObserver { focusState = it }
+                    .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
                     .then(FocusModifier(focusState))
             )

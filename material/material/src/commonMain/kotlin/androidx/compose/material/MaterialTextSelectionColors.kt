@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.useOrElse
 import androidx.compose.ui.selection.TextSelectionColors
 import androidx.compose.ui.util.annotation.VisibleForTesting
 import kotlin.math.max
@@ -39,9 +40,12 @@ internal fun rememberTextSelectionColors(colors: Colors): TextSelectionColors {
     // Test with ContentAlpha.medium to ensure that the selection background is accessible in the
     // 'worst case' scenario. We explicitly don't test with ContentAlpha.disabled, as disabled
     // text shouldn't be selectable / is noted as disabled for accessibility purposes.
-    val textColorWithLowestAlpha = contentColorFor(backgroundColor).copy(
-        alpha = ContentAlpha.medium
-    )
+    val textColorWithLowestAlpha = colors.contentColorFor(backgroundColor)
+        .useOrElse {
+            AmbientContentColor.current
+        }.copy(
+            alpha = ContentAlpha.medium
+        )
     return remember(primaryColor, backgroundColor, textColorWithLowestAlpha) {
         TextSelectionColors(
             handleColor = colors.primary,

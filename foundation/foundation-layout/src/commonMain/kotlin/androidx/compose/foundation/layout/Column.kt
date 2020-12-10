@@ -25,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measured
 import androidx.compose.ui.layout.VerticalAlignmentLine
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.util.annotation.FloatRange
 
@@ -66,7 +65,7 @@ import androidx.compose.ui.util.annotation.FloatRange
  * @see [androidx.compose.foundation.lazy.LazyColumn]
  */
 @Composable
-@OptIn(ExperimentalLayoutNodeApi::class, InternalLayoutApi::class)
+@OptIn(InternalLayoutApi::class)
 inline fun Column(
     modifier: Modifier = Modifier,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,

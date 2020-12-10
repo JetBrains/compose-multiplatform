@@ -59,12 +59,10 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.globalPosition
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutEmitHelper
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.node.isAttached
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.captureToImage
@@ -573,7 +571,7 @@ class AndroidViewCompatTest {
     }
 
     @Test
-    @OptIn(ExperimentalLayoutNodeApi::class, ExperimentalComposeApi::class)
+    @OptIn(ExperimentalComposeApi::class)
     fun testComposeInsideView_attachingAndDetaching() {
         var composeContent by mutableStateOf(true)
         var node: LayoutNode? = null
@@ -585,7 +583,7 @@ class AndroidViewCompatTest {
                             emit<LayoutNode, Applier<Any>>(
                                 ctor = LayoutEmitHelper.constructor,
                                 update = {
-                                    node = this.node
+                                    set(Unit) { node = this }
                                     set(noOpMeasureBlocks, LayoutEmitHelper.setMeasureBlocks)
                                 }
                             )
@@ -620,7 +618,7 @@ class AndroidViewCompatTest {
         assertNotNull(innerAndroidComposeView)
         assertTrue(innerAndroidComposeView!!.isAttachedToWindow)
         assertNotNull(node)
-        assertTrue(node!!.isAttached())
+        assertTrue(node!!.isAttached)
 
         rule.runOnIdle { composeContent = false }
 
@@ -628,7 +626,7 @@ class AndroidViewCompatTest {
         rule.runOnIdle {
             assertFalse(innerAndroidComposeView!!.isAttachedToWindow)
             // the node stays attached after the compose view is detached
-            assertTrue(node!!.isAttached())
+            assertTrue(node!!.isAttached)
         }
     }
 
@@ -783,7 +781,6 @@ class AndroidViewCompatTest {
         }
     }
 
-    @OptIn(ExperimentalLayoutNodeApi::class)
     private val noOpMeasureBlocks = object : LayoutNode.NoIntrinsicsMeasureBlocks("") {
         override fun measure(
             measureScope: MeasureScope,

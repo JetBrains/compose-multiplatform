@@ -16,6 +16,8 @@
 
 package androidx.compose.foundation.text
 
+import androidx.compose.foundation.Interaction
+import androidx.compose.foundation.InteractionState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -92,6 +94,10 @@ import androidx.compose.ui.text.input.VisualTransformation
  * communicating with platform text input service, e.g. software keyboard on Android. Called with
  * [SoftwareKeyboardController] instance which can be used for requesting input show/hide software
  * keyboard.
+ * @param interactionState the [InteractionState] representing the different [Interaction]s
+ * present on this TextField. You can create and pass in your own remembered [InteractionState]
+ * if you want to read the [InteractionState] and customize the appearance / behavior of this
+ * TextField in different [Interaction]s.
  * @param cursorColor Color of the cursor. If [Color.Unspecified], there will be no cursor drawn
  */
 @OptIn(ExperimentalTextApi::class)
@@ -108,6 +114,7 @@ fun BasicTextField(
     visualTransformation: VisualTransformation = VisualTransformation.None,
     onTextLayout: (TextLayoutResult) -> Unit = {},
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
+    interactionState: InteractionState = remember { InteractionState() },
     cursorColor: Color = Color.Black
 ) {
     var textFieldValueState by remember { mutableStateOf(TextFieldValue(text = value)) }
@@ -130,6 +137,7 @@ fun BasicTextField(
         onTextLayout = onTextLayout,
         onTextInputStarted = onTextInputStarted,
         cursorColor = cursorColor,
+        interactionState = interactionState,
         singleLine = singleLine
     )
 }
@@ -188,6 +196,10 @@ fun BasicTextField(
  * communicating with platform text input service, e.g. software keyboard on Android. Called with
  * [SoftwareKeyboardController] instance which can be used for requesting input show/hide software
  * keyboard.
+ * @param interactionState The [InteractionState] representing the different [Interaction]s
+ * present on this TextField. You can create and pass in your own remembered [InteractionState]
+ * if you want to read the [InteractionState] and customize the appearance / behavior of this
+ * TextField in different [Interaction]s.
  * @param cursorColor Color of the cursor. If [Color.Unspecified], there will be no cursor drawn
  */
 @Composable
@@ -204,6 +216,7 @@ fun BasicTextField(
     visualTransformation: VisualTransformation = VisualTransformation.None,
     onTextLayout: (TextLayoutResult) -> Unit = {},
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
+    interactionState: InteractionState = remember { InteractionState() },
     cursorColor: Color = Color.Black
 ) {
     // We use it to get the cursor position
@@ -224,6 +237,7 @@ fun BasicTextField(
             textLayoutResult.value = it
             onTextLayout(it)
         },
+        interactionState = interactionState,
         onTextInputStarted = onTextInputStarted,
         cursorColor = cursorColor,
         imeOptions = keyboardOptions.toImeOptions(singleLine = singleLine),
@@ -235,6 +249,7 @@ fun BasicTextField(
                 scrollerPosition,
                 value,
                 visualTransformation,
+                interactionState,
                 textLayoutResult
             )
     )

@@ -24,18 +24,18 @@ import androidx.activity.ComponentActivity
 import androidx.annotation.MainThread
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
+import androidx.compose.runtime.CompositionData
 import androidx.compose.runtime.CompositionReference
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.InternalComposeApi
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.Recomposer
-import androidx.compose.runtime.SlotTable
 import androidx.compose.runtime.compositionFor
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.tooling.InspectionTables
 import androidx.compose.ui.R
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.UiApplier
 import androidx.lifecycle.Lifecycle
@@ -111,8 +111,8 @@ fun Activity.setViewContent(composable: @Composable () -> Unit): Composition {
 // nextFrame() inside recompose() doesn't really start a new frame, but a new subframe
 // instead.
 @MainThread
-@OptIn(ExperimentalComposeApi::class, ExperimentalLayoutNodeApi::class)
-internal actual fun actualSubcomposeInto(
+@OptIn(ExperimentalComposeApi::class)
+internal actual fun subcomposeInto(
     container: LayoutNode,
     parent: CompositionReference,
     composable: @Composable () -> Unit
@@ -140,9 +140,9 @@ fun ComponentActivity.setContent(
     content: @Composable () -> Unit
 ): Composition {
     GlobalSnapshotManager.ensureStarted()
-    val composeView: AndroidOwner = window.decorView
+    val composeView: AndroidComposeView = window.decorView
         .findViewById<ViewGroup>(android.R.id.content)
-        .getChildAt(0) as? AndroidOwner
+        .getChildAt(0) as? AndroidComposeView
         ?: AndroidComposeView(this).also {
             setContentView(it.view, DefaultLayoutParams)
         }
@@ -169,7 +169,7 @@ fun ViewGroup.setContent(
     GlobalSnapshotManager.ensureStarted()
     val composeView =
         if (childCount > 0) {
-            getChildAt(0) as? AndroidOwner
+            getChildAt(0) as? AndroidComposeView
         } else {
             removeAllViews(); null
         } ?: AndroidComposeView(context).also { addView(it.view, DefaultLayoutParams) }
@@ -178,14 +178,14 @@ fun ViewGroup.setContent(
 
 @OptIn(InternalComposeApi::class)
 private fun doSetContent(
-    owner: AndroidOwner,
+    owner: AndroidComposeView,
     parent: CompositionReference,
     content: @Composable () -> Unit
 ): Composition {
     if (inspectionWanted(owner)) {
-        owner.view.setTag(
+        owner.setTag(
             R.id.inspection_slot_table_set,
-            Collections.newSetFromMap(WeakHashMap<SlotTable, Boolean>())
+            Collections.newSetFromMap(WeakHashMap<CompositionData, Boolean>())
         )
         enableDebugInspectorInfo()
     }
@@ -213,36 +213,44 @@ private fun enableDebugInspectorInfo() {
 }
 
 private class WrappedComposition(
-    val owner: AndroidOwner,
+    val owner: AndroidComposeView,
     val original: Composition
 ) : Composition, LifecycleEventObserver {
 
     private var disposed = false
     private var addedToLifecycle: Lifecycle? = null
-    private var contentWaitingForCreated: @Composable () -> Unit = emptyContent()
+    private var lastContent: @Composable () -> Unit = emptyContent()
 
     @OptIn(InternalComposeApi::class)
     override fun setContent(content: @Composable () -> Unit) {
         owner.setOnViewTreeOwnersAvailable {
             if (!disposed) {
                 val lifecycle = it.lifecycleOwner.lifecycle
+                lastContent = content
                 if (addedToLifecycle == null) {
-                    lifecycle.addObserver(this)
                     addedToLifecycle = lifecycle
-                }
-                if (lifecycle.currentState.isAtLeast(Lifecycle.State.CREATED)) {
+                    // this will call ON_CREATE synchronously if we already created
+                    lifecycle.addObserver(this)
+                } else if (lifecycle.currentState.isAtLeast(Lifecycle.State.CREATED)) {
                     original.setContent {
                         @Suppress("UNCHECKED_CAST")
                         val inspectionTable =
-                            owner.view.getTag(R.id.inspection_slot_table_set) as?
-                                MutableSet<SlotTable>
-                        inspectionTable?.add(currentComposer.slotTable)
+                            owner.getTag(R.id.inspection_slot_table_set) as?
+                                MutableSet<CompositionData>
+                                ?: (owner.parent as? View)?.getTag(R.id.inspection_slot_table_set)
+                                    as? MutableSet<CompositionData>
+                        if (inspectionTable != null) {
+                            @OptIn(InternalComposeApi::class)
+                            inspectionTable.add(currentComposer.compositionData)
+                            currentComposer.collectParameterInformation()
+                        }
+
+                        LaunchedEffect(owner) { owner.keyboardVisibilityEventLoop() }
+
                         Providers(InspectionTables provides inspectionTable) {
                             ProvideAndroidAmbients(owner, content)
                         }
                     }
-                } else {
-                    contentWaitingForCreated = content
                 }
             }
         }
@@ -264,8 +272,7 @@ private class WrappedComposition(
             dispose()
         } else if (event == Lifecycle.Event.ON_CREATE) {
             if (!disposed) {
-                setContent(contentWaitingForCreated)
-                contentWaitingForCreated = emptyContent()
+                setContent(lastContent)
             }
         }
     }
@@ -286,6 +293,6 @@ private val DefaultLayoutParams = ViewGroup.LayoutParams(
  *
  * Instead check if the attributeSourceResourceMap is not empty.
  */
-private fun inspectionWanted(owner: AndroidOwner): Boolean =
+private fun inspectionWanted(owner: AndroidComposeView): Boolean =
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
-        owner.view.attributeSourceResourceMap.isNotEmpty()
+        owner.attributeSourceResourceMap.isNotEmpty()

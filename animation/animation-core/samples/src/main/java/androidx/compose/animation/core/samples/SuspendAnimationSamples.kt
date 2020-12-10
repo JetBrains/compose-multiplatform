@@ -17,14 +17,13 @@
 package androidx.compose.animation.core.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.animation.core.AnimationConstants
 import androidx.compose.animation.core.AnimationState
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.animateTo
+import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.isFinished
-import androidx.compose.animation.core.repeatable
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
@@ -82,8 +81,7 @@ fun suspendAnimateFloatVariant() {
             animate(
                 initialValue = 1f,
                 targetValue = 0f,
-                animationSpec = repeatable(
-                    iterations = AnimationConstants.Infinite,
+                animationSpec = infiniteRepeatable(
                     animation = tween(1000),
                     repeatMode = RepeatMode.Reverse
                 )

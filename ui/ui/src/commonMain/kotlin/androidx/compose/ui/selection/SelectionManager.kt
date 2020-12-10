@@ -31,6 +31,7 @@ import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.TextToolbarStatus
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.length
 import androidx.compose.ui.text.subSequence
@@ -40,7 +41,10 @@ import kotlin.math.min
 /**
  * A bridge class between user interaction to the text composables for text selection.
  */
-@OptIn(InternalTextApi::class)
+@OptIn(
+    InternalTextApi::class,
+    ExperimentalTextApi::class
+)
 internal class SelectionManager(private val selectionRegistrar: SelectionRegistrarImpl) {
     /**
      * The current selection.
@@ -49,7 +53,6 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
         set(value) {
             field = value
             updateHandleOffsets()
-            hideSelectionToolbar()
         }
 
     /**
@@ -123,9 +126,20 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
     init {
         selectionRegistrar.onPositionChangeCallback = {
             updateHandleOffsets()
+            updateSelectionToolbarPosition()
+        }
+
+        selectionRegistrar.onSelectionUpdateStartCallback = { layoutCoordinates, startPosition ->
+            updateSelection(
+                startPosition = convertToContainerCoordinates(layoutCoordinates, startPosition),
+                endPosition = convertToContainerCoordinates(layoutCoordinates, startPosition),
+                isStartHandle = true,
+                longPress = true
+            )
             hideSelectionToolbar()
         }
-        selectionRegistrar.onUpdateSelectionCallback =
+
+        selectionRegistrar.onSelectionUpdateCallback =
             { layoutCoordinates, startPosition, endPosition ->
                 updateSelection(
                     startPosition = convertToContainerCoordinates(layoutCoordinates, startPosition),
@@ -134,6 +148,10 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                     longPress = true
                 )
             }
+
+        selectionRegistrar.onSelectionUpdateEndCallback = {
+            showSelectionToolbar()
+        }
     }
 
     private fun updateHandleOffsets() {
@@ -265,12 +283,9 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
         }
     }
 
-    private fun hideSelectionToolbar() {
+    internal fun hideSelectionToolbar() {
         if (textToolbar?.status == TextToolbarStatus.Shown) {
-            val selection = selection
-            if (selection == null) {
-                textToolbar?.hide()
-            }
+            textToolbar?.hide()
         }
     }
 
@@ -356,12 +371,14 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
             endPosition = Offset(-1f, -1f),
             previousSelection = selection
         )
+        hideSelectionToolbar()
         if (selection != null) onSelectionChange(null)
     }
 
     fun handleDragObserver(isStartHandle: Boolean): DragObserver {
         return object : DragObserver {
             override fun onStart(downPosition: Offset) {
+                hideSelectionToolbar()
                 val selection = selection!!
                 // The LayoutCoordinates of the composable where the drag gesture should begin. This
                 // is used to convert the position of the beginning of the drag gesture from the
@@ -375,13 +392,15 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                 // The position of the character where the drag gesture should begin. This is in
                 // the composable coordinates.
                 val beginCoordinates = getAdjustedCoordinates(
-                    if (isStartHandle)
+                    if (isStartHandle) {
                         selection.start.selectable.getHandlePosition(
                             selection = selection, isStartHandle = true
-                        ) else
+                        )
+                    } else {
                         selection.end.selectable.getHandlePosition(
                             selection = selection, isStartHandle = false
                         )
+                    }
                 )
 
                 // Convert the position where drag gesture begins from composable coordinates to
@@ -434,6 +453,14 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                 )
                 return dragDistance
             }
+
+            override fun onStop(velocity: Offset) {
+                showSelectionToolbar()
+            }
+
+            override fun onCancel() {
+                showSelectionToolbar()
+            }
         }
     }
 
@@ -468,6 +495,7 @@ internal fun merge(lhs: Selection?, rhs: Selection?): Selection? {
     return lhs?.merge(rhs) ?: rhs
 }
 
+@OptIn(ExperimentalTextApi::class)
 internal fun getCurrentSelectedText(
     selectable: Selectable,
     selection: Selection

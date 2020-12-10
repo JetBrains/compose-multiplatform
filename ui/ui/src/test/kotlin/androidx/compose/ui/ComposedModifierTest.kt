@@ -22,7 +22,6 @@ import androidx.compose.runtime.Composer
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.Recomposer
-import androidx.compose.runtime.SlotTable
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.dispatch.MonotonicFrameClock
 import androidx.compose.runtime.invalidate
@@ -211,7 +210,6 @@ fun compose(
     block: @Composable () -> Unit
 ): Composer<Unit> {
     return Composer(
-        SlotTable(),
         EmptyApplier(),
         recomposer
     ).apply {
@@ -221,7 +219,7 @@ fun compose(
             fn(this, 0)
         }
         applyChanges()
-        slotTable.verifyWellFormed()
+        verifyConsistent()
     }
 }
 
@@ -241,7 +239,10 @@ class EmptyApplier : Applier<Unit> {
     override val current: Unit = Unit
     override fun down(node: Unit) {}
     override fun up() {}
-    override fun insert(index: Int, instance: Unit) {
+    override fun insertTopDown(index: Int, instance: Unit) {
+        error("Unexpected")
+    }
+    override fun insertBottomUp(index: Int, instance: Unit) {
         error("Unexpected")
     }
     override fun remove(index: Int, count: Int) {

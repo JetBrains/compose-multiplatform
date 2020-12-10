@@ -16,8 +16,7 @@
 
 package androidx.compose.ui.tooling.inspector
 
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
-import androidx.compose.ui.node.LayoutNode
+import androidx.compose.ui.layout.LayoutInfo
 
 /**
  * Node representing a Composable for the Layout Inspector.
@@ -105,10 +104,9 @@ class RawParameter(val name: String, val value: Any?)
 /**
  * Mutable version of [InspectorNode].
  */
-@ExperimentalLayoutNodeApi
 internal class MutableInspectorNode {
     var id = 0L
-    var layoutNodes = mutableListOf<LayoutNode>()
+    var layoutNodes = mutableListOf<LayoutInfo>()
     var name = ""
     var fileName = ""
     var packageHash = -1

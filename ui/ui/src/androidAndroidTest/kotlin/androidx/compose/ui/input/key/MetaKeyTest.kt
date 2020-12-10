@@ -28,7 +28,6 @@ import org.junit.runner.RunWith
 
 @SmallTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalKeyInput::class)
 class MetaKeyTest {
 
     @Test

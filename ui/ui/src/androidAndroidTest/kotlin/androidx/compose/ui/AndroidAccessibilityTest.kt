@@ -38,7 +38,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat
 import androidx.compose.ui.platform.testTag
@@ -59,7 +58,6 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.core.os.BuildCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -92,7 +90,6 @@ import java.util.concurrent.TimeUnit
 @RunWith(AndroidJUnit4::class)
 @OptIn(
     ExperimentalFoundationApi::class,
-    ExperimentalLayoutNodeApi::class
 )
 class AndroidAccessibilityTest {
     @get:Rule
@@ -176,7 +173,7 @@ class AndroidAccessibilityTest {
         var accessibilityNodeInfo = provider.createAccessibilityNodeInfo(toggleableNode.id)
         assertEquals("android.view.View", accessibilityNodeInfo.className)
         val stateDescription = when {
-            BuildCompat.isAtLeastR() -> {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
                 accessibilityNodeInfo.stateDescription
             }
             Build.VERSION.SDK_INT >= 19 -> {

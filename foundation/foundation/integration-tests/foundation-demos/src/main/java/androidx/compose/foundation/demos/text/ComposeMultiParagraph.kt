@@ -22,7 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.annotatedString
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.text.withStyle
@@ -52,7 +52,7 @@ fun TextDemoParagraph() {
     val text1 = "paragraph1 paragraph1 paragraph1 paragraph1 paragraph1"
     val text2 = "paragraph2 paragraph2 paragraph2 paragraph2 paragraph2"
     Text(
-        text = annotatedString {
+        text = buildAnnotatedString {
             append(text1)
             withStyle(ParagraphStyle()) {
                 append(text2)
@@ -64,7 +64,7 @@ fun TextDemoParagraph() {
 
 @Composable
 fun TextDemoParagraphTextAlign() {
-    val annotatedString = annotatedString {
+    val annotatedString = buildAnnotatedString {
         TextAlign.values().forEach { textAlign ->
             val str = List(4) { "TextAlign.$textAlign" }.joinToString(" ")
             withStyle(ParagraphStyle(textAlign = textAlign)) {
@@ -114,7 +114,7 @@ fun TextDemoParagraphIndent() {
     val text2 = "TextIndent restLine TextIndent restLine TextIndent restLine"
 
     Text(
-        text = annotatedString {
+        text = buildAnnotatedString {
             withStyle(ParagraphStyle(textIndent = TextIndent(firstLine = 20.sp))) {
                 append(text1)
             }
@@ -131,7 +131,7 @@ fun TextDemoParagraphTextDirection() {
     val ltrText = "Hello World! Hello World! Hello World! Hello World! Hello World!"
     val rtlText = "مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم"
     Text(
-        text = annotatedString {
+        text = buildAnnotatedString {
             withStyle(ParagraphStyle()) {
                 append(ltrText)
             }

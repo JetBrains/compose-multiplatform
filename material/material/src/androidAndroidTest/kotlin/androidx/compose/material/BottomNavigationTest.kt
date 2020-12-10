@@ -32,6 +32,7 @@ import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
+import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.isSelectable
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -63,7 +64,7 @@ class BottomNavigationTest {
         rule.setMaterialContentForSizeAssertions {
             BottomNavigationSample()
         }
-            .assertWidthFillsRoot()
+            .assertWidthIsEqualTo(rule.rootWidth())
             .assertHeightIsEqualTo(height)
     }
 

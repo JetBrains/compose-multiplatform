@@ -146,7 +146,7 @@ class MouseScrollFilterTest {
             )
             Box(
                 Modifier
-                    .mouseScrollFilter { event, bounds ->
+                    .mouseScrollFilter { _, _ ->
                         false
                     }
                     .size(5.dp, 10.dp)
@@ -254,7 +254,7 @@ class MouseScrollFilterTest {
             ) {
                 Box(
                     Modifier
-                        .mouseScrollFilter { event, bounds ->
+                        .mouseScrollFilter { _, _ ->
                             false
                         }
                         .size(5.dp, 10.dp)

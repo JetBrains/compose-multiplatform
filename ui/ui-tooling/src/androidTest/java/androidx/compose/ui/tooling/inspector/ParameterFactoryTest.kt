@@ -40,8 +40,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.LinearGradient
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.SolidColor
@@ -49,7 +49,6 @@ import androidx.compose.ui.graphics.colorspace.ColorModel
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
@@ -81,7 +80,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@ExperimentalLayoutNodeApi
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class ParameterFactoryTest {
@@ -200,7 +198,11 @@ class ParameterFactoryTest {
             factory.create(
                 node,
                 "brush",
-                LinearGradient(listOf(Color.Red, Color.Blue), 0.0f, 0.5f, 5.0f, 10.0f)
+                Brush.linearGradient(
+                    colors = listOf(Color.Red, Color.Blue),
+                    start = Offset(0.0f, 0.5f),
+                    end = Offset(5.0f, 10.0f)
+                )
             )!!
         ) {
             parameter("brush", ParameterType.String, "LinearGradient") {
@@ -208,10 +210,17 @@ class ParameterFactoryTest {
                     parameter("0", ParameterType.Color, Color.Red.toArgb())
                     parameter("1", ParameterType.Color, Color.Blue.toArgb())
                 }
-                parameter("endX", ParameterType.Float, 5.0f)
-                parameter("endY", ParameterType.Float, 10.0f)
-                parameter("startX", ParameterType.Float, 0.0f)
-                parameter("startY", ParameterType.Float, 0.5f)
+                // Parameters are traversed in alphabetical order through reflection queries.
+                // Validate createdSize exists before validating end parameter
+                parameter("createdSize", ParameterType.String, "Unspecified")
+                parameter("end", ParameterType.String, Offset::class.java.simpleName) {
+                    parameter("x", ParameterType.DimensionDp, 2.5f)
+                    parameter("y", ParameterType.DimensionDp, 5.0f)
+                }
+                parameter("start", ParameterType.String, Offset::class.java.simpleName) {
+                    parameter("x", ParameterType.DimensionDp, 0.0f)
+                    parameter("y", ParameterType.DimensionDp, 0.25f)
+                }
                 parameter("tileMode", ParameterType.String, "Clamp")
             }
         }

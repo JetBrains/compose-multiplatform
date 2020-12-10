@@ -19,7 +19,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.material.TabConstants.defaultTabIndicatorOffset
+import androidx.compose.material.TabDefaults.tabIndicatorOffset
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.samples.ScrollingTextTabs
@@ -124,7 +124,7 @@ class TabTest {
             val indicator = @Composable { tabPositions: List<TabPosition> ->
                 Box(
                     Modifier
-                        .defaultTabIndicatorOffset(tabPositions[state])
+                        .tabIndicatorOffset(tabPositions[state])
                         .fillMaxWidth()
                         .preferredHeight(indicatorHeight)
                         .background(color = Color.Red)
@@ -299,7 +299,7 @@ class TabTest {
             val indicator = @Composable { tabPositions: List<TabPosition> ->
                 Box(
                     Modifier
-                        .defaultTabIndicatorOffset(tabPositions[state])
+                        .tabIndicatorOffset(tabPositions[state])
                         .fillMaxWidth()
                         .preferredHeight(indicatorHeight)
                         .background(color = Color.Red)
@@ -330,7 +330,7 @@ class TabTest {
         rule.onNodeWithTag("indicator")
             .assertPositionInRootIsEqualTo(
                 // Tabs in a scrollable tab row are offset 52.dp from each end
-                expectedLeft = TabConstants.DefaultScrollableTabRowPadding,
+                expectedLeft = TabDefaults.ScrollableTabRowPadding,
                 expectedTop = tabRowBounds.height - indicatorHeight
             )
 
@@ -341,7 +341,7 @@ class TabTest {
         // should be in the middle of the TabRow
         rule.onNodeWithTag("indicator")
             .assertPositionInRootIsEqualTo(
-                expectedLeft = TabConstants.DefaultScrollableTabRowPadding + minimumTabWidth,
+                expectedLeft = TabDefaults.ScrollableTabRowPadding + minimumTabWidth,
                 expectedTop = tabRowBounds.height - indicatorHeight
             )
     }
@@ -446,8 +446,8 @@ class TabTest {
     fun testInspectorValue() {
         val pos = TabPosition(10.0.dp, 200.0.dp)
         rule.setContent {
-            val modifier = Modifier.defaultTabIndicatorOffset(pos) as InspectableValue
-            assertThat(modifier.nameFallback).isEqualTo("defaultTabIndicatorOffset")
+            val modifier = Modifier.tabIndicatorOffset(pos) as InspectableValue
+            assertThat(modifier.nameFallback).isEqualTo("tabIndicatorOffset")
             assertThat(modifier.valueOverride).isEqualTo(pos)
             assertThat(modifier.inspectableElements.asIterable()).isEmpty()
         }

@@ -21,7 +21,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.material.Button
-import androidx.compose.material.ButtonConstants
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.samples.FancyIndicatorContainerTabs
 import androidx.compose.material.samples.FancyIndicatorTabs
@@ -69,7 +69,7 @@ fun TabDemo() {
             onClick = {
                 showingSimple.value = !showingSimple.value
             },
-            colors = ButtonConstants.defaultButtonColors(backgroundColor = Color.Cyan)
+            colors = ButtonDefaults.buttonColors(backgroundColor = Color.Cyan)
         ) {
             Text(buttonText)
         }

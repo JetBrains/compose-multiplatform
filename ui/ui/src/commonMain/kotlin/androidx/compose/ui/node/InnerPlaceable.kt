@@ -16,9 +16,8 @@
 
 package androidx.compose.ui.node
 
-import androidx.compose.ui.focus.ExperimentalFocus
-import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.gesture.nestedscroll.NestedScrollDelegatingWrapper
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.GraphicsLayerScope
@@ -31,7 +30,6 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 
-@OptIn(ExperimentalLayoutNodeApi::class)
 internal class InnerPlaceable(
     layoutNode: LayoutNode
 ) : LayoutNodeWrapper(layoutNode), Density by layoutNode.measureScope {
@@ -60,12 +58,11 @@ internal class InnerPlaceable(
 
     override fun findLastFocusWrapper(): ModifiedFocusNode? = findPreviousFocusWrapper()
 
-    @OptIn(ExperimentalFocus::class)
-    override fun propagateFocusStateChange(focusState: FocusState) {
-        wrappedBy?.propagateFocusStateChange(focusState)
-    }
-
     override fun findPreviousKeyInputWrapper() = wrappedBy?.findPreviousKeyInputWrapper()
+
+    override fun findPreviousNestedScrollWrapper() = wrappedBy?.findPreviousNestedScrollWrapper()
+
+    override fun findNextNestedScrollWrapper(): NestedScrollDelegatingWrapper? = null
 
     override fun findNextKeyInputWrapper(): ModifiedKeyInputNode? = null
 

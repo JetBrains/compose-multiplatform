@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Button
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -45,11 +46,13 @@ fun ModalBottomSheetSample() {
     ModalBottomSheetLayout(
         sheetState = state,
         sheetContent = {
-            for (i in 1..5) {
-                ListItem(
-                    text = { Text("Item $i") },
-                    icon = { Icon(Icons.Default.Favorite) }
-                )
+            LazyColumn {
+                for (i in 1..50) item {
+                    ListItem(
+                        text = { Text("Item $i") },
+                        icon = { Icon(Icons.Default.Favorite) }
+                    )
+                }
             }
         }
     ) {

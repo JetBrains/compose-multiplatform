@@ -19,28 +19,25 @@ package androidx.compose.ui.test
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
-import androidx.compose.ui.node.LayoutNode
-import androidx.compose.ui.node.findClosestParentNode
-import androidx.compose.ui.platform.AndroidOwner
+import androidx.compose.ui.layout.LayoutInfo
+import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.semantics.SemanticsNode
 
-@OptIn(ExperimentalLayoutNodeApi::class)
 internal actual fun SemanticsNodeInteraction.checkIsDisplayed(): Boolean {
     // hierarchy check - check layout nodes are visible
     val errorMessageOnFail = "Failed to perform isDisplayed check."
     val node = fetchSemanticsNode(errorMessageOnFail)
 
-    fun isNotPlaced(node: LayoutNode): Boolean {
+    fun isNotPlaced(node: LayoutInfo): Boolean {
         return !node.isPlaced
     }
 
-    val layoutNode = node.componentNode
-    if (isNotPlaced(layoutNode) || layoutNode.findClosestParentNode(::isNotPlaced) != null) {
+    val layoutInfo = node.layoutInfo
+    if (isNotPlaced(layoutInfo) || layoutInfo.findClosestParentNode(::isNotPlaced) != null) {
         return false
     }
 
-    (layoutNode.owner as? AndroidOwner)?.let {
+    (node.owner as? ViewRootForTest)?.let {
         if (!ViewMatchers.isDisplayed().matches(it.view)) {
             return false
         }
@@ -55,9 +52,8 @@ internal actual fun SemanticsNodeInteraction.checkIsDisplayed(): Boolean {
     return (globalRect.width > 0f && globalRect.height > 0f)
 }
 
-@OptIn(ExperimentalLayoutNodeApi::class)
 internal actual fun SemanticsNode.clippedNodeBoundsInWindow(): Rect {
-    val composeView = (componentNode.owner as AndroidOwner).view
+    val composeView = (owner as ViewRootForTest).view
     val rootLocationInWindow = intArrayOf(0, 0).let {
         composeView.getLocationInWindow(it)
         Offset(it[0].toFloat(), it[1].toFloat())
@@ -65,9 +61,8 @@ internal actual fun SemanticsNode.clippedNodeBoundsInWindow(): Rect {
     return boundsInRoot.translate(rootLocationInWindow)
 }
 
-@OptIn(ExperimentalLayoutNodeApi::class)
 internal actual fun SemanticsNode.isInScreenBounds(): Boolean {
-    val composeView = (componentNode.owner as AndroidOwner).view
+    val composeView = (owner as ViewRootForTest).view
 
     // Window relative bounds of our node
     val nodeBoundsInWindow = clippedNodeBoundsInWindow()
@@ -85,4 +80,24 @@ internal actual fun SemanticsNode.isInScreenBounds(): Boolean {
         nodeBoundsInWindow.left >= globalRootRect.left &&
         nodeBoundsInWindow.right <= globalRootRect.right &&
         nodeBoundsInWindow.bottom <= globalRootRect.bottom
+}
+
+/**
+ * Executes [selector] on every parent of this [LayoutInfo] and returns the closest
+ * [LayoutInfo] to return `true` from [selector] or null if [selector] returns false
+ * for all ancestors.
+ */
+private fun LayoutInfo.findClosestParentNode(
+    selector: (LayoutInfo) -> Boolean
+): LayoutInfo? {
+    var currentParent = this.parentInfo
+    while (currentParent != null) {
+        if (selector(currentParent)) {
+            return currentParent
+        } else {
+            currentParent = currentParent.parentInfo
+        }
+    }
+
+    return null
 }

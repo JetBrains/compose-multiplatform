@@ -17,6 +17,9 @@
 
 package androidx.compose.foundation.text
 
+import androidx.compose.foundation.Interaction
+import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.text.selection.TextFieldSelectionHandle
 import androidx.compose.foundation.text.selection.TextFieldSelectionManager
 import androidx.compose.runtime.Composable
@@ -29,11 +32,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.focus
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.isFocused
-import androidx.compose.ui.focusObserver
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.gesture.longPressDragGestureFilter
@@ -58,7 +59,6 @@ import androidx.compose.ui.selection.AmbientTextSelectionColors
 import androidx.compose.ui.selection.SimpleLayout
 import androidx.compose.ui.semantics.copyText
 import androidx.compose.ui.semantics.cutText
-import androidx.compose.ui.semantics.focused
 import androidx.compose.ui.semantics.getTextLayoutResult
 import androidx.compose.ui.semantics.imeAction
 import androidx.compose.ui.semantics.onClick
@@ -123,13 +123,16 @@ import kotlin.math.roundToInt
  * communicating with platform text input service, e.g. software keyboard on Android. Called with
  * [SoftwareKeyboardController] instance which can be used for requesting input show/hide software
  * keyboard.
+ * @param interactionState The [InteractionState] representing the different [Interaction]s
+ * present on this TextField. You can create and pass in your own remembered [InteractionState]
+ * if you want to read the [InteractionState] and customize the appearance / behavior of this
+ * TextField in different [Interaction]s.
  * @param cursorColor Color of the cursor. If [Color.Unspecified], there will be no cursor drawn
  * @param softWrap Whether the text should break at soft line breaks. If false, the glyphs in the
  * text will be positioned as if there was unlimited horizontal space.
  */
 @Composable
 @OptIn(
-    ExperimentalFocus::class,
     ExperimentalTextApi::class,
     MouseTemporaryApi::class
 )
@@ -143,6 +146,7 @@ fun CoreTextField(
     visualTransformation: VisualTransformation = VisualTransformation.None,
     onTextLayout: (TextLayoutResult) -> Unit = {},
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
+    interactionState: InteractionState? = null,
     cursorColor: Color = Color.Unspecified,
     softWrap: Boolean = true,
     imeOptions: ImeOptions = ImeOptions.Default
@@ -207,9 +211,9 @@ fun CoreTextField(
     manager.hapticFeedBack = AmbientHapticFeedback.current
     manager.focusRequester = focusRequester
 
-    val focusObserver = Modifier.focusObserver {
+    val onFocusChanged = Modifier.onFocusChanged {
         if (state.hasFocus == it.isFocused) {
-            return@focusObserver
+            return@onFocusChanged
         }
 
         state.hasFocus = it.isFocused
@@ -269,6 +273,7 @@ fun CoreTextField(
     }
 
     val dragPositionGestureModifier = Modifier.dragPositionGestureFilter(
+        interactionState = interactionState,
         onPress = {
             if (state.hasFocus) {
                 state.selectionIsOn = false
@@ -341,10 +346,10 @@ fun CoreTextField(
     }
 
     val semanticsModifier = Modifier.semantics {
+        // focused semantics are handled by Modifier.focusable()
         this.imeAction = imeOptions.imeAction
         this.text = AnnotatedString(value.text)
         this.textSelectionRange = value.selection
-        this.focused = state.hasFocus
         getTextLayoutResult {
             if (state.layoutResult != null) {
                 it.add(state.layoutResult!!)
@@ -411,7 +416,7 @@ fun CoreTextField(
 
     val modifiers = modifier
         .focusRequester(focusRequester)
-        .then(focusObserver)
+        .then(onFocusChanged)
         .then(cursorModifier)
         .then(pointerModifier)
         .then(drawModifier)
@@ -419,7 +424,7 @@ fun CoreTextField(
         .then(semanticsModifier)
         .textFieldMinSize(textStyle)
         .textFieldKeyboardModifier(manager)
-        .focus()
+        .focusable(interactionState = interactionState)
 
     SimpleLayout(modifiers) {
         Layout(emptyContent()) { _, constraints ->

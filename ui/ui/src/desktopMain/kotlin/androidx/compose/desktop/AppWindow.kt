@@ -19,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.ambientOf
 import androidx.compose.runtime.emptyContent
-import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.platform.Keyboard
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -89,6 +88,9 @@ fun Window(
  */
 class AppWindow : AppFrame {
 
+    /**
+     * Gets ComposeWindow object.
+     */
     override val window: ComposeWindow
 
     init {
@@ -232,10 +234,20 @@ class AppWindow : AppFrame {
         pair = null
     }
 
+    /**
+     * Sets the title of the window.
+     *
+     * @param title Window title text.
+     */
     override fun setTitle(title: String) {
         window.setTitle(title)
     }
 
+    /**
+     * Sets the image icon of the window.
+     *
+     * @param image Image of the icon.
+     */
     override fun setIcon(image: BufferedImage?) {
         this.icon = image
         if (icon != null) {
@@ -249,16 +261,31 @@ class AppWindow : AppFrame {
         }
     }
 
+    /**
+     * Sets the menu bar of the window. The menu bar can be displayed inside a window (Windows,
+     * Linux) or at the top of the screen (Mac OS).
+     *
+     * @param manuBar Window menu bar.
+     */
     override fun setMenuBar(menuBar: MenuBar) {
         this.menuBar = menuBar
         window.setJMenuBar(menuBar.menuBar)
     }
 
+    /**
+     * Removes the menu bar of the window.
+     */
     override fun removeMenuBar() {
         this.menuBar = null
         window.setJMenuBar(JMenuBar())
     }
 
+    /**
+     * Sets the new size of the window.
+     *
+     * @param width the new width of the window.
+     * @param height the new height of the window.
+     */
     override fun setSize(width: Int, height: Int) {
         // better check min/max values of current window size
         var w = width
@@ -273,10 +300,19 @@ class AppWindow : AppFrame {
         window.setSize(w, h)
     }
 
+    /**
+     * Sets the new position of the window on the screen.
+     *
+     * @param x the new x-coordinate of the window.
+     * @param y the new y-coordinate of the window.
+     */
     override fun setLocation(x: Int, y: Int) {
         window.setLocation(x, y)
     }
 
+    /**
+     * Sets the window to the center of the screen.
+     */
     override fun setWindowCentered() {
         val dim: Dimension = Toolkit.getDefaultToolkit().getScreenSize()
         val x = dim.width / 2 - width / 2
@@ -293,7 +329,11 @@ class AppWindow : AppFrame {
         }
     }
 
-    @OptIn(ExperimentalKeyInput::class)
+    /**
+     * Shows a window with the given Compose content.
+     *
+     * @param content Composable content of the window.
+     */
     override fun show(content: @Composable () -> Unit) {
         if (invoker != null) {
             invoker!!.lockWindow()
@@ -309,15 +349,18 @@ class AppWindow : AppFrame {
         events.invokeOnOpen()
     }
 
+    /**
+     * Closes the window.
+     */
     override fun close() {
         window.dispatchEvent(WindowEvent(window, WindowEvent.WINDOW_CLOSING))
     }
 
-    override fun dispose() {
+    internal override fun dispose() {
         invoker?.unlockWindow()
     }
 
-    override fun lockWindow() {
+    internal override fun lockWindow() {
         window.apply {
             defaultCloseOperation = WindowConstants.DO_NOTHING_ON_CLOSE
             setFocusableWindowState(false)
@@ -327,7 +370,7 @@ class AppWindow : AppFrame {
         invoker?.connectPair(this)
     }
 
-    override fun unlockWindow() {
+    internal override fun unlockWindow() {
         window.apply {
             defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
             setFocusableWindowState(true)
@@ -339,6 +382,8 @@ class AppWindow : AppFrame {
         disconnectPair()
     }
 
-    @ExperimentalKeyInput
+    /**
+     * Gets the Keyboard object of the window.
+     */
     val keyboard: Keyboard = Keyboard()
 }

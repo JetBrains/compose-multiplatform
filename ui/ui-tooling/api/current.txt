@@ -12,7 +12,7 @@ package androidx.compose.ui.tooling {
     method public final java.util.Collection<java.lang.Object> getData();
     method public final Object? getKey();
     method public final androidx.compose.ui.tooling.SourceLocation? getLocation();
-    method public java.util.List<androidx.compose.ui.node.ModifierInfo> getModifierInfo();
+    method public java.util.List<androidx.compose.ui.layout.ModifierInfo> getModifierInfo();
     method public final String? getName();
     method public java.util.List<androidx.compose.ui.tooling.ParameterInformation> getParameters();
     property public final androidx.compose.ui.unit.IntBounds box;
@@ -20,7 +20,7 @@ package androidx.compose.ui.tooling {
     property public final java.util.Collection<java.lang.Object> data;
     property public final Object? key;
     property public final androidx.compose.ui.tooling.SourceLocation? location;
-    property public java.util.List<androidx.compose.ui.node.ModifierInfo> modifierInfo;
+    property public java.util.List<androidx.compose.ui.layout.ModifierInfo> modifierInfo;
     property public final String? name;
     property public java.util.List<androidx.compose.ui.tooling.ParameterInformation> parameters;
   }
@@ -41,9 +41,9 @@ package androidx.compose.ui.tooling {
   }
 
   public final class NodeGroup extends androidx.compose.ui.tooling.Group {
-    ctor public NodeGroup(Object? key, Object node, androidx.compose.ui.unit.IntBounds box, java.util.Collection<?> data, java.util.List<androidx.compose.ui.node.ModifierInfo> modifierInfo, java.util.Collection<? extends androidx.compose.ui.tooling.Group> children);
+    ctor public NodeGroup(Object? key, Object node, androidx.compose.ui.unit.IntBounds box, java.util.Collection<?> data, java.util.List<androidx.compose.ui.layout.ModifierInfo> modifierInfo, java.util.Collection<? extends androidx.compose.ui.tooling.Group> children);
     method public Object getNode();
-    property public java.util.List<androidx.compose.ui.node.ModifierInfo> modifierInfo;
+    property public java.util.List<androidx.compose.ui.layout.ModifierInfo> modifierInfo;
     property public final Object node;
   }
 
@@ -74,7 +74,7 @@ package androidx.compose.ui.tooling {
   }
 
   public final class SlotTreeKt {
-    method public static androidx.compose.ui.tooling.Group asTree(androidx.compose.runtime.SlotTable);
+    method public static androidx.compose.ui.tooling.Group asTree(androidx.compose.runtime.CompositionData);
     method public static String? getPosition(androidx.compose.ui.tooling.Group);
   }
 

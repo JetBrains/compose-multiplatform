@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-@file:OptIn(ExperimentalPointerInput::class)
 @file:Suppress("PrivatePropertyName")
 
 package androidx.compose.ui.gesture

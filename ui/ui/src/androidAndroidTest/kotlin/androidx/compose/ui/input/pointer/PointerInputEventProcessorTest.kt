@@ -16,20 +16,18 @@
 
 package androidx.compose.ui.input.pointer
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.hapticfeedback.HapticFeedback
-import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNodeWrapper
@@ -84,7 +82,6 @@ import org.junit.runner.RunWith
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalLayoutNodeApi::class)
 class PointerInputEventProcessorTest {
 
     private lateinit var root: LayoutNode
@@ -3094,7 +3091,6 @@ class PointerInputEventProcessorTest {
 abstract class TestOwner : Owner {
     var position: IntOffset? = null
 
-    @ExperimentalLayoutNodeApi
     override val root: LayoutNode
         get() = LayoutNode()
 
@@ -3106,7 +3102,6 @@ abstract class TestOwner : Owner {
 private class PointerInputModifierImpl2(override val pointerInputFilter: PointerInputFilter) :
     PointerInputModifier
 
-@OptIn(ExperimentalLayoutNodeApi::class)
 private fun LayoutNode(x: Int, y: Int, x2: Int, y2: Int, modifier: Modifier = Modifier) =
     LayoutNode().apply {
         this.modifier = modifier
@@ -3130,27 +3125,19 @@ private fun LayoutNode(x: Int, y: Int, x2: Int, y2: Int, modifier: Modifier = Mo
         detach()
     }
 
-@ExperimentalLayoutNodeApi
 private fun mockOwner(
     position: IntOffset = IntOffset.Zero,
     targetRoot: LayoutNode = LayoutNode()
 ): Owner = MockOwner(position, targetRoot)
 
-@ExperimentalLayoutNodeApi
-@OptIn(
-    ExperimentalFocus::class,
-    InternalCoreApi::class
-)
+@OptIn(ExperimentalComposeUiApi::class, InternalCoreApi::class)
 private class MockOwner(
     private val position: IntOffset,
     private val targetRoot: LayoutNode
 ) : Owner {
     override fun calculatePosition(): IntOffset = position
     override fun requestFocus(): Boolean = false
-
-    @ExperimentalKeyInput
     override fun sendKeyEvent(keyEvent: KeyEvent): Boolean = false
-
     override val root: LayoutNode
         get() = targetRoot
     override val hapticFeedBack: HapticFeedback
@@ -3186,8 +3173,6 @@ private class MockOwner(
 
     override fun onRequestRelayout(layoutNode: LayoutNode) {
     }
-
-    override val hasPendingMeasureOrLayout = false
 
     override fun onAttach(node: LayoutNode) {
     }

@@ -17,7 +17,6 @@
 package androidx.compose.foundation.gestures
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.ExperimentalPointerInput
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputScope
@@ -31,9 +30,6 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.atan2
-
-private val NoRotateZoom: (Float) -> Unit = { }
-private val NoPan: (Offset) -> Unit = { }
 
 /**
  * A gesture detector for rotationg, panning, and zoom. Once touch slop has been reached, the
@@ -51,15 +47,12 @@ private val NoPan: (Offset) -> Unit = { }
  * Example Usage:
  * @sample androidx.compose.foundation.samples.DetectMultitouchGestures
  */
-@ExperimentalPointerInput
 suspend fun PointerInputScope.detectMultitouchGestures(
     panZoomLock: Boolean = false,
-    onRotate: (rotation: Float) -> Unit = NoRotateZoom,
-    onZoom: (zoom: Float) -> Unit = NoRotateZoom,
-    onPan: (pan: Offset) -> Unit = NoPan
+    onGesture: (centroid: Offset, pan: Offset, zoom: Float, rotation: Float) -> Unit
 ) {
     forEachGesture {
-        handlePointerInput {
+        awaitPointerEventScope {
             var rotation = 0f
             var zoom = 1f
             var pan = Offset.Zero
@@ -94,20 +87,20 @@ suspend fun PointerInputScope.detectMultitouchGestures(
                             lockedToPanZoom = panZoomLock && rotationMotion < touchSlop
                         }
                     }
+
                     if (pastTouchSlop) {
+                        val centroid = event.calculateCentroid(useCurrent = false)
+                        val effectiveRotation = if (lockedToPanZoom) 0f else rotationChange
+                        if (effectiveRotation != 0f ||
+                            zoomChange != 1f ||
+                            panChange != Offset.Zero
+                        ) {
+                            onGesture(centroid, panChange, zoomChange, effectiveRotation)
+                        }
                         event.changes.fastForEach {
                             if (it.positionChanged()) {
                                 it.consumeAllChanges()
                             }
-                        }
-                        if (!lockedToPanZoom && rotationChange != 0f) {
-                            onRotate(rotationChange)
-                        }
-                        if (zoomChange != 1f) {
-                            onZoom(zoomChange)
-                        }
-                        if (panChange != Offset.Zero) {
-                            onPan(panChange)
                         }
                     }
                 }

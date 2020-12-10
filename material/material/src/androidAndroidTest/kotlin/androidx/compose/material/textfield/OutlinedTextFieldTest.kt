@@ -36,9 +36,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.isFocused
-import androidx.compose.ui.focusObserver
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -81,7 +80,7 @@ import kotlin.math.roundToInt
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalFocus::class, ExperimentalTesting::class)
+@OptIn(ExperimentalTesting::class)
 class OutlinedTextFieldTest {
     private val ExpectedMinimumTextFieldHeight = 56.dp
     private val ExpectedPadding = 16.dp
@@ -105,7 +104,7 @@ class OutlinedTextFieldTest {
                 OutlinedTextField(
                     modifier = Modifier
                         .testTag(textField1Tag)
-                        .focusObserver { textField1Focused = it.isFocused },
+                        .onFocusChanged { textField1Focused = it.isFocused },
                     value = "input1",
                     onValueChange = {},
                     label = {}
@@ -113,7 +112,7 @@ class OutlinedTextFieldTest {
                 OutlinedTextField(
                     modifier = Modifier
                         .testTag(textField2Tag)
-                        .focusObserver { textField2Focused = it.isFocused },
+                        .onFocusChanged { textField2Focused = it.isFocused },
                     value = "input2",
                     onValueChange = {},
                     label = {}
@@ -144,7 +143,7 @@ class OutlinedTextFieldTest {
                 OutlinedTextField(
                     modifier = Modifier
                         .testTag(TextfieldTag)
-                        .focusObserver { focused = it.isFocused },
+                        .onFocusChanged { focused = it.isFocused },
                     value = "input",
                     onValueChange = {},
                     label = {}

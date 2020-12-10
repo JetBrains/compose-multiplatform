@@ -35,7 +35,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.selection.triStateToggleable
-import androidx.compose.material.ripple.rememberRippleIndication
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
@@ -76,7 +76,7 @@ import androidx.compose.ui.util.lerp
  * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
  * behavior of this Checkbox in different [Interaction]s.
  * @param colors [CheckboxColors] that will be used to determine the color of the checkmark / box
- * / border in different states. See [CheckboxConstants.defaultColors].
+ * / border in different states. See [CheckboxDefaults.colors].
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -86,7 +86,7 @@ fun Checkbox(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionState: InteractionState = remember { InteractionState() },
-    colors: CheckboxColors = CheckboxConstants.defaultColors()
+    colors: CheckboxColors = CheckboxDefaults.colors()
 ) {
     TriStateCheckbox(
         state = ToggleableState(checked),
@@ -120,7 +120,7 @@ fun Checkbox(
  * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
  * behavior of this TriStateCheckbox in different [Interaction]s.
  * @param colors [CheckboxColors] that will be used to determine the color of the checkmark / box
- * / border in different states. See [CheckboxConstants.defaultColors].
+ * / border in different states. See [CheckboxDefaults.colors].
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -130,7 +130,7 @@ fun TriStateCheckbox(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionState: InteractionState = remember { InteractionState() },
-    colors: CheckboxColors = CheckboxConstants.defaultColors()
+    colors: CheckboxColors = CheckboxDefaults.colors()
 ) {
     CheckboxImpl(
         enabled = enabled,
@@ -141,7 +141,7 @@ fun TriStateCheckbox(
                 onClick = onClick,
                 enabled = enabled,
                 interactionState = interactionState,
-                indication = rememberRippleIndication(
+                indication = rememberRipple(
                     bounded = false,
                     radius = CheckboxRippleRadius
                 )
@@ -155,7 +155,7 @@ fun TriStateCheckbox(
  * Represents the colors used by the three different sections (checkmark, box, and border) of a
  * [Checkbox] or [TriStateCheckbox] in different states.
  *
- * See [CheckboxConstants.defaultColors] for the default implementation that follows Material
+ * See [CheckboxDefaults.colors] for the default implementation that follows Material
  * specifications.
  */
 @ExperimentalMaterialApi
@@ -190,6 +190,13 @@ interface CheckboxColors {
 /**
  * Constants used in [Checkbox] and [TriStateCheckbox].
  */
+@Deprecated(
+    "CheckboxConstants has been replaced with CheckboxDefaults",
+    ReplaceWith(
+        "CheckboxDefaults",
+        "androidx.compose.material.CheckboxDefaults"
+    )
+)
 object CheckboxConstants {
     /**
      * Creates a [CheckboxColors] that will animate between the provided colors according to the
@@ -204,7 +211,66 @@ object CheckboxConstants {
      */
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
+    @Deprecated(
+        "CheckboxConstants has been replaced with CheckboxDefaults",
+        ReplaceWith(
+            "CheckboxDefaults.colors(checkedColor, uncheckedColor, checkmarkColor, disabledColor," +
+                " disabledIndeterminateColor)",
+            "androidx.compose.material.CheckboxDefaults"
+        )
+    )
     fun defaultColors(
+        checkedColor: Color = MaterialTheme.colors.secondary,
+        uncheckedColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f),
+        checkmarkColor: Color = MaterialTheme.colors.surface,
+        disabledColor: Color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled),
+        disabledIndeterminateColor: Color = checkedColor.copy(alpha = ContentAlpha.disabled)
+    ): CheckboxColors {
+        val clock = AmbientAnimationClock.current.asDisposableClock()
+        return remember(
+            checkedColor,
+            uncheckedColor,
+            checkmarkColor,
+            disabledColor,
+            disabledIndeterminateColor,
+            clock
+        ) {
+            DefaultCheckboxColors(
+                checkedBorderColor = checkedColor,
+                checkedBoxColor = checkedColor,
+                checkedCheckmarkColor = checkmarkColor,
+                uncheckedCheckmarkColor = checkmarkColor.copy(alpha = 0f),
+                uncheckedBoxColor = checkedColor.copy(alpha = 0f),
+                disabledCheckedBoxColor = disabledColor,
+                disabledUncheckedBoxColor = disabledColor.copy(alpha = 0f),
+                disabledIndeterminateBoxColor = disabledIndeterminateColor,
+                uncheckedBorderColor = uncheckedColor,
+                disabledBorderColor = disabledColor,
+                disabledIndeterminateBorderColor = disabledIndeterminateColor,
+                clock = clock
+            )
+        }
+    }
+}
+
+/**
+ * Defaults used in [Checkbox] and [TriStateCheckbox].
+ */
+object CheckboxDefaults {
+    /**
+     * Creates a [CheckboxColors] that will animate between the provided colors according to the
+     * Material specification.
+     *
+     * @param checkedColor the color that will be used for the border and box when checked
+     * @param uncheckedColor color that will be used for the border when unchecked
+     * @param checkmarkColor color that will be used for the checkmark when checked
+     * @param disabledColor color that will be used for the box and border when disabled
+     * @param disabledIndeterminateColor color that will be used for the box and
+     * border in a [TriStateCheckbox] when disabled AND in an [ToggleableState.Indeterminate] state.
+     */
+    @OptIn(ExperimentalMaterialApi::class)
+    @Composable
+    fun colors(
         checkedColor: Color = MaterialTheme.colors.secondary,
         uncheckedColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f),
         checkmarkColor: Color = MaterialTheme.colors.surface,

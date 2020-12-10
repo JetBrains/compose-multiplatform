@@ -16,6 +16,8 @@
 
 package androidx.compose.ui.autofill
 
+import androidx.compose.ui.ExperimentalComposeUiApi
+
 /**
  * The autofill tree is a temporary data structure that is used before the Semantics Tree is
  * implemented. This data structure is used by compose components to set autofill
@@ -27,6 +29,7 @@ package androidx.compose.ui.autofill
  * Since this is a temporary implementation, it is implemented as a list of [children], which is
  * essentially a tree of height = 1
  */
+@ExperimentalComposeUiApi
 class AutofillTree {
     /**
      * A map which contains [AutofillNode]s, where every node represents an autofillable field.

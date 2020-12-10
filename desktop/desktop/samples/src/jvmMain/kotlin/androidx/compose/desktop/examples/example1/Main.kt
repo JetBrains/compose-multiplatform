@@ -46,7 +46,7 @@ import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.BottomAppBar
 import androidx.compose.material.Button
-import androidx.compose.material.ButtonConstants
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExtendedFloatingActionButton
@@ -68,11 +68,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphicsLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.input.key.ExperimentalKeyInput
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.plus
 import androidx.compose.ui.input.key.shortcuts
@@ -83,7 +82,7 @@ import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.annotatedString
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.fontFamily
 import androidx.compose.ui.text.platform.font
 import androidx.compose.ui.text.style.TextAlign
@@ -133,7 +132,7 @@ private fun App() {
                     IconButton(
                         onClick = {}
                     ) {
-                        Icon(Icons.Filled.Menu, Modifier.size(ButtonConstants.DefaultIconSize))
+                        Icon(Icons.Filled.Menu, Modifier.size(ButtonDefaults.IconSize))
                     }
                 }
             },
@@ -158,7 +157,6 @@ private fun LeftColumn(modifier: Modifier) = Box(modifier.fillMaxSize()) {
     )
 }
 
-@OptIn(ExperimentalKeyInput::class)
 @Composable
 private fun ScrollableContent(scrollState: ScrollState) {
     val amount = remember { mutableStateOf(0) }
@@ -179,7 +177,7 @@ private fun ScrollableContent(scrollState: ScrollState) {
         val inlineIndicatorId = "indicator"
 
         Text(
-            text = annotatedString {
+            text = buildAnnotatedString {
                 append("The quick ")
                 if (animation.value) {
                     appendInlineContent(inlineIndicatorId)

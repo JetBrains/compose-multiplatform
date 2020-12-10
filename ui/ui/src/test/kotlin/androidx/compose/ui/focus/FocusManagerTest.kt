@@ -22,7 +22,6 @@ import androidx.compose.ui.focus.FocusState.ActiveParent
 import androidx.compose.ui.focus.FocusState.Captured
 import androidx.compose.ui.focus.FocusState.Disabled
 import androidx.compose.ui.focus.FocusState.Inactive
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.InnerPlaceable
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.ModifiedFocusNode
@@ -33,10 +32,6 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import kotlin.jvm.JvmStatic
 
-@OptIn(
-    ExperimentalFocus::class,
-    ExperimentalLayoutNodeApi::class
-)
 @RunWith(Parameterized::class)
 class FocusManagerTest(private val initialFocusState: FocusState) {
     companion object {

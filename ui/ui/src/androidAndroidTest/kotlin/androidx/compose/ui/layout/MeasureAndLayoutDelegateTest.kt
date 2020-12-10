@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.layout
 
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode.LayoutState
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
 import androidx.compose.ui.unit.Constraints
@@ -29,7 +28,6 @@ import org.junit.runner.RunWith
 
 @SmallTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalLayoutNodeApi::class)
 class MeasureAndLayoutDelegateTest {
 
     private val DifferentSize = 50
@@ -1098,7 +1096,6 @@ class MeasureAndLayoutDelegateTest {
         val root = root {
             add(
                 node {
-                    @OptIn(ExperimentalLayoutNodeApi::class)
                     modifier = spyModifier
                 }
             )
@@ -1118,7 +1115,6 @@ class MeasureAndLayoutDelegateTest {
         val root = root {
             add(
                 node {
-                    @OptIn(ExperimentalLayoutNodeApi::class)
                     modifier = spyModifier
                 }
             )
@@ -1168,7 +1164,6 @@ class MeasureAndLayoutDelegateTest {
                     delegate.requestRelayout(root)
                     root.runDuringLayout {
                         // this means the root.first will be measured before laying out the root
-                        @OptIn(ExperimentalLayoutNodeApi::class)
                         assertThat(root.first.layoutState).isEqualTo(LayoutState.NeedsRelayout)
                     }
                     assertThat(delegate.measureAndLayout()).isFalse()

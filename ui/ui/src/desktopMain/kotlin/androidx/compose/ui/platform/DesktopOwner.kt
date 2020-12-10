@@ -24,13 +24,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
-import androidx.compose.ui.focus.ExperimentalFocus
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusManagerImpl
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.DesktopCanvas
-import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyInputModifier
 import androidx.compose.ui.input.mouse.MouseScrollEvent
@@ -41,7 +40,6 @@ import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerMoveEventFilter
 import androidx.compose.ui.layout.RootMeasureBlocks
 import androidx.compose.ui.layout.globalBounds
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.MeasureAndLayoutDelegate
@@ -58,9 +56,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 
 @OptIn(
-    ExperimentalFocus::class,
-    ExperimentalKeyInput::class,
-    ExperimentalLayoutNodeApi::class,
+    ExperimentalComposeUiApi::class,
     ExperimentalComposeApi::class,
     InternalCoreApi::class
 )
@@ -78,6 +74,7 @@ class DesktopOwner(
     private val semanticsModifier = SemanticsModifierCore(
         id = SemanticsModifierCore.generateSemanticsId(),
         mergeDescendants = false,
+        clearAndSetSemantics = false,
         properties = {}
     )
 
@@ -177,9 +174,6 @@ class DesktopOwner(
             container.invalidate()
         }
     }
-
-    override val hasPendingMeasureOrLayout
-        get() = measureAndLayoutDelegate.hasPendingMeasureOrLayout
 
     override fun createLayer(
         drawBlock: (Canvas) -> Unit,

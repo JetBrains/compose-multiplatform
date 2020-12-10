@@ -27,10 +27,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Matrix
-import androidx.compose.ui.graphics.NativePathEffect
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.PaintingStyle
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
@@ -102,7 +102,7 @@ class CanvasDrawScope : DrawScope {
         end: Offset,
         strokeWidth: Float,
         cap: StrokeCap,
-        pathEffect: NativePathEffect?,
+        pathEffect: PathEffect?,
         @FloatRange(from = 0.0, to = 1.0) alpha: Float,
         colorFilter: ColorFilter?,
         blendMode: BlendMode
@@ -131,7 +131,7 @@ class CanvasDrawScope : DrawScope {
         end: Offset,
         strokeWidth: Float,
         cap: StrokeCap,
-        pathEffect: NativePathEffect?,
+        pathEffect: PathEffect?,
         @FloatRange(from = 0.0, to = 1.0) alpha: Float,
         colorFilter: ColorFilter?,
         blendMode: BlendMode
@@ -432,7 +432,7 @@ class CanvasDrawScope : DrawScope {
         color: Color,
         strokeWidth: Float,
         cap: StrokeCap,
-        pathEffect: NativePathEffect?,
+        pathEffect: PathEffect?,
         @FloatRange(from = 0.0, to = 1.0) alpha: Float,
         colorFilter: ColorFilter?,
         blendMode: BlendMode
@@ -461,7 +461,7 @@ class CanvasDrawScope : DrawScope {
         brush: Brush,
         strokeWidth: Float,
         cap: StrokeCap,
-        pathEffect: NativePathEffect?,
+        pathEffect: PathEffect?,
         @FloatRange(from = 0.0, to = 1.0) alpha: Float,
         colorFilter: ColorFilter?,
         blendMode: BlendMode
@@ -554,15 +554,11 @@ class CanvasDrawScope : DrawScope {
             is Stroke ->
                 obtainStrokePaint()
                     .apply {
-                        with(drawStyle) {
-                            if (strokeWidth != width) strokeWidth = width
-                            if (strokeCap != cap) strokeCap = cap
-                            if (strokeMiterLimit != miter) strokeMiterLimit = miter
-                            if (strokeJoin != join) strokeJoin = join
-
-                            // TODO b/154550525 add PathEffect to Paint if necessary
-                            nativePathEffect = pathEffect
-                        }
+                        if (strokeWidth != drawStyle.width) strokeWidth = drawStyle.width
+                        if (strokeCap != drawStyle.cap) strokeCap = drawStyle.cap
+                        if (strokeMiterLimit != drawStyle.miter) strokeMiterLimit = drawStyle.miter
+                        if (strokeJoin != drawStyle.join) strokeJoin = drawStyle.join
+                        if (pathEffect != drawStyle.pathEffect) pathEffect = drawStyle.pathEffect
                     }
         }
 
@@ -578,7 +574,7 @@ class CanvasDrawScope : DrawScope {
         blendMode: BlendMode
     ): Paint = selectPaint(style).apply {
         if (brush != null) {
-            brush.applyTo(this, alpha)
+            brush.applyTo(size, this, alpha)
         } else if (this.alpha != alpha) {
             this.alpha = alpha
         }
@@ -612,7 +608,7 @@ class CanvasDrawScope : DrawScope {
         miter: Float,
         cap: StrokeCap,
         join: StrokeJoin,
-        pathEffect: NativePathEffect?,
+        pathEffect: PathEffect?,
         @FloatRange(from = 0.0, to = 1.0) alpha: Float,
         colorFilter: ColorFilter?,
         blendMode: BlendMode
@@ -629,7 +625,7 @@ class CanvasDrawScope : DrawScope {
             if (this.strokeMiterLimit != miter) this.strokeMiterLimit = miter
             if (this.strokeCap != cap) this.strokeCap = cap
             if (this.strokeJoin != join) this.strokeJoin = join
-            this.nativePathEffect = pathEffect
+            if (this.pathEffect != pathEffect) this.pathEffect = pathEffect
         }
 
     private fun configureStrokePaint(
@@ -638,13 +634,13 @@ class CanvasDrawScope : DrawScope {
         miter: Float,
         cap: StrokeCap,
         join: StrokeJoin,
-        pathEffect: NativePathEffect?,
+        pathEffect: PathEffect?,
         @FloatRange(from = 0.0, to = 1.0) alpha: Float,
         colorFilter: ColorFilter?,
         blendMode: BlendMode
     ) = obtainStrokePaint().apply {
         if (brush != null) {
-            brush.applyTo(this, alpha)
+            brush.applyTo(size, this, alpha)
         } else if (this.alpha != alpha) {
             this.alpha = alpha
         }
@@ -654,7 +650,7 @@ class CanvasDrawScope : DrawScope {
         if (this.strokeMiterLimit != miter) this.strokeMiterLimit = miter
         if (this.strokeCap != cap) this.strokeCap = cap
         if (this.strokeJoin != join) this.strokeJoin = join
-        this.nativePathEffect = pathEffect
+        if (this.pathEffect != pathEffect) this.pathEffect = pathEffect
     }
 
     /**

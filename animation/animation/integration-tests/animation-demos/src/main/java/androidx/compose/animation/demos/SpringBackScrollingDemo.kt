@@ -42,7 +42,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.gesture.ExperimentalPointerInput
 import androidx.compose.ui.gesture.util.VelocityTracker
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -54,7 +53,6 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 fun SpringBackScrollingDemo() {
     Column(Modifier.fillMaxHeight()) {
@@ -72,12 +70,12 @@ fun SpringBackScrollingDemo() {
         val gesture = Modifier.pointerInput {
             coroutineScope {
                 while (true) {
-                    val pointerId = handlePointerInput {
+                    val pointerId = awaitPointerEventScope {
                         awaitFirstDown().id
                     }
                     val velocityTracker = VelocityTracker()
                     mutatorMutex.mutate(MutatePriority.UserInput) {
-                        handlePointerInput {
+                        awaitPointerEventScope {
                             horizontalDrag(pointerId) {
                                 scrollPosition += it.positionChange().x
                                 velocityTracker.addPosition(

@@ -21,7 +21,6 @@ import androidx.compose.ui.geometry.lerp
 import androidx.compose.ui.gesture.DoubleTapTimeout
 import androidx.compose.ui.gesture.LongPressTimeout
 import androidx.compose.ui.layout.globalBounds
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.unit.Duration
 import androidx.compose.ui.unit.IntSize
@@ -107,12 +106,11 @@ class GestureScope(node: SemanticsNode, testContext: TestContext) {
         }
 
     // Convenience property
-    @OptIn(ExperimentalLayoutNodeApi::class)
-    private val owner get() = semanticsNode.componentNode.owner
+    private val owner get() = semanticsNode.owner
 
     // TODO(b/133217292): Better error: explain which gesture couldn't be performed
     private var _inputDispatcher: InputDispatcher? =
-        InputDispatcher(testContext, checkNotNull(owner))
+        createInputDispatcher(testContext, checkNotNull(owner))
     internal val inputDispatcher
         get() = checkNotNull(_inputDispatcher) {
             "Can't send gesture, (Partial)GestureScope has already been disposed"
@@ -287,8 +285,7 @@ fun GestureScope.percentOffset(
  * @param position A position in local coordinates
  */
 private fun GestureScope.localToGlobal(position: Offset): Offset {
-    @OptIn(ExperimentalLayoutNodeApi::class)
-    return position + semanticsNode.componentNode.coordinates.globalBounds.topLeft
+    return position + semanticsNode.layoutInfo.coordinates.globalBounds.topLeft
 }
 
 /**

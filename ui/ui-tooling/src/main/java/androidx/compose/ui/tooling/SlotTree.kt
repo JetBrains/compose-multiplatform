@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 
-@file:OptIn(InternalComposeApi::class)
-
 package androidx.compose.ui.tooling
 
-import androidx.compose.runtime.InternalComposeApi
-import androidx.compose.runtime.SlotReader
-import androidx.compose.runtime.SlotTable
-import androidx.compose.runtime.keySourceInfoOf
+import androidx.compose.runtime.CompositionData
+import androidx.compose.runtime.CompositionGroup
 import androidx.compose.ui.layout.globalPosition
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
-import androidx.compose.ui.node.LayoutNode
-import androidx.compose.ui.node.ModifierInfo
+import androidx.compose.ui.layout.LayoutInfo
+import androidx.compose.ui.layout.ModifierInfo
 import androidx.compose.ui.unit.IntBounds
 import java.lang.reflect.Field
 import kotlin.math.max
@@ -160,9 +155,6 @@ class NodeGroup(
  * A key that has being joined together to form one key.
  */
 data class JoinedKey(val left: Any?, val right: Any?)
-
-@OptIn(InternalComposeApi::class)
-private fun convertKey(key: Int): Any? = keySourceInfoOf(key)
 
 internal val emptyBox = IntBounds(0, 0, 0, 0)
 
@@ -433,30 +425,17 @@ private fun sourceInformationContextOf(
 /**
  * Iterate the slot table and extract a group tree that corresponds to the content of the table.
  */
-@OptIn(ExperimentalLayoutNodeApi::class, InternalComposeApi::class)
-private fun SlotReader.getGroup(parentContext: SourceInformationContext?): Group {
-    val key = convertKey(groupKey)
-    val groupData = groupAux
-    val context = if (groupData != null && groupData is String) {
-        sourceInformationContextOf(groupData, parentContext)
-    } else null
-    val nodeGroup = isNode
-    val end = currentGroup + groupSize
-    val node = if (nodeGroup) groupNode else null
+private fun CompositionGroup.getGroup(parentContext: SourceInformationContext?): Group {
+    val key = key
+    val context = sourceInfo?.let { sourceInformationContextOf(it, parentContext) }
+    val node = node
     val data = mutableListOf<Any?>()
     val children = mutableListOf<Group>()
-    for (index in 0 until groupSlotCount) {
-        data.add(groupGet(index))
-    }
+    data.addAll(this.data)
+    for (child in compositionGroups)
+        children.add(child.getGroup(context))
 
-    reposition(currentGroup + 1)
-
-    // A group ends with a list of groups
-    while (currentGroup < end) {
-        children.add(getGroup(context))
-    }
-
-    val modifierInfo = if (node is LayoutNode) {
+    val modifierInfo = if (node is LayoutInfo) {
         node.getModifierInfo()
     } else {
         emptyList()
@@ -464,14 +443,14 @@ private fun SlotReader.getGroup(parentContext: SourceInformationContext?): Group
 
     // Calculate bounding box
     val box = when (node) {
-        is LayoutNode -> boundsOfLayoutNode(node)
+        is LayoutInfo -> boundsOfLayoutNode(node)
         else ->
             if (children.isEmpty()) emptyBox else
                 children.map { g -> g.box }.reduce { acc, box -> box.union(acc) }
     }
-    return if (nodeGroup) NodeGroup(
+    return if (node != null) NodeGroup(
         key,
-        node as Any,
+        node,
         box,
         data,
         modifierInfo,
@@ -492,9 +471,8 @@ private fun SlotReader.getGroup(parentContext: SourceInformationContext?): Group
         )
 }
 
-@OptIn(ExperimentalLayoutNodeApi::class)
-private fun boundsOfLayoutNode(node: LayoutNode): IntBounds {
-    if (node.owner == null) {
+private fun boundsOfLayoutNode(node: LayoutInfo): IntBounds {
+    if (!node.isAttached) {
         return IntBounds(
             left = 0,
             top = 0,
@@ -515,8 +493,7 @@ private fun boundsOfLayoutNode(node: LayoutNode): IntBounds {
  * Return a group tree for for the slot table that represents the entire content of the slot
  * table.
  */
-@OptIn(InternalComposeApi::class)
-fun SlotTable.asTree(): Group = read { it.getGroup(null) }
+fun CompositionData.asTree(): Group = compositionGroups.first().getGroup(null)
 
 internal fun IntBounds.union(other: IntBounds): IntBounds {
     if (this == emptyBox) return other else if (other == emptyBox) return this
@@ -549,62 +526,61 @@ private fun extractParameterInfo(
     context: SourceInformationContext?
 ): List<ParameterInformation> {
     if (data.isNotEmpty()) {
-        val recomposeScope = data[0]
+        val recomposeScope = data.firstOrNull {
+            it != null && it.javaClass.name.endsWith(recomposeScopeNameSuffix)
+        }
         if (recomposeScope != null) {
-            val scopeClass = recomposeScope.javaClass
-            if (scopeClass.name.endsWith(recomposeScopeNameSuffix)) {
-                try {
-                    val blockField = scopeClass.accessibleField("block")
-                    if (blockField != null) {
-                        val block = blockField.get(recomposeScope)
-                        if (block != null) {
-                            val blockClass = block.javaClass
-                            val defaultsField = blockClass.accessibleField(defaultFieldName)
-                            val changedField = blockClass.accessibleField(changedFieldName)
-                            val default =
-                                if (defaultsField != null) defaultsField.get(block) as Int else 0
-                            val changed =
-                                if (changedField != null) changedField.get(block) as Int else 0
-                            val fields = blockClass.declaredFields
-                                .filter {
-                                    it.name.startsWith(parameterPrefix) &&
-                                        !it.name.startsWith(internalFieldPrefix) &&
-                                        !it.name.startsWith(jacocoDataField)
-                                }.sortedBy { it.name }
-                            val parameters = mutableListOf<ParameterInformation>()
-                            val parametersMetadata = context?.parameters ?: emptyList()
-                            repeat(fields.size) { index ->
-                                val metadata = if (index < parametersMetadata.size)
-                                    parametersMetadata[index] else Parameter(index)
-                                if (metadata.sortedIndex >= fields.size) return@repeat
-                                val field = fields[metadata.sortedIndex]
-                                field.isAccessible = true
-                                val value = field.get(block)
-                                val fromDefault = (1 shl index) and default != 0
-                                val changedOffset = index * BITS_PER_SLOT + 1
-                                val parameterChanged = (
-                                    (SLOT_MASK shl changedOffset) and changed
-                                    ) shr changedOffset
-                                val static = parameterChanged and STATIC_BITS == STATIC_BITS
-                                val compared = parameterChanged and STATIC_BITS == 0
-                                val stable = parameterChanged and STABLE_BITS == 0
-                                parameters.add(
-                                    ParameterInformation(
-                                        name = field.name.substring(1),
-                                        value = value,
-                                        fromDefault = fromDefault,
-                                        static = static,
-                                        compared = compared && !fromDefault,
-                                        inlineClass = metadata.inlineClass,
-                                        stable = stable
-                                    )
+            try {
+                val blockField = recomposeScope.javaClass.accessibleField("block")
+                if (blockField != null) {
+                    val block = blockField.get(recomposeScope)
+                    if (block != null) {
+                        val blockClass = block.javaClass
+                        val defaultsField = blockClass.accessibleField(defaultFieldName)
+                        val changedField = blockClass.accessibleField(changedFieldName)
+                        val default =
+                            if (defaultsField != null) defaultsField.get(block) as Int else 0
+                        val changed =
+                            if (changedField != null) changedField.get(block) as Int else 0
+                        val fields = blockClass.declaredFields
+                            .filter {
+                                it.name.startsWith(parameterPrefix) &&
+                                    !it.name.startsWith(internalFieldPrefix) &&
+                                    !it.name.startsWith(jacocoDataField)
+                            }.sortedBy { it.name }
+                        val parameters = mutableListOf<ParameterInformation>()
+                        val parametersMetadata = context?.parameters ?: emptyList()
+                        repeat(fields.size) { index ->
+                            val metadata = if (index < parametersMetadata.size)
+                                parametersMetadata[index] else Parameter(index)
+                            if (metadata.sortedIndex >= fields.size) return@repeat
+                            val field = fields[metadata.sortedIndex]
+                            field.isAccessible = true
+                            val value = field.get(block)
+                            val fromDefault = (1 shl index) and default != 0
+                            val changedOffset = index * BITS_PER_SLOT + 1
+                            val parameterChanged = (
+                                (SLOT_MASK shl changedOffset) and changed
+                                ) shr changedOffset
+                            val static = parameterChanged and STATIC_BITS == STATIC_BITS
+                            val compared = parameterChanged and STATIC_BITS == 0
+                            val stable = parameterChanged and STABLE_BITS == 0
+                            parameters.add(
+                                ParameterInformation(
+                                    name = field.name.substring(1),
+                                    value = value,
+                                    fromDefault = fromDefault,
+                                    static = static,
+                                    compared = compared && !fromDefault,
+                                    inlineClass = metadata.inlineClass,
+                                    stable = stable
                                 )
-                            }
-                            return parameters
+                            )
                         }
+                        return parameters
                     }
-                } catch (_: Throwable) {
                 }
+            } catch (_: Throwable) {
             }
         }
     }

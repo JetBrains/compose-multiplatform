@@ -18,27 +18,41 @@ package androidx.compose.material
 
 import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.ManualAnimationClock
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.gesture.nestedscroll.nestedScroll
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.center
+import androidx.compose.ui.test.centerX
+import androidx.compose.ui.test.centerY
+import androidx.compose.ui.test.down
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.moveBy
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.swipe
 import androidx.compose.ui.test.swipeWithVelocity
+import androidx.compose.ui.test.up
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.milliseconds
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
@@ -1518,6 +1532,223 @@ class SwipeableTest {
                 "resistance",
                 "velocityThreshold"
             )
+        }
+    }
+
+    @Test
+    fun swipeable_defaultVerticalNestedScrollConnection_nestedDrag() {
+        lateinit var swipeableState: SwipeableState<String>
+        lateinit var anchors: MutableState<Map<Float, String>>
+        lateinit var scrollState: ScrollState
+        rule.setContent {
+            swipeableState = rememberSwipeableState("A")
+            anchors = remember { mutableStateOf(mapOf(0f to "A", -1000f to "B")) }
+            scrollState = rememberScrollState()
+            Box(
+                Modifier
+                    .preferredSize(300.dp)
+                    .nestedScroll(swipeableState.PreUpPostDownNestedScrollConnection)
+                    .swipeable(
+                        state = swipeableState,
+                        anchors = anchors.value,
+                        thresholds = { _, _ -> FractionalThreshold(0.5f) },
+                        orientation = Orientation.Horizontal
+                    )
+            ) {
+                ScrollableColumn(
+                    scrollState = scrollState,
+                    modifier = Modifier.fillMaxWidth().testTag(swipeableTag)
+                ) {
+                    repeat(100) {
+                        Text(text = it.toString(), modifier = Modifier.height(50.dp))
+                    }
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(swipeableState.value).isEqualTo("A")
+        }
+
+        rule.onNodeWithTag(swipeableTag)
+            .performGesture {
+                down(Offset(x = 10f, y = 10f))
+                moveBy(Offset(x = 0f, y = -1500f))
+                up()
+            }
+        advanceClock()
+
+        rule.runOnIdle {
+            assertThat(swipeableState.value).isEqualTo("B")
+            assertThat(scrollState.value).isGreaterThan(0f)
+        }
+
+        rule.onNodeWithTag(swipeableTag)
+            .performGesture {
+                down(Offset(x = 10f, y = 10f))
+                moveBy(Offset(x = 0f, y = 1500f))
+                up()
+            }
+
+        advanceClock()
+
+        rule.runOnIdle {
+            assertThat(swipeableState.value).isEqualTo("A")
+            assertThat(scrollState.value).isEqualTo(0f)
+        }
+    }
+
+    @Test
+    fun swipeable_nestedScroll_preFling() {
+        lateinit var swipeableState: SwipeableState<String>
+        lateinit var anchors: MutableState<Map<Float, String>>
+        lateinit var scrollState: ScrollState
+        rule.setContent {
+            swipeableState = rememberSwipeableState("A")
+            anchors = remember { mutableStateOf(mapOf(0f to "A", -1000f to "B")) }
+            scrollState = rememberScrollState()
+            Box(
+                Modifier
+                    .preferredSize(300.dp)
+                    .nestedScroll(swipeableState.PreUpPostDownNestedScrollConnection)
+                    .swipeable(
+                        state = swipeableState,
+                        anchors = anchors.value,
+                        thresholds = { _, _ -> FixedThreshold(56.dp) },
+                        orientation = Orientation.Horizontal
+                    )
+            ) {
+                ScrollableColumn(
+                    scrollState = scrollState,
+                    modifier = Modifier.fillMaxWidth().testTag(swipeableTag)
+                ) {
+                    repeat(100) {
+                        Text(text = it.toString(), modifier = Modifier.height(50.dp))
+                    }
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(swipeableState.value).isEqualTo("A")
+        }
+
+        rule.onNodeWithTag(swipeableTag)
+            .performGesture {
+                swipeWithVelocity(
+                    center,
+                    center.copy(y = centerY - 500, x = centerX),
+                    duration = 50.milliseconds,
+                    endVelocity = 20000f
+                )
+            }
+
+        advanceClock()
+
+        rule.runOnIdle {
+            assertThat(swipeableState.value).isEqualTo("B")
+            // should eat all velocity, no internal scroll
+            assertThat(scrollState.value).isEqualTo(0f)
+        }
+
+        rule.onNodeWithTag(swipeableTag)
+            .performGesture {
+                swipeWithVelocity(
+                    center,
+                    center.copy(y = centerY + 500, x = centerX),
+                    duration = 50.milliseconds,
+                    endVelocity = 20000f
+                )
+            }
+
+        advanceClock()
+
+        rule.runOnIdle {
+            assertThat(swipeableState.value).isEqualTo("A")
+            assertThat(scrollState.value).isEqualTo(0f)
+        }
+    }
+
+    @Test
+    fun swipeable_nestedScroll_postFlings() {
+        lateinit var swipeableState: SwipeableState<String>
+        lateinit var anchors: MutableState<Map<Float, String>>
+        lateinit var scrollState: ScrollState
+        rule.setContent {
+            swipeableState = rememberSwipeableState("B")
+            anchors = remember { mutableStateOf(mapOf(0f to "A", -1000f to "B")) }
+            scrollState = rememberScrollState(initial = 5000f)
+            Box(
+                Modifier
+                    .preferredSize(300.dp)
+                    .nestedScroll(swipeableState.PreUpPostDownNestedScrollConnection)
+                    .swipeable(
+                        state = swipeableState,
+                        anchors = anchors.value,
+                        thresholds = { _, _ -> FixedThreshold(56.dp) },
+                        orientation = Orientation.Horizontal
+                    )
+            ) {
+                ScrollableColumn(
+                    scrollState = scrollState,
+                    modifier = Modifier.fillMaxWidth().testTag(swipeableTag)
+                ) {
+                    repeat(100) {
+                        Text(text = it.toString(), modifier = Modifier.height(50.dp))
+                    }
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(swipeableState.value).isEqualTo("B")
+            assertThat(scrollState.value).isEqualTo(5000f)
+        }
+
+        rule.onNodeWithTag(swipeableTag)
+            .performGesture {
+                // swipe less than scrollState.value but with velocity to test that backdrop won't
+                // move when receives, because it's at anchor
+                swipeWithVelocity(
+                    center,
+                    center.copy(y = centerY + 1500, x = centerX),
+                    duration = 50.milliseconds,
+                    endVelocity = 20000f
+                )
+            }
+
+        advanceClock()
+
+        rule.runOnIdle {
+            assertThat(swipeableState.value).isEqualTo("B")
+            assertThat(scrollState.value).isEqualTo(0f)
+            // set value again to test overshoot
+            scrollState.scrollBy(500f)
+        }
+
+        advanceClock()
+
+        rule.runOnIdle {
+            assertThat(swipeableState.value).isEqualTo("B")
+            assertThat(scrollState.value).isEqualTo(500f)
+        }
+
+        rule.onNodeWithTag(swipeableTag)
+            .performGesture {
+                // swipe more than scrollState.value so backdrop start receiving nested scroll
+                swipeWithVelocity(
+                    center,
+                    center.copy(y = centerY + 1500, x = centerX),
+                    duration = 50.milliseconds,
+                    endVelocity = 20000f
+                )
+            }
+
+        advanceClock()
+
+        rule.runOnIdle {
+            assertThat(swipeableState.value).isEqualTo("A")
+            assertThat(scrollState.value).isEqualTo(0f)
         }
     }
 

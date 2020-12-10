@@ -16,21 +16,25 @@
 
 package androidx.compose.ui.test.junit4
 
-import android.os.Handler
 import android.os.Looper
+import androidx.activity.ComponentActivity
 import androidx.compose.animation.core.FloatPropKey
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.transitionDefinition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.transition
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.State
+import androidx.compose.runtime.dispatch.withFrameNanos
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -39,6 +43,12 @@ import androidx.compose.ui.test.junit4.android.ComposeIdlingResource
 import androidx.test.espresso.Espresso.onIdle
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 
@@ -51,14 +61,12 @@ class ComposeIdlingResourceTest {
         private val rectSize = Size(50.0f, 50.0f)
     }
 
-    private val handler = Handler(Looper.getMainLooper())
-
     private var animationRunning = false
     private val recordedAnimatedValues = mutableListOf<Float>()
-    private var hasRecomposed = false
 
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createAndroidComposeRule<ComponentActivity>()
+    private val composeIdlingResource = rule.composeIdlingResource
 
     /**
      * High level test to only verify that [ComposeTestRule.runOnIdle] awaits animations.
@@ -106,86 +114,83 @@ class ComposeIdlingResourceTest {
     }
 
     /**
-     * Detailed test to verify if [ComposeIdlingResource.isIdle] reports idleness correctly at
+     * Detailed test to verify if [ComposeIdlingResource.isIdleNow] reports idleness correctly at
      * key moments during the animation kick-off process.
      */
     @Test
+    @Ignore("b/173798666: Idleness not detected after Snapshot.sendApplyNotifications()")
     fun testAnimationIdle_detailed() {
-        var wasIdleAfterCommit = false
-        var wasIdleAfterRecompose = false
         var wasIdleBeforeKickOff = false
-        var wasIdleBeforeCommit = false
+        var wasIdleBeforeApplySnapshot = false
+        var wasIdleAfterApplySnapshot = false
 
         val animationState = mutableStateOf(AnimationStates.From)
-        rule.setContent { Ui(animationState) }
+        lateinit var scope: CoroutineScope
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            Ui(animationState)
+        }
 
-        rule.runOnIdle {
-            // Record idleness after this frame is committed. The mutation we're about to make
-            // will trigger a commit of the frame, which is posted at the front of the handler's
-            // queue. By posting a message at the front of the queue here, it will be executed
-            // right after the frame commit.
-            handler.postAtFrontOfQueue {
-                wasIdleAfterCommit = ComposeIdlingResource.isIdle()
-            }
+        runBlocking(scope.coroutineContext) {
+            // Verify that we're on the main thread, which is important for isIdle() later
+            assertThat(Looper.myLooper()).isEqualTo(Looper.getMainLooper())
+        }
 
-            // Record idleness after the next recomposition. Since we can't get a signal from the
-            // recomposer, keep polling until we detect we have been recomposed.
-            hasRecomposed = false
-            handler.pollUntil({ hasRecomposed }) {
-                wasIdleAfterRecompose = ComposeIdlingResource.isIdle()
-            }
-
+        val wasIdleAfterRecompose = rule.runOnIdle {
             // Record idleness before kickoff of animation
-            wasIdleBeforeKickOff = ComposeIdlingResource.isIdle()
+            wasIdleBeforeKickOff = composeIdlingResource.isIdleNow
 
             // Kick off the animation
             animationRunning = true
             animationState.value = AnimationStates.To
 
-            // Record idleness after kickoff of animation, but before the frame is committed
-            wasIdleBeforeCommit = ComposeIdlingResource.isIdle()
+            // Record idleness after kickoff of animation, but before the snapshot is applied
+            wasIdleBeforeApplySnapshot = composeIdlingResource.isIdleNow
+
+            // Apply the snapshot
+            @OptIn(ExperimentalComposeApi::class)
+            Snapshot.sendApplyNotifications()
+
+            // Record idleness after this snapshot is applied
+            wasIdleAfterApplySnapshot = composeIdlingResource.isIdleNow
+
+            // Record idleness after the first recomposition
+            @OptIn(ExperimentalCoroutinesApi::class)
+            scope.async(start = CoroutineStart.UNDISPATCHED) {
+                // Await a single recomposition
+                withFrameNanos {}
+                composeIdlingResource.isIdleNow
+            }
+        }.let {
+            runBlocking {
+                it.await()
+            }
         }
 
-        // Verify that animation is kicked off
-        assertThat(animationRunning).isTrue()
         // Wait until it is finished
-        onIdle()
-        // Verify it was finished
-        assertThat(animationRunning).isFalse()
+        rule.runOnIdle {
+            // Verify it was finished
+            assertThat(animationRunning).isFalse()
 
-        // Before the animation is kicked off, it is still idle
-        assertThat(wasIdleBeforeKickOff).isTrue()
-        // After animation is kicked off, but before the frame is committed, it must be busy
-        assertThat(wasIdleBeforeCommit).isFalse()
-        // After the frame is committed, it must still be busy
-        assertThat(wasIdleAfterCommit).isFalse()
-        // After recomposition, it must still be busy
-        assertThat(wasIdleAfterRecompose).isFalse()
-    }
-
-    private fun Handler.pollUntil(condition: () -> Boolean, onDone: () -> Unit) {
-        object : Runnable {
-            override fun run() {
-                if (condition()) {
-                    onDone()
-                } else {
-                    this@pollUntil.post(this)
-                }
-            }
-        }.run()
+            // Before the animation is kicked off, it is still idle
+            assertThat(wasIdleBeforeKickOff).isTrue()
+            // After animation is kicked off, but before the frame is committed, it must be busy
+            assertThat(wasIdleBeforeApplySnapshot).isFalse()
+            // After the frame is committed, it must still be busy
+            assertThat(wasIdleAfterApplySnapshot).isFalse()
+            // After recomposition, it must still be busy
+            assertThat(wasIdleAfterRecompose).isFalse()
+        }
     }
 
     @Composable
     private fun Ui(animationState: State<AnimationStates>) {
-        hasRecomposed = true
         Box(modifier = Modifier.background(color = Color.Yellow).fillMaxSize()) {
-            hasRecomposed = true
             val state = transition(
                 definition = animationDefinition,
                 toState = animationState.value,
                 onStateChangeFinished = { animationRunning = false }
             )
-            hasRecomposed = true
             Canvas(modifier = Modifier.fillMaxSize()) {
                 recordedAnimatedValues.add(state[x])
                 drawRect(Color.Cyan, Offset(state[x], 0f), rectSize)

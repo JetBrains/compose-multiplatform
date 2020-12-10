@@ -16,8 +16,13 @@
 
 package androidx.compose.ui.layout
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ExperimentalLayout
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
+import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.FixedSize
 import androidx.compose.ui.Modifier
@@ -31,6 +36,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
+import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -191,6 +197,84 @@ class RtlLayoutTest {
         assertTrue(latch.await(1, TimeUnit.SECONDS))
         assertEquals(LayoutDirection.Ltr, actualDirection)
     }
+    @Test
+    fun testModifiedLayoutDirection_inMeasureScope() {
+        val latch = CountDownLatch(1)
+        val resultLayoutDirection = Ref<LayoutDirection>()
+
+        activityTestRule.runOnUiThread {
+            activity.setContent {
+                Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+                    Layout(content = {}) { _, _ ->
+                        resultLayoutDirection.value = layoutDirection
+                        latch.countDown()
+                        layout(0, 0) {}
+                    }
+                }
+            }
+        }
+
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+        assertTrue(LayoutDirection.Rtl == resultLayoutDirection.value)
+    }
+
+    @Test
+    fun testModifiedLayoutDirection_inIntrinsicsMeasure() {
+        val latch = CountDownLatch(1)
+        var resultLayoutDirection: LayoutDirection? = null
+
+        activityTestRule.runOnUiThread {
+            activity.setContent {
+                @OptIn(ExperimentalLayout::class)
+                Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+                    Layout(
+                        content = {},
+                        modifier = Modifier.preferredWidth(IntrinsicSize.Max),
+                        minIntrinsicWidthMeasureBlock = { _, _ -> 0 },
+                        minIntrinsicHeightMeasureBlock = { _, _ -> 0 },
+                        maxIntrinsicWidthMeasureBlock = { _, _ ->
+                            resultLayoutDirection = this.layoutDirection
+                            latch.countDown()
+                            0
+                        },
+                        maxIntrinsicHeightMeasureBlock = { _, _ -> 0 }
+                    ) { _, _ ->
+                        layout(0, 0) {}
+                    }
+                }
+            }
+        }
+
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+        Assert.assertNotNull(resultLayoutDirection)
+        assertTrue(LayoutDirection.Rtl == resultLayoutDirection)
+    }
+
+    @Test
+    fun testRestoreLocaleLayoutDirection() {
+        val latch = CountDownLatch(1)
+        val resultLayoutDirection = Ref<LayoutDirection>()
+
+        activityTestRule.runOnUiThread {
+            activity.setContent {
+                val initialLayoutDirection = AmbientLayoutDirection.current
+                Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+                    Box {
+                        Providers(AmbientLayoutDirection provides initialLayoutDirection) {
+                            Layout(emptyContent()) { _, _ ->
+                                resultLayoutDirection.value = layoutDirection
+                                latch.countDown()
+                                layout(0, 0) {}
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+        assertEquals(LayoutDirection.Ltr, resultLayoutDirection.value)
+    }
 
     @Composable
     private fun CustomLayout(
@@ -199,31 +283,10 @@ class RtlLayoutTest {
     ) {
         Providers(AmbientLayoutDirection provides testLayoutDirection) {
             Layout(
-                content = @Composable {
-                    FixedSize(
-                        size,
-                        modifier = Modifier.saveLayoutInfo(
-                            position[0],
-                            countDownLatch
-                        )
-                    ) {
-                    }
-                    FixedSize(
-                        size,
-                        modifier = Modifier.saveLayoutInfo(
-                            position[1],
-                            countDownLatch
-                        )
-                    ) {
-                    }
-                    FixedSize(
-                        size,
-                        modifier = Modifier.saveLayoutInfo(
-                            position[2],
-                            countDownLatch
-                        )
-                    ) {
-                    }
+                content = {
+                    FixedSize(size, modifier = Modifier.saveLayoutInfo(position[0], countDownLatch))
+                    FixedSize(size, modifier = Modifier.saveLayoutInfo(position[1], countDownLatch))
+                    FixedSize(size, modifier = Modifier.saveLayoutInfo(position[2], countDownLatch))
                 }
             ) { measurables, constraints ->
                 val placeables = measurables.map { it.measure(constraints) }

@@ -42,10 +42,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.isFocused
-import androidx.compose.ui.focusObserver
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -95,7 +94,7 @@ import kotlin.math.roundToInt
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalFocus::class, ExperimentalTesting::class)
+@OptIn(ExperimentalTesting::class)
 class TextFieldTest {
 
     private val ExpectedMinimumTextFieldHeight = 56.dp
@@ -134,7 +133,7 @@ class TextFieldTest {
             Column {
                 TextField(
                     modifier = Modifier
-                        .focusObserver { textField1Focused = it.isFocused }
+                        .onFocusChanged { textField1Focused = it.isFocused }
                         .testTag(textField1Tag),
                     value = "input1",
                     onValueChange = {},
@@ -142,7 +141,7 @@ class TextFieldTest {
                 )
                 TextField(
                     modifier = Modifier
-                        .focusObserver { textField2Focused = it.isFocused }
+                        .onFocusChanged { textField2Focused = it.isFocused }
                         .testTag(textField2Tag),
                     value = "input2",
                     onValueChange = {},
@@ -173,7 +172,7 @@ class TextFieldTest {
             Box {
                 TextField(
                     modifier = Modifier
-                        .focusObserver { focused = it.isFocused }
+                        .onFocusChanged { focused = it.isFocused }
                         .testTag(TextfieldTag),
                     value = "input",
                     onValueChange = {},
@@ -194,8 +193,7 @@ class TextFieldTest {
 
     @Test
     fun testTextField_showHideKeyboardBasedOnFocus() {
-        val parentFocusRequester = FocusRequester()
-        val focusRequester = FocusRequester()
+        val (focusRequester, parentFocusRequester) = FocusRequester.createRefs()
         lateinit var hostView: View
         rule.setMaterialContent {
             hostView = AmbientView.current
@@ -224,8 +222,7 @@ class TextFieldTest {
 
     @Test
     fun testTextField_clickingOnTextAfterDismissingKeyboard_showsKeyboard() {
-        val parentFocusRequester = FocusRequester()
-        val focusRequester = FocusRequester()
+        val (focusRequester, parentFocusRequester) = FocusRequester.createRefs()
         lateinit var softwareKeyboardController: SoftwareKeyboardController
         lateinit var hostView: View
         rule.setMaterialContent {
@@ -823,7 +820,7 @@ class TextFieldTest {
             Box(Modifier.background(color = Color.White)) {
                 TextField(
                     modifier = Modifier
-                        .focusObserver { if (it.isFocused) latch.countDown() }
+                        .onFocusChanged { if (it.isFocused) latch.countDown() }
                         .testTag(TextfieldTag),
                     value = "",
                     onValueChange = {},

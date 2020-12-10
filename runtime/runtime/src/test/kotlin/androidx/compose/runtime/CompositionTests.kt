@@ -25,6 +25,7 @@ import androidx.compose.runtime.mock.MockViewListValidator
 import androidx.compose.runtime.mock.MockViewValidator
 import androidx.compose.runtime.mock.Point
 import androidx.compose.runtime.mock.Report
+import androidx.compose.runtime.mock.TestMonotonicFrameClock
 import androidx.compose.runtime.mock.View
 import androidx.compose.runtime.mock.ViewApplier
 import androidx.compose.runtime.mock.contact
@@ -41,9 +42,12 @@ import androidx.compose.runtime.mock.text
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.snapshots.takeMutableSnapshot
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.test.runBlockingTest
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -317,7 +321,7 @@ class CompositionTests {
             repeat(of = chars) { c -> textOf(c) }
         }
 
-        fun MockViewValidator.validatechars(chars: Iterable<Char>) {
+        fun MockViewValidator.validateChars(chars: Iterable<Char>) {
             repeat(of = chars) { c -> textOf(c) }
         }
 
@@ -329,9 +333,9 @@ class CompositionTests {
         }
 
         result.validate {
-            validatechars(chars)
-            validatechars(chars)
-            validatechars(chars)
+            validateChars(chars)
+            validateChars(chars)
+            validateChars(chars)
         }
 
         chars = listOf('a', 'b', 'x', 'c')
@@ -339,9 +343,9 @@ class CompositionTests {
         result.expectChanges()
 
         result.validate {
-            validatechars(chars)
-            validatechars(chars)
-            validatechars(chars)
+            validateChars(chars)
+            validateChars(chars)
+            validateChars(chars)
         }
     }
 
@@ -563,7 +567,7 @@ class CompositionTests {
     }
 
     @Test
-    fun testComponentWithVarCtorParameter() {
+    fun testComponentWithVarConstructorParameter() {
         @Composable fun MockComposeScope.One(first: Int) {
             text("$first")
         }
@@ -597,7 +601,7 @@ class CompositionTests {
     }
 
     @Test
-    fun testComponentWithValCtorParameter() {
+    fun testComponentWithValConstructorParameter() {
         @Composable fun MockComposeScope.One(first: Int) {
             text("$first")
         }
@@ -2503,6 +2507,129 @@ class CompositionTests {
             validate()
         }
     }
+
+    /**
+     * This test checks that an updated ComposableLambda capture used in a subcomposition
+     * correctly invalidates that subcomposition and schedules recomposition of that subcomposition.
+     */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun testComposableLambdaSubcompositionInvalidation() = runBlockingTest {
+        localRecomposerTest { recomposer ->
+            val composer = Composer(EmptyApplier(), recomposer)
+            try {
+                var rootState by mutableStateOf(false)
+                val composedResults = mutableListOf<Boolean>()
+                Snapshot.notifyObjectsInitialized()
+                recomposer.composeInitial(composer) {
+                    // Read into local variable, local will be captured below
+                    val capturedValue = rootState
+                    TestSubcomposition {
+                        composedResults.add(capturedValue)
+                    }
+                }
+                composer.applyChanges()
+                assertEquals(listOf(false), composedResults)
+                rootState = true
+                Snapshot.sendApplyNotifications()
+                advanceUntilIdle()
+                assertEquals(listOf(false, true), composedResults)
+            } finally {
+                composer.dispose()
+            }
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun testCompositionReferenceIsRemembered() = runBlockingTest {
+        localRecomposerTest { recomposer ->
+            val composer = Composer(EmptyApplier(), recomposer)
+            try {
+                lateinit var invalidator: () -> Unit
+                val parentReferences = mutableListOf<CompositionReference>()
+                recomposer.composeInitial(composer) {
+                    invalidator = invalidate
+                    parentReferences += compositionReference()
+                }
+                composer.applyChanges()
+                invalidator()
+                advanceUntilIdle()
+                assert(parentReferences.size > 1) { "expected to be composed more than once" }
+                assert(parentReferences.toSet().size == 1) {
+                    "expected all parentReferences to be the same; saw $parentReferences"
+                }
+            } finally {
+                composer.dispose()
+            }
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun testParentCompositionRecomposesFirst() = runBlockingTest {
+        localRecomposerTest { recomposer ->
+            val composer = Composer(EmptyApplier(), recomposer)
+            val results = mutableListOf<String>()
+            try {
+                var firstState by mutableStateOf("firstInitial")
+                var secondState by mutableStateOf("secondInitial")
+                Snapshot.notifyObjectsInitialized()
+                recomposer.composeInitial(composer) {
+                    results += firstState
+                    TestSubcomposition {
+                        results += secondState
+                    }
+                }
+                secondState = "secondSet"
+                Snapshot.sendApplyNotifications()
+                firstState = "firstSet"
+                Snapshot.sendApplyNotifications()
+                advanceUntilIdle()
+                assertEquals(
+                    listOf("firstInitial", "secondInitial", "firstSet", "secondSet"),
+                    results,
+                    "Expected call ordering during recomposition of subcompositions"
+                )
+            } finally {
+                composer.dispose()
+            }
+        }
+    }
+}
+
+@OptIn(InternalComposeApi::class, ExperimentalComposeApi::class)
+@Composable
+private fun TestSubcomposition(
+    content: @Composable () -> Unit
+) {
+    val parentRef = compositionReference()
+    val currentContent by rememberUpdatedState(content)
+    DisposableEffect(parentRef) {
+        val subcomposer = Composer(EmptyApplier(), parentRef)
+        parentRef.composeInitial(subcomposer) {
+            currentContent()
+        }
+        subcomposer.applyChanges()
+        onDispose {
+            subcomposer.dispose()
+        }
+    }
+}
+
+@OptIn(ExperimentalCoroutinesApi::class)
+private suspend fun <R> localRecomposerTest(
+    block: CoroutineScope.(Recomposer) -> R
+) = coroutineScope {
+    val contextWithClock = coroutineContext + TestMonotonicFrameClock(this)
+    val recomposer = Recomposer(contextWithClock)
+    launch(contextWithClock) {
+        recomposer.runRecomposeAndApplyChanges()
+    }
+    block(recomposer)
+    // This call doesn't need to be in a finally; everything it does will be torn down
+    // in exceptional cases by the coroutineScope failure
+    recomposer.shutDown()
 }
 
 @Composable fun Wrap(content: @Composable () -> Unit) {
@@ -2544,8 +2671,7 @@ private class CompositionResult(
         assertTrue(changes, "Expected changes")
         composer.applyChanges()
         Snapshot.notifyObjectsInitialized()
-        composer.slotTable.verifyWellFormed()
-        composer.insertTable.verifyWellFormed()
+        composer.verifyConsistent()
     }
 
     fun recompose(): Boolean = doCompose(composer) { composer.recompose() }
@@ -2581,6 +2707,9 @@ private fun <T> doCompose(composer: Composer<*>, block: () -> T): T {
     }
 }
 
+/**
+ * Composer the given block.
+ */
 @OptIn(InternalComposeApi::class, ExperimentalComposeApi::class)
 private fun compose(
     block: @Composable MockComposeScope.() -> Unit
@@ -2600,7 +2729,6 @@ private fun compose(
             scope.launch(clock) { runRecomposeAndApplyChanges() }
         }
         Composer(
-            SlotTable(),
             ViewApplier(root),
             recomposer
         )
@@ -2614,24 +2742,9 @@ private fun compose(
         Snapshot.notifyObjectsInitialized()
         composer.applyChanges()
     }
-    composer.slotTable.verifyWellFormed()
-    validateRecomposeScopeAnchors(composer.slotTable)
+    composer.verifyConsistent()
 
     return CompositionResult(composer, root)
-}
-
-@OptIn(InternalComposeApi::class)
-fun validateRecomposeScopeAnchors(slotTable: SlotTable) {
-    val scopes = slotTable.slots.map { it as? RecomposeScope }.filterNotNull()
-    for (scope in scopes) {
-        scope.anchor?.let { anchor ->
-            check(scope in slotTable.slotsOf(anchor.toIndexFor(slotTable))) {
-                val dataIndex = slotTable.slots.indexOf(scope)
-                "Misaligned anchor $anchor in scope $scope encountered, scope found at " +
-                    "$dataIndex"
-            }
-        }
-    }
 }
 
 // Contact test data
@@ -2663,4 +2776,24 @@ private interface Ordered {
 
 private interface Named {
     val name: String
+}
+
+@OptIn(ExperimentalComposeApi::class)
+private class EmptyApplier : Applier<Unit> {
+    override val current: Unit = Unit
+    override fun down(node: Unit) {}
+    override fun up() {}
+    override fun insertTopDown(index: Int, instance: Unit) {
+        error("Unexpected")
+    }
+    override fun insertBottomUp(index: Int, instance: Unit) {
+        error("Unexpected")
+    }
+    override fun remove(index: Int, count: Int) {
+        error("Unexpected")
+    }
+    override fun move(from: Int, to: Int, count: Int) {
+        error("Unexpected")
+    }
+    override fun clear() {}
 }

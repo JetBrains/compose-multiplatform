@@ -42,7 +42,6 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.MeasuringIntrinsicsMeasureBlocks
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
@@ -89,7 +88,7 @@ fun defaultScrollbarStyle() = ScrollbarStyle(
 
 /**
  * Vertical scrollbar that can be attached to some scrollable
- * component (ScrollableColumn, LazyColumnFor) and share common state with it.
+ * component (ScrollableColumn, LazyColumn) and share common state with it.
  *
  * Can be placed independently.
  *
@@ -129,7 +128,7 @@ fun VerticalScrollbar(
 
 /**
  * Horizontal scrollbar that can be attached to some scrollable
- * component (ScrollableRow, LazyRowFor) and share common state with it.
+ * component (ScrollableRow, LazyRow) and share common state with it.
  *
  * Can be placed independently.
  *
@@ -169,7 +168,6 @@ fun HorizontalScrollbar(
 
 // TODO(demin): do we need to stop dragging if cursor is beyond constraints?
 // TODO(demin): add Interaction.Hovered to interactionState
-@OptIn(ExperimentalLayoutNodeApi::class)
 @Composable
 private fun Scrollbar(
     adapter: ScrollbarAdapter,
@@ -451,7 +449,7 @@ private class SliderAdapter(
     val containerSize: Int,
     val minHeight: Float
 ) {
-    private val contentSize = adapter.maxScrollOffset(containerSize) + containerSize
+    private val contentSize get() = adapter.maxScrollOffset(containerSize) + containerSize
     private val visiblePart get() = containerSize.toFloat() / contentSize
 
     val size

@@ -61,7 +61,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.SweepGradient
+import androidx.compose.ui.graphics.SweepGradientShader
 import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.toPixelMap
@@ -309,9 +309,8 @@ private val MagnifierPopupShape = GenericShape { size ->
 private class ColorWheel(diameter: Int) {
     private val radius = diameter / 2f
 
-    // TODO: b/152063545 - replace with Compose SweepGradient when it is available
-    private val sweepGradient = SweepGradient(
-        listOf(
+    private val sweepGradient = SweepGradientShader(
+        colors = listOf(
             Color.Red,
             Color.Magenta,
             Color.Blue,
@@ -320,13 +319,14 @@ private class ColorWheel(diameter: Int) {
             Color.Yellow,
             Color.Red
         ),
-        Offset(radius, radius)
+        colorStops = null,
+        center = Offset(radius, radius)
     )
 
     val image = ImageBitmap(diameter, diameter).also { imageBitmap ->
         val canvas = Canvas(imageBitmap)
         val center = Offset(radius, radius)
-        val paint = Paint().apply { sweepGradient.applyTo(this, 1.0f) }
+        val paint = Paint().apply { shader = sweepGradient }
         canvas.drawCircle(center, radius, paint)
     }
 }

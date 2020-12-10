@@ -31,7 +31,6 @@ private val focusRequesterNotInitialized = "FocusRequester is not initialized. O
  *
  * @see androidx.compose.ui.focusRequester
  */
-@ExperimentalFocus
 class FocusRequester {
 
     internal val focusRequesterNodes: MutableVector<ModifiedFocusRequesterNode> = mutableVectorOf()
@@ -97,5 +96,35 @@ class FocusRequester {
             }
         }
         return success
+    }
+
+    companion object {
+        /**
+         * Convenient way to create multiple [FocusRequester] instances.
+         */
+        object FocusRequesterFactory {
+            operator fun component1() = FocusRequester()
+            operator fun component2() = FocusRequester()
+            operator fun component3() = FocusRequester()
+            operator fun component4() = FocusRequester()
+            operator fun component5() = FocusRequester()
+            operator fun component6() = FocusRequester()
+            operator fun component7() = FocusRequester()
+            operator fun component8() = FocusRequester()
+            operator fun component9() = FocusRequester()
+            operator fun component10() = FocusRequester()
+            operator fun component11() = FocusRequester()
+            operator fun component12() = FocusRequester()
+            operator fun component13() = FocusRequester()
+            operator fun component14() = FocusRequester()
+            operator fun component15() = FocusRequester()
+            operator fun component16() = FocusRequester()
+        }
+
+        /**
+         * Convenient way to create multiple [FocusRequester]s, which can to be used to request
+         * focus, or to specify a focus traversal order.
+         */
+        fun createRefs() = FocusRequesterFactory
     }
 }

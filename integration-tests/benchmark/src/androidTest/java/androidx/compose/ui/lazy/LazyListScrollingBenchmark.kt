@@ -24,11 +24,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyColumnFor
-import androidx.compose.foundation.lazy.LazyColumnForIndexed
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.LazyRowFor
-import androidx.compose.foundation.lazy.LazyRowForIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.emptyContent
@@ -92,13 +88,9 @@ class LazyListScrollingBenchmark(
                 LazyColumnWithItemAndItems,
                 LazyColumnWithItems,
                 LazyColumnWithItemsIndexed,
-                LazyColumnFor,
-                LazyColumnForIndexed,
                 LazyRowWithItemAndItems,
                 LazyRowWithItems,
-                LazyRowWithItemsIndexed,
-                LazyRowFor,
-                LazyRowForIndexed
+                LazyRowWithItemsIndexed
             )
     }
 }
@@ -147,26 +139,6 @@ private val LazyColumnWithItemsIndexed = LazyListScrollingTestCase("LazyColumnWi
     }
 }
 
-private val LazyColumnFor = LazyListScrollingTestCase("LazyColumnFor") {
-    LazyColumnFor(items, modifier = Modifier.height(400.dp).fillMaxWidth()) {
-        if (it.index == 0) {
-            RemeasurableItem()
-        } else {
-            RegularItem()
-        }
-    }
-}
-
-private val LazyColumnForIndexed = LazyListScrollingTestCase("LazyColumnForIndexed") {
-    LazyColumnForIndexed(items, modifier = Modifier.height(400.dp).fillMaxWidth()) { index, _ ->
-        if (index == 0) {
-            RemeasurableItem()
-        } else {
-            RegularItem()
-        }
-    }
-}
-
 private val LazyRowWithItemAndItems = LazyListScrollingTestCase("LazyRowWithItemAndItems") {
     LazyRow(modifier = Modifier.width(400.dp).fillMaxHeight()) {
         item {
@@ -198,26 +170,6 @@ private val LazyRowWithItemsIndexed = LazyListScrollingTestCase("LazyRowWithItem
             } else {
                 RegularItem()
             }
-        }
-    }
-}
-
-private val LazyRowFor = LazyListScrollingTestCase("LazyRowFor") {
-    LazyRowFor(items, modifier = Modifier.width(400.dp).fillMaxHeight()) {
-        if (it.index == 0) {
-            RemeasurableItem()
-        } else {
-            RegularItem()
-        }
-    }
-}
-
-private val LazyRowForIndexed = LazyListScrollingTestCase("LazyRowForIndexed") {
-    LazyRowForIndexed(items, modifier = Modifier.width(400.dp).fillMaxHeight()) { index, _ ->
-        if (index == 0) {
-            RemeasurableItem()
-        } else {
-            RegularItem()
         }
     }
 }

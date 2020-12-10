@@ -15,17 +15,13 @@
  */
 package androidx.compose.desktop
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Composition
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import javax.swing.JFrame
 
 class ComposeWindow : JFrame {
-    companion object {
-        init {
-            initCompose()
-        }
-    }
-
     val parent: AppFrame
     internal val layer = ComposeLayer()
 
@@ -43,6 +39,21 @@ class ComposeWindow : JFrame {
         })
     }
 
+    /**
+     * Sets Compose content of the ComposeWindow.
+     *
+     * @param content Composable content of the ComposeWindow.
+     *
+     * @return Composition of the content.
+     */
+    fun setContent(content: @Composable () -> Unit): Composition {
+        return layer.setContent(
+            parent = parent,
+            invalidate = this::needRedrawLayer,
+            content = content
+        )
+    }
+
     private fun updateLayer() {
         if (!isVisible) {
             return
@@ -50,7 +61,7 @@ class ComposeWindow : JFrame {
         layer.updateLayer()
     }
 
-    fun needRedrawLayer() {
+    internal fun needRedrawLayer() {
         if (!isVisible) {
             return
         }

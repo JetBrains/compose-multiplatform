@@ -113,8 +113,12 @@ internal fun composeVector(
 }
 
 class VectorApplier(root: VNode) : AbstractApplier<VNode>(root) {
-    override fun insert(index: Int, instance: VNode) {
+    override fun insertTopDown(index: Int, instance: VNode) {
         current.asGroup().insertAt(index, instance)
+    }
+
+    override fun insertBottomUp(index: Int, instance: VNode) {
+        // Ignored as the tree is built top-down.
     }
 
     override fun remove(index: Int, count: Int) {

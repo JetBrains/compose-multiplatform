@@ -88,9 +88,11 @@ class SnapshotStateList<T> : MutableList<T>, StateObject {
     override fun clear() = writable { list = persistentListOf() }
     override fun remove(element: T) = conditionalUpdate { it.remove(element) }
     override fun removeAll(elements: Collection<T>) = conditionalUpdate { it.removeAll(elements) }
-    override fun removeAt(index: Int) = get(index).also { update { it.removeAt(index) } }
+    override fun removeAt(index: Int): T = get(index).also { update { it.removeAt(index) } }
     override fun retainAll(elements: Collection<T>) = mutate { it.retainAll(elements) }
-    override fun set(index: Int, element: T) = get(index).also { update { it.set(index, element) } }
+    override fun set(index: Int, element: T): T = get(index).also {
+        update { it.set(index, element) }
+    }
 
     fun removeRange(fromIndex: Int, toIndex: Int) {
         mutate {

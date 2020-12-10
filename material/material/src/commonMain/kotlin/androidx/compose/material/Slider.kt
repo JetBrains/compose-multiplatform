@@ -29,6 +29,7 @@ import androidx.compose.foundation.Strings
 import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.animation.defaultFlingConfig
 import androidx.compose.foundation.animation.fling
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.layout.Box
@@ -39,9 +40,9 @@ import androidx.compose.foundation.layout.preferredHeightIn
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredWidthIn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.SliderConstants.InactiveTrackColorAlpha
-import androidx.compose.material.SliderConstants.TickColorAlpha
-import androidx.compose.material.ripple.rememberRippleIndication
+import androidx.compose.material.SliderDefaults.InactiveTrackColorAlpha
+import androidx.compose.material.SliderDefaults.TickColorAlpha
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -58,8 +59,8 @@ import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.semantics.AccessibilityRangeInfo
-import androidx.compose.ui.semantics.accessibilityValue
-import androidx.compose.ui.semantics.accessibilityValueRange
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.semantics.stateDescriptionRange
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.setProgress
 import androidx.compose.ui.unit.LayoutDirection
@@ -195,7 +196,29 @@ fun Slider(
 /**
  * Object to hold constants used by the [Slider]
  */
+@Deprecated(
+    "SliderConstants has been replaced with SliderDefaults",
+    ReplaceWith(
+        "SliderDefaults",
+        "androidx.compose.material.SliderDefaults"
+    )
+)
 object SliderConstants {
+    /**
+     * Default alpha of the inactive part of the track
+     */
+    const val InactiveTrackColorAlpha = 0.24f
+
+    /**
+     * Default alpha of the ticks that are drawn on top of the track
+     */
+    const val TickColorAlpha = 0.54f
+}
+
+/**
+ * Object to hold defaults used by [Slider]
+ */
+object SliderDefaults {
     /**
      * Default alpha of the inactive part of the track
      */
@@ -257,13 +280,15 @@ private fun SliderImpl(
                 shape = CircleShape,
                 color = thumbColor,
                 elevation = elevation,
-                modifier = Modifier.indication(
-                    interactionState = interactionState,
-                    indication = rememberRippleIndication(
-                        bounded = false,
-                        radius = ThumbRippleRadius
+                modifier = Modifier
+                    .focusable(interactionState = interactionState)
+                    .indication(
+                        interactionState = interactionState,
+                        indication = rememberRipple(
+                            bounded = false,
+                            radius = ThumbRippleRadius
+                        )
                     )
-                )
             ) {
                 Spacer(Modifier.preferredSize(thumbSize, thumbSize))
             }
@@ -357,9 +382,9 @@ private fun Modifier.sliderSemantics(
         1f -> 100
         else -> (fraction * 100).roundToInt().coerceIn(1, 99)
     }
-    return semantics {
-        accessibilityValue = Strings.TemplatePercent.format(percent)
-        accessibilityValueRange = AccessibilityRangeInfo(coerced, valueRange, steps)
+    return semantics(mergeDescendants = true) {
+        stateDescription = Strings.TemplatePercent.format(percent)
+        stateDescriptionRange = AccessibilityRangeInfo(coerced, valueRange, steps)
         setProgress(
             action = { targetValue ->
                 val newValue = targetValue.coerceIn(position.startValue, position.endValue)

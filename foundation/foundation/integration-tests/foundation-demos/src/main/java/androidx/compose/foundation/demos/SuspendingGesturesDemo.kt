@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.demos
 
+import android.graphics.Matrix
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -46,13 +47,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.gesture.ExperimentalPointerInput
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.consumeAllChanges
@@ -60,9 +60,12 @@ import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import kotlin.math.atan2
 import kotlin.math.roundToInt
+import kotlin.math.sqrt
 import kotlin.random.Random
 
 val CoroutineGestureDemos = listOf(
@@ -104,7 +107,6 @@ fun anotherRandomHue(hue: Float): Float {
 /**
  * Gesture detector for tap, double-tap, and long-press.
  */
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 fun CoroutineTapDemo() {
     var tapHue by remember { mutableStateOf(randomHue()) }
@@ -209,7 +211,6 @@ fun CoroutineTapDemo() {
     }
 }
 
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 fun TouchSlopDragGestures() {
     Column {
@@ -287,7 +288,6 @@ fun TouchSlopDragGestures() {
     }
 }
 
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 fun OrientationLockDragGestures() {
     var size by remember { mutableStateOf(IntSize.Zero) }
@@ -332,7 +332,6 @@ fun OrientationLockDragGestures() {
     }
 }
 
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 fun Drag2DGestures() {
     var size by remember { mutableStateOf(IntSize.Zero) }
@@ -344,7 +343,7 @@ fun Drag2DGestures() {
         }.fillMaxSize()
     ) {
         Box(
-            Modifier.offset({ offsetX.value }, { offsetY.value })
+            Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .background(Color.Blue)
                 .size(50.dp)
                 .pointerInput {
@@ -362,24 +361,41 @@ fun Drag2DGestures() {
     }
 }
 
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 fun MultitouchArea(
     text: String,
     gestureDetector: suspend PointerInputScope.(
-        (angle: Float) -> Unit,
-        (zoom: Float) -> Unit,
-        (pan: Offset) -> Unit
+        (centroid: Offset, pan: Offset, zoom: Float, angle: Float) -> Unit,
     ) -> Unit
 ) {
+    val matrix by remember { mutableStateOf(Matrix()) }
     var angle by remember { mutableStateOf(0f) }
     var zoom by remember { mutableStateOf(1f) }
-    val offsetX = remember { mutableStateOf(0f) }
-    val offsetY = remember { mutableStateOf(0f) }
+    var offsetX by remember { mutableStateOf(0f) }
+    var offsetY by remember { mutableStateOf(0f) }
 
-    Box(Modifier.fillMaxSize()) {
+    Box(
+        Modifier.fillMaxSize().pointerInput {
+            gestureDetector { centroid, pan, gestureZoom, gestureAngle ->
+                val anchorX = centroid.x - size.width / 2f
+                val anchorY = centroid.y - size.height / 2f
+                matrix.postRotate(gestureAngle, anchorX, anchorY)
+                matrix.postScale(gestureZoom, gestureZoom, anchorX, anchorY)
+                matrix.postTranslate(pan.x, pan.y)
+
+                val v = FloatArray(9)
+                matrix.getValues(v)
+                offsetX = v[Matrix.MTRANS_X]
+                offsetY = v[Matrix.MTRANS_Y]
+                val scaleX = v[Matrix.MSCALE_X]
+                val skewY = v[Matrix.MSKEW_Y]
+                zoom = sqrt(scaleX * scaleX + skewY * skewY)
+                angle = atan2(v[Matrix.MSKEW_X], v[Matrix.MSCALE_X]) * (-180 / Math.PI.toFloat())
+            }
+        }
+    ) {
         Box(
-            Modifier.offset({ offsetX.value }, { offsetY.value })
+            Modifier.offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
                 .graphicsLayer(
                     scaleX = zoom,
                     scaleY = zoom,
@@ -408,15 +424,6 @@ fun MultitouchArea(
                             drawRect(color = color, topLeft = topLeft, size = rectangleSize)
                         }
                     }
-                }.pointerInput {
-                    gestureDetector(
-                        { angle += it },
-                        { zoom *= it },
-                        {
-                            offsetX.value += it.x
-                            offsetY.value += it.y
-                        }
-                    )
                 }
                 .fillMaxSize()
         )
@@ -428,17 +435,14 @@ fun MultitouchArea(
  * This is a multi-touch gesture detector, including pan, zoom, and rotation.
  * The user can pan, zoom, and rotate once touch slop has been reached.
  */
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 fun MultitouchGestureDetector() {
     MultitouchArea(
         "Zoom, Pan, and Rotate"
-    ) { onRotate, onZoom, onPan ->
+    ) {
         detectMultitouchGestures(
             panZoomLock = false,
-            onRotate = onRotate,
-            onZoom = onZoom,
-            onPan = onPan
+            onGesture = it
         )
     }
 }
@@ -448,17 +452,14 @@ fun MultitouchGestureDetector() {
  * It is common to want to lean toward zoom over rotation, so this gesture detector will
  * lock into zoom if the first unless the rotation passes touch slop first.
  */
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 fun MultitouchLockGestureDetector() {
     MultitouchArea(
         "Zoom, Pan, and Rotate Locking to Zoom"
-    ) { onRotate, onZoom, onPan ->
+    ) {
         detectMultitouchGestures(
             panZoomLock = true,
-            onRotate = onRotate,
-            onZoom = onZoom,
-            onPan = onPan
+            onGesture = it
         )
     }
 }

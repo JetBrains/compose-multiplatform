@@ -15,7 +15,6 @@
  */
 package androidx.compose.ui.test.junit4
 
-import androidx.compose.ui.test.initCompose
 import org.jetbrains.skija.Surface
 import org.junit.rules.TestRule
 import org.junit.runner.Description
@@ -167,12 +166,6 @@ fun DesktopScreenshotTestRule(
 class ScreenshotTestRule internal constructor(val config: GoldenConfig) : TestRule {
     private lateinit var testIdentifier: String
     private lateinit var album: SkijaTestAlbum
-
-    companion object {
-        init {
-            initCompose()
-        }
-    }
 
     val executionQueue = LinkedList<() -> Unit>()
 

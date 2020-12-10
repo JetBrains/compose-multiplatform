@@ -48,16 +48,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.gesture.ExperimentalPointerInput
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
+import kotlin.math.roundToInt
 
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 @Sampled
 fun AwaitHorizontalDragOrCancellationSample() {
@@ -69,13 +69,13 @@ fun AwaitHorizontalDragOrCancellationSample() {
             .onSizeChanged { width = it.width.toFloat() }
     ) {
         Box(
-            Modifier.offset({ offsetX.value }, { offsetY.value })
+            Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .fillMaxHeight()
                 .width(50.dp)
                 .background(Color.Blue)
                 .pointerInput {
                     forEachGesture {
-                        handlePointerInput {
+                        awaitPointerEventScope {
                             val down = awaitFirstDown()
                             var change =
                                 awaitHorizontalTouchSlopOrCancellation(down.id) { change, over ->
@@ -102,7 +102,6 @@ fun AwaitHorizontalDragOrCancellationSample() {
     }
 }
 
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 @Sampled
 fun HorizontalDragSample() {
@@ -114,13 +113,13 @@ fun HorizontalDragSample() {
             .onSizeChanged { width = it.width.toFloat() }
     ) {
         Box(
-            Modifier.offset({ offsetX.value }, { offsetY.value })
+            Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .fillMaxHeight()
                 .width(50.dp)
                 .background(Color.Blue)
                 .pointerInput {
                     forEachGesture {
-                        handlePointerInput {
+                        awaitPointerEventScope {
                             val down = awaitFirstDown()
                             val change =
                                 awaitHorizontalTouchSlopOrCancellation(down.id) { change, over ->
@@ -146,7 +145,6 @@ fun HorizontalDragSample() {
     }
 }
 
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 @Sampled
 fun DetectHorizontalDragGesturesSample() {
@@ -158,7 +156,7 @@ fun DetectHorizontalDragGesturesSample() {
             .onSizeChanged { width = it.width.toFloat() }
     ) {
         Box(
-            Modifier.offset({ offsetX.value }, { offsetY.value })
+            Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .fillMaxHeight()
                 .width(50.dp)
                 .background(Color.Blue)
@@ -174,7 +172,6 @@ fun DetectHorizontalDragGesturesSample() {
     }
 }
 
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 @Sampled
 fun AwaitVerticalDragOrCancellationSample() {
@@ -186,13 +183,13 @@ fun AwaitVerticalDragOrCancellationSample() {
             .onSizeChanged { height = it.height.toFloat() }
     ) {
         Box(
-            Modifier.offset({ offsetX.value }, { offsetY.value })
+            Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .fillMaxWidth()
                 .height(50.dp)
                 .background(Color.Blue)
                 .pointerInput {
                     forEachGesture {
-                        handlePointerInput {
+                        awaitPointerEventScope {
                             val down = awaitFirstDown()
                             var change =
                                 awaitVerticalTouchSlopOrCancellation(down.id) { change, over ->
@@ -219,7 +216,6 @@ fun AwaitVerticalDragOrCancellationSample() {
     }
 }
 
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 @Sampled
 fun VerticalDragSample() {
@@ -231,13 +227,13 @@ fun VerticalDragSample() {
             .onSizeChanged { height = it.height.toFloat() }
     ) {
         Box(
-            Modifier.offset({ offsetX.value }, { offsetY.value })
+            Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .fillMaxWidth()
                 .height(50.dp)
                 .background(Color.Blue)
                 .pointerInput {
                     forEachGesture {
-                        handlePointerInput {
+                        awaitPointerEventScope {
                             val down = awaitFirstDown()
                             val change =
                                 awaitVerticalTouchSlopOrCancellation(down.id) { change, over ->
@@ -263,7 +259,6 @@ fun VerticalDragSample() {
     }
 }
 
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 @Sampled
 fun DetectVerticalDragGesturesSample() {
@@ -275,7 +270,7 @@ fun DetectVerticalDragGesturesSample() {
             .onSizeChanged { height = it.height.toFloat() }
     ) {
         Box(
-            Modifier.offset({ offsetX.value }, { offsetY.value })
+            Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .fillMaxWidth()
                 .height(50.dp)
                 .background(Color.Blue)
@@ -291,7 +286,6 @@ fun DetectVerticalDragGesturesSample() {
     }
 }
 
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 @Sampled
 fun AwaitDragOrCancellationSample() {
@@ -303,12 +297,12 @@ fun AwaitDragOrCancellationSample() {
             .onSizeChanged { size = it.toSize() }
     ) {
         Box(
-            Modifier.offset({ offsetX.value }, { offsetY.value })
+            Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .size(50.dp)
                 .background(Color.Blue)
                 .pointerInput {
                     forEachGesture {
-                        handlePointerInput {
+                        awaitPointerEventScope {
                             val down = awaitFirstDown()
                             var change = awaitTouchSlopOrCancellation(down.id) { change, over ->
                                 val original = Offset(offsetX.value, offsetY.value)
@@ -348,7 +342,6 @@ fun AwaitDragOrCancellationSample() {
     }
 }
 
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 @Sampled
 fun DragSample() {
@@ -360,12 +353,12 @@ fun DragSample() {
             .onSizeChanged { size = it.toSize() }
     ) {
         Box(
-            Modifier.offset({ offsetX.value }, { offsetY.value })
+            Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .size(50.dp)
                 .background(Color.Blue)
                 .pointerInput {
                     forEachGesture {
-                        handlePointerInput {
+                        awaitPointerEventScope {
                             val down = awaitFirstDown()
                             val change = awaitTouchSlopOrCancellation(down.id) { change, over ->
                                 val original = Offset(offsetX.value, offsetY.value)
@@ -404,7 +397,6 @@ fun DragSample() {
     }
 }
 
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 @Sampled
 fun DetectDragGesturesSample() {
@@ -416,7 +408,7 @@ fun DetectDragGesturesSample() {
             .onSizeChanged { size = it.toSize() }
     ) {
         Box(
-            Modifier.offset({ offsetX.value }, { offsetY.value })
+            Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .size(50.dp)
                 .background(Color.Blue)
                 .pointerInput {

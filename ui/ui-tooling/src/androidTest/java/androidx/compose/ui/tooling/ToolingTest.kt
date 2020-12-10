@@ -21,12 +21,11 @@ import android.os.Looper
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.InternalComposeApi
-import androidx.compose.runtime.SlotTable
+import androidx.compose.runtime.CompositionData
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.R
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.AndroidOwner
+import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.platform.setContent
 import org.junit.Before
 import org.junit.Rule
@@ -73,17 +72,16 @@ open class ToolingTest {
         activityTestRule.onUiThread { }
     }
 
-    @OptIn(InternalComposeApi::class)
-    internal fun showAndRecord(content: @Composable () -> Unit): MutableSet<SlotTable>? {
+    internal fun showAndRecord(content: @Composable () -> Unit): MutableSet<CompositionData>? {
 
         positionedLatch = CountDownLatch(1)
-        val map: MutableSet<SlotTable> = Collections.newSetFromMap(
-            WeakHashMap<SlotTable, Boolean>()
+        val map: MutableSet<CompositionData> = Collections.newSetFromMap(
+            WeakHashMap<CompositionData, Boolean>()
         )
         activityTestRule.onUiThread {
-            AndroidOwner.onAndroidOwnerCreatedCallback = {
+            ViewRootForTest.onViewCreatedCallback = {
                 it.view.setTag(R.id.inspection_slot_table_set, map)
-                AndroidOwner.onAndroidOwnerCreatedCallback = null
+                ViewRootForTest.onViewCreatedCallback = null
             }
             activity.setContent {
                 Box(

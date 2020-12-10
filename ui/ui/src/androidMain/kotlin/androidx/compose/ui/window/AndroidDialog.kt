@@ -31,6 +31,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionReference
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.compositionReference
 import androidx.compose.runtime.onActive
 import androidx.compose.runtime.onCommit
@@ -55,11 +56,17 @@ import androidx.savedstate.ViewTreeSavedStateRegistryOwner
 /**
  * Android specific properties to configure a dialog.
  *
- * @param securePolicy Policy for setting [WindowManager.LayoutParams.FLAG_SECURE] on the dialog's
- * window.
+ * @property dismissOnClickOutside whether the dialog can be dismissed by pressing the back button.
+ * If true, pressing the back button will call onDismissRequest.
+ * @property dismissOnClickOutside whether the dialog can be dismissed by clicking outside the
+ * dialog's bounds. If true, clicking outside the dialog will call onDismissRequest.
+ * @property securePolicy Policy for setting [WindowManager.LayoutParams.FLAG_SECURE] on the
+ * dialog's window.
  */
 @Immutable
 data class AndroidDialogProperties(
+    val dismissOnBackPress: Boolean = true,
+    val dismissOnClickOutside: Boolean = true,
     val securePolicy: SecureFlagPolicy = SecureFlagPolicy.Inherit
 ) : DialogProperties
 
@@ -88,8 +95,8 @@ internal actual fun ActualDialog(
     val density = AmbientDensity.current
 
     val dialog = remember(view, density) { DialogWrapper(view, density) }
-    dialog.onCloseRequest = onDismissRequest
-    remember(properties) { dialog.setProperties(properties) }
+    dialog.onDismissRequest = onDismissRequest
+    SideEffect { dialog.setProperties(properties) }
 
     onActive {
         dialog.show()
@@ -138,10 +145,11 @@ private class DialogWrapper(
      */
     ContextThemeWrapper(composeView.context, R.style.DialogWindowTheme)
 ) {
-    lateinit var onCloseRequest: () -> Unit
+    lateinit var onDismissRequest: () -> Unit
 
     private val dialogLayout: DialogLayout
     private var composition: Composition? = null
+    private var properties: AndroidDialogProperties = AndroidDialogProperties()
 
     private val maxSupportedElevation = 30.dp
 
@@ -209,15 +217,13 @@ private class DialogWrapper(
         )
     }
 
-    fun setProperties(properties: DialogProperties?) {
-        if (properties != null && properties is AndroidDialogProperties) {
-            setSecureFlagEnabled(
-                properties.securePolicy
-                    .shouldApplySecureFlag(composeView.isFlagSecureEnabled())
-            )
-        } else {
-            setSecureFlagEnabled(composeView.isFlagSecureEnabled())
+    fun setProperties(newProperties: DialogProperties?) {
+        if (newProperties is AndroidDialogProperties) {
+            properties = newProperties
         }
+        setSecureFlagEnabled(
+            properties.securePolicy.shouldApplySecureFlag(composeView.isFlagSecureEnabled())
+        )
     }
 
     fun disposeComposition() {
@@ -226,8 +232,8 @@ private class DialogWrapper(
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         val result = super.onTouchEvent(event)
-        if (result) {
-            onCloseRequest()
+        if (result && properties.dismissOnClickOutside) {
+            onDismissRequest()
         }
 
         return result
@@ -239,7 +245,9 @@ private class DialogWrapper(
     }
 
     override fun onBackPressed() {
-        onCloseRequest()
+        if (properties.dismissOnBackPress) {
+            onDismissRequest()
+        }
     }
 }
 

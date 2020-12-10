@@ -18,11 +18,10 @@ package androidx.compose.foundation.text
 
 import androidx.compose.animation.core.AnimatedFloat
 import androidx.compose.animation.core.AnimationClockObservable
-import androidx.compose.animation.core.AnimationConstants
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.keyframes
-import androidx.compose.animation.core.repeatable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -103,8 +102,7 @@ private class AnimatedFloatModel(
 }
 
 private val cursorAnimationSpec: AnimationSpec<Float>
-    get() = repeatable(
-        iterations = AnimationConstants.Infinite,
+    get() = infiniteRepeatable(
         animation = keyframes {
             durationMillis = 1000
             1f at 0

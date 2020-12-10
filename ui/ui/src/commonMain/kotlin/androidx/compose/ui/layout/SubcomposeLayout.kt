@@ -29,17 +29,15 @@ import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.materialize
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutEmitHelper
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNode.LayoutState
-import androidx.compose.ui.node.isAttached
+import androidx.compose.ui.node.MeasureBlocks
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.subcomposeInto
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.util.fastForEach
 
 /**
  * Analogue of [Layout] which allows to subcompose the actual content during the measuring stage
@@ -60,7 +58,7 @@ import androidx.compose.ui.util.fastForEach
  * @param measureBlock Measure block which provides ability to subcompose during the measuring.
  */
 @Composable
-@OptIn(ExperimentalLayoutNodeApi::class, ExperimentalComposeApi::class)
+@OptIn(ExperimentalComposeApi::class)
 fun SubcomposeLayout(
     modifier: Modifier = Modifier,
     measureBlock: SubcomposeMeasureScope.(Constraints) -> MeasureResult
@@ -79,8 +77,6 @@ fun SubcomposeLayout(
             set(AmbientLayoutDirection.current, LayoutEmitHelper.setLayoutDirection)
         }
     )
-
-    state.subcomposeIfRemeasureNotScheduled()
 }
 
 /**
@@ -102,7 +98,6 @@ interface SubcomposeMeasureScope : MeasureScope {
     fun subcompose(slotId: Any?, content: @Composable () -> Unit): List<Measurable>
 }
 
-@OptIn(ExperimentalLayoutNodeApi::class)
 private class SubcomposeLayoutState :
     SubcomposeMeasureScope,
     CompositionLifecycleObserver {
@@ -160,15 +155,6 @@ private class SubcomposeLayoutState :
         return node.children
     }
 
-    fun subcomposeIfRemeasureNotScheduled() {
-        val root = root!!
-        if (root.layoutState != LayoutState.NeedsRemeasure && root.isAttached()) {
-            root.foldedChildren.fastForEach {
-                subcompose(it, nodeToNodeState.getValue(it))
-            }
-        }
-    }
-
     private fun subcompose(node: LayoutNode, nodeState: NodeState) {
         node.ignoreModelReads {
             val content = nodeState.content
@@ -196,7 +182,7 @@ private class SubcomposeLayoutState :
 
     private fun createMeasureBlocks(
         block: SubcomposeMeasureScope.(Constraints) -> MeasureResult
-    ): LayoutNode.MeasureBlocks = object : LayoutNode.NoIntrinsicsMeasureBlocks(
+    ): MeasureBlocks = object : LayoutNode.NoIntrinsicsMeasureBlocks(
         error = "Intrinsic measurements are not currently supported by SubcomposeLayout"
     ) {
         override fun measure(

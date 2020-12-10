@@ -17,21 +17,20 @@
 package androidx.compose.ui.test.junit4
 
 import androidx.activity.ComponentActivity
+import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.text.blinkingCursorEnabled
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Recomposer
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.IdlingResource
 import androidx.compose.ui.test.InternalTestingApi
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.SemanticsNodeInteractionCollection
 import androidx.compose.ui.test.createTestContext
-import androidx.compose.ui.test.junit4.android.AndroidOwnerRegistry
-import androidx.compose.ui.test.junit4.android.FirstDrawRegistry
-import androidx.compose.ui.test.junit4.android.IdleAwaiter
-import androidx.compose.ui.test.junit4.android.registerComposeWithEspresso
-import androidx.compose.ui.test.junit4.android.unregisterComposeFromEspresso
+import androidx.compose.ui.test.junit4.android.ComposeIdlingResource
+import androidx.compose.ui.test.junit4.android.EspressoLink
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.input.textInputServiceFactory
 import androidx.compose.ui.unit.Density
@@ -141,18 +140,25 @@ internal constructor(
         activityProvider: (R) -> A
     ) : this(activityRule, activityProvider, false)
 
+    private val idlingResourceRegistry = IdlingResourceRegistry()
+    private val espressoLink = EspressoLink(idlingResourceRegistry)
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    internal val composeIdlingResource = ComposeIdlingResource().also {
+        registerIdlingResource(it)
+    }
+
     @ExperimentalTesting
     override val clockTestRule: AnimationClockTestRule =
         if (!driveClockByMonotonicFrameClock) {
-            AndroidAnimationClockTestRule()
+            AndroidAnimationClockTestRule(composeIdlingResource)
         } else {
-            MonotonicFrameClockTestRule()
+            MonotonicFrameClockTestRule(composeIdlingResource)
         }
 
     internal var disposeContentHook: (() -> Unit)? = null
 
-    private val idleAwaiter = IdleAwaiter()
-    private val testOwner = AndroidTestOwner(idleAwaiter)
+    private val testOwner = AndroidTestOwner(composeIdlingResource)
     private val testContext = createTestContext(testOwner)
 
     private var activity: A? = null
@@ -175,11 +181,14 @@ internal constructor(
         }
     }
 
-    override fun apply(base: Statement, description: Description?): Statement {
+    override fun apply(base: Statement, description: Description): Statement {
         @Suppress("NAME_SHADOWING")
         @OptIn(ExperimentalTesting::class)
         return RuleChain
-            .outerRule(clockTestRule)
+            .outerRule { base, _ -> composeIdlingResource.getStatementFor(base) }
+            .around { base, _ -> idlingResourceRegistry.getStatementFor(base) }
+            .around { base, _ -> espressoLink.getStatementFor(base) }
+            .around(clockTestRule)
             .around { base, _ -> AndroidComposeStatement(base) }
             .around(activityRule)
             .apply(base, description)
@@ -216,12 +225,12 @@ internal constructor(
     }
 
     override fun waitForIdle() {
-        idleAwaiter.waitForIdle()
+        composeIdlingResource.waitForIdle()
     }
 
     @ExperimentalTesting
     override suspend fun awaitIdle() {
-        idleAwaiter.awaitIdle()
+        composeIdlingResource.awaitIdle()
     }
 
     override fun <T> runOnUiThread(action: () -> T): T {
@@ -235,6 +244,14 @@ internal constructor(
         return runOnUiThread(action)
     }
 
+    override fun registerIdlingResource(idlingResource: IdlingResource) {
+        idlingResourceRegistry.registerIdlingResource(idlingResource)
+    }
+
+    override fun unregisterIdlingResource(idlingResource: IdlingResource) {
+        idlingResourceRegistry.unregisterIdlingResource(idlingResource)
+    }
+
     inner class AndroidComposeStatement(
         private val base: Statement
     ) : Statement() {
@@ -242,54 +259,38 @@ internal constructor(
         override fun evaluate() {
             @Suppress("DEPRECATION_ERROR")
             val oldTextInputFactory = textInputServiceFactory
-            beforeEvaluate()
             try {
+                @Suppress("DEPRECATION_ERROR")
+                blinkingCursorEnabled = false
+                @Suppress("DEPRECATION_ERROR")
+                textInputServiceFactory = {
+                    TextInputServiceForTests(it)
+                }
                 base.evaluate()
             } finally {
-                afterEvaluate()
+                @Suppress("DEPRECATION_ERROR")
+                blinkingCursorEnabled = true
                 @Suppress("DEPRECATION_ERROR")
                 textInputServiceFactory = oldTextInputFactory
-            }
-        }
-
-        @OptIn(InternalTextApi::class)
-        private fun beforeEvaluate() {
-            @Suppress("DEPRECATION_ERROR")
-            blinkingCursorEnabled = false
-            AndroidOwnerRegistry.setupRegistry()
-            FirstDrawRegistry.setupRegistry()
-            registerComposeWithEspresso()
-            @Suppress("DEPRECATION_ERROR")
-            textInputServiceFactory = {
-                TextInputServiceForTests(it)
-            }
-        }
-
-        @OptIn(InternalTextApi::class)
-        private fun afterEvaluate() {
-            @Suppress("DEPRECATION_ERROR")
-            blinkingCursorEnabled = true
-            AndroidOwnerRegistry.tearDownRegistry()
-            FirstDrawRegistry.tearDownRegistry()
-            unregisterComposeFromEspresso()
-            // Dispose the content
-            if (disposeContentHook != null) {
-                runOnUiThread {
-                    // NOTE: currently, calling dispose after an exception that happened during
-                    // composition is not a safe call. Compose runtime should fix this, and then
-                    // this call will be okay. At the moment, however, calling this could
-                    // itself produce an exception which will then obscure the original
-                    // exception. To fix this, we will just wrap this call in a try/catch of
-                    // its own
-                    try {
-                        disposeContentHook!!()
-                    } catch (e: Exception) {
-                        // ignore
+                // Dispose the content
+                if (disposeContentHook != null) {
+                    runOnUiThread {
+                        // NOTE: currently, calling dispose after an exception that happened during
+                        // composition is not a safe call. Compose runtime should fix this, and then
+                        // this call will be okay. At the moment, however, calling this could
+                        // itself produce an exception which will then obscure the original
+                        // exception. To fix this, we will just wrap this call in a try/catch of
+                        // its own
+                        try {
+                            disposeContentHook!!()
+                        } catch (e: Exception) {
+                            // ignore
+                        }
+                        disposeContentHook = null
                     }
-                    disposeContentHook = null
                 }
+                activity = null
             }
-            activity = null
         }
     }
 

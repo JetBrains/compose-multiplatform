@@ -26,7 +26,6 @@ import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
 
-@OptIn(ExperimentalLayoutNodeApi::class)
 internal class ModifiedLayoutNode(
     wrapped: LayoutNodeWrapper,
     modifier: LayoutModifier
@@ -67,7 +66,7 @@ internal class ModifiedLayoutNode(
         }
         // Place our wrapped to obtain their position inside ourselves.
         isShallowPlacing = true
-        placeAt(this.position, zIndex = 0f, null)
+        placeAt(this.position, this.zIndex, this.layerBlock)
         isShallowPlacing = false
         return if (line is HorizontalAlignmentLine) {
             positionInWrapped + wrapped.position.y

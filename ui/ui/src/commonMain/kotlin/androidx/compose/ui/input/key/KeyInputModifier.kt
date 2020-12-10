@@ -21,18 +21,71 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.node.ModifiedKeyInputNode
 import androidx.compose.ui.platform.debugInspectorInfo
 
+// TODO(b/175156387): Remove this modifier after Alpha09
 /**
  * Adding this [modifier][Modifier] to the [modifier][Modifier] parameter of a component will
  * allow it to intercept hardware key events.
  *
  * @param onKeyEvent This callback is invoked when the user interacts with the hardware keyboard.
  * While implementing this callback, return true to stop propagation of this event. If you return
- * false, the key event will be sent to this [keyInputFilter]'s parent.
+ * false, the key event will be sent to this [KeyInputModifier]'s parent.
  */
-@ExperimentalKeyInput
+@Deprecated(
+    message = "Use Modifier.onKeyEvent() instead",
+    replaceWith = ReplaceWith(
+        "onKeyEvent(onKeyEvent)",
+        "androidx.compose.ui.input.key.onKeyEvent"
+    ),
+    level = DeprecationLevel.ERROR
+)
 fun Modifier.keyInputFilter(onKeyEvent: (KeyEvent) -> Boolean): Modifier = composed(
     inspectorInfo = debugInspectorInfo {
         name = "keyInputFilter"
+        properties["onKeyEvent"] = onKeyEvent
+    }
+) {
+    KeyInputModifier(onKeyEvent = onKeyEvent, onPreviewKeyEvent = null)
+}
+
+// TODO(b/175156387): Remove this modifier after Alpha09
+/**
+ * Adding this [modifier][Modifier] to the [modifier][Modifier] parameter of a component will
+ * allow it to intercept hardware key events.
+ *
+ * @param onPreviewKeyEvent This callback is invoked when the user interacts with the hardware
+ * keyboard. It gives ancestors of a focused component the chance to intercept a [KeyEvent].
+ * Return true to stop propagation of this event. If you return false, the key event will be sent
+ * to this [previewKeyInputFilter]'s child. If none of the children consume the event, it will be
+ * sent back up to the root [KeyInputModifier] using the onKeyEvent callback.
+ */
+@Deprecated(
+    message = "Use Modifier.onPreviewKeyEvent() instead",
+    replaceWith = ReplaceWith(
+        "onPreviewKeyEvent(onPreviewKeyEvent)",
+        "androidx.compose.ui.input.key.onPreviewKeyEvent"
+    ),
+    level = DeprecationLevel.ERROR
+)
+fun Modifier.previewKeyInputFilter(onPreviewKeyEvent: (KeyEvent) -> Boolean): Modifier = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "previewKeyInputFilter"
+        properties["onPreviewKeyEvent"] = onPreviewKeyEvent
+    }
+) {
+    KeyInputModifier(onKeyEvent = null, onPreviewKeyEvent = onPreviewKeyEvent)
+}
+
+/**
+ * Adding this [modifier][Modifier] to the [modifier][Modifier] parameter of a component will
+ * allow it to intercept hardware key events.
+ *
+ * @param onKeyEvent This callback is invoked when the user interacts with the hardware keyboard.
+ * While implementing this callback, return true to stop propagation of this event. If you return
+ * false, the key event will be sent to this [onKeyEvent]'s parent.
+ */
+fun Modifier.onKeyEvent(onKeyEvent: (KeyEvent) -> Boolean): Modifier = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "onKeyEvent"
         properties["onKeyEvent"] = onKeyEvent
     }
 ) {
@@ -46,20 +99,18 @@ fun Modifier.keyInputFilter(onKeyEvent: (KeyEvent) -> Boolean): Modifier = compo
  * @param onPreviewKeyEvent This callback is invoked when the user interacts with the hardware
  * keyboard. It gives ancestors of a focused component the chance to intercept a [KeyEvent].
  * Return true to stop propagation of this event. If you return false, the key event will be sent
- * to this [previewKeyInputFilter]'s child. If none of the children consume the event, it will be
- * sent back up to the root [keyInputFilter] using the onKeyEvent callback.
+ * to this [onPreviewKeyEvent]'s child. If none of the children consume the event, it will be
+ * sent back up to the root [KeyInputModifier] using the onKeyEvent callback.
  */
-@ExperimentalKeyInput
-fun Modifier.previewKeyInputFilter(onPreviewKeyEvent: (KeyEvent) -> Boolean): Modifier = composed(
+fun Modifier.onPreviewKeyEvent(onPreviewKeyEvent: (KeyEvent) -> Boolean): Modifier = composed(
     inspectorInfo = debugInspectorInfo {
-        name = "previewKeyInputFilter"
+        name = "onPreviewKeyEvent"
         properties["onPreviewKeyEvent"] = onPreviewKeyEvent
     }
 ) {
     KeyInputModifier(onKeyEvent = null, onPreviewKeyEvent = onPreviewKeyEvent)
 }
 
-@OptIn(ExperimentalKeyInput::class)
 internal class KeyInputModifier(
     val onKeyEvent: ((KeyEvent) -> Boolean)?,
     val onPreviewKeyEvent: ((KeyEvent) -> Boolean)?

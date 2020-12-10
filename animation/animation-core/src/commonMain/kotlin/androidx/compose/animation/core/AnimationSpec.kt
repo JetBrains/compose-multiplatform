@@ -28,8 +28,13 @@ object AnimationConstants {
     const val DefaultDurationMillis: Int = 300
 
     /**
-     * Used as a iterations count for [VectorizedRepeatableSpec] to create an infinity repeating animation.
+     * Used as a iterations count for [VectorizedRepeatableSpec] to create an infinity repeating
+     * animation.
      */
+    @Deprecated(
+        "Using Infinite to specify repeatable animation iterations has been " +
+            "deprecated. Please use [InfiniteRepeatableSpec] or [infiniteRepeatable] instead."
+    )
     const val Infinite: Int = Int.MAX_VALUE
 }
 
@@ -62,6 +67,19 @@ interface AnimationSpec<T> {
     fun <V : AnimationVector> vectorize(
         converter: TwoWayConverter<T, V>
     ): VectorizedAnimationSpec<V>
+}
+
+/**
+ * [FiniteAnimationSpec] is the interface that all non-infinite [AnimationSpec]s implement,
+ * including: [TweenSpec], [SpringSpec], [KeyframesSpec], [RepeatableSpec], [SnapSpec], etc. By
+ * definition, [InfiniteRepeatableSpec] __does not__ implement this interface.
+ *
+ * @see [InfiniteRepeatableSpec]
+ */
+interface FiniteAnimationSpec<T> : AnimationSpec<T> {
+    override fun <V : AnimationVector> vectorize(
+        converter: TwoWayConverter<T, V>
+    ): VectorizedFiniteAnimationSpec<V>
 }
 
 /**
@@ -100,7 +118,7 @@ class TweenSpec<T>(
  *  [TweenSpec], and [SnapSpec]. These duration based specs can repeated when put into a
  *  [RepeatableSpec].
  */
-interface DurationBasedAnimationSpec<T> : AnimationSpec<T> {
+interface DurationBasedAnimationSpec<T> : FiniteAnimationSpec<T> {
     override fun <V : AnimationVector> vectorize(converter: TwoWayConverter<T, V>):
         VectorizedDurationBasedAnimationSpec<V>
 }
@@ -114,12 +132,13 @@ interface DurationBasedAnimationSpec<T> : AnimationSpec<T> {
  * @param stiffness stiffness of the spring. [Spring.StiffnessMedium] by default.
  * @param visibilityThreshold specifies the visibility threshold
  */
+// TODO: annotate damping/stiffness with FloatRange
 @Immutable
 class SpringSpec<T>(
     val dampingRatio: Float = Spring.DampingRatioNoBouncy,
     val stiffness: Float = Spring.StiffnessMedium,
     val visibilityThreshold: T? = null
-) : AnimationSpec<T> {
+) : FiniteAnimationSpec<T> {
 
     override fun <V : AnimationVector> vectorize(converter: TwoWayConverter<T, V>) =
         VectorizedSpringSpec(dampingRatio, stiffness, converter.convert(visibilityThreshold))
@@ -146,14 +165,18 @@ private fun <T, V : AnimationVector> TwoWayConverter<T, V>.convert(data: T?): V?
 }
 
 /**
- * [RepeatableSpec] takes another [DurationBasedAnimationSpec] and plays it [iterations] times.
+ * [RepeatableSpec] takes another [DurationBasedAnimationSpec] and plays it [iterations] times. For
+ * creating infinitely repeating animation spec, consider using [InfiniteRepeatableSpec].
  *
  * __Note__: When repeating in the [RepeatMode.Reverse] mode, it's highly recommended to have an
- * __odd__ number of iterations, or [AnimationConstants.Infinite] iterations. Otherwise, the
- * animation may jump to the end value when it finishes the last iteration.
+ * __odd__ number of iterations. Otherwise, the animation may jump to the end value when it finishes
+ * the last iteration.
  *
- * @param iterations the count of iterations. Should be at least 1. [AnimationConstants.Infinite]
- *                   can be used to have an infinity repeating animation.
+ * @see repeatable
+ * @see InfiniteRepeatableSpec
+ * @see infiniteRepeatable
+ *
+ * @param iterations the count of iterations. Should be at least 1.
  * @param animation the [AnimationSpec] to be repeated
  * @param repeatMode whether animation should repeat by starting from the beginning (i.e.
  *                  [RepeatMode.Restart]) or from the end (i.e. [RepeatMode.Reverse])
@@ -163,10 +186,10 @@ class RepeatableSpec<T>(
     val iterations: Int,
     val animation: DurationBasedAnimationSpec<T>,
     val repeatMode: RepeatMode = RepeatMode.Restart
-) : AnimationSpec<T> {
+) : FiniteAnimationSpec<T> {
     override fun <V : AnimationVector> vectorize(
         converter: TwoWayConverter<T, V>
-    ): VectorizedAnimationSpec<V> {
+    ): VectorizedFiniteAnimationSpec<V> {
         return VectorizedRepeatableSpec(iterations, animation.vectorize(converter), repeatMode)
     }
 
@@ -181,6 +204,42 @@ class RepeatableSpec<T>(
 
     override fun hashCode(): Int {
         return (iterations * 31 + animation.hashCode()) * 31 + repeatMode.hashCode()
+    }
+}
+
+/**
+ * [InfiniteRepeatableSpec] repeats the provided [animation] infinite amount of times. It will
+ * never naturally finish. This means the animation will only be stopped via some form of manual
+ * cancellation. When used with transition or other animation composables, the infinite animations
+ * will stop when the composable is removed from the compose tree.
+ *
+ * For non-infinite repeating animations, consider [RepeatableSpec].
+ *
+ * @param animation the [AnimationSpec] to be repeated
+ * @param repeatMode whether animation should repeat by starting from the beginning (i.e.
+ *                  [RepeatMode.Restart]) or from the end (i.e. [RepeatMode.Reverse])
+ * @see infiniteRepeatable
+ */
+// TODO: Consider supporting repeating spring specs
+class InfiniteRepeatableSpec<T>(
+    val animation: DurationBasedAnimationSpec<T>,
+    val repeatMode: RepeatMode = RepeatMode.Restart
+) : AnimationSpec<T> {
+    override fun <V : AnimationVector> vectorize(
+        converter: TwoWayConverter<T, V>
+    ): VectorizedAnimationSpec<V> {
+        return VectorizedInfiniteRepeatableSpec(animation.vectorize(converter), repeatMode)
+    }
+
+    override fun equals(other: Any?): Boolean =
+        if (other is RepeatableSpec<*>) {
+            other.animation == this.animation && other.repeatMode == this.repeatMode
+        } else {
+            false
+        }
+
+    override fun hashCode(): Int {
+        return animation.hashCode() * 31 + repeatMode.hashCode()
     }
 }
 
@@ -207,7 +266,7 @@ enum class RepeatMode {
  *              starts. Defaults to 0.
  */
 @Immutable
-class SnapSpec<T>(val delay: Int = 0) : AnimationSpec<T> {
+class SnapSpec<T>(val delay: Int = 0) : DurationBasedAnimationSpec<T> {
     override fun <V : AnimationVector> vectorize(
         converter: TwoWayConverter<T, V>
     ): VectorizedDurationBasedAnimationSpec<V> = VectorizedSnapSpec(delay)

@@ -32,19 +32,6 @@ internal expect fun identityHashCode(instance: Any?): Int
 
 internal expect inline fun <R> synchronized(lock: Any, block: () -> R): R
 
-expect open class WeakReference<T> : Reference<T> {
-    constructor(referent: T)
-    constructor(referent: T, q: ReferenceQueue<in T>?)
-}
-
-expect abstract class Reference<T> {
-    open fun get(): T?
-}
-
-expect open class ReferenceQueue<T>() {
-    open fun poll(): Reference<out T>?
-}
-
 expect class AtomicReference<V>(value: V) {
     fun get(): V
     fun set(value: V)

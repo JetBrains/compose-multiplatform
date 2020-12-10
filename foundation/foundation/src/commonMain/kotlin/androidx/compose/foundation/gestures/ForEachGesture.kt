@@ -15,8 +15,7 @@
  */
 package androidx.compose.foundation.gestures
 
-import androidx.compose.ui.gesture.ExperimentalPointerInput
-import androidx.compose.ui.input.pointer.HandlePointerInputScope
+import androidx.compose.ui.input.pointer.AwaitPointerEventScope
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.util.fastAny
@@ -37,7 +36,6 @@ class GestureCancellationException(message: String? = null) : CancellationExcept
  * exits if [isActive] is `false`.
  */
 @OptIn(InternalCoroutinesApi::class, ExperimentalStdlibApi::class)
-@ExperimentalPointerInput
 suspend fun PointerInputScope.forEachGesture(block: suspend PointerInputScope.() -> Unit) {
     while (isActive) {
         try {
@@ -59,22 +57,20 @@ suspend fun PointerInputScope.forEachGesture(block: suspend PointerInputScope.()
  * Returns `true` if the current state of the pointer events has all pointers up and `false`
  * if any of the pointers are down.
  */
-@ExperimentalPointerInput
-internal fun HandlePointerInputScope.allPointersUp(): Boolean = !currentPointers.fastAny { it.down }
+internal fun AwaitPointerEventScope.allPointersUp(): Boolean =
+    !currentEvent.changes.fastAny { it.current.down }
 
 /**
  * Waits for all pointers to be up before returning.
  */
-@ExperimentalPointerInput
 internal suspend fun PointerInputScope.awaitAllPointersUp() {
-    handlePointerInput { awaitAllPointersUp() }
+    awaitPointerEventScope { awaitAllPointersUp() }
 }
 
 /**
  * Waits for all pointers to be up before returning.
  */
-@ExperimentalPointerInput
-internal suspend fun HandlePointerInputScope.awaitAllPointersUp() {
+internal suspend fun AwaitPointerEventScope.awaitAllPointersUp() {
     if (!allPointersUp()) {
         do {
             val events = awaitPointerEvent(PointerEventPass.Final)

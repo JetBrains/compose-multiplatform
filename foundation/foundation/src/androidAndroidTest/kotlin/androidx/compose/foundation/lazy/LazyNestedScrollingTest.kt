@@ -16,12 +16,14 @@
 
 package androidx.compose.foundation.lazy
 
-import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberScrollableController
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.gesture.TouchSlop
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.down
@@ -34,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -46,21 +49,33 @@ class LazyNestedScrollingTest {
     @get:Rule
     val rule = createComposeRule()
 
+    var expectedDragOffset = Float.MAX_VALUE
+
+    @Before
+    fun test() {
+        expectedDragOffset = with(rule.density) {
+            TouchSlop.toPx() + 20
+        }
+    }
+
     @Test
     fun column_nestedScrollingBackwardInitially() {
         val items = (1..3).toList()
         var draggedOffset = 0f
         rule.setContent {
             Box(
-                Modifier.draggable(Orientation.Vertical) {
-                    draggedOffset += it
-                }
+                Modifier.scrollable(
+                    orientation = Orientation.Vertical,
+                    controller = rememberScrollableController {
+                        draggedOffset += it
+                        it
+                    }
+                )
             ) {
-                LazyColumnFor(
-                    items = items,
-                    modifier = Modifier.size(100.dp).testTag(LazyTag)
-                ) {
-                    Spacer(Modifier.size(50.dp).testTag("$it"))
+                LazyColumn(Modifier.size(100.dp).testTag(LazyTag)) {
+                    items(items) {
+                        Spacer(Modifier.size(50.dp).testTag("$it"))
+                    }
                 }
             }
         }
@@ -83,15 +98,18 @@ class LazyNestedScrollingTest {
         var draggedOffset = 0f
         rule.setContent {
             Box(
-                Modifier.draggable(Orientation.Vertical) {
-                    draggedOffset += it
-                }
+                Modifier.scrollable(
+                    orientation = Orientation.Vertical,
+                    controller = rememberScrollableController {
+                        draggedOffset += it
+                        it
+                    }
+                )
             ) {
-                LazyColumnFor(
-                    items = items,
-                    modifier = Modifier.size(100.dp).testTag(LazyTag)
-                ) {
-                    Spacer(Modifier.size(50.dp).testTag("$it"))
+                LazyColumn(Modifier.size(100.dp).testTag(LazyTag)) {
+                    items(items) {
+                        Spacer(Modifier.size(50.dp).testTag("$it"))
+                    }
                 }
             }
         }
@@ -109,12 +127,12 @@ class LazyNestedScrollingTest {
             .performGesture {
                 draggedOffset = 0f
                 down(Offset(x = 10f, y = 10f))
-                moveBy(Offset(x = 0f, y = 50f))
+                moveBy(Offset(x = 0f, y = expectedDragOffset))
                 up()
             }
 
         rule.runOnIdle {
-            Truth.assertThat(draggedOffset).isEqualTo(50f)
+            Truth.assertThat(draggedOffset).isEqualTo(expectedDragOffset)
         }
     }
 
@@ -124,15 +142,18 @@ class LazyNestedScrollingTest {
         var draggedOffset = 0f
         rule.setContent {
             Box(
-                Modifier.draggable(Orientation.Vertical) {
-                    draggedOffset += it
-                }
+                Modifier.scrollable(
+                    orientation = Orientation.Vertical,
+                    controller = rememberScrollableController {
+                        draggedOffset += it
+                        it
+                    }
+                )
             ) {
-                LazyColumnFor(
-                    items = items,
-                    modifier = Modifier.size(100.dp).testTag(LazyTag)
-                ) {
-                    Spacer(Modifier.size(40.dp).testTag("$it"))
+                LazyColumn(Modifier.size(100.dp).testTag(LazyTag)) {
+                    items(items) {
+                        Spacer(Modifier.size(40.dp).testTag("$it"))
+                    }
                 }
             }
         }
@@ -140,12 +161,12 @@ class LazyNestedScrollingTest {
         rule.onNodeWithTag(LazyTag)
             .performGesture {
                 down(Offset(x = 10f, y = 10f))
-                moveBy(Offset(x = 0f, y = -50f))
+                moveBy(Offset(x = 0f, y = -expectedDragOffset))
                 up()
             }
 
         rule.runOnIdle {
-            Truth.assertThat(draggedOffset).isEqualTo(-50f)
+            Truth.assertThat(draggedOffset).isEqualTo(-expectedDragOffset)
         }
     }
 
@@ -155,15 +176,18 @@ class LazyNestedScrollingTest {
         var draggedOffset = 0f
         rule.setContent {
             Box(
-                Modifier.draggable(Orientation.Vertical) {
-                    draggedOffset += it
-                }
+                Modifier.scrollable(
+                    orientation = Orientation.Vertical,
+                    controller = rememberScrollableController {
+                        draggedOffset += it
+                        it
+                    }
+                )
             ) {
-                LazyColumnFor(
-                    items = items,
-                    modifier = Modifier.size(100.dp).testTag(LazyTag)
-                ) {
-                    Spacer(Modifier.size(50.dp).testTag("$it"))
+                LazyColumn(Modifier.size(100.dp).testTag(LazyTag)) {
+                    items(items) {
+                        Spacer(Modifier.size(50.dp).testTag("$it"))
+                    }
                 }
             }
         }
@@ -176,12 +200,12 @@ class LazyNestedScrollingTest {
             .performGesture {
                 draggedOffset = 0f
                 down(Offset(x = 10f, y = 10f))
-                moveBy(Offset(x = 0f, y = -50f))
+                moveBy(Offset(x = 0f, y = -expectedDragOffset))
                 up()
             }
 
         rule.runOnIdle {
-            Truth.assertThat(draggedOffset).isEqualTo(-50f)
+            Truth.assertThat(draggedOffset).isEqualTo(-expectedDragOffset)
         }
     }
 
@@ -191,15 +215,20 @@ class LazyNestedScrollingTest {
         var draggedOffset = 0f
         rule.setContent {
             Box(
-                Modifier.draggable(Orientation.Horizontal) {
-                    draggedOffset += it
-                }
+                Modifier.scrollable(
+                    orientation = Orientation.Horizontal,
+                    controller = rememberScrollableController {
+                        draggedOffset += it
+                        it
+                    }
+                )
             ) {
-                LazyRowFor(
-                    items = items,
+                LazyRow(
                     modifier = Modifier.size(100.dp).testTag(LazyTag)
                 ) {
-                    Spacer(Modifier.size(50.dp).testTag("$it"))
+                    items(items) {
+                        Spacer(Modifier.size(50.dp).testTag("$it"))
+                    }
                 }
             }
         }
@@ -207,12 +236,12 @@ class LazyNestedScrollingTest {
         rule.onNodeWithTag(LazyTag)
             .performGesture {
                 down(Offset(x = 10f, y = 10f))
-                moveBy(Offset(x = 100f, y = 0f))
+                moveBy(Offset(x = expectedDragOffset, y = 0f))
                 up()
             }
 
         rule.runOnIdle {
-            Truth.assertThat(draggedOffset).isEqualTo(100f)
+            Truth.assertThat(draggedOffset).isEqualTo(expectedDragOffset)
         }
     }
 
@@ -222,15 +251,20 @@ class LazyNestedScrollingTest {
         var draggedOffset = 0f
         rule.setContent {
             Box(
-                Modifier.draggable(Orientation.Horizontal) {
-                    draggedOffset += it
-                }
+                Modifier.scrollable(
+                    orientation = Orientation.Horizontal,
+                    controller = rememberScrollableController {
+                        draggedOffset += it
+                        it
+                    }
+                )
             ) {
-                LazyRowFor(
-                    items = items,
+                LazyRow(
                     modifier = Modifier.size(100.dp).testTag(LazyTag)
                 ) {
-                    Spacer(Modifier.size(50.dp).testTag("$it"))
+                    items(items) {
+                        Spacer(Modifier.size(50.dp).testTag("$it"))
+                    }
                 }
             }
         }
@@ -248,12 +282,12 @@ class LazyNestedScrollingTest {
             .performGesture {
                 draggedOffset = 0f
                 down(Offset(x = 10f, y = 10f))
-                moveBy(Offset(x = 50f, y = 0f))
+                moveBy(Offset(x = expectedDragOffset, y = 0f))
                 up()
             }
 
         rule.runOnIdle {
-            Truth.assertThat(draggedOffset).isEqualTo(50f)
+            Truth.assertThat(draggedOffset).isEqualTo(expectedDragOffset)
         }
     }
 
@@ -263,15 +297,20 @@ class LazyNestedScrollingTest {
         var draggedOffset = 0f
         rule.setContent {
             Box(
-                Modifier.draggable(Orientation.Horizontal) {
-                    draggedOffset += it
-                }
+                Modifier.scrollable(
+                    orientation = Orientation.Horizontal,
+                    controller = rememberScrollableController {
+                        draggedOffset += it
+                        it
+                    }
+                )
             ) {
-                LazyRowFor(
-                    items = items,
+                LazyRow(
                     modifier = Modifier.size(100.dp).testTag(LazyTag)
                 ) {
-                    Spacer(Modifier.size(40.dp).testTag("$it"))
+                    items(items) {
+                        Spacer(Modifier.size(40.dp).testTag("$it"))
+                    }
                 }
             }
         }
@@ -279,12 +318,12 @@ class LazyNestedScrollingTest {
         rule.onNodeWithTag(LazyTag)
             .performGesture {
                 down(Offset(x = 10f, y = 10f))
-                moveBy(Offset(x = -50f, y = 0f))
+                moveBy(Offset(x = -expectedDragOffset, y = 0f))
                 up()
             }
 
         rule.runOnIdle {
-            Truth.assertThat(draggedOffset).isEqualTo(-50f)
+            Truth.assertThat(draggedOffset).isEqualTo(-expectedDragOffset)
         }
     }
 
@@ -294,15 +333,20 @@ class LazyNestedScrollingTest {
         var draggedOffset = 0f
         rule.setContent {
             Box(
-                Modifier.draggable(Orientation.Horizontal) {
-                    draggedOffset += it
-                }
+                Modifier.scrollable(
+                    orientation = Orientation.Horizontal,
+                    controller = rememberScrollableController {
+                        draggedOffset += it
+                        it
+                    }
+                )
             ) {
-                LazyRowFor(
-                    items = items,
+                LazyRow(
                     modifier = Modifier.size(100.dp).testTag(LazyTag)
                 ) {
-                    Spacer(Modifier.size(50.dp).testTag("$it"))
+                    items(items) {
+                        Spacer(Modifier.size(50.dp).testTag("$it"))
+                    }
                 }
             }
         }
@@ -315,12 +359,12 @@ class LazyNestedScrollingTest {
             .performGesture {
                 draggedOffset = 0f
                 down(Offset(x = 10f, y = 10f))
-                moveBy(Offset(x = -50f, y = 0f))
+                moveBy(Offset(x = -expectedDragOffset, y = 0f))
                 up()
             }
 
         rule.runOnIdle {
-            Truth.assertThat(draggedOffset).isEqualTo(-50f)
+            Truth.assertThat(draggedOffset).isEqualTo(-expectedDragOffset)
         }
     }
 }

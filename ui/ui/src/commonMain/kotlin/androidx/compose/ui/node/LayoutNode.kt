@@ -17,19 +17,15 @@ package androidx.compose.ui.node
 
 import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
-import androidx.compose.ui.ContentDrawScope
-import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.FocusModifier
-import androidx.compose.ui.FocusObserverModifier
 import androidx.compose.ui.FocusRequesterModifier
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.ExperimentalFocus
+import androidx.compose.ui.draw.DrawModifier
+import androidx.compose.ui.focus.FocusEventModifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.gesture.nestedscroll.NestedScrollDelegatingWrapper
+import androidx.compose.ui.gesture.nestedscroll.NestedScrollModifier
 import androidx.compose.ui.graphics.Canvas
-import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.input.key.KeyInputModifier
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
@@ -38,10 +34,12 @@ import androidx.compose.ui.layout.HorizontalAlignmentLine
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.LayoutInfo
 import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.layout.ModifierInfo
 import androidx.compose.ui.layout.OnGloballyPositionedModifier
 import androidx.compose.ui.layout.OnRemeasuredModifier
 import androidx.compose.ui.layout.ParentDataModifier
@@ -78,14 +76,9 @@ internal val sharedDrawScope = LayoutNodeDrawScope()
 /**
  * An element in the layout hierarchy, built with compose UI.
  */
-@ExperimentalLayoutNodeApi
-@OptIn(
-    ExperimentalFocus::class,
-    ExperimentalLayoutNodeApi::class
-)
-class LayoutNode : Measurable, Remeasurement, OwnerScope {
+class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
 
-    constructor() : this(false)
+    internal constructor() : this(false)
 
     internal constructor(isVirtual: Boolean) {
         this.isVirtual = isVirtual
@@ -133,7 +126,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
             unfoldedVirtualChildrenListDirty = true
         }
         if (isVirtual) {
-            parent?.unfoldedVirtualChildrenListDirty = true
+            this.parent?.unfoldedVirtualChildrenListDirty = true
         }
     }
 
@@ -148,13 +141,13 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
     /**
      * The children of this LayoutNode, controlled by [insertAt], [move], and [removeAt].
      */
-    val children: List<LayoutNode> get() = _children.asMutableList()
+    internal val children: List<LayoutNode> get() = _children.asMutableList()
 
     /**
-     * The parent node in the LayoutNode hierarchy. This is `null` when the `LayoutNode`
-     * is attached (has an [owner]) and is the root of the tree or has not had [add] called for it.
+     * The parent node in the LayoutNode hierarchy. This is `null` when the [LayoutNode]
+     * is not attached attached to a hierarchy or is the root of the hierarchy.
      */
-    var parent: LayoutNode? = null
+    internal var parent: LayoutNode? = null
         get() {
             val parent = field
             return if (parent != null && parent.isVirtual) parent.parent else parent
@@ -164,13 +157,19 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
     /**
      * The view system [Owner]. This `null` until [attach] is called
      */
-    var owner: Owner? = null
+    internal var owner: Owner? = null
         private set
 
     /**
-     * The tree depth of the LayoutNode. This is valid only when [owner] is not `null`.
+     * Returns true if this [LayoutNode] currently has an [LayoutNode.owner].  Semantically,
+     * this means that the LayoutNode is currently a part of a component tree.
      */
-    var depth: Int = 0
+    override val isAttached: Boolean get() = owner != null
+
+    /**
+     * The tree depth of the [LayoutNode]. This is valid only when it is attached to a hierarchy.
+     */
+    internal var depth: Int = 0
 
     /**
      * The layout state the node is currently in.
@@ -189,7 +188,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
      * Inserts a child [LayoutNode] at a particular index. If this LayoutNode [owner] is not `null`
      * then [instance] will become [attach]ed also. [instance] must have a `null` [parent].
      */
-    fun insertAt(index: Int, instance: LayoutNode) {
+    internal fun insertAt(index: Int, instance: LayoutNode) {
         check(instance.parent == null) {
             "Cannot insert $instance because it already has a parent"
         }
@@ -222,7 +221,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
     /**
      * Removes one or more children, starting at [index].
      */
-    fun removeAt(index: Int, count: Int) {
+    internal fun removeAt(index: Int, count: Int) {
         require(count >= 0) {
             "count ($count) must be greater than 0"
         }
@@ -249,7 +248,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
     /**
      * Removes all children.
      */
-    fun removeAll() {
+    internal fun removeAll() {
         val attached = owner != null
         for (i in _foldedChildren.size - 1 downTo 0) {
             val child = _foldedChildren[i]
@@ -272,7 +271,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
      * were LayoutNodes A B C D E, calling `move(1, 3, 1)` would result in the LayoutNodes
      * being reordered to A C B D E.
      */
-    fun move(from: Int, to: Int, count: Int) {
+    internal fun move(from: Int, to: Int, count: Int) {
         if (from == to) {
             return // nothing to do
         }
@@ -299,11 +298,11 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
      * Set the [Owner] of this LayoutNode. This LayoutNode must not already be attached.
      * [owner] must match its [parent].[owner].
      */
-    fun attach(owner: Owner) {
+    internal fun attach(owner: Owner) {
         check(this.owner == null) {
             "Cannot attach $this as it already is attached"
         }
-        val parent = parent
+        val parent = this.parent
         check(parent == null || parent.owner == owner) {
             "Attaching to a different owner($owner) than the parent's owner(${parent?.owner})"
         }
@@ -327,7 +326,6 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
         parent?.requestRemeasure()
         innerLayoutNodeWrapper.attach()
         forEachDelegate { it.attach() }
-        updateInnerLayerWrapper()
         onAttach?.invoke(owner)
     }
 
@@ -336,15 +334,15 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
      * and its [parent]'s [owner] must be `null` before calling this. This will also [detach] all
      * children. After executing, the [owner] will be `null`.
      */
-    fun detach() {
+    internal fun detach() {
         val owner = owner
         checkNotNull(owner) {
             "Cannot detach node that is already detached!"
         }
-        val parentLayoutNode = parent
-        if (parentLayoutNode != null) {
-            parentLayoutNode.invalidateLayer()
-            parentLayoutNode.requestRemeasure()
+        val parent = this.parent
+        if (parent != null) {
+            parent.invalidateLayer()
+            parent.requestRemeasure()
         }
         alignmentLinesQueryOwner = null
         alignmentUsageByParent = UsageByParent.NotUsed
@@ -357,7 +355,6 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
         }
         owner.onDetach(this)
         this.owner = null
-        _innerLayerWrapper = null
         depth = 0
         _foldedChildren.forEach { child ->
             child.detach()
@@ -389,7 +386,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
         }
 
     override val isValid: Boolean
-        get() = isAttached()
+        get() = isAttached
 
     override fun toString(): String {
         return "${simpleIdentityToString(this, null)} children: ${children.size} " +
@@ -420,55 +417,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
         return tree.toString()
     }
 
-    interface MeasureBlocks {
-        /**
-         * The function used to measure the child. It must call [MeasureScope.layout] before
-         * completing.
-         */
-        fun measure(
-            measureScope: MeasureScope,
-            measurables: List<Measurable>,
-            constraints: Constraints
-        ): MeasureResult
-
-        /**
-         * The function used to calculate [IntrinsicMeasurable.minIntrinsicWidth].
-         */
-        fun minIntrinsicWidth(
-            intrinsicMeasureScope: IntrinsicMeasureScope,
-            measurables: List<IntrinsicMeasurable>,
-            h: Int
-        ): Int
-
-        /**
-         * The lambda used to calculate [IntrinsicMeasurable.minIntrinsicHeight].
-         */
-        fun minIntrinsicHeight(
-            intrinsicMeasureScope: IntrinsicMeasureScope,
-            measurables: List<IntrinsicMeasurable>,
-            w: Int
-        ): Int
-
-        /**
-         * The function used to calculate [IntrinsicMeasurable.maxIntrinsicWidth].
-         */
-        fun maxIntrinsicWidth(
-            intrinsicMeasureScope: IntrinsicMeasureScope,
-            measurables: List<IntrinsicMeasurable>,
-            h: Int
-        ): Int
-
-        /**
-         * The lambda used to calculate [IntrinsicMeasurable.maxIntrinsicHeight].
-         */
-        fun maxIntrinsicHeight(
-            intrinsicMeasureScope: IntrinsicMeasureScope,
-            measurables: List<IntrinsicMeasurable>,
-            w: Int
-        ): Int
-    }
-
-    abstract class NoIntrinsicsMeasureBlocks(private val error: String) : MeasureBlocks {
+    internal abstract class NoIntrinsicsMeasureBlocks(private val error: String) : MeasureBlocks {
         override fun minIntrinsicWidth(
             intrinsicMeasureScope: IntrinsicMeasureScope,
             measurables: List<IntrinsicMeasurable>,
@@ -497,7 +446,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
     /**
      * Blocks that define the measurement and intrinsic measurement of the layout.
      */
-    var measureBlocks: MeasureBlocks = ErrorMeasureBlocks
+    internal var measureBlocks: MeasureBlocks = ErrorMeasureBlocks
         set(value) {
             if (field != value) {
                 field = value
@@ -508,13 +457,13 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
     /**
      * The screen density to be used by this layout.
      */
-    var density: Density = Density(1f)
+    internal var density: Density = Density(1f)
 
     /**
      * The scope used to run the [MeasureBlocks.measure]
      * [MeasureBlock][androidx.compose.ui.layout.MeasureBlock].
      */
-    val measureScope: MeasureScope = object : MeasureScope, Density {
+    internal val measureScope: MeasureScope = object : MeasureScope, Density {
         override val density: Float get() = this@LayoutNode.density.density
         override val fontScale: Float get() = this@LayoutNode.density.fontScale
         override val layoutDirection: LayoutDirection get() = this@LayoutNode.layoutDirection
@@ -534,12 +483,12 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
     /**
      * The measured width of this layout and all of its [modifier]s. Shortcut for `size.width`.
      */
-    val width: Int get() = outerMeasurablePlaceable.width
+    override val width: Int get() = outerMeasurablePlaceable.width
 
     /**
      * The measured height of this layout and all of its [modifier]s. Shortcut for `size.height`.
      */
-    val height: Int get() = outerMeasurablePlaceable.height
+    override val height: Int get() = outerMeasurablePlaceable.height
 
     /**
      * The alignment lines of this layout, inherited + intrinsic
@@ -554,9 +503,9 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
     internal val mDrawScope: LayoutNodeDrawScope = sharedDrawScope
 
     /**
-     * Whether or not this LayoutNode and all of its parents have been placed in the hierarchy.
+     * Whether or not this [LayoutNode] and all of its parents have been placed in the hierarchy.
      */
-    var isPlaced = false
+    override var isPlaced: Boolean = false
         private set
 
     /**
@@ -614,7 +563,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
     private val previousAlignmentLines = mutableMapOf<AlignmentLine, Int>()
 
     @Deprecated("Temporary API to support ConstraintLayout prototyping.")
-    var canMultiMeasure: Boolean = false
+    internal var canMultiMeasure: Boolean = false
 
     internal val innerLayoutNodeWrapper: LayoutNodeWrapper = InnerPlaceable(this)
     private val outerMeasurablePlaceable = OuterMeasurablePlaceable(this, innerLayoutNodeWrapper)
@@ -633,7 +582,20 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
      * The inner-most layer wrapper. Used for performance for LayoutNodeWrapper.findLayer().
      */
     private var _innerLayerWrapper: LayoutNodeWrapper? = null
+    internal var innerLayerWrapperIsDirty = true
     internal val innerLayerWrapper: LayoutNodeWrapper? get() {
+        if (innerLayerWrapperIsDirty) {
+            var delegate: LayoutNodeWrapper? = innerLayoutNodeWrapper
+            val final = outerLayoutNodeWrapper.wrappedBy
+            _innerLayerWrapper = null
+            while (delegate != final) {
+                if (delegate?.layer != null) {
+                    _innerLayerWrapper = delegate
+                    break
+                }
+                delegate = delegate?.wrappedBy
+            }
+        }
         val layerWrapper = _innerLayerWrapper
         if (layerWrapper != null) {
             requireNotNull(layerWrapper.layer)
@@ -651,7 +613,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
         if (innerLayerWrapper != null) {
             innerLayerWrapper.invalidateLayer()
         } else {
-            val parent = parent
+            val parent = this.parent
             parent?.invalidateLayer()
         }
     }
@@ -659,7 +621,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
     /**
      * The [Modifier] currently applied to this node.
      */
-    var modifier: Modifier = Modifier
+    internal var modifier: Modifier = Modifier
         set(value) {
             if (value == field) return
             if (modifier != Modifier) {
@@ -670,10 +632,11 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
             val invalidateParentLayer = shouldInvalidateParentLayer()
 
             copyWrappersToCache()
+            markReusedModifiers(value)
 
-            // Rebuild layoutNodeWrapper
+            // Rebuild LayoutNodeWrapper
             val oldOuterWrapper = outerMeasurablePlaceable.outerWrapper
-            if (outerSemantics != null && isAttached()) {
+            if (outerSemantics != null && isAttached) {
                 owner!!.onSemanticsChange()
             }
             val addedCallback = hasNewPositioningCallback()
@@ -708,8 +671,8 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
                     if (mod is FocusModifier) {
                         wrapper = ModifiedFocusNode(wrapper, mod).assignChained(toWrap)
                     }
-                    if (mod is FocusObserverModifier) {
-                        wrapper = ModifiedFocusObserverNode(wrapper, mod).assignChained(toWrap)
+                    if (mod is FocusEventModifier) {
+                        wrapper = ModifiedFocusEventNode(wrapper, mod).assignChained(toWrap)
                     }
                     if (mod is FocusRequesterModifier) {
                         wrapper = ModifiedFocusRequesterNode(wrapper, mod).assignChained(toWrap)
@@ -719,6 +682,9 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
                     }
                     if (mod is PointerInputModifier) {
                         wrapper = PointerInputDelegatingWrapper(wrapper, mod).assignChained(toWrap)
+                    }
+                    if (mod is NestedScrollModifier) {
+                        wrapper = NestedScrollDelegatingWrapper(wrapper, mod).assignChained(toWrap)
                     }
                     if (mod is LayoutModifier) {
                         wrapper = ModifiedLayoutNode(wrapper, mod).assignChained(toWrap)
@@ -736,13 +702,10 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
             outerWrapper.wrappedBy = parent?.innerLayoutNodeWrapper
             outerMeasurablePlaceable.outerWrapper = outerWrapper
 
-            if (isAttached()) {
+            if (isAttached) {
                 // call detach() on all removed LayoutNodeWrappers
                 wrapperCache.forEach {
                     it.detach()
-                    if (_innerLayerWrapper === it) {
-                        _innerLayerWrapper = null
-                    }
                 }
 
                 // attach() all new LayoutNodeWrappers
@@ -782,21 +745,20 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
         }
 
     /**
-     * Coordinates of just the contents of the LayoutNode, after being affected by all modifiers.
+     * Coordinates of just the contents of the [LayoutNode], after being affected by all modifiers.
      */
-    // TODO(mount): remove this
-    val coordinates: LayoutCoordinates
+    override val coordinates: LayoutCoordinates
         get() = innerLayoutNodeWrapper
 
     /**
      * Callback to be executed whenever the [LayoutNode] is attached to a new [Owner].
      */
-    var onAttach: ((Owner) -> Unit)? = null
+    internal var onAttach: ((Owner) -> Unit)? = null
 
     /**
      * Callback to be executed whenever the [LayoutNode] is detached from an [Owner].
      */
-    var onDetach: ((Owner) -> Unit)? = null
+    internal var onDetach: ((Owner) -> Unit)? = null
 
     /**
      * List of all OnPositioned callbacks in the modifier chain.
@@ -815,7 +777,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
      */
     internal var needsOnPositionedDispatch = false
 
-    fun place(x: Int, y: Int) {
+    internal fun place(x: Int, y: Int) {
         Placeable.PlacementScope.executeWithRtlMirroringValues(
             outerMeasurablePlaceable.measuredWidth,
             layoutDirection
@@ -831,7 +793,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
         outerMeasurablePlaceable.replace()
     }
 
-    fun draw(canvas: Canvas) = outerLayoutNodeWrapper.draw(canvas)
+    internal fun draw(canvas: Canvas) = outerLayoutNodeWrapper.draw(canvas)
 
     /**
      * Carries out a hit test on the [PointerInputModifier]s associated with this [LayoutNode] and
@@ -846,7 +808,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
      * @param hitPointerInputFilters The collection that the hit [PointerInputFilter]s will be
      * added to if hit.
      */
-    fun hitTest(
+    internal fun hitTest(
         pointerPositionRelativeToScreen: Offset,
         hitPointerInputFilters: MutableList<PointerInputFilter>
     ) {
@@ -857,7 +819,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
      * Returns the alignment line value for a given alignment line without affecting whether
      * the flag for whether the alignment line was read.
      */
-    fun getAlignmentLine(line: AlignmentLine): Int? {
+    internal fun getAlignmentLine(line: AlignmentLine): Int? {
         val linePos = alignmentLines[line] ?: return null
         var pos = Offset(linePos.toFloat(), linePos.toFloat())
         var wrapper = innerLayoutNodeWrapper
@@ -884,28 +846,10 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
     }
 
     /**
-     * Find the current inner layer.
-     */
-    private fun updateInnerLayerWrapper() {
-        var delegate: LayoutNodeWrapper? = innerLayoutNodeWrapper
-        val final = outerLayoutNodeWrapper.wrappedBy
-        _innerLayerWrapper = null
-        while (delegate != final) {
-            if (delegate?.layer != null) {
-                _innerLayerWrapper = delegate
-                break
-            }
-            delegate = delegate?.wrappedBy
-        }
-    }
-
-    /**
      * Invoked when the parent placed the node. It will trigger the layout.
      */
     internal fun onNodePlaced() {
         val parent = parent
-
-        updateInnerLayerWrapper()
 
         var newZIndex = innerLayoutNodeWrapper.zIndex
         forEachDelegate {
@@ -957,7 +901,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
         // as a result of the previous operation we can figure out a child has been resized
         // and we need to be remeasured, not relaid out
         if (layoutState == NeedsRelayout) {
-            layoutState = LayoutState.LayingOut
+            layoutState = LayingOut
             val owner = requireOwner()
             owner.snapshotObserver.observeLayoutSnapshotReads(this) {
                 // reset the place order counter which will be used by the children
@@ -1074,7 +1018,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
         val parent = parent
         if (parent != null) {
             if (alignmentUsageByParent == UsageByParent.InMeasureBlock &&
-                parent.layoutState != LayoutState.LayingOut
+                parent.layoutState != LayingOut
             ) {
                 parent.requestRemeasure()
             } else if (alignmentUsageByParent == UsageByParent.InLayoutBlock) {
@@ -1090,7 +1034,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
         alignmentLinesQueriedSinceLastLayout = true
         val newUsageByParent = when (parent?.layoutState) {
             Measuring -> UsageByParent.InMeasureBlock
-            LayoutState.LayingOut -> UsageByParent.InLayoutBlock
+            LayingOut -> UsageByParent.InLayoutBlock
             else -> UsageByParent.NotUsed
         }
         val newUsageHasLowerPriority = newUsageByParent == UsageByParent.InLayoutBlock &&
@@ -1137,14 +1081,14 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
     /**
      * Used to request a new measurement + layout pass from the owner.
      */
-    fun requestRemeasure() {
+    internal fun requestRemeasure() {
         owner?.onRequestMeasure(this)
     }
 
     /**
      * Used to request a new layout pass from the owner.
      */
-    fun requestRelayout() {
+    internal fun requestRelayout() {
         owner?.onRequestRelayout(this)
     }
 
@@ -1152,7 +1096,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
      * Execute your code within the [block] if you want some code to not be observed for the
      * model reads even if you are currently inside some observed scope like measuring.
      */
-    fun ignoreModelReads(block: () -> Unit) {
+    internal fun ignoreModelReads(block: () -> Unit) {
         requireOwner().snapshotObserver.pauseSnapshotReadObservation(block)
     }
 
@@ -1171,7 +1115,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
      * that may be useful. This is used for tooling to retrieve layout modifier and layer
      * information.
      */
-    fun getModifierInfo(): List<ModifierInfo> {
+    override fun getModifierInfo(): List<ModifierInfo> {
         val infoList = mutableVectorOf<ModifierInfo>()
         forEachDelegate { wrapper ->
             wrapper as DelegatingLayoutNodeWrapper<*>
@@ -1204,8 +1148,16 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
         if (wrapperCache.isEmpty()) {
             return null
         }
-        val index = wrapperCache.indexOfLast {
-            it.modifier === modifier || it.modifier.nativeClass() == modifier.nativeClass()
+        // Look for exact match
+        var index = wrapperCache.indexOfLast {
+            it.toBeReusedForSameModifier && it.modifier === modifier
+        }
+
+        if (index < 0) {
+            // Look for class match
+            index = wrapperCache.indexOfLast {
+                !it.toBeReusedForSameModifier && it.modifier.nativeClass() == modifier.nativeClass()
+            }
         }
 
         if (index < 0) {
@@ -1237,6 +1189,17 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
     private fun copyWrappersToCache() {
         forEachDelegate {
             wrapperCache += it as DelegatingLayoutNodeWrapper<*>
+        }
+    }
+
+    private fun markReusedModifiers(modifier: Modifier) {
+        wrapperCache.forEach {
+            it.toBeReusedForSameModifier = false
+        }
+
+        modifier.foldIn(Unit) { _, mod ->
+            val wrapper = wrapperCache.firstOrNull { it.modifier === mod }
+            wrapper?.toBeReusedForSameModifier = true
         }
     }
 
@@ -1295,17 +1258,14 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
     }
 
     private fun shouldInvalidateParentLayer(): Boolean {
-        if (innerLayerWrapper == null) {
-            return true
-        }
         forEachDelegateIncludingInner {
-            if (it is ModifiedDrawNode) {
-                return true
-            } else if (it.layer != null) {
+            if (it.layer != null) {
                 return false
+            } else if (it is ModifiedDrawNode) {
+                return true
             }
         }
-        error("innerLayerWrapper should have been reached.")
+        return true
     }
 
     /**
@@ -1319,6 +1279,9 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
             node1.zIndex.compareTo(node2.zIndex)
         }
     }
+
+    override val parentInfo: LayoutInfo?
+        get() = parent
 
     internal companion object {
         private val ErrorMeasureBlocks: NoIntrinsicsMeasureBlocks =
@@ -1375,39 +1338,20 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope {
 /**
  * Object of pre-allocated lambdas used to make emits to LayoutNodes allocation-less.
  */
-@OptIn(ExperimentalLayoutNodeApi::class)
 @PublishedApi
 internal object LayoutEmitHelper {
     val constructor: () -> LayoutNode = { LayoutNode() }
     val setModifier: LayoutNode.(Modifier) -> Unit = { this.modifier = it }
     val setDensity: LayoutNode.(Density) -> Unit = { this.density = it }
-    val setMeasureBlocks: LayoutNode.(LayoutNode.MeasureBlocks) -> Unit =
+    val setMeasureBlocks: LayoutNode.(MeasureBlocks) -> Unit =
         { this.measureBlocks = it }
     val setRef: LayoutNode.(Ref<LayoutNode>) -> Unit = { it.value = this }
     val setLayoutDirection: LayoutNode.(LayoutDirection) -> Unit = { this.layoutDirection = it }
 }
 
 /**
- * Returns true if this [LayoutNode] currently has an [LayoutNode.owner].  Semantically,
- * this means that the LayoutNode is currently a part of a component tree.
- */
-@Suppress("NOTHING_TO_INLINE")
-@OptIn(ExperimentalLayoutNodeApi::class)
-internal inline fun LayoutNode.isAttached() = owner != null
-
-/**
- * Used by tooling to examine the modifiers on a [LayoutNode].
- */
-class ModifierInfo(
-    val modifier: Modifier,
-    val coordinates: LayoutCoordinates,
-    val extra: Any? = null
-)
-
-/**
  * Returns [LayoutNode.owner] or throws if it is null.
  */
-@OptIn(ExperimentalLayoutNodeApi::class)
 internal fun LayoutNode.requireOwner(): Owner {
     val owner = owner
     checkNotNull(owner) {
@@ -1417,70 +1361,12 @@ internal fun LayoutNode.requireOwner(): Owner {
 }
 
 /**
- * Inserts a child [LayoutNode] at a last index. If this LayoutNode [isAttached]
- * then [child] will become [isAttached]ed also. [child] must have a `null` [LayoutNode.parent].
+ * Inserts a child [LayoutNode] at a last index. If this LayoutNode [LayoutNode.isAttached]
+ * then [child] will become [LayoutNode.isAttached] also. [child] must have a `null`
+ * [LayoutNode.parent].
  */
-@OptIn(ExperimentalLayoutNodeApi::class)
 internal fun LayoutNode.add(child: LayoutNode) {
     insertAt(children.size, child)
-}
-
-/**
- * Executes [selector] on every parent of this [LayoutNode] and returns the closest
- * [LayoutNode] to return `true` from [selector] or null if [selector] returns false
- * for all ancestors.
- */
-@OptIn(ExperimentalLayoutNodeApi::class)
-fun LayoutNode.findClosestParentNode(selector: (LayoutNode) -> Boolean): LayoutNode? {
-    var currentParent = parent
-    while (currentParent != null) {
-        if (selector(currentParent)) {
-            return currentParent
-        } else {
-            currentParent = currentParent.parent
-        }
-    }
-
-    return null
-}
-
-/**
- * [ContentDrawScope] implementation that extracts density and layout direction information
- * from the given LayoutNodeWrapper
- */
-@OptIn(ExperimentalLayoutNodeApi::class)
-internal class LayoutNodeDrawScope(
-    private val canvasDrawScope: CanvasDrawScope = CanvasDrawScope()
-) : DrawScope by canvasDrawScope, ContentDrawScope {
-
-    // NOTE, currently a single ComponentDrawScope is shared across composables
-    // which done to allocate a single set of Paint objects and re-use them across
-    // draw calls for all composables.
-    // As a result there could be thread safety concerns here for multi-threaded drawing
-    // scenarios, generally a single ComponentDrawScope should be shared for a particular thread
-    private var wrapped: LayoutNodeWrapper? = null
-
-    override fun drawContent() {
-        drawIntoCanvas { canvas -> wrapped?.draw(canvas) }
-    }
-
-    internal inline fun draw(
-        canvas: Canvas,
-        size: Size,
-        layoutNodeWrapper: LayoutNodeWrapper,
-        block: DrawScope.() -> Unit
-    ) {
-        val previousWrapper = wrapped
-        wrapped = layoutNodeWrapper
-        canvasDrawScope.draw(
-            layoutNodeWrapper.measureScope,
-            layoutNodeWrapper.measureScope.layoutDirection,
-            canvas,
-            size,
-            block
-        )
-        wrapped = previousWrapper
-    }
 }
 
 /**

@@ -36,7 +36,6 @@ import androidx.compose.ui.util.fastForEach
  * dispatch [OnPositionedModifier] callbacks for the nodes affected by the previous
  * [measureAndLayout] execution.
  */
-@OptIn(ExperimentalLayoutNodeApi::class)
 internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
     /**
      * LayoutNodes that need measure or layout.
@@ -190,7 +189,7 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
      * Iterates through all LayoutNodes that have requested layout and measures and lays them out
      */
     fun measureAndLayout(): Boolean {
-        require(root.isAttached())
+        require(root.isAttached)
         require(root.isPlaced)
         require(!duringMeasureLayout)
         // we don't need to measure any children unless we have the correct root constraints
@@ -226,7 +225,7 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
                     // execute postponed `onRequestMeasure`
                     if (postponedMeasureRequests.isNotEmpty()) {
                         postponedMeasureRequests.fastForEach {
-                            if (it.isAttached()) {
+                            if (it.isAttached) {
                                 requestRemeasure(it)
                             }
                         }

@@ -30,7 +30,6 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontListFontFamily
@@ -70,7 +69,6 @@ private typealias CLambda =
  *
  * Each parameter value is converted to a user readable value.
  */
-@OptIn(ExperimentalLayoutNodeApi::class)
 internal class ParameterFactory(private val inlineClassConverter: InlineClassConverter) {
     /**
      * A map from known values to a user readable string representation.

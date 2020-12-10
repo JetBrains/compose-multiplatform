@@ -23,9 +23,9 @@ import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
@@ -34,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.Saver
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.gesture.nestedscroll.nestedScroll
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
@@ -42,8 +43,10 @@ import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlin.math.max
+import kotlin.math.roundToInt
 
 /**
  * Possible values of [ModalBottomSheetState].
@@ -79,7 +82,7 @@ enum class ModalBottomSheetValue {
 class ModalBottomSheetState(
     initialValue: ModalBottomSheetValue,
     clock: AnimationClockObservable,
-    animationSpec: AnimationSpec<Float> = SwipeableConstants.DefaultAnimationSpec,
+    animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
     confirmStateChange: (ModalBottomSheetValue) -> Boolean = { true }
 ) : SwipeableState<ModalBottomSheetValue>(
     initialValue = initialValue,
@@ -131,6 +134,8 @@ class ModalBottomSheetState(
         )
     }
 
+    internal val nestedScrollConnection = this.PreUpPostDownNestedScrollConnection
+
     companion object {
         /**
          * The default [Saver] implementation for [ModalBottomSheetState].
@@ -167,7 +172,7 @@ class ModalBottomSheetState(
 fun rememberModalBottomSheetState(
     initialValue: ModalBottomSheetValue,
     clock: AnimationClockObservable = AmbientAnimationClock.current,
-    animationSpec: AnimationSpec<Float> = SwipeableConstants.DefaultAnimationSpec,
+    animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
     confirmStateChange: (ModalBottomSheetValue) -> Boolean = { true }
 ): ModalBottomSheetState {
     val disposableClock = clock.asDisposableClock()
@@ -219,10 +224,10 @@ fun ModalBottomSheetLayout(
     sheetState: ModalBottomSheetState =
         rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
     sheetShape: Shape = MaterialTheme.shapes.large,
-    sheetElevation: Dp = ModalBottomSheetConstants.DefaultElevation,
+    sheetElevation: Dp = ModalBottomSheetDefaults.Elevation,
     sheetBackgroundColor: Color = MaterialTheme.colors.surface,
     sheetContentColor: Color = contentColorFor(sheetBackgroundColor),
-    scrimColor: Color = ModalBottomSheetConstants.DefaultScrimColor,
+    scrimColor: Color = ModalBottomSheetDefaults.scrimColor,
     content: @Composable () -> Unit
 ) = BottomSheetStack(
     modifier = modifier,
@@ -230,7 +235,8 @@ fun ModalBottomSheetLayout(
         Surface(
             Modifier
                 .fillMaxWidth()
-                .offset(y = { sheetState.offset.value }),
+                .nestedScroll(sheetState.nestedScrollConnection)
+                .offset { IntOffset(0, sheetState.offset.value.roundToInt()) },
             shape = sheetShape,
             elevation = sheetElevation,
             color = sheetBackgroundColor,
@@ -322,6 +328,13 @@ private enum class BottomSheetStackSlot { SheetContent, Content }
 /**
  * Contains useful constants for [ModalBottomSheetLayout].
  */
+@Deprecated(
+    "ModalBottomSheetConstants has been replaced with ModalBottomSheetDefaults",
+    ReplaceWith(
+        "ModalBottomSheetDefaults",
+        "androidx.compose.material.ModalBottomSheetDefaults"
+    )
+)
 object ModalBottomSheetConstants {
 
     /**
@@ -332,7 +345,25 @@ object ModalBottomSheetConstants {
     /**
      * The default scrim color used by [ModalBottomSheetLayout].
      */
-    @Composable
     val DefaultScrimColor: Color
+        @Composable
+        get() = MaterialTheme.colors.onSurface.copy(alpha = 0.32f)
+}
+
+/**
+ * Contains useful Defaults for [ModalBottomSheetLayout].
+ */
+object ModalBottomSheetDefaults {
+
+    /**
+     * The default elevation used by [ModalBottomSheetLayout].
+     */
+    val Elevation = 16.dp
+
+    /**
+     * The default scrim color used by [ModalBottomSheetLayout].
+     */
+    val scrimColor: Color
+        @Composable
         get() = MaterialTheme.colors.onSurface.copy(alpha = 0.32f)
 }

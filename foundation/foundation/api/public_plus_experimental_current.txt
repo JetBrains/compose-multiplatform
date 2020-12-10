@@ -75,7 +75,7 @@ package androidx.compose.foundation {
   }
 
   public interface IndicationInstance {
-    method public void drawIndication(androidx.compose.ui.ContentDrawScope, androidx.compose.foundation.InteractionState interactionState);
+    method public void drawIndication(androidx.compose.ui.graphics.drawscope.ContentDrawScope, androidx.compose.foundation.InteractionState interactionState);
     method public default void onDispose();
   }
 
@@ -137,7 +137,7 @@ package androidx.compose.foundation {
     method public static androidx.compose.ui.Modifier verticalScroll(androidx.compose.ui.Modifier, androidx.compose.foundation.ScrollState state, optional boolean enabled, optional boolean reverseScrolling);
   }
 
-  @androidx.compose.runtime.Stable public final class ScrollState {
+  @androidx.compose.runtime.Stable public final class ScrollState implements androidx.compose.foundation.gestures.Scrollable {
     ctor public ScrollState(float initial, androidx.compose.foundation.animation.FlingConfig flingConfig, androidx.compose.animation.core.AnimationClockObservable animationClock, androidx.compose.foundation.InteractionState? interactionState);
     method public float getMaxValue();
     method public float getValue();
@@ -224,6 +224,10 @@ package androidx.compose.foundation.animation {
     method public static void fling(androidx.compose.animation.core.AnimatedFloat, float startVelocity, androidx.compose.foundation.animation.FlingConfig config, optional kotlin.jvm.functions.Function3<? super androidx.compose.animation.core.AnimationEndReason,? super java.lang.Float,? super java.lang.Float,kotlin.Unit>? onAnimationEnd);
   }
 
+  public final class SmoothScrollKt {
+    method public static suspend Object? smoothScrollBy(androidx.compose.foundation.gestures.Scrollable, float value, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> spec, optional kotlin.coroutines.Continuation<? super java.lang.Float> p);
+  }
+
 }
 
 package androidx.compose.foundation.gestures {
@@ -232,18 +236,18 @@ package androidx.compose.foundation.gestures {
   }
 
   public final class DragGestureDetectorKt {
-    method @androidx.compose.ui.gesture.ExperimentalPointerInput public static suspend Object? awaitDragOrCancellation-3UZYup8(androidx.compose.ui.input.pointer.HandlePointerInputScope, long pointerId, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange> p);
-    method @androidx.compose.ui.gesture.ExperimentalPointerInput public static suspend Object? awaitHorizontalDragOrCancellation-3UZYup8(androidx.compose.ui.input.pointer.HandlePointerInputScope, long pointerId, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange> p);
-    method @androidx.compose.ui.gesture.ExperimentalPointerInput public static suspend Object? awaitHorizontalTouchSlopOrCancellation-s7qLkbw(androidx.compose.ui.input.pointer.HandlePointerInputScope, long pointerId, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputChange,? super java.lang.Float,kotlin.Unit> onTouchSlopReached, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange> p);
-    method @androidx.compose.ui.gesture.ExperimentalPointerInput public static suspend Object? awaitTouchSlopOrCancellation-s7qLkbw(androidx.compose.ui.input.pointer.HandlePointerInputScope, long pointerId, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputChange,? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onTouchSlopReached, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange> p);
-    method @androidx.compose.ui.gesture.ExperimentalPointerInput public static suspend Object? awaitVerticalDragOrCancellation-3UZYup8(androidx.compose.ui.input.pointer.HandlePointerInputScope, long pointerId, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange> p);
-    method @androidx.compose.ui.gesture.ExperimentalPointerInput public static suspend Object? awaitVerticalTouchSlopOrCancellation-s7qLkbw(androidx.compose.ui.input.pointer.HandlePointerInputScope, long pointerId, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputChange,? super java.lang.Float,kotlin.Unit> onTouchSlopReached, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange> p);
-    method @androidx.compose.ui.gesture.ExperimentalPointerInput public static suspend Object? detectDragGestures(androidx.compose.ui.input.pointer.PointerInputScope, optional kotlin.jvm.functions.Function0<kotlin.Unit> onDragEnd, optional kotlin.jvm.functions.Function0<kotlin.Unit> onDragCancel, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputChange,? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onDrag, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method @androidx.compose.ui.gesture.ExperimentalPointerInput public static suspend Object? detectHorizontalDragGestures(androidx.compose.ui.input.pointer.PointerInputScope, optional kotlin.jvm.functions.Function0<kotlin.Unit> onDragEnd, optional kotlin.jvm.functions.Function0<kotlin.Unit> onDragCancel, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputChange,? super java.lang.Float,kotlin.Unit> onHorizontalDrag, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method @androidx.compose.ui.gesture.ExperimentalPointerInput public static suspend Object? detectVerticalDragGestures(androidx.compose.ui.input.pointer.PointerInputScope, optional kotlin.jvm.functions.Function0<kotlin.Unit> onDragEnd, optional kotlin.jvm.functions.Function0<kotlin.Unit> onDragCancel, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputChange,? super java.lang.Float,kotlin.Unit> onVerticalDrag, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method @androidx.compose.ui.gesture.ExperimentalPointerInput public static suspend Object? drag-xpXNQDM(androidx.compose.ui.input.pointer.HandlePointerInputScope, long pointerId, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.pointer.PointerInputChange,kotlin.Unit> onDrag, kotlin.coroutines.Continuation<? super java.lang.Boolean> p);
-    method @androidx.compose.ui.gesture.ExperimentalPointerInput public static suspend Object? horizontalDrag-xpXNQDM(androidx.compose.ui.input.pointer.HandlePointerInputScope, long pointerId, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.pointer.PointerInputChange,kotlin.Unit> onDrag, kotlin.coroutines.Continuation<? super java.lang.Boolean> p);
-    method @androidx.compose.ui.gesture.ExperimentalPointerInput public static suspend Object? verticalDrag-xpXNQDM(androidx.compose.ui.input.pointer.HandlePointerInputScope, long pointerId, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.pointer.PointerInputChange,kotlin.Unit> onDrag, kotlin.coroutines.Continuation<? super java.lang.Boolean> p);
+    method public static suspend Object? awaitDragOrCancellation-ijcpFGM(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange> p);
+    method public static suspend Object? awaitHorizontalDragOrCancellation-ijcpFGM(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange> p);
+    method public static suspend Object? awaitHorizontalTouchSlopOrCancellation-qFc19kk(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputChange,? super java.lang.Float,kotlin.Unit> onTouchSlopReached, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange> p);
+    method public static suspend Object? awaitTouchSlopOrCancellation-qFc19kk(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputChange,? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onTouchSlopReached, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange> p);
+    method public static suspend Object? awaitVerticalDragOrCancellation-ijcpFGM(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange> p);
+    method public static suspend Object? awaitVerticalTouchSlopOrCancellation-qFc19kk(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputChange,? super java.lang.Float,kotlin.Unit> onTouchSlopReached, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange> p);
+    method public static suspend Object? detectDragGestures(androidx.compose.ui.input.pointer.PointerInputScope, optional kotlin.jvm.functions.Function0<kotlin.Unit> onDragEnd, optional kotlin.jvm.functions.Function0<kotlin.Unit> onDragCancel, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputChange,? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onDrag, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public static suspend Object? detectHorizontalDragGestures(androidx.compose.ui.input.pointer.PointerInputScope, optional kotlin.jvm.functions.Function0<kotlin.Unit> onDragEnd, optional kotlin.jvm.functions.Function0<kotlin.Unit> onDragCancel, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputChange,? super java.lang.Float,kotlin.Unit> onHorizontalDrag, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public static suspend Object? detectVerticalDragGestures(androidx.compose.ui.input.pointer.PointerInputScope, optional kotlin.jvm.functions.Function0<kotlin.Unit> onDragEnd, optional kotlin.jvm.functions.Function0<kotlin.Unit> onDragCancel, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputChange,? super java.lang.Float,kotlin.Unit> onVerticalDrag, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public static suspend Object? drag-Pd94rOk(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.pointer.PointerInputChange,kotlin.Unit> onDrag, kotlin.coroutines.Continuation<? super java.lang.Boolean> p);
+    method public static suspend Object? horizontalDrag-Pd94rOk(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.pointer.PointerInputChange,kotlin.Unit> onDrag, kotlin.coroutines.Continuation<? super java.lang.Boolean> p);
+    method public static suspend Object? verticalDrag-Pd94rOk(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.pointer.PointerInputChange,kotlin.Unit> onDrag, kotlin.coroutines.Continuation<? super java.lang.Boolean> p);
   }
 
   public final class DraggableKt {
@@ -251,7 +255,7 @@ package androidx.compose.foundation.gestures {
   }
 
   public final class ForEachGestureKt {
-    method @androidx.compose.ui.gesture.ExperimentalPointerInput public static suspend Object? forEachGesture(androidx.compose.ui.input.pointer.PointerInputScope, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public static suspend Object? forEachGesture(androidx.compose.ui.input.pointer.PointerInputScope, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
   }
 
   public final class GestureCancellationException extends java.util.concurrent.CancellationException {
@@ -265,7 +269,7 @@ package androidx.compose.foundation.gestures {
     method public static long calculatePan(androidx.compose.ui.input.pointer.PointerEvent);
     method public static float calculateRotation(androidx.compose.ui.input.pointer.PointerEvent);
     method public static float calculateZoom(androidx.compose.ui.input.pointer.PointerEvent);
-    method @androidx.compose.ui.gesture.ExperimentalPointerInput public static suspend Object? detectMultitouchGestures(androidx.compose.ui.input.pointer.PointerInputScope, optional boolean panZoomLock, optional kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit> onRotate, optional kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit> onZoom, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onPan, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public static suspend Object? detectMultitouchGestures(androidx.compose.ui.input.pointer.PointerInputScope, optional boolean panZoomLock, kotlin.jvm.functions.Function4<? super androidx.compose.ui.geometry.Offset,? super androidx.compose.ui.geometry.Offset,? super java.lang.Float,? super java.lang.Float,kotlin.Unit> onGesture, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
   }
 
   public interface PressGestureScope extends androidx.compose.ui.unit.Density {
@@ -277,12 +281,15 @@ package androidx.compose.foundation.gestures {
     method public float scrollBy(float pixels);
   }
 
-  public final class ScrollableController {
+  public interface Scrollable {
+    method public suspend Object? scroll(kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.ScrollScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+  }
+
+  public final class ScrollableController implements androidx.compose.foundation.gestures.Scrollable {
     ctor public ScrollableController(kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> consumeScrollDelta, androidx.compose.foundation.animation.FlingConfig flingConfig, androidx.compose.animation.core.AnimationClockObservable animationClock, androidx.compose.foundation.InteractionState? interactionState);
     method public boolean isAnimationRunning();
     method public suspend Object? scroll(kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.ScrollScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public void smoothScrollBy(float value, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> spec, optional kotlin.jvm.functions.Function2<? super androidx.compose.animation.core.AnimationEndReason,? super java.lang.Float,kotlin.Unit> onEnd);
-    method public suspend Object? smoothScrollBy(float value, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> spec, optional kotlin.coroutines.Continuation<? super java.lang.Float> p);
     method public void stopAnimation();
     property public final boolean isAnimationRunning;
   }
@@ -293,9 +300,9 @@ package androidx.compose.foundation.gestures {
   }
 
   public final class TapGestureDetectorKt {
-    method @androidx.compose.ui.gesture.ExperimentalPointerInput public static suspend Object? awaitFirstDown(androidx.compose.ui.input.pointer.HandlePointerInputScope, optional boolean requireUnconsumed, optional kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange> p);
-    method @androidx.compose.ui.gesture.ExperimentalPointerInput public static suspend Object? detectTapGestures(androidx.compose.ui.input.pointer.PointerInputScope, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onDoubleTap, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onLongPress, optional kotlin.jvm.functions.Function3<? super androidx.compose.foundation.gestures.PressGestureScope,? super androidx.compose.ui.geometry.Offset,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> onPress, kotlin.jvm.functions.Function0<kotlin.Unit> onTap, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method @androidx.compose.ui.gesture.ExperimentalPointerInput public static suspend Object? waitForUpOrCancellation(androidx.compose.ui.input.pointer.HandlePointerInputScope, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange> p);
+    method public static suspend Object? awaitFirstDown(androidx.compose.ui.input.pointer.AwaitPointerEventScope, optional boolean requireUnconsumed, optional kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange> p);
+    method public static suspend Object? detectTapGestures(androidx.compose.ui.input.pointer.PointerInputScope, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onDoubleTap, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onLongPress, optional kotlin.jvm.functions.Function3<? super androidx.compose.foundation.gestures.PressGestureScope,? super androidx.compose.ui.geometry.Offset,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> onPress, kotlin.jvm.functions.Function0<kotlin.Unit> onTap, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public static suspend Object? waitForUpOrCancellation(androidx.compose.ui.input.pointer.AwaitPointerEventScope, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange> p);
   }
 
   public final class ZoomableController {
@@ -319,19 +326,40 @@ package androidx.compose.foundation.lazy {
   public final class CachingItemContentFactoryKt {
   }
 
+  public abstract sealed class GridCells {
+  }
+
+  public static final class GridCells.Adaptive extends androidx.compose.foundation.lazy.GridCells {
+    method public float getMinSize-D9Ej5fM();
+    property public final float minSize;
+  }
+
+  public static final class GridCells.Fixed extends androidx.compose.foundation.lazy.GridCells {
+    ctor public GridCells.Fixed(int count);
+    method public int getCount();
+    property public final int count;
+  }
+
   public final class LazyDslKt {
-    method @androidx.compose.runtime.Composable public static void LazyColumn(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.LazyListState state, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional androidx.compose.ui.Alignment.Horizontal horizontalAlignment, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyListScope,kotlin.Unit> content);
-    method @androidx.compose.runtime.Composable public static void LazyRow(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.LazyListState state, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional androidx.compose.ui.Alignment.Vertical verticalAlignment, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyListScope,kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static void LazyColumn(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.LazyListState state, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional boolean reverseLayout, optional androidx.compose.foundation.layout.Arrangement.Vertical verticalArrangement, optional androidx.compose.ui.Alignment.Horizontal horizontalAlignment, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyListScope,kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static void LazyRow(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.LazyListState state, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional boolean reverseLayout, optional androidx.compose.foundation.layout.Arrangement.Horizontal horizontalArrangement, optional androidx.compose.ui.Alignment.Vertical verticalAlignment, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyListScope,kotlin.Unit> content);
   }
 
   public final class LazyForKt {
-    method @androidx.compose.runtime.Composable public static <T> void LazyColumnFor(java.util.List<? extends T> items, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.LazyListState state, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional androidx.compose.ui.Alignment.Horizontal horizontalAlignment, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyItemScope,? super T,kotlin.Unit> itemContent);
-    method @androidx.compose.runtime.Composable public static <T> void LazyColumnForIndexed(java.util.List<? extends T> items, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.LazyListState state, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional androidx.compose.ui.Alignment.Horizontal horizontalAlignment, kotlin.jvm.functions.Function3<? super androidx.compose.foundation.lazy.LazyItemScope,? super java.lang.Integer,? super T,kotlin.Unit> itemContent);
-    method @androidx.compose.runtime.Composable public static <T> void LazyRowFor(java.util.List<? extends T> items, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.LazyListState state, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional androidx.compose.ui.Alignment.Vertical verticalAlignment, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyItemScope,? super T,kotlin.Unit> itemContent);
-    method @androidx.compose.runtime.Composable public static <T> void LazyRowForIndexed(java.util.List<? extends T> items, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.LazyListState state, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional androidx.compose.ui.Alignment.Vertical verticalAlignment, kotlin.jvm.functions.Function3<? super androidx.compose.foundation.lazy.LazyItemScope,? super java.lang.Integer,? super T,kotlin.Unit> itemContent);
+    method @Deprecated @androidx.compose.runtime.Composable public static <T> void LazyColumnFor(java.util.List<? extends T> items, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.LazyListState state, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional boolean reverseLayout, optional androidx.compose.foundation.layout.Arrangement.Vertical verticalArrangement, optional androidx.compose.ui.Alignment.Horizontal horizontalAlignment, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyItemScope,? super T,kotlin.Unit> itemContent);
+    method @Deprecated @androidx.compose.runtime.Composable public static <T> void LazyColumnForIndexed(java.util.List<? extends T> items, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.LazyListState state, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional boolean reverseLayout, optional androidx.compose.foundation.layout.Arrangement.Vertical verticalArrangement, optional androidx.compose.ui.Alignment.Horizontal horizontalAlignment, kotlin.jvm.functions.Function3<? super androidx.compose.foundation.lazy.LazyItemScope,? super java.lang.Integer,? super T,kotlin.Unit> itemContent);
+    method @Deprecated @androidx.compose.runtime.Composable public static <T> void LazyRowFor(java.util.List<? extends T> items, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.LazyListState state, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional boolean reverseLayout, optional androidx.compose.foundation.layout.Arrangement.Horizontal horizontalArrangement, optional androidx.compose.ui.Alignment.Vertical verticalAlignment, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyItemScope,? super T,kotlin.Unit> itemContent);
+    method @Deprecated @androidx.compose.runtime.Composable public static <T> void LazyRowForIndexed(java.util.List<? extends T> items, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.LazyListState state, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional boolean reverseLayout, optional androidx.compose.foundation.layout.Arrangement.Horizontal horizontalArrangement, optional androidx.compose.ui.Alignment.Vertical verticalAlignment, kotlin.jvm.functions.Function3<? super androidx.compose.foundation.lazy.LazyItemScope,? super java.lang.Integer,? super T,kotlin.Unit> itemContent);
   }
 
   public final class LazyGridKt {
+    method @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Composable public static void LazyVerticalGrid(androidx.compose.foundation.lazy.GridCells cells, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.LazyListState state, optional androidx.compose.foundation.layout.PaddingValues contentPadding, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyGridScope,kotlin.Unit> content);
+  }
+
+  public interface LazyGridScope {
+    method public void item(kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyItemScope,kotlin.Unit> content);
+    method public <T> void items(java.util.List<? extends T> items, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyItemScope,? super T,kotlin.Unit> itemContent);
+    method public <T> void itemsIndexed(java.util.List<? extends T> items, kotlin.jvm.functions.Function3<? super androidx.compose.foundation.lazy.LazyItemScope,? super java.lang.Integer,? super T,kotlin.Unit> itemContent);
   }
 
   @androidx.compose.runtime.Stable public interface LazyItemScope {
@@ -340,7 +368,30 @@ package androidx.compose.foundation.lazy {
     method public androidx.compose.ui.Modifier fillParentMaxWidth(androidx.compose.ui.Modifier, optional @FloatRange(from=0.0, to=1.0) float fraction);
   }
 
+  public interface LazyListItemInfo {
+    method public int getIndex();
+    method public int getOffset();
+    method public int getSize();
+    property public abstract int index;
+    property public abstract int offset;
+    property public abstract int size;
+  }
+
   public final class LazyListKt {
+  }
+
+  public interface LazyListLayoutInfo {
+    method public int getTotalItemsCount();
+    method public int getViewportEndOffset();
+    method public int getViewportStartOffset();
+    method public java.util.List<androidx.compose.foundation.lazy.LazyListItemInfo> getVisibleItemsInfo();
+    property public abstract int totalItemsCount;
+    property public abstract int viewportEndOffset;
+    property public abstract int viewportStartOffset;
+    property public abstract java.util.List<androidx.compose.foundation.lazy.LazyListItemInfo> visibleItemsInfo;
+  }
+
+  public final class LazyListMeasureKt {
   }
 
   public interface LazyListScope {
@@ -349,17 +400,18 @@ package androidx.compose.foundation.lazy {
     method public <T> void itemsIndexed(java.util.List<? extends T> items, kotlin.jvm.functions.Function3<? super androidx.compose.foundation.lazy.LazyItemScope,? super java.lang.Integer,? super T,kotlin.Unit> itemContent);
   }
 
-  @androidx.compose.runtime.Stable public final class LazyListState {
+  @androidx.compose.runtime.Stable public final class LazyListState implements androidx.compose.foundation.gestures.Scrollable {
     ctor public LazyListState(int firstVisibleItemIndex, int firstVisibleItemScrollOffset, androidx.compose.foundation.InteractionState? interactionState, androidx.compose.foundation.animation.FlingConfig flingConfig, androidx.compose.animation.core.AnimationClockObservable animationClock);
     method public int getFirstVisibleItemIndex();
     method public int getFirstVisibleItemScrollOffset();
+    method public androidx.compose.foundation.lazy.LazyListLayoutInfo getLayoutInfo();
     method public boolean isAnimationRunning();
     method public suspend Object? scroll(kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.ScrollScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public suspend Object? smoothScrollBy(float value, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> spec, optional kotlin.coroutines.Continuation<? super java.lang.Float> p);
     method public suspend Object? snapToItemIndex(@IntRange(from=0) int index, optional @IntRange(from=0) int scrollOffset, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     property public final int firstVisibleItemIndex;
     property public final int firstVisibleItemScrollOffset;
     property public final boolean isAnimationRunning;
+    property public final androidx.compose.foundation.lazy.LazyListLayoutInfo layoutInfo;
     field public static final androidx.compose.foundation.lazy.LazyListState.Companion Companion;
   }
 
@@ -462,8 +514,8 @@ package androidx.compose.foundation.text {
   }
 
   public final class BasicTextFieldKt {
-    method @androidx.compose.runtime.Composable public static void BasicTextField-3T4ULwA(androidx.compose.ui.text.input.TextFieldValue value, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.TextFieldValue,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.text.TextStyle textStyle, optional androidx.compose.foundation.text.KeyboardOptions keyboardOptions, optional boolean singleLine, optional int maxLines, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.ImeAction,kotlin.Unit> onImeActionPerformed, optional androidx.compose.ui.text.input.VisualTransformation visualTransformation, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted, optional long cursorColor);
-    method @androidx.compose.runtime.Composable public static void BasicTextField-kNtltWE(String value, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.text.TextStyle textStyle, optional androidx.compose.foundation.text.KeyboardOptions keyboardOptions, optional boolean singleLine, optional int maxLines, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.ImeAction,kotlin.Unit> onImeActionPerformed, optional androidx.compose.ui.text.input.VisualTransformation visualTransformation, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted, optional long cursorColor);
+    method @androidx.compose.runtime.Composable public static void BasicTextField-3Gdz-6o(androidx.compose.ui.text.input.TextFieldValue value, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.TextFieldValue,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.text.TextStyle textStyle, optional androidx.compose.foundation.text.KeyboardOptions keyboardOptions, optional boolean singleLine, optional int maxLines, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.ImeAction,kotlin.Unit> onImeActionPerformed, optional androidx.compose.ui.text.input.VisualTransformation visualTransformation, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted, optional androidx.compose.foundation.InteractionState interactionState, optional long cursorColor);
+    method @androidx.compose.runtime.Composable public static void BasicTextField-UWLcGC4(String value, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.text.TextStyle textStyle, optional androidx.compose.foundation.text.KeyboardOptions keyboardOptions, optional boolean singleLine, optional int maxLines, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.ImeAction,kotlin.Unit> onImeActionPerformed, optional androidx.compose.ui.text.input.VisualTransformation visualTransformation, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted, optional androidx.compose.foundation.InteractionState interactionState, optional long cursorColor);
   }
 
   public final class BasicTextKt {
@@ -472,7 +524,7 @@ package androidx.compose.foundation.text {
   }
 
   public final class CoreTextFieldKt {
-    method @androidx.compose.runtime.Composable @androidx.compose.ui.text.InternalTextApi public static void CoreTextField-lVEleRQ(androidx.compose.ui.text.input.TextFieldValue value, optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.TextFieldValue,kotlin.Unit> onValueChange, optional androidx.compose.ui.text.TextStyle textStyle, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.ImeAction,kotlin.Unit> onImeActionPerformed, optional androidx.compose.ui.text.input.VisualTransformation visualTransformation, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted, optional long cursorColor, optional boolean softWrap, optional androidx.compose.ui.text.input.ImeOptions imeOptions);
+    method @androidx.compose.runtime.Composable @androidx.compose.ui.text.InternalTextApi public static void CoreTextField-Q2a5TJk(androidx.compose.ui.text.input.TextFieldValue value, optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.TextFieldValue,kotlin.Unit> onValueChange, optional androidx.compose.ui.text.TextStyle textStyle, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.ImeAction,kotlin.Unit> onImeActionPerformed, optional androidx.compose.ui.text.input.VisualTransformation visualTransformation, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted, optional androidx.compose.foundation.InteractionState? interactionState, optional long cursorColor, optional boolean softWrap, optional androidx.compose.ui.text.input.ImeOptions imeOptions);
   }
 
   public final class CoreTextKt {

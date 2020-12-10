@@ -17,7 +17,6 @@
 
 import androidx.build.AndroidXUiPlugin
 import androidx.build.LibraryGroups
-import androidx.build.LibraryVersions
 import androidx.build.Publish
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -42,6 +41,7 @@ dependencies {
         api project(":compose:animation:animation-core")
         api project(":compose:foundation:foundation")
         api project(":compose:material:material-icons-core")
+        api project(":compose:material:material-ripple")
         api project(":compose:runtime:runtime")
         api project(":compose:ui:ui")
         api project(":compose:ui:ui-text")
@@ -86,6 +86,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 api project(":compose:animation:animation-core")
                 api project(":compose:foundation:foundation")
                 api project(":compose:material:material-icons-core")
+                api project(":compose:material:material-ripple")
                 api project(":compose:runtime:runtime")
                 api project(":compose:ui:ui")
                 api project(":compose:ui:ui-text")

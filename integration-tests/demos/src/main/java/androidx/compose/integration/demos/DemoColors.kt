@@ -36,7 +36,6 @@ class DemoColors {
     var light: Colors by mutableStateOf(lightColors())
     var dark: Colors by mutableStateOf(darkColors())
 
-    @Composable
     val colors
-        get() = if (isSystemInDarkTheme()) dark else light
+        @Composable get() = if (isSystemInDarkTheme()) dark else light
 }

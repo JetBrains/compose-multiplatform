@@ -41,7 +41,6 @@ import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -88,9 +87,7 @@ private typealias ScrollFraction = MutableState<Float>
 private fun DynamicThemeApp(scrollFraction: ScrollFraction, palette: Colors) {
     MaterialTheme(palette) {
         val scrollState = rememberScrollState()
-        val fraction =
-            round((scrollState.value / scrollState.maxValue) * 100) / 100
-        remember(fraction) { scrollFraction.value = fraction }
+        scrollFraction.value = round((scrollState.value / scrollState.maxValue) * 100) / 100
         Scaffold(
             topBar = { TopAppBar({ Text("Scroll down!") }) },
             bottomBar = { BottomAppBar(cutoutShape = CircleShape) {} },

@@ -50,10 +50,4 @@ class TestComposeWindow(
         owner.draw(canvas)
         return owners
     }
-
-    companion object {
-        init {
-            initCompose()
-        }
-    }
 }

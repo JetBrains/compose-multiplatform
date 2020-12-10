@@ -22,11 +22,10 @@ import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.compositionFor
-import androidx.compose.ui.input.key.ExperimentalKeyInput
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.node.LayoutNode
 
-@OptIn(ExperimentalComposeApi::class, ExperimentalKeyInput::class)
+@OptIn(ExperimentalComposeApi::class)
 fun DesktopOwner.setContent(content: @Composable () -> Unit): Composition {
     GlobalSnapshotManager.ensureStarted()
 
@@ -47,8 +46,7 @@ fun DesktopOwner.setContent(content: @Composable () -> Unit): Composition {
 
     return composition
 }
-
-@OptIn(ExperimentalKeyInput::class)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun ProvideDesktopAmbients(owner: DesktopOwner, content: @Composable () -> Unit) {
     Providers(
@@ -64,8 +62,8 @@ private fun ProvideDesktopAmbients(owner: DesktopOwner, content: @Composable () 
     }
 }
 
-@OptIn(ExperimentalComposeApi::class, ExperimentalLayoutNodeApi::class)
-internal actual fun actualSubcomposeInto(
+@OptIn(ExperimentalComposeApi::class)
+internal actual fun subcomposeInto(
     container: LayoutNode,
     parent: CompositionReference,
     composable: @Composable () -> Unit

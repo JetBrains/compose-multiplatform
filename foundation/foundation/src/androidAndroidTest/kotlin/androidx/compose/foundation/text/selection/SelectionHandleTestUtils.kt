@@ -17,12 +17,8 @@
 package androidx.compose.foundation.text.selection
 
 import android.view.View
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
-import androidx.compose.ui.node.Owner
-import androidx.compose.ui.platform.AndroidOwner
+import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.test.junit4.ComposeTestRule
-import androidx.compose.ui.test.onRoot
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.window.isPopupLayout
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.Root
@@ -38,7 +34,7 @@ internal fun ComposeTestRule.doubleSelectionHandleMatches(
 ) {
     // Make sure that current measurement/drawing is finished
     runOnIdle { }
-    Espresso.onView(CoreMatchers.instanceOf(Owner::class.java))
+    Espresso.onView(CoreMatchers.instanceOf(ViewRootForTest::class.java))
         .inRoot(DoubleSelectionHandleMatcher(index))
         .check(ViewAssertions.matches(viewMatcher))
 }
@@ -56,17 +52,5 @@ internal class DoubleSelectionHandleMatcher(val index: Int) : TypeSafeMatcher<Ro
             popupsMatchedSoFar++
         }
         return matches && popupsMatchedSoFar == index + 1
-    }
-}
-
-internal fun ComposeTestRule.rootWidth(): Dp {
-    val nodeInteraction = onRoot()
-    val node = nodeInteraction.fetchSemanticsNode("Failed to get screen width")
-
-    @OptIn(ExperimentalLayoutNodeApi::class)
-    val owner = node.componentNode.owner as AndroidOwner
-
-    return with(owner.density) {
-        owner.view.width.toDp()
     }
 }

@@ -23,6 +23,8 @@ import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredSizeIn
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.test.R
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -50,8 +52,13 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.testutils.assertPixels
+import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import org.junit.Assert
@@ -296,6 +303,7 @@ class ImageTest {
     }
 
     @Test
+    @LargeTest
     fun testImageScalesNonuniformly() {
         val imageComposableWidth = imageWidth * 3
         val imageComposableHeight = imageHeight * 7
@@ -515,5 +523,42 @@ class ImageTest {
             Assert.assertEquals(Color.Red.toArgb(), getPixel(50, 0))
             Assert.assertEquals(Color.Red.toArgb(), getPixel(50, height - 1))
         }
+    }
+
+    @Test
+    @LargeTest
+    fun testPainterResourceWithImage() {
+        val testTag = "testTag"
+        var imageColor = Color.Black
+
+        rule.setContent {
+            val painterId = remember {
+                mutableStateOf(R.drawable.ic_vector_square_asset_test)
+            }
+            with(imageResource(R.drawable.ic_image_test)) {
+                // Sample the actual color of the image to make sure we are loading it properly
+                // when we toggle the state of the resource id
+                imageColor = toPixelMap()[width / 2, height / 2]
+            }
+            Image(
+                painterResource(painterId.value),
+                contentScale = ContentScale.FillBounds,
+                modifier = Modifier.testTag(testTag).clickable {
+                    if (painterId.value == R.drawable.ic_vector_square_asset_test) {
+                        painterId.value = R.drawable.ic_image_test
+                    } else {
+                        painterId.value = R.drawable.ic_vector_square_asset_test
+                    }
+                }
+            )
+        }
+
+        rule.onNodeWithTag(testTag).captureToImage().assertPixels { Color.Red }
+
+        rule.onNodeWithTag(testTag).performClick()
+
+        rule.waitForIdle()
+
+        rule.onNodeWithTag(testTag).captureToImage().assertPixels { imageColor }
     }
 }

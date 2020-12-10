@@ -30,7 +30,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.gesture.pressIndicatorGestureFilter
 import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.platform.debugInspectorInfo
-import androidx.compose.ui.semantics.accessibilityValue
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
@@ -137,7 +137,7 @@ private fun Modifier.toggleableImpl(
 ): Modifier = composed {
     // TODO(pavlis): Handle multiple states for Semantics
     val semantics = Modifier.semantics(mergeDescendants = true) {
-        this.accessibilityValue = when (state) {
+        this.stateDescription = when (state) {
             // TODO(ryanmentley): These should be set by Checkbox, Switch, etc.
             On -> Strings.Checked
             Off -> Strings.Unchecked

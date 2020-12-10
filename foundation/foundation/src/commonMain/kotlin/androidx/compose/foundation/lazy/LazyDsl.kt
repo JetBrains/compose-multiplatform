@@ -16,6 +16,8 @@
 
 package androidx.compose.foundation.lazy
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.InternalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -56,19 +58,13 @@ interface LazyListScope {
     )
 }
 
-internal class IntervalHolder(
-    val startIndex: Int,
-    val content: LazyItemScope.(Int) -> (@Composable () -> Unit)
-)
-
 internal class LazyListScopeImpl : LazyListScope {
-    private val intervals = mutableListOf<IntervalHolder>()
-    var totalSize = 0
+    private val intervals = IntervalList<LazyItemScope.(Int) -> (@Composable () -> Unit)>()
+
+    val totalSize get() = intervals.totalSize
 
     fun contentFor(index: Int, scope: LazyItemScope): @Composable () -> Unit {
-        val intervalIndex = findIndexOfHighestValueLesserThan(intervals, index)
-
-        val interval = intervals[intervalIndex]
+        val interval = intervals.intervalForIndex(index)
         val localIntervalIndex = index - interval.startIndex
 
         return interval.content(scope, localIntervalIndex)
@@ -78,84 +74,24 @@ internal class LazyListScopeImpl : LazyListScope {
         items: List<T>,
         itemContent: @Composable LazyItemScope.(item: T) -> Unit
     ) {
-        // There aren't any items to display
-        if (items.isEmpty()) { return }
-
-        val interval = IntervalHolder(
-            startIndex = totalSize,
-            content = { index ->
-                val item = items[index]
-
-                { itemContent(item) }
-            }
-        )
-
-        totalSize += items.size
-
-        intervals.add(interval)
+        intervals.add(items.size) { index ->
+            val item = items[index]
+            @Composable { itemContent(item) }
+        }
     }
 
     override fun item(content: @Composable LazyItemScope.() -> Unit) {
-        val interval = IntervalHolder(
-            startIndex = totalSize,
-            content = { { content() } }
-        )
-
-        totalSize += 1
-
-        intervals.add(interval)
+        intervals.add(1) { @Composable { content() } }
     }
 
     override fun <T> itemsIndexed(
         items: List<T>,
         itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
     ) {
-        // There aren't any items to display
-        if (items.isEmpty()) { return }
-
-        val interval = IntervalHolder(
-            startIndex = totalSize,
-            content = { index ->
-                val item = items[index]
-
-                { itemContent(index, item) }
-            }
-        )
-
-        totalSize += items.size
-
-        intervals.add(interval)
-    }
-
-    /**
-     * Finds the index of the [list] which contains the highest value of [IntervalHolder.startIndex]
-     * that is less than or equal to the given [value].
-     */
-    private fun findIndexOfHighestValueLesserThan(list: List<IntervalHolder>, value: Int): Int {
-        var left = 0
-        var right = list.lastIndex
-
-        while (left < right) {
-            val middle = (left + right) / 2
-
-            val middleValue = list[middle].startIndex
-            if (middleValue == value) {
-                return middle
-            }
-
-            if (middleValue < value) {
-                left = middle + 1
-
-                // Verify that the left will not be bigger than our value
-                if (value < list[left].startIndex) {
-                    return middle
-                }
-            } else {
-                right = middle - 1
-            }
+        intervals.add(items.size) { index ->
+            val item = items[index]
+            @Composable { itemContent(index, item) }
         }
-
-        return left
     }
 }
 
@@ -170,17 +106,28 @@ internal class LazyListScopeImpl : LazyListScope {
  * @param modifier the modifier to apply to this layout
  * @param state the state object to be used to control or observe the list's state
  * @param contentPadding a padding around the whole content. This will add padding for the
- * content after it has been clipped, which is not possible via [modifier] param. Note that it is
- * **not** a padding applied for each item's content
+ * content after it has been clipped, which is not possible via [modifier] param. You can use it
+ * to add a padding before the first item or after the last one. If you want to add a spacing
+ * between each item use [horizontalArrangement].
+ * @param reverseLayout reverse the direction of scrolling and layout, when `true` items will be
+ * composed from the end to the start and [LazyListState.firstVisibleItemIndex] == 0 will mean
+ * the first item is located at the end.
+ * @param horizontalArrangement The horizontal arrangement of the layout's children. This allows
+ * to add a spacing between items and specify the arrangement of the items when we have not enough
+ * of them to fill the whole minimum size.
  * @param verticalAlignment the vertical alignment applied to the items
  * @param content a block which describes the content. Inside this block you can use methods like
  * [LazyListScope.item] to add a single item or [LazyListScope.items] to add a list of items.
  */
+@OptIn(InternalLayoutApi::class)
 @Composable
 fun LazyRow(
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
+    reverseLayout: Boolean = false,
+    horizontalArrangement: Arrangement.Horizontal =
+        if (!reverseLayout) Arrangement.Start else Arrangement.End,
     verticalAlignment: Alignment.Vertical = Alignment.Top,
     content: LazyListScope.() -> Unit
 ) {
@@ -193,7 +140,9 @@ fun LazyRow(
         state = state,
         contentPadding = contentPadding,
         verticalAlignment = verticalAlignment,
-        isVertical = false
+        horizontalArrangement = horizontalArrangement,
+        isVertical = false,
+        reverseLayout = reverseLayout
     ) { index ->
         scope.contentFor(index, this)
     }
@@ -207,20 +156,31 @@ fun LazyRow(
  *
  * @sample androidx.compose.foundation.samples.LazyColumnSample
  *
- * @param modifier the modifier to apply to this layout
- * @param state the state object to be used to control or observe the list's state
- * @param contentPadding a padding around the whole content. This will add padding for the
- * content after it has been clipped, which is not possible via [modifier] param. Note that it is
- * **not** a padding applied for each item's content
- * @param horizontalAlignment the horizontal alignment applied to the items
+ * @param modifier the modifier to apply to this layout.
+ * @param state the state object to be used to control or observe the list's state.
+ * @param contentPadding a padding around the whole content. This will add padding for the.
+ * content after it has been clipped, which is not possible via [modifier] param. You can use it
+ * to add a padding before the first item or after the last one. If you want to add a spacing
+ * between each item use [verticalArrangement].
+ * @param reverseLayout reverse the direction of scrolling and layout, when `true` items will be
+ * composed from the bottom to the top and [LazyListState.firstVisibleItemIndex] == 0 will mean
+ * we scrolled to the bottom.
+ * @param verticalArrangement The vertical arrangement of the layout's children. This allows
+ * to add a spacing between items and specify the arrangement of the items when we have not enough
+ * of them to fill the whole minimum size.
+ * @param horizontalAlignment the horizontal alignment applied to the items.
  * @param content a block which describes the content. Inside this block you can use methods like
  * [LazyListScope.item] to add a single item or [LazyListScope.items] to add a list of items.
  */
+@OptIn(InternalLayoutApi::class)
 @Composable
 fun LazyColumn(
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
+    reverseLayout: Boolean = false,
+    verticalArrangement: Arrangement.Vertical =
+        if (!reverseLayout) Arrangement.Top else Arrangement.Bottom,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     content: LazyListScope.() -> Unit
 ) {
@@ -233,7 +193,9 @@ fun LazyColumn(
         state = state,
         contentPadding = contentPadding,
         horizontalAlignment = horizontalAlignment,
-        isVertical = true
+        verticalArrangement = verticalArrangement,
+        isVertical = true,
+        reverseLayout = reverseLayout
     ) { index ->
         scope.contentFor(index, this)
     }

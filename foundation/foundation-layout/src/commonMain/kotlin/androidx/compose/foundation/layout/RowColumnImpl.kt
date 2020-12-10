@@ -28,8 +28,7 @@ import androidx.compose.ui.layout.Measured
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.measureBlocksOf
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
-import androidx.compose.ui.node.LayoutNode
+import androidx.compose.ui.node.MeasureBlocks
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.unit.Constraints
@@ -43,14 +42,13 @@ import kotlin.math.roundToInt
 import kotlin.math.sign
 
 @PublishedApi
-@OptIn(ExperimentalLayoutNodeApi::class)
 internal fun rowColumnMeasureBlocks(
     orientation: LayoutOrientation,
     arrangement: (Int, IntArray, LayoutDirection, Density, IntArray) -> Unit,
     arrangementSpacing: Dp,
     crossAxisSize: SizeMode,
     crossAxisAlignment: CrossAxisAlignment
-): LayoutNode.MeasureBlocks {
+): MeasureBlocks {
     fun Placeable.mainAxisSize() =
         if (orientation == LayoutOrientation.Horizontal) width else height
 

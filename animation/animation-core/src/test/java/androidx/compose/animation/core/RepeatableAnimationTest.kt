@@ -104,6 +104,25 @@ class RepeatableAnimationTest {
         assertEquals(100f, repeatAnim.getValue(901))
     }
 
+    @Test
+    fun testInfiniteRepeat() {
+        val repeat = infiniteRepeatable(
+            animation = TweenSpec<Float>(
+                durationMillis = 100, easing = LinearEasing
+            ),
+            repeatMode = RepeatMode.Reverse
+        )
+
+        assertEquals(
+            Int.MAX_VALUE.toLong() * 100,
+            repeat.vectorize(Float.VectorConverter).getDurationMillis(
+                AnimationVector(0f),
+                AnimationVector(100f),
+                AnimationVector(0f)
+            )
+        )
+    }
+
     private companion object {
         private val DelayDuration = 13
         private val Duration = 50

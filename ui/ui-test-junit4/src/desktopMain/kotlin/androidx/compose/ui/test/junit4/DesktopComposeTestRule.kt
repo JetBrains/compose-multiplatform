@@ -26,13 +26,13 @@ import androidx.compose.ui.platform.DesktopOwners
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.IdlingResource
 import androidx.compose.ui.test.InternalTestingApi
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.SemanticsNodeInteractionCollection
 import androidx.compose.ui.test.TestOwner
 import androidx.compose.ui.test.createTestContext
-import androidx.compose.ui.test.initCompose
 import androidx.compose.ui.text.input.EditOperation
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.Density
@@ -53,10 +53,6 @@ actual fun createComposeRule(): ComposeTestRule = DesktopComposeTestRule()
 class DesktopComposeTestRule : ComposeTestRule {
 
     companion object {
-        init {
-            initCompose()
-        }
-
         var current: DesktopComposeTestRule? = null
     }
 
@@ -133,6 +129,14 @@ class DesktopComposeTestRule : ComposeTestRule {
         // stabilization of the new rendering/dispatching model
         waitForIdle()
         return action().also { waitForIdle() }
+    }
+
+    override fun registerIdlingResource(idlingResource: IdlingResource) {
+        // TODO: implement
+    }
+
+    override fun unregisterIdlingResource(idlingResource: IdlingResource) {
+        // TODO: implement
     }
 
     override fun setContent(composable: @Composable () -> Unit) {

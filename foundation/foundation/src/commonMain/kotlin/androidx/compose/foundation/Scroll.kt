@@ -25,6 +25,7 @@ import androidx.compose.animation.core.SpringSpec
 import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.animation.defaultFlingConfig
 import androidx.compose.foundation.gestures.ScrollScope
+import androidx.compose.foundation.gestures.Scrollable
 import androidx.compose.foundation.gestures.ScrollableController
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
@@ -122,7 +123,7 @@ class ScrollState(
     internal val flingConfig: FlingConfig,
     animationClock: AnimationClockObservable,
     interactionState: InteractionState? = null
-) {
+) : Scrollable {
 
     /**
      * current scroll position value in pixels
@@ -170,8 +171,7 @@ class ScrollState(
      *
      * If [scroll] is called from elsewhere, this will be canceled.
      */
-    @OptIn(ExperimentalFoundationApi::class)
-    suspend fun scroll(
+    override suspend fun scroll(
         block: suspend ScrollScope.() -> Unit
     ): Unit = scrollableController.scroll(block)
 
@@ -289,7 +289,6 @@ fun ScrollableColumn(
                 isScrollEnabled,
                 reverseScrolling = reverseScrollDirection
             )
-            .clipToBounds()
             .padding(contentPadding),
         verticalArrangement = verticalArrangement,
         horizontalAlignment = horizontalAlignment,
@@ -334,7 +333,6 @@ fun ScrollableRow(
                 isScrollEnabled,
                 reverseScrolling = reverseScrollDirection
             )
-            .clipToBounds()
             .padding(contentPadding),
         horizontalArrangement = horizontalArrangement,
         verticalAlignment = verticalAlignment,
@@ -471,7 +469,7 @@ private data class ScrollingLayoutModifier(
             val absScroll = if (isReversed) scroll - side else -scroll
             val xOffset = if (isVertical) 0 else absScroll.roundToInt()
             val yOffset = if (isVertical) absScroll.roundToInt() else 0
-            placeable.placeRelative(xOffset, yOffset)
+            placeable.placeRelativeWithLayer(xOffset, yOffset)
         }
     }
 }
@@ -480,7 +478,7 @@ internal fun Constraints.assertNotNestingScrollableContainers(isVertical: Boolea
     if (isVertical) {
         check(maxHeight != Constraints.Infinity) {
             "Nesting scrollable in the same direction layouts like ScrollableContainer and " +
-                "LazyColumnFor is not allowed. If you want to add a header before the list of" +
+                "LazyColumn is not allowed. If you want to add a header before the list of" +
                 " items please take a look on LazyColumn component which has a DSL api which" +
                 " allows to first add a header via item() function and then the list of " +
                 "items via items()."
@@ -488,7 +486,7 @@ internal fun Constraints.assertNotNestingScrollableContainers(isVertical: Boolea
     } else {
         check(maxWidth != Constraints.Infinity) {
             "Nesting scrollable in the same direction layouts like ScrollableRow and " +
-                "LazyRowFor is not allowed. If you want to add a header before the list of " +
+                "LazyRow is not allowed. If you want to add a header before the list of " +
                 "items please take a look on LazyRow component which has a DSL api which " +
                 "allows to first add a fixed element via item() function and then the " +
                 "list of items via items()."

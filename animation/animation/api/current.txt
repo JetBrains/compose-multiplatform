@@ -94,10 +94,6 @@ package androidx.compose.animation {
   @kotlin.RequiresOptIn(message="This is an experimental animation API.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface ExperimentalAnimationApi {
   }
 
-  public final class LegacyTransitionKt {
-    method @Deprecated @androidx.compose.runtime.Composable public static <T> void Transition(androidx.compose.animation.core.TransitionDefinition<T> definition, T? toState, optional androidx.compose.animation.core.AnimationClockObservable clock, optional T? initState, optional kotlin.jvm.functions.Function1<? super T,kotlin.Unit>? onStateChangeFinished, kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.TransitionState,kotlin.Unit> children);
-  }
-
   public final class OffsetPropKey implements androidx.compose.animation.core.PropKey<androidx.compose.ui.geometry.Offset,androidx.compose.animation.core.AnimationVector2D> {
     ctor public OffsetPropKey(String label);
     ctor public OffsetPropKey();
@@ -109,14 +105,14 @@ package androidx.compose.animation {
 
   public final class PropertyKeysKt {
     method public static kotlin.jvm.functions.Function1<androidx.compose.ui.graphics.colorspace.ColorSpace,androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.graphics.Color,androidx.compose.animation.core.AnimationVector4D>> getVectorConverter(androidx.compose.ui.graphics.Color.Companion);
-    method public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.geometry.Rect,androidx.compose.animation.core.AnimationVector4D> getVectorConverter(androidx.compose.ui.geometry.Rect.Companion);
-    method public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.Dp,androidx.compose.animation.core.AnimationVector1D> getVectorConverter(androidx.compose.ui.unit.Dp.Companion);
-    method public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.Position,androidx.compose.animation.core.AnimationVector2D> getVectorConverter(androidx.compose.ui.unit.Position.Companion);
-    method public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.geometry.Size,androidx.compose.animation.core.AnimationVector2D> getVectorConverter(androidx.compose.ui.geometry.Size.Companion);
-    method public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.Bounds,androidx.compose.animation.core.AnimationVector4D> getVectorConverter(androidx.compose.ui.unit.Bounds.Companion);
-    method public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.geometry.Offset,androidx.compose.animation.core.AnimationVector2D> getVectorConverter(androidx.compose.ui.geometry.Offset.Companion);
-    method public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.IntOffset,androidx.compose.animation.core.AnimationVector2D> getVectorConverter(androidx.compose.ui.unit.IntOffset.Companion);
-    method public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.IntSize,androidx.compose.animation.core.AnimationVector2D> getVectorConverter(androidx.compose.ui.unit.IntSize.Companion);
+    method @Deprecated public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.geometry.Rect,androidx.compose.animation.core.AnimationVector4D> getVectorConverter(androidx.compose.ui.geometry.Rect.Companion);
+    method @Deprecated public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.Dp,androidx.compose.animation.core.AnimationVector1D> getVectorConverter(androidx.compose.ui.unit.Dp.Companion);
+    method @Deprecated public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.Position,androidx.compose.animation.core.AnimationVector2D> getVectorConverter(androidx.compose.ui.unit.Position.Companion);
+    method @Deprecated public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.geometry.Size,androidx.compose.animation.core.AnimationVector2D> getVectorConverter(androidx.compose.ui.geometry.Size.Companion);
+    method @Deprecated public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.Bounds,androidx.compose.animation.core.AnimationVector4D> getVectorConverter(androidx.compose.ui.unit.Bounds.Companion);
+    method @Deprecated public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.geometry.Offset,androidx.compose.animation.core.AnimationVector2D> getVectorConverter(androidx.compose.ui.geometry.Offset.Companion);
+    method @Deprecated public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.IntOffset,androidx.compose.animation.core.AnimationVector2D> getVectorConverter(androidx.compose.ui.unit.IntOffset.Companion);
+    method @Deprecated public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.IntSize,androidx.compose.animation.core.AnimationVector2D> getVectorConverter(androidx.compose.ui.unit.IntSize.Companion);
   }
 
   public final class PxPropKey implements androidx.compose.animation.core.PropKey<java.lang.Float,androidx.compose.animation.core.AnimationVector1D> {
@@ -154,6 +150,7 @@ package androidx.compose.animation {
   }
 
   public final class TransitionKt {
+    method @androidx.compose.runtime.Composable public static inline <S> androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> animateColor(androidx.compose.animation.core.Transition<S>, optional kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.Transition.States<S>,? extends androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.graphics.Color>> transitionSpec, kotlin.jvm.functions.Function1<? super S,androidx.compose.ui.graphics.Color> targetValueByState);
     method @Deprecated @VisibleForTesting public static void setTransitionsEnabled(boolean p);
     method @androidx.compose.runtime.Composable public static <T> androidx.compose.animation.core.TransitionState transition(androidx.compose.animation.core.TransitionDefinition<T> definition, T? toState, optional androidx.compose.animation.core.AnimationClockObservable clock, optional T? initState, optional String? label, optional kotlin.jvm.functions.Function1<? super T,kotlin.Unit>? onStateChangeFinished);
   }

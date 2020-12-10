@@ -17,9 +17,9 @@
 package androidx.compose.ui.tooling.inspector
 
 import android.view.View
+import androidx.compose.runtime.CompositionData
 import androidx.compose.runtime.InternalComposeApi
-import androidx.compose.runtime.SlotTable
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
+import androidx.compose.ui.layout.LayoutInfo
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.tooling.Group
@@ -58,14 +58,13 @@ private fun packageNameHash(packageName: String) =
 /**
  * Generator of a tree for the Layout Inspector.
  */
-@OptIn(ExperimentalLayoutNodeApi::class)
 class LayoutInspectorTree {
     private val inlineClassConverter = InlineClassConverter()
     private val parameterFactory = ParameterFactory(inlineClassConverter)
     private val cache = ArrayDeque<MutableInspectorNode>()
     private var generatedId = -1L
-    /** Map from [LayoutNode] to the nearest [InspectorNode] that contains it */
-    private val claimedNodes = IdentityHashMap<LayoutNode, InspectorNode>()
+    /** Map from [LayoutInfo] to the nearest [InspectorNode] that contains it */
+    private val claimedNodes = IdentityHashMap<LayoutInfo, InspectorNode>()
     /** Map from parent tree to child trees that are about to be stitched together */
     private val treeMap = IdentityHashMap<MutableInspectorNode, MutableList<MutableInspectorNode>>()
     /** Map from owner node to child trees that are about to be stitched to this owner */
@@ -75,13 +74,13 @@ class LayoutInspectorTree {
         Collections.newSetFromMap(IdentityHashMap<MutableInspectorNode, Boolean>())
 
     /**
-     * Converts the [SlotTable] set held by [view] into a list of root nodes.
+     * Converts the [CompositionData] set held by [view] into a list of root nodes.
      */
     @OptIn(InternalComposeApi::class)
     fun convert(view: View): List<InspectorNode> {
         parameterFactory.density = Density(view.context)
         @Suppress("UNCHECKED_CAST")
-        val tables = view.getTag(R.id.inspection_slot_table_set) as? Set<SlotTable>
+        val tables = view.getTag(R.id.inspection_slot_table_set) as? Set<CompositionData>
             ?: return emptyList()
         clear()
         val result = convert(tables)
@@ -113,7 +112,7 @@ class LayoutInspectorTree {
     }
 
     @OptIn(InternalComposeApi::class)
-    private fun convert(tables: Set<SlotTable>): List<InspectorNode> {
+    private fun convert(tables: Set<CompositionData>): List<InspectorNode> {
         val trees = tables.map { convert(it) }
         return when (trees.size) {
             0 -> listOf()
@@ -123,20 +122,21 @@ class LayoutInspectorTree {
     }
 
     /**
-     * Stitch separate trees together using the [LayoutNode]s found in the [SlotTable]s.
+     * Stitch separate trees together using the [LayoutNode]s found in the [CompositionData]s.
      *
-     * Some constructs in Compose (e.g. ModalDrawerLayout) will result is multiple [SlotTable]s.
-     * This code will attempt to stitch the resulting [InspectorNode] trees together by looking
-     * at the parent of each [LayoutNode].
+     * Some constructs in Compose (e.g. ModalDrawerLayout) will result is multiple
+     * [CompositionData]s. This code will attempt to stitch the resulting [InspectorNode] trees
+     * together by looking at the parent of each [LayoutNode].
+     *
      * If this algorithm is successful the result of this function will be a list with a single
      * tree.
      */
     private fun stitchTreesByLayoutNode(trees: List<MutableInspectorNode>): List<InspectorNode> {
-        val layoutToTreeMap = IdentityHashMap<LayoutNode, MutableInspectorNode>()
+        val layoutToTreeMap = IdentityHashMap<LayoutInfo, MutableInspectorNode>()
         trees.forEach { tree -> tree.layoutNodes.forEach { layoutToTreeMap[it] = tree } }
         trees.forEach { tree ->
             val layout = tree.layoutNodes.lastOrNull()
-            val parentLayout = generateSequence(layout) { it.parent }.firstOrNull {
+            val parentLayout = generateSequence(layout) { it.parentInfo }.firstOrNull {
                 val otherTree = layoutToTreeMap[it]
                 otherTree != null && otherTree != tree
             }
@@ -201,7 +201,7 @@ class LayoutInspectorTree {
     }
 
     @OptIn(InternalComposeApi::class)
-    private fun convert(table: SlotTable): MutableInspectorNode {
+    private fun convert(table: CompositionData): MutableInspectorNode {
         val fakeParent = newNode()
         addToParent(fakeParent, listOf(convert(table.asTree())))
         return fakeParent
@@ -264,7 +264,7 @@ class LayoutInspectorTree {
     private fun parse(group: Group): MutableInspectorNode {
         val node = newNode()
         node.id = getRenderNode(group)
-        ((group as? NodeGroup)?.node as? LayoutNode)?.let { node.layoutNodes.add(it) }
+        ((group as? NodeGroup)?.node as? LayoutInfo)?.let { node.layoutNodes.add(it) }
         if (!parseCallLocation(group, node) && group.name.isNullOrEmpty()) {
             return markUnwanted(node)
         }

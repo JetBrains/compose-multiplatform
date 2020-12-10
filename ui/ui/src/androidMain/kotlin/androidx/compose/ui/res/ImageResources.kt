@@ -30,6 +30,8 @@ import androidx.compose.ui.util.trace
  *
  * Note: This API is transient and will be likely removed for encouraging async resource loading.
  *
+ * For loading generic loading of rasterized or vector assets see [painterResource]
+ *
  * @param id the resource identifier
  * @return the decoded image data associated with the resource
  */

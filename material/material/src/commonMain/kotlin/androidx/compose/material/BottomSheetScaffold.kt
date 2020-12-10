@@ -37,12 +37,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.Saver
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.WithConstraints
+import androidx.compose.ui.gesture.nestedscroll.nestedScroll
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientDensity
@@ -79,7 +80,7 @@ enum class BottomSheetValue {
 class BottomSheetState(
     initialValue: BottomSheetValue,
     clock: AnimationClockObservable,
-    animationSpec: AnimationSpec<Float> = SwipeableConstants.DefaultAnimationSpec,
+    animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
     confirmStateChange: (BottomSheetValue) -> Boolean = { true }
 ) : SwipeableState<BottomSheetValue>(
     initialValue = initialValue,
@@ -151,6 +152,8 @@ class BottomSheetState(
             }
         )
     }
+
+    internal val nestedScrollConnection = this.PreUpPostDownNestedScrollConnection
 }
 
 /**
@@ -164,7 +167,7 @@ class BottomSheetState(
 @ExperimentalMaterialApi
 fun rememberBottomSheetState(
     initialValue: BottomSheetValue,
-    animationSpec: AnimationSpec<Float> = SwipeableConstants.DefaultAnimationSpec,
+    animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
     confirmStateChange: (BottomSheetValue) -> Boolean = { true }
 ): BottomSheetState {
     val disposableClock = AmbientAnimationClock.current.asDisposableClock()
@@ -279,17 +282,17 @@ fun BottomSheetScaffold(
     floatingActionButtonPosition: FabPosition = FabPosition.End,
     sheetGesturesEnabled: Boolean = true,
     sheetShape: Shape = MaterialTheme.shapes.large,
-    sheetElevation: Dp = BottomSheetScaffoldConstants.DefaultSheetElevation,
+    sheetElevation: Dp = BottomSheetScaffoldDefaults.SheetElevation,
     sheetBackgroundColor: Color = MaterialTheme.colors.surface,
     sheetContentColor: Color = contentColorFor(sheetBackgroundColor),
-    sheetPeekHeight: Dp = BottomSheetScaffoldConstants.DefaultSheetPeekHeight,
+    sheetPeekHeight: Dp = BottomSheetScaffoldDefaults.SheetPeekHeight,
     drawerContent: @Composable (ColumnScope.() -> Unit)? = null,
     drawerGesturesEnabled: Boolean = true,
     drawerShape: Shape = MaterialTheme.shapes.large,
-    drawerElevation: Dp = DrawerConstants.DefaultElevation,
+    drawerElevation: Dp = DrawerDefaults.Elevation,
     drawerBackgroundColor: Color = MaterialTheme.colors.surface,
     drawerContentColor: Color = contentColorFor(drawerBackgroundColor),
-    drawerScrimColor: Color = DrawerConstants.defaultScrimColor,
+    drawerScrimColor: Color = DrawerDefaults.scrimColor,
     backgroundColor: Color = MaterialTheme.colors.background,
     contentColor: Color = contentColorFor(backgroundColor),
     bodyContent: @Composable (PaddingValues) -> Unit
@@ -299,16 +302,18 @@ fun BottomSheetScaffold(
         val peekHeightPx = with(AmbientDensity.current) { sheetPeekHeight.toPx() }
         var bottomSheetHeight by remember { mutableStateOf(fullHeight) }
 
-        val swipeable = Modifier.swipeable(
-            state = scaffoldState.bottomSheetState,
-            anchors = mapOf(
-                fullHeight - peekHeightPx to BottomSheetValue.Collapsed,
-                fullHeight - bottomSheetHeight to BottomSheetValue.Expanded
-            ),
-            orientation = Orientation.Vertical,
-            enabled = sheetGesturesEnabled,
-            resistance = null
-        )
+        val swipeable = Modifier
+            .nestedScroll(scaffoldState.bottomSheetState.nestedScrollConnection)
+            .swipeable(
+                state = scaffoldState.bottomSheetState,
+                anchors = mapOf(
+                    fullHeight - peekHeightPx to BottomSheetValue.Collapsed,
+                    fullHeight - bottomSheetHeight to BottomSheetValue.Expanded
+                ),
+                orientation = Orientation.Vertical,
+                enabled = sheetGesturesEnabled,
+                resistance = null
+            )
 
         val child = @Composable {
             BottomSheetScaffoldStack(
@@ -422,6 +427,13 @@ private val FabEndSpacing = 16.dp
 /**
  * Contains useful constants for [BottomSheetScaffold].
  */
+@Deprecated(
+    message = "BottomSheetScaffoldConstants has been replaced with BottomSheetScaffoldDefaults",
+    ReplaceWith(
+        "BottomSheetScaffoldDefaults",
+        "androidx.compose.material.BottomSheetScaffoldDefaults"
+    )
+)
 object BottomSheetScaffoldConstants {
 
     /**
@@ -433,4 +445,20 @@ object BottomSheetScaffoldConstants {
      * The default peek height used by [BottomSheetScaffold].
      */
     val DefaultSheetPeekHeight = 56.dp
+}
+
+/**
+ * Contains useful defaults for [BottomSheetScaffold].
+ */
+object BottomSheetScaffoldDefaults {
+
+    /**
+     * The default elevation used by [BottomSheetScaffold].
+     */
+    val SheetElevation = 8.dp
+
+    /**
+     * The default peek height used by [BottomSheetScaffold].
+     */
+    val SheetPeekHeight = 56.dp
 }

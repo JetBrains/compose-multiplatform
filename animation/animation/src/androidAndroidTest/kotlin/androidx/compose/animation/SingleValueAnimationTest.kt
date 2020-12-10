@@ -22,6 +22,7 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.FloatSpringSpec
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
@@ -338,14 +339,14 @@ class SingleValueAnimationTest {
         var boundsValue = Bounds(0.dp, 0.dp, 0.dp, 0.dp)
 
         val specForFloat = FloatSpringSpec(visibilityThreshold = 0.01f)
-        val specForVector = FloatSpringSpec(visibilityThreshold = PxVisibilityThreshold)
-        val specForOffset = FloatSpringSpec(visibilityThreshold = PxVisibilityThreshold)
-        val specForBounds = FloatSpringSpec(visibilityThreshold = DpVisibilityThreshold)
+        val specForVector = FloatSpringSpec(visibilityThreshold = 0.5f)
+        val specForOffset = FloatSpringSpec(visibilityThreshold = 0.5f)
+        val specForBounds = FloatSpringSpec(visibilityThreshold = 0.1f)
 
         val content: @Composable (Boolean) -> Unit = { enabled ->
             vectorValue = animate(
                 if (enabled) AnimationVector(100f) else AnimationVector(0f),
-                visibilityThreshold = AnimationVector(PxVisibilityThreshold)
+                visibilityThreshold = AnimationVector(0.5f)
             )
 
             offsetValue = animate(

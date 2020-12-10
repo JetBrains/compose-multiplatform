@@ -18,11 +18,16 @@ package androidx.compose.ui.layout
 
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Recomposer
+import androidx.compose.runtime.State
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,6 +48,7 @@ import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.unit.Constraints
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
+import com.google.common.truth.Truth.assertThat
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -53,6 +59,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import kotlin.math.min
 
 @SmallTest
 @RunWith(AndroidJUnit4::class)
@@ -430,6 +437,226 @@ class OnGloballyPositionedTest {
 
         assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
     }
+
+    @Test
+    fun simplePadding() {
+        val paddingLeftPx = 100.0f
+        val paddingTopPx = 120.0f
+        var realLeft: Float? = null
+        var realTop: Float? = null
+
+        val positionedLatch = CountDownLatch(1)
+        rule.runOnUiThread {
+            activity.setContent {
+                with(AmbientDensity.current) {
+                    Box(
+                        Modifier.fillMaxSize()
+                            .padding(start = paddingLeftPx.toDp(), top = paddingTopPx.toDp())
+                            .onGloballyPositioned {
+                                realLeft = it.positionInParent.x
+                                realTop = it.positionInParent.y
+                                positionedLatch.countDown()
+                            }
+                    )
+                }
+            }
+        }
+        assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
+
+        assertThat(paddingLeftPx).isEqualTo(realLeft)
+        assertThat(paddingTopPx).isEqualTo(realTop)
+    }
+    @Test
+    fun nestedLayoutCoordinates() {
+        val firstPaddingPx = 10f
+        val secondPaddingPx = 20f
+        val thirdPaddingPx = 30f
+        var gpCoordinates: LayoutCoordinates? = null
+        var childCoordinates: LayoutCoordinates? = null
+
+        val positionedLatch = CountDownLatch(2)
+        rule.runOnUiThread {
+            activity.setContent {
+                with(AmbientDensity.current) {
+                    Box(
+                        Modifier.padding(start = firstPaddingPx.toDp()).then(
+                            Modifier.onGloballyPositioned {
+                                gpCoordinates = it
+                                positionedLatch.countDown()
+                            }
+                        )
+                    ) {
+                        Box(Modifier.padding(start = secondPaddingPx.toDp())) {
+                            Box(
+                                Modifier.fillMaxSize()
+                                    .padding(start = thirdPaddingPx.toDp())
+                                    .onGloballyPositioned {
+                                        childCoordinates = it
+                                        positionedLatch.countDown()
+                                    }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+        assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
+
+        // global position
+        val gPos = childCoordinates!!.localToGlobal(Offset.Zero).x
+        assertThat(gPos).isEqualTo((firstPaddingPx + secondPaddingPx + thirdPaddingPx))
+        // Position in grandparent Px(value=50.0)
+        val gpPos = gpCoordinates!!.childToLocal(childCoordinates!!, Offset.Zero).x
+        assertThat(gpPos).isEqualTo((secondPaddingPx + thirdPaddingPx))
+        // local position
+        assertThat(childCoordinates!!.positionInParent.x).isEqualTo(thirdPaddingPx)
+    }
+
+    @Test
+    fun globalCoordinatesAreInActivityCoordinates() {
+        val padding = 30
+        val localPosition = androidx.compose.ui.geometry.Offset.Zero
+        val framePadding = Offset(padding.toFloat(), padding.toFloat())
+        var realGlobalPosition: Offset? = null
+        var realLocalPosition: Offset? = null
+        var frameGlobalPosition: Offset? = null
+
+        val positionedLatch = CountDownLatch(1)
+        rule.runOnUiThread {
+            val frameLayout = FrameLayout(activity)
+            frameLayout.setPadding(padding, padding, padding, padding)
+            activity.setContentView(frameLayout)
+
+            val position = IntArray(2)
+            frameLayout.getLocationOnScreen(position)
+            frameGlobalPosition = Offset(position[0].toFloat(), position[1].toFloat())
+
+            frameLayout.setContent(Recomposer.current()) {
+                Box(
+                    Modifier.fillMaxSize().onGloballyPositioned {
+                        realGlobalPosition = it.localToGlobal(localPosition)
+                        realLocalPosition = it.globalToLocal(
+                            framePadding + frameGlobalPosition!!
+                        )
+                        positionedLatch.countDown()
+                    }
+                )
+            }
+        }
+        assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
+
+        assertThat(realGlobalPosition).isEqualTo(frameGlobalPosition!! + framePadding)
+        assertThat(realLocalPosition).isEqualTo(localPosition)
+    }
+
+    @Test
+    fun justAddedOnPositionedCallbackFiredWithoutLayoutChanges() {
+        val needCallback = mutableStateOf(false)
+
+        val positionedLatch = CountDownLatch(1)
+        rule.runOnUiThread {
+            activity.setContent {
+                val modifier = if (needCallback.value) {
+                    Modifier.onGloballyPositioned { positionedLatch.countDown() }
+                } else {
+                    Modifier
+                }
+                Box(modifier.fillMaxSize())
+            }
+        }
+
+        rule.runOnUiThread { needCallback.value = true }
+
+        assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
+    }
+
+    @Test
+    fun testRepositionTriggersCallback() {
+        val left = mutableStateOf(30)
+        var realLeft: Float? = null
+
+        var positionedLatch = CountDownLatch(1)
+        rule.runOnUiThread {
+            activity.setContent {
+                with(AmbientDensity.current) {
+                    Box {
+                        Box(
+                            Modifier.onGloballyPositioned {
+                                realLeft = it.positionInParent.x
+                                positionedLatch.countDown()
+                            }
+                                .fillMaxSize()
+                                .padding(start = left.value.toDp()),
+                        )
+                    }
+                }
+            }
+        }
+        assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
+
+        positionedLatch = CountDownLatch(1)
+        rule.runOnUiThread { left.value = 40 }
+
+        assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
+        assertThat(realLeft).isEqualTo(40)
+    }
+
+    @Test
+    fun testGrandParentRepositionTriggersChildrenCallback() {
+        // when we reposition any parent layout is causes the change in global
+        // position of all the children down the tree(for example during the scrolling).
+        // children should be able to react on this change.
+        val left = mutableStateOf(20)
+        var realLeft: Float? = null
+        var positionedLatch = CountDownLatch(1)
+        rule.runOnUiThread {
+            activity.setContent {
+                with(AmbientDensity.current) {
+                    Box {
+                        Offset(left) {
+                            Box(Modifier.size(10.toDp())) {
+                                Box(Modifier.size(10.toDp())) {
+                                    Box(
+                                        Modifier.onGloballyPositioned {
+                                            realLeft = it.positionInRoot.x
+                                            positionedLatch.countDown()
+                                        }.size(10.toDp())
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
+
+        positionedLatch = CountDownLatch(1)
+        rule.runOnUiThread { left.value = 40 }
+
+        assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
+        assertThat(realLeft).isEqualTo(40)
+    }
+
+    @Test
+    fun testAlignmentLinesArePresent() {
+        val latch = CountDownLatch(1)
+        val line = VerticalAlignmentLine(::min)
+        val lineValue = 10
+        rule.runOnUiThread {
+            activity.setContent {
+                val onPositioned = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
+                    assertEquals(1, coordinates.providedAlignmentLines.size)
+                    assertEquals(lineValue, coordinates[line])
+                    latch.countDown()
+                }
+                Layout(modifier = onPositioned, content = { }) { _, _ ->
+                    layout(0, 0, mapOf(line to lineValue)) { }
+                }
+            }
+        }
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+    }
 }
 
 @Composable
@@ -447,6 +674,16 @@ fun DelayedMeasure(
             placeables.forEach { child ->
                 child.place(0, 0)
             }
+        }
+    }
+}
+
+@Composable
+private fun Offset(sizeModel: State<Int>, content: @Composable () -> Unit) {
+    // simple copy of Padding which doesn't recompose when the size changes
+    Layout(content) { measurables, constraints ->
+        layout(constraints.maxWidth, constraints.maxHeight) {
+            measurables.first().measure(constraints).placeRelative(sizeModel.value, 0)
         }
     }
 }

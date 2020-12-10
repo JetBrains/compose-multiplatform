@@ -52,6 +52,7 @@ import androidx.autofill.HintConstants.AUTOFILL_HINT_POSTAL_ADDRESS_STREET_ADDRE
 import androidx.autofill.HintConstants.AUTOFILL_HINT_POSTAL_CODE
 import androidx.autofill.HintConstants.AUTOFILL_HINT_SMS_OTP
 import androidx.autofill.HintConstants.AUTOFILL_HINT_USERNAME
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.autofill.AutofillType.AddressAuxiliaryDetails
 import androidx.compose.ui.autofill.AutofillType.AddressCountry
 import androidx.compose.ui.autofill.AutofillType.AddressLocality
@@ -93,6 +94,7 @@ import androidx.compose.ui.autofill.AutofillType.Username
  * Gets the Android specific [AutofillHint][android.view.ViewStructure.setAutofillHints]
  * corresponding to the current [AutofillType].
  */
+@ExperimentalComposeUiApi
 internal val AutofillType.androidType: String
     get() {
         val androidAutofillType = androidAutofillTypes[this]
@@ -103,6 +105,7 @@ internal val AutofillType.androidType: String
 /**
  * Maps each [AutofillType] to one of the  autofill hints in [androidx.autofill.HintConstants]
  */
+@ExperimentalComposeUiApi
 private val androidAutofillTypes: HashMap<AutofillType, String> = hashMapOf(
     EmailAddress to AUTOFILL_HINT_EMAIL_ADDRESS,
     Username to AUTOFILL_HINT_USERNAME,

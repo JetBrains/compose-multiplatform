@@ -23,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus
 import androidx.compose.ui.focus.FocusState.Active
 import androidx.compose.ui.focus.FocusState.Inactive
-import androidx.compose.ui.focusObserver
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.platform.AmbientView
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -35,7 +34,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @MediumTest
-@OptIn(ExperimentalFocus::class)
 @RunWith(AndroidJUnit4::class)
 class FocusRequesterTest {
     @get:Rule
@@ -49,7 +47,7 @@ class FocusRequesterTest {
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
-                    .focusObserver { focusState = it }
+                    .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
             )
         }
@@ -71,7 +69,7 @@ class FocusRequesterTest {
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
-                    .focusObserver { focusState = it }
+                    .onFocusChanged { focusState = it }
                     .focus()
                     .focusRequester(focusRequester)
             )
@@ -94,7 +92,7 @@ class FocusRequesterTest {
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
-                    .focusObserver { focusState = it }
+                    .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
                     .focus()
             )
@@ -118,7 +116,7 @@ class FocusRequesterTest {
             Box(
                 modifier = Modifier
                     .focusRequester(focusRequester)
-                    .focusObserver { focusState = it }
+                    .onFocusChanged { focusState = it }
             ) {
                 Box(modifier = Modifier.focus())
             }
@@ -140,7 +138,7 @@ class FocusRequesterTest {
         val focusRequester = FocusRequester()
         rule.setFocusableContent {
             Box(
-                modifier = Modifier.focusObserver { focusState = it }
+                modifier = Modifier.onFocusChanged { focusState = it }
             ) {
                 Box(
                     modifier = Modifier
@@ -170,7 +168,7 @@ class FocusRequesterTest {
             ) {
                 Box(
                     modifier = Modifier
-                        .focusObserver { focusState = it }
+                        .onFocusChanged { focusState = it }
                         .focus()
                 )
             }
@@ -193,7 +191,7 @@ class FocusRequesterTest {
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
-                    .focusObserver { focusState = it }
+                    .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
             ) {
                 Box {
@@ -233,12 +231,12 @@ class FocusRequesterTest {
             ) {
                 Box(
                     modifier = Modifier
-                        .focusObserver { focusState1 = it }
+                        .onFocusChanged { focusState1 = it }
                         .focus()
                 )
                 Box(
                     modifier = Modifier
-                        .focusObserver { focusState2 = it }
+                        .onFocusChanged { focusState2 = it }
                         .focus()
                 )
             }
@@ -255,16 +253,15 @@ class FocusRequesterTest {
     }
 
     @Test
-    fun requestFocusForAnyChild_triggersFocusObserverInParent() {
+    fun requestFocusForAnyChild_triggersonFocusChangedInParent() {
         // Arrange.
         lateinit var hostView: View
         var focusState = Inactive
-        val focusRequester1 = FocusRequester()
-        val focusRequester2 = FocusRequester()
+        val (focusRequester1, focusRequester2) = FocusRequester.createRefs()
         rule.setFocusableContent {
             hostView = AmbientView.current
             Column(
-                modifier = Modifier.focusObserver { focusState = it }
+                modifier = Modifier.onFocusChanged { focusState = it }
             ) {
                 Box(
                     modifier = Modifier

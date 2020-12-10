@@ -2,12 +2,12 @@
 package androidx.compose.ui.test.junit4 {
 
   public final class AndroidAnimationClockTestRuleKt {
-    method @androidx.compose.ui.test.ExperimentalTesting public static androidx.compose.ui.test.junit4.AnimationClockTestRule createAnimationClockRule();
+    method @Deprecated @androidx.compose.ui.test.ExperimentalTesting public static androidx.compose.ui.test.junit4.AnimationClockTestRule createAnimationClockRule();
   }
 
   public final class AndroidComposeTestRule<R extends org.junit.rules.TestRule, A extends androidx.activity.ComponentActivity> implements androidx.compose.ui.test.junit4.ComposeTestRule {
     ctor public AndroidComposeTestRule(R activityRule, kotlin.jvm.functions.Function1<? super R,? extends A> activityProvider);
-    method public org.junit.runners.model.Statement apply(org.junit.runners.model.Statement base, org.junit.runner.Description? description);
+    method public org.junit.runners.model.Statement apply(org.junit.runners.model.Statement base, org.junit.runner.Description description);
     method @androidx.compose.ui.test.ExperimentalTesting public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public R getActivityRule();
     method public androidx.compose.ui.test.junit4.AnimationClockTestRule getClockTestRule();
@@ -15,9 +15,11 @@ package androidx.compose.ui.test.junit4 {
     method public long getDisplaySize-YbymL2g();
     method public androidx.compose.ui.test.SemanticsNodeInteractionCollection onAllNodes(androidx.compose.ui.test.SemanticsMatcher matcher, boolean useUnmergedTree);
     method public androidx.compose.ui.test.SemanticsNodeInteraction onNode(androidx.compose.ui.test.SemanticsMatcher matcher, boolean useUnmergedTree);
+    method public void registerIdlingResource(androidx.compose.ui.test.IdlingResource idlingResource);
     method public <T> T! runOnIdle(kotlin.jvm.functions.Function0<? extends T> action);
     method public <T> T! runOnUiThread(kotlin.jvm.functions.Function0<? extends T> action);
     method public void setContent(kotlin.jvm.functions.Function0<kotlin.Unit> composable);
+    method public void unregisterIdlingResource(androidx.compose.ui.test.IdlingResource idlingResource);
     method public void waitForIdle();
     property public final R activityRule;
     property public androidx.compose.ui.test.junit4.AnimationClockTestRule clockTestRule;
@@ -54,9 +56,11 @@ package androidx.compose.ui.test.junit4 {
     method public androidx.compose.ui.test.junit4.AnimationClockTestRule getClockTestRule();
     method public androidx.compose.ui.unit.Density getDensity();
     method public long getDisplaySize-YbymL2g();
+    method public void registerIdlingResource(androidx.compose.ui.test.IdlingResource idlingResource);
     method public <T> T! runOnIdle(kotlin.jvm.functions.Function0<? extends T> action);
     method public <T> T! runOnUiThread(kotlin.jvm.functions.Function0<? extends T> action);
     method public void setContent(kotlin.jvm.functions.Function0<kotlin.Unit> composable);
+    method public void unregisterIdlingResource(androidx.compose.ui.test.IdlingResource idlingResource);
     method public void waitForIdle();
     property public abstract androidx.compose.ui.test.junit4.AnimationClockTestRule clockTestRule;
     property public abstract androidx.compose.ui.unit.Density density;
@@ -82,15 +86,21 @@ package androidx.compose.ui.test.junit4 {
 
 package androidx.compose.ui.test.junit4.android {
 
+  public final class AndroidOwnerRegistryKt {
+  }
+
   public final class ComposeIdlingResourceKt {
-    method public static void registerComposeWithEspresso();
-    method @androidx.compose.ui.test.ExperimentalTesting public static void registerTestClock(androidx.compose.ui.test.TestAnimationClock clock);
-    method public static void unregisterComposeFromEspresso();
-    method @androidx.compose.ui.test.ExperimentalTesting public static void unregisterTestClock(androidx.compose.ui.test.TestAnimationClock clock);
+    method @Deprecated public static void registerComposeWithEspresso();
+    method @Deprecated @androidx.compose.ui.test.ExperimentalTesting public static void registerTestClock(androidx.compose.ui.test.TestAnimationClock clock);
+    method @Deprecated public static void unregisterComposeFromEspresso();
+    method @Deprecated @androidx.compose.ui.test.ExperimentalTesting public static void unregisterTestClock(androidx.compose.ui.test.TestAnimationClock clock);
   }
 
   public final class ComposeNotIdleException extends java.lang.Throwable {
     ctor public ComposeNotIdleException(String? message, Throwable? cause);
+  }
+
+  public final class EspressoLinkKt {
   }
 
 }

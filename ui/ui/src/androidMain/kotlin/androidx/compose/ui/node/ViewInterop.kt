@@ -29,7 +29,7 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.AndroidOwner
+import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.util.fastFirstOrNull
 import androidx.compose.ui.util.fastForEach
@@ -95,7 +95,7 @@ private fun obtainMeasureSpec(
  * Builds a [LayoutNode] tree representation for an Android [View].
  * The component nodes will proxy the Compose core calls to the [View].
  */
-@OptIn(ExperimentalLayoutNodeApi::class, InternalInteropApi::class)
+@OptIn(InternalInteropApi::class)
 internal fun AndroidViewHolder.toLayoutNode(): LayoutNode {
     // TODO(soboleva): add layout direction here?
     // TODO(popam): forward pointer input, accessibility, focus
@@ -106,7 +106,7 @@ internal fun AndroidViewHolder.toLayoutNode(): LayoutNode {
         .pointerInteropFilter(this)
         .drawBehind {
             drawIntoCanvas { canvas ->
-                (layoutNode.owner as? AndroidOwner)
+                (layoutNode.owner as? AndroidComposeView)
                     ?.drawAndroidView(this@toLayoutNode, canvas.nativeCanvas)
             }
         }.onGloballyPositioned {
@@ -122,11 +122,11 @@ internal fun AndroidViewHolder.toLayoutNode(): LayoutNode {
 
     var viewRemovedOnDetach: View? = null
     layoutNode.onAttach = { owner ->
-        (owner as? AndroidOwner)?.addAndroidView(this, layoutNode)
+        (owner as? AndroidComposeView)?.addAndroidView(this, layoutNode)
         if (viewRemovedOnDetach != null) view = viewRemovedOnDetach
     }
     layoutNode.onDetach = { owner ->
-        (owner as? AndroidOwner)?.removeAndroidView(this)
+        (owner as? AndroidComposeView)?.removeAndroidView(this)
         viewRemovedOnDetach = view
         view = null
     }
@@ -168,7 +168,6 @@ internal fun AndroidViewHolder.toLayoutNode(): LayoutNode {
     return layoutNode
 }
 
-@OptIn(ExperimentalLayoutNodeApi::class)
 private fun View.layoutAccordingTo(layoutNode: LayoutNode) {
     val position = layoutNode.coordinates.positionInRoot
     val x = position.x.roundToInt()

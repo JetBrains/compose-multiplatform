@@ -35,22 +35,22 @@ class AbstractApplierTest {
 
     @Test fun downGoesDown() {
         val one = Node("one")
-        applier.insert(0, one)
+        applier.insertTopDown(0, one)
         applier.down(one)
         assertSame(one, applier.current)
 
         val two = Node("two")
-        applier.insert(0, two)
+        applier.insertTopDown(0, two)
         applier.down(two)
         assertSame(two, applier.current)
     }
 
     @Test fun upGoesUp() {
         val one = Node("one")
-        applier.insert(0, one)
+        applier.insertTopDown(0, one)
         applier.down(one)
         val two = Node("two")
-        applier.insert(0, two)
+        applier.insertTopDown(0, two)
         applier.down(two)
 
         applier.up()
@@ -61,7 +61,7 @@ class AbstractApplierTest {
 
     @Test fun clearClearsAndPointsToRoot() {
         val child = Node("child")
-        applier.insert(0, child)
+        applier.insertTopDown(0, child)
         applier.down(child)
 
         applier.clear()
@@ -76,10 +76,10 @@ class AbstractApplierTest {
         val two = Node("two")
         val three = Node("three")
         val four = Node("four")
-        applier.insert(0, one)
-        applier.insert(1, two)
-        applier.insert(2, three)
-        applier.insert(3, four)
+        applier.insertTopDown(0, one)
+        applier.insertTopDown(1, two)
+        applier.insertTopDown(2, three)
+        applier.insertTopDown(3, four)
 
         applier.remove(1, 1) // Middle
         assertEquals(listOf(one, three, four), root.children)
@@ -99,13 +99,13 @@ class AbstractApplierTest {
         val five = Node("five")
         val six = Node("six")
         val seven = Node("seven")
-        applier.insert(0, one)
-        applier.insert(1, two)
-        applier.insert(2, three)
-        applier.insert(3, four)
-        applier.insert(4, five)
-        applier.insert(5, six)
-        applier.insert(6, seven)
+        applier.insertTopDown(0, one)
+        applier.insertTopDown(1, two)
+        applier.insertTopDown(2, three)
+        applier.insertTopDown(3, four)
+        applier.insertTopDown(4, five)
+        applier.insertTopDown(5, six)
+        applier.insertTopDown(6, seven)
 
         applier.remove(2, 2) // Middle
         assertEquals(listOf(one, two, five, six, seven), root.children)
@@ -121,9 +121,9 @@ class AbstractApplierTest {
         val one = Node("one")
         val two = Node("two")
         val three = Node("three")
-        applier.insert(0, one)
-        applier.insert(1, two)
-        applier.insert(2, three)
+        applier.insertTopDown(0, one)
+        applier.insertTopDown(1, two)
+        applier.insertTopDown(2, three)
 
         applier.move(0, 3, 1)
         assertEquals(listOf(two, three, one), root.children)
@@ -141,9 +141,9 @@ class AbstractApplierTest {
         val one = Node("one")
         val two = Node("two")
         val three = Node("three")
-        applier.insert(0, one)
-        applier.insert(1, two)
-        applier.insert(2, three)
+        applier.insertTopDown(0, one)
+        applier.insertTopDown(1, two)
+        applier.insertTopDown(2, three)
 
         applier.move(2, 0, 1)
         assertEquals(listOf(three, one, two), root.children)
@@ -162,10 +162,10 @@ class AbstractApplierTest {
         val two = Node("two")
         val three = Node("three")
         val four = Node("four")
-        applier.insert(0, one)
-        applier.insert(1, two)
-        applier.insert(2, three)
-        applier.insert(3, four)
+        applier.insertTopDown(0, one)
+        applier.insertTopDown(1, two)
+        applier.insertTopDown(2, three)
+        applier.insertTopDown(3, four)
 
         applier.move(0, 4, 2)
         assertEquals(listOf(three, four, one, two), root.children)
@@ -178,10 +178,10 @@ class AbstractApplierTest {
         val two = Node("two")
         val three = Node("three")
         val four = Node("four")
-        applier.insert(0, one)
-        applier.insert(1, two)
-        applier.insert(2, three)
-        applier.insert(3, four)
+        applier.insertTopDown(0, one)
+        applier.insertTopDown(1, two)
+        applier.insertTopDown(2, three)
+        applier.insertTopDown(3, four)
 
         applier.move(2, 0, 2)
         assertEquals(listOf(three, four, one, two), root.children)
@@ -195,9 +195,11 @@ private class Node(val name: String) {
 
 @OptIn(ExperimentalComposeApi::class)
 private class NodeApplier(root: Node) : AbstractApplier<Node>(root) {
-    override fun insert(index: Int, instance: Node) {
+    override fun insertTopDown(index: Int, instance: Node) {
         current.children.add(index, instance)
     }
+
+    override fun insertBottomUp(index: Int, instance: Node) { }
 
     override fun remove(index: Int, count: Int) {
         current.children.remove(index, count)

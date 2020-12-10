@@ -15,23 +15,39 @@
  */
 package androidx.compose.ui.window
 
+import org.jetbrains.skiko.Library
 import java.awt.event.ActionListener
 import java.awt.event.ActionEvent
 import javax.swing.JMenu
 import javax.swing.JMenuBar
 import javax.swing.JMenuItem
 
+/**
+ * MenuBar is a class that represents a menu bar that can be attached to a window.
+ * The menu bar can be displayed inside a window (Windows, Linux) or at the top of
+ * the screen (Mac OS).
+ */
 class MenuBar {
     internal var menuBar: JMenuBar
 
     init {
         menuBar = JMenuBar()
+        // For the MenuBar to work correctly, we need to set the skiko system properties
+        Library.load()
     }
 
+    /**
+     * Constructs a MenuBar with the given menus.
+     *
+     * @param menu MenuBar menus.
+     */
     constructor(vararg menu: Menu) {
         menu(menu)
     }
 
+    /**
+     * Adds additional menus to the MenuBar.
+     */
     fun add(vararg menu: Menu) {
         menu(menu)
     }
@@ -55,10 +71,26 @@ class MenuBar {
     }
 }
 
+/**
+ * Menu is a class that represents a menu on a menu bar.
+ */
 class Menu {
+    /**
+     * Gets the menu name.
+     */
     val name: String
+
+    /**
+     * Gets the menu items.
+     */
     val list: List<MenuItem>
 
+    /**
+     * Constructs a Menu with the given name and menu items.
+     *
+     * @param name Menu name.
+     * @param item Menu items.
+     */
     constructor(name: String, vararg item: MenuItem) {
         this.name = name
         this.list = item.asList()

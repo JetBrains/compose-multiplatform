@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
@@ -112,6 +113,7 @@ class TextFieldScrollTest {
                         remember { scrollerPosition },
                         value,
                         VisualTransformation.None,
+                        remember { InteractionState() },
                         textLayoutResultRef
                     )
             )
@@ -142,6 +144,7 @@ class TextFieldScrollTest {
                         remember { scrollerPosition },
                         value,
                         VisualTransformation.None,
+                        remember { InteractionState() },
                         textLayoutResultRef,
                     )
             )
@@ -172,6 +175,7 @@ class TextFieldScrollTest {
                         remember { scrollerPosition },
                         value,
                         VisualTransformation.None,
+                        remember { InteractionState() },
                         textLayoutResultRef,
                     )
             )
@@ -203,6 +207,7 @@ class TextFieldScrollTest {
                         remember { scrollerPosition },
                         value,
                         VisualTransformation.None,
+                        remember { InteractionState() },
                         textLayoutResultRef,
                     )
             )
@@ -231,6 +236,7 @@ class TextFieldScrollTest {
                         remember { scrollerPosition },
                         value,
                         VisualTransformation.None,
+                        remember { InteractionState() },
                         textLayoutResultRef,
                     )
             )
@@ -242,6 +248,7 @@ class TextFieldScrollTest {
     }
 
     @Test
+    @LargeTest
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun testTextField_horizontal_scrolledAndClipped() {
         val scrollerPosition = TextFieldScrollerPosition()
@@ -271,6 +278,7 @@ class TextFieldScrollTest {
                                 remember { scrollerPosition },
                                 value,
                                 VisualTransformation.None,
+                                remember { InteractionState() },
                                 textLayoutResultRef
                             )
                     )
@@ -288,6 +296,7 @@ class TextFieldScrollTest {
     }
 
     @Test
+    @LargeTest
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun testTextField_vertical_scrolledAndClipped() {
         val scrollerPosition = TextFieldScrollerPosition()
@@ -316,6 +325,7 @@ class TextFieldScrollTest {
                                 remember { scrollerPosition },
                                 value,
                                 VisualTransformation.None,
+                                remember { InteractionState() },
                                 textLayoutResultRef
                             )
                     )
@@ -354,6 +364,7 @@ class TextFieldScrollTest {
                         remember { scrollerPosition },
                         value,
                         VisualTransformation.None,
+                        remember { InteractionState() },
                         textLayoutResultRef
                     )
             )
@@ -398,6 +409,7 @@ class TextFieldScrollTest {
                         remember { scrollerPosition },
                         value,
                         VisualTransformation.None,
+                        remember { InteractionState() },
                         textLayoutResultRef
                     )
             )
@@ -450,6 +462,7 @@ class TextFieldScrollTest {
                         scrollerPosition,
                         value,
                         VisualTransformation.None,
+                        remember { InteractionState() },
                         textLayoutResultRef
                     )
             )
@@ -482,7 +495,12 @@ class TextFieldScrollTest {
         val value = TextFieldValue()
         rule.setContent {
             val modifier = Modifier.textFieldScroll(
-                orientation, position, value, VisualTransformation.None, Ref()
+                orientation,
+                position,
+                value,
+                VisualTransformation.None,
+                remember { InteractionState() },
+                Ref()
             ) as InspectableValue
             assertThat(modifier.nameFallback).isEqualTo("textFieldScroll")
             assertThat(modifier.valueOverride).isNull()
@@ -491,6 +509,7 @@ class TextFieldScrollTest {
                 "scrollerPosition",
                 "textFieldValue",
                 "visualTransformation",
+                "interactionState",
                 "textLayoutResult"
             )
         }
@@ -532,6 +551,7 @@ class TextFieldScrollTest {
                             remember { textFieldScrollPosition },
                             value,
                             VisualTransformation.None,
+                            remember { InteractionState() },
                             textLayoutResultRef
                         ),
                     textStyle = TextStyle(fontSize = 20.sp)

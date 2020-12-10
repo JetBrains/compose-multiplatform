@@ -28,8 +28,8 @@ import androidx.compose.material.DismissDirection.StartToEnd
 import androidx.compose.material.DismissValue.Default
 import androidx.compose.material.DismissValue.DismissedToEnd
 import androidx.compose.material.DismissValue.DismissedToStart
-import androidx.compose.material.SwipeableConstants.StandardResistanceFactor
-import androidx.compose.material.SwipeableConstants.StiffResistanceFactor
+import androidx.compose.material.SwipeableDefaults.StandardResistanceFactor
+import androidx.compose.material.SwipeableDefaults.StiffResistanceFactor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.Saver
@@ -39,7 +39,9 @@ import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
+import kotlin.math.roundToInt
 
 /**
  * The directions in which a [SwipeToDismiss] can be dismissed.
@@ -239,7 +241,7 @@ fun SwipeToDismiss(
         )
         Row(
             content = dismissContent,
-            modifier = Modifier.offset(x = { state.offset.value })
+            modifier = Modifier.offset { IntOffset(state.offset.value.roundToInt(), 0) }
         )
     }
 }

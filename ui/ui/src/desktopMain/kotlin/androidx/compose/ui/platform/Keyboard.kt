@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.platform
 
-import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeysSet
@@ -28,7 +27,6 @@ import androidx.compose.ui.input.key.shortcuts
  *
  * @see [shortcuts] to setup event handlers based on the element that is in focus
  */
-@ExperimentalKeyInput
 class Keyboard {
     private val shortcutsInstance = lazy {
         ShortcutsInstance()
