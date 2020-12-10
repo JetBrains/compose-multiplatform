@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation.layout.demos
 
-import androidx.compose.foundation.layout.samples.SimpleFlowRow
 import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.integration.demos.common.DemoCategory
 
@@ -30,7 +29,6 @@ val LayoutDemos = DemoCategory(
                 ComposableDemo("With ConstraintSet DSL") { DemoConstraintSet() }
             )
         ),
-        ComposableDemo("Flow layout") { SimpleFlowRow() },
         ComposableDemo("Row and column") { SimpleLayoutDemo() },
         ComposableDemo("Rtl support") { RtlDemo() }
     )

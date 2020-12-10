@@ -132,6 +132,7 @@ private fun ListHoistedStateDemo() {
     val state = rememberLazyListState(interactionState = interactionState)
     var lastScrollDescription: String by remember { mutableStateOf("") }
     Column {
+        @Suppress("DEPRECATION")
         FlowRow {
             val buttonModifier = Modifier.padding(8.dp)
             val density = AmbientDensity.current
