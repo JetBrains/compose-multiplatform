@@ -135,17 +135,12 @@ fun SelectionContainer(
                         handle = null
                     )
                 }
-                SelectionFloatingToolBar(manager = manager)
             }
         }
     }
 
     onDispose {
         manager.selection = null
+        manager.hideSelectionToolbar()
     }
-}
-
-@Composable
-private fun SelectionFloatingToolBar(manager: SelectionManager) {
-    manager.showSelectionToolbar()
 }

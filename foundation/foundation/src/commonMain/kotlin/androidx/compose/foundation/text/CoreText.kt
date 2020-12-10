@@ -52,6 +52,7 @@ import androidx.compose.ui.selection.SelectionRegistrar
 import androidx.compose.ui.semantics.getTextLayoutResult
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.TextDelegate
@@ -96,6 +97,7 @@ private typealias InlineContentRange = AnnotatedString.Range<@Composable (String
  */
 @Composable
 @InternalTextApi
+@OptIn(ExperimentalTextApi::class)
 fun CoreText(
     text: AnnotatedString,
     modifier: Modifier = Modifier,
@@ -194,7 +196,10 @@ internal fun InlineChildren(
     }
 }
 
-@OptIn(InternalTextApi::class)
+@OptIn(
+    InternalTextApi::class,
+    ExperimentalTextApi::class
+)
 private class TextController(val state: TextState) {
     var selectionRegistrar: SelectionRegistrar? = null
 
@@ -225,7 +230,7 @@ private class TextController(val state: TextState) {
             if (state.selectionRange != null) {
                 val newGlobalPosition = it.globalPosition
                 if (newGlobalPosition != state.previousGlobalPosition) {
-                    selectionRegistrar.onPositionChange()
+                    selectionRegistrar.notifyPositionChange()
                 }
                 state.previousGlobalPosition = newGlobalPosition
             }
@@ -353,7 +358,7 @@ internal class TextState(
     var layoutCoordinates: LayoutCoordinates? = null
     /** The latest TextLayoutResult calculated in the measure block */
     var layoutResult: TextLayoutResult? = null
-    /** The global position calculated during the last onPositioned callback */
+    /** The global position calculated during the last notifyPosition callback */
     var previousGlobalPosition: Offset = Offset.Zero
     /** The paint used to draw highlight background for selected text. */
     val selectionPaint: Paint = Paint()
@@ -433,7 +438,10 @@ private fun resolveInlineContent(
     return Pair(placeholders, inlineComposables)
 }
 
-@OptIn(InternalTextApi::class)
+@OptIn(
+    InternalTextApi::class,
+    ExperimentalTextApi::class
+)
 @VisibleForTesting
 internal fun longPressDragObserver(
     state: TextState,
@@ -455,10 +463,9 @@ internal fun longPressDragObserver(
             state.layoutCoordinates?.let {
                 if (!it.isAttached) return
 
-                selectionRegistrar?.onUpdateSelection(
+                selectionRegistrar?.notifySelectionUpdateStart(
                     layoutCoordinates = it,
-                    startPosition = pxPosition,
-                    endPosition = pxPosition
+                    startPosition = pxPosition
                 )
 
                 dragBeginPosition = pxPosition
@@ -466,7 +473,6 @@ internal fun longPressDragObserver(
         }
 
         override fun onDragStart() {
-            super.onDragStart()
             // selection never started
             if (state.selectionRange == null) return
             // Zero out the total distance that being dragged.
@@ -481,13 +487,21 @@ internal fun longPressDragObserver(
 
                 dragTotalDistance += dragDistance
 
-                selectionRegistrar?.onUpdateSelection(
+                selectionRegistrar?.notifySelectionUpdate(
                     layoutCoordinates = it,
                     startPosition = dragBeginPosition,
                     endPosition = dragBeginPosition + dragTotalDistance
                 )
             }
             return dragDistance
+        }
+
+        override fun onStop(velocity: Offset) {
+            selectionRegistrar?.notifySelectionUpdateEnd()
+        }
+
+        override fun onCancel() {
+            selectionRegistrar?.notifySelectionUpdateEnd()
         }
     }
 }

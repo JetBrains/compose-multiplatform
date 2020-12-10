@@ -22,6 +22,7 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.selection.Selectable
 import androidx.compose.ui.selection.Selection
 import androidx.compose.ui.selection.SelectionRegistrar
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextDelegate
 import androidx.compose.ui.text.style.ResolvedTextDirection
@@ -36,7 +37,10 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
-@OptIn(InternalTextApi::class)
+@OptIn(
+    InternalTextApi::class,
+    ExperimentalTextApi::class
+)
 class TextSelectionLongPressDragTest {
     private val selectionRegistrar = mock<SelectionRegistrar>()
     private val selectable = mock<Selectable>()
@@ -93,15 +97,14 @@ class TextSelectionLongPressDragTest {
     }
 
     @Test
-    fun longPressDragObserver_onLongPress_calls_getSelection_change_selection() {
+    fun longPressDragObserver_onLongPress_calls_notifySelectionInitiated() {
         val position = Offset(100f, 100f)
 
         gesture.onLongPress(position)
 
-        verify(selectionRegistrar, times(1)).onUpdateSelection(
+        verify(selectionRegistrar, times(1)).notifySelectionUpdateStart(
             layoutCoordinates = layoutCoordinates,
-            startPosition = position,
-            endPosition = position
+            startPosition = position
         )
     }
 
@@ -127,7 +130,7 @@ class TextSelectionLongPressDragTest {
 
         // Verify.
         verify(selectionRegistrar, times(1))
-            .onUpdateSelection(
+            .notifySelectionUpdate(
                 layoutCoordinates = layoutCoordinates,
                 startPosition = beginPosition2,
                 endPosition = beginPosition2 + dragDistance2
@@ -135,7 +138,7 @@ class TextSelectionLongPressDragTest {
     }
 
     @Test
-    fun longPressDragObserver_onDrag_calls_getSelection_change_selection() {
+    fun longPressDragObserver_onDrag_calls_notifySelectionDrag() {
         val dragDistance = Offset(15f, 10f)
         val beginPosition = Offset(30f, 20f)
         gesture.onLongPress(beginPosition)
@@ -146,10 +149,35 @@ class TextSelectionLongPressDragTest {
 
         assertThat(result).isEqualTo(dragDistance)
         verify(selectionRegistrar, times(1))
-            .onUpdateSelection(
+            .notifySelectionUpdate(
                 layoutCoordinates = layoutCoordinates,
                 startPosition = beginPosition,
                 endPosition = beginPosition + dragDistance
             )
+    }
+
+    @Test
+    fun longPressDragObserver_onStop_calls_notifySelectionEnd() {
+        val dragDistance = Offset(15f, 10f)
+        val beginPosition = Offset(30f, 20f)
+        gesture.onLongPress(beginPosition)
+        state.selectionRange = fakeInitialSelection.toTextRange()
+        gesture.onDragStart()
+        gesture.onStop(dragDistance)
+
+        verify(selectionRegistrar, times(1))
+            .notifySelectionUpdateEnd()
+    }
+
+    @Test
+    fun longPressDragObserver_onCancel_calls_notifySelectionEnd() {
+        val beginPosition = Offset(30f, 20f)
+        gesture.onLongPress(beginPosition)
+        state.selectionRange = fakeInitialSelection.toTextRange()
+        gesture.onDragStart()
+        gesture.onCancel()
+
+        verify(selectionRegistrar, times(1))
+            .notifySelectionUpdateEnd()
     }
 }
