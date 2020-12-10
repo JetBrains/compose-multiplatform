@@ -17,8 +17,8 @@
 package androidx.build.doclava
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
@@ -26,7 +26,12 @@ import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import org.gradle.process.ExecOperations
+import org.gradle.workers.WorkAction
+import org.gradle.workers.WorkParameters
+import org.gradle.workers.WorkerExecutor
 import java.io.File
+import javax.inject.Inject
 
 // external/doclava/src/com/google/doclava/Errors.java
 val DEFAULT_DOCLAVA_CONFIG = ChecksConfig(
@@ -42,7 +47,9 @@ val DEFAULT_DOCLAVA_CONFIG = ChecksConfig(
     )
 )
 
-open class DoclavaTask : DefaultTask() {
+abstract class DoclavaTask @Inject constructor(
+    private val workerExecutor: WorkerExecutor
+) : DefaultTask() {
 
     // All lowercase name to match MinimalJavadocOptions#docletpath
     private var docletpath: List<File> = emptyList()
@@ -206,7 +213,7 @@ open class DoclavaTask : DefaultTask() {
     @TaskAction
     fun generate() {
         val args = computeArguments()
-        runDoclavaWithArgs(docletpath, project, args)
+        runDoclavaWithArgs(docletpath, args, workerExecutor)
     }
 }
 
@@ -252,11 +259,30 @@ class DoclavaArgumentBuilder {
     private val args = mutableListOf<String>()
 }
 
-fun runDoclavaWithArgs(classpath: List<File>, project: Project, args: List<String>) {
-    val result = project.javaexec { spec ->
-        spec.classpath = project.files(classpath)
-        spec.main = "com.google.doclava.Doclava"
-        spec.args = args
+interface DoclavaParams : WorkParameters {
+    fun getClasspath(): ListProperty<File>
+    fun getArgs(): ListProperty<String>
+}
+
+fun runDoclavaWithArgs(classpath: List<File>, args: List<String>, workerExecutor: WorkerExecutor) {
+    val workQueue = workerExecutor.noIsolation()
+    workQueue.submit(DoclavaWorkAction::class.java) { parameters ->
+        parameters.getArgs().set(args)
+        parameters.getClasspath().set(classpath)
     }
-    result.assertNormalExitValue()
+}
+
+abstract class DoclavaWorkAction @Inject constructor (
+    private val execOperations: ExecOperations
+) : WorkAction<DoclavaParams> {
+    override fun execute() {
+        val args = getParameters().getArgs().get()
+        val classpath = getParameters().getClasspath().get()
+
+        execOperations.javaexec {
+            it.classpath(classpath)
+            it.main = "com.google.doclava.Doclava"
+            it.args = args
+        }
+    }
 }
