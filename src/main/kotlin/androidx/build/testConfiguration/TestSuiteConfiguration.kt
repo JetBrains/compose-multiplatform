@@ -16,10 +16,15 @@
 
 @file:Suppress("UnstableApiUsage") // Incubating AGP APIs
 
-package androidx.build
+package androidx.build.testConfiguration
 
+import androidx.build.AndroidXPlugin
+import androidx.build.asFilenamePrefix
 import androidx.build.dependencyTracker.AffectedModuleDetector
+import androidx.build.getTestConfigDirectory
 import androidx.build.gradle.getByType
+import androidx.build.hasAndroidTestSourceCode
+import androidx.build.hasBenchmarkPlugin
 import com.android.build.api.artifact.ArtifactType
 import com.android.build.api.artifact.Artifacts
 import com.android.build.api.extension.AndroidComponentsExtension
@@ -85,8 +90,7 @@ private fun getOrCreateMediaTestConfigTask(project: Project, isMedia2: Boolean):
         if (!project.parent!!.tasks.withType(GenerateMediaTestConfigurationTask::class.java)
             .names.contains(
                     "support-$mediaPrefix-test${
-                    AndroidXPlugin
-                        .GENERATE_TEST_CONFIGURATION_TASK
+                    AndroidXPlugin.GENERATE_TEST_CONFIGURATION_TASK
                     }"
                 )
         ) {
@@ -95,6 +99,11 @@ private fun getOrCreateMediaTestConfigTask(project: Project, isMedia2: Boolean):
                 GenerateMediaTestConfigurationTask::class.java
             ) { task ->
                 AffectedModuleDetector.configureTaskGuard(task)
+                task.affectedModuleDetectorSubset.set(
+                    project.provider {
+                        AffectedModuleDetector.getProjectSubset(project)
+                    }
+                )
             }
             project.rootProject.tasks.findByName(AndroidXPlugin.ZIP_TEST_CONFIGS_WITH_APKS_TASK)!!
                 .dependsOn(task)
@@ -103,8 +112,7 @@ private fun getOrCreateMediaTestConfigTask(project: Project, isMedia2: Boolean):
             return project.parent!!.tasks.withType(GenerateMediaTestConfigurationTask::class.java)
                 .named(
                     "support-$mediaPrefix-test${
-                    AndroidXPlugin
-                        .GENERATE_TEST_CONFIGURATION_TASK
+                    AndroidXPlugin.GENERATE_TEST_CONFIGURATION_TASK
                     }"
                 )
         }
