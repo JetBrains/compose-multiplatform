@@ -277,6 +277,13 @@ private class TextController(val state: TextState) {
         )
         if (state.layoutResult != layoutResult) {
             state.onTextLayout(layoutResult)
+            if (state.layoutResult != null) {
+                // Notify the SelectionContainer that this CoreText has changed and previous
+                // selection is invalid.
+                state.selectable?.let {
+                    selectionRegistrar?.notifySelectableChange(it)
+                }
+            }
         }
         state.layoutResult = layoutResult
 
@@ -323,31 +330,35 @@ private class TextController(val state: TextState) {
 
     val commit: CommitScope.() -> Unit = {
         // if no SelectionContainer is added as parent selectionRegistrar will be null
-        val id: Selectable? =
-            selectionRegistrar?.let { selectionRegistrar ->
-                selectionRegistrar.subscribe(
-                    MultiWidgetSelectionDelegate(
-                        selectionRangeUpdate = { state.selectionRange = it },
-                        coordinatesCallback = { state.layoutCoordinates },
-                        layoutResultCallback = { state.layoutResult }
-                    )
+        state.selectable = selectionRegistrar?.let { selectionRegistrar ->
+            selectionRegistrar.subscribe(
+                MultiWidgetSelectionDelegate(
+                    selectionRangeUpdate = { state.selectionRange = it },
+                    coordinatesCallback = { state.layoutCoordinates },
+                    layoutResultCallback = { state.layoutResult }
                 )
-            }
+            )
+        }
 
         onDispose {
             // unregister only if any id was provided by SelectionRegistrar
-            id?.let { selectionRegistrar?.unsubscribe(id) }
+            state.selectable?.let { selectionRegistrar?.unsubscribe(it) }
         }
     }
 }
 
-@OptIn(InternalTextApi::class)
+@OptIn(
+    InternalTextApi::class,
+    ExperimentalTextApi::class
+)
 @VisibleForTesting
 internal class TextState(
     var textDelegate: TextDelegate
 ) {
     var onTextLayout: (TextLayoutResult) -> Unit = {}
 
+    /** The [Selectable] associated with this [CoreText]. */
+    var selectable: Selectable? = null
     /**
      * The current selection range, used by selection.
      * This should be a state as every time we update the value during the selection we

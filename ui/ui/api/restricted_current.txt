@@ -2554,6 +2554,7 @@ package androidx.compose.ui.selection {
 
   @androidx.compose.ui.text.ExperimentalTextApi public interface SelectionRegistrar {
     method public void notifyPositionChange();
+    method public void notifySelectableChange(androidx.compose.ui.selection.Selectable selectable);
     method public void notifySelectionUpdate-rULFVbc(androidx.compose.ui.layout.LayoutCoordinates layoutCoordinates, long startPosition, long endPosition);
     method public void notifySelectionUpdateEnd();
     method public void notifySelectionUpdateStart-YJiYy8w(androidx.compose.ui.layout.LayoutCoordinates layoutCoordinates, long startPosition);

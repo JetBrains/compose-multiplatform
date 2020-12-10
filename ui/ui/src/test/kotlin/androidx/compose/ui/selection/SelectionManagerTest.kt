@@ -425,4 +425,43 @@ class SelectionManagerTest {
             times(1)
         ).performHapticFeedback(HapticFeedbackType.TextHandleMove)
     }
+
+    @Test
+    fun notifySelectableChange_clears_selection() {
+        val fakeSelection =
+            Selection(
+                start = Selection.AnchorInfo(
+                    direction = ResolvedTextDirection.Ltr,
+                    offset = 0,
+                    selectable = startSelectable
+                ),
+                end = Selection.AnchorInfo(
+                    direction = ResolvedTextDirection.Ltr,
+                    offset = 5,
+                    selectable = endSelectable
+                )
+            )
+        var selection: Selection? = fakeSelection
+        val lambda: (Selection?) -> Unit = { selection = it }
+        val spyLambda = spy(lambda)
+        selectionManager.onSelectionChange = spyLambda
+        selectionManager.selection = fakeSelection
+
+        selectionRegistrar.notifySelectableChange(selectable)
+
+        verify(selectable, times(1))
+            .getSelection(
+                startPosition = Offset(-1f, -1f),
+                endPosition = Offset(-1f, -1f),
+                containerLayoutCoordinates = selectionManager.requireContainerCoordinates(),
+                longPress = false,
+                previousSelection = fakeSelection
+            )
+        assertThat(selection).isNull()
+        verify(spyLambda, times(1)).invoke(null)
+        verify(
+            hapticFeedback,
+            times(1)
+        ).performHapticFeedback(HapticFeedbackType.TextHandleMove)
+    }
 }
