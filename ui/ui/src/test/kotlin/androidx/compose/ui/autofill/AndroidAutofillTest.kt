@@ -19,6 +19,7 @@ package androidx.compose.ui.autofill
 import android.app.Activity
 import android.view.View
 import android.view.autofill.AutofillManager
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.toComposeRect
 import androidx.compose.ui.test.ComposeUiRobolectricTestRunner
@@ -35,6 +36,7 @@ import org.robolectric.annotation.Implements
 import org.robolectric.shadow.api.Shadow
 import android.graphics.Rect as AndroidRect
 
+@OptIn(ExperimentalComposeUiApi::class)
 @RunWith(ComposeUiRobolectricTestRunner::class)
 @Config(
     shadows = [ShadowAutofillManager::class],

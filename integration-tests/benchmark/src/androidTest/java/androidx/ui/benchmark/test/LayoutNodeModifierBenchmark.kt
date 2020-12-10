@@ -26,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.gesture.pressIndicatorGestureFilter
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.keyInputFilter
 import androidx.compose.ui.layout.TestModifierUpdater
 import androidx.compose.ui.layout.TestModifierUpdaterLayout
@@ -71,7 +70,6 @@ class LayoutNodeModifierBenchmark(
     lateinit var testModifierUpdater: TestModifierUpdater
 
     @Before
-    @OptIn(ExperimentalKeyInput::class)
     fun setup() {
         modifiers = listOf(
             Modifier.padding(10.dp),

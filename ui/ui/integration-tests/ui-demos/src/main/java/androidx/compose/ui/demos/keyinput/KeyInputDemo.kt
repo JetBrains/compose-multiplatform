@@ -29,14 +29,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focusObserver
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.KeyEventType.KeyDown
 import androidx.compose.ui.input.key.keyInputFilter
 
@@ -63,10 +61,6 @@ fun KeyInputDemo() {
 }
 
 @Composable
-@OptIn(
-    ExperimentalFocus::class,
-    ExperimentalKeyInput::class
-)
 private fun FocusableText(text: MutableState<String>) {
     var color by remember { mutableStateOf(Color.Black) }
     val focusRequester = FocusRequester()

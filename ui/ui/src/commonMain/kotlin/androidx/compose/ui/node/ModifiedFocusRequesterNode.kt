@@ -17,13 +17,9 @@
 package androidx.compose.ui.node
 
 import androidx.compose.ui.FocusRequesterModifier
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.searchChildrenForFocusNode
 
-@OptIn(
-    ExperimentalFocus::class
-)
 internal class ModifiedFocusRequesterNode(
     wrapped: LayoutNodeWrapper,
     modifier: FocusRequesterModifier

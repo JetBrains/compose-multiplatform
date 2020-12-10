@@ -28,7 +28,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focusObserver
@@ -58,7 +57,6 @@ fun FocusableDemo() {
 }
 
 @Composable
-@OptIn(ExperimentalFocus::class)
 private fun FocusableText(text: String) {
     var color by remember { mutableStateOf(Black) }
     val focusRequester = FocusRequester()

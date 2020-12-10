@@ -29,10 +29,10 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.AutofillNode
 import androidx.compose.ui.autofill.AutofillType
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focusObserver
 import androidx.compose.ui.geometry.Offset
@@ -46,10 +46,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 
 @Composable
-@OptIn(
-    ExperimentalFocus::class,
-    ExperimentalFoundationApi::class
-)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 fun ExplicitAutofillTypesDemo() {
     Column {
         val nameState = remember { mutableStateOf("Enter name here") }
@@ -112,6 +109,7 @@ fun ExplicitAutofillTypesDemo() {
     }
 }
 
+@ExperimentalComposeUiApi
 @Composable
 private fun Autofill(
     autofillTypes: List<AutofillType>,

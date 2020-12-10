@@ -30,7 +30,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.RectangleShape
@@ -274,7 +273,6 @@ fun OutlinedTextField(
     )
 }
 
-@OptIn(ExperimentalFocus::class)
 @Composable
 internal fun OutlinedTextFieldLayout(
     modifier: Modifier = Modifier,

@@ -15,6 +15,7 @@
  */
 package androidx.compose.ui.node
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.Modifier
@@ -22,7 +23,6 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
@@ -30,7 +30,6 @@ import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedback
-import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
@@ -1693,10 +1692,7 @@ class LayoutNodeTest {
         PointerInputModifier
 }
 
-@OptIn(
-    ExperimentalFocus::class,
-    InternalCoreApi::class
-)
+@OptIn(InternalCoreApi::class)
 private class MockOwner(
     val position: IntOffset = IntOffset.Zero,
     override val root: LayoutNode = LayoutNode()
@@ -1711,8 +1707,10 @@ private class MockOwner(
         get() = TODO("Not yet implemented")
     override val textToolbar: TextToolbar
         get() = TODO("Not yet implemented")
+    @OptIn(ExperimentalComposeUiApi::class)
     override val autofillTree: AutofillTree
         get() = TODO("Not yet implemented")
+    @OptIn(ExperimentalComposeUiApi::class)
     override val autofill: Autofill?
         get() = TODO("Not yet implemented")
     override val density: Density
@@ -1753,7 +1751,6 @@ private class MockOwner(
 
     override fun requestFocus(): Boolean = false
 
-    @ExperimentalKeyInput
     override fun sendKeyEvent(keyEvent: KeyEvent): Boolean = false
 
     override fun measureAndLayout() {

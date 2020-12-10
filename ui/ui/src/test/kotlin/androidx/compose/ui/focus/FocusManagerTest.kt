@@ -32,9 +32,6 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import kotlin.jvm.JvmStatic
 
-@OptIn(
-    ExperimentalFocus::class,
-)
 @RunWith(Parameterized::class)
 class FocusManagerTest(private val initialFocusState: FocusState) {
     companion object {

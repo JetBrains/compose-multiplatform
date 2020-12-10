@@ -36,7 +36,6 @@ class KeyInputModifierTest {
         isDebugInspectorInfoEnabled = false
     }
 
-    @OptIn(ExperimentalKeyInput::class)
     @Test
     fun testInspectorValueForKeyInputFilter() {
         val onKeyEvent: (KeyEvent) -> Boolean = { true }
@@ -48,7 +47,6 @@ class KeyInputModifierTest {
         )
     }
 
-    @OptIn(ExperimentalKeyInput::class)
     @Test
     fun testInspectorValueForPreviewKeyInputFilter() {
         val onPreviewKeyEvent: (KeyEvent) -> Boolean = { true }

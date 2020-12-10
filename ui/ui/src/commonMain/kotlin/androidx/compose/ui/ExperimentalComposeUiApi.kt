@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.input.key
+package androidx.compose.ui
 
-@RequiresOptIn("The Key Input API is experimental and is likely to change in the future.")
-annotation class ExperimentalKeyInput
+@RequiresOptIn("This API is experimental and is likely to change in the future.")
+annotation class ExperimentalComposeUiApi

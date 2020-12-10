@@ -22,7 +22,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.gesture.rawDragGestureFilter
@@ -91,7 +90,6 @@ private class DragGlue(val observer: DragObserver) : DragObserver by observer {
     }
 }
 
-@OptIn(ExperimentalFocus::class)
 @Composable
 fun DesktopSelectionContainer(
     selection: Selection?,

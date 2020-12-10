@@ -17,7 +17,6 @@
 package androidx.compose.foundation.text
 
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focusObserver
 import androidx.compose.ui.platform.testTag
@@ -48,8 +47,7 @@ import org.junit.runner.RunWith
 
 @OptIn(
     ExperimentalTextApi::class,
-    InternalTextApi::class,
-    ExperimentalFocus::class
+    InternalTextApi::class
 )
 @LargeTest
 @RunWith(AndroidJUnit4::class)

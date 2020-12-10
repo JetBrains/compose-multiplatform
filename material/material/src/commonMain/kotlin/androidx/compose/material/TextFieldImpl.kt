@@ -39,7 +39,6 @@ import androidx.compose.runtime.Providers
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -73,10 +72,7 @@ internal enum class TextFieldType {
  * Implementation of the [TextField] and [OutlinedTextField]
  */
 @Composable
-@OptIn(
-    ExperimentalFocus::class,
-    ExperimentalFoundationApi::class
-)
+@OptIn(ExperimentalFoundationApi::class)
 internal fun TextFieldImpl(
     type: TextFieldType,
     value: TextFieldValue,

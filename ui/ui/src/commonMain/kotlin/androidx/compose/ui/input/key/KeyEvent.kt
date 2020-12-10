@@ -20,7 +20,6 @@ package androidx.compose.ui.input.key
  * When a user presses a key on a hardware keyboard, a [KeyEvent] is sent to the
  * [KeyInputModifier] that is currently active.
  */
-@ExperimentalKeyInput
 interface KeyEvent {
     /**
      * The key that was pressed.
@@ -85,7 +84,6 @@ interface KeyEvent {
 /**
  * The type of Key Event.
  */
-@ExperimentalKeyInput
 enum class KeyEventType {
     /**
      * Unknown key event.
@@ -110,7 +108,6 @@ enum class KeyEventType {
     message = "Alt is replaced by KeyEvent.isAltPressed",
     level = DeprecationLevel.WARNING
 )
-@ExperimentalKeyInput
 interface Alt {
     /**
      * Indicates whether the Alt key is pressed.

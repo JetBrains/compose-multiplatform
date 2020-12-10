@@ -26,7 +26,6 @@ import androidx.compose.ui.input.key.KeyEventType.KeyUp
 import androidx.compose.ui.input.key.KeyEventType.Unknown
 import android.view.KeyEvent as AndroidKeyEvent
 
-@OptIn(ExperimentalKeyInput::class)
 internal inline class KeyEventAndroid(val keyEvent: AndroidKeyEvent) : KeyEvent {
 
     override val key: Key
@@ -59,7 +58,6 @@ internal inline class KeyEventAndroid(val keyEvent: AndroidKeyEvent) : KeyEvent 
 }
 
 @Suppress("DEPRECATION")
-@OptIn(ExperimentalKeyInput::class)
 internal inline class AltAndroid(val keyEvent: AndroidKeyEvent) : Alt {
     override val isLeftAltPressed
         get() = (keyEvent.metaState and META_ALT_LEFT_ON) != 0

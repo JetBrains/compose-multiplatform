@@ -16,11 +16,9 @@
 
 package androidx.compose.ui.node
 
-import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyInputModifier
 
-@OptIn(ExperimentalKeyInput::class)
 internal class ModifiedKeyInputNode(wrapped: LayoutNodeWrapper, modifier: KeyInputModifier) :
     DelegatingLayoutNodeWrapper<KeyInputModifier>(wrapped, modifier) {
 

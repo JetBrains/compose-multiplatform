@@ -25,7 +25,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.semantics.AccessibilityAction
 import androidx.compose.ui.semantics.SemanticsPropertyKey
@@ -228,5 +227,4 @@ private val exampleUiState = Unit
 private class MyActivity : ComponentActivity()
 @Composable private fun MyButton(content: @Composable RowScope.() -> Unit) { }
 private lateinit var key: SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>
-@OptIn(ExperimentalKeyInput::class)
 private lateinit var keyEvent: KeyEvent

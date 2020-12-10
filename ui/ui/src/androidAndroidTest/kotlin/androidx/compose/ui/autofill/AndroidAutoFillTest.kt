@@ -22,6 +22,7 @@ import android.view.ViewStructure
 import android.view.autofill.AutofillValue
 import androidx.autofill.HintConstants.AUTOFILL_HINT_PERSON_NAME
 import androidx.compose.testutils.fake.FakeViewStructure
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.platform.AmbientAutofill
 import androidx.compose.ui.platform.AmbientAutofillTree
@@ -36,6 +37,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@OptIn(ExperimentalComposeUiApi::class)
 @SmallTest
 @RunWith(AndroidJUnit4::class)
 class AndroidAutoFillTest {
