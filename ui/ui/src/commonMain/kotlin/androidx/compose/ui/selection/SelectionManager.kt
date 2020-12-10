@@ -27,6 +27,7 @@ import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.globalBounds
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.TextToolbarStatus
@@ -167,30 +168,41 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
     private fun updateHandleOffsets() {
         val selection = selection
         val containerCoordinates = containerLayoutCoordinates
-        if (selection != null && containerCoordinates != null && containerCoordinates.isAttached) {
-            val startLayoutCoordinates = selection.start.selectable.getLayoutCoordinates()
-            val endLayoutCoordinates = selection.end.selectable.getLayoutCoordinates()
+        val startLayoutCoordinates = selection?.start?.selectable?.getLayoutCoordinates()
+        val endLayoutCoordinates = selection?.end?.selectable?.getLayoutCoordinates()
 
-            if (startLayoutCoordinates != null && endLayoutCoordinates != null) {
-                startHandlePosition = containerCoordinates.childToLocal(
-                    startLayoutCoordinates,
-                    selection.start.selectable.getHandlePosition(
-                        selection = selection,
-                        isStartHandle = true
-                    )
-                )
-                endHandlePosition = containerCoordinates.childToLocal(
-                    endLayoutCoordinates,
-                    selection.end.selectable.getHandlePosition(
-                        selection = selection,
-                        isStartHandle = false
-                    )
-                )
-                return
-            }
+        if (
+            selection == null ||
+            containerCoordinates == null ||
+            !containerCoordinates.isAttached ||
+            startLayoutCoordinates == null ||
+            endLayoutCoordinates == null
+        ) {
+            this.startHandlePosition = null
+            this.endHandlePosition = null
+            return
         }
-        startHandlePosition = null
-        endHandlePosition = null
+
+        val startHandlePosition = containerCoordinates.childToLocal(
+            startLayoutCoordinates,
+            selection.start.selectable.getHandlePosition(
+                selection = selection,
+                isStartHandle = true
+            )
+        )
+        val endHandlePosition = containerCoordinates.childToLocal(
+            endLayoutCoordinates,
+            selection.end.selectable.getHandlePosition(
+                selection = selection,
+                isStartHandle = false
+            )
+        )
+
+        val visibleBounds = containerCoordinates.visibleBounds()
+        this.startHandlePosition =
+            if (visibleBounds.containsInclusive(startHandlePosition)) startHandlePosition else null
+        this.endHandlePosition =
+            if (visibleBounds.containsInclusive(endHandlePosition)) endHandlePosition else null
     }
 
     /**
@@ -548,3 +560,17 @@ internal fun getCurrentSelectedText(
         }
     }
 }
+
+/** Returns the boundary of the visible area in this [LayoutCoordinates]. */
+private fun LayoutCoordinates.visibleBounds(): Rect {
+    // globalBounds is the global boundaries of this LayoutCoordinates after it's clipped by
+    // parents. We can think it as the global visible bounds of this Layout. Here globalBounds
+    // is convert to local, which is the boundary of the visible area within the LayoutCoordinates.
+    return Rect(
+        globalToLocal(globalBounds.topLeft),
+        globalToLocal(globalBounds.bottomRight)
+    )
+}
+
+private fun Rect.containsInclusive(offset: Offset): Boolean =
+    offset.x in left..right && offset.y in top..bottom
