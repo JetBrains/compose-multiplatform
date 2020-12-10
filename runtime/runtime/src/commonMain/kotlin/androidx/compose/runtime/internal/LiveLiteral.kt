@@ -51,7 +51,13 @@ annotation class LiveLiteralFileInfo(
 private val liveLiteralCache = HashMap<String, MutableState<Any?>>()
 
 @InternalComposeApi
-val isLiveLiteralsEnabled: Boolean = false
+var isLiveLiteralsEnabled: Boolean = false
+    private set
+
+@InternalComposeApi
+fun enableLiveLiterals() {
+    isLiveLiteralsEnabled = true
+}
 
 @InternalComposeApi
 fun <T> liveLiteral(key: String, value: T): State<T> {
