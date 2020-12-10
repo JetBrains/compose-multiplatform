@@ -251,6 +251,9 @@ internal class AndroidComposeTestCaseRunner<T : ComposeTestCase>(
 
         composition?.dispose()
 
+        // Dispatcher will clean up the cancelled coroutines when it advances to them
+        testCoroutineDispatcher.advanceUntilIdle()
+
         // Clear the view
         val rootView = activity.findViewById(android.R.id.content) as ViewGroup
         rootView.removeAllViews()
