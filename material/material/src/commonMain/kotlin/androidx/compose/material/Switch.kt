@@ -47,8 +47,10 @@ import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import kotlin.math.roundToInt
 
 /**
  * A Switch is a two state toggleable component that provides on/off like options
@@ -168,7 +170,7 @@ private fun BoxScope.SwitchImpl(
         elevation = elevation,
         modifier = Modifier
             .align(Alignment.CenterStart)
-            .offset(x = { thumbValue.value })
+            .offset { IntOffset(thumbValue.value.roundToInt(), 0) }
             .indication(
                 interactionState = interactionState,
                 indication = rememberRipple(bounded = false, radius = ThumbRippleRadius)

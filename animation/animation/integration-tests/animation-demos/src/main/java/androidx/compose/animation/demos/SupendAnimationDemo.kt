@@ -39,9 +39,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 @Composable
 fun SuspendAnimationDemo() {
@@ -57,7 +59,7 @@ fun SuspendAnimationDemo() {
         Modifier.fillMaxSize().background(Color(0xffb99aff)).pointerInput {
             coroutineScope {
                 while (true) {
-                    val offset = handlePointerInput {
+                    val offset = awaitPointerEventScope {
                         awaitFirstDown().current.position
                     }
                     val x = offset.x
@@ -84,7 +86,9 @@ fun SuspendAnimationDemo() {
     ) {
         Text("Tap anywhere", Modifier.align(Alignment.Center))
         Box(
-            Modifier.offset({ animStateX.value }, { animStateY.value }).size(40.dp)
+            Modifier
+                .offset { IntOffset(animStateX.value.roundToInt(), animStateY.value.roundToInt()) }
+                .size(40.dp)
                 .background(Color(0xff3c1361), CircleShape)
         )
     }

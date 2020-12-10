@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.lazy
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
@@ -23,6 +24,7 @@ import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
@@ -32,6 +34,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@OptIn(ExperimentalFoundationApi::class)
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class LazyGridTest {
@@ -45,8 +48,8 @@ class LazyGridTest {
         val itemTestTag = "itemTestTag"
 
         rule.setContent {
-            LazyGrid(
-                columns = 3
+            LazyVerticalGrid(
+                cells = GridCells.Fixed(3)
             ) {
                 item {
                     Spacer(
@@ -65,8 +68,8 @@ class LazyGridTest {
         val items = (1..5).map { it.toString() }
 
         rule.setContent {
-            LazyGrid(
-                columns = 3,
+            LazyVerticalGrid(
+                cells = GridCells.Fixed(3),
                 modifier = Modifier.preferredHeight(100.dp).preferredWidth(300.dp)
             ) {
                 items(items) {
@@ -96,8 +99,8 @@ class LazyGridTest {
         val items = (1..9).map { it.toString() }
 
         rule.setContent {
-            LazyGrid(
-                columns = 3,
+            LazyVerticalGrid(
+                cells = GridCells.Fixed(3),
                 modifier = Modifier.preferredHeight(100.dp).testTag(LazyGridTag)
             ) {
                 items(items) {
@@ -133,8 +136,8 @@ class LazyGridTest {
         val items = (1..9).map { it.toString() }
 
         rule.setContent {
-            LazyGrid(
-                columns = 3,
+            LazyVerticalGrid(
+                cells = GridCells.Fixed(3),
                 modifier = Modifier.preferredHeight(200.dp).testTag(LazyGridTag)
             ) {
                 items(items) {
@@ -172,5 +175,61 @@ class LazyGridTest {
 
         rule.onNodeWithTag("9")
             .assertIsDisplayed()
+    }
+
+    @Test
+    fun adaptiveLazyGridFillsAllWidth() {
+        val items = (1..5).map { it.toString() }
+
+        rule.setContent {
+            LazyVerticalGrid(
+                cells = GridCells.Adaptive(130.dp),
+                modifier = Modifier.preferredHeight(100.dp).preferredWidth(300.dp)
+            ) {
+                items(items) {
+                    Spacer(Modifier.preferredHeight(101.dp).testTag(it))
+                }
+            }
+        }
+
+        rule.onNodeWithTag("1")
+            .assertLeftPositionInRootIsEqualTo(0.dp)
+
+        rule.onNodeWithTag("2")
+            .assertLeftPositionInRootIsEqualTo(150.dp)
+
+        rule.onNodeWithTag("3")
+            .assertDoesNotExist()
+
+        rule.onNodeWithTag("4")
+            .assertDoesNotExist()
+
+        rule.onNodeWithTag("5")
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun adaptiveLazyGridAtLeastOneColumn() {
+        val items = (1..3).map { it.toString() }
+
+        rule.setContent {
+            LazyVerticalGrid(
+                cells = GridCells.Adaptive(301.dp),
+                modifier = Modifier.preferredHeight(100.dp).preferredWidth(300.dp)
+            ) {
+                items(items) {
+                    Spacer(Modifier.preferredHeight(101.dp).testTag(it))
+                }
+            }
+        }
+
+        rule.onNodeWithTag("1")
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag("2")
+            .assertDoesNotExist()
+
+        rule.onNodeWithTag("3")
+            .assertDoesNotExist()
     }
 }

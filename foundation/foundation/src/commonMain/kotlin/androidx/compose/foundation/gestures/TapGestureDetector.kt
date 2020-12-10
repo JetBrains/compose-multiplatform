@@ -17,7 +17,7 @@
 package androidx.compose.foundation.gestures
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.pointer.HandlePointerInputScope
+import androidx.compose.ui.input.pointer.AwaitPointerEventScope
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputChange
@@ -95,7 +95,7 @@ suspend fun PointerInputScope.detectTapGestures(
     forEachGesture {
         coroutineScope {
             pressScope.reset()
-            val down = handlePointerInput {
+            val down = awaitPointerEventScope {
                 awaitFirstDown().also {
                     it.consumeDownChange()
                 }
@@ -115,7 +115,7 @@ suspend fun PointerInputScope.detectTapGestures(
             try {
                 // wait for first tap up or long press
                 up = withTimeout(longPressTimeout.inMilliseconds()) {
-                    handlePointerInput {
+                    awaitPointerEventScope {
                         waitForUpOrCancellation()?.also { it.consumeDownChange() }
                     }
                 }
@@ -151,7 +151,7 @@ suspend fun PointerInputScope.detectTapGestures(
                         try {
                             // Might have a long second press as the second tap
                             withTimeout(longPressTimeout.inMilliseconds()) {
-                                handlePointerInput {
+                                awaitPointerEventScope {
                                     val secondUp = waitForUpOrCancellation()
                                     if (secondUp == null) {
                                         pressScope.cancel()
@@ -184,7 +184,7 @@ suspend fun PointerInputScope.detectTapGestures(
  * Reads events until the first down is received. If [requireUnconsumed] is `true` and the first
  * down is consumed in the [PointerEventPass.Main] pass, that gesture is ignored.
  */
-suspend fun HandlePointerInputScope.awaitFirstDown(
+suspend fun AwaitPointerEventScope.awaitFirstDown(
     requireUnconsumed: Boolean = true
 ): PointerInputChange {
     var event: PointerEvent
@@ -205,7 +205,7 @@ suspend fun HandlePointerInputScope.awaitFirstDown(
  * pass. If the gesture was not canceled, the final up change is returned or `null` if the
  * event was canceled.
  */
-suspend fun HandlePointerInputScope.waitForUpOrCancellation(): PointerInputChange? {
+suspend fun AwaitPointerEventScope.waitForUpOrCancellation(): PointerInputChange? {
     while (true) {
         val event = awaitPointerEvent(PointerEventPass.Main)
         if (event.changes.fastAll { it.changedToUp() }) {
@@ -230,7 +230,7 @@ suspend fun HandlePointerInputScope.waitForUpOrCancellation(): PointerInputChang
  * Consumes all event changes in the [PointerEventPass.Initial] until all pointers are up.
  */
 private suspend fun PointerInputScope.consumeAllEventsUntilUp() {
-    handlePointerInput {
+    awaitPointerEventScope {
         if (!allPointersUp()) {
             do {
                 val event = awaitPointerEvent(PointerEventPass.Initial)
@@ -250,7 +250,7 @@ private suspend fun PointerInputScope.detectSecondTapDown(
     upTime: Uptime
 ): PointerInputChange? {
     return withTimeoutOrNull(viewConfiguration.doubleTapTimeout.inMilliseconds()) {
-        handlePointerInput {
+        awaitPointerEventScope {
             val minUptime = upTime + viewConfiguration.doubleTapMinTime
             var change: PointerInputChange
             // The second tap doesn't count if it happens before DoubleTapMinTime of the first tap

@@ -18,7 +18,7 @@ package androidx.compose.ui.tooling.inspector
 
 import androidx.compose.ui.tooling.Group
 import androidx.compose.ui.tooling.Inspectable
-import androidx.compose.ui.tooling.SlotTableRecord
+import androidx.compose.ui.tooling.CompositionDataRecord
 import androidx.compose.ui.tooling.ToolingTest
 import androidx.compose.ui.tooling.asTree
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -32,7 +32,7 @@ import org.junit.runner.RunWith
 class OffsetInformationTest : ToolingTest() {
     @Test
     fun testOffset() {
-        val slotTableRecord = SlotTableRecord.create()
+        val slotTableRecord = CompositionDataRecord.create()
         show {
             Inspectable(slotTableRecord) {
                 OffsetData()

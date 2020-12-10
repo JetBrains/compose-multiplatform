@@ -26,9 +26,6 @@ val AnimationDemos = DemoCategory(
             "State Transition Demos",
             listOf(
                 ComposableDemo("Multi-dimensional prop") { MultiDimensionalAnimationDemo() },
-                ComposableDemo("State animation with interruptions") {
-                    StateAnimationWithInterruptionsDemo()
-                },
                 ComposableDemo("State based ripple") { StateBasedRippleDemo() },
                 ComposableDemo("Repeating rotation") { RepeatedRotationDemo() },
                 ComposableDemo("Manual animation clock") { AnimatableSeekBarDemo() },

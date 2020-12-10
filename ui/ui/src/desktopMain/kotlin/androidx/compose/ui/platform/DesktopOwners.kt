@@ -18,7 +18,6 @@ package androidx.compose.ui.platform
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.staticAmbientOf
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.KeyEventDesktop
 import androidx.compose.ui.input.mouse.MouseScrollEvent
 import androidx.compose.ui.input.pointer.PointerId
@@ -49,7 +48,6 @@ class DesktopOwners(
     }
 
     val list = LinkedHashSet<DesktopOwner>()
-    @ExperimentalKeyInput
     var keyboard: Keyboard? = null
 
     private var pointerId = 0L

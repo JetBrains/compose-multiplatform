@@ -20,11 +20,13 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
 
 /**
  * Provides [Selection] information for a composable to SelectionContainer. Composables who can
  * be selected should subscribe to [SelectionRegistrar] using this interface.
  */
+@ExperimentalTextApi
 interface Selectable {
     /**
      * Returns [Selection] information for a selectable composable. If no selection can be provided

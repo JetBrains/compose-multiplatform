@@ -37,7 +37,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.lazy.LazyColumnFor
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.Button
 import androidx.compose.material.Checkbox
@@ -224,11 +224,10 @@ fun CenterMenu(
                     }
                 }
             }
-            LazyColumnFor(
-                menuText,
-                modifier = Modifier.fillMaxSize().background(Color(0xFFd8c7ff))
-            ) {
-                Text(it, Modifier.padding(5.dp))
+            LazyColumn(Modifier.fillMaxSize().background(Color(0xFFd8c7ff))) {
+                items(menuText) {
+                    Text(it, Modifier.padding(5.dp))
+                }
             }
         }
     }

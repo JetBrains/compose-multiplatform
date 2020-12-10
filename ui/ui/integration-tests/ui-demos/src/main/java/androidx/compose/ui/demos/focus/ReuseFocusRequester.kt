@@ -30,10 +30,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.isFocused
-import androidx.compose.ui.focusObserver
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -44,7 +43,6 @@ private const val size = 200f
 private enum class CurrentShape { Circle, Square }
 
 @Composable
-@OptIn(ExperimentalFocus::class)
 fun ReuseFocusRequester() {
     Column(
         verticalArrangement = Arrangement.Top
@@ -76,7 +74,6 @@ fun ReuseFocusRequester() {
 }
 
 @Composable
-@OptIn(ExperimentalFocus::class)
 private fun Circle(modifier: Modifier = Modifier, nextShape: () -> Unit) {
     var isFocused by remember { mutableStateOf(false) }
     val scale = animate(if (isFocused) 0f else 1f, TweenSpec(2000)) {
@@ -87,7 +84,7 @@ private fun Circle(modifier: Modifier = Modifier, nextShape: () -> Unit) {
     val radius = size / 2
     Canvas(
         modifier
-            .focusObserver { isFocused = it.isFocused }
+            .onFocusChanged { isFocused = it.isFocused }
             .fillMaxSize()
             .focus()
     ) {
@@ -100,7 +97,6 @@ private fun Circle(modifier: Modifier = Modifier, nextShape: () -> Unit) {
 }
 
 @Composable
-@OptIn(ExperimentalFocus::class)
 private fun Square(modifier: Modifier = Modifier, nextShape: () -> Unit) {
     var isFocused by remember { mutableStateOf(false) }
     val scale = animate(if (isFocused) 0f else 1f, TweenSpec(2000)) {
@@ -111,7 +107,7 @@ private fun Square(modifier: Modifier = Modifier, nextShape: () -> Unit) {
     val side = size
     Canvas(
         modifier
-            .focusObserver { isFocused = it.isFocused }
+            .onFocusChanged { isFocused = it.isFocused }
             .fillMaxSize()
             .focus()
     ) {

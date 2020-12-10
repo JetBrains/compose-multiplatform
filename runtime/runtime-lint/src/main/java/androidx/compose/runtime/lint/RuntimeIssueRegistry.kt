@@ -30,6 +30,7 @@ class RuntimeIssueRegistry : IssueRegistry() {
         AmbientNamingDetector.AmbientNaming,
         ComposableLambdaParameterDetector.ComposableLambdaParameterNaming,
         ComposableLambdaParameterDetector.ComposableLambdaParameterPosition,
-        ComposableNamingDetector.ComposableNaming
+        ComposableNamingDetector.ComposableNaming,
+        RememberDetector.RememberReturnType
     )
 }

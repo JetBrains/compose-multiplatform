@@ -17,9 +17,9 @@
 package androidx.compose.ui.tooling
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionData
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.Providers
-import androidx.compose.runtime.SlotTable
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.tooling.InspectionTables
 import androidx.compose.ui.platform.InspectionMode
@@ -27,20 +27,19 @@ import java.util.Collections
 import java.util.WeakHashMap
 
 /**
- * Storage for the preview generated [SlotTable]s.
+ * Storage for the preview generated [CompositionData]s.
  */
-internal interface SlotTableRecord {
-    @OptIn(InternalComposeApi::class)
-    val store: Set<SlotTable>
+internal interface CompositionDataRecord {
+    val store: Set<CompositionData>
 
     companion object {
-        fun create(): SlotTableRecord = SlotTableRecordImpl()
+        fun create(): CompositionDataRecord = CompositionDataRecordImpl()
     }
 }
 
-private class SlotTableRecordImpl : SlotTableRecord {
+private class CompositionDataRecordImpl : CompositionDataRecord {
     @OptIn(InternalComposeApi::class)
-    override val store: MutableSet<SlotTable> =
+    override val store: MutableSet<CompositionData> =
         Collections.newSetFromMap(WeakHashMap())
 }
 
@@ -48,20 +47,21 @@ private class SlotTableRecordImpl : SlotTableRecord {
  * A wrapper for compositions in inspection mode. The composition inside the Inspectable component
  * is in inspection mode.
  *
- * @param slotTableRecord [SlotTableRecord] to record the SlotTable used in the composition of [content]
+ * @param compositionDataRecord [CompositionDataRecord] to record the SlotTable used in the
+ * composition of [content]
  *
  * @suppress
  */
 @Composable
 @OptIn(InternalComposeApi::class)
 internal fun Inspectable(
-    slotTableRecord: SlotTableRecord,
+    compositionDataRecord: CompositionDataRecord,
     content: @Composable () -> Unit
 ) {
     currentComposer.collectKeySourceInformation()
     currentComposer.collectParameterInformation()
-    val store = (slotTableRecord as SlotTableRecordImpl).store
-    store.add(currentComposer.slotTable)
+    val store = (compositionDataRecord as CompositionDataRecordImpl).store
+    store.add(currentComposer.compositionData)
     Providers(
         InspectionMode provides true,
         InspectionTables provides store,

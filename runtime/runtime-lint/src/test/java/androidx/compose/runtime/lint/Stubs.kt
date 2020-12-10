@@ -35,3 +35,41 @@ val composableStub: LintDetectorTest.TestFile = LintDetectorTest.kotlin(
         annotation class Composable
     """
 )
+
+val rememberStub: LintDetectorTest.TestFile = LintDetectorTest.kotlin(
+"""
+        package androidx.compose.runtime
+
+        import androidx.compose.runtime.Composable
+
+        @Composable
+        inline fun <T> remember(calculation: () -> T): T = calculation()
+
+        @Composable
+        inline fun <T, V1> remember(
+            v1: V1,
+            calculation: () -> T
+        ): T = calculation()
+
+        @Composable
+        inline fun <T, V1, V2> remember(
+            v1: V1,
+            v2: V2,
+            calculation: () -> T
+        ): T = calculation()
+
+        @Composable
+        inline fun <T, V1, V2, V3> remember(
+            v1: V1,
+            v2: V2,
+            v3: V3,
+            calculation: () -> T
+        ): T = calculation()
+
+        @Composable
+        inline fun <V> remember(
+            vararg inputs: Any?,
+            calculation: () -> V
+        ): V = calculation()
+    """
+)

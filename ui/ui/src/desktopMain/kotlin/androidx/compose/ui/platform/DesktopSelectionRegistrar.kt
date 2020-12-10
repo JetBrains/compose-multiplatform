@@ -20,8 +20,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.selection.Selectable
 import androidx.compose.ui.selection.SelectionRegistrar
+import androidx.compose.ui.text.ExperimentalTextApi
 
 // based on androidx.compose.ui.selection.SelectionRegistrarImpl
+@OptIn(ExperimentalTextApi::class)
 internal class DesktopSelectionRegistrar : SelectionRegistrar {
     internal var sorted: Boolean = false
 
@@ -71,12 +73,23 @@ internal class DesktopSelectionRegistrar : SelectionRegistrar {
         return selectables
     }
 
-    override fun onPositionChange() {
+    override fun notifyPositionChange() {
         sorted = false
         onPositionChangeCallback?.invoke()
     }
 
-    override fun onUpdateSelection(
+    override fun notifySelectionUpdateStart(
+        layoutCoordinates: LayoutCoordinates,
+        startPosition: Offset
+    ) {
+        onUpdateSelectionCallback?.invoke(
+            layoutCoordinates,
+            startPosition,
+            startPosition
+        )
+    }
+
+    override fun notifySelectionUpdate(
         layoutCoordinates: LayoutCoordinates,
         startPosition: Offset,
         endPosition: Offset
@@ -87,4 +100,6 @@ internal class DesktopSelectionRegistrar : SelectionRegistrar {
             endPosition
         )
     }
+
+    override fun notifySelectionUpdateEnd() { /* do nothing */ }
 }

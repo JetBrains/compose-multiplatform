@@ -29,9 +29,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.LinearGradient
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.Path
 import androidx.compose.ui.graphics.vector.PathData
@@ -50,12 +51,10 @@ import androidx.compose.ui.unit.dp
 fun DrawWithCacheModifierSample() {
     Box(
         Modifier.drawWithCache {
-            val gradient = LinearGradient(
-                startX = 0.0f,
-                startY = 0.0f,
-                endX = size.width,
-                endY = size.height,
-                colors = listOf(Color.Red, Color.Blue)
+            val gradient = Brush.linearGradient(
+                colors = listOf(Color.Red, Color.Blue),
+                start = Offset.Zero,
+                end = Offset(size.width, size.height)
             )
             onDrawBehind {
                 drawRect(gradient)
@@ -66,9 +65,9 @@ fun DrawWithCacheModifierSample() {
 
 /**
  * Sample showing how to leverage [Modifier.drawWithCache] to persist data across
- * draw calls. In the example below, the [LinearGradient] will be re-created if either
+ * draw calls. In the example below, the linear gradient will be re-created if either
  * the size of the drawing area changes, or the toggle flag represented by a mutable state
- * object changes. Otherwise the same [LinearGradient] instance is re-used for each call
+ * object changes. Otherwise the same linear gradient instance is re-used for each call
  * to drawRect.
  */
 @Sampled
@@ -79,12 +78,10 @@ fun DrawWithCacheModifierStateParameterSample() {
     var toggle by remember { mutableStateOf(true) }
     Box(
         Modifier.clickable { toggle = !toggle }.drawWithCache {
-            val gradient = LinearGradient(
-                startX = 0.0f,
-                startY = 0.0f,
-                endX = size.width,
-                endY = size.height,
-                colors = if (toggle) colors1 else colors2
+            val gradient = Brush.linearGradient(
+                colors = if (toggle) colors1 else colors2,
+                start = Offset.Zero,
+                end = Offset(size.width, size.height)
             )
             onDrawBehind {
                 drawRect(gradient)
@@ -115,12 +112,10 @@ fun DrawWithCacheContentSample() {
     Image(
         painter = vectorPainter,
         modifier = Modifier.size(120.dp).drawWithCache {
-            val gradient = LinearGradient(
+            val gradient = Brush.linearGradient(
                 colors = listOf(Color.Red, Color.Blue),
-                startX = 0f,
-                startY = 0f,
-                endX = 0f,
-                endY = size.height
+                start = Offset.Zero,
+                end = Offset(0f, size.height)
             )
             onDrawWithContent {
                 drawContent()

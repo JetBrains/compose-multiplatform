@@ -15,6 +15,7 @@
  */
 package androidx.compose.ui.node
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.Modifier
@@ -22,7 +23,6 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
@@ -30,7 +30,6 @@ import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedback
-import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
@@ -38,6 +37,7 @@ import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
@@ -1639,6 +1639,44 @@ class LayoutNodeTest {
         assertEquals(0, owner.onRequestMeasureParams.count { it === node2 })
     }
 
+    @Test
+    fun modifierMatchesWrapperWithIdentity() {
+        val modifier1 = Modifier.layout { measurable, constraints ->
+            val placeable = measurable.measure(constraints)
+            layout(placeable.width, placeable.height) {
+                placeable.place(0, 0)
+            }
+        }
+        val modifier2 = Modifier.layout { measurable, constraints ->
+            val placeable = measurable.measure(constraints)
+            layout(placeable.width, placeable.height) {
+                placeable.place(1, 1)
+            }
+        }
+
+        val root = LayoutNode()
+        root.modifier = modifier1.then(modifier2)
+
+        val wrapper1 = root.outerLayoutNodeWrapper
+        val wrapper2 = root.outerLayoutNodeWrapper.wrapped
+
+        assertEquals(modifier1, (wrapper1 as DelegatingLayoutNodeWrapper<*>).modifier)
+        assertEquals(modifier2, (wrapper2 as DelegatingLayoutNodeWrapper<*>).modifier)
+
+        root.modifier = modifier2.then(modifier1)
+
+        assertEquals(wrapper2, root.outerLayoutNodeWrapper)
+        assertEquals(wrapper1, root.outerLayoutNodeWrapper.wrapped)
+        assertEquals(
+            modifier1,
+            (root.outerLayoutNodeWrapper.wrapped as DelegatingLayoutNodeWrapper<*>).modifier
+        )
+        assertEquals(
+            modifier2,
+            (root.outerLayoutNodeWrapper as DelegatingLayoutNodeWrapper<*>).modifier
+        )
+    }
+
     private fun createSimpleLayout(): Triple<LayoutNode, LayoutNode, LayoutNode> {
         val layoutNode = ZeroSizedLayoutNode()
         val child1 = ZeroSizedLayoutNode()
@@ -1654,10 +1692,7 @@ class LayoutNodeTest {
         PointerInputModifier
 }
 
-@OptIn(
-    ExperimentalFocus::class,
-    InternalCoreApi::class
-)
+@OptIn(InternalCoreApi::class)
 private class MockOwner(
     val position: IntOffset = IntOffset.Zero,
     override val root: LayoutNode = LayoutNode()
@@ -1672,8 +1707,10 @@ private class MockOwner(
         get() = TODO("Not yet implemented")
     override val textToolbar: TextToolbar
         get() = TODO("Not yet implemented")
+    @OptIn(ExperimentalComposeUiApi::class)
     override val autofillTree: AutofillTree
         get() = TODO("Not yet implemented")
+    @OptIn(ExperimentalComposeUiApi::class)
     override val autofill: Autofill?
         get() = TODO("Not yet implemented")
     override val density: Density
@@ -1714,7 +1751,6 @@ private class MockOwner(
 
     override fun requestFocus(): Boolean = false
 
-    @ExperimentalKeyInput
     override fun sendKeyEvent(keyEvent: KeyEvent): Boolean = false
 
     override fun measureAndLayout() {

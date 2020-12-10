@@ -161,13 +161,13 @@ fun hasNoScrollAction(): SemanticsMatcher =
  * @param label Text to match.
  * @param ignoreCase Whether case should be ignored.
  *
- * @see SemanticsProperties.AccessibilityLabel
+ * @see SemanticsProperties.ContentDescription
  */
-fun hasLabel(label: String, ignoreCase: Boolean = false): SemanticsMatcher {
+fun hasContentDescription(label: String, ignoreCase: Boolean = false): SemanticsMatcher {
     return SemanticsMatcher(
-        "${SemanticsProperties.AccessibilityLabel.name} = '$label' (ignoreCase: $ignoreCase)"
+        "${SemanticsProperties.ContentDescription.name} = '$label' (ignoreCase: $ignoreCase)"
     ) {
-        it.config.getOrNull(SemanticsProperties.AccessibilityLabel).equals(label, ignoreCase)
+        it.config.getOrNull(SemanticsProperties.ContentDescription).equals(label, ignoreCase)
     }
 }
 
@@ -212,10 +212,10 @@ fun hasSubstring(substring: String, ignoreCase: Boolean = false):
  *
  * @param value Value to match.
  *
- * @see SemanticsProperties.AccessibilityValue
+ * @see SemanticsProperties.StateDescription
  */
 fun hasValue(value: String): SemanticsMatcher = SemanticsMatcher.expectValue(
-    SemanticsProperties.AccessibilityValue, value
+    SemanticsProperties.StateDescription, value
 )
 
 /**

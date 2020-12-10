@@ -22,7 +22,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.platform.InspectableValue
@@ -47,7 +46,6 @@ import org.junit.runner.RunWith
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalFocus::class)
 class FocusableTest {
 
     @get:Rule
@@ -98,8 +96,7 @@ class FocusableTest {
 
     @Test
     fun focusableTest_focusAcquire() {
-        val requester = FocusRequester()
-        val otherRequester = FocusRequester()
+        val (requester, otherRequester) = FocusRequester.createRefs()
         rule.setContent {
             Box {
                 BasicText(
@@ -139,8 +136,7 @@ class FocusableTest {
     @Test
     fun focusableTest_interactionState() {
         val interactionState = InteractionState()
-        val requester = FocusRequester()
-        val otherRequester = FocusRequester()
+        val (requester, otherRequester) = FocusRequester.createRefs()
         rule.setContent {
             Box {
                 BasicText(

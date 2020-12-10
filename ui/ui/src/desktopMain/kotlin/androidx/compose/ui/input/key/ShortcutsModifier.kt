@@ -80,7 +80,6 @@ fun KeysSet(key: Key): KeysSet {
 
 private fun makeHandlers() = TreeMap<KeysSet, () -> Unit>()
 
-@ExperimentalKeyInput
 internal class ShortcutsInstance(
     internal var handlers: TreeMap<KeysSet, () -> Unit> = makeHandlers()
 ) {
@@ -130,15 +129,14 @@ internal class ShortcutsInstance(
 /**
  * [KeyEvent] handler which tracks pressed keys and triggers matched callbacks
  *
- * @see [keyInputFilter]
+ * @see [onKeyEvent]
  * @see [androidx.compose.ui.platform.Keyboard] to define window-scoped shortcuts
  */
-@ExperimentalKeyInput
 @Composable
 fun Modifier.shortcuts(builder: (ShortcutsBuilderScope).() -> Unit) = composed {
     val instance = remember { ShortcutsInstance() }
     instance.handlers = ShortcutsBuilderScope().also(builder).handlers
-    keyInputFilter(instance::process)
+    onKeyEvent(instance::process)
 }
 
 class ShortcutsBuilderScope {

@@ -39,7 +39,9 @@ import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
+import kotlin.math.roundToInt
 
 /**
  * The directions in which a [SwipeToDismiss] can be dismissed.
@@ -239,7 +241,7 @@ fun SwipeToDismiss(
         )
         Row(
             content = dismissContent,
-            modifier = Modifier.offset(x = { state.offset.value })
+            modifier = Modifier.offset { IntOffset(state.offset.value.roundToInt(), 0) }
         )
     }
 }

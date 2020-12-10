@@ -35,6 +35,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.ExperimentalComposeApi
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.AndroidAutofill
 import androidx.compose.ui.autofill.Autofill
@@ -43,7 +44,6 @@ import androidx.compose.ui.autofill.performAutofill
 import androidx.compose.ui.autofill.populateViewStructure
 import androidx.compose.ui.autofill.registerCallback
 import androidx.compose.ui.autofill.unregisterCallback
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FOCUS_TAG
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusManagerImpl
@@ -51,7 +51,6 @@ import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
 import androidx.compose.ui.hapticfeedback.AndroidHapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedback
-import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventAndroid
 import androidx.compose.ui.input.key.KeyInputModifier
@@ -94,8 +93,7 @@ import android.view.KeyEvent as AndroidKeyEvent
 @SuppressLint("ViewConstructor", "VisibleForTests")
 @OptIn(
     ExperimentalComposeApi::class,
-    ExperimentalFocus::class,
-    ExperimentalKeyInput::class,
+    ExperimentalComposeUiApi::class,
 )
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 internal class AndroidComposeView(context: Context) :
@@ -180,13 +178,6 @@ internal class AndroidComposeView(context: Context) :
 
     @OptIn(InternalCoreApi::class)
     override var showLayoutBounds = false
-
-    private val clearInvalidObservations: Runnable = Runnable {
-        if (observationClearRequested) {
-            observationClearRequested = false
-            snapshotObserver.clearInvalidObservations()
-        }
-    }
 
     private var _androidViewsHandler: AndroidViewsHandler? = null
     private val androidViewsHandler: AndroidViewsHandler
@@ -336,10 +327,28 @@ internal class AndroidComposeView(context: Context) :
     }
 
     fun requestClearInvalidObservations() {
-        val handler = handler
-        if (!observationClearRequested && handler != null) {
-            observationClearRequested = true
-            handler.postAtFrontOfQueue(clearInvalidObservations)
+        observationClearRequested = true
+    }
+
+    internal fun clearInvalidObservations() {
+        if (observationClearRequested) {
+            snapshotObserver.clearInvalidObservations()
+            observationClearRequested = false
+        }
+        val childAndroidViews = _androidViewsHandler
+        if (childAndroidViews != null) {
+            clearChildInvalidObservations(childAndroidViews)
+        }
+    }
+
+    private fun clearChildInvalidObservations(viewGroup: ViewGroup) {
+        for (i in 0 until viewGroup.childCount) {
+            val child = viewGroup.getChildAt(i)
+            if (child is AndroidComposeView) {
+                child.clearInvalidObservations()
+            } else if (child is ViewGroup) {
+                clearChildInvalidObservations(child)
+            }
         }
     }
 
@@ -540,6 +549,18 @@ internal class AndroidComposeView(context: Context) :
     }
 
     /**
+     * Android has an issue where calling showSoftwareKeyboard after calling
+     * hideSoftwareKeyboard, it results in keyboard flickering and sometimes the keyboard ends up
+     * being hidden even though the most recent call was to showKeyboard.
+     *
+     * This function starts a suspended function that listens for show/hide commands and only
+     * runs the latest command.
+     */
+    suspend fun keyboardVisibilityEventLoop() {
+        textInputServiceAndroid.keyboardVisibilityEventLoop()
+    }
+
+    /**
      * Walks the entire LayoutNode sub-hierarchy and marks all nodes as needing measurement.
      */
     private fun invalidateLayoutNodeMeasurement(node: LayoutNode) {
@@ -602,14 +623,6 @@ internal class AndroidComposeView(context: Context) :
         }
         viewTreeObserver.removeOnGlobalLayoutListener(globalLayoutListener)
         viewTreeObserver.removeOnScrollChangedListener(scrollChangedListener)
-
-        // In case of benchmarks, the handler callbacks will never get executed as benchmarks block
-        // the main thread. However this callback holds references that point to this view which
-        // effectively prevents it from being garbage collected in benchmarks.
-        if (observationClearRequested) {
-            observationClearRequested = false
-            handler.removeCallbacks(clearInvalidObservations)
-        }
     }
 
     override fun onProvideAutofillVirtualStructure(structure: ViewStructure?, flags: Int) {

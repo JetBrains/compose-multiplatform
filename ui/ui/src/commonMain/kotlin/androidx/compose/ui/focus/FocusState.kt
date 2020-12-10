@@ -20,7 +20,6 @@ package androidx.compose.ui.focus
  * Different states of the focus system. These are the states used by the Focus Nodes.
  *
  */
-@ExperimentalFocus
 enum class FocusState {
     /**
      * The focusable component is currently active (i.e. it receives key events).
@@ -56,7 +55,6 @@ enum class FocusState {
  *
  * @return true if the component is focused, false otherwise.
  */
-@ExperimentalFocus
 val FocusState.isFocused
     get() = when (this) {
         FocusState.Captured,

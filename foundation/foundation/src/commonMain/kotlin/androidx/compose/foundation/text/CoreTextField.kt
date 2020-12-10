@@ -32,10 +32,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.isFocused
-import androidx.compose.ui.focusObserver
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.gesture.longPressDragGestureFilter
@@ -134,7 +133,6 @@ import kotlin.math.roundToInt
  */
 @Composable
 @OptIn(
-    ExperimentalFocus::class,
     ExperimentalTextApi::class,
     MouseTemporaryApi::class
 )
@@ -213,9 +211,9 @@ fun CoreTextField(
     manager.hapticFeedBack = AmbientHapticFeedback.current
     manager.focusRequester = focusRequester
 
-    val focusObserver = Modifier.focusObserver {
+    val onFocusChanged = Modifier.onFocusChanged {
         if (state.hasFocus == it.isFocused) {
-            return@focusObserver
+            return@onFocusChanged
         }
 
         state.hasFocus = it.isFocused
@@ -418,7 +416,7 @@ fun CoreTextField(
 
     val modifiers = modifier
         .focusRequester(focusRequester)
-        .then(focusObserver)
+        .then(onFocusChanged)
         .then(cursorModifier)
         .then(pointerModifier)
         .then(drawModifier)

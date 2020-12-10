@@ -18,14 +18,13 @@ package androidx.compose.foundation.lazy
 
 import androidx.compose.animation.asDisposableClock
 import androidx.compose.animation.core.AnimationClockObservable
-import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.animation.defaultFlingConfig
 import androidx.compose.foundation.gestures.ScrollScope
+import androidx.compose.foundation.gestures.Scrollable
 import androidx.compose.foundation.gestures.ScrollableController
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -99,7 +98,7 @@ class LazyListState constructor(
     interactionState: InteractionState? = null,
     flingConfig: FlingConfig,
     animationClock: AnimationClockObservable
-) {
+) : Scrollable {
     /**
      * The holder class for the current scroll position.
      */
@@ -118,7 +117,7 @@ class LazyListState constructor(
     val firstVisibleItemScrollOffset: Int get() = scrollPosition.observableScrollOffset
 
     /**
-     * whether this [LazyListState] is currently scrolling via [scroll] or via an
+     * Whether this [LazyListState] is currently scrolling via [scroll] or via an
      * animation/fling.
      *
      * Note: **all** scrolls initiated via [scroll] are considered to be animations, regardless of
@@ -126,6 +125,15 @@ class LazyListState constructor(
      */
     val isAnimationRunning
         get() = scrollableController.isAnimationRunning
+
+    /** Backing state for [layoutInfo] */
+    private val layoutInfoState = mutableStateOf<LazyListLayoutInfo>(EmptyLazyListLayoutInfo)
+
+    /**
+     * The object of [LazyListLayoutInfo] calculated during the last layout pass. For example,
+     * you can use it to calculate what items are currently visible.
+     */
+    val layoutInfo: LazyListLayoutInfo get() = layoutInfoState.value
 
     /**
      * The amount of scroll to be consumed in the next layout pass.  Scrolling forward is negative
@@ -216,25 +224,9 @@ class LazyListState constructor(
      * If [scroll] is called from elsewhere, this will be canceled.
      */
     @OptIn(ExperimentalFoundationApi::class)
-    suspend fun scroll(
+    override suspend fun scroll(
         block: suspend ScrollScope.() -> Unit
     ): Unit = scrollableController.scroll(block)
-
-    /**
-     * Smooth scroll by [value] pixels.
-     *
-     * Cancels the currently running scroll, if any, and suspends until the cancellation is
-     * complete.
-     *
-     * @param value delta to scroll by
-     * @param spec [AnimationSpec] to be used for this smooth scrolling
-     *
-     * @return the amount of scroll consumed
-     */
-    suspend fun smoothScrollBy(
-        value: Float,
-        spec: AnimationSpec<Float> = spring()
-    ): Float = scrollableController.smoothScrollBy(value, spec)
 
     // TODO: Coroutine scrolling APIs will allow this to be private again once we have more
     //  fine-grained control over scrolling
@@ -282,6 +274,7 @@ class LazyListState constructor(
             canScrollForward = measureResult.canScrollForward
         )
         scrollToBeConsumed -= measureResult.consumedScroll
+        layoutInfoState.value = measureResult
         numMeasurePasses++
     }
 
@@ -352,4 +345,11 @@ private class ItemRelativeScrollPosition(
         scrollOffsetState.value = scrollOffset
         this.canScrollForward = canScrollForward
     }
+}
+
+private object EmptyLazyListLayoutInfo : LazyListLayoutInfo {
+    override val visibleItemsInfo = emptyList<LazyListItemInfo>()
+    override val viewportStartOffset = 0
+    override val viewportEndOffset = 0
+    override val totalItemsCount = 0
 }

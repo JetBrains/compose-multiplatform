@@ -23,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus
 import androidx.compose.ui.focus.FocusState.Active
 import androidx.compose.ui.focus.FocusState.Inactive
-import androidx.compose.ui.focusObserver
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.platform.AmbientView
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -36,7 +35,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @MediumTest
-@OptIn(ExperimentalFocus::class)
 @RunWith(AndroidJUnit4::class)
 class OwnerFocusTest {
     @get:Rule
@@ -78,7 +76,7 @@ class OwnerFocusTest {
             ownerView = getOwner()
             Box(
                 modifier = Modifier
-                    .focusObserver { focusState = it }
+                    .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
                     .focus()
             )
@@ -106,7 +104,7 @@ class OwnerFocusTest {
             ownerView = getOwner()
             Box(
                 modifier = Modifier
-                    .focusObserver { focusState = it }
+                    .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
                     .focus()
             )
@@ -133,7 +131,7 @@ class OwnerFocusTest {
             ownerView = getOwner()
             Box(
                 modifier = Modifier
-                    .focusObserver { focusState = it }
+                    .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
                     .focus()
             )
@@ -163,7 +161,7 @@ class OwnerFocusTest {
             ownerView = getOwner()
             Box(
                 modifier = Modifier
-                    .focusObserver { focusState = it }
+                    .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
                     .focus()
             )

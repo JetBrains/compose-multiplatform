@@ -17,6 +17,7 @@
 package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.animation.smoothScrollBy
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
@@ -36,7 +37,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import kotlin.math.roundToInt
 
 @MediumTest
 @OptIn(ExperimentalTesting::class)
@@ -84,18 +84,24 @@ class LazyScrollTest(private val orientation: Orientation) {
         }
         assertThat(state.firstVisibleItemIndex).isEqualTo(3)
         assertThat(state.firstVisibleItemScrollOffset)
-            .isEqualTo(with(rule.density) { 17.dp.toPx().roundToInt() })
+            .isEqualTo(
+                with(rule.density) { 320.dp.toIntPx() - 101.dp.toIntPx() * 3 }
+            )
     }
 
     @Composable
     private fun TestContent() {
         if (vertical) {
-            LazyColumnFor(items, Modifier.preferredHeight(300.dp), state) {
-                ItemContent()
+            LazyColumn(Modifier.preferredHeight(300.dp), state) {
+                items(items) {
+                    ItemContent()
+                }
             }
         } else {
-            LazyRowFor(items, Modifier.preferredWidth(300.dp), state) {
-                ItemContent()
+            LazyRow(Modifier.preferredWidth(300.dp), state) {
+                items(items) {
+                    ItemContent()
+                }
             }
         }
     }

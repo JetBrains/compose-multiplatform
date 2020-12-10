@@ -20,7 +20,6 @@ import java.awt.event.KeyEvent.KEY_PRESSED
 import java.awt.event.KeyEvent.KEY_RELEASED
 import java.awt.event.KeyEvent as KeyEventAwt
 
-@OptIn(ExperimentalKeyInput::class)
 internal inline class KeyEventDesktop(val keyEvent: KeyEventAwt) : KeyEvent {
 
     override val key: Key
@@ -47,19 +46,4 @@ internal inline class KeyEventDesktop(val keyEvent: KeyEventAwt) : KeyEvent {
 
     override val isShiftPressed: Boolean
         get() = keyEvent.isShiftDown
-
-    @Suppress("DEPRECATION", "OverridingDeprecatedMember")
-    override val alt: Alt
-        get() = AltDesktop(keyEvent)
-}
-
-@Suppress("DEPRECATION")
-@OptIn(ExperimentalKeyInput::class)
-internal inline class AltDesktop(val keyEvent: KeyEventAwt) : Alt {
-
-    override val isLeftAltPressed
-        get() = keyEvent.isAltDown
-
-    override val isRightAltPressed
-        get() = keyEvent.isAltGraphDown
 }

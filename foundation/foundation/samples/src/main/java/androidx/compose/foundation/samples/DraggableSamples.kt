@@ -29,7 +29,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import kotlin.math.roundToInt
 
 @Sampled
 @Composable
@@ -52,7 +54,9 @@ fun DraggableSample() {
             .background(Color.Black)
     ) {
         Box(
-            Modifier.offset(x = { offsetPosition.value }).preferredSize(50.dp).background(Color.Red)
+            Modifier.offset { IntOffset(offsetPosition.value.roundToInt(), 0) }
+                .preferredSize(50.dp)
+                .background(Color.Red)
         )
     }
 }

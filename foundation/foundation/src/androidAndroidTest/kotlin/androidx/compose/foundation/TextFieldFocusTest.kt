@@ -22,10 +22,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.isFocused
-import androidx.compose.ui.focusObserver
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.dp
@@ -37,7 +36,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @LargeTest
-@OptIn(ExperimentalFocus::class)
 @RunWith(AndroidJUnit4::class)
 class TextFieldFocusTest {
     @get:Rule
@@ -51,7 +49,7 @@ class TextFieldFocusTest {
                 value = editor.value,
                 modifier = Modifier
                     .focusRequester(data.focusRequester)
-                    .focusObserver { data.focused = it.isFocused }
+                    .onFocusChanged { data.focused = it.isFocused }
                     .width(10.dp),
                 onValueChange = {
                     editor.value = it

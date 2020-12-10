@@ -23,7 +23,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyColumnFor
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -60,27 +60,28 @@ fun PointerInputDuringSubComp() {
                 "it is actually a new item that has not been hit tested yet.  If you keep " +
                 "your finger there and then add more fingers, it will track those new fingers."
         )
-        LazyColumnFor(
-            List(100) { index -> index },
+        LazyColumn(
             Modifier
                 .fillMaxSize()
                 .wrapContentSize(Alignment.Center)
                 .size(200.dp)
                 .background(color = Color.White)
         ) {
-            val pointerCount = remember { mutableStateOf(0) }
+            items(List(100) { index -> index }) {
+                val pointerCount = remember { mutableStateOf(0) }
 
-            Box(
-                Modifier.fillParentMaxSize()
-                    .border(width = 1.dp, color = Color.Black)
-                    .pointerCounterGestureFilter { newCount -> pointerCount.value = newCount },
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    "${pointerCount.value}",
-                    fontSize = TextUnit.Em(16),
-                    color = Color.Black
-                )
+                Box(
+                    Modifier.fillParentMaxSize()
+                        .border(width = 1.dp, color = Color.Black)
+                        .pointerCounterGestureFilter { newCount -> pointerCount.value = newCount },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        "${pointerCount.value}",
+                        fontSize = TextUnit.Em(16),
+                        color = Color.Black
+                    )
+                }
             }
         }
     }

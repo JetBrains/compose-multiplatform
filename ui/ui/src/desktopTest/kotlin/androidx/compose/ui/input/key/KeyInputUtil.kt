@@ -28,7 +28,6 @@ private object DummyComponent : Component()
  * The [KeyEvent] is usually created by the system. This function creates an instance of
  * [KeyEvent] that can be used in tests.
  */
-@OptIn(ExperimentalKeyInput::class)
 fun keyEvent(key: Key, keyEventType: KeyEventType): KeyEvent {
     val action = when (keyEventType) {
         KeyEventType.KeyDown -> KEY_PRESSED
@@ -46,7 +45,6 @@ fun keyEvent(key: Key, keyEventType: KeyEventType): KeyEvent {
 /**
  * Creates [KeyEvent] of Unknown type. It wraps KEY_TYPED AWTs KeyEvent
  */
-@OptIn(ExperimentalKeyInput::class)
 fun keyTypedEvent(key: Key): KeyEvent {
     return KeyEventDesktop(
         KeyEventAwt(

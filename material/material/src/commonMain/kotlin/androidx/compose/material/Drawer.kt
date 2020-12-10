@@ -21,9 +21,9 @@ import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -34,20 +34,23 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.Saver
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.WithConstraints
+import androidx.compose.ui.gesture.nestedscroll.nestedScroll
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.semantics.dismiss
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
+import kotlin.math.roundToInt
 
 /**
  * Possible values of [DrawerState].
@@ -253,6 +256,8 @@ class BottomDrawerState(
         )
     }
 
+    internal val nestedScrollConnection = this.PreUpPostDownNestedScrollConnection
+
     companion object {
         /**
          * The default [Saver] implementation for [BottomDrawerState].
@@ -394,7 +399,7 @@ fun ModalDrawerLayout(
                             dismiss(action = { drawerState.close(); true })
                         }
                     }
-                    .offset(x = { drawerState.offset.value })
+                    .offset { IntOffset(drawerState.offset.value.roundToInt(), 0) }
                     .padding(end = VerticalDrawerPadding),
                 shape = drawerShape,
                 color = drawerBackgroundColor,
@@ -481,13 +486,15 @@ fun BottomDrawerLayout(
                 )
             }
         Box(
-            Modifier.swipeable(
-                state = drawerState,
-                anchors = anchors,
-                orientation = Orientation.Vertical,
-                enabled = gesturesEnabled,
-                resistance = null
-            )
+            Modifier
+                .nestedScroll(drawerState.nestedScrollConnection)
+                .swipeable(
+                    state = drawerState,
+                    anchors = anchors,
+                    orientation = Orientation.Vertical,
+                    enabled = gesturesEnabled,
+                    resistance = null
+                )
         ) {
             Box {
                 bodyContent()
@@ -514,8 +521,7 @@ fun BottomDrawerLayout(
                         if (drawerState.isOpen) {
                             dismiss(action = { drawerState.close(); true })
                         }
-                    }
-                    .offset(y = { drawerState.offset.value }),
+                    }.offset { IntOffset(0, drawerState.offset.value.roundToInt()) },
                 shape = drawerShape,
                 color = drawerBackgroundColor,
                 contentColor = drawerContentColor,

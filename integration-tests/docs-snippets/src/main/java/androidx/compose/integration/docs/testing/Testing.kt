@@ -25,11 +25,10 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.semantics.AccessibilityAction
 import androidx.compose.ui.semantics.SemanticsPropertyKey
-import androidx.compose.ui.semantics.accessibilityLabel
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
@@ -47,10 +46,10 @@ import androidx.compose.ui.test.hasParent
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onAllNodesWithLabel
+import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onFirst
-import androidx.compose.ui.test.onNodeWithLabel
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
@@ -73,7 +72,7 @@ import org.junit.Test
  */
 
 @Composable private fun TestingSnippet1() {
-    MyButton(modifier = Modifier.semantics { accessibilityLabel = "Like button" })
+    MyButton(modifier = Modifier.semantics { contentDescription = "Like button" })
 }
 
 private object TestingSnippet3 {
@@ -142,11 +141,11 @@ private object TestingSnippet3 {
 
 @Composable private fun TestingSnippets8() {
     // Check number of matched nodes
-    composeTestRule.onAllNodesWithLabel("Beatle").assertCountEquals(4)
+    composeTestRule.onAllNodesWithContentDescription("Beatle").assertCountEquals(4)
     // At least one matches
-    composeTestRule.onAllNodesWithLabel("Beatle").assertAny(hasTestTag("Drummer"))
+    composeTestRule.onAllNodesWithContentDescription("Beatle").assertAny(hasTestTag("Drummer"))
     // All of them match
-    composeTestRule.onAllNodesWithLabel("Beatle").assertAll(hasClickAction())
+    composeTestRule.onAllNodesWithContentDescription("Beatle").assertAll(hasClickAction())
 }
 
 @Composable private fun SemanticsNodeInteraction.TestingSnippets9() {
@@ -202,13 +201,13 @@ private object TestingSnippets13 {
 
         @Test
         fun changeTheme_scrollIsPersisted() {
-            composeTestRule.onNodeWithLabel("Continue").performClick()
+            composeTestRule.onNodeWithContentDescription("Continue").performClick()
 
             // Set theme to dark
             themeIsDark.value = true
 
             // Check that we're still on the same page
-            composeTestRule.onNodeWithLabel("Welcome").assertIsDisplayed()
+            composeTestRule.onNodeWithContentDescription("Welcome").assertIsDisplayed()
         }
     }
 }
@@ -228,5 +227,4 @@ private val exampleUiState = Unit
 private class MyActivity : ComponentActivity()
 @Composable private fun MyButton(content: @Composable RowScope.() -> Unit) { }
 private lateinit var key: SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>
-@OptIn(ExperimentalKeyInput::class)
 private lateinit var keyEvent: KeyEvent

@@ -26,6 +26,7 @@ import androidx.compose.ui.util.fastForEach
  * if the user emit multiple layout nodes in the item callback.
  */
 internal class LazyMeasuredItem(
+    override val index: Int,
     private val placeables: List<Placeable>,
     private val isVertical: Boolean,
     private val horizontalAlignment: Alignment.Horizontal?,
@@ -34,29 +35,39 @@ internal class LazyMeasuredItem(
     private val startContentPadding: Int,
     private val endContentPadding: Int,
     /**
-     * Extra size to be added to [mainAxisSize] aside from the sum of the [placeables] size.
+     * Extra spacing to be added to [size] aside from the sum of the [placeables] size. It
+     * is usually representing the spacing after the item.
      */
-    val extraMainAxisSize: Int
-) {
+    private val spacing: Int
+) : LazyListItemInfo {
     /**
      * Sum of the main axis sizes of all the inner placeables.
      */
-    val mainAxisSize: Int
+    override val size: Int
+
+    /**
+     * Sum of the main axis sizes of all the inner placeables and [spacing].
+     */
+    val sizeWithSpacings: Int
 
     /**
      * Max of the cross axis sizes of all the inner placeables.
      */
     val crossAxisSize: Int
 
+    override var offset: Int = 0
+        private set
+
     init {
-        var mainAxisSize = extraMainAxisSize
+        var mainAxisSize = 0
         var maxCrossAxis = 0
         placeables.fastForEach {
             mainAxisSize += if (isVertical) it.height else it.width
             maxCrossAxis = maxOf(maxCrossAxis, if (!isVertical) it.height else it.width)
         }
-        this.mainAxisSize = mainAxisSize
-        this.crossAxisSize = maxCrossAxis
+        size = mainAxisSize
+        sizeWithSpacings = size + spacing
+        crossAxisSize = maxCrossAxis
     }
 
     /**
@@ -73,6 +84,7 @@ internal class LazyMeasuredItem(
         offset: Int,
         reverseOrder: Boolean
     ) = with(scope) {
+        this@LazyMeasuredItem.offset = offset
         var mainAxisOffset = offset
         val indices = if (reverseOrder) placeables.lastIndex downTo 0 else placeables.indices
         for (index in indices) {

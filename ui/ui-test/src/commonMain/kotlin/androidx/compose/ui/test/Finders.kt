@@ -45,7 +45,7 @@ fun SemanticsNodeInteractionsProvider.onAllNodesWithTag(
 ): SemanticsNodeInteractionCollection = onAllNodes(hasTestTag(testTag), useUnmergedTree)
 
 /**
- * Finds a semantics node with the given label as its accessibilityLabel.
+ * Finds a semantics node with the given contentDescription.
  *
  * For usage patterns and semantics concepts see [SemanticsNodeInteraction]
  *
@@ -53,11 +53,11 @@ fun SemanticsNodeInteractionsProvider.onAllNodesWithTag(
  *
  * @see SemanticsNodeInteractionsProvider.onNode for general find method.
  */
-fun SemanticsNodeInteractionsProvider.onNodeWithLabel(
+fun SemanticsNodeInteractionsProvider.onNodeWithContentDescription(
     label: String,
     ignoreCase: Boolean = false,
     useUnmergedTree: Boolean = false
-): SemanticsNodeInteraction = onNode(hasLabel(label, ignoreCase), useUnmergedTree)
+): SemanticsNodeInteraction = onNode(hasContentDescription(label, ignoreCase), useUnmergedTree)
 
 /**
  * Finds a semantincs node with the given text.
@@ -105,18 +105,19 @@ fun SemanticsNodeInteractionsProvider.onAllNodesWithText(
 ): SemanticsNodeInteractionCollection = onAllNodes(hasText(text, ignoreCase), useUnmergedTree)
 
 /**
- * Finds all semantics nodes with the given label as AccessibilityLabel.
+ * Finds all semantics nodes with the given label as ContentDescription.
  *
  * For usage patterns and semantics concepts see [SemanticsNodeInteraction]
  *
  * @param useUnmergedTree Find within merged composables like Buttons.
  * @see SemanticsNodeInteractionsProvider.onAllNodes for general find method.
  */
-fun SemanticsNodeInteractionsProvider.onAllNodesWithLabel(
+fun SemanticsNodeInteractionsProvider.onAllNodesWithContentDescription(
     label: String,
     ignoreCase: Boolean = false,
     useUnmergedTree: Boolean = false
-): SemanticsNodeInteractionCollection = onAllNodes(hasLabel(label, ignoreCase), useUnmergedTree)
+): SemanticsNodeInteractionCollection =
+    onAllNodes(hasContentDescription(label, ignoreCase), useUnmergedTree)
 
 /**
  * Finds all semantics nodes with text that contains the given substring.

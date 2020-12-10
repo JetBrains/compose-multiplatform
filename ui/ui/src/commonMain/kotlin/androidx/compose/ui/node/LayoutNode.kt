@@ -18,11 +18,10 @@ package androidx.compose.ui.node
 import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.ui.FocusModifier
-import androidx.compose.ui.FocusObserverModifier
 import androidx.compose.ui.FocusRequesterModifier
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.DrawModifier
-import androidx.compose.ui.focus.ExperimentalFocus
+import androidx.compose.ui.focus.FocusEventModifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.nestedscroll.NestedScrollDelegatingWrapper
 import androidx.compose.ui.gesture.nestedscroll.NestedScrollModifier
@@ -77,10 +76,9 @@ internal val sharedDrawScope = LayoutNodeDrawScope()
 /**
  * An element in the layout hierarchy, built with compose UI.
  */
-@OptIn(ExperimentalFocus::class)
 class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
 
-    constructor() : this(false)
+    internal constructor() : this(false)
 
     internal constructor(isVirtual: Boolean) {
         this.isVirtual = isVirtual
@@ -143,13 +141,13 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
     /**
      * The children of this LayoutNode, controlled by [insertAt], [move], and [removeAt].
      */
-    val children: List<LayoutNode> get() = _children.asMutableList()
+    internal val children: List<LayoutNode> get() = _children.asMutableList()
 
     /**
      * The parent node in the LayoutNode hierarchy. This is `null` when the [LayoutNode]
      * is not attached attached to a hierarchy or is the root of the hierarchy.
      */
-    var parent: LayoutNode? = null
+    internal var parent: LayoutNode? = null
         get() {
             val parent = field
             return if (parent != null && parent.isVirtual) parent.parent else parent
@@ -159,7 +157,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
     /**
      * The view system [Owner]. This `null` until [attach] is called
      */
-    var owner: Owner? = null
+    internal var owner: Owner? = null
         private set
 
     /**
@@ -328,7 +326,6 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
         parent?.requestRemeasure()
         innerLayoutNodeWrapper.attach()
         forEachDelegate { it.attach() }
-        updateInnerLayerWrapper()
         onAttach?.invoke(owner)
     }
 
@@ -358,7 +355,6 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
         }
         owner.onDetach(this)
         this.owner = null
-        _innerLayerWrapper = null
         depth = 0
         _foldedChildren.forEach { child ->
             child.detach()
@@ -586,7 +582,20 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
      * The inner-most layer wrapper. Used for performance for LayoutNodeWrapper.findLayer().
      */
     private var _innerLayerWrapper: LayoutNodeWrapper? = null
+    internal var innerLayerWrapperIsDirty = true
     internal val innerLayerWrapper: LayoutNodeWrapper? get() {
+        if (innerLayerWrapperIsDirty) {
+            var delegate: LayoutNodeWrapper? = innerLayoutNodeWrapper
+            val final = outerLayoutNodeWrapper.wrappedBy
+            _innerLayerWrapper = null
+            while (delegate != final) {
+                if (delegate?.layer != null) {
+                    _innerLayerWrapper = delegate
+                    break
+                }
+                delegate = delegate?.wrappedBy
+            }
+        }
         val layerWrapper = _innerLayerWrapper
         if (layerWrapper != null) {
             requireNotNull(layerWrapper.layer)
@@ -612,7 +621,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
     /**
      * The [Modifier] currently applied to this node.
      */
-    var modifier: Modifier = Modifier
+    internal var modifier: Modifier = Modifier
         set(value) {
             if (value == field) return
             if (modifier != Modifier) {
@@ -623,6 +632,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
             val invalidateParentLayer = shouldInvalidateParentLayer()
 
             copyWrappersToCache()
+            markReusedModifiers(value)
 
             // Rebuild LayoutNodeWrapper
             val oldOuterWrapper = outerMeasurablePlaceable.outerWrapper
@@ -661,8 +671,8 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
                     if (mod is FocusModifier) {
                         wrapper = ModifiedFocusNode(wrapper, mod).assignChained(toWrap)
                     }
-                    if (mod is FocusObserverModifier) {
-                        wrapper = ModifiedFocusObserverNode(wrapper, mod).assignChained(toWrap)
+                    if (mod is FocusEventModifier) {
+                        wrapper = ModifiedFocusEventNode(wrapper, mod).assignChained(toWrap)
                     }
                     if (mod is FocusRequesterModifier) {
                         wrapper = ModifiedFocusRequesterNode(wrapper, mod).assignChained(toWrap)
@@ -696,9 +706,6 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
                 // call detach() on all removed LayoutNodeWrappers
                 wrapperCache.forEach {
                     it.detach()
-                    if (_innerLayerWrapper === it) {
-                        _innerLayerWrapper = null
-                    }
                 }
 
                 // attach() all new LayoutNodeWrappers
@@ -839,28 +846,10 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
     }
 
     /**
-     * Find the current inner layer.
-     */
-    private fun updateInnerLayerWrapper() {
-        var delegate: LayoutNodeWrapper? = innerLayoutNodeWrapper
-        val final = outerLayoutNodeWrapper.wrappedBy
-        _innerLayerWrapper = null
-        while (delegate != final) {
-            if (delegate?.layer != null) {
-                _innerLayerWrapper = delegate
-                break
-            }
-            delegate = delegate?.wrappedBy
-        }
-    }
-
-    /**
      * Invoked when the parent placed the node. It will trigger the layout.
      */
     internal fun onNodePlaced() {
         val parent = parent
-
-        updateInnerLayerWrapper()
 
         var newZIndex = innerLayoutNodeWrapper.zIndex
         forEachDelegate {
@@ -1159,8 +1148,16 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
         if (wrapperCache.isEmpty()) {
             return null
         }
-        val index = wrapperCache.indexOfLast {
-            it.modifier === modifier || it.modifier.nativeClass() == modifier.nativeClass()
+        // Look for exact match
+        var index = wrapperCache.indexOfLast {
+            it.toBeReusedForSameModifier && it.modifier === modifier
+        }
+
+        if (index < 0) {
+            // Look for class match
+            index = wrapperCache.indexOfLast {
+                !it.toBeReusedForSameModifier && it.modifier.nativeClass() == modifier.nativeClass()
+            }
         }
 
         if (index < 0) {
@@ -1192,6 +1189,17 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
     private fun copyWrappersToCache() {
         forEachDelegate {
             wrapperCache += it as DelegatingLayoutNodeWrapper<*>
+        }
+    }
+
+    private fun markReusedModifiers(modifier: Modifier) {
+        wrapperCache.forEach {
+            it.toBeReusedForSameModifier = false
+        }
+
+        modifier.foldIn(Unit) { _, mod ->
+            val wrapper = wrapperCache.firstOrNull { it.modifier === mod }
+            wrapper?.toBeReusedForSameModifier = true
         }
     }
 
@@ -1250,17 +1258,14 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
     }
 
     private fun shouldInvalidateParentLayer(): Boolean {
-        if (innerLayerWrapper == null) {
-            return true
-        }
         forEachDelegateIncludingInner {
-            if (it is ModifiedDrawNode) {
-                return true
-            } else if (it.layer != null) {
+            if (it.layer != null) {
                 return false
+            } else if (it is ModifiedDrawNode) {
+                return true
             }
         }
-        error("innerLayerWrapper should have been reached.")
+        return true
     }
 
     /**

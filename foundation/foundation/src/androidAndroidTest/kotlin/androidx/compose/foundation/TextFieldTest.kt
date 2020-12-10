@@ -37,9 +37,8 @@ import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.isFocused
-import androidx.compose.ui.focusObserver
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -97,10 +96,7 @@ import org.junit.runner.RunWith
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(
-    ExperimentalFocus::class,
-    ExperimentalFoundationApi::class
-)
+@OptIn(ExperimentalFoundationApi::class)
 class TextFieldTest {
     @get:Rule
     val rule = createComposeRule()
@@ -119,7 +115,7 @@ class TextFieldTest {
             ) {
                 BasicTextField(
                     value = state.value,
-                    modifier = Modifier.fillMaxSize().focusObserver { isFocused = it.isFocused },
+                    modifier = Modifier.fillMaxSize().onFocusChanged { isFocused = it.isFocused },
                     onValueChange = { state.value = it }
                 )
             }

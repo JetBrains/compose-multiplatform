@@ -18,6 +18,7 @@ package androidx.compose.ui.test.junit4
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.IdlingResource
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
@@ -80,6 +81,16 @@ interface ComposeTestRule : TestRule, SemanticsNodeInteractionsProvider {
      */
     @ExperimentalTesting
     suspend fun awaitIdle()
+
+    /**
+     * Registers an [IdlingResource] in this test.
+     */
+    fun registerIdlingResource(idlingResource: IdlingResource)
+
+    /**
+     * Unregisters an [IdlingResource] from this test.
+     */
+    fun unregisterIdlingResource(idlingResource: IdlingResource)
 
     /**
      * Sets the given composable as a content of the current screen.

@@ -18,7 +18,6 @@ package androidx.compose.ui.platform
 
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Popup
@@ -33,7 +32,6 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.SECONDS
 
 @MediumTest
-@OptIn(ExperimentalFocus::class)
 @RunWith(AndroidJUnit4::class)
 class WindowManagerAmbientTest {
     @get:Rule

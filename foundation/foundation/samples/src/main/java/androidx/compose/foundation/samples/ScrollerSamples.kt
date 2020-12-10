@@ -36,10 +36,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.HorizontalGradient
 import androidx.compose.ui.graphics.TileMode
-import androidx.compose.ui.graphics.VerticalGradient
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -88,7 +87,7 @@ private val phrases = listOf(
 @Composable
 fun HorizontalScrollSample() {
     val scrollState = rememberScrollState()
-    val gradient = HorizontalGradient(
+    val gradient = Brush.horizontalGradient(
         listOf(Color.Red, Color.Blue, Color.Green), 0.0f, 10000.0f, TileMode.Repeated
     )
     Box(
@@ -103,7 +102,7 @@ fun HorizontalScrollSample() {
 @Composable
 fun VerticalScrollExample() {
     val scrollState = rememberScrollState()
-    val gradient = VerticalGradient(
+    val gradient = Brush.verticalGradient(
         listOf(Color.Red, Color.Blue, Color.Green), 0.0f, 10000.0f, TileMode.Repeated
     )
     Box(

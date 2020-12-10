@@ -51,6 +51,7 @@ dependencies {
         testImplementation KOTLIN_TEST_JUNIT
         testImplementation(JUNIT)
         testImplementation(ROBOLECTRIC)
+        testImplementation(KOTLIN_COROUTINES_TEST)
 
         androidTestImplementation KOTLIN_TEST_JUNIT
         androidTestImplementation(ANDROIDX_TEST_EXT_JUNIT)
@@ -102,6 +103,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 
             commonTest.dependencies {
                 implementation kotlin("test-junit")
+                implementation(KOTLIN_COROUTINES_TEST)
             }
             androidAndroidTest.dependencies {
                 implementation(ANDROIDX_TEST_EXT_JUNIT)

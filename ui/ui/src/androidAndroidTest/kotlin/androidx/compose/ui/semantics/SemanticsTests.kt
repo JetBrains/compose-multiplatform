@@ -19,7 +19,6 @@ package androidx.compose.ui.semantics
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.InspectableValue
@@ -34,9 +33,9 @@ import androidx.compose.ui.test.assertLabelEquals
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.assertValueEquals
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onAllNodesWithLabel
+import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithText
-import androidx.compose.ui.test.onNodeWithLabel
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.text.AnnotatedString
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -85,7 +84,7 @@ class SemanticsTests {
         val recomposeForcer = mutableStateOf(0)
         rule.setContent {
             recomposeForcer.value
-            CountingLayout(Modifier.semantics { accessibilityLabel = "label" }, layoutCounter)
+            CountingLayout(Modifier.semantics { contentDescription = "label" }, layoutCounter)
         }
 
         rule.runOnIdle { assertEquals(1, layoutCounter.count) }
@@ -105,13 +104,13 @@ class SemanticsTests {
         rule.setContent {
             SimpleTestLayout(
                 Modifier.testTag(TestTag)
-                    .semantics(mergeDescendants = true) { accessibilityLabel = root }
+                    .semantics(mergeDescendants = true) { contentDescription = root }
             ) {
-                SimpleTestLayout(Modifier.semantics { accessibilityLabel = child1 }) {
-                    SimpleTestLayout(Modifier.semantics { accessibilityLabel = grandchild1 }) { }
-                    SimpleTestLayout(Modifier.semantics { accessibilityLabel = grandchild2 }) { }
+                SimpleTestLayout(Modifier.semantics { contentDescription = child1 }) {
+                    SimpleTestLayout(Modifier.semantics { contentDescription = grandchild1 }) { }
+                    SimpleTestLayout(Modifier.semantics { contentDescription = grandchild2 }) { }
                 }
-                SimpleTestLayout(Modifier.semantics { accessibilityLabel = child2 }) { }
+                SimpleTestLayout(Modifier.semantics { contentDescription = child2 }) { }
             }
         }
 
@@ -128,9 +127,9 @@ class SemanticsTests {
         val label2 = "bar"
         rule.setContent {
             SimpleTestLayout(Modifier.semantics(mergeDescendants = true) {}.testTag(tag1)) {
-                SimpleTestLayout(Modifier.semantics { accessibilityLabel = label1 }) { }
+                SimpleTestLayout(Modifier.semantics { contentDescription = label1 }) { }
                 SimpleTestLayout(Modifier.semantics(mergeDescendants = true) {}.testTag(tag2)) {
-                    SimpleTestLayout(Modifier.semantics { accessibilityLabel = label2 }) { }
+                    SimpleTestLayout(Modifier.semantics { contentDescription = label2 }) { }
                 }
             }
         }
@@ -148,12 +147,12 @@ class SemanticsTests {
         val label3 = "baz"
         rule.setContent {
             SimpleTestLayout(Modifier.semantics(mergeDescendants = true) {}.testTag(tag1)) {
-                SimpleTestLayout(Modifier.semantics { accessibilityLabel = label1 }) { }
+                SimpleTestLayout(Modifier.semantics { contentDescription = label1 }) { }
                 SimpleTestLayout(Modifier.clearAndSetSemantics {}) {
-                    SimpleTestLayout(Modifier.semantics { accessibilityLabel = label2 }) { }
+                    SimpleTestLayout(Modifier.semantics { contentDescription = label2 }) { }
                 }
-                SimpleTestLayout(Modifier.clearAndSetSemantics { accessibilityLabel = label3 }) {
-                    SimpleTestLayout(Modifier.semantics { accessibilityLabel = label2 }) { }
+                SimpleTestLayout(Modifier.clearAndSetSemantics { contentDescription = label3 }) {
+                    SimpleTestLayout(Modifier.semantics { contentDescription = label2 }) { }
                 }
                 SimpleTestLayout(
                     Modifier.semantics(mergeDescendants = true) {}.testTag(tag2)
@@ -174,7 +173,7 @@ class SemanticsTests {
         rule.setContent {
             SimpleTestLayout(Modifier.semantics(mergeDescendants = true) {}.testTag(TestTag)) {
                 if (showSubtree.value) {
-                    SimpleTestLayout(Modifier.semantics { accessibilityLabel = label }) { }
+                    SimpleTestLayout(Modifier.semantics { contentDescription = label }) { }
                 }
             }
         }
@@ -184,7 +183,7 @@ class SemanticsTests {
         rule.runOnIdle { showSubtree.value = false }
 
         rule.onNodeWithTag(TestTag)
-            .assertDoesNotHaveProperty(SemanticsProperties.AccessibilityLabel)
+            .assertDoesNotHaveProperty(SemanticsProperties.ContentDescription)
 
         rule.onAllNodesWithText(label).assertCountEquals(0)
     }
@@ -196,16 +195,16 @@ class SemanticsTests {
         val showNewNode = mutableStateOf(false)
         rule.setContent {
             SimpleTestLayout(Modifier.semantics(mergeDescendants = true) {}.testTag(TestTag)) {
-                SimpleTestLayout(Modifier.semantics { accessibilityLabel = label }) { }
+                SimpleTestLayout(Modifier.semantics { contentDescription = label }) { }
                 if (showNewNode.value) {
-                    SimpleTestLayout(Modifier.semantics { accessibilityValue = value }) { }
+                    SimpleTestLayout(Modifier.semantics { stateDescription = value }) { }
                 }
             }
         }
 
         rule.onNodeWithTag(TestTag)
             .assertLabelEquals(label)
-            .assertDoesNotHaveProperty(SemanticsProperties.AccessibilityValue)
+            .assertDoesNotHaveProperty(SemanticsProperties.StateDescription)
 
         rule.runOnIdle { showNewNode.value = true }
 
@@ -221,18 +220,18 @@ class SemanticsTests {
         rule.setContent {
             SimpleTestLayout(Modifier.testTag(TestTag)) {
                 if (showSubtree.value) {
-                    SimpleTestLayout(Modifier.semantics { accessibilityLabel = label }) { }
+                    SimpleTestLayout(Modifier.semantics { contentDescription = label }) { }
                 }
             }
         }
 
-        rule.onAllNodesWithLabel(label).assertCountEquals(1)
+        rule.onAllNodesWithContentDescription(label).assertCountEquals(1)
 
         rule.runOnIdle {
             showSubtree.value = false
         }
 
-        rule.onAllNodesWithLabel(label).assertCountEquals(0)
+        rule.onAllNodesWithContentDescription(label).assertCountEquals(0)
     }
 
     @Test
@@ -243,7 +242,7 @@ class SemanticsTests {
         rule.setContent {
             SimpleTestLayout(
                 Modifier.testTag(TestTag).semantics {
-                    accessibilityLabel = if (isAfter.value) afterLabel else beforeLabel
+                    contentDescription = if (isAfter.value) afterLabel else beforeLabel
                 }
             ) {}
         }
@@ -265,7 +264,7 @@ class SemanticsTests {
             SimpleTestLayout(Modifier.testTag("don't care")) {
                 SimpleTestLayout(
                     Modifier.testTag(TestTag).semantics {
-                        accessibilityLabel = if (isAfter.value) afterLabel else beforeLabel
+                        contentDescription = if (isAfter.value) afterLabel else beforeLabel
                     }
                 ) {}
             }
@@ -289,7 +288,7 @@ class SemanticsTests {
                 SimpleTestLayout {
                     SimpleTestLayout(
                         Modifier.testTag(TestTag).semantics {
-                            accessibilityLabel = if (isAfter.value) afterLabel else beforeLabel
+                            contentDescription = if (isAfter.value) afterLabel else beforeLabel
                         }
                     ) {}
                 }
@@ -313,7 +312,7 @@ class SemanticsTests {
             SimpleTestLayout(Modifier.testTag(TestTag).semantics(mergeDescendants = true) {}) {
                 SimpleTestLayout(
                     Modifier.semantics {
-                        accessibilityLabel = if (isAfter.value) afterLabel else beforeLabel
+                        contentDescription = if (isAfter.value) afterLabel else beforeLabel
                     }
                 ) {}
             }
@@ -332,14 +331,14 @@ class SemanticsTests {
         rule.setContent {
             SimpleTestLayout(Modifier.testTag(TestTag)) {
                 SimpleTestLayout(Modifier.semantics(mergeDescendants = true) {}) {
-                    SimpleTestLayout(Modifier.semantics { accessibilityLabel = label }) { }
+                    SimpleTestLayout(Modifier.semantics { contentDescription = label }) { }
                 }
             }
         }
 
         rule.onNodeWithTag(TestTag)
-            .assertDoesNotHaveProperty(SemanticsProperties.AccessibilityLabel)
-        rule.onNodeWithLabel(label) // assert exists
+            .assertDoesNotHaveProperty(SemanticsProperties.ContentDescription)
+        rule.onNodeWithContentDescription(label) // assert exists
     }
 
     @Test
@@ -354,7 +353,7 @@ class SemanticsTests {
         rule.setContent {
             SimpleTestLayout(
                 Modifier.testTag(TestTag).semantics {
-                    accessibilityLabel = if (isAfter.value) afterLabel else beforeLabel
+                    contentDescription = if (isAfter.value) afterLabel else beforeLabel
                 }
             ) {
                 SimpleTestLayout(Modifier.semantics { }) { }
@@ -385,7 +384,7 @@ class SemanticsTests {
         rule.setContent {
             SimpleTestLayout(
                 Modifier.testTag(TestTag).semantics {
-                    accessibilityLabel = if (isAfter.value) afterLabel else beforeLabel
+                    contentDescription = if (isAfter.value) afterLabel else beforeLabel
                     onClick(
                         action = {
                             if (isAfter.value) afterAction() else beforeAction()
@@ -395,7 +394,7 @@ class SemanticsTests {
                 }
             ) {
                 SimpleTestLayout {
-                    remember { nodeCount++ }
+                    nodeCount++
                 }
             }
         }

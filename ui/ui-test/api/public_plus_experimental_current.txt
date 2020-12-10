@@ -86,9 +86,9 @@ package androidx.compose.ui.test {
     method public static androidx.compose.ui.test.SemanticsMatcher hasAnyDescendant(androidx.compose.ui.test.SemanticsMatcher matcher);
     method public static androidx.compose.ui.test.SemanticsMatcher hasAnySibling(androidx.compose.ui.test.SemanticsMatcher matcher);
     method public static androidx.compose.ui.test.SemanticsMatcher hasClickAction();
+    method public static androidx.compose.ui.test.SemanticsMatcher hasContentDescription(String label, optional boolean ignoreCase);
     method public static androidx.compose.ui.test.SemanticsMatcher hasImeAction(androidx.compose.ui.text.input.ImeAction actionType);
     method @Deprecated public static androidx.compose.ui.test.SemanticsMatcher hasInputMethodsSupport();
-    method public static androidx.compose.ui.test.SemanticsMatcher hasLabel(String label, optional boolean ignoreCase);
     method public static androidx.compose.ui.test.SemanticsMatcher hasNoClickAction();
     method public static androidx.compose.ui.test.SemanticsMatcher hasNoScrollAction();
     method public static androidx.compose.ui.test.SemanticsMatcher hasParent(androidx.compose.ui.test.SemanticsMatcher matcher);
@@ -120,11 +120,11 @@ package androidx.compose.ui.test {
   }
 
   public final class FindersKt {
-    method public static androidx.compose.ui.test.SemanticsNodeInteractionCollection onAllNodesWithLabel(androidx.compose.ui.test.SemanticsNodeInteractionsProvider, String label, optional boolean ignoreCase, optional boolean useUnmergedTree);
+    method public static androidx.compose.ui.test.SemanticsNodeInteractionCollection onAllNodesWithContentDescription(androidx.compose.ui.test.SemanticsNodeInteractionsProvider, String label, optional boolean ignoreCase, optional boolean useUnmergedTree);
     method public static androidx.compose.ui.test.SemanticsNodeInteractionCollection onAllNodesWithSubstring(androidx.compose.ui.test.SemanticsNodeInteractionsProvider, String text, optional boolean ignoreCase, optional boolean useUnmergedTree);
     method public static androidx.compose.ui.test.SemanticsNodeInteractionCollection onAllNodesWithTag(androidx.compose.ui.test.SemanticsNodeInteractionsProvider, String testTag, optional boolean useUnmergedTree);
     method public static androidx.compose.ui.test.SemanticsNodeInteractionCollection onAllNodesWithText(androidx.compose.ui.test.SemanticsNodeInteractionsProvider, String text, optional boolean ignoreCase, optional boolean useUnmergedTree);
-    method public static androidx.compose.ui.test.SemanticsNodeInteraction onNodeWithLabel(androidx.compose.ui.test.SemanticsNodeInteractionsProvider, String label, optional boolean ignoreCase, optional boolean useUnmergedTree);
+    method public static androidx.compose.ui.test.SemanticsNodeInteraction onNodeWithContentDescription(androidx.compose.ui.test.SemanticsNodeInteractionsProvider, String label, optional boolean ignoreCase, optional boolean useUnmergedTree);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction onNodeWithSubstring(androidx.compose.ui.test.SemanticsNodeInteractionsProvider, String text, optional boolean ignoreCase, optional boolean useUnmergedTree);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction onNodeWithTag(androidx.compose.ui.test.SemanticsNodeInteractionsProvider, String testTag, optional boolean useUnmergedTree);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction onNodeWithText(androidx.compose.ui.test.SemanticsNodeInteractionsProvider, String text, optional boolean ignoreCase, optional boolean useUnmergedTree);
@@ -177,6 +177,12 @@ package androidx.compose.ui.test {
     method public static void swipeUp(androidx.compose.ui.test.GestureScope);
     method public static void swipeWithVelocity-f-x_cs4(androidx.compose.ui.test.GestureScope, long start, long end, @FloatRange(from=0.0, to=3.4E38) float endVelocity, optional long duration);
     method public static void up(androidx.compose.ui.test.GestureScope, optional int pointerId);
+  }
+
+  public interface IdlingResource {
+    method public default String? getDiagnosticMessageIfBusy();
+    method public boolean isIdleNow();
+    property public abstract boolean isIdleNow;
   }
 
   @kotlin.RequiresOptIn(message="This is internal API for Compose modules that may change frequently and without warning.") public @interface InternalTestingApi {

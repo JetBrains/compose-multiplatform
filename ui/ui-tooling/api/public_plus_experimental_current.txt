@@ -74,7 +74,7 @@ package androidx.compose.ui.tooling {
   }
 
   public final class SlotTreeKt {
-    method public static androidx.compose.ui.tooling.Group asTree(androidx.compose.runtime.SlotTable);
+    method public static androidx.compose.ui.tooling.Group asTree(androidx.compose.runtime.CompositionData);
     method public static String? getPosition(androidx.compose.ui.tooling.Group);
   }
 

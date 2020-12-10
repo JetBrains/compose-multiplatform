@@ -18,7 +18,9 @@ package androidx.compose.ui.selection
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.text.ExperimentalTextApi
 
+@OptIn(ExperimentalTextApi::class)
 internal class SelectionRegistrarImpl : SelectionRegistrar {
     /**
      * A flag to check if the [Selectable]s have already been sorted.
@@ -41,6 +43,21 @@ internal class SelectionRegistrarImpl : SelectionRegistrar {
      * The callback to be invoked when the position change was triggered.
      */
     internal var onPositionChangeCallback: (() -> Unit)? = null
+
+    /**
+     * The callback to be invoked when the selection is initiated.
+     */
+    internal var onSelectionUpdateStartCallback: ((LayoutCoordinates, Offset) -> Unit)? = null
+
+    /**
+     * The callback to be invoked when the selection is updated.
+     */
+    internal var onSelectionUpdateCallback: ((LayoutCoordinates, Offset, Offset) -> Unit)? = null
+
+    /**
+     * The callback to be invoked when selection update finished.
+     */
+    internal var onSelectionUpdateEndCallback: (() -> Unit)? = null
 
     override fun subscribe(selectable: Selectable): Selectable {
         _selectables.add(selectable)
@@ -87,27 +104,29 @@ internal class SelectionRegistrarImpl : SelectionRegistrar {
         return selectables
     }
 
-    override fun onPositionChange() {
+    override fun notifyPositionChange() {
         // Set the variable sorted to be false, when the global position of a registered
         // selectable changes.
         sorted = false
         onPositionChangeCallback?.invoke()
     }
 
-    /**
-     * The callback to be invoked when the selection change was triggered.
-     */
-    internal var onUpdateSelectionCallback: ((LayoutCoordinates, Offset, Offset) -> Unit)? = null
+    override fun notifySelectionUpdateStart(
+        layoutCoordinates: LayoutCoordinates,
+        startPosition: Offset
+    ) {
+        onSelectionUpdateStartCallback?.invoke(layoutCoordinates, startPosition)
+    }
 
-    override fun onUpdateSelection(
+    override fun notifySelectionUpdate(
         layoutCoordinates: LayoutCoordinates,
         startPosition: Offset,
         endPosition: Offset
     ) {
-        onUpdateSelectionCallback?.invoke(
-            layoutCoordinates,
-            startPosition,
-            endPosition
-        )
+        onSelectionUpdateCallback?.invoke(layoutCoordinates, startPosition, endPosition)
+    }
+
+    override fun notifySelectionUpdateEnd() {
+        onSelectionUpdateEndCallback?.invoke()
     }
 }

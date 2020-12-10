@@ -23,8 +23,8 @@ import androidx.compose.animation.core.AnimationEndReason.Interrupted
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -38,6 +38,7 @@ import androidx.compose.runtime.savedinstancestate.Saver
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.gesture.nestedscroll.nestedScroll
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
@@ -48,6 +49,7 @@ import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.offset
 import androidx.compose.ui.util.fastForEach
@@ -138,6 +140,8 @@ class BackdropScaffoldState(
             }
         )
     }
+
+    internal val nestedScrollConnection = this.PreUpPostDownNestedScrollConnection
 
     companion object {
         /**
@@ -317,19 +321,23 @@ fun BackdropScaffold(
                 revealedHeight = min(revealedHeight, backLayerHeight)
             }
 
-            val swipeable = Modifier.swipeable(
-                state = scaffoldState,
-                anchors = mapOf(
-                    peekHeightPx to Concealed,
-                    revealedHeight to Revealed
-                ),
-                orientation = Orientation.Vertical,
-                enabled = gesturesEnabled
-            )
+            val swipeable = Modifier
+                .nestedScroll(scaffoldState.nestedScrollConnection)
+                .swipeable(
+                    state = scaffoldState,
+                    anchors = mapOf(
+                        peekHeightPx to Concealed,
+                        revealedHeight to Revealed
+                    ),
+                    orientation = Orientation.Vertical,
+                    enabled = gesturesEnabled
+                )
 
             // Front layer
             Surface(
-                Modifier.offset(y = { scaffoldState.offset.value }).then(swipeable),
+                Modifier
+                    .offset { IntOffset(0, scaffoldState.offset.value.roundToInt()) }
+                    .then(swipeable),
                 shape = frontLayerShape,
                 elevation = frontLayerElevation,
                 color = frontLayerBackgroundColor,

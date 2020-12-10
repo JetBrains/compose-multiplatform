@@ -16,9 +16,11 @@
 
 package androidx.compose.foundation.demos
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.ScrollableColumn
+import androidx.compose.foundation.animation.smoothScrollBy
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -35,12 +37,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyColumnFor
-import androidx.compose.foundation.lazy.LazyColumnForIndexed
+import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.LazyRowFor
-import androidx.compose.foundation.lazy.LazyRowForIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -82,22 +83,25 @@ val LazyListDemos = listOf(
     ComposableDemo("Arrangements") { LazyListArrangements() },
     ComposableDemo("Reverse scroll direction") { ReverseLayout() },
     ComposableDemo("Nested lazy lists") { NestedLazyDemo() },
+    ComposableDemo("LazyGrid") { LazyGridDemo() },
     PagingDemos
 )
 
 @Composable
 private fun LazyColumnDemo() {
-    LazyColumnFor(
-        items = listOf(
-            "Hello,", "World:", "It works!", "",
-            "this one is really long and spans a few lines for scrolling purposes",
-            "these", "are", "offscreen"
-        ) + (1..100).map { "$it" }
-    ) {
-        Text(text = it, fontSize = 80.sp)
+    LazyColumn {
+        items(
+            items = listOf(
+                "Hello,", "World:", "It works!", "",
+                "this one is really long and spans a few lines for scrolling purposes",
+                "these", "are", "offscreen"
+            ) + (1..100).map { "$it" }
+        ) {
+            Text(text = it, fontSize = 80.sp)
 
-        if (it.contains("works")) {
-            Text("You can even emit multiple components per item.")
+            if (it.contains("works")) {
+                Text("You can even emit multiple components per item.")
+            }
         }
     }
 }
@@ -113,11 +117,10 @@ private fun ListAddRemoveItemsDemo() {
             Button(modifier = buttonModifier, onClick = { numItems-- }) { Text("Remove") }
             Button(modifier = buttonModifier, onClick = { offset++ }) { Text("Offset") }
         }
-        LazyColumnFor(
-            (1..numItems).map { it + offset }.toList(),
-            Modifier.fillMaxWidth()
-        ) {
-            Text("$it", style = AmbientTextStyle.current.copy(fontSize = 40.sp))
+        LazyColumn(Modifier.fillMaxWidth()) {
+            items((1..numItems).map { it + offset }.toList()) {
+                Text("$it", style = AmbientTextStyle.current.copy(fontSize = 40.sp))
+            }
         }
     }
 }
@@ -183,12 +186,13 @@ private fun ListHoistedStateDemo() {
                 fontSize = 20.sp
             )
         }
-        LazyColumnFor(
-            (0..1000).toList(),
+        LazyColumn(
             Modifier.fillMaxWidth(),
             state = state
         ) {
-            Text("$it", style = AmbientTextStyle.current.copy(fontSize = 40.sp))
+            items((0..1000).toList()) {
+                Text("$it", style = AmbientTextStyle.current.copy(fontSize = 40.sp))
+            }
         }
     }
 }
@@ -207,8 +211,10 @@ fun Button(modifier: Modifier = Modifier, onClick: () -> Unit, content: @Composa
 
 @Composable
 private fun LazyRowItemsDemo() {
-    LazyRowFor(items = (1..1000).toList()) {
-        Square(it)
+    LazyRow {
+        items((1..1000).toList()) {
+            Square(it)
+        }
     }
 }
 
@@ -227,11 +233,15 @@ private fun Square(index: Int) {
 private fun ListWithIndexSample() {
     val friends = listOf("Alex", "John", "Danny", "Sam")
     Column {
-        LazyRowForIndexed(friends, Modifier.fillMaxWidth()) { index, friend ->
-            Text("$friend at index $index", Modifier.padding(16.dp))
+        LazyRow(Modifier.fillMaxWidth()) {
+            itemsIndexed(friends) { index, friend ->
+                Text("$friend at index $index", Modifier.padding(16.dp))
+            }
         }
-        LazyColumnForIndexed(friends, Modifier.fillMaxWidth()) { index, friend ->
-            Text("$friend at index $index", Modifier.padding(16.dp))
+        LazyColumn(Modifier.fillMaxWidth()) {
+            itemsIndexed(friends) { index, friend ->
+                Text("$friend at index $index", Modifier.padding(16.dp))
+            }
         }
     }
 }
@@ -239,14 +249,16 @@ private fun ListWithIndexSample() {
 @Composable
 private fun RtlListDemo() {
     Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
-        LazyRowForIndexed((0..100).toList(), Modifier.fillMaxWidth()) { index, item ->
-            Text(
-                "$item",
-                Modifier
-                    .size(100.dp)
-                    .background(if (index % 2 == 0) Color.LightGray else Color.Transparent)
-                    .padding(16.dp)
-            )
+        LazyRow(Modifier.fillMaxWidth()) {
+            itemsIndexed((0..100).toList()) { index, item ->
+                Text(
+                    "$item",
+                    Modifier
+                        .size(100.dp)
+                        .background(if (index % 2 == 0) Color.LightGray else Color.Transparent)
+                        .padding(16.dp)
+                )
+            }
         }
     }
 }
@@ -254,8 +266,10 @@ private fun RtlListDemo() {
 @Composable
 private fun PagerLikeDemo() {
     val pages = listOf(Color.LightGray, Color.White, Color.DarkGray)
-    LazyRowFor(pages) {
-        Spacer(Modifier.fillParentMaxSize().background(it))
+    LazyRow {
+        items(pages) {
+            Spacer(Modifier.fillParentMaxSize().background(it))
+        }
     }
 }
 
@@ -457,12 +471,54 @@ private fun NestedLazyDemo() {
     }
     LazyColumn {
         item {
-            LazyRowFor(List(100) { it }) {
-                item(it)
+            LazyRow {
+                items(List(100) { it }) {
+                    item(it)
+                }
             }
         }
         items(List(100) { it }) {
             item(it)
+        }
+    }
+}
+
+@Composable
+private fun LazyGridDemo() {
+    val columnModes = listOf(
+        GridCells.Fixed(3),
+        GridCells.Adaptive(minSize = 60.dp)
+    )
+    var currentMode by remember { mutableStateOf(0) }
+    Column {
+        Button(
+            modifier = Modifier.wrapContentSize(),
+            onClick = {
+                currentMode = (currentMode + 1) % columnModes.size
+            }
+        ) {
+            Text("Switch mode")
+        }
+        LazyGridForMode(columnModes[currentMode])
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun LazyGridForMode(mode: GridCells) {
+    LazyVerticalGrid(
+        cells = mode
+    ) {
+        items(
+            items = (1..100).toList()
+        ) {
+            Text(
+                text = "$it",
+                fontSize = 20.sp,
+                modifier = Modifier
+                    .background(Color.Gray.copy(alpha = (it % 10) / 10f))
+                    .padding(8.dp)
+            )
         }
     }
 }

@@ -22,7 +22,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumnFor
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
@@ -436,12 +436,13 @@ class ScrollbarTest {
         scrollbarWidth: Dp,
     ) = withTestEnvironment {
         Box(Modifier.size(size)) {
-            LazyColumnFor(
-                (0 until childCount).toList(),
+            LazyColumn(
                 Modifier.fillMaxSize().testTag("column"),
                 state
             ) {
-                Box(Modifier.size(childSize).testTag("box$it"))
+                items((0 until childCount).toList()) {
+                    Box(Modifier.size(childSize).testTag("box$it"))
+                }
             }
 
             VerticalScrollbar(

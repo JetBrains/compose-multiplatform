@@ -44,7 +44,7 @@ class ModifierInfoTest : ToolingTest() {
 
     @Test
     fun testBounds() {
-        val slotTableRecord = SlotTableRecord.create()
+        val slotTableRecord = CompositionDataRecord.create()
         show {
             Inspectable(slotTableRecord) {
                 with(AmbientDensity.current) {

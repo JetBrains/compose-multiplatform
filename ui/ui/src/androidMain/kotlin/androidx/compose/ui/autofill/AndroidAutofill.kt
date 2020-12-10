@@ -24,6 +24,7 @@ import android.view.ViewStructure
 import android.view.autofill.AutofillManager
 import android.view.autofill.AutofillValue
 import androidx.annotation.RequiresApi
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.toAndroidRect
 
 /**
@@ -32,6 +33,7 @@ import androidx.compose.ui.graphics.toAndroidRect
  * @param view The parent compose view.
  * @param autofillTree The autofill tree. This will be replaced by a semantic tree (b/138604305).
  */
+@ExperimentalComposeUiApi
 @RequiresApi(Build.VERSION_CODES.O)
 internal class AndroidAutofill(val view: View, val autofillTree: AutofillTree) : Autofill {
 
@@ -63,6 +65,7 @@ internal class AndroidAutofill(val view: View, val autofillTree: AutofillTree) :
  *
  * This function populates the view structure using the information in the { AutofillTree }.
  */
+@ExperimentalComposeUiApi
 @RequiresApi(Build.VERSION_CODES.O)
 internal fun AndroidAutofill.populateViewStructure(root: ViewStructure) {
 
@@ -96,6 +99,7 @@ internal fun AndroidAutofill.populateViewStructure(root: ViewStructure) {
 /**
  * Triggers onFill() in response to a request from the autofill framework.
  */
+@ExperimentalComposeUiApi
 @RequiresApi(Build.VERSION_CODES.O)
 internal fun AndroidAutofill.performAutofill(values: SparseArray<AutofillValue>) {
     for (index in 0 until values.size()) {

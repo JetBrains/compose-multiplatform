@@ -103,10 +103,11 @@ internal fun LazyList(
             this,
             cachingItemContentFactory
         ) { index, placeables ->
-            // we add spaceBetweenItems as an extra size for all items apart from the last one so
+            // we add spaceBetweenItems as an extra spacing for all items apart from the last one so
             // the lazy list measuring logic will take it into account.
-            val extraMainAxisSize = if (index.value == itemsCount - 1) 0 else spaceBetweenItems
+            val spacing = if (index.value == itemsCount - 1) 0 else spaceBetweenItems
             LazyMeasuredItem(
+                index = index.value,
                 placeables = placeables,
                 isVertical = isVertical,
                 horizontalAlignment = horizontalAlignment,
@@ -114,7 +115,7 @@ internal fun LazyList(
                 layoutDirection = layoutDirection,
                 startContentPadding = startContentPaddingPx,
                 endContentPadding = endContentPaddingPx,
-                extraMainAxisSize = extraMainAxisSize
+                spacing = spacing
             )
         }
 

@@ -16,11 +16,13 @@
 
 package androidx.compose.ui.autofill
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
+@OptIn(ExperimentalComposeUiApi::class)
 @RunWith(JUnit4::class)
 class AutofillNodeTest {
     @Test

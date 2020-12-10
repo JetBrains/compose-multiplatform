@@ -53,8 +53,10 @@ import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
+import kotlin.math.roundToInt
 
 @Composable
 @Sampled
@@ -67,13 +69,13 @@ fun AwaitHorizontalDragOrCancellationSample() {
             .onSizeChanged { width = it.width.toFloat() }
     ) {
         Box(
-            Modifier.offset({ offsetX.value }, { offsetY.value })
+            Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .fillMaxHeight()
                 .width(50.dp)
                 .background(Color.Blue)
                 .pointerInput {
                     forEachGesture {
-                        handlePointerInput {
+                        awaitPointerEventScope {
                             val down = awaitFirstDown()
                             var change =
                                 awaitHorizontalTouchSlopOrCancellation(down.id) { change, over ->
@@ -111,13 +113,13 @@ fun HorizontalDragSample() {
             .onSizeChanged { width = it.width.toFloat() }
     ) {
         Box(
-            Modifier.offset({ offsetX.value }, { offsetY.value })
+            Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .fillMaxHeight()
                 .width(50.dp)
                 .background(Color.Blue)
                 .pointerInput {
                     forEachGesture {
-                        handlePointerInput {
+                        awaitPointerEventScope {
                             val down = awaitFirstDown()
                             val change =
                                 awaitHorizontalTouchSlopOrCancellation(down.id) { change, over ->
@@ -154,7 +156,7 @@ fun DetectHorizontalDragGesturesSample() {
             .onSizeChanged { width = it.width.toFloat() }
     ) {
         Box(
-            Modifier.offset({ offsetX.value }, { offsetY.value })
+            Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .fillMaxHeight()
                 .width(50.dp)
                 .background(Color.Blue)
@@ -181,13 +183,13 @@ fun AwaitVerticalDragOrCancellationSample() {
             .onSizeChanged { height = it.height.toFloat() }
     ) {
         Box(
-            Modifier.offset({ offsetX.value }, { offsetY.value })
+            Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .fillMaxWidth()
                 .height(50.dp)
                 .background(Color.Blue)
                 .pointerInput {
                     forEachGesture {
-                        handlePointerInput {
+                        awaitPointerEventScope {
                             val down = awaitFirstDown()
                             var change =
                                 awaitVerticalTouchSlopOrCancellation(down.id) { change, over ->
@@ -225,13 +227,13 @@ fun VerticalDragSample() {
             .onSizeChanged { height = it.height.toFloat() }
     ) {
         Box(
-            Modifier.offset({ offsetX.value }, { offsetY.value })
+            Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .fillMaxWidth()
                 .height(50.dp)
                 .background(Color.Blue)
                 .pointerInput {
                     forEachGesture {
-                        handlePointerInput {
+                        awaitPointerEventScope {
                             val down = awaitFirstDown()
                             val change =
                                 awaitVerticalTouchSlopOrCancellation(down.id) { change, over ->
@@ -268,7 +270,7 @@ fun DetectVerticalDragGesturesSample() {
             .onSizeChanged { height = it.height.toFloat() }
     ) {
         Box(
-            Modifier.offset({ offsetX.value }, { offsetY.value })
+            Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .fillMaxWidth()
                 .height(50.dp)
                 .background(Color.Blue)
@@ -295,12 +297,12 @@ fun AwaitDragOrCancellationSample() {
             .onSizeChanged { size = it.toSize() }
     ) {
         Box(
-            Modifier.offset({ offsetX.value }, { offsetY.value })
+            Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .size(50.dp)
                 .background(Color.Blue)
                 .pointerInput {
                     forEachGesture {
-                        handlePointerInput {
+                        awaitPointerEventScope {
                             val down = awaitFirstDown()
                             var change = awaitTouchSlopOrCancellation(down.id) { change, over ->
                                 val original = Offset(offsetX.value, offsetY.value)
@@ -351,12 +353,12 @@ fun DragSample() {
             .onSizeChanged { size = it.toSize() }
     ) {
         Box(
-            Modifier.offset({ offsetX.value }, { offsetY.value })
+            Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .size(50.dp)
                 .background(Color.Blue)
                 .pointerInput {
                     forEachGesture {
-                        handlePointerInput {
+                        awaitPointerEventScope {
                             val down = awaitFirstDown()
                             val change = awaitTouchSlopOrCancellation(down.id) { change, over ->
                                 val original = Offset(offsetX.value, offsetY.value)
@@ -406,7 +408,7 @@ fun DetectDragGesturesSample() {
             .onSizeChanged { size = it.toSize() }
     ) {
         Box(
-            Modifier.offset({ offsetX.value }, { offsetY.value })
+            Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .size(50.dp)
                 .background(Color.Blue)
                 .pointerInput {

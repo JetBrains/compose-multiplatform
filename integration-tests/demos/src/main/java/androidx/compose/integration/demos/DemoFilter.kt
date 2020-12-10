@@ -39,7 +39,6 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.onCommit
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.graphics.compositeOver
@@ -101,10 +100,7 @@ fun FilterAppBar(
  * [BasicTextField] that edits the current [filterText], providing [onFilter] when edited.
  */
 @Composable
-@OptIn(
-    ExperimentalFocus::class,
-    ExperimentalFoundationApi::class
-)
+@OptIn(ExperimentalFoundationApi::class)
 private fun FilterField(
     filterText: String,
     onFilter: (String) -> Unit,

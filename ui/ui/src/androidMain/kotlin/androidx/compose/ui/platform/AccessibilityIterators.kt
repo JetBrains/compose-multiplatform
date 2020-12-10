@@ -28,7 +28,7 @@ import java.util.Locale
  * This class contains the implementation of text segment iterators
  * for accessibility support.
  *
- * Note: We want to be able to iterator over [SemanticsProperties.AccessibilityLabel] of any
+ * Note: We want to be able to iterator over [SemanticsProperties.ContentDescription] of any
  * component.
  */
 internal class AccessibilityIterators {

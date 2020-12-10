@@ -99,6 +99,9 @@ package androidx.compose.ui.geometry {
 
   public final class OffsetKt {
     method @androidx.compose.runtime.Stable public static inline long Offset(float x, float y);
+    method public static boolean isFinite-k-4lQ0M(long);
+    method public static boolean isSpecified-k-4lQ0M(long);
+    method public static inline boolean isUnspecified-k-4lQ0M(long);
     method @androidx.compose.runtime.Stable public static long lerp-tX6QBWo(long start, long stop, float fraction);
   }
 

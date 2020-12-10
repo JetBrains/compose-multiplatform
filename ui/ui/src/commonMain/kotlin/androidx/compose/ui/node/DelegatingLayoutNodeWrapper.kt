@@ -17,8 +17,6 @@
 package androidx.compose.ui.node
 
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.ExperimentalFocus
-import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.GraphicsLayerScope
@@ -47,6 +45,10 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
      * Indicates that this modifier is used in [wrappedBy] also.
      */
     var isChained = false
+
+    // This is used by LayoutNode to mark LayoutNodeWrappers that are going to be reused
+    // because they match the modifier instance.
+    var toBeReusedForSameModifier = false
 
     init {
         wrapped.wrappedBy = this
@@ -130,11 +132,6 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
             next = next.wrapped.findNextFocusWrapper()
         }
         return lastFocusWrapper
-    }
-
-    @OptIn(ExperimentalFocus::class)
-    override fun propagateFocusStateChange(focusState: FocusState) {
-        wrappedBy?.propagateFocusStateChange(focusState)
     }
 
     override fun findPreviousNestedScrollWrapper() = wrappedBy?.findPreviousNestedScrollWrapper()

@@ -27,7 +27,10 @@ plugins {
     id("kotlin-android")
 }
 
-android.defaultConfig.minSdkVersion 28
+android.defaultConfig {
+    minSdkVersion 28
+    testInstrumentationRunnerArgument 'androidx.benchmark.output.enable', 'true'
+}
 
 dependencies {
     androidTestImplementation(project(":benchmark:benchmark-junit4"))

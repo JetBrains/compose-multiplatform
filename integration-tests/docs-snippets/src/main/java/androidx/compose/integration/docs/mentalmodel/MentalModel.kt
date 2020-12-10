@@ -23,7 +23,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.lazy.LazyColumnFor
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Button
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Divider
@@ -118,12 +118,14 @@ private object MentalModelSnippet6 {
             Text(header, style = MaterialTheme.typography.h5)
             Divider()
 
-            // LazyColumnFor is the Compose version of a RecyclerView.
-            // The lambda passed is similar to a RecyclerView.ViewHolder.
-            LazyColumnFor(names) { name ->
-                // When an item's [name] updates, the adapter for that item
-                // will recompose. This will not recompose when [header] changes
-                NamePickerItem(name, onNameClicked)
+            // LazyColumn is the Compose version of a RecyclerView.
+            // The lambda passed to items() is similar to a RecyclerView.ViewHolder.
+            LazyColumn {
+                items(names) { name ->
+                    // When an item's [name] updates, the adapter for that item
+                    // will recompose. This will not recompose when [header] changes
+                    NamePickerItem(name, onNameClicked)
+                }
             }
         }
     }
