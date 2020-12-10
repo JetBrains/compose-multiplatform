@@ -19,7 +19,6 @@ package androidx.compose.ui.graphics
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.util.nativeClass
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.isFinite
 import androidx.compose.ui.geometry.isSpecified
@@ -412,10 +411,7 @@ class SolidColor(val value: Color) : Brush() {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (nativeClass() != other?.nativeClass()) return false
-
-        other as SolidColor
-
+        if (other !is SolidColor) return false
         if (value != other.value) return false
 
         return true
@@ -802,9 +798,7 @@ class LinearGradient internal constructor(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (nativeClass() != other?.nativeClass()) return false
-
-        other as LinearGradient
+        if (other !is LinearGradient) return false
 
         if (colors != other.colors) return false
         if (stops != other.stops) return false
@@ -870,9 +864,7 @@ class RadialGradient internal constructor(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (nativeClass() != other?.nativeClass()) return false
-
-        other as RadialGradient
+        if (other !is RadialGradient) return false
 
         if (colors != other.colors) return false
         if (stops != other.stops) return false
@@ -930,9 +922,7 @@ class SweepGradient internal constructor(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (nativeClass() != other?.nativeClass()) return false
-
-        other as SweepGradient
+        if (other !is SweepGradient) return false
 
         if (center != other.center) return false
         if (colors != other.colors) return false

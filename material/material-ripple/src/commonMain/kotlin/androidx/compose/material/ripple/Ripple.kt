@@ -43,7 +43,6 @@ import androidx.compose.ui.graphics.useOrElse
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.util.fastForEach
-import androidx.compose.ui.util.nativeClass
 
 /**
  * Creates and [remember]s a Ripple using values provided by [RippleTheme].
@@ -180,9 +179,7 @@ private class Ripple(
     // making this class to be "data class"
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (this.nativeClass() != other?.nativeClass()) return false
-
-        other as Ripple
+        if (other !is Ripple) return false
 
         if (bounded != other.bounded) return false
         if (radius != other.radius) return false

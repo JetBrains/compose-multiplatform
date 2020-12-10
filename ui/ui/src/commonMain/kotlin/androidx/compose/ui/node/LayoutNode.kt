@@ -52,6 +52,7 @@ import androidx.compose.ui.node.LayoutNode.LayoutState.Measuring
 import androidx.compose.ui.node.LayoutNode.LayoutState.NeedsRelayout
 import androidx.compose.ui.node.LayoutNode.LayoutState.NeedsRemeasure
 import androidx.compose.ui.node.LayoutNode.LayoutState.Ready
+import androidx.compose.ui.platform.nativeClass
 import androidx.compose.ui.platform.simpleIdentityToString
 import androidx.compose.ui.semantics.SemanticsModifier
 import androidx.compose.ui.semantics.SemanticsWrapper
@@ -61,7 +62,6 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.util.deleteAt
-import androidx.compose.ui.util.nativeClass
 import kotlin.math.roundToInt
 
 /**

@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -182,6 +183,12 @@ class CornerBasedShapeTest {
         ).isTrue()
     }
 
+    @Ignore(
+        "It might be a better responsibility of the implementation of CornerBasedShape " +
+            "to enforce that types must be equivalent if this is a requirement rather " +
+            "than enforcing it in the base class implementation of CornerBasedShape" +
+            "see: b/175306433 and b/175124574"
+    )
     @Test
     fun differentImplWithTheSameCornersAreNotEquals() {
         @Suppress("ReplaceCallWithBinaryOperator")
