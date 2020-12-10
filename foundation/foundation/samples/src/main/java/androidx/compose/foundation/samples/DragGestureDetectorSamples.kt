@@ -48,7 +48,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.gesture.ExperimentalPointerInput
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
@@ -57,7 +56,6 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 @Sampled
 fun AwaitHorizontalDragOrCancellationSample() {
@@ -102,7 +100,6 @@ fun AwaitHorizontalDragOrCancellationSample() {
     }
 }
 
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 @Sampled
 fun HorizontalDragSample() {
@@ -146,7 +143,6 @@ fun HorizontalDragSample() {
     }
 }
 
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 @Sampled
 fun DetectHorizontalDragGesturesSample() {
@@ -174,7 +170,6 @@ fun DetectHorizontalDragGesturesSample() {
     }
 }
 
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 @Sampled
 fun AwaitVerticalDragOrCancellationSample() {
@@ -219,7 +214,6 @@ fun AwaitVerticalDragOrCancellationSample() {
     }
 }
 
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 @Sampled
 fun VerticalDragSample() {
@@ -263,7 +257,6 @@ fun VerticalDragSample() {
     }
 }
 
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 @Sampled
 fun DetectVerticalDragGesturesSample() {
@@ -291,7 +284,6 @@ fun DetectVerticalDragGesturesSample() {
     }
 }
 
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 @Sampled
 fun AwaitDragOrCancellationSample() {
@@ -348,7 +340,6 @@ fun AwaitDragOrCancellationSample() {
     }
 }
 
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 @Sampled
 fun DragSample() {
@@ -404,7 +395,6 @@ fun DragSample() {
     }
 }
 
-@OptIn(ExperimentalPointerInput::class)
 @Composable
 @Sampled
 fun DetectDragGesturesSample() {

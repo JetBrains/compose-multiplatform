@@ -21,7 +21,6 @@ import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.gesture.ExperimentalPointerInput
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AmbientViewConfiguration
 import androidx.compose.ui.platform.ViewConfiguration
@@ -47,7 +46,6 @@ import kotlin.coroutines.resume
  * resume synchronously and the caller may mutate the result **before** the next await call to
  * affect the next stage of the input processing pipeline.
  */
-@ExperimentalPointerInput
 @RestrictsSuspension
 interface HandlePointerInputScope : Density {
     /**
@@ -106,7 +104,6 @@ interface HandlePointerInputScope : Density {
 // gesture detectors as suspending extensions with a PointerInputScope receiver, also making this
 // interface implement CoroutineScope would be an invitation to break structured concurrency in
 // these extensions, leaving other launched coroutines running in the calling scope.
-@ExperimentalPointerInput
 interface PointerInputScope : Density {
     /**
      * The measured size of the pointer input region. Input events will be reported with
@@ -149,7 +146,6 @@ interface PointerInputScope : Density {
  * pointer input events. Extension functions on [PointerInputScope] or [HandlePointerInputScope]
  * may be defined to perform higher-level gesture detection.
  */
-@ExperimentalPointerInput
 fun Modifier.pointerInput(
     block: suspend PointerInputScope.() -> Unit
 ): Modifier = composed(
@@ -184,7 +180,6 @@ private val DownChangeConsumed = ConsumedData(downChange = true)
  */
 // TODO: Suppressing deprecation for synchronized; need to move to atomicfu wrapper
 @Suppress("DEPRECATION_ERROR")
-@ExperimentalPointerInput
 internal class SuspendingPointerInputFilter(
     override val viewConfiguration: ViewConfiguration,
     density: Density = Density(1f)

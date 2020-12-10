@@ -18,7 +18,6 @@ package androidx.compose.ui.input.pointer
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.ExperimentalPointerInput
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.platform.ViewConfiguration
@@ -48,7 +47,7 @@ import org.junit.runner.RunWith
 
 @SmallTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalPointerInput::class, ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class SuspendingPointerInputFilterTest {
     @After
     fun after() {
@@ -235,7 +234,6 @@ class SuspendingPointerInputFilterTest {
 
 private fun PointerInputChange.toPointerEvent() = PointerEvent(listOf(this))
 
-@ExperimentalPointerInput
 private val PointerEvent.firstChange get() = changes.first()
 
 private class PointerInputChangeEmitter(id: Int = 0) {

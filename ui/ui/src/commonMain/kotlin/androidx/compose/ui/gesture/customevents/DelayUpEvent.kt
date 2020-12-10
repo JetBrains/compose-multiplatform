@@ -17,7 +17,6 @@
 package androidx.compose.ui.gesture.customevents
 
 import androidx.compose.ui.gesture.DoubleTapGestureFilter
-import androidx.compose.ui.gesture.ExperimentalPointerInput
 import androidx.compose.ui.gesture.TapGestureFilter
 import androidx.compose.ui.input.pointer.CustomEvent
 import androidx.compose.ui.input.pointer.PointerId
@@ -40,7 +39,6 @@ import androidx.compose.ui.input.pointer.PointerInputFilter
  * @param pointers The pointers whose up events are being requested to be delayed.
  */
 @Suppress("EqualsOrHashCode")
-@ExperimentalPointerInput
 data class DelayUpEvent(var message: DelayUpMessage, val pointers: Set<PointerId>) : CustomEvent {
 
     // Only generating hash code with immutable property.
@@ -52,7 +50,6 @@ data class DelayUpEvent(var message: DelayUpMessage, val pointers: Set<PointerId
 /**
  * The types of messages that can be dispatched.
  */
-@ExperimentalPointerInput
 enum class DelayUpMessage {
     /**
      * Reports that future "up events" should not result in any normally related callbacks at
