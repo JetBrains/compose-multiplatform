@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.node
 
-import androidx.compose.ui.FocusModifier
+import androidx.compose.ui.focus.FocusModifier
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.FocusState.Active
 import androidx.compose.ui.focus.FocusState.ActiveParent

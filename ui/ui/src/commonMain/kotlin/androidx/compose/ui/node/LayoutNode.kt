@@ -17,10 +17,10 @@ package androidx.compose.ui.node
 
 import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
-import androidx.compose.ui.FocusModifier
-import androidx.compose.ui.FocusRequesterModifier
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.DrawModifier
+import androidx.compose.ui.focus.FocusModifier
+import androidx.compose.ui.focus.FocusReferenceModifier
 import androidx.compose.ui.focus.FocusEventModifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.nestedscroll.NestedScrollDelegatingWrapper
@@ -674,8 +674,8 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
                     if (mod is FocusEventModifier) {
                         wrapper = ModifiedFocusEventNode(wrapper, mod).assignChained(toWrap)
                     }
-                    if (mod is FocusRequesterModifier) {
-                        wrapper = ModifiedFocusRequesterNode(wrapper, mod).assignChained(toWrap)
+                    if (mod is FocusReferenceModifier) {
+                        wrapper = ModifiedFocusReferenceNode(wrapper, mod).assignChained(toWrap)
                     }
                     if (mod is KeyInputModifier) {
                         wrapper = ModifiedKeyInputNode(wrapper, mod).assignChained(toWrap)

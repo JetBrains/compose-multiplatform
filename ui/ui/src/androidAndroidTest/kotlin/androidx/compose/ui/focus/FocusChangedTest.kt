@@ -17,15 +17,12 @@
 package androidx.compose.ui.focus
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.ui.FocusModifier
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus
 import androidx.compose.ui.focus.FocusState.Active
 import androidx.compose.ui.focus.FocusState.ActiveParent
 import androidx.compose.ui.focus.FocusState.Captured
 import androidx.compose.ui.focus.FocusState.Disabled
 import androidx.compose.ui.focus.FocusState.Inactive
-import androidx.compose.ui.focusRequester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -44,19 +41,19 @@ class FocusChangedTest {
     fun active_requestFocus() {
         // Arrange.
         lateinit var focusState: FocusState
-        val focusRequester = FocusRequester()
+        val focusReference = FocusReference()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
-                    .focusRequester(focusRequester)
+                    .focusReference(focusReference)
                     .then(FocusModifier(Active))
             )
         }
 
         rule.runOnIdle {
             // Act.
-            focusRequester.requestFocus()
+            focusReference.requestFocus()
 
             // Assert.
             assertThat(focusState).isEqualTo(Active)
@@ -67,29 +64,29 @@ class FocusChangedTest {
     fun activeParent_requestFocus() {
         // Arrange.
         lateinit var focusState: FocusState
-        val (focusRequester, childFocusRequester) = FocusRequester.createRefs()
+        val (focusReference, childFocusReference) = FocusReference.createRefs()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
-                    .focusRequester(focusRequester)
-                    .focus()
+                    .focusReference(focusReference)
+                    .focusModifier()
             ) {
                 Box(
                     modifier = Modifier
-                        .focusRequester(childFocusRequester)
-                        .focus()
+                        .focusReference(childFocusReference)
+                        .focusModifier()
                 )
             }
         }
         rule.runOnIdle {
-            childFocusRequester.requestFocus()
+            childFocusReference.requestFocus()
             assertThat(focusState).isEqualTo(ActiveParent)
         }
 
         rule.runOnIdle {
             // Act.
-            focusRequester.requestFocus()
+            focusReference.requestFocus()
 
             // Assert.
             assertThat(focusState).isEqualTo(Active)
@@ -100,19 +97,19 @@ class FocusChangedTest {
     fun captured_requestFocus() {
         // Arrange.
         lateinit var focusState: FocusState
-        val focusRequester = FocusRequester()
+        val focusReference = FocusReference()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
-                    .focusRequester(focusRequester)
+                    .focusReference(focusReference)
                     .then(FocusModifier(Captured))
             )
         }
 
         rule.runOnIdle {
             // Act.
-            focusRequester.requestFocus()
+            focusReference.requestFocus()
 
             // Assert.
             assertThat(focusState).isEqualTo(Captured)
@@ -123,19 +120,19 @@ class FocusChangedTest {
     fun disabled_requestFocus() {
         // Arrange.
         lateinit var focusState: FocusState
-        val focusRequester = FocusRequester()
+        val focusReference = FocusReference()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
-                    .focusRequester(focusRequester)
+                    .focusReference(focusReference)
                     .then(FocusModifier(Disabled))
             )
         }
 
         rule.runOnIdle {
             // Act.
-            focusRequester.requestFocus()
+            focusReference.requestFocus()
 
             // Assert.
             assertThat(focusState).isEqualTo(Disabled)
@@ -146,19 +143,19 @@ class FocusChangedTest {
     fun inactive_requestFocus() {
         // Arrange.
         lateinit var focusState: FocusState
-        val focusRequester = FocusRequester()
+        val focusReference = FocusReference()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
-                    .focusRequester(focusRequester)
+                    .focusReference(focusReference)
                     .then(FocusModifier(Inactive))
             )
         }
 
         rule.runOnIdle {
             // Act.
-            focusRequester.requestFocus()
+            focusReference.requestFocus()
 
             // Assert.
             assertThat(focusState).isEqualTo(Active)
@@ -174,7 +171,7 @@ class FocusChangedTest {
         lateinit var focusState4: FocusState
         lateinit var focusState5: FocusState
         lateinit var focusState6: FocusState
-        val focusRequester = FocusRequester()
+        val focusReference = FocusReference()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
@@ -191,7 +188,7 @@ class FocusChangedTest {
                             modifier = Modifier
                                 .onFocusChanged { focusState5 = it }
                                 .onFocusChanged { focusState6 = it }
-                                .focusRequester(focusRequester)
+                                .focusReference(focusReference)
                                 .then(FocusModifier(Inactive))
                         )
                     }
@@ -201,7 +198,7 @@ class FocusChangedTest {
 
         rule.runOnIdle {
             // Act.
-            focusRequester.requestFocus()
+            focusReference.requestFocus()
 
             // Assert.
             assertThat(focusState1).isEqualTo(Active)
@@ -220,23 +217,23 @@ class FocusChangedTest {
         var focusState2: FocusState? = null
         var focusState3: FocusState? = null
         var focusState4: FocusState? = null
-        val focusRequester = FocusRequester()
+        val focusReference = FocusReference()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState1 = it }
                     .onFocusChanged { focusState2 = it }
-                    .focus()
+                    .focusModifier()
                     .onFocusChanged { focusState3 = it }
                     .onFocusChanged { focusState4 = it }
-                    .focusRequester(focusRequester)
-                    .focus()
+                    .focusReference(focusReference)
+                    .focusModifier()
             )
         }
 
         rule.runOnIdle {
             // Act.
-            focusRequester.requestFocus()
+            focusReference.requestFocus()
 
             // Assert.
             assertThat(focusState1).isEqualTo(ActiveParent)

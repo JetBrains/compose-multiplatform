@@ -18,10 +18,8 @@ package androidx.compose.ui.focus
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus
 import androidx.compose.ui.focus.FocusState.Active
 import androidx.compose.ui.focus.FocusState.Inactive
-import androidx.compose.ui.focusRequester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -32,7 +30,7 @@ import org.junit.runner.RunWith
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-class ReusedFocusRequesterTest {
+class ReusedFocusReferenceTest {
     @get:Rule
     val rule = createComposeRule()
 
@@ -40,19 +38,19 @@ class ReusedFocusRequesterTest {
     fun oneComponent() {
         // Arrange.
         lateinit var focusState: FocusState
-        val focusRequester = FocusRequester()
+        val focusReference = FocusReference()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
-                    .focusRequester(focusRequester)
-                    .focus()
+                    .focusReference(focusReference)
+                    .focusModifier()
             )
         }
 
         rule.runOnIdle {
             // Act.
-            focusRequester.requestFocus()
+            focusReference.requestFocus()
 
             // Assert.
             assertThat(focusState).isEqualTo(Active)
@@ -64,25 +62,25 @@ class ReusedFocusRequesterTest {
         // Arrange.
         lateinit var focusState1: FocusState
         lateinit var focusState2: FocusState
-        val focusRequester = FocusRequester()
+        val focusReference = FocusReference()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState1 = it }
-                    .focusRequester(focusRequester)
-                    .focus()
+                    .focusReference(focusReference)
+                    .focusModifier()
             )
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState2 = it }
-                    .focusRequester(focusRequester)
-                    .focus()
+                    .focusReference(focusReference)
+                    .focusModifier()
             )
         }
 
         rule.runOnIdle {
             // Act.
-            focusRequester.requestFocus()
+            focusReference.requestFocus()
 
             // Assert.
             assertThat(focusState1).isEqualTo(Inactive)
@@ -91,36 +89,36 @@ class ReusedFocusRequesterTest {
     }
 
     @Test
-    fun focusRequesterUsedWithThreeComponent() {
+    fun focusReferenceUsedWithThreeComponent() {
         // Arrange.
         lateinit var focusState1: FocusState
         lateinit var focusState2: FocusState
         lateinit var focusState3: FocusState
-        val focusRequester = FocusRequester()
+        val focusReference = FocusReference()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState1 = it }
-                    .focusRequester(focusRequester)
-                    .focus()
+                    .focusReference(focusReference)
+                    .focusModifier()
             )
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState2 = it }
-                    .focusRequester(focusRequester)
-                    .focus()
+                    .focusReference(focusReference)
+                    .focusModifier()
             )
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState3 = it }
-                    .focusRequester(focusRequester)
-                    .focus()
+                    .focusReference(focusReference)
+                    .focusModifier()
             )
         }
 
         rule.runOnIdle {
             // Act.
-            focusRequester.requestFocus()
+            focusReference.requestFocus()
 
             // Assert.
             assertThat(focusState1).isEqualTo(Inactive)

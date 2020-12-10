@@ -18,11 +18,9 @@ package androidx.compose.ui.focus
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus
 import androidx.compose.ui.focus.FocusState.Active
 import androidx.compose.ui.focus.FocusState.ActiveParent
 import androidx.compose.ui.focus.FocusState.Inactive
-import androidx.compose.ui.focusRequester
 import androidx.compose.ui.platform.AmbientFocusManager
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -42,20 +40,20 @@ class FocusManagerAmbientTest {
     fun clearFocus_singleLayout() {
         // Arrange.
         lateinit var focusManager: FocusManager
-        lateinit var focusRequester: FocusRequester
+        lateinit var focusReference: FocusReference
         var focusState = Inactive
         rule.setFocusableContent {
             focusManager = AmbientFocusManager.current
-            focusRequester = FocusRequester()
+            focusReference = FocusReference()
             Box(
                 modifier = Modifier
-                    .focusRequester(focusRequester)
+                    .focusReference(focusReference)
                     .onFocusChanged { focusState = it }
-                    .focus()
+                    .focusModifier()
             )
         }
         rule.runOnIdle {
-            focusRequester.requestFocus()
+            focusReference.requestFocus()
             assertThat(focusState).isEqualTo(Active)
         }
 
@@ -70,34 +68,34 @@ class FocusManagerAmbientTest {
     fun clearFocus_entireHierarchyIsCleared() {
         // Arrange.
         lateinit var focusManager: FocusManager
-        lateinit var focusRequester: FocusRequester
+        lateinit var focusReference: FocusReference
         var focusState = Inactive
         var parentFocusState = Inactive
         var grandparentFocusState = Inactive
         rule.setFocusableContent {
             focusManager = AmbientFocusManager.current
-            focusRequester = FocusRequester()
+            focusReference = FocusReference()
             Box(
                 modifier = Modifier
                     .onFocusChanged { grandparentFocusState = it }
-                    .focus()
+                    .focusModifier()
             ) {
                 Box(
                     modifier = Modifier
                         .onFocusChanged { parentFocusState = it }
-                        .focus()
+                        .focusModifier()
                 ) {
                     Box(
                         modifier = Modifier
-                            .focusRequester(focusRequester)
+                            .focusReference(focusReference)
                             .onFocusChanged { focusState = it }
-                            .focus()
+                            .focusModifier()
                     )
                 }
             }
         }
         rule.runOnIdle {
-            focusRequester.requestFocus()
+            focusReference.requestFocus()
             assertThat(grandparentFocusState).isEqualTo(ActiveParent)
             assertThat(parentFocusState).isEqualTo(ActiveParent)
             assertThat(focusState).isEqualTo(Active)

@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui
+package androidx.compose.ui.focus
 
-import androidx.compose.ui.focus.FocusReference
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.platform.InspectorValueInfo
+import androidx.compose.ui.platform.debugInspectorInfo
 
 /**
  * A [modifier][Modifier.Element] that can be used to pass in a [FocusReference] that can be used
@@ -24,31 +27,29 @@ import androidx.compose.ui.focus.FocusReference
  *
  * @see FocusReference
  */
-@Deprecated(
-    message = "Use FocusReferenceModifier instead",
-    replaceWith = ReplaceWith(
-        "FocusReferenceModifier",
-        "androidx.compose.ui.focus.FocusReferenceModifier"
-    ),
-    level = DeprecationLevel.ERROR
-)
-interface FocusRequesterModifier : Modifier.Element {
+interface FocusReferenceModifier : Modifier.Element {
     /**
      * An instance of [FocusReference], that can be used to request focus state changes.
      */
     val focusReference: FocusReference
 }
 
+internal class FocusReferenceModifierImpl(
+    override val focusReference: FocusReference,
+    inspectorInfo: InspectorInfo.() -> Unit
+) : FocusReferenceModifier, InspectorValueInfo(inspectorInfo)
+
 /**
  * Add this modifier to a component to observe changes to focus state.
  */
-@Suppress("UNUSED_PARAMETER")
-@Deprecated(
-    message = "Use Modifier.focusReference instead",
-    replaceWith = ReplaceWith(
-        "this.focusReference(focusReference)",
-        "androidx.compose.ui.focus.focusReference"
-    ),
-    level = DeprecationLevel.ERROR
-)
-fun Modifier.focusRequester(focusRequester: Any): Modifier = this
+fun Modifier.focusReference(focusReference: FocusReference): Modifier {
+    return this.then(
+        FocusReferenceModifierImpl(
+            focusReference = focusReference,
+            inspectorInfo = debugInspectorInfo {
+                name = "focusReference"
+                properties["focusReference"] = focusReference
+            }
+        )
+    )
+}
