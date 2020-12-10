@@ -126,6 +126,7 @@ class MediaConfigBuilder {
             .append(CONFIGURATION_OPEN)
             .append(MIN_API_LEVEL_CONTROLLER_OBJECT.replace("MIN_SDK", minSdk))
             .append(TEST_SUITE_TAG_OPTION.replace("TEST_SUITE_TAG", tag))
+            .append(TEST_SUITE_TAG_OPTION.replace("TEST_SUITE_TAG", "media_compat"))
             .append(
                 MODULE_METADATA_TAG_OPTION.replace(
                     "APPLICATION_ID", "$clientApplicationId;$serviceApplicationId"
