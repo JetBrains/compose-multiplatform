@@ -35,6 +35,7 @@ val FoundationDemos = DemoCategory(
         ComposableDemo("Multiple-interaction InteractionState") {
             MultipleInteractionStateSample()
         },
-        DemoCategory("Suspending Gesture Detectors", CoroutineGestureDemos)
+        DemoCategory("Suspending Gesture Detectors", CoroutineGestureDemos),
+        ComposableDemo("NestedScroll") { NestedScrollDemo() },
     )
 )
