@@ -634,6 +634,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
             val invalidateParentLayer = shouldInvalidateParentLayer()
 
             copyWrappersToCache()
+            markReusedModifiers(value)
 
             // Rebuild LayoutNodeWrapper
             val oldOuterWrapper = outerMeasurablePlaceable.outerWrapper
@@ -1149,8 +1150,16 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
         if (wrapperCache.isEmpty()) {
             return null
         }
-        val index = wrapperCache.indexOfLast {
-            it.modifier === modifier || it.modifier.nativeClass() == modifier.nativeClass()
+        // Look for exact match
+        var index = wrapperCache.indexOfLast {
+            it.toBeReusedForSameModifier && it.modifier === modifier
+        }
+
+        if (index < 0) {
+            // Look for class match
+            index = wrapperCache.indexOfLast {
+                !it.toBeReusedForSameModifier && it.modifier.nativeClass() == modifier.nativeClass()
+            }
         }
 
         if (index < 0) {
@@ -1182,6 +1191,17 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
     private fun copyWrappersToCache() {
         forEachDelegate {
             wrapperCache += it as DelegatingLayoutNodeWrapper<*>
+        }
+    }
+
+    private fun markReusedModifiers(modifier: Modifier) {
+        wrapperCache.forEach {
+            it.toBeReusedForSameModifier = false
+        }
+
+        modifier.foldIn(Unit) { _, mod ->
+            val wrapper = wrapperCache.firstOrNull { it.modifier === mod }
+            wrapper?.toBeReusedForSameModifier = true
         }
     }
 

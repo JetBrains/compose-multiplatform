@@ -48,6 +48,10 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
      */
     var isChained = false
 
+    // This is used by LayoutNode to mark LayoutNodeWrappers that are going to be reused
+    // because they match the modifier instance.
+    var toBeReusedForSameModifier = false
+
     init {
         wrapped.wrappedBy = this
     }
