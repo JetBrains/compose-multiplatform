@@ -140,8 +140,8 @@ internal constructor(
                 )
             }
         return "IdlingResourceRegistry has the following idling resources registered:" +
-            busy.map { "\n- [busy] ${it.indentBy("         ")}" } +
-            idle.map { "\n- [idle] $it" } +
+            busy.joinToString { "\n- [busy] ${it.indentBy("         ")}" } +
+            idle.joinToString { "\n- [idle] $it" } +
             if (idle.isEmpty() && busy.isEmpty()) "\n<none>" else ""
     }
 

@@ -171,7 +171,9 @@ internal class ComposeIdlingResource : IdlingResource {
         // TODO(b/174244530): Include hadNoPendingDraw when it is reliable
 //        val hadPendingDraw = !hadNoPendingDraw
 
-        val wasIdle = !hadSnapshotChanges && !hadRecomposerChanges && !hadRunningAnimations
+        val wasIdle = !hadSnapshotChanges && !hadRecomposerChanges && !hadRunningAnimations &&
+            // TODO(b/174244530): Include hadNoPendingDraw when it is reliable
+            !hadPendingMeasureLayout /*&& !hadPendingDraw*/
 
         if (wasIdle) {
             return null
@@ -185,16 +187,16 @@ internal class ComposeIdlingResource : IdlingResource {
         if (busyRecomposing) {
             busyReasons.add("pending recompositions")
         }
+        if (hadPendingMeasureLayout) {
+            busyReasons.add("pending measure/layout")
+        }
 
         var message = "${javaClass.simpleName} is busy due to ${busyReasons.joinToString(", ")}.\n"
         if (busyRecomposing) {
             message += "- Note: Timeout on pending recomposition means that there are most likely" +
                 " infinite re-compositions happening in the tested code.\n"
             message += "- Debug: hadRecomposerChanges = $hadRecomposerChanges, "
-            message += "hadSnapshotChanges = $hadSnapshotChanges, "
-            message += "hadPendingMeasureLayout = $hadPendingMeasureLayout"
-            // TODO(b/174244530): Include hadNoPendingDraw when it is reliable
-//            message += ", hadPendingDraw = $hadPendingDraw"
+            message += "hadSnapshotChanges = $hadSnapshotChanges"
         }
         return message
     }
