@@ -411,7 +411,6 @@ class DraggableTest {
                 "reverseDirection",
                 "interactionState",
                 "startDragImmediately",
-                "canDrag",
                 "onDragStarted",
                 "onDragStopped",
                 "onDrag",
