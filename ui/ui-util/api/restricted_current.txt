@@ -51,8 +51,6 @@ package androidx.compose.ui.util {
     method public static int lerp(int start, int stop, float fraction);
     method public static long lerp(long start, long stop, float fraction);
     method public static String toHexString(int);
-    method public static float toRadians(float);
-    method public static double toRadians(double);
   }
 
 }
