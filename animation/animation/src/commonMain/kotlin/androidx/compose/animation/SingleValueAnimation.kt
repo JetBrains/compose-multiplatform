@@ -21,10 +21,10 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.AnimationState
 import androidx.compose.animation.core.AnimationVector
 import androidx.compose.animation.core.AnimationVector1D
-import androidx.compose.animation.core.AnimationVector4D
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.TwoWayConverter
 import androidx.compose.animation.core.VectorConverter
+import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.animateTo
 import androidx.compose.animation.core.isFinished
 import androidx.compose.runtime.Composable
@@ -45,26 +45,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.Position
-import androidx.compose.ui.unit.dp
-
-internal const val DpVisibilityThreshold = 0.1f
-internal const val PxVisibilityThreshold = 0.5f
-
-// Dp-based visibility threshold
-private val DpVisibilityThreshold4D = AnimationVector4D(
-    DpVisibilityThreshold,
-    DpVisibilityThreshold,
-    DpVisibilityThreshold,
-    DpVisibilityThreshold
-)
-
-// Px-based visibility threshold
-private val PxVisibilityThreshold4D = AnimationVector4D(
-    PxVisibilityThreshold,
-    PxVisibilityThreshold,
-    PxVisibilityThreshold,
-    PxVisibilityThreshold
-)
 
 private val defaultAnimation = SpringSpec<Float>()
 
@@ -159,7 +139,7 @@ fun animate(
 fun animate(
     target: Dp,
     animSpec: AnimationSpec<Dp> = remember {
-        SpringSpec(visibilityThreshold = DpVisibilityThreshold.dp)
+        SpringSpec(visibilityThreshold = Dp.VisibilityThreshold)
     },
     endListener: ((Dp) -> Unit)? = null
 ): Dp {
@@ -187,7 +167,7 @@ fun animate(
     target: Position,
     animSpec: AnimationSpec<Position> = remember {
         SpringSpec(
-            visibilityThreshold = Position(DpVisibilityThreshold.dp, DpVisibilityThreshold.dp)
+            visibilityThreshold = Position.VisibilityThreshold
         )
     },
     endListener: ((Position) -> Unit)? = null
@@ -217,7 +197,7 @@ fun animate(
 fun animate(
     target: Size,
     animSpec: AnimationSpec<Size> = remember {
-        SpringSpec(visibilityThreshold = Size(PxVisibilityThreshold, PxVisibilityThreshold))
+        SpringSpec(visibilityThreshold = Size.VisibilityThreshold)
     },
     endListener: ((Size) -> Unit)? = null
 ): Size {
@@ -244,10 +224,7 @@ fun animate(
 fun animate(
     target: Bounds,
     animSpec: AnimationSpec<Bounds> = remember {
-        SpringSpec(
-            visibilityThreshold = Bounds.VectorConverter.convertFromVector
-            (DpVisibilityThreshold4D)
-        )
+        SpringSpec(visibilityThreshold = Bounds.VisibilityThreshold)
     },
     endListener: ((Bounds) -> Unit)? = null
 ): Bounds {
@@ -278,7 +255,7 @@ fun animate(
 fun animate(
     target: Offset,
     animSpec: AnimationSpec<Offset> = remember {
-        SpringSpec(visibilityThreshold = Offset(PxVisibilityThreshold, PxVisibilityThreshold))
+        SpringSpec(visibilityThreshold = Offset.VisibilityThreshold)
     },
     endListener: ((Offset) -> Unit)? = null
 ): Offset {
@@ -307,10 +284,7 @@ fun animate(
 fun animate(
     target: Rect,
     animSpec: AnimationSpec<Rect> = remember {
-        SpringSpec(
-            visibilityThreshold =
-                Rect.VectorConverter.convertFromVector(PxVisibilityThreshold4D)
-        )
+        SpringSpec(visibilityThreshold = Rect.VisibilityThreshold)
     },
     endListener: ((Rect) -> Unit)? = null
 ): Rect {
@@ -364,7 +338,7 @@ fun animate(
 fun animate(
     target: IntOffset,
     animSpec: AnimationSpec<IntOffset> = remember {
-        SpringSpec(visibilityThreshold = IntOffset(1, 1))
+        SpringSpec(visibilityThreshold = IntOffset.VisibilityThreshold)
     },
     endListener: ((IntOffset) -> Unit)? = null
 ): IntOffset {
@@ -390,7 +364,7 @@ fun animate(
 fun animate(
     target: IntSize,
     animSpec: AnimationSpec<IntSize> = remember {
-        SpringSpec(visibilityThreshold = IntSize(1, 1))
+        SpringSpec(visibilityThreshold = IntSize.VisibilityThreshold)
     },
     endListener: ((IntSize) -> Unit)? = null
 ): IntSize {
