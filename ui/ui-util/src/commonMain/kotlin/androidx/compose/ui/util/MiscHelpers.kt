@@ -22,9 +22,6 @@ expect fun String.format(vararg args: Any?): String
 
 expect fun StringBuilder.deleteAt(index: Int): StringBuilder
 
-// For performance optimizations of type.
-expect fun Any.nativeClass(): Any
-
 expect class TreeSet<E>(comparator: Comparator<in E>) {
     fun add(element: E): Boolean
     fun remove(element: E): Boolean
