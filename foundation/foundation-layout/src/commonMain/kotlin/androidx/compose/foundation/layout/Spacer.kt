@@ -24,8 +24,8 @@ import androidx.compose.ui.unit.hasFixedHeight
 import androidx.compose.ui.unit.hasFixedWidth
 
 /**
- * Component that represents an empty space layout, whose size can be defined using the [LayoutWidth],
- * [LayoutHeight] and [LayoutSize] modifiers.
+ * Component that represents an empty space layout, whose size can be defined using [Modifier.width],
+ * [Modifier.height] and [Modifier.size] modifiers.
  *
  * @sample androidx.compose.foundation.layout.samples.SpacerExample
  *
