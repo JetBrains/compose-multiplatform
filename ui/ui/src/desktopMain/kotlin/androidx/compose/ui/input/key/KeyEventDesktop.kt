@@ -46,18 +46,4 @@ internal inline class KeyEventDesktop(val keyEvent: KeyEventAwt) : KeyEvent {
 
     override val isShiftPressed: Boolean
         get() = keyEvent.isShiftDown
-
-    @Suppress("DEPRECATION", "OverridingDeprecatedMember")
-    override val alt: Alt
-        get() = AltDesktop(keyEvent)
-}
-
-@Suppress("DEPRECATION")
-internal inline class AltDesktop(val keyEvent: KeyEventAwt) : Alt {
-
-    override val isLeftAltPressed
-        get() = keyEvent.isAltDown
-
-    override val isRightAltPressed
-        get() = keyEvent.isAltGraphDown
 }
