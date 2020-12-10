@@ -17,16 +17,16 @@
 package androidx.compose.animation.core
 
 import androidx.compose.animation.VectorConverter
+import androidx.compose.animation.animateColor
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
-import org.junit.Rule
-import org.junit.Test
-import org.junit.runner.RunWith
-import androidx.compose.animation.animateColor
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import junit.framework.TestCase.assertEquals
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -68,8 +68,37 @@ class TransitionTest {
             Color.Red,
             Color.VectorConverter(Color.Red.colorSpace)
         )
+
+        // Animate from 0f to 0f for 1000ms
+        val keyframes1 = keyframes<Float> {
+            durationMillis = 1000
+            0f at 0
+            200f at 400
+            1000f at 1000
+        }
+
+        val keyframes2 = keyframes<Float> {
+            durationMillis = 800
+            0f at 0
+            -500f at 400
+            -1000f at 800
+        }
+
+        val keyframesAnim1 = TargetBasedAnimation(
+            keyframes1,
+            0f,
+            0f,
+            Float.VectorConverter
+        )
+        val keyframesAnim2 = TargetBasedAnimation(
+            keyframes2,
+            0f,
+            0f,
+            Float.VectorConverter
+        )
         val animFloat = mutableStateOf(-1f)
         val animColor = mutableStateOf(Color.Gray)
+        val animFloatWithKeyframes = mutableStateOf(-1f)
         rule.setContent {
             val transition = updateTransition(target.value)
             animFloat.value = transition.animateFloat(
@@ -99,6 +128,19 @@ class TransitionTest {
                 }
             }.value
 
+            animFloatWithKeyframes.value = transition.animateFloat(
+                transitionSpec = {
+                    if (it.initialState == AnimStates.From && it.targetState == AnimStates.To) {
+                        keyframes1
+                    } else {
+                        keyframes2
+                    }
+                }
+            ) {
+                // Same values for all states, but different transitions from state to state.
+                0f
+            }.value
+
             if (transition.isRunning) {
                 if (transition.targetState == AnimStates.To) {
                     assertEquals(
@@ -109,6 +151,11 @@ class TransitionTest {
                         colorAnim1.getValue(transition.playTimeNanos / 1_000_000L),
                         animColor.value
                     )
+                    assertEquals(
+                        keyframesAnim1.getValue(transition.playTimeNanos / 1_000_000L),
+                        animFloatWithKeyframes.value, 0.00001f
+                    )
+
                     assertEquals(AnimStates.To, transition.transitionStates.targetState)
                     assertEquals(AnimStates.From, transition.transitionStates.initialState)
                 } else {
@@ -119,6 +166,10 @@ class TransitionTest {
                     assertEquals(
                         colorAnim2.getValue(transition.playTimeNanos / 1_000_000L),
                         animColor.value
+                    )
+                    assertEquals(
+                        keyframesAnim2.getValue(transition.playTimeNanos / 1_000_000L),
+                        animFloatWithKeyframes.value, 0.00001f
                     )
                     assertEquals(AnimStates.From, transition.transitionStates.targetState)
                     assertEquals(AnimStates.To, transition.transitionStates.initialState)
