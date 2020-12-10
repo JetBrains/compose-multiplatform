@@ -32,10 +32,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.FocusReference
+import androidx.compose.ui.focus.focusReference
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.focusRequester
 import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.gesture.longPressDragGestureFilter
 import androidx.compose.ui.gesture.tapGestureFilter
@@ -154,7 +154,7 @@ fun CoreTextField(
     // If developer doesn't pass new value to TextField, recompose won't happen but internal state
     // and IME may think it is updated. To fix this inconsistent state, enforce recompose.
     val recompose = invalidate
-    val focusRequester = FocusRequester()
+    val focusReference = FocusReference()
 
     // Ambients
     val textInputService = AmbientTextInputService.current
@@ -209,7 +209,7 @@ fun CoreTextField(
     manager.clipboardManager = AmbientClipboardManager.current
     manager.textToolbar = AmbientTextToolbar.current
     manager.hapticFeedBack = AmbientHapticFeedback.current
-    manager.focusRequester = focusRequester
+    manager.focusReference = focusReference
 
     val onFocusChanged = Modifier.onFocusChanged {
         if (state.hasFocus == it.isFocused) {
@@ -265,7 +265,7 @@ fun CoreTextField(
 
     val focusRequestTapModifier = Modifier.tapGestureFilter {
         if (!state.hasFocus) {
-            focusRequester.requestFocus()
+            focusReference.requestFocus()
         } else {
             // if already focused make sure tap request keyboard.
             textInputService?.showSoftwareKeyboard(state.inputSession)
@@ -297,7 +297,7 @@ fun CoreTextField(
 
     val pointerModifier = if (isMouseInput) {
         Modifier.dragGestureFilter(
-            manager.mouseSelectionObserver(onStart = { focusRequester.requestFocus() }),
+            manager.mouseSelectionObserver(onStart = { focusReference.requestFocus() }),
             startDragImmediately = true
         )
     } else {
@@ -384,7 +384,7 @@ fun CoreTextField(
         }
         onClick {
             if (!state.hasFocus) {
-                focusRequester.requestFocus()
+                focusReference.requestFocus()
             } else {
                 textInputService?.showSoftwareKeyboard(state.inputSession)
             }
@@ -415,7 +415,7 @@ fun CoreTextField(
     onDispose { manager.hideSelectionToolbar() }
 
     val modifiers = modifier
-        .focusRequester(focusRequester)
+        .focusReference(focusReference)
         .then(onFocusChanged)
         .then(cursorModifier)
         .then(pointerModifier)

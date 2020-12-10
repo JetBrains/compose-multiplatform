@@ -136,7 +136,7 @@ package androidx.compose.ui {
   }
 
   public final class FocusModifierKt {
-    method public static androidx.compose.ui.Modifier focus(androidx.compose.ui.Modifier);
+    method @Deprecated public static androidx.compose.ui.Modifier focus(androidx.compose.ui.Modifier);
   }
 
   @Deprecated public interface FocusObserverModifier extends androidx.compose.ui.Modifier.Element {
@@ -148,13 +148,13 @@ package androidx.compose.ui {
     method @Deprecated public static androidx.compose.ui.Modifier focusObserver(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.focus.FocusState,kotlin.Unit> onFocusChange);
   }
 
-  public interface FocusRequesterModifier extends androidx.compose.ui.Modifier.Element {
-    method public androidx.compose.ui.focus.FocusRequester getFocusRequester();
-    property public abstract androidx.compose.ui.focus.FocusRequester focusRequester;
+  @Deprecated public interface FocusRequesterModifier extends androidx.compose.ui.Modifier.Element {
+    method @Deprecated public androidx.compose.ui.focus.FocusReference getFocusReference();
+    property public abstract androidx.compose.ui.focus.FocusReference focusReference;
   }
 
   public final class FocusRequesterModifierKt {
-    method public static androidx.compose.ui.Modifier focusRequester(androidx.compose.ui.Modifier, androidx.compose.ui.focus.FocusRequester focusRequester);
+    method @Deprecated public static androidx.compose.ui.Modifier focusRequester(androidx.compose.ui.Modifier, Object focusRequester);
   }
 
   @androidx.compose.runtime.Stable public interface Modifier {
@@ -347,42 +347,62 @@ package androidx.compose.ui.focus {
     method public void clearFocus(optional boolean forcedClear);
   }
 
+  public final class FocusModifierKt {
+    method public static androidx.compose.ui.Modifier focusModifier(androidx.compose.ui.Modifier);
+  }
+
   public final class FocusNodeUtilsKt {
   }
 
-  public final class FocusRequester {
-    ctor public FocusRequester();
+  public final class FocusReference {
+    ctor public FocusReference();
     method public boolean captureFocus();
     method public boolean freeFocus();
     method public void requestFocus();
-    field public static final androidx.compose.ui.focus.FocusRequester.Companion Companion;
+    field public static final androidx.compose.ui.focus.FocusReference.Companion Companion;
   }
 
-  public static final class FocusRequester.Companion {
-    method public androidx.compose.ui.focus.FocusRequester.Companion.FocusRequesterFactory createRefs();
+  public static final class FocusReference.Companion {
+    method public androidx.compose.ui.focus.FocusReference.Companion.FocusReferenceFactory createRefs();
   }
 
-  public static final class FocusRequester.Companion.FocusRequesterFactory {
-    method public operator androidx.compose.ui.focus.FocusRequester component1();
-    method public operator androidx.compose.ui.focus.FocusRequester component10();
-    method public operator androidx.compose.ui.focus.FocusRequester component11();
-    method public operator androidx.compose.ui.focus.FocusRequester component12();
-    method public operator androidx.compose.ui.focus.FocusRequester component13();
-    method public operator androidx.compose.ui.focus.FocusRequester component14();
-    method public operator androidx.compose.ui.focus.FocusRequester component15();
-    method public operator androidx.compose.ui.focus.FocusRequester component16();
-    method public operator androidx.compose.ui.focus.FocusRequester component2();
-    method public operator androidx.compose.ui.focus.FocusRequester component3();
-    method public operator androidx.compose.ui.focus.FocusRequester component4();
-    method public operator androidx.compose.ui.focus.FocusRequester component5();
-    method public operator androidx.compose.ui.focus.FocusRequester component6();
-    method public operator androidx.compose.ui.focus.FocusRequester component7();
-    method public operator androidx.compose.ui.focus.FocusRequester component8();
-    method public operator androidx.compose.ui.focus.FocusRequester component9();
-    field public static final androidx.compose.ui.focus.FocusRequester.Companion.FocusRequesterFactory INSTANCE;
+  public static final class FocusReference.Companion.FocusReferenceFactory {
+    method public operator androidx.compose.ui.focus.FocusReference component1();
+    method public operator androidx.compose.ui.focus.FocusReference component10();
+    method public operator androidx.compose.ui.focus.FocusReference component11();
+    method public operator androidx.compose.ui.focus.FocusReference component12();
+    method public operator androidx.compose.ui.focus.FocusReference component13();
+    method public operator androidx.compose.ui.focus.FocusReference component14();
+    method public operator androidx.compose.ui.focus.FocusReference component15();
+    method public operator androidx.compose.ui.focus.FocusReference component16();
+    method public operator androidx.compose.ui.focus.FocusReference component2();
+    method public operator androidx.compose.ui.focus.FocusReference component3();
+    method public operator androidx.compose.ui.focus.FocusReference component4();
+    method public operator androidx.compose.ui.focus.FocusReference component5();
+    method public operator androidx.compose.ui.focus.FocusReference component6();
+    method public operator androidx.compose.ui.focus.FocusReference component7();
+    method public operator androidx.compose.ui.focus.FocusReference component8();
+    method public operator androidx.compose.ui.focus.FocusReference component9();
+    field public static final androidx.compose.ui.focus.FocusReference.Companion.FocusReferenceFactory INSTANCE;
   }
 
-  public final class FocusRequesterKt {
+  public final class FocusReferenceKt {
+  }
+
+  public interface FocusReferenceModifier extends androidx.compose.ui.Modifier.Element {
+    method public androidx.compose.ui.focus.FocusReference getFocusReference();
+    property public abstract androidx.compose.ui.focus.FocusReference focusReference;
+  }
+
+  public final class FocusReferenceModifierKt {
+    method public static androidx.compose.ui.Modifier focusReference(androidx.compose.ui.Modifier, androidx.compose.ui.focus.FocusReference focusReference);
+  }
+
+  @Deprecated public final class FocusRequester {
+    ctor @Deprecated public FocusRequester();
+    method @Deprecated public boolean captureFocus();
+    method @Deprecated public boolean freeFocus();
+    method @Deprecated public void requestFocus();
   }
 
   public enum FocusState {

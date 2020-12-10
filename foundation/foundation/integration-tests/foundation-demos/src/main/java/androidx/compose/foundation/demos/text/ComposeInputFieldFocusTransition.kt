@@ -25,10 +25,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.FocusReference
+import androidx.compose.ui.focus.focusReference
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.focusRequester
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.text.TextStyle
@@ -37,22 +37,22 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun TextFieldFocusTransition() {
-    val focusRequesters = List(6) { FocusRequester() }
+    val focusReferences = List(6) { FocusReference() }
 
     ScrollableColumn {
-        TextFieldWithFocusRequesters(focusRequesters[0], focusRequesters[1])
-        TextFieldWithFocusRequesters(focusRequesters[1], focusRequesters[2])
-        TextFieldWithFocusRequesters(focusRequesters[2], focusRequesters[3])
-        TextFieldWithFocusRequesters(focusRequesters[3], focusRequesters[4])
-        TextFieldWithFocusRequesters(focusRequesters[4], focusRequesters[5])
-        TextFieldWithFocusRequesters(focusRequesters[5], focusRequesters[0])
+        TextFieldWithFocusReferences(focusReferences[0], focusReferences[1])
+        TextFieldWithFocusReferences(focusReferences[1], focusReferences[2])
+        TextFieldWithFocusReferences(focusReferences[2], focusReferences[3])
+        TextFieldWithFocusReferences(focusReferences[3], focusReferences[4])
+        TextFieldWithFocusReferences(focusReferences[4], focusReferences[5])
+        TextFieldWithFocusReferences(focusReferences[5], focusReferences[0])
     }
 }
 
 @Composable
-private fun TextFieldWithFocusRequesters(
-    focusRequester: FocusRequester,
-    nextFocusRequester: FocusRequester
+private fun TextFieldWithFocusReferences(
+    focusReference: FocusReference,
+    nextFocusReference: FocusReference
 ) {
     val state = savedInstanceState { "Focus Transition Test" }
     var color by remember { mutableStateOf(Black) }
@@ -61,10 +61,10 @@ private fun TextFieldWithFocusRequesters(
         value = state.value,
         modifier = demoTextFieldModifiers
             .onFocusChanged { color = if (it.isFocused) Red else Black }
-            .focusRequester(focusRequester),
+            .focusReference(focusReference),
         textStyle = TextStyle(color = color, fontSize = 32.sp),
         onValueChange = { state.value = it },
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-        onImeActionPerformed = { if (it == ImeAction.Next) nextFocusRequester.requestFocus() }
+        onImeActionPerformed = { if (it == ImeAction.Next) nextFocusReference.requestFocus() }
     )
 }

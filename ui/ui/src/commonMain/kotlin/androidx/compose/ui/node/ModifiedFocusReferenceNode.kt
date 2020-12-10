@@ -16,21 +16,21 @@
 
 package androidx.compose.ui.node
 
-import androidx.compose.ui.FocusRequesterModifier
-import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.FocusReference
+import androidx.compose.ui.focus.FocusReferenceModifier
 import androidx.compose.ui.focus.searchChildrenForFocusNode
 
-internal class ModifiedFocusRequesterNode(
+internal class ModifiedFocusReferenceNode(
     wrapped: LayoutNodeWrapper,
-    modifier: FocusRequesterModifier
-) : DelegatingLayoutNodeWrapper<FocusRequesterModifier>(wrapped, modifier) {
+    modifier: FocusReferenceModifier
+) : DelegatingLayoutNodeWrapper<FocusReferenceModifier>(wrapped, modifier) {
 
-    private var focusRequester: FocusRequester? = null
+    private var focusReference: FocusReference? = null
         set(value) {
-            // Check if this focus requester node is associated with another focusRequester.
-            field?.focusRequesterNodes?.remove(this)
+            // Check if this focus requester node is associated with another focusReference.
+            field?.focusReferenceNodes?.remove(this)
             field = value
-            field?.focusRequesterNodes?.add(this)
+            field?.focusReferenceNodes?.add(this)
         }
 
     // Searches for the focus node associated with this focus requester node.
@@ -40,16 +40,16 @@ internal class ModifiedFocusRequesterNode(
 
     override fun onModifierChanged() {
         super.onModifierChanged()
-        focusRequester = modifier.focusRequester
+        focusReference = modifier.focusReference
     }
 
     override fun attach() {
         super.attach()
-        focusRequester = modifier.focusRequester
+        focusReference = modifier.focusReference
     }
 
     override fun detach() {
-        focusRequester = null
+        focusReference = null
         super.detach()
     }
 }

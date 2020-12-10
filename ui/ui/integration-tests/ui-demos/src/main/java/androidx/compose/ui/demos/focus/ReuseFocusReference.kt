@@ -29,11 +29,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus
-import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.FocusReference
+import androidx.compose.ui.focus.focusModifier
+import androidx.compose.ui.focus.focusReference
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.gesture.tapGestureFilter
@@ -43,7 +43,7 @@ private const val size = 200f
 private enum class CurrentShape { Circle, Square }
 
 @Composable
-fun ReuseFocusRequester() {
+fun ReuseFocusReference() {
     Column(
         verticalArrangement = Arrangement.Top
     ) {
@@ -52,21 +52,21 @@ fun ReuseFocusRequester() {
                 "another shape. The same focus requester is used for both shapes."
         )
 
-        // Shared focus requester.
-        val focusRequester = FocusRequester()
+        // Shared focus reference.
+        val focusReference = FocusReference()
 
         var shape by remember { mutableStateOf(CurrentShape.Square) }
         when (shape) {
             CurrentShape.Circle -> Circle(
                 modifier = Modifier
-                    .focusRequester(focusRequester)
-                    .tapGestureFilter { focusRequester.requestFocus() },
+                    .focusReference(focusReference)
+                    .tapGestureFilter { focusReference.requestFocus() },
                 nextShape = { shape = CurrentShape.Square }
             )
             CurrentShape.Square -> Square(
                 modifier = Modifier
-                    .focusRequester(focusRequester)
-                    .tapGestureFilter { focusRequester.requestFocus() },
+                    .focusReference(focusReference)
+                    .tapGestureFilter { focusReference.requestFocus() },
                 nextShape = { shape = CurrentShape.Circle }
             )
         }
@@ -86,7 +86,7 @@ private fun Circle(modifier: Modifier = Modifier, nextShape: () -> Unit) {
         modifier
             .onFocusChanged { isFocused = it.isFocused }
             .fillMaxSize()
-            .focus()
+            .focusModifier()
     ) {
         drawCircle(
             color = if (isFocused) Color.Red else Color.Blue,
@@ -109,7 +109,7 @@ private fun Square(modifier: Modifier = Modifier, nextShape: () -> Unit) {
         modifier
             .onFocusChanged { isFocused = it.isFocused }
             .fillMaxSize()
-            .focus()
+            .focusModifier()
     ) {
         drawRect(
             color = if (isFocused) Color.Red else Color.Blue,

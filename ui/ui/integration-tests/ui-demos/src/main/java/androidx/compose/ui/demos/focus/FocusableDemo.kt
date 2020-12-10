@@ -27,11 +27,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus
-import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.FocusReference
+import androidx.compose.ui.focus.focusModifier
+import androidx.compose.ui.focus.focusReference
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.focusRequester
 import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Green
@@ -59,13 +59,13 @@ fun FocusableDemo() {
 @Composable
 private fun FocusableText(text: String) {
     var color by remember { mutableStateOf(Black) }
-    val focusRequester = FocusRequester()
+    val focusReference = FocusReference()
     Text(
         modifier = Modifier
-            .focusRequester(focusRequester)
+            .focusReference(focusReference)
             .onFocusChanged { color = if (it.isFocused) Green else Black }
-            .focus()
-            .tapGestureFilter { focusRequester.requestFocus() },
+            .focusModifier()
+            .tapGestureFilter { focusReference.requestFocus() },
         text = text,
         color = color
     )

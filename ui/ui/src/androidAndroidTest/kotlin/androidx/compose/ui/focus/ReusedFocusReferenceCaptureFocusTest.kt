@@ -17,12 +17,10 @@
 package androidx.compose.ui.focus
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.ui.FocusModifier
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusState.Active
 import androidx.compose.ui.focus.FocusState.Captured
 import androidx.compose.ui.focus.FocusState.Inactive
-import androidx.compose.ui.focusRequester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -33,7 +31,7 @@ import org.junit.runner.RunWith
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-class ReusedFocusRequesterCaptureFocusTest {
+class ReusedFocusReferenceCaptureFocusTest {
     @get:Rule
     val rule = createComposeRule()
 
@@ -41,19 +39,19 @@ class ReusedFocusRequesterCaptureFocusTest {
     fun oneActiveComponent_returnsTrue() {
         // Arrange.
         var focusState = Active
-        val focusRequester = FocusRequester()
+        val focusReference = FocusReference()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
-                    .focusRequester(focusRequester)
+                    .focusReference(focusReference)
                     .then(FocusModifier(focusState))
             )
         }
 
         rule.runOnIdle {
             // Act.
-            val success = focusRequester.captureFocus()
+            val success = focusReference.captureFocus()
 
             // Assert.
             assertThat(success).isTrue()
@@ -65,19 +63,19 @@ class ReusedFocusRequesterCaptureFocusTest {
     fun oneCapturedComponent_returnsTrue() {
         // Arrange.
         var focusState = Captured
-        val focusRequester = FocusRequester()
+        val focusReference = FocusReference()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
-                    .focusRequester(focusRequester)
+                    .focusReference(focusReference)
                     .then(FocusModifier(focusState))
             )
         }
 
         rule.runOnIdle {
             // Act.
-            val success = focusRequester.captureFocus()
+            val success = focusReference.captureFocus()
 
             // Assert.
             assertThat(success).isTrue()
@@ -89,19 +87,19 @@ class ReusedFocusRequesterCaptureFocusTest {
     fun oneInactiveComponent_returnsFalse() {
         // Arrange.
         var focusState = Inactive
-        val focusRequester = FocusRequester()
+        val focusReference = FocusReference()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
-                    .focusRequester(focusRequester)
+                    .focusReference(focusReference)
                     .then(FocusModifier(focusState))
             )
         }
 
         rule.runOnIdle {
             // Act.
-            val success = focusRequester.captureFocus()
+            val success = focusReference.captureFocus()
 
             // Assert.
             assertThat(success).isFalse()
@@ -114,25 +112,25 @@ class ReusedFocusRequesterCaptureFocusTest {
         // Arrange.
         var focusState1 = Inactive
         var focusState2 = Active
-        val focusRequester = FocusRequester()
+        val focusReference = FocusReference()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState1 = it }
-                    .focusRequester(focusRequester)
+                    .focusReference(focusReference)
                     .then(FocusModifier(focusState1))
             )
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState2 = it }
-                    .focusRequester(focusRequester)
+                    .focusReference(focusReference)
                     .then(FocusModifier(focusState2))
             )
         }
 
         rule.runOnIdle {
             // Act.
-            val success = focusRequester.captureFocus()
+            val success = focusReference.captureFocus()
 
             // Assert.
             assertThat(success).isTrue()
@@ -146,25 +144,25 @@ class ReusedFocusRequesterCaptureFocusTest {
         // Arrange.
         var focusState1 = Inactive
         var focusState2 = Captured
-        val focusRequester = FocusRequester()
+        val focusReference = FocusReference()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState1 = it }
-                    .focusRequester(focusRequester)
+                    .focusReference(focusReference)
                     .then(FocusModifier(focusState1))
             )
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState2 = it }
-                    .focusRequester(focusRequester)
+                    .focusReference(focusReference)
                     .then(FocusModifier(focusState2))
             )
         }
 
         rule.runOnIdle {
             // Act.
-            val success = focusRequester.captureFocus()
+            val success = focusReference.captureFocus()
 
             // Assert.
             assertThat(success).isTrue()
@@ -178,25 +176,25 @@ class ReusedFocusRequesterCaptureFocusTest {
         // Arrange.
         var focusState1 = Inactive
         var focusState2 = Inactive
-        val focusRequester = FocusRequester()
+        val focusReference = FocusReference()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState1 = it }
-                    .focusRequester(focusRequester)
+                    .focusReference(focusReference)
                     .then(FocusModifier(focusState1))
             )
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState2 = it }
-                    .focusRequester(focusRequester)
+                    .focusReference(focusReference)
                     .then(FocusModifier(focusState2))
             )
         }
 
         rule.runOnIdle {
             // Act.
-            val success = focusRequester.captureFocus()
+            val success = focusReference.captureFocus()
 
             // Assert.
             assertThat(success).isFalse()
