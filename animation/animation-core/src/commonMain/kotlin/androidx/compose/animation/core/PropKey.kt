@@ -110,22 +110,6 @@ class IntPropKey(override val label: String = "IntPropKey") : PropKey<Int, Anima
 
 /**
  * A [TwoWayConverter] that converts [Float] from and to [AnimationVector1D]
- * @see [Float.Companion.VectorConverter]
- */
-@Deprecated("", ReplaceWith("Float.VectorConverter"))
-val FloatToVectorConverter: TwoWayConverter<Float, AnimationVector1D> =
-    Float.VectorConverter
-
-/**
- * A [TwoWayConverter] that converts [Int] from and to [AnimationVector1D]
- * @see [Int.Companion.VectorConverter]
- */
-@Deprecated("", ReplaceWith("Int.VectorConverter"))
-val IntToVectorConverter: TwoWayConverter<Int, AnimationVector1D> =
-    Int.VectorConverter
-
-/**
- * A [TwoWayConverter] that converts [Float] from and to [AnimationVector1D]
  */
 val Float.Companion.VectorConverter: TwoWayConverter<Float, AnimationVector1D>
     get() = FloatToVector

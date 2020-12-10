@@ -204,47 +204,55 @@ val Color.Companion.VectorConverter:
 /**
  * A type converter that converts a [Rect] to a [AnimationVector4D], and vice versa.
  */
+@Deprecated("Rect.VectorConverter has been moved to animation-core library")
 val Rect.Companion.VectorConverter: TwoWayConverter<Rect, AnimationVector4D>
     get() = RectToVector
 
 /**
  * A type converter that converts a [Dp] to a [AnimationVector1D], and vice versa.
  */
+@Deprecated("Dp.VectorConverter has been moved to animation-core library")
 val Dp.Companion.VectorConverter: TwoWayConverter<Dp, AnimationVector1D>
     get() = DpToVector
 
 /**
  * A type converter that converts a [Position] to a [AnimationVector2D], and vice versa.
  */
+@Deprecated("Position.VectorConverter has been moved to animation-core library")
 val Position.Companion.VectorConverter: TwoWayConverter<Position, AnimationVector2D>
     get() = PositionToVector
 
 /**
  * A type converter that converts a [Size] to a [AnimationVector2D], and vice versa.
  */
+@Deprecated("Size.VectorConverter has been moved to animation-core library")
 val Size.Companion.VectorConverter: TwoWayConverter<Size, AnimationVector2D>
     get() = SizeToVector
 
 /**
  * A type converter that converts a [Bounds] to a [AnimationVector4D], and vice versa.
  */
+@Deprecated("Bounds.VectorConverter has been moved to animation-core library")
 val Bounds.Companion.VectorConverter: TwoWayConverter<Bounds, AnimationVector4D>
     get() = BoundsToVector
 
 /**
  * A type converter that converts a [Offset] to a [AnimationVector2D], and vice versa.
  */
+@Deprecated("Offset.VectorConverter has been moved to animation-core library")
 val Offset.Companion.VectorConverter: TwoWayConverter<Offset, AnimationVector2D>
     get() = OffsetToVector
 
 /**
  * A type converter that converts a [IntOffset] to a [AnimationVector2D], and vice versa.
  */
+@Deprecated("IntOffset.VectorConverter has been moved to animation-core library")
 val IntOffset.Companion.VectorConverter: TwoWayConverter<IntOffset, AnimationVector2D>
     get() = IntOffsetToVector
 
 /**
  * A type converter that converts a [IntSize] to a [AnimationVector2D], and vice versa.
  */
+@Deprecated("IntSize.VectorConverter has been moved to animation-core library")
 val IntSize.Companion.VectorConverter: TwoWayConverter<IntSize, AnimationVector2D>
     get() = IntSizeToVector
