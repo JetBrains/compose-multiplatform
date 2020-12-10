@@ -39,7 +39,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.Group
 import androidx.compose.ui.tooling.Inspectable
 import androidx.compose.ui.tooling.R
-import androidx.compose.ui.tooling.SlotTableRecord
+import androidx.compose.ui.tooling.CompositionDataRecord
 import androidx.compose.ui.tooling.ToolingTest
 import androidx.compose.ui.tooling.asTree
 import androidx.compose.ui.tooling.position
@@ -76,7 +76,7 @@ class LayoutInspectorTreeTest : ToolingTest() {
     @Ignore("Manual test")
     @Test
     fun buildTree() {
-        val slotTableRecord = SlotTableRecord.create()
+        val slotTableRecord = CompositionDataRecord.create()
 
         show {
             Inspectable(slotTableRecord) {
@@ -388,7 +388,7 @@ class LayoutInspectorTreeTest : ToolingTest() {
 
     @Test
     fun testStitchTreeFromModelDrawerLayout() {
-        val slotTableRecord = SlotTableRecord.create()
+        val slotTableRecord = CompositionDataRecord.create()
 
         show {
             Inspectable(slotTableRecord) {
@@ -442,7 +442,7 @@ class LayoutInspectorTreeTest : ToolingTest() {
 
     @Test
     fun testSpacer() {
-        val slotTableRecord = SlotTableRecord.create()
+        val slotTableRecord = CompositionDataRecord.create()
 
         show {
             Inspectable(slotTableRecord) {
@@ -466,7 +466,7 @@ class LayoutInspectorTreeTest : ToolingTest() {
 
     @Test // regression test b/174855322
     fun testBasicText() {
-        val slotTableRecord = SlotTableRecord.create()
+        val slotTableRecord = CompositionDataRecord.create()
 
         view.setTag(R.id.inspection_slot_table_set, slotTableRecord.store)
         show {
@@ -492,7 +492,7 @@ class LayoutInspectorTreeTest : ToolingTest() {
     @Test
     @Ignore("b/174152464")
     fun testTextId() {
-        val slotTableRecord = SlotTableRecord.create()
+        val slotTableRecord = CompositionDataRecord.create()
 
         show {
             Inspectable(slotTableRecord) {
@@ -664,7 +664,7 @@ class LayoutInspectorTreeTest : ToolingTest() {
             else -> value?.toString() ?: "null"
         }
 
-    private fun dumpSlotTableSet(slotTableRecord: SlotTableRecord) {
+    private fun dumpSlotTableSet(slotTableRecord: CompositionDataRecord) {
         @Suppress("ConstantConditionIf")
         if (!DEBUG) {
             return

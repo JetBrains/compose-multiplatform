@@ -321,7 +321,7 @@ class CompositionTests {
             repeat(of = chars) { c -> textOf(c) }
         }
 
-        fun MockViewValidator.validatechars(chars: Iterable<Char>) {
+        fun MockViewValidator.validateChars(chars: Iterable<Char>) {
             repeat(of = chars) { c -> textOf(c) }
         }
 
@@ -333,9 +333,9 @@ class CompositionTests {
         }
 
         result.validate {
-            validatechars(chars)
-            validatechars(chars)
-            validatechars(chars)
+            validateChars(chars)
+            validateChars(chars)
+            validateChars(chars)
         }
 
         chars = listOf('a', 'b', 'x', 'c')
@@ -343,9 +343,9 @@ class CompositionTests {
         result.expectChanges()
 
         result.validate {
-            validatechars(chars)
-            validatechars(chars)
-            validatechars(chars)
+            validateChars(chars)
+            validateChars(chars)
+            validateChars(chars)
         }
     }
 
@@ -567,7 +567,7 @@ class CompositionTests {
     }
 
     @Test
-    fun testComponentWithVarCtorParameter() {
+    fun testComponentWithVarConstructorParameter() {
         @Composable fun MockComposeScope.One(first: Int) {
             text("$first")
         }
@@ -601,7 +601,7 @@ class CompositionTests {
     }
 
     @Test
-    fun testComponentWithValCtorParameter() {
+    fun testComponentWithValConstructorParameter() {
         @Composable fun MockComposeScope.One(first: Int) {
             text("$first")
         }
@@ -2516,7 +2516,7 @@ class CompositionTests {
     @Test
     fun testComposableLambdaSubcompositionInvalidation() = runBlockingTest {
         localRecomposerTest { recomposer ->
-            val composer = Composer(SlotTable(), EmptyApplier(), recomposer)
+            val composer = Composer(EmptyApplier(), recomposer)
             try {
                 var rootState by mutableStateOf(false)
                 val composedResults = mutableListOf<Boolean>()
@@ -2544,7 +2544,7 @@ class CompositionTests {
     @Test
     fun testCompositionReferenceIsRemembered() = runBlockingTest {
         localRecomposerTest { recomposer ->
-            val composer = Composer(SlotTable(), EmptyApplier(), recomposer)
+            val composer = Composer(EmptyApplier(), recomposer)
             try {
                 lateinit var invalidator: () -> Unit
                 val parentReferences = mutableListOf<CompositionReference>()
@@ -2569,7 +2569,7 @@ class CompositionTests {
     @Test
     fun testParentCompositionRecomposesFirst() = runBlockingTest {
         localRecomposerTest { recomposer ->
-            val composer = Composer(SlotTable(), EmptyApplier(), recomposer)
+            val composer = Composer(EmptyApplier(), recomposer)
             val results = mutableListOf<String>()
             try {
                 var firstState by mutableStateOf("firstInitial")
@@ -2606,7 +2606,7 @@ private fun TestSubcomposition(
     val parentRef = compositionReference()
     val currentContent by rememberUpdatedState(content)
     DisposableEffect(parentRef) {
-        val subcomposer = Composer(SlotTable(), EmptyApplier(), parentRef)
+        val subcomposer = Composer(EmptyApplier(), parentRef)
         parentRef.composeInitial(subcomposer) {
             currentContent()
         }
@@ -2671,8 +2671,7 @@ private class CompositionResult(
         assertTrue(changes, "Expected changes")
         composer.applyChanges()
         Snapshot.notifyObjectsInitialized()
-        composer.slotTable.verifyWellFormed()
-        composer.insertTable.verifyWellFormed()
+        composer.verifyConsistent()
     }
 
     fun recompose(): Boolean = doCompose(composer) { composer.recompose() }
@@ -2708,6 +2707,9 @@ private fun <T> doCompose(composer: Composer<*>, block: () -> T): T {
     }
 }
 
+/**
+ * Composer the given block.
+ */
 @OptIn(InternalComposeApi::class, ExperimentalComposeApi::class)
 private fun compose(
     block: @Composable MockComposeScope.() -> Unit
@@ -2727,7 +2729,6 @@ private fun compose(
             scope.launch(clock) { runRecomposeAndApplyChanges() }
         }
         Composer(
-            SlotTable(),
             ViewApplier(root),
             recomposer
         )
@@ -2741,24 +2742,9 @@ private fun compose(
         Snapshot.notifyObjectsInitialized()
         composer.applyChanges()
     }
-    composer.slotTable.verifyWellFormed()
-    validateRecomposeScopeAnchors(composer.slotTable)
+    composer.verifyConsistent()
 
     return CompositionResult(composer, root)
-}
-
-@OptIn(InternalComposeApi::class)
-fun validateRecomposeScopeAnchors(slotTable: SlotTable) {
-    val scopes = slotTable.slots.map { it as? RecomposeScope }.filterNotNull()
-    for (scope in scopes) {
-        scope.anchor?.let { anchor ->
-            check(scope in slotTable.slotsOf(anchor.toIndexFor(slotTable))) {
-                val dataIndex = slotTable.slots.indexOf(scope)
-                "Misaligned anchor $anchor in scope $scope encountered, scope found at " +
-                    "$dataIndex"
-            }
-        }
-    }
 }
 
 // Contact test data

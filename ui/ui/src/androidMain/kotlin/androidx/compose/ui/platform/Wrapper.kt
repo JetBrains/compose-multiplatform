@@ -24,13 +24,13 @@ import androidx.activity.ComponentActivity
 import androidx.annotation.MainThread
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
+import androidx.compose.runtime.CompositionData
 import androidx.compose.runtime.CompositionReference
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.Recomposer
-import androidx.compose.runtime.SlotTable
 import androidx.compose.runtime.compositionFor
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.emptyContent
@@ -185,7 +185,7 @@ private fun doSetContent(
     if (inspectionWanted(owner)) {
         owner.setTag(
             R.id.inspection_slot_table_set,
-            Collections.newSetFromMap(WeakHashMap<SlotTable, Boolean>())
+            Collections.newSetFromMap(WeakHashMap<CompositionData, Boolean>())
         )
         enableDebugInspectorInfo()
     }
@@ -236,11 +236,12 @@ private class WrappedComposition(
                         @Suppress("UNCHECKED_CAST")
                         val inspectionTable =
                             owner.getTag(R.id.inspection_slot_table_set) as?
-                                MutableSet<SlotTable>
+                                MutableSet<CompositionData>
                                 ?: (owner.parent as? View)?.getTag(R.id.inspection_slot_table_set)
-                                    as? MutableSet<SlotTable>
+                                    as? MutableSet<CompositionData>
                         if (inspectionTable != null) {
-                            inspectionTable.add(currentComposer.slotTable)
+                            @OptIn(InternalComposeApi::class)
+                            inspectionTable.add(currentComposer.compositionData)
                             currentComposer.collectParameterInformation()
                         }
 

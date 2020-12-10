@@ -17,9 +17,10 @@
 package androidx.compose.ui.tooling.inspector
 
 import android.view.View
+import androidx.compose.runtime.CompositionData
 import androidx.compose.runtime.InternalComposeApi
-import androidx.compose.runtime.SlotTable
 import androidx.compose.ui.layout.LayoutInfo
+import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.tooling.Group
 import androidx.compose.ui.tooling.NodeGroup
@@ -73,13 +74,13 @@ class LayoutInspectorTree {
         Collections.newSetFromMap(IdentityHashMap<MutableInspectorNode, Boolean>())
 
     /**
-     * Converts the [SlotTable] set held by [view] into a list of root nodes.
+     * Converts the [CompositionData] set held by [view] into a list of root nodes.
      */
     @OptIn(InternalComposeApi::class)
     fun convert(view: View): List<InspectorNode> {
         parameterFactory.density = Density(view.context)
         @Suppress("UNCHECKED_CAST")
-        val tables = view.getTag(R.id.inspection_slot_table_set) as? Set<SlotTable>
+        val tables = view.getTag(R.id.inspection_slot_table_set) as? Set<CompositionData>
             ?: return emptyList()
         clear()
         val result = convert(tables)
@@ -111,7 +112,7 @@ class LayoutInspectorTree {
     }
 
     @OptIn(InternalComposeApi::class)
-    private fun convert(tables: Set<SlotTable>): List<InspectorNode> {
+    private fun convert(tables: Set<CompositionData>): List<InspectorNode> {
         val trees = tables.map { convert(it) }
         return when (trees.size) {
             0 -> listOf()
@@ -121,11 +122,12 @@ class LayoutInspectorTree {
     }
 
     /**
-     * Stitch separate trees together using the [LayoutInfo]s found in the [SlotTable]s.
+     * Stitch separate trees together using the [LayoutNode]s found in the [CompositionData]s.
      *
-     * Some constructs in Compose (e.g. ModalDrawerLayout) will result is multiple [SlotTable]s.
-     * This code will attempt to stitch the resulting [InspectorNode] trees together by looking
-     * at the parent of each [LayoutInfo].
+     * Some constructs in Compose (e.g. ModalDrawerLayout) will result is multiple
+     * [CompositionData]s. This code will attempt to stitch the resulting [InspectorNode] trees
+     * together by looking at the parent of each [LayoutNode].
+     *
      * If this algorithm is successful the result of this function will be a list with a single
      * tree.
      */
@@ -199,7 +201,7 @@ class LayoutInspectorTree {
     }
 
     @OptIn(InternalComposeApi::class)
-    private fun convert(table: SlotTable): MutableInspectorNode {
+    private fun convert(table: CompositionData): MutableInspectorNode {
         val fakeParent = newNode()
         addToParent(fakeParent, listOf(convert(table.asTree())))
         return fakeParent
