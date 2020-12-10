@@ -103,7 +103,7 @@ internal expect fun ActualRadialGradientShader(
 fun SweepGradientShader(
     center: Offset,
     colors: List<Color>,
-    colorStops: List<Float>? = null,
+    colorStops: List<Float>? = null
 ): Shader = ActualSweepGradientShader(center, colors, colorStops)
 
 internal expect fun ActualSweepGradientShader(

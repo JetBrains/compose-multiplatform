@@ -574,7 +574,7 @@ class CanvasDrawScope : DrawScope {
         blendMode: BlendMode
     ): Paint = selectPaint(style).apply {
         if (brush != null) {
-            brush.applyTo(this, alpha)
+            brush.applyTo(size, this, alpha)
         } else if (this.alpha != alpha) {
             this.alpha = alpha
         }
@@ -640,7 +640,7 @@ class CanvasDrawScope : DrawScope {
         blendMode: BlendMode
     ) = obtainStrokePaint().apply {
         if (brush != null) {
-            brush.applyTo(this, alpha)
+            brush.applyTo(size, this, alpha)
         } else if (this.alpha != alpha) {
             this.alpha = alpha
         }

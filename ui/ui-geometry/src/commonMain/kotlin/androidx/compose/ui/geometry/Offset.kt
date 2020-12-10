@@ -64,11 +64,23 @@ inline class Offset(val packedValue: Long) {
 
     @Stable
     val x: Float
-        get() = unpackFloat1(packedValue)
+        get() {
+            // Explicitly compare against packed values to avoid auto-boxing of Size.Unspecified
+            check(this.packedValue != Size.Unspecified.packedValue) {
+                "Offset is unspecified"
+            }
+            return unpackFloat1(packedValue)
+        }
 
     @Stable
     val y: Float
-        get() = unpackFloat2(packedValue)
+        get() {
+            // Explicitly compare against packed values to avoid auto-boxing of Size.Unspecified
+            check(this.packedValue != Size.Unspecified.packedValue) {
+                "Offset is unspecified"
+            }
+            return unpackFloat2(packedValue)
+        }
 
     @Stable
     operator fun component1(): Float = x
@@ -222,3 +234,21 @@ fun lerp(start: Offset, stop: Offset, fraction: Float): Offset {
         lerp(start.y, stop.y, fraction)
     )
 }
+
+/**
+ * True if both x and y values of the [Offset] are finite
+ */
+@Stable
+val Offset.isFinite: Boolean get() = x.isFinite() && y.isFinite()
+
+/**
+ * `false` when this is [Offset.Unspecified].
+ */
+@Stable
+val Offset.isSpecified: Boolean get() = packedValue != Offset.Unspecified.packedValue
+
+/**
+ * `true` when this is [Offset.Unspecified].
+ */
+@Stable
+inline val Offset.isUnspecified: Boolean get() = packedValue == Offset.Unspecified.packedValue

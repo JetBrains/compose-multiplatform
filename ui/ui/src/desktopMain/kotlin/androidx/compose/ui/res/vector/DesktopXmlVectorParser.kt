@@ -19,14 +19,11 @@ package androidx.compose.ui.res.vector
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorStop
-import androidx.compose.ui.graphics.LinearGradient
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.PathFillType
-import androidx.compose.ui.graphics.RadialGradient
-import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
-import androidx.compose.ui.graphics.SweepGradient
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.vector.DefaultPivotX
 import androidx.compose.ui.graphics.vector.DefaultPivotY
@@ -157,13 +154,13 @@ private fun Element.parseGroup(builder: ImageVector.Builder, context: BuildConte
 
 private fun parseStringBrush(str: String) = SolidColor(Color(parseColorValue(str)))
 
-private fun Element.parseElementBrush(): ShaderBrush? =
+private fun Element.parseElementBrush(): Brush? =
     childrenSequence
         .filterIsInstance<Element>()
         .find { it.nodeName == "gradient" }
         ?.parseGradient()
 
-private fun Element.parseGradient(): ShaderBrush? {
+private fun Element.parseGradient(): Brush? {
     return when (attributeOrNull(ANDROID_NS, "type")) {
         "linear" -> parseLinearGradient()
         "radial" -> parseRadialGradient()
@@ -173,26 +170,32 @@ private fun Element.parseGradient(): ShaderBrush? {
 }
 
 @Suppress("CHANGING_ARGUMENTS_EXECUTION_ORDER_FOR_NAMED_VARARGS")
-private fun Element.parseLinearGradient() = LinearGradient(
+private fun Element.parseLinearGradient() = Brush.linearGradient(
     colorStops = parseColorStops(),
-    startX = attributeOrNull(ANDROID_NS, "startX")?.toFloat() ?: 0f,
-    startY = attributeOrNull(ANDROID_NS, "startY")?.toFloat() ?: 0f,
-    endX = attributeOrNull(ANDROID_NS, "endX")?.toFloat() ?: 0f,
-    endY = attributeOrNull(ANDROID_NS, "endY")?.toFloat() ?: 0f,
+    start = Offset(
+        attributeOrNull(ANDROID_NS, "startX")?.toFloat() ?: 0f,
+        attributeOrNull(ANDROID_NS, "startY")?.toFloat() ?: 0f
+    ),
+    end = Offset(
+        attributeOrNull(ANDROID_NS, "endX")?.toFloat() ?: 0f,
+        attributeOrNull(ANDROID_NS, "endY")?.toFloat() ?: 0f
+    ),
     tileMode = attributeOrNull(ANDROID_NS, "tileMode")?.let(::parseTileMode) ?: TileMode.Clamp
 )
 
 @Suppress("CHANGING_ARGUMENTS_EXECUTION_ORDER_FOR_NAMED_VARARGS")
-private fun Element.parseRadialGradient() = RadialGradient(
+private fun Element.parseRadialGradient() = Brush.radialGradient(
     colorStops = parseColorStops(),
-    centerX = attributeOrNull(ANDROID_NS, "centerX")?.toFloat() ?: 0f,
-    centerY = attributeOrNull(ANDROID_NS, "centerY")?.toFloat() ?: 0f,
+    center = Offset(
+        attributeOrNull(ANDROID_NS, "centerX")?.toFloat() ?: 0f,
+        attributeOrNull(ANDROID_NS, "centerY")?.toFloat() ?: 0f
+    ),
     radius = attributeOrNull(ANDROID_NS, "gradientRadius")?.toFloat() ?: 0f,
     tileMode = attributeOrNull(ANDROID_NS, "tileMode")?.let(::parseTileMode) ?: TileMode.Clamp
 )
 
 @Suppress("CHANGING_ARGUMENTS_EXECUTION_ORDER_FOR_NAMED_VARARGS")
-private fun Element.parseSweepGradient() = SweepGradient(
+private fun Element.parseSweepGradient() = Brush.sweepGradient(
     colorStops = parseColorStops(),
     center = Offset(
         attributeOrNull(ANDROID_NS, "centerX")?.toFloat() ?: 0f,
