@@ -131,4 +131,24 @@ class UiApplier(root: Any) : AbstractApplier<Any>(root) {
             else -> invalidNode(root)
         }
     }
+
+    override fun onEndChanges() {
+        super.onEndChanges()
+        if (root is ViewGroup) {
+            clearInvalidObservations(root)
+        } else if (root is LayoutNode) {
+            (root.owner as? AndroidComposeView)?.clearInvalidObservations()
+        }
+    }
+
+    private fun clearInvalidObservations(viewGroup: ViewGroup) {
+        for (i in 0 until viewGroup.childCount) {
+            val child = viewGroup.getChildAt(i)
+            if (child is AndroidComposeView) {
+                child.clearInvalidObservations()
+            } else if (child is ViewGroup) {
+                clearInvalidObservations(child)
+            }
+        }
+    }
 }
