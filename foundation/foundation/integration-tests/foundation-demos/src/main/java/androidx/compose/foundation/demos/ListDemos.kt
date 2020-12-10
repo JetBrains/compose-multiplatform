@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.demos
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.ScrollableColumn
@@ -35,7 +36,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
@@ -78,6 +82,7 @@ val LazyListDemos = listOf(
     ComposableDemo("Arrangements") { LazyListArrangements() },
     ComposableDemo("Reverse scroll direction") { ReverseLayout() },
     ComposableDemo("Nested lazy lists") { NestedLazyDemo() },
+    ComposableDemo("LazyGrid") { LazyGridDemo() },
     PagingDemos
 )
 
@@ -473,6 +478,46 @@ private fun NestedLazyDemo() {
         }
         items(List(100) { it }) {
             item(it)
+        }
+    }
+}
+
+@Composable
+private fun LazyGridDemo() {
+    val columnModes = listOf(
+        GridCells.Fixed(3),
+        GridCells.Adaptive(minSize = 60.dp)
+    )
+    var currentMode by remember { mutableStateOf(0) }
+    Column {
+        Button(
+            modifier = Modifier.wrapContentSize(),
+            onClick = {
+                currentMode = (currentMode + 1) % columnModes.size
+            }
+        ) {
+            Text("Switch mode")
+        }
+        LazyGridForMode(columnModes[currentMode])
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun LazyGridForMode(mode: GridCells) {
+    LazyVerticalGrid(
+        cells = mode
+    ) {
+        items(
+            items = (1..100).toList()
+        ) {
+            Text(
+                text = "$it",
+                fontSize = 20.sp,
+                modifier = Modifier
+                    .background(Color.Gray.copy(alpha = (it % 10) / 10f))
+                    .padding(8.dp)
+            )
         }
     }
 }

@@ -58,19 +58,13 @@ interface LazyListScope {
     )
 }
 
-internal class IntervalHolder(
-    val startIndex: Int,
-    val content: LazyItemScope.(Int) -> (@Composable () -> Unit)
-)
-
 internal class LazyListScopeImpl : LazyListScope {
-    private val intervals = mutableListOf<IntervalHolder>()
-    var totalSize = 0
+    private val intervals = IntervalList<LazyItemScope.(Int) -> (@Composable () -> Unit)>()
+
+    val totalSize get() = intervals.totalSize
 
     fun contentFor(index: Int, scope: LazyItemScope): @Composable () -> Unit {
-        val intervalIndex = findIndexOfHighestValueLesserThan(intervals, index)
-
-        val interval = intervals[intervalIndex]
+        val interval = intervals.intervalForIndex(index)
         val localIntervalIndex = index - interval.startIndex
 
         return interval.content(scope, localIntervalIndex)
@@ -80,84 +74,24 @@ internal class LazyListScopeImpl : LazyListScope {
         items: List<T>,
         itemContent: @Composable LazyItemScope.(item: T) -> Unit
     ) {
-        // There aren't any items to display
-        if (items.isEmpty()) { return }
-
-        val interval = IntervalHolder(
-            startIndex = totalSize,
-            content = { index ->
-                val item = items[index]
-
-                { itemContent(item) }
-            }
-        )
-
-        totalSize += items.size
-
-        intervals.add(interval)
+        intervals.add(items.size) { index ->
+            val item = items[index]
+            @Composable { itemContent(item) }
+        }
     }
 
     override fun item(content: @Composable LazyItemScope.() -> Unit) {
-        val interval = IntervalHolder(
-            startIndex = totalSize,
-            content = { { content() } }
-        )
-
-        totalSize += 1
-
-        intervals.add(interval)
+        intervals.add(1) { @Composable { content() } }
     }
 
     override fun <T> itemsIndexed(
         items: List<T>,
         itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
     ) {
-        // There aren't any items to display
-        if (items.isEmpty()) { return }
-
-        val interval = IntervalHolder(
-            startIndex = totalSize,
-            content = { index ->
-                val item = items[index]
-
-                { itemContent(index, item) }
-            }
-        )
-
-        totalSize += items.size
-
-        intervals.add(interval)
-    }
-
-    /**
-     * Finds the index of the [list] which contains the highest value of [IntervalHolder.startIndex]
-     * that is less than or equal to the given [value].
-     */
-    private fun findIndexOfHighestValueLesserThan(list: List<IntervalHolder>, value: Int): Int {
-        var left = 0
-        var right = list.lastIndex
-
-        while (left < right) {
-            val middle = (left + right) / 2
-
-            val middleValue = list[middle].startIndex
-            if (middleValue == value) {
-                return middle
-            }
-
-            if (middleValue < value) {
-                left = middle + 1
-
-                // Verify that the left will not be bigger than our value
-                if (value < list[left].startIndex) {
-                    return middle
-                }
-            } else {
-                right = middle - 1
-            }
+        intervals.add(items.size) { index ->
+            val item = items[index]
+            @Composable { itemContent(index, item) }
         }
-
-        return left
     }
 }
 
