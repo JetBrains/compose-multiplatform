@@ -34,8 +34,8 @@ import androidx.compose.ui.semantics.SemanticsModifierCore
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.semantics.SemanticsWrapper
-import androidx.compose.ui.semantics.accessibilityValue
-import androidx.compose.ui.semantics.accessibilityValueRange
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.semantics.stateDescriptionRange
 import androidx.compose.ui.semantics.dismiss
 import androidx.compose.ui.semantics.focused
 import androidx.compose.ui.semantics.getTextLayoutResult
@@ -110,9 +110,9 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
         val info = AccessibilityNodeInfoCompat.obtain()
         val clickActionLabel = "click"
         val dismissActionLabel = "dismiss"
-        val accessibilityValue = "checked"
+        val stateDescription = "checked"
         val semanticsModifier = SemanticsModifierCore(1, true, false) {
-            this.accessibilityValue = accessibilityValue
+            this.stateDescription = stateDescription
             onClick(clickActionLabel) { true }
             dismiss(dismissActionLabel) { true }
         }
@@ -140,7 +140,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
                 )
             )
         )
-        val stateDescription = when {
+        val stateDescriptionResult = when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
                 info.unwrap().stateDescription
             }
@@ -153,7 +153,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
                 null
             }
         }
-        assertEquals(accessibilityValue, stateDescription)
+        assertEquals(stateDescription, stateDescriptionResult)
         assertTrue(info.isClickable)
         assertTrue(info.isVisibleToUser)
     }
@@ -163,7 +163,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
         val info = AccessibilityNodeInfoCompat.obtain()
         val setProgressActionLabel = "setProgress"
         val semanticsModifier = SemanticsModifierCore(1, true, false) {
-            accessibilityValueRange = AccessibilityRangeInfo(0.5f, 0f..1f, 6)
+            stateDescriptionRange = AccessibilityRangeInfo(0.5f, 0f..1f, 6)
             setProgress(setProgressActionLabel) { true }
         }
         val semanticsNode = SemanticsNode(

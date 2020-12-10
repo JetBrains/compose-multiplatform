@@ -27,7 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.platform.debugInspectorInfo
-import androidx.compose.ui.semantics.accessibilityValue
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 
@@ -71,7 +71,7 @@ fun Modifier.selectable(
             onClick = onClick
         ).semantics {
             this.selected = selected
-            this.accessibilityValue = if (selected) Strings.Selected else Strings.NotSelected
+            this.stateDescription = if (selected) Strings.Selected else Strings.NotSelected
         }
     },
     inspectorInfo = debugInspectorInfo {

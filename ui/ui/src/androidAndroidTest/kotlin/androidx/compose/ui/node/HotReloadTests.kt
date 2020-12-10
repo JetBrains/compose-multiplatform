@@ -30,7 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.accessibilityLabel
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.assertLabelEquals
@@ -125,7 +125,7 @@ class HotReloadTests {
         var value = "First value"
 
         @Composable fun semanticsNode(text: String, id: Int) {
-            Box(Modifier.testTag("text$id").semantics { accessibilityLabel = text }) {
+            Box(Modifier.testTag("text$id").semantics { contentDescription = text }) {
             }
         }
 

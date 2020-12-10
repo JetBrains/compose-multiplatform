@@ -33,10 +33,10 @@ object SemanticsProperties {
      * Developer-set content description of the semantics node. If this is not set, accessibility
      * services will present the [Text] of this node as content part.
      *
-     * @see SemanticsPropertyReceiver.accessibilityLabel
+     * @see SemanticsPropertyReceiver.contentDescription
      */
-    val AccessibilityLabel = SemanticsPropertyKey<String>(
-        name = "AccessibilityLabel",
+    val ContentDescription = SemanticsPropertyKey<String>(
+        name = "ContentDescription",
         mergePolicy = { parentValue, childValue ->
             if (parentValue == null) {
                 childValue
@@ -52,14 +52,14 @@ object SemanticsProperties {
      * [AccessibilityRangeInfo], but it is not guaranteed and the format will be decided by
      * accessibility services.
      *
-     * @see SemanticsPropertyReceiver.accessibilityValue
+     * @see SemanticsPropertyReceiver.stateDescription
      */
-    val AccessibilityValue = SemanticsPropertyKey<String>("AccessibilityValue")
+    val StateDescription = SemanticsPropertyKey<String>("StateDescription")
 
     /**
      * The node is a range with current value.
      *
-     * @see SemanticsPropertyReceiver.accessibilityValueRange
+     * @see SemanticsPropertyReceiver.stateDescriptionRange
      */
     val AccessibilityRangeInfo =
         SemanticsPropertyKey<AccessibilityRangeInfo>("AccessibilityRangeInfo")
@@ -410,9 +410,15 @@ interface SemanticsPropertyReceiver {
  * Developer-set content description of the semantics node. If this is not set, accessibility
  * services will present the text of this node as content part.
  *
- * @see SemanticsProperties.AccessibilityLabel
+ * @see SemanticsProperties.ContentDescription
  */
-var SemanticsPropertyReceiver.accessibilityLabel by SemanticsProperties.AccessibilityLabel
+var SemanticsPropertyReceiver.contentDescription by SemanticsProperties.ContentDescription
+
+@Deprecated(
+    "accessibilityLabel was renamed to contentDescription",
+    ReplaceWith("contentDescription", "androidx.compose.ui.semantics")
+)
+var SemanticsPropertyReceiver.accessibilityLabel by SemanticsProperties.ContentDescription
 
 /**
  * Developer-set state description of the semantics node. For example: on/off. If this not
@@ -420,16 +426,22 @@ var SemanticsPropertyReceiver.accessibilityLabel by SemanticsProperties.Accessib
  * [AccessibilityRangeInfo], but it is not guaranteed and the format will be decided by
  * accessibility services.
  *
- * @see SemanticsProperties.AccessibilityValue
+ * @see SemanticsProperties.StateDescription
  */
-var SemanticsPropertyReceiver.accessibilityValue by SemanticsProperties.AccessibilityValue
+var SemanticsPropertyReceiver.stateDescription by SemanticsProperties.StateDescription
+
+@Deprecated(
+    "accessibilityValue was renamed to stateDescription",
+    ReplaceWith("stateDescription", "androidx.compose.ui.semantics")
+)
+var SemanticsPropertyReceiver.accessibilityValue by SemanticsProperties.StateDescription
 
 /**
  * The node is a range with current value.
  *
  * @see SemanticsProperties.AccessibilityRangeInfo
  */
-var SemanticsPropertyReceiver.accessibilityValueRange by SemanticsProperties.AccessibilityRangeInfo
+var SemanticsPropertyReceiver.stateDescriptionRange by SemanticsProperties.AccessibilityRangeInfo
 
 /**
  * Whether this semantics node is disabled.
