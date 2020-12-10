@@ -31,6 +31,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionReference
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.compositionReference
 import androidx.compose.runtime.onActive
 import androidx.compose.runtime.onCommit
@@ -95,7 +96,7 @@ internal actual fun ActualDialog(
 
     val dialog = remember(view, density) { DialogWrapper(view, density) }
     dialog.onDismissRequest = onDismissRequest
-    remember(properties) { dialog.setProperties(properties) }
+    SideEffect { dialog.setProperties(properties) }
 
     onActive {
         dialog.show()

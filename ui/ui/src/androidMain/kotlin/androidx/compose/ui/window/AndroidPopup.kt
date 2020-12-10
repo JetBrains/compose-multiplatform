@@ -30,6 +30,7 @@ import android.widget.FrameLayout
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.compositionReference
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.onCommit
@@ -95,9 +96,11 @@ internal actual fun ActualPopup(
     // Refresh anything that might have changed
     popupLayout.onDismissRequest = onDismissRequest
     popupLayout.testTag = AmbientPopupTestTag.current
-    remember(popupPositionProvider) { popupLayout.setPositionProvider(popupPositionProvider) }
-    remember(isFocusable) { popupLayout.setIsFocusable(isFocusable) }
-    remember(properties) { popupLayout.setProperties(properties) }
+    SideEffect {
+        popupLayout.setPositionProvider(popupPositionProvider)
+        popupLayout.setIsFocusable(isFocusable)
+        popupLayout.setProperties(properties)
+    }
 
     var composition: Composition? = null
 

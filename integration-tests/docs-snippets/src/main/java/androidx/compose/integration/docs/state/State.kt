@@ -327,7 +327,7 @@ private object binding {
 
 private const val it = 1
 private lateinit var helloViewModel: StateSnippet2.HelloViewModel
-private fun computeTextFormatting(st: String) {}
+private fun computeTextFormatting(st: String): String = ""
 
 private fun ExpandingCard(
     title: String,
