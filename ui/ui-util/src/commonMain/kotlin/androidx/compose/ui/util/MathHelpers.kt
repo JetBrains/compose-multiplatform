@@ -40,6 +40,3 @@ fun lerp(start: Long, stop: Long, fraction: Float): Long {
 }
 
 expect fun Float.toStringAsFixed(digits: Int): String
-
-@OptIn(kotlin.ExperimentalUnsignedTypes::class)
-fun Int.toHexString() = "0x${toUInt().toString(16).padStart(8, '0')}"

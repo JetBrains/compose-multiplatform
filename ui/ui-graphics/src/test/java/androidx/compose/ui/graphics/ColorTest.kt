@@ -18,7 +18,6 @@ package androidx.compose.ui.graphics
 
 import androidx.compose.ui.graphics.colorspace.ColorSpaces
 import androidx.compose.ui.util.lerp
-import androidx.compose.ui.util.toHexString
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
@@ -284,5 +283,10 @@ class ColorTest {
         assertEquals(0.3f, green, epsilon)
         assertEquals(0.4f, blue, epsilon)
         assertEquals(0.6f, alpha, epsilon)
+    }
+
+    companion object {
+        @OptIn(kotlin.ExperimentalUnsignedTypes::class)
+        fun Int.toHexString() = "0x${toUInt().toString(16).padStart(8, '0')}"
     }
 }

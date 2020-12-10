@@ -50,7 +50,6 @@ package androidx.compose.ui.util {
     method public static float lerp(float start, float stop, float fraction);
     method public static int lerp(int start, int stop, float fraction);
     method public static long lerp(long start, long stop, float fraction);
-    method public static String toHexString(int);
   }
 
 }
