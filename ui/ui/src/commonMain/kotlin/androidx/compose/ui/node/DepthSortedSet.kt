@@ -58,7 +58,7 @@ internal class DepthSortedSet(
     }
 
     fun add(node: LayoutNode) {
-        check(node.isAttached())
+        check(node.isAttached)
         if (extraAssertions) {
             val usedDepth = mapOfOriginalDepth[node]
             if (usedDepth == null) {
@@ -71,7 +71,7 @@ internal class DepthSortedSet(
     }
 
     fun remove(node: LayoutNode) {
-        check(node.isAttached())
+        check(node.isAttached)
         val contains = set.remove(node)
         if (extraAssertions) {
             val usedDepth = mapOfOriginalDepth.remove(node)

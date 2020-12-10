@@ -72,7 +72,7 @@ internal abstract class LayoutNodeWrapper(
     override val isAttached: Boolean
         get() {
             if (_isAttached) {
-                require(layoutNode.isAttached())
+                require(layoutNode.isAttached)
             }
             return _isAttached
         }

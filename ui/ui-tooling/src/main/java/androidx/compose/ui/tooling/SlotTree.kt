@@ -23,8 +23,8 @@ import androidx.compose.runtime.SlotReader
 import androidx.compose.runtime.SlotTable
 import androidx.compose.runtime.keySourceInfoOf
 import androidx.compose.ui.layout.globalPosition
-import androidx.compose.ui.node.LayoutNode
-import androidx.compose.ui.node.ModifierInfo
+import androidx.compose.ui.layout.LayoutInfo
+import androidx.compose.ui.layout.ModifierInfo
 import androidx.compose.ui.unit.IntBounds
 import java.lang.reflect.Field
 import kotlin.math.max
@@ -455,7 +455,7 @@ private fun SlotReader.getGroup(parentContext: SourceInformationContext?): Group
         children.add(getGroup(context))
     }
 
-    val modifierInfo = if (node is LayoutNode) {
+    val modifierInfo = if (node is LayoutInfo) {
         node.getModifierInfo()
     } else {
         emptyList()
@@ -463,7 +463,7 @@ private fun SlotReader.getGroup(parentContext: SourceInformationContext?): Group
 
     // Calculate bounding box
     val box = when (node) {
-        is LayoutNode -> boundsOfLayoutNode(node)
+        is LayoutInfo -> boundsOfLayoutNode(node)
         else ->
             if (children.isEmpty()) emptyBox else
                 children.map { g -> g.box }.reduce { acc, box -> box.union(acc) }
@@ -491,8 +491,8 @@ private fun SlotReader.getGroup(parentContext: SourceInformationContext?): Group
         )
 }
 
-private fun boundsOfLayoutNode(node: LayoutNode): IntBounds {
-    if (node.owner == null) {
+private fun boundsOfLayoutNode(node: LayoutInfo): IntBounds {
+    if (!node.isAttached) {
         return IntBounds(
             left = 0,
             top = 0,

@@ -79,13 +79,13 @@ class LayoutNodeTest {
         val owner = MockOwner()
         node.attach(owner)
         assertEquals(owner, node.owner)
-        assertTrue(node.isAttached())
+        assertTrue(node.isAttached)
 
         assertEquals(1, owner.onAttachParams.count { it === node })
 
         node.detach()
         assertNull(node.owner)
-        assertFalse(node.isAttached())
+        assertFalse(node.isAttached)
         assertEquals(1, owner.onDetachParams.count { it === node })
     }
 
@@ -1633,8 +1633,8 @@ class LayoutNodeTest {
         // Dispose
         root.removeAt(0, 1)
 
-        assertFalse(node1.isAttached())
-        assertFalse(node2.isAttached())
+        assertFalse(node1.isAttached)
+        assertFalse(node2.isAttached)
         assertEquals(0, owner.onRequestMeasureParams.count { it === node1 })
         assertEquals(0, owner.onRequestMeasureParams.count { it === node2 })
     }

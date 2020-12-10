@@ -63,7 +63,6 @@ import androidx.compose.ui.node.LayoutEmitHelper
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.node.isAttached
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.captureToImage
@@ -619,7 +618,7 @@ class AndroidViewCompatTest {
         assertNotNull(innerAndroidComposeView)
         assertTrue(innerAndroidComposeView!!.isAttachedToWindow)
         assertNotNull(node)
-        assertTrue(node!!.isAttached())
+        assertTrue(node!!.isAttached)
 
         rule.runOnIdle { composeContent = false }
 
@@ -627,7 +626,7 @@ class AndroidViewCompatTest {
         rule.runOnIdle {
             assertFalse(innerAndroidComposeView!!.isAttachedToWindow)
             // the node stays attached after the compose view is detached
-            assertTrue(node!!.isAttached())
+            assertTrue(node!!.isAttached)
         }
     }
 

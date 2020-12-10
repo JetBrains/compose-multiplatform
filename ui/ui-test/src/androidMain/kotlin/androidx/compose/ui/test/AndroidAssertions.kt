@@ -19,7 +19,7 @@ package androidx.compose.ui.test
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.node.LayoutNode
+import androidx.compose.ui.layout.LayoutInfo
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.semantics.SemanticsNode
 
@@ -28,16 +28,16 @@ internal actual fun SemanticsNodeInteraction.checkIsDisplayed(): Boolean {
     val errorMessageOnFail = "Failed to perform isDisplayed check."
     val node = fetchSemanticsNode(errorMessageOnFail)
 
-    fun isNotPlaced(node: LayoutNode): Boolean {
+    fun isNotPlaced(node: LayoutInfo): Boolean {
         return !node.isPlaced
     }
 
-    val layoutNode = node.layoutNode
-    if (isNotPlaced(layoutNode) || layoutNode.findClosestParentNode(::isNotPlaced) != null) {
+    val layoutInfo = node.layoutInfo
+    if (isNotPlaced(layoutInfo) || layoutInfo.findClosestParentNode(::isNotPlaced) != null) {
         return false
     }
 
-    (layoutNode.owner as? ViewRootForTest)?.let {
+    (node.owner as? ViewRootForTest)?.let {
         if (!ViewMatchers.isDisplayed().matches(it.view)) {
             return false
         }
@@ -53,7 +53,7 @@ internal actual fun SemanticsNodeInteraction.checkIsDisplayed(): Boolean {
 }
 
 internal actual fun SemanticsNode.clippedNodeBoundsInWindow(): Rect {
-    val composeView = (layoutNode.owner as ViewRootForTest).view
+    val composeView = (owner as ViewRootForTest).view
     val rootLocationInWindow = intArrayOf(0, 0).let {
         composeView.getLocationInWindow(it)
         Offset(it[0].toFloat(), it[1].toFloat())
@@ -62,7 +62,7 @@ internal actual fun SemanticsNode.clippedNodeBoundsInWindow(): Rect {
 }
 
 internal actual fun SemanticsNode.isInScreenBounds(): Boolean {
-    val composeView = (layoutNode.owner as ViewRootForTest).view
+    val composeView = (owner as ViewRootForTest).view
 
     // Window relative bounds of our node
     val nodeBoundsInWindow = clippedNodeBoundsInWindow()
@@ -83,17 +83,19 @@ internal actual fun SemanticsNode.isInScreenBounds(): Boolean {
 }
 
 /**
- * Executes [selector] on every parent of this [LayoutNode] and returns the closest
- * [LayoutNode] to return `true` from [selector] or null if [selector] returns false
+ * Executes [selector] on every parent of this [LayoutInfo] and returns the closest
+ * [LayoutInfo] to return `true` from [selector] or null if [selector] returns false
  * for all ancestors.
  */
-private fun LayoutNode.findClosestParentNode(selector: (LayoutNode) -> Boolean): LayoutNode? {
-    var currentParent = this.parent
+private fun LayoutInfo.findClosestParentNode(
+    selector: (LayoutInfo) -> Boolean
+): LayoutInfo? {
+    var currentParent = this.parentInfo
     while (currentParent != null) {
         if (selector(currentParent)) {
             return currentParent
         } else {
-            currentParent = currentParent.parent
+            currentParent = currentParent.parentInfo
         }
     }
 
