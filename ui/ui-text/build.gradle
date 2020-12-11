@@ -148,6 +148,15 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                     exclude group: 'org.mockito' // to keep control on the mockito version
                 }
             }
+
+            desktopTest.dependencies {
+                implementation(TRUTH)
+                implementation(JUNIT)
+                implementation(SKIKO_CURRENT_OS)
+                implementation project(":compose:foundation:foundation")
+                implementation project(":compose:ui:ui-test-junit4")
+                implementation project(":compose:ui:ui-test-font")
+            }
         }
     }
 }
