@@ -16,8 +16,6 @@
 
 package androidx.compose.ui.util
 
-expect fun Any?.identityHashCode(): Int
-
 expect fun String.format(vararg args: Any?): String
 
 expect fun StringBuilder.deleteAt(index: Int): StringBuilder

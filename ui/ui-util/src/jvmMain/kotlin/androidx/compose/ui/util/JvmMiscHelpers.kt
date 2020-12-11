@@ -16,8 +16,6 @@
 
 package androidx.compose.ui.util
 
-actual fun Any?.identityHashCode(): Int = if (this == null) 0 else System.identityHashCode(this)
-
 actual fun String.format(vararg args: Any?): String = java.lang.String.format(this, *args)
 
 actual fun StringBuilder.deleteAt(index: Int): StringBuilder {

@@ -17,7 +17,6 @@
 package androidx.compose.ui.node
 
 import androidx.compose.ui.util.TreeSet
-import androidx.compose.ui.util.identityHashCode
 
 /**
  * The set of [LayoutNode]s which orders items by their [LayoutNode.depth] and
@@ -44,7 +43,7 @@ internal class DepthSortedSet(
             if (depthDiff != 0) {
                 return depthDiff
             }
-            return l1.identityHashCode().compareTo(l2.identityHashCode())
+            return l1.hashCode().compareTo(l2.hashCode())
         }
     }
     private val set = TreeSet<LayoutNode>(DepthComparator)
