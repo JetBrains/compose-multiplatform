@@ -214,12 +214,12 @@ fun AnimationState<Float, AnimationVector1D>.copy(
         value, this.typeConverter, AnimationVector(velocity), lastFrameTime, endTime, isRunning
     )
 
-/*
- * Factory method for creating an [AnimationState] for Float [value].
+/**
+ * Factory method for creating an [AnimationState] for Float [initialValue].
  *
  * @param initialValue initial value of the [AnimationState]
  * @param initialVelocity initial velocity of the [AnimationState], 0 (i.e. no velocity) by default
- * @param lastFrameTime last frame time of the animation, [Uptime.UnSpecified] by default
+ * @param lastFrameTime last frame time of the animation, [Uptime.Unspecified] by default
  * @param endTime the time that the animation ended, [Uptime.Unspecified] by default.
  * @param isRunning whether the [AnimationState] is currently being updated by an animation.
  *                  False by default
