@@ -3067,6 +3067,32 @@ class SlotTableTests {
             // Expect the above not to crash.
         }
     }
+
+    @Test
+    fun canRemoveFromFullTable() {
+        // Create a table that is exactly 64 entries
+        val slots = SlotTable().also {
+            it.write { writer ->
+                writer.insert {
+                    repeat(7) { outer ->
+                        writer.group(10 + outer) {
+                            repeat(8) { inner ->
+                                writer.group(inner) { }
+                            }
+                        }
+                    }
+                    writer.group(30) { }
+                }
+            }
+        }
+        slots.verifyWellFormed()
+
+        // Remove the first group
+        slots.write { writer ->
+            writer.removeGroup()
+        }
+        slots.verifyWellFormed()
+    }
 }
 
 @OptIn(InternalComposeApi::class)
