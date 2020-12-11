@@ -42,6 +42,7 @@ const val CONSTRAINT_LAYOUT_CORE = "androidx.constraintlayout:constraintlayout-c
 const val DAGGER = "com.google.dagger:dagger:2.29.1"
 const val DAGGER_COMPILER = "com.google.dagger:dagger-compiler:2.29.1"
 const val DEXMAKER_MOCKITO = "com.linkedin.dexmaker:dexmaker-mockito:2.25.0"
+const val DEXMAKER_MOCKITO_INLINE = "com.linkedin.dexmaker:dexmaker-mockito-inline:2.25.0"
 const val ESPRESSO_CONTRIB = "androidx.test.espresso:espresso-contrib:3.3.0"
 const val ESPRESSO_CORE = "androidx.test.espresso:espresso-core:3.3.0"
 const val ESPRESSO_INTENTS = "androidx.test.espresso:espresso-intents:3.3.0"
