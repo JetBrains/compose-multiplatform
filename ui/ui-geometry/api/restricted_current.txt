@@ -31,6 +31,9 @@ package androidx.compose.ui.geometry {
     method @androidx.compose.runtime.Stable public static long lerp-LCIZJP8(long start, long stop, float fraction);
   }
 
+  public final class GeometryUtilsKt {
+  }
+
   public final class MutableRect {
     ctor public MutableRect(float left, float top, float right, float bottom);
     method public boolean contains-k-4lQ0M(long offset);
