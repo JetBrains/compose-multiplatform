@@ -18,6 +18,7 @@ package androidx.compose.material.textfield
 
 import android.os.Build
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.GOLDEN_MATERIAL
 import androidx.compose.material.OutlinedTextField
@@ -39,6 +40,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.up
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
@@ -181,6 +183,172 @@ class OutlinedTextFieldScreenshotTest {
         }
 
         assertAgainstGolden("outlined_textField_textColor_defaultContentColor")
+    }
+
+    @Test
+    fun outlinedTextField_multiLine_withLabel_textAlignedToTop() {
+        rule.setMaterialContent {
+            OutlinedTextField(
+                value = "Text",
+                onValueChange = {},
+                label = { Text("Label") },
+                modifier = Modifier.height(300.dp).testTag(TextFieldTag)
+            )
+        }
+
+        assertAgainstGolden("outlined_textField_multiLine_withLabel_textAlignedToTop")
+    }
+
+    @Test
+    fun outlinedTextField_multiLine_withoutLabel_textAlignedToTop() {
+        rule.setMaterialContent {
+            OutlinedTextField(
+                value = "Text",
+                onValueChange = {},
+                modifier = Modifier.height(300.dp).testTag(TextFieldTag)
+            )
+        }
+
+        assertAgainstGolden("outlined_textField_multiLine_withoutLabel_textAlignedToTop")
+    }
+
+    @Test
+    fun outlinedTextField_multiLine_withLabel_placeholderAlignedToTop() {
+        rule.setMaterialContent {
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                label = { Text("Label") },
+                placeholder = { Text("placeholder") },
+                modifier = Modifier.height(300.dp).testTag(TextFieldTag)
+            )
+        }
+
+        rule.onNodeWithTag(TextFieldTag)
+            // split click into (down) and (move, up) to enforce a composition in between
+            .performGesture { down(center) }
+            .performGesture { move(); up() }
+
+        assertAgainstGolden("outlined_textField_multiLine_withLabel_placeholderAlignedToTop")
+    }
+
+    @Test
+    fun outlinedTextField_multiLine_withoutLabel_placeholderAlignedToTop() {
+        rule.setMaterialContent {
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                placeholder = { Text("placeholder") },
+                modifier = Modifier.height(300.dp).testTag(TextFieldTag)
+            )
+        }
+
+        rule.onNodeWithTag(TextFieldTag)
+            // split click into (down) and (move, up) to enforce a composition in between
+            .performGesture { down(center) }
+            .performGesture { move(); up() }
+
+        assertAgainstGolden("outlined_textField_multiLine_withoutLabel_placeholderAlignedToTop")
+    }
+
+    @Test
+    fun outlinedTextField_multiLine_labelAlignedToTop() {
+        rule.setMaterialContent {
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                label = { Text("Label") },
+                modifier = Modifier.height(300.dp).testTag(TextFieldTag)
+            )
+        }
+
+        assertAgainstGolden("outlined_textField_multiLine_labelAlignedToTop")
+    }
+
+    @Test
+    fun outlinedTextField_singleLine_withLabel_textAlignedToTop() {
+        rule.setMaterialContent {
+            OutlinedTextField(
+                value = "Text",
+                onValueChange = {},
+                singleLine = true,
+                label = { Text("Label") },
+                modifier = Modifier.testTag(TextFieldTag)
+            )
+        }
+
+        assertAgainstGolden("outlined_textField_singleLine_withLabel_textAlignedToTop")
+    }
+
+    @Test
+    fun outlinedTextField_singleLine_withoutLabel_textCenteredVertically() {
+        rule.setMaterialContent {
+            OutlinedTextField(
+                value = "Text",
+                onValueChange = {},
+                singleLine = true,
+                modifier = Modifier.testTag(TextFieldTag)
+            )
+        }
+
+        assertAgainstGolden("outlined_textField_singleLine_withoutLabel_textCenteredVertically")
+    }
+
+    @Test
+    fun outlinedTextField_singleLine_withLabel_placeholderAlignedToTop() {
+        rule.setMaterialContent {
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                placeholder = { Text("placeholder") },
+                label = { Text("Label") },
+                singleLine = true,
+                modifier = Modifier.testTag(TextFieldTag)
+            )
+        }
+
+        rule.onNodeWithTag(TextFieldTag)
+            // split click into (down) and (move, up) to enforce a composition in between
+            .performGesture { down(center) }
+            .performGesture { move(); up() }
+
+        assertAgainstGolden("outlined_textField_singleLine_withLabel_placeholderAlignedToTop")
+    }
+
+    @Test
+    fun outlinedTextField_singleLine_withoutLabel_placeholderCenteredVertically() {
+        rule.setMaterialContent {
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                placeholder = { Text("placeholder") },
+                singleLine = true,
+                modifier = Modifier.testTag(TextFieldTag)
+            )
+        }
+
+        rule.onNodeWithTag(TextFieldTag)
+            // split click into (down) and (move, up) to enforce a composition in between
+            .performGesture { down(center) }
+            .performGesture { move(); up() }
+
+        assertAgainstGolden(
+            "outlined_textField_singleLine_withoutLabel_placeholderCenteredVertically"
+        )
+    }
+
+    @Test
+    fun outlinedTextField_singleLine_labelCenteredVetically() {
+        rule.setMaterialContent {
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                label = { Text("Label") },
+                modifier = Modifier.testTag(TextFieldTag)
+            )
+        }
+
+        assertAgainstGolden("outlined_textField_singleLine_labelCenteredVetically")
     }
 
     private fun assertAgainstGolden(goldenIdentifier: String) {

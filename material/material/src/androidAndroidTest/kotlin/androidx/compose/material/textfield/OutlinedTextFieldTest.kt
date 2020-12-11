@@ -29,6 +29,7 @@ import androidx.compose.material.AmbientTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
+import androidx.compose.material.TextFieldPadding
 import androidx.compose.material.runOnIdleWithDensity
 import androidx.compose.material.setMaterialContent
 import androidx.compose.runtime.Providers
@@ -162,6 +163,45 @@ class OutlinedTextFieldTest {
     }
 
     @Test
+    fun testOutlinedTextField_labelPosition_initial_singlineLine() {
+        val labelSize = Ref<IntSize>()
+        val labelPosition = Ref<Offset>()
+        rule.setMaterialContent {
+            Box {
+                OutlinedTextField(
+                    value = "",
+                    onValueChange = {},
+                    singleLine = true,
+                    label = {
+                        Text(
+                            text = "label",
+                            modifier = Modifier.onGloballyPositioned {
+                                labelPosition.value = it.positionInRoot
+                                labelSize.value = it.size
+                            }
+                        )
+                    }
+                )
+            }
+        }
+
+        rule.runOnIdleWithDensity {
+            // size
+            assertThat(labelSize.value).isNotNull()
+            assertThat(labelSize.value?.height).isGreaterThan(0)
+            assertThat(labelSize.value?.width).isGreaterThan(0)
+            assertThat(labelPosition.value?.x).isEqualTo(
+                ExpectedPadding.toIntPx().toFloat()
+            )
+            // label is centered in 56.dp default container, plus additional 8.dp padding on top
+            val minimumHeight = ExpectedMinimumTextFieldHeight.toIntPx()
+            assertThat(labelPosition.value?.y).isEqualTo(
+                ((minimumHeight - labelSize.value!!.height) / 2f).roundToInt() + 8.dp.toIntPx()
+            )
+        }
+    }
+
+    @Test
     fun testOutlinedTextField_labelPosition_initial_withDefaultHeight() {
         val labelSize = Ref<IntSize>()
         val labelPosition = Ref<Offset>()
@@ -191,10 +231,9 @@ class OutlinedTextFieldTest {
             assertThat(labelPosition.value?.x).isEqualTo(
                 ExpectedPadding.toIntPx().toFloat()
             )
-            // label is centered in 56.dp default container, plus additional 8.dp padding on top
-            val minimumHeight = ExpectedMinimumTextFieldHeight.toIntPx()
+            // label is aligned to the top with padding, plus additional 8.dp padding on top
             assertThat(labelPosition.value?.y).isEqualTo(
-                ((minimumHeight - labelSize.value!!.height) / 2f).roundToInt() + 8.dp.toIntPx()
+                TextFieldPadding.toIntPx() + 8.dp.toIntPx()
             )
         }
     }
@@ -308,11 +347,7 @@ class OutlinedTextFieldTest {
             // placeholder is centered in 56.dp default container,
             // plus additional 8.dp padding on top
             assertThat(placeholderPosition.value?.y).isEqualTo(
-                (
-                    (ExpectedMinimumTextFieldHeight.toIntPx() - placeholderSize.value!!.height) /
-                        2f
-                    ).roundToInt() +
-                    8.dp.toIntPx()
+                TextFieldPadding.toIntPx() + 8.dp.toIntPx()
             )
         }
     }
@@ -352,14 +387,9 @@ class OutlinedTextFieldTest {
             assertThat(placeholderPosition.value?.x).isEqualTo(
                 ExpectedPadding.toIntPx().toFloat()
             )
-            // placeholder is centered in 56.dp default container,
-            // plus additional 8.dp padding on top
+            // placeholder is placed with fixed padding plus additional 8.dp padding on top
             assertThat(placeholderPosition.value?.y).isEqualTo(
-                (
-                    (ExpectedMinimumTextFieldHeight.toIntPx() - placeholderSize.value!!.height) /
-                        2f
-                    ).roundToInt() +
-                    8.dp.toIntPx()
+                TextFieldPadding.toIntPx() + 8.dp.toIntPx()
             )
         }
     }

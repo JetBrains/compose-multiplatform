@@ -25,9 +25,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.Checkbox
@@ -51,6 +54,8 @@ import androidx.compose.material.samples.TextFieldWithIcons
 import androidx.compose.material.samples.TextFieldWithPlaceholder
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -80,6 +85,49 @@ fun TextFieldsDemo() {
         TextFieldWithHideKeyboardOnImeAction()
         Text("TextFieldValue overload")
         TextFieldSample()
+    }
+}
+
+@Composable
+fun VerticalAlignmentsInTextField() {
+    Column {
+        val singleLine = remember { mutableStateOf(false) }
+        val label = remember { mutableStateOf(false) }
+        val text = remember { mutableStateOf("") }
+
+        Spacer(Modifier.height(10.dp))
+        OptionRow(
+            title = "Single line",
+            checked = singleLine.value,
+            onCheckedChange = { singleLine.value = it }
+        )
+        OptionRow(
+            title = "Label",
+            checked = label.value,
+            onCheckedChange = { label.value = it }
+        )
+
+        Spacer(Modifier.height(10.dp))
+        val textFieldModifier = Modifier
+            .align(Alignment.CenterHorizontally)
+            .width(300.dp)
+            .heightIn(max = 200.dp)
+            .then(if (singleLine.value) Modifier else Modifier.heightIn(min = 100.dp))
+        TextField(
+            value = text.value,
+            onValueChange = { text.value = it },
+            label = { if (label.value) Text("Label") },
+            singleLine = singleLine.value,
+            modifier = textFieldModifier
+        )
+        Spacer(Modifier.height(10.dp))
+        OutlinedTextField(
+            value = text.value,
+            onValueChange = { text.value = it },
+            label = { if (label.value) Text("Label") },
+            singleLine = singleLine.value,
+            modifier = textFieldModifier
+        )
     }
 }
 
