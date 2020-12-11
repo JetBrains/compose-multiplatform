@@ -394,7 +394,7 @@ class ConstraintLayoutTest : LayoutTest() {
                         }
                         .preferredSize(boxSize.toDp(), boxSize.toDp())
                         .onGloballyPositioned {
-                            position[0].value = it.positionInRoot
+                            position[0].value = it.positionInRoot()
                         }
                 )
                 val half = createGuidelineFromAbsoluteLeft(fraction = 0.5f)
@@ -406,7 +406,7 @@ class ConstraintLayoutTest : LayoutTest() {
                         }
                         .preferredSize(boxSize.toDp(), boxSize.toDp())
                         .onGloballyPositioned {
-                            position[1].value = it.positionInRoot
+                            position[1].value = it.positionInRoot()
                         }
                 )
                 Box(
@@ -417,7 +417,7 @@ class ConstraintLayoutTest : LayoutTest() {
                         }
                         .preferredSize(boxSize.toDp(), boxSize.toDp())
                         .onGloballyPositioned {
-                            position[2].value = it.positionInRoot
+                            position[2].value = it.positionInRoot()
                         }
                 )
             }
@@ -486,7 +486,7 @@ class ConstraintLayoutTest : LayoutTest() {
                     Box(
                         Modifier.layoutId("box$i").preferredSize(boxSize.toDp(), boxSize.toDp())
                             .onGloballyPositioned {
-                                position[i].value = it.positionInRoot
+                                position[i].value = it.positionInRoot()
                             }
                     )
                 }
@@ -539,7 +539,7 @@ class ConstraintLayoutTest : LayoutTest() {
                             }
                             .preferredSize(boxSize.toDp(), boxSize.toDp())
                             .onGloballyPositioned {
-                                position[0].value = it.positionInRoot
+                                position[0].value = it.positionInRoot()
                             }
                     )
                     val half = createGuidelineFromAbsoluteLeft(fraction = 0.5f)
@@ -551,7 +551,7 @@ class ConstraintLayoutTest : LayoutTest() {
                             }
                             .preferredSize(boxSize.toDp(), boxSize.toDp())
                             .onGloballyPositioned {
-                                position[1].value = it.positionInRoot
+                                position[1].value = it.positionInRoot()
                             }
                     )
                     Box(
@@ -562,7 +562,7 @@ class ConstraintLayoutTest : LayoutTest() {
                             }
                             .preferredSize(boxSize.toDp(), boxSize.toDp())
                             .onGloballyPositioned {
-                                position[2].value = it.positionInRoot
+                                position[2].value = it.positionInRoot()
                             }
                     )
                 }

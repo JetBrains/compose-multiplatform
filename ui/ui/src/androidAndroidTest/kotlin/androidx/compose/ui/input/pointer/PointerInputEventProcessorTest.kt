@@ -2972,6 +2972,8 @@ private class MockOwner(
     private val targetRoot: LayoutNode
 ) : Owner {
     override fun calculatePosition(): IntOffset = position
+    override fun calculatePositionInWindow(): IntOffset = position
+
     override fun requestFocus(): Boolean = false
     override fun sendKeyEvent(keyEvent: KeyEvent): Boolean = false
     override val root: LayoutNode

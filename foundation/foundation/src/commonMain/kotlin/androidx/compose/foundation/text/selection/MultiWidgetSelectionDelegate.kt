@@ -44,7 +44,7 @@ internal class MultiWidgetSelectionDelegate(
         val layoutCoordinates = getLayoutCoordinates() ?: return null
         val textLayoutResult = layoutResultCallback() ?: return null
 
-        val relativePosition = containerLayoutCoordinates.childToLocal(
+        val relativePosition = containerLayoutCoordinates.localPositionOf(
             layoutCoordinates, Offset.Zero
         )
         val startPx = startPosition - relativePosition

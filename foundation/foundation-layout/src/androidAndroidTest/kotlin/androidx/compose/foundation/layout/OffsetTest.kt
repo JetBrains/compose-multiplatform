@@ -81,8 +81,8 @@ class OffsetTest : LayoutTest() {
                     .wrapContentSize(Alignment.TopStart)
                     .offset(offsetX, offsetY)
                     .onGloballyPositioned { coordinates: LayoutCoordinates ->
-                        positionX = coordinates.positionInRoot.x.roundToInt()
-                        positionY = coordinates.positionInRoot.y.roundToInt()
+                        positionX = coordinates.positionInRoot().x.roundToInt()
+                        positionY = coordinates.positionInRoot().y.roundToInt()
                     }
             ) {
             }
@@ -112,8 +112,8 @@ class OffsetTest : LayoutTest() {
                         .wrapContentSize(Alignment.TopStart)
                         .offset(offsetX, offsetY)
                         .onGloballyPositioned { coordinates: LayoutCoordinates ->
-                            positionX = coordinates.positionInRoot.x.roundToInt()
-                            positionY = coordinates.positionInRoot.y.roundToInt()
+                            positionX = coordinates.positionInRoot().x.roundToInt()
+                            positionY = coordinates.positionInRoot().y.roundToInt()
                         }
                 ) {
                     // TODO(soboleva): this box should not be needed after b/154758475 is fixed.
@@ -141,8 +141,8 @@ class OffsetTest : LayoutTest() {
                     .wrapContentSize(Alignment.TopStart)
                     .absoluteOffset(offsetX, offsetY)
                     .onGloballyPositioned { coordinates: LayoutCoordinates ->
-                        positionX = coordinates.positionInRoot.x.roundToInt()
-                        positionY = coordinates.positionInRoot.y.roundToInt()
+                        positionX = coordinates.positionInRoot().x.roundToInt()
+                        positionY = coordinates.positionInRoot().y.roundToInt()
                     }
             ) {
             }
@@ -172,8 +172,8 @@ class OffsetTest : LayoutTest() {
                         .wrapContentSize(Alignment.TopStart)
                         .absoluteOffset(offsetX, offsetY)
                         .onGloballyPositioned { coordinates: LayoutCoordinates ->
-                            positionX = coordinates.positionInRoot.x.roundToInt()
-                            positionY = coordinates.positionInRoot.y.roundToInt()
+                            positionX = coordinates.positionInRoot().x.roundToInt()
+                            positionY = coordinates.positionInRoot().y.roundToInt()
                         }
                 ) {
                     // TODO(soboleva): this box should not be needed after b/154758475 is fixed.
@@ -201,8 +201,8 @@ class OffsetTest : LayoutTest() {
                     .wrapContentSize(Alignment.TopStart)
                     .offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
                     .onGloballyPositioned { coordinates: LayoutCoordinates ->
-                        positionX = coordinates.positionInRoot.x
-                        positionY = coordinates.positionInRoot.y
+                        positionX = coordinates.positionInRoot().x
+                        positionY = coordinates.positionInRoot().y
                     }
             ) {
             }
@@ -232,8 +232,8 @@ class OffsetTest : LayoutTest() {
                         .wrapContentSize(Alignment.TopStart)
                         .offset { IntOffset(offsetX, offsetY) }
                         .onGloballyPositioned { coordinates: LayoutCoordinates ->
-                            positionX = coordinates.positionInRoot.x.roundToInt()
-                            positionY = coordinates.positionInRoot.y.roundToInt()
+                            positionX = coordinates.positionInRoot().x.roundToInt()
+                            positionY = coordinates.positionInRoot().y.roundToInt()
                         }
                 ) {
                     // TODO(soboleva): this box should not be needed after b/154758475 is fixed.
@@ -264,8 +264,8 @@ class OffsetTest : LayoutTest() {
                     .wrapContentSize(Alignment.TopStart)
                     .absoluteOffset { IntOffset(offsetX, offsetY) }
                     .onGloballyPositioned { coordinates: LayoutCoordinates ->
-                        positionX = coordinates.positionInRoot.x.roundToInt()
-                        positionY = coordinates.positionInRoot.y.roundToInt()
+                        positionX = coordinates.positionInRoot().x.roundToInt()
+                        positionY = coordinates.positionInRoot().y.roundToInt()
                     }
             ) {
             }
@@ -295,8 +295,8 @@ class OffsetTest : LayoutTest() {
                         .wrapContentSize(Alignment.TopStart)
                         .absoluteOffset { IntOffset(offsetX, offsetY) }
                         .onGloballyPositioned { coordinates: LayoutCoordinates ->
-                            positionX = coordinates.positionInRoot.x.roundToInt()
-                            positionY = coordinates.positionInRoot.y.roundToInt()
+                            positionX = coordinates.positionInRoot().x.roundToInt()
+                            positionY = coordinates.positionInRoot().y.roundToInt()
                         }
                 ) {
                     // TODO(soboleva): this box should not be needed after b/154758475 is fixed.

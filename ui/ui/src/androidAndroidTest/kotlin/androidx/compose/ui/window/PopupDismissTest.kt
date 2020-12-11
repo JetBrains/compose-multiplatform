@@ -78,6 +78,7 @@ class PopupDismissTest(private val isFocusable: Boolean) {
                     onClick = { btnClicksCounter++ },
                     modifier = Modifier.onGloballyPositioned {
                         // UiDevice needs screen relative coordinates
+                        @Suppress("DEPRECATION")
                         btnPos = it.localToGlobal(Offset.Zero)
                     }
                 )

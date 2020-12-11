@@ -679,6 +679,11 @@ internal class AndroidComposeView(context: Context) :
 
     override fun calculatePosition(): IntOffset = globalPosition
 
+    override fun calculatePositionInWindow(): IntOffset {
+        getLocationOnScreen(tmpPositionArray)
+        return IntOffset(tmpPositionArray[0], tmpPositionArray[1])
+    }
+
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         density = Density(context)

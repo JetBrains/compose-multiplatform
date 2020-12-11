@@ -195,6 +195,8 @@ class DesktopOwner(
 
     override fun calculatePosition() = IntOffset.Zero
 
+    override fun calculatePositionInWindow() = IntOffset.Zero
+
     fun setSize(width: Int, height: Int) {
         val constraints = Constraints(0, width, 0, height)
         this.size = IntSize(width, height)

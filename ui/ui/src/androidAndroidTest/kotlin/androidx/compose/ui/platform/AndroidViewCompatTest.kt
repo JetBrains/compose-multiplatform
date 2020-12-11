@@ -57,8 +57,8 @@ import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
-import androidx.compose.ui.layout.globalPosition
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.node.LayoutEmitHelper
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.Owner
@@ -437,14 +437,14 @@ class AndroidViewCompatTest {
         var inner: Offset = Offset.Zero
 
         rule.setContent {
-            Box(Modifier.onGloballyPositioned { outer = it.globalPosition }) {
+            Box(Modifier.onGloballyPositioned { outer = it.positionInWindow() }) {
                 val paddingDp = with(AmbientDensity.current) { padding.toDp() }
                 Box(Modifier.padding(paddingDp)) {
                     AndroidView(::ComposeView) {
                         it.setContent {
                             Box(
                                 Modifier.padding(paddingDp)
-                                    .onGloballyPositioned { inner = it.globalPosition }
+                                    .onGloballyPositioned { inner = it.positionInWindow() }
                             )
                         }
                     }
@@ -492,12 +492,12 @@ class AndroidViewCompatTest {
                 }
             }
         }
-        rule.runOnIdle { startX = coordinates.globalPosition.x.roundToInt() }
+        rule.runOnIdle { startX = coordinates.positionInWindow().x.roundToInt() }
 
         rule.runOnIdle { topView.visibility = View.GONE }
 
         rule.runOnIdle {
-            assertEquals(100, startX - coordinates.globalPosition.x.roundToInt())
+            assertEquals(100, startX - coordinates.positionInWindow().x.roundToInt())
         }
     }
 
@@ -513,17 +513,17 @@ class AndroidViewCompatTest {
         var inner1: Offset = Offset.Zero
         var inner2: Offset = Offset.Zero
         rule.setContent {
-            Box(Modifier.onGloballyPositioned { outer = it.globalPosition }) {
+            Box(Modifier.onGloballyPositioned { outer = it.positionInWindow() }) {
                 Box(Modifier.padding(start = paddingDp, top = paddingDp)) {
                     emitView(::LinearLayout, {}) {
                         Box(
                             Modifier.size(sizeDp).background(Color.Blue).onGloballyPositioned {
-                                inner1 = it.globalPosition
+                                inner1 = it.positionInWindow()
                             }
                         )
                         Box(
                             Modifier.size(sizeDp).background(Color.Gray).onGloballyPositioned {
-                                inner2 = it.globalPosition
+                                inner2 = it.positionInWindow()
                             }
                         )
                     }

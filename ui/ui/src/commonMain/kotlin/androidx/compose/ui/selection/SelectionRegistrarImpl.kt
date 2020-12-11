@@ -88,13 +88,13 @@ internal class SelectionRegistrarImpl : SelectionRegistrar {
                     val layoutCoordinatesB = b.getLayoutCoordinates()
 
                     val positionA =
-                        if (layoutCoordinatesA != null) containerLayoutCoordinates.childToLocal(
+                        if (layoutCoordinatesA != null) containerLayoutCoordinates.localPositionOf(
                             layoutCoordinatesA,
                             Offset.Zero
                         )
                         else Offset.Zero
                     val positionB =
-                        if (layoutCoordinatesB != null) containerLayoutCoordinates.childToLocal(
+                        if (layoutCoordinatesB != null) containerLayoutCoordinates.localPositionOf(
                             layoutCoordinatesB,
                             Offset.Zero
                         )

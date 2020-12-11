@@ -267,7 +267,7 @@ class PaddingTest : LayoutTest() {
                             .preferredSize(sizeDp, sizeDp)
                             .onGloballyPositioned { coordinates: LayoutCoordinates ->
                                 childSize[0] = coordinates.size
-                                childPosition[0] = coordinates.positionInRoot
+                                childPosition[0] = coordinates.positionInRoot()
                                 drawLatch.countDown()
                             }
                     ) {
@@ -278,7 +278,7 @@ class PaddingTest : LayoutTest() {
                             .preferredSize(sizeDp, sizeDp)
                             .onGloballyPositioned { coordinates: LayoutCoordinates ->
                                 childSize[1] = coordinates.size
-                                childPosition[1] = coordinates.positionInRoot
+                                childPosition[1] = coordinates.positionInRoot()
                                 drawLatch.countDown()
                             }
                     ) {
@@ -289,7 +289,7 @@ class PaddingTest : LayoutTest() {
                             .preferredSize(sizeDp, sizeDp)
                             .onGloballyPositioned { coordinates: LayoutCoordinates ->
                                 childSize[2] = coordinates.size
-                                childPosition[2] = coordinates.positionInRoot
+                                childPosition[2] = coordinates.positionInRoot()
                                 drawLatch.countDown()
                             }
                     ) {
@@ -342,7 +342,7 @@ class PaddingTest : LayoutTest() {
                         Modifier.absolutePadding(left = padding1Dp, right = padding2Dp)
                             .preferredSize(sizeDp, sizeDp)
                             .onGloballyPositioned { coordinates: LayoutCoordinates ->
-                                childPosition[0] = coordinates.positionInRoot
+                                childPosition[0] = coordinates.positionInRoot()
                                 drawLatch.countDown()
                             }
                     ) {
@@ -351,7 +351,7 @@ class PaddingTest : LayoutTest() {
                         Modifier.absolutePadding(right = padding3Dp)
                             .preferredSize(sizeDp, sizeDp)
                             .onGloballyPositioned { coordinates: LayoutCoordinates ->
-                                childPosition[1] = coordinates.positionInRoot
+                                childPosition[1] = coordinates.positionInRoot()
                                 drawLatch.countDown()
                             }
                     ) {
@@ -439,7 +439,7 @@ class PaddingTest : LayoutTest() {
                         Container(
                             Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                                 childSize = coordinates.size
-                                childPosition = coordinates.positionInRoot
+                                childPosition = coordinates.positionInRoot()
                                 drawLatch.countDown()
                             }
                         ) {
@@ -487,7 +487,7 @@ class PaddingTest : LayoutTest() {
                         Container(
                             Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                                 childSize = coordinates.size
-                                childPosition = coordinates.positionInRoot
+                                childPosition = coordinates.positionInRoot()
                                 drawLatch.countDown()
                             }
                         ) {
@@ -542,7 +542,7 @@ class PaddingTest : LayoutTest() {
                         Container(
                             Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                                 childSize = coordinates.size
-                                childPosition = coordinates.positionInRoot
+                                childPosition = coordinates.positionInRoot()
                                 drawLatch.countDown()
                             }
                         ) {

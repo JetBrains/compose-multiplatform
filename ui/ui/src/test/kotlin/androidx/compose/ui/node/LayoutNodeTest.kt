@@ -372,7 +372,7 @@ class LayoutNodeTest {
         val expectedY = globalPosition.y - y0.toFloat() - y1.toFloat()
         val expectedPosition = Offset(expectedX, expectedY)
 
-        val result = node1.coordinates.globalToLocal(globalPosition)
+        val result = node1.coordinates.windowToLocal(globalPosition)
 
         assertEquals(expectedPosition, result)
     }
@@ -397,7 +397,7 @@ class LayoutNodeTest {
         val expectedY = globalPosition.y - y0.toFloat() - y1.toFloat()
         val expectedPosition = Offset(expectedX, expectedY)
 
-        val result = node1.coordinates.globalToLocal(globalPosition)
+        val result = node1.coordinates.windowToLocal(globalPosition)
 
         assertEquals(expectedPosition, result)
     }
@@ -422,7 +422,7 @@ class LayoutNodeTest {
         val expectedY = localPosition.y + y0.toFloat() + y1.toFloat()
         val expectedPosition = Offset(expectedX, expectedY)
 
-        val result = node1.coordinates.localToGlobal(localPosition)
+        val result = node1.coordinates.localToWindow(localPosition)
 
         assertEquals(expectedPosition, result)
     }
@@ -447,7 +447,7 @@ class LayoutNodeTest {
         val expectedY = localPosition.y + y0.toFloat() + y1.toFloat()
         val expectedPosition = Offset(expectedX, expectedY)
 
-        val result = node1.coordinates.localToGlobal(localPosition)
+        val result = node1.coordinates.localToWindow(localPosition)
 
         assertEquals(expectedPosition, result)
     }
@@ -458,7 +458,7 @@ class LayoutNodeTest {
         node.attach(MockOwner(IntOffset(20, 20)))
         node.place(100, 10)
 
-        val result = node.coordinates.localToGlobal(Offset.Zero)
+        val result = node.coordinates.localToWindow(Offset.Zero)
 
         assertEquals(Offset(120f, 30f), result)
     }
@@ -469,7 +469,7 @@ class LayoutNodeTest {
         node.attach(MockOwner(IntOffset(20, 20)))
         node.place(100, 10)
 
-        val result = node.coordinates.localToGlobal(Offset.Zero)
+        val result = node.coordinates.localToWindow(Offset.Zero)
 
         assertEquals(Offset(120f, 30f), result)
     }
@@ -492,23 +492,24 @@ class LayoutNodeTest {
         val expectedY = localPosition.y + y1.toFloat()
         val expectedPosition = Offset(expectedX, expectedY)
 
-        val result = node0.coordinates.childToLocal(node1.coordinates, localPosition)
+        val result = node0.coordinates.localPositionOf(node1.coordinates, localPosition)
 
         assertEquals(expectedPosition, result)
     }
 
     @Test
-    fun testChildToLocalFailedWhenNotAncestor() {
+    fun testLocalPositionOfWithSiblings() {
         val node0 = LayoutNode()
         node0.attach(MockOwner())
         val node1 = LayoutNode()
         val node2 = LayoutNode()
         node0.insertAt(0, node1)
-        node1.insertAt(0, node2)
+        node0.insertAt(1, node2)
+        node1.place(10, 20)
+        node2.place(100, 200)
 
-        thrown.expect(IllegalStateException::class.java)
-
-        node2.coordinates.childToLocal(node1.coordinates, Offset(5f, 15f))
+        val offset = node2.coordinates.localPositionOf(node1.coordinates, Offset(5f, 15f))
+        assertEquals(Offset(-85f, -165f), offset)
     }
 
     @Test
@@ -519,9 +520,9 @@ class LayoutNodeTest {
         val node1 = LayoutNode()
         node1.attach(owner)
 
-        thrown.expect(IllegalStateException::class.java)
+        thrown.expect(IllegalArgumentException::class.java)
 
-        node1.coordinates.childToLocal(node0.coordinates, Offset(5f, 15f))
+        node1.coordinates.localPositionOf(node0.coordinates, Offset(5f, 15f))
     }
 
     @Test
@@ -530,7 +531,7 @@ class LayoutNodeTest {
         node.attach(MockOwner())
         val position = Offset(5f, 15f)
 
-        val result = node.coordinates.childToLocal(node.coordinates, position)
+        val result = node.coordinates.localPositionOf(node.coordinates, position)
 
         assertEquals(position, result)
     }
@@ -544,7 +545,7 @@ class LayoutNodeTest {
         parent.place(-100, 10)
         child.place(50, 80)
 
-        val actual = child.coordinates.positionInRoot
+        val actual = child.coordinates.positionInRoot()
 
         assertEquals(Offset(-50f, 90f), actual)
     }
@@ -557,7 +558,7 @@ class LayoutNodeTest {
         parent.insertAt(0, child)
         child.place(50, 80)
 
-        val actual = child.coordinates.positionInRoot
+        val actual = child.coordinates.positionInRoot()
 
         assertEquals(Offset(50f, 80f), actual)
     }
@@ -571,7 +572,7 @@ class LayoutNodeTest {
         parent.place(-100, 10)
         child.place(50, 80)
 
-        val actual = parent.coordinates.childToLocal(child.coordinates, Offset.Zero)
+        val actual = parent.coordinates.localPositionOf(child.coordinates, Offset.Zero)
 
         assertEquals(Offset(50f, 80f), actual)
     }
@@ -588,7 +589,7 @@ class LayoutNodeTest {
         parent.place(23, -13)
         child.place(-3, 11)
 
-        val actual = grandParent.coordinates.childToLocal(child.coordinates, Offset.Zero)
+        val actual = grandParent.coordinates.localPositionOf(child.coordinates, Offset.Zero)
 
         assertEquals(Offset(20f, -2f), actual)
     }
@@ -1766,6 +1767,7 @@ private class MockOwner(
     }
 
     override fun calculatePosition(): IntOffset = position
+    override fun calculatePositionInWindow(): IntOffset = position
 
     override fun requestFocus(): Boolean = false
 

@@ -285,6 +285,7 @@ fun GestureScope.percentOffset(
  * @param position A position in local coordinates
  */
 private fun GestureScope.localToGlobal(position: Offset): Offset {
+    @Suppress("DEPRECATION")
     return position + semanticsNode.layoutInfo.coordinates.globalBounds.topLeft
 }
 

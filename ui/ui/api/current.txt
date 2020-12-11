@@ -1770,16 +1770,20 @@ package androidx.compose.ui.layout {
   }
 
   public interface LayoutCoordinates {
-    method public androidx.compose.ui.geometry.Rect childBoundingBox(androidx.compose.ui.layout.LayoutCoordinates child);
-    method public long childToLocal-YJiYy8w(androidx.compose.ui.layout.LayoutCoordinates child, long childLocal);
+    method @Deprecated public androidx.compose.ui.geometry.Rect childBoundingBox(androidx.compose.ui.layout.LayoutCoordinates child);
+    method @Deprecated public long childToLocal-YJiYy8w(androidx.compose.ui.layout.LayoutCoordinates child, long childLocal);
     method public operator int get(androidx.compose.ui.layout.AlignmentLine line);
     method public androidx.compose.ui.layout.LayoutCoordinates? getParentCoordinates();
     method public java.util.Set<androidx.compose.ui.layout.AlignmentLine> getProvidedAlignmentLines();
     method public long getSize-YbymL2g();
-    method public long globalToLocal-k-4lQ0M(long global);
+    method @Deprecated public long globalToLocal-k-4lQ0M(long global);
     method public boolean isAttached();
-    method public long localToGlobal-k-4lQ0M(long local);
-    method public long localToRoot-k-4lQ0M(long local);
+    method public androidx.compose.ui.geometry.Rect localBoundingBoxOf(androidx.compose.ui.layout.LayoutCoordinates sourceCoordinates, optional boolean clipBounds);
+    method public long localPositionOf-YJiYy8w(androidx.compose.ui.layout.LayoutCoordinates sourceCoordinates, long relativeToSource);
+    method @Deprecated public long localToGlobal-k-4lQ0M(long local);
+    method public long localToRoot-k-4lQ0M(long relativeToLocal);
+    method public long localToWindow-k-4lQ0M(long relativeToLocal);
+    method public long windowToLocal-k-4lQ0M(long relativeToWindow);
     property public abstract boolean isAttached;
     property public abstract androidx.compose.ui.layout.LayoutCoordinates? parentCoordinates;
     property public abstract java.util.Set<androidx.compose.ui.layout.AlignmentLine> providedAlignmentLines;
@@ -1787,12 +1791,16 @@ package androidx.compose.ui.layout {
   }
 
   public final class LayoutCoordinatesKt {
+    method public static androidx.compose.ui.geometry.Rect boundsInRoot(androidx.compose.ui.layout.LayoutCoordinates);
+    method public static androidx.compose.ui.geometry.Rect boundsInWindow(androidx.compose.ui.layout.LayoutCoordinates);
     method public static androidx.compose.ui.geometry.Rect getBoundsInParent(androidx.compose.ui.layout.LayoutCoordinates);
-    method public static androidx.compose.ui.geometry.Rect getBoundsInRoot(androidx.compose.ui.layout.LayoutCoordinates);
-    method public static androidx.compose.ui.geometry.Rect getGlobalBounds(androidx.compose.ui.layout.LayoutCoordinates);
-    method public static inline long getGlobalPosition(androidx.compose.ui.layout.LayoutCoordinates);
+    method @Deprecated public static androidx.compose.ui.geometry.Rect getBoundsInRoot(androidx.compose.ui.layout.LayoutCoordinates);
+    method @Deprecated public static androidx.compose.ui.geometry.Rect getGlobalBounds(androidx.compose.ui.layout.LayoutCoordinates);
+    method @Deprecated public static inline long getGlobalPosition(androidx.compose.ui.layout.LayoutCoordinates);
     method public static long getPositionInParent(androidx.compose.ui.layout.LayoutCoordinates);
-    method public static inline long getPositionInRoot(androidx.compose.ui.layout.LayoutCoordinates);
+    method @Deprecated public static inline long getPositionInRoot(androidx.compose.ui.layout.LayoutCoordinates);
+    method public static long positionInRoot(androidx.compose.ui.layout.LayoutCoordinates);
+    method public static long positionInWindow(androidx.compose.ui.layout.LayoutCoordinates);
   }
 
   public final class LayoutIdKt {
@@ -2074,6 +2082,7 @@ package androidx.compose.ui.node {
 
   public interface Owner {
     method public long calculatePosition-nOcc-ac();
+    method public long calculatePositionInWindow-nOcc-ac();
     method public androidx.compose.ui.node.OwnedLayer createLayer(kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.Canvas,kotlin.Unit> drawBlock, kotlin.jvm.functions.Function0<kotlin.Unit> invalidateParentLayer);
     method @androidx.compose.ui.ExperimentalComposeUiApi public androidx.compose.ui.autofill.Autofill? getAutofill();
     method @androidx.compose.ui.ExperimentalComposeUiApi public androidx.compose.ui.autofill.AutofillTree getAutofillTree();

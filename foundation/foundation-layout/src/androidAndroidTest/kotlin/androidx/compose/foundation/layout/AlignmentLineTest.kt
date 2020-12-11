@@ -86,7 +86,7 @@ class AlignmentLineTest : LayoutTest() {
                     childDp, 0.dp, testLine, lineDp,
                     Modifier.onGloballyPositioned {
                         childSize.value = it.size
-                        childPosition.value = it.positionInRoot
+                        childPosition.value = it.positionInRoot()
                         layoutLatch.countDown()
                     }.paddingFrom(testLine, beforeDp, afterDp)
                 )
@@ -132,7 +132,7 @@ class AlignmentLineTest : LayoutTest() {
                     0.dp, childDp, testLine, lineDp,
                     Modifier.onGloballyPositioned {
                         childSize.value = it.size
-                        childPosition.value = it.positionInRoot
+                        childPosition.value = it.positionInRoot()
                         layoutLatch.countDown()
                     }.paddingFrom(testLine, beforeDp, afterDp)
                 )
