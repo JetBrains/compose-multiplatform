@@ -315,11 +315,13 @@ package androidx.compose.runtime {
   public final class Recomposer extends androidx.compose.runtime.CompositionReference {
     ctor public Recomposer(kotlin.coroutines.CoroutineContext effectCoroutineContext);
     method public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public int getChangeCount();
     method public boolean hasInvalidations();
     method public suspend Object? join(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method @Deprecated public suspend Object? recomposeAndApplyChanges(long frameCount, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public suspend Object? runRecomposeAndApplyChanges(kotlin.coroutines.Continuation<?> p);
     method public void shutDown();
+    property public final int changeCount;
     field public static final androidx.compose.runtime.Recomposer.Companion Companion;
   }
 

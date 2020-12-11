@@ -17,12 +17,7 @@
 package androidx.compose.runtime.mock
 
 import androidx.compose.runtime.AbstractApplier
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ComposeCompilerApi
-import androidx.compose.runtime.Composer
 import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.currentComposer
 
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 @OptIn(ExperimentalComposeApi::class)
@@ -60,26 +55,4 @@ class ViewApplier(root: View) : AbstractApplier<View>(root) {
     override fun onEndChanges() {
         onEndChangesCalled++
     }
-}
-
-@Stable
-class MockComposeScope
-
-// TODO(lmr): we should really remove this from our tests
-@Suppress("UNCHECKED_CAST", "ComposableNaming")
-@OptIn(ComposeCompilerApi::class)
-@Composable
-fun <P1> MockComposeScope.memoize(
-    key: Int,
-    p1: P1,
-    block: @Composable (p1: P1) -> Unit
-) {
-    currentComposer.startGroup(key)
-    if (!currentComposer.changed(p1)) {
-        currentComposer.skipToGroupEnd()
-    } else {
-        val realFn = block as Function3<P1, Composer<*>, Int, Unit>
-        realFn(p1, currentComposer, 0)
-    }
-    currentComposer.endGroup()
 }

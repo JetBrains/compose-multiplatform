@@ -17,45 +17,41 @@
 @file:OptIn(ExperimentalComposeApi::class, InternalComposeApi::class)
 package androidx.compose.runtime
 
-import androidx.compose.runtime.dispatch.MonotonicFrameClock
 import androidx.compose.runtime.mock.Contact
 import androidx.compose.runtime.mock.ContactModel
-import androidx.compose.runtime.mock.MockComposeScope
-import androidx.compose.runtime.mock.MockViewListValidator
 import androidx.compose.runtime.mock.MockViewValidator
 import androidx.compose.runtime.mock.Point
 import androidx.compose.runtime.mock.Report
 import androidx.compose.runtime.mock.TestMonotonicFrameClock
-import androidx.compose.runtime.mock.View
 import androidx.compose.runtime.mock.ViewApplier
 import androidx.compose.runtime.mock.contact
-import androidx.compose.runtime.mock.edit
-import androidx.compose.runtime.mock.linear
-import androidx.compose.runtime.mock.memoize
-import androidx.compose.runtime.mock.points
-import androidx.compose.runtime.mock.repeat
-import androidx.compose.runtime.mock.reportsReport
-import androidx.compose.runtime.mock.reportsTo
-import androidx.compose.runtime.mock.selectContact
+import androidx.compose.runtime.mock.Edit
+import androidx.compose.runtime.mock.Linear
+import androidx.compose.runtime.mock.Points
+import androidx.compose.runtime.mock.Repeated
+import androidx.compose.runtime.mock.ReportsReport
+import androidx.compose.runtime.mock.ReportsTo
+import androidx.compose.runtime.mock.SelectContact
+import androidx.compose.runtime.mock.compositionTest
 import androidx.compose.runtime.mock.skip
-import androidx.compose.runtime.mock.text
+import androidx.compose.runtime.mock.Text
+import androidx.compose.runtime.mock.expectChanges
+import androidx.compose.runtime.mock.expectNoChanges
+import androidx.compose.runtime.mock.validate
 import androidx.compose.runtime.snapshots.Snapshot
-import androidx.compose.runtime.snapshots.takeMutableSnapshot
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.test.runBlockingTest
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
-@Composable fun Container(content: @Composable () -> Unit) = content()
+@Composable
+fun Container(content: @Composable () -> Unit) = content()
 
 @Stable
 @OptIn(ExperimentalComposeApi::class, InternalComposeApi::class)
@@ -68,21 +64,21 @@ class CompositionTests {
     }
 
     @Test
-    fun testComposeAModel() {
+    fun testComposeAModel() = compositionTest {
         val model = testModel()
-        val result = compose {
-            selectContact(model)
+        compose {
+            SelectContact(model)
         }
 
-        result.validate {
-            linear {
-                linear {
-                    text("Filter:")
-                    edit("")
+        validate {
+            Linear {
+                Linear {
+                    Text("Filter:")
+                    Edit("")
                 }
-                linear {
-                    text(value = "Contacts:")
-                    linear {
+                Linear {
+                    Text(value = "Contacts:")
+                    Linear {
                         contact(bob)
                         contact(jon)
                         contact(steve)
@@ -93,35 +89,36 @@ class CompositionTests {
     }
 
     @Test
-    fun testRecomposeWithoutChanges() {
+    fun testRecomposeWithoutChanges() = compositionTest {
         val model = testModel()
-        val result = compose {
-            selectContact(model)
+        compose {
+            SelectContact(model)
         }
 
-        result.expectNoChanges()
+        expectNoChanges()
 
-        result.validate {
-            selectContact(model)
+        validate {
+            SelectContact(model)
         }
     }
 
     @Test
-    fun testInsertAContact() {
+    fun testInsertAContact() = compositionTest {
         val model =
             testModel(mutableListOf(bob, jon))
         var changed = {}
-        val result = compose {
+
+        compose {
             changed = invalidate
-            selectContact(model)
+            SelectContact(model)
         }
 
-        result.validate {
-            linear {
+        validate {
+            Linear {
                 skip()
-                linear {
+                Linear {
                     skip()
-                    linear {
+                    Linear {
                         contact(bob)
                         contact(jon)
                     }
@@ -131,14 +128,14 @@ class CompositionTests {
 
         model.add(steve, after = bob)
         changed()
-        result.expectChanges()
+        expectChanges()
 
-        result.validate {
-            linear {
+        validate {
+            Linear {
                 skip()
-                linear {
+                Linear {
                     skip()
-                    linear {
+                    Linear {
                         contact(bob)
                         contact(steve)
                         contact(jon)
@@ -149,7 +146,7 @@ class CompositionTests {
     }
 
     @Test
-    fun testMoveAContact() {
+    fun testMoveAContact() = compositionTest {
         val model = testModel(
             mutableListOf(
                 bob,
@@ -158,21 +155,22 @@ class CompositionTests {
             )
         )
         var changed = {}
-        val result = compose {
+
+        compose {
             changed = invalidate
-            selectContact(model)
+            SelectContact(model)
         }
 
         model.move(steve, after = jon)
         changed()
-        result.expectChanges()
+        expectChanges()
 
-        result.validate {
-            linear {
+        validate {
+            Linear {
                 skip()
-                linear {
+                Linear {
                     skip()
-                    linear {
+                    Linear {
                         contact(bob)
                         contact(jon)
                         contact(steve)
@@ -183,7 +181,7 @@ class CompositionTests {
     }
 
     @Test
-    fun testChangeTheFilter() {
+    fun testChangeTheFilter() = compositionTest {
         val model = testModel(
             mutableListOf(
                 bob,
@@ -191,22 +189,23 @@ class CompositionTests {
                 jon
             )
         )
-        var changed: (() -> Unit)? = null
-        val result = compose {
+        var changed = {}
+
+        compose {
             changed = invalidate
-            selectContact(model)
+            SelectContact(model)
         }
 
         model.filter = "Jon"
-        changed!!()
-        result.expectChanges()
+        changed()
+        expectChanges()
 
-        result.validate {
-            linear {
+        validate {
+            Linear {
                 skip()
-                linear {
+                Linear {
                     skip()
-                    linear {
+                    Linear {
                         contact(jon)
                     }
                 }
@@ -215,33 +214,33 @@ class CompositionTests {
     }
 
     @Test
-    fun testComposeCompositionWithMultipleRoots() {
+    fun testComposeCompositionWithMultipleRoots() = compositionTest {
         val reports = listOf(
             jim_reports_to_sally,
             rob_reports_to_alice,
             clark_reports_to_lois
         )
 
-        val result = compose {
-            reportsReport(reports)
+        compose {
+            ReportsReport(reports)
         }
 
-        result.validate {
-            reportsReport(reports)
+        validate {
+            ReportsReport(reports)
         }
     }
 
     @Test
-    fun testMoveCompositionWithMultipleRoots() {
+    fun testMoveCompositionWithMultipleRoots() = compositionTest {
         var reports = listOf(
             jim_reports_to_sally,
             rob_reports_to_alice,
             clark_reports_to_lois
         )
-        var changed: (() -> Unit)? = null
-        val result = compose {
+        var changed = { }
+        compose {
             changed = invalidate
-            reportsReport(reports)
+            ReportsReport(reports)
         }
 
         reports = listOf(
@@ -249,100 +248,110 @@ class CompositionTests {
             clark_reports_to_lois,
             rob_reports_to_alice
         )
-        changed!!()
-        result.expectChanges()
+        changed()
+        expectChanges()
 
-        result.validate {
-            reportsReport(reports)
+        validate {
+            ReportsReport(reports)
         }
     }
 
     @Test
-    fun testReplace() {
+    fun testReplace() = compositionTest {
         var includeA = true
-        var changed: (() -> Unit)? = null
-        @Composable fun MockComposeScope.composition() {
+        var changed = { }
+
+        @Composable
+        fun Composition() {
             changed = invalidate
-            text("Before")
+            Text("Before")
             if (includeA) {
-                linear {
-                    text("A")
+                Linear {
+                    Text("A")
                 }
             } else {
-                edit("B")
+                Edit("B")
             }
-            text("After")
+            Text("After")
         }
-        fun MockViewValidator.composition() {
-            text("Before")
+
+        fun MockViewValidator.Composition() {
+            Text("Before")
             if (includeA) {
-                linear {
-                    text("A")
+                Linear {
+                    Text("A")
                 }
             } else {
-                edit("B")
+                Edit("B")
             }
-            text("After")
+            Text("After")
         }
-        val result = compose {
-            composition()
+
+        compose {
+            Composition()
         }
-        result.validate {
-            composition()
+
+        validate {
+            this.Composition()
         }
+
         includeA = false
-        changed!!()
-        result.expectChanges()
-        result.validate {
-            composition()
+        changed()
+        expectChanges()
+        validate {
+            this.Composition()
         }
         includeA = true
-        changed!!()
-        result.expectChanges()
-        result.validate {
-            composition()
+        changed()
+        expectChanges()
+        validate {
+            this.Composition()
         }
+        changed()
+        expectNoChanges()
     }
 
     @Test
-    fun testInsertWithMultipleRoots() {
+    fun testInsertWithMultipleRoots() = compositionTest {
         var chars = listOf('a', 'b', 'c')
-        var changed: (() -> Unit)? = null
+        var changed = { }
 
-        @Composable fun MockComposeScope.textOf(c: Char) {
-            text(c.toString())
+        @Composable
+        fun TextOf(c: Char) {
+            Text(c.toString())
         }
 
-        fun MockViewValidator.textOf(c: Char) {
-            text(c.toString())
+        fun MockViewValidator.TextOf(c: Char) {
+            Text(c.toString())
         }
 
-        @Composable fun MockComposeScope.chars(chars: Iterable<Char>) {
-            repeat(of = chars) { c -> textOf(c) }
+        @Composable
+        fun Chars(chars: Iterable<Char>) {
+            Repeated(of = chars) { c -> TextOf(c) }
         }
 
         fun MockViewValidator.validateChars(chars: Iterable<Char>) {
-            repeat(of = chars) { c -> textOf(c) }
+            Repeated(of = chars) { c -> this.TextOf(c) }
         }
 
-        val result = compose {
+        compose {
             changed = invalidate
-            chars(chars)
-            chars(chars)
-            chars(chars)
+            Chars(chars)
+            Chars(chars)
+            Chars(chars)
         }
 
-        result.validate {
+        validate {
             validateChars(chars)
             validateChars(chars)
             validateChars(chars)
         }
 
         chars = listOf('a', 'b', 'x', 'c')
-        changed!!()
-        result.expectChanges()
+        changed()
+        expectChanges()
 
-        result.validate {
+        validate {
             validateChars(chars)
             validateChars(chars)
             validateChars(chars)
@@ -350,33 +359,35 @@ class CompositionTests {
     }
 
     @Test
-    fun testSimpleMemoize() {
+    fun testSimpleSkipping() = compositionTest {
         val points = listOf(Point(1, 2), Point(2, 3))
-        val result = compose {
-            points(points)
+        var changed = {}
+        compose {
+            changed = invalidate
+            Points(points)
         }
 
-        result.validate { points(points) }
+        validate { Points(points) }
 
-        val changes = result.recompose()
-        assertFalse(changes)
+        changed()
+        expectNoChanges()
     }
 
     @Test
-    fun testMovingMemoization() {
+    fun testMovingMemoization() = compositionTest {
         var points = listOf(
             Point(1, 2),
             Point(2, 3),
             Point(4, 5),
             Point(6, 7)
         )
-        var changed: (() -> Unit)? = null
-        val result = compose {
+        var changed = { }
+        compose {
             changed = invalidate
-            points(points)
+            Points(points)
         }
 
-        result.validate { points(points) }
+        validate { Points(points) }
 
         points = listOf(
             Point(1, 2),
@@ -384,27 +395,29 @@ class CompositionTests {
             Point(2, 3),
             Point(6, 7)
         )
-        changed!!()
-        result.expectChanges()
+        changed()
+        expectChanges()
 
-        result.validate { points(points) }
+        validate { Points(points) }
     }
 
     @Test
-    fun testComponent() {
-        @Composable fun MockComposeScope.Reporter(report: Report? = null) {
+    fun testComponent() = compositionTest {
+        @Composable
+        fun Reporter(report: Report? = null) {
             if (report != null) {
-                text(report.from)
-                text("reports to")
-                text(report.to)
+                Text(report.from)
+                Text("reports to")
+                Text(report.to)
             } else {
-                text("no report to report")
+                Text("no report to report")
             }
         }
 
-        @Composable fun MockComposeScope.reportsReport(reports: Iterable<Report>) {
-            linear {
-                repeat(of = reports) { report ->
+        @Composable
+        fun ReportsReport(reports: Iterable<Report>) {
+            Linear {
+                Repeated(of = reports) { report ->
                     Reporter(report)
                 }
             }
@@ -415,246 +428,260 @@ class CompositionTests {
             rob_reports_to_alice,
             clark_reports_to_lois
         )
-        val result = compose {
-            reportsReport(reports)
+        compose {
+            ReportsReport(reports)
         }
 
-        result.validate {
-            linear {
-                reportsTo(jim_reports_to_sally)
-                reportsTo(rob_reports_to_alice)
-                reportsTo(clark_reports_to_lois)
+        validate {
+            Linear {
+                ReportsTo(jim_reports_to_sally)
+                ReportsTo(rob_reports_to_alice)
+                ReportsTo(clark_reports_to_lois)
             }
         }
 
-        result.expectNoChanges()
+        expectNoChanges()
     }
 
     @Test
-    fun testComposeTwoAttributeComponent() {
-        @Composable fun MockComposeScope.Two2(first: Int = 1, second: Int = 2) {
-            linear {
-                text("$first $second")
+    fun testComposeTwoAttributeComponent() = compositionTest {
+        @Composable
+        fun Two2(first: Int = 1, second: Int = 2) {
+            Linear {
+                Text("$first $second")
             }
         }
 
         fun MockViewValidator.two(first: Int, second: Int) {
-            linear {
-                text("$first $second")
+            Linear {
+                Text("$first $second")
             }
         }
 
-        val result = compose {
+        compose {
             Two2(41, 42)
         }
 
-        result.validate {
+        validate {
             two(41, 42)
         }
     }
 
     @Test
-    fun testComposeThreeAttributeComponent() {
-        @Composable fun MockComposeScope.Three3(first: Int = 1, second: Int = 2, third: Int = 3) {
-            linear {
-                text("$first $second $third")
+    fun testComposeThreeAttributeComponent() = compositionTest {
+        @Composable
+        fun Three3(first: Int = 1, second: Int = 2, third: Int = 3) {
+            Linear {
+                Text("$first $second $third")
             }
         }
 
-        fun MockViewValidator.three(first: Int, second: Int, third: Int) {
-            linear {
-                text("$first $second $third")
+        fun MockViewValidator.Three(first: Int, second: Int, third: Int) {
+            Linear {
+                Text("$first $second $third")
             }
         }
 
-        val result = compose {
+        compose {
             Three3(41, 42, 43)
         }
 
-        result.validate {
-            three(41, 42, 43)
+        validate {
+            Three(41, 42, 43)
         }
     }
 
     @Test
-    fun testComposeFourOrMoreAttributeComponent() {
-        @Composable fun MockComposeScope.Four4(
+    fun testComposeFourOrMoreAttributeComponent() = compositionTest {
+        @Composable
+        fun Four4(
             first: Int = 1,
             second: Int = 2,
             third: Int = 3,
             fourth: Int = 4
         ) {
-            linear {
-                text("$first $second $third $fourth")
+            Linear {
+                Text("$first $second $third $fourth")
             }
         }
 
-        fun MockViewValidator.four(first: Int, second: Int, third: Int, fourth: Int) {
-            linear {
-                text("$first $second $third $fourth")
+        fun MockViewValidator.Four(first: Int, second: Int, third: Int, fourth: Int) {
+            Linear {
+                Text("$first $second $third $fourth")
             }
         }
 
-        val result = compose {
+        compose {
             Four4(41, 42, 43, 44)
         }
 
-        result.validate {
-            four(41, 42, 43, 44)
+        validate {
+            Four(41, 42, 43, 44)
         }
     }
 
     @Test
-    fun testSkippingACall() {
+    fun testSkippingACall() = compositionTest {
 
-        @Composable fun MockComposeScope.show(value: Int) {
-            linear {
-                text("$value")
+        @Composable
+        fun Show(value: Int) {
+            Linear {
+                Text("$value")
             }
-            linear {
-                text("value")
+            Linear {
+                Text("value")
             }
         }
 
-        fun MockViewValidator.show(value: Int) {
-            linear {
-                text("$value")
+        fun MockViewValidator.Show(value: Int) {
+            Linear {
+                Text("$value")
             }
-            linear {
-                text("value")
+            Linear {
+                Text("value")
             }
         }
 
-        @Composable fun MockComposeScope.test(showThree: Boolean) {
-            show(1)
-            show(2)
+        @Composable
+        fun Test(showThree: Boolean) {
+            Show(1)
+            Show(2)
             if (showThree) {
-                show(3)
+                Show(3)
             }
         }
 
         var showThree = false
 
-        var recomposeTest: () -> Unit = { }
+        var changed = { }
 
-        @Composable fun MockComposeScope.Test() {
-            recomposeTest = invalidate
-            test(showThree)
+        @Composable
+        fun Test() {
+            changed = invalidate
+            Test(showThree)
         }
 
-        fun MockViewValidator.test(showThree: Boolean) {
-            show(1)
-            show(2)
+        fun MockViewValidator.Test(showThree: Boolean) {
+            this.Show(1)
+            this.Show(2)
             if (showThree) {
-                show(3)
+                this.Show(3)
             }
         }
 
-        val composition: @Composable MockComposeScope.() -> Unit = {
+        fun validate() {
+            validate {
+                this.Test(showThree)
+            }
+        }
+
+        compose {
             Test()
         }
-        val validation: MockViewValidator.() -> Unit = {
-            test(showThree)
-        }
 
-        val result = compose(block = composition)
-        result.validate(validation)
+        validate()
 
         showThree = true
-        recomposeTest()
-        result.expectChanges()
-        result.validate(validation)
+        changed()
+        expectChanges()
+        validate()
     }
 
     @Test
-    fun testComponentWithVarConstructorParameter() {
-        @Composable fun MockComposeScope.One(first: Int) {
-            text("$first")
+    fun testComponentWithVarConstructorParameter() = compositionTest {
+        @Composable
+        fun One(first: Int) {
+            Text("$first")
         }
 
-        fun MockViewValidator.one(first: Int) {
-            text("$first")
+        fun MockViewValidator.One(first: Int) {
+            Text("$first")
         }
 
-        @Composable fun MockComposeScope.callOne(value: Int) {
+        @Composable
+        fun CallOne(value: Int) {
             One(first = value)
         }
 
         var value = 42
-        var changed: (() -> Unit)? = null
-        val result = compose {
+        var changed = { }
+        compose {
             changed = invalidate
-            callOne(value)
+            CallOne(value)
         }
 
-        result.validate {
-            one(42)
+        validate {
+            this.One(42)
         }
 
         value = 43
-        changed!!()
-        result.expectChanges()
+        changed()
+        expectChanges()
 
-        result.validate {
-            one(43)
+        validate {
+            this.One(43)
         }
     }
 
     @Test
-    fun testComponentWithValConstructorParameter() {
-        @Composable fun MockComposeScope.One(first: Int) {
-            text("$first")
+    fun testComponentWithValConstructorParameter() = compositionTest {
+        @Composable
+        fun One(first: Int) {
+            Text("$first")
         }
 
-        fun MockViewValidator.one(first: Int) {
-            text("$first")
+        fun MockViewValidator.One(first: Int) {
+            Text("$first")
         }
 
-        @Composable fun MockComposeScope.callOne(value: Int) {
+        @Composable
+        fun CallOne(value: Int) {
             One(first = value)
         }
 
         var value = 42
-        var changed: (() -> Unit)? = null
-        val result = compose {
+        var changed = { }
+        compose {
             changed = invalidate
-            callOne(value)
+            CallOne(value)
         }
 
-        result.validate {
-            one(42)
+        validate {
+            this.One(42)
         }
 
         value = 43
-        changed!!()
-        result.expectChanges()
+        changed()
+        expectChanges()
 
-        result.validate {
-            one(43)
+        validate {
+            this.One(43)
         }
 
-        changed!!()
-        result.expectNoChanges()
+        changed()
+        expectNoChanges()
     }
 
     @Test
-    fun testComposePartOfTree() {
-        var recomposeLois: (() -> Unit)? = null
+    fun testComposePartOfTree() = compositionTest {
+        var recomposeLois = { }
 
-        @Composable fun MockComposeScope.Reporter(report: Report? = null) {
+        @Composable
+        fun Reporter(report: Report? = null) {
             if (report != null) {
                 if (report.from == "Lois" || report.to == "Lois") recomposeLois = invalidate
-                text(report.from)
-                text("reports to")
-                text(report.to)
+                Text(report.from)
+                Text("reports to")
+                Text(report.to)
             } else {
-                text("no report to report")
+                Text("no report to report")
             }
         }
 
-        @Composable fun MockComposeScope.reportsReport(reports: Iterable<Report>) {
-            linear {
-                repeat(of = reports) { report ->
+        @Composable
+        fun ReportsReport(reports: Iterable<Report>) {
+            Linear {
+                Repeated(of = reports) { report ->
                     Reporter(report)
                 }
             }
@@ -666,61 +693,62 @@ class CompositionTests {
             rob_reports_to_alice,
             clark_reports_to_lois, r
         )
-        val result = compose {
-            reportsReport(reports)
+        compose {
+            ReportsReport(reports)
         }
 
-        result.validate {
-            linear {
-                reportsTo(jim_reports_to_sally)
-                reportsTo(rob_reports_to_alice)
-                reportsTo(clark_reports_to_lois)
-                reportsTo(r)
+        validate {
+            Linear {
+                ReportsTo(jim_reports_to_sally)
+                ReportsTo(rob_reports_to_alice)
+                ReportsTo(clark_reports_to_lois)
+                ReportsTo(r)
             }
         }
 
-        result.expectNoChanges()
+        expectNoChanges()
 
         // Demote Perry
         r.from = "Perry"
         r.to = "Lois"
 
         // Compose only the Lois report
-        recomposeLois?.let { it() }
+        recomposeLois()
 
-        result.expectChanges()
+        expectChanges()
 
-        result.validate {
-            linear {
-                reportsTo(jim_reports_to_sally)
-                reportsTo(rob_reports_to_alice)
-                reportsTo(clark_reports_to_lois)
-                reportsTo(r)
+        validate {
+            Linear {
+                ReportsTo(jim_reports_to_sally)
+                ReportsTo(rob_reports_to_alice)
+                ReportsTo(clark_reports_to_lois)
+                ReportsTo(r)
             }
         }
     }
 
     @Test
-    fun testRecomposeWithReplace() {
-        var recomposeLois: (() -> Unit)? = null
+    fun testRecomposeWithReplace() = compositionTest {
+        var recomposeLois = { }
         var key = 0
 
-        @Composable fun MockComposeScope.Reporter(report: Report? = null) {
+        @Composable
+        fun Reporter(report: Report? = null) {
             if (report != null) {
                 if (report.from == "Lois" || report.to == "Lois") recomposeLois = invalidate
                 key(key) {
-                    text(report.from)
-                    text("reports to")
-                    text(report.to)
+                    Text(report.from)
+                    Text("reports to")
+                    Text(report.to)
                 }
             } else {
-                text("no report to report")
+                Text("no report to report")
             }
         }
 
-        @Composable fun MockComposeScope.reportsReport(reports: Iterable<Report>) {
-            linear {
-                repeat(of = reports) { report ->
+        @Composable fun ReportsReport(reports: Iterable<Report>) {
+            Linear {
+                Repeated(of = reports) { report ->
                     Reporter(report)
                 }
             }
@@ -732,20 +760,20 @@ class CompositionTests {
             rob_reports_to_alice,
             clark_reports_to_lois, r
         )
-        val result = compose {
-            reportsReport(reports)
+        compose {
+            ReportsReport(reports)
         }
 
-        result.validate {
-            linear {
-                reportsTo(jim_reports_to_sally)
-                reportsTo(rob_reports_to_alice)
-                reportsTo(clark_reports_to_lois)
-                reportsTo(r)
+        validate {
+            Linear {
+                ReportsTo(jim_reports_to_sally)
+                ReportsTo(rob_reports_to_alice)
+                ReportsTo(clark_reports_to_lois)
+                ReportsTo(r)
             }
         }
 
-        result.expectNoChanges()
+        expectNoChanges()
 
         // Demote Perry
         r.from = "Perry"
@@ -755,45 +783,47 @@ class CompositionTests {
         key = 2
 
         // Compose only the Lois report
-        recomposeLois?.let { it() }
+        recomposeLois()
 
-        result.expectChanges()
+        expectChanges()
 
-        result.validate {
-            linear {
-                reportsTo(jim_reports_to_sally)
-                reportsTo(rob_reports_to_alice)
-                reportsTo(clark_reports_to_lois)
-                reportsTo(r)
+        validate {
+            Linear {
+                ReportsTo(jim_reports_to_sally)
+                ReportsTo(rob_reports_to_alice)
+                ReportsTo(clark_reports_to_lois)
+                ReportsTo(r)
             }
         }
     }
 
     @Test
-    fun testInvalidationAfterRemoval() {
-        var recomposeLois = {}
+    fun testInvalidationAfterRemoval() = compositionTest {
+        var recomposeLois = { }
         val key = 0
 
-        @Composable fun MockComposeScope.Reporter(report: Report? = null) {
+        @Composable
+        fun Reporter(report: Report? = null) {
             if (report != null) {
                 val callback = invalidate
                 if (report.from == "Lois" || report.to == "Lois") recomposeLois = callback
                 key(key) {
-                    text(report.from)
-                    text("reports to")
-                    text(report.to)
+                    Text(report.from)
+                    Text("reports to")
+                    Text(report.to)
                 }
             } else {
-                text("no report to report")
+                Text("no report to report")
             }
         }
 
-        @Composable fun MockComposeScope.reportsReport(
+        @Composable
+        fun ReportsReport(
             reports: Iterable<Report>,
             include: (report: Report) -> Boolean
         ) {
-            linear {
-                repeat(of = reports) { report ->
+            Linear {
+                Repeated(of = reports) { report ->
                     if (include(report)) {
                         Reporter(report)
                     }
@@ -812,40 +842,40 @@ class CompositionTests {
         val notLois: (report: Report) -> Boolean = { it.from != "Lois" && it.to != "Lois" }
 
         var filter = all
-        var changed = {}
-        val result = compose {
+        var changed = { }
+        compose {
             changed = invalidate
-            reportsReport(reports, filter)
+            ReportsReport(reports, filter)
         }
 
-        result.validate {
-            linear {
-                reportsTo(jim_reports_to_sally)
-                reportsTo(rob_reports_to_alice)
-                reportsTo(clark_reports_to_lois)
-                reportsTo(r)
+        validate {
+            Linear {
+                ReportsTo(jim_reports_to_sally)
+                ReportsTo(rob_reports_to_alice)
+                ReportsTo(clark_reports_to_lois)
+                ReportsTo(r)
             }
         }
 
         filter = notLois
         changed()
-        result.expectChanges()
+        expectChanges()
 
-        result.validate {
-            linear {
-                reportsTo(jim_reports_to_sally)
-                reportsTo(rob_reports_to_alice)
+        validate {
+            Linear {
+                ReportsTo(jim_reports_to_sally)
+                ReportsTo(rob_reports_to_alice)
             }
         }
 
         // Invalidate Lois which is now removed.
         recomposeLois()
-        result.expectNoChanges()
+        expectNoChanges()
 
-        result.validate {
-            linear {
-                reportsTo(jim_reports_to_sally)
-                reportsTo(rob_reports_to_alice)
+        validate {
+            Linear {
+                ReportsTo(jim_reports_to_sally)
+                ReportsTo(rob_reports_to_alice)
             }
         }
     }
@@ -853,9 +883,9 @@ class CompositionTests {
     // remember()
 
     @Test
-    fun testSimpleRemember() {
+    fun testSimpleRemember() = compositionTest {
         var count = 0
-        var changed: (() -> Unit)? = null
+        var changed = { }
 
         class Wrapper(val value: Int) {
             init {
@@ -863,33 +893,34 @@ class CompositionTests {
             }
         }
 
-        @Composable fun MockComposeScope.test(value: Int) {
+        @Composable
+        fun Test(value: Int) {
             changed = invalidate
             val w = remember { Wrapper(value) }
-            text("value = ${w.value}")
+            Text("value = ${w.value}")
         }
 
-        fun MockViewValidator.test(value: Int) {
-            text("value = $value")
+        fun MockViewValidator.Test(value: Int) {
+            Text("value = $value")
         }
 
-        val result = compose {
-            test(1)
+        compose {
+            Test(1)
         }
 
-        result.validate { test(1) }
+        validate { this.Test(1) }
 
         assertEquals(1, count)
 
-        changed!!()
-        result.expectNoChanges()
+        changed()
+        expectNoChanges()
 
         // Expect the previous instance to be remembered
         assertEquals(1, count)
     }
 
     @Test
-    fun testRememberOneParameter() {
+    fun testRememberOneParameter() = compositionTest {
         var count = 0
 
         class Wrapper(val value: Int) {
@@ -898,40 +929,41 @@ class CompositionTests {
             }
         }
 
-        @Composable fun MockComposeScope.test(value: Int) {
+        @Composable
+        fun Test(value: Int) {
             val w = remember(value) { Wrapper(value) }
-            text("value = ${w.value}")
+            Text("value = ${w.value}")
         }
 
-        fun MockViewValidator.test(value: Int) {
-            text("value = $value")
+        fun MockViewValidator.Test(value: Int) {
+            Text("value = $value")
         }
 
         var value = 1
-        var changed: (() -> Unit)? = null
-        val result = compose {
+        var changed = { }
+        compose {
             changed = invalidate
-            test(value)
+            Test(value)
         }
 
-        result.validate { test(1) }
+        validate { this.Test(1) }
 
         value = 2
-        changed!!()
-        result.expectChanges()
+        changed()
+        expectChanges()
 
-        result.validate { test(2) }
+        validate { this.Test(2) }
 
-        changed!!()
-        result.expectNoChanges()
+        changed()
+        expectNoChanges()
 
-        result.validate { test(2) }
+        validate { this.Test(2) }
 
         assertEquals(2, count)
     }
 
     @Test
-    fun testRememberTwoParameters() {
+    fun testRememberTwoParameters() = compositionTest {
         var count = 0
 
         class Wrapper(val a: Int, val b: Int) {
@@ -940,43 +972,44 @@ class CompositionTests {
             }
         }
 
-        @Composable fun MockComposeScope.test(a: Int, b: Int) {
+        @Composable
+        fun Test(a: Int, b: Int) {
             val w = remember(a, b) { Wrapper(a, b) }
-            text("a = ${w.a} b = ${w.b}")
+            Text("a = ${w.a} b = ${w.b}")
         }
 
-        fun MockViewValidator.test(a: Int, b: Int) {
-            text("a = $a b = $b")
+        fun MockViewValidator.Test(a: Int, b: Int) {
+            Text("a = $a b = $b")
         }
 
         var p1 = 1
         var p2 = 2
-        var changed: (() -> Unit)? = null
+        var changed = { }
 
-        val result = compose {
+        compose {
             changed = invalidate
-            test(p1, p2)
+            Test(p1, p2)
         }
 
-        result.validate { test(1, 2) }
+        validate { this.Test(1, 2) }
 
         p1 = 2
         p2 = 3
-        changed!!()
-        result.expectChanges()
+        changed()
+        expectChanges()
 
-        result.validate { test(2, 3) }
+        validate { this.Test(2, 3) }
 
-        changed!!()
-        result.expectNoChanges()
+        changed()
+        expectNoChanges()
 
-        result.validate { test(2, 3) }
+        validate { this.Test(2, 3) }
 
         assertEquals(2, count)
     }
 
     @Test
-    fun testRememberThreeParameters() {
+    fun testRememberThreeParameters() = compositionTest {
         var count = 0
 
         class Wrapper(val a: Int, val b: Int, val c: Int) {
@@ -985,40 +1018,41 @@ class CompositionTests {
             }
         }
 
-        @Composable fun MockComposeScope.test(a: Int, b: Int, c: Int) {
+        @Composable
+        fun Test(a: Int, b: Int, c: Int) {
             val w = remember(a, b, c) { Wrapper(a, b, c) }
-            text("a = ${w.a} b = ${w.b} c = ${w.c}")
+            Text("a = ${w.a} b = ${w.b} c = ${w.c}")
         }
 
-        fun MockViewValidator.test(a: Int, b: Int, c: Int) {
-            text("a = $a b = $b c = $c")
+        fun MockViewValidator.Test(a: Int, b: Int, c: Int) {
+            Text("a = $a b = $b c = $c")
         }
 
         var p3 = 3
-        var changed: (() -> Unit)? = null
-        val result = compose {
+        var changed = { }
+        compose {
             changed = invalidate
-            test(1, 2, p3)
+            Test(1, 2, p3)
         }
 
-        result.validate { test(1, 2, 3) }
+        validate { this.Test(1, 2, 3) }
 
         p3 = 4
-        changed!!()
-        result.expectChanges()
+        changed()
+        expectChanges()
 
-        result.validate { test(1, 2, 4) }
+        validate { this.Test(1, 2, 4) }
 
-        changed!!()
-        result.expectNoChanges()
+        changed()
+        expectNoChanges()
 
-        result.validate { test(1, 2, 4) }
+        validate { this.Test(1, 2, 4) }
 
         assertEquals(2, count)
     }
 
     @Test
-    fun testRememberFourParameters() {
+    fun testRememberFourParameters() = compositionTest {
         var count = 0
 
         class Wrapper(val a: Int, val b: Int, val c: Int, val d: Int) {
@@ -1027,43 +1061,44 @@ class CompositionTests {
             }
         }
 
-        @Composable fun MockComposeScope.test(a: Int, b: Int, c: Int, d: Int) {
+        @Composable
+        fun Test(a: Int, b: Int, c: Int, d: Int) {
             val w = remember(a, b, c, d) { Wrapper(a, b, c, d) }
-            text("a = ${w.a} b = ${w.b} c = ${w.c} d = ${w.d}")
+            Text("a = ${w.a} b = ${w.b} c = ${w.c} d = ${w.d}")
         }
 
-        fun MockViewValidator.test(a: Int, b: Int, c: Int, d: Int) {
-            text("a = $a b = $b c = $c d = $d")
+        fun MockViewValidator.Test(a: Int, b: Int, c: Int, d: Int) {
+            Text("a = $a b = $b c = $c d = $d")
         }
 
         var p3 = 3
         var p4 = 4
-        var changed: (() -> Unit)? = null
+        var changed = { }
 
-        val result = compose {
+        compose {
             changed = invalidate
-            test(1, 2, p3, p4)
+            Test(1, 2, p3, p4)
         }
 
-        result.validate { test(1, 2, 3, 4) }
+        validate { this.Test(1, 2, 3, 4) }
 
         p3 = 4
         p4 = 5
-        changed!!()
-        result.expectChanges()
+        changed()
+        expectChanges()
 
-        result.validate { test(1, 2, 4, 5) }
+        validate { this.Test(1, 2, 4, 5) }
 
-        changed!!()
-        result.expectNoChanges()
+        changed()
+        expectNoChanges()
 
-        result.validate { test(1, 2, 4, 5) }
+        validate { this.Test(1, 2, 4, 5) }
 
         assertEquals(2, count)
     }
 
     @Test
-    fun testRememberFiveParameters() {
+    fun testRememberFiveParameters() = compositionTest {
         var count = 0
 
         class Wrapper(val a: Int, val b: Int, val c: Int, val d: Int, val e: Int) {
@@ -1072,277 +1107,267 @@ class CompositionTests {
             }
         }
 
-        @Composable fun MockComposeScope.test(a: Int, b: Int, c: Int, d: Int, e: Int) {
+        @Composable
+        fun Test(a: Int, b: Int, c: Int, d: Int, e: Int) {
             val w = remember(a, b, c, d, e) { Wrapper(a, b, c, d, e) }
-            text("a = ${w.a} b = ${w.b} c = ${w.c} d = ${w.d} e = ${w.e}")
+            Text("a = ${w.a} b = ${w.b} c = ${w.c} d = ${w.d} e = ${w.e}")
         }
 
-        fun MockViewValidator.test(a: Int, b: Int, c: Int, d: Int, e: Int) {
-            text("a = $a b = $b c = $c d = $d e = $e")
+        fun MockViewValidator.Test(a: Int, b: Int, c: Int, d: Int, e: Int) {
+            Text("a = $a b = $b c = $c d = $d e = $e")
         }
 
         var lastParameter = 5
-        var changed: (() -> Unit)? = null
-        val result = compose {
+        var changed = { }
+        compose {
             changed = invalidate
-            test(1, 2, 3, 4, lastParameter)
+            Test(1, 2, 3, 4, lastParameter)
         }
 
-        result.validate { test(1, 2, 3, 4, 5) }
+        validate { this.Test(1, 2, 3, 4, 5) }
 
         lastParameter = 6
-        changed!!()
+        changed()
 
-        result.expectChanges()
+        expectChanges()
 
-        result.validate { test(1, 2, 3, 4, 6) }
+        validate { this.Test(1, 2, 3, 4, 6) }
 
-        result.expectNoChanges()
+        expectNoChanges()
 
-        result.validate { test(1, 2, 3, 4, 6) }
+        validate { this.Test(1, 2, 3, 4, 6) }
 
         assertEquals(2, count)
     }
 
     @Test
-    fun testInsertGroupInContainer() {
-        val values = mutableListOf(0)
-        var changed: (() -> Unit)? = null
+    fun testInsertGroupInContainer() = compositionTest {
+        val values = mutableStateListOf(0)
 
-        @Composable fun MockComposeScope.composition() {
-            linear {
-                changed = invalidate
+        @Composable
+        fun Composition() {
+            Linear {
                 for (value in values) {
-                    memoize(value, value) {
-                        text("$value")
-                    }
+                    Text("$value")
                 }
             }
         }
 
-        fun MockViewValidator.composition() {
-            linear {
+        fun MockViewValidator.Composition() {
+            Linear {
                 for (value in values)
-                    text("$value")
+                    Text("$value")
             }
         }
 
-        val result = compose { composition() }
+        compose { Composition() }
 
-        result.validate { composition() }
+        validate { this.Composition() }
 
         for (i in 1..10) {
             values.add(i)
-            changed!!()
-            result.expectChanges()
-            result.validate { composition() }
+            expectChanges()
+            validate { this.Composition() }
         }
     }
 
     // b/148273328
     @Test
-    fun testInsertInGroups() {
+    fun testInsertInGroups() = compositionTest {
+        var threeVisible by mutableStateOf(false)
 
-        var threeVisible = false
-        var changed: (() -> Unit)? = null
-
-        @Composable fun MockComposeScope.composition() {
-            linear {
-                text("one")
-                text("two")
-                changed = invalidate
+        @Composable fun Composition() {
+            Linear {
+                Text("one")
+                Text("two")
                 if (threeVisible) {
-                    text("three")
-                    text("four")
+                    Text("three")
+                    Text("four")
                 }
-                linear {
-                    text("five")
+                Linear {
+                    Text("five")
                 }
             }
         }
 
-        fun MockViewValidator.composition() {
-            linear {
-                text("one")
-                text("two")
+        fun MockViewValidator.Composition() {
+            Linear {
+                Text("one")
+                Text("two")
                 if (threeVisible) {
-                    text("three")
-                    text("four")
+                    Text("three")
+                    Text("four")
                 }
-                linear {
-                    text("five")
+                Linear {
+                    Text("five")
                 }
             }
         }
 
-        val result = compose { composition() }
-        result.validate { composition() }
+        compose { Composition() }
+        validate { this.Composition() }
 
         threeVisible = true
-        changed!!()
-        result.expectChanges()
+        expectChanges()
 
-        result.validate { composition() }
+        validate { this.Composition() }
     }
 
     @Test
-    fun testStartJoin() {
-        var text = "Starting"
-        var myInvalidate: (() -> Unit)? = null
-        @Composable fun MockComposeScope.composition() {
-            linear {
-                myInvalidate = invalidate
-                text(text)
+    fun testStartJoin() = compositionTest {
+        var text by mutableStateOf("Starting")
+
+        @Composable
+        fun Composition() {
+            Linear {
+                Text(text)
             }
         }
 
-        fun MockViewValidator.composition() {
-            linear {
-                text(text)
+        fun MockViewValidator.Composition() {
+            Linear {
+                Text(text)
             }
         }
 
-        val result = compose { composition() }
+        compose { Composition() }
 
-        result.validate { composition() }
+        validate { this.Composition() }
 
         text = "Ending"
-        myInvalidate?.let { it() }
 
-        result.expectChanges()
+        expectChanges()
 
-        result.validate { composition() }
+        validate { this.Composition() }
     }
 
     @Test
-    fun testInvalidateJoin_End() {
-        var text = "Starting"
-        var includeNested = true
-        var invalidate1 = {}
-        var invalidate2 = {}
+    fun testInvalidateJoin_End() = compositionTest {
+        var text by mutableStateOf("Starting")
+        var includeNested by mutableStateOf(true)
 
-        @Composable fun MockComposeScope.composition() {
-            linear {
-                invalidate1 = invalidate
-                text(text)
+        @Composable
+        fun Composition() {
+            Linear {
+                Text(text)
                 if (includeNested) {
-                    invalidate2 = invalidate
-                    text("Nested in $text")
+                    Text("Nested in $text")
                 }
             }
         }
 
-        fun MockViewValidator.composition() {
-            linear {
-                text(text)
+        fun MockViewValidator.Composition() {
+            Linear {
+                Text(text)
                 if (includeNested) {
-                    text("Nested in $text")
+                    Text("Nested in $text")
                 }
             }
         }
 
-        val result = compose { composition() }
+        compose { Composition() }
 
-        result.validate { composition() }
+        validate { this.Composition() }
 
         text = "Ending"
         includeNested = false
-        invalidate1()
-        invalidate2()
 
-        result.expectChanges()
+        expectChanges()
 
-        result.validate { composition() }
+        validate { this.Composition() }
 
-        result.expectNoChanges()
+        expectNoChanges()
 
-        result.validate { composition() }
+        validate { this.Composition() }
     }
 
     @Test
-    fun testInvalidateJoin_Start() {
-        var text = "Starting"
-        var includeNested = true
-        var invalidate1: (() -> Unit)? = null
-        var invalidate2: (() -> Unit)? = null
+    fun testInvalidateJoin_Start() = compositionTest {
+        var text by mutableStateOf("Starting")
+        var includeNested by mutableStateOf(true)
 
-        @Composable fun MockComposeScope.composition() {
-            linear {
-                invalidate1 = invalidate
+        @Composable
+        fun Composition() {
+            Linear {
                 if (includeNested) {
-                    invalidate2 = invalidate
-                    text("Nested in $text")
+                    Text("Nested in $text")
                 }
-                text(text)
+                Text(text)
             }
         }
 
-        fun MockViewValidator.composition() {
-            linear {
+        fun MockViewValidator.Composition() {
+            Linear {
                 if (includeNested) {
-                    text("Nested in $text")
+                    Text("Nested in $text")
                 }
-                text(text)
+                Text(text)
             }
         }
 
-        val result = compose { composition() }
+        compose { Composition() }
 
-        result.validate { composition() }
+        validate { this.Composition() }
 
         text = "Ending"
         includeNested = false
-        invalidate1?.invoke()
-        invalidate2?.invoke()
 
-        result.expectChanges()
+        expectChanges()
 
-        result.validate { composition() }
+        validate { this.Composition() }
 
-        result.expectNoChanges()
+        expectNoChanges()
 
-        result.validate { composition() }
+        validate { this.Composition() }
     }
 
     // b/132638679
     @Test
-    fun testJoinInvalidate() {
+    fun testJoinInvalidate() = compositionTest {
         var texts = 5
-        var invalidateOuter: (() -> Unit)? = null
-        var invalidateInner: (() -> Unit)? = null
+        var invalidateOuter = { }
+        var invalidateInner = { }
+        var forceInvalidate = false
 
-        @Composable fun MockComposeScope.composition() {
-            linear {
+        @Composable fun Composition() {
+            Linear {
                 invalidateOuter = invalidate
                 for (i in 1..texts) {
-                    text("Some text")
+                    Text("Some text")
                 }
 
                 Container {
-                    text("Some text")
+                    Text("Some text")
 
                     // Force the invalidation to survive the compose
                     val innerInvalidate = invalidate
-                    innerInvalidate()
                     invalidateInner = innerInvalidate
+                    if (forceInvalidate) {
+                        innerInvalidate()
+                        forceInvalidate = false
+                    }
                 }
             }
         }
 
-        val result = compose { composition() }
+        compose { Composition() }
 
         texts = 4
-        invalidateOuter?.invoke()
-        invalidateInner?.invoke()
-        result.expectChanges()
+        invalidateOuter()
+        invalidateInner()
+        forceInvalidate = true
+        expectChanges()
 
         texts = 3
-        invalidateOuter?.invoke()
-        result.expectChanges()
+        invalidateOuter()
+        forceInvalidate = true
+        expectChanges()
+
+        expectNoChanges()
     }
 
     @Test
-    fun testLifecycle_Enter_Simple() {
+    fun testLifecycle_Enter_Simple() = compositionTest {
         val lifecycleObject = object : CompositionLifecycleObserver {
             var count = 0
             override fun onEnter() {
@@ -1354,37 +1379,39 @@ class CompositionTests {
             }
         }
 
-        @Composable fun MockComposeScope.composition() {
-            linear {
+        var changed = { }
+
+        @Composable
+        fun Composition() {
+            Linear {
+                changed = invalidate
                 remember { lifecycleObject }
-                text("Some text")
+                Text("Some text")
             }
         }
 
-        fun MockViewValidator.composition() {
-            linear {
-                text("Some text")
+        fun MockViewValidator.Composition() {
+            Linear {
+                Text("Some text")
             }
         }
 
-        var changed: (() -> Unit)? = null
-        val result = compose {
-            changed = invalidate
-            composition()
+        compose {
+            Composition()
         }
-        result.validate { composition() }
+        validate { this.Composition() }
 
         assertEquals(1, lifecycleObject.count, "object should have been notified of an enter")
 
-        changed!!()
-        result.expectNoChanges()
-        result.validate { composition() }
+        changed()
+        expectNoChanges()
+        validate { this.Composition() }
 
         assertEquals(1, lifecycleObject.count, "Object should have only been notified once")
     }
 
     @Test
-    fun testLifecycle_Enter_SingleNotification() {
+    fun testLifecycle_Enter_SingleNotification() = compositionTest {
         val lifecycleObject = object : CompositionLifecycleObserver {
             var count = 0
             override fun onEnter() {
@@ -1396,46 +1423,46 @@ class CompositionTests {
             }
         }
 
-        @Composable fun MockComposeScope.composition() {
-            linear {
+        var value by mutableStateOf(0)
+        @Composable
+        fun Composition() {
+            Linear {
                 val l = remember { lifecycleObject }
                 assertEquals(lifecycleObject, l, "Lifecycle object should be returned")
-                text("Some text")
+                Text("Some text $value")
             }
-            linear {
+            Linear {
                 val l = remember { lifecycleObject }
                 assertEquals(lifecycleObject, l, "Lifecycle object should be returned")
-                text("Some other text")
+                Text("Some other text $value")
             }
         }
 
-        fun MockViewValidator.composition() {
-            linear {
-                text("Some text")
+        fun MockViewValidator.Composition() {
+            Linear {
+                Text("Some text $value")
             }
-            linear {
-                text("Some other text")
+            Linear {
+                Text("Some other text $value")
             }
         }
 
-        var changed: (() -> Unit)? = null
-        val result = compose {
-            changed = invalidate
-            composition()
+        compose {
+            Composition()
         }
-        result.validate { composition() }
+        validate { this.Composition() }
 
         assertEquals(1, lifecycleObject.count, "object should have been notified of an enter")
 
-        changed!!()
-        result.expectNoChanges()
-        result.validate { composition() }
+        value++
+        expectChanges()
+        validate { this.Composition() }
 
         assertEquals(1, lifecycleObject.count, "Object should have only been notified once")
     }
 
     @Test
-    fun testLifecycle_Leave_Simple() {
+    fun testLifecycle_Leave_Simple() = compositionTest {
         val lifecycleObject = object : CompositionLifecycleObserver {
             var count = 0
             override fun onEnter() {
@@ -1447,54 +1474,55 @@ class CompositionTests {
             }
         }
 
-        @Composable fun MockComposeScope.composition(includeLifecycleObject: Boolean) {
-            linear {
+        @Composable
+        fun Composition(includeLifecycleObject: Boolean) {
+            Linear {
                 if (includeLifecycleObject) {
-                    linear {
+                    Linear {
                         val l = remember { lifecycleObject }
                         assertEquals(lifecycleObject, l, "Lifecycle object should be returned")
-                        text("Some text")
+                        Text("Some text")
                     }
                 }
             }
         }
 
-        fun MockViewValidator.composition(includeLifecycleObject: Boolean) {
-            linear {
+        fun MockViewValidator.Composition(includeLifecycleObject: Boolean) {
+            Linear {
                 if (includeLifecycleObject) {
-                    linear {
-                        text("Some text")
+                    Linear {
+                        Text("Some text")
                     }
                 }
             }
         }
 
-        var changed: (() -> Unit)? = null
+        var changed = { }
         var value = true
-        val result = compose {
+        compose {
             changed = invalidate
-            composition(value)
+            Composition(value)
         }
-        result.validate { composition(true) }
+        validate { this.Composition(true) }
 
         assertEquals(1, lifecycleObject.count, "object should have been notified of an enter")
 
-        changed!!()
-        result.expectNoChanges()
-        result.validate { composition(true) }
+        changed()
+        expectNoChanges()
+        validate { this.Composition(true) }
 
         assertEquals(1, lifecycleObject.count, "Object should have only been notified once")
 
         value = false
-        changed!!()
-        result.expectChanges()
-        result.validate { composition(false) }
+        changed()
+        expectChanges()
+        validate { this.Composition(false) }
 
         assertEquals(0, lifecycleObject.count, "Object should have been notified of a leave")
     }
 
     @Test
-    fun testLifecycle_Leave_NoLeaveOnReenter() {
+    fun testLifecycle_Leave_NoLeaveOnReenter() = compositionTest {
         var expectedEnter = true
         var expectedLeave = true
         val lifecycleObject = object : CompositionLifecycleObserver {
@@ -1510,53 +1538,54 @@ class CompositionTests {
             }
         }
 
-        @Composable fun MockComposeScope.composition(a: Boolean, b: Boolean, c: Boolean) {
-            linear {
+        @Composable
+        fun Composition(a: Boolean, b: Boolean, c: Boolean) {
+            Linear {
                 if (a) {
                     key(1) {
-                        linear {
+                        Linear {
                             val l = remember { lifecycleObject }
                             assertEquals(lifecycleObject, l, "Lifecycle object should be returned")
-                            text("a")
+                            Text("a")
                         }
                     }
                 }
                 if (b) {
                     key(2) {
-                        linear {
+                        Linear {
                             val l = remember { lifecycleObject }
                             assertEquals(lifecycleObject, l, "Lifecycle object should be returned")
-                            text("b")
+                            Text("b")
                         }
                     }
                 }
                 if (c) {
                     key(3) {
-                        linear {
+                        Linear {
                             val l = remember { lifecycleObject }
                             assertEquals(lifecycleObject, l, "Lifecycle object should be returned")
-                            text("c")
+                            Text("c")
                         }
                     }
                 }
             }
         }
 
-        fun MockViewValidator.composition(a: Boolean, b: Boolean, c: Boolean) {
-            linear {
+        fun MockViewValidator.Composition(a: Boolean, b: Boolean, c: Boolean) {
+            Linear {
                 if (a) {
-                    linear {
-                        text("a")
+                    Linear {
+                        Text("a")
                     }
                 }
                 if (b) {
-                    linear {
-                        text("b")
+                    Linear {
+                        Text("b")
                     }
                 }
                 if (c) {
-                    linear {
-                        text("c")
+                    Linear {
+                        Text("c")
                     }
                 }
             }
@@ -1568,13 +1597,13 @@ class CompositionTests {
         var a = true
         var b = false
         var c = false
-        var changed: (() -> Unit)? = null
-        val result = compose {
+        var changed = { }
+        compose {
             changed = invalidate
-            composition(a = a, b = b, c = c)
+            Composition(a = a, b = b, c = c)
         }
-        result.validate {
-            composition(
+        validate {
+            this.Composition(
                 a = true,
                 b = false,
                 c = false
@@ -1589,10 +1618,10 @@ class CompositionTests {
 
         expectedEnter = false
         expectedLeave = false
-        changed!!()
-        result.expectNoChanges()
-        result.validate {
-            composition(
+        changed()
+        expectNoChanges()
+        validate {
+            this.Composition(
                 a = true,
                 b = false,
                 c = false
@@ -1609,10 +1638,10 @@ class CompositionTests {
         a = false
         b = true
         c = false
-        changed!!()
-        result.expectChanges()
-        result.validate {
-            composition(
+        changed()
+        expectChanges()
+        validate {
+            this.Composition(
                 a = false,
                 b = true,
                 c = false
@@ -1625,10 +1654,10 @@ class CompositionTests {
         a = false
         b = false
         c = true
-        changed!!()
-        result.expectChanges()
-        result.validate {
-            composition(
+        changed()
+        expectChanges()
+        validate {
+            this.Composition(
                 a = false,
                 b = false,
                 c = true
@@ -1641,10 +1670,10 @@ class CompositionTests {
         a = true
         b = false
         c = false
-        changed!!()
-        result.expectChanges()
-        result.validate {
-            composition(
+        changed()
+        expectChanges()
+        validate {
+            this.Composition(
                 a = true,
                 b = false,
                 c = false
@@ -1657,10 +1686,10 @@ class CompositionTests {
         a = false
         b = false
         c = false
-        changed!!()
-        result.expectChanges()
-        result.validate {
-            composition(
+        changed()
+        expectChanges()
+        validate {
+            this.Composition(
                 a = false,
                 b = false,
                 c = false
@@ -1670,7 +1699,7 @@ class CompositionTests {
     }
 
     @Test
-    fun testLifecycle_Leave_LeaveOnReplace() {
+    fun testLifecycle_Leave_LeaveOnReplace() = compositionTest {
         val lifecycleObject1 = object : CompositionLifecycleObserver {
             var count = 0
             override fun onEnter() {
@@ -1696,50 +1725,51 @@ class CompositionTests {
         var lifecycleObject: Any = lifecycleObject1
         var changed = {}
 
-        @Composable fun MockComposeScope.composition(obj: Any) {
-            linear {
+        @Composable
+        fun Composition(obj: Any) {
+            Linear {
                 key(1) {
-                    linear {
+                    Linear {
                         remember(obj) { obj }
-                        text("Some value")
+                        Text("Some value")
                     }
                 }
             }
         }
 
-        fun MockViewValidator.composition() {
-            linear {
-                linear {
-                    text("Some value")
+        fun MockViewValidator.Composition() {
+            Linear {
+                Linear {
+                    Text("Some value")
                 }
             }
         }
 
-        val result = compose {
+        compose {
             changed = invalidate
-            composition(obj = lifecycleObject)
+            Composition(obj = lifecycleObject)
         }
-        result.validate { composition() }
+        validate { this.Composition() }
         assertEquals(1, lifecycleObject1.count, "first object should enter")
         assertEquals(0, lifecycleObject2.count, "second object should not have entered")
 
         lifecycleObject = lifecycleObject2
         changed()
-        result.expectChanges()
-        result.validate { composition() }
+        expectChanges()
+        validate { Composition() }
         assertEquals(0, lifecycleObject1.count, "first object should have left")
         assertEquals(1, lifecycleObject2.count, "second object should have entered")
 
         lifecycleObject = object {}
         changed()
-        result.expectChanges()
-        result.validate { composition() }
+        expectChanges()
+        validate { Composition() }
         assertEquals(0, lifecycleObject1.count, "first object should have left")
         assertEquals(0, lifecycleObject2.count, "second object should have left")
     }
 
     @Test
-    fun testLifecycle_EnterLeaveOrder() {
+    fun testLifecycle_EnterLeaveOrder() = compositionTest {
         var order = 0
         val objects = mutableListOf<Any>()
         val newLifecycleObject = { name: String ->
@@ -1766,10 +1796,11 @@ class CompositionTests {
             }.also { objects.add(it) }
         }
 
-        @Composable fun MockComposeScope.lifecycleUser(name: String) {
-            linear {
+        @Composable
+        fun LifecycleUser(name: String) {
+            Linear {
                 remember(name) { newLifecycleObject(name) }
-                text(value = name)
+                Text(value = name)
             }
         }
 
@@ -1789,41 +1820,41 @@ class CompositionTests {
         Should leave as: J, I, H, G, F, E, D, C, B, A
         */
 
-        @Composable fun MockComposeScope.tree() {
-            linear {
-                lifecycleUser("A")
-                linear {
-                    lifecycleUser("B")
-                    linear {
-                        lifecycleUser("C")
-                        lifecycleUser("D")
+        @Composable
+        fun Tree() {
+            Linear {
+                LifecycleUser("A")
+                Linear {
+                    LifecycleUser("B")
+                    Linear {
+                        LifecycleUser("C")
+                        LifecycleUser("D")
                     }
-                    lifecycleUser("E")
-                    lifecycleUser("F")
-                    linear {
-                        lifecycleUser("G")
-                        lifecycleUser("H")
-                        linear {
-                            lifecycleUser("I")
+                    LifecycleUser("E")
+                    LifecycleUser("F")
+                    Linear {
+                        LifecycleUser("G")
+                        LifecycleUser("H")
+                        Linear {
+                            LifecycleUser("I")
                         }
                     }
-                    lifecycleUser("J")
+                    LifecycleUser("J")
                 }
             }
         }
 
-        @Composable fun MockComposeScope.composition(includeTree: Boolean) {
-            linear {
-                if (includeTree) tree()
+        @Composable
+        fun Composition(includeTree: Boolean) {
+            Linear {
+                if (includeTree) Tree()
             }
         }
 
-        var value = true
-        var changed: (() -> Unit)? = null
+        var value by mutableStateOf(true)
 
-        val result = compose {
-            changed = invalidate
-            composition(value)
+        compose {
+            Composition(value)
         }
 
         assertTrue(
@@ -1832,8 +1863,7 @@ class CompositionTests {
         )
 
         value = false
-        changed!!()
-        result.expectChanges()
+        expectChanges()
 
         assertTrue(
             objects.mapNotNull { it as? Counted }.map { it.count == 0 }.all { it },
@@ -1858,7 +1888,7 @@ class CompositionTests {
     }
 
     @Test
-    fun testCompoundKeyHashStaysTheSameAfterRecompositions() {
+    fun testCompoundKeyHashStaysTheSameAfterRecompositions() = compositionTest {
         val outerKeys = mutableListOf<Int>()
         val innerKeys = mutableListOf<Int>()
         var previousOuterKeysSize = 0
@@ -1867,11 +1897,11 @@ class CompositionTests {
         var innerInvalidate: (() -> Unit) = {}
 
         @Composable
-        fun MockComposeScope.test() {
+        fun Test() {
             outerInvalidate = invalidate
             outerKeys.add(currentComposer.currentCompoundKeyHash)
             Container {
-                linear {
+                Linear {
                     innerInvalidate = invalidate
                     innerKeys.add(currentComposer.currentCompoundKeyHash)
                 }
@@ -1880,8 +1910,8 @@ class CompositionTests {
             assertEquals(outerKeys.last(), currentComposer.currentCompoundKeyHash)
         }
 
-        val result = compose {
-            test()
+        compose {
+            Test()
         }
 
         assertNotEquals(previousOuterKeysSize, outerKeys.size)
@@ -1889,12 +1919,12 @@ class CompositionTests {
 
         previousOuterKeysSize = outerKeys.size
         outerInvalidate()
-        result.expectNoChanges()
+        expectNoChanges()
         assertNotEquals(previousOuterKeysSize, outerKeys.size)
 
         previousInnerKeysSize = innerKeys.size
         innerInvalidate()
-        result.expectNoChanges()
+        expectNoChanges()
         assertNotEquals(previousInnerKeysSize, innerKeys.size)
 
         assertNotEquals(innerKeys[0], outerKeys[0])
@@ -1907,25 +1937,25 @@ class CompositionTests {
     }
 
     @Test // b/152753046
-    fun testSwappingGroups() {
+    fun testSwappingGroups() = compositionTest {
         val items = mutableListOf(0, 1, 2, 3, 4)
         var invalidateComposition = {}
 
         @Composable
-        fun MockComposeScope.noNodes() { }
+        fun NoNodes() { }
 
         @Composable
-        fun MockComposeScope.test() {
+        fun Test() {
             invalidateComposition = invalidate
             for (item in items) {
                 key(item) {
-                    noNodes()
+                    NoNodes()
                 }
             }
         }
 
-        val result = compose {
-            test()
+        compose {
+            Test()
         }
 
         // Swap 2 and 3
@@ -1933,11 +1963,11 @@ class CompositionTests {
         items[3] = 2
         invalidateComposition()
 
-        result.expectChanges()
+        expectChanges()
     }
 
     @Test // b/154650546
-    fun testInsertOnMultipleLevels() {
+    fun testInsertOnMultipleLevels() = compositionTest {
         val items = mutableListOf(
             1 to mutableListOf(
                 0, 1, 2, 3, 4
@@ -1954,70 +1984,70 @@ class CompositionTests {
         }
 
         @Composable
-        fun MockComposeScope.numbers(numbers: List<Int>) {
-            linear {
-                linear {
+        fun Numbers(numbers: List<Int>) {
+            Linear {
+                Linear {
                     invalidates.add(invalidate)
                     for (number in numbers) {
-                        text("$number")
+                        Text("$number")
                     }
                 }
             }
         }
 
         @Composable
-        fun MockComposeScope.item(number: Int, numbers: List<Int>) {
-            linear {
+        fun Item(number: Int, numbers: List<Int>) {
+            Linear {
                 invalidates.add(invalidate)
-                text("$number")
-                numbers(numbers)
+                Text("$number")
+                Numbers(numbers)
             }
         }
 
         @Composable
-        fun MockComposeScope.test() {
+        fun Test() {
             invalidates.add(invalidate)
 
-            linear {
+            Linear {
                 invalidates.add(invalidate)
                 for ((number, numbers) in items) {
-                    item(number, numbers)
+                    Item(number, numbers)
                 }
             }
         }
 
         fun MockViewValidator.numbers(numbers: List<Int>) {
-            linear {
-                linear {
+            Linear {
+                Linear {
                     for (number in numbers) {
-                        text("$number")
+                        Text("$number")
                     }
                 }
             }
         }
 
         fun MockViewValidator.item(number: Int, numbers: List<Int>) {
-            linear {
-                text("$number")
+            Linear {
+                Text("$number")
                 numbers(numbers)
             }
         }
 
-        fun MockViewValidator.test() {
-            linear {
+        fun MockViewValidator.Test() {
+            Linear {
                 for ((number, numbers) in items) {
                     item(number, numbers)
                 }
             }
         }
 
-        val result = compose {
-            test()
+        compose {
+            Test()
         }
 
         fun validate() {
-            result.validate {
-                test()
+            validate {
+                this.Test()
             }
         }
 
@@ -2032,12 +2062,12 @@ class CompositionTests {
 
         invalidateComposition()
 
-        result.expectChanges()
+        expectChanges()
         validate()
     }
 
     @Test
-    fun testInsertingAfterSkipping() {
+    fun testInsertingAfterSkipping() = compositionTest {
         val items = mutableListOf(
             1 to listOf(0, 1, 2, 3, 4)
         )
@@ -2049,55 +2079,54 @@ class CompositionTests {
         }
 
         @Composable
-        fun MockComposeScope.test() {
+        fun Test() {
             invalidates.add(invalidate)
 
-            linear {
+            Linear {
                 for ((item, numbers) in items) {
-                    text(item.toString())
-                    linear {
+                    Text(item.toString())
+                    Linear {
                         invalidates.add(invalidate)
                         for (number in numbers) {
-                            text(number.toString())
+                            Text(number.toString())
                         }
                     }
                 }
             }
         }
 
-        fun MockViewValidator.test() {
-            linear {
+        fun MockViewValidator.Test() {
+            Linear {
                 for ((item, numbers) in items) {
-                    text(item.toString())
-                    linear {
+                    Text(item.toString())
+                    Linear {
                         for (number in numbers) {
-                            text(number.toString())
+                            Text(number.toString())
                         }
                     }
                 }
             }
         }
 
-        val result = compose {
-            test()
+        compose {
+            Test()
         }
 
-        result.validate {
-            test()
+        validate {
+            this.Test()
         }
 
         items.add(2 to listOf(3, 4, 5, 6))
         invalidateComposition()
 
-        result.expectChanges()
-        result.validate {
-            test()
+        expectChanges()
+        validate {
+            this.Test()
         }
     }
 
     @Test
-    fun evenOddRecomposeGroup() {
-
+    fun evenOddRecomposeGroup() = compositionTest {
         var includeEven = true
         var includeOdd = true
         val invalidates = mutableListOf<() -> Unit>()
@@ -2110,122 +2139,122 @@ class CompositionTests {
         }
 
         @Composable
-        fun MockComposeScope.wrapper(content: @Composable () -> Unit) {
+        fun Wrapper(content: @Composable () -> Unit) {
             content()
         }
 
         @Composable
-        fun MockComposeScope.emitText() {
+        fun EmitText() {
             invalidates.add(invalidate)
             if (includeOdd) {
                 key(1) {
-                    text("odd 1")
+                    Text("odd 1")
                 }
             }
             if (includeEven) {
                 key(2) {
-                    text("even 2")
+                    Text("even 2")
                 }
             }
             if (includeOdd) {
                 key(3) {
-                    text("odd 3")
+                    Text("odd 3")
                 }
             }
             if (includeEven) {
                 key(4) {
-                    text("even 4")
+                    Text("even 4")
                 }
             }
         }
 
         @Composable
-        fun MockComposeScope.test() {
-            linear {
-                wrapper {
-                    emitText()
+        fun Test() {
+            Linear {
+                Wrapper {
+                    EmitText()
                 }
-                emitText()
-                wrapper {
-                    emitText()
+                EmitText()
+                Wrapper {
+                    EmitText()
                 }
-                emitText()
+                EmitText()
             }
         }
 
-        fun MockViewValidator.wrapper(children: () -> Unit) {
+        fun MockViewValidator.Wrapper(children: () -> Unit) {
             children()
         }
 
-        fun MockViewValidator.emitText() {
+        fun MockViewValidator.EmitText() {
             if (includeOdd) {
-                text("odd 1")
+                Text("odd 1")
             }
             if (includeEven) {
-                text("even 2")
+                Text("even 2")
             }
             if (includeOdd) {
-                text("odd 3")
+                Text("odd 3")
             }
             if (includeEven) {
-                text("even 4")
+                Text("even 4")
             }
         }
 
-        fun MockViewValidator.test() {
-            linear {
-                wrapper {
-                    emitText()
+        fun MockViewValidator.Test() {
+            Linear {
+                this.Wrapper {
+                    this.EmitText()
                 }
-                emitText()
-                wrapper {
-                    emitText()
+                this.EmitText()
+                this.Wrapper {
+                    this.EmitText()
                 }
-                emitText()
+                this.EmitText()
             }
         }
 
-        val result = compose {
-            test()
+        compose {
+            Test()
         }
 
         fun validate() {
-            result.validate {
-                test()
+            validate {
+                this.Test()
             }
         }
         validate()
 
         includeEven = false
         invalidateComposition()
-        result.expectChanges()
+        expectChanges()
         validate()
 
         includeEven = true
         includeOdd = false
         invalidateComposition()
-        result.expectChanges()
+        expectChanges()
         validate()
 
         includeEven = false
         includeOdd = false
         invalidateComposition()
-        result.expectChanges()
+        expectChanges()
         validate()
 
         includeEven = true
         invalidateComposition()
-        result.expectChanges()
+        expectChanges()
         validate()
 
         includeOdd = true
         invalidateComposition()
-        result.expectChanges()
+        expectChanges()
         validate()
     }
 
     @Test
-    fun evenOddWithMovement() {
+    fun evenOddWithMovement() = compositionTest {
         var includeEven = true
         var includeOdd = true
         var order = listOf(1, 2, 3, 4)
@@ -2239,84 +2268,84 @@ class CompositionTests {
         }
 
         @Composable
-        fun MockComposeScope.emitText(all: Boolean) {
+        fun EmitText(all: Boolean) {
             invalidates.add(invalidate)
             for (i in order) {
                 if (i % 2 == 1 && (all || includeOdd)) {
                     key(i) {
-                        text("odd $i")
+                        Text("odd $i")
                     }
                 }
                 if (i % 2 == 0 && (all || includeEven)) {
                     key(i) {
-                        text("even $i")
+                        Text("even $i")
                     }
                 }
             }
         }
 
         @Composable
-        fun MockComposeScope.test() {
-            linear {
+        fun Test() {
+            Linear {
                 invalidates.add(invalidate)
                 for (i in order) {
                     key(i) {
-                        text("group $i")
+                        Text("group $i")
                         if (i == 2 || (includeEven && includeOdd)) {
-                            text("including everything")
+                            Text("including everything")
                         } else {
                             if (includeEven) {
-                                text("including evens")
+                                Text("including evens")
                             }
                             if (includeOdd) {
-                                text("including odds")
+                                Text("including odds")
                             }
                         }
-                        emitText(i == 2)
+                        EmitText(i == 2)
                     }
                 }
-                emitText(false)
+                EmitText(false)
             }
         }
 
-        fun MockViewValidator.emitText(all: Boolean) {
+        fun MockViewValidator.EmitText(all: Boolean) {
             for (i in order) {
                 if (i % 2 == 1 && (includeOdd || all)) {
-                    text("odd $i")
+                    Text("odd $i")
                 }
                 if (i % 2 == 0 && (includeEven || all)) {
-                    text("even $i")
+                    Text("even $i")
                 }
             }
         }
 
-        fun MockViewValidator.test() {
-            linear {
+        fun MockViewValidator.Test() {
+            Linear {
                 for (i in order) {
-                    text("group $i")
+                    Text("group $i")
                     if (i == 2 || (includeEven && includeOdd)) {
-                        text("including everything")
+                        Text("including everything")
                     } else {
                         if (includeEven) {
-                            text("including evens")
+                            Text("including evens")
                         }
                         if (includeOdd) {
-                            text("including odds")
+                            Text("including odds")
                         }
                     }
-                    emitText(i == 2)
+                    this.EmitText(i == 2)
                 }
-                emitText(false)
+                this.EmitText(false)
             }
         }
 
-        val result = compose {
-            test()
+        compose {
+            Test()
         }
 
         fun validate() {
-            result.validate {
-                test()
+            validate {
+                this.Test()
             }
         }
         validate()
@@ -2324,78 +2353,75 @@ class CompositionTests {
         order = listOf(1, 2, 4, 3)
         includeEven = false
         invalidateComposition()
-        result.expectChanges()
+        expectChanges()
         validate()
 
         order = listOf(1, 4, 2, 3)
         includeEven = true
         includeOdd = false
         invalidateComposition()
-        result.expectChanges()
+        expectChanges()
         validate()
 
         order = listOf(3, 4, 2, 1)
         includeEven = false
         includeOdd = false
         invalidateComposition()
-        result.expectChanges()
+        expectChanges()
         validate()
 
         order = listOf(4, 3, 2, 1)
         includeEven = true
         invalidateComposition()
-        result.expectChanges()
+        expectChanges()
         validate()
 
         order = listOf(1, 2, 3, 4)
         includeOdd = true
         invalidateComposition()
-        result.expectChanges()
+        expectChanges()
         validate()
     }
 
     @Test
-    fun testObservationScopes() {
+    fun testObservationScopes() = compositionTest {
         val states = mutableListOf<MutableState<Int>>()
         var iterations = 0
 
-        @Composable fun MockComposeScope.test() {
+        @Composable
+        fun Test() {
             val s1 = mutableStateOf(iterations++)
-            text("s1 ${s1.value}")
+            Text("s1 ${s1.value}")
             states.add(s1)
             val s2 = mutableStateOf(iterations++)
-            text("s2 ${s2.value}")
+            Text("s2 ${s2.value}")
             states.add(s2)
         }
 
-        val result = compose {
-            test()
+        compose {
+            Test()
         }
 
-        result.observe {
-            fun invalidateFirst() {
-                states.first().value++
-                Snapshot.sendApplyNotifications()
-            }
-
-            fun invalidateLast() {
-                states.last().value++
-                Snapshot.sendApplyNotifications()
-            }
-
-            repeat(10) {
-                invalidateLast()
-                result.expectChanges()
-            }
-
-            invalidateFirst()
-            result.expectNoChanges()
+        fun invalidateFirst() {
+            states.first().value++
         }
+
+        fun invalidateLast() {
+            states.last().value++
+        }
+
+        repeat(10) {
+            invalidateLast()
+            expectChanges()
+        }
+
+        invalidateFirst()
+        expectNoChanges()
     }
 
     @OptIn(ComposeCompilerApi::class)
     @Test
-    fun testApplierBeginEndCallbacks() {
+    fun testApplierBeginEndCallbacks() = compositionTest {
         val checks = mutableListOf<String>()
         compose {
             val myComposer = currentComposer
@@ -2446,66 +2472,72 @@ class CompositionTests {
     }
 
     @Test // regression test for b/172660922
-    fun testInvalidationOfRemovedContent() {
+    fun testInvalidationOfRemovedContent() = compositionTest {
         var markS1Invalid: () -> Unit = {}
         var viewS1 by mutableStateOf(true)
-        @Composable fun MockComposeScope.s1() {
+        var performBackwardsWrite = true
+        @Composable
+        fun S1() {
             markS1Invalid = invalidate
-            text("In s1")
-            markS1Invalid()
+            Text("In s1")
         }
 
-        @Composable fun MockComposeScope.s2() {
-            text("In s2")
+        @Composable
+        fun S2() {
+            Text("In s2")
         }
 
-        @Composable fun MockComposeScope.test() {
-            text("$viewS1")
+        @Composable
+        fun Test() {
+            Text("$viewS1")
             Wrap {
                 if (viewS1) {
-                    s1()
+                    S1()
                 }
-                s2()
+                S2()
             }
 
-            // This forces the equivalent of a backwards write.
-            markS1Invalid()
+            if (performBackwardsWrite) {
+                // This forces the equivalent of a backwards write.
+                markS1Invalid()
+                performBackwardsWrite = false
+            }
         }
 
-        fun MockViewValidator.s1() {
-            text("In s1")
+        fun MockViewValidator.S1() {
+            Text("In s1")
         }
 
-        fun MockViewValidator.s2() {
-            text("In s2")
+        fun MockViewValidator.S2() {
+            Text("In s2")
         }
 
-        fun MockViewValidator.test() {
-            text("$viewS1")
+        fun MockViewValidator.Test() {
+            Text("$viewS1")
             if (viewS1) {
-                s1()
+                this.S1()
             }
-            s2()
+            this.S2()
         }
 
-        val result = compose {
-            test()
+        compose {
+            Test()
         }
 
-        fun validate() = result.validate { test() }
+        fun validate() = validate { this.Test() }
 
         validate()
 
         markS1Invalid()
-        result.expectNoChanges()
+        performBackwardsWrite = true
+        expectNoChanges()
 
         validate()
 
-        result.observe {
-            viewS1 = false
-            result.expectChanges()
-            validate()
-        }
+        viewS1 = false
+        performBackwardsWrite = true
+        expectChanges()
+        validate()
     }
 
     /**
@@ -2728,101 +2760,6 @@ private fun <T> assertArrayEquals(message: String, expected: Array<T>, received:
                 expected[index]}], received: [${received[index]}]"
             )
     }
-}
-
-@OptIn(InternalComposeApi::class, ExperimentalComposeApi::class)
-private class CompositionResult(
-    val composer: Composer<*>,
-    val root: View
-) {
-    fun validate(block: MockViewValidator.() -> Unit) {
-        MockViewListValidator(root.children).validate(block)
-    }
-
-    fun expectNoChanges() {
-        val changes = recompose() && composer.changeCount > 0
-        assertFalse(changes, "Changes detected when they were not expected")
-    }
-
-    fun expectChanges() {
-        val changes = recompose() && composer.changeCount > 0
-        assertTrue(changes, "Expected changes")
-        composer.applyChanges()
-        Snapshot.notifyObjectsInitialized()
-        composer.verifyConsistent()
-    }
-
-    fun recompose(): Boolean = doCompose(composer) { composer.recompose() }
-
-    fun observe(block: () -> Unit) {
-        val unregister = Snapshot.registerApplyObserver { changed, _ ->
-            composer.recordModificationsOf(changed)
-        }
-        try {
-            block()
-        } finally {
-            unregister()
-        }
-    }
-}
-
-@OptIn(InternalComposeApi::class, ExperimentalComposeApi::class)
-private fun <T> doCompose(composer: Composer<*>, block: () -> T): T {
-    val snapshot = takeMutableSnapshot(
-        {
-            composer.recordReadOf(it)
-        },
-        {
-            composer.recordWriteOf(it)
-        }
-    )
-    return try {
-        snapshot.enter { block() }.also {
-            snapshot.apply().check()
-        }
-    } finally {
-        snapshot.dispose()
-    }
-}
-
-/**
- * Composer the given block.
- */
-@OptIn(InternalComposeApi::class, ExperimentalComposeApi::class)
-private fun compose(
-    block: @Composable MockComposeScope.() -> Unit
-): CompositionResult {
-    val root = View().apply { name = "root" }
-    val composer = run {
-        val scope = CoroutineScope(Job())
-        val clock = object : MonotonicFrameClock {
-            override suspend fun <R> withFrameNanos(onFrame: (Long) -> R): R {
-                // The original version of this test used a mock Recomposer
-                // that never successfully scheduled a frame.
-                suspendCancellableCoroutine<Unit> {}
-                return onFrame(0)
-            }
-        }
-        val recomposer = Recomposer(scope.coroutineContext).apply {
-            scope.launch(clock) { runRecomposeAndApplyChanges() }
-        }
-        Composer(
-            ViewApplier(root),
-            recomposer
-        )
-    }
-
-    val mockScope = MockComposeScope()
-    doCompose(composer) {
-        composer.composeInitial {
-            mockScope.block()
-        }
-        Snapshot.notifyObjectsInitialized()
-        composer.applyChanges()
-    }
-    composer.verifyConsistent()
-
-    return CompositionResult(composer, root)
 }
 
 // Contact test data
