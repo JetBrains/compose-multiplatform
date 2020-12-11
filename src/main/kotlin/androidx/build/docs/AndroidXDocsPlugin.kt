@@ -43,6 +43,7 @@ import org.gradle.api.attributes.DocsType
 import org.gradle.api.attributes.Usage
 import org.gradle.api.file.FileCollection
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskProvider
@@ -208,6 +209,24 @@ class AndroidXDocsPlugin : Plugin<Project> {
         }
         val docsRuntimeClasspath = project.configurations.create("docs-runtime-classpath") {
             it.setResolveClasspathForUsage(Usage.JAVA_RUNTIME)
+        }
+        docsCompileClasspath.resolutionStrategy {
+            val buildVersions = (project.rootProject.property("ext") as ExtraPropertiesExtension)
+                .let { it.get("build_versions") as Map<*, *> }
+            it.eachDependency { details ->
+                if (details.requested.group == "org.jetbrains.kotlin") {
+                    details.useVersion(buildVersions["kotlin"] as String)
+                }
+            }
+        }
+        docsRuntimeClasspath.resolutionStrategy {
+            val buildVersions = (project.rootProject.property("ext") as ExtraPropertiesExtension)
+                .let { it.get("build_versions") as Map<*, *> }
+            it.eachDependency { details ->
+                if (details.requested.group == "org.jetbrains.kotlin") {
+                    details.useVersion(buildVersions["kotlin"] as String)
+                }
+            }
         }
         dependencyClasspath = docsCompileClasspath.incoming.artifactView {
             it.attributes.attribute(
