@@ -184,14 +184,12 @@ class LazyColumnTest {
         var disposed = false
         // Ten 31dp spacers in a 300dp list
         val latch = CountDownLatch(10)
-        // Make it long enough that it's _definitely_ taller than the screen
-        val data = (1..50).toList()
 
         rule.setContent {
             // Fixed height to eliminate device size as a factor
             Box(Modifier.testTag(LazyListTag).preferredHeight(300.dp)) {
                 LazyColumn(Modifier.fillMaxSize()) {
-                    items(data) {
+                    items(50) {
                         onCommit {
                             composed = true
                             // Signal when everything is done composing
@@ -285,7 +283,7 @@ class LazyColumnTest {
         rule.setContent {
             if (emitAdapterList) {
                 LazyColumn(Modifier.fillMaxSize()) {
-                    items(listOf(0, 1)) {
+                    items(2) {
                         Box(Modifier.size(100.dp))
                         onDispose {
                             if (it == 1) {
@@ -987,7 +985,6 @@ class LazyColumnTest {
     @Test
     fun stateIsRestored() {
         val restorationTester = StateRestorationTester(rule)
-        val items by mutableStateOf((1..20).toList())
         var state: LazyListState? = null
         restorationTester.setContent {
             state = rememberLazyListState()
@@ -995,7 +992,7 @@ class LazyColumnTest {
                 Modifier.size(100.dp).testTag(LazyListTag),
                 state = state!!
             ) {
-                items(items) {
+                items(20) {
                     Spacer(Modifier.size(20.dp).testTag("$it"))
                 }
             }
@@ -1046,7 +1043,6 @@ class LazyColumnTest {
 
     @Test
     fun snapToItemIndex() {
-        val items by mutableStateOf((1..20).toList())
         lateinit var state: LazyListState
         rule.setContent {
             state = rememberLazyListState()
@@ -1054,7 +1050,7 @@ class LazyColumnTest {
                 Modifier.size(100.dp).testTag(LazyListTag),
                 state = state
             ) {
-                items(items) {
+                items(20) {
                     Spacer(Modifier.size(20.dp).testTag("$it"))
                 }
             }
@@ -1097,12 +1093,11 @@ class LazyColumnTest {
 
     @Test
     fun itemInvalidationIsNotCausingAnotherItemToRedraw() {
-        val items = (0..1).toList()
         val redrawCount = Array(2) { 0 }
         var stateUsedInDrawScope by mutableStateOf(false)
         rule.setContent {
             LazyColumn(Modifier.size(100.dp).testTag(LazyListTag)) {
-                items(items) {
+                items(2) {
                     Spacer(
                         Modifier.size(50.dp)
                             .drawBehind {
@@ -1130,7 +1125,6 @@ class LazyColumnTest {
 
     @Test
     fun notVisibleAnymoreItemNotAffectingCrossAxisSize() {
-        val items = (0..1).toList()
         val itemSize = with(rule.density) { 30.toDp() }
         val itemSizeMinusOne = with(rule.density) { 29.toDp() }
         lateinit var state: LazyListState
@@ -1139,7 +1133,7 @@ class LazyColumnTest {
                 Modifier.height(itemSizeMinusOne).testTag(LazyListTag),
                 state = rememberLazyListState().also { state = it }
             ) {
-                items(items) {
+                items(2) {
                     Spacer(
                         if (it == 0) {
                             Modifier.width(30.dp).height(itemSizeMinusOne)
@@ -1185,6 +1179,54 @@ class LazyColumnTest {
 
         rule.onNodeWithTag(LazyListTag)
             .assertWidthIsEqualTo(30.dp)
+    }
+
+    @Test
+    fun usedWithArray() {
+        val items = arrayOf("1", "2", "3")
+
+        val itemSize = with(rule.density) { 15.toDp() }
+
+        rule.setContent {
+            LazyColumn {
+                items(items) {
+                    Spacer(Modifier.size(itemSize).testTag(it))
+                }
+            }
+        }
+
+        rule.onNodeWithTag("1")
+            .assertTopPositionInRootIsEqualTo(0.dp)
+
+        rule.onNodeWithTag("2")
+            .assertTopPositionInRootIsEqualTo(itemSize)
+
+        rule.onNodeWithTag("3")
+            .assertTopPositionInRootIsEqualTo(itemSize * 2)
+    }
+
+    @Test
+    fun usedWithArrayIndexed() {
+        val items = arrayOf("1", "2", "3")
+
+        val itemSize = with(rule.density) { 15.toDp() }
+
+        rule.setContent {
+            LazyColumn {
+                itemsIndexed(items) { index, item ->
+                    Spacer(Modifier.size(itemSize).testTag("$index*$item"))
+                }
+            }
+        }
+
+        rule.onNodeWithTag("0*1")
+            .assertTopPositionInRootIsEqualTo(0.dp)
+
+        rule.onNodeWithTag("1*2")
+            .assertTopPositionInRootIsEqualTo(itemSize)
+
+        rule.onNodeWithTag("2*3")
+            .assertTopPositionInRootIsEqualTo(itemSize * 2)
     }
 
     private fun SemanticsNodeInteraction.assertTopPositionIsAlmost(expected: Dp) {

@@ -67,7 +67,7 @@ fun PointerInputDuringSubComp() {
                 .size(200.dp)
                 .background(color = Color.White)
         ) {
-            items(List(100) { index -> index }) {
+            items(100) {
                 val pointerCount = remember { mutableStateOf(0) }
 
                 Box(

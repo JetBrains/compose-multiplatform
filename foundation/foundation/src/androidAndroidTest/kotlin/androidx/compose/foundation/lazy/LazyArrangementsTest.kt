@@ -62,7 +62,7 @@ class LazyArrangementsTest {
             LazyColumn(
                 modifier = Modifier.size(containerSize)
             ) {
-                items((0..1).toList()) {
+                items(2) {
                     Box(Modifier.size(itemSize).testTag(it.toString()))
                 }
             }
@@ -96,7 +96,7 @@ class LazyArrangementsTest {
             LazyRow(
                 modifier = Modifier.size(containerSize)
             ) {
-                items((0..1).toList()) {
+                items(2) {
                     Box(Modifier.size(itemSize).testTag(it.toString()))
                 }
             }
@@ -152,7 +152,7 @@ class LazyArrangementsTest {
                 verticalArrangement = Arrangement.spacedBy(itemSize),
                 modifier = Modifier.testTag(ContainerTag)
             ) {
-                items((0..1).toList()) {
+                items(2) {
                     Box(Modifier.size(itemSize))
                 }
             }
@@ -170,7 +170,7 @@ class LazyArrangementsTest {
                 horizontalArrangement = Arrangement.spacedBy(itemSize),
                 modifier = Modifier.testTag(ContainerTag)
             ) {
-                items((0..1).toList()) {
+                items(2) {
                     Box(Modifier.size(itemSize))
                 }
             }
@@ -190,7 +190,7 @@ class LazyArrangementsTest {
                 verticalArrangement = Arrangement.spacedBy(itemSize),
                 modifier = Modifier.size(itemSize * 3.5f)
             ) {
-                items((0..2).toList()) {
+                items(3) {
                     Box(Modifier.size(itemSize).testTag(it.toString()))
                 }
             }
@@ -210,7 +210,7 @@ class LazyArrangementsTest {
                 verticalArrangement = Arrangement.spacedBy(itemSize),
                 modifier = Modifier.size(itemSize * 3.5f).testTag(ContainerTag)
             ) {
-                items((0..2).toList()) {
+                items(3) {
                     Box(Modifier.size(itemSize).testTag(it.toString()))
                 }
             }
@@ -233,7 +233,7 @@ class LazyArrangementsTest {
                 horizontalArrangement = Arrangement.spacedBy(itemSize),
                 modifier = Modifier.size(itemSize * 3.5f)
             ) {
-                items((0..2).toList()) {
+                items(3) {
                     Box(Modifier.size(itemSize).testTag(it.toString()))
                 }
             }
@@ -253,7 +253,7 @@ class LazyArrangementsTest {
                 horizontalArrangement = Arrangement.spacedBy(itemSize),
                 modifier = Modifier.size(itemSize * 3.5f).testTag(ContainerTag)
             ) {
-                items((0..2).toList()) {
+                items(3) {
                     Box(Modifier.size(itemSize).testTag(it.toString()))
                 }
             }
@@ -278,7 +278,7 @@ class LazyArrangementsTest {
                 reverseLayout = true,
                 modifier = Modifier.size(containerSize)
             ) {
-                items((0..1).toList()) {
+                items(2) {
                     Box(Modifier.size(itemSize).testTag(it.toString()))
                 }
             }
@@ -294,7 +294,7 @@ class LazyArrangementsTest {
                 reverseLayout = true,
                 modifier = Modifier.size(containerSize)
             ) {
-                items((0..1).toList()) {
+                items(2) {
                     Box(Modifier.size(itemSize).testTag(it.toString()))
                 }
             }
@@ -311,7 +311,7 @@ class LazyArrangementsTest {
                 verticalArrangement = arrangement,
                 modifier = Modifier.size(containerSize)
             ) {
-                items((0..1).toList()) {
+                items(2) {
                     Box(Modifier.size(itemSize).testTag(it.toString()))
                 }
             }
@@ -325,7 +325,7 @@ class LazyArrangementsTest {
                     horizontalArrangement = arrangement,
                     modifier = Modifier.size(containerSize)
                 ) {
-                    items((0..1).toList()) {
+                    items(2) {
                         Box(Modifier.size(itemSize).testTag(it.toString()))
                     }
                 }
