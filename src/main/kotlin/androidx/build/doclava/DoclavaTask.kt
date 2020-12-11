@@ -16,15 +16,22 @@
 
 package androidx.build.doclava
 
+import org.gradle.api.DefaultTask
+import org.gradle.api.file.FileCollection
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
-import org.gradle.api.tasks.javadoc.Javadoc
-import org.gradle.external.javadoc.CoreJavadocOptions
-import org.gradle.external.javadoc.StandardJavadocDocletOptions
+import org.gradle.api.tasks.TaskAction
+import org.gradle.process.ExecOperations
+import org.gradle.workers.WorkAction
+import org.gradle.workers.WorkParameters
+import org.gradle.workers.WorkerExecutor
 import java.io.File
+import javax.inject.Inject
 
 // external/doclava/src/com/google/doclava/Errors.java
 val DEFAULT_DOCLAVA_CONFIG = ChecksConfig(
@@ -40,14 +47,9 @@ val DEFAULT_DOCLAVA_CONFIG = ChecksConfig(
     )
 )
 
-private fun <E> CoreJavadocOptions.addMultilineMultiValueOption(
-    name: String,
-    values: Collection<E>
-) {
-    addMultilineMultiValueOption(name).value = values.map { listOf(it.toString()) }
-}
-
-open class DoclavaTask : Javadoc() {
+abstract class DoclavaTask @Inject constructor(
+    private val workerExecutor: WorkerExecutor
+) : DefaultTask() {
 
     // All lowercase name to match MinimalJavadocOptions#docletpath
     private var docletpath: List<File> = emptyList()
@@ -86,18 +88,10 @@ open class DoclavaTask : Javadoc() {
 
     /**
      * If non-null, the location of where to place the generated removed api file.
-     * If this is non-null, then {@link #apiFile} must be non-null as well.
      */
     @Optional
     @OutputFile
     var removedApiFile: File? = null
-
-    /**
-     * If non-null, the location of the generated keep list.
-     */
-    @Optional
-    @OutputFile
-    var keepListFile: File? = null
 
     /**
      * If non-null, the location to put the generated stub sources.
@@ -107,20 +101,13 @@ open class DoclavaTask : Javadoc() {
     var stubsDir: File? = null
 
     init {
-        setFailOnError(true)
-        options.doclet = "com.google.doclava.Doclava"
-        options.encoding("UTF-8")
-        options.quiet()
-        // doclava doesn't understand '-doctitle'
-        title = null
-        maxMemory = "1280m"
-        // If none of generateDocs, apiFile, keepListFile, or stubJarsDir are true, then there is
+        // If none of generateDocs, apiFile, or stubJarsDir are true, then there is
         // no work to do.
-        onlyIf({ generateDocs || apiFile != null || keepListFile != null || stubsDir != null })
+        onlyIf({ generateDocs || apiFile != null || stubsDir != null })
     }
 
     /**
-     * The doclet path which has the {@code com.gogole.doclava.Doclava} class.
+     * The doclet path which has the {@code com.google.doclava.Doclava} class.
      * This option will override any doclet path set in this instance's
      * {@link #options JavadocOptions}.
      * @see MinimalJavadocOptions#getDocletpath()
@@ -138,60 +125,164 @@ open class DoclavaTask : Javadoc() {
      */
     fun setDocletpath(docletpath: Collection<File>) {
         this.docletpath = docletpath.toList()
-        // Go ahead and keep the docletpath in our JavadocOptions object in sync.
-        options.docletpath = docletpath.toList()
+    }
+
+    @OutputDirectory
+    var destinationDir: File? = null
+
+    @InputFiles
+    var classpath: FileCollection? = null
+
+    @InputFiles
+    val sources = mutableListOf<FileCollection>()
+
+    fun source(files: FileCollection) {
+        sources.add(files)
     }
 
     /**
-     * "Configures" this DoclavaTask with parameters that might not be at their final values
-     * until this task is run.
+     * Builder containing extra arguments
      */
-    private fun configureDoclava() = (options as StandardJavadocDocletOptions).apply {
+    @Internal
+    val extraArgumentsBuilder = DoclavaArgumentBuilder()
 
-        docletpath = this@DoclavaTask.docletpath
+    @Input
+    val extraArguments = extraArgumentsBuilder.build()
+
+    private fun computeArguments(): List<String> {
+        val args = DoclavaArgumentBuilder()
+
+        // classpath
+        val classpathString = classpath!!.files.map({ f -> f.toString() }).joinToString(":")
+        args.addStringOption("cp", classpathString)
+        args.addStringOption("doclet", "com.google.doclava.Doclava")
+        args.addStringOption("docletpath", classpathString)
+
+        args.addOption("quiet")
+        args.addStringOption("encoding", "UTF-8")
 
         // configure doclava error/warning/hide levels
-        addMultilineMultiValueOption("hide", checksConfig.hidden)
-        addMultilineMultiValueOption("warning", checksConfig.warnings)
-        addMultilineMultiValueOption("error", checksConfig.errors)
+        args.addRepeatableOption("hide", checksConfig.hidden)
+        args.addRepeatableOption("warning", checksConfig.warnings)
+        args.addRepeatableOption("error", checksConfig.errors)
 
         if (hiddenPackages != null) {
-            addMultilineMultiValueOption("hidePackage", hiddenPackages!!)
+            args.addRepeatableOption("hidePackage", hiddenPackages!!)
         }
 
         if (!generateDocs) {
-            addBooleanOption("nodocs", true)
+            args.addOption("nodocs")
         }
 
         // If requested, generate the API files.
         if (apiFile != null) {
-            addFileOption("api", apiFile)
-            addFileOption("removedApi", removedApiFile)
+            args.addFileOption("api", apiFile!!)
+            if (removedApiFile != null) {
+                args.addFileOption("removedApi", removedApiFile!!)
+            }
         }
-
-        // If requested, generate the keep list.
-        addFileOption("proguard", keepListFile)
 
         // If requested, generate stubs.
         if (stubsDir != null) {
-            addFileOption("stubs", stubsDir)
+            args.addFileOption("stubs", stubsDir!!)
             val stubs = stubPackages
             if (stubs != null) {
-                addStringOption("stubpackages", stubs.joinToString(":"))
+                args.addStringOption("stubpackages", stubs.joinToString(":"))
             }
         }
         // Always treat this as an Android docs task.
-        addBooleanOption("android", true)
+        args.addOption("android")
 
-        // Doclava does not understand -notimestamp option that is default since Gradle 6.0
-        isNoTimestamp = false
+        // destination directory
+        args.addFileOption("d", destinationDir!!)
+
+        // source files
+        for (source in sources) {
+            for (file in source) {
+                val arg = file.toString()
+                // Doclava does not know how to parse Kotlin files
+                if (!arg.endsWith(".kt")) {
+                    args.add(arg)
+                }
+            }
+        }
+
+        return args.build() + extraArgumentsBuilder.build()
     }
 
-    fun coreJavadocOptions(configure: CoreJavadocOptions.() -> Unit) =
-        (options as CoreJavadocOptions).configure()
+    @TaskAction
+    fun generate() {
+        val args = computeArguments()
+        runDoclavaWithArgs(docletpath, args, workerExecutor)
+    }
+}
 
-    override fun generate() {
-        configureDoclava()
-        super.generate()
+class DoclavaArgumentBuilder {
+    fun add(value: String) {
+        args.add(value)
+    }
+
+    fun addOption(name: String) {
+        args.add("-" + name)
+    }
+
+    fun addStringOption(name: String, value: String) {
+        addOption(name)
+        args.add(value)
+    }
+
+    fun addBooleanOption(name: String, value: Boolean) {
+        addStringOption(name, value.toString())
+    }
+
+    fun addFileOption(name: String, value: File) {
+        addStringOption(name, value.toString())
+    }
+
+    fun addRepeatableOption(name: String, values: Collection<*>) {
+        for (value in values) {
+            addStringOption(name, value.toString())
+        }
+    }
+
+    fun addStringOption(name: String, values: Collection<String>) {
+        args.add("-" + name)
+        for (value in values) {
+            args.add(value)
+        }
+    }
+
+    fun build(): List<String> {
+        return args
+    }
+
+    private val args = mutableListOf<String>()
+}
+
+interface DoclavaParams : WorkParameters {
+    fun getClasspath(): ListProperty<File>
+    fun getArgs(): ListProperty<String>
+}
+
+fun runDoclavaWithArgs(classpath: List<File>, args: List<String>, workerExecutor: WorkerExecutor) {
+    val workQueue = workerExecutor.noIsolation()
+    workQueue.submit(DoclavaWorkAction::class.java) { parameters ->
+        parameters.getArgs().set(args)
+        parameters.getClasspath().set(classpath)
+    }
+}
+
+abstract class DoclavaWorkAction @Inject constructor (
+    private val execOperations: ExecOperations
+) : WorkAction<DoclavaParams> {
+    override fun execute() {
+        val args = getParameters().getArgs().get()
+        val classpath = getParameters().getClasspath().get()
+
+        execOperations.javaexec {
+            it.classpath(classpath)
+            it.main = "com.google.doclava.Doclava"
+            it.args = args
+        }
     }
 }

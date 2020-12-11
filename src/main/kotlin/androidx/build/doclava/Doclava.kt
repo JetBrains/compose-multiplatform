@@ -53,15 +53,12 @@ internal fun createGenerateSdkApiTask(
                 project.zipTree(androidSrcJarFile(project))
                     .matching(PatternSet().include("**/*.java"))
             )
-            exclude("**/overview.html") // TODO https://issuetracker.google.com/issues/116699307
             apiFile = File(destination, "release/sdk_current.txt")
             generateDocs = false
-            coreJavadocOptions {
+            extraArgumentsBuilder.apply({
                 addStringOption("stubpackages", "android.*")
-            }
-            coreJavadocOptions {
                 addStringOption("-release", "8")
-            }
+            })
         }
     }
 
