@@ -25,7 +25,7 @@ import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.state.ToggleableState.Indeterminate
 import androidx.compose.ui.state.ToggleableState.Off
 import androidx.compose.ui.state.ToggleableState.On
-import androidx.compose.ui.test.assertHasNoClickAction
+import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
@@ -106,7 +106,7 @@ class CheckboxUiTest {
         }
 
         rule.onNodeWithTag(defaultTag)
-            .assertHasNoClickAction()
+            .assertHasClickAction()
     }
 
     @Test
