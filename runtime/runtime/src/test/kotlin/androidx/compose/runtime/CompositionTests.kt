@@ -2596,6 +2596,84 @@ class CompositionTests {
             }
         }
     }
+
+    /**
+     * An [Applier] may inadvertently (or on purpose) run arbitrary user code as a side effect
+     * of performing tree manipulations as a [Composer] is applying changes. This can happen
+     * if the tree type dispatches event callbacks when nodes are added or removed from a tree.
+     * These callbacks may cause snapshot state writes, which can in turn invalidate scopes in the
+     * composition that produced the tree in the first place. Ensure that the recomposition
+     * machinery is robust to this, and that these invalidations are processed on a subsequent
+     * recomposition.
+     */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun testStateWriteInApplier() = runBlockingTest {
+
+        class MutateOnRemoveApplier(
+            private val removeCounter: MutableState<Int>
+        ) : AbstractApplier<Unit>(Unit) {
+            var insertCount: Int = 0
+                private set
+
+            override fun remove(index: Int, count: Int) {
+                removeCounter.value += count
+            }
+
+            override fun onClear() {
+                // do nothing
+            }
+
+            override fun insertTopDown(index: Int, instance: Unit) {
+                insertCount++
+            }
+
+            override fun insertBottomUp(index: Int, instance: Unit) {
+                // do nothing
+            }
+
+            override fun move(from: Int, to: Int, count: Int) {
+                // do nothing
+            }
+        }
+
+        localRecomposerTest { recomposer ->
+            val stateMutatedOnRemove = mutableStateOf(0)
+            var shouldEmitNode by mutableStateOf(true)
+            var compositionCount = 0
+            Snapshot.notifyObjectsInitialized()
+            val applier = MutateOnRemoveApplier(stateMutatedOnRemove)
+            val composer = Composer(applier, recomposer)
+            try {
+                recomposer.composeInitial(composer) {
+                    compositionCount++
+                    // Read the state here so that the emit removal will invalidate it
+                    stateMutatedOnRemove.value
+                    if (shouldEmitNode) {
+                        emit<Unit, MutateOnRemoveApplier>({ Unit }) {}
+                    }
+                }
+                // Initial composition should not contain the node we will remove. We want to test
+                // recomposition for this case in particular.
+                assertEquals(1, applier.insertCount, "expected setup node not inserted")
+                shouldEmitNode = false
+                Snapshot.sendApplyNotifications()
+                advanceUntilIdle()
+                assertEquals(1, stateMutatedOnRemove.value, "observable removals performed")
+                // Only two composition passes should have been performed by this point; a state
+                // invalidation in the applier should not be picked up or acted upon until after
+                // this frame is complete.
+                assertEquals(2, compositionCount, "expected number of (re)compositions performed")
+                // After sending apply notifications we expect the snapshot state change made by
+                // the applier to trigger one final recomposition.
+                Snapshot.sendApplyNotifications()
+                advanceUntilIdle()
+                assertEquals(3, compositionCount, "expected number of (re)compositions performed")
+            } finally {
+                composer.dispose()
+            }
+        }
+    }
 }
 
 @OptIn(InternalComposeApi::class, ExperimentalComposeApi::class)

@@ -372,10 +372,9 @@ class Recomposer(
     private fun performRecompose(composer: Composer<*>): Boolean {
         if (composer.isComposing || composer.isDisposed) return false
         return composing(composer) {
-            composer.recompose().also {
-                Snapshot.notifyObjectsInitialized()
-                composer.applyChanges()
-            }
+            composer.recompose()
+        }.also {
+            composer.applyChanges()
         }
     }
 
