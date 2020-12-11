@@ -76,6 +76,7 @@ object LibraryGroups {
     val RECOMMENDATION = LibraryGroup("androidx.recommendation", LibraryVersions.RECOMMENDATION)
     val RECYCLERVIEW = LibraryGroup("androidx.recyclerview", null)
     val REMOTECALLBACK = LibraryGroup("androidx.remotecallback", LibraryVersions.REMOTECALLBACK)
+    val RESOURCEINSPECTION = LibraryGroup("androidx.resourceinspection", LibraryVersions.RESOURCEINSPECTION)
     val ROOM = LibraryGroup("androidx.room", LibraryVersions.ROOM)
     val STARTUP = LibraryGroup("androidx.startup", LibraryVersions.STARTUP)
     val SAVEDSTATE = LibraryGroup("androidx.savedstate", LibraryVersions.SAVEDSTATE)
