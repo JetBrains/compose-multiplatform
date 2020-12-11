@@ -38,5 +38,3 @@ fun lerp(start: Int, stop: Int, fraction: Float): Int {
 fun lerp(start: Long, stop: Long, fraction: Float): Long {
     return start + ((stop - start) * fraction.toDouble()).roundToLong()
 }
-
-expect fun Float.toStringAsFixed(digits: Int): String

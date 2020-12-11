@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.util
+package androidx.compose.ui.geometry
 
-actual fun Float.toStringAsFixed(digits: Int): String = String.format("%.${digits}f", this)
+import androidx.compose.ui.util.format
+
+// File of internal utility methods used for the geometry library
+internal fun Float.toStringAsFixed(digits: Int): String = "%.${digits}f".format(this)
