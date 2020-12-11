@@ -137,6 +137,46 @@ class CutCornerShapeTest {
         )
     }
 
+    @Test
+    fun objectsWithTheSameCornersAreEquals() {
+        @Suppress("ReplaceCallWithBinaryOperator")
+        assertThat(
+            CutCornerShape(
+                topLeft = CornerSize(4.0f),
+                topRight = CornerSize(3.0f),
+                bottomRight = CornerSize(3.dp),
+                bottomLeft = CornerSize(50)
+            ).equals(
+                CutCornerShape(
+                    topLeft = CornerSize(4.0f),
+                    topRight = CornerSize(3.0f),
+                    bottomRight = CornerSize(3.dp),
+                    bottomLeft = CornerSize(50)
+                )
+            )
+        ).isTrue()
+    }
+
+    @Test
+    fun objectsWithDifferentCornersAreNotEquals() {
+        @Suppress("ReplaceCallWithBinaryOperator")
+        assertThat(
+            CutCornerShape(
+                topLeft = CornerSize(4.0f),
+                topRight = CornerSize(3.0f),
+                bottomRight = CornerSize(3.dp),
+                bottomLeft = CornerSize(50)
+            ).equals(
+                CutCornerShape(
+                    topLeft = CornerSize(4.0f),
+                    topRight = CornerSize(5.0f),
+                    bottomRight = CornerSize(3.dp),
+                    bottomLeft = CornerSize(50)
+                )
+            )
+        ).isFalse()
+    }
+
     private fun Shape.toOutline() = createOutline(size, density)
 }
 

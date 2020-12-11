@@ -82,6 +82,26 @@ class CutCornerShape(
         return "CutCornerShape(topLeft = $topLeft, topRight = $topRight, bottomRight = " +
             "$bottomRight, bottomLeft = $bottomLeft)"
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is CutCornerShape) return false
+
+        if (topLeft != other.topLeft) return false
+        if (topRight != other.topRight) return false
+        if (bottomRight != other.bottomRight) return false
+        if (bottomLeft != other.bottomLeft) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = topLeft.hashCode()
+        result = 31 * result + topRight.hashCode()
+        result = 31 * result + bottomRight.hashCode()
+        result = 31 * result + bottomLeft.hashCode()
+        return result
+    }
 }
 
 /**
