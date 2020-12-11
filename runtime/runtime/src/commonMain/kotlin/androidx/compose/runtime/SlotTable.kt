@@ -2057,22 +2057,14 @@ internal class SlotWriter(
         return if (len > 0) {
             var anchorsRemoved = false
             val anchors = anchors
-            if (groupGapLen == 0) {
-                // If there is no current gap, just update the anchors and make the removed slots
-                // the gap
-                if (anchors.isNotEmpty()) updateAnchors(groupGapStart, start)
-                groupGapStart = start
-                if (anchors.isNotEmpty()) anchorsRemoved = removeAnchors(start, len)
-                groupGapLen = len
-            } else {
-                // Move the gap to start of the removal and grow the gap
-                moveGroupGapTo(start)
-                if (anchors.isNotEmpty()) anchorsRemoved = removeAnchors(start, len)
-                groupGapStart = start
-                val previousGapLen = groupGapLen
-                val newGapLen = previousGapLen + len
-                groupGapLen = newGapLen
-            }
+
+            // Move the gap to start of the removal and grow the gap
+            moveGroupGapTo(start)
+            if (anchors.isNotEmpty()) anchorsRemoved = removeAnchors(start, len)
+            groupGapStart = start
+            val previousGapLen = groupGapLen
+            val newGapLen = previousGapLen + len
+            groupGapLen = newGapLen
 
             // Adjust the gap owner if necessary.
             val slotsGapOwner = slotsGapOwner
