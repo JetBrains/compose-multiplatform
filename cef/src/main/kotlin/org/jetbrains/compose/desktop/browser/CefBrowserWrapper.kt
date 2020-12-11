@@ -1,34 +1,22 @@
 package org.jetbrains.compose.desktop.browser
 
 import androidx.compose.ui.unit.IntOffset
-
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
-import java.awt.event.MouseMotionAdapter
 import java.awt.KeyboardFocusManager
-
 import java.nio.ByteBuffer
-
 import org.cef.CefApp
-import org.cef.CefClient
 import org.cef.CefSettings
 import org.cef.browser.CefBrowser
 import org.cef.browser.BrowserView
 import org.cef.handler.CefFocusHandlerAdapter
-
 import org.jetbrains.skija.Bitmap
+import org.jetbrains.skija.ImageInfo
+import org.jetbrains.skija.ColorAlphaType
 import org.jetbrains.skiko.HardwareLayer
 
 class CefBrowserWrapper {
-    private var offset = IntOffset(0, 0)
-    private var isFocused = false
     private var cefFocus = true
     private val browser: BrowserView
     public var onInvalidate: (() -> Unit)? = null
@@ -64,78 +52,10 @@ class CefBrowserWrapper {
                 browser.onFocusLost()
             }
         })
-
-        layer.addMouseListener(object : MouseAdapter() {
-            override fun mousePressed(event: MouseEvent) {
-                if (isInLayer(event)) {
-                    browser.onMouseEvent(event)
-                }
-            }
-            override fun mouseReleased(event: MouseEvent) {
-                if (isInLayer(event)) {
-                    browser.onMouseEvent(event)
-                }
-            }
-        })
-
-        layer.addMouseMotionListener(object : MouseMotionAdapter() {
-            override fun mouseMoved(event: MouseEvent) {
-                if (isInLayer(event)) {
-                    browser.onMouseEvent(event)
-                }
-            }
-            override fun mouseDragged(event: MouseEvent) {
-                if (isInLayer(event)) {
-                    browser.onMouseEvent(event)
-                }
-            }
-        })
-
-        layer.addMouseWheelListener(object : MouseWheelListener {
-            override fun mouseWheelMoved(event: MouseWheelEvent) {
-                if (isInLayer(event)) {
-                    browser.onMouseScrollEvent(event)
-                }
-            }
-        })
-    
-        layer.addKeyListener(object : KeyAdapter() {
-            override fun keyPressed(event: KeyEvent) {
-                if (!isFocused) {
-                    return
-                }
-                browser.onKeyEvent(event)
-            }
-            override fun keyReleased(event: KeyEvent) {
-                if (!isFocused) {
-                    return
-                }
-                browser.onKeyEvent(event)
-            }
-            override fun keyTyped(event: KeyEvent) {
-                if (!isFocused) {
-                    return
-                }
-                browser.onKeyEvent(event)
-            }
-        })
-    }
-
-    private fun isInLayer(event: MouseEvent): Boolean {
-        val x = event.x
-        val y = event.y
-        if (x > offset.x && y > offset.y) {
-            return true
-        }
-        return false
     }
 
     fun loadURL(url: String) {
         browser.loadURL(url)
-    }
-
-    fun setFocused(value: Boolean) {
-        isFocused = value
     }
 
     fun getBitmap(): Bitmap {
@@ -143,7 +63,6 @@ class CefBrowserWrapper {
     }
 
     fun onLayout(x: Int, y: Int, width: Int, height: Int) {
-        offset = IntOffset(x, y)
         browser.onResized(x, y, width, height)
     }
 
@@ -154,4 +73,25 @@ class CefBrowserWrapper {
     fun onDismiss() {
         CefApp.getInstance().dispose()
     }
+
+    fun onMouseEvent(event: MouseEvent) {
+        browser.onMouseEvent(event)
+    }
+
+    fun onMouseScrollEvent(event: MouseWheelEvent) {
+        browser.onMouseScrollEvent(event)
+    }
+
+    fun onKeyEvent(event: KeyEvent) {
+        if (cefFocus) {
+            browser.onKeyEvent(event)
+        }
+    }
 }
+
+internal val emptyBitmap: Bitmap
+    get() {
+        val bitmap = Bitmap()
+        bitmap.allocPixels(ImageInfo.makeS32(1, 1, ColorAlphaType.PREMUL))
+        return bitmap
+    }

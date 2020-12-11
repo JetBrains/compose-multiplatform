@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.MutableState
 import androidx.compose.desktop.Window
 import androidx.compose.desktop.WindowEvents
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,18 +23,26 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.TextField
 import androidx.compose.material.Button
 import androidx.compose.foundation.Text
-import org.jetbrains.compose.desktop.browser.BrowserState
-import org.jetbrains.compose.desktop.browser.CefView
+import org.jetbrains.compose.desktop.browser.Browser
+import org.jetbrains.compose.desktop.browser.BrowserView
+import org.jetbrains.compose.desktop.browser.BrowserSlicer
 
-fun main() {
-    val browser = BrowserState()
+fun main(args: Array<String>) {
+    val browser = when {
+        args.isEmpty() -> BrowserView()
+        args[0] == "slices" -> BrowserSlicer(IntSize(800, 700))
+        else -> {
+            BrowserView()
+        }
+    }
+
     val url = mutableStateOf("https://www.google.com")
 
     Window(
         title = "CEF-compose",
-        size = IntSize(800, 800),
+        size = IntSize(900, 900),
         events = WindowEvents(
-            onFocusGet = { browser.loadURL(url.value) }
+            onFocusGet = { browser.load(url.value) }
         )
     ) {
         Surface(
@@ -50,7 +59,7 @@ fun main() {
 }
 
 @Composable
-private fun AddressBar(browser: BrowserState, url: MutableState<String>) {
+private fun AddressBar(browser: Browser, url: MutableState<String>) {
     Surface(
         color = Color.Transparent,
         modifier = Modifier
@@ -74,7 +83,7 @@ private fun AddressBar(browser: BrowserState, url: MutableState<String>) {
             Button(
                 modifier = Modifier.preferredHeight(48.dp),
                 shape = CircleShape,
-                onClick = { browser.loadURL(url.value) }
+                onClick = { browser.load(url.value) }
             ) {
                 Text(text = "Go!")
             }
@@ -83,11 +92,24 @@ private fun AddressBar(browser: BrowserState, url: MutableState<String>) {
 }
 
 @Composable
-private fun WebView(browser: BrowserState) {
+private fun WebView(browser: Browser) {
     Surface(
         color = Color.Gray,
         modifier = Modifier.fillMaxSize().padding(10.dp)
     ) {
-        CefView(browser)
+        when (browser) {
+            is BrowserView -> {
+                browser.view()
+            }
+            is BrowserSlicer -> {
+                Column {
+                    browser.slice(0, 200)
+                    Spacer(Modifier.height(30.dp))
+                    browser.slice(200, 200)
+                    Spacer(Modifier.height(30.dp))
+                    browser.tail()
+                }
+            }
+        }
     }
 }
