@@ -18,6 +18,7 @@ package androidx.compose.desktop
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
+import androidx.compose.runtime.CompositionReference
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.input.mouse.MouseScrollEvent
 import androidx.compose.ui.input.mouse.MouseScrollUnit
@@ -28,10 +29,10 @@ import androidx.compose.ui.platform.FrameDispatcher
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.unit.Density
 import org.jetbrains.skija.Canvas
-import org.jetbrains.skiko.HardwareLayer
 import org.jetbrains.skija.Picture
 import org.jetbrains.skija.PictureRecorder
 import org.jetbrains.skija.Rect
+import org.jetbrains.skiko.HardwareLayer
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaRenderer
 import java.awt.DisplayMode
@@ -295,6 +296,7 @@ internal class ComposeLayer {
     internal fun setContent(
         parent: Any? = null,
         invalidate: () -> Unit = this::needRedrawLayer,
+        parentComposition: CompositionReference? = null,
         content: @Composable () -> Unit
     ): Composition {
         check(owners == null) {
@@ -304,7 +306,7 @@ internal class ComposeLayer {
         val desktopOwner = DesktopOwner(desktopOwners, density)
 
         owners = desktopOwners
-        val composition = desktopOwner.setContent(content)
+        val composition = desktopOwner.setContent(parent = parentComposition, content = content)
 
         onDensityChanged(desktopOwner::density::set)
 

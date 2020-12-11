@@ -18,6 +18,7 @@ package androidx.compose.desktop.examples.popupexample
 import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.AppWindow
 import androidx.compose.desktop.WindowEvents
+import androidx.compose.runtime.Providers
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.window.Menu
@@ -75,7 +76,11 @@ fun main() = SwingUtilities.invokeLater {
             )
         )
     ).show {
-        content()
+        Providers(
+            AmbientTest provides 42
+        ) {
+            content()
+        }
     }
 }
 

@@ -165,7 +165,7 @@ class DesktopComposeTestRule : ComposeTestRule {
             owners = it
         }
         val owner = DesktopOwner(owners)
-        owner.setContent(composable)
+        owner.setContent(content = composable)
         owner.setSize(displaySize.width, displaySize.height)
         owner.measureAndLayout()
         owner.draw(canvas)
