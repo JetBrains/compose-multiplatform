@@ -107,6 +107,7 @@ class AndroidAccessibilityTest {
 
     companion object {
         private const val ToggleableTag = "toggleable"
+        private const val DisabledToggleableTag = "disabledToggleable"
         private const val TextFieldTag = "textField"
         private const val InputText = "hello"
         private const val InitialText = "h"
@@ -136,6 +137,18 @@ class AndroidAccessibilityTest {
                         Modifier
                             .toggleable(value = checked, onValueChange = { checked = it })
                             .testTag(ToggleableTag),
+                        content = {
+                            BasicText("ToggleableText")
+                        }
+                    )
+                    Box(
+                        Modifier
+                            .toggleable(
+                                value = checked,
+                                enabled = false,
+                                onValueChange = { checked = it }
+                            )
+                            .testTag(DisabledToggleableTag),
                         content = {
                             BasicText("ToggleableText")
                         }
@@ -242,11 +255,13 @@ class AndroidAccessibilityTest {
     }
 
     @Test
-    fun testPerformAction() {
+    fun testPerformAction_succeedOnEnabledNodes() {
+        rule.onNodeWithTag(ToggleableTag)
+            .assertIsOn()
         val toggleableNode = rule.onNodeWithTag(ToggleableTag)
             .fetchSemanticsNode("couldn't find node with tag $ToggleableTag")
         rule.runOnUiThread {
-            provider.performAction(toggleableNode.id, ACTION_CLICK, null)
+            assertTrue(provider.performAction(toggleableNode.id, ACTION_CLICK, null))
         }
         rule.onNodeWithTag(ToggleableTag)
             .assertIsOff()
@@ -254,7 +269,7 @@ class AndroidAccessibilityTest {
         val textFieldNode = rule.onNodeWithTag(TextFieldTag)
             .fetchSemanticsNode("couldn't find node with tag $TextFieldTag")
         rule.runOnUiThread {
-            provider.performAction(textFieldNode.id, ACTION_CLICK, null)
+            assertTrue(provider.performAction(textFieldNode.id, ACTION_CLICK, null))
         }
         rule.onNodeWithTag(TextFieldTag)
             .assert(SemanticsMatcher.expectValue(SemanticsProperties.Focused, true))
@@ -263,7 +278,7 @@ class AndroidAccessibilityTest {
         argument.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT, 1)
         rule.runOnUiThread {
             textFieldSelectionOneLatch = CountDownLatch(1)
-            provider.performAction(textFieldNode.id, ACTION_SET_SELECTION, argument)
+            assertTrue(provider.performAction(textFieldNode.id, ACTION_SET_SELECTION, argument))
         }
         if (!textFieldSelectionOneLatch.await(5, TimeUnit.SECONDS)) {
             throw AssertionError("Failed to wait for text selection change.")
@@ -275,6 +290,19 @@ class AndroidAccessibilityTest {
                     TextRange(1)
                 )
             )
+    }
+
+    @Test
+    fun testPerformAction_failOnDisabledNodes() {
+        rule.onNodeWithTag(DisabledToggleableTag)
+            .assertIsOn()
+        val toggleableNode = rule.onNodeWithTag(DisabledToggleableTag)
+            .fetchSemanticsNode("couldn't find node with tag $DisabledToggleableTag")
+        rule.runOnUiThread {
+            assertFalse(provider.performAction(toggleableNode.id, ACTION_CLICK, null))
+        }
+        rule.onNodeWithTag(DisabledToggleableTag)
+            .assertIsOn()
     }
 
     @Test

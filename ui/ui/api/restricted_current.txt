@@ -2278,6 +2278,9 @@ package androidx.compose.ui.platform {
   public final class AndroidClipboardManagerKt {
   }
 
+  public final class AndroidComposeViewAccessibilityDelegateCompatKt {
+  }
+
   public final class AndroidComposeViewKt {
   }
 

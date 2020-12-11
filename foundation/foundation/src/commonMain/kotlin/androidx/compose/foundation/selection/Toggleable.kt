@@ -145,9 +145,8 @@ private fun Modifier.toggleableImpl(
         }
         this.toggleableState = state
 
-        if (enabled) {
-            onClick(action = { onClick(); return@onClick true }, label = "Toggle")
-        } else {
+        onClick(action = { onClick(); return@onClick true }, label = Strings.Toggle)
+        if (!enabled) {
             disabled()
         }
     }
