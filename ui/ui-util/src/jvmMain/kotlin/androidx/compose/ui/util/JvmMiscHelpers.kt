@@ -22,5 +22,3 @@ actual fun StringBuilder.deleteAt(index: Int): StringBuilder {
     this.deleteCharAt(index)
     return this
 }
-
-actual typealias TreeSet<T> = java.util.TreeSet<T>

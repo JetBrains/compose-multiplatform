@@ -16,8 +16,6 @@
 
 package androidx.compose.ui.node
 
-import androidx.compose.ui.util.TreeSet
-
 /**
  * The set of [LayoutNode]s which orders items by their [LayoutNode.depth] and
  * allows modifications(additions and removals) while we iterate through it via [popEach].
@@ -46,7 +44,7 @@ internal class DepthSortedSet(
             return l1.hashCode().compareTo(l2.hashCode())
         }
     }
-    private val set = TreeSet<LayoutNode>(DepthComparator)
+    private val set = TreeSet(DepthComparator)
 
     fun contains(node: LayoutNode): Boolean {
         val contains = set.contains(node)

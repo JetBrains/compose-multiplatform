@@ -1,3 +1,4 @@
+// ktlint-disable filename
 /*
  * Copyright 2020 The Android Open Source Project
  *
@@ -14,8 +15,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.util
+package androidx.compose.ui.node
 
-expect fun String.format(vararg args: Any?): String
-
-expect fun StringBuilder.deleteAt(index: Int): StringBuilder
+internal actual class TreeSet<E> actual constructor(comparator: Comparator<in E>) :
+    java.util.TreeSet<E>(comparator)
