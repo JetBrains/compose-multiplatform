@@ -47,8 +47,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.offset
 import kotlin.math.max
@@ -322,6 +320,7 @@ internal fun TextFieldLayout(
     decoratedLabel: @Composable (() -> Unit)?,
     leading: @Composable (() -> Unit)?,
     trailing: @Composable (() -> Unit)?,
+    singleLine: Boolean,
     leadingColor: Color,
     trailingColor: Color,
     labelProgress: Float,
@@ -346,6 +345,7 @@ internal fun TextFieldLayout(
         label = decoratedLabel,
         leading = leading,
         trailing = trailing,
+        singleLine = singleLine,
         leadingColor = leadingColor,
         trailingColor = trailingColor,
         animationProgress = labelProgress
@@ -364,6 +364,7 @@ private fun IconsWithTextFieldLayout(
     placeholder: @Composable ((Modifier) -> Unit)?,
     leading: @Composable (() -> Unit)?,
     trailing: @Composable (() -> Unit)?,
+    singleLine: Boolean,
     leadingColor: Color,
     trailingColor: Color,
     animationProgress: Float
@@ -404,6 +405,7 @@ private fun IconsWithTextFieldLayout(
         },
         modifier = modifier
     ) { measurables, incomingConstraints ->
+        val topBottomPadding = TextFieldPadding.toIntPx()
         val baseLineOffset = FirstBaselineOffset.toIntPx()
         val bottomPadding = LastBaselineOffset.toIntPx()
         val topPadding = TextFieldTopPadding.toIntPx()
@@ -438,10 +440,16 @@ private fun IconsWithTextFieldLayout(
         val effectiveLabelBaseline = max(lastBaseline, baseLineOffset)
 
         // measure input field
+        // input field is laid out differently depending on whether the label is present or not
+        val verticalConstraintOffset = if (labelPlaceable != null) {
+            -bottomPadding - topPadding - effectiveLabelBaseline
+        } else {
+            -topBottomPadding * 2
+        }
         val textFieldConstraints = incomingConstraints
             .copy(minHeight = 0)
             .offset(
-                vertical = -bottomPadding - topPadding - effectiveLabelBaseline,
+                vertical = verticalConstraintOffset,
                 horizontal = -occupiedSpaceHorizontally
             )
         val textFieldPlaceable = measurables
@@ -464,6 +472,7 @@ private fun IconsWithTextFieldLayout(
         )
         val height = calculateHeight(
             textFieldPlaceable,
+            labelPlaceable,
             effectiveLabelBaseline,
             leadingPlaceable,
             trailingPlaceable,
@@ -474,30 +483,32 @@ private fun IconsWithTextFieldLayout(
 
         layout(width, height) {
             if (widthOrZero(labelPlaceable) != 0) {
-                val labelEndPosition =
-                    (baseLineOffset - lastBaseline).coerceAtLeast(0)
-                place(
+                // label's final position is always relative to the baseline
+                val labelEndPosition = (baseLineOffset - lastBaseline).coerceAtLeast(0)
+                placeWithLabel(
                     width,
                     height,
-                    layoutDirection,
                     textFieldPlaceable,
                     labelPlaceable,
                     placeholderPlaceable,
                     leadingPlaceable,
                     trailingPlaceable,
+                    singleLine,
                     labelEndPosition,
                     effectiveLabelBaseline + topPadding,
-                    animationProgress
+                    animationProgress,
+                    density
                 )
             } else {
-                // text field should be centered vertically if there is no label
                 placeWithoutLabel(
                     width,
                     height,
                     textFieldPlaceable,
                     placeholderPlaceable,
                     leadingPlaceable,
-                    trailingPlaceable
+                    trailingPlaceable,
+                    singleLine,
+                    density
                 )
             }
         }
@@ -526,6 +537,7 @@ private fun calculateWidth(
 
 private fun calculateHeight(
     textFieldPlaceable: Placeable,
+    labelPlaceable: Placeable?,
     labelBaseline: Int,
     leadingPlaceable: Placeable?,
     trailingPlaceable: Placeable?,
@@ -535,8 +547,14 @@ private fun calculateHeight(
 ): Int {
     val bottomPadding = LastBaselineOffset.value * density
     val topPadding = TextFieldTopPadding.value * density
+    val topBottomPadding = TextFieldPadding.value * density
+
     val inputFieldHeight = max(textFieldPlaceable.height, heightOrZero(placeholderPlaceable))
-    val middleSectionHeight = labelBaseline + topPadding + inputFieldHeight + bottomPadding
+    val middleSectionHeight = if (labelPlaceable != null) {
+        labelBaseline + topPadding + inputFieldHeight + bottomPadding
+    } else {
+        topBottomPadding * 2 + inputFieldHeight
+    }
     return maxOf(
         middleSectionHeight.roundToInt(),
         max(heightOrZero(leadingPlaceable), heightOrZero(trailingPlaceable)),
@@ -546,21 +564,24 @@ private fun calculateHeight(
 
 /**
  * Places the provided text field, placeholder and label with respect to the baseline offsets in
- * [TextField]
+ * [TextField] when there is a label. When there is no label, [placeWithoutLabel] is used.
  */
-private fun Placeable.PlacementScope.place(
+private fun Placeable.PlacementScope.placeWithLabel(
     width: Int,
     height: Int,
-    layoutDirection: LayoutDirection,
     textfieldPlaceable: Placeable,
     labelPlaceable: Placeable?,
     placeholderPlaceable: Placeable?,
     leadingPlaceable: Placeable?,
     trailingPlaceable: Placeable?,
+    singleLine: Boolean,
     labelEndPosition: Int,
     textPosition: Int,
-    animationProgress: Float
+    animationProgress: Float,
+    density: Float
 ) {
+    val topBottomPadding = (TextFieldPadding.value * density).roundToInt()
+
     leadingPlaceable?.placeRelative(
         0,
         Alignment.CenterVertically.align(leadingPlaceable.height, height)
@@ -569,23 +590,26 @@ private fun Placeable.PlacementScope.place(
         width - trailingPlaceable.width,
         Alignment.CenterVertically.align(trailingPlaceable.height, height)
     )
-    if (labelPlaceable != null) {
-        val labelCenterPosition = Alignment.CenterStart.align(
-            IntSize(labelPlaceable.width, labelPlaceable.height),
-            IntSize(width, height),
-            layoutDirection
-        )
-        val labelDistance = labelCenterPosition.y - labelEndPosition
-        val labelPositionY =
-            labelCenterPosition.y - (labelDistance * animationProgress).roundToInt()
-        labelPlaceable.placeRelative(widthOrZero(leadingPlaceable), labelPositionY)
+    labelPlaceable?.let {
+        // if it's a single line, the label's start position is in the center of the
+        // container. When it's a multiline text field, the label's start position is at the
+        // top with padding
+        val startPosition = if (singleLine) {
+            Alignment.CenterVertically.align(it.height, height)
+        } else {
+            topBottomPadding
+        }
+        val distance = startPosition - labelEndPosition
+        val positionY = startPosition - (distance * animationProgress).roundToInt()
+        it.placeRelative(widthOrZero(leadingPlaceable), positionY)
     }
     textfieldPlaceable.placeRelative(widthOrZero(leadingPlaceable), textPosition)
     placeholderPlaceable?.placeRelative(widthOrZero(leadingPlaceable), textPosition)
 }
 
 /**
- * Places the provided text field and placeholder center vertically in [TextField]
+ * Places the provided text field and placeholder in [TextField] when there is no label. When
+ * there is a label, [placeWithLabel] is used
  */
 private fun Placeable.PlacementScope.placeWithoutLabel(
     width: Int,
@@ -593,8 +617,12 @@ private fun Placeable.PlacementScope.placeWithoutLabel(
     textPlaceable: Placeable,
     placeholderPlaceable: Placeable?,
     leadingPlaceable: Placeable?,
-    trailingPlaceable: Placeable?
+    trailingPlaceable: Placeable?,
+    singleLine: Boolean,
+    density: Float
 ) {
+    val topBottomPadding = (TextFieldPadding.value * density).roundToInt()
+
     leadingPlaceable?.placeRelative(
         0,
         Alignment.CenterVertically.align(leadingPlaceable.height, height)
@@ -603,14 +631,31 @@ private fun Placeable.PlacementScope.placeWithoutLabel(
         width - trailingPlaceable.width,
         Alignment.CenterVertically.align(trailingPlaceable.height, height)
     )
+
+    // Single line text field without label places its input center vertically. Multiline text
+    // field without label places its input at the top with padding
+    val textVerticalPosition = if (singleLine) {
+        Alignment.CenterVertically.align(textPlaceable.height, height)
+    } else {
+        topBottomPadding
+    }
     textPlaceable.placeRelative(
         widthOrZero(leadingPlaceable),
-        Alignment.CenterVertically.align(textPlaceable.height, height)
+        textVerticalPosition
     )
-    placeholderPlaceable?.placeRelative(
-        widthOrZero(leadingPlaceable),
-        Alignment.CenterVertically.align(placeholderPlaceable.height, height)
-    )
+
+    // placeholder is placed similar to the text input above
+    placeholderPlaceable?.let {
+        val placeholderVerticalPosition = if (singleLine) {
+            Alignment.CenterVertically.align(placeholderPlaceable.height, height)
+        } else {
+            topBottomPadding
+        }
+        it.placeRelative(
+            widthOrZero(leadingPlaceable),
+            placeholderVerticalPosition
+        )
+    }
 }
 
 /**
