@@ -2170,10 +2170,14 @@ package androidx.compose.ui.platform {
     method @androidx.compose.runtime.Composable public abstract void Content();
     method public final void createComposition();
     method public final void disposeComposition();
-    method public final boolean isDisposed();
+    method public final boolean getHasComposition();
+    method protected boolean getShouldCreateCompositionOnAttachedToWindow();
     method protected final void onLayout(boolean changed, int left, int top, int right, int bottom);
     method protected final void onMeasure(int widthMeasureSpec, int heightMeasureSpec);
-    property public final boolean isDisposed;
+    method public final void setParentCompositionReference(androidx.compose.runtime.CompositionReference? parent);
+    method public final void setViewCompositionStrategy(androidx.compose.ui.platform.ViewCompositionStrategy strategy);
+    property public final boolean hasComposition;
+    property protected boolean shouldCreateCompositionOnAttachedToWindow;
   }
 
   public final class AmbientsKt {
@@ -2253,6 +2257,7 @@ package androidx.compose.ui.platform {
     ctor public ComposeView(android.content.Context context);
     method @androidx.compose.runtime.Composable public void Content();
     method public void setContent(kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    property protected boolean shouldCreateCompositionOnAttachedToWindow;
   }
 
   public final class DebugUtilsKt {
@@ -2343,6 +2348,33 @@ package androidx.compose.ui.platform {
     method public operator void set(String name, Object? value);
   }
 
+  public interface ViewCompositionStrategy {
+    method public kotlin.jvm.functions.Function0<kotlin.Unit> installFor(androidx.compose.ui.platform.AbstractComposeView view);
+    field public static final androidx.compose.ui.platform.ViewCompositionStrategy.Companion Companion;
+  }
+
+  public static final class ViewCompositionStrategy.Companion {
+  }
+
+  public static final class ViewCompositionStrategy.DisposeOnDetachedFromWindow implements androidx.compose.ui.platform.ViewCompositionStrategy {
+    method public kotlin.jvm.functions.Function0<kotlin.Unit> installFor(androidx.compose.ui.platform.AbstractComposeView view);
+    field public static final androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnDetachedFromWindow INSTANCE;
+  }
+
+  public static final class ViewCompositionStrategy.DisposeOnLifecycleDestroyed implements androidx.compose.ui.platform.ViewCompositionStrategy {
+    ctor public ViewCompositionStrategy.DisposeOnLifecycleDestroyed(androidx.lifecycle.Lifecycle lifecycle);
+    ctor public ViewCompositionStrategy.DisposeOnLifecycleDestroyed(androidx.lifecycle.LifecycleOwner lifecycleOwner);
+    method public kotlin.jvm.functions.Function0<kotlin.Unit> installFor(androidx.compose.ui.platform.AbstractComposeView view);
+  }
+
+  public static final class ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed implements androidx.compose.ui.platform.ViewCompositionStrategy {
+    method public kotlin.jvm.functions.Function0<kotlin.Unit> installFor(androidx.compose.ui.platform.AbstractComposeView view);
+    field public static final androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed INSTANCE;
+  }
+
+  public final class ViewCompositionStrategyKt {
+  }
+
   public interface ViewConfiguration {
     method public long getDoubleTapMinTime-ojFfpTE();
     method public long getDoubleTapTimeout-ojFfpTE();
@@ -2380,9 +2412,15 @@ package androidx.compose.ui.platform {
     method @androidx.compose.runtime.Composable public static void WindowFocusObserver(kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onWindowFocusChanged);
   }
 
+  public final class WindowRecomposerKt {
+    method public static androidx.compose.runtime.CompositionReference? findViewTreeCompositionReference(android.view.View);
+    method public static androidx.compose.runtime.CompositionReference? getCompositionReference(android.view.View);
+    method public static void setCompositionReference(android.view.View, androidx.compose.runtime.CompositionReference? value);
+  }
+
   public final class WrapperKt {
     method public static androidx.compose.runtime.Composition setContent(androidx.activity.ComponentActivity, optional androidx.compose.runtime.CompositionReference parent, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method public static androidx.compose.runtime.Composition setContent(android.view.ViewGroup, optional androidx.compose.runtime.CompositionReference parent, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @Deprecated public static androidx.compose.runtime.Composition setContent(android.view.ViewGroup, optional androidx.compose.runtime.CompositionReference parent, kotlin.jvm.functions.Function0<kotlin.Unit> content);
     method @Deprecated public static androidx.compose.runtime.Composition setViewContent(android.view.ViewGroup, optional androidx.compose.runtime.CompositionReference parent, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
     method @Deprecated public static androidx.compose.runtime.Composition setViewContent(android.app.Activity, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
   }

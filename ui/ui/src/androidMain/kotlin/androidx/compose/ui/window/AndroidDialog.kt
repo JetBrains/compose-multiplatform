@@ -25,23 +25,25 @@ import android.view.ViewGroup
 import android.view.ViewOutlineProvider
 import android.view.Window
 import android.view.WindowManager
-import android.widget.FrameLayout
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionReference
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.compositionReference
-import androidx.compose.runtime.onActive
-import androidx.compose.runtime.onCommit
+import androidx.compose.runtime.emptyContent
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.R
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AmbientView
-import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.semantics.dialog
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Density
@@ -93,12 +95,25 @@ internal actual fun ActualDialog(
 ) {
     val view = AmbientView.current
     val density = AmbientDensity.current
+    val composition = compositionReference()
+    val currentContent by rememberUpdatedState(content)
+    val dialog = remember(view, density) {
+        DialogWrapper(view, density).apply {
+            this.onDismissRequest = onDismissRequest
+            setProperties(properties)
+            setContent(composition) {
+                // TODO(b/159900354): draw a scrim and add margins around the Compose Dialog, and
+                //  consume clicks so they can't pass through to the underlying UI
+                DialogLayout(
+                    Modifier.semantics { dialog() },
+                ) {
+                    currentContent()
+                }
+            }
+        }
+    }
 
-    val dialog = remember(view, density) { DialogWrapper(view, density) }
-    dialog.onDismissRequest = onDismissRequest
-    SideEffect { dialog.setProperties(properties) }
-
-    onActive {
+    DisposableEffect(dialog) {
         dialog.show()
 
         onDispose {
@@ -107,16 +122,9 @@ internal actual fun ActualDialog(
         }
     }
 
-    val composition = compositionReference()
-    onCommit {
-        dialog.setContent(composition) {
-            // TODO(b/159900354): draw a scrim and add margins around the Compose Dialog, and
-            //  consume clicks so they can't pass through to the underlying UI
-            DialogLayout(
-                Modifier.semantics { dialog() },
-                content
-            )
-        }
+    SideEffect {
+        dialog.onDismissRequest = onDismissRequest
+        dialog.setProperties(properties)
     }
 }
 
@@ -133,7 +141,25 @@ interface DialogWindowProvider {
 private class DialogLayout(
     context: Context,
     override val window: Window
-) : FrameLayout(context), DialogWindowProvider
+) : AbstractComposeView(context), DialogWindowProvider {
+
+    private var content: @Composable () -> Unit by mutableStateOf(emptyContent())
+
+    protected override var shouldCreateCompositionOnAttachedToWindow: Boolean = false
+        private set
+
+    fun setContent(parent: CompositionReference, content: @Composable () -> Unit) {
+        setParentCompositionReference(parent)
+        this.content = content
+        shouldCreateCompositionOnAttachedToWindow = true
+        createComposition()
+    }
+
+    @Composable
+    override fun Content() {
+        content()
+    }
+}
 
 private class DialogWrapper(
     private val composeView: View,
@@ -148,7 +174,6 @@ private class DialogWrapper(
     lateinit var onDismissRequest: () -> Unit
 
     private val dialogLayout: DialogLayout
-    private var composition: Composition? = null
     private var properties: AndroidDialogProperties = AndroidDialogProperties()
 
     private val maxSupportedElevation = 30.dp
@@ -202,8 +227,8 @@ private class DialogWrapper(
 
     // TODO(b/159900354): Make the Android Dialog full screen and the scrim fully transparent
 
-    fun setContent(parentComposition: CompositionReference, content: @Composable () -> Unit) {
-        composition = dialogLayout.setContent(parentComposition, content)
+    fun setContent(parentComposition: CompositionReference, children: @Composable () -> Unit) {
+        dialogLayout.setContent(parentComposition, children)
     }
 
     private fun setSecureFlagEnabled(secureFlagEnabled: Boolean) {
@@ -227,7 +252,7 @@ private class DialogWrapper(
     }
 
     fun disposeComposition() {
-        composition?.dispose()
+        dialogLayout.disposeComposition()
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {

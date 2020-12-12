@@ -304,6 +304,15 @@ package androidx.compose.runtime {
   @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface NoLiveLiterals {
   }
 
+  public final class PausableMonotonicFrameClock implements androidx.compose.runtime.dispatch.MonotonicFrameClock {
+    ctor public PausableMonotonicFrameClock(androidx.compose.runtime.dispatch.MonotonicFrameClock frameClock);
+    method public boolean isPaused();
+    method public void pause();
+    method public void resume();
+    method public suspend <R> Object? withFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
+    property public final boolean isPaused;
+  }
+
   @kotlin.PublishedApi internal final class PreCommitScopeImpl implements androidx.compose.runtime.CommitScope androidx.compose.runtime.CompositionLifecycleObserver {
     ctor public PreCommitScopeImpl(kotlin.jvm.functions.Function1<? super androidx.compose.runtime.CommitScope,kotlin.Unit> onCommit);
     method public void onDispose(kotlin.jvm.functions.Function0<kotlin.Unit> callback);

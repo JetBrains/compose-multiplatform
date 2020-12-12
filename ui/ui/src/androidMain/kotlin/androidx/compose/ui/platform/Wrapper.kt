@@ -162,6 +162,7 @@ fun ComponentActivity.setContent(
  * @param parent The [Recomposer] or parent composition reference.
  * @param content Composable that will be the content of the view.
  */
+@Deprecated("Use ComposeView or AbstractComposeView instead.")
 fun ViewGroup.setContent(
     parent: CompositionReference = Recomposer.current(),
     content: @Composable () -> Unit

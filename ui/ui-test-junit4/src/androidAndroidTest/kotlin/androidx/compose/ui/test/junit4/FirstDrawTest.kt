@@ -21,10 +21,9 @@ import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Recomposer
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.platform.ComposeView
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
@@ -75,13 +74,13 @@ class FirstDrawTest {
                 clipToPadding = true
             }
 
-            val outOfBoundsView = FrameLayout(activity).apply {
+            val outOfBoundsView = ComposeView(activity).apply {
                 layoutParams = ViewGroup.MarginLayoutParams(100, 100)
             }
 
             root.addView(outOfBoundsView)
             activity.setContentView(root)
-            outOfBoundsView.setContent(Recomposer.current()) {
+            outOfBoundsView.setContent {
                 // If you see this box when running the test, the test is setup incorrectly
                 Canvas(Modifier.fillMaxSize()) {
                     drawRect(Color.Yellow)

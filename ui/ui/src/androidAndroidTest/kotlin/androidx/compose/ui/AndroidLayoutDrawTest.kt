@@ -91,6 +91,7 @@ import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.RenderNodeApi23
 import androidx.compose.ui.platform.RenderNodeApi29
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.ViewLayer
 import androidx.compose.ui.platform.ViewLayerContainer
 import androidx.compose.ui.platform.setContent
@@ -3039,6 +3040,9 @@ class AndroidLayoutDrawTest {
         lateinit var view: ComposeView
         activityTestRule.runOnUiThread {
             view = ComposeView(activity)
+            view.setViewCompositionStrategy(
+                ViewCompositionStrategy.DisposeOnLifecycleDestroyed(activity)
+            )
             view.setContent {
                 with(AmbientDensity.current) {
                     Box(

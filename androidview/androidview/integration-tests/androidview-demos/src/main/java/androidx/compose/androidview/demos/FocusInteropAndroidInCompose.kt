@@ -19,7 +19,6 @@ package androidx.compose.androidview.demos
 import android.annotation.SuppressLint
 import android.widget.EditText
 import android.widget.LinearLayout
-import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.compose.foundation.layout.Arrangement.SpaceEvenly
 import androidx.compose.foundation.layout.Column
@@ -29,12 +28,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 
@@ -71,8 +69,8 @@ fun EditTextInteropDemo() {
                                 }
                             )
                             addView(
-                                RelativeLayout(it).apply {
-                                    setContent(Recomposer.current()) {
+                                ComposeView(it).apply {
+                                    setContent {
                                         val text = remember { mutableStateOf("") }
                                         TextField(text.value, onValueChange = { text.value = it })
                                     }

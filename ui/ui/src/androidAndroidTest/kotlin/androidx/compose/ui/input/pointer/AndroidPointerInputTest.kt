@@ -103,8 +103,6 @@ class AndroidPointerInputTest {
         }
 
         rule.runOnUiThread {
-            androidComposeView = container.getChildAt(0) as AndroidComposeView
-
             val motionEvent = MotionEvent(
                 0,
                 MotionEvent.ACTION_DOWN,
@@ -115,7 +113,7 @@ class AndroidPointerInputTest {
             )
 
             // Act
-            val actual = androidComposeView.dispatchTouchEvent(motionEvent)
+            val actual = container.dispatchTouchEvent(motionEvent)
 
             // Assert
             assertThat(actual).isFalse()
@@ -140,11 +138,8 @@ class AndroidPointerInputTest {
         }
 
         rule.runOnUiThread {
-
-            androidComposeView = container.getChildAt(0) as AndroidComposeView
-
             val locationInWindow = IntArray(2).also {
-                androidComposeView.getLocationInWindow(it)
+                container.getLocationInWindow(it)
             }
 
             val motionEvent = MotionEvent(
@@ -157,7 +152,7 @@ class AndroidPointerInputTest {
             )
 
             // Act
-            val actual = androidComposeView.dispatchTouchEvent(motionEvent)
+            val actual = container.dispatchTouchEvent(motionEvent)
 
             // Assert
             assertThat(actual).isTrue()
@@ -206,7 +201,7 @@ class AndroidPointerInputTest {
         assertThat(latch.await(1, TimeUnit.SECONDS)).isTrue()
 
         rule.runOnUiThread {
-            androidComposeView = container.getChildAt(0) as AndroidComposeView
+            val androidComposeView = container.getChildAt(0) as AndroidComposeView
 
             // we update size from 10 to 20 pixels
             size.value = 20
@@ -270,11 +265,8 @@ class AndroidPointerInputTest {
         }
 
         rule.runOnUiThread {
-
-            androidComposeView = container.getChildAt(0) as AndroidComposeView
-
             val locationInWindow = IntArray(2).also {
-                androidComposeView.getLocationInWindow(it)
+                container.getLocationInWindow(it)
             }
 
             val motionEvent = MotionEvent(
@@ -292,7 +284,7 @@ class AndroidPointerInputTest {
             )
 
             // Act
-            androidComposeView.dispatchTouchEvent(motionEvent)
+            container.dispatchTouchEvent(motionEvent)
 
             // Assert
             assertThat(log).hasSize(1)
@@ -321,10 +313,8 @@ class AndroidPointerInputTest {
         }
 
         rule.runOnUiThread {
-
-            androidComposeView = container.getChildAt(0) as AndroidComposeView
             val (x, y) = IntArray(2).let { array ->
-                androidComposeView.getLocationInWindow(array)
+                container.getLocationInWindow(array)
                 array.map { item -> item.toFloat() }
             }
 
@@ -346,10 +336,10 @@ class AndroidPointerInputTest {
                 arrayOf(PointerCoords(x + 1, y))
             )
 
-            androidComposeView.dispatchTouchEvent(down)
+            container.dispatchTouchEvent(down)
 
             // Act
-            androidComposeView.dispatchTouchEvent(move)
+            container.dispatchTouchEvent(move)
 
             // Assert
             if (callsRequestDisallowInterceptTouchEvent) {
@@ -386,16 +376,13 @@ class AndroidPointerInputTest {
         }
 
         rule.runOnUiThread {
-
-            androidComposeView = container.getChildAt(0) as AndroidComposeView
-
             // Get the current location in window.
             val locationInWindow = IntArray(2).also {
-                androidComposeView.getLocationInWindow(it)
+                container.getLocationInWindow(it)
             }
 
             // Offset the androidComposeView.
-            androidComposeView.offsetTopAndBottom(offset)
+            container.offsetTopAndBottom(offset)
 
             // Create a motion event that is also offset.
             val motionEvent = MotionEvent(
@@ -413,7 +400,7 @@ class AndroidPointerInputTest {
             )
 
             // Act
-            androidComposeView.dispatchTouchEvent(motionEvent)
+            container.dispatchTouchEvent(motionEvent)
 
             // Assert
             assertThat(log).hasSize(1)
@@ -452,18 +439,16 @@ class AndroidPointerInputTest {
 
         val locationInWindow = IntArray(2)
         rule.runOnUiThread {
-            androidComposeView = container.getChildAt(0) as AndroidComposeView
-
             // Get the current location in window.
-            androidComposeView.getLocationInWindow(locationInWindow)
+            container.getLocationInWindow(locationInWindow)
 
             val downEvent = createPointerEventAt(0, MotionEvent.ACTION_DOWN, locationInWindow)
-            androidComposeView.dispatchTouchEvent(downEvent)
+            container.dispatchTouchEvent(downEvent)
         }
 
         rule.runOnUiThread {
             val upEvent = createPointerEventAt(200, MotionEvent.ACTION_UP, locationInWindow)
-            androidComposeView.dispatchTouchEvent(upEvent)
+            container.dispatchTouchEvent(upEvent)
         }
 
         assertTrue(tapLatch.await(1, TimeUnit.SECONDS))
@@ -475,7 +460,7 @@ class AndroidPointerInputTest {
 
         rule.runOnUiThread {
             val downEvent = createPointerEventAt(1000, MotionEvent.ACTION_DOWN, locationInWindow)
-            androidComposeView.dispatchTouchEvent(downEvent)
+            container.dispatchTouchEvent(downEvent)
         }
         // Need to wait for long press timeout (at least)
         rule.runOnUiThread {
@@ -484,7 +469,7 @@ class AndroidPointerInputTest {
                 MotionEvent.ACTION_UP,
                 locationInWindow
             )
-            androidComposeView.dispatchTouchEvent(upEvent)
+            container.dispatchTouchEvent(upEvent)
         }
         assertTrue(tapLatch2.await(1, TimeUnit.SECONDS))
 
@@ -494,11 +479,11 @@ class AndroidPointerInputTest {
 
         rule.runOnUiThread {
             val downEvent = createPointerEventAt(2000, MotionEvent.ACTION_DOWN, locationInWindow)
-            androidComposeView.dispatchTouchEvent(downEvent)
+            container.dispatchTouchEvent(downEvent)
         }
         rule.runOnUiThread {
             val upEvent = createPointerEventAt(2200, MotionEvent.ACTION_UP, locationInWindow)
-            androidComposeView.dispatchTouchEvent(upEvent)
+            container.dispatchTouchEvent(upEvent)
         }
         assertTrue(tapLatch.await(1, TimeUnit.SECONDS))
     }

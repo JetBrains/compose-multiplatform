@@ -26,23 +26,25 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewOutlineProvider
 import android.view.WindowManager
-import android.widget.FrameLayout
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Composition
+import androidx.compose.runtime.CompositionReference
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.compositionReference
 import androidx.compose.runtime.emptyContent
-import androidx.compose.runtime.onCommit
-import androidx.compose.runtime.onDispose
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.layout.Layout
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AmbientView
-import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.semantics.popup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Density
@@ -90,19 +92,48 @@ internal actual fun ActualPopup(
 ) {
     val view = AmbientView.current
     val density = AmbientDensity.current
+    val testTag = AmbientPopupTestTag.current
+    val parentComposition = compositionReference()
+    val currentContent by rememberUpdatedState(content)
 
-    val popupLayout = remember { PopupLayout(view, density) }
-
-    // Refresh anything that might have changed
-    popupLayout.onDismissRequest = onDismissRequest
-    popupLayout.testTag = AmbientPopupTestTag.current
-    SideEffect {
-        popupLayout.setPositionProvider(popupPositionProvider)
-        popupLayout.setIsFocusable(isFocusable)
-        popupLayout.setProperties(properties)
+    val popupLayout = remember {
+        PopupLayout(view, density).apply {
+            this.onDismissRequest = onDismissRequest
+            this.testTag = testTag
+            setPositionProvider(popupPositionProvider)
+            setIsFocusable(isFocusable)
+            setProperties(properties)
+            setContent(parentComposition) {
+                SimpleStack(
+                    Modifier.semantics { this.popup() }.onGloballyPositioned {
+                        // Get the size of the content
+                        popupContentSize = it.size
+                        updatePosition()
+                    }
+                ) {
+                    currentContent()
+                }
+            }
+        }
     }
 
-    var composition: Composition? = null
+    DisposableEffect(popupLayout) {
+        onDispose {
+            popupLayout.disposeComposition()
+            // Remove the window
+            popupLayout.dismiss()
+        }
+    }
+
+    SideEffect {
+        popupLayout.apply {
+            this.onDismissRequest = onDismissRequest
+            this.testTag = testTag
+            setPositionProvider(popupPositionProvider)
+            setIsFocusable(isFocusable)
+            setProperties(properties)
+        }
+    }
 
     // TODO(soboleva): Look at module arrangement so that Box can be
     // used instead of this custom Layout
@@ -122,28 +153,6 @@ internal actual fun ActualPopup(
     ) { _, _ ->
         popupLayout.parentLayoutDirection = layoutDirection
         layout(0, 0) {}
-    }
-
-    val parentComposition = compositionReference()
-    onCommit {
-        composition = popupLayout.setContent(parentComposition) {
-            SimpleStack(
-                Modifier.semantics { this.popup() }.onGloballyPositioned {
-                    // Get the size of the content
-                    popupLayout.popupContentSize = it.size
-
-                    // Update the popup's position
-                    popupLayout.updatePosition()
-                },
-                content = content
-            )
-        }
-    }
-
-    onDispose {
-        composition?.dispose()
-        // Remove the window
-        popupLayout.dismiss()
     }
 }
 
@@ -189,8 +198,8 @@ private inline fun SimpleStack(modifier: Modifier, noinline content: @Composable
 @SuppressLint("ViewConstructor")
 private class PopupLayout(
     private val composeView: View,
-    private val density: Density
-) : FrameLayout(composeView.context) {
+    density: Density
+) : AbstractComposeView(composeView.context) {
     private val windowManager =
         composeView.context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     private val params = createLayoutParams()
@@ -233,6 +242,23 @@ private class PopupLayout(
                 result.alpha = 0f
             }
         }
+    }
+
+    private var content: @Composable () -> Unit by mutableStateOf(emptyContent())
+
+    protected override var shouldCreateCompositionOnAttachedToWindow: Boolean = false
+        private set
+
+    fun setContent(parent: CompositionReference, content: @Composable () -> Unit) {
+        setParentCompositionReference(parent)
+        this.content = content
+        shouldCreateCompositionOnAttachedToWindow = true
+        createComposition()
+    }
+
+    @Composable
+    override fun Content() {
+        content()
     }
 
     fun setPositionProvider(positionProvider: PopupPositionProvider) {
