@@ -19,6 +19,7 @@ package androidx.compose.ui.unit
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.unit.Dp.Companion.Hairline
 import androidx.compose.ui.util.lerp
 import androidx.compose.ui.util.packFloats
@@ -143,6 +144,27 @@ inline class Dp(val value: Float) : Comparable<Dp> {
         val Unspecified = Dp(value = Float.NaN)
     }
 }
+
+/**
+ * `false` when this is [Dp.Unspecified].
+ */
+@Stable
+inline val Dp.isSpecified: Boolean
+    get() = !value.isNaN()
+
+/**
+ * `true` when this is [Dp.Unspecified].
+ */
+@Stable
+inline val Dp.isUnspecified: Boolean
+    get() = value.isNaN()
+
+/**
+ * If this [Dp] [isSpecified] then this is returned, otherwise [block] is executed
+ * and its result is returned.
+ */
+inline fun Dp.useOrElse(block: () -> Dp): Dp =
+    if (isSpecified) this else block()
 
 /**
  * Create a [Dp] using an [Int]:

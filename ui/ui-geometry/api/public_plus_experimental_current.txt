@@ -106,6 +106,7 @@ package androidx.compose.ui.geometry {
     method public static boolean isSpecified-k-4lQ0M(long);
     method public static inline boolean isUnspecified-k-4lQ0M(long);
     method @androidx.compose.runtime.Stable public static long lerp-tX6QBWo(long start, long stop, float fraction);
+    method public static inline long useOrElse-Yy5JL0A(long, kotlin.jvm.functions.Function0<androidx.compose.ui.geometry.Offset> block);
   }
 
   @androidx.compose.runtime.Immutable public final class Rect {
@@ -269,11 +270,14 @@ package androidx.compose.ui.geometry {
 
   public final class SizeKt {
     method @androidx.compose.runtime.Stable public static long Size(float width, float height);
+    method public static inline boolean isSpecified-uvyYCjk(long);
+    method public static inline boolean isUnspecified-uvyYCjk(long);
     method @androidx.compose.runtime.Stable public static long lerp-3tf5JpU(long start, long stop, float fraction);
     method @androidx.compose.runtime.Stable public static inline operator long times-2DtskRk(float, long size);
     method @androidx.compose.runtime.Stable public static inline operator long times-B9jgaKk(double, long size);
     method @androidx.compose.runtime.Stable public static inline operator long times-cEP68aU(int, long size);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.geometry.Rect toRect-uvyYCjk(long);
+    method public static inline long useOrElse-GR1djXE(long, kotlin.jvm.functions.Function0<androidx.compose.ui.geometry.Size> block);
   }
 
 }

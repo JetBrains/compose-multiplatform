@@ -106,4 +106,14 @@ class OffsetTest {
         // Verify that verifying equality here does not crash
         assertTrue(Offset.Unspecified == Offset.Unspecified)
     }
+
+    @Test
+    fun testUseOrElseTrue() {
+        assertTrue(Offset(1f, 1f).useOrElse { Offset.Unspecified }.isSpecified)
+    }
+
+    @Test
+    fun testUseOrElseFalse() {
+        assertTrue(Offset.Unspecified.useOrElse { Offset(1f, 1f) }.isSpecified)
+    }
 }

@@ -138,6 +138,27 @@ inline class Size(@PublishedApi internal val packedValue: Long) {
 }
 
 /**
+ * `false` when this is [Size.Unspecified].
+ */
+@Stable
+inline val Size.isSpecified: Boolean
+    get() = packedValue != Size.Unspecified.packedValue
+
+/**
+ * `true` when this is [Size.Unspecified].
+ */
+@Stable
+inline val Size.isUnspecified: Boolean
+    get() = packedValue == Size.Unspecified.packedValue
+
+/**
+ * If this [Size] [isSpecified] then this is returned, otherwise [block] is executed
+ * and its result is returned.
+ */
+inline fun Size.useOrElse(block: () -> Size): Size =
+    if (isSpecified) this else block()
+
+/**
  * Linearly interpolate between two sizes
  *
  * The [fraction] argument represents position on the timeline, with 0.0 meaning

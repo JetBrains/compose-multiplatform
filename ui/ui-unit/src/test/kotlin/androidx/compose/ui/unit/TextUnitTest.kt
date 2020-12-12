@@ -17,6 +17,7 @@
 package androidx.compose.ui.unit
 
 import com.google.common.truth.Truth.assertThat
+import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -1064,5 +1065,27 @@ class TextUnitTest {
         assertThat(TextUnit.Inherit.isUnspecified).isTrue()
         assertThat(1.em.isUnspecified).isFalse()
         assertThat(1.em.isInherit).isFalse()
+    }
+
+    @Test
+    fun testIsSpecified() {
+        Assert.assertFalse(TextUnit.Unspecified.isSpecified)
+        Assert.assertTrue(1.sp.isSpecified)
+    }
+
+    @Test
+    fun testIsUnspecified() {
+        Assert.assertTrue(TextUnit.Unspecified.isUnspecified)
+        Assert.assertFalse(1.sp.isUnspecified)
+    }
+
+    @Test
+    fun testUseOrElseTrue() {
+        Assert.assertTrue(1.sp.useOrElse { TextUnit.Unspecified }.isSpecified)
+    }
+
+    @Test
+    fun testUseOrElseFalse() {
+        Assert.assertTrue(TextUnit.Unspecified.useOrElse { 1.sp }.isSpecified)
     }
 }

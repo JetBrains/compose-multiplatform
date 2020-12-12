@@ -17,6 +17,8 @@
 package androidx.compose.ui.unit
 
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
+import androidx.compose.ui.geometry.isSpecified
 
 /**
  * A single point in time with a time base of the system's uptime [nanoseconds]. Compare to
@@ -65,6 +67,27 @@ inline class Uptime(val nanoseconds: Long) : Comparable<Uptime> {
         val Unspecified = Uptime(Long.MIN_VALUE)
     }
 }
+
+/**
+ * `false` when this is [Uptime.Unspecified].
+ */
+@Stable
+inline val Uptime.isSpecified: Boolean
+    get() = nanoseconds != Uptime.Unspecified.nanoseconds
+
+/**
+ * `true` when this is [Uptime.Unspecified].
+ */
+@Stable
+inline val Uptime.isUnspecified: Boolean
+    get() = nanoseconds == Uptime.Unspecified.nanoseconds
+
+/**
+ * If this [Uptime] [isSpecified] then this is returned, otherwise [block] is executed
+ * and its result is returned.
+ */
+inline fun Uptime.useOrElse(block: () -> Uptime): Uptime =
+    if (isSpecified) this else block()
 
 /**
  * Add a Duration to a [Uptime] and returns the result as a [Uptime].
