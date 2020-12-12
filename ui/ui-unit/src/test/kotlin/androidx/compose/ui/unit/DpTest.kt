@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.unit
 
+import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
@@ -379,5 +380,27 @@ class DpTest {
         val copy = position.copy(y = 67.dp)
         assertEquals(19.dp, copy.x)
         assertEquals(67.dp, copy.y)
+    }
+
+    @Test
+    fun testIsSpecified() {
+        Assert.assertFalse(Dp.Unspecified.isSpecified)
+        assertTrue(Dp(1f).isSpecified)
+    }
+
+    @Test
+    fun testIsUnspecified() {
+        assertTrue(Dp.Unspecified.isUnspecified)
+        Assert.assertFalse(Dp(1f).isUnspecified)
+    }
+
+    @Test
+    fun testUseOrElseTrue() {
+        assertTrue(Dp(1f).useOrElse { Dp.Unspecified }.isSpecified)
+    }
+
+    @Test
+    fun testUseOrElseFalse() {
+        assertTrue(Dp.Unspecified.useOrElse { Dp(1f) }.isSpecified)
     }
 }

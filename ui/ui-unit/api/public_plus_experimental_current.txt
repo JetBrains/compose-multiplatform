@@ -173,6 +173,8 @@ package androidx.compose.ui.unit {
     method public static inline float getHeight(androidx.compose.ui.unit.Bounds);
     method public static inline float getWidth(androidx.compose.ui.unit.Bounds);
     method @androidx.compose.runtime.Stable public static inline boolean isFinite-0680j_4(float);
+    method public static inline boolean isSpecified-0680j_4(float);
+    method public static inline boolean isUnspecified-0680j_4(float);
     method @androidx.compose.runtime.Stable public static long lerp-2vlZtig(long start, long stop, float fraction);
     method @androidx.compose.runtime.Stable public static float lerp-7oHWEOI(float start, float stop, float fraction);
     method @androidx.compose.runtime.Stable public static inline float max-ioHfwGI(float a, float b);
@@ -180,6 +182,7 @@ package androidx.compose.ui.unit {
     method @androidx.compose.runtime.Stable public static inline operator float times-Cp9Wa6o(int, float other);
     method @androidx.compose.runtime.Stable public static inline operator float times-NSq4UQk(double, float other);
     method @androidx.compose.runtime.Stable public static inline operator float times-NnR5yEA(float, float other);
+    method public static inline float useOrElse-RiydCdY(float, kotlin.jvm.functions.Function0<androidx.compose.ui.unit.Dp> block);
   }
 
   @androidx.compose.runtime.Immutable public final inline class DpSquared implements java.lang.Comparable<androidx.compose.ui.unit.DpSquared> {
@@ -454,7 +457,6 @@ package androidx.compose.ui.unit {
     method public static boolean isEm-impl(long $this);
     method @Deprecated public static boolean isInherit-impl(long $this);
     method public static boolean isSp-impl(long $this);
-    method public static boolean isUnspecified-impl(long $this);
     method public static inline operator long minus--R2X_6o(long $this, long other);
     method public static inline operator long plus--R2X_6o(long $this, long other);
     method public static inline operator long times-XSAIIZE(long $this, float other);
@@ -489,12 +491,15 @@ package androidx.compose.ui.unit {
     method public static long getSp(float);
     method public static long getSp(double);
     method public static long getSp(int);
+    method public static inline boolean isSpecified--R2X_6o(long);
+    method public static boolean isUnspecified--R2X_6o(long);
     method @androidx.compose.runtime.Stable public static long lerp-KeuwX78(long a, long b, float t);
     method @androidx.compose.runtime.Stable public static inline long max-8E83U4Q(long a, long b);
     method @androidx.compose.runtime.Stable public static inline long min-8E83U4Q(long a, long b);
     method @androidx.compose.runtime.Stable public static inline operator long times-0PRCd3Q(double, long other);
     method @androidx.compose.runtime.Stable public static inline operator long times-Ew26DjI(float, long other);
     method @androidx.compose.runtime.Stable public static inline operator long times-VJWtCv4(int, long other);
+    method public static inline long useOrElse-bAewZlA(long, kotlin.jvm.functions.Function0<androidx.compose.ui.unit.TextUnit> block);
   }
 
   public enum TextUnitType {
@@ -531,7 +536,10 @@ package androidx.compose.ui.unit {
   }
 
   public final class UptimeKt {
+    method public static inline boolean isSpecified-fQUwLeo(long);
+    method public static inline boolean isUnspecified-fQUwLeo(long);
     method public static operator long plus-I3RPvYE(long, long uptime);
+    method public static inline long useOrElse-N-58ELw(long, kotlin.jvm.functions.Function0<androidx.compose.ui.unit.Uptime> block);
   }
 
   @androidx.compose.runtime.Immutable public final inline class Velocity {
