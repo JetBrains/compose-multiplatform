@@ -61,7 +61,6 @@ import androidx.compose.ui.util.annotation.FloatRange
  * @param horizontalAlignment The horizontal alignment of the layout's children.
  *
  * @see Row
- * @see [androidx.compose.foundation.ScrollableColumn]
  * @see [androidx.compose.foundation.lazy.LazyColumn]
  */
 @Composable

@@ -16,7 +16,6 @@
 
 package androidx.compose.material.demos
 
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -32,7 +31,10 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Checkbox
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
@@ -65,25 +67,41 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun TextFieldsDemo() {
-    Column(
+    LazyColumn(
         modifier = Modifier.fillMaxHeight()
     ) {
-        Text("Password text field")
-        PasswordTextField()
-        Text("Text field with leading and trailing icons")
-        TextFieldWithIcons()
-        Text("Outlined text field")
-        SimpleOutlinedTextFieldSample()
-        Text("Text field with placeholder")
-        TextFieldWithPlaceholder()
-        Text("Text field with error state handling")
-        TextFieldWithErrorState()
-        Text("Text field with helper/error message")
-        TextFieldWithHelperMessage()
-        Text("Hide keyboard on IME action")
-        TextFieldWithHideKeyboardOnImeAction()
-        Text("TextFieldValue overload")
-        TextFieldSample()
+        item {
+            Text("Password text field")
+            PasswordTextField()
+        }
+        item {
+            Text("Text field with leading and trailing icons")
+            TextFieldWithIcons()
+        }
+        item {
+            Text("Outlined text field")
+            SimpleOutlinedTextFieldSample()
+        }
+        item {
+            Text("Text field with placeholder")
+            TextFieldWithPlaceholder()
+        }
+        item {
+            Text("Text field with error state handling")
+            TextFieldWithErrorState()
+        }
+        item {
+            Text("Text field with helper/error message")
+            TextFieldWithHelperMessage()
+        }
+        item {
+            Text("Hide keyboard on IME action")
+            TextFieldWithHideKeyboardOnImeAction()
+        }
+        item {
+            Text("TextFieldValue overload")
+            TextFieldSample()
+        }
     }
 }
 
@@ -132,7 +150,7 @@ fun VerticalAlignmentsInTextField() {
 
 @Composable
 fun MaterialTextFieldDemo() {
-    ScrollableColumn(contentPadding = PaddingValues(10.dp)) {
+    Column(Modifier.verticalScroll(rememberScrollState()).padding(PaddingValues(10.dp))) {
         var text by savedInstanceState { "" }
         var leadingChecked by savedInstanceState { false }
         var trailingChecked by savedInstanceState { false }

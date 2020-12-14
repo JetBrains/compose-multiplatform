@@ -19,7 +19,6 @@ package androidx.compose.foundation.demos
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.animation.smoothScrollBy
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -48,6 +47,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.samples.StickyHeaderSample
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.AmbientTextStyle
@@ -361,9 +361,12 @@ private fun LazyListArrangements() {
                         .border(1.dp, Color.Cyan)
                 )
             }
-            ScrollableColumn(
+            Column(
                 verticalArrangement = Arrangements[arrangement],
-                modifier = Modifier.weight(1f).fillMaxHeight()
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .verticalScroll(rememberScrollState())
             ) {
                 repeat(count) {
                     item()
@@ -429,11 +432,12 @@ fun ReverseLayout() {
             val item2 = @Composable { index: Int ->
                 Text("After $index")
             }
-            ScrollableColumn(
-                reverseScrollDirection = reverse,
+            Column(
                 verticalArrangement = if (reverse) Arrangement.Bottom else Arrangement.Top,
-                scrollState = scrollState,
-                modifier = Modifier.weight(1f).fillMaxHeight()
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .verticalScroll(scrollState, reverseScrolling = reverse)
             ) {
                 if (reverse) {
                     (count - 1 downTo 0).forEach {

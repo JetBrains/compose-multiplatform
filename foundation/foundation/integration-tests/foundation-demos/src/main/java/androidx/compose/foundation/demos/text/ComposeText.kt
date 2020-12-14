@@ -16,11 +16,11 @@
 
 package androidx.compose.foundation.demos.text
 
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -61,42 +61,74 @@ val fontSize10 = 30.sp
 
 @Composable
 fun TextDemo() {
-    ScrollableColumn {
-        TagLine(tag = "color, fontSize, fontWeight and fontStyle")
-        TextDemoBasic()
-        TagLine(
-            tag = "color, fontSize, fontWeight, fontFamily, fontStyle, letterSpacing, " +
-                "background, decoration"
-        )
-        TextDemoComplexStyling()
-        TagLine(tag = "Chinese, Arabic, and Hindi")
-        TextDemoLanguage()
-        TagLine(tag = "FontFamily generic names")
-        TextDemoFontFamily()
-        TagLine(tag = "FontFamily default values")
-        TextDemoFontFamilyDefaultValues()
-        TagLine(tag = "decoration, decorationColor and decorationStyle")
-        TextDemoTextDecoration()
-        TagLine(tag = "letterSpacing")
-        TextDemoLetterSpacing()
-        TagLine(tag = "baselineShift")
-        TextDemoBaselineShift()
-        TagLine(tag = "lineHeight")
-        TextDemoHeight()
-        TagLine(tag = "background")
-        TextDemoBackground()
-        TagLine(tag = "Locale: Japanese, Simplified and Traditional Chinese")
-        TextDemoLocale()
-        TagLine(tag = "textAlign and textDirection")
-        TextDemoTextAlign()
-        TagLine(tag = "softWrap: on and off")
-        TextDemoSoftWrap()
-        TagLine(tag = "shadow")
-        TextDemoShadowEffect()
-        TagLine(tag = "fontSizeScale")
-        TextDemoFontSizeScale()
-        TagLine(tag = "complex paragraph styling")
-        TextDemoParagraphStyling()
+    LazyColumn {
+        item {
+            TagLine(tag = "color, fontSize, fontWeight and fontStyle")
+            TextDemoBasic()
+        }
+        item {
+            TagLine(
+                tag = "color, fontSize, fontWeight, fontFamily, fontStyle, letterSpacing, " +
+                    "background, decoration"
+            )
+            TextDemoComplexStyling()
+        }
+        item {
+            TagLine(tag = "Chinese, Arabic, and Hindi")
+            TextDemoLanguage()
+        }
+        item {
+            TagLine(tag = "FontFamily generic names")
+            TextDemoFontFamily()
+        }
+        item {
+            TagLine(tag = "FontFamily default values")
+            TextDemoFontFamilyDefaultValues()
+        }
+        item {
+            TagLine(tag = "decoration, decorationColor and decorationStyle")
+            TextDemoTextDecoration()
+        }
+        item {
+            TagLine(tag = "letterSpacing")
+            TextDemoLetterSpacing()
+        }
+        item {
+            TagLine(tag = "baselineShift")
+            TextDemoBaselineShift()
+        }
+        item {
+            TagLine(tag = "lineHeight")
+            TextDemoHeight()
+        }
+        item {
+            TagLine(tag = "background")
+            TextDemoBackground()
+        }
+        item {
+            TagLine(tag = "Locale: Japanese, Simplified and Traditional Chinese")
+            TextDemoLocale()
+        }
+        item {
+            TagLine(tag = "textAlign and textDirection")
+            TextDemoTextAlign()
+        }
+        item {
+            TagLine(tag = "softWrap: on and off")
+            TextDemoSoftWrap()
+        }
+        item {
+            TagLine(tag = "shadow")
+            TextDemoShadowEffect()
+        }
+        item {
+            TagLine(tag = "fontSizeScale")
+            TextDemoFontSizeScale()
+        }
+        item {
+            TagLine(tag = "complex paragraph styling")
+            TextDemoParagraphStyling()
+        }
     }
 }
 

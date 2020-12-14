@@ -20,12 +20,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.testutils.ComposeTestCase
 import androidx.compose.testutils.ToggleableTestCase
 import androidx.compose.ui.unit.dp
@@ -39,7 +39,7 @@ class ScrollerTestCase : ComposeTestCase, ToggleableTestCase {
     @Composable
     override fun Content() {
         scrollState = rememberScrollState()
-        ScrollableColumn(scrollState = scrollState) {
+        Column(Modifier.verticalScroll(scrollState)) {
             Column(Modifier.fillMaxHeight()) {
                 for (green in 0..0xFF) {
                     ColorStripe(0xFF, green, 0)

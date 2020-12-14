@@ -16,11 +16,11 @@
 
 package androidx.compose.foundation.demos.text
 
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -41,25 +41,33 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun InputFieldDemo() {
-    ScrollableColumn {
-        TagLine(tag = "LTR Layout")
-        Providers(AmbientLayoutDirection provides LayoutDirection.Ltr) {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                TagLine(tag = "simple editing single line")
-                EditLine(singleLine = true)
-                TagLine(tag = "simple editing multi line")
-                EditLine(text = displayTextHindi)
-                TagLine(tag = "simple editing RTL")
-                EditLine(text = displayTextArabic)
+    LazyColumn {
+        item {
+            TagLine(tag = "LTR Layout")
+        }
+        item {
+            Providers(AmbientLayoutDirection provides LayoutDirection.Ltr) {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    TagLine(tag = "simple editing single line")
+                    EditLine(singleLine = true)
+                    TagLine(tag = "simple editing multi line")
+                    EditLine(text = displayTextHindi)
+                    TagLine(tag = "simple editing RTL")
+                    EditLine(text = displayTextArabic)
+                }
             }
         }
-        TagLine(tag = "RTL Layout")
-        Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                TagLine(tag = "simple editing RTL")
-                EditLine()
-                EditLine(text = displayTextArabic)
-                EditLine(text = displayText)
+        item {
+            TagLine(tag = "RTL Layout")
+        }
+        item {
+            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    TagLine(tag = "simple editing RTL")
+                    EditLine()
+                    EditLine(text = displayTextArabic)
+                    EditLine(text = displayText)
+                }
             }
         }
     }

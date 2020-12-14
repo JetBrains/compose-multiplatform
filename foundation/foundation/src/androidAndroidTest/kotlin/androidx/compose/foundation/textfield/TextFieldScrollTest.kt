@@ -22,16 +22,17 @@ import androidx.compose.animation.core.ManualAnimationClock
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.text.CoreTextField
 import androidx.compose.foundation.text.TextFieldScrollerPosition
 import androidx.compose.foundation.text.maxLinesHeight
 import androidx.compose.foundation.text.textFieldScroll
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.testutils.assertPixels
@@ -542,9 +543,10 @@ class TextFieldScrollTest {
 
         rule.setContent {
             val textLayoutResultRef: Ref<TextLayoutResult?> = remember { Ref() }
-            ScrollableColumn(
-                modifier = Modifier.preferredSize(size),
-                scrollState = remember { scrollerPosition }
+            Column(
+                Modifier
+                    .preferredSize(size)
+                    .verticalScroll(scrollerPosition)
             ) {
                 CoreTextField(
                     value = value,

@@ -16,11 +16,9 @@
 
 package androidx.compose.material.demos
 
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.samples.RadioButtonSample
@@ -28,26 +26,30 @@ import androidx.compose.material.samples.RadioGroupSample
 import androidx.compose.material.samples.SwitchSample
 import androidx.compose.material.samples.TriStateCheckboxSample
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun SelectionControlsDemo() {
     val headerStyle = MaterialTheme.typography.h6
-    ScrollableColumn(
+    LazyColumn(
         contentPadding = PaddingValues(10.dp),
         verticalArrangement = Arrangement.SpaceEvenly
     ) {
-        Text(text = "Checkbox", style = headerStyle)
-        TriStateCheckboxSample()
-        Spacer(Modifier.height(16.dp))
-        Text(text = "Switch", style = headerStyle)
-        SwitchSample()
-        Spacer(Modifier.height(16.dp))
-        Text(text = "RadioButtons with custom colors", style = headerStyle)
-        RadioButtonSample()
-        Spacer(Modifier.height(16.dp))
-        Text(text = "Radio group", style = headerStyle)
-        RadioGroupSample()
+        item {
+            Text(text = "Checkbox", style = headerStyle)
+            TriStateCheckboxSample()
+        }
+        item {
+            Text(text = "Switch", style = headerStyle)
+            SwitchSample()
+        }
+        item {
+            Text(text = "RadioButtons with custom colors", style = headerStyle)
+            RadioButtonSample()
+        }
+        item {
+            Text(text = "Radio group", style = headerStyle)
+            RadioGroupSample()
+        }
     }
 }

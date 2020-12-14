@@ -16,8 +16,9 @@
 
 package androidx.compose.foundation.demos.text
 
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.layout.defaultMinSizeConstraints
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.CoreTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -77,9 +78,9 @@ private val ImeOptionsList = listOf(
 @OptIn(ExperimentalTextApi::class)
 @Composable
 fun CapitalizationAutoCorrectDemo() {
-    ScrollableColumn {
-        for (data in ImeOptionsList) {
-            TagLine(tag = "${data.name}")
+    LazyColumn {
+        items(ImeOptionsList) { data ->
+            TagLine(tag = data.name)
             MyTextField(data)
         }
     }

@@ -18,12 +18,13 @@ package androidx.compose.ui.test.gesturescope
 
 import androidx.compose.animation.core.FloatExponentialDecaySpec
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.testutils.MockAnimationClock
 import androidx.compose.ui.Alignment
@@ -172,9 +173,11 @@ class SendSwipeTest {
         rule.setContent {
             with(AmbientDensity.current) {
                 // Scrollable with a viewport the size of 10 boxes
-                ScrollableColumn(
-                    Modifier.testTag("scrollable").size(100.toDp(), 1000.toDp()),
-                    scrollState
+                Column(
+                    Modifier
+                        .testTag("scrollable")
+                        .size(100.toDp(), 1000.toDp())
+                        .verticalScroll(scrollState)
                 ) {
                     repeat(100) {
                         ClickableTestBox()
