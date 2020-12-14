@@ -16,16 +16,17 @@
 
 package androidx.compose.ui.test
 
-import androidx.compose.runtime.EmbeddingContext
+import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
 
-// Experimental because it isn't yet clear if the behavior on Robolectric is correct
 @ExperimentalTesting
 object TestUiDispatcher {
     /**
      * The dispatcher to use if you need to dispatch coroutines on the main thread in tests.
      */
-    val Main: CoroutineContext by lazy {
-        EmbeddingContext().mainThreadCompositionContext()
-    }
+    @Deprecated(
+        message = "Removed in favor of Dispatchers.Main",
+        replaceWith = ReplaceWith("Dispatchers.Main", "kotlinx.coroutines.Dispatchers")
+    )
+    val Main: CoroutineContext = Dispatchers.Main
 }

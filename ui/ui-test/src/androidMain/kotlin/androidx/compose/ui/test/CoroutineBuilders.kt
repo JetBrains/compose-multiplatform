@@ -20,6 +20,7 @@ import androidx.compose.animation.core.ManualFrameClock
 import androidx.compose.animation.core.MonotonicFrameAnimationClock
 import androidx.compose.animation.core.advanceClockMillis
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.yield
 
@@ -29,7 +30,7 @@ import kotlinx.coroutines.yield
  * [runBlocking] if they want to use a [ManualFrameClock].
  *
  * The clock will start at time 0L and should be driven manually from your test, from the
- * [main dispatcher][TestUiDispatcher.Main]. Pass the clock to the animation that you want to
+ * [main dispatcher][Dispatchers.Main]. Pass the clock to the animation that you want to
  * control in your test, and then [advance][advanceClockMillis] it as necessary. After the block
  * has completed, the clock will be forwarded with 10 second increments until it has drained all
  * work that took frames from that clock. If the work never ends, this function never ends, so
