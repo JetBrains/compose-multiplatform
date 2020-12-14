@@ -102,13 +102,13 @@ val ZoomControlsTimeout: Duration = 3000.milliseconds
  */
 // TODO(shepshapard): Create variants of HorizontalDragGestureFilter et al for
 // paging, which use this constant.
-val PagingTouchSlop = TouchSlop * 2.dp
+val PagingTouchSlop = TouchSlop * 2f
 
 /**
  * The distance a touch has to travel for the framework to be confident that
  * the gesture is a panning gesture.
  */
-val PanSlop = TouchSlop * 2.dp
+val PanSlop = TouchSlop * 2f
 
 /**
  * The absolute cumulative average change in distance of all pointers from the
