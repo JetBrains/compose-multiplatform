@@ -227,7 +227,7 @@ inline fun Dp.coerceAtMost(maximumValue: Dp): Dp =
  * Return `true` when it is finite or `false` when it is [Dp.Infinity]
  */
 @Stable
-inline fun Dp.isFinite(): Boolean = value != Float.POSITIVE_INFINITY
+inline val Dp.isFinite: Boolean get() = value != Float.POSITIVE_INFINITY
 
 /**
  * Linearly interpolate between two [Dp]s.
