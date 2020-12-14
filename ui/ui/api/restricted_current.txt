@@ -2850,6 +2850,7 @@ package androidx.compose.ui.semantics {
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> getContentDescription();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> getDisabled();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> getFocused();
+    method public androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> getHeading();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.ScrollAxisRange> getHorizontalScrollAxisRange();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.text.input.ImeAction> getImeAction();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> getInvisibleToUser();
@@ -2867,6 +2868,7 @@ package androidx.compose.ui.semantics {
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> ContentDescription;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> Disabled;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> Focused;
+    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> Heading;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.ScrollAxisRange> HorizontalScrollAxisRange;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.text.input.ImeAction> ImeAction;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> InvisibleToUser;
@@ -2908,6 +2910,7 @@ package androidx.compose.ui.semantics {
     method public static androidx.compose.ui.state.ToggleableState getToggleableState(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method @Deprecated public static androidx.compose.ui.semantics.ScrollAxisRange getVerticalAccessibilityScrollState(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static androidx.compose.ui.semantics.ScrollAxisRange getVerticalScrollAxisRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
+    method public static void heading(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method @Deprecated public static void hidden(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method @androidx.compose.ui.ExperimentalComposeUiApi public static void invisibleToUser(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static void onClick(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean> action);

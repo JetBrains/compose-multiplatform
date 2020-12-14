@@ -283,6 +283,9 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             semanticsNode.config.getOrNull(SemanticsProperties.StateDescription)
         info.contentDescription =
             semanticsNode.config.getOrNull(SemanticsProperties.ContentDescription)
+        semanticsNode.config.getOrNull(SemanticsProperties.Heading)?.let {
+            info.isHeading = true
+        }
         // Note editable is not added to semantics properties api.
         info.isEditable = semanticsNode.config.contains(SemanticsActions.SetText)
         info.isEnabled = semanticsNode.enabled()
