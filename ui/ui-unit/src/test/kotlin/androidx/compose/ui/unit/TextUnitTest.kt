@@ -1080,12 +1080,12 @@ class TextUnitTest {
     }
 
     @Test
-    fun testUseOrElseTrue() {
-        Assert.assertTrue(1.sp.useOrElse { TextUnit.Unspecified }.isSpecified)
+    fun testTakeOrElseTrue() {
+        Assert.assertTrue(1.sp.takeOrElse { TextUnit.Unspecified }.isSpecified)
     }
 
     @Test
-    fun testUseOrElseFalse() {
-        Assert.assertTrue(TextUnit.Unspecified.useOrElse { 1.sp }.isSpecified)
+    fun testTakeOrElseFalse() {
+        Assert.assertTrue(TextUnit.Unspecified.takeOrElse { 1.sp }.isSpecified)
     }
 }

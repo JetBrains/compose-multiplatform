@@ -24,7 +24,7 @@ import androidx.compose.runtime.ambientOf
 import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.useOrElse
+import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Paragraph
 import androidx.compose.ui.text.TextLayoutResult
@@ -193,8 +193,8 @@ fun Text(
     onTextLayout: (TextLayoutResult) -> Unit = {},
     style: TextStyle = AmbientTextStyle.current
 ) {
-    val textColor = color.useOrElse {
-        style.color.useOrElse {
+    val textColor = color.takeOrElse {
+        style.color.takeOrElse {
             AmbientContentColor.current.copy(alpha = AmbientContentAlpha.current)
         }
     }

@@ -128,7 +128,7 @@ inline val ScaleFactor.isUnspecified: Boolean
  * If this [ScaleFactor] [isSpecified] then this is returned, otherwise [block] is executed
  * and its result is returned.
  */
-inline fun ScaleFactor.useOrElse(block: () -> ScaleFactor): ScaleFactor =
+inline fun ScaleFactor.takeOrElse(block: () -> ScaleFactor): ScaleFactor =
     if (isSpecified) this else block()
 
 /**

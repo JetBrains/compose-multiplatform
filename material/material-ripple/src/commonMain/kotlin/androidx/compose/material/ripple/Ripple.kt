@@ -39,7 +39,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.clipRect
-import androidx.compose.ui.graphics.useOrElse
+import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.util.fastForEach
@@ -89,7 +89,7 @@ public fun rememberRippleIndication(
 ): Indication {
     val theme = AmbientRippleTheme.current
     val clock = AmbientAnimationClock.current.asDisposableClock()
-    val resolvedColor = color.useOrElse { theme.defaultColor() }
+    val resolvedColor = color.takeOrElse { theme.defaultColor() }
     val colorState = remember { mutableStateOf(resolvedColor, structuralEqualityPolicy()) }
     colorState.value = resolvedColor
     val rippleAlpha = theme.rippleAlpha()
@@ -136,7 +136,7 @@ public fun rememberRipple(
 ): Indication {
     val theme = AmbientRippleTheme.current
     val clock = AmbientAnimationClock.current.asDisposableClock()
-    val resolvedColor = color.useOrElse { theme.defaultColor() }
+    val resolvedColor = color.takeOrElse { theme.defaultColor() }
     val colorState = remember { mutableStateOf(resolvedColor, structuralEqualityPolicy()) }
     colorState.value = resolvedColor
     val rippleAlpha = theme.rippleAlpha()

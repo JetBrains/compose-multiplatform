@@ -153,12 +153,12 @@ class SizeTest {
     }
 
     @Test
-    fun testUseOrElseTrue() {
-        Assert.assertTrue(Size(1f, 1f).useOrElse { Size.Unspecified }.isSpecified)
+    fun testTakeOrElseTrue() {
+        Assert.assertTrue(Size(1f, 1f).takeOrElse { Size.Unspecified }.isSpecified)
     }
 
     @Test
-    fun testUseOrElseFalse() {
-        Assert.assertTrue(Size.Unspecified.useOrElse { Size(1f, 1f) }.isSpecified)
+    fun testTakeOrElseFalse() {
+        Assert.assertTrue(Size.Unspecified.takeOrElse { Size(1f, 1f) }.isSpecified)
     }
 }

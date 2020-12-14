@@ -1987,9 +1987,9 @@ package androidx.compose.ui.layout {
     method public static inline boolean isSpecified-FK8aYYs(long);
     method public static inline boolean isUnspecified-FK8aYYs(long);
     method @androidx.compose.runtime.Stable public static long lerp-bKVCie4(long start, long stop, float fraction);
+    method public static inline long takeOrElse-L-byAFk(long, kotlin.jvm.functions.Function0<androidx.compose.ui.layout.ScaleFactor> block);
     method @androidx.compose.runtime.Stable public static operator long times-Sp6zcS4(long, long size);
     method @androidx.compose.runtime.Stable public static operator long times-ngKnWWw(long, long scaleFactor);
-    method public static inline long useOrElse-L-byAFk(long, kotlin.jvm.functions.Function0<androidx.compose.ui.layout.ScaleFactor> block);
   }
 
   public final class SubcomposeLayoutKt {

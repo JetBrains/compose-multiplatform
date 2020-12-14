@@ -43,7 +43,7 @@ import androidx.compose.ui.focus.FocusReference
 import androidx.compose.ui.focus.focusReference
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.useOrElse
+import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
@@ -98,7 +98,7 @@ internal fun TextFieldImpl(
     shape: Shape
 ) {
     // If color is not provided via the text style, use content color as a default
-    val textColor = textStyle.color.useOrElse {
+    val textColor = textStyle.color.takeOrElse {
         AmbientContentColor.current.copy(alpha = AmbientContentAlpha.current)
     }
     val mergedTextStyle = textStyle.merge(TextStyle(color = textColor))

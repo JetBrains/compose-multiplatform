@@ -125,12 +125,12 @@ class ScaleFactorTest {
     }
 
     @Test
-    fun testUseOrElseTrue() {
-        assertTrue(ScaleFactor(1f, 1f).useOrElse { ScaleFactor.Unspecified }.isSpecified)
+    fun testTakeOrElseTrue() {
+        assertTrue(ScaleFactor(1f, 1f).takeOrElse { ScaleFactor.Unspecified }.isSpecified)
     }
 
     @Test
-    fun testUseOrElseFalse() {
-        assertTrue(ScaleFactor.Unspecified.useOrElse { ScaleFactor(1f, 1f) }.isSpecified)
+    fun testTakeOrElseFalse() {
+        assertTrue(ScaleFactor.Unspecified.takeOrElse { ScaleFactor(1f, 1f) }.isSpecified)
     }
 }
