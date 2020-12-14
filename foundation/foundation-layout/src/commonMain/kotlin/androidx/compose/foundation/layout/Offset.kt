@@ -90,7 +90,8 @@ fun Modifier.absoluteOffset(x: Dp = 0.dp, y: Dp = 0.dp) = this.then(
  * Offset the content by [offset] px. The offsets can be positive as well as non-positive.
  * Applying an offset only changes the position of the content, without interfering with
  * its size measurement.
- * This modifier is designed to be used for offsets that change, possibly due to user interactions.
+ * This modifier is designed to be used for offsets that change, possibly due to user interactions,
+ * the advantage being that it avoids recomposition when the offset is changing.
  * Note that, even if for convenience the API is accepting [Float] values, these will be rounded
  * to the closest integer value before applying the offset.
  * This modifier will automatically adjust the horizontal offset according to the layout direction.
@@ -130,7 +131,8 @@ fun Modifier.offsetPx(
  * Offset the content by [offset] px. The offsets can be positive as well as non-positive.
  * Applying an offset only changes the position of the content, without interfering with
  * its size measurement.
- * This modifier is designed to be used for offsets that change, possibly due to user interactions.
+ * This modifier is designed to be used for offsets that change, possibly due to user interactions,
+ * the advantage being that it avoids recomposition when the offset is changing.
  * Note that, even if for convenience the API is accepting [Float] values, these will be rounded
  * to the closest integer value before applying the offset.
  * This modifier will not consider layout direction when calculating the position of the content.
