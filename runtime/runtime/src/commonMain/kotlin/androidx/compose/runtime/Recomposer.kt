@@ -53,14 +53,11 @@ private const val RecomposerCompoundHashKey = 1000
 suspend fun <R> withRunningRecomposer(
     block: suspend CoroutineScope.(recomposer: Recomposer) -> R
 ): R = coroutineScope {
-    val recomposerJob = Job(coroutineContext[Job])
-    val recomposer = Recomposer(coroutineContext + recomposerJob)
+    val recomposer = Recomposer(coroutineContext)
     // Will be cancelled when recomposerJob cancels
     launch { recomposer.runRecomposeAndApplyChanges() }
-    try {
-        block(recomposer)
-    } finally {
-        recomposerJob.cancel()
+    block(recomposer).also {
+        recomposer.shutDown()
     }
 }
 
