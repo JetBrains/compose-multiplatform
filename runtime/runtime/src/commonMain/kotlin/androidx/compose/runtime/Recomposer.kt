@@ -77,6 +77,13 @@ suspend fun <R> withRunningRecomposer(
 class Recomposer(
     effectCoroutineContext: CoroutineContext
 ) : CompositionReference() {
+    /**
+     * This is a running count of the number of times the recomposer awoke and applied changes to
+     * one or more composers. This count is unaffected if the composer awakes and recomposed but
+     * composition did not produce changes to apply.
+     */
+    var changeCount = 0
+        private set
 
     /**
      * This collection is its own lock, shared with [invalidComposersAwaiter]
@@ -306,10 +313,12 @@ class Recomposer(
 
                             // Actually perform recomposition for any invalidated composers
                             if (toRecompose.isNotEmpty()) {
+                                var changes = false
                                 for (i in 0 until toRecompose.size) {
-                                    performRecompose(toRecompose[i])
+                                    changes = performRecompose(toRecompose[i]) || changes
                                 }
                                 toRecompose.clear()
+                                if (changes) changeCount++
                             }
                         }
                     }

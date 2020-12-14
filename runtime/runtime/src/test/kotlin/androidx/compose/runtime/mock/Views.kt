@@ -20,11 +20,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.emit
 import androidx.compose.runtime.key
 
-@Suppress("ComposableNaming")
 @Composable
-fun <T : Any> MockComposeScope.repeat(
+fun <T : Any> Repeated(
     of: Iterable<T>,
-    block: @Composable MockComposeScope.(value: T) -> Unit
+    block: @Composable (value: T) -> Unit
 ) {
     for (value in of) {
         key(value) {
@@ -33,9 +32,8 @@ fun <T : Any> MockComposeScope.repeat(
     }
 }
 
-@Suppress("ComposableNaming")
 @Composable
-fun MockComposeScope.linear(content: @Composable MockComposeScope.() -> Unit) {
+fun Linear(content: @Composable () -> Unit) {
     emit<View, ViewApplier>(
         ctor = { View().also { it.name = "linear" } },
         update = { }
@@ -44,29 +42,26 @@ fun MockComposeScope.linear(content: @Composable MockComposeScope.() -> Unit) {
     }
 }
 
-@Suppress("ComposableNaming")
 @Composable
-fun MockComposeScope.text(value: String) {
+fun Text(value: String) {
     emit<View, ViewApplier>(
         ctor = { View().also { it.name = "text" } },
         update = { set(value) { text = it } }
     )
 }
 
-@Suppress("ComposableNaming")
 @Composable
-fun MockComposeScope.edit(value: String) {
+fun Edit(value: String) {
     emit<View, ViewApplier>(
         ctor = { View().also { it.name = "edit" } },
         update = { set(value) { this.value = it } }
     )
 }
 
-@Suppress("ComposableNaming")
 @Composable
-fun MockComposeScope.selectBox(
+fun SelectBox(
     selected: Boolean,
-    content: @Composable MockComposeScope.() -> Unit
+    content: @Composable () -> Unit
 ) {
     if (selected) {
         emit<View, ViewApplier>(

@@ -2100,7 +2100,7 @@ class Composer<N>(
                     if (!complete) abortRoot()
                 }
             }
-            return true
+            return changes.isNotEmpty()
         }
         return false
     }
