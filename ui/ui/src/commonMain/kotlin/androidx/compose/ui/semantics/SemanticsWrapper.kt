@@ -40,6 +40,7 @@ internal class SemanticsWrapper(
     }
 
     override fun onModifierChanged() {
+        super.onModifierChanged()
         layoutNode.owner?.onSemanticsChange()
     }
 

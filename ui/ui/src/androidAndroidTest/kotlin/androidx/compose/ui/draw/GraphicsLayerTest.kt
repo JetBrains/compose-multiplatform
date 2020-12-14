@@ -20,11 +20,13 @@ import android.os.Build
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.FixedSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Padding
-import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.background
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -32,9 +34,10 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.globalBounds
@@ -365,5 +368,27 @@ class GraphicsLayerTest {
             assertEquals(0f, bounds.width)
             assertEquals(0f, bounds.height)
         }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun invalidateWhenWeHaveSemanticModifierAfterLayer() {
+        var color by mutableStateOf(Color.Red)
+        rule.setContent {
+            FixedSize(
+                5,
+                Modifier.graphicsLayer().testTag("tag").background(color)
+            )
+        }
+
+        rule.runOnIdle {
+            color = Color.Green
+        }
+
+        rule.onNodeWithTag("tag")
+            .captureToImage()
+            .assertPixels {
+                color
+            }
     }
 }
