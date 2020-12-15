@@ -239,12 +239,12 @@ class DpTest {
     }
 
     @Test
-    fun testUseOrElseTrue() {
-        assertTrue(Dp(1f).useOrElse { Dp.Unspecified }.isSpecified)
+    fun testTakeOrElseTrue() {
+        assertTrue(Dp(1f).takeOrElse { Dp.Unspecified }.isSpecified)
     }
 
     @Test
-    fun testUseOrElseFalse() {
-        assertTrue(Dp.Unspecified.useOrElse { Dp(1f) }.isSpecified)
+    fun testTakeOrElseFalse() {
+        assertTrue(Dp.Unspecified.takeOrElse { Dp(1f) }.isSpecified)
     }
 }

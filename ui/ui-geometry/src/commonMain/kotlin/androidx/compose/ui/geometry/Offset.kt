@@ -256,5 +256,5 @@ inline val Offset.isUnspecified: Boolean get() = packedValue == Offset.Unspecifi
  * If this [Offset] [isSpecified] then this is returned, otherwise [block] is executed
  * and its result is returned.
  */
-inline fun Offset.useOrElse(block: () -> Offset): Offset =
+inline fun Offset.takeOrElse(block: () -> Offset): Offset =
     if (isSpecified) this else block()

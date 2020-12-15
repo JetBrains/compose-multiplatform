@@ -155,7 +155,7 @@ inline val Size.isUnspecified: Boolean
  * If this [Size] [isSpecified] then this is returned, otherwise [block] is executed
  * and its result is returned.
  */
-inline fun Size.useOrElse(block: () -> Size): Size =
+inline fun Size.takeOrElse(block: () -> Size): Size =
     if (isSpecified) this else block()
 
 /**

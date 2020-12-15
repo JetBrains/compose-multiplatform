@@ -24,7 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticAmbientOf
 import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.useOrElse
+import androidx.compose.ui.graphics.takeOrElse
 
 /**
  * Collection of colors in the
@@ -260,7 +260,7 @@ fun Colors.contentColorFor(color: Color): Color {
  */
 @Composable
 fun contentColorFor(color: Color) =
-    MaterialTheme.colors.contentColorFor(color).useOrElse { AmbientContentColor.current }
+    MaterialTheme.colors.contentColorFor(color).takeOrElse { AmbientContentColor.current }
 
 /**
  * Updates the internal values of the given [Colors] with values from the [other] [Colors]. This

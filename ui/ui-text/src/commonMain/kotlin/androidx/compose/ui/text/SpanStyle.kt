@@ -21,7 +21,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.lerp
-import androidx.compose.ui.graphics.useOrElse
+import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
@@ -99,7 +99,7 @@ data class SpanStyle(
         if (other == null) return this
 
         return SpanStyle(
-            color = other.color.useOrElse { this.color },
+            color = other.color.takeOrElse { this.color },
             fontFamily = other.fontFamily ?: this.fontFamily,
             fontSize = if (!other.fontSize.isUnspecified) other.fontSize else this.fontSize,
             fontWeight = other.fontWeight ?: this.fontWeight,
@@ -114,7 +114,7 @@ data class SpanStyle(
             baselineShift = other.baselineShift ?: this.baselineShift,
             textGeometricTransform = other.textGeometricTransform ?: this.textGeometricTransform,
             localeList = other.localeList ?: this.localeList,
-            background = other.background.useOrElse { this.background },
+            background = other.background.takeOrElse { this.background },
             textDecoration = other.textDecoration ?: this.textDecoration,
             shadow = other.shadow ?: this.shadow
         )
