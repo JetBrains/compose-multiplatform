@@ -307,8 +307,8 @@ package androidx.compose.ui.test {
   }
 
   @androidx.compose.ui.test.ExperimentalTesting public final class TestUiDispatcher {
-    method public kotlin.coroutines.CoroutineContext getMain();
-    property public final kotlin.coroutines.CoroutineContext Main;
+    method @Deprecated public kotlin.coroutines.CoroutineContext getMain();
+    property @Deprecated public final kotlin.coroutines.CoroutineContext Main;
     field public static final androidx.compose.ui.test.TestUiDispatcher INSTANCE;
   }
 

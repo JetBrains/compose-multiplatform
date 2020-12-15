@@ -21,10 +21,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.ExperimentalTesting
-import androidx.compose.ui.test.TestUiDispatcher
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -118,15 +118,12 @@ class WaitingForOnCommitCallbackTest {
     }
 
     @Test
-    fun cascadingOnCommits_suspendedWait_defaultDispatcher() = cascadingOnCommits_suspendedWait(
-        EmptyCoroutineContext
-    )
+    fun cascadingOnCommits_suspendedWait_defaultDispatcher() =
+        cascadingOnCommits_suspendedWait(EmptyCoroutineContext)
 
     @Test
-    @OptIn(ExperimentalTesting::class)
-    fun cascadingOnCommits_suspendedWait_mainDispatcher() = cascadingOnCommits_suspendedWait(
-        TestUiDispatcher.Main
-    )
+    fun cascadingOnCommits_suspendedWait_mainDispatcher() =
+        cascadingOnCommits_suspendedWait(Dispatchers.Main)
 
     @OptIn(ExperimentalTesting::class)
     fun cascadingOnCommits_suspendedWait(context: CoroutineContext) = runBlocking(context) {
