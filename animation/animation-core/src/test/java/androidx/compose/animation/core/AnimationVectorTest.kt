@@ -39,6 +39,45 @@ class AnimationVectorTest {
     }
 
     @Test
+    fun testHashCode() {
+        // Expect equal
+        assertEquals(
+            AnimationVector1D(0f).hashCode(),
+            AnimationVector(1f).apply { reset() }.hashCode()
+        )
+        assertEquals(
+            AnimationVector2D(0f, 0f).hashCode(),
+            AnimationVector(1f, 2f).apply { reset() }.hashCode()
+        )
+        assertEquals(
+            AnimationVector3D(0f, 0f, 0f).hashCode(),
+            AnimationVector(1f, 2f, 3f).apply { reset() }.hashCode()
+        )
+        assertEquals(
+            AnimationVector4D(0f, 0f, 0f, 0f).hashCode(),
+            AnimationVector(1f, 2f, 3f, 4f).apply { reset() }.hashCode()
+        )
+
+        // Expect *not* equal
+        assertNotEquals(
+            AnimationVector1D(0f).hashCode(),
+            AnimationVector(1f).hashCode()
+        )
+        assertNotEquals(
+            AnimationVector2D(2f, 1f).hashCode(),
+            AnimationVector(1f, 2f).hashCode()
+        )
+        assertNotEquals(
+            AnimationVector3D(1f, 2f, 3f).hashCode(),
+            AnimationVector(1f, 2f, 3f).apply { reset() }.hashCode()
+        )
+        assertNotEquals(
+            AnimationVector4D(4f, 3f, 2f, 1f).hashCode(),
+            AnimationVector(1f, 2f, 3f, 4f).hashCode()
+        )
+    }
+
+    @Test
     fun testAnimationVectorFactoryMethod() {
         assertEquals(AnimationVector1D(200f), AnimationVector(200f))
         assertEquals(AnimationVector2D(7f, 500f), AnimationVector(7f, 500f))
