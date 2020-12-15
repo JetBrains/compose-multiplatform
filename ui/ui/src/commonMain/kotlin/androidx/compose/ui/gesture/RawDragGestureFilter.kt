@@ -246,7 +246,8 @@ internal class RawDragGestureFilter : PointerInputFilter() {
                                 changes.fastForEach {
                                     it.consumeDownChange()
                                 }
-                                velocityTracker!!.calculateVelocity().pixelsPerSecond
+                                val velocity = velocityTracker!!.calculateVelocity()
+                                Offset(velocity.x, velocity.y)
                             } else {
                                 null
                             }

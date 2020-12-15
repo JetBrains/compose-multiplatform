@@ -66,7 +66,10 @@ class VelocityTracker {
      *
      * This can be expensive. Only call this when you need the velocity.
      */
-    fun calculateVelocity() = Velocity(pixelsPerSecond = getVelocityEstimate().pixelsPerSecond)
+    fun calculateVelocity(): Velocity {
+        val estimate = getVelocityEstimate().pixelsPerSecond
+        return Velocity(estimate.x, estimate.y)
+    }
 
     /**
      * Clears the tracked positions added by [addPosition].

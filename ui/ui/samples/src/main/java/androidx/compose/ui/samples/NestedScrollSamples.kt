@@ -89,7 +89,7 @@ fun NestedScrollSample() {
             override fun onStop(velocity: Float) {
                 // for simplicity we won't fling ourselves, but we need to respect nested scroll
                 // dispatch pre fling
-                val velocity2d = Velocity(Offset(x = 0f, y = velocity))
+                val velocity2d = Velocity(x = 0f, y = velocity)
                 val consumed = nestedScrollDispatcher.dispatchPreFling(velocity2d)
                 // now, since we don't fling, we consume 0 (Offset.Zero).
                 // Adjust what's left after prefling and dispatch post fling

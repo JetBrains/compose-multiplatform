@@ -85,7 +85,7 @@ fun SpringBackScrollingDemo() {
                             }
                         }
                     }
-                    val velocity = velocityTracker.calculateVelocity().pixelsPerSecond.x
+                    val velocity = velocityTracker.calculateVelocity().x
                     // Now finger lifted, get fling going
                     launch {
                         mutatorMutex.mutate {
