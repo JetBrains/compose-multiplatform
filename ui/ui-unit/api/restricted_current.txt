@@ -57,9 +57,10 @@ package androidx.compose.ui.unit {
     method @androidx.compose.runtime.Stable public static long enforce-WVSBfsc(long, long otherConstraints);
     method public static boolean getHasFixedHeight-BRTryo0(long);
     method public static boolean getHasFixedWidth-BRTryo0(long);
+    method @androidx.compose.runtime.Stable public static boolean isSatisfiedBy-m9CmiCs(long, long size);
     method public static boolean isZero-BRTryo0(long);
     method @androidx.compose.runtime.Stable public static long offset-dAqVMF8(long, optional int horizontal, optional int vertical);
-    method @androidx.compose.runtime.Stable public static boolean satisfiedBy-m9CmiCs(long, long size);
+    method @Deprecated @androidx.compose.runtime.Stable public static boolean satisfiedBy-m9CmiCs(long, long size);
   }
 
   @androidx.compose.runtime.Immutable public interface Density {

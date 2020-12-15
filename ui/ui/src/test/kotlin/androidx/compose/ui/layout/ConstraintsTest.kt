@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.hasFixedHeight
 import androidx.compose.ui.unit.hasFixedWidth
 import androidx.compose.ui.unit.isZero
 import androidx.compose.ui.unit.offset
-import androidx.compose.ui.unit.satisfiedBy
+import androidx.compose.ui.unit.isSatisfiedBy
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -157,13 +157,13 @@ class ConstraintsTest {
     @Test
     fun satisfiedBy() {
         val constraints = Constraints(2, 5, 7, 9)
-        assertTrue(constraints.satisfiedBy(IntSize(4, 8)))
-        assertTrue(constraints.satisfiedBy(IntSize(2, 7)))
-        assertTrue(constraints.satisfiedBy(IntSize(5, 9)))
-        assertFalse(constraints.satisfiedBy(IntSize(1, 8)))
-        assertFalse(constraints.satisfiedBy(IntSize(7, 8)))
-        assertFalse(constraints.satisfiedBy(IntSize(4, 5)))
-        assertFalse(constraints.satisfiedBy(IntSize(4, 11)))
+        assertTrue(constraints.isSatisfiedBy(IntSize(4, 8)))
+        assertTrue(constraints.isSatisfiedBy(IntSize(2, 7)))
+        assertTrue(constraints.isSatisfiedBy(IntSize(5, 9)))
+        assertFalse(constraints.isSatisfiedBy(IntSize(1, 8)))
+        assertFalse(constraints.isSatisfiedBy(IntSize(7, 8)))
+        assertFalse(constraints.isSatisfiedBy(IntSize(4, 5)))
+        assertFalse(constraints.isSatisfiedBy(IntSize(4, 11)))
     }
 
     @Test
