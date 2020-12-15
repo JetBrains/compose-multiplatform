@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package androidx.compose.animation.core
+@file:Suppress("RedundantOverride")
 
-import androidx.compose.ui.util.identityHashCode
+package androidx.compose.animation.core
 
 /**
  * [AnimationVector] class that is the base class of [AnimationVector1D], [AnimationVector2D],
@@ -122,7 +122,7 @@ class AnimationVector1D(initVal: Float) : AnimationVector() {
     override fun equals(other: Any?): Boolean =
         other is AnimationVector1D && other.value == value
 
-    override fun hashCode(): Int = identityHashCode()
+    override fun hashCode(): Int = super.hashCode()
 }
 
 /**
@@ -174,7 +174,7 @@ class AnimationVector2D(v1: Float, v2: Float) : AnimationVector() {
     override fun equals(other: Any?): Boolean =
         other is AnimationVector2D && other.v1 == v1 && other.v2 == v2
 
-    override fun hashCode(): Int = identityHashCode()
+    override fun hashCode(): Int = super.hashCode()
 }
 
 /**
@@ -237,7 +237,7 @@ class AnimationVector3D(v1: Float, v2: Float, v3: Float) : AnimationVector() {
     override fun equals(other: Any?): Boolean =
         other is AnimationVector3D && other.v1 == v1 && other.v2 == v2 && other.v3 == v3
 
-    override fun hashCode(): Int = identityHashCode()
+    override fun hashCode(): Int = super.hashCode()
 }
 
 /**
@@ -312,5 +312,5 @@ class AnimationVector4D(v1: Float, v2: Float, v3: Float, v4: Float) : AnimationV
             other.v3 == v3 &&
             other.v4 == v4
 
-    override fun hashCode(): Int = identityHashCode()
+    override fun hashCode(): Int = super.hashCode()
 }

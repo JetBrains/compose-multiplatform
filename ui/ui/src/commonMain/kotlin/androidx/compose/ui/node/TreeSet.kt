@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.util
+package androidx.compose.ui.node
 
-expect fun String.format(vararg args: Any?): String
-
-expect fun StringBuilder.deleteAt(index: Int): StringBuilder
+internal expect class TreeSet<E>(comparator: Comparator<in E>) {
+    fun add(element: E): Boolean
+    fun remove(element: E): Boolean
+    fun first(): E
+    fun contains(element: E): Boolean
+    fun isEmpty(): Boolean
+}
