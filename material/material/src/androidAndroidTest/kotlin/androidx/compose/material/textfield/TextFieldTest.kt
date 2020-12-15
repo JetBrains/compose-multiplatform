@@ -20,6 +20,8 @@ import android.content.Context
 import android.os.Build
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.compose.foundation.Interaction
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -47,8 +49,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.isFocused
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -92,8 +92,6 @@ import com.nhaarman.mockitokotlin2.verify
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 
 @MediumTest
@@ -153,29 +151,26 @@ class TextFieldTest {
 
     @Test
     fun testTextFields_singleFocus() {
-        var textField1Focused = false
         val textField1Tag = "TextField1"
-
-        var textField2Focused = false
         val textField2Tag = "TextField2"
+        val interactionState1 = InteractionState()
+        val interactionState2 = InteractionState()
 
         rule.setMaterialContent {
             Column {
                 TextField(
-                    modifier = Modifier
-                        .onFocusChanged { textField1Focused = it.isFocused }
-                        .testTag(textField1Tag),
+                    modifier = Modifier.testTag(textField1Tag),
                     value = "input1",
                     onValueChange = {},
-                    label = {}
+                    label = {},
+                    interactionState = interactionState1
                 )
                 TextField(
-                    modifier = Modifier
-                        .onFocusChanged { textField2Focused = it.isFocused }
-                        .testTag(textField2Tag),
+                    modifier = Modifier.testTag(textField2Tag),
                     value = "input2",
                     onValueChange = {},
-                    label = {}
+                    label = {},
+                    interactionState = interactionState2
                 )
             }
         }
@@ -183,32 +178,29 @@ class TextFieldTest {
         rule.onNodeWithTag(textField1Tag).performClick()
 
         rule.runOnIdle {
-            assertThat(textField1Focused).isTrue()
-            assertThat(textField2Focused).isFalse()
+            assertThat(interactionState1.contains(Interaction.Focused)).isTrue()
+            assertThat(interactionState2.contains(Interaction.Focused)).isFalse()
         }
 
         rule.onNodeWithTag(textField2Tag).performClick()
 
         rule.runOnIdle {
-            assertThat(textField1Focused).isFalse()
-            assertThat(textField2Focused).isTrue()
+            assertThat(interactionState1.contains(Interaction.Focused)).isFalse()
+            assertThat(interactionState2.contains(Interaction.Focused)).isTrue()
         }
     }
 
     @Test
     fun testTextField_getFocus_whenClickedOnSurfaceArea() {
-        var focused = false
+        val interactionState = InteractionState()
         rule.setMaterialContent {
-            Box {
-                TextField(
-                    modifier = Modifier
-                        .onFocusChanged { focused = it.isFocused }
-                        .testTag(TextfieldTag),
-                    value = "input",
-                    onValueChange = {},
-                    label = {}
-                )
-            }
+            TextField(
+                modifier = Modifier.testTag(TextfieldTag),
+                value = "input",
+                onValueChange = {},
+                label = {},
+                interactionState = interactionState
+            )
         }
 
         // Click on (2, 2) which is Surface area and outside input area
@@ -217,7 +209,7 @@ class TextFieldTest {
         }
 
         rule.runOnIdleWithDensity {
-            assertThat(focused).isTrue()
+            assertThat(interactionState.contains(Interaction.Focused)).isTrue()
         }
     }
 
@@ -885,21 +877,20 @@ class TextFieldTest {
     @LargeTest
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun testTextField_alphaNotApplied_toCustomBackgroundColorAndTransparentColors() {
-        val latch = CountDownLatch(1)
+        val interactionState = InteractionState()
 
         rule.setMaterialContent {
             Box(Modifier.background(color = Color.White)) {
                 TextField(
-                    modifier = Modifier
-                        .onFocusChanged { if (it.isFocused) latch.countDown() }
-                        .testTag(TextfieldTag),
+                    modifier = Modifier.testTag(TextfieldTag),
                     value = "",
                     onValueChange = {},
                     label = {},
                     shape = RectangleShape,
                     backgroundColor = Color.Blue,
                     activeColor = Color.Transparent,
-                    inactiveColor = Color.Transparent
+                    inactiveColor = Color.Transparent,
+                    interactionState = interactionState
                 )
             }
         }
@@ -916,7 +907,9 @@ class TextFieldTest {
             )
 
         rule.onNodeWithTag(TextfieldTag).performClick()
-        assert(latch.await(1, TimeUnit.SECONDS))
+        rule.runOnIdle {
+            assertThat(interactionState.contains(Interaction.Focused)).isTrue()
+        }
 
         rule.onNodeWithTag(TextfieldTag)
             .captureToImage()

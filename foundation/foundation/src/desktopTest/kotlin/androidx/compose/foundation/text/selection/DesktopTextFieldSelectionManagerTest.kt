@@ -74,8 +74,9 @@ class DesktopTextFieldSelectionManagerTest {
 
         state.layoutResult = mock()
         state.textDelegate = mock()
+        whenever(state.layoutResult!!.value).thenReturn(mock())
         whenever(state.textDelegate.density).thenReturn(density)
-        whenever(state.layoutResult!!.layoutInput).thenReturn(
+        whenever(state.layoutResult!!.value.layoutInput).thenReturn(
             TextLayoutInput(
                 text = AnnotatedString(text),
                 style = TextStyle.Default,

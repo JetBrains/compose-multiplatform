@@ -35,6 +35,7 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.input.OffsetMapping
@@ -47,14 +48,15 @@ internal fun Modifier.cursor(
     state: TextFieldState,
     value: TextFieldValue,
     offsetMapping: OffsetMapping,
-    cursorColor: Color
-) = composed {
+    cursorColor: Color,
+    enabled: Boolean
+) = if (enabled) composed {
     // this should be a disposable clock, but it's not available in this module
     // however, we only launch one animation and guarantee that we stop it (via snap) in dispose
     val animationClocks = AmbientAnimationClock.current
     val cursorAlpha = remember(animationClocks) { AnimatedFloatModel(0f, animationClocks) }
 
-    if (state.hasFocus && value.selection.collapsed && cursorColor != Color.Unspecified) {
+    if (state.hasFocus && value.selection.collapsed && cursorColor.isSpecified) {
         onCommit(cursorColor, value.annotatedString) {
             if (@Suppress("DEPRECATION_ERROR") blinkingCursorEnabled) {
                 cursorAlpha.animateTo(0f, anim = cursorAnimationSpec)
@@ -71,7 +73,7 @@ internal fun Modifier.cursor(
             if (cursorAlphaValue != 0f) {
                 val transformedOffset = offsetMapping
                     .originalToTransformed(value.selection.start)
-                val cursorRect = state.layoutResult?.getCursorRect(transformedOffset)
+                val cursorRect = state.layoutResult?.value?.getCursorRect(transformedOffset)
                     ?: Rect(0f, 0f, 0f, 0f)
                 val cursorWidth = DefaultCursorThickness.toPx()
                 val cursorX = (cursorRect.left + cursorWidth / 2)
@@ -89,7 +91,7 @@ internal fun Modifier.cursor(
     } else {
         Modifier
     }
-}
+} else this
 
 @Stable
 private class AnimatedFloatModel(

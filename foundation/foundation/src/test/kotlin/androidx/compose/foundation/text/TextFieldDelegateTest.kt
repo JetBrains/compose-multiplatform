@@ -72,6 +72,7 @@ class TextFieldDelegateTest {
     private lateinit var textInputService: TextInputService
     private lateinit var layoutCoordinates: LayoutCoordinates
     private lateinit var multiParagraphIntrinsics: MultiParagraphIntrinsics
+    private lateinit var textLayoutResultProxy: TextLayoutResultProxy
     private lateinit var textLayoutResult: TextLayoutResult
 
     /**
@@ -93,6 +94,8 @@ class TextFieldDelegateTest {
         layoutCoordinates = mock()
         multiParagraphIntrinsics = mock()
         textLayoutResult = mock()
+        textLayoutResultProxy = mock()
+        whenever(textLayoutResultProxy.value).thenReturn(textLayoutResult)
     }
 
     @Test
@@ -101,11 +104,11 @@ class TextFieldDelegateTest {
         val offset = 10
         val editorState = TextFieldValue(text = "Hello, World", selection = TextRange(1))
         whenever(processor.mBufferState).thenReturn(editorState)
-        whenever(textLayoutResult.getOffsetForPosition(position)).thenReturn(offset)
+        whenever(textLayoutResultProxy.getOffsetForPosition(position)).thenReturn(offset)
 
         TextFieldDelegate.setCursorOffset(
             position,
-            textLayoutResult,
+            textLayoutResultProxy,
             processor,
             OffsetMapping.Identity,
             onValueChange
@@ -295,11 +298,11 @@ class TextFieldDelegateTest {
         val offset = 10
         val editorState = TextFieldValue(text = "Hello, World", selection = TextRange(1))
         whenever(processor.mBufferState).thenReturn(editorState)
-        whenever(textLayoutResult.getOffsetForPosition(position)).thenReturn(offset)
+        whenever(textLayoutResultProxy.getOffsetForPosition(position)).thenReturn(offset)
 
         TextFieldDelegate.setCursorOffset(
             position,
-            textLayoutResult,
+            textLayoutResultProxy,
             processor,
             skippingOffsetMap,
             onValueChange
