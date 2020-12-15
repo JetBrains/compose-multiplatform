@@ -64,6 +64,37 @@ class CompositionTests {
     }
 
     @Test
+    fun simple() = compositionTest {
+        compose {
+            Text("Hello!")
+        }
+
+        validate {
+            Text("Hello!")
+        }
+    }
+
+    @Test
+    fun simpleChanges() = compositionTest {
+        var name by mutableStateOf("Bob")
+        compose {
+            Text("Hello $name")
+        }
+
+        validate {
+            Text("Hello $name")
+        }
+
+        name = "Robert"
+
+        expectChanges()
+
+        validate {
+            Text("Hello $name")
+        }
+    }
+
+    @Test
     fun testComposeAModel() = compositionTest {
         val model = testModel()
         compose {

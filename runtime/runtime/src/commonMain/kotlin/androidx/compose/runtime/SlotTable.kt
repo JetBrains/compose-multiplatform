@@ -1055,6 +1055,11 @@ internal class SlotWriter(
     }
 
     /**
+     * Return the node at [anchor] if it is a node group or null.
+     */
+    fun node(anchor: Anchor) = node(anchor.toIndexFor(this))
+
+    /**
      * Return the index of the nearest group that contains [currentGroup].
      */
     var parent: Int = -1
@@ -1117,9 +1122,14 @@ internal class SlotWriter(
     }
 
     /**
-     * Updates the node for the current node group.
+     * Updates the node for the current node group to [value].
      */
     fun updateNode(value: Any?) = updateNodeOfGroup(currentGroup, value)
+
+    /**
+     * Update the node of a the group at [anchor] to [value].
+     */
+    fun updateNode(anchor: Anchor, value: Any?) = updateNodeOfGroup(anchor.toIndexFor(this), value)
 
     /**
      * Updates the node of the parent group.

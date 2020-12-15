@@ -42,7 +42,7 @@ fun Group(
     content: @Composable () -> Unit
 ) {
     emit<GroupComponent, VectorApplier>(
-        ctor = { GroupComponent() },
+        factory = { GroupComponent() },
         update = {
             set(name) { this.name = it }
             set(rotation) { this.rotation = it }
@@ -77,7 +77,7 @@ fun Path(
     trimPathOffset: Float = DefaultTrimPathOffset
 ) {
     emit<PathComponent, VectorApplier>(
-        ctor = { PathComponent() },
+        factory = { PathComponent() },
         update = {
             set(name) { this.name = it }
             set(pathData) { this.pathData = it }

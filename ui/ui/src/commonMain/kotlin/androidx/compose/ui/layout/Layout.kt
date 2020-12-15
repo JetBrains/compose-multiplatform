@@ -230,12 +230,14 @@ fun measureBlocksOf(
     modifier: Modifier = Modifier
 ) {
     @OptIn(ExperimentalComposeApi::class)
+    val density = AmbientDensity.current
+    val layoutDirection = AmbientLayoutDirection.current
     emit<LayoutNode, Applier<Any>>(
-        ctor = LayoutEmitHelper.constructor,
+        factory = LayoutEmitHelper.constructor,
         update = {
             set(measureBlocks, LayoutEmitHelper.setMeasureBlocks)
-            set(AmbientDensity.current, LayoutEmitHelper.setDensity)
-            set(AmbientLayoutDirection.current, LayoutEmitHelper.setLayoutDirection)
+            set(density, LayoutEmitHelper.setDensity)
+            set(layoutDirection, LayoutEmitHelper.setLayoutDirection)
         },
         skippableUpdate = materializerOf(modifier),
         content = content
@@ -265,17 +267,19 @@ fun MultiMeasureLayout(
 ) {
     val measureBlocks = remember(measureBlock) { MeasuringIntrinsicsMeasureBlocks(measureBlock) }
     val materialized = currentComposer.materialize(modifier)
+    val density = AmbientDensity.current
+    val layoutDirection = AmbientLayoutDirection.current
 
     @OptIn(ExperimentalComposeApi::class)
     emit<LayoutNode, Applier<Any>>(
-        ctor = LayoutEmitHelper.constructor,
+        factory = LayoutEmitHelper.constructor,
         update = {
             set(materialized, LayoutEmitHelper.setModifier)
             set(measureBlocks, LayoutEmitHelper.setMeasureBlocks)
-            set(AmbientDensity.current, LayoutEmitHelper.setDensity)
-            set(AmbientLayoutDirection.current, LayoutEmitHelper.setLayoutDirection)
+            set(density, LayoutEmitHelper.setDensity)
+            set(layoutDirection, LayoutEmitHelper.setLayoutDirection)
             @Suppress("DEPRECATION")
-            set(Unit) { this.canMultiMeasure = true }
+            init { this.canMultiMeasure = true }
         },
         content = children
     )
@@ -315,7 +319,7 @@ internal enum class IntrinsicWidthHeight {
 }
 
 /**
- * A wrapper around a [Measurable] for intrinsic measurments in [Layout]. Consumers of
+ * A wrapper around a [Measurable] for intrinsic measurements in [Layout]. Consumers of
  * [Layout] don't identify intrinsic methods, but we can give a reasonable implementation
  * by using their [measure], substituting the intrinsics gathering method
  * for the [Measurable.measure] call.
@@ -440,7 +444,7 @@ fun MeasuringIntrinsicsMeasureBlocks(measureBlock: MeasureBlock) =
  * measure block with measure calls replaced with intrinsic measurement calls.
  */
 private inline fun Density.MeasuringMinIntrinsicWidth(
-    measureBlock: MeasureBlock /*TODO: crossinline*/,
+    measureBlock: MeasureBlock,
     measurables: List<IntrinsicMeasurable>,
     h: Int,
     layoutDirection: LayoutDirection

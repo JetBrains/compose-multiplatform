@@ -683,7 +683,7 @@ class Composer<N>(
     }
 
     private fun validateRecomposeScopeAnchors(slotTable: SlotTable) {
-        val scopes = slotTable.slots.map { it as? RecomposeScope }.filterNotNull()
+        val scopes = slotTable.slots.mapNotNull { it as? RecomposeScope }
         for (scope in scopes) {
             scope.anchor?.let { anchor ->
                 check(scope in slotTable.slotsOf(anchor.toIndexFor(slotTable))) {
@@ -880,14 +880,14 @@ class Composer<N>(
      *
      *  @param key The key for the group
      */
-    internal fun startGroup(key: Int) = start(key, null, false, null)
+    private fun startGroup(key: Int) = start(key, null, false, null)
 
-    internal fun startGroup(key: Int, dataKey: Any?) = start(key, dataKey, false, null)
+    private fun startGroup(key: Int, dataKey: Any?) = start(key, dataKey, false, null)
 
     /**
      * End the current group.
      */
-    internal fun endGroup() = end(false)
+    internal fun endGroup() = end(isNode = false)
 
     @OptIn(InternalComposeApi::class)
     private fun skipGroup() {
@@ -895,11 +895,11 @@ class Composer<N>(
     }
 
     /**
-     * Start emitting a node. It is required that one of [emitNode] or [createNode] is called
-     * after [startNode]. Similar to [startGroup], if, during recomposition, the current node
-     * does not have the provided key a node with that key is scanned for and moved into the
-     * current position if found, if no such node is found the composition switches into insert
-     * mode and a the node is scheduled to be inserted at the current location.
+     * Start emitting a node. It is required that [createNode] is called after [startNode].
+     * Similar to [startGroup], if, during recomposition, the current node does not have the
+     * provided key a node with that key is scanned for and moved into the current position if
+     * found, if no such node is found the composition switches into insert mode and a the node
+     * is scheduled to be inserted at the current location.
      */
     @PublishedApi
     internal fun startNode() {
@@ -913,82 +913,58 @@ class Composer<N>(
      */
     @Suppress("UNUSED")
     @OptIn(ExperimentalComposeApi::class)
-    internal fun <T : N> createNode(factory: () -> T) {
+    @PublishedApi
+    internal fun <T> createNode(factory: () -> T) {
         validateNodeExpected()
         check(inserting) { "createNode() can only be called when inserting" }
         val insertIndex = nodeIndexStack.peek()
-        // see emitNode
+        val groupAnchor = writer.anchor(writer.parent)
         groupNodeCount++
         recordFixup { applier, slots, _ ->
-            val node = factory()
-            slots.node = node
+            @Suppress("UNCHECKED_CAST")
+            val node = factory() as N
+            slots.updateNode(groupAnchor, node)
             applier.insertTopDown(insertIndex, node)
             applier.down(node)
         }
-        recordInsertUp { applier, _, _ ->
-            val nodeToInsert = applier.current
+        recordInsertUpFixup { applier, slots, _ ->
+            @Suppress("UNCHECKED_CAST")
+            val nodeToInsert = slots.node(groupAnchor) as N
             applier.up()
             applier.insertBottomUp(insertIndex, nodeToInsert)
         }
     }
 
     /**
-     * Schedule the given node to be inserted. This is only valid to call when the composer is
-     * inserting.
-     */
-    @PublishedApi
-    @OptIn(ExperimentalComposeApi::class)
-    internal fun emitNode(node: Any?) {
-        validateNodeExpected()
-        check(inserting) { "emitNode() called when not inserting" }
-        val insertIndex = nodeIndexStack.peek()
-        // see emitNode
-        groupNodeCount++
-        @Suppress("UNCHECKED_CAST")
-        writer.node = node as N
-        recordApplierOperation { applier, _, _ ->
-            applier.insertTopDown(insertIndex, node)
-            applier.down(node)
-        }
-        recordInsertUp { applier, _, _ ->
-            val nodeToInsert = applier.current
-            applier.up()
-            applier.insertBottomUp(insertIndex, nodeToInsert)
-        }
-    }
-
-    /**
-     * Return the instance of the node that was inserted at the given location. This is only
-     * valid to call when the composition is not inserting. This must be called at the same
-     * location as [emitNode] or [createNode] as called even if the value is unused.
+     * Mark the node that was created by [createNode] as used by composition.
      */
     @PublishedApi
     @OptIn(InternalComposeApi::class)
-    internal fun useNode(): N {
+    internal fun useNode() {
         validateNodeExpected()
         check(!inserting) { "useNode() called while inserting" }
-        val result = reader.node
-        recordDown(result)
-        return result
+        recordDown(reader.node)
     }
 
     /**
      * Called to end the node group.
      */
     @PublishedApi
-    internal fun endNode() = end(true)
+    internal fun endNode() = end(isNode = true)
 
     /**
      * Schedule a change to be applied to a node's property. This change will be applied to the
-     * node that is the current node in the tree which was either created by [createNode],
-     * emitted by [emitNode] or returned by [useNode].
+     * node that is the current node in the tree which was either created by [createNode].
      */
     @OptIn(ExperimentalComposeApi::class)
+    @PublishedApi
     internal fun <V, T> apply(value: V, block: T.(V) -> Unit) {
-        recordApplierOperation { applier, _, _ ->
+        val operation: Change<N> = { applier, _, _ ->
             @Suppress("UNCHECKED_CAST")
             (applier.current as T).block(value)
         }
+        if (inserting) recordFixup(operation)
+        else recordApplierOperation(operation)
     }
 
     /**
@@ -1637,7 +1613,7 @@ class Composer<N>(
         val inserting = inserting
         if (inserting) {
             if (isNode) {
-                registerInsertUp()
+                registerInsertUpFixup()
                 expectedNodeCount = 1
             }
             reader.endEmpty()
@@ -2050,7 +2026,7 @@ class Composer<N>(
         } else {
             null
         }
-        end(false)
+        end(isNode = false)
         return result
     }
 
@@ -2108,12 +2084,6 @@ class Composer<N>(
     internal fun hasInvalidations() = invalidations.isNotEmpty()
 
     @Suppress("UNCHECKED_CAST")
-    @OptIn(InternalComposeApi::class)
-    private var SlotWriter.node
-        get() = node(currentGroup) as N
-        set(value) { updateParentNode(value) }
-
-    @Suppress("UNCHECKED_CAST")
     private val SlotReader.node get() = node(parent) as N
 
     @Suppress("UNCHECKED_CAST")
@@ -2145,7 +2115,6 @@ class Composer<N>(
      * node.
      */
     private fun recordApplierOperation(change: Change<N>) {
-        realizeInsertUps()
         realizeUps()
         realizeDowns()
         record(change)
@@ -2218,32 +2187,6 @@ class Composer<N>(
         }
     }
 
-    private var insertUpRequests = Stack<Change<N>>()
-
-    private var pendingInsertUps = mutableListOf<Change<N>>()
-
-    private fun registerInsertUp() {
-        pendingInsertUps.add(insertUpRequests.pop())
-    }
-
-    private fun realizeInsertUps() {
-        if (pendingInsertUps.isNotEmpty()) {
-            pendingInsertUps.forEach { record(it) }
-            pendingInsertUps.clear()
-        }
-    }
-
-    /**
-     * Record a change that will be added after all the changes for the node and all its children
-     * have been performed.
-     *
-     * This is used to implement calling [Applier.insertBottomUp] to allow a tree to be built
-     * bottom-up instead of top-down.
-     */
-    private fun recordInsertUp(change: Change<N>) {
-        insertUpRequests.push(change)
-    }
-
     // Navigating the writer slot is performed relatively as the location of a group in the writer
     // might be different than it is in the reader as groups can be inserted, deleted, or moved.
     //
@@ -2300,6 +2243,8 @@ class Composer<N>(
         } else {
             val fixups = insertFixups.toMutableList()
             insertFixups.clear()
+            realizeUps()
+            realizeDowns()
             recordSlotEditingOperation { applier, slots, lifecycleManager ->
                 insertTable.write { writer ->
                     for (fixup in fixups) {
@@ -2314,15 +2259,17 @@ class Composer<N>(
     }
 
     private fun recordFixup(change: Change<N>) {
-        realizeInsertUps()
-        val anchor = insertAnchor
-        val start = anchor.toIndexFor(insertTable)
-        val location = writer.currentGroup - start
-        insertFixups.add { _, slots, _ ->
-            val newLocation = location + anchor.toIndexFor(insertTable)
-            slots.advanceBy(newLocation - slots.currentGroup)
-        }
         insertFixups.add(change)
+    }
+
+    private val insertUpFixups = Stack<Change<N>>()
+
+    private fun recordInsertUpFixup(change: Change<N>) {
+        insertUpFixups.push(change)
+    }
+
+    private fun registerInsertUpFixup() {
+        insertFixups.add(insertUpFixups.pop())
     }
 
     /**
@@ -2383,7 +2330,6 @@ class Composer<N>(
     }
 
     private fun finalizeCompose() {
-        realizeInsertUps()
         realizeUps()
         check(pendingStack.isEmpty()) { "Start/end imbalance" }
         check(startedGroups.isEmpty()) { "Missed recording an endGroup()" }
@@ -2566,12 +2512,11 @@ class Composer<N>(
             updateCompoundKeyWhenWeEnterGroupKeyHash(dataKey.hashCode())
     }
 
-    @ExperimentalComposeApi
+    @OptIn(ExperimentalComposeApi::class)
     private fun updateCompoundKeyWhenWeEnterGroupKeyHash(keyHash: Int) {
         currentCompoundKeyHash = (currentCompoundKeyHash rol 3) xor keyHash
     }
 
-    @ExperimentalComposeApi
     private fun updateCompoundKeyWhenWeExitGroup(groupKey: Int, dataKey: Any?) {
         if (dataKey == null)
             updateCompoundKeyWhenWeExitGroupKeyHash(groupKey)
@@ -2579,83 +2524,140 @@ class Composer<N>(
             updateCompoundKeyWhenWeExitGroupKeyHash(dataKey.hashCode())
     }
 
-    @ExperimentalComposeApi
+    @OptIn(ExperimentalComposeApi::class)
     private fun updateCompoundKeyWhenWeExitGroupKeyHash(groupKey: Int) {
         currentCompoundKeyHash = (currentCompoundKeyHash xor groupKey.hashCode()) ror 3
     }
 }
 
-@Suppress("UNCHECKED_CAST")
-/*inline */ class Updater<T> @PublishedApi internal constructor(
-    @PublishedApi internal val composer: Composer<*>,
-    @PublishedApi internal val node: T
+/**
+ * A helper receiver scope class used by [emit] to help write code to initialized and update a
+ * node.
+ *
+ * @see emit
+ */
+@Suppress("EXPERIMENTAL_FEATURE_WARNING")
+inline class Updater<T> constructor(
+    @PublishedApi internal val composer: Composer<*>
 ) {
+    /**
+     * Set the value property of the emitted node.
+     *
+     * Schedules [block] to be run when the node is first created or when [value] is different
+     * than the previous composition.
+     *
+     * @see update
+     */
+    @Suppress("NOTHING_TO_INLINE") // Inlining the compare has noticeable impact
     inline fun set(
         value: Int,
-        /*crossinline*/
-        block: T.(value: Int) -> Unit
+        noinline block: T.(value: Int) -> Unit
     ) = with(composer) {
         if (inserting || nextSlot() != value) {
             updateValue(value)
-            node.block(value)
-//            val appliedBlock: T.(value: Int) -> Unit = { block(it) }
-//            composer.apply(value, appliedBlock)
+            composer.apply(value, block)
         }
     }
 
-    inline fun <reified V> set(
+    /**
+     * Set the value property of the emitted node.
+     *
+     * Schedules [block] to be run when the node is first created or when [value] is different
+     * than the previous composition.
+     *
+     * @see update
+     */
+    fun <V> set(
         value: V,
-        /*crossinline*/
         block: T.(value: V) -> Unit
     ) = with(composer) {
         if (inserting || nextSlot() != value) {
             updateValue(value)
-            node.block(value)
-//            val appliedBlock: T.(value: V) -> Unit = { block(it) }
-//            composer.apply(value, appliedBlock)
+            composer.apply(value, block)
         }
     }
 
+    /**
+     * Update the value of a property of the emitted node.
+     *
+     * Schedules [block] to be run when [value] is different than the previous composition. It is
+     * different than [set] in that it does not run when the node is created. This is used when
+     * initial value set by the [emit] in the constructor callback already has the correct value.
+     * For example, use [update} when [value] is passed into of the classes constructor
+     * parameters.
+     *
+     * @see set
+     */
+    @Suppress("NOTHING_TO_INLINE") // Inlining the compare has noticeable impact
     inline fun update(
         value: Int,
-        /*crossinline*/
-        block: T.(value: Int) -> Unit
+        noinline block: T.(value: Int) -> Unit
     ) = with(composer) {
         if (inserting || nextSlot() != value) {
             updateValue(value)
-            node.block(value)
-//            val appliedBlock: T.(value: Int) -> Unit = { block(it) }
-//            if (!inserting) composer.apply(value, appliedBlock)
+            composer.apply(value, block)
         }
     }
 
-    inline fun <reified V> update(
+    /**
+     * Update the value of a property of the emitted node.
+     *
+     * Schedules [block] to be run when [value] is different than the previous composition. It is
+     * different than [set] in that it does not run when the node is created. This is used when
+     * initial value set by the [emit] in the constructor callback already has the correct value.
+     * For example, use [update} when [value] is passed into of the classes constructor
+     * parameters.
+     *
+     * @see set
+     */
+    fun <V> update(
         value: V,
-        /*crossinline*/
         block: T.(value: V) -> Unit
     ) = with(composer) {
         if (inserting || nextSlot() != value) {
             updateValue(value)
-            node.block(value)
-//            val appliedBlock: T.(value: V) -> Unit = { block(it) }
-//            if (!inserting) composer.apply(value, appliedBlock)
+            composer.apply(value, block)
         }
     }
 
-    inline fun reconcile(
-        block: T.() -> Unit
-    ) {
-        node.block()
+    /**
+     * Initialize emitted node.
+     *
+     * Schedule [block] to be executed after the node is created.
+     *
+     * This is only executed once. The can be used to call a method or set a value on a node
+     * instance that is required to be set after one or more other properties have been set.
+     *
+     * @see reconcile
+     */
+    fun init(block: T.() -> Unit) {
+        if (composer.inserting) composer.apply<Unit, T>(Unit, { block() })
+    }
+
+    /**
+     * Reconcile the node to the current state.
+     *
+     * This is used when [set] and [update] are insufficient to update the state of the node
+     * based on changes passed to the function calling [emit].
+     *
+     * Schedules [block] to execute. As this unconditionally schedules [block] to executed it
+     * might be executed unnecessarily as no effort is taken to ensure it only executes when the
+     * values [block] captures have changed. It is highly recommended that [set] and [update] be
+     * used instead as they will only schedule their blocks to executed when the value passed to
+     * them has changed.
+     */
+    fun reconcile(block: T.() -> Unit) {
+        composer.apply<Unit, T>(Unit, { this.block() })
     }
 }
 
-class SkippableUpdater<T> @PublishedApi internal constructor(
-    @PublishedApi internal val composer: Composer<*>,
-    @PublishedApi internal val node: T
+@Suppress("EXPERIMENTAL_FEATURE_WARNING")
+inline class SkippableUpdater<T> constructor(
+    @PublishedApi internal val composer: Composer<*>
 ) {
     inline fun update(block: Updater<T>.() -> Unit) {
         composer.startReplaceableGroup(0x1e65194f)
-        Updater(composer, node).block()
+        Updater<T>(composer).block()
         composer.endReplaceableGroup()
     }
 }
@@ -2977,34 +2979,40 @@ private const val nodeKey = 125
 internal const val invocationKey = 200
 
 @PublishedApi
+@Suppress("HiddenTypeParameter")
 internal val invocation = OpaqueKey("provider")
 
 @PublishedApi
 internal const val providerKey = 201
 
 @PublishedApi
+@Suppress("HiddenTypeParameter")
 internal val provider = OpaqueKey("provider")
 
 @PublishedApi
 internal const val ambientMapKey = 202
 
 @PublishedApi
+@Suppress("HiddenTypeParameter")
 internal val ambientMap = OpaqueKey("ambientMap")
 
 @PublishedApi
 internal const val providerValuesKey = 203
 
 @PublishedApi
+@Suppress("HiddenTypeParameter")
 internal val providerValues = OpaqueKey("providerValues")
 
 @PublishedApi
 internal const val providerMapsKey = 204
 
 @PublishedApi
+@Suppress("HiddenTypeParameter")
 internal val providerMaps = OpaqueKey("providers")
 
 @PublishedApi
 internal const val referenceKey = 206
 
 @PublishedApi
+@Suppress("HiddenTypeParameter")
 internal val reference = OpaqueKey("reference")

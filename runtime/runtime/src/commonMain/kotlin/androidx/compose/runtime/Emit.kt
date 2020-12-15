@@ -25,7 +25,7 @@ package androidx.compose.runtime
  *
  * @sample androidx.compose.runtime.samples.CustomTreeComposition
  *
- * @param ctor A function which will create a new instance of [T]. This function is NOT
+ * @param factory A function which will create a new instance of [T]. This function is NOT
  * guaranteed to be called in place.
  * @param update A function to perform updates on the node. This will run every time emit is
  * executed. This function is called in place and will be inlined.
@@ -38,17 +38,17 @@ package androidx.compose.runtime
 @Suppress("ComposableNaming")
 @OptIn(ComposeCompilerApi::class)
 @Composable inline fun <T : Any, reified E : Applier<*>> emit(
-    noinline ctor: () -> T,
-    update: Updater<T>.() -> Unit
+    noinline factory: () -> T,
+    update: @ComposableContract(preventCapture = true) Updater<T>.() -> Unit
 ) {
     if (currentComposer.applier !is E) invalidApplier()
     currentComposer.startNode()
-    val node = if (currentComposer.inserting)
-        ctor().also { currentComposer.emitNode(it) }
-    else
-        @Suppress("UNCHECKED_CAST")
-        currentComposer.useNode() as T
-    Updater(currentComposer, node).update()
+    if (currentComposer.inserting) {
+        currentComposer.createNode { factory() }
+    } else {
+        currentComposer.useNode()
+    }
+    Updater<T>(currentComposer).update()
     currentComposer.endNode()
 }
 
@@ -64,7 +64,7 @@ package androidx.compose.runtime
  *
  * @sample androidx.compose.runtime.samples.CustomTreeComposition
  *
- * @param ctor A function which will create a new instance of [T]. This function is NOT
+ * @param factory A function which will create a new instance of [T]. This function is NOT
  * guaranteed to be called in place.
  * @param update A function to perform updates on the node. This will run every time emit is
  * executed. This function is called in place and will be inlined.
@@ -79,18 +79,18 @@ package androidx.compose.runtime
 @OptIn(ComposeCompilerApi::class)
 @Composable
 inline fun <T : Any?, reified E : Applier<*>> emit(
-    noinline ctor: () -> T,
-    update: Updater<T>.() -> Unit,
+    noinline factory: () -> T,
+    update: @ComposableContract(preventCapture = true) Updater<T>.() -> Unit,
     content: @Composable () -> Unit
 ) {
     if (currentComposer.applier !is E) invalidApplier()
     currentComposer.startNode()
-    val node = if (currentComposer.inserting)
-        ctor().also { currentComposer.emitNode(it) }
-    else
-        @Suppress("UNCHECKED_CAST")
-        currentComposer.useNode() as T
-    Updater(currentComposer, node).update()
+    if (currentComposer.inserting) {
+        currentComposer.createNode(factory)
+    } else {
+        currentComposer.useNode()
+    }
+    Updater<T>(currentComposer).update()
     content()
     currentComposer.endNode()
 }
@@ -104,7 +104,7 @@ inline fun <T : Any?, reified E : Applier<*>> emit(
  *
  * @sample androidx.compose.runtime.samples.CustomTreeComposition
  *
- * @param ctor A function which will create a new instance of [T]. This function is NOT
+ * @param factory A function which will create a new instance of [T]. This function is NOT
  * guaranteed to be called in place.
  * @param update A function to perform updates on the node. This will run every time emit is
  * executed. This function is called in place and will be inlined.
@@ -124,21 +124,21 @@ inline fun <T : Any?, reified E : Applier<*>> emit(
 @Suppress("ComposableNaming")
 @OptIn(ComposeCompilerApi::class)
 @Composable @ComposableContract(readonly = true)
-inline fun <T : Any?, reified E : Applier<*>> emit(
-    noinline ctor: () -> T,
-    update: Updater<T>.() -> Unit,
+inline fun <T, reified E : Applier<*>> emit(
+    noinline factory: () -> T,
+    update: @ComposableContract(preventCapture = true) Updater<T>.() -> Unit,
     noinline skippableUpdate: @Composable SkippableUpdater<T>.() -> Unit,
     content: @Composable () -> Unit
 ) {
     if (currentComposer.applier !is E) invalidApplier()
     currentComposer.startNode()
-    val node = if (currentComposer.inserting)
-        ctor().also { currentComposer.emitNode(it) }
-    else
-        @Suppress("UNCHECKED_CAST")
-        currentComposer.useNode() as T
-    Updater(currentComposer, node).update()
-    SkippableUpdater(currentComposer, node).skippableUpdate()
+    if (currentComposer.inserting) {
+        currentComposer.createNode(factory)
+    } else {
+        currentComposer.useNode()
+    }
+    Updater<T>(currentComposer).update()
+    SkippableUpdater<T>(currentComposer).skippableUpdate()
     currentComposer.startReplaceableGroup(0x7ab4aae9)
     content()
     currentComposer.endReplaceableGroup()

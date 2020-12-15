@@ -589,9 +589,9 @@ class AndroidViewCompatTest {
                     ) {
                         it.setContent {
                             emit<LayoutNode, Applier<Any>>(
-                                ctor = LayoutEmitHelper.constructor,
+                                factory = LayoutEmitHelper.constructor,
                                 update = {
-                                    set(Unit) { node = this }
+                                    init { node = this }
                                     set(noOpMeasureBlocks, LayoutEmitHelper.setMeasureBlocks)
                                 }
                             )
