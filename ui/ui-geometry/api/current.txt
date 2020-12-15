@@ -270,6 +270,7 @@ package androidx.compose.ui.geometry {
 
   public final class SizeKt {
     method @androidx.compose.runtime.Stable public static long Size(float width, float height);
+    method public static long getCenter-uvyYCjk(long);
     method public static inline boolean isSpecified-uvyYCjk(long);
     method public static inline boolean isUnspecified-uvyYCjk(long);
     method @androidx.compose.runtime.Stable public static long lerp-3tf5JpU(long start, long stop, float fraction);

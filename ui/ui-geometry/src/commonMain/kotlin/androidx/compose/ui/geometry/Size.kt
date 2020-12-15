@@ -209,3 +209,10 @@ fun Size.toRect(): Rect {
 @Suppress("NOTHING_TO_INLINE")
 @Stable
 inline operator fun Float.times(size: Size) = size * this
+
+/**
+ * Returns the [Offset] of the center of the rect from the point of [0, 0]
+ * with this [Size].
+ */
+@Stable
+val Size.center: Offset get() = Offset(width / 2f, height / 2f)
