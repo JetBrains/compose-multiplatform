@@ -83,36 +83,14 @@ class DpTest {
     }
 
     @Test
-    fun multiplyDimension() {
-        assertEquals(DpSquared(40f), 10.dp * 4.dp)
-    }
-
-    @Test
-    fun multiplyDimensionSquared() {
-        assertEquals(DpCubed(40f), 10.dp * (2.dp * 2.dp))
-    }
-
-    @Test
     fun divideOperator() {
         assertEquals(10f, 100.dp / 10f.dp, 0f)
         assertEquals(0f, 0.dp / 10f.dp, 0f)
     }
 
     @Test
-    fun divideOperatorInverse() {
-        assertEquals(DpInverse(10f), 100f / 10.dp)
-        assertEquals(DpInverse(10f), 100.0 / 10.dp)
-        assertEquals(DpInverse(10f), 100 / 10.dp)
-    }
-
-    @Test
     fun divideToScalar() {
         assertEquals(1f, 1.dp / 1.dp, 0f)
-    }
-
-    @Test
-    fun divideToInverse() {
-        assertEquals(DpInverse(10f), 100.dp / (5.dp * 2.dp))
     }
 
     @Test
@@ -140,140 +118,6 @@ class DpTest {
         val infNaN = Float.POSITIVE_INFINITY / Float.NEGATIVE_INFINITY
         assertEquals(0, zeroNaN.dp.compareTo(zeroNaN.dp))
         assertEquals(0, infNaN.dp.compareTo(infNaN.dp))
-    }
-
-    @Test
-    fun addDimension2() {
-        assertEquals(DpSquared(4f), (2.dp * 1.dp) + (1.dp * 2.dp))
-    }
-
-    @Test
-    fun subtractDimension2() {
-        assertEquals(DpSquared(0f), (2.dp * 3.dp) - (3.dp * 2.dp))
-    }
-
-    @Test
-    fun divideDimension2() {
-        assertEquals(DpSquared(1f), (2.dp * 5.dp) / 10f)
-    }
-
-    @Test
-    fun divideDimension2Dimension() {
-        assertEquals(1f, ((2.dp * 2.dp) / 4.dp).value, 0f)
-    }
-
-    @Test
-    fun divideDimension2Dimension2() {
-        assertEquals(1f, (2.dp * 2.dp) / (2.dp * 2.dp))
-    }
-
-    @Test
-    fun divideDimension2Dimension3() {
-        assertEquals(DpInverse(0.5f), (2.dp * 2.dp) / (2.dp * 2.dp * 2.dp))
-    }
-
-    @Test
-    fun multiplyDimension2() {
-        assertEquals(DpSquared(4f), (2.dp * 1.dp) * 2f)
-    }
-
-    @Test
-    fun multiplyDimension2Dimension() {
-        assertEquals(DpCubed(4f), (2.dp * 1.dp) * 2.dp)
-    }
-
-    @Test
-    fun compareDimension2() {
-        assertTrue(DpSquared(0f) < DpSquared(Float.MIN_VALUE))
-        assertTrue(DpSquared(1f) < DpSquared(3f))
-        assertTrue(DpSquared(1f) == DpSquared(1f))
-        assertTrue(DpSquared(1f) > DpSquared(0f))
-    }
-
-    @Test
-    fun addDimension3() {
-        assertEquals(DpCubed(4f), (2.dp * 1.dp * 1.dp) + (1.dp * 2.dp * 1.dp))
-    }
-
-    @Test
-    fun subtractDimension3() {
-        assertEquals(DpCubed(0f), (2.dp * 3.dp * 1.dp) - (3.dp * 2.dp * 1.dp))
-    }
-
-    @Test
-    fun divideDimension3() {
-        assertEquals(DpCubed(1f), (2.dp * 5.dp * 1.dp) / 10f)
-    }
-
-    @Test
-    fun divideDimension3Dimension() {
-        assertEquals(DpSquared(1f), (2.dp * 2.dp * 1.dp) / 4.dp)
-    }
-
-    @Test
-    fun divideDimension3Dimension2() {
-        assertEquals(1f, ((2.dp * 2.dp * 1.dp) / (2.dp * 2.dp)).value, 0f)
-    }
-
-    @Test
-    fun divideDimension3Dimension3() {
-        assertEquals(1f, (2.dp * 2.dp * 1.dp) / (2.dp * 2.dp * 1.dp))
-    }
-
-    @Test
-    fun multiplyDimension3() {
-        assertEquals(DpCubed(4f), (2.dp * 1.dp * 1.dp) * 2f)
-    }
-
-    @Test
-    fun compareDimension3() {
-        assertTrue(DpCubed(0f) < DpCubed(Float.MIN_VALUE))
-        assertTrue(DpCubed(1f) < DpCubed(3f))
-        assertTrue(DpCubed(1f) == DpCubed(1f))
-        assertTrue(DpCubed(1f) > DpCubed(0f))
-    }
-
-    @Test
-    fun addDimensionInverse() {
-        assertEquals(DpInverse(1f), 1 / 2.dp + 1 / 2.dp)
-    }
-
-    @Test
-    fun subtractDimensionInverse() {
-        assertEquals(DpInverse(0f), 1 / 2.dp - 1 / 2.dp)
-    }
-
-    @Test
-    fun divideDimensionInverse() {
-        assertEquals(DpInverse(1f), (10 / 1.dp) / 10f)
-    }
-
-    @Test
-    fun multiplyDimensionInverse() {
-        assertEquals(DpInverse(4f), (1 / 2.dp) * 8f)
-    }
-
-    @Test
-    fun multiplyDimensionInverseDimension() {
-        assertEquals(4f, (1 / 2.dp) * 8.dp)
-    }
-
-    @Test
-    fun multiplyDimensionInverseDimension2() {
-        assertEquals(4f, ((1 / 2.dp) * (8.dp * 1.dp)).value, 0f)
-    }
-
-    @Test
-    fun multiplyDimensionInverseDimension3() {
-        assertEquals(DpSquared(4f), (1 / 2.dp) * (8.dp * 1.dp * 1.dp))
-    }
-
-    @Test
-    fun compareDimensionInverse() {
-        assertTrue(DpInverse(0f) < DpInverse(Float.MIN_VALUE))
-        assertTrue(DpInverse(1f) < DpInverse(3f))
-        assertTrue(DpInverse(1f) == DpInverse(1f))
-        assertTrue(DpInverse(1f) > DpInverse(0f))
     }
 
     @Test
