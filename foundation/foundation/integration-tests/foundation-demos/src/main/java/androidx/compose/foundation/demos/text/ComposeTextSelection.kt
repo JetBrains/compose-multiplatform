@@ -77,7 +77,7 @@ fun TextDemoSelection() {
                     append(displayTextHindi)
                 }
 
-                append(text = "$arabicSentence")
+                append(text = arabicSentence)
 
                 withStyle(SpanStyle(localeList = LocaleList("zh-CN"))) {
                     append("\n先帝创业未半而中道崩殂，今天下三分，益州疲弊，此诚危急存亡之秋也。")

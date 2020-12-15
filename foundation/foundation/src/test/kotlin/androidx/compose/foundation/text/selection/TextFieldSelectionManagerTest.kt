@@ -49,6 +49,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import org.mockito.ArgumentMatchers
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 
@@ -109,10 +110,14 @@ class TextFieldSelectionManagerTest {
             beginOffset
         )
         whenever(state.layoutResult!!.getOffsetForPosition(dragDistance)).thenReturn(dragOffset)
-        whenever(state.layoutResult!!.getWordBoundary(beginOffset))
-            .thenAnswer(TextRangeAnswer(fakeTextRange))
-        whenever(state.layoutResult!!.getWordBoundary(dragOffset))
-            .thenAnswer(TextRangeAnswer(dragTextRange))
+
+        whenever(
+            state.layoutResult!!.getWordBoundary(ArgumentMatchers.intThat { it in 0 until 5 })
+        ).thenAnswer(TextRangeAnswer(fakeTextRange))
+        whenever(
+            state.layoutResult!!.getWordBoundary(ArgumentMatchers.intThat { it in 6 until 11 })
+        ).thenAnswer(TextRangeAnswer(dragTextRange))
+
         whenever(state.layoutResult!!.getBidiRunDirection(any()))
             .thenReturn(ResolvedTextDirection.Ltr)
         whenever(state.layoutResult!!.getBoundingBox(any())).thenReturn(Rect.Zero)

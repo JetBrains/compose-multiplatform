@@ -150,7 +150,7 @@ internal class TextFieldSelectionManager() {
                     value = value,
                     transformedStartOffset = offset,
                     transformedEndOffset = offset,
-                    isStartHandle = true,
+                    isStartHandle = false,
                     wordBasedSelection = true
                 )
             }
@@ -172,7 +172,7 @@ internal class TextFieldSelectionManager() {
                     value = value,
                     transformedStartOffset = startOffset,
                     transformedEndOffset = endOffset,
-                    isStartHandle = true,
+                    isStartHandle = false,
                     wordBasedSelection = true
                 )
             }
@@ -218,7 +218,7 @@ internal class TextFieldSelectionManager() {
                     value = value,
                     transformedStartOffset = startOffset,
                     transformedEndOffset = endOffset,
-                    isStartHandle = true,
+                    isStartHandle = false,
                     wordBasedSelection = false
                 )
             }
@@ -561,7 +561,7 @@ internal class TextFieldSelectionManager() {
 
     private fun createTextFieldValue(
         text: String,
-        selection: TextRange,
+        selection: TextRange
     ): TextFieldValue {
         return TextFieldValue(text = text, selection = selection.constrain(0, text.length))
     }
