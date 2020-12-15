@@ -22,7 +22,7 @@ package androidx.build
 object LibraryVersions {
     val ACTIVITY = Version("1.2.0-rc01")
     val ADS_IDENTIFIER = Version("1.0.0-alpha04")
-    val ANNOTATION = Version("1.2.0-alpha02")
+    val ANNOTATION = Version("1.2.0-beta01")
     val ANNOTATION_EXPERIMENTAL = Version("1.1.0-alpha02")
     val APPCOMPAT = Version("1.3.0-alpha03")
     val APPSEARCH = Version("1.0.0-alpha01")
@@ -46,7 +46,7 @@ object LibraryVersions {
     val CONTENTPAGER = Version("1.1.0-alpha01")
     val COMPOSE = Version(System.getenv("COMPOSE_CUSTOM_VERSION") ?: "1.0.0-alpha10")
     val COORDINATORLAYOUT = Version("1.2.0-alpha01")
-    val CORE = Version("1.5.0-alpha06")
+    val CORE = Version("1.5.0-beta01")
     val CORE_ANIMATION = Version("1.0.0-alpha03")
     val CORE_ANIMATION_TESTING = Version("1.0.0-alpha03")
     val CORE_APPDIGEST = Version("1.0.0-alpha01")
