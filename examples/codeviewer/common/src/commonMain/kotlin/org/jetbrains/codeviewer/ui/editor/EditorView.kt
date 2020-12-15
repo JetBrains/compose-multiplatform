@@ -13,13 +13,11 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawOpacity
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.selection.DisableSelection
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.annotatedString
-import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.*
 import androidx.compose.ui.unit.dp
 import org.jetbrains.codeviewer.platform.SelectionContainer
 import org.jetbrains.codeviewer.platform.VerticalScrollbar
@@ -104,7 +102,7 @@ private fun Line(modifier: Modifier, maxNum: String, line: Editor.Line, settings
     Row(modifier = modifier) {
         DisableSelection {
             Box {
-                LineNumber(maxNum, Modifier.drawOpacity(0f), settings)
+                LineNumber(maxNum, Modifier.alpha(0f), settings)
                 LineNumber(line.number.toString(), Modifier.align(Alignment.CenterEnd), settings)
             }
         }
@@ -133,7 +131,7 @@ private fun LineContent(content: Editor.Content, modifier: Modifier, settings: S
     text = if (content.isCode) {
         codeString(content.value.value)
     } else {
-        annotatedString {
+        buildAnnotatedString {
             withStyle(AppTheme.code.simple) {
                 append(content.value.value)
             }
@@ -145,7 +143,7 @@ private fun LineContent(content: Editor.Content, modifier: Modifier, settings: S
     softWrap = false
 )
 
-private fun codeString(str: String) = annotatedString {
+private fun codeString(str: String) = buildAnnotatedString {
     withStyle(AppTheme.code.simple) {
         append(str.replace("\t", "    "))
         addStyle(AppTheme.code.punctuation, ":")

@@ -13,7 +13,7 @@ import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawLayer
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import org.jetbrains.codeviewer.ui.editor.EditorEmptyView
 import org.jetbrains.codeviewer.ui.editor.EditorTabsView
@@ -85,7 +85,7 @@ private fun ResizablePanel(
     val alpha = animate(if (state.isExpanded) 1f else 0f, SpringSpec(stiffness = StiffnessLow))
 
     Box(modifier) {
-        Box(Modifier.fillMaxSize().drawLayer(alpha = alpha)) {
+        Box(Modifier.fillMaxSize().graphicsLayer(alpha = alpha)) {
             content()
         }
 

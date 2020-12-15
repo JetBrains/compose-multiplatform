@@ -200,9 +200,6 @@ fun getFilterImage(type: FilterType, content: ContentState): ImageBitmap {
     }
 }
 
-@OptIn(
-    ExperimentalKeyInput::class
-)
 @Composable
 fun setImage(content: ContentState) {
     val drag = DragHandler()

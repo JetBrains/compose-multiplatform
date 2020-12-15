@@ -23,9 +23,8 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.keyInputFilter
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -132,7 +131,6 @@ private fun Item(
     }
 }
 
-@OptIn(ExperimentalKeyInput::class)
 @Composable
 private fun TodoInput(
     text: String,
@@ -142,7 +140,7 @@ private fun TodoInput(
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(8.dp)) {
         OutlinedTextField(
             value = text,
-            modifier = Modifier.weight(weight = 1F).keyInputFilter(onKeyUp(Key.Enter, onAddClicked)),
+            modifier = Modifier.weight(weight = 1F).onKeyEvent(onKeyUp(Key.Enter, onAddClicked)),
             onValueChange = onTextChanged,
             label = { Text(text = "Add a todo") }
         )

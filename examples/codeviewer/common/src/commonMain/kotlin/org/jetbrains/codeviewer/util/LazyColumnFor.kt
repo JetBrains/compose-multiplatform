@@ -16,14 +16,14 @@ fun LazyColumnFor(
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    horizontalGravity: Alignment.Horizontal = Alignment.Start,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     itemContent: @Composable LazyItemScope.(index: Int) -> Unit
 ) = LazyColumnForIndexed(
-    UnitList(size),
-    modifier,
-    state,
-    contentPadding,
-    horizontalGravity,
+    items = UnitList(size),
+    modifier = modifier,
+    state = state,
+    contentPadding = contentPadding,
+    horizontalAlignment = horizontalAlignment,
 ) { index, _ ->
     itemContent(index)
 }
