@@ -210,7 +210,7 @@ class AndroidXPlugin : Plugin<Project> {
     ) {
         project.tasks.withType(KotlinCompile::class.java).configureEach { task ->
             task.kotlinOptions.jvmTarget = "1.8"
-            project.configureCompilationWarnings(task)
+            project.configureJavaCompilationWarnings(task)
             if (project.hasProperty(EXPERIMENTAL_KOTLIN_BACKEND_ENABLED)) {
                 task.kotlinOptions.freeCompilerArgs += listOf("-Xuse-ir=true")
             }
@@ -289,6 +289,7 @@ class AndroidXPlugin : Plugin<Project> {
         project.configureSourceJarForAndroid(libraryExtension)
         project.configureVersionFileWriter(libraryExtension, androidXExtension)
         project.addCreateLibraryBuildInfoFileTask(androidXExtension)
+        project.configureJavaCompilationWarnings(androidXExtension)
 
         val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
         val checkReleaseReadyTasks = mutableListOf<TaskProvider<out Task>>()
@@ -313,10 +314,6 @@ class AndroidXPlugin : Plugin<Project> {
             verifyDependencyVersionsTask?.configure { task ->
                 task.dependsOn(libraryVariant.javaCompileProvider)
             }
-
-            libraryVariant.javaCompileProvider.configure { task ->
-                project.configureCompilationWarnings(task)
-            }
         }
 
         // Standard lint, docs, resource API, and Metalava configuration for AndroidX projects.
@@ -340,9 +337,7 @@ class AndroidXPlugin : Plugin<Project> {
             targetCompatibility = VERSION_1_8
         }
 
-        project.tasks.withType(JavaCompile::class.java) { task ->
-            project.configureCompilationWarnings(task)
-        }
+        project.configureJavaCompilationWarnings(extension)
 
         project.hideJavadocTask()
 
@@ -533,15 +528,6 @@ class AndroidXPlugin : Plugin<Project> {
         project.afterEvaluate {
             if (androidXExtension.publish.shouldRelease()) {
                 project.extra.set("publish", true)
-            }
-            if (!project.rootProject.hasProperty(USE_MAX_DEP_VERSIONS)) {
-                defaultPublishVariant { libraryVariant ->
-                    libraryVariant.javaCompileProvider.configure { javaCompile ->
-                        if (androidXExtension.failOnDeprecationWarnings) {
-                            javaCompile.options.compilerArgs.add("-Xlint:deprecation")
-                        }
-                    }
-                }
             }
         }
     }
@@ -752,14 +738,23 @@ private fun Project.configureTaskTimeouts() {
     }
 }
 
-private fun Project.configureCompilationWarnings(task: JavaCompile) {
-    if (hasProperty(ALL_WARNINGS_AS_ERRORS)) {
-        task.options.compilerArgs.add("-Werror")
-        task.options.compilerArgs.add("-Xlint:unchecked")
+private fun Project.configureJavaCompilationWarnings(androidXExtension: AndroidXExtension) {
+    afterEvaluate {
+        project.tasks.withType(JavaCompile::class.java).configureEach { task ->
+            if (hasProperty(ALL_WARNINGS_AS_ERRORS)) {
+                task.options.compilerArgs.add("-Werror")
+                task.options.compilerArgs.add("-Xlint:unchecked")
+                if (androidXExtension.failOnDeprecationWarnings &&
+                    !hasProperty(AndroidXPlugin.USE_MAX_DEP_VERSIONS)
+                ) {
+                    task.options.compilerArgs.add("-Xlint:deprecation")
+                }
+            }
+        }
     }
 }
 
-private fun Project.configureCompilationWarnings(task: KotlinCompile) {
+private fun Project.configureJavaCompilationWarnings(task: KotlinCompile) {
     if (hasProperty(ALL_WARNINGS_AS_ERRORS)) {
         task.kotlinOptions.allWarningsAsErrors = true
     }
