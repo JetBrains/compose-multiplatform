@@ -47,7 +47,6 @@ import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertHasClickAction
-import androidx.compose.ui.test.assertHasNoClickAction
 import androidx.compose.ui.test.assertHeightIsAtLeast
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsEnabled
@@ -63,7 +62,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
@@ -133,7 +131,6 @@ class ButtonTest {
     }
 
     @Test
-    @FlakyTest // TODO: b/158341686
     fun canBeDisabled() {
         val tag = "myButton"
 
@@ -151,8 +148,8 @@ class ButtonTest {
             .assertHasClickAction()
             .assertIsEnabled()
             .performClick()
-            // Then confirm it's disabled with no click action after clicking it
-            .assertHasNoClickAction()
+            // Then confirm it's disabled with click action after clicking it
+            .assertHasClickAction()
             .assertIsNotEnabled()
     }
 
