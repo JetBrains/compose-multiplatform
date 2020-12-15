@@ -255,8 +255,8 @@ open class LayoutTest {
         val maxHeight: Dp = Dp.Infinity
     ) {
         init {
-            require(minWidth.isFinite()) { "Constraints#minWidth should be finite" }
-            require(minHeight.isFinite()) { "Constraints#minHeight should be finite" }
+            require(minWidth.isFinite) { "Constraints#minWidth should be finite" }
+            require(minHeight.isFinite) { "Constraints#minHeight should be finite" }
             require(!minWidth.value.isNaN()) { "Constraints#minWidth should not be NaN" }
             require(!maxWidth.value.isNaN()) { "Constraints#maxWidth should not be NaN" }
             require(!minHeight.value.isNaN()) { "Constraints#minHeight should not be NaN" }

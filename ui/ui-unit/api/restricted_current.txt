@@ -126,7 +126,7 @@ package androidx.compose.ui.unit {
     method public static inline float getDp(float);
     method public static inline float getHeight(androidx.compose.ui.unit.Bounds);
     method public static inline float getWidth(androidx.compose.ui.unit.Bounds);
-    method @androidx.compose.runtime.Stable public static inline boolean isFinite-0680j_4(float);
+    method public static inline boolean isFinite-0680j_4(float);
     method public static inline boolean isSpecified-0680j_4(float);
     method public static inline boolean isUnspecified-0680j_4(float);
     method @androidx.compose.runtime.Stable public static long lerp-2vlZtig(long start, long stop, float fraction);
