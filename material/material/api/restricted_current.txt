@@ -481,7 +481,7 @@ package androidx.compose.material {
   }
 
   public final class MenuKt {
-    method @androidx.compose.runtime.Composable public static void DropdownMenu-iBtHMRc(kotlin.jvm.functions.Function0<kotlin.Unit> toggle, boolean expanded, kotlin.jvm.functions.Function0<kotlin.Unit> onDismissRequest, optional androidx.compose.ui.Modifier toggleModifier, optional long dropdownOffset, optional androidx.compose.ui.Modifier dropdownModifier, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit> dropdownContent);
+    method @androidx.compose.runtime.Composable public static void DropdownMenu-k5nJks8(kotlin.jvm.functions.Function0<kotlin.Unit> toggle, boolean expanded, kotlin.jvm.functions.Function0<kotlin.Unit> onDismissRequest, optional androidx.compose.ui.Modifier toggleModifier, optional long dropdownOffset, optional androidx.compose.ui.Modifier dropdownModifier, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit> dropdownContent);
     method @androidx.compose.runtime.Composable public static void DropdownMenuItem(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 

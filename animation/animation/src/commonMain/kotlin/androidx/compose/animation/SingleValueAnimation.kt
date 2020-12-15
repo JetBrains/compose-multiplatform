@@ -44,7 +44,7 @@ import androidx.compose.ui.unit.Bounds
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.Position
+import androidx.compose.ui.unit.DpOffset
 
 private val defaultAnimation = SpringSpec<Float>()
 
@@ -147,15 +147,15 @@ fun animate(
 }
 
 /**
- * Fire-and-forget animation [Composable] for [Position]. Once such an animation is created, it will
+ * Fire-and-forget animation [Composable] for [DpOffset]. Once such an animation is created, it will
  * be positionally memoized, like other @[Composable]s. To trigger the animation, or alter the
  * course of the animation, simply supply a different [target] to the [Composable].
  *
  * Note, [animateTo] is for simple animations that cannot be canceled. For cancellable animations
  * see [animatedValue].
  *
- *     val position : Position = animate(
- *         if (selected) Position(0.dp, 0.dp) else Position(20.dp, 20.dp))
+ *     val position : DpOffset = animate(
+ *         if (selected) DpOffset(0.dp, 0.dp) else DpOffset(20.dp, 20.dp))
  *
  * @param target Target value of the animation
  * @param animSpec The animation that will be used to change the value through time. Physics
@@ -164,16 +164,16 @@ fun animate(
  */
 @Composable
 fun animate(
-    target: Position,
-    animSpec: AnimationSpec<Position> = remember {
+    target: DpOffset,
+    animSpec: AnimationSpec<DpOffset> = remember {
         SpringSpec(
-            visibilityThreshold = Position.VisibilityThreshold
+            visibilityThreshold = DpOffset.VisibilityThreshold
         )
     },
-    endListener: ((Position) -> Unit)? = null
-): Position {
+    endListener: ((DpOffset) -> Unit)? = null
+): DpOffset {
     return animate(
-        target, Position.VectorConverter, animSpec, endListener = endListener
+        target, DpOffset.VectorConverter, animSpec, endListener = endListener
     )
 }
 

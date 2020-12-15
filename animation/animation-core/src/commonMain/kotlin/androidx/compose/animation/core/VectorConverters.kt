@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.Bounds
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.Position
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 
@@ -40,10 +40,10 @@ val Dp.Companion.VectorConverter: TwoWayConverter<Dp, AnimationVector1D>
     get() = DpToVector
 
 /**
- * A type converter that converts a [Position] to a [AnimationVector2D], and vice versa.
+ * A type converter that converts a [DpOffset] to a [AnimationVector2D], and vice versa.
  */
-val Position.Companion.VectorConverter: TwoWayConverter<Position, AnimationVector2D>
-    get() = PositionToVector
+val DpOffset.Companion.VectorConverter: TwoWayConverter<DpOffset, AnimationVector2D>
+    get() = DpOffsetToVector
 
 /**
  * A type converter that converts a [Size] to a [AnimationVector2D], and vice versa.
@@ -84,12 +84,12 @@ private val DpToVector: TwoWayConverter<Dp, AnimationVector1D> = TwoWayConverter
 )
 
 /**
- * A type converter that converts a [Position] to a [AnimationVector2D], and vice versa.
+ * A type converter that converts a [DpOffset] to a [AnimationVector2D], and vice versa.
  */
-private val PositionToVector: TwoWayConverter<Position, AnimationVector2D> =
+private val DpOffsetToVector: TwoWayConverter<DpOffset, AnimationVector2D> =
     TwoWayConverter(
         convertToVector = { AnimationVector2D(it.x.value, it.y.value) },
-        convertFromVector = { Position(it.v1.dp, it.v2.dp) }
+        convertFromVector = { DpOffset(it.v1.dp, it.v2.dp) }
     )
 
 /**

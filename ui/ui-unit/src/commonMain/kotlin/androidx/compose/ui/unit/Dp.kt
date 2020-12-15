@@ -27,7 +27,6 @@ import androidx.compose.ui.util.unpackFloat1
 import androidx.compose.ui.util.unpackFloat2
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.math.sqrt
 
 /**
  * Dimension value representing device-independent pixels (dp). Component APIs specify their
@@ -249,70 +248,81 @@ fun lerp(start: Dp, stop: Dp, fraction: Float): Dp {
 // Structures using Dp
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
+@Deprecated(
+    "Use DpOffset",
+    ReplaceWith("DpOffset", "androidx.compose.ui.unit.DpOffset")
+)
+typealias Position = DpOffset
+
 /**
- * A two-dimensional position using [Dp] for units
+ * A two-dimensional offset using [Dp] for units
  */
 @OptIn(ExperimentalUnsignedTypes::class)
 @Suppress("EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class Position(@PublishedApi internal val packedValue: Long) {
+inline class DpOffset(@PublishedApi internal val packedValue: Long) {
     /**
-     * The horizontal aspect of the position in [Dp]
+     * The horizontal aspect of the offset in [Dp]
      */
     @Stable
     /*inline*/ val x: Dp
         get() = unpackFloat1(packedValue).dp
 
     /**
-     * The vertical aspect of the position in [Dp]
+     * The vertical aspect of the offset in [Dp]
      */
     @Stable
     /*inline*/ val y: Dp
         get() = unpackFloat2(packedValue).dp
 
     /**
-     * Returns a copy of this Position instance optionally overriding the
+     * Returns a copy of this [DpOffset] instance optionally overriding the
      * x or y parameter
      */
-    fun copy(x: Dp = this.x, y: Dp = this.y): Position = Position(x, y)
+    fun copy(x: Dp = this.x, y: Dp = this.y): DpOffset = DpOffset(x, y)
 
     /**
-     * Subtract a [Position] from another one.
+     * Subtract a [DpOffset] from another one.
      */
     @Stable
-    inline operator fun minus(other: Position) =
-        Position(x - other.x, y - other.y)
+    inline operator fun minus(other: DpOffset) =
+        DpOffset(x - other.x, y - other.y)
 
     /**
-     * Add a [Position] to another one.
+     * Add a [DpOffset] to another one.
      */
     @Stable
-    inline operator fun plus(other: Position) =
-        Position(x + other.x, y + other.y)
+    inline operator fun plus(other: DpOffset) =
+        DpOffset(x + other.x, y + other.y)
 
     @Stable
     override fun toString(): String = "($x, $y)"
 
-    companion object
+    companion object {
+        /**
+         * A [DpOffset] with 0 DP [x] and 0 DP [y] values.
+         */
+        val Zero = DpOffset(0.dp, 0.dp)
+    }
 }
 
 /**
- * Constructs a [Position] from [x] and [y] position [Dp] values.
+ * Constructs a [DpOffset] from [x] and [y] position [Dp] values.
  */
 @OptIn(ExperimentalUnsignedTypes::class)
 @Stable
-inline fun Position(x: Dp, y: Dp): Position = Position(packFloats(x.value, y.value))
+inline fun DpOffset(x: Dp, y: Dp): DpOffset = DpOffset(packFloats(x.value, y.value))
 
-/**
- * The magnitude of the offset represented by this [Position].
- */
+@Deprecated(
+    "Use DpOffset",
+    ReplaceWith("DpOffset(x, y)", "androidx.compose.ui.unit.DpOffset")
+)
+@OptIn(ExperimentalUnsignedTypes::class)
 @Stable
-fun Position.getDistance(): Dp {
-    return Dp(sqrt(x.value * x.value + y.value * y.value))
-}
+inline fun Position(x: Dp, y: Dp): DpOffset = DpOffset(packFloats(x.value, y.value))
 
 /**
- * Linearly interpolate between two [Position]s.
+ * Linearly interpolate between two [DpOffset]s.
  *
  * The [fraction] argument represents position on the timeline, with 0.0 meaning
  * that the interpolation has not started, returning [start] (or something
@@ -323,8 +333,8 @@ fun Position.getDistance(): Dp {
  * 1.0, so negative values and values greater than 1.0 are valid.
  */
 @Stable
-fun lerp(start: Position, stop: Position, fraction: Float): Position =
-    Position(lerp(start.x, stop.x, fraction), lerp(start.y, stop.y, fraction))
+fun lerp(start: DpOffset, stop: DpOffset, fraction: Float): DpOffset =
+    DpOffset(lerp(start.x, stop.x, fraction), lerp(start.y, stop.y, fraction))
 
 /**
  * A four dimensional bounds using [Dp] for units

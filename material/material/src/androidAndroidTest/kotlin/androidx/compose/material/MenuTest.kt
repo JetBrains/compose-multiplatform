@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.IntBounds
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.Position
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -134,7 +134,7 @@ class MenuTest {
         val popupSize = IntSize(50, 80)
 
         val ltrPosition = DropdownMenuPositionProvider(
-            Position(offsetX.dp, offsetY.dp),
+            DpOffset(offsetX.dp, offsetY.dp),
             density
         ).calculatePosition(
             IntBounds(anchorPosition, anchorSize),
@@ -151,7 +151,7 @@ class MenuTest {
         )
 
         val rtlPosition = DropdownMenuPositionProvider(
-            Position(offsetX.dp, offsetY.dp),
+            DpOffset(offsetX.dp, offsetY.dp),
             density
         ).calculatePosition(
             IntBounds(anchorPosition, anchorSize),
@@ -182,7 +182,7 @@ class MenuTest {
         val popupSize = IntSize(150, 80)
 
         val ltrPosition = DropdownMenuPositionProvider(
-            Position(offsetX.dp, offsetY.dp),
+            DpOffset(offsetX.dp, offsetY.dp),
             density
         ).calculatePosition(
             IntBounds(anchorPosition, anchorSize),
@@ -199,7 +199,7 @@ class MenuTest {
         )
 
         val rtlPosition = DropdownMenuPositionProvider(
-            Position(offsetX.dp, offsetY.dp),
+            DpOffset(offsetX.dp, offsetY.dp),
             density
         ).calculatePosition(
             IntBounds(anchorPositionRtl, anchorSize),
@@ -231,7 +231,7 @@ class MenuTest {
         val verticalMargin = with(density) { MenuVerticalMargin.toIntPx() }
 
         val position = DropdownMenuPositionProvider(
-            Position(0.dp, 0.dp),
+            DpOffset(0.dp, 0.dp),
             density
         ).calculatePosition(
             IntBounds(anchorPosition, anchorSize),
@@ -260,7 +260,7 @@ class MenuTest {
         var obtainedParentBounds = IntBounds(0, 0, 0, 0)
         var obtainedMenuBounds = IntBounds(0, 0, 0, 0)
         DropdownMenuPositionProvider(
-            Position(offsetX.dp, offsetY.dp),
+            DpOffset(offsetX.dp, offsetY.dp),
             density
         ) { parentBounds, menuBounds ->
             obtainedParentBounds = parentBounds
