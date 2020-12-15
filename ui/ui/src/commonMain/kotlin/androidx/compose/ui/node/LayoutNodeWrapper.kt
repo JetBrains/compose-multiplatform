@@ -88,6 +88,7 @@ internal abstract class LayoutNodeWrapper(
                 } else {
                     wrappedBy?.invalidateLayer()
                 }
+                layoutNode.owner?.onLayoutChange(layoutNode)
             }
             _measureResult = value
             measuredSize = IntSize(measureResult.width, measureResult.height)
@@ -169,6 +170,7 @@ internal abstract class LayoutNodeWrapper(
             } else {
                 wrappedBy?.invalidateLayer()
             }
+            layoutNode.owner?.onLayoutChange(layoutNode)
         }
         this.zIndex = zIndex
     }

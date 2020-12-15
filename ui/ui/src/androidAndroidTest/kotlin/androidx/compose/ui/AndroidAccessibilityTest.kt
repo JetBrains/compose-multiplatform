@@ -27,6 +27,7 @@ import android.view.accessibility.AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_
 import android.view.accessibility.AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY
 import android.view.accessibility.AccessibilityNodeInfo.ACTION_SET_SELECTION
 import android.view.accessibility.AccessibilityNodeProvider
+import android.view.accessibility.AccessibilityRecord
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
@@ -34,6 +35,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,7 +67,6 @@ import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.nhaarman.mockitokotlin2.argThat
-import com.nhaarman.mockitokotlin2.atLeast
 import com.nhaarman.mockitokotlin2.atLeastOnce
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.eq
@@ -90,6 +91,7 @@ import java.util.concurrent.TimeUnit
 @RunWith(AndroidJUnit4::class)
 @OptIn(
     ExperimentalFoundationApi::class,
+    ExperimentalComposeApi::class
 )
 class AndroidAccessibilityTest {
     @get:Rule
@@ -106,9 +108,11 @@ class AndroidAccessibilityTest {
     private var textFieldSelectionOneLatch = CountDownLatch(1)
 
     companion object {
+        private const val TopColTag = "topColumn"
         private const val ToggleableTag = "toggleable"
         private const val DisabledToggleableTag = "disabledToggleable"
         private const val TextFieldTag = "textField"
+        private const val TextNodeTag = "textNode"
         private const val InputText = "hello"
         private const val InitialText = "h"
     }
@@ -132,15 +136,17 @@ class AndroidAccessibilityTest {
             container.setContent {
                 var checked by remember { mutableStateOf(true) }
                 var value by remember { mutableStateOf(TextFieldValue(InitialText)) }
-                Column {
+                Column(Modifier.testTag(TopColTag)) {
                     Box(
                         Modifier
                             .toggleable(value = checked, onValueChange = { checked = it })
-                            .testTag(ToggleableTag),
-                        content = {
-                            BasicText("ToggleableText")
+                            .testTag(ToggleableTag)
+                    ) {
+                        BasicText("ToggleableText")
+                        Box {
+                            BasicText("TextNode", Modifier.testTag(TextNodeTag))
                         }
-                    )
+                    }
                     Box(
                         Modifier
                             .toggleable(
@@ -174,6 +180,7 @@ class AndroidAccessibilityTest {
             androidComposeView = container.getChildAt(0) as AndroidComposeView
             delegate = ViewCompat.getAccessibilityDelegate(androidComposeView) as
                 AndroidComposeViewAccessibilityDelegateCompat
+            delegate.accessibilityForceEnabledForTesting = true
             provider = delegate.getAccessibilityNodeProvider(androidComposeView).provider
                 as AccessibilityNodeProvider
         }
@@ -401,20 +408,36 @@ class AndroidAccessibilityTest {
 
     @Test
     fun sendSubtreeChangeEvents_whenNodeRemoved() {
+        val topColumn = rule.onNodeWithTag(TopColTag)
+            .fetchSemanticsNode("couldn't find node with tag $TopColTag")
         rule.onNodeWithTag(TextFieldTag)
             .assertExists()
-        // TextField is removed compared to setup.
-        isTextFieldVisible = false
-        rule.onNodeWithTag(TextFieldTag)
-            .assertDoesNotExist()
-
-        rule.runOnIdle {
-            // One from initialization and one from text field removal.
-            verify(container, atLeast(2)).requestSendAccessibilityEvent(
+        // wait for the subtree change events from initialization to send
+        waitForSubtreeEventToSendAndVerify {
+            verify(container, atLeastOnce()).requestSendAccessibilityEvent(
                 eq(androidComposeView),
                 argThat(
                     ArgumentMatcher {
-                        it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
+                        getAccessibilityEventSourceSemanticsNodeId(it) == topColumn.id &&
+                            it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
+                            it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_SUBTREE
+                    }
+                )
+            )
+        }
+
+        // TextField is removed compared to setup.
+        isTextFieldVisible = false
+
+        rule.onNodeWithTag(TextFieldTag)
+            .assertDoesNotExist()
+        waitForSubtreeEventToSendAndVerify {
+            verify(container, atLeastOnce()).requestSendAccessibilityEvent(
+                eq(androidComposeView),
+                argThat(
+                    ArgumentMatcher {
+                        getAccessibilityEventSourceSemanticsNodeId(it) == topColumn.id &&
+                            it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
                             it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_SUBTREE
                     }
                 )
@@ -476,6 +499,90 @@ class AndroidAccessibilityTest {
         }
     }
 
+    @Test
+    fun semanticsNodeBeingMergedLayoutChange_sendThrottledSubtreeEventsForMergedSemanticsNode() {
+        val toggleableNode = rule.onNodeWithTag(ToggleableTag)
+            .fetchSemanticsNode("couldn't find node with tag $ToggleableTag")
+        val textNode = rule.onNodeWithTag(TextNodeTag, useUnmergedTree = true)
+            .fetchSemanticsNode("couldn't find node with tag $TextNodeTag")
+        // wait for the subtree change events from initialization to send
+        waitForSubtreeEventToSendAndVerify {
+            verify(container, atLeastOnce()).requestSendAccessibilityEvent(
+                eq(androidComposeView),
+                argThat(
+                    ArgumentMatcher {
+                        getAccessibilityEventSourceSemanticsNodeId(it) == toggleableNode.id &&
+                            it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
+                            it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_SUBTREE
+                    }
+                )
+            )
+        }
+
+        rule.runOnUiThread {
+            // Directly call onLayoutChange because this guarantees short time.
+            for (i in 1..10) {
+                delegate.onLayoutChange(textNode.layoutNode)
+            }
+        }
+
+        waitForSubtreeEventToSendAndVerify {
+            verify(container, atLeastOnce()).requestSendAccessibilityEvent(
+                eq(androidComposeView),
+                argThat(
+                    ArgumentMatcher {
+                        getAccessibilityEventSourceSemanticsNodeId(it) == toggleableNode.id &&
+                            it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
+                            it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_SUBTREE
+                    }
+                )
+            )
+        }
+    }
+
+    @Test
+    fun layoutNodeWithoutSemanticsLayoutChange_sendThrottledSubtreeEventsForMergedSemanticsNode() {
+        val toggleableNode = rule.onNodeWithTag(ToggleableTag)
+            .fetchSemanticsNode("couldn't find node with tag $ToggleableTag")
+        val textNode = rule.onNodeWithTag(TextNodeTag, useUnmergedTree = true)
+            .fetchSemanticsNode("couldn't find node with tag $TextNodeTag")
+        // wait for the subtree change events from initialization to send
+        waitForSubtreeEventToSendAndVerify {
+            verify(container, atLeastOnce()).requestSendAccessibilityEvent(
+                eq(androidComposeView),
+                argThat(
+                    ArgumentMatcher {
+                        getAccessibilityEventSourceSemanticsNodeId(it) == toggleableNode.id &&
+                            it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
+                            it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_SUBTREE
+                    }
+                )
+            )
+        }
+
+        rule.runOnUiThread {
+            // Directly call onLayoutChange because this guarantees short time.
+            for (i in 1..10) {
+                // layout change for the parent box node
+                delegate.onLayoutChange(textNode.layoutNode.parent!!)
+            }
+        }
+
+        waitForSubtreeEventToSendAndVerify {
+            // One from initialization and one from layout changes.
+            verify(container, atLeastOnce()).requestSendAccessibilityEvent(
+                eq(androidComposeView),
+                argThat(
+                    ArgumentMatcher {
+                        getAccessibilityEventSourceSemanticsNodeId(it) == toggleableNode.id &&
+                            it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
+                            it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_SUBTREE
+                    }
+                )
+            )
+        }
+    }
+
     private fun eventIndex(list: List<AccessibilityEvent>, event: AccessibilityEvent): Int {
         for (i in list.indices) {
             if (ReflectionEquals(list[i], null).matches(event)) {
@@ -487,5 +594,18 @@ class AndroidAccessibilityTest {
 
     private fun containsEvent(list: List<AccessibilityEvent>, event: AccessibilityEvent): Boolean {
         return eventIndex(list, event) != -1
+    }
+
+    private fun getAccessibilityEventSourceSemanticsNodeId(event: AccessibilityEvent): Int {
+        val getSourceNodeIdMethod = AccessibilityRecord::class.java
+            .getDeclaredMethod("getSourceNodeId")
+        getSourceNodeIdMethod.isAccessible = true
+        return (getSourceNodeIdMethod.invoke(event) as Long shr 32).toInt()
+    }
+
+    private fun waitForSubtreeEventToSendAndVerify(verify: () -> Unit) {
+        // TODO(aelias): Make this wait after the 100ms delay to check the second batch is also correct
+        rule.waitForIdle()
+        verify()
     }
 }

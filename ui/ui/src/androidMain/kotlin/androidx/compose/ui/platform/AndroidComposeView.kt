@@ -516,6 +516,10 @@ internal class AndroidComposeView(context: Context) :
         accessibilityDelegate.onSemanticsChange()
     }
 
+    override fun onLayoutChange(layoutNode: LayoutNode) {
+        accessibilityDelegate.onLayoutChange(layoutNode)
+    }
+
     override fun dispatchDraw(canvas: android.graphics.Canvas) {
         if (!isAttachedToWindow) {
             invalidateLayers(root)
@@ -546,6 +550,10 @@ internal class AndroidComposeView(context: Context) :
         } else {
             onViewTreeOwnersAvailable = callback
         }
+    }
+
+    suspend fun boundsUpdatesEventLoop() {
+        accessibilityDelegate.boundsUpdatesEventLoop()
     }
 
     /**

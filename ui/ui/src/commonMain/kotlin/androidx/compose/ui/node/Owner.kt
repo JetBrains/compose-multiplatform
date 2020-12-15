@@ -164,6 +164,11 @@ interface Owner {
      */
     fun onSemanticsChange()
 
+    /**
+     * The position and/or size of the [layoutNode] changed.
+     */
+    fun onLayoutChange(layoutNode: LayoutNode)
+
     val measureIteration: Long
 
     /**

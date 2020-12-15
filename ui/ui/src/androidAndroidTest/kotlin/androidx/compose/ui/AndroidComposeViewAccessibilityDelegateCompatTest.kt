@@ -104,6 +104,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
             accessibilityDelegate = AndroidComposeViewAccessibilityDelegateCompat(
                 androidComposeView
             )
+            accessibilityDelegate.accessibilityForceEnabledForTesting = true
         }
         rule.setContent {
             AmbientClipboardManager.current.setText(AnnotatedString("test"))
@@ -419,15 +420,6 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
                 }
             )
         )
-        verify(container, times(1)).requestSendAccessibilityEvent(
-            eq(androidComposeView),
-            argThat(
-                ArgumentMatcher {
-                    it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
-                        it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_SUBTREE
-                }
-            )
-        )
     }
 
     @Test
@@ -444,15 +436,6 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
         newNodes[1] = newSemanticsNode
         accessibilityDelegate.sendSemanticsPropertyChangeEvents(newNodes)
 
-        verify(container, times(1)).requestSendAccessibilityEvent(
-            eq(androidComposeView),
-            argThat(
-                ArgumentMatcher {
-                    it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
-                        it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_SUBTREE
-                }
-            )
-        )
         verify(container, times(1)).requestSendAccessibilityEvent(
             eq(androidComposeView),
             argThat(
