@@ -24,17 +24,17 @@ import androidx.compose.runtime.Composable
 // </linear>
 @Suppress("ComposableNaming")
 @Composable
-fun MockComposeScope.contact(contact: Contact) {
-    linear {
-        text(value = "Name: ${contact.name}")
-        text(value = "email: ${contact.email}")
+fun contact(contact: Contact) {
+    Linear {
+        Text(value = "Name: ${contact.name}")
+        Text(value = "email: ${contact.email}")
     }
 }
 
 fun MockViewValidator.contact(contact: Contact) {
-    linear {
-        text(value = "Name: ${contact.name}")
-        text(value = "email: ${contact.email}")
+    Linear {
+        Text(value = "Name: ${contact.name}")
+        Text(value = "email: ${contact.email}")
     }
 }
 
@@ -47,10 +47,10 @@ fun MockViewValidator.contact(contact: Contact) {
 // </linear>
 @Suppress("ComposableNaming")
 @Composable
-fun MockComposeScope.contacts(contacts: Collection<Contact>, selected: Contact?) {
-    linear {
-        repeat(of = contacts) {
-            selectBox(it == selected) {
+fun contacts(contacts: Collection<Contact>, selected: Contact?) {
+    Linear {
+        Repeated(of = contacts) {
+            SelectBox(it == selected) {
                 contact(it)
             }
         }
@@ -58,9 +58,9 @@ fun MockComposeScope.contacts(contacts: Collection<Contact>, selected: Contact?)
 }
 
 fun MockViewValidator.contacts(contacts: Collection<Contact>, selected: Contact?) {
-    linear {
-        repeat(of = contacts) {
-            selectBox(it == selected) {
+    Linear {
+        Repeated(of = contacts) {
+            SelectBox(it == selected) {
                 contact(it)
             }
         }
@@ -79,29 +79,29 @@ fun MockViewValidator.contacts(contacts: Collection<Contact>, selected: Contact?
 // </linear>
 @Suppress("ComposableNaming")
 @Composable
-fun MockComposeScope.selectContact(model: ContactModel) {
-    linear {
-        linear {
-            text(value = "Filter:")
-            edit(value = model.filter)
+fun SelectContact(model: ContactModel) {
+    Linear {
+        Linear {
+            Text(value = "Filter:")
+            Edit(value = model.filter)
         }
 
-        linear {
-            text(value = "Contacts:")
+        Linear {
+            Text(value = "Contacts:")
             contacts(model.filtered, model.selected)
         }
     }
 }
 
-fun MockViewValidator.selectContact(model: ContactModel) {
-    linear {
-        linear {
-            text(value = "Filter:")
-            edit(value = model.filter)
+fun MockViewValidator.SelectContact(model: ContactModel) {
+    Linear {
+        Linear {
+            Text(value = "Filter:")
+            Edit(value = model.filter)
         }
 
-        linear {
-            text(value = "Contacts:")
+        Linear {
+            Text(value = "Contacts:")
             contacts(model.filtered, model.selected)
         }
     }

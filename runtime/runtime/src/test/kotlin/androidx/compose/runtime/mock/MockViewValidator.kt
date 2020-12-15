@@ -56,25 +56,25 @@ fun MockViewValidator.view(name: String, block: (MockViewValidator.() -> Unit)? 
     MockViewListValidator(view.children).validate(block)
 }
 
-fun <T> MockViewValidator.repeat(of: Iterable<T>, block: MockViewValidator.(value: T) -> Unit) {
+fun <T> MockViewValidator.Repeated(of: Iterable<T>, block: MockViewValidator.(value: T) -> Unit) {
     for (value in of) {
         block(value)
     }
 }
 
-fun MockViewValidator.linear() = view("linear", null)
-fun MockViewValidator.linear(block: MockViewValidator.() -> Unit) = view("linear", block)
+fun MockViewValidator.Linear() = view("linear", null)
+fun MockViewValidator.Linear(block: MockViewValidator.() -> Unit) = view("linear", block)
 fun MockViewValidator.box(block: MockViewValidator.() -> Unit) = view("box", block)
-fun MockViewValidator.text(value: String) {
+fun MockViewValidator.Text(value: String) {
     view("text")
     assertEquals(value, view.attributes["text"])
 }
-fun MockViewValidator.edit(value: String) {
+fun MockViewValidator.Edit(value: String) {
     view("edit")
     assertEquals(value, view.attributes["value"])
 }
 
-fun MockViewValidator.selectBox(selected: Boolean, block: MockViewValidator.() -> Unit) {
+fun MockViewValidator.SelectBox(selected: Boolean, block: MockViewValidator.() -> Unit) {
     if (selected) {
         box {
             block()
