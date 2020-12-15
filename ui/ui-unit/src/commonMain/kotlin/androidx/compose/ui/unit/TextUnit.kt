@@ -304,7 +304,7 @@ val TextUnit.isUnspecified: Boolean
  * If this [TextUnit] [isSpecified] then this is returned, otherwise [block] is executed
  * and its result is returned.
  */
-inline fun TextUnit.useOrElse(block: () -> TextUnit): TextUnit =
+inline fun TextUnit.takeOrElse(block: () -> TextUnit): TextUnit =
     if (isSpecified) this else block()
 
 /**

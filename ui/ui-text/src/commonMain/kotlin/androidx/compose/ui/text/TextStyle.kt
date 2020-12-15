@@ -20,7 +20,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.graphics.useOrElse
+import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
@@ -258,7 +258,7 @@ fun lerp(start: TextStyle, stop: TextStyle, fraction: Float): TextStyle {
  * @return resolved text style.
  */
 fun resolveDefaults(style: TextStyle, direction: LayoutDirection) = TextStyle(
-    color = style.color.useOrElse { DefaultColor },
+    color = style.color.takeOrElse { DefaultColor },
     fontSize = if (style.fontSize.isUnspecified) DefaultFontSize else style.fontSize,
     fontWeight = style.fontWeight ?: FontWeight.Normal,
     fontStyle = style.fontStyle ?: FontStyle.Normal,
@@ -273,7 +273,7 @@ fun resolveDefaults(style: TextStyle, direction: LayoutDirection) = TextStyle(
     baselineShift = style.baselineShift ?: BaselineShift.None,
     textGeometricTransform = style.textGeometricTransform ?: TextGeometricTransform.None,
     localeList = style.localeList ?: LocaleList.current,
-    background = style.background.useOrElse { DefaultBackgroundColor },
+    background = style.background.takeOrElse { DefaultBackgroundColor },
     textDecoration = style.textDecoration ?: TextDecoration.None,
     shadow = style.shadow ?: Shadow.None,
     textAlign = style.textAlign ?: TextAlign.Start,

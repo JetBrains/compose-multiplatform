@@ -108,12 +108,12 @@ class OffsetTest {
     }
 
     @Test
-    fun testUseOrElseTrue() {
-        assertTrue(Offset(1f, 1f).useOrElse { Offset.Unspecified }.isSpecified)
+    fun testTakeOrElseTrue() {
+        assertTrue(Offset(1f, 1f).takeOrElse { Offset.Unspecified }.isSpecified)
     }
 
     @Test
-    fun testUseOrElseFalse() {
-        assertTrue(Offset.Unspecified.useOrElse { Offset(1f, 1f) }.isSpecified)
+    fun testTakeOrElseFalse() {
+        assertTrue(Offset.Unspecified.takeOrElse { Offset(1f, 1f) }.isSpecified)
     }
 }

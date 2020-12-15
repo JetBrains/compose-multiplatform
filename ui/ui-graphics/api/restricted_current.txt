@@ -366,8 +366,9 @@ package androidx.compose.ui.graphics {
     method public static inline boolean isUnspecified-8_81llA(long);
     method @androidx.compose.runtime.Stable public static long lerp-m18UwgE(long start, long stop, @FloatRange(from=0.0, to=1.0) float fraction);
     method @androidx.compose.runtime.Stable public static float luminance-8_81llA(long);
+    method public static inline long takeOrElse-iYUlWp8(long, kotlin.jvm.functions.Function0<androidx.compose.ui.graphics.Color> block);
     method @ColorInt @androidx.compose.runtime.Stable public static int toArgb-8_81llA(long);
-    method public static inline long useOrElse-iYUlWp8(long, kotlin.jvm.functions.Function0<androidx.compose.ui.graphics.Color> block);
+    method @Deprecated public static inline long useOrElse-iYUlWp8(long, kotlin.jvm.functions.Function0<androidx.compose.ui.graphics.Color> block);
   }
 
   public final class DegreesKt {

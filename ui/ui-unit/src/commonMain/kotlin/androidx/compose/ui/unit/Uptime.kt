@@ -86,7 +86,7 @@ inline val Uptime.isUnspecified: Boolean
  * If this [Uptime] [isSpecified] then this is returned, otherwise [block] is executed
  * and its result is returned.
  */
-inline fun Uptime.useOrElse(block: () -> Uptime): Uptime =
+inline fun Uptime.takeOrElse(block: () -> Uptime): Uptime =
     if (isSpecified) this else block()
 
 /**

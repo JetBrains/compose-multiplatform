@@ -79,12 +79,12 @@ class UptimeTest {
     }
 
     @Test
-    fun testUseOrElseTrue() {
-        assertTrue(Uptime(1).useOrElse { Uptime.Unspecified }.isSpecified)
+    fun testTakeOrElseTrue() {
+        assertTrue(Uptime(1).takeOrElse { Uptime.Unspecified }.isSpecified)
     }
 
     @Test
-    fun testUseOrElseFalse() {
-        assertTrue(Uptime.Unspecified.useOrElse { Uptime(1) }.isSpecified)
+    fun testTakeOrElseFalse() {
+        assertTrue(Uptime.Unspecified.takeOrElse { Uptime(1) }.isSpecified)
     }
 }

@@ -142,7 +142,7 @@ inline val Dp.isUnspecified: Boolean
  * If this [Dp] [isSpecified] then this is returned, otherwise [block] is executed
  * and its result is returned.
  */
-inline fun Dp.useOrElse(block: () -> Dp): Dp =
+inline fun Dp.takeOrElse(block: () -> Dp): Dp =
     if (isSpecified) this else block()
 
 /**

@@ -594,4 +594,11 @@ inline val Color.isUnspecified: Boolean get() = value == Color.Unspecified.value
  * If this [Color] [isSpecified] then this is returned, otherwise [block] is executed and its result
  * is returned.
  */
+@Deprecated("Use takeOrElse", ReplaceWith("takeOrElse(block)"))
 inline fun Color.useOrElse(block: () -> Color): Color = if (isSpecified) this else block()
+
+/**
+ * If this [Color] [isSpecified] then this is returned, otherwise [block] is executed and its result
+ * is returned.
+ */
+inline fun Color.takeOrElse(block: () -> Color): Color = if (isSpecified) this else block()
