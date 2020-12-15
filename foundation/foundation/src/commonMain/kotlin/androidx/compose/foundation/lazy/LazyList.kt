@@ -57,6 +57,8 @@ internal fun LazyList(
     verticalAlignment: Alignment.Vertical? = null,
     /** The horizontal arrangement for items. Required when isVertical is false */
     horizontalArrangement: Arrangement.Horizontal? = null,
+    /** The list of indexes of the sticky header items */
+    headerIndexes: List<Int> = emptyList(),
     /** The factory defining the content for an item on the given position in the list */
     itemContent: LazyItemScope.(Int) -> @Composable () -> Unit
 ) {
@@ -132,13 +134,20 @@ internal fun LazyList(
 
         state.applyMeasureResult(measureResult)
 
+        val headers = if (headerIndexes.isNotEmpty()) {
+            LazyListHeaders(itemProvider, headerIndexes, measureResult, startContentPaddingPx)
+        } else {
+            null
+        }
+
         layoutLazyList(
             constraints,
             isVertical,
             verticalArrangement,
             horizontalArrangement,
             measureResult,
-            reverseLayout
+            reverseLayout,
+            headers
         )
     }
 }

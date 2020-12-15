@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.lazy
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.InternalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
@@ -56,12 +57,24 @@ interface LazyListScope {
         items: List<T>,
         itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
     )
+
+    /**
+     * Adds a sticky header item, which will remain pinned even when scrolling after it.
+     * The header will remain pinned until the next header will take its place.
+     *
+     * @sample androidx.compose.foundation.samples.StickyHeaderSample
+     *
+     * @param content the content of the header
+     */
+    @ExperimentalFoundationApi
+    fun stickyHeader(content: @Composable LazyItemScope.() -> Unit)
 }
 
 internal class LazyListScopeImpl : LazyListScope {
     private val intervals = IntervalList<LazyItemScope.(Int) -> (@Composable () -> Unit)>()
-
     val totalSize get() = intervals.totalSize
+    var headersIndexes: MutableList<Int>? = null
+        private set
 
     fun contentFor(index: Int, scope: LazyItemScope): @Composable () -> Unit {
         val interval = intervals.intervalForIndex(index)
@@ -92,6 +105,16 @@ internal class LazyListScopeImpl : LazyListScope {
             val item = items[index]
             @Composable { itemContent(index, item) }
         }
+    }
+
+    @ExperimentalFoundationApi
+    override fun stickyHeader(content: @Composable LazyItemScope.() -> Unit) {
+        val headersIndexes = headersIndexes ?: mutableListOf<Int>().also {
+            headersIndexes = it
+        }
+        headersIndexes.add(totalSize)
+
+        item(content)
     }
 }
 
@@ -142,7 +165,8 @@ fun LazyRow(
         verticalAlignment = verticalAlignment,
         horizontalArrangement = horizontalArrangement,
         isVertical = false,
-        reverseLayout = reverseLayout
+        reverseLayout = reverseLayout,
+        headerIndexes = scope.headersIndexes ?: emptyList()
     ) { index ->
         scope.contentFor(index, this)
     }
@@ -195,7 +219,8 @@ fun LazyColumn(
         horizontalAlignment = horizontalAlignment,
         verticalArrangement = verticalArrangement,
         isVertical = true,
-        reverseLayout = reverseLayout
+        reverseLayout = reverseLayout,
+        headerIndexes = scope.headersIndexes ?: emptyList()
     ) { index ->
         scope.contentFor(index, this)
     }
