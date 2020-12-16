@@ -126,10 +126,11 @@ data class AnnotatedString internal constructor(
      * with the range [start, end) will be returned. When [start] is bigger than [end], an empty
      * list will be returned.
      */
+    @Suppress("UNCHECKED_CAST")
     fun getStringAnnotations(start: Int, end: Int): List<StringAnnotation> =
-        annotations.filterIsInstance<Range<String>>().filter {
-            intersect(start, end, it.start, it.end)
-        }
+        annotations.filter {
+            it.item is String && intersect(start, end, it.start, it.end)
+        } as List<StringAnnotation>
 
     /**
      * Query all of the string annotations attached on this AnnotatedString.
@@ -140,10 +141,11 @@ data class AnnotatedString internal constructor(
      * with the range [start, end) will be returned. When [start] is bigger than [end], an empty
      * list will be returned.
      */
+    @Suppress("UNCHECKED_CAST")
     fun getTtsAnnotations(start: Int, end: Int): List<Range<TtsAnnotation>> =
-        annotations.filterIsInstance<Range<TtsAnnotation>>().filter {
-            intersect(start, end, it.start, it.end)
-        }
+        annotations.filter {
+            it.item is TtsAnnotation && intersect(start, end, it.start, it.end)
+        } as List<Range<TtsAnnotation>>
 
     /**
      * The information attached on the text such as a [SpanStyle].
