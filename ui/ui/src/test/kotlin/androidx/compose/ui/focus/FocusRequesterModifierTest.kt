@@ -25,7 +25,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
-class FocusReferenceModifierTest {
+class FocusRequesterModifierTest {
     @Before
     fun before() {
         isDebugInspectorInfoEnabled = true
@@ -38,12 +38,12 @@ class FocusReferenceModifierTest {
 
     @Test
     fun testInspectorValue() {
-        val focusReference = FocusReference()
-        val modifier = Modifier.focusReference(focusReference) as InspectableValue
-        assertThat(modifier.nameFallback).isEqualTo("focusReference")
+        val focusRequester = FocusRequester()
+        val modifier = Modifier.focusRequester(focusRequester) as InspectableValue
+        assertThat(modifier.nameFallback).isEqualTo("focusRequester")
         assertThat(modifier.valueOverride).isNull()
         assertThat(modifier.inspectableElements.asIterable()).containsExactly(
-            ValueElement("focusReference", focusReference)
+            ValueElement("focusRequester", focusRequester)
         )
     }
 }

@@ -29,9 +29,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusReference
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusModifier
-import androidx.compose.ui.focus.focusReference
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
@@ -43,7 +43,7 @@ private const val size = 200f
 private enum class CurrentShape { Circle, Square }
 
 @Composable
-fun ReuseFocusReference() {
+fun ReuseFocusRequester() {
     Column(
         verticalArrangement = Arrangement.Top
     ) {
@@ -52,21 +52,21 @@ fun ReuseFocusReference() {
                 "another shape. The same focus requester is used for both shapes."
         )
 
-        // Shared focus reference.
-        val focusReference = FocusReference()
+        // Shared focus requester.
+        val focusRequester = FocusRequester()
 
         var shape by remember { mutableStateOf(CurrentShape.Square) }
         when (shape) {
             CurrentShape.Circle -> Circle(
                 modifier = Modifier
-                    .focusReference(focusReference)
-                    .tapGestureFilter { focusReference.requestFocus() },
+                    .focusRequester(focusRequester)
+                    .tapGestureFilter { focusRequester.requestFocus() },
                 nextShape = { shape = CurrentShape.Square }
             )
             CurrentShape.Square -> Square(
                 modifier = Modifier
-                    .focusReference(focusReference)
-                    .tapGestureFilter { focusReference.requestFocus() },
+                    .focusRequester(focusRequester)
+                    .tapGestureFilter { focusRequester.requestFocus() },
                 nextShape = { shape = CurrentShape.Circle }
             )
         }

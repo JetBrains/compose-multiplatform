@@ -191,6 +191,7 @@ class DemoTest {
             ?.activityClass != ComposeInAndroidDialogDismissDialogDuringDispatch::class
 
         if (hasComposeView) {
+            rule.waitForIdle()
             while (rule.onAllNodes(isDialog()).isNotEmpty()) {
                 rule.waitForIdle()
                 Espresso.pressBack()

@@ -39,8 +39,8 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.onCommit
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusReference
-import androidx.compose.ui.focus.focusReference
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.withStyle
@@ -106,16 +106,16 @@ private fun FilterField(
     onFilter: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val focusReference = FocusReference()
+    val focusRequester = FocusRequester()
     // TODO: replace with Material text field when available
     BasicTextField(
-        modifier = modifier.focusReference(focusReference),
+        modifier = modifier.focusRequester(focusRequester),
         value = filterText,
         onValueChange = onFilter,
         textStyle = AmbientTextStyle.current,
         cursorColor = AmbientContentColor.current
     )
-    onCommit { focusReference.requestFocus() }
+    onCommit { focusRequester.requestFocus() }
 }
 
 /**

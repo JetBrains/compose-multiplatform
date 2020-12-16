@@ -22,8 +22,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.InactiveTextField
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.focus.FocusReference
-import androidx.compose.ui.focus.focusReference
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.selection.AmbientSelectionRegistrar
 import androidx.compose.ui.test.assertIsEnabled
@@ -52,18 +52,18 @@ class InactiveTextFieldTest {
     @Test
     fun inactiveTextField_disabled_noFocus() {
         val interactionState = InteractionState()
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         rule.setContent {
             InactiveTextField(
                 value = text,
-                modifier = Modifier.testTag(tag).focusReference(focusReference),
+                modifier = Modifier.testTag(tag).focusRequester(focusRequester),
                 enabled = false,
                 interactionState = interactionState
             )
         }
 
         rule.runOnIdle {
-            focusReference.requestFocus()
+            focusRequester.requestFocus()
             assertThat(interactionState.contains(Interaction.Focused)).isFalse()
         }
 
@@ -74,11 +74,11 @@ class InactiveTextFieldTest {
     @Test
     fun inactiveTextField_enabled_focusable() {
         val interactionState = InteractionState()
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         rule.setContent {
             InactiveTextField(
                 value = text,
-                modifier = Modifier.testTag(tag).focusReference(focusReference),
+                modifier = Modifier.testTag(tag).focusRequester(focusRequester),
                 enabled = true,
                 interactionState = interactionState
             )
@@ -88,7 +88,7 @@ class InactiveTextFieldTest {
         }
 
         rule.runOnIdle {
-            focusReference.requestFocus()
+            focusRequester.requestFocus()
             assertThat(interactionState.contains(Interaction.Focused)).isTrue()
         }
         rule.onNodeWithTag(tag)

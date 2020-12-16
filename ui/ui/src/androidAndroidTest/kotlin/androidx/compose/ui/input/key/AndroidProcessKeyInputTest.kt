@@ -22,9 +22,9 @@ import android.view.KeyEvent.KEYCODE_A as KeyCodeA
 import android.view.View
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusReference
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusModifier
-import androidx.compose.ui.focus.focusReference
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.setFocusableContent
 import androidx.compose.ui.input.key.Key.Companion.A
 import androidx.compose.ui.input.key.KeyEventType.KeyDown
@@ -60,12 +60,12 @@ class AndroidProcessKeyInputTest(val keyEventAction: Int) {
         // Arrange.
         lateinit var ownerView: View
         var receivedKeyEvent: KeyEvent? = null
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         rule.setFocusableContent {
             ownerView = AmbientView.current
             Box(
                 modifier = Modifier
-                    .focusReference(focusReference)
+                    .focusRequester(focusRequester)
                     .focusModifier()
                     .onKeyEvent {
                         receivedKeyEvent = it
@@ -74,7 +74,7 @@ class AndroidProcessKeyInputTest(val keyEventAction: Int) {
             )
         }
         rule.runOnIdle {
-            focusReference.requestFocus()
+            focusRequester.requestFocus()
         }
 
         // Act.
