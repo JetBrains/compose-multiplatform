@@ -34,6 +34,7 @@ package androidx.compose.runtime.dispatch {
   public final class BroadcastFrameClock implements androidx.compose.runtime.dispatch.MonotonicFrameClock {
     ctor public BroadcastFrameClock(kotlin.jvm.functions.Function0<kotlin.Unit>? onNewAwaiters);
     ctor public BroadcastFrameClock();
+    method public void cancel(optional java.util.concurrent.CancellationException cancellationException);
     method public boolean getHasAwaiters();
     method public void sendFrame(long timeNanos);
     method public suspend <R> Object? withFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);

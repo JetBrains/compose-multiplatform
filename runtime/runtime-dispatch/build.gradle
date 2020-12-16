@@ -51,6 +51,9 @@ if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         androidTestImplementation(ANDROIDX_TEST_EXT_KTX)
         androidTestImplementation(ANDROIDX_TEST_UIAUTOMATOR)
         androidTestImplementation(JUNIT)
+
+        testImplementation(KOTLIN_TEST_JUNIT)
+        testImplementation(KOTLIN_COROUTINES_TEST)
     }
 }
 
@@ -81,6 +84,10 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 dependsOn jvmMain
             }
 
+            commonTest.dependencies {
+                implementation kotlin("test-junit")
+                implementation(KOTLIN_COROUTINES_TEST)
+            }
             androidTest.dependencies {
                 implementation(ANDROIDX_TEST_RULES)
                 implementation(ANDROIDX_TEST_RUNNER)
