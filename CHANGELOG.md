@@ -1,3 +1,6 @@
+# M3
+   * Fix [Ambients are not transferred across pop ups](https://github.com/JetBrains/compose-jb/issues/135)
+
 # M2 (Dec 2020)
    * Swing interoperability support (Compose in Swing frame)
    * Support [XML vector images](https://developer.android.com/guide/topics/graphics/vector-drawable-resources)
