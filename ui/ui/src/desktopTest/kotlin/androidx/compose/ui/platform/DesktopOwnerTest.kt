@@ -16,9 +16,9 @@
 
 package androidx.compose.ui.platform
 
-import androidx.compose.animation.animate
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.TweenSpec
+import androidx.compose.animation.core.animateAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -213,9 +213,9 @@ class DesktopOwnerTest {
         var targetValue by mutableStateOf(10f)
 
         setContent {
-            val value = animate(
+            val value by animateAsState(
                 targetValue,
-                animSpec = TweenSpec(durationMillis = 30, easing = LinearEasing)
+                animationSpec = TweenSpec(durationMillis = 30, easing = LinearEasing)
             )
             Box(Modifier.size(value.dp).background(Color.Blue))
         }

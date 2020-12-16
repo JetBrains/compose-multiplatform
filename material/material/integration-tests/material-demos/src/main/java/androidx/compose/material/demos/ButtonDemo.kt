@@ -16,7 +16,7 @@
 
 package androidx.compose.material.demos
 
-import androidx.compose.animation.animate
+import androidx.compose.animation.animateAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.layout.Arrangement
@@ -162,7 +162,7 @@ private fun IconToggleButtonDisabled() {
     var checked by remember { mutableStateOf(false) }
 
     IconToggleButton(checked = checked, enabled = false, onCheckedChange = { checked = it }) {
-        val tint = animate(if (checked) Color(0xFFEC407A) else Color(0xFFB0BEC5))
+        val tint by animateAsState(if (checked) Color(0xFFEC407A) else Color(0xFFB0BEC5))
         Icon(Icons.Filled.Favorite, tint = tint)
     }
 }

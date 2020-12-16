@@ -78,6 +78,7 @@ fun RadioButton(
     interactionState: InteractionState = remember { InteractionState() },
     colors: RadioButtonColors = RadioButtonDefaults.colors()
 ) {
+    @Suppress("Deprecation") // b/176192329
     val dotRadius = animate(
         target = if (selected) RadioButtonDotSize / 2 else 0.dp,
         animSpec = tween(durationMillis = RadioAnimationDuration)

@@ -17,7 +17,7 @@
 package androidx.compose.material.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.animation.animate
+import androidx.compose.animation.animateAsState
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.IconToggleButton
@@ -44,7 +44,7 @@ fun IconToggleButtonSample() {
     var checked by remember { mutableStateOf(false) }
 
     IconToggleButton(checked = checked, onCheckedChange = { checked = it }) {
-        val tint = animate(if (checked) Color(0xFFEC407A) else Color(0xFFB0BEC5))
+        val tint by animateAsState(if (checked) Color(0xFFEC407A) else Color(0xFFB0BEC5))
         Icon(Icons.Filled.Favorite, tint = tint)
     }
 }
