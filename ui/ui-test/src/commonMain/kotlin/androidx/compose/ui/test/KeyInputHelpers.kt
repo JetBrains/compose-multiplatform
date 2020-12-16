@@ -27,6 +27,6 @@ fun SemanticsNodeInteraction.performKeyPress(keyEvent: KeyEvent): Boolean {
     val semanticsNode = fetchSemanticsNode("Failed to send key Event (${keyEvent.key})")
     val owner = semanticsNode.owner
     requireNotNull(owner) { "Failed to find owner" }
-    @OptIn(InternalTestingApi::class)
+    @OptIn(InternalTestApi::class)
     return testContext.testOwner.runOnUiThread { owner.sendKeyEvent(keyEvent) }
 }

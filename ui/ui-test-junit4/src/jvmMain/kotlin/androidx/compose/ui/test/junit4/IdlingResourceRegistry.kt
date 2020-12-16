@@ -18,7 +18,7 @@ package androidx.compose.ui.test.junit4
 
 import androidx.annotation.VisibleForTesting
 import androidx.compose.ui.test.IdlingResource
-import androidx.compose.ui.test.InternalTestingApi
+import androidx.compose.ui.test.InternalTestApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -29,12 +29,12 @@ import org.junit.runners.model.Statement
 
 internal class IdlingResourceRegistry
 @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-@InternalTestingApi
+@InternalTestApi
 internal constructor(
     private val pollScopeOverride: CoroutineScope?
 ) : IdlingResource {
     // Publicly facing constructor, that doesn't override the poll scope
-    @OptIn(InternalTestingApi::class)
+    @OptIn(InternalTestApi::class)
     constructor() : this(null)
 
     private val lock = Any()

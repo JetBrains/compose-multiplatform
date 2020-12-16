@@ -25,9 +25,9 @@ import androidx.compose.ui.platform.DesktopOwner
 import androidx.compose.ui.platform.DesktopOwners
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.semantics.SemanticsNode
-import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.IdlingResource
-import androidx.compose.ui.test.InternalTestingApi
+import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.SemanticsNodeInteractionCollection
@@ -49,7 +49,7 @@ import javax.swing.SwingUtilities.isEventDispatchThread
 
 actual fun createComposeRule(): ComposeTestRule = DesktopComposeTestRule()
 
-@OptIn(InternalTestingApi::class)
+@OptIn(InternalTestApi::class)
 class DesktopComposeTestRule : ComposeTestRule {
 
     companion object {
@@ -59,7 +59,7 @@ class DesktopComposeTestRule : ComposeTestRule {
     var owners: DesktopOwners? = null
     private var owner: DesktopOwner? = null
 
-    @ExperimentalTesting
+    @ExperimentalTestApi
     override val clockTestRule: AnimationClockTestRule = DesktopAnimationClockTestRule()
 
     override val density: Density
@@ -104,7 +104,7 @@ class DesktopComposeTestRule : ComposeTestRule {
         }
     }
 
-    @ExperimentalTesting
+    @ExperimentalTestApi
     override suspend fun awaitIdle() {
         while (!isIdle()) {
             runExecutionQueue()

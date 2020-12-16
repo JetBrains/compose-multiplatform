@@ -20,13 +20,13 @@ import android.annotation.SuppressLint
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.semantics.SemanticsNode
-import androidx.compose.ui.test.InternalTestingApi
+import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.test.TestOwner
 import androidx.compose.ui.test.junit4.android.ComposeIdlingResource
 import androidx.compose.ui.text.input.EditOperation
 import androidx.compose.ui.text.input.ImeAction
 
-@OptIn(InternalTestingApi::class)
+@OptIn(InternalTestApi::class)
 internal class AndroidTestOwner(
     private val composeIdlingResource: ComposeIdlingResource
 ) : TestOwner {

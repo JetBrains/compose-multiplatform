@@ -38,7 +38,7 @@ import androidx.compose.ui.input.mouse.MouseScrollUnit
 import androidx.compose.ui.platform.DesktopPlatform
 import androidx.compose.ui.platform.DesktopPlatformAmbient
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.down
 import androidx.compose.ui.test.junit4.ComposeTestRule
@@ -61,7 +61,7 @@ import org.junit.Rule
 import org.junit.Test
 
 @Suppress("WrapUnaryOperator")
-@OptIn(ExperimentalTesting::class)
+@OptIn(ExperimentalTestApi::class)
 class ScrollbarTest {
     @get:Rule
     val rule = createComposeRule()

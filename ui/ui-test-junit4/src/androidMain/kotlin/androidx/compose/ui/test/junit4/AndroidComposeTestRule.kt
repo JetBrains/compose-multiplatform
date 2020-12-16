@@ -22,9 +22,9 @@ import androidx.compose.foundation.text.blinkingCursorEnabled
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Recomposer
 import androidx.compose.ui.platform.setContent
-import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.IdlingResource
-import androidx.compose.ui.test.InternalTestingApi
+import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.SemanticsNodeInteractionCollection
@@ -85,7 +85,7 @@ inline fun <reified A : ComponentActivity> createAndroidComposeRule():
 fun <A : ComponentActivity> createAndroidComposeRule(
     activityClass: Class<A>
 ): AndroidComposeTestRule<ActivityScenarioRule<A>, A> =
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     createAndroidComposeRule(
         activityClass = activityClass,
         driveClockByMonotonicFrameClock = false
@@ -97,14 +97,14 @@ fun <A : ComponentActivity> createAndroidComposeRule(
  * experimental and _will_ be removed in the future. See the other overloads of
  * [createAndroidComposeRule] for the recommended way of creating a [ComposeTestRule].
  */
-@ExperimentalTesting
+@ExperimentalTestApi
 internal fun createAndroidComposeRule(
     driveClockByMonotonicFrameClock: Boolean
 ): AndroidComposeTestRule<ActivityScenarioRule<ComponentActivity>, ComponentActivity> {
     return createAndroidComposeRule(ComponentActivity::class.java, driveClockByMonotonicFrameClock)
 }
 
-@ExperimentalTesting
+@ExperimentalTestApi
 private fun <A : ComponentActivity> createAndroidComposeRule(
     activityClass: Class<A>,
     driveClockByMonotonicFrameClock: Boolean
@@ -125,16 +125,16 @@ private fun <A : ComponentActivity> createAndroidComposeRule(
  * @param activityProvider To resolve the activity from the given test rule. Must be a blocking
  * function.
  */
-@OptIn(InternalTestingApi::class)
+@OptIn(InternalTestApi::class)
 class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>
-@ExperimentalTesting
+@ExperimentalTestApi
 internal constructor(
     val activityRule: R,
     private val activityProvider: (R) -> A,
     driveClockByMonotonicFrameClock: Boolean
 ) : ComposeTestRule {
 
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     constructor(
         activityRule: R,
         activityProvider: (R) -> A
@@ -148,7 +148,7 @@ internal constructor(
         registerIdlingResource(it)
     }
 
-    @ExperimentalTesting
+    @ExperimentalTestApi
     override val clockTestRule: AnimationClockTestRule =
         if (!driveClockByMonotonicFrameClock) {
             AndroidAnimationClockTestRule(composeIdlingResource)
@@ -183,7 +183,7 @@ internal constructor(
 
     override fun apply(base: Statement, description: Description): Statement {
         @Suppress("NAME_SHADOWING")
-        @OptIn(ExperimentalTesting::class)
+        @OptIn(ExperimentalTestApi::class)
         return RuleChain
             .outerRule { base, _ -> composeIdlingResource.getStatementFor(base) }
             .around { base, _ -> idlingResourceRegistry.getStatementFor(base) }
@@ -228,7 +228,7 @@ internal constructor(
         composeIdlingResource.waitForIdle()
     }
 
-    @ExperimentalTesting
+    @ExperimentalTestApi
     override suspend fun awaitIdle() {
         composeIdlingResource.awaitIdle()
     }
