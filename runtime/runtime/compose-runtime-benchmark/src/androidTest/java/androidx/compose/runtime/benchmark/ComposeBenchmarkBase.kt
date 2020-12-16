@@ -30,10 +30,16 @@ import androidx.compose.runtime.snapshots.SnapshotReadObserver
 import androidx.compose.runtime.snapshots.SnapshotWriteObserver
 import androidx.compose.runtime.snapshots.takeMutableSnapshot
 import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.test.TestMonotonicFrameClock
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.DelayController
+import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.withContext
 import org.junit.Assert.assertTrue
 import org.junit.Assert.assertFalse
 import org.junit.Rule
@@ -47,17 +53,31 @@ abstract class ComposeBenchmarkBase {
     @get:Rule
     val activityRule = androidx.test.rule.ActivityTestRule(ComposeActivity::class.java)
 
-    fun measureCompose(block: @Composable () -> Unit) {
-        val activity = activityRule.activity
+    @ExperimentalCoroutinesApi
+    suspend fun DelayController.measureCompose(block: @Composable () -> Unit) = coroutineScope {
         var composition: Composition? = null
-        benchmarkRule.measureRepeated {
-            composition = activity.setContent(Recomposer.current(), block)
+        val activity = activityRule.activity
+        val recomposer = Recomposer(coroutineContext)
 
-            runWithTimingDisabled {
-                composition?.dispose()
+        try {
+            benchmarkRule.measureRepeatedSuspendable {
+                composition = activity.setContent(recomposer) {
+                    block()
+                }
+
+                runWithTimingDisabled {
+                    composition?.dispose()
+                    advanceUntilIdle()
+                    Runtime.getRuntime().let {
+                        it.gc()
+                    }
+                }
             }
+        } finally {
+            composition?.dispose()
+            advanceUntilIdle()
+            recomposer.shutDown()
         }
-        composition?.dispose()
     }
 
     fun measureRecompose(block: RecomposeReceiver.() -> Unit) {
@@ -140,6 +160,18 @@ abstract class ComposeBenchmarkBase {
 
         composition.dispose()
         recomposer.shutDown()
+    }
+}
+
+@ExperimentalCoroutinesApi
+fun runBlockingTestWithFrameClock(
+    context: CoroutineContext = EmptyCoroutineContext,
+    testBody: suspend TestCoroutineScope.() -> Unit
+) {
+    runBlockingTest(context) {
+        withContext(TestMonotonicFrameClock(this)) {
+            testBody()
+        }
     }
 }
 
