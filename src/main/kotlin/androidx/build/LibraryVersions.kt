@@ -66,7 +66,7 @@ object LibraryVersions {
     val GRIDLAYOUT = Version("1.1.0-alpha01")
     val HEIFWRITER = Version("1.1.0-alpha02")
     val HILT = Version("1.0.0-alpha03")
-    val INSPECTION = Version("1.0.0-beta01")
+    val INSPECTION = Version("1.0.0-rc01")
     val INTERPOLATOR = Version("1.1.0-alpha01")
     val IPC = Version("1.0.0-alpha01")
     val JETIFIER = Version("1.0.0-beta10")
@@ -138,5 +138,5 @@ object LibraryVersions {
     val WINDOW = Version("1.0.0-alpha02")
     val WINDOW_EXTENSIONS = Version("1.0.0-alpha01")
     val WINDOW_SIDECAR = Version("0.1.0-alpha01")
-    val WORK = Version("2.5.0-beta02")
+    val WORK = Version("2.5.0-rc01")
 }
