@@ -10,7 +10,7 @@ import com.squareup.sqldelight.Query
 import example.todo.common.database.TodoDatabaseQueries
 import example.todo.common.database.TodoItemEntity
 import example.todo.common.database.asObservable
-import example.todo.common.main.store.TodoItem
+import example.todo.common.main.TodoItem
 import example.todo.common.main.store.TodoMainStoreProvider
 
 internal class TodoMainStoreDatabase(
@@ -40,11 +40,6 @@ internal class TodoMainStoreDatabase(
             .subscribeOn(ioScheduler)
 
     override fun add(text: String): Completable =
-        completableFromFunction {
-            queries.transactionWithResult {
-                queries.add(text = text)
-                val lastId = queries.getLastInsertId().executeAsOne()
-                queries.select(id = lastId).executeAsOne()
-            }
-        }.subscribeOn(ioScheduler)
+        completableFromFunction { queries.add(text = text) }
+            .subscribeOn(ioScheduler)
 }

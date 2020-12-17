@@ -13,6 +13,7 @@ import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.arkivanov.mvikotlin.timetravel.store.TimeTravelStoreFactory
 import example.todo.common.database.TodoDatabaseDriver
 import example.todo.common.root.TodoRoot
+import example.todo.common.ui.TodoRootContent
 import example.todo.database.TodoDatabase
 
 class MainActivity : AppCompatActivity() {
@@ -22,7 +23,7 @@ class MainActivity : AppCompatActivity() {
         setContent {
             ComposeAppTheme {
                 Surface(color = MaterialTheme.colors.background) {
-                    rootComponent(::todoRoot).invoke()
+                    TodoRootContent(rootComponent(::todoRoot))
                 }
             }
         }

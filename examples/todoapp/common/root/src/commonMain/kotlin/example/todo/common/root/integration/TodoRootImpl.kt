@@ -1,19 +1,18 @@
 package example.todo.common.root.integration
 
-import androidx.compose.runtime.Composable
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.extensions.compose.jetbrains.children
+import com.arkivanov.decompose.RouterState
 import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.arkivanov.decompose.statekeeper.Parcelize
+import com.arkivanov.decompose.value.Value
 import com.badoo.reaktive.base.Consumer
 import example.todo.common.edit.TodoEdit
 import example.todo.common.main.TodoMain
 import example.todo.common.root.TodoRoot
+import example.todo.common.root.TodoRoot.Child
 import example.todo.common.root.TodoRoot.Dependencies
-import example.todo.common.utils.Component
 import example.todo.common.utils.Consumer
-import example.todo.common.utils.Crossfade
 
 internal class TodoRootImpl(
     componentContext: ComponentContext,
@@ -21,16 +20,18 @@ internal class TodoRootImpl(
 ) : TodoRoot, ComponentContext by componentContext, Dependencies by dependencies {
 
     private val router =
-        router<Configuration, Component>(
+        router<Configuration, Child>(
             initialConfiguration = Configuration.Main,
             handleBackButton = true,
             componentFactory = ::createChild
         )
 
-    private fun createChild(configuration: Configuration, componentContext: ComponentContext): Component =
+    override val routerState: Value<RouterState<*, Child>> = router.state
+
+    private fun createChild(configuration: Configuration, componentContext: ComponentContext): Child =
         when (configuration) {
-            is Configuration.Main -> todoMain(componentContext)
-            is Configuration.Edit -> todoEdit(componentContext, itemId = configuration.itemId)
+            is Configuration.Main -> Child.Main(todoMain(componentContext))
+            is Configuration.Edit -> Child.Edit(todoEdit(componentContext, itemId = configuration.itemId))
         }
 
     private fun todoMain(componentContext: ComponentContext): TodoMain =
@@ -59,15 +60,6 @@ internal class TodoRootImpl(
         when (output) {
             is TodoEdit.Output.Finished -> router.pop()
         }
-
-    @Composable
-    override fun invoke() {
-        router.state.children { child, configuration ->
-            Crossfade(currentChild = child, currentKey = configuration) { currentChild ->
-                currentChild()
-            }
-        }
-    }
 
     private sealed class Configuration : Parcelable {
         @Parcelize

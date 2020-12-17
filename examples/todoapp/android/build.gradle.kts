@@ -30,6 +30,7 @@ dependencies {
     implementation(project(":common:database"))
     implementation(project(":common:utils"))
     implementation(project(":common:root"))
+    implementation(project(":common:compose-ui"))
     implementation(compose.material)
     implementation(Deps.ArkIvanov.MVIKotlin.mvikotlin)
     implementation(Deps.ArkIvanov.MVIKotlin.mvikotlinMain)
@@ -37,4 +38,5 @@ dependencies {
     implementation(Deps.ArkIvanov.MVIKotlin.mvikotlinTimeTravel)
     implementation(Deps.ArkIvanov.Decompose.decompose)
     implementation(Deps.ArkIvanov.Decompose.extensionsCompose)
+    implementation(Deps.AndroidX.AppCompat.appCompat)
 }

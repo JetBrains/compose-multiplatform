@@ -1,16 +1,16 @@
 plugins {
     id("multiplatform-setup")
-    id("multiplatform-compose-setup")
+    id("android-setup")
 }
 
 kotlin {
     sourceSets {
         named("commonMain") {
             dependencies {
+                implementation(Deps.ArkIvanov.MVIKotlin.rx)
                 implementation(Deps.ArkIvanov.MVIKotlin.mvikotlin)
-                implementation(Deps.ArkIvanov.MVIKotlin.mvikotlinExtensionsReaktive)
                 implementation(Deps.ArkIvanov.Decompose.decompose)
-                implementation(Deps.ArkIvanov.Decompose.extensionsCompose)
+                implementation(Deps.Badoo.Reaktive.reaktive)
             }
         }
     }

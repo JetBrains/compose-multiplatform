@@ -12,10 +12,10 @@ import com.badoo.reaktive.test.observable.test
 import com.badoo.reaktive.test.scheduler.TestScheduler
 import example.todo.common.database.TestDatabaseDriver
 import example.todo.common.database.TodoItemEntity
+import example.todo.common.main.TodoItem
 import example.todo.common.main.TodoMain.Dependencies
+import example.todo.common.main.TodoMain.Model
 import example.todo.common.main.TodoMain.Output
-import example.todo.common.main.store.TodoItem
-import example.todo.common.main.store.TodoMainStore.Intent
 import example.todo.database.TodoDatabase
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -45,12 +45,16 @@ class TodoMainTest {
         )
     }
 
+    private val model: Model get() = impl.models.value
+
     @BeforeTest
     fun before() {
         overrideSchedulers(
             main = { TestScheduler() },
             io = { TestScheduler() }
         )
+
+        queries.clear()
     }
 
     @Test
@@ -67,15 +71,15 @@ class TodoMainTest {
 
         queries.delete(id = id)
 
-        assertFalse(impl.state.items.any { it.id == id })
+        assertFalse(model.items.any { it.id == id })
     }
 
     @Test
-    fun WHEN_item_selected_THEN_Output_Selected_emitted() {
+    fun WHEN_item_clicked_THEN_Output_Selected_emitted() {
         queries.add("Item1")
         val id = firstItem().id
 
-        impl.onOutput(Output.Selected(id = id))
+        impl.onItemClicked(id = id)
 
         output.assertValue(Output.Selected(id = id))
     }
@@ -86,7 +90,7 @@ class TodoMainTest {
         val id = firstItem().id
         queries.setDone(id = id, isDone = false)
 
-        impl.onIntent(Intent.SetItemDone(id = id, isDone = true))
+        impl.onItemDoneChanged(id = id, isDone = true)
 
         assertTrue(queries.select(id = id).executeAsOne().isDone)
     }
@@ -97,17 +101,17 @@ class TodoMainTest {
         val id = firstItem().id
         queries.setDone(id = id, isDone = true)
 
-        impl.onIntent(Intent.SetItemDone(id = id, isDone = false))
+        impl.onItemDoneChanged(id = id, isDone = false)
 
         assertFalse(queries.select(id = id).executeAsOne().isDone)
     }
 
     @Test
-    fun WHEN_delete_clicked_THEN_item_deleted_in_database() {
+    fun WHEN_item_delete_clicked_THEN_item_deleted_in_database() {
         queries.add("Item1")
         val id = firstItem().id
 
-        impl.onIntent(Intent.DeleteItem(id = id))
+        impl.onItemDeleteClicked(id = id)
 
         assertNull(queries.select(id = id).executeAsOneOrNull())
     }
@@ -123,25 +127,25 @@ class TodoMainTest {
     }
 
     @Test
-    fun WHEN_text_changed_THEN_text_updated() {
-        impl.onIntent(Intent.SetText(text = "Item text"))
+    fun WHEN_input_text_changed_THEN_text_updated() {
+        impl.onInputTextChanged(text = "Item text")
 
-        assertEquals("Item text", impl.state.text)
+        assertEquals("Item text", model.text)
     }
 
     @Test
-    fun GIVEN_text_entered_WHEN_add_clicked_THEN_item_added_in_database() {
-        impl.onIntent(Intent.SetText(text = "Item text"))
+    fun GIVEN_input_text_entered_WHEN_add_item_clicked_THEN_item_added_in_database() {
+        impl.onInputTextChanged(text = "Item text")
 
-        impl.onIntent(Intent.AddItem)
+        impl.onAddItemClicked()
 
         assertEquals("Item text", lastInsertItem().text)
     }
 
-    private fun firstItem(): TodoItem = impl.state.items[0]
+    private fun firstItem(): TodoItem = model.items[0]
 
     private fun lastInsertItem(): TodoItemEntity {
-        val lastInsertId = queries.getLastInsertId().executeAsOne()
+        val lastInsertId = queries.transactionWithResult<Long> { queries.getLastInsertId().executeAsOne() }
 
         return queries.select(id = lastInsertId).executeAsOne()
     }

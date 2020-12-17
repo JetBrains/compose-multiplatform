@@ -1,5 +1,6 @@
 plugins {
     id("multiplatform-setup")
+    id("android-setup")
     id("com.squareup.sqldelight")
 }
 
@@ -27,6 +28,12 @@ kotlin {
         desktopMain {
             dependencies {
                 implementation(Deps.Squareup.SQLDelight.sqliteDriver)
+            }
+        }
+
+        iosMain {
+            dependencies {
+                implementation(Deps.Squareup.SQLDelight.nativeDriver)
             }
         }
     }
