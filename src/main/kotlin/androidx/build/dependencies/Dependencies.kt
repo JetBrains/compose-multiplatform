@@ -78,9 +78,17 @@ const val KOTLINPOET_CLASSINSPECTOR_ELEMENTS =
     "com.squareup:kotlinpoet-classinspector-elements:1.4.0"
 const val KOTLIN_COMPILE_TESTING = "com.github.tschuchortdev:kotlin-compile-testing:1.3.1"
 const val KOTLIN_COMPILE_TESTING_KSP = "com.github.tschuchortdev:kotlin-compile-testing-ksp:1.3.1"
-const val KSP_VERSION = "1.4.20-dev-experimental-20201204"
-const val KOTLIN_KSP_API = "com.google.devtools.ksp:symbol-processing-api:$KSP_VERSION"
-const val KOTLIN_KSP = "com.google.devtools.ksp:symbol-processing:$KSP_VERSION"
+
+/**
+ * KSP is used both as a plugin and runtime dependency, hence its version is declared in the
+ * build dependencies file.
+ */
+internal lateinit var kspVersion: String
+
+val KSP_VERSION get() = kspVersion
+val KOTLIN_KSP_API get() = "com.google.devtools.ksp:symbol-processing-api:$KSP_VERSION"
+val KOTLIN_KSP get() = "com.google.devtools.ksp:symbol-processing:$KSP_VERSION"
+val KOTLIN_KSP_GRADLE_PLUGIN get() = "com.google.devtools.ksp:symbol-processing:$KSP_VERSION"
 const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.21"
 
 const val KOTLIN_METADATA = "me.eugeniomarletti.kotlin.metadata:kotlin-metadata:1.4.0"
