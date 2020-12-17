@@ -34,6 +34,7 @@ import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyInputModifier
 import androidx.compose.ui.input.mouse.MouseScrollEvent
 import androidx.compose.ui.input.mouse.MouseScrollEventFilter
+import androidx.compose.ui.input.pointer.TestPointerInputEventData
 import androidx.compose.ui.input.pointer.PointerInputEvent
 import androidx.compose.ui.input.pointer.PointerInputEventProcessor
 import androidx.compose.ui.input.pointer.PointerInputFilter
@@ -54,6 +55,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.Uptime
 
 @OptIn(
     ExperimentalComposeUiApi::class,
@@ -203,9 +205,18 @@ class DesktopOwner(
         root.draw(DesktopCanvas(canvas))
     }
 
-    fun processPointerInput(event: PointerInputEvent) {
+    internal fun processPointerInput(event: PointerInputEvent) {
         measureAndLayout()
         pointerInputEventProcessor.process(event)
+    }
+
+    fun processPointerInput(time: Uptime, pointers: List<TestPointerInputEventData>) {
+        processPointerInput(
+            PointerInputEvent(
+                time,
+                pointers.map { it.toPointerInputEventData() }
+            )
+        )
     }
 
     // TODO(demin): This is likely temporary. After PointerInputEvent can handle mouse events

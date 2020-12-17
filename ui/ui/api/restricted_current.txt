@@ -1616,51 +1616,23 @@ package androidx.compose.ui.input.pointer {
   }
 
   @androidx.compose.runtime.Immutable public final class PointerInputChange {
-    method public long component1-J3iCeTQ();
-    method public androidx.compose.ui.input.pointer.PointerInputData component2();
-    method public androidx.compose.ui.input.pointer.PointerInputData component3();
-    method public androidx.compose.ui.input.pointer.ConsumedData component4();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.input.pointer.PointerInputChange copy-FzBznnU(long id, androidx.compose.ui.input.pointer.PointerInputData current, androidx.compose.ui.input.pointer.PointerInputData previous, androidx.compose.ui.input.pointer.ConsumedData consumed);
+    method public androidx.compose.ui.input.pointer.PointerInputChange copy-OG0_fLE(optional long id, optional long currentTime, optional long currentPosition, optional boolean currentPressed, optional long previousTime, optional long previousPosition, optional boolean previousPressed, optional androidx.compose.ui.input.pointer.ConsumedData consumed);
     method public androidx.compose.ui.input.pointer.ConsumedData getConsumed();
-    method public androidx.compose.ui.input.pointer.PointerInputData getCurrent();
     method public long getId-J3iCeTQ();
-    method public androidx.compose.ui.input.pointer.PointerInputData getPrevious();
-    property public final androidx.compose.ui.input.pointer.ConsumedData consumed;
-    property public final androidx.compose.ui.input.pointer.PointerInputData current;
-    property public final long id;
-    property public final androidx.compose.ui.input.pointer.PointerInputData previous;
-  }
-
-  @androidx.compose.runtime.Immutable public final class PointerInputData {
-    method public long component1-CLVl0cY();
-    method public long component2-F1C5BW0();
-    method public boolean component3();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.input.pointer.PointerInputData copy-JMrSy48(long uptime, long position, boolean down);
-    method public boolean getDown();
     method public long getPosition-F1C5BW0();
-    method public long getUptime-CLVl0cY();
-    property public final boolean down;
-    property public final long position;
-    property public final long uptime;
-  }
-
-  public final class PointerInputEvent {
-    method public android.view.MotionEvent getMotionEvent();
-    method public java.util.List<androidx.compose.ui.input.pointer.PointerInputEventData> getPointers();
-    method public long getUptime-CLVl0cY();
-    property public final android.view.MotionEvent motionEvent;
-    property public final java.util.List<androidx.compose.ui.input.pointer.PointerInputEventData> pointers;
-    property public final long uptime;
-  }
-
-  public final class PointerInputEventData {
-    method public long component1-J3iCeTQ();
-    method public androidx.compose.ui.input.pointer.PointerInputData component2();
-    method public androidx.compose.ui.input.pointer.PointerInputEventData copy-pdufZyI(long id, androidx.compose.ui.input.pointer.PointerInputData pointerInputData);
-    method public long getId-J3iCeTQ();
-    method public androidx.compose.ui.input.pointer.PointerInputData getPointerInputData();
+    method public boolean getPressed();
+    method public long getPreviousPosition-F1C5BW0();
+    method public boolean getPreviousPressed();
+    method public long getPreviousTime-CLVl0cY();
+    method public long getTime-CLVl0cY();
+    property public final androidx.compose.ui.input.pointer.ConsumedData consumed;
     property public final long id;
-    property public final androidx.compose.ui.input.pointer.PointerInputData pointerInputData;
+    property public final long position;
+    property public final boolean pressed;
+    property public final long previousPosition;
+    property public final boolean previousPressed;
+    property public final long previousTime;
+    property public final long time;
   }
 
   public final class PointerInputEventProcessorKt {

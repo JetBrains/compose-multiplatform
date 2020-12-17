@@ -289,7 +289,7 @@ class AndroidPointerInputTest {
             // Assert
             assertThat(log).hasSize(1)
             assertThat(log[0]).hasSize(1)
-            assertThat(log[0][0].current.position).isEqualTo(Offset(0f, 0f))
+            assertThat(log[0][0].position).isEqualTo(Offset(0f, 0f))
         }
     }
 
@@ -405,7 +405,7 @@ class AndroidPointerInputTest {
             // Assert
             assertThat(log).hasSize(1)
             assertThat(log[0]).hasSize(1)
-            assertThat(log[0][0].current.position).isEqualTo(Offset(0f, 0f))
+            assertThat(log[0][0].position).isEqualTo(Offset(0f, 0f))
         }
     }
 
@@ -563,7 +563,7 @@ private class ConsumeDownChangeFilter : PointerInputFilter() {
     ) {
         pointerEvent.changes.fastForEach {
             if (it.changedToDown()) {
-                onDown(it.current.position)
+                onDown(it.position)
                 it.consumeDownChange()
             }
         }

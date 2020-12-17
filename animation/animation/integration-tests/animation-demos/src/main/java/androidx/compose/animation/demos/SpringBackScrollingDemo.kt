@@ -79,8 +79,8 @@ fun SpringBackScrollingDemo() {
                             horizontalDrag(pointerId) {
                                 scrollPosition += it.positionChange().x
                                 velocityTracker.addPosition(
-                                    it.current.uptime,
-                                    it.current.position
+                                    it.time,
+                                    it.position
                                 )
                             }
                         }

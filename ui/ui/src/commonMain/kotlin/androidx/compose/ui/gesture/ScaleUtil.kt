@@ -60,16 +60,16 @@ internal fun List<Float>.calculateDimensionInformation(): DimensionData {
 internal fun List<PointerInputChange>.calculateAllDimensionInformation() =
     AllDimensionData(
         map {
-            it.previous.position.x
+            it.previousPosition.x
         }.calculateDimensionInformation(),
         map {
-            it.previous.position.y
+            it.previousPosition.y
         }.calculateDimensionInformation(),
         map {
-            it.previous.position.x + it.positionChange().x
+            it.previousPosition.x + it.positionChange().x
         }.calculateDimensionInformation(),
         map {
-            it.previous.position.y + it.positionChange().y
+            it.previousPosition.y + it.positionChange().y
         }.calculateDimensionInformation()
     )
 

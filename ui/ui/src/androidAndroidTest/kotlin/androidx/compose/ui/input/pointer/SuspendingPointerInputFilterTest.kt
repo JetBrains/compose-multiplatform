@@ -158,16 +158,12 @@ class SuspendingPointerInputFilterTest {
                 listOf(
                     PointerInputChange(
                         PointerId(0),
-                        current = PointerInputData(
-                            uptime = Uptime.Boot,
-                            position = Offset(6f, 6f),
-                            down = false
-                        ),
-                        previous = PointerInputData(
-                            uptime = Uptime.Boot,
-                            position = Offset(6f, 6f),
-                            down = true
-                        ),
+                        Uptime.Boot,
+                        Offset(6f, 6f),
+                        false,
+                        Uptime.Boot,
+                        Offset(6f, 6f),
+                        true,
                         consumed = ConsumedData(downChange = true)
                     )
                 )
@@ -238,29 +234,29 @@ private val PointerEvent.firstChange get() = changes.first()
 
 private class PointerInputChangeEmitter(id: Int = 0) {
     val pointerId = PointerId(id.toLong())
-    var previousData = PointerInputData(
-        uptime = Uptime.Boot,
-        position = Offset.Zero,
-        down = false
-    )
+    var previousTime = Uptime.Boot
+    var previousPosition = Offset.Zero
+    var previousPressed = false
 
     fun nextChange(
         position: Offset = Offset.Zero,
         down: Boolean = true,
         time: Uptime = Uptime.Boot
     ): PointerInputChange {
-        val current = PointerInputData(
-            position = position,
-            down = down,
-            uptime = time
-        )
-
         return PointerInputChange(
             id = pointerId,
-            current = current,
-            previous = previousData,
+            time,
+            position,
+            down,
+            previousTime,
+            previousPosition,
+            previousPressed,
             consumed = ConsumedData()
-        ).also { previousData = current }
+        ).also {
+            previousTime = time
+            previousPosition = position
+            previousPressed = down
+        }
     }
 }
 

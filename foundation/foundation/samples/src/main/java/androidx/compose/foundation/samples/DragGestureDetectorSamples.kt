@@ -85,9 +85,9 @@ fun AwaitHorizontalDragOrCancellationSample() {
                                     change.consumePositionChange(newValue - originalX, 0f)
                                     offsetX.value = newValue
                                 }
-                            while (change != null && change.current.down) {
+                            while (change != null && change.pressed) {
                                 change = awaitHorizontalDragOrCancellation(change.id)
-                                if (change != null && change.current.down) {
+                                if (change != null && change.pressed) {
                                     val originalX = offsetX.value
                                     val newValue = (originalX + change.positionChange().x)
                                         .coerceIn(0f, width - 50.dp.toPx())
@@ -199,9 +199,9 @@ fun AwaitVerticalDragOrCancellationSample() {
                                     change.consumePositionChange(0f, newValue - originalY)
                                     offsetY.value = newValue
                                 }
-                            while (change != null && change.current.down) {
+                            while (change != null && change.pressed) {
                                 change = awaitVerticalDragOrCancellation(change.id)
-                                if (change != null && change.current.down) {
+                                if (change != null && change.pressed) {
                                     val originalY = offsetY.value
                                     val newValue = (originalY + change.positionChange().y)
                                         .coerceIn(0f, height - 50.dp.toPx())
@@ -318,9 +318,9 @@ fun AwaitDragOrCancellationSample() {
                                 offsetX.value = newValue.x
                                 offsetY.value = newValue.y
                             }
-                            while (change != null && change.current.down) {
+                            while (change != null && change.pressed) {
                                 change = awaitDragOrCancellation(change.id)
-                                if (change != null && change.current.down) {
+                                if (change != null && change.pressed) {
                                     val original = Offset(offsetX.value, offsetY.value)
                                     val summed = original + change.positionChange()
                                     val newValue = Offset(

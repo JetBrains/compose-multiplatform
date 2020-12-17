@@ -21,7 +21,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.key.KeyEvent as ComposeKeyEvent
 import androidx.compose.ui.input.mouse.MouseScrollEvent
 import androidx.compose.ui.input.pointer.PointerId
-import androidx.compose.ui.input.pointer.PointerInputData
 import androidx.compose.ui.input.pointer.PointerInputEvent
 import androidx.compose.ui.input.pointer.PointerInputEventData
 import androidx.compose.ui.node.InternalCoreApi
@@ -176,11 +175,9 @@ class DesktopOwners(
             listOf(
                 PointerInputEventData(
                     PointerId(pointerId),
-                    PointerInputData(
-                        time,
-                        Offset(x.toFloat(), y.toFloat()),
-                        down
-                    )
+                    time,
+                    Offset(x.toFloat(), y.toFloat()),
+                    down
                 )
             )
         )

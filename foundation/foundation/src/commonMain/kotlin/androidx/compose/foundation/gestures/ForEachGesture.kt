@@ -58,7 +58,7 @@ suspend fun PointerInputScope.forEachGesture(block: suspend PointerInputScope.()
  * if any of the pointers are down.
  */
 internal fun AwaitPointerEventScope.allPointersUp(): Boolean =
-    !currentEvent.changes.fastAny { it.current.down }
+    !currentEvent.changes.fastAny { it.pressed }
 
 /**
  * Waits for all pointers to be up before returning.
@@ -74,6 +74,6 @@ internal suspend fun AwaitPointerEventScope.awaitAllPointersUp() {
     if (!allPointersUp()) {
         do {
             val events = awaitPointerEvent(PointerEventPass.Final)
-        } while (events.changes.fastAny { it.current.down })
+        } while (events.changes.fastAny { it.pressed })
     }
 }

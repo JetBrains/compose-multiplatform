@@ -104,21 +104,21 @@ suspend fun PointerInputScope.detectMultitouchGestures(
                         }
                     }
                 }
-            } while (!canceled && event.changes.fastAny { it.current.down })
+            } while (!canceled && event.changes.fastAny { it.pressed })
         }
     }
 }
 
 /**
- * Returns the rotation, in degrees, of the pointers between the [PointerInputChange.previous]
- * and [PointerInputChange.current] states. Only the pointers that are down in both previous
- * and current states are considered.
+ * Returns the rotation, in degrees, of the pointers between the
+ * [PointerInputChange.previousPosition] and [PointerInputChange.position] states. Only
+ * the pointers that are down in both previous and current states are considered.
  *
  * Example Usage:
  * @sample androidx.compose.foundation.samples.CalculateRotation
  */
 fun PointerEvent.calculateRotation(): Float {
-    val pointerCount = changes.fastSumBy { if (it.previous.down && it.current.down) 1 else 0 }
+    val pointerCount = changes.fastSumBy { if (it.previousPressed && it.pressed) 1 else 0 }
     if (pointerCount < 2) {
         return 0f
     }
@@ -134,9 +134,9 @@ fun PointerEvent.calculateRotation(): Float {
     // from the centroid, which should be more stable.
 
     changes.fastForEach { change ->
-        if (change.current.down && change.previous.down) {
-            val currentPosition = change.current.position
-            val previousPosition = change.previous.position
+        if (change.pressed && change.previousPressed) {
+            val currentPosition = change.position
+            val previousPosition = change.previousPosition
             val previousOffset = previousPosition - previousCentroid
             val currentOffset = currentPosition - currentCentroid
 
@@ -168,8 +168,8 @@ private fun Offset.angle(): Float =
     if (x == 0f && y == 0f) 0f else -atan2(x, y) * 180f / PI.toFloat()
 
 /**
- * Uses the change of the centroid size between the [PointerInputChange.previous] and
- * [PointerInputChange.current] to determine how much zoom was intended.
+ * Uses the change of the centroid size between the [PointerInputChange.previousPosition] and
+ * [PointerInputChange.position] to determine how much zoom was intended.
  *
  * Example Usage:
  * @sample androidx.compose.foundation.samples.CalculateZoom
@@ -203,9 +203,9 @@ fun PointerEvent.calculatePan(): Offset {
 /**
  * Returns the average distance from the centroid for all pointers that are currently
  * and were previously down. If no pointers are down, `0` is returned.
- * If [useCurrent] is `true`, the size of the [PointerInputChange.current] is returned and if
- * `false`, the size of [PointerInputChange.previous] is returned. Only pointers that are down
- * in both the previous and current state are used to calculate the centroid size.
+ * If [useCurrent] is `true`, the size of the [PointerInputChange.position] is returned and
+ * if `false`, the size of [PointerInputChange.previousPosition] is returned. Only pointers that
+ * are down in both the previous and current state are used to calculate the centroid size.
  *
  * Example Usage:
  * @sample androidx.compose.foundation.samples.CalculateCentroidSize
@@ -219,9 +219,9 @@ fun PointerEvent.calculateCentroidSize(useCurrent: Boolean = true): Float {
     var distanceToCentroid = 0f
     var distanceWeight = 0
     changes.fastForEach { change ->
-        if (change.current.down && change.previous.down) {
-            val data = if (useCurrent) change.current else change.previous
-            distanceToCentroid += (data.position - centroid).getDistance()
+        if (change.pressed && change.previousPressed) {
+            val position = if (useCurrent) change.position else change.previousPosition
+            distanceToCentroid += (position - centroid).getDistance()
             distanceWeight++
         }
     }
@@ -231,9 +231,9 @@ fun PointerEvent.calculateCentroidSize(useCurrent: Boolean = true): Float {
 /**
  * Returns the centroid of all pointers that are down and were previously down. If no pointers
  * are down, [Offset.Unspecified] is returned. If [useCurrent] is `true`, the centroid of the
- * [PointerInputChange.current] is returned and if `false`, the centroid of the
- * [PointerInputChange.previous] is returned. Only pointers that are down in both the previous and
- * current state are used to calculate the centroid.
+ * [PointerInputChange.position] is returned and if `false`, the centroid of the
+ * [PointerInputChange.previousPosition] is returned. Only pointers that are down in both the
+ * previous and current state are used to calculate the centroid.
  *
  * Example Usage:
  * @sample androidx.compose.foundation.samples.CalculateCentroidSize
@@ -246,9 +246,9 @@ fun PointerEvent.calculateCentroid(
     var centroidWeight = 0
 
     changes.fastForEach { change ->
-        if (change.current.down && change.previous.down) {
-            val data = if (useCurrent) change.current else change.previous
-            centroid += data.position
+        if (change.pressed && change.previousPressed) {
+            val position = if (useCurrent) change.position else change.previousPosition
+            centroid += position
             centroidWeight++
         }
     }

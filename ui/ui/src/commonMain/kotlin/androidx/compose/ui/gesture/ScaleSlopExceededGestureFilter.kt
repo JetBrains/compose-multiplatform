@@ -88,7 +88,7 @@ internal class ScaleSlopExceededGestureFilter(private val scaleSlop: Float) : Po
             if (!passedSlop) {
 
                 val currentlyDownChanges =
-                    changes.filter { it.current.down && it.previous.down }
+                    changes.filter { it.pressed && it.previousPressed }
 
                 if (currentlyDownChanges.isNotEmpty()) {
                     val dimensionInformation =
