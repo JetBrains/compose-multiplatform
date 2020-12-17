@@ -36,7 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.Position
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 
@@ -85,7 +85,7 @@ fun MenuInstance(modifier: Modifier = Modifier) {
         expanded = expanded,
         onDismissRequest = { expanded = false },
         toggle = iconButton,
-        dropdownOffset = Position(24.dp, 0.dp),
+        dropdownOffset = DpOffset(24.dp, 0.dp),
         toggleModifier = modifier
     ) {
         options.forEach {

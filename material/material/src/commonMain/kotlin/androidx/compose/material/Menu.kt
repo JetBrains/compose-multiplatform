@@ -51,7 +51,7 @@ import androidx.compose.ui.unit.IntBounds
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.Position
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
 import androidx.compose.ui.unit.width
@@ -94,7 +94,7 @@ fun DropdownMenu(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
     toggleModifier: Modifier = Modifier,
-    dropdownOffset: Position = Position(0.dp, 0.dp),
+    dropdownOffset: DpOffset = DpOffset(0.dp, 0.dp),
     dropdownModifier: Modifier = Modifier,
     dropdownContent: @Composable ColumnScope.() -> Unit
 ) {
@@ -289,7 +289,7 @@ private fun calculateTransformOrigin(
 // TODO(popam): Investigate if this can/should consider the app window size rather than screen size
 @Immutable
 internal data class DropdownMenuPositionProvider(
-    val contentOffset: Position,
+    val contentOffset: DpOffset,
     val density: Density,
     val onPositionCalculated: (IntBounds, IntBounds) -> Unit = { _, _ -> }
 ) : PopupPositionProvider {

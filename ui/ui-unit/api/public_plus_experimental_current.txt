@@ -117,11 +117,11 @@ package androidx.compose.ui.unit {
   }
 
   public final class DpKt {
-    method @androidx.compose.runtime.Stable public static inline long Position-ioHfwGI(float x, float y);
+    method @androidx.compose.runtime.Stable public static inline long DpOffset-ioHfwGI(float x, float y);
+    method @Deprecated @androidx.compose.runtime.Stable public static inline long Position-ioHfwGI(float x, float y);
     method @androidx.compose.runtime.Stable public static inline float coerceAtLeast-ioHfwGI(float, float minimumValue);
     method @androidx.compose.runtime.Stable public static inline float coerceAtMost-ioHfwGI(float, float maximumValue);
     method @androidx.compose.runtime.Stable public static inline float coerceIn-qYQSm_w(float, float minimumValue, float maximumValue);
-    method @androidx.compose.runtime.Stable public static float getDistance-IsWn59c(long);
     method public static inline float getDp(int);
     method public static inline float getDp(double);
     method public static inline float getDp(float);
@@ -130,14 +130,34 @@ package androidx.compose.ui.unit {
     method public static inline boolean isFinite-0680j_4(float);
     method public static inline boolean isSpecified-0680j_4(float);
     method public static inline boolean isUnspecified-0680j_4(float);
-    method @androidx.compose.runtime.Stable public static long lerp-2vlZtig(long start, long stop, float fraction);
     method @androidx.compose.runtime.Stable public static float lerp-7oHWEOI(float start, float stop, float fraction);
+    method @androidx.compose.runtime.Stable public static long lerp-O0PuQT4(long start, long stop, float fraction);
     method @androidx.compose.runtime.Stable public static inline float max-ioHfwGI(float a, float b);
     method @androidx.compose.runtime.Stable public static inline float min-ioHfwGI(float a, float b);
     method public static inline float takeOrElse-RiydCdY(float, kotlin.jvm.functions.Function0<androidx.compose.ui.unit.Dp> block);
     method @androidx.compose.runtime.Stable public static inline operator float times-Cp9Wa6o(int, float other);
     method @androidx.compose.runtime.Stable public static inline operator float times-NSq4UQk(double, float other);
     method @androidx.compose.runtime.Stable public static inline operator float times-NnR5yEA(float, float other);
+  }
+
+  @androidx.compose.runtime.Immutable public final inline class DpOffset {
+    ctor public DpOffset();
+    method public static long constructor-impl(long packedValue);
+    method public static long copy-ioHfwGI(long $this, optional float x, optional float y);
+    method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
+    method public static boolean equals-impl0(long p1, long p2);
+    method public static float getX-D9Ej5fM(long $this);
+    method public static float getY-D9Ej5fM(long $this);
+    method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(long p);
+    method @androidx.compose.runtime.Stable public static inline operator long minus-jo-Fl9I(long $this, long other);
+    method @androidx.compose.runtime.Stable public static inline operator long plus-jo-Fl9I(long $this, long other);
+    method @androidx.compose.runtime.Stable public static String toString-impl(long $this);
+    field public static final androidx.compose.ui.unit.DpOffset.Companion Companion;
+  }
+
+  public static final class DpOffset.Companion {
+    method public long getZero-RKDOV3M();
+    property public final long Zero;
   }
 
   @androidx.compose.runtime.Immutable public final inline class Duration implements java.lang.Comparable<androidx.compose.ui.unit.Duration> {
@@ -294,24 +314,6 @@ package androidx.compose.ui.unit {
   public enum LayoutDirection {
     enum_constant public static final androidx.compose.ui.unit.LayoutDirection Ltr;
     enum_constant public static final androidx.compose.ui.unit.LayoutDirection Rtl;
-  }
-
-  @androidx.compose.runtime.Immutable public final inline class Position {
-    ctor public Position();
-    method public static long constructor-impl(long packedValue);
-    method public static long copy-ioHfwGI(long $this, optional float x, optional float y);
-    method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
-    method public static boolean equals-impl0(long p1, long p2);
-    method public static float getX-D9Ej5fM(long $this);
-    method public static float getY-D9Ej5fM(long $this);
-    method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(long p);
-    method @androidx.compose.runtime.Stable public static inline operator long minus-IsWn59c(long $this, long other);
-    method @androidx.compose.runtime.Stable public static inline operator long plus-IsWn59c(long $this, long other);
-    method @androidx.compose.runtime.Stable public static String toString-impl(long $this);
-    field public static final androidx.compose.ui.unit.Position.Companion Companion;
-  }
-
-  public static final class Position.Companion {
   }
 
   @androidx.compose.runtime.Immutable public final inline class PxCubed implements java.lang.Comparable<androidx.compose.ui.unit.PxCubed> {
