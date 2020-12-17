@@ -24,6 +24,25 @@ import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.NoInspectorInfo
 import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.focus.FocusState.Active
+import androidx.compose.ui.focus.FocusState.Inactive
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.Key.Companion.Tab
+import androidx.compose.ui.input.key.Key.Companion.DPadRight
+import androidx.compose.ui.input.key.Key.Companion.DPadLeft
+import androidx.compose.ui.input.key.Key.Companion.DPadUp
+import androidx.compose.ui.input.key.Key.Companion.DPadDown
+import androidx.compose.ui.focus.FocusDirection.Next
+import androidx.compose.ui.focus.FocusDirection.Previous
+import androidx.compose.ui.focus.FocusDirection.Left
+import androidx.compose.ui.focus.FocusDirection.Right
+import androidx.compose.ui.focus.FocusDirection.Up
+import androidx.compose.ui.focus.FocusDirection.Down
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.KeyEventType.KeyDown
+import androidx.compose.ui.input.key.isShiftPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.type
 
 /**
  * A [Modifier.Element] that wraps makes the modifiers on the right into a Focusable. Use a
@@ -52,5 +71,23 @@ internal class FocusModifier(
  * Add this modifier to a component to make it focusable.
  */
 fun Modifier.focusModifier(): Modifier = composed(debugInspectorInfo { name = "focusModifier" }) {
-    remember { FocusModifier(FocusState.Inactive) }
+    val focusModifier = remember { FocusModifier(Inactive) }
+    focusModifier.onKeyEvent {
+        val direction = getFocusDirection(it)
+        if (direction != null && it.type == KeyDown && focusModifier.focusState == Active) {
+            focusModifier.focusNode.moveFocus(direction)
+            true
+        } else {
+            false
+        }
+    }
+}
+
+private fun getFocusDirection(keyEvent: KeyEvent) = when (keyEvent.key) {
+    Tab -> if (keyEvent.isShiftPressed) Previous else Next
+    DPadRight -> Right
+    DPadLeft -> Left
+    DPadUp -> Up
+    DPadDown -> Down
+    else -> null
 }

@@ -43,6 +43,7 @@ import androidx.compose.ui.demos.keyinput.KeyInputDemo
 import androidx.compose.ui.demos.viewinterop.ViewInteropDemo
 import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.integration.demos.common.DemoCategory
+import androidx.compose.ui.demos.focus.CustomFocusOrderDemo
 import androidx.compose.ui.demos.focus.FocusInDialog
 import androidx.compose.ui.demos.focus.FocusInPopup
 import androidx.compose.ui.samples.NestedScrollSample
@@ -97,6 +98,7 @@ private val FocusDemos = DemoCategory(
     "Focus",
     listOf(
         ComposableDemo("Focusable Siblings") { FocusableDemo() },
+        ComposableDemo("Custom Focus Order") { CustomFocusOrderDemo() },
         ComposableDemo("Focus Within Dialog") { FocusInDialog() },
         ComposableDemo("Focus Within Popup") { FocusInPopup() },
         ComposableDemo("Reuse Focus Requester") { ReuseFocusRequester() }

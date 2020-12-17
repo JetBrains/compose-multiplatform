@@ -18,6 +18,7 @@
 
 package androidx.compose.ui.node
 
+import androidx.compose.ui.focus.FocusOrder
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
@@ -552,6 +553,15 @@ internal abstract class LayoutNodeWrapper(
      */
     open fun propagateFocusEvent(focusState: FocusState) {
         wrappedBy?.propagateFocusEvent(focusState)
+    }
+
+    /**
+     * Search up the component tree for any parent/parents that have specified a custom focus order.
+     * Allowing parents higher up the hierarchy to overwrite the focus order specified by their
+     * children.
+     */
+    open fun populateFocusOrder(focusOrder: FocusOrder) {
+        wrappedBy?.populateFocusOrder(focusOrder)
     }
 
     /**

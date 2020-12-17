@@ -251,7 +251,7 @@ class FocusRequesterTest {
     }
 
     @Test
-    fun requestFocusForAnyChild_triggersonFocusChangedInParent() {
+    fun requestFocusForAnyChild_triggersOnFocusChangedInParent() {
         // Arrange.
         lateinit var hostView: View
         var focusState = Inactive

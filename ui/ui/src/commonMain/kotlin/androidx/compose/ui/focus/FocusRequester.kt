@@ -20,8 +20,8 @@ import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.ui.node.ModifiedFocusRequesterNode
 
-private val focusRequesterNotInitialized = "FocusRequester is not initialized. One reason for " +
-    "this is that you requesting focus changes during composition. Focus requesters should " +
+private const val focusRequesterNotInitialized = "FocusRequester is not initialized. One reason " +
+    "for this is that you requesting focus changes during composition. Focus requesters should " +
     "not be made during composition, but should be made in response to some event."
 
 /**
@@ -100,6 +100,13 @@ class FocusRequester {
     }
 
     companion object {
+        /**
+         * Default [focusRequester], which when used in [Modifier.focusOrder][focusOrder] implies
+         * that we want to use the default system focus order, that is based on the location on
+         * items on the screen.
+         */
+        val Default = FocusRequester()
+
         /**
          * Convenient way to create multiple [FocusRequester] instances.
          */
