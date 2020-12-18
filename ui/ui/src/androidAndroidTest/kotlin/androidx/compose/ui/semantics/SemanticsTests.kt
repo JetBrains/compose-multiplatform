@@ -38,6 +38,7 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.zIndex
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
@@ -425,6 +426,33 @@ class SemanticsTests {
                 ValueElement("properties", properties)
             )
         }
+    }
+
+    @Test
+    fun testChildrenAreZSorted() {
+        val child1 = "child1"
+        val child2 = "child2"
+        rule.setContent {
+            SimpleTestLayout(
+                Modifier.testTag(TestTag).semantics {}
+            ) {
+                SimpleTestLayout(
+                    Modifier.zIndex(1f).semantics { contentDescription = child1 }
+                ) {}
+                SimpleTestLayout(Modifier.semantics { contentDescription = child2 }) { }
+            }
+        }
+
+        val root = rule.onNodeWithTag(TestTag).fetchSemanticsNode("can't find node $TestTag")
+        assertEquals(2, root.children.size)
+        assertEquals(
+            child2,
+            root.children[0].config.getOrNull(SemanticsProperties.ContentDescription)
+        )
+        assertEquals(
+            child1,
+            root.children[1].config.getOrNull(SemanticsProperties.ContentDescription)
+        )
     }
 }
 

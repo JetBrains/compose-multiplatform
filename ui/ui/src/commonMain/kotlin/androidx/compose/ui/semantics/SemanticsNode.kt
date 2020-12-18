@@ -318,7 +318,7 @@ internal fun SemanticsNode.findChildById(id: Int): SemanticsNode? {
 private fun LayoutNode.findOneLayerOfSemanticsWrappers(
     list: MutableList<SemanticsWrapper> = mutableListOf<SemanticsWrapper>()
 ): List<SemanticsWrapper> {
-    children.fastForEach { child ->
+    zSortedChildren.forEach { child ->
         val outerSemantics = child.outerSemantics
         if (outerSemantics != null) {
             list.add(outerSemantics)
