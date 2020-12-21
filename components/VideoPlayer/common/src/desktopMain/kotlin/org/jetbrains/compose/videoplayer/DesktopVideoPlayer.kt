@@ -2,16 +2,14 @@ package org.jetbrains.compose.videoplayer
   
 import androidx.compose.runtime.Composable
 import javax.swing.JFrame
+import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery
 import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent
-
 
 @Composable
 internal actual fun VideoPlayerImpl(url: String, width: Int, height: Int) {
     println("Video player for $url")
-    /*
-    val vlcHome = "/Applications/VLC.app/Contents/MacOS/lib/"
-    System.load("$vlcHome/libvlccore.dylib")
-    System.load("$vlcHome/libvlc.dylib") */
+    NativeDiscovery().discover()
+    // Doesn't work on macOS, see https://github.com/caprica/vlcj/issues/887 for suggestions.
     val frame = JFrame()
     val mediaPlayerComponent = EmbeddedMediaPlayerComponent()
     frame.contentPane = mediaPlayerComponent

@@ -13,7 +13,7 @@ fun main() {
     ) {
         MaterialTheme {
             DesktopTheme {
-                VideoPlayer("file:///System/Library/Compositions/Yosemite.mov", 640, 480)
+                VideoPlayer("/System/Library/Compositions/Yosemite.mov", 640, 480)
             }
         }
     }
