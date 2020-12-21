@@ -99,7 +99,7 @@ import androidx.compose.ui.unit.sp
 
 private const val title = "Desktop Compose Elements"
 
-val italicFont = fontFamily(font("Noto Italic", "NotoSans-Italic.ttf"))
+val italicFont = fontFamily(font("NotoSans-Italic.ttf"))
 
 fun main() {
     Window(title, IntSize(1024, 850)) {
