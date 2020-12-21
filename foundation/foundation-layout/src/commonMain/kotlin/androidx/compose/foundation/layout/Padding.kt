@@ -195,7 +195,12 @@ private class PaddingModifier(
     inspectorInfo: InspectorInfo.() -> Unit
 ) : LayoutModifier, InspectorValueInfo(inspectorInfo) {
     init {
-        require(start.value >= 0f && top.value >= 0f && end.value >= 0f && bottom.value >= 0f) {
+        require(
+            (start.value >= 0f || start == Dp.Unspecified) &&
+                (top.value >= 0f || top == Dp.Unspecified) &&
+                (end.value >= 0f || end == Dp.Unspecified) &&
+                (bottom.value >= 0f || bottom == Dp.Unspecified)
+        ) {
             "Padding must be non-negative"
         }
     }
