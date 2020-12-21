@@ -16,3 +16,9 @@ kotlin {
         }
     }
 }
+
+compose.desktop {
+    application {
+        mainClass = "org.jetbrains.compose.videoplayer.demo.MainKt"
+    }
+}

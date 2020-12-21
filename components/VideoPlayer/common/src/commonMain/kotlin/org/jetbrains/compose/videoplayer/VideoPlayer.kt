@@ -7,4 +7,4 @@ fun VideoPlayer(url: String, width: Int, height: Int) {
     VideoPlayerImpl(url, width, height)
 }
 
-expect fun VideoPlayerImpl(url: String, width: Int, height: Int)
+internal expect fun VideoPlayerImpl(url: String, width: Int, height: Int)
