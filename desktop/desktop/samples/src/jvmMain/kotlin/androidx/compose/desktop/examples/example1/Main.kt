@@ -27,10 +27,12 @@ import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
@@ -83,6 +85,7 @@ import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.fontFamily
 import androidx.compose.ui.text.platform.font
 import androidx.compose.ui.text.style.TextAlign
@@ -260,6 +263,35 @@ private fun ScrollableContent(scrollState: ScrollState) {
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Text(
+                "Default",
+            )
+
+            Text(
+                "SansSerif",
+                fontFamily = FontFamily.SansSerif
+            )
+
+            Text(
+                "Serif",
+                fontFamily = FontFamily.Serif
+            )
+
+            Text(
+                "Monospace",
+                fontFamily = FontFamily.Monospace
+            )
+
+            Text(
+                "Cursive",
+                fontFamily = FontFamily.Cursive
+            )
+        }
 
         var overText by remember { mutableStateOf("Move mouse over text:") }
         Text(overText, style = TextStyle(letterSpacing = 10.sp))
