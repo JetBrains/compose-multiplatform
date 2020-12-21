@@ -8,6 +8,8 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.gradle.process.ExecResult
 import org.gradle.process.ExecSpec
+import org.gradle.work.ChangeType
+import org.gradle.work.InputChanges
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.*
 import java.io.File
@@ -17,6 +19,9 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:Input
     val targetFormat: TargetFormat,
 ) : AbstractJvmToolOperationTask("jpackage") {
+    @get:OutputDirectory
+    val destinationDir: DirectoryProperty = objects.directoryProperty()
+
     @get:InputFiles
     val files: ConfigurableFileCollection = objects.fileCollection()
 
@@ -216,18 +221,34 @@ abstract class AbstractJPackageTask @Inject constructor(
         }
     }
 
-    override fun prepareWorkingDir(tmpDir: File) {
-        super.prepareWorkingDir(tmpDir)
+    override fun prepareWorkingDir(inputChanges: InputChanges) {
+        fileOperations.delete(destinationDir)
 
-        launcherMainJar.asFile.orNull?.let { sourceFile ->
-            val targetFile = tmpDir.resolve(sourceFile.name)
-            sourceFile.copyTo(targetFile)
-        }
+        if (inputChanges.isIncremental) {
+            logger.debug("Updating working dir incrementally: $workingDir")
+            val allChanges = inputChanges.getFileChanges(files).asSequence() +
+                    inputChanges.getFileChanges(launcherMainJar)
+            allChanges.forEach { fileChange ->
+                val sourceFile = fileChange.file
+                val targetFile = workingDir.resolve(sourceFile.name)
 
-        val myFiles = files
-        fileOperations.copy {
-            it.from(myFiles)
-            it.into(tmpDir)
+                if (fileChange.changeType == ChangeType.REMOVED) {
+                    fileOperations.delete(targetFile)
+                    logger.debug("Deleted: $targetFile")
+                } else {
+                    sourceFile.copyTo(targetFile, overwrite = true)
+                    logger.debug("Updated: $targetFile")
+                }
+            }
+        } else {
+            logger.debug("Updating working dir non-incrementally: $workingDir")
+            fileOperations.delete(workingDir)
+            workingDir.mkdirs()
+            fileOperations.copy {
+                it.from(files)
+                it.from(launcherMainJar)
+                it.into(workingDir)
+            }
         }
     }
 
