@@ -7,14 +7,13 @@ import androidx.compose.ui.unit.IntSize
 import org.jetbrains.compose.videoplayer.VideoPlayer
 
 fun main() {
-
     Window(
         title = "Video Player",
         size = IntSize(800, 800)
     ) {
         MaterialTheme {
             DesktopTheme {
-                VideoPlayer("file://video.mp4", 640, 480)
+                VideoPlayer("file:///System/Library/Compositions/Yosemite.mov", 640, 480)
             }
         }
     }
