@@ -16,5 +16,11 @@ kotlin {
                 api(compose.material)
             }
         }
+        named("desktopMain") {
+            dependencies {
+                implementation("uk.co.caprica:vlcj:4.7.0")
+                implementation("com.sun.jna:jna:3.0.9")
+            }
+        }
     }
 }
