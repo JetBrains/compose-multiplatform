@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-@file:Suppress("RedundantOverride")
-
 package androidx.compose.animation.core
 
 /**
@@ -122,7 +120,7 @@ class AnimationVector1D(initVal: Float) : AnimationVector() {
     override fun equals(other: Any?): Boolean =
         other is AnimationVector1D && other.value == value
 
-    override fun hashCode(): Int = super.hashCode()
+    override fun hashCode(): Int = value.hashCode()
 }
 
 /**
@@ -174,7 +172,7 @@ class AnimationVector2D(v1: Float, v2: Float) : AnimationVector() {
     override fun equals(other: Any?): Boolean =
         other is AnimationVector2D && other.v1 == v1 && other.v2 == v2
 
-    override fun hashCode(): Int = super.hashCode()
+    override fun hashCode(): Int = v1.hashCode() * 31 + v2.hashCode()
 }
 
 /**
@@ -237,7 +235,7 @@ class AnimationVector3D(v1: Float, v2: Float, v3: Float) : AnimationVector() {
     override fun equals(other: Any?): Boolean =
         other is AnimationVector3D && other.v1 == v1 && other.v2 == v2 && other.v3 == v3
 
-    override fun hashCode(): Int = super.hashCode()
+    override fun hashCode(): Int = (v1.hashCode() * 31 + v2.hashCode()) * 31 + v3.hashCode()
 }
 
 /**
@@ -312,5 +310,6 @@ class AnimationVector4D(v1: Float, v2: Float, v3: Float, v4: Float) : AnimationV
             other.v3 == v3 &&
             other.v4 == v4
 
-    override fun hashCode(): Int = super.hashCode()
+    override fun hashCode(): Int =
+        ((v1.hashCode() * 31 + v2.hashCode()) * 31 + v3.hashCode()) * 31 + v4.hashCode()
 }
