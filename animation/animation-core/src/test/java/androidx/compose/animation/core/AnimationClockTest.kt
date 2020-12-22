@@ -17,16 +17,12 @@
 package androidx.compose.animation.core
 
 import junit.framework.TestCase.assertEquals
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import kotlin.coroutines.Continuation
-import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 @RunWith(JUnit4::class)
@@ -36,66 +32,6 @@ class AnimationClockTest {
     @Before
     fun setup() {
         clock = ManualAnimationClock(0L)
-    }
-
-    /**
-     * This function tests BaseAnimationClock's ability to handle an addition to its subscribers
-     * while it is processing other subscribers.
-     *
-     * First a blocking subscription is added - when the time changes it will hang the execution
-     * of all the subscriptions in the clock
-     *
-     * Second, we change the time to trigger said subscription
-     *
-     * While the clock is being blocked, we subscribe a second observer - at this time it should
-     * not be triggered
-     *
-     * Lastly, we unblock the execution and the second observer should have an execution on the
-     * same frame
-     */
-    @Test
-    fun testSubscriptionDuringFrameCallback() {
-        lateinit var blockingObserverContinuation: Continuation<Unit>
-        val blockingSubscription = ignoreFirstFrameObserver { _ ->
-            blockWithContinuation { blockingObserverContinuation = it }
-        }
-
-        // Subscribe a blocking subscription - it will hang clock.dispatchTime until
-        // blockingObserverContinuation is resumed.
-        clock.subscribe(blockingSubscription)
-
-        // Block the thread until we dispatch the frame callbacks in another thread
-        lateinit var frameCallbackJob: Job
-        blockWithContinuation {
-            val assertionContinuation = it
-            // Call dispatchTime and allow it to hang
-            frameCallbackJob = GlobalScope.launch {
-                assertionContinuation.resume(Unit)
-                clock.clockTimeMillis += 100
-            }
-        }
-
-        var newObserverFrameTime = -1L
-
-        val newObserver = ignoreFirstFrameObserver {
-            newObserverFrameTime = it
-        }
-
-        // Subscribe a observer while dispatchTime is hanging
-        clock.subscribe(newObserver)
-
-        assertEquals(-1L, newObserverFrameTime)
-
-        // Unblock the dispatchTime
-        blockingObserverContinuation.resume(Unit)
-
-        // Allow dispatchTime to finish its work
-        runBlocking {
-            frameCallbackJob.join()
-        }
-
-        // Within the same frame, the new subscription should have called back.
-        assertEquals(100L, newObserverFrameTime)
     }
 
     @Test
