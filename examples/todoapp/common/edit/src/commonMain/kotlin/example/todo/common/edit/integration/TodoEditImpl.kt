@@ -3,6 +3,7 @@ package example.todo.common.edit.integration
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.decompose.value.operator.map
+import com.badoo.reaktive.base.invoke
 import example.todo.common.edit.TodoEdit
 import example.todo.common.edit.TodoEdit.Dependencies
 import example.todo.common.edit.TodoEdit.Model
@@ -37,6 +38,6 @@ internal class TodoEditImpl(
     }
 
     override fun onCloseClicked() {
-        editOutput.onNext(Output.Finished)
+        editOutput(Output.Finished)
     }
 }
