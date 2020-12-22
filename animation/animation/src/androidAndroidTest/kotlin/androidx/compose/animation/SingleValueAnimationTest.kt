@@ -41,7 +41,7 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.test.ExperimentalTesting
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.Bounds
-import androidx.compose.ui.unit.Position
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -135,7 +135,7 @@ class SingleValueAnimationTest {
         val endVal = AnimationVector(0f, 77f)
 
         var vectorValue = startVal
-        var positionValue = Position.VectorConverter.convertFromVector(startVal)
+        var positionValue = DpOffset.VectorConverter.convertFromVector(startVal)
         var sizeValue = Size.VectorConverter.convertFromVector(startVal)
         var pxPositionValue = Offset.VectorConverter.convertFromVector(startVal)
 
@@ -153,9 +153,9 @@ class SingleValueAnimationTest {
 
             positionValue = animate(
                 if (enabled)
-                    Position.VectorConverter.convertFromVector(endVal)
+                    DpOffset.VectorConverter.convertFromVector(endVal)
                 else
-                    Position.VectorConverter.convertFromVector(startVal),
+                    DpOffset.VectorConverter.convertFromVector(startVal),
                 tween()
             )
 
@@ -185,7 +185,7 @@ class SingleValueAnimationTest {
 
                 assertEquals(expect, vectorValue)
                 assertEquals(Size.VectorConverter.convertFromVector(expect), sizeValue)
-                assertEquals(Position.VectorConverter.convertFromVector(expect), positionValue)
+                assertEquals(DpOffset.VectorConverter.convertFromVector(expect), positionValue)
                 assertEquals(Offset.VectorConverter.convertFromVector(expect), pxPositionValue)
                 rule.clockTestRule.advanceClock(50)
                 rule.waitForIdle()

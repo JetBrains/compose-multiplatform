@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.Bounds
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.Position
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.Uptime
 import androidx.compose.ui.util.annotation.VisibleForTesting
 
@@ -430,7 +430,7 @@ inline fun <S> Transition<S>.animateOffset(
     animateValue(Offset.VectorConverter, transitionSpec, targetValueByState)
 
 /**
- * Creates a [Position] animation as a part of the given [Transition]. This means the states
+ * Creates a [DpOffset] animation as a part of the given [Transition]. This means the states
  * of this animation will be managed by the [Transition].
  *
  * [targetValueByState] is used as a mapping from a target state to the target value of this
@@ -450,12 +450,12 @@ inline fun <S> Transition<S>.animateOffset(
  */
 @Composable
 inline fun <S> Transition<S>.animatePosition(
-    noinline transitionSpec: @Composable (Transition.States<S>) -> FiniteAnimationSpec<Position> = {
-        spring(visibilityThreshold = Position.VisibilityThreshold)
+    noinline transitionSpec: @Composable (Transition.States<S>) -> FiniteAnimationSpec<DpOffset> = {
+        spring(visibilityThreshold = DpOffset.VisibilityThreshold)
     },
-    targetValueByState: @Composable (state: S) -> Position
-): State<Position> =
-    animateValue(Position.VectorConverter, transitionSpec, targetValueByState)
+    targetValueByState: @Composable (state: S) -> DpOffset
+): State<DpOffset> =
+    animateValue(DpOffset.VectorConverter, transitionSpec, targetValueByState)
 
 /**
  * Creates a [Size] animation as a part of the given [Transition]. This means the states

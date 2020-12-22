@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.Bounds
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.Position
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 
 private const val DpVisibilityThreshold = 0.1f
@@ -76,12 +76,12 @@ val Dp.Companion.VisibilityThreshold: Dp
     get() = DpVisibilityThreshold.dp
 
 /**
- * Visibility threshold for [Position]. This defines the amount of value change that is
+ * Visibility threshold for [DpOffset]. This defines the amount of value change that is
  * considered to be no longer visible. The animation system uses this to signal to some default
  * [spring] animations to stop when the value is close enough to the target.
  */
-val Position.Companion.VisibilityThreshold: Position
-    get() = Position(Dp.VisibilityThreshold, Dp.VisibilityThreshold)
+val DpOffset.Companion.VisibilityThreshold: DpOffset
+    get() = DpOffset(Dp.VisibilityThreshold, Dp.VisibilityThreshold)
 
 /**
  * Visibility threshold for [Size]. This defines the amount of value change that is
