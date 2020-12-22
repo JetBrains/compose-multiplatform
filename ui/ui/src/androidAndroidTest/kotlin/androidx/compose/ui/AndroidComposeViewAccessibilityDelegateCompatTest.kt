@@ -33,6 +33,7 @@ import androidx.compose.ui.semantics.AccessibilityScrollState
 import androidx.compose.ui.semantics.SemanticsModifierCore
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsWrapper
 import androidx.compose.ui.semantics.copyText
 import androidx.compose.ui.semantics.cutText
@@ -46,6 +47,7 @@ import androidx.compose.ui.semantics.horizontalAccessibilityScrollState
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.onLongClick
 import androidx.compose.ui.semantics.pasteText
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.setProgress
 import androidx.compose.ui.semantics.setSelection
 import androidx.compose.ui.semantics.setText
@@ -66,6 +68,7 @@ import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -85,6 +88,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
     private lateinit var accessibilityDelegate: AndroidComposeViewAccessibilityDelegateCompat
     private lateinit var container: ViewGroup
     private lateinit var androidComposeView: AndroidComposeView
+    private lateinit var info: AccessibilityNodeInfoCompat
 
     @Before
     fun setup() {
@@ -109,23 +113,24 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
         rule.setContent {
             AmbientClipboardManager.current.setText(AnnotatedString("test"))
         }
+        info = AccessibilityNodeInfoCompat.obtain()
+    }
+
+    @After
+    fun cleanup() {
+        info.recycle()
     }
 
     @Test
     fun testPopulateAccessibilityNodeInfoProperties_general() {
-        val info = AccessibilityNodeInfoCompat.obtain()
         val clickActionLabel = "click"
         val dismissActionLabel = "dismiss"
         val stateDescription = "checked"
-        val semanticsModifier = SemanticsModifierCore(1, true, false) {
+        val semanticsNode = createSemanticsNodeWithProperties(1, true) {
             this.stateDescription = stateDescription
             onClick(clickActionLabel) { true }
             dismiss(dismissActionLabel) { true }
         }
-        val semanticsNode = SemanticsNode(
-            SemanticsWrapper(InnerPlaceable(LayoutNode()), semanticsModifier),
-            true
-        )
         accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
         assertEquals("android.view.View", info.className)
         assertTrue(
@@ -166,7 +171,6 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
 
     @Test
     fun testPopulateAccessibilityNodeInfoProperties_disabled() {
-        val info = AccessibilityNodeInfoCompat.obtain()
         val semanticsNode = createSemanticsNodeWithProperties(1, true) {
             disabled()
             text = AnnotatedString("text")
@@ -244,21 +248,56 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
                 AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_RIGHT
             )
         )
+    }
+
+    @Test
+    fun testPopulateAccessibilityNodeInfoProperties_role() {
+        var semanticsNode = createSemanticsNodeWithProperties(1, true) {
+            role = Role.Button
+        }
+        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
+        assertEquals("android.widget.Button", info.className)
         info.recycle()
+
+        info = AccessibilityNodeInfoCompat.obtain()
+        semanticsNode = createSemanticsNodeWithProperties(1, true) {
+            role = Role.Switch
+        }
+        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
+        assertEquals("android.widget.Switch", info.className)
+        info.recycle()
+
+        info = AccessibilityNodeInfoCompat.obtain()
+        semanticsNode = createSemanticsNodeWithProperties(1, true) {
+            role = Role.Checkbox
+        }
+        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
+        assertEquals("android.widget.CheckBox", info.className)
+        info.recycle()
+
+        info = AccessibilityNodeInfoCompat.obtain()
+        semanticsNode = createSemanticsNodeWithProperties(1, true) {
+            role = Role.RadioButton
+        }
+        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
+        assertEquals("android.widget.RadioButton", info.className)
+        info.recycle()
+
+        info = AccessibilityNodeInfoCompat.obtain()
+        semanticsNode = createSemanticsNodeWithProperties(1, true) {
+            role = Role.Tab
+        }
+        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
+        assertEquals("Tab", info.roleDescription)
     }
 
     @Test
     fun testPopulateAccessibilityNodeInfoProperties_SeekBar() {
-        val info = AccessibilityNodeInfoCompat.obtain()
         val setProgressActionLabel = "setProgress"
-        val semanticsModifier = SemanticsModifierCore(1, true, false) {
+        val semanticsNode = createSemanticsNodeWithProperties(1, true) {
             stateDescriptionRange = AccessibilityRangeInfo(0.5f, 0f..1f, 6)
             setProgress(setProgressActionLabel) { true }
         }
-        val semanticsNode = SemanticsNode(
-            SemanticsWrapper(InnerPlaceable(LayoutNode()), semanticsModifier),
-            true
-        )
         accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
         assertEquals("android.widget.SeekBar", info.className)
         assertEquals(
@@ -283,11 +322,10 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
 
     @Test
     fun testPopulateAccessibilityNodeInfoProperties_EditText() {
-        val info = AccessibilityNodeInfoCompat.obtain()
         val setSelectionActionLabel = "setSelection"
         val setTextActionLabel = "setText"
         val text = "hello"
-        val semanticsModifier = SemanticsModifierCore(1, true, false) {
+        val semanticsNode = createSemanticsNodeWithProperties(1, true) {
             this.text = AnnotatedString(text)
             this.textSelectionRange = TextRange(1)
             this.focused = true
@@ -295,10 +333,6 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
             setText(setTextActionLabel) { true }
             setSelection(setSelectionActionLabel) { _, _, _ -> true }
         }
-        val semanticsNode = SemanticsNode(
-            SemanticsWrapper(InnerPlaceable(LayoutNode()), semanticsModifier),
-            true
-        )
         accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
         assertEquals("android.widget.EditText", info.className)
         assertEquals(SpannableString(text), info.text)
@@ -355,7 +389,6 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
 
     @Test
     fun test_PasteAction_ifFocused() {
-        val info = AccessibilityNodeInfoCompat.obtain()
         val semanticsNode = createSemanticsNodeWithProperties(1, true) {
             focused = true
             pasteText {
@@ -378,7 +411,6 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
 
     @Test
     fun test_noPasteAction_ifUnfocused() {
-        val info = AccessibilityNodeInfoCompat.obtain()
         val semanticsNode = createSemanticsNodeWithProperties(1, true) {
             pasteText {
                 true

@@ -26,9 +26,11 @@ import androidx.compose.ui.gesture.longPressGestureFilter
 import androidx.compose.ui.gesture.pressIndicatorGestureFilter
 import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.onLongClick
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 
 /**
@@ -41,6 +43,8 @@ import androidx.compose.ui.semantics.semantics
  * @param enabled Controls the enabled state. When `false`, [onClick], [onLongClick] or
  * [onDoubleClick] won't be invoked
  * @param onClickLabel semantic / accessibility label for the [onClick] action
+ * @param role the type of user interface element. Accessibility services might use this
+ * to describe the element or do customizations
  * @param interactionState [InteractionState] that will be updated when this Clickable is
  * pressed, using [Interaction.Pressed]. Only initial (first) press will be recorded and added to
  * [InteractionState]
@@ -56,6 +60,7 @@ import androidx.compose.ui.semantics.semantics
 fun Modifier.clickable(
     enabled: Boolean = true,
     onClickLabel: String? = null,
+    role: Role? = null,
     interactionState: InteractionState = remember { InteractionState() },
     indication: Indication? = AmbientIndication.current(),
     onLongClickLabel: String? = null,
@@ -65,6 +70,9 @@ fun Modifier.clickable(
 ) = composed(
     factory = {
         val semanticModifier = Modifier.semantics(mergeDescendants = true) {
+            if (role != null) {
+                this.role = role
+            }
             // b/156468846:  add long click semantics and double click if needed
             onClick(action = { onClick(); true }, label = onClickLabel)
             if (onLongClick != null) {
@@ -112,6 +120,7 @@ fun Modifier.clickable(
         name = "clickable"
         properties["enabled"] = enabled
         properties["onClickLabel"] = onClickLabel
+        properties["role"] = role
         properties["onClick"] = onClick
         properties["onDoubleClick"] = onDoubleClick
         properties["onLongClick"] = onLongClick

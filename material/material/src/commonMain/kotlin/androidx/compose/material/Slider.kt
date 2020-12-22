@@ -25,7 +25,6 @@ import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
-import androidx.compose.foundation.Strings
 import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.animation.defaultFlingConfig
 import androidx.compose.foundation.animation.fling
@@ -39,6 +38,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeightIn
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredWidthIn
+import androidx.compose.foundation.progressSemantics
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.SliderDefaults.InactiveTrackColorAlpha
 import androidx.compose.material.SliderDefaults.TickColorAlpha
@@ -58,18 +58,13 @@ import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AmbientLayoutDirection
-import androidx.compose.ui.semantics.AccessibilityRangeInfo
-import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.ui.semantics.stateDescriptionRange
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.setProgress
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.annotation.IntRange
-import androidx.compose.ui.util.format
 import androidx.compose.ui.util.lerp
 import kotlin.math.abs
-import kotlin.math.roundToInt
 
 /**
  * Sliders allow users to make selections from a range of values.
@@ -375,16 +370,7 @@ private fun Modifier.sliderSemantics(
     @IntRange(from = 0) steps: Int = 0
 ): Modifier {
     val coerced = value.coerceIn(position.startValue, position.endValue)
-    val fraction = calcFraction(position.startValue, position.endValue, coerced)
-    // We only display 0% or 100% when it is exactly 0% or 100%.
-    val percent = when (fraction) {
-        0f -> 0
-        1f -> 100
-        else -> (fraction * 100).roundToInt().coerceIn(1, 99)
-    }
     return semantics(mergeDescendants = true) {
-        stateDescription = Strings.TemplatePercent.format(percent)
-        stateDescriptionRange = AccessibilityRangeInfo(coerced, valueRange, steps)
         setProgress(
             action = { targetValue ->
                 val newValue = targetValue.coerceIn(position.startValue, position.endValue)
@@ -405,7 +391,7 @@ private fun Modifier.sliderSemantics(
                 }
             }
         )
-    }
+    }.progressSemantics(value, valueRange, steps)
 }
 
 /**

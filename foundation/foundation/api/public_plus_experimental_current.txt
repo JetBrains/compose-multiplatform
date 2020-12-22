@@ -35,7 +35,7 @@ package androidx.compose.foundation {
   }
 
   public final class ClickableKt {
-    method @androidx.compose.runtime.Composable public static androidx.compose.ui.Modifier clickable(androidx.compose.ui.Modifier, optional boolean enabled, optional String? onClickLabel, optional androidx.compose.foundation.InteractionState interactionState, optional androidx.compose.foundation.Indication? indication, optional String? onLongClickLabel, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onLongClick, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onDoubleClick, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
+    method @androidx.compose.runtime.Composable public static androidx.compose.ui.Modifier clickable(androidx.compose.ui.Modifier, optional boolean enabled, optional String? onClickLabel, optional androidx.compose.ui.semantics.Role? role, optional androidx.compose.foundation.InteractionState interactionState, optional androidx.compose.foundation.Indication? indication, optional String? onLongClickLabel, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onLongClick, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onDoubleClick, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
   }
 
   public final class ClickableTextKt {
@@ -125,7 +125,7 @@ package androidx.compose.foundation {
   }
 
   public final class ProgressSemanticsKt {
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier progressSemantics(androidx.compose.ui.Modifier, @FloatRange(from=0.0, to=1.0) float progress);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier progressSemantics(androidx.compose.ui.Modifier, float value, optional kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> valueRange, optional @IntRange(from=0) int steps);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier progressSemantics(androidx.compose.ui.Modifier);
   }
 
@@ -156,26 +156,6 @@ package androidx.compose.foundation {
 
   public static final class ScrollState.Companion {
     method public androidx.compose.runtime.savedinstancestate.Saver<androidx.compose.foundation.ScrollState,?> Saver(androidx.compose.foundation.animation.FlingConfig flingConfig, androidx.compose.animation.core.AnimationClockObservable animationClock, androidx.compose.foundation.InteractionState? interactionState);
-  }
-
-  public final class Strings {
-    method public String getChecked();
-    method public String getInProgress();
-    method public String getIndeterminate();
-    method public String getNotSelected();
-    method public String getSelected();
-    method public String getTemplatePercent();
-    method public String getToggle();
-    method public String getUnchecked();
-    property public final String Checked;
-    property public final String InProgress;
-    property public final String Indeterminate;
-    property public final String NotSelected;
-    property public final String Selected;
-    property public final String TemplatePercent;
-    property public final String Toggle;
-    property public final String Unchecked;
-    field public static final androidx.compose.foundation.Strings INSTANCE;
   }
 
   public final class TextKt {
@@ -431,12 +411,12 @@ package androidx.compose.foundation.lazy {
 package androidx.compose.foundation.selection {
 
   public final class SelectableKt {
-    method @androidx.compose.runtime.Composable public static androidx.compose.ui.Modifier selectable(androidx.compose.ui.Modifier, boolean selected, optional boolean enabled, optional boolean inMutuallyExclusiveGroup, optional androidx.compose.foundation.InteractionState interactionState, optional androidx.compose.foundation.Indication? indication, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
+    method @androidx.compose.runtime.Composable public static androidx.compose.ui.Modifier selectable(androidx.compose.ui.Modifier, boolean selected, optional boolean enabled, optional androidx.compose.ui.semantics.Role? role, optional androidx.compose.foundation.InteractionState interactionState, optional androidx.compose.foundation.Indication? indication, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
   }
 
   public final class ToggleableKt {
-    method @androidx.compose.runtime.Composable public static androidx.compose.ui.Modifier toggleable(androidx.compose.ui.Modifier, boolean value, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, optional androidx.compose.foundation.Indication? indication, kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onValueChange);
-    method @androidx.compose.runtime.Composable public static androidx.compose.ui.Modifier triStateToggleable(androidx.compose.ui.Modifier, androidx.compose.ui.state.ToggleableState state, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, optional androidx.compose.foundation.Indication? indication, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
+    method @androidx.compose.runtime.Composable public static androidx.compose.ui.Modifier toggleable(androidx.compose.ui.Modifier, boolean value, optional boolean enabled, optional androidx.compose.ui.semantics.Role? role, optional androidx.compose.foundation.InteractionState interactionState, optional androidx.compose.foundation.Indication? indication, kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onValueChange);
+    method @androidx.compose.runtime.Composable public static androidx.compose.ui.Modifier triStateToggleable(androidx.compose.ui.Modifier, androidx.compose.ui.state.ToggleableState state, optional boolean enabled, optional androidx.compose.ui.semantics.Role? role, optional androidx.compose.foundation.InteractionState interactionState, optional androidx.compose.foundation.Indication? indication, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
   }
 
 }

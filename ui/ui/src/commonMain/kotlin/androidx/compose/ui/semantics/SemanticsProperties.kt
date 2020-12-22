@@ -130,6 +130,17 @@ object SemanticsProperties {
         }
     )
 
+    /**
+     * The type of user interface element. Accessibility services might use this to describe the
+     * element or do customizations. Most roles can be automatically resolved by the semantics
+     * properties of this element. But some elements with subtle differences need an exact role. If
+     * an exact role is not listed in [Role], this property should not be set and the framework will
+     * automatically resolve it.
+     *
+     * @see SemanticsPropertyReceiver.role
+     */
+    val Role = SemanticsPropertyKey<Role>("Role")
+
     // TODO(b/138172781): Move to FoundationSemanticsProperties
     /**
      * Test tag attached to this semantics node.
@@ -403,6 +414,48 @@ data class AccessibilityScrollState(
     val reverseScrolling: Boolean = false
 )
 
+/**
+ * The type of user interface element. Accessibility services might use this to describe the
+ * element or do customizations. Most roles can be automatically resolved by the semantics
+ * properties of this element. But some elements with subtle differences need an exact role. If an
+ * exact role is not listed, [SemanticsPropertyReceiver.role] should not be set and the framework
+ * will automatically resolve it.
+ */
+enum class Role {
+    /**
+     * This element is a button control. Associated semantics properties for accessibility:
+     * [SemanticsProperties.Disabled], [SemanticsActions.OnClick]
+     */
+    Button,
+    /**
+     * This element is a Checkbox which is a component that represents two states (checked /
+     * unchecked). Associated semantics properties for accessibility:
+     * [SemanticsProperties.Disabled], [SemanticsProperties.StateDescription],
+     * [SemanticsActions.OnClick]
+     */
+    Checkbox,
+    /**
+     * This element is a Switch which is a two state toggleable component that provides on/off
+     * like options. Associated semantics properties for accessibility:
+     * [SemanticsProperties.Disabled], [SemanticsProperties.StateDescription],
+     * [SemanticsActions.OnClick]
+     */
+    Switch,
+    /**
+     * This element is a RadioButton which is a component to represent two states, selected and not
+     * selected. Associated semantics properties for accessibility: [SemanticsProperties.Disabled],
+     * [SemanticsProperties.StateDescription], [SemanticsActions.OnClick]
+     */
+    RadioButton,
+    /**
+     * This element is a Tab which represents a single page of content using a text label and/or
+     * icon. A Tab also has two states: selected and not selected. Associated semantics properties
+     * for accessibility: [SemanticsProperties.Disabled], [SemanticsProperties.StateDescription],
+     * [SemanticsActions.OnClick]
+     */
+    Tab
+}
+
 interface SemanticsPropertyReceiver {
     operator fun <T> set(key: SemanticsPropertyKey<T>, value: T)
 }
@@ -502,6 +555,17 @@ fun SemanticsPropertyReceiver.popup() {
 fun SemanticsPropertyReceiver.dialog() {
     this[SemanticsProperties.IsDialog] = Unit
 }
+
+/**
+ * The type of user interface element. Accessibility services might use this to describe the
+ * element or do customizations. Most roles can be automatically resolved by the semantics
+ * properties of this element. But some elements with subtle differences need an exact role. If
+ * an exact role is not listed in [Role], this property should not be set and the framework will
+ * automatically resolve it.
+ *
+ * @see SemanticsProperties.Role
+ */
+var SemanticsPropertyReceiver.role by SemanticsProperties.Role
 
 // TODO(b/138172781): Move to FoundationSemanticsProperties.kt
 /**

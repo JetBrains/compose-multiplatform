@@ -41,6 +41,7 @@ import androidx.compose.ui.R
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsActions.CustomActions
 import androidx.compose.ui.semantics.SemanticsNode
@@ -224,8 +225,16 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         info: AccessibilityNodeInfoCompat,
         semanticsNode: SemanticsNode
     ) {
-        // TODO(b/151240295): Should we have widgets class name?
         info.className = ClassName
+        semanticsNode.config.getOrNull(SemanticsProperties.Role)?.let {
+            when (it) {
+                Role.Button -> info.className = "android.widget.Button"
+                Role.Checkbox -> info.className = "android.widget.CheckBox"
+                Role.Switch -> info.className = "android.widget.Switch"
+                Role.RadioButton -> info.className = "android.widget.RadioButton"
+                Role.Tab -> info.roleDescription = AccessibilityRoleDescriptions.Tab
+            }
+        }
         info.packageName = view.context.packageName
         try {
             info.setBoundsInScreen(

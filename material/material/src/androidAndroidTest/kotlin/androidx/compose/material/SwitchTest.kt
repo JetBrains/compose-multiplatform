@@ -16,7 +16,6 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.Strings
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Providers
@@ -26,6 +25,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertHasClickAction
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsOff
@@ -70,13 +73,15 @@ class SwitchTest {
         }
 
         rule.onNodeWithTag("checked")
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Switch))
             .assertIsEnabled()
             .assertIsOn()
-            .assertValueEquals(Strings.Checked)
+            .assertValueEquals("On")
         rule.onNodeWithTag("unchecked")
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Switch))
             .assertIsEnabled()
             .assertIsOff()
-            .assertValueEquals(Strings.Unchecked)
+            .assertValueEquals("Off")
     }
 
     @Test

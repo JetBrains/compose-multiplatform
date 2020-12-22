@@ -47,6 +47,7 @@ import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -89,6 +90,7 @@ fun Switch(
                 value = checked,
                 onValueChange = onCheckedChange,
                 enabled = enabled,
+                role = Role.Switch,
                 interactionState = interactionState,
                 indication = null
             )

@@ -46,6 +46,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.platform.AmbientAnimationClock
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -117,6 +118,7 @@ fun Button(
         modifier = modifier.clickable(
             onClick = onClick,
             enabled = enabled,
+            role = Role.Button,
             interactionState = interactionState,
             indication = null
         )

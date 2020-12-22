@@ -16,12 +16,15 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.Strings
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.assertValueEquals
@@ -48,10 +51,10 @@ class RadioButtonTest {
     private val itemThree = "Sap"
 
     private fun SemanticsNodeInteraction.assertHasSelectedSemantics(): SemanticsNodeInteraction =
-        assertIsSelected().assertValueEquals(Strings.Selected)
+        assertIsSelected().assertValueEquals("Selected")
 
     private fun SemanticsNodeInteraction.assertHasUnSelectedSemantics(): SemanticsNodeInteraction =
-        assertIsNotSelected().assertValueEquals(Strings.NotSelected)
+        assertIsNotSelected().assertValueEquals("Not selected")
 
     private val options = listOf(itemOne, itemTwo, itemThree)
 
@@ -71,9 +74,21 @@ class RadioButtonTest {
             }
         }
 
-        rule.onNodeWithTag(itemOne).assertHasSelectedSemantics()
-        rule.onNodeWithTag(itemTwo).assertHasUnSelectedSemantics()
-        rule.onNodeWithTag(itemThree).assertHasUnSelectedSemantics()
+        rule.onNodeWithTag(itemOne)
+            .assert(
+                SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.RadioButton)
+            )
+            .assertHasSelectedSemantics()
+        rule.onNodeWithTag(itemTwo)
+            .assertHasUnSelectedSemantics()
+            .assert(
+                SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.RadioButton)
+            )
+        rule.onNodeWithTag(itemThree)
+            .assert(
+                SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.RadioButton)
+            )
+            .assertHasUnSelectedSemantics()
     }
 
     @Test

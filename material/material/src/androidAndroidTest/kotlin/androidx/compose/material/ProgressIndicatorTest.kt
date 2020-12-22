@@ -15,7 +15,6 @@
  */
 package androidx.compose.material
 
-import androidx.compose.foundation.Strings
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -90,7 +89,7 @@ class ProgressIndicatorTest {
         }
 
         rule.onNodeWithTag(tag)
-            .assertValueEquals(Strings.InProgress)
+            .assertValueEquals("In progress")
     }
 
     @Test
@@ -150,7 +149,7 @@ class ProgressIndicatorTest {
         }
 
         rule.onNodeWithTag(tag)
-            .assertValueEquals(Strings.InProgress)
+            .assertValueEquals("In progress")
     }
 
     @Test
