@@ -174,7 +174,7 @@ class DialogUiTest {
         rule.onNodeWithText(defaultText).assertIsDisplayed()
     }
 
-    @Test
+    @FlakyTest(bugId = 159364185)
     fun dialogTest_isDismissed_whenSpecified_backButtonPressed() {
         rule.setContent {
             val showDialog = remember { mutableStateOf(true) }
@@ -198,7 +198,7 @@ class DialogUiTest {
         rule.onNodeWithText(defaultText).assertDoesNotExist()
     }
 
-    @Test
+    @FlakyTest(bugId = 159364185)
     fun dialogTest_isNotDismissed_whenNotSpecified_backButtonPressed() {
         rule.setContent {
             val showDialog = remember { mutableStateOf(true) }
@@ -219,7 +219,7 @@ class DialogUiTest {
         rule.onNodeWithText(defaultText).assertIsDisplayed()
     }
 
-    @Test
+    @FlakyTest(bugId = 159364185)
     fun dialogTest_isNotDismissed_whenDismissOnBackPressIsFalse() {
         rule.setContent {
             val showDialog = remember { mutableStateOf(true) }
