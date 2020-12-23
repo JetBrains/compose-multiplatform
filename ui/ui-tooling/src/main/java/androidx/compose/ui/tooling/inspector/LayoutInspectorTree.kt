@@ -33,6 +33,25 @@ import java.util.Collections
 import java.util.IdentityHashMap
 import kotlin.math.absoluteValue
 
+private val systemPackages = setOf(
+    packageNameHash("androidx.compose.animation"),
+    packageNameHash("androidx.compose.animation.core"),
+    packageNameHash("androidx.compose.desktop"),
+    packageNameHash("androidx.compose.foundation"),
+    packageNameHash("androidx.compose.foundation.layout"),
+    packageNameHash("androidx.compose.foundation.text"),
+    packageNameHash("androidx.compose.material"),
+    packageNameHash("androidx.compose.material.ripple"),
+    packageNameHash("androidx.compose.runtime"),
+    packageNameHash("androidx.compose.ui"),
+    packageNameHash("androidx.compose.ui.layout"),
+    packageNameHash("androidx.compose.ui.platform"),
+    packageNameHash("androidx.compose.ui.tooling"),
+    packageNameHash("androidx.compose.ui.selection"),
+    packageNameHash("androidx.compose.ui.semantics"),
+    packageNameHash("androidx.compose.ui.viewinterop")
+)
+
 private val unwantedPackages = setOf(
     -1,
     packageNameHash("androidx.compose.ui"),
@@ -59,6 +78,8 @@ private fun packageNameHash(packageName: String) =
  * Generator of a tree for the Layout Inspector.
  */
 class LayoutInspectorTree {
+    @Suppress("MemberVisibilityCanBePrivate")
+    var hideSystemNodes = true
     private val inlineClassConverter = InlineClassConverter()
     private val parameterFactory = ParameterFactory(inlineClassConverter)
     private val cache = ArrayDeque<MutableInspectorNode>()
@@ -98,6 +119,7 @@ class LayoutInspectorTree {
     /**
      * Reset the generated id. Nodes are assigned an id if there isn't a layout node id present.
      */
+    @Suppress("unused")
     fun resetGeneratedId() {
         generatedId = -1L
     }
@@ -116,7 +138,7 @@ class LayoutInspectorTree {
         val trees = tables.map { convert(it) }
         return when (trees.size) {
             0 -> listOf()
-            1 -> trees.first().children
+            1 -> addTree(mutableListOf(), trees.single())
             else -> stitchTreesByLayoutNode(trees)
         }
     }
@@ -155,7 +177,9 @@ class LayoutInspectorTree {
             treeMap.remove(parentTree)
             parentTree = findDeepParentTree()
         }
-        return trees.asSequence().filter { !stitched.contains(it) }.flatMap { it.children }.toList()
+        val result = mutableListOf<InspectorNode>()
+        trees.asSequence().filter { !stitched.contains(it) }.forEach { addTree(result, it) }
+        return result
     }
 
     /**
@@ -194,16 +218,34 @@ class LayoutInspectorTree {
         }
         val newCopy = newNode ?: newNode(node)
         if (trees != null) {
-            trees.flatMapTo(newCopy.children) { it.children }
+            trees.forEach { addTree(newCopy.children, it) }
             stitched.addAll(trees)
         }
         return buildAndRelease(newCopy)
     }
 
+    /**
+     * Add [tree] to the end of the [out] list.
+     * The root nodes of [tree] may be a fake node that hold a list of [LayoutInfo].
+     */
+    private fun addTree(
+        out: MutableList<InspectorNode>,
+        tree: MutableInspectorNode
+    ): List<InspectorNode> {
+        tree.children.forEach {
+            if (it.name.isNotEmpty()) {
+                out.add(it)
+            } else {
+                out.addAll(it.children)
+            }
+        }
+        return out
+    }
+
     @OptIn(InternalComposeApi::class)
     private fun convert(table: CompositionData): MutableInspectorNode {
         val fakeParent = newNode()
-        addToParent(fakeParent, listOf(convert(table.asTree())))
+        addToParent(fakeParent, listOf(convert(table.asTree())), buildFakeChildNodes = true)
         return fakeParent
     }
 
@@ -234,13 +276,17 @@ class LayoutInspectorTree {
 
     /**
      * Adds the nodes in [input] to the children of [parentNode].
-     * Nodes without a reference to a Composable are skipped.
+     * Nodes without a reference to a wanted Composable are skipped unless [buildFakeChildNodes].
      * A single skipped render id and layoutNode will be added to [parentNode].
      */
-    private fun addToParent(parentNode: MutableInspectorNode, input: List<MutableInspectorNode>) {
+    private fun addToParent(
+        parentNode: MutableInspectorNode,
+        input: List<MutableInspectorNode>,
+        buildFakeChildNodes: Boolean = false
+    ) {
         var id: Long? = null
         input.forEach { node ->
-            if (node.name.isEmpty()) {
+            if (node.name.isEmpty() && !(buildFakeChildNodes && node.layoutNodes.isNotEmpty())) {
                 parentNode.children.addAll(node.children)
                 if (node.id != 0L) {
                     // If multiple siblings with a render ids are dropped:
@@ -322,7 +368,8 @@ class LayoutInspectorTree {
     }
 
     private fun unwantedGroup(node: MutableInspectorNode): Boolean =
-        (node.packageHash in unwantedPackages && node.name in unwantedCalls)
+        (node.packageHash in unwantedPackages && node.name in unwantedCalls) ||
+            (hideSystemNodes && node.packageHash in systemPackages)
 
     private fun newNode(): MutableInspectorNode =
         if (cache.isNotEmpty()) cache.pop() else MutableInspectorNode()
