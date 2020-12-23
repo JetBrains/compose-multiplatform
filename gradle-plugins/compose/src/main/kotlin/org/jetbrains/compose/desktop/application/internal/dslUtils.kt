@@ -12,5 +12,8 @@ internal inline fun <reified T : Any> ObjectFactory.nullableProperty(): Property
 internal inline fun <reified T : Any> ObjectFactory.notNullProperty(): Property<T> =
     property(T::class.java)
 
+internal inline fun <reified T : Any> ObjectFactory.notNullProperty(defaultValue: T): Property<T> =
+    property(T::class.java).value(defaultValue)
+
 internal inline fun <reified T> Task.provider(noinline fn: () -> T): Provider<T> =
     project.provider(fn)

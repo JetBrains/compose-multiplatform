@@ -1,16 +1,20 @@
 package org.jetbrains.compose.desktop.application.tasks
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.Directory
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.internal.file.FileOperations
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.*
 import org.gradle.process.ExecOperations
 import org.gradle.process.ExecResult
 import org.gradle.process.ExecSpec
 import org.gradle.work.InputChanges
+import org.jetbrains.compose.desktop.application.internal.*
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.desktop.application.internal.OS
 import org.jetbrains.compose.desktop.application.internal.currentOS
@@ -29,7 +33,10 @@ abstract class AbstractJvmToolOperationTask(private val toolName: String) : Defa
     protected abstract val fileOperations: FileOperations
 
     @get:LocalState
-    protected val workingDir: File = project.buildDir.resolve("compose/tmp/$name")
+    protected val workingDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/$name")
+
+    @get:OutputDirectory
+    val destinationDir: DirectoryProperty = objects.directoryProperty()
 
     @get:Input
     @get:Optional
@@ -47,7 +54,7 @@ abstract class AbstractJvmToolOperationTask(private val toolName: String) : Defa
 
     protected open fun prepareWorkingDir(inputChanges: InputChanges) {
         fileOperations.delete(workingDir)
-        workingDir.mkdirs()
+        fileOperations.mkdir(workingDir)
     }
 
     protected open fun makeArgs(tmpDir: File): MutableList<String> = arrayListOf<String>().apply {
@@ -69,10 +76,14 @@ abstract class AbstractJvmToolOperationTask(private val toolName: String) : Defa
                     "Ensure JAVA_HOME or buildSettings.javaHome is set to JDK 14 or newer"
         }
 
+        fileOperations.delete(destinationDir)
         prepareWorkingDir(inputChanges)
-        val args = makeArgs(workingDir)
-        val argsFile = workingDir.parentFile.resolve("${name}.args.txt")
-        argsFile.writeText(args.joinToString("\n"))
+        val argsFile = workingDir.ioFile.let { dir ->
+            val args = makeArgs(dir)
+            dir.resolveSibling("${name}.args.txt").apply {
+                writeText(args.joinToString("\n"))
+            }
+        }
 
         try {
             execOperations.exec { exec ->

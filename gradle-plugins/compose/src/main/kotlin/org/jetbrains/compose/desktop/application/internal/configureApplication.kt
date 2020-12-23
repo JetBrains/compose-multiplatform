@@ -9,6 +9,7 @@ import org.gradle.api.tasks.*
 import org.gradle.jvm.tasks.Jar
 import org.jetbrains.compose.desktop.application.dsl.Application
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.compose.desktop.application.tasks.AbstractJLinkTask
 import org.jetbrains.compose.desktop.application.tasks.AbstractJPackageTask
 import org.jetbrains.compose.desktop.application.tasks.AbstractRunDistributableTask
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -56,12 +57,20 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
             configureRunTask(app)
         }
 
+        val createRuntimeImage = tasks.composeTask<AbstractJLinkTask>(
+            taskName("createRuntimeImage", app)
+        ) {
+            javaHome.set(provider { app.javaHomeOrDefault() })
+            modules.set(provider { app.nativeDistributions.modules })
+            destinationDir.set(project.layout.buildDirectory.dir("compose/tmp/${app.name}/runtime"))
+        }
+
         val packageFormats = app.nativeDistributions.targetFormats.map { targetFormat ->
             tasks.composeTask<AbstractJPackageTask>(
                 taskName("package", app, targetFormat.name),
                 args = listOf(targetFormat)
             ) {
-                configurePackagingTask(app)
+                configurePackagingTask(app, createRuntimeImage)
             }
         }
 
@@ -77,7 +86,7 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
             taskName("createDistributable", app),
             args = listOf(TargetFormat.AppImage)
         ) {
-            configurePackagingTask(app)
+            configurePackagingTask(app, createRuntimeImage)
         }
 
         val runDistributable = project.tasks.composeTask<AbstractRunDistributableTask>(
@@ -88,9 +97,14 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
 }
 
 internal fun AbstractJPackageTask.configurePackagingTask(
-    app: Application
+    app: Application,
+    createRuntimeImage: TaskProvider<AbstractJLinkTask>
 ) {
     enabled = targetFormat.isCompatibleWithCurrentOS
+
+    val runtimeImageDir = createRuntimeImage.flatMap { it.destinationDir }
+    dependsOn(createRuntimeImage)
+    runtimeImage.set(runtimeImageDir)
 
     configurePlatformSettings(app)
 
@@ -115,7 +129,6 @@ internal fun AbstractJPackageTask.configurePackagingTask(
         launcherMainJar.set(app.mainJar.orElse(configSource.jarTask(project).flatMap { it.archiveFile }))
     }
 
-    modules.set(provider { app.nativeDistributions.modules })
     launcherMainClass.set(provider { app.mainClass })
     launcherJvmArgs.set(provider { app.jvmArgs })
     launcherArgs.set(provider { app.args })
@@ -205,7 +218,7 @@ private fun Jar.configurePackageUberJarForCurrentOS(app: Application) {
         destinationDirectory.set(project.layout.buildDirectory.dir("compose/jars"))
 
         doLast {
-            logger.lifecycle("The jar is written to ${archiveFile.get().asFile.canonicalPath}")
+            logger.lifecycle("The jar is written to ${archiveFile.ioFile.canonicalPath}")
         }
     }
 
