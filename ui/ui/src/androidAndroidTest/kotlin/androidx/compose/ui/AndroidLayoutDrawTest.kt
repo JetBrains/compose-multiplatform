@@ -29,7 +29,7 @@ import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.annotation.RequiresApi
-import androidx.compose.animation.animate
+import androidx.compose.animation.core.animateAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
@@ -3004,7 +3004,7 @@ class AndroidLayoutDrawTest {
             activity.setContent {
                 Box(Modifier.background(Color.Red).drawLatchModifier()) {
                     var animatedSize by remember { mutableStateOf(size) }
-                    animatedSize = animate(size)
+                    animatedSize = animateAsState(size).value
                     if (animatedSize == 10f) {
                         Layout(
                             modifier = Modifier.background(Color.Cyan),

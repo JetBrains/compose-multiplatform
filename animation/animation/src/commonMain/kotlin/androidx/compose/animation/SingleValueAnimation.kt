@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.animation
 
 import androidx.compose.animation.core.AnimationEndReason
@@ -25,16 +27,19 @@ import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.TwoWayConverter
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.VisibilityThreshold
+import androidx.compose.animation.core.animateAsState
 import androidx.compose.animation.core.animateTo
 import androidx.compose.animation.core.isFinished
+import androidx.compose.animation.core.spring
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
@@ -42,11 +47,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.unit.Bounds
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.Position
 
-private val defaultAnimation = SpringSpec<Float>()
+private val defaultAnimation = spring<Float>()
 
 /**
  * Fire-and-forget animation [Composable] for [Float]. Once such an animation is created, it will be
@@ -65,6 +71,13 @@ private val defaultAnimation = SpringSpec<Float>()
  *                            considered close enough to the target.
  * @param endListener An optional end listener to get notified when the animation is finished.
  */
+@Deprecated(
+    "animate has been replaced with animateAsState",
+    ReplaceWith(
+        "animateAsState(target, animSpec, visibilityThreshold, endListener).value",
+        "androidx.compose.animation.core.animateAsState"
+    )
+)
 @Composable
 fun animate(
     target: Float,
@@ -110,10 +123,17 @@ fun animate(
  *                    animation will be used by default.
  * @param endListener An optional end listener to get notified when the animation is finished.
  */
+@Deprecated(
+    "animate has been replaced with animateAsState",
+    ReplaceWith(
+        "animateAsState(target, animSpec, endListener).value",
+        "androidx.compose.animation.animateAsState"
+    )
+)
 @Composable
 fun animate(
     target: Color,
-    animSpec: AnimationSpec<Color> = remember { SpringSpec() },
+    animSpec: AnimationSpec<Color> = remember { spring() },
     endListener: ((Color) -> Unit)? = null
 ): Color {
     val converter = remember(target.colorSpace) { (Color.VectorConverter)(target.colorSpace) }
@@ -135,11 +155,18 @@ fun animate(
  *                    animation will be used by default.
  * @param endListener An optional end listener to get notified when the animation is finished.
  */
+@Deprecated(
+    "animate has been replaced with animateAsState",
+    ReplaceWith(
+        "animateAsState(target, animSpec, endListener).value",
+        "androidx.compose.animation.core.animateAsState"
+    )
+)
 @Composable
 fun animate(
     target: Dp,
     animSpec: AnimationSpec<Dp> = remember {
-        SpringSpec(visibilityThreshold = Dp.VisibilityThreshold)
+        spring(visibilityThreshold = Dp.VisibilityThreshold)
     },
     endListener: ((Dp) -> Unit)? = null
 ): Dp {
@@ -147,33 +174,38 @@ fun animate(
 }
 
 /**
- * Fire-and-forget animation [Composable] for [DpOffset]. Once such an animation is created, it will
+ * Fire-and-forget animation [Composable] for [Position]. Once such an animation is created, it will
  * be positionally memoized, like other @[Composable]s. To trigger the animation, or alter the
  * course of the animation, simply supply a different [target] to the [Composable].
  *
  * Note, [animateTo] is for simple animations that cannot be canceled. For cancellable animations
  * see [animatedValue].
  *
- *     val position : DpOffset = animate(
- *         if (selected) DpOffset(0.dp, 0.dp) else DpOffset(20.dp, 20.dp))
+ *     val position : Position = animate(
+ *         if (selected) Position(0.dp, 0.dp) else Position(20.dp, 20.dp))
  *
  * @param target Target value of the animation
  * @param animSpec The animation that will be used to change the value through time. Physics
  *                    animation will be used by default.
  * @param endListener An optional end listener to get notified when the animation is finished.
  */
+@Deprecated(
+    "animate has been replaced with animateAsState",
+    ReplaceWith(
+        "animateAsState(target, animSpec, endListener).value",
+        "androidx.compose.animation.core.animateAsState"
+    )
+)
 @Composable
 fun animate(
-    target: DpOffset,
-    animSpec: AnimationSpec<DpOffset> = remember {
-        SpringSpec(
-            visibilityThreshold = DpOffset.VisibilityThreshold
-        )
+    target: Position,
+    animSpec: AnimationSpec<Position> = remember {
+        spring(visibilityThreshold = Position.VisibilityThreshold)
     },
-    endListener: ((DpOffset) -> Unit)? = null
-): DpOffset {
+    endListener: ((Position) -> Unit)? = null
+): Position {
     return animate(
-        target, DpOffset.VectorConverter, animSpec, endListener = endListener
+        target, Position.VectorConverter, animSpec, endListener = endListener
     )
 }
 
@@ -193,11 +225,18 @@ fun animate(
  *                    animation will be used by default.
  * @param endListener An optional end listener to get notified when the animation is finished.
  */
+@Deprecated(
+    "animate has been replaced with animateAsState",
+    ReplaceWith(
+        "animateAsState(target, animSpec, endListener).value",
+        "androidx.compose.animation.core.animateAsState"
+    )
+)
 @Composable
 fun animate(
     target: Size,
     animSpec: AnimationSpec<Size> = remember {
-        SpringSpec(visibilityThreshold = Size.VisibilityThreshold)
+        spring(visibilityThreshold = Size.VisibilityThreshold)
     },
     endListener: ((Size) -> Unit)? = null
 ): Size {
@@ -220,11 +259,18 @@ fun animate(
  *                    animation will be used by default.
  * @param endListener An optional end listener to get notified when the animation is finished.
  */
+@Deprecated(
+    "animate has been replaced with animateAsState",
+    ReplaceWith(
+        "animateAsState(target, animSpec, endListener).value",
+        "androidx.compose.animation.core.animateAsState"
+    )
+)
 @Composable
 fun animate(
     target: Bounds,
     animSpec: AnimationSpec<Bounds> = remember {
-        SpringSpec(visibilityThreshold = Bounds.VisibilityThreshold)
+        spring(visibilityThreshold = Bounds.VisibilityThreshold)
     },
     endListener: ((Bounds) -> Unit)? = null
 ): Bounds {
@@ -251,11 +297,18 @@ fun animate(
  *                    animation will be used by default.
  * @param endListener An optional end listener to get notified when the animation is finished.
  */
+@Deprecated(
+    "animate has been replaced with animateAsState",
+    ReplaceWith(
+        "animateAsState(target, animSpec, endListener).value",
+        "androidx.compose.animation.core.animateAsState"
+    )
+)
 @Composable
 fun animate(
     target: Offset,
     animSpec: AnimationSpec<Offset> = remember {
-        SpringSpec(visibilityThreshold = Offset.VisibilityThreshold)
+        spring(visibilityThreshold = Offset.VisibilityThreshold)
     },
     endListener: ((Offset) -> Unit)? = null
 ): Offset {
@@ -280,11 +333,18 @@ fun animate(
  *                    animation will be used by default.
  * @param endListener An optional end listener to get notified when the animation is finished.
  */
+@Deprecated(
+    "animate has been replaced with animateAsState",
+    ReplaceWith(
+        "animateAsState(target, animSpec, endListener).value",
+        "androidx.compose.animation.core.animateAsState"
+    )
+)
 @Composable
 fun animate(
     target: Rect,
     animSpec: AnimationSpec<Rect> = remember {
-        SpringSpec(visibilityThreshold = Rect.VisibilityThreshold)
+        spring(visibilityThreshold = Rect.VisibilityThreshold)
     },
     endListener: ((Rect) -> Unit)? = null
 ): Rect {
@@ -306,12 +366,17 @@ fun animate(
  *                    animation will be used by default.
  * @param endListener An optional end listener to get notified when the animation is finished.
  */
+@Deprecated(
+    "animate has been replaced with animateAsState",
+    ReplaceWith(
+        "animateAsState(target, animSpec, endListener).value",
+        "androidx.compose.animation.core.animateAsState"
+    )
+)
 @Composable
 fun animate(
     target: Int,
-    animSpec: AnimationSpec<Int> = remember {
-        SpringSpec(visibilityThreshold = 1)
-    },
+    animSpec: AnimationSpec<Int> = remember { spring(visibilityThreshold = 1) },
     endListener: ((Int) -> Unit)? = null
 ): Int {
     return animate(
@@ -334,11 +399,18 @@ fun animate(
  *                    animation will be used by default.
  * @param endListener An optional end listener to get notified when the animation is finished.
  */
+@Deprecated(
+    "animate has been replaced with animateAsState",
+    ReplaceWith(
+        "animateAsState(target, animSpec, endListener).value",
+        "androidx.compose.animation.core.animateAsState"
+    )
+)
 @Composable
 fun animate(
     target: IntOffset,
     animSpec: AnimationSpec<IntOffset> = remember {
-        SpringSpec(visibilityThreshold = IntOffset.VisibilityThreshold)
+        spring(visibilityThreshold = IntOffset.VisibilityThreshold)
     },
     endListener: ((IntOffset) -> Unit)? = null
 ): IntOffset {
@@ -360,11 +432,18 @@ fun animate(
  *                    animation will be used by default.
  * @param endListener An optional end listener to get notified when the animation is finished.
  */
+@Deprecated(
+    "animate has been replaced with animateAsState",
+    ReplaceWith(
+        "animateAsState(target, animSpec, endListener).value",
+        "androidx.compose.animation.core.animateAsState"
+    )
+)
 @Composable
 fun animate(
     target: IntSize,
     animSpec: AnimationSpec<IntSize> = remember {
-        SpringSpec(visibilityThreshold = IntSize.VisibilityThreshold)
+        spring(visibilityThreshold = IntSize.VisibilityThreshold)
     },
     endListener: ((IntSize) -> Unit)? = null
 ): IntSize {
@@ -388,11 +467,18 @@ fun animate(
  *                            considered close enough to the target to end the animation.
  * @param endListener An optional end listener to get notified when the animation is finished.
  */
+@Deprecated(
+    "animate has been replaced with animateAsState",
+    ReplaceWith(
+        "animateAsState(target, animSpec, visibilityThreshold, endListener).value",
+        "androidx.compose.animation.core.animateAsState"
+    )
+)
 @Composable
 fun <T : AnimationVector> animate(
     target: T,
     animSpec: AnimationSpec<T> = remember {
-        SpringSpec(visibilityThreshold = visibilityThreshold)
+        spring(visibilityThreshold = visibilityThreshold)
     },
     visibilityThreshold: T? = null,
     endListener: ((T) -> Unit)? = null
@@ -424,12 +510,19 @@ fun <T : AnimationVector> animate(
  *                            considered close enough to the target to end the animation.
  * @param endListener An optional end listener to get notified when the animation is finished.
  */
+@Deprecated(
+    "animate has been replaced with animateAsState",
+    ReplaceWith(
+        "animateAsState(target, converter, animSpec, visibilityThreshold, endListener).value",
+        "androidx.compose.animation.core.animateAsState"
+    )
+)
 @Composable
 fun <T, V : AnimationVector> animate(
     target: T,
     converter: TwoWayConverter<T, V>,
     animSpec: AnimationSpec<T> = remember {
-        SpringSpec(visibilityThreshold = visibilityThreshold)
+        spring(visibilityThreshold = visibilityThreshold)
     },
     visibilityThreshold: T? = null,
     endListener: ((T) -> Unit)? = null
@@ -451,4 +544,39 @@ fun <T, V : AnimationVector> animate(
         }
     }
     return anim.value
+}
+
+/**
+ * Fire-and-forget animation function for [Color]. This Composable function is overloaded for
+ * different parameter types such as [Dp], [Float], [Int], [Size], [Offset], [DpOffset],
+ * etc. When the provided [targetValue] is changed, the animation will run automatically. If there
+ * is already an animation in-flight whe [targetValue] changes, the on-going animation will adjust
+ * course to animate towards the new target value.
+ *
+ * [animateAsState] returns a [State] object. The value of the state object will continuously be
+ * updated by the animation until the animation finishes.
+ *
+ * Note, [animateAsState] cannot be canceled/stopped without removing this composable function
+ * from the tree. See [animatedColor][androidx.compose.animation.animatedColor] for cancelable
+ * animations.
+ *
+ * @sample androidx.compose.animation.samples.ColorAnimationSample
+ *
+ * @param targetValue Target value of the animation
+ * @param animationSpec The animation that will be used to change the value through time. Physics
+ *                    animation will be used by default.
+ * @param finishedListener An optional end listener to get notified when the animation is finished.
+ */
+@Composable
+fun animateAsState(
+    targetValue: Color,
+    animationSpec: AnimationSpec<Color> = remember { spring() },
+    finishedListener: ((Color) -> Unit)? = null
+): State<Color> {
+    val converter = remember(targetValue.colorSpace) {
+        (Color.VectorConverter)(targetValue.colorSpace)
+    }
+    return animateAsState(
+        targetValue, converter, animationSpec, finishedListener = finishedListener
+    )
 }

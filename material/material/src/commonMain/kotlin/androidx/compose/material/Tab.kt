@@ -17,9 +17,9 @@
 package androidx.compose.material
 
 import androidx.compose.animation.ColorPropKey
-import androidx.compose.animation.animate
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateAsState
 import androidx.compose.animation.core.transitionDefinition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.transition
@@ -41,6 +41,7 @@ import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.emptyContent
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -232,9 +233,9 @@ object TabConstants {
         // TODO: should we animate the width of the indicator as it moves between tabs of different
         // sizes inside a scrollable tab row?
         val currentTabWidth = currentTabPosition.width
-        val indicatorOffset = animate(
-            target = currentTabPosition.left,
-            animSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing)
+        val indicatorOffset by animateAsState(
+            targetValue = currentTabPosition.left,
+            animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing)
         )
         fillMaxWidth()
             .wrapContentSize(Alignment.BottomStart)
@@ -324,9 +325,9 @@ object TabDefaults {
         // TODO: should we animate the width of the indicator as it moves between tabs of different
         // sizes inside a scrollable tab row?
         val currentTabWidth = currentTabPosition.width
-        val indicatorOffset = animate(
-            target = currentTabPosition.left,
-            animSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing)
+        val indicatorOffset by animateAsState(
+            targetValue = currentTabPosition.left,
+            animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing)
         )
         fillMaxWidth()
             .wrapContentSize(Alignment.BottomStart)
