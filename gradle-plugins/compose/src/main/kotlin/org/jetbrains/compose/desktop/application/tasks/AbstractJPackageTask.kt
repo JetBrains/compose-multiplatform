@@ -19,9 +19,6 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:Input
     val targetFormat: TargetFormat,
 ) : AbstractJvmToolOperationTask("jpackage") {
-    @get:OutputDirectory
-    val destinationDir: DirectoryProperty = objects.directoryProperty()
-
     @get:InputFiles
     val files: ConfigurableFileCollection = objects.fileCollection()
 
@@ -158,19 +155,20 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:Optional
     val winUpgradeUuid: Property<String?> = objects.nullableProperty()
 
-    @get:Input
-    val modules: ListProperty<String> = objects.listProperty(String::class.java)
+    @get:InputDirectory
+    @get:Optional
+    val runtimeImage: DirectoryProperty = objects.directoryProperty()
 
     override fun makeArgs(tmpDir: File): MutableList<String> = super.makeArgs(tmpDir).apply {
         cliArg("--input", tmpDir)
         cliArg("--type", targetFormat.id)
 
-        cliArg("--dest", destinationDir.asFile.get())
+        cliArg("--dest", destinationDir.ioFile)
         cliArg("--verbose", verbose)
 
         cliArg("--install-dir", installationPath)
-        cliArg("--license-file", licenseFile.asFile.orNull)
-        cliArg("--icon", iconFile.asFile.orNull)
+        cliArg("--license-file", licenseFile.ioFileOrNull)
+        cliArg("--icon", iconFile.ioFileOrNull)
 
         cliArg("--name", packageName)
         cliArg("--description", packageDescription)
@@ -178,7 +176,7 @@ abstract class AbstractJPackageTask @Inject constructor(
         cliArg("--app-version", packageVersion)
         cliArg("--vendor", packageVendor)
 
-        cliArg("--main-jar", launcherMainJar.asFile.get().name)
+        cliArg("--main-jar", launcherMainJar.ioFile.name)
         cliArg("--main-class", launcherMainClass)
         launcherArgs.orNull?.forEach {
             cliArg("--arguments", it)
@@ -202,7 +200,7 @@ abstract class AbstractJPackageTask @Inject constructor(
                 cliArg("--mac-package-name", macPackageName)
                 cliArg("--mac-bundle-signing-prefix", macBundleSigningPrefix)
                 cliArg("--mac-sign", macSign)
-                cliArg("--mac-signing-keychain", macSigningKeychain.asFile.orNull)
+                cliArg("--mac-signing-keychain", macSigningKeychain.ioFileOrNull)
                 cliArg("--mac-signing-key-user-name", macSigningKeyUserName)
             }
             OS.Windows -> {
@@ -216,13 +214,11 @@ abstract class AbstractJPackageTask @Inject constructor(
             }
         }
 
-        modules.get().forEach { m ->
-            cliArg("--add-modules", m)
-        }
+        cliArg("--runtime-image", runtimeImage)
     }
 
     override fun prepareWorkingDir(inputChanges: InputChanges) {
-        fileOperations.delete(destinationDir)
+        val workingDir = workingDir.ioFile
 
         if (inputChanges.isIncremental) {
             logger.debug("Updating working dir incrementally: $workingDir")
@@ -243,7 +239,7 @@ abstract class AbstractJPackageTask @Inject constructor(
         } else {
             logger.debug("Updating working dir non-incrementally: $workingDir")
             fileOperations.delete(workingDir)
-            workingDir.mkdirs()
+            fileOperations.mkdir(workingDir)
             fileOperations.copy {
                 it.from(files)
                 it.from(launcherMainJar)
@@ -259,7 +255,7 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     private fun configureWixPathIfNeeded(exec: ExecSpec) {
         if (currentOS == OS.Windows) {
-            val wixDir = wixToolsetDir.asFile.orNull ?: return
+            val wixDir = wixToolsetDir.ioFileOrNull ?: return
             val wixPath = wixDir.absolutePath
             val path = System.getenv("PATH") ?: ""
             exec.environment("PATH", "$wixPath;$path")
@@ -269,10 +265,11 @@ abstract class AbstractJPackageTask @Inject constructor(
     override fun checkResult(result: ExecResult) {
         super.checkResult(result)
 
-        val destinationDirFile = destinationDir.asFile.get()
-        val finalLocation = when (targetFormat) {
-            TargetFormat.AppImage -> destinationDirFile
-            else -> destinationDirFile.walk().first { it.isFile && it.name.endsWith(targetFormat.fileExt) }
+        val finalLocation = destinationDir.ioFile.let { destinationDir ->
+            when (targetFormat) {
+                TargetFormat.AppImage -> destinationDir
+                else -> destinationDir.walk().first { it.isFile && it.name.endsWith(targetFormat.fileExt) }
+            }
         }
         logger.lifecycle("The distribution is written to ${finalLocation.canonicalPath}")
     }

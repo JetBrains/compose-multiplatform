@@ -29,9 +29,8 @@ abstract class AbstractRunDistributableTask @Inject constructor(
 
     @TaskAction
     fun run() {
-        val appDir = appImageRootDir.get().let { appImageRoot ->
-            val files = appImageRoot.asFile.listFiles()
-
+        val appDir = appImageRootDir.ioFile.let { appImageRoot ->
+            val files = appImageRoot.listFiles()
             if (files == null || files.isEmpty()) {
                 error("Could not find application image: $appImageRoot is empty!")
             } else if (files.size > 1) {
