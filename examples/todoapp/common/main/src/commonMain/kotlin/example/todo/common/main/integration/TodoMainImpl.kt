@@ -3,6 +3,7 @@ package example.todo.common.main.integration
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.decompose.value.operator.map
+import com.badoo.reaktive.base.invoke
 import example.todo.common.main.TodoMain
 import example.todo.common.main.TodoMain.Dependencies
 import example.todo.common.main.TodoMain.Model
@@ -28,7 +29,7 @@ internal class TodoMainImpl(
     override val models: Value<Model> = store.asValue().map(stateToModel)
 
     override fun onItemClicked(id: Long) {
-        mainOutput.onNext(Output.Selected(id = id))
+        mainOutput(Output.Selected(id = id))
     }
 
     override fun onItemDoneChanged(id: Long, isDone: Boolean) {

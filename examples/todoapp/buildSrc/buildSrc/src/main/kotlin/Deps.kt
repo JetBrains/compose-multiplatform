@@ -45,7 +45,7 @@ object Deps {
         }
 
         object Decompose {
-            private const val VERSION = "0.1.3"
+            private const val VERSION = "0.1.4"
             const val decompose = "com.arkivanov.decompose:decompose:$VERSION"
             const val decomposeIosX64 = "com.arkivanov.decompose:decompose-iosx64:$VERSION"
             const val decomposeIosArm64 = "com.arkivanov.decompose:decompose-iosarm64:$VERSION"
@@ -55,7 +55,7 @@ object Deps {
 
     object Badoo {
         object Reaktive {
-            private const val VERSION = "1.1.18"
+            private const val VERSION = "1.1.19"
             const val reaktive = "com.badoo.reaktive:reaktive:$VERSION"
             const val reaktiveTesting = "com.badoo.reaktive:reaktive-testing:$VERSION"
             const val utils = "com.badoo.reaktive:utils:$VERSION"
