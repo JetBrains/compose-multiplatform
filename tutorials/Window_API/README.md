@@ -66,7 +66,7 @@ fun main() {
 
 ## Window attributes
 
-Each window has 9 parameters, all of them could be omitted and have default values:
+Each window has following parameters, all of them could be omitted and have default values:
 
 1. title – window title
 2. size – initial window size
