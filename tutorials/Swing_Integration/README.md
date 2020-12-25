@@ -2,7 +2,7 @@
 
 ## What is covered
 
-In this tutorial, we will show you how to use ComposePanel in your Swing application.
+In this tutorial, we will show you how to use ComposePanel and SwingPanel in your application.
 
 ## Using ComposePanel
 
@@ -146,4 +146,113 @@ fun Counter(text: String, counter: MutableState<Int>) {
 
 ![IntegrationWithSwing](screenshot.png)
 
-### Note. Adding a Swing component to CFD composition is not currently supported.
+## Adding a Swing component to CFD composition using SwingPanel.
+
+SwingPanel lets you create a UI using Swing components in a Compose-based UI. To achieve this you need to create Swing component and pass it as a parameter to SwingPanel.
+
+```kotlin
+import androidx.compose.desktop.SwingPanel
+import androidx.compose.desktop.Window
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.Button
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import java.awt.Component
+import java.awt.Dimension
+import java.awt.event.ActionEvent
+import java.awt.event.ActionListener
+import javax.swing.BoxLayout
+import javax.swing.JButton
+import javax.swing.JPanel
+
+fun main() {
+    Window {
+        val counter = remember { mutableStateOf(0) }
+
+        val inc: () -> Unit = { counter.value++ }
+        val dec: () -> Unit = { counter.value-- }
+
+        Box(
+            modifier = Modifier.fillMaxWidth().height(60.dp).padding(top = 20.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text("Counter: ${counter.value}")
+        }
+        
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                modifier = Modifier.padding(top = 80.dp, bottom = 20.dp)
+            ) {
+                Button("1. Compose Button: increment", inc)
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Box(
+                    modifier = Modifier.size(270.dp, 90.dp)
+                ) {
+                    SwingPanel(
+                        component = swingBox(dec),
+                        background = Color.White
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+                Button("2. Compose Button: increment", inc)
+            }
+        }
+    }
+}
+
+@Composable
+fun Button(text: String = "", action: (() -> Unit)? = null) {
+    Button(
+        modifier = Modifier.size(270.dp, 30.dp),
+        onClick = { action?.invoke() }
+    ) {
+        Text(text)
+    }
+}
+
+fun swingBox(action: (() -> Unit)? = null): Component {
+    val box = JPanel()
+    box.setLayout(BoxLayout(box, BoxLayout.Y_AXIS))
+
+    box.add(actionButton("1. Swing Button: decrement", action))
+    box.add(actionButton("2. Swing Button: decrement", action))
+    box.add(actionButton("3. Swing Button: decrement", action))
+
+    return box
+}
+
+fun actionButton(
+    text: String,
+    action: (() -> Unit)? = null
+): JButton {
+    val button = JButton(text)
+    button.setAlignmentX(Component.CENTER_ALIGNMENT)
+    button.addActionListener(object : ActionListener {
+        public override fun actionPerformed(e: ActionEvent) {
+            action?.invoke()
+        }
+    })
+
+    return button
+}
+```
+
+![IntegrationWithSwing](swing_panel.gif)

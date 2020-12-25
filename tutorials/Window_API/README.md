@@ -66,7 +66,7 @@ fun main() {
 
 ## Window attributes
 
-Each window has 9 parameters, all of them could be omitted and have default values:
+Each window has following parameters, all of them could be omitted and have default values:
 
 1. title – window title
 2. size – initial window size
@@ -75,8 +75,9 @@ Each window has 9 parameters, all of them could be omitted and have default valu
 5. icon – window icon
 6. menuBar – window context menu
 7. undecorated – disable native border and title bar of the window
-8. events – window events
-9. onDismissEvent – event when removing the window content from a composition
+8. resizable – makes the window resizable or unresizable
+9. events – window events
+10. onDismissEvent – event when removing the window content from a composition
 
 An example of using window parameters in the creation step:
 
@@ -177,8 +178,9 @@ AppWindow parameters correspond to the following properties:
 3. height – window height
 4. x – position of the left top corner of the window along the X axis
 5. y – position of the left top corner of the window along the Y axis
-6. icon – window icon image
-7. events – window events
+6. resizable - returns `true` if the window resizable, `false` otherwise
+7. icon – window icon image
+8. events – window events
 
 To get the properties of a window, it is enough to have a link to the current or specific window. There are two ways to get the current focused window:
 
@@ -276,6 +278,7 @@ Using the following methods, you can change the properties of the AppWindow:
 3. setLocation(x: Int, y: Int) – window position
 4. setWindowCentered() – set the window to the center of the display
 5. setIcon(image: BufferedImage?) – window icon
+6. setMenuBar(menuBar: MenuBar) - window menu bar
 
 ```kotlin
 import androidx.compose.desktop.AppWindowAmbient
@@ -299,6 +302,76 @@ fun main() {
 ```
 
 ![Window properties](center_the_window.gif)
+
+## Methods
+
+Using the following methods, you can change the state of the AppWindow:
+
+1. show(parentComposition: CompositionReference? = null, content: @Composable () -> Unit) – shows a window with the given Compose content,
+`parentComposition` is the parent of this window's composition.
+2. close() - closes the window.
+3. minimize() - minimizes the window to the taskbar. If the window is in fullscreen mode this method is ignored.
+4. maximize() - maximizes the window to fill all available screen space. If the window is in fullscreen mode this method is ignored.
+5. makeFullscreen() - switches the window to fullscreen mode if the window is resizable. If the window is in fullscreen mode `minimize()` and `maximize()` methods are ignored.
+6. restore() - restores the normal state and size of the window after maximizing/minimizing/fullscreen mode.
+
+You can know about window state via properties below:
+
+1. isMinimized - returns true if the window is minimized, false otherwise.
+2. isMaximized - returns true if the window is maximized, false otherwise.
+3. isFullscreen - returns true if the window is in fullscreen state, false otherwise.
+
+```kotlin
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.desktop.AppManager
+import androidx.compose.desktop.AppWindow
+import androidx.compose.material.Button
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import javax.swing.SwingUtilities.invokeLater
+
+fun main() = invokeLater {
+    AppWindow().show {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                modifier = Modifier.padding(top = 20.dp, bottom = 20.dp)
+            ) {
+                Button("Minimize", { AppManager.focusedWindow?.minimize() })
+                Button("Maximize", { AppManager.focusedWindow?.maximize() })
+                Button("Fullscreen", { AppManager.focusedWindow?.makeFullscreen() })
+                Button("Restore", { AppManager.focusedWindow?.restore() })
+                Spacer(modifier = Modifier.height(20.dp))
+                Button("Close", { AppManager.focusedWindow?.close() })
+            }
+        }
+    }
+}
+
+@Composable
+fun Button(text: String = "", action: (() -> Unit)? = null) {
+    Button(
+        modifier = Modifier.size(150.dp, 30.dp),
+        onClick = { action?.invoke() }
+    ) {
+        Text(text)
+    }
+    Spacer(modifier = Modifier.height(10.dp))
+}
+```
+
+![Window state](window_state.gif)
 
 ## Window events
 
