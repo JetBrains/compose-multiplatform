@@ -44,7 +44,7 @@ val westClicks = mutableStateOf(0)
 val eastClicks = mutableStateOf(0)
 
 fun main() {
-    // explicitly clear the application events
+    // Explicitly clear the application events
     AppManager.setEvents(
         onAppStart = null,
         onAppExit = null,
@@ -56,7 +56,7 @@ fun main() {
 fun SwingComposeWindow() {
     val window = JFrame()
 
-    // creating ComposePanel
+    // Creating ComposePanel
     val composePanel = ComposePanel()
     window.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
     window.title = "SwingComposeWindow"
@@ -75,10 +75,10 @@ fun SwingComposeWindow() {
         BorderLayout.SOUTH
     )
 
-    // addind ComposePanel on JFrame
+    // Addind ComposePanel on JFrame
     window.contentPane.add(composePanel, BorderLayout.CENTER)
 
-    // setting the content
+    // Setting the content
     composePanel.setContent {
         ComposeContent()
     }
