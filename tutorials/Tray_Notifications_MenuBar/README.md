@@ -279,7 +279,7 @@ fun main() {
             )
         )
     ) {
-        // content
+        // Content
         Button(
             onClick = {
                 Window(
