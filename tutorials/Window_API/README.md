@@ -14,7 +14,7 @@ import javax.swing.SwingUtilities.invokeLater
 
 fun main() = invokeLater {
     AppWindow().show {
-        // content
+        // Content
     }
 }
 ```
@@ -25,7 +25,7 @@ import androidx.compose.desktop.Window
 
 fun main() {
     Window {
-        // content
+        // Content
     }
 }
 ```
@@ -57,7 +57,7 @@ fun main() {
             Dialog(
                 onDismissRequest = { dialogState.value = false }
             ) {
-                // dialog's content
+                // Dialog's content
             }
         }
     }
@@ -205,7 +205,7 @@ fun main() {
     Window {
         val current = AppWindowAmbient.current
 
-        // content
+        // Content
         Box(
             modifier = Modifier.fillMaxSize(),
             alignment = Alignment.Center,
@@ -246,7 +246,7 @@ fun main() {
     val windowPos = mutableStateOf(IntOffset.Zero)
 
     Window {
-        // content
+        // Content
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center,
@@ -289,7 +289,7 @@ import androidx.compose.material.Button
 fun main() {
     Window {
 
-        // content
+        // Content
         Button(
             onClick = {
                 AppWindowAmbient.current?.setWindowCentered()
@@ -412,7 +412,7 @@ fun main() {
             }
         )
     ) {
-        // content
+        // Content
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center,
@@ -432,14 +432,14 @@ The AppManager singleton is used to customize the behavior of the entire applica
 1. Description of common application events
 ```kotlin
 AppManager.setEvents(
-    onAppStart = { println("onAppStart") }, // invoked before the first window is created
-    onAppExit = { println("onAppExit") }, // invoked after all windows are closed
+    onAppStart = { println("onAppStart") }, // Invoked before the first window is created
+    onAppExit = { println("onAppExit") }, // Invoked after all windows are closed
 )
 ```
 2. Customization of common application context menu
 ```kotlin
 AppManager.setMenu(
-    getCommonAppMenuBar() // custom function that returns MenuBar
+    getCommonAppMenuBar() // Custom function that returns MenuBar
 )
 ```
 3. Access to the application windows list
@@ -452,7 +452,7 @@ val current = AppManager.focusedWindow
 ```
 5. Application exit
 ```kotlin
-AppManager.exit() // closes all windows
+AppManager.exit() // Closes all windows
 ```
 
 ## Access to Swing components
@@ -474,7 +474,7 @@ import androidx.compose.ui.Modifier
 fun main() {
     val scaleFactor = mutableStateOf(0.0)
     Window {
-        // content
+        // Content
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center,
@@ -485,7 +485,7 @@ fun main() {
                         val current = AppManager.focusedWindow
                         if (current != null) {
                             val jFrame = current.window
-                            // do whatever you want with it
+                            // Do whatever you want with it
                             scaleFactor.value = jFrame.graphicsConfiguration.defaultTransform.scaleX
                         }
                     }
