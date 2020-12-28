@@ -121,13 +121,13 @@ fun main() {
                     onClick = {
                         count.value++
                     },
-                    shortcut = KeyStroke(Key.I)
+                    shortcut = KeyStroke(Key.I),
                 ),
                 MenuItem(
                     name = "Exit",
                     onClick = { AppManager.exit() },
-                    shortcut = KeyStroke(Key.X)
-                )
+                    shortcut = KeyStroke(Key.X),
+                ),
             )
         ),
         undecorated = true, // false - by default
@@ -135,12 +135,12 @@ fun main() {
             onRelocate = { location ->
                 windowPos.value = location
             }
-        )
+        ),
     ) {
         // content
         Box(
             modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             Column {
                 Text(text = "Location: ${windowPos.value} Value: ${count.value}")
@@ -208,7 +208,7 @@ fun main() {
         // content
         Box(
             modifier = Modifier.fillMaxSize(),
-            alignment = Alignment.Center
+            alignment = Alignment.Center,
         ) {
             Column {
                 Text(text = "Location: ${windowPos.value}")
@@ -249,7 +249,7 @@ fun main() {
         // content
         Box(
             modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             Column {
                 Text(text = "Location: ${windowPos.value}")
@@ -343,7 +343,7 @@ fun main() = invokeLater {
     AppWindow().show {
         Box(
             modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             Column(
                 modifier = Modifier.padding(top = 20.dp, bottom = 20.dp)
@@ -363,7 +363,7 @@ fun main() = invokeLater {
 fun Button(text: String = "", action: (() -> Unit)? = null) {
     Button(
         modifier = Modifier.size(150.dp, 30.dp),
-        onClick = { action?.invoke() }
+        onClick = { action?.invoke() },
     ) {
         Text(text)
     }
@@ -415,7 +415,7 @@ fun main() {
         // content
         Box(
             modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             Text(text = "Size: ${windowSize.value} Focused: ${focused.value}")
         }
@@ -433,7 +433,7 @@ The AppManager singleton is used to customize the behavior of the entire applica
 ```kotlin
 AppManager.setEvents(
     onAppStart = { println("onAppStart") }, // invoked before the first window is created
-    onAppExit = { println("onAppExit") } // invoked after all windows are closed
+    onAppExit = { println("onAppExit") }, // invoked after all windows are closed
 )
 ```
 2. Customization of common application context menu
@@ -477,7 +477,7 @@ fun main() {
         // content
         Box(
             modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             Column {
                 Button(
