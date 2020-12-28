@@ -29,7 +29,7 @@ compose.desktop {
         mainClass = "org.jetbrains.compose.demo.falling.MainKt"
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "hipa_game"
+            packageName = "falling_balls"
         }
     }
 }
