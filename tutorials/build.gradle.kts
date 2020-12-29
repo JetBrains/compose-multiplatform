@@ -48,7 +48,13 @@ fun checkDirs(dirs: List<String>) {
   snippets.forEachIndexed { index, snippet ->
     println("process snippet $index at ${snippet.file}:${snippet.lineNumber}")
     snippet.tempDir = cloneTemplate(index, snippet.content)
-    val proc = ProcessBuilder("bash", "./gradlew", "build")
+    val isWin = System.getProperty("os.name").startsWith("Win")
+    val procBuilder = if (isWin) {
+        ProcessBuilder("gradlew.bat", "build")
+    } else {
+        ProcessBuilder("bash", "./gradlew", "build")
+    }
+    val proc = procBuilder
       .directory(snippet.tempDir)
       .redirectOutput(ProcessBuilder.Redirect.PIPE)
       .redirectError(ProcessBuilder.Redirect.PIPE)
