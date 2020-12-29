@@ -48,7 +48,7 @@ cd sample
 ```
 
 Create `settings.gradle.kts` as follows:
-```kotlin
+``` kotlin
 pluginManagement {
     repositories {
         gradlePluginPortal()
@@ -57,7 +57,7 @@ pluginManagement {
 }
 ```
 Then create `build.gradle.kts` with the following content:
-```kotlin
+``` kotlin
 import org.jetbrains.compose.compose
 
 plugins {

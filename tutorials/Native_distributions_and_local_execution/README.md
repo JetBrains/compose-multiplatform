@@ -18,7 +18,7 @@ In other words, an `application` in DSL allows you to pack a bunch of files,
 together with a JDK distribution, into a set of compressed binary installers
 in various formats (`.dmg`, `.deb`, `.msi`, `.exe`, etc).
 
-```kotlin
+``` kotlin
 import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
@@ -77,7 +77,7 @@ The plugin uses `jpackage`, which is available since [JDK 14](https://openjdk.ja
 Make sure you meet at least one of the following requirements:
 * `JAVA_HOME` environment variable points to the compatible JDK version.
 * `javaHome` is set via DSL:
-```kotlin
+``` kotlin
 compose.desktop {
     application {
         javaHome = System.getenv("JDK_14")
@@ -87,7 +87,7 @@ compose.desktop {
 
 ## Customizing output dir
 
-```kotlin
+``` kotlin
 compose.desktop {
     application {
         nativeDistributions {
@@ -104,7 +104,7 @@ The following properties are available for customizing the application startup:
 * `args` — arguments for the application's main method;
 * `jvmArgs` — arguments for the application's JVM.
 
-```kotlin
+``` kotlin
 compose.desktop {
     application {
         mainClass = "MainKt"
@@ -123,7 +123,7 @@ The following properties are available in the `nativeDistributions` DSL block:
 * `copyright` — application's copyright (default value: none);
 * `vendor` — application's vendor (default value: none).
 
-```kotlin
+``` kotlin
 compose.desktop {
     application {
         nativeDistributions {
@@ -149,7 +149,7 @@ manually, or a single target should be specified (see below).
 
 If the default configuration is ambiguous or not sufficient, the plugin can be configured:
 * Using a Gradle [source set](https://docs.gradle.org/current/userguide/java_plugin.html#source_sets)
-```kotlin
+``` kotlin
 plugins {
     kotlin("jvm")
     id("org.jetbrains.compose")
@@ -163,7 +163,7 @@ compose.desktop {
 }
 ```
 * Using a Kotlin [JVM target](https://kotlinlang.org/docs/reference/mpp-dsl-reference.html#targets):
-```kotlin
+``` kotlin
 plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose")
@@ -184,7 +184,7 @@ compose.desktop {
      * `dependsOn` can be used to add task dependencies to all plugin's tasks;
      * `fromFiles` can be used to specify files to include;
      * `mainJar` file property can be specified to point to a jar, containing a main class.
-```kotlin
+``` kotlin
 compose.desktop {
     application {
         disableDefaultConfiguration()
@@ -202,7 +202,7 @@ The app icon needs to be provided in OS-specific formats:
 * `.ico` for Windows;
 * `.png` for Linux.
 
-```kotlin
+``` kotlin
 compose.desktop {
     application {
         nativeDistributions {
