@@ -709,6 +709,38 @@ class AnnotatedStringBuilderTest {
         )
     }
 
+    @Test
+    fun getAnnotation_separates_ttsAnnotation_and_stringAnnotation() {
+        val annotation1 = VerbatimTtsAnnotation("abc")
+        val annotation2 = "annotation"
+        val tag = "tag"
+        val buildResult = AnnotatedString.Builder().apply {
+            pushTtsAnnotation(annotation1)
+            append("Hello")
+            pushStringAnnotation(tag, annotation2)
+            append("world")
+            pop()
+            append("!")
+            pop()
+        }.toAnnotatedString()
+
+        // The final result is Helloworld!
+        //                     [         ] TtsAnnotation
+        //                          [   ]  StringAnnotation
+        assertThat(buildResult.getTtsAnnotations(0, 5)).isEqualTo(
+            listOf(AnnotatedString.Range(annotation1, 0, 11, ""))
+        )
+        assertThat(buildResult.getTtsAnnotations(5, 6)).isEqualTo(
+            listOf(AnnotatedString.Range(annotation1, 0, 11, ""))
+        )
+
+        assertThat(buildResult.getStringAnnotations(0, 5)).isEmpty()
+        assertThat(buildResult.getStringAnnotations(5, 6)).isEqualTo(
+            listOf(AnnotatedString.Range(annotation2, 5, 10, tag))
+        )
+        assertThat(buildResult.getStringAnnotations(10, 11)).isEmpty()
+    }
+
     private fun createAnnotatedString(
         text: String,
         color: Color = Color.Red,
