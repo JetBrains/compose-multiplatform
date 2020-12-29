@@ -150,7 +150,7 @@ fun Counter(text: String, counter: MutableState<Int>) {
 
 SwingPanel lets you create a UI using Swing components in a Compose-based UI. To achieve this you need to create Swing component and pass it as a parameter to SwingPanel.
 
-``` kotlin
+```kotlin
 import androidx.compose.desktop.SwingPanel
 import androidx.compose.desktop.Window
 import androidx.compose.foundation.layout.Box

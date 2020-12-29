@@ -189,11 +189,11 @@ To get the properties of a window, it is enough to have a link to the current or
 ```kotlin
 import androidx.compose.desktop.AppWindowAmbient
 import androidx.compose.desktop.Window
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
+import androidx.compose.material.Text
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -208,7 +208,7 @@ fun main() {
         // Content
         Box(
             modifier = Modifier.fillMaxSize(),
-            alignment = Alignment.Center
+            contentAlignment = Alignment.Center
         ) {
             Column {
                 Text(text = "Location: ${windowPos.value}")
@@ -288,11 +288,11 @@ import androidx.compose.material.Button
 
 fun main() {
     Window {
-
+        val window = AppWindowAmbient.current!!
         // Content
         Button(
             onClick = {
-                AppWindowAmbient.current?.setWindowCentered()
+                window.setWindowCentered()
             }
         ) {
             Text(text = "Center the window")
