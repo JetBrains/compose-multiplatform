@@ -8,7 +8,6 @@ data class SnippetData(
 fun findSnippets(dirs: List<String>): List<SnippetData> {
   val snippets = mutableListOf<SnippetData>()
   dirs.forEach { dirName ->
-    println(dirName)
     rootProject
       .projectDir
       .parentFile
@@ -68,9 +67,9 @@ fun checkDirs(dirs: List<String>) {
       .start()
     proc.waitFor(5, TimeUnit.MINUTES)
     if (proc.exitValue() != 0) {
-      System.err.println("Error in snippet at ${snippet.file}:${snippet.lineNumber}")
       println(proc.inputStream.bufferedReader().readText())
       println(proc.errorStream.bufferedReader().readText())
+      throw GradleException("Error in snippet at ${snippet.file}:${snippet.lineNumber}")
     }
   }
 }
