@@ -430,28 +430,28 @@ fun main() {
 The AppManager singleton is used to customize the behavior of the entire application. Its main features:
 
 1. Description of common application events
-```kotlin
+``` kotlin
 AppManager.setEvents(
     onAppStart = { println("onAppStart") }, // invoked before the first window is created
     onAppExit = { println("onAppExit") } // invoked after all windows are closed
 )
 ```
 2. Customization of common application context menu
-```kotlin
+``` kotlin
 AppManager.setMenu(
     getCommonAppMenuBar() // custom function that returns MenuBar
 )
 ```
 3. Access to the application windows list
-```kotlin
+``` kotlin
 val windows = AppManager.windows
 ```
 4. Getting the current focused window
-```kotlin
+``` kotlin
 val current = AppManager.focusedWindow
 ```
 5. Application exit
-```kotlin
+``` kotlin
 AppManager.exit() // closes all windows
 ```
 
