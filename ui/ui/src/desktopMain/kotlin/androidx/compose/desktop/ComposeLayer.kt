@@ -50,6 +50,7 @@ import java.awt.im.InputMethodRequests
 
 internal class ComposeLayer {
 
+    private var composition: Composition? = null
     private val events = AWTDebounceEventQueue()
 
     var owners: DesktopOwners? = null
@@ -275,6 +276,7 @@ internal class ComposeLayer {
     }
 
     fun dispose() {
+        composition?.dispose()
         events.cancel()
         check(!isDisposed)
         frameDispatcher.cancel()
@@ -298,7 +300,7 @@ internal class ComposeLayer {
         invalidate: () -> Unit = this::needRedrawLayer,
         parentComposition: CompositionReference? = null,
         content: @Composable () -> Unit
-    ): Composition {
+    ) {
         check(owners == null) {
             "Cannot setContent twice."
         }
@@ -306,7 +308,7 @@ internal class ComposeLayer {
         val desktopOwner = DesktopOwner(desktopOwners, density)
 
         owners = desktopOwners
-        val composition = desktopOwner.setContent(parent = parentComposition, content = content)
+        composition = desktopOwner.setContent(parent = parentComposition, content = content)
 
         onDensityChanged(desktopOwner::density::set)
 
@@ -314,7 +316,5 @@ internal class ComposeLayer {
             is AppFrame -> parent.onDispose = desktopOwner::dispose
             is ComposePanel -> parent.onDispose = desktopOwner::dispose
         }
-
-        return composition
     }
 }

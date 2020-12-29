@@ -96,9 +96,29 @@ fun content() {
                     TextBox(text = AppState.wndTitle.value)
                 }
                 Row {
-                    Button(color = Color(232, 182, 109), size = IntSize(16, 16))
+                    Button(
+                        color = Color(210, 210, 210),
+                        size = IntSize(16, 16),
+                        onClick = {
+                            AppManager.focusedWindow?.makeFullscreen()
+                        }
+                    )
+                    Spacer(modifier = Modifier.width(30.dp))
+                    Button(
+                        color = Color(232, 182, 109),
+                        size = IntSize(16, 16),
+                        onClick = {
+                            AppManager.focusedWindow?.minimize()
+                        }
+                    )
                     Spacer(modifier = Modifier.width(3.dp))
-                    Button(color = Color(150, 232, 150), size = IntSize(16, 16))
+                    Button(
+                        color = Color(150, 232, 150),
+                        size = IntSize(16, 16),
+                        onClick = {
+                            AppManager.focusedWindow?.maximize()
+                        }
+                    )
                     Spacer(modifier = Modifier.width(3.dp))
                     Button(
                         onClick = { AppManager.exit() },
@@ -130,6 +150,9 @@ fun content() {
                                         AppManager.focusedWindow?.close()
                                     }
                                 )
+                                onDispose {
+                                    println("Dispose composition")
+                                }
                             }
                         },
                         color = Color(26, 198, 188)
@@ -160,15 +183,14 @@ fun content() {
                         .fillMaxWidth()
                 ) {
                     ContextMenu()
-                    Spacer(modifier = Modifier.height(30.dp))
-                    Spacer(modifier = Modifier.height(60.dp))
+                    Spacer(modifier = Modifier.height(100.dp))
                     Row {
                         Checkbox(
                             checked = AppState.undecorated.value,
                             onCheckedChange = {
                                 AppState.undecorated.value = !AppState.undecorated.value
                             },
-                            modifier = Modifier.height(30.dp).padding(start = 20.dp)
+                            modifier = Modifier.height(35.dp).padding(start = 20.dp)
                         )
                         Spacer(modifier = Modifier.width(5.dp))
                         TextBox(text = "- undecorated")
@@ -320,7 +342,7 @@ fun Button(
     text: String = "",
     onClick: () -> Unit = {},
     color: Color = Color(10, 162, 232),
-    size: IntSize = IntSize(150, 30)
+    size: IntSize = IntSize(200, 35)
 ) {
     val buttonHover = remember { mutableStateOf(false) }
     Button(
@@ -371,7 +393,8 @@ fun ContextMenu() {
 
     Surface(
         modifier = Modifier
-            .padding(start = 4.dp, top = 2.dp),
+            .padding(start = 4.dp, top = 2.dp)
+            .clickable(onClick = { showMenu.value = true }),
         color = Color(255, 255, 255, 40),
         shape = RoundedCornerShape(4.dp)
     ) {
@@ -380,9 +403,8 @@ fun ContextMenu() {
                 TextBox(
                     text = "Selected: ${items[selectedIndex.value]}",
                     modifier = Modifier
-                        .height(26.dp)
+                        .height(35.dp)
                         .padding(start = 4.dp, end = 4.dp)
-                        .clickable(onClick = { showMenu.value = true })
                 )
             },
             expanded = showMenu.value,
@@ -405,7 +427,7 @@ fun ContextMenu() {
 @Composable
 fun RadioButton(text: String, state: MutableState<Boolean>) {
     Box(
-        modifier = Modifier.height(30.dp),
+        modifier = Modifier.height(35.dp),
         contentAlignment = Alignment.Center
     ) {
         RadioButton(
