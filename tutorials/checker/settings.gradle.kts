@@ -1,2 +1,2 @@
-rootProject.name = "tutorials"
+rootProject.name = "checker"
 
