@@ -189,11 +189,11 @@ To get the properties of a window, it is enough to have a link to the current or
 ```kotlin
 import androidx.compose.desktop.AppWindowAmbient
 import androidx.compose.desktop.Window
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
+import androidx.compose.material.Text
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -208,7 +208,7 @@ fun main() {
         // Content
         Box(
             modifier = Modifier.fillMaxSize(),
-            alignment = Alignment.Center,
+            contentAlignment = Alignment.Center,
         ) {
             Column {
                 Text(text = "Location: ${windowPos.value}")
@@ -288,11 +288,11 @@ import androidx.compose.material.Button
 
 fun main() {
     Window {
-
+        val window = AppWindowAmbient.current!!
         // Content
         Button(
             onClick = {
-                AppWindowAmbient.current?.setWindowCentered()
+                window.setWindowCentered()
             }
         ) {
             Text(text = "Center the window")
@@ -430,28 +430,28 @@ fun main() {
 The AppManager singleton is used to customize the behavior of the entire application. Its main features:
 
 1. Description of common application events
-```kotlin
+``` kotlin
 AppManager.setEvents(
     onAppStart = { println("onAppStart") }, // Invoked before the first window is created
     onAppExit = { println("onAppExit") }, // Invoked after all windows are closed
 )
 ```
 2. Customization of common application context menu
-```kotlin
+``` kotlin
 AppManager.setMenu(
     getCommonAppMenuBar() // Custom function that returns MenuBar
 )
 ```
 3. Access to the application windows list
-```kotlin
+``` kotlin
 val windows = AppManager.windows
 ```
 4. Getting the current focused window
-```kotlin
+``` kotlin
 val current = AppManager.focusedWindow
 ```
 5. Application exit
-```kotlin
+``` kotlin
 AppManager.exit() // Closes all windows
 ```
 

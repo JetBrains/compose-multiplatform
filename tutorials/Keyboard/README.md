@@ -33,7 +33,7 @@ It works the same as Compose for Android, for details see [API Reference](https:
 
 The most common use case is to define keyboard handlers for active controls like `TextField`. Here is an example:
 
-``` kotlin
+```kotlin
 import androidx.compose.desktop.Window
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -51,7 +51,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.input.key.shortcuts
 
-@OptIn(ExperimentalKeyInput::class)
 fun main() = Window(title = "Compose for Desktop", size = IntSize(300, 300)) {
     MaterialTheme {
         var consumedText by remember { mutableStateOf(0) }
