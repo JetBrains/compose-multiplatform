@@ -17,9 +17,9 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import java.io.File
 import java.util.*
 
-// todo: multiple launchers
-// todo: file associations
-// todo: use workers
+// TODO: Multiple launchers
+// TODO: File associations
+// TODO: Use workers
 fun configureApplicationImpl(project: Project, app: Application) {
     if (app._isDefaultConfigurationEnabled) {
         if (project.plugins.hasPlugin("org.jetbrains.kotlin.multiplatform")) {
@@ -181,7 +181,7 @@ private fun JavaExec.configureRunTask(app: Application) {
     args = app.args
 
     val cp = project.objects.fileCollection()
-    // adding a null value will cause future invocations of `from` to throw an NPE
+    // Adding a null value will cause future invocations of `from` to throw an NPE
     app.mainJar.orNull?.let { cp.from(it) }
     cp.from(app._fromFiles)
     dependsOn(*app._dependenciesTaskNames.toTypedArray())
@@ -200,7 +200,7 @@ private fun Jar.configurePackageUberJarForCurrentOS(app: Application) {
                 files.map { if (it.isZipOrJar()) project.zipTree(it) else it }
             })
 
-        // adding a null value will cause future invocations of `from` to throw an NPE
+        // Adding a null value will cause future invocations of `from` to throw an NPE
         app.mainJar.orNull?.let { from(it) }
         from(flattenJars(app._fromFiles))
         dependsOn(*app._dependenciesTaskNames.toTypedArray())

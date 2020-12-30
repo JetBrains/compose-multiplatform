@@ -4,7 +4,7 @@ plugins {
 }
 
 repositories {
-    // TODO: remove after new build is published
+    // TODO: Remove after new build is published
     mavenLocal()
     google()
     jcenter()
@@ -13,7 +13,7 @@ repositories {
 
 buildscript {
     repositories {
-        // TODO: remove after new build is published
+        // TODO: Remove after new build is published
         mavenLocal()
         google()
         jcenter()

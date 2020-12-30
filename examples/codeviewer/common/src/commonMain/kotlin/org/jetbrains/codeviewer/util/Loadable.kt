@@ -16,7 +16,7 @@ fun <T : Any> loadableScoped(load: CoroutineScope.() -> T): MutableState<T?> {
         try {
             state.value = load()
         } catch (e: CancellationException) {
-            // ignore
+            // Ignore
         } catch (e: Exception) {
             e.printStackTrace()
         }

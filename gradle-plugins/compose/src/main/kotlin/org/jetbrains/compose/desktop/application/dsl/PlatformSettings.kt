@@ -17,7 +17,7 @@ open class MacOSPlatformSettings @Inject constructor(objects: ObjectFactory): Pl
 
     private var isSignInitialized = false
     fun signing(fn: Action<MacOSSigningSettings>) {
-        // enable sign if it the corresponding block is present in DSL
+        // Enable sign if it the corresponding block is present in DSL
         if (!isSignInitialized) {
             isSignInitialized = true
             signing.sign = true

@@ -111,7 +111,7 @@ fun main() {
         title = "MyApp",
         size = IntSize(400, 250),
         location = IntOffset(100, 100),
-        centered = false, // true - by default
+        centered = false, // true - By default
         icon = getMyAppIcon(),
         menuBar = MenuBar(
             Menu(
@@ -130,14 +130,14 @@ fun main() {
                 )
             )
         ),
-        undecorated = true, // false - by default
+        undecorated = true, // false - By default
         events = WindowEvents(
             onRelocate = { location ->
                 windowPos.value = location
             }
         )
     ) {
-        // content
+        // Content
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center

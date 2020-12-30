@@ -53,7 +53,7 @@ subprojects {
 }
 
 fun Project.configureGradlePlugin(config: GradlePluginConfigExtension) {
-    // maven publication for plugin
+    // Maven publication for plugin
     configureIfExists<PublishingExtension> {
         // pluginMaven is a default publication created by java-gradle-plugin
         // https://github.com/gradle/gradle/issues/10384
@@ -73,14 +73,14 @@ fun Project.configureGradlePlugin(config: GradlePluginConfigExtension) {
         }
     }
 
-    // metadata for gradle plugin portal (relates to pluginBundle extension block from com.gradle.plugin-publish)
+    // Metadata for gradle plugin portal (relates to pluginBundle extension block from com.gradle.plugin-publish)
     configureIfExists<PluginBundleExtension> {
         vcsUrl = BuildProperties.vcs
         website = BuildProperties.website
         description = config.description
     }
 
-    // gradle plugin definition (relates to gradlePlugin extension block from java-gradle-plugin)
+    // Gradle plugin definition (relates to gradlePlugin extension block from java-gradle-plugin)
     configureIfExists<GradlePluginDevelopmentExtension> {
         plugins {
             create("gradlePlugin") {

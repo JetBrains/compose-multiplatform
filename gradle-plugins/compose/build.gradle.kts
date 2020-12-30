@@ -39,7 +39,7 @@ dependencies {
         compileOnly(dep)
         embedded(dep)
     }
-    // include relocated download task to avoid potential runtime conflicts
+    // Include relocated download task to avoid potential runtime conflicts
     embeddedCompileOnly("de.undercouch:gradle-download-task:4.1.1")
 }
 

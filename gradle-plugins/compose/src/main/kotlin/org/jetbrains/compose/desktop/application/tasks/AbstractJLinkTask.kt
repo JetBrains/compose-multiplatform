@@ -10,8 +10,8 @@ import org.jetbrains.compose.desktop.application.internal.notNullProperty
 import org.jetbrains.compose.desktop.application.internal.nullableProperty
 import java.io.File
 
-// todo: public DSL
-// todo: deduplicate if multiple runtimes are created
+// TODO: Public DSL
+// TODO: Deduplicate if multiple runtimes are created
 abstract class AbstractJLinkTask : AbstractJvmToolOperationTask("jlink") {
     @get:Input
     val modules: ListProperty<String> = objects.listProperty(String::class.java)

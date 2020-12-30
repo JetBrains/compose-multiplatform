@@ -45,7 +45,7 @@ repositories {
     google()
     jcenter()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-    // temp
+    // Temp
     maven("https://packages.jetbrains.team/maven/p/ui/dev")
 }
 

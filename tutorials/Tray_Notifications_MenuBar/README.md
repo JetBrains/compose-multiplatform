@@ -61,7 +61,7 @@ fun main() {
             }
         }
 
-        // content
+        // Content
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
@@ -210,7 +210,7 @@ fun main() {
     )
 
     Window {
-        // content
+        // Content
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
@@ -279,7 +279,7 @@ fun main() {
             )
         )
     ) {
-        // content
+        // Content
         Button(
             onClick = {
                 Window(

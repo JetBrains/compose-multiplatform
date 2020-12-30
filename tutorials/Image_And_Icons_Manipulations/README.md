@@ -102,15 +102,15 @@ fun bitmapFromByteArray(): Bitmap {
     try {
         image = ImageIO.read(File("sample.png"))
     } catch (e: Exception) {
-        // image file does not exist
+        // Image file does not exist
     }
 
     if (image == null) {
         image = BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB)
     }
-    val pixels = getBytes(image) // assume we only have raw pixels
+    val pixels = getBytes(image) // Assume we only have raw pixels
 
-    // allocate and fill skija Bitmap
+    // Allocate and fill skija Bitmap
     val bitmap = Bitmap()
     bitmap.allocPixels(ImageInfo.makeS32(image.width, image.height, ColorAlphaType.PREMUL))
     bitmap.installPixels(bitmap.getImageInfo(), pixels, (image.width * 4).toLong())
@@ -118,7 +118,7 @@ fun bitmapFromByteArray(): Bitmap {
     return bitmap
 }
 
-// creating byte array from BufferedImage
+// Creating byte array from BufferedImage
 private fun getBytes(image: BufferedImage): ByteArray {
     val width = image.width
     val height = image.height
@@ -182,7 +182,7 @@ fun getWindowIcon(): BufferedImage {
     try {
         image = ImageIO.read(File("sample.png"))
     } catch (e: Exception) {
-        // image file does not exist
+        // Image file does not exist
     }
 
     if (image == null) {
@@ -235,7 +235,7 @@ fun getWindowIcon(): BufferedImage {
     try {
         image = ImageIO.read(File("sample.png"))
     } catch (e: Exception) {
-        // image file does not exist
+        // Image file does not exist
     }
 
     if (image == null) {
@@ -312,7 +312,7 @@ fun getWindowIcon(): BufferedImage {
     try {
         image = ImageIO.read(File("sample.png"))
     } catch (e: Exception) {
-        // image file does not exist
+        // Image file does not exist
     }
 
     if (image == null) {

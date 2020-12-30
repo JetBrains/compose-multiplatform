@@ -20,7 +20,7 @@ class ComposePlugin : Plugin<Project> {
         val desktopExtension = composeExtension.extensions.create("desktop", DesktopExtension::class.java)
 
         if (!project.buildFile.endsWith(".gradle.kts")) {
-            // add compose extension for Groovy DSL to work
+            // Add compose extension for Groovy DSL to work
             project.dependencies.extensions.add("compose", Dependencies)
             project.plugins.withId("org.jetbrains.kotlin.multiplatform") {
                 (project.extensions.getByName("kotlin") as? ExtensionAware)?.apply {

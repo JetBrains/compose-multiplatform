@@ -15,8 +15,8 @@ import org.jetbrains.compose.desktop.application.internal.ioFile
 import javax.inject.Inject
 
 // Custom task is used instead of Exec, because Exec does not support
-// lazy configuration yet. Lazy configuration is needed to
-// calculate appImageDir after the evaluation of createApplicationImage
+// Lazy configuration yet. Lazy configuration is needed to
+// Calculate appImageDir after the evaluation of createApplicationImage
 abstract class AbstractRunDistributableTask @Inject constructor(
     createApplicationImage: TaskProvider<AbstractJPackageTask>,
     private val execOperations: ExecOperations

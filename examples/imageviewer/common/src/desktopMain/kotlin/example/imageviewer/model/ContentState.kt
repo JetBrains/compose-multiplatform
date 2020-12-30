@@ -43,7 +43,7 @@ object ContentState {
         return isAppUIReady.value
     }
 
-    // drawable content
+    // Drawable content
     private val mainImageWrapper = MainImageWrapper
     private val mainImage = mutableStateOf(BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB))
     private val currentImageIndex = mutableStateOf(0)
@@ -61,7 +61,7 @@ object ContentState {
         return mainImageWrapper.getName()
     }
 
-    // filters managing
+    // Filters managing
     private val appliedFilters = FiltersManager()
     private val filterUIState: MutableMap<FilterType, MutableState<Boolean>> = LinkedHashMap()
 
@@ -124,7 +124,7 @@ object ContentState {
         mainImage.value = restoreFilters()
     }
 
-    // application content initialization
+    // Application content initialization
     private fun initData() {
         if (isAppUIReady.value)
             return
@@ -187,7 +187,7 @@ object ContentState {
         }
     }
 
-    // preview/fullscreen image managing
+    // Preview/Fullscreen image managing
     fun isMainImageEmpty(): Boolean {
         return mainImageWrapper.isEmpty()
     }
@@ -275,7 +275,7 @@ object ContentState {
 }
 
 private object MainImageWrapper {
-    // origin image
+    // Origin image
     var origin: BufferedImage? = null
         private set
 
@@ -293,7 +293,7 @@ private object MainImageWrapper {
         return copy(picture.value.image)
     }
 
-    // picture adapter
+    // Picture adapter
     private var picture = mutableStateOf(
         Picture(image = BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB))
     )
@@ -322,7 +322,7 @@ private object MainImageWrapper {
         return picture.value.id
     }
 
-    // applied filters
+    // Applied filters
     private var filtersSet: MutableSet<FilterType> = LinkedHashSet()
 
     fun addFilter(filter: FilterType) {
