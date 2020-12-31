@@ -210,21 +210,14 @@ class AndroidXDocsPlugin : Plugin<Project> {
         val docsRuntimeClasspath = project.configurations.create("docs-runtime-classpath") {
             it.setResolveClasspathForUsage(Usage.JAVA_RUNTIME)
         }
-        docsCompileClasspath.resolutionStrategy {
-            val buildVersions = (project.rootProject.property("ext") as ExtraPropertiesExtension)
-                .let { it.get("build_versions") as Map<*, *> }
-            it.eachDependency { details ->
-                if (details.requested.group == "org.jetbrains.kotlin") {
-                    details.useVersion(buildVersions["kotlin"] as String)
-                }
-            }
-        }
-        docsRuntimeClasspath.resolutionStrategy {
-            val buildVersions = (project.rootProject.property("ext") as ExtraPropertiesExtension)
-                .let { it.get("build_versions") as Map<*, *> }
-            it.eachDependency { details ->
-                if (details.requested.group == "org.jetbrains.kotlin") {
-                    details.useVersion(buildVersions["kotlin"] as String)
+        listOf(docsCompileClasspath, docsRuntimeClasspath).forEach { config ->
+            config.resolutionStrategy {
+                val versions = (project.rootProject.property("ext") as ExtraPropertiesExtension)
+                    .let { it.get("build_versions") as Map<*, *> }
+                it.eachDependency { details ->
+                    if (details.requested.group == "org.jetbrains.kotlin") {
+                        details.useVersion(versions["kotlin"] as String)
+                    }
                 }
             }
         }
