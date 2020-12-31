@@ -23,6 +23,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.internal.tasks.userinput.UserInputHandler
+import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.gradle.internal.service.ServiceRegistry
@@ -243,11 +244,17 @@ open class RootStudioTask : StudioTask() {
  * Task for launching studio in a playground project
  */
 open class PlaygroundStudioTask : RootStudioTask() {
+    @get:Internal
+    val supportRootFolder = (project.rootProject.property("ext") as ExtraPropertiesExtension)
+        .let { it.get("supportRootFolder") as File }
+
     /**
      * Playground projects have only 1 setup so there is no need to specify the project list.
      */
     override val requiresProjectList get() = false
-    override val installParentDir get() = projectRoot.resolve("..")
-    override val ideaProperties get() = projectRoot.resolve("../playground-common/idea.properties")
-    override val vmOptions get() = projectRoot.resolve("../playground-common/studio.vmoptions")
+    override val installParentDir get() = supportRootFolder
+    override val ideaProperties
+        get() = supportRootFolder.resolve("../playground-common/idea.properties")
+    override val vmOptions
+        get() = supportRootFolder.resolve("../playground-common/studio.vmoptions")
 }
