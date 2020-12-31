@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.ImagePainter
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.toolingGraphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
@@ -96,7 +97,10 @@ fun Icon(
     // size that this icon will be forced to take up.
     // TODO: b/149735981 semantics for content description
     val colorFilter = if (tint == Color.Unspecified) null else ColorFilter.tint(tint)
-    Box(modifier.defaultSizeFor(painter).paint(painter, colorFilter = colorFilter))
+    Box(
+        modifier.toolingGraphicsLayer().defaultSizeFor(painter)
+            .paint(painter, colorFilter = colorFilter)
+    )
 }
 
 private fun Modifier.defaultSizeFor(painter: Painter) =

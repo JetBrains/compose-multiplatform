@@ -663,6 +663,7 @@ package androidx.compose.ui.graphics {
   public final class GraphicsLayerModifierKt {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier graphicsLayer(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.GraphicsLayerScope,kotlin.Unit> block);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier graphicsLayer-i_P0lGk(androidx.compose.ui.Modifier, optional float scaleX, optional float scaleY, optional float alpha, optional float translationX, optional float translationY, optional float shadowElevation, optional float rotationX, optional float rotationY, optional float rotationZ, optional float cameraDistance, optional long transformOrigin, optional androidx.compose.ui.graphics.Shape shape, optional boolean clip);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier toolingGraphicsLayer(androidx.compose.ui.Modifier);
   }
 
   public interface GraphicsLayerScope extends androidx.compose.ui.unit.Density {

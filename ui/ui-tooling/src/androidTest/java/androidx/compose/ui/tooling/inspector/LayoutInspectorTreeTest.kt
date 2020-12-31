@@ -24,16 +24,19 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.material.Button
+import androidx.compose.material.Icon
 import androidx.compose.material.ModalDrawerLayout
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.resetSourceInfo
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.node.OwnedLayer
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.Group
@@ -51,6 +54,7 @@ import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
+import org.junit.After
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
@@ -66,11 +70,17 @@ class LayoutInspectorTreeTest : ToolingTest() {
     private lateinit var view: View
 
     @Before
-    fun density() {
+    fun before() {
         @OptIn(InternalComposeApi::class)
         resetSourceInfo()
         density = Density(activity)
         view = activityTestRule.activity.findViewById<ViewGroup>(android.R.id.content)
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
     }
 
     @SdkSuppress(minSdkVersion = 29) // Render id is not returned for api < 29
@@ -82,6 +92,7 @@ class LayoutInspectorTreeTest : ToolingTest() {
             Inspectable(slotTableRecord) {
                 Column {
                     Text(text = "Hello World", color = Color.Green)
+                    Icon(Icons.Filled.FavoriteBorder)
                     Surface {
                         Button(onClick = {}) { Text(text = "OK") }
                     }
@@ -107,8 +118,8 @@ class LayoutInspectorTreeTest : ToolingTest() {
             node(
                 name = "Column",
                 fileName = "LayoutInspectorTreeTest.kt",
-                left = 0.0.dp, top = 0.0.dp, width = 72.0.dp, height = 54.9.dp,
-                children = listOf("Text", "Surface")
+                left = 0.0.dp, top = 0.0.dp, width = 72.0.dp, height = 78.9.dp,
+                children = listOf("Text", "Icon", "Surface")
             )
             node(
                 name = "Text",
@@ -117,25 +128,31 @@ class LayoutInspectorTreeTest : ToolingTest() {
                 left = 0.0.dp, top = 0.0.dp, width = 72.0.dp, height = 18.9.dp,
             )
             node(
+                name = "Icon",
+                isRenderNode = true,
+                fileName = "LayoutInspectorTreeTest.kt",
+                left = 0.0.dp, top = 18.9.dp, width = 24.0.dp, height = 24.0.dp,
+            )
+            node(
                 name = "Surface",
                 fileName = "LayoutInspectorTreeTest.kt",
                 isRenderNode = true,
                 left = 0.0.dp,
-                top = 18.9.dp, width = 64.0.dp, height = 36.0.dp,
+                top = 42.9.dp, width = 64.0.dp, height = 36.0.dp,
                 children = listOf("Button")
             )
             node(
                 name = "Button",
                 fileName = "LayoutInspectorTreeTest.kt",
                 left = 0.0.dp,
-                top = 18.9.dp, width = 64.0.dp, height = 36.0.dp,
+                top = 42.9.dp, width = 64.0.dp, height = 36.0.dp,
                 children = listOf("Text")
             )
             node(
                 name = "Text",
                 isRenderNode = true,
                 fileName = "LayoutInspectorTreeTest.kt",
-                left = 21.7.dp, top = 27.4.dp, width = 20.9.dp, height = 18.9.dp,
+                left = 21.7.dp, top = 51.6.dp, width = 20.9.dp, height = 18.9.dp,
             )
         }
     }
