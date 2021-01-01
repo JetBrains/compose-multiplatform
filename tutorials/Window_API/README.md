@@ -111,7 +111,7 @@ fun main() {
         title = "MyApp",
         size = IntSize(400, 250),
         location = IntOffset(100, 100),
-        centered = false, // true - By default
+        centered = false, // true - by default
         icon = getMyAppIcon(),
         menuBar = MenuBar(
             Menu(
