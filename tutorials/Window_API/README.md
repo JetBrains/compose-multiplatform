@@ -130,7 +130,7 @@ fun main() {
                 )
             )
         ),
-        undecorated = true, // false - By default
+        undecorated = true, // false - by default
         events = WindowEvents(
             onRelocate = { location ->
                 windowPos.value = location
