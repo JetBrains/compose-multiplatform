@@ -155,7 +155,6 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         }
     }
 }
-
 androidx {
     name = "Compose Foundation"
     publish = Publish.SNAPSHOT_AND_RELEASE

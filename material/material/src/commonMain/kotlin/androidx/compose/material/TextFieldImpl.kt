@@ -75,6 +75,8 @@ internal enum class TextFieldType {
 @OptIn(ExperimentalFoundationApi::class)
 internal fun TextFieldImpl(
     type: TextFieldType,
+    enabled: Boolean,
+    readOnly: Boolean,
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     modifier: Modifier,
@@ -97,10 +99,11 @@ internal fun TextFieldImpl(
     backgroundColor: Color,
     shape: Shape
 ) {
+    // TODO(soboleva): b/171305338 provide colors object and apply alpha there instead
     // If color is not provided via the text style, use content color as a default
     val textColor = textStyle.color.takeOrElse {
-        AmbientContentColor.current.copy(alpha = AmbientContentAlpha.current)
-    }
+        AmbientContentColor.current
+    }.copy(alpha = if (enabled) AmbientContentAlpha.current else ContentAlpha.disabled)
     val mergedTextStyle = textStyle.merge(TextStyle(color = textColor))
 
     val keyboardController: Ref<SoftwareKeyboardController> = remember { Ref() }
@@ -116,12 +119,14 @@ internal fun TextFieldImpl(
         Decoration(
             contentColor = inactiveColor,
             typography = MaterialTheme.typography.subtitle1,
-            contentAlpha = ContentAlpha.high
+            contentAlpha = if (enabled) ContentAlpha.high else ContentAlpha.disabled
         ) {
             BasicTextField(
                 value = value,
                 modifier = tagModifier.defaultMinSizeConstraints(minWidth = TextFieldMinWidth),
                 textStyle = mergedTextStyle,
+                enabled = enabled,
+                readOnly = readOnly,
                 onValueChange = onValueChange,
                 cursorColor = if (isErrorValue) errorColor else activeColor,
                 visualTransformation = visualTransformation,
@@ -141,19 +146,23 @@ internal fun TextFieldImpl(
     }
 
     val focusReference = FocusReference()
-    val textFieldModifier = modifier
-        .focusReference(focusReference)
-        .let {
-            it.clickable(interactionState = interactionState, indication = null) {
+    val textFieldModifier = if (enabled) {
+        modifier
+            .focusReference(focusReference)
+            .clickable(interactionState = interactionState, indication = null) {
                 focusReference.requestFocus()
                 // TODO(b/163109449): Showing and hiding keyboard should be handled by BaseTextField.
                 //  The requestFocus() call here should be enough to trigger the software keyboard.
                 //  Investiate why this is needed here. If it is really needed, instead of doing
                 //  this in the onClick callback, we should move this logic to onFocusChanged
                 //  so that it can show or hide the keyboard based on the focus state.
-                keyboardController.value?.showSoftwareKeyboard()
+                if (!readOnly) {
+                    keyboardController.value?.showSoftwareKeyboard()
+                }
             }
-        }
+    } else {
+        modifier
+    }
 
     TextFieldTransitionScope.Transition(
         inputState = inputState,
@@ -166,11 +175,13 @@ internal fun TextFieldImpl(
         labelInactiveColor = if (isErrorValue) {
             errorColor
         } else {
-            inactiveColor.applyAlpha(alpha = ContentAlpha.medium)
+            inactiveColor.applyAlpha(if (enabled) ContentAlpha.medium else ContentAlpha.disabled)
         },
         indicatorInactiveColor = when {
             isErrorValue -> errorColor
-            type == TextFieldType.Filled -> inactiveColor.applyAlpha(alpha = IndicatorInactiveAlpha)
+            type == TextFieldType.Filled -> inactiveColor.applyAlpha(
+                if (enabled) IndicatorInactiveAlpha else ContentAlpha.disabled
+            )
             else -> inactiveColor.applyAlpha(alpha = ContentAlpha.disabled)
         }
 
@@ -202,7 +213,8 @@ internal fun TextFieldImpl(
                         Decoration(
                             contentColor = inactiveColor,
                             typography = MaterialTheme.typography.subtitle1,
-                            contentAlpha = ContentAlpha.medium,
+                            contentAlpha =
+                                if (enabled) ContentAlpha.medium else ContentAlpha.disabled,
                             content = placeholder
                         )
                     }

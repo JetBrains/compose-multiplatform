@@ -32,7 +32,7 @@ import androidx.compose.ui.util.annotation.IntRange
  * Constraint the height of the text field so that it vertically occupies no more than [maxLines]
  * number of lines.
  */
-fun Modifier.maxLinesHeight(
+internal fun Modifier.maxLinesHeight(
     @IntRange(from = 1) maxLines: Int,
     textStyle: TextStyle
 ) = composed(

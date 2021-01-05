@@ -1,4 +1,4 @@
-/*
+ /*
  * Copyright 2020 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,14 +17,15 @@
 // TODO(b/160821157): Replace FocusState with FocusState2.isFocused
 @file:Suppress("DEPRECATION")
 
-package androidx.compose.foundation
+package androidx.compose.foundation.textfield
 
 import android.os.Build
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.preferredSize
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable

@@ -19,6 +19,7 @@ package androidx.compose.foundation.text
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.gestures.rememberScrollableController
 import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,7 +56,8 @@ internal fun Modifier.textFieldScroll(
     textFieldValue: TextFieldValue,
     visualTransformation: VisualTransformation,
     interactionState: InteractionState,
-    textLayoutResult: Ref<TextLayoutResult?>
+    textLayoutResult: Ref<TextLayoutResult?>,
+    enabled: Boolean = true
 ) = composed(
     factory = {
         // do not reverse direction only in case of RTL in horizontal orientation
@@ -77,7 +79,8 @@ internal fun Modifier.textFieldScroll(
             orientation = orientation,
             canScroll = { scrollerPosition.maximum != 0f },
             reverseDirection = reverseDirection,
-            controller = controller
+            controller = controller,
+            enabled = enabled
         )
 
         val cursorOffset = scrollerPosition.getOffsetToFollow(textFieldValue.selection)
@@ -108,6 +111,7 @@ internal fun Modifier.textFieldScroll(
         name = "textFieldScroll"
         properties["orientation"] = orientation
         properties["scrollerPosition"] = scrollerPosition
+        properties["enabled"] = enabled
         properties["textFieldValue"] = textFieldValue
         properties["visualTransformation"] = visualTransformation
         properties["interactionState"] = interactionState

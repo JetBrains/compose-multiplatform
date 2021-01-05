@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation
+package androidx.compose.foundation.textfield
 
 import android.os.Build
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSize

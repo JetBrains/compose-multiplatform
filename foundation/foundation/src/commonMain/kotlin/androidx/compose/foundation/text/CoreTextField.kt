@@ -139,8 +139,8 @@ import kotlin.math.roundToInt
 @InternalTextApi
 fun CoreTextField(
     value: TextFieldValue,
-    modifier: Modifier = Modifier,
     onValueChange: (TextFieldValue) -> Unit,
+    modifier: Modifier = Modifier,
     textStyle: TextStyle = TextStyle.Default,
     onImeActionPerformed: (ImeAction) -> Unit = {},
     visualTransformation: VisualTransformation = VisualTransformation.None,

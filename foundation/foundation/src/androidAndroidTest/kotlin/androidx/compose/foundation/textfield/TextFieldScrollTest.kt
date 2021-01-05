@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation
+package androidx.compose.foundation.textfield
 
 import android.os.Build
 import androidx.compose.animation.core.ExponentialDecay
 import androidx.compose.animation.core.ManualAnimationClock
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.animation.FlingConfig
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredWidth
@@ -500,7 +505,8 @@ class TextFieldScrollTest {
                 value,
                 VisualTransformation.None,
                 remember { InteractionState() },
-                Ref()
+                Ref(),
+                true
             ) as InspectableValue
             assertThat(modifier.nameFallback).isEqualTo("textFieldScroll")
             assertThat(modifier.valueOverride).isNull()
@@ -510,7 +516,8 @@ class TextFieldScrollTest {
                 "textFieldValue",
                 "visualTransformation",
                 "interactionState",
-                "textLayoutResult"
+                "textLayoutResult",
+                "enabled"
             )
         }
     }

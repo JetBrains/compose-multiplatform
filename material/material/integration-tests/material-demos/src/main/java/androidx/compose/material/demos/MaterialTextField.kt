@@ -65,9 +65,8 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun TextFieldsDemo() {
-    ScrollableColumn(
-        modifier = Modifier.fillMaxHeight(),
-        contentPadding = PaddingValues(10.dp)
+    Column(
+        modifier = Modifier.fillMaxHeight()
     ) {
         Text("Password text field")
         PasswordTextField()
@@ -141,6 +140,8 @@ fun MaterialTextFieldDemo() {
         var singleLineChecked by savedInstanceState { true }
         var selectedOption by savedInstanceState { Option.None }
         var selectedTextField by savedInstanceState { TextFieldType.Filled }
+        var disabled by savedInstanceState { false }
+        var readOnly by savedInstanceState { false }
 
         val textField: @Composable () -> Unit = @Composable {
             when (selectedTextField) {
@@ -148,6 +149,8 @@ fun MaterialTextFieldDemo() {
                     TextField(
                         value = text,
                         onValueChange = { text = it },
+                        enabled = !disabled,
+                        readOnly = readOnly,
                         singleLine = singleLineChecked,
                         label = {
                             val label =
@@ -163,6 +166,8 @@ fun MaterialTextFieldDemo() {
                     OutlinedTextField(
                         value = text,
                         onValueChange = { text = it },
+                        enabled = !disabled,
+                        readOnly = readOnly,
                         singleLine = singleLineChecked,
                         label = {
                             val label =
@@ -187,29 +192,27 @@ fun MaterialTextFieldDemo() {
 
         Column {
             Title("Text field type")
-            Column {
-                TextFieldType.values().map { it.name }.forEach { textType ->
-                    Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .selectable(
-                                selected = (textType == selectedTextField.name),
-                                onClick = {
-                                    selectedTextField = TextFieldType.valueOf(textType)
-                                }
-                            )
-                            .padding(horizontal = 16.dp)
-                    ) {
-                        RadioButton(
+            TextFieldType.values().map { it.name }.forEach { textType ->
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .selectable(
                             selected = (textType == selectedTextField.name),
-                            onClick = { selectedTextField = TextFieldType.valueOf(textType) }
+                            onClick = {
+                                selectedTextField = TextFieldType.valueOf(textType)
+                            }
                         )
-                        Text(
-                            text = textType,
-                            style = MaterialTheme.typography.body1.merge(),
-                            modifier = Modifier.padding(start = 16.dp)
-                        )
-                    }
+                        .padding(horizontal = 16.dp)
+                ) {
+                    RadioButton(
+                        selected = (textType == selectedTextField.name),
+                        onClick = { selectedTextField = TextFieldType.valueOf(textType) }
+                    )
+                    Text(
+                        text = textType,
+                        style = MaterialTheme.typography.body1.merge(),
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
                 }
             }
 
@@ -239,29 +242,39 @@ fun MaterialTextFieldDemo() {
             Spacer(Modifier.preferredHeight(20.dp))
 
             Title("Assistive text")
-            Column {
-                Option.values().map { it.name }.forEach { text ->
-                    Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .selectable(
-                                selected = (text == selectedOption.name),
-                                onClick = { selectedOption = Option.valueOf(text) }
-                            )
-                            .padding(horizontal = 16.dp)
-                    ) {
-                        RadioButton(
+            Option.values().map { it.name }.forEach { text ->
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .selectable(
                             selected = (text == selectedOption.name),
                             onClick = { selectedOption = Option.valueOf(text) }
                         )
-                        Text(
-                            text = text,
-                            style = MaterialTheme.typography.body1.merge(),
-                            modifier = Modifier.padding(start = 16.dp)
-                        )
-                    }
+                        .padding(horizontal = 16.dp)
+                ) {
+                    RadioButton(
+                        selected = (text == selectedOption.name),
+                        onClick = { selectedOption = Option.valueOf(text) }
+                    )
+                    Text(
+                        text = text,
+                        style = MaterialTheme.typography.body1.merge(),
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
                 }
             }
+
+            Title("Other settings")
+            OptionRow(
+                title = "Read-only",
+                checked = readOnly,
+                onCheckedChange = { readOnly = it }
+            )
+            OptionRow(
+                title = "Disabled",
+                checked = disabled,
+                onCheckedChange = { disabled = it }
+            )
         }
     }
 }
