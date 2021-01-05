@@ -883,22 +883,20 @@ package androidx.compose.ui.text.input {
     property public final int amount;
   }
 
-  public interface OffsetMap {
+  public interface OffsetMapping {
     method public int originalToTransformed(int offset);
     method public int transformedToOriginal(int offset);
-    field public static final androidx.compose.ui.text.input.OffsetMap.Companion Companion;
+    field public static final androidx.compose.ui.text.input.OffsetMapping.Companion Companion;
   }
 
-  public static final class OffsetMap.Companion {
-    method public androidx.compose.ui.text.input.OffsetMap getIdentityOffsetMap();
-    property public final androidx.compose.ui.text.input.OffsetMap identityOffsetMap;
+  public static final class OffsetMapping.Companion {
+    method public androidx.compose.ui.text.input.OffsetMapping getIdentity();
+    property public final androidx.compose.ui.text.input.OffsetMapping Identity;
   }
 
   public final class PasswordVisualTransformation implements androidx.compose.ui.text.input.VisualTransformation {
     ctor public PasswordVisualTransformation(char mask);
     ctor public PasswordVisualTransformation();
-    method public char component1();
-    method public androidx.compose.ui.text.input.PasswordVisualTransformation copy(char mask);
     method public androidx.compose.ui.text.input.TransformedText filter(androidx.compose.ui.text.AnnotatedString text);
     method public char getMask();
     property public final char mask;
@@ -989,13 +987,13 @@ package androidx.compose.ui.text.input {
   }
 
   public final class TransformedText {
-    ctor public TransformedText(androidx.compose.ui.text.AnnotatedString transformedText, androidx.compose.ui.text.input.OffsetMap offsetMap);
+    ctor public TransformedText(androidx.compose.ui.text.AnnotatedString transformedText, androidx.compose.ui.text.input.OffsetMapping offsetMapping);
     method public androidx.compose.ui.text.AnnotatedString component1();
-    method public androidx.compose.ui.text.input.OffsetMap component2();
-    method public androidx.compose.ui.text.input.TransformedText copy(androidx.compose.ui.text.AnnotatedString transformedText, androidx.compose.ui.text.input.OffsetMap offsetMap);
-    method public androidx.compose.ui.text.input.OffsetMap getOffsetMap();
+    method public androidx.compose.ui.text.input.OffsetMapping component2();
+    method public androidx.compose.ui.text.input.TransformedText copy(androidx.compose.ui.text.AnnotatedString transformedText, androidx.compose.ui.text.input.OffsetMapping offsetMapping);
+    method public androidx.compose.ui.text.input.OffsetMapping getOffsetMapping();
     method public androidx.compose.ui.text.AnnotatedString getTransformedText();
-    property public final androidx.compose.ui.text.input.OffsetMap offsetMap;
+    property public final androidx.compose.ui.text.input.OffsetMapping offsetMapping;
     property public final androidx.compose.ui.text.AnnotatedString transformedText;
   }
 

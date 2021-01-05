@@ -18,7 +18,7 @@ package androidx.compose.ui.text.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.input.OffsetMap
+import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 
 @Sampled
@@ -27,10 +27,10 @@ fun passwordFilter(text: AnnotatedString): TransformedText {
         AnnotatedString("*".repeat(text.text.length)),
 
         /**
-         * [OffsetMap.identityOffsetMap] is a predefined [OffsetMap] that can be used for the
+         * [OffsetMapping.Identity] is a predefined [OffsetMapping] that can be used for the
          * transformation that does not change the character count.
          */
-        OffsetMap.identityOffsetMap
+        OffsetMapping.Identity
     )
 }
 
@@ -54,7 +54,7 @@ fun creditCardFilter(text: AnnotatedString): TransformedText {
      *  - The 5th char of the transformed text is 4th char in the original text.
      *  - The 12th char of the transformed text is 10th char in the original text.
      */
-    val creditCardOffsetTranslator = object : OffsetMap {
+    val creditCardOffsetTranslator = object : OffsetMapping {
         override fun originalToTransformed(offset: Int): Int {
             if (offset <= 3) return offset
             if (offset <= 7) return offset + 1

@@ -37,7 +37,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.constrain
-import androidx.compose.ui.text.input.OffsetMap
+import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.getSelectedText
 import androidx.compose.ui.text.input.getTextAfterSelection
@@ -55,9 +55,9 @@ import kotlin.math.min
 internal class TextFieldSelectionManager() {
 
     /**
-     * The current [OffsetMap] for text field.
+     * The current [OffsetMapping] for text field.
      */
-    internal var offsetMap: OffsetMap = OffsetMap.identityOffsetMap
+    internal var offsetMapping: OffsetMapping = OffsetMapping.Identity
 
     /**
      * Called when the input service updates the values in [TextFieldValue].
@@ -124,7 +124,7 @@ internal class TextFieldSelectionManager() {
             // Long Press at the blank area, the cursor should show up at the end of the line.
             if (!isPositionOnText(pxPosition)) {
                 state?.layoutResult?.let { layoutResult ->
-                    val offset = offsetMap.transformedToOriginal(
+                    val offset = offsetMapping.transformedToOriginal(
                         layoutResult.getLineEnd(
                             layoutResult.getLineForVerticalPosition(pxPosition.y)
                         )
@@ -196,7 +196,7 @@ internal class TextFieldSelectionManager() {
                     downPosition,
                     layoutResult,
                     state!!.processor,
-                    offsetMap,
+                    offsetMapping,
                     onValueChange
                 )
             }
@@ -248,10 +248,10 @@ internal class TextFieldSelectionManager() {
                     val startOffset = if (isStartHandle)
                         layoutResult.getOffsetForPosition(dragBeginPosition + dragTotalDistance)
                     else
-                        offsetMap.originalToTransformed(value.selection.start)
+                        offsetMapping.originalToTransformed(value.selection.start)
 
                     val endOffset = if (isStartHandle)
-                        offsetMap.originalToTransformed(value.selection.end)
+                        offsetMapping.originalToTransformed(value.selection.end)
                     else
                         layoutResult.getOffsetForPosition(dragBeginPosition + dragTotalDistance)
 
@@ -405,7 +405,7 @@ internal class TextFieldSelectionManager() {
         val offset = if (isStartHandle) value.selection.start else value.selection.end
         return getSelectionHandleCoordinates(
             textLayoutResult = state?.layoutResult!!,
-            offset = offsetMap.originalToTransformed(offset),
+            offset = offsetMapping.originalToTransformed(offset),
             isStart = isStartHandle,
             areHandlesCrossed = value.selection.reversed
         )
@@ -523,8 +523,8 @@ internal class TextFieldSelectionManager() {
         wordBasedSelection: Boolean
     ) {
         val transformedSelection = TextRange(
-            offsetMap.originalToTransformed(value.selection.start),
-            offsetMap.originalToTransformed(value.selection.end)
+            offsetMapping.originalToTransformed(value.selection.start),
+            offsetMapping.originalToTransformed(value.selection.end)
         )
 
         val newTransformedSelection = getTextFieldSelection(
@@ -538,8 +538,8 @@ internal class TextFieldSelectionManager() {
         )
 
         val originalSelection = TextRange(
-            start = offsetMap.transformedToOriginal(newTransformedSelection.start),
-            end = offsetMap.transformedToOriginal(newTransformedSelection.end)
+            start = offsetMapping.transformedToOriginal(newTransformedSelection.start),
+            end = offsetMapping.transformedToOriginal(newTransformedSelection.end)
         )
 
         if (originalSelection == value.selection) return

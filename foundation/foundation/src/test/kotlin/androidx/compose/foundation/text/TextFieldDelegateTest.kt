@@ -35,7 +35,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.OffsetMap
+import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.text.input.TransformedText
@@ -77,7 +77,7 @@ class TextFieldDelegateTest {
     /**
      * Test implementation of offset map which doubles the offset in transformed text.
      */
-    private val skippingOffsetMap = object : OffsetMap {
+    private val skippingOffsetMap = object : OffsetMapping {
         override fun originalToTransformed(offset: Int): Int = offset * 2
         override fun transformedToOriginal(offset: Int): Int = offset / 2
     }
@@ -107,7 +107,7 @@ class TextFieldDelegateTest {
             position,
             textLayoutResult,
             processor,
-            OffsetMap.identityOffsetMap,
+            OffsetMapping.Identity,
             onValueChange
         )
 
@@ -219,7 +219,7 @@ class TextFieldDelegateTest {
             textInputService,
             inputSessionToken,
             true /* hasFocus */,
-            OffsetMap.identityOffsetMap
+            OffsetMapping.Identity
         )
         verify(textInputService).notifyFocusedRect(eq(inputSessionToken), any())
     }
@@ -236,7 +236,7 @@ class TextFieldDelegateTest {
             textInputService,
             inputSessionToken,
             false /* hasFocus */,
-            OffsetMap.identityOffsetMap
+            OffsetMapping.Identity
         )
         verify(textInputService, never()).notifyFocusedRect(any(), any())
     }
@@ -259,7 +259,7 @@ class TextFieldDelegateTest {
             textInputService,
             inputSessionToken,
             true /* hasFocus */,
-            OffsetMap.identityOffsetMap
+            OffsetMapping.Identity
         )
         verify(textInputService).notifyFocusedRect(eq(inputSessionToken), any())
     }
@@ -312,20 +312,20 @@ class TextFieldDelegateTest {
 
     @Test
     fun use_identity_mapping_if_none_visual_transformation() {
-        val (visualText, offsetMap) =
+        val (visualText, offsetMapping) =
             VisualTransformation.None.filter(AnnotatedString(text = "Hello, World"))
 
         assertEquals("Hello, World", visualText.text)
         for (i in 0..visualText.text.length) {
             // Identity mapping returns if no visual filter is provided.
-            assertThat(offsetMap.originalToTransformed(i)).isEqualTo(i)
-            assertThat(offsetMap.transformedToOriginal(i)).isEqualTo(i)
+            assertThat(offsetMapping.originalToTransformed(i)).isEqualTo(i)
+            assertThat(offsetMapping.transformedToOriginal(i)).isEqualTo(i)
         }
     }
 
     @Test
     fun apply_composition_decoration() {
-        val identityOffsetMap = object : OffsetMap {
+        val identityOffsetMapping = object : OffsetMapping {
             override fun originalToTransformed(offset: Int): Int = offset
             override fun transformedToOriginal(offset: Int): Int = offset
         }
@@ -335,7 +335,7 @@ class TextFieldDelegateTest {
                 pushStyle(SpanStyle(color = Color.Red))
                 append("Hello, World")
             }.toAnnotatedString(),
-            offsetMap = identityOffsetMap
+            offsetMapping = identityOffsetMapping
         )
 
         val result = TextFieldDelegate.applyCompositionDecoration(
@@ -353,7 +353,7 @@ class TextFieldDelegateTest {
     @Test
     fun apply_composition_decoration_with_offsetmap() {
         val offsetAmount = 5
-        val offsetMap = object : OffsetMap {
+        val offsetMapping = object : OffsetMapping {
             override fun originalToTransformed(offset: Int): Int = offsetAmount + offset
             override fun transformedToOriginal(offset: Int): Int = offset - offsetAmount
         }
@@ -363,7 +363,7 @@ class TextFieldDelegateTest {
                 append(" ".repeat(offsetAmount))
                 append("Hello World")
             }.toAnnotatedString(),
-            offsetMap = offsetMap
+            offsetMapping = offsetMapping
         )
 
         val range = TextRange(0, 2)
