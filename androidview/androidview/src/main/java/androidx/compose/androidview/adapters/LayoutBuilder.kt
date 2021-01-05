@@ -16,6 +16,7 @@
 
 package androidx.compose.androidview.adapters
 
+import android.annotation.SuppressLint
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.ui.node.ViewAdapter
@@ -33,6 +34,7 @@ private val genDefaultLayoutParams by lazy {
     method
 }
 
+@SuppressLint("RestrictedApi")
 fun View.getOrAddLayoutBuilderAdapter() = getOrAddAdapter(LayoutBuilderId) { LayoutBuilder() }
 
 fun registerFloatLayoutHandler(attr: Int, setter: ViewGroup.LayoutParams.(Float) -> Unit) {
@@ -47,6 +49,7 @@ fun registerLayoutHandler(attr: Int, setter: ViewGroup.LayoutParams.(Any?) -> Un
     anyHandlers[attr] = setter
 }
 
+@SuppressLint("RestrictedApi")
 class LayoutBuilder : ViewAdapter {
     private val intAttrs = HashMap<Int, Int>()
     private val floatAttrs = HashMap<Int, Float>()
