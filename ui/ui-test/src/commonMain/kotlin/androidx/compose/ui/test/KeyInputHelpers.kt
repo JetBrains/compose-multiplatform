@@ -17,6 +17,7 @@
 package androidx.compose.ui.test
 
 import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.key
 
 /**
  * Send the specified [KeyEvent] to the focused component.

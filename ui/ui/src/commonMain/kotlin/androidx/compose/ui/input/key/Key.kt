@@ -19,9 +19,10 @@ package androidx.compose.ui.input.key
 /**
  * Represents keys on a keyboard.
  *
- * @param keyCode an integer code representing the key pressed.
+ * @param keyCode a Long value representing the key pressed. Note: This keycode can be used to
+ * uniquely identify a hardware key. It is different from the native keycode.
  */
-expect inline class Key(val keyCode: Int) {
+expect inline class Key(val keyCode: Long) {
     companion object {
         /** Unknown key. */
         val Unknown: Key
@@ -180,40 +181,34 @@ expect inline class Key(val keyCode: Int) {
         val Clear: Key
 
         /** '0' key. */
-        val Number0: Key
+        val Zero: Key
 
         /** '1' key. */
-        val Number1: Key
+        val One: Key
 
         /** '2' key. */
-        val Number2: Key
+        val Two: Key
 
         /** '3' key. */
-        val Number3: Key
+        val Three: Key
 
         /** '4' key. */
-        val Number4: Key
+        val Four: Key
 
         /** '5' key. */
-        val Number5: Key
+        val Five: Key
 
         /** '6' key. */
-        val Number6: Key
+        val Six: Key
 
         /** '7' key. */
-        val Number7: Key
+        val Seven: Key
 
         /** '8' key. */
-        val Number8: Key
+        val Eight: Key
 
         /** '9' key. */
-        val Number9: Key
-
-        /** '11' key. */
-        val Number11: Key
-
-        /** '12' key. */
-        val Number12: Key
+        val Nine: Key
 
         /** '+' key. */
         val Plus: Key

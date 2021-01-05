@@ -1,8 +1,4 @@
 // Baseline format: 1.0
-AutoBoxing: androidx.compose.ui.text.FractionTtsAnnotation#FractionTtsAnnotation(long, long, Long) parameter #2:
-    Must avoid boxed primitives (`java.lang.Long`)
-
-
 BuilderSetStyle: androidx.compose.ui.text.AnnotatedString.Builder#append(String):
     Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.text.AnnotatedString.Builder.append(String)
 BuilderSetStyle: androidx.compose.ui.text.AnnotatedString.Builder#append(androidx.compose.ui.text.AnnotatedString):

@@ -1,21 +1,3 @@
 // Baseline format: 1.0
-ArrayReturn: androidx.compose.foundation.layout.ConstraintLayoutBaseScope#createAbsoluteLeftBarrier-GB4eHDc(androidx.compose.foundation.layout.ConstrainedLayoutReference[], float) parameter #0:
-    Method parameter should be Collection<ConstrainedLayoutReference> (or subclass) instead of raw array; was `androidx.compose.foundation.layout.ConstrainedLayoutReference[]`
-ArrayReturn: androidx.compose.foundation.layout.ConstraintLayoutBaseScope#createAbsoluteRightBarrier-GB4eHDc(androidx.compose.foundation.layout.ConstrainedLayoutReference[], float) parameter #0:
-    Method parameter should be Collection<ConstrainedLayoutReference> (or subclass) instead of raw array; was `androidx.compose.foundation.layout.ConstrainedLayoutReference[]`
-ArrayReturn: androidx.compose.foundation.layout.ConstraintLayoutBaseScope#createBottomBarrier-GB4eHDc(androidx.compose.foundation.layout.ConstrainedLayoutReference[], float) parameter #0:
-    Method parameter should be Collection<ConstrainedLayoutReference> (or subclass) instead of raw array; was `androidx.compose.foundation.layout.ConstrainedLayoutReference[]`
-ArrayReturn: androidx.compose.foundation.layout.ConstraintLayoutBaseScope#createEndBarrier-GB4eHDc(androidx.compose.foundation.layout.ConstrainedLayoutReference[], float) parameter #0:
-    Method parameter should be Collection<ConstrainedLayoutReference> (or subclass) instead of raw array; was `androidx.compose.foundation.layout.ConstrainedLayoutReference[]`
-ArrayReturn: androidx.compose.foundation.layout.ConstraintLayoutBaseScope#createHorizontalChain(androidx.compose.foundation.layout.ConstrainedLayoutReference[], androidx.compose.foundation.layout.ChainStyle) parameter #0:
-    Method parameter should be Collection<ConstrainedLayoutReference> (or subclass) instead of raw array; was `androidx.compose.foundation.layout.ConstrainedLayoutReference[]`
-ArrayReturn: androidx.compose.foundation.layout.ConstraintLayoutBaseScope#createStartBarrier-GB4eHDc(androidx.compose.foundation.layout.ConstrainedLayoutReference[], float) parameter #0:
-    Method parameter should be Collection<ConstrainedLayoutReference> (or subclass) instead of raw array; was `androidx.compose.foundation.layout.ConstrainedLayoutReference[]`
-ArrayReturn: androidx.compose.foundation.layout.ConstraintLayoutBaseScope#createTopBarrier-GB4eHDc(androidx.compose.foundation.layout.ConstrainedLayoutReference[], float) parameter #0:
-    Method parameter should be Collection<ConstrainedLayoutReference> (or subclass) instead of raw array; was `androidx.compose.foundation.layout.ConstrainedLayoutReference[]`
-ArrayReturn: androidx.compose.foundation.layout.ConstraintLayoutBaseScope#createVerticalChain(androidx.compose.foundation.layout.ConstrainedLayoutReference[], androidx.compose.foundation.layout.ChainStyle) parameter #0:
-    Method parameter should be Collection<ConstrainedLayoutReference> (or subclass) instead of raw array; was `androidx.compose.foundation.layout.ConstrainedLayoutReference[]`
-
-
 MutableBareField: androidx.compose.foundation.layout.State#layoutDirection:
     Bare field layoutDirection must be marked final, or moved behind accessors if mutable

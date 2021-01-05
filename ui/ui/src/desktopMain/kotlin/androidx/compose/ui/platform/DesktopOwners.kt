@@ -18,7 +18,7 @@ package androidx.compose.ui.platform
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.staticAmbientOf
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.key.KeyEventDesktop
+import androidx.compose.ui.input.key.KeyEvent as ComposeKeyEvent
 import androidx.compose.ui.input.mouse.MouseScrollEvent
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputData
@@ -136,7 +136,7 @@ class DesktopOwners(
     }
 
     private fun consumeKeyEventOr(event: KeyEvent, or: () -> Unit) {
-        val consumed = list.lastOrNull()?.sendKeyEvent(KeyEventDesktop(event)) ?: false
+        val consumed = list.lastOrNull()?.sendKeyEvent(ComposeKeyEvent(event)) ?: false
         if (!consumed) {
             or()
         }

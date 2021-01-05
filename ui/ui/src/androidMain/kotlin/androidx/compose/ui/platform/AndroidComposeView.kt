@@ -52,7 +52,6 @@ import androidx.compose.ui.graphics.CanvasHolder
 import androidx.compose.ui.hapticfeedback.AndroidHapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.input.key.KeyEvent
-import androidx.compose.ui.input.key.KeyEventAndroid
 import androidx.compose.ui.input.key.KeyInputModifier
 import androidx.compose.ui.input.pointer.MotionEventAdapter
 import androidx.compose.ui.input.pointer.PointerInputEventProcessor
@@ -310,7 +309,7 @@ internal class AndroidComposeView(context: Context) :
         if (isFocused) {
             // Focus lies within the Compose hierarchy, so we dispatch the key event to the
             // appropriate place.
-            sendKeyEvent(KeyEventAndroid(event))
+            sendKeyEvent(KeyEvent(event))
         } else {
             // This Owner has a focused child view, which is a view interop use case,
             // so we use the default ViewGroup behavior which will route tke key event to the

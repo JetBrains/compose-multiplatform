@@ -19,6 +19,9 @@
 
 package androidx.compose.integration.docs.testing
 
+import android.view.KeyEvent as AndroidKeyEvent
+import android.view.KeyEvent.KEYCODE_A as KeyCodeA
+import android.view.KeyEvent.ACTION_DOWN as ActionDown
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.Text
@@ -227,4 +230,4 @@ private val exampleUiState = Unit
 private class MyActivity : ComponentActivity()
 @Composable private fun MyButton(content: @Composable RowScope.() -> Unit) { }
 private lateinit var key: SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>
-private lateinit var keyEvent: KeyEvent
+private var keyEvent = KeyEvent(AndroidKeyEvent(ActionDown, KeyCodeA))
