@@ -18,6 +18,3 @@ package androidx.compose.foundation.layout
 
 @RequiresOptIn("The API of this layout is experimental and is likely to change in the future.")
 annotation class ExperimentalLayout
-
-@RequiresOptIn("This is an internal layout API subject to change and should not be used directly.")
-annotation class InternalLayoutApi

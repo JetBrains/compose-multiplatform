@@ -52,6 +52,7 @@ val AmbientAnimationClock = staticAmbientOf<AnimationClockObservable>()
 /**
  * The ambient that can be used to trigger autofill actions. Eg. [Autofill.requestAutofillForNode].
  */
+@get:ExperimentalComposeUiApi
 @ExperimentalComposeUiApi
 val AmbientAutofill = staticAmbientOf<Autofill?>()
 
@@ -61,6 +62,7 @@ val AmbientAutofill = staticAmbientOf<Autofill?>()
  * [AutofillTree] is a temporary data structure that will be replaced by Autofill Semantics
  * (b/138604305).
  */
+@get:ExperimentalComposeUiApi
 @ExperimentalComposeUiApi
 val AmbientAutofillTree = staticAmbientOf<AutofillTree>()
 

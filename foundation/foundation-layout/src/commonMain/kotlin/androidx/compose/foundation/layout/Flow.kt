@@ -130,7 +130,6 @@ typealias FlowMainAxisAlignment = MainAxisAlignment
  * Layout model that arranges its children in a horizontal or vertical flow.
  */
 @Composable
-@OptIn(InternalLayoutApi::class)
 private fun Flow(
     orientation: LayoutOrientation,
     mainAxisSize: SizeMode,
@@ -298,7 +297,6 @@ enum class SizeMode {
 /**
  * Used to specify the alignment of a layout's children, in main axis direction.
  */
-@OptIn(InternalLayoutApi::class)
 enum class MainAxisAlignment(internal val arrangement: Arrangement.Vertical) {
     // TODO(soboleva) support RTl in Flow
     // workaround for now - use Arrangement that equals to previous Arrangement

@@ -74,17 +74,17 @@ package androidx.compose.foundation.layout {
     field public static final androidx.compose.foundation.layout.Arrangement.Absolute INSTANCE;
   }
 
-  @androidx.compose.foundation.layout.InternalLayoutApi @androidx.compose.runtime.Immutable public static interface Arrangement.Horizontal {
+  @androidx.compose.runtime.Immutable public static interface Arrangement.Horizontal {
     method public void arrange(int totalSize, int[] size, androidx.compose.ui.unit.LayoutDirection layoutDirection, androidx.compose.ui.unit.Density density, int[] outPosition);
     method public default float getSpacing-D9Ej5fM();
     property public default float spacing;
   }
 
-  @androidx.compose.foundation.layout.InternalLayoutApi @androidx.compose.runtime.Immutable public static interface Arrangement.HorizontalOrVertical extends androidx.compose.foundation.layout.Arrangement.Horizontal androidx.compose.foundation.layout.Arrangement.Vertical {
+  @androidx.compose.runtime.Immutable public static interface Arrangement.HorizontalOrVertical extends androidx.compose.foundation.layout.Arrangement.Horizontal androidx.compose.foundation.layout.Arrangement.Vertical {
     property public default float spacing;
   }
 
-  @androidx.compose.foundation.layout.InternalLayoutApi @androidx.compose.runtime.Immutable public static interface Arrangement.Vertical {
+  @androidx.compose.runtime.Immutable public static interface Arrangement.Vertical {
     method public void arrange(int totalSize, int[] size, androidx.compose.ui.unit.Density density, int[] outPosition);
     method public default float getSpacing-D9Ej5fM();
     property public default float spacing;
@@ -329,9 +329,6 @@ package androidx.compose.foundation.layout {
   public final class FlowKt {
     method @Deprecated @androidx.compose.foundation.layout.ExperimentalLayout @androidx.compose.runtime.Composable public static void FlowColumn-4CIokMg(optional androidx.compose.foundation.layout.SizeMode mainAxisSize, optional androidx.compose.foundation.layout.MainAxisAlignment mainAxisAlignment, optional float mainAxisSpacing, optional androidx.compose.foundation.layout.FlowCrossAxisAlignment crossAxisAlignment, optional float crossAxisSpacing, optional androidx.compose.foundation.layout.MainAxisAlignment lastLineMainAxisAlignment, kotlin.jvm.functions.Function0<kotlin.Unit> content);
     method @Deprecated @androidx.compose.foundation.layout.ExperimentalLayout @androidx.compose.runtime.Composable public static void FlowRow-4CIokMg(optional androidx.compose.foundation.layout.SizeMode mainAxisSize, optional androidx.compose.foundation.layout.MainAxisAlignment mainAxisAlignment, optional float mainAxisSpacing, optional androidx.compose.foundation.layout.FlowCrossAxisAlignment crossAxisAlignment, optional float crossAxisSpacing, optional androidx.compose.foundation.layout.MainAxisAlignment lastLineMainAxisAlignment, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-  }
-
-  @kotlin.RequiresOptIn(message="This is an internal layout API subject to change and should not be used directly.") public @interface InternalLayoutApi {
   }
 
   public final class IntrinsicKt {

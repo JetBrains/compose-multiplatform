@@ -65,7 +65,6 @@ import androidx.compose.ui.util.annotation.FloatRange
  * @see [androidx.compose.foundation.lazy.LazyColumn]
  */
 @Composable
-@OptIn(InternalLayoutApi::class)
 inline fun Column(
     modifier: Modifier = Modifier,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
@@ -81,7 +80,6 @@ inline fun Column(
 }
 
 @PublishedApi
-@OptIn(InternalLayoutApi::class)
 internal val DefaultColumnMeasureBlocks = rowColumnMeasureBlocks(
     orientation = LayoutOrientation.Vertical,
     arrangement = { totalSize, size, _, density, outPosition ->
@@ -94,7 +92,6 @@ internal val DefaultColumnMeasureBlocks = rowColumnMeasureBlocks(
 
 @PublishedApi
 @Composable
-@OptIn(InternalLayoutApi::class)
 internal fun columnMeasureBlocks(
     verticalArrangement: Arrangement.Vertical,
     horizontalAlignment: Alignment.Horizontal
