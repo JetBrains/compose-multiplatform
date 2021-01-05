@@ -818,12 +818,7 @@ package androidx.compose.ui.text.input {
   @androidx.compose.runtime.Immutable public final class ImeOptions {
     ctor public ImeOptions(boolean singleLine, androidx.compose.ui.text.input.KeyboardCapitalization capitalization, boolean autoCorrect, androidx.compose.ui.text.input.KeyboardType keyboardType, androidx.compose.ui.text.input.ImeAction imeAction);
     ctor public ImeOptions();
-    method public boolean component1();
-    method public androidx.compose.ui.text.input.KeyboardCapitalization component2();
-    method public boolean component3();
-    method public androidx.compose.ui.text.input.KeyboardType component4();
-    method public androidx.compose.ui.text.input.ImeAction component5();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.text.input.ImeOptions copy(boolean singleLine, androidx.compose.ui.text.input.KeyboardCapitalization capitalization, boolean autoCorrect, androidx.compose.ui.text.input.KeyboardType keyboardType, androidx.compose.ui.text.input.ImeAction imeAction);
+    method public androidx.compose.ui.text.input.ImeOptions copy(optional boolean singleLine, optional androidx.compose.ui.text.input.KeyboardCapitalization capitalization, optional boolean autoCorrect, optional androidx.compose.ui.text.input.KeyboardType keyboardType, optional androidx.compose.ui.text.input.ImeAction imeAction);
     method public boolean getAutoCorrect();
     method public androidx.compose.ui.text.input.KeyboardCapitalization getCapitalization();
     method public androidx.compose.ui.text.input.ImeAction getImeAction();
