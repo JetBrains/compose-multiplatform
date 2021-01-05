@@ -157,6 +157,9 @@ package androidx.compose.ui {
     method @Deprecated public static androidx.compose.ui.Modifier focusRequester(androidx.compose.ui.Modifier, Object focusRequester);
   }
 
+  @kotlin.RequiresOptIn(message="Unstable API for use only between compose-ui modules sharing the same exact version, " + "subject to change without notice in major, minor, or patch releases.") public @interface InternalComposeUiApi {
+  }
+
   @androidx.compose.runtime.Stable public interface Modifier {
     method public boolean all(kotlin.jvm.functions.Function1<? super androidx.compose.ui.Modifier.Element,java.lang.Boolean> predicate);
     method public boolean any(kotlin.jvm.functions.Function1<? super androidx.compose.ui.Modifier.Element,java.lang.Boolean> predicate);
@@ -2413,10 +2416,27 @@ package androidx.compose.ui.platform {
     method @androidx.compose.runtime.Composable public static void WindowFocusObserver(kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onWindowFocusChanged);
   }
 
+  @androidx.compose.ui.InternalComposeUiApi public fun interface WindowRecomposerFactory {
+    method public androidx.compose.runtime.Recomposer createRecomposer(android.view.View windowRootView);
+    field public static final androidx.compose.ui.platform.WindowRecomposerFactory.Companion Companion;
+  }
+
+  public static final class WindowRecomposerFactory.Companion {
+    method @Deprecated public androidx.compose.ui.platform.WindowRecomposerFactory getGlobal();
+    method public androidx.compose.ui.platform.WindowRecomposerFactory getLifecycleAware();
+    property @Deprecated public final androidx.compose.ui.platform.WindowRecomposerFactory Global;
+    property public final androidx.compose.ui.platform.WindowRecomposerFactory LifecycleAware;
+  }
+
   public final class WindowRecomposerKt {
     method public static androidx.compose.runtime.CompositionReference? findViewTreeCompositionReference(android.view.View);
     method public static androidx.compose.runtime.CompositionReference? getCompositionReference(android.view.View);
     method public static void setCompositionReference(android.view.View, androidx.compose.runtime.CompositionReference? value);
+  }
+
+  @androidx.compose.ui.InternalComposeUiApi public final class WindowRecomposerPolicy {
+    method public void setWindowRecomposerFactory(androidx.compose.ui.platform.WindowRecomposerFactory factory);
+    field public static final androidx.compose.ui.platform.WindowRecomposerPolicy INSTANCE;
   }
 
   public final class WrapperKt {
