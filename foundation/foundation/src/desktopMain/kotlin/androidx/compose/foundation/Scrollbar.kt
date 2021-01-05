@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation
 
-import androidx.compose.animation.animate
+import androidx.compose.animation.animateAsState
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.lazy.LazyListState
@@ -218,9 +218,9 @@ private fun Scrollbar(
         }
     }
 
-    val color = animate(
+    val color by animateAsState(
         if (isHover) style.hoverColor else style.unhoverColor,
-        animSpec = TweenSpec(durationMillis = style.hoverDurationMillis)
+        animationSpec = TweenSpec(durationMillis = style.hoverDurationMillis)
     )
 
     val isVisible = sliderAdapter.size < containerSize

@@ -17,7 +17,8 @@
 package androidx.compose.material.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.animation.animate
+import androidx.compose.animation.animateAsState
+import androidx.compose.animation.core.animateAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -96,7 +97,7 @@ fun SwipeToDismissListItems() {
                 },
                 background = {
                     val direction = dismissState.dismissDirection ?: return@SwipeToDismiss
-                    val color = animate(
+                    val color by animateAsState(
                         when (dismissState.targetValue) {
                             Default -> Color.LightGray
                             DismissedToEnd -> Color.Green
@@ -111,7 +112,9 @@ fun SwipeToDismissListItems() {
                         StartToEnd -> Icons.Default.Done
                         EndToStart -> Icons.Default.Delete
                     }
-                    val scale = animate(if (dismissState.targetValue == Default) 0.75f else 1f)
+                    val scale by animateAsState(
+                        if (dismissState.targetValue == Default) 0.75f else 1f
+                    )
 
                     Box(
                         Modifier.fillMaxSize().background(color).padding(horizontal = 20.dp),
@@ -122,9 +125,9 @@ fun SwipeToDismissListItems() {
                 },
                 dismissContent = {
                     Card(
-                        elevation = animate(
+                        elevation = animateAsState(
                             if (dismissState.dismissDirection != null) 4.dp else 0.dp
-                        )
+                        ).value
                     ) {
                         ListItem(
                             text = {

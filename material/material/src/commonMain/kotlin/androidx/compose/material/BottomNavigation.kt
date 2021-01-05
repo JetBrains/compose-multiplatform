@@ -16,10 +16,10 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.animate
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.VectorizedAnimationSpec
+import androidx.compose.animation.core.animateAsState
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.layout.Arrangement
@@ -34,6 +34,7 @@ import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.emptyContent
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -204,9 +205,9 @@ private fun BottomNavigationTransition(
     selected: Boolean,
     content: @Composable (animationProgress: Float) -> Unit
 ) {
-    val animationProgress = animate(
-        target = if (selected) 1f else 0f,
-        animSpec = BottomNavigationAnimationSpec
+    val animationProgress by animateAsState(
+        targetValue = if (selected) 1f else 0f,
+        animationSpec = BottomNavigationAnimationSpec
     )
 
     val color = lerp(inactiveColor, activeColor, animationProgress)
