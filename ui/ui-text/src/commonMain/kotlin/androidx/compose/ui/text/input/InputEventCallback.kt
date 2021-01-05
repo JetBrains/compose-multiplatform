@@ -19,13 +19,13 @@ package androidx.compose.ui.text.input
 /**
  * An interface of listening IME events.
  */
-interface InputEventListener {
+interface InputEventCallback {
     /**
      * Called when IME sends some input events.
      *
-     * @param editOps The list of edit operations.
+     * @param editCommands The list of edit commands.
      */
-    fun onEditOperations(editOps: List<EditOperation>)
+    fun onEditCommands(editCommands: List<EditCommand>)
 
     /**
      * Called when IME triggered IME action.

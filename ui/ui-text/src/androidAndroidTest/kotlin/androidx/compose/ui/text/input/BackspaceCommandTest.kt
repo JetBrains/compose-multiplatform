@@ -26,7 +26,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @SmallTest
 @RunWith(AndroidJUnit4::class)
-class BackspaceKeyEditOpTest {
+class BackspaceCommandTest {
 
     // Test sample surrogate pair characters.
     private val SP1 = "\uD83D\uDE00" // U+1F600: GRINNING FACE
@@ -42,7 +42,7 @@ class BackspaceKeyEditOpTest {
     fun test_delete() {
         val eb = EditingBuffer("ABCDE", TextRange(1))
 
-        BackspaceKeyEditOp().process(eb)
+        BackspaceCommand().applyTo(eb)
 
         assertEquals("BCDE", eb.toString())
         assertEquals(0, eb.cursor)
@@ -53,7 +53,7 @@ class BackspaceKeyEditOpTest {
     fun test_delete_from_offset0() {
         val eb = EditingBuffer("ABCDE", TextRange.Zero)
 
-        BackspaceKeyEditOp().process(eb)
+        BackspaceCommand().applyTo(eb)
 
         assertEquals("ABCDE", eb.toString())
         assertEquals(0, eb.cursor)
@@ -64,7 +64,7 @@ class BackspaceKeyEditOpTest {
     fun test_delete_with_selection() {
         val eb = EditingBuffer("ABCDE", TextRange(2, 3))
 
-        BackspaceKeyEditOp().process(eb)
+        BackspaceCommand().applyTo(eb)
 
         assertEquals("ABDE", eb.toString())
         assertEquals(2, eb.cursor)
@@ -76,7 +76,7 @@ class BackspaceKeyEditOpTest {
         val eb = EditingBuffer("ABCDE", TextRange(1))
         eb.setComposition(2, 3)
 
-        BackspaceKeyEditOp().process(eb)
+        BackspaceCommand().applyTo(eb)
 
         assertEquals("ABDE", eb.toString())
         assertEquals(1, eb.cursor)
@@ -87,7 +87,7 @@ class BackspaceKeyEditOpTest {
     fun test_delete_surrogate_pair() {
         val eb = EditingBuffer("$SP1$SP2$SP3$SP4$SP5", TextRange(2))
 
-        BackspaceKeyEditOp().process(eb)
+        BackspaceCommand().applyTo(eb)
 
         assertEquals("$SP2$SP3$SP4$SP5", eb.toString())
         assertEquals(0, eb.cursor)
@@ -98,7 +98,7 @@ class BackspaceKeyEditOpTest {
     fun test_delete_with_selection_surrogate_pair() {
         val eb = EditingBuffer("$SP1$SP2$SP3$SP4$SP5", TextRange(4, 6))
 
-        BackspaceKeyEditOp().process(eb)
+        BackspaceCommand().applyTo(eb)
 
         assertEquals("$SP1$SP2$SP4$SP5", eb.toString())
         assertEquals(4, eb.cursor)
@@ -110,7 +110,7 @@ class BackspaceKeyEditOpTest {
         val eb = EditingBuffer("$SP1$SP2$SP3$SP4$SP5", TextRange(2))
         eb.setComposition(4, 6)
 
-        BackspaceKeyEditOp().process(eb)
+        BackspaceCommand().applyTo(eb)
 
         assertEquals("$SP1$SP2$SP4$SP5", eb.toString())
         assertEquals(2, eb.cursor)
@@ -125,7 +125,7 @@ class BackspaceKeyEditOpTest {
             TextRange(ZWJ_EMOJI.length)
         )
 
-        BackspaceKeyEditOp().process(eb)
+        BackspaceCommand().applyTo(eb)
 
         assertEquals(ZWJ_EMOJI, eb.toString())
         assertEquals(0, eb.cursor)

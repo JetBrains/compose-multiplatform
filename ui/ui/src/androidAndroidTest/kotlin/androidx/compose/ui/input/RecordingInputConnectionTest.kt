@@ -19,18 +19,18 @@ package androidx.compose.ui.input
 import android.view.KeyEvent
 import android.view.inputmethod.CorrectionInfo
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.input.BackspaceKeyEditOp
-import androidx.compose.ui.text.input.CommitTextEditOp
-import androidx.compose.ui.text.input.DeleteSurroundingTextEditOp
-import androidx.compose.ui.text.input.DeleteSurroundingTextInCodePointsEditOp
-import androidx.compose.ui.text.input.EditOperation
-import androidx.compose.ui.text.input.FinishComposingTextEditOp
-import androidx.compose.ui.text.input.InputEventListener
-import androidx.compose.ui.text.input.MoveCursorEditOp
+import androidx.compose.ui.text.input.BackspaceCommand
+import androidx.compose.ui.text.input.CommitTextCommand
+import androidx.compose.ui.text.input.DeleteSurroundingTextCommand
+import androidx.compose.ui.text.input.DeleteSurroundingTextInCodePointsCommand
+import androidx.compose.ui.text.input.EditCommand
+import androidx.compose.ui.text.input.FinishComposingTextCommand
+import androidx.compose.ui.text.input.InputEventCallback
+import androidx.compose.ui.text.input.MoveCursorCommand
 import androidx.compose.ui.text.input.RecordingInputConnection
-import androidx.compose.ui.text.input.SetComposingRegionEditOp
-import androidx.compose.ui.text.input.SetComposingTextEditOp
-import androidx.compose.ui.text.input.SetSelectionEditOp
+import androidx.compose.ui.text.input.SetComposingRegionCommand
+import androidx.compose.ui.text.input.SetComposingTextCommand
+import androidx.compose.ui.text.input.SetSelectionCommand
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
@@ -52,14 +52,14 @@ import org.junit.runner.RunWith
 class RecordingInputConnectionTest {
 
     private lateinit var ic: RecordingInputConnection
-    private lateinit var listener: InputEventListener
+    private lateinit var mCallback: InputEventCallback
 
     @Before
     fun setup() {
-        listener = mock()
+        mCallback = mock()
         ic = RecordingInputConnection(
             initState = TextFieldValue("", TextRange.Zero),
-            eventListener = listener,
+            eventCallback = mCallback,
             autoCorrect = true
         )
     }
@@ -156,22 +156,22 @@ class RecordingInputConnectionTest {
 
     @Test
     fun commitTextTest() {
-        val captor = argumentCaptor<List<EditOperation>>()
+        val captor = argumentCaptor<List<EditCommand>>()
 
         ic.mTextFieldValue = TextFieldValue(text = "", selection = TextRange.Zero)
 
         // Inserting "Hello, " into the empty text field.
         assertTrue(ic.commitText("Hello, ", 1))
 
-        verify(listener, times(1)).onEditOperations(captor.capture())
-        val editOps = captor.lastValue
-        assertEquals(1, editOps.size)
-        assertEquals(CommitTextEditOp("Hello, ", 1), editOps[0])
+        verify(mCallback, times(1)).onEditCommands(captor.capture())
+        val editCommands = captor.lastValue
+        assertEquals(1, editCommands.size)
+        assertEquals(CommitTextCommand("Hello, ", 1), editCommands[0])
     }
 
     @Test
     fun commitTextTest_batchSession() {
-        val captor = argumentCaptor<List<EditOperation>>()
+        val captor = argumentCaptor<List<EditCommand>>()
 
         ic.mTextFieldValue = TextFieldValue(text = "", selection = TextRange.Zero)
 
@@ -180,38 +180,38 @@ class RecordingInputConnectionTest {
         ic.beginBatchEdit()
 
         assertTrue(ic.commitText("Hello, ", 1))
-        verify(listener, never()).onEditOperations(any())
+        verify(mCallback, never()).onEditCommands(any())
 
         assertTrue(ic.commitText("World.", 1))
-        verify(listener, never()).onEditOperations(any())
+        verify(mCallback, never()).onEditCommands(any())
 
         ic.endBatchEdit()
 
-        verify(listener, times(1)).onEditOperations(captor.capture())
-        val editOps = captor.lastValue
-        assertEquals(2, editOps.size)
-        assertEquals(CommitTextEditOp("Hello, ", 1), editOps[0])
-        assertEquals(CommitTextEditOp("World.", 1), editOps[1])
+        verify(mCallback, times(1)).onEditCommands(captor.capture())
+        val editCommands = captor.lastValue
+        assertEquals(2, editCommands.size)
+        assertEquals(CommitTextCommand("Hello, ", 1), editCommands[0])
+        assertEquals(CommitTextCommand("World.", 1), editCommands[1])
     }
 
     @Test
     fun setComposingRegion() {
-        val captor = argumentCaptor<List<EditOperation>>()
+        val captor = argumentCaptor<List<EditCommand>>()
 
         ic.mTextFieldValue = TextFieldValue(text = "Hello, World.", selection = TextRange.Zero)
 
         // Mark first "H" as composition.
         assertTrue(ic.setComposingRegion(0, 1))
 
-        verify(listener, times(1)).onEditOperations(captor.capture())
-        val editOps = captor.lastValue
-        assertEquals(1, editOps.size)
-        assertEquals(SetComposingRegionEditOp(0, 1), editOps[0])
+        verify(mCallback, times(1)).onEditCommands(captor.capture())
+        val editCommands = captor.lastValue
+        assertEquals(1, editCommands.size)
+        assertEquals(SetComposingRegionCommand(0, 1), editCommands[0])
     }
 
     @Test
     fun setComposingRegion_batchSession() {
-        val captor = argumentCaptor<List<EditOperation>>()
+        val captor = argumentCaptor<List<EditCommand>>()
 
         ic.mTextFieldValue = TextFieldValue(text = "Hello, World", selection = TextRange.Zero)
 
@@ -219,38 +219,38 @@ class RecordingInputConnectionTest {
         ic.beginBatchEdit()
 
         assertTrue(ic.setComposingRegion(0, 1))
-        verify(listener, never()).onEditOperations(any())
+        verify(mCallback, never()).onEditCommands(any())
 
         assertTrue(ic.setComposingRegion(1, 2))
-        verify(listener, never()).onEditOperations(any())
+        verify(mCallback, never()).onEditCommands(any())
 
         ic.endBatchEdit()
 
-        verify(listener, times(1)).onEditOperations(captor.capture())
-        val editOps = captor.lastValue
-        assertEquals(2, editOps.size)
-        assertEquals(SetComposingRegionEditOp(0, 1), editOps[0])
-        assertEquals(SetComposingRegionEditOp(1, 2), editOps[1])
+        verify(mCallback, times(1)).onEditCommands(captor.capture())
+        val editCommands = captor.lastValue
+        assertEquals(2, editCommands.size)
+        assertEquals(SetComposingRegionCommand(0, 1), editCommands[0])
+        assertEquals(SetComposingRegionCommand(1, 2), editCommands[1])
     }
 
     @Test
     fun setComposingTextTest() {
-        val captor = argumentCaptor<List<EditOperation>>()
+        val captor = argumentCaptor<List<EditCommand>>()
 
         ic.mTextFieldValue = TextFieldValue(text = "", selection = TextRange.Zero)
 
         // Inserting "Hello, " into the empty text field.
         assertTrue(ic.setComposingText("Hello, ", 1))
 
-        verify(listener, times(1)).onEditOperations(captor.capture())
-        val editOps = captor.lastValue
-        assertEquals(1, editOps.size)
-        assertEquals(SetComposingTextEditOp("Hello, ", 1), editOps[0])
+        verify(mCallback, times(1)).onEditCommands(captor.capture())
+        val editCommands = captor.lastValue
+        assertEquals(1, editCommands.size)
+        assertEquals(SetComposingTextCommand("Hello, ", 1), editCommands[0])
     }
 
     @Test
     fun setComposingTextTest_batchSession() {
-        val captor = argumentCaptor<List<EditOperation>>()
+        val captor = argumentCaptor<List<EditCommand>>()
 
         ic.mTextFieldValue = TextFieldValue(text = "", selection = TextRange.Zero)
 
@@ -259,38 +259,38 @@ class RecordingInputConnectionTest {
         ic.beginBatchEdit()
 
         assertTrue(ic.setComposingText("Hello, ", 1))
-        verify(listener, never()).onEditOperations(any())
+        verify(mCallback, never()).onEditCommands(any())
 
         assertTrue(ic.setComposingText("World.", 1))
-        verify(listener, never()).onEditOperations(any())
+        verify(mCallback, never()).onEditCommands(any())
 
         ic.endBatchEdit()
 
-        verify(listener, times(1)).onEditOperations(captor.capture())
-        val editOps = captor.lastValue
-        assertEquals(2, editOps.size)
-        assertEquals(SetComposingTextEditOp("Hello, ", 1), editOps[0])
-        assertEquals(SetComposingTextEditOp("World.", 1), editOps[1])
+        verify(mCallback, times(1)).onEditCommands(captor.capture())
+        val editCommands = captor.lastValue
+        assertEquals(2, editCommands.size)
+        assertEquals(SetComposingTextCommand("Hello, ", 1), editCommands[0])
+        assertEquals(SetComposingTextCommand("World.", 1), editCommands[1])
     }
 
     @Test
     fun deleteSurroundingText() {
-        val captor = argumentCaptor<List<EditOperation>>()
+        val captor = argumentCaptor<List<EditCommand>>()
 
         ic.mTextFieldValue = TextFieldValue(text = "Hello, World.", selection = TextRange.Zero)
 
         // Delete first "Hello, " characters
         assertTrue(ic.deleteSurroundingText(0, 6))
 
-        verify(listener, times(1)).onEditOperations(captor.capture())
-        val editOps = captor.lastValue
-        assertEquals(1, editOps.size)
-        assertEquals(DeleteSurroundingTextEditOp(0, 6), editOps[0])
+        verify(mCallback, times(1)).onEditCommands(captor.capture())
+        val editCommands = captor.lastValue
+        assertEquals(1, editCommands.size)
+        assertEquals(DeleteSurroundingTextCommand(0, 6), editCommands[0])
     }
 
     @Test
     fun deleteSurroundingText_batchSession() {
-        val captor = argumentCaptor<List<EditOperation>>()
+        val captor = argumentCaptor<List<EditCommand>>()
 
         ic.mTextFieldValue = TextFieldValue(text = "Hello, World", selection = TextRange.Zero)
 
@@ -298,38 +298,38 @@ class RecordingInputConnectionTest {
         ic.beginBatchEdit()
 
         assertTrue(ic.deleteSurroundingText(0, 6))
-        verify(listener, never()).onEditOperations(any())
+        verify(mCallback, never()).onEditCommands(any())
 
         assertTrue(ic.deleteSurroundingText(0, 5))
-        verify(listener, never()).onEditOperations(any())
+        verify(mCallback, never()).onEditCommands(any())
 
         ic.endBatchEdit()
 
-        verify(listener, times(1)).onEditOperations(captor.capture())
-        val editOps = captor.lastValue
-        assertEquals(2, editOps.size)
-        assertEquals(DeleteSurroundingTextEditOp(0, 6), editOps[0])
-        assertEquals(DeleteSurroundingTextEditOp(0, 5), editOps[1])
+        verify(mCallback, times(1)).onEditCommands(captor.capture())
+        val editCommands = captor.lastValue
+        assertEquals(2, editCommands.size)
+        assertEquals(DeleteSurroundingTextCommand(0, 6), editCommands[0])
+        assertEquals(DeleteSurroundingTextCommand(0, 5), editCommands[1])
     }
 
     @Test
     fun deleteSurroundingTextInCodePoints() {
-        val captor = argumentCaptor<List<EditOperation>>()
+        val captor = argumentCaptor<List<EditCommand>>()
 
         ic.mTextFieldValue = TextFieldValue(text = "Hello, World.", selection = TextRange.Zero)
 
         // Delete first "Hello, " characters
         assertTrue(ic.deleteSurroundingTextInCodePoints(0, 6))
 
-        verify(listener, times(1)).onEditOperations(captor.capture())
-        val editOps = captor.lastValue
-        assertEquals(1, editOps.size)
-        assertEquals(DeleteSurroundingTextInCodePointsEditOp(0, 6), editOps[0])
+        verify(mCallback, times(1)).onEditCommands(captor.capture())
+        val editCommands = captor.lastValue
+        assertEquals(1, editCommands.size)
+        assertEquals(DeleteSurroundingTextInCodePointsCommand(0, 6), editCommands[0])
     }
 
     @Test
     fun deleteSurroundingTextInCodePoints_batchSession() {
-        val captor = argumentCaptor<List<EditOperation>>()
+        val captor = argumentCaptor<List<EditCommand>>()
 
         ic.mTextFieldValue = TextFieldValue(text = "Hello, World", selection = TextRange.Zero)
 
@@ -337,38 +337,38 @@ class RecordingInputConnectionTest {
         ic.beginBatchEdit()
 
         assertTrue(ic.deleteSurroundingTextInCodePoints(0, 6))
-        verify(listener, never()).onEditOperations(any())
+        verify(mCallback, never()).onEditCommands(any())
 
         assertTrue(ic.deleteSurroundingTextInCodePoints(0, 5))
-        verify(listener, never()).onEditOperations(any())
+        verify(mCallback, never()).onEditCommands(any())
 
         ic.endBatchEdit()
 
-        verify(listener, times(1)).onEditOperations(captor.capture())
-        val editOps = captor.lastValue
-        assertEquals(2, editOps.size)
-        assertEquals(DeleteSurroundingTextInCodePointsEditOp(0, 6), editOps[0])
-        assertEquals(DeleteSurroundingTextInCodePointsEditOp(0, 5), editOps[1])
+        verify(mCallback, times(1)).onEditCommands(captor.capture())
+        val editCommands = captor.lastValue
+        assertEquals(2, editCommands.size)
+        assertEquals(DeleteSurroundingTextInCodePointsCommand(0, 6), editCommands[0])
+        assertEquals(DeleteSurroundingTextInCodePointsCommand(0, 5), editCommands[1])
     }
 
     @Test
     fun setSelection() {
-        val captor = argumentCaptor<List<EditOperation>>()
+        val captor = argumentCaptor<List<EditCommand>>()
 
         ic.mTextFieldValue = TextFieldValue(text = "Hello, World.", selection = TextRange.Zero)
 
         // Select "Hello, "
         assertTrue(ic.setSelection(0, 6))
 
-        verify(listener, times(1)).onEditOperations(captor.capture())
-        val editOps = captor.lastValue
-        assertEquals(1, editOps.size)
-        assertEquals(SetSelectionEditOp(0, 6), editOps[0])
+        verify(mCallback, times(1)).onEditCommands(captor.capture())
+        val editCommands = captor.lastValue
+        assertEquals(1, editCommands.size)
+        assertEquals(SetSelectionCommand(0, 6), editCommands[0])
     }
 
     @Test
     fun setSelection_batchSession() {
-        val captor = argumentCaptor<List<EditOperation>>()
+        val captor = argumentCaptor<List<EditCommand>>()
 
         ic.mTextFieldValue = TextFieldValue(text = "Hello, World", selection = TextRange.Zero)
 
@@ -376,23 +376,23 @@ class RecordingInputConnectionTest {
         ic.beginBatchEdit()
 
         assertTrue(ic.setSelection(0, 6))
-        verify(listener, never()).onEditOperations(any())
+        verify(mCallback, never()).onEditCommands(any())
 
         assertTrue(ic.setSelection(6, 11))
-        verify(listener, never()).onEditOperations(any())
+        verify(mCallback, never()).onEditCommands(any())
 
         ic.endBatchEdit()
 
-        verify(listener, times(1)).onEditOperations(captor.capture())
-        val editOps = captor.lastValue
-        assertEquals(2, editOps.size)
-        assertEquals(SetSelectionEditOp(0, 6), editOps[0])
-        assertEquals(SetSelectionEditOp(6, 11), editOps[1])
+        verify(mCallback, times(1)).onEditCommands(captor.capture())
+        val editCommands = captor.lastValue
+        assertEquals(2, editCommands.size)
+        assertEquals(SetSelectionCommand(0, 6), editCommands[0])
+        assertEquals(SetSelectionCommand(6, 11), editCommands[1])
     }
 
     @Test
     fun finishComposingText() {
-        val captor = argumentCaptor<List<EditOperation>>()
+        val captor = argumentCaptor<List<EditCommand>>()
 
         ic.mTextFieldValue = TextFieldValue(text = "Hello, World.", selection = TextRange.Zero)
 
@@ -400,15 +400,15 @@ class RecordingInputConnectionTest {
         // should record the API call
         assertTrue(ic.finishComposingText())
 
-        verify(listener, times(1)).onEditOperations(captor.capture())
-        val editOps = captor.lastValue
-        assertEquals(1, editOps.size)
-        assertEquals(FinishComposingTextEditOp(), editOps[0])
+        verify(mCallback, times(1)).onEditCommands(captor.capture())
+        val editCommands = captor.lastValue
+        assertEquals(1, editCommands.size)
+        assertEquals(FinishComposingTextCommand(), editCommands[0])
     }
 
     @Test
     fun finishComposingText_batchSession() {
-        val captor = argumentCaptor<List<EditOperation>>()
+        val captor = argumentCaptor<List<EditCommand>>()
 
         ic.mTextFieldValue = TextFieldValue(text = "Hello, World", selection = TextRange.Zero)
 
@@ -416,23 +416,23 @@ class RecordingInputConnectionTest {
         ic.beginBatchEdit()
 
         assertTrue(ic.finishComposingText())
-        verify(listener, never()).onEditOperations(any())
+        verify(mCallback, never()).onEditCommands(any())
 
         assertTrue(ic.finishComposingText())
-        verify(listener, never()).onEditOperations(any())
+        verify(mCallback, never()).onEditCommands(any())
 
         ic.endBatchEdit()
 
-        verify(listener, times(1)).onEditOperations(captor.capture())
-        val editOps = captor.lastValue
-        assertEquals(2, editOps.size)
-        assertEquals(FinishComposingTextEditOp(), editOps[0])
-        assertEquals(FinishComposingTextEditOp(), editOps[1])
+        verify(mCallback, times(1)).onEditCommands(captor.capture())
+        val editCommands = captor.lastValue
+        assertEquals(2, editCommands.size)
+        assertEquals(FinishComposingTextCommand(), editCommands[0])
+        assertEquals(FinishComposingTextCommand(), editCommands[1])
     }
 
     @Test
     fun mixedAPICalls_batchSession() {
-        val captor = argumentCaptor<List<EditOperation>>()
+        val captor = argumentCaptor<List<EditCommand>>()
 
         ic.mTextFieldValue = TextFieldValue(text = "", selection = TextRange.Zero)
 
@@ -440,30 +440,30 @@ class RecordingInputConnectionTest {
         ic.beginBatchEdit()
 
         assertTrue(ic.setComposingText("Hello, ", 1))
-        verify(listener, never()).onEditOperations(any())
+        verify(mCallback, never()).onEditCommands(any())
 
         assertTrue(ic.finishComposingText())
-        verify(listener, never()).onEditOperations(any())
+        verify(mCallback, never()).onEditCommands(any())
 
         assertTrue(ic.commitText("World.", 1))
-        verify(listener, never()).onEditOperations(any())
+        verify(mCallback, never()).onEditCommands(any())
 
         assertTrue(ic.setSelection(0, 12))
-        verify(listener, never()).onEditOperations(any())
+        verify(mCallback, never()).onEditCommands(any())
 
         assertTrue(ic.commitText("", 1))
-        verify(listener, never()).onEditOperations(any())
+        verify(mCallback, never()).onEditCommands(any())
 
         ic.endBatchEdit()
 
-        verify(listener, times(1)).onEditOperations(captor.capture())
-        val editOps = captor.lastValue
-        assertEquals(5, editOps.size)
-        assertEquals(SetComposingTextEditOp("Hello, ", 1), editOps[0])
-        assertEquals(FinishComposingTextEditOp(), editOps[1])
-        assertEquals(CommitTextEditOp("World.", 1), editOps[2])
-        assertEquals(SetSelectionEditOp(0, 12), editOps[3])
-        assertEquals(CommitTextEditOp("", 1), editOps[4])
+        verify(mCallback, times(1)).onEditCommands(captor.capture())
+        val editCommands = captor.lastValue
+        assertEquals(5, editCommands.size)
+        assertEquals(SetComposingTextCommand("Hello, ", 1), editCommands[0])
+        assertEquals(FinishComposingTextCommand(), editCommands[1])
+        assertEquals(CommitTextCommand("World.", 1), editCommands[2])
+        assertEquals(SetSelectionCommand(0, 12), editCommands[3])
+        assertEquals(CommitTextCommand("", 1), editCommands[4])
     }
 
     @Test
@@ -475,85 +475,85 @@ class RecordingInputConnectionTest {
 
     @Test
     fun key_event_del_down() {
-        val captor = argumentCaptor<List<EditOperation>>()
+        val captor = argumentCaptor<List<EditCommand>>()
         ic.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL))
-        verify(listener, times(1)).onEditOperations(captor.capture())
+        verify(mCallback, times(1)).onEditCommands(captor.capture())
 
-        val editOps = captor.lastValue
-        assertEquals(1, editOps.size)
-        assertEquals(BackspaceKeyEditOp(), editOps[0])
+        val editCommands = captor.lastValue
+        assertEquals(1, editCommands.size)
+        assertEquals(BackspaceCommand(), editCommands[0])
     }
 
     @Test
     fun key_event_del_up() {
         ic.sendKeyEvent(KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DEL))
-        verify(listener, never()).onEditOperations(any())
+        verify(mCallback, never()).onEditCommands(any())
     }
 
     @Test
     fun key_event_left_down() {
-        val captor = argumentCaptor<List<EditOperation>>()
+        val captor = argumentCaptor<List<EditCommand>>()
         ic.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_LEFT))
-        verify(listener, times(1)).onEditOperations(captor.capture())
+        verify(mCallback, times(1)).onEditCommands(captor.capture())
 
-        val editOps = captor.lastValue
-        assertEquals(1, editOps.size)
-        assertEquals(MoveCursorEditOp(-1), editOps[0])
+        val editCommands = captor.lastValue
+        assertEquals(1, editCommands.size)
+        assertEquals(MoveCursorCommand(-1), editCommands[0])
     }
 
     @Test
     fun key_event_left_up() {
         ic.sendKeyEvent(KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DPAD_LEFT))
-        verify(listener, never()).onEditOperations(any())
+        verify(mCallback, never()).onEditCommands(any())
     }
 
     @Test
     fun key_event_right_down() {
-        val captor = argumentCaptor<List<EditOperation>>()
+        val captor = argumentCaptor<List<EditCommand>>()
         ic.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_RIGHT))
-        verify(listener, times(1)).onEditOperations(captor.capture())
+        verify(mCallback, times(1)).onEditCommands(captor.capture())
 
-        val editOps = captor.lastValue
-        assertEquals(1, editOps.size)
-        assertEquals(MoveCursorEditOp(1), editOps[0])
+        val editCommands = captor.lastValue
+        assertEquals(1, editCommands.size)
+        assertEquals(MoveCursorCommand(1), editCommands[0])
     }
 
     @Test
     fun key_event_right_up() {
         ic.sendKeyEvent(KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DPAD_RIGHT))
-        verify(listener, never()).onEditOperations(any())
+        verify(mCallback, never()).onEditCommands(any())
     }
 
     @Test
     fun key_event_printablekey_down() {
-        val captor = argumentCaptor<List<EditOperation>>()
+        val captor = argumentCaptor<List<EditCommand>>()
         ic.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_1))
-        verify(listener, times(1)).onEditOperations(captor.capture())
+        verify(mCallback, times(1)).onEditCommands(captor.capture())
 
-        val editOps = captor.lastValue
-        assertEquals(1, editOps.size)
-        assertEquals(CommitTextEditOp("1", 1), editOps[0])
+        val editCommands = captor.lastValue
+        assertEquals(1, editCommands.size)
+        assertEquals(CommitTextCommand("1", 1), editCommands[0])
     }
 
     @Test
     fun sendKeyEvent_doesNotCommitKeyEventsWithUnicodeCharEqualTo0() {
-        val captor = argumentCaptor<List<EditOperation>>()
+        val captor = argumentCaptor<List<EditCommand>>()
         ic.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_SHIFT_LEFT))
-        verify(listener, never()).onEditOperations(captor.capture())
+        verify(mCallback, never()).onEditCommands(captor.capture())
     }
 
     @Test
     fun do_not_callback_empty_edit_ops() {
         ic.beginBatchEdit()
         ic.endBatchEdit()
-        verify(listener, never()).onEditOperations(any())
+        verify(mCallback, never()).onEditCommands(any())
     }
 
     @Test
     fun commitCorrection_returns_true_when_autoCorrect_is_on() {
         val inputConnection = RecordingInputConnection(
             initState = TextFieldValue(),
-            eventListener = listener,
+            eventCallback = mCallback,
             autoCorrect = true
         )
         val anyCorrectionInfo = CorrectionInfo(0, "", "")
@@ -565,7 +565,7 @@ class RecordingInputConnectionTest {
     fun commitCorrection_returns_false_when_autoCorrect_is_off() {
         val inputConnection = RecordingInputConnection(
             initState = TextFieldValue(),
-            eventListener = listener,
+            eventCallback = mCallback,
             autoCorrect = false
         )
         val anyCorrectionInfo = CorrectionInfo(0, "", "")
@@ -578,6 +578,6 @@ class RecordingInputConnectionTest {
         ic.beginBatchEdit()
         ic.getSelectedText(1)
         ic.endBatchEdit()
-        verify(listener, never()).onEditOperations(any())
+        verify(mCallback, never()).onEditCommands(any())
     }
 }

@@ -17,9 +17,9 @@
 package androidx.compose.ui.test
 
 import androidx.compose.ui.semantics.SemanticsProperties
-import androidx.compose.ui.text.input.CommitTextEditOp
-import androidx.compose.ui.text.input.DeleteAllEditOp
-import androidx.compose.ui.text.input.EditOperation
+import androidx.compose.ui.text.input.CommitTextCommand
+import androidx.compose.ui.text.input.DeleteAllCommand
+import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.ImeAction
 
 /**
@@ -36,7 +36,7 @@ fun SemanticsNodeInteraction.performTextClearance(alreadyHasFocus: Boolean = fal
     }
     // TODO: There should be some assertion on focus in the future.
 
-    sendTextInputCommand(listOf(DeleteAllEditOp()))
+    sendTextInputCommand(listOf(DeleteAllCommand()))
 }
 
 /**
@@ -52,7 +52,7 @@ fun SemanticsNodeInteraction.performTextInput(text: String, alreadyHasFocus: Boo
     }
     // TODO: There should be some assertion on focus in the future.
 
-    sendTextInputCommand(listOf(CommitTextEditOp(text, 1)))
+    sendTextInputCommand(listOf(CommitTextCommand(text, 1)))
 }
 
 /**
@@ -74,7 +74,7 @@ fun SemanticsNodeInteraction.performTextReplacement(
 
     // TODO: There should be some assertion on focus in the future.
 
-    sendTextInputCommand(listOf(DeleteAllEditOp(), CommitTextEditOp(text, 1)))
+    sendTextInputCommand(listOf(DeleteAllCommand(), CommitTextCommand(text, 1)))
 }
 
 /**
@@ -114,7 +114,7 @@ fun SemanticsNodeInteraction.performImeAction(alreadyHasFocus: Boolean = false) 
     testContext.testOwner.sendImeAction(node, actionSpecified)
 }
 
-internal fun SemanticsNodeInteraction.sendTextInputCommand(command: List<EditOperation>) {
+internal fun SemanticsNodeInteraction.sendTextInputCommand(command: List<EditCommand>) {
     val errorOnFail = "Failed to perform text input."
     val node = fetchSemanticsNode(errorOnFail)
     assert(hasSetTextAction()) { errorOnFail }

@@ -24,7 +24,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
-class DeleteSurroundingTextInCodePointsEditOpTest {
+class DeleteSurroundingTextInCodePointsCommandTest {
     val CH1 = "\uD83D\uDE00" // U+1F600
     val CH2 = "\uD83D\uDE01" // U+1F601
     val CH3 = "\uD83D\uDE02" // U+1F602
@@ -35,7 +35,7 @@ class DeleteSurroundingTextInCodePointsEditOpTest {
     fun test_delete_after() {
         val eb = EditingBuffer("$CH1$CH2$CH3$CH4$CH5", TextRange(2))
 
-        DeleteSurroundingTextInCodePointsEditOp(0, 1).process(eb)
+        DeleteSurroundingTextInCodePointsCommand(0, 1).applyTo(eb)
 
         assertEquals("$CH1$CH3$CH4$CH5", eb.toString())
         assertEquals(2, eb.cursor)
@@ -46,7 +46,7 @@ class DeleteSurroundingTextInCodePointsEditOpTest {
     fun test_delete_before() {
         val eb = EditingBuffer("$CH1$CH2$CH3$CH4$CH5", TextRange(2))
 
-        DeleteSurroundingTextInCodePointsEditOp(1, 0).process(eb)
+        DeleteSurroundingTextInCodePointsCommand(1, 0).applyTo(eb)
 
         assertEquals("$CH2$CH3$CH4$CH5", eb.toString())
         assertEquals(0, eb.cursor)
@@ -57,7 +57,7 @@ class DeleteSurroundingTextInCodePointsEditOpTest {
     fun test_delete_both() {
         val eb = EditingBuffer("$CH1$CH2$CH3$CH4$CH5", TextRange(6))
 
-        DeleteSurroundingTextInCodePointsEditOp(1, 1).process(eb)
+        DeleteSurroundingTextInCodePointsCommand(1, 1).applyTo(eb)
 
         assertEquals("$CH1$CH2$CH5", eb.toString())
         assertEquals(4, eb.cursor)
@@ -68,7 +68,7 @@ class DeleteSurroundingTextInCodePointsEditOpTest {
     fun test_delete_after_multiple() {
         val eb = EditingBuffer("$CH1$CH2$CH3$CH4$CH5", TextRange(4))
 
-        DeleteSurroundingTextInCodePointsEditOp(0, 2).process(eb)
+        DeleteSurroundingTextInCodePointsCommand(0, 2).applyTo(eb)
 
         assertEquals("$CH1$CH2$CH5", eb.toString())
         assertEquals(4, eb.cursor)
@@ -79,7 +79,7 @@ class DeleteSurroundingTextInCodePointsEditOpTest {
     fun test_delete_before_multiple() {
         val eb = EditingBuffer("$CH1$CH2$CH3$CH4$CH5", TextRange(6))
 
-        DeleteSurroundingTextInCodePointsEditOp(2, 0).process(eb)
+        DeleteSurroundingTextInCodePointsCommand(2, 0).applyTo(eb)
 
         assertEquals("$CH1$CH4$CH5", eb.toString())
         assertEquals(2, eb.cursor)
@@ -90,7 +90,7 @@ class DeleteSurroundingTextInCodePointsEditOpTest {
     fun test_delete_both_multiple() {
         val eb = EditingBuffer("$CH1$CH2$CH3$CH4$CH5", TextRange(6))
 
-        DeleteSurroundingTextInCodePointsEditOp(2, 2).process(eb)
+        DeleteSurroundingTextInCodePointsCommand(2, 2).applyTo(eb)
 
         assertEquals("$CH1", eb.toString())
         assertEquals(2, eb.cursor)
@@ -101,7 +101,7 @@ class DeleteSurroundingTextInCodePointsEditOpTest {
     fun test_delete_selection_preserve() {
         val eb = EditingBuffer("$CH1$CH2$CH3$CH4$CH5", TextRange(4, 8))
 
-        DeleteSurroundingTextInCodePointsEditOp(1, 1).process(eb)
+        DeleteSurroundingTextInCodePointsCommand(1, 1).applyTo(eb)
 
         assertEquals("$CH1$CH3$CH4", eb.toString())
         assertEquals(2, eb.selectionStart)
@@ -113,7 +113,7 @@ class DeleteSurroundingTextInCodePointsEditOpTest {
     fun test_delete_before_too_many() {
         val eb = EditingBuffer("$CH1$CH2$CH3$CH4$CH5", TextRange(6))
 
-        DeleteSurroundingTextInCodePointsEditOp(1000, 0).process(eb)
+        DeleteSurroundingTextInCodePointsCommand(1000, 0).applyTo(eb)
 
         assertEquals("$CH4$CH5", eb.toString())
         assertEquals(0, eb.cursor)
@@ -124,7 +124,7 @@ class DeleteSurroundingTextInCodePointsEditOpTest {
     fun test_delete_after_too_many() {
         val eb = EditingBuffer("$CH1$CH2$CH3$CH4$CH5", TextRange(6))
 
-        DeleteSurroundingTextInCodePointsEditOp(0, 1000).process(eb)
+        DeleteSurroundingTextInCodePointsCommand(0, 1000).applyTo(eb)
 
         assertEquals("$CH1$CH2$CH3", eb.toString())
         assertEquals(6, eb.cursor)
@@ -135,7 +135,7 @@ class DeleteSurroundingTextInCodePointsEditOpTest {
     fun test_delete_both_too_many() {
         val eb = EditingBuffer("$CH1$CH2$CH3$CH4$CH5", TextRange(6))
 
-        DeleteSurroundingTextInCodePointsEditOp(1000, 1000).process(eb)
+        DeleteSurroundingTextInCodePointsCommand(1000, 1000).applyTo(eb)
 
         assertEquals("", eb.toString())
         assertEquals(0, eb.cursor)
@@ -148,7 +148,7 @@ class DeleteSurroundingTextInCodePointsEditOpTest {
 
         eb.setComposition(0, 2)
 
-        DeleteSurroundingTextInCodePointsEditOp(1, 1).process(eb)
+        DeleteSurroundingTextInCodePointsCommand(1, 1).applyTo(eb)
 
         assertEquals("$CH1$CH2$CH5", eb.toString())
         assertEquals(4, eb.cursor)
@@ -162,7 +162,7 @@ class DeleteSurroundingTextInCodePointsEditOpTest {
 
         eb.setComposition(8, 10)
 
-        DeleteSurroundingTextInCodePointsEditOp(1, 1).process(eb)
+        DeleteSurroundingTextInCodePointsCommand(1, 1).applyTo(eb)
 
         assertEquals("$CH1$CH2$CH5", eb.toString())
         assertEquals(4, eb.cursor)
@@ -176,7 +176,7 @@ class DeleteSurroundingTextInCodePointsEditOpTest {
 
         eb.setComposition(0, 6)
 
-        DeleteSurroundingTextInCodePointsEditOp(1, 1).process(eb)
+        DeleteSurroundingTextInCodePointsCommand(1, 1).applyTo(eb)
 
         assertEquals("$CH1$CH2$CH5", eb.toString())
         assertEquals(4, eb.cursor)
@@ -190,7 +190,7 @@ class DeleteSurroundingTextInCodePointsEditOpTest {
 
         eb.setComposition(6, 10)
 
-        DeleteSurroundingTextInCodePointsEditOp(1, 1).process(eb)
+        DeleteSurroundingTextInCodePointsCommand(1, 1).applyTo(eb)
 
         assertEquals("$CH1$CH2$CH5", eb.toString())
         assertEquals(4, eb.cursor)
@@ -204,7 +204,7 @@ class DeleteSurroundingTextInCodePointsEditOpTest {
 
         eb.setComposition(4, 6)
 
-        DeleteSurroundingTextInCodePointsEditOp(1, 1).process(eb)
+        DeleteSurroundingTextInCodePointsCommand(1, 1).applyTo(eb)
 
         assertEquals("$CH1$CH2$CH5", eb.toString())
         assertEquals(4, eb.cursor)
@@ -217,7 +217,7 @@ class DeleteSurroundingTextInCodePointsEditOpTest {
 
         eb.setComposition(0, 10)
 
-        DeleteSurroundingTextInCodePointsEditOp(1, 1).process(eb)
+        DeleteSurroundingTextInCodePointsCommand(1, 1).applyTo(eb)
 
         assertEquals("$CH1$CH2$CH5", eb.toString())
         assertEquals(4, eb.cursor)

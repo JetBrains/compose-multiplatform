@@ -80,8 +80,8 @@ class EditProcessor {
      * This method updates internal editing buffer with the given edit operations and returns the
      * latest editor state representation of the editing buffer.
      */
-    fun onEditCommands(ops: List<EditOperation>): TextFieldValue {
-        ops.forEach { it.process(mBuffer) }
+    fun onEditCommands(ops: List<EditCommand>): TextFieldValue {
+        ops.forEach { it.applyTo(mBuffer) }
 
         val newState = TextFieldValue(
             text = mBuffer.toString(),

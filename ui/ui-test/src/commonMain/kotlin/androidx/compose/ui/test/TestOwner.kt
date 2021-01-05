@@ -19,7 +19,7 @@ package androidx.compose.ui.test
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.getAllSemanticsNodes
-import androidx.compose.ui.text.input.EditOperation
+import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.ImeAction
 
 /**
@@ -33,7 +33,7 @@ interface TestOwner {
     /**
      * Sends the given list of text commands to the given semantics node.
      */
-    fun sendTextInputCommand(node: SemanticsNode, command: List<EditOperation>)
+    fun sendTextInputCommand(node: SemanticsNode, command: List<EditCommand>)
 
     /**
      * Sends the given IME action to the given semantics node.

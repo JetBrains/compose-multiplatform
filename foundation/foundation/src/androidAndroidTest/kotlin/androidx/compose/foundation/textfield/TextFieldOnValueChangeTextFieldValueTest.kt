@@ -28,13 +28,13 @@ import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.input.CommitTextEditOp
-import androidx.compose.ui.text.input.DeleteSurroundingTextEditOp
-import androidx.compose.ui.text.input.EditOperation
-import androidx.compose.ui.text.input.FinishComposingTextEditOp
-import androidx.compose.ui.text.input.SetComposingRegionEditOp
-import androidx.compose.ui.text.input.SetComposingTextEditOp
-import androidx.compose.ui.text.input.SetSelectionEditOp
+import androidx.compose.ui.text.input.CommitTextCommand
+import androidx.compose.ui.text.input.DeleteSurroundingTextCommand
+import androidx.compose.ui.text.input.EditCommand
+import androidx.compose.ui.text.input.FinishComposingTextCommand
+import androidx.compose.ui.text.input.SetComposingRegionCommand
+import androidx.compose.ui.text.input.SetComposingTextCommand
+import androidx.compose.ui.text.input.SetSelectionCommand
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputService
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -62,7 +62,7 @@ class TextFieldOnValueChangeTextFieldValueTest {
 
     val onValueChange: (androidx.compose.ui.text.input.TextFieldValue) -> Unit = mock()
 
-    lateinit var onEditCommandCallback: (List<EditOperation>) -> Unit
+    lateinit var onEditCommandCallback: (List<EditCommand>) -> Unit
 
     @Before
     fun setUp() {
@@ -100,7 +100,7 @@ class TextFieldOnValueChangeTextFieldValueTest {
 
         rule.runOnIdle {
             // Verify startInput is called and capture the callback.
-            val onEditCommandCaptor = argumentCaptor<(List<EditOperation>) -> Unit>()
+            val onEditCommandCaptor = argumentCaptor<(List<EditCommand>) -> Unit>()
             verify(textInputService, times(1)).startInput(
                 value = any(),
                 imeOptions = any(),
@@ -114,7 +114,7 @@ class TextFieldOnValueChangeTextFieldValueTest {
         }
     }
 
-    private fun performEditOperation(op: EditOperation) {
+    private fun performEditCommand(op: EditCommand) {
         arrayOf(listOf(op)).forEach {
             rule.runOnUiThread {
                 onEditCommandCallback(it)
@@ -125,7 +125,7 @@ class TextFieldOnValueChangeTextFieldValueTest {
     @Test
     fun commitText_onValueChange_call_once() {
         // Committing text should be reported as value change
-        performEditOperation(CommitTextEditOp("ABCDE", 1))
+        performEditCommand(CommitTextCommand("ABCDE", 1))
         rule.runOnIdle {
             verify(onValueChange, times(1))
                 .invoke(
@@ -143,7 +143,7 @@ class TextFieldOnValueChangeTextFieldValueTest {
     fun setComposingRegion_onValueChange_call_once() {
         val textFieldValueCaptor = argumentCaptor<TextFieldValue>()
         // Composition change will be reported as a change
-        performEditOperation(SetComposingRegionEditOp(0, 5))
+        performEditCommand(SetComposingRegionCommand(0, 5))
 
         rule.runOnIdle {
             verify(onValueChange, times(1)).invoke(textFieldValueCaptor.capture())
@@ -158,7 +158,7 @@ class TextFieldOnValueChangeTextFieldValueTest {
         val textFieldValueCaptor = argumentCaptor<TextFieldValue>()
         val composingText = "ABCDE"
 
-        performEditOperation(SetComposingTextEditOp(composingText, 1))
+        performEditCommand(SetComposingTextCommand(composingText, 1))
 
         rule.runOnIdle {
             verify(onValueChange, times(1)).invoke(textFieldValueCaptor.capture())
@@ -171,7 +171,7 @@ class TextFieldOnValueChangeTextFieldValueTest {
     @Test
     fun setSelection_onValueChange_call_once() {
         // Selection change is a part of value-change in EditorModel text field
-        performEditOperation(SetSelectionEditOp(1, 1))
+        performEditCommand(SetSelectionCommand(1, 1))
         rule.runOnIdle {
             verify(onValueChange, times(1)).invoke(
                 eq(
@@ -189,7 +189,7 @@ class TextFieldOnValueChangeTextFieldValueTest {
         val textFieldValueCaptor = argumentCaptor<TextFieldValue>()
         val composingText = "ABCDE"
 
-        performEditOperation(SetComposingTextEditOp(composingText, 1))
+        performEditCommand(SetComposingTextCommand(composingText, 1))
 
         rule.runOnIdle {
             verify(onValueChange, times(1)).invoke(textFieldValueCaptor.capture())
@@ -203,7 +203,7 @@ class TextFieldOnValueChangeTextFieldValueTest {
         // Composition change will be reported as a change
         clearInvocations(onValueChange)
         val compositionClearCaptor = argumentCaptor<TextFieldValue>()
-        performEditOperation(FinishComposingTextEditOp())
+        performEditCommand(FinishComposingTextCommand())
         rule.runOnIdle {
             verify(onValueChange, times(1)).invoke(compositionClearCaptor.capture())
             assertThat(compositionClearCaptor.firstValue.text).isEqualTo("ABCDEabcde")
@@ -214,7 +214,7 @@ class TextFieldOnValueChangeTextFieldValueTest {
 
     @Test
     fun deleteSurroundingText_onValueChange_call_once() {
-        performEditOperation(DeleteSurroundingTextEditOp(0, 1))
+        performEditCommand(DeleteSurroundingTextCommand(0, 1))
         rule.runOnIdle {
             verify(onValueChange, times(1)).invoke(
                 eq(
