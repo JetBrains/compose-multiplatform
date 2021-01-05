@@ -26,6 +26,7 @@ import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHasClickAction
@@ -84,6 +85,7 @@ class ClickableTest {
         }
 
         rule.onNodeWithTag("myClickable")
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.Role))
             .assertIsEnabled()
             .assertHasClickAction()
     }
@@ -100,6 +102,7 @@ class ClickableTest {
         }
 
         rule.onNodeWithTag("myClickable")
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.Role))
             .assertIsNotEnabled()
             .assertHasClickAction()
     }
@@ -582,6 +585,7 @@ class ClickableTest {
             assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
                 "enabled",
                 "onClickLabel",
+                "role",
                 "onClick",
                 "onDoubleClick",
                 "onLongClick",

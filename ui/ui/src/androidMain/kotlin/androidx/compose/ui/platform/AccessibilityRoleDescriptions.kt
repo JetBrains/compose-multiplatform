@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2020 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,10 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation
+package androidx.compose.ui.platform
 
 // TODO(b/138327849): (STOPSHIP) Move all of these to resources once we have a real resources system,
 //  then delete this class
-internal object Strings {
-    const val Checked = "Checked"
-    const val Unchecked = "Unchecked"
-    const val On = "On"
-    const val Off = "Off"
-    const val Indeterminate = "Indeterminate"
-    const val Selected = "Selected"
-    const val NotSelected = "Not selected"
-    const val InProgress = "In progress"
-    const val TemplatePercent = "%d percent"
-    const val Toggle = "Toggle"
+internal object AccessibilityRoleDescriptions {
+    const val Tab = "Tab"
 }

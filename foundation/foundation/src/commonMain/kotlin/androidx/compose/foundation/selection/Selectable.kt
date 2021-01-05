@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 
@@ -45,8 +46,8 @@ import androidx.compose.ui.semantics.semantics
  * @param onClick callback to invoke when this item is clicked
  * @param enabled whether or not this [selectable] will handle input events
  * and appear enabled from a semantics perspective
- * @param inMutuallyExclusiveGroup whether or not this item is a part of mutually exclusive
- * group, meaning that only one of these items can be selected at any point of time
+ * @param role the type of user interface element. Accessibility services might use this
+ * to describe the element or do customizations
  * @param interactionState [InteractionState] that will be updated when this element is
  * pressed, using [Interaction.Pressed]
  * @param indication indication to be shown when the modified element is pressed. By default,
@@ -58,7 +59,7 @@ import androidx.compose.ui.semantics.semantics
 fun Modifier.selectable(
     selected: Boolean,
     enabled: Boolean = true,
-    inMutuallyExclusiveGroup: Boolean = true,
+    role: Role? = null,
     interactionState: InteractionState = remember { InteractionState() },
     indication: Indication? = AmbientIndication.current(),
     onClick: () -> Unit
@@ -66,6 +67,7 @@ fun Modifier.selectable(
     factory = {
         Modifier.clickable(
             enabled = enabled,
+            role = role,
             interactionState = interactionState,
             indication = indication,
             onClick = onClick
@@ -78,7 +80,7 @@ fun Modifier.selectable(
         name = "selectable"
         properties["selected"] = selected
         properties["enabled"] = enabled
-        properties["inMutuallyExclusiveGroup"] = inMutuallyExclusiveGroup
+        properties["role"] = role
         properties["interactionState"] = interactionState
         properties["indication"] = indication
         properties["onClick"] = onClick

@@ -26,6 +26,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
@@ -76,6 +79,7 @@ class SelectableTest {
         rule.onAllNodes(isSelectable())
             .assertCountEquals(1)
             .onFirst()
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.Role))
             .assertIsSelected()
     }
 
@@ -207,7 +211,7 @@ class SelectableTest {
             assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
                 "selected",
                 "enabled",
-                "inMutuallyExclusiveGroup",
+                "role",
                 "interactionState",
                 "indication",
                 "onClick"

@@ -30,9 +30,11 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.gesture.pressIndicatorGestureFilter
 import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.toggleableState
 import androidx.compose.ui.state.ToggleableState
@@ -52,6 +54,8 @@ import androidx.compose.ui.state.ToggleableState.On
  * therefore the change of the state in requested.
  * @param enabled whether or not this [toggleable] will handle input events and appear
  * enabled for semantics purposes
+ * @param role the type of user interface element. Accessibility services might use this
+ * to describe the element or do customizations
  * @param interactionState [InteractionState] that will be updated when this toggleable is
  * pressed, using [Interaction.Pressed]
  * @param indication indication to be shown when modified element is pressed. Be default,
@@ -63,6 +67,7 @@ import androidx.compose.ui.state.ToggleableState.On
 fun Modifier.toggleable(
     value: Boolean,
     enabled: Boolean = true,
+    role: Role? = null,
     interactionState: InteractionState = remember { InteractionState() },
     indication: Indication? = AmbientIndication.current(),
     onValueChange: (Boolean) -> Unit
@@ -71,6 +76,7 @@ fun Modifier.toggleable(
         name = "toggleable"
         properties["value"] = value
         properties["enabled"] = enabled
+        properties["role"] = role
         properties["interactionState"] = interactionState
         properties["indication"] = indication
         properties["onValueChange"] = onValueChange
@@ -80,6 +86,7 @@ fun Modifier.toggleable(
             state = ToggleableState(value),
             onClick = { onValueChange(!value) },
             enabled = enabled,
+            role = role,
             interactionState = interactionState,
             indication = indication
         )
@@ -101,6 +108,8 @@ fun Modifier.toggleable(
  * @param onClick will be called when user clicks the toggleable.
  * @param enabled whether or not this [triStateToggleable] will handle input events and
  * appear enabled for semantics purposes
+ * @param role the type of user interface element. Accessibility services might use this
+ * to describe the element or do customizations
  * @param interactionState [InteractionState] that will be updated when this toggleable is
  * pressed, using [Interaction.Pressed]
  * @param indication indication to be shown when modified element is pressed. Be default,
@@ -112,6 +121,7 @@ fun Modifier.toggleable(
 fun Modifier.triStateToggleable(
     state: ToggleableState,
     enabled: Boolean = true,
+    role: Role? = null,
     interactionState: InteractionState = remember { InteractionState() },
     indication: Indication? = AmbientIndication.current(),
     onClick: () -> Unit
@@ -120,27 +130,33 @@ fun Modifier.triStateToggleable(
         name = "triStateToggleable"
         properties["state"] = state
         properties["enabled"] = enabled
+        properties["role"] = role
         properties["interactionState"] = interactionState
         properties["indication"] = indication
         properties["onClick"] = onClick
     },
-    factory = { toggleableImpl(state, enabled, interactionState, indication, onClick) }
+    factory = {
+        toggleableImpl(state, enabled, role, interactionState, indication, onClick)
+    }
 )
 
 @Suppress("ModifierInspectorInfo")
 private fun Modifier.toggleableImpl(
     state: ToggleableState,
     enabled: Boolean,
+    role: Role? = null,
     interactionState: InteractionState,
     indication: Indication?,
     onClick: () -> Unit
 ): Modifier = composed {
     // TODO(pavlis): Handle multiple states for Semantics
     val semantics = Modifier.semantics(mergeDescendants = true) {
+        if (role != null) {
+            this.role = role
+        }
         this.stateDescription = when (state) {
-            // TODO(ryanmentley): These should be set by Checkbox, Switch, etc.
-            On -> Strings.Checked
-            Off -> Strings.Unchecked
+            On -> if (role == Role.Switch) Strings.On else Strings.Checked
+            Off -> if (role == Role.Switch) Strings.Off else Strings.Unchecked
             Indeterminate -> Strings.Indeterminate
         }
         this.toggleableState = state
