@@ -35,7 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.test.espresso.Espresso.onIdle
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
@@ -45,7 +45,7 @@ import org.junit.Rule
 import org.junit.Test
 
 @LargeTest
-@OptIn(ExperimentalTesting::class)
+@OptIn(ExperimentalTestApi::class)
 class MonotonicFrameClockTestRuleTest {
 
     companion object {

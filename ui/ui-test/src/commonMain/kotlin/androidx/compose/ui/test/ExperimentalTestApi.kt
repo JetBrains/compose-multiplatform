@@ -16,10 +16,26 @@
 
 package androidx.compose.ui.test
 
+@Deprecated(
+    "Renamed to ExperimentalTestApi for consistency with other experimental module APIs",
+    replaceWith = ReplaceWith("ExperimentalTestApi", "androidx.compose.ui.test.ExperimentalTestApi")
+)
 @RequiresOptIn("This testing API is experimental and is likely to be changed or removed entirely")
 annotation class ExperimentalTesting
 
+@RequiresOptIn("This testing API is experimental and is likely to be changed or removed entirely")
+annotation class ExperimentalTestApi
+
+@Deprecated(
+    "Renamed to InternalTestApi for consistency with other internal module APIs",
+    replaceWith = ReplaceWith("InternalTestApi", "androidx.compose.ui.test.InternalTestApi")
+)
 @RequiresOptIn(
     "This is internal API for Compose modules that may change frequently and without warning."
 )
 annotation class InternalTestingApi
+
+@RequiresOptIn(
+    "This is internal API for Compose modules that may change frequently and without warning."
+)
+annotation class InternalTestApi

@@ -42,7 +42,7 @@ import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.center
 import androidx.compose.ui.test.down
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -90,7 +90,7 @@ class ScrollableTest {
     }
 
     @Test
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_horizontalScroll() = runBlockingWithManualClock { clock ->
         var total = 0f
         val controller = ScrollableController(
@@ -146,7 +146,7 @@ class ScrollableTest {
     }
 
     @Test
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_verticalScroll() = runBlockingWithManualClock { clock ->
         var total = 0f
         val controller = ScrollableController(
@@ -202,7 +202,7 @@ class ScrollableTest {
     }
 
     @Test
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_startStop_notify() = runBlockingWithManualClock(true) { clock ->
         var startTrigger = 0f
         var stopTrigger = 0f
@@ -248,7 +248,7 @@ class ScrollableTest {
     }
 
     @Test
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_disabledWontCallLambda() = runBlockingWithManualClock(true) { clock ->
         val enabled = mutableStateOf(true)
         var total = 0f
@@ -294,7 +294,7 @@ class ScrollableTest {
     }
 
     @Test
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_velocityProxy() = runBlockingWithManualClock { clock ->
         var velocityTriggered = 0f
         var total = 0f
@@ -342,7 +342,7 @@ class ScrollableTest {
     }
 
     @Test
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_startWithoutSlop_ifFlinging() = runBlockingWithManualClock { clock ->
         var total = 0f
         val controller = ScrollableController(
@@ -386,7 +386,7 @@ class ScrollableTest {
     }
 
     @Test
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_cancel_callsDragStop() = runBlocking {
         var total by mutableStateOf(0f)
         var dragStopped = 0f
@@ -425,7 +425,7 @@ class ScrollableTest {
     }
 
     @Test
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_snappingScrolling() = runBlocking {
         var total = 0f
         val controller = ScrollableController(
@@ -450,7 +450,7 @@ class ScrollableTest {
     }
 
     @Test
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_explicitDisposal() = runBlockingWithManualClock { clock ->
         val disposed = mutableStateOf(false)
         var total = 0f
@@ -491,7 +491,7 @@ class ScrollableTest {
     }
 
     @Test
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_nestedDrag() = runBlockingWithManualClock { clock ->
         var innerDrag = 0f
         var outerDrag = 0f
@@ -560,7 +560,7 @@ class ScrollableTest {
     }
 
     @Test
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_nestedFling() = runBlockingWithManualClock { clock ->
         var innerDrag = 0f
         var outerDrag = 0f
@@ -631,7 +631,7 @@ class ScrollableTest {
     }
 
     @Test
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_nestedScrollAbove_respectsPreConsumption() =
         runBlockingWithManualClock { clock ->
             var value = 0f
@@ -699,7 +699,7 @@ class ScrollableTest {
         }
 
     @Test
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_nestedScrollAbove_proxiesPostCycles() =
         runBlockingWithManualClock { clock ->
             var value = 0f
@@ -776,7 +776,7 @@ class ScrollableTest {
         }
 
     @Test
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_nestedScrollBelow_listensDispatches() =
         runBlockingWithManualClock { clock ->
             var value = 0f
@@ -848,7 +848,7 @@ class ScrollableTest {
         }
 
     @Test
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_interactionState() = runBlocking {
         val interactionState = InteractionState()
         var total = 0f
@@ -894,7 +894,7 @@ class ScrollableTest {
     }
 
     @Test
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_interactionState_resetWhenDisposed() = runBlocking {
         val interactionState = InteractionState()
         var emitScrollableBox by mutableStateOf(true)
@@ -985,7 +985,7 @@ class ScrollableTest {
         }
     }
 
-    @ExperimentalTesting
+    @ExperimentalTestApi
     private suspend fun advanceClockWhileAwaitersExist(clock: ManualFrameClock) {
         rule.awaitIdle()
         yield()

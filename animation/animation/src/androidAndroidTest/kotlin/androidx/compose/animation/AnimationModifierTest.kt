@@ -31,7 +31,7 @@ import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
-import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
@@ -52,7 +52,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-@OptIn(ExperimentalTesting::class)
+@OptIn(ExperimentalTestApi::class)
 class AnimationModifierTest {
 
     @get:Rule

@@ -21,7 +21,7 @@ import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.node.Owner
-import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.IdlingResource
 import androidx.compose.ui.test.TestAnimationClock
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -72,7 +72,7 @@ fun unregisterComposeFromEspresso(): Unit = throw UnsupportedOperationException(
     level = DeprecationLevel.ERROR,
     replaceWith = ReplaceWith("composeIdlingResource.registerTestClock(clock)")
 )
-@ExperimentalTesting
+@ExperimentalTestApi
 @Suppress("UNUSED_PARAMETER", "DocumentExceptions")
 fun registerTestClock(clock: TestAnimationClock): Unit = throw UnsupportedOperationException(
     "Global (un)registration of TestAnimationClocks is no longer supported. Register clocks " +
@@ -88,7 +88,7 @@ fun registerTestClock(clock: TestAnimationClock): Unit = throw UnsupportedOperat
     level = DeprecationLevel.ERROR,
     replaceWith = ReplaceWith("composeIdlingResource.unregisterTestClock(clock)")
 )
-@ExperimentalTesting
+@ExperimentalTestApi
 @Suppress("UNUSED_PARAMETER", "DocumentExceptions")
 fun unregisterTestClock(clock: TestAnimationClock): Unit = throw UnsupportedOperationException(
     "Global (un)registration of TestAnimationClocks is no longer supported. Register clocks " +
@@ -107,7 +107,7 @@ internal class ComposeIdlingResource : IdlingResource {
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     internal val androidOwnerRegistry = AndroidOwnerRegistry()
 
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     private val clocks = mutableSetOf<TestAnimationClock>()
 
     private var hadAnimationClocksIdle = true
@@ -142,21 +142,21 @@ internal class ComposeIdlingResource : IdlingResource {
                 hadNoPendingDraw*/
         }
 
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun registerTestClock(clock: TestAnimationClock) {
         synchronized(clocks) {
             clocks.add(clock)
         }
     }
 
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun unregisterTestClock(clock: TestAnimationClock) {
         synchronized(clocks) {
             clocks.remove(clock)
         }
     }
 
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     private fun areAllClocksIdle(): Boolean {
         return synchronized(clocks) {
             clocks.all { it.isIdle }
@@ -221,7 +221,7 @@ internal class ComposeIdlingResource : IdlingResource {
         //  waitForAndroidOwners() suggests that we are now guaranteed one.
     }
 
-    @ExperimentalTesting
+    @ExperimentalTestApi
     suspend fun awaitIdle() {
         // TODO(b/169038516): when we can query AndroidOwners for measure or layout, remove
         //  runEspressoOnIdle() and replace it with a suspend fun that loops while the

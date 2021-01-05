@@ -17,7 +17,7 @@
 package androidx.compose.ui.test.junit4
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.IdlingResource
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.unit.Density
@@ -46,7 +46,7 @@ interface ComposeTestRule : TestRule, SemanticsNodeInteractionsProvider {
     /**
      * A test rule that allows you to control the animation clock
      */
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     val clockTestRule: AnimationClockTestRule
 
     /**
@@ -79,7 +79,7 @@ interface ComposeTestRule : TestRule, SemanticsNodeInteractionsProvider {
      * Suspends until compose is idle. Compose is idle if there are no pending compositions, no
      * pending changes that could lead to another composition, and no pending draw calls.
      */
-    @ExperimentalTesting
+    @ExperimentalTestApi
     suspend fun awaitIdle()
 
     /**

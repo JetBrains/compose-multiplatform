@@ -26,7 +26,7 @@ import androidx.compose.integration.demos.common.Demo
 import androidx.compose.integration.demos.common.DemoCategory
 import androidx.compose.integration.demos.common.allDemos
 import androidx.compose.integration.demos.common.allLaunchableDemos
-import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsNodeInteractionCollection
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasClickAction
@@ -55,7 +55,7 @@ private val ignoredDemos = listOf(
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalTesting::class)
+@OptIn(ExperimentalTestApi::class)
 class DemoTest {
     @get:Rule
     val rule = createAndroidComposeRule<DemoActivity>()

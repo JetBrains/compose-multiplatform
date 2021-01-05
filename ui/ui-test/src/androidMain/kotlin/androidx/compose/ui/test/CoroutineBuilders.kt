@@ -72,7 +72,7 @@ import kotlinx.coroutines.yield
  * first frame immediately upon subscription. Avoid reliance on this if possible. `false` by
  * default.
  */
-@ExperimentalTesting
+@ExperimentalTestApi
 fun <R> runBlockingWithManualClock(
     compatibleWithManualAnimationClock: Boolean = false,
     block: suspend CoroutineScope.(clock: ManualFrameClock) -> R
