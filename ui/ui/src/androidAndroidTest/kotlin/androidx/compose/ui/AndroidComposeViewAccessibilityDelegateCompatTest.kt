@@ -459,13 +459,13 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
         val oldSemanticsNode = createSemanticsNodeWithProperties(2, false) {
             this.verticalAccessibilityScrollState = AccessibilityScrollState(0f, 5f, false)
         }
-        accessibilityDelegate.semanticsNodes[1] =
+        accessibilityDelegate.semanticsNodes[2] =
             AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(oldSemanticsNode)
         val newSemanticsNode = createSemanticsNodeWithProperties(2, false) {
             this.verticalAccessibilityScrollState = AccessibilityScrollState(2f, 5f, false)
         }
         val newNodes = mutableMapOf<Int, SemanticsNode>()
-        newNodes[1] = newSemanticsNode
+        newNodes[2] = newSemanticsNode
         accessibilityDelegate.sendSemanticsPropertyChangeEvents(newNodes)
 
         verify(container, times(1)).requestSendAccessibilityEvent(
@@ -479,6 +479,77 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
                         } else {
                             true
                         }
+                }
+            )
+        )
+    }
+
+    @Test
+    fun sendWindowContentChangeUndefinedEventByDefault_whenPropertyAdded() {
+        val oldSemanticsNode = createSemanticsNodeWithProperties(1, false) {}
+        accessibilityDelegate.semanticsNodes[1] =
+            AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(oldSemanticsNode)
+        val newSemanticsNode = createSemanticsNodeWithProperties(1, false) {
+            disabled()
+        }
+        val newNodes = mutableMapOf<Int, SemanticsNode>()
+        newNodes[1] = newSemanticsNode
+        accessibilityDelegate.sendSemanticsPropertyChangeEvents(newNodes)
+
+        verify(container, times(1)).requestSendAccessibilityEvent(
+            eq(androidComposeView),
+            argThat(
+                ArgumentMatcher {
+                    it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
+                        it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_UNDEFINED
+                }
+            )
+        )
+    }
+
+    @Test
+    fun sendWindowContentChangeUndefinedEventByDefault_whenPropertyRemoved() {
+        val oldSemanticsNode = createSemanticsNodeWithProperties(1, false) {
+            disabled()
+        }
+        accessibilityDelegate.semanticsNodes[1] =
+            AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(oldSemanticsNode)
+        val newSemanticsNode = createSemanticsNodeWithProperties(1, false) {}
+        val newNodes = mutableMapOf<Int, SemanticsNode>()
+        newNodes[1] = newSemanticsNode
+        accessibilityDelegate.sendSemanticsPropertyChangeEvents(newNodes)
+
+        verify(container, times(1)).requestSendAccessibilityEvent(
+            eq(androidComposeView),
+            argThat(
+                ArgumentMatcher {
+                    it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
+                        it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_UNDEFINED
+                }
+            )
+        )
+    }
+
+    @Test
+    fun sendWindowContentChangeUndefinedEventByDefault_onlyOnce_whenMultiplePropertiesChange() {
+        val oldSemanticsNode = createSemanticsNodeWithProperties(1, false) {
+            disabled()
+        }
+        accessibilityDelegate.semanticsNodes[1] =
+            AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(oldSemanticsNode)
+        val newSemanticsNode = createSemanticsNodeWithProperties(1, false) {
+            onClick { true }
+        }
+        val newNodes = mutableMapOf<Int, SemanticsNode>()
+        newNodes[1] = newSemanticsNode
+        accessibilityDelegate.sendSemanticsPropertyChangeEvents(newNodes)
+
+        verify(container, times(1)).requestSendAccessibilityEvent(
+            eq(androidComposeView),
+            argThat(
+                ArgumentMatcher {
+                    it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
+                        it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_UNDEFINED
                 }
             )
         )

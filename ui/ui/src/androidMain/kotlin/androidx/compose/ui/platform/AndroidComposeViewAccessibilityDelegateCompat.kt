@@ -59,6 +59,7 @@ import androidx.compose.ui.util.annotation.VisibleForTesting
 import androidx.compose.ui.util.fastForEach
 import androidx.core.view.AccessibilityDelegateCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.accessibility.AccessibilityEventCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.core.view.accessibility.AccessibilityNodeProviderCompat
 import kotlinx.coroutines.channels.Channel
@@ -1309,16 +1310,13 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     @VisibleForTesting
     internal fun sendSemanticsPropertyChangeEvents(newSemanticsNodes: Map<Int, SemanticsNode>) {
         for (id in newSemanticsNodes.keys) {
-            if (!semanticsNodes.contains(id)) {
-                continue
-            }
-
             // We do doing this search because the new configuration is set as a whole, so we
             // can't indicate which property is changed when setting the new configuration.
+            val oldNode = semanticsNodes[id] ?: continue
             val newNode = newSemanticsNodes[id]
-            val oldNode = semanticsNodes[id]
+            var propertyChanged = false
             for (entry in newNode!!.config) {
-                if (entry.value == oldNode!!.config.getOrNull(entry.key)) {
+                if (entry.value == oldNode.config.getOrNull(entry.key)) {
                     continue
                 }
                 when (entry.key) {
@@ -1326,7 +1324,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                         sendEventForVirtualView(
                             semanticsNodeIdToAccessibilityVirtualNodeId(id),
                             AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED,
-                            AccessibilityEvent.CONTENT_CHANGE_TYPE_STATE_DESCRIPTION
+                            AccessibilityEventCompat.CONTENT_CHANGE_TYPE_STATE_DESCRIPTION
                         )
                     SemanticsProperties.ContentDescription ->
                         sendEventForVirtualView(
@@ -1472,10 +1470,25 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                             AccessibilityEvent.CONTENT_CHANGE_TYPE_UNDEFINED
                         )
                     }
+                    // TODO(b/151840490) send the correct events for certain properties, like pane
+                    //  title, view selected.
                     else -> {
-                        // TODO(b/151840490) send the correct events when property changes
+                        propertyChanged = true
                     }
                 }
+            }
+
+            if (!propertyChanged) {
+                propertyChanged = newNode.propertiesDeleted(oldNode)
+            }
+            if (propertyChanged) {
+                // TODO(b/176105563): throttle the window content change events and merge different
+                //  sub types. We can use the subtreeChangedLayoutNodes with sub types.
+                sendEventForVirtualView(
+                    semanticsNodeIdToAccessibilityVirtualNodeId(id),
+                    AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED,
+                    AccessibilityEvent.CONTENT_CHANGE_TYPE_UNDEFINED
+                )
             }
         }
     }
@@ -1773,3 +1786,14 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
 }
 
 private fun SemanticsNode.enabled() = (config.getOrNull(SemanticsProperties.Disabled) == null)
+
+private fun SemanticsNode.propertiesDeleted(
+    oldNode: AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy
+): Boolean {
+    for (entry in oldNode.config) {
+        if (!config.contains(entry.key)) {
+            return true
+        }
+    }
+    return false
+}
