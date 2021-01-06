@@ -24,8 +24,8 @@ package androidx.compose.ui.test {
   }
 
   public final class AnimationClocksKt {
-    method @androidx.compose.ui.test.ExperimentalTesting public static androidx.compose.animation.core.MonotonicFrameAnimationClock monotonicFrameAnimationClockOf(kotlin.coroutines.CoroutineContext coroutineContext, androidx.compose.runtime.dispatch.MonotonicFrameClock clock);
-    method @androidx.compose.ui.test.ExperimentalTesting public static androidx.compose.animation.core.MonotonicFrameAnimationClock monotonicFrameAnimationClockOf(kotlin.coroutines.CoroutineContext coroutineContext);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static androidx.compose.animation.core.MonotonicFrameAnimationClock monotonicFrameAnimationClockOf(kotlin.coroutines.CoroutineContext coroutineContext, androidx.compose.runtime.dispatch.MonotonicFrameClock clock);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static androidx.compose.animation.core.MonotonicFrameAnimationClock monotonicFrameAnimationClockOf(kotlin.coroutines.CoroutineContext coroutineContext);
   }
 
   public final class AssertionsKt {
@@ -71,13 +71,16 @@ package androidx.compose.ui.test {
   }
 
   public final class CoroutineBuildersKt {
-    method @androidx.compose.ui.test.ExperimentalTesting public static <R> void runBlockingWithManualClock(optional boolean compatibleWithManualAnimationClock, kotlin.jvm.functions.Function3<? super kotlinx.coroutines.CoroutineScope,? super androidx.compose.animation.core.ManualFrameClock,? super kotlin.coroutines.Continuation<? super R>,?> block);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static <R> void runBlockingWithManualClock(optional boolean compatibleWithManualAnimationClock, kotlin.jvm.functions.Function3<? super kotlinx.coroutines.CoroutineScope,? super androidx.compose.animation.core.ManualFrameClock,? super kotlin.coroutines.Continuation<? super R>,?> block);
   }
 
   public final class ErrorMessagesKt {
   }
 
-  @kotlin.RequiresOptIn(message="This testing API is experimental and is likely to be changed or removed entirely") public @interface ExperimentalTesting {
+  @kotlin.RequiresOptIn(message="This testing API is experimental and is likely to be changed or removed entirely") public @interface ExperimentalTestApi {
+  }
+
+  @Deprecated @kotlin.RequiresOptIn(message="This testing API is experimental and is likely to be changed or removed entirely") public @interface ExperimentalTesting {
   }
 
   public final class FiltersKt {
@@ -185,7 +188,10 @@ package androidx.compose.ui.test {
     property public abstract boolean isIdleNow;
   }
 
-  @kotlin.RequiresOptIn(message="This is internal API for Compose modules that may change frequently and without warning.") public @interface InternalTestingApi {
+  @kotlin.RequiresOptIn(message="This is internal API for Compose modules that may change frequently and without warning.") public @interface InternalTestApi {
+  }
+
+  @Deprecated @kotlin.RequiresOptIn(message="This is internal API for Compose modules that may change frequently and without warning.") public @interface InternalTestingApi {
   }
 
   public final class KeyInputHelpersKt {
@@ -270,7 +276,7 @@ package androidx.compose.ui.test {
   public final class SemanticsSelectorKt {
   }
 
-  @androidx.compose.ui.test.ExperimentalTesting public interface TestAnimationClock extends androidx.compose.animation.core.AnimationClockObservable {
+  @androidx.compose.ui.test.ExperimentalTestApi public interface TestAnimationClock extends androidx.compose.animation.core.AnimationClockObservable {
     method public void advanceClock(long milliseconds);
     method public boolean isIdle();
     method public boolean isPaused();
@@ -295,7 +301,7 @@ package androidx.compose.ui.test {
     method public static long getFrameDelayMillis(androidx.compose.ui.test.TestMonotonicFrameClock);
   }
 
-  @androidx.compose.ui.test.InternalTestingApi public interface TestOwner {
+  @androidx.compose.ui.test.InternalTestApi public interface TestOwner {
     method public java.util.Set<androidx.compose.ui.node.Owner> getOwners();
     method public <T> T! runOnUiThread(kotlin.jvm.functions.Function0<? extends T> action);
     method public void sendImeAction(androidx.compose.ui.semantics.SemanticsNode node, androidx.compose.ui.text.input.ImeAction actionSpecified);
@@ -303,10 +309,10 @@ package androidx.compose.ui.test {
   }
 
   public final class TestOwnerKt {
-    method @androidx.compose.ui.test.InternalTestingApi public static androidx.compose.ui.test.TestContext createTestContext(androidx.compose.ui.test.TestOwner owner);
+    method @androidx.compose.ui.test.InternalTestApi public static androidx.compose.ui.test.TestContext createTestContext(androidx.compose.ui.test.TestOwner owner);
   }
 
-  @androidx.compose.ui.test.ExperimentalTesting public final class TestUiDispatcher {
+  @androidx.compose.ui.test.ExperimentalTestApi public final class TestUiDispatcher {
     method @Deprecated public kotlin.coroutines.CoroutineContext getMain();
     property @Deprecated public final kotlin.coroutines.CoroutineContext Main;
     field public static final androidx.compose.ui.test.TestUiDispatcher INSTANCE;

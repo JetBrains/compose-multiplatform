@@ -19,7 +19,7 @@ package androidx.compose.ui.test.junit4
 import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.animation.transition
 import androidx.compose.animation.transitionsEnabled
-import androidx.compose.ui.test.InternalTestingApi
+import androidx.compose.ui.test.InternalTestApi
 import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
@@ -29,7 +29,7 @@ import org.junit.runners.model.Statement
  * can be turned into a no-op by setting [disableTransitions] to `false`, allowing you to put it
  * into a rule chain without branching logic.
  */
-@InternalTestingApi
+@InternalTestApi
 class DisableTransitionsTestRule(private val disableTransitions: Boolean = false) : TestRule {
 
     override fun apply(base: Statement, description: Description?): Statement {
@@ -58,5 +58,5 @@ class DisableTransitionsTestRule(private val disableTransitions: Boolean = false
     )
 )
 @Suppress("unused")
-@OptIn(InternalTestingApi::class)
+@OptIn(InternalTestApi::class)
 typealias DisableTransitions = DisableTransitionsTestRule

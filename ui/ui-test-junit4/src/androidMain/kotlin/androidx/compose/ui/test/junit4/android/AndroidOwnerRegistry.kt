@@ -19,7 +19,7 @@ package androidx.compose.ui.test.junit4.android
 import android.view.View
 import androidx.annotation.VisibleForTesting
 import androidx.compose.ui.platform.ViewRootForTest
-import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.ExperimentalTestApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.junit.runners.model.Statement
 import java.util.Collections
@@ -203,7 +203,7 @@ internal fun AndroidOwnerRegistry.waitForAndroidOwners() {
     }
 }
 
-@ExperimentalTesting
+@ExperimentalTestApi
 @OptIn(ExperimentalTime::class)
 internal suspend fun AndroidOwnerRegistry.awaitAndroidOwners() {
     ensureAndroidOwnerRegistryIsSetUp()

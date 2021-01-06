@@ -2,13 +2,13 @@
 package androidx.compose.ui.test.junit4 {
 
   public final class AndroidAnimationClockTestRuleKt {
-    method @Deprecated @androidx.compose.ui.test.ExperimentalTesting public static androidx.compose.ui.test.junit4.AnimationClockTestRule createAnimationClockRule();
+    method @Deprecated @androidx.compose.ui.test.ExperimentalTestApi public static androidx.compose.ui.test.junit4.AnimationClockTestRule createAnimationClockRule();
   }
 
   public final class AndroidComposeTestRule<R extends org.junit.rules.TestRule, A extends androidx.activity.ComponentActivity> implements androidx.compose.ui.test.junit4.ComposeTestRule {
     ctor public AndroidComposeTestRule(R activityRule, kotlin.jvm.functions.Function1<? super R,? extends A> activityProvider);
     method public org.junit.runners.model.Statement apply(org.junit.runners.model.Statement base, org.junit.runner.Description description);
-    method @androidx.compose.ui.test.ExperimentalTesting public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method @androidx.compose.ui.test.ExperimentalTestApi public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public R getActivityRule();
     method public androidx.compose.ui.test.junit4.AnimationClockTestRule getClockTestRule();
     method public androidx.compose.ui.unit.Density getDensity();
@@ -41,7 +41,7 @@ package androidx.compose.ui.test.junit4 {
   public final class AndroidSynchronizationKt {
   }
 
-  @androidx.compose.ui.test.ExperimentalTesting public interface AnimationClockTestRule extends org.junit.rules.TestRule {
+  @androidx.compose.ui.test.ExperimentalTestApi public interface AnimationClockTestRule extends org.junit.rules.TestRule {
     method public default void advanceClock(long milliseconds);
     method public androidx.compose.ui.test.TestAnimationClock getClock();
     method public default boolean isPaused();
@@ -52,7 +52,7 @@ package androidx.compose.ui.test.junit4 {
   }
 
   public interface ComposeTestRule extends org.junit.rules.TestRule androidx.compose.ui.test.SemanticsNodeInteractionsProvider {
-    method @androidx.compose.ui.test.ExperimentalTesting public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method @androidx.compose.ui.test.ExperimentalTestApi public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public androidx.compose.ui.test.junit4.AnimationClockTestRule getClockTestRule();
     method public androidx.compose.ui.unit.Density getDensity();
     method public long getDisplaySize-YbymL2g();
@@ -67,7 +67,7 @@ package androidx.compose.ui.test.junit4 {
     property public abstract long displaySize;
   }
 
-  @androidx.compose.ui.test.InternalTestingApi public final class DisableTransitionsTestRule implements org.junit.rules.TestRule {
+  @androidx.compose.ui.test.InternalTestApi public final class DisableTransitionsTestRule implements org.junit.rules.TestRule {
     ctor public DisableTransitionsTestRule(boolean disableTransitions);
     ctor public DisableTransitionsTestRule();
     method public org.junit.runners.model.Statement apply(org.junit.runners.model.Statement base, org.junit.runner.Description? description);
@@ -91,9 +91,9 @@ package androidx.compose.ui.test.junit4.android {
 
   public final class ComposeIdlingResourceKt {
     method @Deprecated public static void registerComposeWithEspresso();
-    method @Deprecated @androidx.compose.ui.test.ExperimentalTesting public static void registerTestClock(androidx.compose.ui.test.TestAnimationClock clock);
+    method @Deprecated @androidx.compose.ui.test.ExperimentalTestApi public static void registerTestClock(androidx.compose.ui.test.TestAnimationClock clock);
     method @Deprecated public static void unregisterComposeFromEspresso();
-    method @Deprecated @androidx.compose.ui.test.ExperimentalTesting public static void unregisterTestClock(androidx.compose.ui.test.TestAnimationClock clock);
+    method @Deprecated @androidx.compose.ui.test.ExperimentalTestApi public static void unregisterTestClock(androidx.compose.ui.test.TestAnimationClock clock);
   }
 
   public final class ComposeNotIdleException extends java.lang.Throwable {

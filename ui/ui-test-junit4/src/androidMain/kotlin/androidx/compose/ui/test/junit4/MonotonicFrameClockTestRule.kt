@@ -20,14 +20,14 @@ import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.animation.core.MonotonicFrameAnimationClock
 import androidx.compose.animation.core.rootAnimationClockFactory
-import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.TestAnimationClock
 import androidx.compose.ui.test.junit4.android.ComposeIdlingResource
 import kotlinx.coroutines.CoroutineScope
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
 
-@ExperimentalTesting
+@ExperimentalTestApi
 internal class MonotonicFrameClockTestRule(
     private val composeIdlingResource: ComposeIdlingResource
 ) : AnimationClockTestRule {

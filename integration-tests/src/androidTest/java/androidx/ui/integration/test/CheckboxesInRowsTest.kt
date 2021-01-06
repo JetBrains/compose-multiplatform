@@ -20,7 +20,7 @@ import androidx.activity.ComponentActivity
 import androidx.compose.testutils.assertMeasureSizeIsPositive
 import androidx.compose.testutils.assertNoPendingChanges
 import androidx.compose.testutils.forGivenTestCase
-import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.filters.MediumTest
 import androidx.ui.integration.test.material.CheckboxesInRowsTestCase
@@ -34,7 +34,7 @@ import org.junit.runners.Parameterized
  */
 @MediumTest
 @RunWith(Parameterized::class)
-@OptIn(ExperimentalTesting::class)
+@OptIn(ExperimentalTestApi::class)
 class CheckboxesInRowsTest(private val numberOfCheckboxes: Int) {
 
     companion object {

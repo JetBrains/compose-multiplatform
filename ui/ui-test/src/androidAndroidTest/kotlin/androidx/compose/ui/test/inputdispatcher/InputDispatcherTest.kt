@@ -19,7 +19,7 @@ package androidx.compose.ui.test.inputdispatcher
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.AndroidInputDispatcher
 import androidx.compose.ui.test.InputDispatcher
-import androidx.compose.ui.test.InternalTestingApi
+import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.test.createTestContext
 import androidx.compose.ui.test.util.InputDispatcherTestRule
 import androidx.compose.ui.test.util.MotionEventRecorder
@@ -29,7 +29,7 @@ import org.junit.After
 import org.junit.Rule
 import org.junit.rules.TestRule
 
-@OptIn(InternalTestingApi::class)
+@OptIn(InternalTestApi::class)
 open class InputDispatcherTest(eventPeriodOverride: Long? = null) {
 
     @get:Rule

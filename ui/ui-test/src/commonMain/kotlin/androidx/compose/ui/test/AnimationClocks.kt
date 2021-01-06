@@ -32,7 +32,7 @@ import kotlin.coroutines.CoroutineContext
  * Use [pauseClock] to switch from automatic ticking to manual ticking, [resumeClock] to switch
  * from manual to automatic with; and manually tick the clock with [advanceClock].
  */
-@ExperimentalTesting
+@ExperimentalTestApi
 interface TestAnimationClock : AnimationClockObservable {
     /**
      * Whether the clock is idle or not. An idle clock is one that is not driving animations,
@@ -73,7 +73,7 @@ interface TestAnimationClock : AnimationClockObservable {
  *
  * @see MonotonicFrameAnimationClock
  */
-@ExperimentalTesting
+@ExperimentalTestApi
 fun monotonicFrameAnimationClockOf(
     coroutineContext: CoroutineContext,
     clock: MonotonicFrameClock
@@ -88,7 +88,7 @@ fun monotonicFrameAnimationClockOf(
  *
  * @see MonotonicFrameAnimationClock
  */
-@ExperimentalTesting
+@ExperimentalTestApi
 fun monotonicFrameAnimationClockOf(
     coroutineContext: CoroutineContext
 ): MonotonicFrameAnimationClock =

@@ -19,7 +19,7 @@ package androidx.compose.ui.test
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
 
-@ExperimentalTesting
+@ExperimentalTestApi
 object TestUiDispatcher {
     /**
      * The dispatcher to use if you need to dispatch coroutines on the main thread in tests.

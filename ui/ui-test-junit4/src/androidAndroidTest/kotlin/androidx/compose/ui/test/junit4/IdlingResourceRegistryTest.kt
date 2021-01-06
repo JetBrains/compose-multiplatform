@@ -17,7 +17,7 @@
 package androidx.compose.ui.test.junit4
 
 import androidx.compose.ui.test.IdlingResource
-import androidx.compose.ui.test.InternalTestingApi
+import androidx.compose.ui.test.InternalTestApi
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
@@ -40,7 +40,7 @@ class IdlingResourceRegistryTest {
     private var onIdleCalled = false
     @OptIn(ExperimentalCoroutinesApi::class)
     private val scope = TestCoroutineScope()
-    @OptIn(InternalTestingApi::class)
+    @OptIn(InternalTestApi::class)
     private val registry = IdlingResourceRegistry(scope).apply {
         setOnIdleCallback { onIdleCalled = true }
     }

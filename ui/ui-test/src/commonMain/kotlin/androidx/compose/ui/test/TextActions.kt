@@ -110,7 +110,7 @@ fun SemanticsNodeInteraction.performImeAction(alreadyHasFocus: Boolean = false) 
         )
     }
 
-    @OptIn(InternalTestingApi::class)
+    @OptIn(InternalTestApi::class)
     testContext.testOwner.sendImeAction(node, actionSpecified)
 }
 
@@ -119,6 +119,6 @@ internal fun SemanticsNodeInteraction.sendTextInputCommand(command: List<EditOpe
     val node = fetchSemanticsNode(errorOnFail)
     assert(hasSetTextAction()) { errorOnFail }
 
-    @OptIn(InternalTestingApi::class)
+    @OptIn(InternalTestApi::class)
     testContext.testOwner.sendTextInputCommand(node, command)
 }

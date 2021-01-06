@@ -27,7 +27,7 @@ import androidx.compose.ui.text.input.ImeAction
  *
  * This is typically implemented by entities like test rule.
  */
-@InternalTestingApi
+@InternalTestApi
 interface TestOwner {
 
     /**
@@ -67,17 +67,17 @@ interface TestOwner {
  * Can crash in case it hits time out. This is not supposed to be handled as it
  * surfaces only in incorrect tests.
  */
-@OptIn(InternalTestingApi::class)
+@OptIn(InternalTestApi::class)
 internal fun TestOwner.getAllSemanticsNodes(useUnmergedTree: Boolean): List<SemanticsNode> {
     return getOwners().flatMap { it.semanticsOwner.getAllSemanticsNodes(useUnmergedTree) }
 }
 
-@InternalTestingApi
+@InternalTestApi
 fun createTestContext(owner: TestOwner): TestContext {
     return TestContext(owner)
 }
 
-@OptIn(InternalTestingApi::class)
+@OptIn(InternalTestApi::class)
 class TestContext internal constructor(internal val testOwner: TestOwner) {
 
     /**

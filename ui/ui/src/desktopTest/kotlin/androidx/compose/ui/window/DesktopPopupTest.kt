@@ -23,14 +23,14 @@ import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticAmbientOf
 import androidx.compose.ui.platform.AmbientDensity
-import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.Density
 import com.google.common.truth.Truth
 import org.junit.Rule
 import org.junit.Test
 
-@OptIn(ExperimentalTesting::class)
+@OptIn(ExperimentalTestApi::class)
 class DesktopPopupTest {
     @get:Rule
     val rule = createComposeRule()

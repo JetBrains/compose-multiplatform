@@ -23,8 +23,8 @@ import androidx.compose.testutils.ComposeBenchmarkScope
 import androidx.compose.testutils.ComposeTestCase
 import androidx.compose.testutils.benchmark.android.AndroidTestCase
 import androidx.compose.testutils.createAndroidComposeBenchmarkRunner
+import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.test.junit4.DisableTransitionsTestRule
-import androidx.compose.ui.test.InternalTestingApi
 import org.junit.rules.RuleChain
 import org.junit.rules.TestRule
 import org.junit.runner.Description
@@ -44,7 +44,7 @@ class ComposeBenchmarkRule(
     val benchmarkRule = BenchmarkRule()
 
     override fun apply(base: Statement, description: Description?): Statement {
-        @OptIn(InternalTestingApi::class)
+        @OptIn(InternalTestApi::class)
         return RuleChain
             .outerRule(DisableTransitionsTestRule(!enableTransitions))
             .around(benchmarkRule)

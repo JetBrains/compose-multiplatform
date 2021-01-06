@@ -47,7 +47,7 @@ import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.AmbientTextInputService
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -81,7 +81,7 @@ import kotlin.math.roundToInt
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalTesting::class)
+@OptIn(ExperimentalTestApi::class)
 class OutlinedTextFieldTest {
     private val ExpectedMinimumTextFieldHeight = 56.dp
     private val ExpectedPadding = 16.dp
