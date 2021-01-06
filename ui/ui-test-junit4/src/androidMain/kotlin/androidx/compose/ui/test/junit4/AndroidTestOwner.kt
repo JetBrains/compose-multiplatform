@@ -23,7 +23,7 @@ import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.test.TestOwner
 import androidx.compose.ui.test.junit4.android.ComposeIdlingResource
-import androidx.compose.ui.text.input.EditOperation
+import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.ImeAction
 
 @OptIn(InternalTestApi::class)
@@ -32,7 +32,7 @@ internal class AndroidTestOwner(
 ) : TestOwner {
 
     @SuppressLint("DocumentExceptions")
-    override fun sendTextInputCommand(node: SemanticsNode, command: List<EditOperation>) {
+    override fun sendTextInputCommand(node: SemanticsNode, command: List<EditCommand>) {
         val owner = node.owner as ViewRootForTest
 
         @Suppress("DEPRECATION")

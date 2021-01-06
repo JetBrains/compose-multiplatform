@@ -70,8 +70,8 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.CommitTextEditOp
-import androidx.compose.ui.text.input.EditOperation
+import androidx.compose.ui.text.input.CommitTextCommand
+import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextFieldValue.Companion.Saver
@@ -159,10 +159,10 @@ class TextFieldTest {
 
         rule.onNode(hasSetTextAction()).performClick()
 
-        var onEditCommandCallback: ((List<EditOperation>) -> Unit)? = null
+        var onEditCommandCallback: ((List<EditCommand>) -> Unit)? = null
         rule.runOnIdle {
             // Verify startInput is called and capture the callback.
-            val onEditCommandCaptor = argumentCaptor<(List<EditOperation>) -> Unit>()
+            val onEditCommandCaptor = argumentCaptor<(List<EditCommand>) -> Unit>()
             verify(textInputService, times(1)).startInput(
                 value = any(),
                 imeOptions = any(),
@@ -176,11 +176,11 @@ class TextFieldTest {
 
         // Performs input events "1", "a", "2", "b", "3". Only numbers should remain.
         arrayOf(
-            listOf(CommitTextEditOp("1", 1)),
-            listOf(CommitTextEditOp("a", 1)),
-            listOf(CommitTextEditOp("2", 1)),
-            listOf(CommitTextEditOp("b", 1)),
-            listOf(CommitTextEditOp("3", 1))
+            listOf(CommitTextCommand("1", 1)),
+            listOf(CommitTextCommand("a", 1)),
+            listOf(CommitTextCommand("2", 1)),
+            listOf(CommitTextCommand("b", 1)),
+            listOf(CommitTextCommand("3", 1))
         ).forEach {
             // TODO: This should work only with runOnUiThread. But it seems that these events are
             // not buffered and chaining multiple of them before composition happens makes them to
@@ -230,10 +230,10 @@ class TextFieldTest {
 
         rule.onNode(hasSetTextAction()).performClick()
 
-        var onEditCommandCallback: ((List<EditOperation>) -> Unit)? = null
+        var onEditCommandCallback: ((List<EditCommand>) -> Unit)? = null
         rule.runOnIdle {
             // Verify startInput is called and capture the callback.
-            val onEditCommandCaptor = argumentCaptor<(List<EditOperation>) -> Unit>()
+            val onEditCommandCaptor = argumentCaptor<(List<EditCommand>) -> Unit>()
             verify(textInputService, times(1)).startInput(
                 value = any(),
                 imeOptions = any(),
@@ -247,11 +247,11 @@ class TextFieldTest {
 
         // Performs input events "1", "a", "2", "b", "3". Only numbers should remain.
         arrayOf(
-            listOf(CommitTextEditOp("1", 1)),
-            listOf(CommitTextEditOp("a", 1)),
-            listOf(CommitTextEditOp("2", 1)),
-            listOf(CommitTextEditOp("b", 1)),
-            listOf(CommitTextEditOp("3", 1))
+            listOf(CommitTextCommand("1", 1)),
+            listOf(CommitTextCommand("a", 1)),
+            listOf(CommitTextCommand("2", 1)),
+            listOf(CommitTextCommand("b", 1)),
+            listOf(CommitTextCommand("3", 1))
         ).forEach {
             // TODO: This should work only with runOnUiThread. But it seems that these events are
             // not buffered and chaining multiple of them before composition happens makes them to
@@ -297,10 +297,10 @@ class TextFieldTest {
 
         rule.onNode(hasSetTextAction()).performClick()
 
-        var onEditCommandCallback: ((List<EditOperation>) -> Unit)? = null
+        var onEditCommandCallback: ((List<EditCommand>) -> Unit)? = null
         rule.runOnIdle {
             // Verify startInput is called and capture the callback.
-            val onEditCommandCaptor = argumentCaptor<(List<EditOperation>) -> Unit>()
+            val onEditCommandCaptor = argumentCaptor<(List<EditCommand>) -> Unit>()
             verify(textInputService, times(1)).startInput(
                 value = any(),
                 imeOptions = any(),
@@ -314,9 +314,9 @@ class TextFieldTest {
 
         // Performs input events "1", "2", "3".
         arrayOf(
-            listOf(CommitTextEditOp("1", 1)),
-            listOf(CommitTextEditOp("2", 1)),
-            listOf(CommitTextEditOp("3", 1))
+            listOf(CommitTextCommand("1", 1)),
+            listOf(CommitTextCommand("2", 1)),
+            listOf(CommitTextCommand("3", 1))
         ).forEach {
             // TODO: This should work only with runOnUiThread. But it seems that these events are
             // not buffered and chaining multiple of them before composition happens makes them to

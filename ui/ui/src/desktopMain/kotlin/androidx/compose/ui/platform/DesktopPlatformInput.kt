@@ -17,15 +17,15 @@ package androidx.compose.ui.platform
 
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.text.ExperimentalTextApi
-import androidx.compose.ui.text.input.BackspaceKeyEditOp
-import androidx.compose.ui.text.input.CommitTextEditOp
-import androidx.compose.ui.text.input.DeleteSurroundingTextInCodePointsEditOp
-import androidx.compose.ui.text.input.EditOperation
+import androidx.compose.ui.text.input.BackspaceCommand
+import androidx.compose.ui.text.input.CommitTextCommand
+import androidx.compose.ui.text.input.DeleteSurroundingTextInCodePointsCommand
+import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.ImeOptions
-import androidx.compose.ui.text.input.MoveCursorEditOp
+import androidx.compose.ui.text.input.MoveCursorCommand
 import androidx.compose.ui.text.input.PlatformTextInputService
-import androidx.compose.ui.text.input.SetComposingTextEditOp
+import androidx.compose.ui.text.input.SetComposingTextCommand
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.substring
 import androidx.compose.ui.unit.Density
@@ -55,7 +55,7 @@ internal class DesktopPlatformInput(val component: DesktopComponent) :
     PlatformTextInputService {
     data class CurrentInput(
         var value: TextFieldValue,
-        val onEditCommand: ((List<EditOperation>) -> Unit),
+        val onEditCommand: ((List<EditCommand>) -> Unit),
         val onImeActionPerformed: ((ImeAction) -> Unit),
         val imeAction: ImeAction,
         var focusedRect: Rect? = null
@@ -69,7 +69,7 @@ internal class DesktopPlatformInput(val component: DesktopComponent) :
     override fun startInput(
         value: TextFieldValue,
         imeOptions: ImeOptions,
-        onEditCommand: (List<EditOperation>) -> Unit,
+        onEditCommand: (List<EditCommand>) -> Unit,
         onImeActionPerformed: (ImeAction) -> Unit
     ) {
         val input = CurrentInput(
@@ -114,17 +114,17 @@ internal class DesktopPlatformInput(val component: DesktopComponent) :
             val command = input.onEditCommand
             when (keyCode) {
                 KeyEvent.VK_LEFT -> {
-                    command.invoke(listOf(MoveCursorEditOp(-1)))
+                    command.invoke(listOf(MoveCursorCommand(-1)))
                 }
                 KeyEvent.VK_RIGHT -> {
-                    command.invoke(listOf(MoveCursorEditOp(1)))
+                    command.invoke(listOf(MoveCursorCommand(1)))
                 }
                 KeyEvent.VK_BACK_SPACE -> {
-                    command.invoke(listOf(BackspaceKeyEditOp()))
+                    command.invoke(listOf(BackspaceCommand()))
                 }
                 KeyEvent.VK_ENTER -> {
                     if (input.imeAction == ImeAction.Unspecified) {
-                        command.invoke(listOf(CommitTextEditOp("\n", 1)))
+                        command.invoke(listOf(CommitTextCommand("\n", 1)))
                     } else
                         input.onImeActionPerformed.invoke(input.imeAction)
                 }
@@ -150,7 +150,7 @@ internal class DesktopPlatformInput(val component: DesktopComponent) :
         needToDeletePreviousChar = false
         currentInput?.onEditCommand?.let {
             if (char.isPrintable()) {
-                it.invoke(listOf(CommitTextEditOp(char.toString(), 1)))
+                it.invoke(listOf(CommitTextCommand(char.toString(), 1)))
             }
         }
     }
@@ -170,7 +170,7 @@ internal class DesktopPlatformInput(val component: DesktopComponent) :
             }
             val committed = event.text.toStringUntil(event.committedCharacterCount)
             val composing = event.text.toStringFrom(event.committedCharacterCount)
-            val ops = mutableListOf<EditOperation>()
+            val ops = mutableListOf<EditCommand>()
 
             if (needToDeletePreviousChar && isMac) {
                 // This is required to support input of accented characters using press-and-hold method (http://support.apple.com/kb/PH11264).
@@ -178,16 +178,16 @@ internal class DesktopPlatformInput(val component: DesktopComponent) :
                 // For our editor component we need this workaround.
                 // After https://bugs.openjdk.java.net/browse/JDK-8074882 is fixed, this workaround should be replaced with a proper solution.
                 needToDeletePreviousChar = false
-                ops.add(DeleteSurroundingTextInCodePointsEditOp(1, 0))
+                ops.add(DeleteSurroundingTextInCodePointsCommand(1, 0))
             }
 
-            // newCursorPosition == 1 leads to effectively ignoring of this parameter in EditOps
+            // newCursorPosition == 1 leads to effectively ignoring of this parameter in EditCommands
             // processing. the cursor will be set after the inserted text.
             if (committed.isNotEmpty()) {
-                ops.add(CommitTextEditOp(committed, 1))
+                ops.add(CommitTextCommand(committed, 1))
             }
             if (composing.isNotEmpty()) {
-                ops.add(SetComposingTextEditOp(composing, 1))
+                ops.add(SetComposingTextCommand(composing, 1))
             }
 
             input.onEditCommand.invoke(ops)

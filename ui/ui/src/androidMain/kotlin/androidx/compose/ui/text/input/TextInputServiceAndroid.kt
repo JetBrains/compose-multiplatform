@@ -45,7 +45,7 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
      *  The following three observers are set when the editable composable has initiated the input
      *  session
      */
-    private var onEditCommand: (List<EditOperation>) -> Unit = {}
+    private var onEditCommand: (List<EditCommand>) -> Unit = {}
     private var onImeActionPerformed: (ImeAction) -> Unit = {}
 
     private var state = TextFieldValue(text = "", selection = TextRange.Zero)
@@ -94,9 +94,9 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
         return RecordingInputConnection(
             initState = state,
             autoCorrect = imeOptions.autoCorrect,
-            eventListener = object : InputEventListener {
-                override fun onEditOperations(editOps: List<EditOperation>) {
-                    onEditCommand(editOps)
+            eventCallback = object : InputEventCallback {
+                override fun onEditCommands(editCommands: List<EditCommand>) {
+                    onEditCommand(editCommands)
                 }
 
                 override fun onImeAction(imeAction: ImeAction) {
@@ -114,7 +114,7 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
     override fun startInput(
         value: TextFieldValue,
         imeOptions: ImeOptions,
-        onEditCommand: (List<EditOperation>) -> Unit,
+        onEditCommand: (List<EditCommand>) -> Unit,
         onImeActionPerformed: (ImeAction) -> Unit
     ) {
         imm = view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager

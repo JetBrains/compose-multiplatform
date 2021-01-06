@@ -24,13 +24,13 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
-class DeleteSurroundingTextEditOpTest {
+class DeleteSurroundingTextCommandTest {
 
     @Test
     fun test_delete_after() {
         val eb = EditingBuffer("ABCDE", TextRange(1))
 
-        DeleteSurroundingTextEditOp(0, 1).process(eb)
+        DeleteSurroundingTextCommand(0, 1).applyTo(eb)
 
         assertEquals("ACDE", eb.toString())
         assertEquals(1, eb.cursor)
@@ -41,7 +41,7 @@ class DeleteSurroundingTextEditOpTest {
     fun test_delete_before() {
         val eb = EditingBuffer("ABCDE", TextRange(1))
 
-        DeleteSurroundingTextEditOp(1, 0).process(eb)
+        DeleteSurroundingTextCommand(1, 0).applyTo(eb)
 
         assertEquals("BCDE", eb.toString())
         assertEquals(0, eb.cursor)
@@ -52,7 +52,7 @@ class DeleteSurroundingTextEditOpTest {
     fun test_delete_both() {
         val eb = EditingBuffer("ABCDE", TextRange(3))
 
-        DeleteSurroundingTextEditOp(1, 1).process(eb)
+        DeleteSurroundingTextCommand(1, 1).applyTo(eb)
 
         assertEquals("ABE", eb.toString())
         assertEquals(2, eb.cursor)
@@ -63,7 +63,7 @@ class DeleteSurroundingTextEditOpTest {
     fun test_delete_after_multiple() {
         val eb = EditingBuffer("ABCDE", TextRange(2))
 
-        DeleteSurroundingTextEditOp(0, 2).process(eb)
+        DeleteSurroundingTextCommand(0, 2).applyTo(eb)
 
         assertEquals("ABE", eb.toString())
         assertEquals(2, eb.cursor)
@@ -74,7 +74,7 @@ class DeleteSurroundingTextEditOpTest {
     fun test_delete_before_multiple() {
         val eb = EditingBuffer("ABCDE", TextRange(3))
 
-        DeleteSurroundingTextEditOp(2, 0).process(eb)
+        DeleteSurroundingTextCommand(2, 0).applyTo(eb)
 
         assertEquals("ADE", eb.toString())
         assertEquals(1, eb.cursor)
@@ -85,7 +85,7 @@ class DeleteSurroundingTextEditOpTest {
     fun test_delete_both_multiple() {
         val eb = EditingBuffer("ABCDE", TextRange(3))
 
-        DeleteSurroundingTextEditOp(2, 2).process(eb)
+        DeleteSurroundingTextCommand(2, 2).applyTo(eb)
 
         assertEquals("A", eb.toString())
         assertEquals(1, eb.cursor)
@@ -96,7 +96,7 @@ class DeleteSurroundingTextEditOpTest {
     fun test_delete_selection_preserve() {
         val eb = EditingBuffer("ABCDE", TextRange(2, 4))
 
-        DeleteSurroundingTextEditOp(1, 1).process(eb)
+        DeleteSurroundingTextCommand(1, 1).applyTo(eb)
 
         assertEquals("ACD", eb.toString())
         assertEquals(1, eb.selectionStart)
@@ -108,7 +108,7 @@ class DeleteSurroundingTextEditOpTest {
     fun test_delete_before_too_many() {
         val eb = EditingBuffer("ABCDE", TextRange(3))
 
-        DeleteSurroundingTextEditOp(1000, 0).process(eb)
+        DeleteSurroundingTextCommand(1000, 0).applyTo(eb)
 
         assertEquals("DE", eb.toString())
         assertEquals(0, eb.cursor)
@@ -119,7 +119,7 @@ class DeleteSurroundingTextEditOpTest {
     fun test_delete_after_too_many() {
         val eb = EditingBuffer("ABCDE", TextRange(3))
 
-        DeleteSurroundingTextEditOp(0, 1000).process(eb)
+        DeleteSurroundingTextCommand(0, 1000).applyTo(eb)
 
         assertEquals("ABC", eb.toString())
         assertEquals(3, eb.cursor)
@@ -130,7 +130,7 @@ class DeleteSurroundingTextEditOpTest {
     fun test_delete_both_too_many() {
         val eb = EditingBuffer("ABCDE", TextRange(3))
 
-        DeleteSurroundingTextEditOp(1000, 1000).process(eb)
+        DeleteSurroundingTextCommand(1000, 1000).applyTo(eb)
 
         assertEquals("", eb.toString())
         assertEquals(0, eb.cursor)
@@ -143,7 +143,7 @@ class DeleteSurroundingTextEditOpTest {
 
         eb.setComposition(0, 1)
 
-        DeleteSurroundingTextEditOp(1, 1).process(eb)
+        DeleteSurroundingTextCommand(1, 1).applyTo(eb)
 
         assertEquals("ABE", eb.toString())
         assertEquals(2, eb.cursor)
@@ -157,7 +157,7 @@ class DeleteSurroundingTextEditOpTest {
 
         eb.setComposition(4, 5)
 
-        DeleteSurroundingTextEditOp(1, 1).process(eb)
+        DeleteSurroundingTextCommand(1, 1).applyTo(eb)
 
         assertEquals("ABE", eb.toString())
         assertEquals(2, eb.cursor)
@@ -171,7 +171,7 @@ class DeleteSurroundingTextEditOpTest {
 
         eb.setComposition(0, 3)
 
-        DeleteSurroundingTextEditOp(1, 1).process(eb)
+        DeleteSurroundingTextCommand(1, 1).applyTo(eb)
 
         assertEquals("ABE", eb.toString())
         assertEquals(2, eb.cursor)
@@ -185,7 +185,7 @@ class DeleteSurroundingTextEditOpTest {
 
         eb.setComposition(3, 5)
 
-        DeleteSurroundingTextEditOp(1, 1).process(eb)
+        DeleteSurroundingTextCommand(1, 1).applyTo(eb)
 
         assertEquals("ABE", eb.toString())
         assertEquals(2, eb.cursor)
@@ -199,7 +199,7 @@ class DeleteSurroundingTextEditOpTest {
 
         eb.setComposition(2, 3)
 
-        DeleteSurroundingTextEditOp(1, 1).process(eb)
+        DeleteSurroundingTextCommand(1, 1).applyTo(eb)
 
         assertEquals("ABE", eb.toString())
         assertEquals(2, eb.cursor)
@@ -212,7 +212,7 @@ class DeleteSurroundingTextEditOpTest {
 
         eb.setComposition(0, 5)
 
-        DeleteSurroundingTextEditOp(1, 1).process(eb)
+        DeleteSurroundingTextCommand(1, 1).applyTo(eb)
 
         assertEquals("ABE", eb.toString())
         assertEquals(2, eb.cursor)

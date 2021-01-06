@@ -735,54 +735,45 @@ package androidx.compose.ui.text.font {
 
 package androidx.compose.ui.text.input {
 
-  public final class BackspaceKeyEditOp implements androidx.compose.ui.text.input.EditOperation {
-    ctor public BackspaceKeyEditOp();
-    method public void process(androidx.compose.ui.text.input.EditingBuffer buffer);
+  public final class BackspaceCommand implements androidx.compose.ui.text.input.EditCommand {
+    ctor public BackspaceCommand();
+    method public void applyTo(androidx.compose.ui.text.input.EditingBuffer buffer);
   }
 
-  public final class CommitTextEditOp implements androidx.compose.ui.text.input.EditOperation {
-    ctor public CommitTextEditOp(String text, int newCursorPosition);
-    method public String component1();
-    method public int component2();
-    method public androidx.compose.ui.text.input.CommitTextEditOp copy(String text, int newCursorPosition);
+  public final class CommitTextCommand implements androidx.compose.ui.text.input.EditCommand {
+    ctor public CommitTextCommand(String text, int newCursorPosition);
+    method public void applyTo(androidx.compose.ui.text.input.EditingBuffer buffer);
     method public int getNewCursorPosition();
     method public String getText();
-    method public void process(androidx.compose.ui.text.input.EditingBuffer buffer);
     property public final int newCursorPosition;
     property public final String text;
   }
 
-  public final class DeleteAllEditOp implements androidx.compose.ui.text.input.EditOperation {
-    ctor public DeleteAllEditOp();
-    method public void process(androidx.compose.ui.text.input.EditingBuffer buffer);
+  public final class DeleteAllCommand implements androidx.compose.ui.text.input.EditCommand {
+    ctor public DeleteAllCommand();
+    method public void applyTo(androidx.compose.ui.text.input.EditingBuffer buffer);
   }
 
-  public final class DeleteSurroundingTextEditOp implements androidx.compose.ui.text.input.EditOperation {
-    ctor public DeleteSurroundingTextEditOp(int beforeLength, int afterLength);
-    method public int component1();
-    method public int component2();
-    method public androidx.compose.ui.text.input.DeleteSurroundingTextEditOp copy(int beforeLength, int afterLength);
-    method public int getAfterLength();
-    method public int getBeforeLength();
-    method public void process(androidx.compose.ui.text.input.EditingBuffer buffer);
-    property public final int afterLength;
-    property public final int beforeLength;
+  public final class DeleteSurroundingTextCommand implements androidx.compose.ui.text.input.EditCommand {
+    ctor public DeleteSurroundingTextCommand(int lengthBeforeCursor, int lengthAfterCursor);
+    method public void applyTo(androidx.compose.ui.text.input.EditingBuffer buffer);
+    method public int getLengthAfterCursor();
+    method public int getLengthBeforeCursor();
+    property public final int lengthAfterCursor;
+    property public final int lengthBeforeCursor;
   }
 
-  public final class DeleteSurroundingTextInCodePointsEditOp implements androidx.compose.ui.text.input.EditOperation {
-    ctor public DeleteSurroundingTextInCodePointsEditOp(int beforeLength, int afterLength);
-    method public int component1();
-    method public int component2();
-    method public androidx.compose.ui.text.input.DeleteSurroundingTextInCodePointsEditOp copy(int beforeLength, int afterLength);
-    method public int getAfterLength();
-    method public int getBeforeLength();
-    method public void process(androidx.compose.ui.text.input.EditingBuffer buffer);
-    property public final int afterLength;
-    property public final int beforeLength;
+  public final class DeleteSurroundingTextInCodePointsCommand implements androidx.compose.ui.text.input.EditCommand {
+    ctor public DeleteSurroundingTextInCodePointsCommand(int lengthBeforeCursor, int lengthAfterCursor);
+    method public void applyTo(androidx.compose.ui.text.input.EditingBuffer buffer);
+    method public int getLengthAfterCursor();
+    method public int getLengthBeforeCursor();
+    property public final int lengthAfterCursor;
+    property public final int lengthBeforeCursor;
   }
 
-  public interface EditOperation {
-    method public void process(androidx.compose.ui.text.input.EditingBuffer buffer);
+  public interface EditCommand {
+    method public void applyTo(androidx.compose.ui.text.input.EditingBuffer buffer);
   }
 
   public final class EditingBuffer {
@@ -805,9 +796,9 @@ package androidx.compose.ui.text.input {
     property public final String text;
   }
 
-  public final class FinishComposingTextEditOp implements androidx.compose.ui.text.input.EditOperation {
-    ctor public FinishComposingTextEditOp();
-    method public void process(androidx.compose.ui.text.input.EditingBuffer buffer);
+  public final class FinishComposingTextCommand implements androidx.compose.ui.text.input.EditCommand {
+    ctor public FinishComposingTextCommand();
+    method public void applyTo(androidx.compose.ui.text.input.EditingBuffer buffer);
   }
 
   public final class GapBufferKt {
@@ -851,8 +842,8 @@ package androidx.compose.ui.text.input {
     property public final androidx.compose.ui.text.input.ImeOptions Default;
   }
 
-  public interface InputEventListener {
-    method public void onEditOperations(java.util.List<? extends androidx.compose.ui.text.input.EditOperation> editOps);
+  public interface InputEventCallback {
+    method public void onEditCommands(java.util.List<? extends androidx.compose.ui.text.input.EditCommand> editCommands);
     method public void onImeAction(androidx.compose.ui.text.input.ImeAction imeAction);
   }
 
@@ -874,12 +865,10 @@ package androidx.compose.ui.text.input {
     enum_constant public static final androidx.compose.ui.text.input.KeyboardType Uri;
   }
 
-  public final class MoveCursorEditOp implements androidx.compose.ui.text.input.EditOperation {
-    ctor public MoveCursorEditOp(int amount);
-    method public int component1();
-    method public androidx.compose.ui.text.input.MoveCursorEditOp copy(int amount);
+  public final class MoveCursorCommand implements androidx.compose.ui.text.input.EditCommand {
+    ctor public MoveCursorCommand(int amount);
+    method public void applyTo(androidx.compose.ui.text.input.EditingBuffer buffer);
     method public int getAmount();
-    method public void process(androidx.compose.ui.text.input.EditingBuffer buffer);
     property public final int amount;
   }
 
@@ -909,42 +898,33 @@ package androidx.compose.ui.text.input {
     method public void notifyFocusedRect(androidx.compose.ui.geometry.Rect rect);
     method public void onStateUpdated(androidx.compose.ui.text.input.TextFieldValue? oldValue, androidx.compose.ui.text.input.TextFieldValue newValue);
     method public void showSoftwareKeyboard();
-    method public void startInput(androidx.compose.ui.text.input.TextFieldValue value, androidx.compose.ui.text.input.ImeOptions imeOptions, kotlin.jvm.functions.Function1<? super java.util.List<? extends androidx.compose.ui.text.input.EditOperation>,kotlin.Unit> onEditCommand, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.ImeAction,kotlin.Unit> onImeActionPerformed);
+    method public void startInput(androidx.compose.ui.text.input.TextFieldValue value, androidx.compose.ui.text.input.ImeOptions imeOptions, kotlin.jvm.functions.Function1<? super java.util.List<? extends androidx.compose.ui.text.input.EditCommand>,kotlin.Unit> onEditCommand, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.ImeAction,kotlin.Unit> onImeActionPerformed);
     method public void stopInput();
   }
 
-  public final class SetComposingRegionEditOp implements androidx.compose.ui.text.input.EditOperation {
-    ctor public SetComposingRegionEditOp(int start, int end);
-    method public int component1();
-    method public int component2();
-    method public androidx.compose.ui.text.input.SetComposingRegionEditOp copy(int start, int end);
+  public final class SetComposingRegionCommand implements androidx.compose.ui.text.input.EditCommand {
+    ctor public SetComposingRegionCommand(int start, int end);
+    method public void applyTo(androidx.compose.ui.text.input.EditingBuffer buffer);
     method public int getEnd();
     method public int getStart();
-    method public void process(androidx.compose.ui.text.input.EditingBuffer buffer);
     property public final int end;
     property public final int start;
   }
 
-  public final class SetComposingTextEditOp implements androidx.compose.ui.text.input.EditOperation {
-    ctor public SetComposingTextEditOp(String text, int newCursorPosition);
-    method public String component1();
-    method public int component2();
-    method public androidx.compose.ui.text.input.SetComposingTextEditOp copy(String text, int newCursorPosition);
+  public final class SetComposingTextCommand implements androidx.compose.ui.text.input.EditCommand {
+    ctor public SetComposingTextCommand(String text, int newCursorPosition);
+    method public void applyTo(androidx.compose.ui.text.input.EditingBuffer buffer);
     method public int getNewCursorPosition();
     method public String getText();
-    method public void process(androidx.compose.ui.text.input.EditingBuffer buffer);
     property public final int newCursorPosition;
     property public final String text;
   }
 
-  public final class SetSelectionEditOp implements androidx.compose.ui.text.input.EditOperation {
-    ctor public SetSelectionEditOp(int start, int end);
-    method public int component1();
-    method public int component2();
-    method public androidx.compose.ui.text.input.SetSelectionEditOp copy(int start, int end);
+  public final class SetSelectionCommand implements androidx.compose.ui.text.input.EditCommand {
+    ctor public SetSelectionCommand(int start, int end);
+    method public void applyTo(androidx.compose.ui.text.input.EditingBuffer buffer);
     method public int getEnd();
     method public int getStart();
-    method public void process(androidx.compose.ui.text.input.EditingBuffer buffer);
     property public final int end;
     property public final int start;
   }
@@ -978,7 +958,7 @@ package androidx.compose.ui.text.input {
     method public void notifyFocusedRect(int token, androidx.compose.ui.geometry.Rect rect);
     method public void onStateUpdated(int token, androidx.compose.ui.text.input.TextFieldValue? oldValue, androidx.compose.ui.text.input.TextFieldValue newValue);
     method public void showSoftwareKeyboard(int token);
-    method public int startInput(androidx.compose.ui.text.input.TextFieldValue value, androidx.compose.ui.text.input.ImeOptions imeOptions, kotlin.jvm.functions.Function1<? super java.util.List<? extends androidx.compose.ui.text.input.EditOperation>,kotlin.Unit> onEditCommand, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.ImeAction,kotlin.Unit> onImeActionPerformed);
+    method public int startInput(androidx.compose.ui.text.input.TextFieldValue value, androidx.compose.ui.text.input.ImeOptions imeOptions, kotlin.jvm.functions.Function1<? super java.util.List<? extends androidx.compose.ui.text.input.EditCommand>,kotlin.Unit> onEditCommand, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.ImeAction,kotlin.Unit> onImeActionPerformed);
     method public void stopInput(int token);
   }
 

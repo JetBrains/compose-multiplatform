@@ -17,7 +17,7 @@
 package androidx.compose.ui.test.junit4
 
 import androidx.compose.ui.text.ExperimentalTextApi
-import androidx.compose.ui.text.input.EditOperation
+import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.InputSessionToken
 import androidx.compose.ui.text.input.ImeOptions
@@ -37,13 +37,13 @@ internal class TextInputServiceForTests(
     platformTextInputService: PlatformTextInputService
 ) : TextInputService(platformTextInputService) {
 
-    var onEditCommand: ((List<EditOperation>) -> Unit)? = null
+    var onEditCommand: ((List<EditCommand>) -> Unit)? = null
     var onImeActionPerformed: ((ImeAction) -> Unit)? = null
 
     override fun startInput(
         value: TextFieldValue,
         imeOptions: ImeOptions,
-        onEditCommand: (List<EditOperation>) -> Unit,
+        onEditCommand: (List<EditCommand>) -> Unit,
         onImeActionPerformed: (ImeAction) -> Unit
     ): InputSessionToken {
         this.onEditCommand = onEditCommand
