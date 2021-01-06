@@ -163,7 +163,7 @@ fun CoreTextField(
     val selectionBackgroundColor = AmbientTextSelectionColors.current.backgroundColor
 
     // State
-    val (visualText, offsetMap) = remember(value, visualTransformation) {
+    val (visualText, offsetMapping) = remember(value, visualTransformation) {
         val transformed = visualTransformation.filter(AnnotatedString(value.text))
         value.composition?.let {
             TextFieldDelegate.applyCompositionDecoration(it, transformed)
@@ -202,7 +202,7 @@ fun CoreTextField(
     state.processor.onNewState(value, textInputService, state.inputSession)
 
     val manager = remember { TextFieldSelectionManager() }
-    manager.offsetMap = offsetMap
+    manager.offsetMapping = offsetMapping
     manager.onValueChange = onValueChangeWrapper
     manager.state = state
     manager.value = value
@@ -246,7 +246,7 @@ fun CoreTextField(
                             textInputService,
                             state.inputSession,
                             state.hasFocus,
-                            offsetMap
+                            offsetMapping
                         )
                     }
                 }
@@ -287,7 +287,7 @@ fun CoreTextField(
                         it,
                         layoutResult,
                         state.processor,
-                        offsetMap,
+                        offsetMapping,
                         onValueChangeWrapper
                     )
                 }
@@ -315,7 +315,7 @@ fun CoreTextField(
                 TextFieldDelegate.draw(
                     canvas,
                     value,
-                    offsetMap,
+                    offsetMapping,
                     layoutResult,
                     state.selectionPaint
                 )
@@ -339,7 +339,7 @@ fun CoreTextField(
                     textInputService,
                     state.inputSession,
                     state.hasFocus,
-                    offsetMap
+                    offsetMapping
                 )
             }
         }
@@ -410,7 +410,7 @@ fun CoreTextField(
         }
     }
 
-    val cursorModifier = Modifier.cursor(state, value, offsetMap, cursorColor)
+    val cursorModifier = Modifier.cursor(state, value, offsetMapping, cursorColor)
 
     onDispose { manager.hideSelectionToolbar() }
 
@@ -452,8 +452,8 @@ fun CoreTextField(
         if (state.hasFocus && state.selectionIsOn && !isMouseInput) {
             manager.state?.layoutResult?.let {
                 if (!value.selection.collapsed) {
-                    val startOffset = offsetMap.originalToTransformed(value.selection.start)
-                    val endOffset = offsetMap.originalToTransformed(value.selection.end)
+                    val startOffset = offsetMapping.originalToTransformed(value.selection.start)
+                    val endOffset = offsetMapping.originalToTransformed(value.selection.end)
                     val startDirection = it.getBidiRunDirection(startOffset)
                     val endDirection = it.getBidiRunDirection(max(endOffset - 1, 0))
                     val directions = Pair(startDirection, endDirection)

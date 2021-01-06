@@ -30,7 +30,7 @@ import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextLayoutInput
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.OffsetMap
+import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextOverflow
@@ -57,7 +57,7 @@ import org.mockito.stubbing.Answer
 class TextFieldSelectionManagerTest {
     private val text = "Hello World"
     private val density = Density(density = 1f)
-    private val offsetMap = OffsetMap.identityOffsetMap
+    private val offsetMapping = OffsetMapping.Identity
     private var value = TextFieldValue(text)
     private val lambda: (TextFieldValue) -> Unit = { value = it }
     private val spyLambda = spy(lambda)
@@ -79,7 +79,7 @@ class TextFieldSelectionManagerTest {
 
     @Before
     fun setup() {
-        manager.offsetMap = offsetMap
+        manager.offsetMapping = offsetMapping
         manager.onValueChange = lambda
         manager.state = state
         manager.value = value
@@ -120,7 +120,7 @@ class TextFieldSelectionManagerTest {
 
     @Test
     fun TextFieldSelectionManager_init() {
-        assertThat(manager.offsetMap).isEqualTo(offsetMap)
+        assertThat(manager.offsetMapping).isEqualTo(offsetMapping)
         assertThat(manager.onValueChange).isEqualTo(lambda)
         assertThat(manager.state).isEqualTo(state)
         assertThat(manager.value).isEqualTo(value)
