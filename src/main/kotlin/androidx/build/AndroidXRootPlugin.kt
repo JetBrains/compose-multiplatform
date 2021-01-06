@@ -205,6 +205,7 @@ class AndroidXRootPlugin : Plugin<Project> {
 
         androidx.build.dependencies.kotlinVersion = getVersion("kotlin")
         androidx.build.dependencies.kotlinCoroutinesVersion = getVersion("kotlin_coroutines")
+        androidx.build.dependencies.kspVersion = getVersion("ksp")
         androidx.build.dependencies.agpVersion = getVersion("agp")
         androidx.build.dependencies.lintVersion = getVersion("lint")
         androidx.build.dependencies.hiltVersion = getVersion("hilt")
