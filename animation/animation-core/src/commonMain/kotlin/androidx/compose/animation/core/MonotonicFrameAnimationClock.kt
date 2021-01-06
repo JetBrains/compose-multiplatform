@@ -20,6 +20,8 @@ import androidx.compose.runtime.dispatch.DefaultMonotonicFrameClock
 import androidx.compose.runtime.dispatch.MonotonicFrameClock
 import androidx.compose.runtime.dispatch.withFrameMillis
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
@@ -59,7 +61,10 @@ class MonotonicFrameAnimationClock(
         // until unsubscribe for that observer is called.
         @Suppress("DEPRECATION_ERROR")
         synchronized(observers) {
-            observers[observer] = scope.launch {
+            // Start the coroutine undispatched to make sure it is awaiting
+            // the next frame before the frame clock sends that next frame
+            @OptIn(ExperimentalCoroutinesApi::class)
+            observers[observer] = scope.launch(start = CoroutineStart.UNDISPATCHED) {
                 val clock = coroutineContext[MonotonicFrameClock] ?: DefaultMonotonicFrameClock
                 // ManualAnimationClock might send the current time when a subscriber subscribes.
                 // ManualFrameClock doesn't, because there's no concept of subscription. Fix this
