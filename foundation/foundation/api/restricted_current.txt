@@ -535,11 +535,7 @@ package androidx.compose.foundation.text {
   @androidx.compose.runtime.Immutable public final class KeyboardOptions {
     ctor public KeyboardOptions(androidx.compose.ui.text.input.KeyboardCapitalization capitalization, boolean autoCorrect, androidx.compose.ui.text.input.KeyboardType keyboardType, androidx.compose.ui.text.input.ImeAction imeAction);
     ctor public KeyboardOptions();
-    method public androidx.compose.ui.text.input.KeyboardCapitalization component1();
-    method public boolean component2();
-    method public androidx.compose.ui.text.input.KeyboardType component3();
-    method public androidx.compose.ui.text.input.ImeAction component4();
-    method @androidx.compose.runtime.Immutable public androidx.compose.foundation.text.KeyboardOptions copy(androidx.compose.ui.text.input.KeyboardCapitalization capitalization, boolean autoCorrect, androidx.compose.ui.text.input.KeyboardType keyboardType, androidx.compose.ui.text.input.ImeAction imeAction);
+    method public androidx.compose.foundation.text.KeyboardOptions copy(optional androidx.compose.ui.text.input.KeyboardCapitalization capitalization, optional boolean autoCorrect, optional androidx.compose.ui.text.input.KeyboardType keyboardType, optional androidx.compose.ui.text.input.ImeAction imeAction);
     method public boolean getAutoCorrect();
     method public androidx.compose.ui.text.input.KeyboardCapitalization getCapitalization();
     method public androidx.compose.ui.text.input.ImeAction getImeAction();
