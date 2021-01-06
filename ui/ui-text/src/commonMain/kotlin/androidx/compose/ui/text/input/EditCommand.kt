@@ -89,6 +89,10 @@ class CommitTextCommand(
         result = 31 * result + newCursorPosition
         return result
     }
+
+    override fun toString(): String {
+        return "CommitTextCommand(text='$text', newCursorPosition=$newCursorPosition)"
+    }
 }
 
 /**
@@ -141,6 +145,10 @@ class SetComposingRegionCommand(
         var result = start
         result = 31 * result + end
         return result
+    }
+
+    override fun toString(): String {
+        return "SetComposingRegionCommand(start=$start, end=$end)"
     }
 }
 
@@ -208,6 +216,10 @@ class SetComposingTextCommand(
         result = 31 * result + newCursorPosition
         return result
     }
+
+    override fun toString(): String {
+        return "SetComposingTextCommand(text='$text', newCursorPosition=$newCursorPosition)"
+    }
 }
 
 /**
@@ -255,6 +267,11 @@ class DeleteSurroundingTextCommand(
         var result = lengthBeforeCursor
         result = 31 * result + lengthAfterCursor
         return result
+    }
+
+    override fun toString(): String {
+        return "DeleteSurroundingTextCommand(lengthBeforeCursor=$lengthBeforeCursor, " +
+            "lengthAfterCursor=$lengthAfterCursor)"
     }
 }
 
@@ -326,6 +343,11 @@ class DeleteSurroundingTextInCodePointsCommand(
         result = 31 * result + lengthAfterCursor
         return result
     }
+
+    override fun toString(): String {
+        return "DeleteSurroundingTextInCodePointsCommand(lengthBeforeCursor=$lengthBeforeCursor, " +
+            "lengthAfterCursor=$lengthAfterCursor)"
+    }
 }
 
 /**
@@ -371,6 +393,10 @@ class SetSelectionCommand(
         result = 31 * result + end
         return result
     }
+
+    override fun toString(): String {
+        return "SetSelectionCommand(start=$start, end=$end)"
+    }
 }
 /**
  * Finishes the composing text that is currently active. This simply leaves the text as-is,
@@ -385,10 +411,12 @@ class FinishComposingTextCommand : EditCommand {
         buffer.commitComposition()
     }
 
-    // Class with empty arguments default ctor cannot be data class.
-    // Treating all FinishComposingTextEditOp are equal object.
     override fun equals(other: Any?): Boolean = other is FinishComposingTextCommand
     override fun hashCode(): Int = this::class.hashCode()
+
+    override fun toString(): String {
+        return "FinishComposingTextCommand()"
+    }
 }
 
 /**
@@ -422,10 +450,13 @@ class BackspaceCommand : EditCommand {
         buffer.delete(prevCursorPos, buffer.cursor)
     }
 
-    // Class with empty arguments default ctor cannot be data class.
-    // Treating all FinishComposingTextEditOp are equal object.
     override fun equals(other: Any?): Boolean = other is BackspaceCommand
+
     override fun hashCode(): Int = this::class.hashCode()
+
+    override fun toString(): String {
+        return "BackspaceCommand()"
+    }
 }
 
 /**
@@ -479,6 +510,10 @@ class MoveCursorCommand(
     override fun hashCode(): Int {
         return amount
     }
+
+    override fun toString(): String {
+        return "MoveCursorCommand(amount=$amount)"
+    }
 }
 
 /**
@@ -489,8 +524,11 @@ class DeleteAllCommand : EditCommand {
         buffer.delete(0, buffer.length)
     }
 
-    // Class with empty arguments default ctor cannot be data class.
-    // Treating all FinishComposingTextEditOp are equal object.
     override fun equals(other: Any?): Boolean = other is DeleteAllCommand
+
     override fun hashCode(): Int = this::class.hashCode()
+
+    override fun toString(): String {
+        return "DeleteAllCommand()"
+    }
 }

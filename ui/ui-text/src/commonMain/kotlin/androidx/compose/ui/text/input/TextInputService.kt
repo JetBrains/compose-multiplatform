@@ -83,10 +83,10 @@ open class TextInputService(private val platformTextInputService: PlatformTextIn
     }
 
     /**
-     * Request showing onscreen keyboard
+     * Request showing onscreen keyboard.
      *
-     * There is no guarantee nor callback of the result of this API. The software keyboard or
-     * system service may silently ignores this request.
+     * There is no guarantee that the keyboard will be shown. The software keyboard or
+     * system service may silently ignore this request.
      */
     open fun showSoftwareKeyboard(token: InputSessionToken) = ignoreIfExpired(token) {
         platformTextInputService.showSoftwareKeyboard()
