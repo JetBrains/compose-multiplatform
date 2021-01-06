@@ -750,12 +750,14 @@ private fun Project.configureJavaCompilationWarnings(androidXExtension: AndroidX
     afterEvaluate {
         project.tasks.withType(JavaCompile::class.java).configureEach { task ->
             if (hasProperty(ALL_WARNINGS_AS_ERRORS)) {
-                task.options.compilerArgs.add("-Werror")
-                task.options.compilerArgs.add("-Xlint:unchecked")
-                if (androidXExtension.failOnDeprecationWarnings &&
-                    !hasProperty(AndroidXPlugin.USE_MAX_DEP_VERSIONS)
-                ) {
-                    task.options.compilerArgs.add("-Xlint:deprecation")
+                // If we're running a hypothetical test build confirming that tip-of-tree versions
+                // are compatible, then we're not concerned about warnings
+                if (!hasProperty(AndroidXPlugin.USE_MAX_DEP_VERSIONS)) {
+                    task.options.compilerArgs.add("-Werror")
+                    task.options.compilerArgs.add("-Xlint:unchecked")
+                    if (androidXExtension.failOnDeprecationWarnings) {
+                        task.options.compilerArgs.add("-Xlint:deprecation")
+                    }
                 }
             }
         }
@@ -763,7 +765,9 @@ private fun Project.configureJavaCompilationWarnings(androidXExtension: AndroidX
 }
 
 private fun Project.configureJavaCompilationWarnings(task: KotlinCompile) {
-    if (hasProperty(ALL_WARNINGS_AS_ERRORS)) {
+    if (hasProperty(ALL_WARNINGS_AS_ERRORS) &&
+        !hasProperty(AndroidXPlugin.USE_MAX_DEP_VERSIONS)
+    ) {
         task.kotlinOptions.allWarningsAsErrors = true
     }
     task.kotlinOptions.freeCompilerArgs += listOf(
