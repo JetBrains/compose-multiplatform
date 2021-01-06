@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.graphics
 
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.util.annotation.FloatRange
 
 /**
@@ -28,7 +29,7 @@ const val DefaultCameraDistance = 8.0f
  * ([scaleX], [scaleY]), rotation ([rotationX], [rotationY], [rotationZ]), opacity ([alpha]), shadow
  * ([shadowElevation], [shape]), and clipping ([clip], [shape]).
  */
-interface GraphicsLayerScope {
+interface GraphicsLayerScope : Density {
     /**
      * The horizontal scale of the drawn area. Default value is `1`.
      */
@@ -148,6 +149,14 @@ internal class ReusableGraphicsLayerScope : GraphicsLayerScope {
     override var transformOrigin: TransformOrigin = TransformOrigin.Center
     override var shape: Shape = RectangleShape
     override var clip: Boolean = false
+
+    internal var graphicsDensity: Density = Density(1.0f)
+
+    override val density: Float
+        get() = graphicsDensity.density
+
+    override val fontScale: Float
+        get() = graphicsDensity.fontScale
 
     fun reset() {
         scaleX = 1f

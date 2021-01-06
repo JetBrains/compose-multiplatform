@@ -244,6 +244,7 @@ internal abstract class LayoutNodeWrapper(
         if (layer != null) {
             val layerBlock = requireNotNull(layerBlock)
             graphicsLayerScope.reset()
+            graphicsLayerScope.graphicsDensity = layoutNode.density
             snapshotObserver.observeReads(this, onCommitAffectingLayerParams) {
                 layerBlock.invoke(graphicsLayerScope)
             }
