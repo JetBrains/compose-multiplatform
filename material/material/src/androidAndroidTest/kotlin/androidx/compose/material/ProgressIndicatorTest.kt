@@ -18,7 +18,7 @@ package androidx.compose.material
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.AccessibilityRangeInfo
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
@@ -57,7 +57,7 @@ class ProgressIndicatorTest {
         rule.onNodeWithTag(tag)
             .assertIsDisplayed()
             .assertValueEquals("0 percent")
-            .assertRangeInfoEquals(AccessibilityRangeInfo(0f, 0f..1f))
+            .assertRangeInfoEquals(ProgressBarRangeInfo(0f, 0f..1f))
 
         rule.runOnUiThread {
             progress.value = 0.5f
@@ -66,7 +66,7 @@ class ProgressIndicatorTest {
         rule.onNodeWithTag(tag)
             .assertIsDisplayed()
             .assertValueEquals("50 percent")
-            .assertRangeInfoEquals(AccessibilityRangeInfo(0.5f, 0f..1f))
+            .assertRangeInfoEquals(ProgressBarRangeInfo(0.5f, 0f..1f))
     }
 
     @Test
@@ -118,7 +118,7 @@ class ProgressIndicatorTest {
         rule.onNodeWithTag(tag)
             .assertIsDisplayed()
             .assertValueEquals("0 percent")
-            .assertRangeInfoEquals(AccessibilityRangeInfo(0f, 0f..1f))
+            .assertRangeInfoEquals(ProgressBarRangeInfo(0f, 0f..1f))
 
         rule.runOnUiThread {
             progress.value = 0.5f
@@ -127,7 +127,7 @@ class ProgressIndicatorTest {
         rule.onNodeWithTag(tag)
             .assertIsDisplayed()
             .assertValueEquals("50 percent")
-            .assertRangeInfoEquals(AccessibilityRangeInfo(0.5f, 0f..1f))
+            .assertRangeInfoEquals(ProgressBarRangeInfo(0.5f, 0f..1f))
     }
 
     @Test

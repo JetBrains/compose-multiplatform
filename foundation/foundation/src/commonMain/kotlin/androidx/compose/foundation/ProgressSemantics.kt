@@ -18,9 +18,9 @@ package androidx.compose.foundation
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.AccessibilityRangeInfo
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.ui.semantics.stateDescriptionRange
+import androidx.compose.ui.semantics.progressBarRangeInfo
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.util.annotation.IntRange
 import androidx.compose.ui.util.format
@@ -60,8 +60,8 @@ fun Modifier.progressSemantics(
 
     return semantics {
         stateDescription = Strings.TemplatePercent.format(percent)
-        stateDescriptionRange =
-            AccessibilityRangeInfo(value.coerceIn(valueRange), valueRange, steps)
+        progressBarRangeInfo =
+            ProgressBarRangeInfo(value.coerceIn(valueRange), valueRange, steps)
     }
 }
 

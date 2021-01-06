@@ -22,7 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.AccessibilityRangeInfo
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
@@ -103,8 +103,8 @@ class SliderTest {
             .assertValueEquals("0 percent")
             .assert(
                 SemanticsMatcher.expectValue(
-                    SemanticsProperties.AccessibilityRangeInfo,
-                    AccessibilityRangeInfo(0f, 0f..1f, 0)
+                    SemanticsProperties.ProgressBarRangeInfo,
+                    ProgressBarRangeInfo(0f, 0f..1f, 0)
                 )
             )
             .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.SetProgress))
@@ -138,8 +138,8 @@ class SliderTest {
             .assertValueEquals("0 percent")
             .assert(
                 SemanticsMatcher.expectValue(
-                    SemanticsProperties.AccessibilityRangeInfo,
-                    AccessibilityRangeInfo(0f, 0f..1f, 4)
+                    SemanticsProperties.ProgressBarRangeInfo,
+                    ProgressBarRangeInfo(0f, 0f..1f, 4)
                 )
             )
             .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.SetProgress))

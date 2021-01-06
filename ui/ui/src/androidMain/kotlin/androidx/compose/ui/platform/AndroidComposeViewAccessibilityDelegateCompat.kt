@@ -57,6 +57,7 @@ import androidx.compose.ui.text.length
 import androidx.compose.ui.text.platform.toAccessibilitySpannableString
 import androidx.compose.ui.util.annotation.VisibleForTesting
 import androidx.compose.ui.util.fastForEach
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.core.view.AccessibilityDelegateCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityEventCompat
@@ -221,6 +222,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     }
 
     @VisibleForTesting
+    @OptIn(ExperimentalComposeUiApi::class)
     fun populateAccessibilityNodeInfoProperties(
         virtualViewId: Int,
         info: AccessibilityNodeInfoCompat,
@@ -288,7 +290,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         if (info.isFocusable) {
             info.isFocused = semanticsNode.config[SemanticsProperties.Focused]
         }
-        info.isVisibleToUser = (semanticsNode.config.getOrNull(SemanticsProperties.Hidden) == null)
+        info.isVisibleToUser =
+            (semanticsNode.config.getOrNull(SemanticsProperties.InvisibleToUser) == null)
         info.isClickable = false
         semanticsNode.config.getOrNull(SemanticsActions.OnClick)?.let {
             info.isClickable = true
@@ -402,7 +405,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         }
 
         val rangeInfo =
-            semanticsNode.config.getOrNull(SemanticsProperties.AccessibilityRangeInfo)
+            semanticsNode.config.getOrNull(SemanticsProperties.ProgressBarRangeInfo)
         if (rangeInfo != null) {
             if (semanticsNode.config.contains(SemanticsActions.SetProgress)) {
                 info.className = "android.widget.SeekBar"
@@ -437,7 +440,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         }
 
         val xScrollState =
-            semanticsNode.config.getOrNull(SemanticsProperties.HorizontalAccessibilityScrollState)
+            semanticsNode.config.getOrNull(SemanticsProperties.HorizontalScrollAxisRange)
         val scrollAction = semanticsNode.config.getOrNull(SemanticsActions.ScrollBy)
         if (xScrollState != null && scrollAction != null) {
             // Talkback defines SCROLLABLE_ROLE_FILTER_FOR_DIRECTION_NAVIGATION, so we need to
@@ -476,7 +479,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             }
         }
         val yScrollState =
-            semanticsNode.config.getOrNull(SemanticsProperties.VerticalAccessibilityScrollState)
+            semanticsNode.config.getOrNull(SemanticsProperties.VerticalScrollAxisRange)
         if (yScrollState != null && scrollAction != null) {
             // Talkback defines SCROLLABLE_ROLE_FILTER_FOR_DIRECTION_NAVIGATION, so we need to
             // assign a role for auto scroll to work.
@@ -829,7 +832,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     action == AccessibilityNodeInfoCompat.ACTION_SCROLL_BACKWARD
                 ) {
                     val rangeInfo =
-                        node.config.getOrNull(SemanticsProperties.AccessibilityRangeInfo)
+                        node.config.getOrNull(SemanticsProperties.ProgressBarRangeInfo)
                     val setProgressAction = node.config.getOrNull(SemanticsActions.SetProgress)
                     if (rangeInfo != null && setProgressAction != null) {
                         val max = rangeInfo.range.endInclusive.coerceAtLeast(rangeInfo.range.start)
@@ -848,7 +851,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
 
                 val scrollAction = node.config.getOrNull(SemanticsActions.ScrollBy) ?: return false
                 val xScrollState =
-                    node.config.getOrNull(SemanticsProperties.HorizontalAccessibilityScrollState)
+                    node.config.getOrNull(SemanticsProperties.HorizontalScrollAxisRange)
                 if (xScrollState != null) {
                     if ((
                         (
@@ -888,7 +891,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     }
                 }
                 val yScrollState =
-                    node.config.getOrNull(SemanticsProperties.VerticalAccessibilityScrollState)
+                    node.config.getOrNull(SemanticsProperties.VerticalScrollAxisRange)
                 if (yScrollState != null) {
                     if ((
                         (
@@ -1407,20 +1410,20 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                         event.text.add(trimToSize(newText, ParcelSafeTextLength))
                         sendEvent(event)
                     }
-                    SemanticsProperties.HorizontalAccessibilityScrollState,
-                    SemanticsProperties.VerticalAccessibilityScrollState -> {
+                    SemanticsProperties.HorizontalScrollAxisRange,
+                    SemanticsProperties.VerticalScrollAxisRange -> {
                         // TODO(yingleiw): Add throttling for scroll/state events.
                         val newXState = newNode.config.getOrNull(
-                            SemanticsProperties.HorizontalAccessibilityScrollState
+                            SemanticsProperties.HorizontalScrollAxisRange
                         )
                         val oldXState = oldNode.config.getOrNull(
-                            SemanticsProperties.HorizontalAccessibilityScrollState
+                            SemanticsProperties.HorizontalScrollAxisRange
                         )
                         val newYState = newNode.config.getOrNull(
-                            SemanticsProperties.VerticalAccessibilityScrollState
+                            SemanticsProperties.VerticalScrollAxisRange
                         )
                         val oldYState = oldNode.config.getOrNull(
-                            SemanticsProperties.VerticalAccessibilityScrollState
+                            SemanticsProperties.VerticalScrollAxisRange
                         )
                         notifySubtreeAccessibilityStateChangedIfNeeded(newNode.layoutNode)
                         val deltaX = if (newXState != null && oldXState != null) {
