@@ -18,10 +18,11 @@ package androidx.compose.ui
 
 import androidx.compose.runtime.Applier
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Composer
+import androidx.compose.runtime.Composition
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.Recomposer
+import androidx.compose.runtime.compositionFor
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.dispatch.MonotonicFrameClock
 import androidx.compose.runtime.invalidate
@@ -208,18 +209,13 @@ class ComposedModifierTest {
 fun compose(
     recomposer: Recomposer,
     block: @Composable () -> Unit
-): Composer<Unit> {
-    return Composer(
+): Composition {
+    return compositionFor(
+        Any(),
         EmptyApplier(),
         recomposer
     ).apply {
-        composeInitial {
-            @Suppress("UNCHECKED_CAST")
-            val fn = block as (Composer<*>, Int) -> Unit
-            fn(this, 0)
-        }
-        applyChanges()
-        verifyConsistent()
+        setContent(block)
     }
 }
 
