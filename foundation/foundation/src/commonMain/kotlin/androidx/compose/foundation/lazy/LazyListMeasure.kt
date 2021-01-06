@@ -17,7 +17,6 @@
 package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.InternalLayoutApi
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.unit.Constraints
@@ -235,7 +234,6 @@ internal fun measureLazyList(
 /**
  * Lays out [LazyMeasuredItem]s based on the [LazyListMeasureResult] and the passed arrangement.
  */
-@OptIn(InternalLayoutApi::class)
 internal fun MeasureScope.layoutLazyList(
     constraints: Constraints,
     isVertical: Boolean,

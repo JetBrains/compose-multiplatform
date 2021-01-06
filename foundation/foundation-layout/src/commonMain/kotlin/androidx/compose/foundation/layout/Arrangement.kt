@@ -31,12 +31,10 @@ import kotlin.math.roundToInt
  * the main axis direction (horizontal and vertical, respectively).
  */
 @Immutable
-@OptIn(InternalLayoutApi::class)
 object Arrangement {
     /**
      * Used to specify the horizontal arrangement of the layout's children in layouts like [Row].
      */
-    @InternalLayoutApi
     @Immutable
     interface Horizontal {
         /**
@@ -66,7 +64,6 @@ object Arrangement {
     /**
      * Used to specify the vertical arrangement of the layout's children in layouts like [Column].
      */
-    @InternalLayoutApi
     @Immutable
     interface Vertical {
         /**
@@ -95,7 +92,6 @@ object Arrangement {
      * like [Row], or the vertical arrangement of the layout's children in vertical layouts like
      * [Column].
      */
-    @InternalLayoutApi
     @Immutable
     interface HorizontalOrVertical : Horizontal, Vertical {
         /**
@@ -356,7 +352,6 @@ object Arrangement {
         SpacedAligned(0.dp, false) { size, _ -> alignment.align(0, size) }
 
     @Immutable
-    @OptIn(InternalLayoutApi::class)
     object Absolute {
         /**
          * Place children horizontally such that they are as close as possible to the left edge of
@@ -649,7 +644,6 @@ object Arrangement {
 }
 
 @Immutable
-@OptIn(InternalLayoutApi::class)
 @Deprecated(
     "AbsoluteArrangement was deprecated in favor of Arrangement.Absolute",
     ReplaceWith("Arrangement.Absolute", "androidx.compose.foundation.layout.Arrangement")

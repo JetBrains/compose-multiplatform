@@ -24,6 +24,7 @@ package androidx.compose.runtime
 @Target(
     AnnotationTarget.CLASS,
     AnnotationTarget.FUNCTION,
-    AnnotationTarget.PROPERTY
+    AnnotationTarget.PROPERTY,
+    AnnotationTarget.PROPERTY_GETTER
 )
 annotation class ExperimentalComposeApi

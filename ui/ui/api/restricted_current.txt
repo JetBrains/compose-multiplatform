@@ -2150,8 +2150,8 @@ package androidx.compose.ui.node {
   public interface Owner {
     method public long calculatePosition-nOcc-ac();
     method public androidx.compose.ui.node.OwnedLayer createLayer(kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.Canvas,kotlin.Unit> drawBlock, kotlin.jvm.functions.Function0<kotlin.Unit> invalidateParentLayer);
-    method public androidx.compose.ui.autofill.Autofill? getAutofill();
-    method public androidx.compose.ui.autofill.AutofillTree getAutofillTree();
+    method @androidx.compose.ui.ExperimentalComposeUiApi public androidx.compose.ui.autofill.Autofill? getAutofill();
+    method @androidx.compose.ui.ExperimentalComposeUiApi public androidx.compose.ui.autofill.AutofillTree getAutofillTree();
     method public androidx.compose.ui.platform.ClipboardManager getClipboardManager();
     method public androidx.compose.ui.unit.Density getDensity();
     method public androidx.compose.ui.focus.FocusManager getFocusManager();
@@ -2176,8 +2176,8 @@ package androidx.compose.ui.node {
     method public void onSemanticsChange();
     method public boolean requestFocus();
     method public boolean sendKeyEvent-ZmokQxo(android.view.KeyEvent keyEvent);
-    property public abstract androidx.compose.ui.autofill.Autofill? autofill;
-    property public abstract androidx.compose.ui.autofill.AutofillTree autofillTree;
+    property @androidx.compose.ui.ExperimentalComposeUiApi public abstract androidx.compose.ui.autofill.Autofill? autofill;
+    property @androidx.compose.ui.ExperimentalComposeUiApi public abstract androidx.compose.ui.autofill.AutofillTree autofillTree;
     property public abstract androidx.compose.ui.platform.ClipboardManager clipboardManager;
     property public abstract androidx.compose.ui.unit.Density density;
     property public abstract androidx.compose.ui.focus.FocusManager focusManager;
@@ -2253,8 +2253,8 @@ package androidx.compose.ui.platform {
 
   public final class AmbientsKt {
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.animation.core.AnimationClockObservable> getAmbientAnimationClock();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.autofill.Autofill> getAmbientAutofill();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.autofill.AutofillTree> getAmbientAutofillTree();
+    method @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.autofill.Autofill> getAmbientAutofill();
+    method @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.autofill.AutofillTree> getAmbientAutofillTree();
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.ClipboardManager> getAmbientClipboardManager();
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.unit.Density> getAmbientDensity();
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.focus.FocusManager> getAmbientFocusManager();

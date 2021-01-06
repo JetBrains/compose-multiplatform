@@ -66,7 +66,6 @@ import androidx.compose.ui.util.annotation.FloatRange
  * @see [androidx.compose.foundation.lazy.LazyRow]
  */
 @Composable
-@OptIn(InternalLayoutApi::class)
 inline fun Row(
     modifier: Modifier = Modifier,
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
@@ -88,7 +87,6 @@ inline fun Row(
  * MeasureBlocks to use when horizontalArrangement and verticalAlignment are not provided.
  */
 @PublishedApi
-@OptIn(InternalLayoutApi::class)
 internal val DefaultRowMeasureBlocks = rowColumnMeasureBlocks(
     orientation = LayoutOrientation.Horizontal,
     arrangement = { totalSize, size, layoutDirection, density, outPosition ->
@@ -101,7 +99,6 @@ internal val DefaultRowMeasureBlocks = rowColumnMeasureBlocks(
 
 @PublishedApi
 @Composable
-@OptIn(InternalLayoutApi::class)
 internal fun rowMeasureBlocks(
     horizontalArrangement: Arrangement.Horizontal,
     verticalAlignment: Alignment.Vertical
