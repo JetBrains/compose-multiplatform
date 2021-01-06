@@ -168,7 +168,7 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
         }
     }
 
-    override fun onStateUpdated(oldValue: TextFieldValue?, newValue: TextFieldValue) {
+    override fun updateState(oldValue: TextFieldValue?, newValue: TextFieldValue) {
         if (oldValue == newValue) return
 
         this.state = newValue

@@ -17,7 +17,6 @@
 package androidx.compose.ui.text.input
 
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.util.annotation.VisibleForTesting
 
@@ -41,10 +40,10 @@ const val NO_SESSION: InputSessionToken = 0
 const val INVALID_SESSION: InputSessionToken = -1
 
 /**
- * Provide a communication with platform text input service.
+ * Handles communication with the IME. Informs about the IME changes via [EditCommand]s and
+ * provides utilities for working with software keyboard.
  */
 // Open for testing purposes.
-@OptIn(ExperimentalTextApi::class)
 open class TextInputService(private val platformTextInputService: PlatformTextInputService) {
 
     private var nextSessionToken: Int = 1
@@ -58,6 +57,12 @@ open class TextInputService(private val platformTextInputService: PlatformTextIn
 
     /**
      * Start text input session for given client.
+     *
+     * @param value initial [TextFieldValue]
+     * @param imeOptions IME configuration
+     * @param onEditCommand callback to inform about changes requested by IME
+     * @param onImeActionPerformed callback to inform if an IME action such as [ImeAction.Done]
+     * etc occurred.
      */
     open fun startInput(
         value: TextFieldValue,
@@ -77,6 +82,10 @@ open class TextInputService(private val platformTextInputService: PlatformTextIn
 
     /**
      * Stop text input session.
+     *
+     * If the [token] is not valid no action will be performed.
+     *
+     * @param token the token returned by [startInput] call.
      */
     open fun stopInput(token: InputSessionToken) = ignoreIfExpired(token) {
         platformTextInputService.stopInput()
@@ -87,31 +96,56 @@ open class TextInputService(private val platformTextInputService: PlatformTextIn
      *
      * There is no guarantee that the keyboard will be shown. The software keyboard or
      * system service may silently ignore this request.
+     *
+     * If the [token] is not valid no action will be performed.
+     *
+     * @param token the token returned by [startInput] call.
      */
     open fun showSoftwareKeyboard(token: InputSessionToken) = ignoreIfExpired(token) {
         platformTextInputService.showSoftwareKeyboard()
     }
 
     /**
-     * Hide onscreen keyboard
+     * Hide onscreen keyboard.
+     *
+     * If the [token] is not valid no action will be performed.
+     *
+     * @param token the token returned by [startInput] call.
      */
     open fun hideSoftwareKeyboard(token: InputSessionToken) = ignoreIfExpired(token) {
         platformTextInputService.hideSoftwareKeyboard()
     }
 
-    /*
-     * Notify the new editor model to IME.
+    /**
+     * Notify IME about the new [TextFieldValue] and latest state of the editing buffer. [oldValue]
+     * is the state of the buffer before the changes applied by the [newValue].
+     *
+     * [oldValue] represents the changes that was requested by IME on the buffer, and [newValue]
+     * is the final state of the editing buffer that was requested by the application. In cases
+     * where [oldValue] is not equal to [newValue], it would mean the IME suggested value is
+     * rejected, and the IME connection will be restarted with the newValue.
+     *
+     * If the [token] is not valid no action will be performed.
+     *
+     * @param token the token returned by [startInput] call.
+     * @param oldValue the value that was requested by IME on the buffer
+     * @param newValue final state of the editing buffer that was requested by the application
      */
-    open fun onStateUpdated(
+    open fun updateState(
         token: InputSessionToken,
         oldValue: TextFieldValue?,
         newValue: TextFieldValue
     ) = ignoreIfExpired(token) {
-        platformTextInputService.onStateUpdated(oldValue, newValue)
+        platformTextInputService.updateState(oldValue, newValue)
     }
 
     /**
      * Notify the focused rectangle to the system.
+     *
+     * If the [token] is not valid no action will be performed.
+     *
+     * @param token the token returned by [startInput] call.
+     * @param rect the rectangle that describes the boundaries on the screen that requires focus
      */
     open fun notifyFocusedRect(token: InputSessionToken, rect: Rect) = ignoreIfExpired(token) {
         platformTextInputService.notifyFocusedRect(rect)
@@ -121,10 +155,11 @@ open class TextInputService(private val platformTextInputService: PlatformTextIn
 /**
  * Platform specific text input service.
  */
-@OptIn(ExperimentalTextApi::class)
 interface PlatformTextInputService {
     /**
      * Start text input session for given client.
+     *
+     * @see TextInputService.startInput
      */
     fun startInput(
         value: TextFieldValue,
@@ -135,6 +170,8 @@ interface PlatformTextInputService {
 
     /**
      * Stop text input session.
+     *
+     * @see TextInputService.stopInput
      */
     fun stopInput()
 
@@ -142,21 +179,29 @@ interface PlatformTextInputService {
      * Request showing onscreen keyboard
      *
      * There is no guarantee nor callback of the result of this API.
+     *
+     * @see TextInputService.showSoftwareKeyboard
      */
     fun showSoftwareKeyboard()
 
     /**
      * Hide software keyboard
+     *
+     * @see TextInputService.hideSoftwareKeyboard
      */
     fun hideSoftwareKeyboard()
 
     /*
      * Notify the new editor model to IME.
+     *
+     * @see TextInputService.updateState
      */
-    fun onStateUpdated(oldValue: TextFieldValue?, newValue: TextFieldValue)
+    fun updateState(oldValue: TextFieldValue?, newValue: TextFieldValue)
 
     /**
      * Notify the focused rectangle to the system.
+     *
+     * @see TextInputService.notifyFocusedRect
      */
     fun notifyFocusedRect(rect: Rect)
 }

@@ -158,8 +158,8 @@ class TextInputServiceTest {
         )
 
         val editorModel = TextFieldValue()
-        textInputService.onStateUpdated(firstToken, null, editorModel)
-        verify(platformService, times(1)).onStateUpdated(eq(null), eq(editorModel))
+        textInputService.updateState(firstToken, null, editorModel)
+        verify(platformService, times(1)).updateState(eq(null), eq(editorModel))
     }
 
     @Test
@@ -184,8 +184,8 @@ class TextInputServiceTest {
         )
 
         val editorModel = TextFieldValue()
-        textInputService.onStateUpdated(firstToken, null, editorModel)
-        verify(platformService, never()).onStateUpdated(any(), any())
+        textInputService.updateState(firstToken, null, editorModel)
+        verify(platformService, never()).updateState(any(), any())
     }
 
     @Test
