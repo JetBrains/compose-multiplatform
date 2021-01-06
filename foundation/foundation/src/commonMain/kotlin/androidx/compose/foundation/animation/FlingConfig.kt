@@ -18,8 +18,8 @@ package androidx.compose.foundation.animation
 
 import androidx.compose.animation.core.AnimatedFloat
 import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.core.ExponentialDecay
 import androidx.compose.animation.core.FloatDecayAnimationSpec
+import androidx.compose.animation.core.FloatExponentialDecaySpec
 import androidx.compose.animation.core.OnAnimationEnd
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.TargetAnimation
@@ -79,7 +79,7 @@ internal expect fun actualFlingConfig(adjustTarget: (Float) -> TargetAnimation?)
 fun FlingConfig(
     anchors: List<Float>,
     animationSpec: AnimationSpec<Float> = SpringSpec(),
-    decayAnimation: FloatDecayAnimationSpec = ExponentialDecay()
+    decayAnimation: FloatDecayAnimationSpec = FloatExponentialDecaySpec()
 ): FlingConfig {
     val adjustTarget: (Float) -> TargetAnimation? = { target ->
         val point = anchors.minByOrNull { abs(it - target) }

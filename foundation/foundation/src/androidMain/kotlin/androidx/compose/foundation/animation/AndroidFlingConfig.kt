@@ -27,7 +27,7 @@ internal actual fun actualFlingConfig(adjustTarget: (Float) -> TargetAnimation?)
     // but the reference to the returned FlingConfig will not change across calls.
     val density = AmbientDensity.current
     return remember(density.density) {
-        val decayAnimation = AndroidFlingDecaySpec(density)
+        val decayAnimation = FloatAndroidFlingDecaySpec(density)
         FlingConfig(
             decayAnimation = decayAnimation,
             adjustTarget = adjustTarget

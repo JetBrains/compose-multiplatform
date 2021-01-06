@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation.lazy
 
-import androidx.compose.animation.core.ExponentialDecay
+import androidx.compose.animation.core.FloatExponentialDecaySpec
 import androidx.compose.animation.core.ManualAnimationClock
 import androidx.compose.animation.core.snap
 import androidx.compose.foundation.animation.FlingConfig
@@ -892,7 +892,7 @@ class LazyColumnTest {
         val items by mutableStateOf((1..20).toList())
         val clock = ManualAnimationClock(0L)
         val state = LazyListState(
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = clock
         )
         rule.setContent {

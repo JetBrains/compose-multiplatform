@@ -245,9 +245,9 @@ class Transition<S> internal constructor(
         internal fun onPlayTimeChanged(playTimeNanos: Long) {
             val anim = animation ?: TargetBasedAnimation<T, V>(
                 animationSpec,
+                typeConverter,
                 value,
                 targetValue,
-                typeConverter,
                 velocityVector
             ).also { animation = it }
             val playTimeMillis = (playTimeNanos - offsetTimeNanos) / 1_000_000L

@@ -27,7 +27,6 @@ import kotlin.math.max
  * Animation<T>, DecayAnimation does not have an end value defined. The end value is a
  * result of the animation rather than an input.
  */
-// TODO: Figure out a better story for non-floats
 interface FloatDecayAnimationSpec {
     /**
      * This is the absolute value of a velocity threshold, below which the animation is considered
@@ -87,6 +86,12 @@ interface FloatDecayAnimationSpec {
 
 private const val ExponentialDecayFriction = -4.2f
 
+@Deprecated(
+    "ExponentialDecay has been renamed to FloatExponentialDecaySpec",
+    replaceWith = ReplaceWith("FloatExponentialDecaySpec")
+)
+typealias ExponentialDecay = FloatExponentialDecaySpec
+
 /**
  * This is a decay animation where the friction/deceleration is always proportional to the velocity.
  * As a result, the velocity goes under an exponential decay. The constructor parameter, friction
@@ -94,7 +99,7 @@ private const val ExponentialDecayFriction = -4.2f
  * multiplier, the higher the friction, the sooner the animation will stop, and the shorter distance
  * the animation will travel with the same starting condition.
  */
-class ExponentialDecay(
+class FloatExponentialDecaySpec(
     @FloatRange(
         from = 0.0,
         // TODO(b/158069385): use POSITIVE_INFINITY constant once it's possible to do in MPP code.

@@ -17,14 +17,24 @@
 package androidx.compose.foundation.animation
 
 import android.view.ViewConfiguration
+import androidx.compose.animation.core.DecayAnimationSpec
 import androidx.compose.animation.core.FloatDecayAnimationSpec
+import androidx.compose.animation.core.generateDecayAnimationSpec
 import androidx.compose.ui.unit.Density
 import kotlin.math.sign
 
+@Deprecated(
+    "AndroidFlingDecaySpec has been renamed to FloatAndroidFlingDecaySpec",
+    replaceWith = ReplaceWith("FloatAndroidFlingDecaySpec")
+)
+typealias AndroidFlingDecaySpec = FloatAndroidFlingDecaySpec
+
 /**
  * A native Android fling curve decay.
+ *
+ * @param density density of the display
  */
-class AndroidFlingDecaySpec(density: Density) : FloatDecayAnimationSpec {
+class FloatAndroidFlingDecaySpec(density: Density) : FloatDecayAnimationSpec {
 
     private val flingCalculator = AndroidFlingCalculator(
         ViewConfiguration.getScrollFriction(),
@@ -48,3 +58,12 @@ class AndroidFlingDecaySpec(density: Density) : FloatDecayAnimationSpec {
     override fun getVelocity(playTime: Long, start: Float, startVelocity: Float): Float =
         flingCalculator.flingInfo(startVelocity).velocity(playTime)
 }
+
+/**
+ * Creates a [DecayAnimationSpec] using the native Android fling decay. This can then be used to
+ * animate any type [T].
+ *
+ * @param density density of the display
+ */
+fun <T> androidFlingDecay(density: Density): DecayAnimationSpec<T> =
+    FloatAndroidFlingDecaySpec(density).generateDecayAnimationSpec()
