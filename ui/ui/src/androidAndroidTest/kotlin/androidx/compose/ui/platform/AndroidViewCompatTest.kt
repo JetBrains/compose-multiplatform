@@ -419,10 +419,12 @@ class AndroidViewCompatTest {
             .assertPixels(IntSize(size, size)) { Color.Blue }
 
         rule.runOnIdle { size += 20 }
+        rule.runOnIdle { } // just wait for composition to finish
         rule.onNodeWithTag("view").captureToImage()
             .assertPixels(IntSize(size, size)) { Color.Blue }
 
         rule.runOnIdle { size += 20 }
+        rule.runOnIdle { } // just wait for composition to finish
         rule.onNodeWithTag("view").captureToImage()
             .assertPixels(IntSize(size, size)) { Color.Blue }
     }

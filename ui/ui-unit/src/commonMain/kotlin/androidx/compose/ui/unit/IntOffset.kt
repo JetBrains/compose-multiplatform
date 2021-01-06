@@ -167,3 +167,9 @@ operator fun IntOffset.plus(offset: Offset): Offset =
 @Stable
 operator fun IntOffset.minus(offset: Offset): Offset =
     Offset(x - offset.x, y - offset.y)
+
+/**
+ * Round a [Offset] down to the nearest [Int] coordinates.
+ */
+@Stable
+inline fun Offset.round(): IntOffset = IntOffset(x.roundToInt(), y.roundToInt())

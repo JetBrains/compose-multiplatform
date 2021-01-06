@@ -19,6 +19,7 @@ package androidx.compose.ui.graphics.drawscope
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.center
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Canvas
@@ -685,7 +686,7 @@ private fun DrawContext.asDrawTransform(): DrawTransform = object : DrawTransfor
         get() = this@asDrawTransform.size
 
     override val center: Offset
-        get() = size.center()
+        get() = size.center
 
     override fun inset(left: Float, top: Float, right: Float, bottom: Float) {
         this@asDrawTransform.canvas.let {

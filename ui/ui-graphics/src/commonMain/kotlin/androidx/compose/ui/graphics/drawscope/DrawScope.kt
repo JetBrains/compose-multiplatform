@@ -19,6 +19,7 @@ package androidx.compose.ui.graphics.drawscope
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.center
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Canvas
@@ -293,7 +294,7 @@ interface DrawScope : Density {
      * Center of the current bounds of the drawing environment
      */
     val center: Offset
-        get() = drawContext.size.center()
+        get() = drawContext.size.center
 
     /**
      * Provides the dimensions of the current drawing environment
