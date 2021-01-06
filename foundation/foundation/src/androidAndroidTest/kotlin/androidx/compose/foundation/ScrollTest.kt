@@ -28,6 +28,7 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.testutils.MockAnimationClock
 import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,7 +41,8 @@ import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.captureToImage
-import androidx.compose.ui.test.click
+import androidx.compose.ui.test.center
+import androidx.compose.ui.test.down
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -646,9 +648,8 @@ class ScrollTest {
             assertThat(scrollState.isAnimationRunning).isEqualTo(true)
         }
 
-        // TODO (matvei/jelle): this should be down, and not click to be 100% fair
         rule.onNodeWithTag(scrollerTag)
-            .performGesture { click() }
+            .performGesture { down(center) }
 
         rule.runOnIdle {
             assertThat(scrollState.isAnimationRunning).isEqualTo(false)
@@ -927,7 +928,7 @@ class ScrollTest {
         val state = ScrollState(
             initial = 0f,
             flingConfig = FlingConfig(FloatExponentialDecaySpec()),
-            animationClock = ManualAnimationClock(0)
+            animationClock = MockAnimationClock()
         )
         rule.setContent {
             val modifier = Modifier.verticalScroll(state) as InspectableValue

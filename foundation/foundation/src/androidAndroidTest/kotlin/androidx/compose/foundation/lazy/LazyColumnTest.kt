@@ -54,7 +54,7 @@ import androidx.compose.ui.test.assertPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.center
-import androidx.compose.ui.test.click
+import androidx.compose.ui.test.down
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -920,9 +920,8 @@ class LazyColumnTest {
             assertThat(state.isAnimationRunning).isEqualTo(true)
         }
 
-        // TODO (jelle): this should be down, and not click to be 100% fair
         rule.onNodeWithTag(LazyListTag)
-            .performGesture { click() }
+            .performGesture { down(center) }
 
         rule.runOnIdle {
             assertThat(state.isAnimationRunning).isEqualTo(false)

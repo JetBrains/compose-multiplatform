@@ -16,8 +16,6 @@
 
 package androidx.compose.ui.test.gesturescope
 
-import androidx.compose.animation.core.AnimationClockObservable
-import androidx.compose.animation.core.AnimationClockObserver
 import androidx.compose.animation.core.FloatExponentialDecaySpec
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.ScrollableColumn
@@ -27,18 +25,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
+import androidx.compose.testutils.MockAnimationClock
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.TouchSlop
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.unit.milliseconds
-import androidx.test.filters.MediumTest
 import androidx.compose.ui.test.bottomCenter
 import androidx.compose.ui.test.bottomRight
-import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.down
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.moveTo
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performGesture
@@ -59,11 +56,13 @@ import androidx.compose.ui.test.util.assertSame
 import androidx.compose.ui.test.util.assertTimestampsAreIncreasing
 import androidx.compose.ui.test.util.isAlmostEqualTo
 import androidx.compose.ui.test.util.verify
+import androidx.compose.ui.unit.milliseconds
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -168,11 +167,7 @@ class SendSwipeTest {
         val scrollState = ScrollState(
             initial = 0f,
             flingConfig = FlingConfig(FloatExponentialDecaySpec()),
-            animationClock = object : AnimationClockObservable {
-                // Use a "broken" clock, we just want response to input, not to time
-                override fun subscribe(observer: AnimationClockObserver) {}
-                override fun unsubscribe(observer: AnimationClockObserver) {}
-            }
+            animationClock = MockAnimationClock()
         )
         rule.setContent {
             with(AmbientDensity.current) {
