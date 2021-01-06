@@ -30,19 +30,19 @@ plugins {
 AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
-    kotlinPlugin project(":compose:compiler:compiler")
+    kotlinPlugin(project(":compose:compiler:compiler"))
 
     if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
          * corresponding block below
          */
-        api project(":compose:foundation:foundation")
-        api project(":compose:runtime:runtime")
+        api(project(":compose:foundation:foundation"))
+        api(project(":compose:runtime:runtime"))
 
         implementation(KOTLIN_STDLIB_COMMON)
-        implementation project(":compose:animation:animation")
-        implementation project(":compose:ui:ui-util")
+        implementation(project(":compose:animation:animation"))
+        implementation(project(":compose:ui:ui-util"))
 
         testImplementation(ANDROIDX_TEST_RULES)
         testImplementation(ANDROIDX_TEST_RUNNER)
@@ -63,11 +63,11 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         sourceSets {
             commonMain.dependencies {
                 implementation(KOTLIN_STDLIB_COMMON)
-                api project(":compose:foundation:foundation")
-                api project(":compose:runtime:runtime")
+                api(project(":compose:foundation:foundation"))
+                api(project(":compose:runtime:runtime"))
 
-                implementation project(":compose:animation:animation")
-                implementation project(":compose:ui:ui-util")
+                implementation(project(":compose:animation:animation"))
+                implementation(project(":compose:ui:ui-util"))
             }
 
             desktopMain.dependencies {

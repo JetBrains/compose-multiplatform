@@ -30,11 +30,11 @@ plugins {
 AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
-    kotlinPlugin project(":compose:compiler:compiler")
+    kotlinPlugin(project(":compose:compiler:compiler"))
 
     if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
-        api project(":compose:ui:ui-test")
-        api "androidx.activity:activity:1.2.0"
+        api(project(":compose:ui:ui-test"))
+        api("androidx.activity:activity:1.2.0")
         api(ANDROIDX_TEST_EXT_JUNIT)
         api(JUNIT)
 
@@ -42,20 +42,20 @@ dependencies {
         implementation(ANDROIDX_TEST_RULES)
         implementation(ANDROIDX_TEST_RUNNER)
         implementation(ESPRESSO_CORE)
-        implementation project(":compose:animation:animation")
-        implementation project(":compose:foundation:foundation")
+        implementation(project(":compose:animation:animation"))
+        implementation(project(":compose:foundation:foundation"))
 
         testImplementation(TRUTH)
 
-        androidTestImplementation project(':compose:test-utils')
-        androidTestImplementation project(':compose:material:material')
-        androidTestImplementation project(':compose:foundation:foundation')
+        androidTestImplementation(project(":compose:test-utils"))
+        androidTestImplementation(project(":compose:material:material"))
+        androidTestImplementation(project(":compose:foundation:foundation"))
         androidTestImplementation(TRUTH)
         androidTestImplementation(MOCKITO_CORE, libs.exclude_bytebuddy) // DexMaker has it"s own MockMaker
         androidTestImplementation(DEXMAKER_MOCKITO, libs.exclude_bytebuddy) // DexMaker has it"s own MockMaker
-        androidTestImplementation MOCKITO_KOTLIN, {
-            exclude group: 'org.mockito' // to keep control on the mockito version
-        }
+        androidTestImplementation(MOCKITO_KOTLIN, {
+            exclude group: "org.mockito" // to keep control on the mockito version
+        })
     }
 }
 
@@ -67,22 +67,22 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 
         sourceSets {
             commonMain.dependencies {
-                api project(":compose:ui:ui-test")
-                implementation project(":compose:animation:animation")
-                implementation project(":compose:foundation:foundation")
+                api(project(":compose:ui:ui-test"))
+                implementation(project(":compose:animation:animation"))
+                implementation(project(":compose:foundation:foundation"))
 
                 implementation(KOTLIN_STDLIB_COMMON)
             }
 
             jvmMain.dependencies {
-                implementation "androidx.collection:collection:1.1.0"
+                implementation("androidx.collection:collection:1.1.0")
                 implementation(JUNIT)
             }
 
             androidMain.dependencies {
                 api(JUNIT)
                 api(ANDROIDX_TEST_EXT_JUNIT)
-                api "androidx.activity:activity:1.2.0"
+                api("androidx.activity:activity:1.2.0")
 
                 implementation(ANDROIDX_TEST_RULES)
                 implementation(ANDROIDX_TEST_RUNNER)
@@ -95,15 +95,15 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 
             androidAndroidTest.dependencies {
                 implementation(TRUTH)
-                implementation project(':compose:test-utils')
-                implementation project(':compose:foundation:foundation')
-                implementation project(':compose:material:material')
+                implementation(project(":compose:test-utils"))
+                implementation(project(":compose:foundation:foundation"))
+                implementation(project(":compose:material:material"))
 
                 implementation(MOCKITO_CORE, libs.exclude_bytebuddy) // DexMaker has it"s own MockMaker
                 implementation(DEXMAKER_MOCKITO, libs.exclude_bytebuddy) // DexMaker has it"s own MockMaker
-                implementation MOCKITO_KOTLIN, {
-                    exclude group: 'org.mockito' // to keep control on the mockito version
-                }
+                implementation(MOCKITO_KOTLIN, {
+                    exclude group: "org.mockito" // to keep control on the mockito version
+                })
             }
 
             desktopMain.dependencies {
@@ -112,8 +112,8 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation(SKIKO)
             }
 
-            desktopMain.dependsOn jvmMain
-            jvmMain.dependsOn commonMain
+            desktopMain.dependsOn(jvmMain)
+            jvmMain.dependsOn(commonMain)
         }
     }
 }

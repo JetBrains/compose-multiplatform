@@ -30,7 +30,7 @@ plugins {
 AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
-    kotlinPlugin project(":compose:compiler:compiler")
+    kotlinPlugin(project(":compose:compiler:compiler"))
 
     if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         /*
@@ -40,24 +40,24 @@ dependencies {
 
         api(KOTLIN_COROUTINES_ANDROID)
 
-        implementation "androidx.annotation:annotation:1.1.0"
-        implementation "org.jetbrains.kotlinx:kotlinx-collections-immutable-jvm:0.3.3"
+        implementation("androidx.annotation:annotation:1.1.0")
+        implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable-jvm:0.3.3")
         implementation(KOTLIN_STDLIB)
 
-        testImplementation KOTLIN_TEST_JUNIT
+        testImplementation(KOTLIN_TEST_JUNIT)
         testImplementation(JUNIT)
         testImplementation(ROBOLECTRIC)
         testImplementation(KOTLIN_COROUTINES_TEST)
 
-        androidTestImplementation KOTLIN_TEST_JUNIT
+        androidTestImplementation(KOTLIN_TEST_JUNIT)
         androidTestImplementation(ANDROIDX_TEST_EXT_JUNIT)
         androidTestImplementation(ANDROIDX_TEST_RULES)
         androidTestImplementation(ANDROIDX_TEST_RUNNER)
         androidTestImplementation(JUNIT)
         androidTestImplementation(TRUTH)
 
-        lintChecks project(":compose:runtime:runtime-lint")
-        lintPublish project(":compose:runtime:runtime-lint")
+        lintChecks(project(":compose:runtime:runtime-lint"))
+        lintPublish(project(":compose:runtime:runtime-lint"))
     }
 }
 
@@ -74,7 +74,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             commonMain.dependencies {
                 implementation(KOTLIN_STDLIB_COMMON)
                 implementation(KOTLIN_COROUTINES_CORE)
-                implementation "org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.3"
+                implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.3")
             }
             jvmMain.dependencies {
                 implementation(KOTLIN_STDLIB)
@@ -83,16 +83,16 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             androidMain {
                 dependencies {
                     api(KOTLIN_COROUTINES_ANDROID)
-                    api "androidx.annotation:annotation:1.1.0"
+                    api("androidx.annotation:annotation:1.1.0")
                 }
-                dependsOn jvmMain
+                dependsOn(jvmMain)
             }
             desktopMain {
-                dependsOn jvmMain
+                dependsOn(jvmMain)
             }
 
             commonTest.dependencies {
-                implementation kotlin("test-junit")
+                implementation(kotlin("test-junit"))
                 implementation(KOTLIN_COROUTINES_TEST)
             }
             androidAndroidTest.dependencies {

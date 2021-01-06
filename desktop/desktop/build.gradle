@@ -30,7 +30,7 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin project(":compose:compiler:compiler")
+    kotlinPlugin(project(":compose:compiler:compiler"))
 }
 
 kotlin {
@@ -41,11 +41,11 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(KOTLIN_STDLIB_COMMON)
-            implementation project(":compose:ui:ui-util")
-            api project(":compose:foundation:foundation")
-            api project(":compose:material:material")
-            api project(":compose:runtime:runtime")
-            api project(":compose:ui:ui")
+            implementation(project(":compose:ui:ui-util"))
+            api(project(":compose:foundation:foundation"))
+            api(project(":compose:material:material"))
+            api(project(":compose:runtime:runtime"))
+            api(project(":compose:ui:ui"))
         }
 
         jvmMain.dependencies {
@@ -60,7 +60,7 @@ kotlin {
             dependencies {
                 implementation(KOTLIN_COROUTINES_TEST)
                 implementation(SKIKO_CURRENT_OS)
-                implementation project(":compose:ui:ui-test-junit4")
+                implementation(project(":compose:ui:ui-test-junit4"))
                 implementation(JUNIT)
                 implementation(TRUTH)
             }
@@ -69,7 +69,7 @@ kotlin {
 }
 
 tasks.findByName("jvmTest").configure {
-    systemProperties['GOLDEN_PATH'] = project.rootDir.absolutePath + "/../../golden"
+    systemProperties["GOLDEN_PATH"] = project.rootDir.absolutePath + "/../../golden"
 }
 
 androidx {
