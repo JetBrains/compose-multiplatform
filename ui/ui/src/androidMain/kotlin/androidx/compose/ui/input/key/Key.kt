@@ -17,13 +17,17 @@
 package androidx.compose.ui.input.key
 
 import android.view.KeyEvent
+import android.view.KeyEvent.KEYCODE_TV_AUDIO_DESCRIPTION_MIX_UP
+import android.view.KeyEvent.KEYCODE_TV_AUDIO_DESCRIPTION_MIX_DOWN
+import androidx.compose.ui.util.packInts
+import androidx.compose.ui.util.unpackInt1
 
 /**
  * Actual implementation of [Key] for Android.
  *
  * @param keyCode an integer code representing the key pressed.
  */
-actual inline class Key(val keyCode: Int) {
+actual inline class Key(val keyCode: Long) {
     actual companion object {
         actual val Unknown = Key(KeyEvent.KEYCODE_UNKNOWN)
         actual val SoftLeft = Key(KeyEvent.KEYCODE_SOFT_LEFT)
@@ -55,18 +59,16 @@ actual inline class Key(val keyCode: Int) {
         actual val Power = Key(KeyEvent.KEYCODE_POWER)
         actual val Camera = Key(KeyEvent.KEYCODE_CAMERA)
         actual val Clear = Key(KeyEvent.KEYCODE_CLEAR)
-        actual val Number0 = Key(KeyEvent.KEYCODE_0)
-        actual val Number1 = Key(KeyEvent.KEYCODE_1)
-        actual val Number2 = Key(KeyEvent.KEYCODE_2)
-        actual val Number3 = Key(KeyEvent.KEYCODE_3)
-        actual val Number4 = Key(KeyEvent.KEYCODE_4)
-        actual val Number5 = Key(KeyEvent.KEYCODE_5)
-        actual val Number6 = Key(KeyEvent.KEYCODE_6)
-        actual val Number7 = Key(KeyEvent.KEYCODE_7)
-        actual val Number8 = Key(KeyEvent.KEYCODE_8)
-        actual val Number9 = Key(KeyEvent.KEYCODE_9)
-        actual val Number11 = Key(KeyEvent.KEYCODE_11)
-        actual val Number12 = Key(KeyEvent.KEYCODE_12)
+        actual val Zero = Key(KeyEvent.KEYCODE_0)
+        actual val One = Key(KeyEvent.KEYCODE_1)
+        actual val Two = Key(KeyEvent.KEYCODE_2)
+        actual val Three = Key(KeyEvent.KEYCODE_3)
+        actual val Four = Key(KeyEvent.KEYCODE_4)
+        actual val Five = Key(KeyEvent.KEYCODE_5)
+        actual val Six = Key(KeyEvent.KEYCODE_6)
+        actual val Seven = Key(KeyEvent.KEYCODE_7)
+        actual val Eight = Key(KeyEvent.KEYCODE_8)
+        actual val Nine = Key(KeyEvent.KEYCODE_9)
         actual val Plus = Key(KeyEvent.KEYCODE_PLUS)
         actual val Minus = Key(KeyEvent.KEYCODE_MINUS)
         actual val Multiply = Key(KeyEvent.KEYCODE_STAR)
@@ -299,10 +301,8 @@ actual inline class Key(val keyCode: Int) {
         actual val TvInputComponent2 = Key(KeyEvent.KEYCODE_TV_INPUT_COMPONENT_2)
         actual val TvInputVga1 = Key(KeyEvent.KEYCODE_TV_INPUT_VGA_1)
         actual val TvAudioDescription = Key(KeyEvent.KEYCODE_TV_AUDIO_DESCRIPTION)
-        actual val TvAudioDescriptionMixingVolumeUp =
-            Key(KeyEvent.KEYCODE_TV_AUDIO_DESCRIPTION_MIX_UP)
-        actual val TvAudioDescriptionMixingVolumeDown =
-            Key(KeyEvent.KEYCODE_TV_AUDIO_DESCRIPTION_MIX_DOWN)
+        actual val TvAudioDescriptionMixingVolumeUp = Key(KEYCODE_TV_AUDIO_DESCRIPTION_MIX_UP)
+        actual val TvAudioDescriptionMixingVolumeDown = Key(KEYCODE_TV_AUDIO_DESCRIPTION_MIX_DOWN)
         actual val TvZoomMode = Key(KeyEvent.KEYCODE_TV_ZOOM_MODE)
         actual val TvContentsMenu = Key(KeyEvent.KEYCODE_TV_CONTENTS_MENU)
         actual val TvMediaContextMenu = Key(KeyEvent.KEYCODE_TV_MEDIA_CONTEXT_MENU)
@@ -318,7 +318,13 @@ actual inline class Key(val keyCode: Int) {
         actual val ProfileSwitch = Key(KeyEvent.KEYCODE_PROFILE_SWITCH)
     }
 
-    actual override fun toString(): String {
-        return "Key code: $keyCode"
-    }
+    actual override fun toString(): String = "Key code: $keyCode"
 }
+
+/**
+ * The native keycode corresponding to this [Key].
+ */
+val Key.nativeKeyCode: Int
+    get() = unpackInt1(keyCode)
+
+fun Key(nativeKeyCode: Int): Key = Key(packInts(nativeKeyCode, 0))

@@ -195,7 +195,7 @@ package androidx.compose.ui.test {
   }
 
   public final class KeyInputHelpersKt {
-    method public static boolean performKeyPress(androidx.compose.ui.test.SemanticsNodeInteraction, androidx.compose.ui.input.key.KeyEvent keyEvent);
+    method public static boolean performKeyPress-S8GO8FU(androidx.compose.ui.test.SemanticsNodeInteraction, android.view.KeyEvent keyEvent);
   }
 
   public final class OutputKt {
