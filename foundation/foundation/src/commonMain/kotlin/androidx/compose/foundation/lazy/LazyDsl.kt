@@ -18,7 +18,6 @@ package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.InternalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -142,7 +141,6 @@ internal class LazyListScopeImpl : LazyListScope {
  * @param content a block which describes the content. Inside this block you can use methods like
  * [LazyListScope.item] to add a single item or [LazyListScope.items] to add a list of items.
  */
-@OptIn(InternalLayoutApi::class)
 @Composable
 fun LazyRow(
     modifier: Modifier = Modifier,
@@ -196,7 +194,6 @@ fun LazyRow(
  * @param content a block which describes the content. Inside this block you can use methods like
  * [LazyListScope.item] to add a single item or [LazyListScope.items] to add a list of items.
  */
-@OptIn(InternalLayoutApi::class)
 @Composable
 fun LazyColumn(
     modifier: Modifier = Modifier,

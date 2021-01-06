@@ -66,12 +66,14 @@ interface Owner {
      *  TODO(ralu): Replace with SemanticsTree. This is a temporary hack until we have a semantics
      *  tree implemented.
      */
+    @get:ExperimentalComposeUiApi
     @ExperimentalComposeUiApi
     val autofillTree: AutofillTree
 
     /**
      * The [Autofill] class can be used to perform autofill operations. It is used as an ambient.
      */
+    @get:ExperimentalComposeUiApi
     @ExperimentalComposeUiApi
     val autofill: Autofill?
 

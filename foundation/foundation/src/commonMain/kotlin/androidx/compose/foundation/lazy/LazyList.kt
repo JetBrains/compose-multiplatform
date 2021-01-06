@@ -19,7 +19,6 @@ package androidx.compose.foundation.lazy
 import androidx.compose.foundation.assertNotNestingScrollableContainers
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.InternalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -34,7 +33,6 @@ import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 
-@OptIn(InternalLayoutApi::class)
 @Composable
 internal fun LazyList(
     /** The total size of the list */

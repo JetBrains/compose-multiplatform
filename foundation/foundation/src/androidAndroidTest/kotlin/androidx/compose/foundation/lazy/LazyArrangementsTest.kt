@@ -18,7 +18,6 @@ package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.InternalLayoutApi
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.Modifier
@@ -37,7 +36,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-@OptIn(InternalLayoutApi::class)
 class LazyArrangementsTest {
 
     private val ContainerTag = "ContainerTag"
