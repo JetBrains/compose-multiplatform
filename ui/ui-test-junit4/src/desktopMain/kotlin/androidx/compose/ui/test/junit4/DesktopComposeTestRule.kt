@@ -33,7 +33,7 @@ import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.SemanticsNodeInteractionCollection
 import androidx.compose.ui.test.TestOwner
 import androidx.compose.ui.test.createTestContext
-import androidx.compose.ui.text.input.EditOperation
+import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
@@ -187,7 +187,7 @@ class DesktopComposeTestRule : ComposeTestRule {
     }
 
     private class DesktopTestOwner(val rule: DesktopComposeTestRule) : TestOwner {
-        override fun sendTextInputCommand(node: SemanticsNode, command: List<EditOperation>) {
+        override fun sendTextInputCommand(node: SemanticsNode, command: List<EditCommand>) {
             TODO()
         }
 

@@ -19,73 +19,84 @@ package androidx.compose.ui.text.input
 import androidx.compose.ui.text.TextRange
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
-class CommitTextEditOpTest {
+class SetComposingTextCommandTest {
 
     @Test
     fun test_insert_empty() {
         val eb = EditingBuffer("", TextRange.Zero)
 
-        CommitTextEditOp("X", 1).process(eb)
+        SetComposingTextCommand("X", 1).applyTo(eb)
 
         assertEquals("X", eb.toString())
         assertEquals(1, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertTrue(eb.hasComposition())
+        assertEquals(0, eb.compositionStart)
+        assertEquals(1, eb.compositionEnd)
     }
 
     @Test
     fun test_insert_cursor_tail() {
         val eb = EditingBuffer("A", TextRange(1))
 
-        CommitTextEditOp("X", 1).process(eb)
+        SetComposingTextCommand("X", 1).applyTo(eb)
 
         assertEquals("AX", eb.toString())
         assertEquals(2, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertTrue(eb.hasComposition())
+        assertEquals(1, eb.compositionStart)
+        assertEquals(2, eb.compositionEnd)
     }
 
     @Test
     fun test_insert_cursor_head() {
         val eb = EditingBuffer("A", TextRange(1))
 
-        CommitTextEditOp("X", 0).process(eb)
+        SetComposingTextCommand("X", 0).applyTo(eb)
 
         assertEquals("AX", eb.toString())
         assertEquals(1, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertTrue(eb.hasComposition())
+        assertEquals(1, eb.compositionStart)
+        assertEquals(2, eb.compositionEnd)
     }
 
     @Test
     fun test_insert_cursor_far_tail() {
         val eb = EditingBuffer("ABCDE", TextRange(1))
 
-        CommitTextEditOp("X", 2).process(eb)
+        SetComposingTextCommand("X", 2).applyTo(eb)
 
         assertEquals("AXBCDE", eb.toString())
         assertEquals(3, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertTrue(eb.hasComposition())
+        assertEquals(1, eb.compositionStart)
+        assertEquals(2, eb.compositionEnd)
     }
 
     @Test
     fun test_insert_cursor_far_head() {
         val eb = EditingBuffer("ABCDE", TextRange(4))
 
-        CommitTextEditOp("X", -2).process(eb)
+        SetComposingTextCommand("X", -2).applyTo(eb)
 
         assertEquals("ABCDXE", eb.toString())
         assertEquals(2, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertTrue(eb.hasComposition())
+        assertEquals(4, eb.compositionStart)
+        assertEquals(5, eb.compositionEnd)
     }
 
     @Test
     fun test_insert_empty_text_cursor_head() {
         val eb = EditingBuffer("ABCDE", TextRange(1))
 
-        CommitTextEditOp("", 0).process(eb)
+        SetComposingTextCommand("", 0).applyTo(eb)
 
         assertEquals("ABCDE", eb.toString())
         assertEquals(1, eb.cursor)
@@ -96,7 +107,7 @@ class CommitTextEditOpTest {
     fun test_insert_empty_text_cursor_tail() {
         val eb = EditingBuffer("ABCDE", TextRange(1))
 
-        CommitTextEditOp("", 1).process(eb)
+        SetComposingTextCommand("", 1).applyTo(eb)
 
         assertEquals("ABCDE", eb.toString())
         assertEquals(1, eb.cursor)
@@ -107,7 +118,7 @@ class CommitTextEditOpTest {
     fun test_insert_empty_text_cursor_far_tail() {
         val eb = EditingBuffer("ABCDE", TextRange(1))
 
-        CommitTextEditOp("", 2).process(eb)
+        SetComposingTextCommand("", 2).applyTo(eb)
 
         assertEquals("ABCDE", eb.toString())
         assertEquals(2, eb.cursor)
@@ -118,7 +129,7 @@ class CommitTextEditOpTest {
     fun test_insert_empty_text_cursor_far_head() {
         val eb = EditingBuffer("ABCDE", TextRange(4))
 
-        CommitTextEditOp("", -2).process(eb)
+        SetComposingTextCommand("", -2).applyTo(eb)
 
         assertEquals("ABCDE", eb.toString())
         assertEquals(2, eb.cursor)
@@ -130,22 +141,26 @@ class CommitTextEditOpTest {
         val eb = EditingBuffer("ABCDE", TextRange.Zero)
 
         eb.setComposition(1, 4) // Mark "BCD" as composition
-        CommitTextEditOp("X", 1).process(eb)
+        SetComposingTextCommand("X", 1).applyTo(eb)
 
         assertEquals("AXE", eb.toString())
         assertEquals(2, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertTrue(eb.hasComposition())
+        assertEquals(1, eb.compositionStart)
+        assertEquals(2, eb.compositionEnd)
     }
 
     @Test
     fun test_replace_selection() {
         val eb = EditingBuffer("ABCDE", TextRange(1, 4)) // select "BCD"
 
-        CommitTextEditOp("X", 1).process(eb)
+        SetComposingTextCommand("X", 1).applyTo(eb)
 
         assertEquals("AXE", eb.toString())
         assertEquals(2, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertTrue(eb.hasComposition())
+        assertEquals(1, eb.compositionStart)
+        assertEquals(2, eb.compositionEnd)
     }
 
     @Test
@@ -153,34 +168,40 @@ class CommitTextEditOpTest {
         val eb = EditingBuffer("ABCDE", TextRange(1, 3)) // select "BC"
 
         eb.setComposition(2, 4) // Mark "CD" as composition
-        CommitTextEditOp("X", 1).process(eb)
+        SetComposingTextCommand("X", 1).applyTo(eb)
 
         // If composition and selection exists at the same time, replace composition and cancel
         // selection and place cursor.
         assertEquals("ABXE", eb.toString())
         assertEquals(3, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertTrue(eb.hasComposition())
+        assertEquals(2, eb.compositionStart)
+        assertEquals(3, eb.compositionEnd)
     }
 
     @Test
     fun test_cursor_position_too_small() {
         val eb = EditingBuffer("ABCDE", TextRange(5))
 
-        CommitTextEditOp("X", -1000).process(eb)
+        SetComposingTextCommand("X", -1000).applyTo(eb)
 
         assertEquals("ABCDEX", eb.toString())
         assertEquals(0, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertTrue(eb.hasComposition())
+        assertEquals(5, eb.compositionStart)
+        assertEquals(6, eb.compositionEnd)
     }
 
     @Test
     fun test_cursor_position_too_large() {
         val eb = EditingBuffer("ABCDE", TextRange(5))
 
-        CommitTextEditOp("X", 1000).process(eb)
+        SetComposingTextCommand("X", 1000).applyTo(eb)
 
         assertEquals("ABCDEX", eb.toString())
         assertEquals(6, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertTrue(eb.hasComposition())
+        assertEquals(5, eb.compositionStart)
+        assertEquals(6, eb.compositionEnd)
     }
 }

@@ -61,7 +61,7 @@ class EditProcessorTest {
 
         val newState = proc.onEditCommands(
             listOf(
-                CommitTextEditOp("X", 1)
+                CommitTextCommand("X", 1)
             )
         )
 

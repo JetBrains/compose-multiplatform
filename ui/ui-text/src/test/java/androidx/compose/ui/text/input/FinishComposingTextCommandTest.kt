@@ -24,14 +24,14 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
-class FinishComposingTextEditOpTest {
+class FinishComposingTextCommandTest {
 
     @Test
     fun test_set() {
         val eb = EditingBuffer("ABCDE", TextRange.Zero)
 
         eb.setComposition(1, 4)
-        FinishComposingTextEditOp().process(eb)
+        FinishComposingTextCommand().applyTo(eb)
 
         assertEquals("ABCDE", eb.toString())
         assertEquals(0, eb.cursor)
@@ -43,7 +43,7 @@ class FinishComposingTextEditOpTest {
         val eb = EditingBuffer("ABCDE", TextRange(1, 4))
 
         eb.setComposition(2, 5)
-        FinishComposingTextEditOp().process(eb)
+        FinishComposingTextCommand().applyTo(eb)
 
         assertEquals("ABCDE", eb.toString())
         assertEquals(1, eb.selectionStart)

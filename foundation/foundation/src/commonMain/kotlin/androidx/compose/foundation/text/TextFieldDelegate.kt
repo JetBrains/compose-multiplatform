@@ -33,7 +33,7 @@ import androidx.compose.ui.text.TextPainter
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.input.EditOperation
+import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.EditProcessor
 import androidx.compose.ui.text.input.INVALID_SESSION
 import androidx.compose.ui.text.input.ImeAction
@@ -203,7 +203,7 @@ class TextFieldDelegate {
          */
         @JvmStatic
         private fun onEditCommand(
-            ops: List<EditOperation>,
+            ops: List<EditCommand>,
             editProcessor: EditProcessor,
             onValueChange: (TextFieldValue) -> Unit
         ) {

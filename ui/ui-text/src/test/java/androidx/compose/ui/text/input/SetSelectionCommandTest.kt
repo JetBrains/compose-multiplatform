@@ -25,19 +25,18 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
-class SetComposingRegionEditOpTest {
+class SetSelectionCommandTest {
 
     @Test
     fun test_set() {
         val eb = EditingBuffer("ABCDE", TextRange.Zero)
 
-        SetComposingRegionEditOp(1, 4).process(eb)
+        SetSelectionCommand(1, 4).applyTo(eb)
 
         assertEquals("ABCDE", eb.toString())
-        assertEquals(0, eb.cursor)
-        assertTrue(eb.hasComposition())
-        assertEquals(1, eb.compositionStart)
-        assertEquals(4, eb.compositionEnd)
+        assertEquals(1, eb.selectionStart)
+        assertEquals(4, eb.selectionEnd)
+        assertFalse(eb.hasComposition())
     }
 
     @Test
@@ -46,47 +45,45 @@ class SetComposingRegionEditOpTest {
 
         eb.setComposition(1, 3)
 
-        SetComposingRegionEditOp(2, 4).process(eb)
+        SetSelectionCommand(2, 4).applyTo(eb)
 
         assertEquals("ABCDE", eb.toString())
-        assertEquals(0, eb.cursor)
+        assertEquals(2, eb.selectionStart)
+        assertEquals(4, eb.selectionEnd)
         assertTrue(eb.hasComposition())
-        assertEquals(2, eb.compositionStart)
-        assertEquals(4, eb.compositionEnd)
+        assertEquals(1, eb.compositionStart)
+        assertEquals(3, eb.compositionEnd)
     }
 
     @Test
-    fun test_preserve_selection() {
+    fun test_cancel_ongoing_selection() {
         val eb = EditingBuffer("ABCDE", TextRange(1, 4))
 
-        SetComposingRegionEditOp(2, 4).process(eb)
+        SetSelectionCommand(2, 5).applyTo(eb)
 
         assertEquals("ABCDE", eb.toString())
-        assertEquals(1, eb.selectionStart)
-        assertEquals(4, eb.selectionEnd)
-        assertTrue(eb.hasComposition())
-        assertEquals(2, eb.compositionStart)
-        assertEquals(4, eb.compositionEnd)
+        assertEquals(2, eb.selectionStart)
+        assertEquals(5, eb.selectionEnd)
+        assertFalse(eb.hasComposition())
     }
 
     @Test
     fun test_set_reversed() {
         val eb = EditingBuffer("ABCDE", TextRange.Zero)
 
-        SetComposingRegionEditOp(4, 1).process(eb)
+        SetSelectionCommand(4, 1).applyTo(eb)
 
         assertEquals("ABCDE", eb.toString())
-        assertEquals(0, eb.cursor)
-        assertTrue(eb.hasComposition())
-        assertEquals(1, eb.compositionStart)
-        assertEquals(4, eb.compositionEnd)
+        assertEquals(1, eb.selectionStart)
+        assertEquals(4, eb.selectionEnd)
+        assertFalse(eb.hasComposition())
     }
 
     @Test
     fun test_set_too_small() {
         val eb = EditingBuffer("ABCDE", TextRange.Zero)
 
-        SetComposingRegionEditOp(-1000, -1000).process(eb)
+        SetSelectionCommand(-1000, -1000).applyTo(eb)
 
         assertEquals("ABCDE", eb.toString())
         assertEquals(0, eb.cursor)
@@ -97,36 +94,34 @@ class SetComposingRegionEditOpTest {
     fun test_set_too_large() {
         val eb = EditingBuffer("ABCDE", TextRange.Zero)
 
-        SetComposingRegionEditOp(1000, 1000).process(eb)
+        SetSelectionCommand(1000, 1000).applyTo(eb)
 
         assertEquals("ABCDE", eb.toString())
-        assertEquals(0, eb.cursor)
+        assertEquals(5, eb.cursor)
         assertFalse(eb.hasComposition())
     }
 
     @Test
-    fun test_set_too_small_and_too_large() {
+    fun test_set_too_small_too_large() {
         val eb = EditingBuffer("ABCDE", TextRange.Zero)
 
-        SetComposingRegionEditOp(-1000, 1000).process(eb)
+        SetSelectionCommand(-1000, 1000).applyTo(eb)
 
         assertEquals("ABCDE", eb.toString())
-        assertEquals(0, eb.cursor)
-        assertTrue(eb.hasComposition())
-        assertEquals(0, eb.compositionStart)
-        assertEquals(5, eb.compositionEnd)
+        assertEquals(0, eb.selectionStart)
+        assertEquals(5, eb.selectionEnd)
+        assertFalse(eb.hasComposition())
     }
 
     @Test
-    fun test_set_too_small_and_too_large_reversed() {
+    fun test_set_too_small_too_large_reversed() {
         val eb = EditingBuffer("ABCDE", TextRange.Zero)
 
-        SetComposingRegionEditOp(1000, -1000).process(eb)
+        SetSelectionCommand(1000, -1000).applyTo(eb)
 
         assertEquals("ABCDE", eb.toString())
-        assertEquals(0, eb.cursor)
-        assertTrue(eb.hasComposition())
-        assertEquals(0, eb.compositionStart)
-        assertEquals(5, eb.compositionEnd)
+        assertEquals(0, eb.selectionStart)
+        assertEquals(5, eb.selectionEnd)
+        assertFalse(eb.hasComposition())
     }
 }

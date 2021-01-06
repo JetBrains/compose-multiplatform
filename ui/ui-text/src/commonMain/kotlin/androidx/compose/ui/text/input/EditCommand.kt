@@ -21,25 +21,24 @@ import androidx.compose.ui.util.findPrecedingBreak
 import androidx.compose.ui.util.isSurrogatePair
 
 /**
- * A base class of all EditOperations
- *
- * An EditOperation is a representation of platform IME API call. For example, in Android,
- * InputConnection#commitText API call is translated to CommitTextEditOp object.
+ * [EditCommand] is a command representation for the platform IME API function calls. The
+ * commands from the IME as function calls are translated into command pattern and used by
+ * [TextInputService.startInput]. For example, as a result of commit text function call by IME
+ * [CommitTextCommand] is created.
  */
-interface EditOperation {
-
+interface EditCommand {
     /**
-     * Processes editing buffer with this edit operation.
+     * Apply the command on the editing buffer.
      */
-    fun process(buffer: EditingBuffer)
+    fun applyTo(buffer: EditingBuffer)
 }
 
 /**
- * An edit operation represent commitText callback from InputMethod.
+ * Commit final [text] to the text box and set the new cursor position.
  *
  * @see <https://developer.android.com/reference/android/view/inputmethod/InputConnection.html#commitText(java.lang.CharSequence,%20int)>
  */
-data class CommitTextEditOp(
+class CommitTextCommand(
     /**
      * The text to commit. We ignore any styles in the original API.
      */
@@ -47,12 +46,11 @@ data class CommitTextEditOp(
 
     /**
      * The cursor position after inserted text.
-     * See original commitText API docs for more details.
      */
     val newCursorPosition: Int
-) : EditOperation {
+) : EditCommand {
 
-    override fun process(buffer: EditingBuffer) {
+    override fun applyTo(buffer: EditingBuffer) {
         // API description says replace ongoing composition text if there. Then, if there is no
         // composition text, insert text into cursor position or replace selection.
         if (buffer.hasComposition()) {
@@ -75,14 +73,30 @@ data class CommitTextEditOp(
 
         buffer.cursor = newCursorInBuffer.coerceIn(0, buffer.length)
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is CommitTextCommand) return false
+
+        if (text != other.text) return false
+        if (newCursorPosition != other.newCursorPosition) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = text.hashCode()
+        result = 31 * result + newCursorPosition
+        return result
+    }
 }
 
 /**
- * An edit operation represents setComposingRegion callback from InputMethod.
+ * Mark a certain region of text as composing text.
  *
  * @see <https://developer.android.com/reference/android/view/inputmethod/InputConnection.html#setComposingRegion(int,%2520int)>
  */
-data class SetComposingRegionEditOp(
+class SetComposingRegionCommand(
     /**
      * The inclusive start offset of the composing region.
      */
@@ -92,9 +106,9 @@ data class SetComposingRegionEditOp(
      * The exclusive end offset of the composing region
      */
     val end: Int
-) : EditOperation {
+) : EditCommand {
 
-    override fun process(buffer: EditingBuffer) {
+    override fun applyTo(buffer: EditingBuffer) {
         // The API description says, different from SetComposingText, SetComposingRegion must
         // preserve the ongoing composition text and set new composition.
         if (buffer.hasComposition()) {
@@ -112,25 +126,42 @@ data class SetComposingRegionEditOp(
             buffer.setComposition(clampedEnd, clampedStart)
         }
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is SetComposingRegionCommand) return false
+
+        if (start != other.start) return false
+        if (end != other.end) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = start
+        result = 31 * result + end
+        return result
+    }
 }
+
 /**
- * An edit operation represents setComposingText callback from InputMethod
+ * Replace the currently composing text with the given text, and set the new cursor position. Any
+ * composing text set previously will be removed automatically.
  *
  * @see <https://developer.android.com/reference/android/view/inputmethod/InputConnection.html#setComposingText(java.lang.CharSequence,%2520int)>
  */
-data class SetComposingTextEditOp(
+class SetComposingTextCommand(
     /**
      * The composing text.
      */
     val text: String,
     /**
      * The cursor position after setting composing text.
-     * See original setComposingText API docs for more details.
      */
     val newCursorPosition: Int
-) : EditOperation {
+) : EditCommand {
 
-    override fun process(buffer: EditingBuffer) {
+    override fun applyTo(buffer: EditingBuffer) {
         if (buffer.hasComposition()) {
             // API doc says, if there is ongoing composing text, replace it with new text.
             val compositionStart = buffer.compositionStart
@@ -161,54 +192,95 @@ data class SetComposingTextEditOp(
 
         buffer.cursor = newCursorInBuffer.coerceIn(0, buffer.length)
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is SetComposingTextCommand) return false
+
+        if (text != other.text) return false
+        if (newCursorPosition != other.newCursorPosition) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = text.hashCode()
+        result = 31 * result + newCursorPosition
+        return result
+    }
 }
+
 /**
- * An edit operation represents deleteSurroundingText callback from InputMethod
+ * Delete [lengthBeforeCursor] characters of text before the current cursor position, and delete
+ * [lengthAfterCursor] characters of text after the current cursor position, excluding the selection.
+ *
+ * Before and after refer to the order of the characters in the string, not to their visual
+ * representation.
  *
  * @see <https://developer.android.com/reference/android/view/inputmethod/InputConnection.html#deleteSurroundingText(int,%2520int)>
  */
-data class DeleteSurroundingTextEditOp(
+class DeleteSurroundingTextCommand(
     /**
      * The number of characters in UTF-16 before the cursor to be deleted.
      */
-    val beforeLength: Int,
+    val lengthBeforeCursor: Int,
     /**
      * The number of characters in UTF-16 after the cursor to be deleted.
      */
-    val afterLength: Int
-) : EditOperation {
-    override fun process(buffer: EditingBuffer) {
+    val lengthAfterCursor: Int
+) : EditCommand {
+    override fun applyTo(buffer: EditingBuffer) {
         buffer.delete(
             buffer.selectionEnd,
-            minOf(buffer.selectionEnd + afterLength, buffer.length)
+            minOf(buffer.selectionEnd + lengthAfterCursor, buffer.length)
         )
 
         buffer.delete(
-            maxOf(0, buffer.selectionStart - beforeLength),
+            maxOf(0, buffer.selectionStart - lengthBeforeCursor),
             buffer.selectionStart
         )
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is DeleteSurroundingTextCommand) return false
+
+        if (lengthBeforeCursor != other.lengthBeforeCursor) return false
+        if (lengthAfterCursor != other.lengthAfterCursor) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = lengthBeforeCursor
+        result = 31 * result + lengthAfterCursor
+        return result
+    }
 }
+
 /**
- * An edit operation represents deleteSurroundingTextInCodePoitns callback from InputMethod
+ * A variant of [DeleteSurroundingTextCommand]. The difference is that
+ * * The lengths are supplied in code points, not in chars.
+ * * This command does nothing if there are one or more invalid surrogate pairs
+ * in the requested range.
  *
  * @see <https://developer.android.com/reference/android/view/inputmethod/InputConnection.html#deleteSurroundingTextInCodePoints(int,%2520int)>
  */
-data class DeleteSurroundingTextInCodePointsEditOp(
+class DeleteSurroundingTextInCodePointsCommand(
     /**
      * The number of characters in Unicode code points before the cursor to be deleted.
      */
-    val beforeLength: Int,
+    val lengthBeforeCursor: Int,
     /**
      * The number of characters in Unicode code points after the cursor to be deleted.
      */
-    val afterLength: Int
-) : EditOperation {
-    override fun process(buffer: EditingBuffer) {
+    val lengthAfterCursor: Int
+) : EditCommand {
+    override fun applyTo(buffer: EditingBuffer) {
         // Convert code point length into character length. Then call the common logic of the
         // DeleteSurroundingTextEditOp
         var beforeLenInChars = 0
-        for (i in 0 until beforeLength) {
+        for (i in 0 until lengthBeforeCursor) {
             beforeLenInChars++
             if (buffer.selectionStart > beforeLenInChars) {
                 val lead = buffer[buffer.selectionStart - beforeLenInChars - 1]
@@ -222,7 +294,7 @@ data class DeleteSurroundingTextInCodePointsEditOp(
         }
 
         var afterLenInChars = 0
-        for (i in 0 until afterLength) {
+        for (i in 0 until lengthAfterCursor) {
             afterLenInChars++
             if (buffer.selectionEnd + afterLenInChars < buffer.length) {
                 val lead = buffer[buffer.selectionEnd + afterLenInChars - 1]
@@ -238,14 +310,31 @@ data class DeleteSurroundingTextInCodePointsEditOp(
         buffer.delete(buffer.selectionEnd, buffer.selectionEnd + afterLenInChars)
         buffer.delete(buffer.selectionStart - beforeLenInChars, buffer.selectionStart)
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is DeleteSurroundingTextInCodePointsCommand) return false
+
+        if (lengthBeforeCursor != other.lengthBeforeCursor) return false
+        if (lengthAfterCursor != other.lengthAfterCursor) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = lengthBeforeCursor
+        result = 31 * result + lengthAfterCursor
+        return result
+    }
 }
 
 /**
- * An edit operation represents setSelection callback from InputMethod
+ * Sets the selection on the text. When [start] and [end] have the same value, it sets the cursor
+ * position.
  *
  * @see <https://developer.android.com/reference/android/view/inputmethod/InputConnection.html#setSelection(int,%2520int)>
  */
-data class SetSelectionEditOp(
+class SetSelectionCommand(
     /**
      * The inclusive start offset of the selection region.
      */
@@ -254,9 +343,9 @@ data class SetSelectionEditOp(
      * The exclusive end offset of the selection region.
      */
     val end: Int
-) : EditOperation {
+) : EditCommand {
 
-    override fun process(buffer: EditingBuffer) {
+    override fun applyTo(buffer: EditingBuffer) {
         // Sanitize the input: reverse if reversed, clamped into valid range.
         val clampedStart = start.coerceIn(0, buffer.length)
         val clampedEnd = end.coerceIn(0, buffer.length)
@@ -266,34 +355,52 @@ data class SetSelectionEditOp(
             buffer.setSelection(clampedEnd, clampedStart)
         }
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is SetSelectionCommand) return false
+
+        if (start != other.start) return false
+        if (end != other.end) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = start
+        result = 31 * result + end
+        return result
+    }
 }
 /**
- * An edit operation represents finishComposingText callback from InputMEthod
+ * Finishes the composing text that is currently active. This simply leaves the text as-is,
+ * removing any special composing styling or other state that was around it. The cursor position
+ * remains unchanged.
  *
  * @see <https://developer.android.com/reference/android/view/inputmethod/InputConnection.html#finishComposingText()>
  */
-class FinishComposingTextEditOp : EditOperation {
+class FinishComposingTextCommand : EditCommand {
 
-    override fun process(buffer: EditingBuffer) {
+    override fun applyTo(buffer: EditingBuffer) {
         buffer.commitComposition()
     }
 
     // Class with empty arguments default ctor cannot be data class.
     // Treating all FinishComposingTextEditOp are equal object.
-    override fun equals(other: Any?): Boolean = other is FinishComposingTextEditOp
+    override fun equals(other: Any?): Boolean = other is FinishComposingTextCommand
     override fun hashCode(): Int = this::class.hashCode()
 }
 
 /**
- * An edit operation represents backspace keyevent
+ * Represents a backspace operation at the cursor position.
  *
  * If there is composition, delete the text in the composition range.
  * If there is no composition but there is selection, delete whole selected range.
  * If there is no composition and selection, perform backspace key event at the cursor position.
  */
-class BackspaceKeyEditOp : EditOperation {
+class BackspaceCommand : EditCommand {
 
-    override fun process(buffer: EditingBuffer) {
+    override fun applyTo(buffer: EditingBuffer) {
         if (buffer.hasComposition()) {
             buffer.delete(buffer.compositionStart, buffer.compositionEnd)
             return
@@ -317,26 +424,26 @@ class BackspaceKeyEditOp : EditOperation {
 
     // Class with empty arguments default ctor cannot be data class.
     // Treating all FinishComposingTextEditOp are equal object.
-    override fun equals(other: Any?): Boolean = other is BackspaceKeyEditOp
+    override fun equals(other: Any?): Boolean = other is BackspaceCommand
     override fun hashCode(): Int = this::class.hashCode()
 }
 
 /**
- * An edit operation represents cursor moving.
+ * Moves the cursor with [amount] characters.
  *
  * If there is selection, cancel the selection first and move the cursor to the selection start
  * position. Then perform the cursor movement.
  */
-data class MoveCursorEditOp(
+class MoveCursorCommand(
     /**
      * The amount of cursor movement.
      *
      * If you want to move backward, pass negative value.
      */
     val amount: Int
-) : EditOperation {
+) : EditCommand {
 
-    override fun process(buffer: EditingBuffer) {
+    override fun applyTo(buffer: EditingBuffer) {
         if (buffer.cursor == -1) {
             buffer.cursor = buffer.selectionStart
         }
@@ -359,13 +466,31 @@ data class MoveCursorEditOp(
 
         buffer.cursor = newCursor
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is MoveCursorCommand) return false
+
+        if (amount != other.amount) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return amount
+    }
 }
 
 /**
- * An edit operation that represents deleting all the text in the buffer.
+ * Deletes all the text in the buffer.
  */
-class DeleteAllEditOp : EditOperation {
-    override fun process(buffer: EditingBuffer) {
+class DeleteAllCommand : EditCommand {
+    override fun applyTo(buffer: EditingBuffer) {
         buffer.delete(0, buffer.length)
     }
+
+    // Class with empty arguments default ctor cannot be data class.
+    // Treating all FinishComposingTextEditOp are equal object.
+    override fun equals(other: Any?): Boolean = other is DeleteAllCommand
+    override fun hashCode(): Int = this::class.hashCode()
 }

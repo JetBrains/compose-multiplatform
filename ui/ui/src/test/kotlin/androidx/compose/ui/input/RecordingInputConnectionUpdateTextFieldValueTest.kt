@@ -21,7 +21,7 @@ import android.view.inputmethod.ExtractedText
 import android.view.inputmethod.InputConnection
 import android.view.inputmethod.InputMethodManager
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.input.InputEventListener
+import androidx.compose.ui.text.input.InputEventCallback
 import androidx.compose.ui.text.input.RecordingInputConnection
 import androidx.compose.ui.text.input.TextFieldValue
 import com.nhaarman.mockitokotlin2.any
@@ -41,14 +41,14 @@ import org.junit.runners.JUnit4
 class RecordingInputConnectionUpdateTextFieldValueTest {
 
     private lateinit var ic: RecordingInputConnection
-    private lateinit var listener: InputEventListener
+    private lateinit var mCallback: InputEventCallback
 
     @Before
     fun setup() {
-        listener = mock()
+        mCallback = mock()
         ic = RecordingInputConnection(
             initState = TextFieldValue("", TextRange.Zero),
-            eventListener = listener,
+            eventCallback = mCallback,
             autoCorrect = true
         )
     }
