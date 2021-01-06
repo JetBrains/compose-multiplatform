@@ -34,7 +34,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.OffsetMap
+import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TransformedText
@@ -47,7 +47,7 @@ import androidx.compose.ui.text.toUpperCase
  *
  * @see creditCardFilter
  */
-private val creditCardOffsetTranslator = object : OffsetMap {
+private val creditCardOffsetTranslator = object : OffsetMapping {
     override fun originalToTransformed(offset: Int): Int {
         if (offset <= 3) return offset
         if (offset <= 7) return offset + 1
@@ -86,7 +86,7 @@ private val creditCardFilter = object : VisualTransformation {
 /**
  * The offset translator which works for all offset keep remains the same.
  */
-private val identityTranslater = object : OffsetMap {
+private val identityTranslator = object : OffsetMapping {
     override fun originalToTransformed(offset: Int): Int = offset
     override fun transformedToOriginal(offset: Int): Int = offset
 }
@@ -100,8 +100,8 @@ private class CapitalizeTransformation(
     val locale: LocaleList = LocaleList("en-US")
 ) : VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {
-        // Note: identityTranslater doesn't work for some locale, e.g. Turkish
-        return TransformedText(AnnotatedString(text.text).toUpperCase(locale), identityTranslater)
+        // Note: identityTranslator doesn't work for some locale, e.g. Turkish
+        return TransformedText(AnnotatedString(text.text).toUpperCase(locale), identityTranslator)
     }
 }
 
@@ -110,7 +110,7 @@ private class CapitalizeTransformation(
  *
  * @see phoneNumberFilter
  */
-private val phoneNumberOffsetTranslater = object : OffsetMap {
+private val phoneNumberOffsetTranslator = object : OffsetMapping {
     override fun originalToTransformed(offset: Int): Int {
         return when (offset) {
             0 -> 1
@@ -160,16 +160,16 @@ private val phoneNumberFilter = object : VisualTransformation {
         val filled = trimmed + "_".repeat(10 - trimmed.length)
         val res = "(" + filled.substring(0..2) + ") " + filled.substring(3..5) + "-" +
             filled.substring(6..9)
-        return TransformedText(AnnotatedString(text = res), phoneNumberOffsetTranslater)
+        return TransformedText(AnnotatedString(text = res), phoneNumberOffsetTranslator)
     }
 }
 
 private val emailFilter = object : VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {
         return if (text.text.indexOf("@") == -1) {
-            TransformedText(AnnotatedString(text = text.text + "@gmail.com"), identityTranslater)
+            TransformedText(AnnotatedString(text = text.text + "@gmail.com"), identityTranslator)
         } else {
-            TransformedText(text, identityTranslater)
+            TransformedText(text, identityTranslator)
         }
     }
 }

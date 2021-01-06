@@ -30,7 +30,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.ResourceFont
-import androidx.compose.ui.text.input.OffsetMap
+import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -91,7 +91,7 @@ class TextFieldDelegateIntegrationTest {
             canvas = actualCanvas,
             value = TextFieldValue(text = "Hello, World", selection = selection),
             selectionPaint = Paint().apply { color = selectionColor },
-            offsetMap = OffsetMap.identityOffsetMap,
+            offsetMapping = OffsetMapping.Identity,
             textLayoutResult = layoutResult
         )
 

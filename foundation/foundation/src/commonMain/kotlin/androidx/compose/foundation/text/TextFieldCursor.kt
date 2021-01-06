@@ -37,7 +37,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.text.InternalTextApi
-import androidx.compose.ui.text.input.OffsetMap
+import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.annotation.VisibleForTesting
@@ -47,7 +47,7 @@ import androidx.compose.ui.util.annotation.VisibleForTesting
 internal fun Modifier.cursor(
     state: TextFieldState,
     value: TextFieldValue,
-    offsetMap: OffsetMap,
+    offsetMapping: OffsetMapping,
     cursorColor: Color
 ) = composed {
     // this should be a disposable clock, but it's not available in this module
@@ -70,7 +70,7 @@ internal fun Modifier.cursor(
             this.drawContent()
             val cursorAlphaValue = cursorAlpha.value.coerceIn(0f, 1f)
             if (cursorAlphaValue != 0f) {
-                val transformedOffset = offsetMap
+                val transformedOffset = offsetMapping
                     .originalToTransformed(value.selection.start)
                 val cursorRect = state.layoutResult?.getCursorRect(transformedOffset)
                     ?: Rect(0f, 0f, 0f, 0f)
