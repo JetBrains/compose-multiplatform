@@ -271,7 +271,13 @@ class AnimationTest {
         end: AnimationVector4D,
         startVelocity: AnimationVector4D
     ) {
-        val fixedAnim = anim.createAnimation(start, end, startVelocity)
+        val fixedAnim = TargetBasedAnimation(
+            anim,
+            TwoWayConverter({ it }, { it }),
+            start,
+            end,
+            startVelocity
+        )
         for (playtime in 0..fixedAnim.durationMillis step 100) {
             assertEquals(
                 anim.getValue(playtime, start, end, startVelocity),

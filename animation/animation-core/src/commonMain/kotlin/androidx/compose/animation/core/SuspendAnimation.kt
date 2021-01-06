@@ -41,14 +41,13 @@ suspend fun animate(
     block: (value: Float, velocity: Float) -> Unit
 ) {
     animate(
+        Float.VectorConverter,
         initialValue,
         targetValue,
-        Float.VectorConverter,
-        AnimationVector1D(initialVelocity),
-        animationSpec
-    ) { value, velocity ->
-        block(value, velocity.value)
-    }
+        initialVelocity,
+        animationSpec,
+        block
+    )
 }
 
 /**
@@ -56,8 +55,8 @@ suspend fun animate(
  * the velocity reaches 0. This is often used after a fling gesture.
  *
  * [animationSpec] defines the decay animation that will be used for this animation. Some options
- * for this [animationSpec] include: [AndroidFlingDecaySpec][androidx.compose.foundation.animation
- * .AndroidFlingDecaySpec] and [ExponentialDecay]. [block] will be invoked on each animation frame
+ * for this [animationSpec] include: [androidFlingDecay][androidx.compose.foundation.animation
+ * .androidFlingDecay] and [exponentialDecay]. [block] will be invoked on each animation frame
  * with up-to-date value and velocity.
  *
  * This is a convenient method for decay animation. If there's a need to access more info related to
@@ -81,9 +80,9 @@ suspend fun animateDecay(
 /**
  * Target based animation for animating any data type [T], so long as [T] can be converted to an
  * [AnimationVector] using [typeConverter]. The animation will start from the [initialValue] and
- * animate to the [targetValue] value. The [initialVelocityVector] will be an all-0 [AnimationVector]
- * unless specified. [animationSpec] can be provided to create a specific look and feel for the
- * animation. By default, a [spring] will be used.
+ * animate to the [targetValue] value. The [initialVelocity] will be derived from an all-0
+ * [AnimationVector] unless specified. [animationSpec] can be provided to create a specific look and
+ * feel for the animation. By default, a [spring] will be used.
  *
  * This is a convenient method for target-based animation. If there's a need to access more info
  * related to the animation such as start time, target, etc, consider using
@@ -92,22 +91,24 @@ suspend fun animateDecay(
  * @see [AnimationState.animateTo]
  */
 suspend fun <T, V : AnimationVector> animate(
+    typeConverter: TwoWayConverter<T, V>,
     initialValue: T,
     targetValue: T,
-    typeConverter: TwoWayConverter<T, V>,
-    initialVelocityVector: V? = null,
+    initialVelocity: T? = null,
     animationSpec: AnimationSpec<T> = spring(),
-    block: (value: T, velocity: V) -> Unit
+    block: (value: T, velocity: T) -> Unit
 ) {
+    val initialVelocityVector = initialVelocity?.let { typeConverter.convertToVector(it) }
+        ?: typeConverter.convertToVector(initialValue).newInstance()
     val anim = TargetBasedAnimation(
         animationSpec = animationSpec,
         initialValue = initialValue,
         targetValue = targetValue,
-        converter = typeConverter,
+        typeConverter = typeConverter,
         initialVelocityVector = initialVelocityVector
     )
-    AnimationState(initialValue, typeConverter, initialVelocityVector).animate(anim) {
-        block(value, velocityVector)
+    AnimationState(typeConverter, initialValue, initialVelocityVector).animate(anim) {
+        block(value, typeConverter.convertFromVector(velocityVector))
     }
 }
 
@@ -143,7 +144,7 @@ suspend fun <T, V : AnimationVector> AnimationState<T, V>.animateTo(
         animationSpec = animationSpec,
         initialValue = value,
         targetValue = targetValue,
-        converter = typeConverter,
+        typeConverter = typeConverter,
         initialVelocityVector = velocityVector
     )
     animate(anim, if (sequentialAnimation) lastFrameTime else Uptime.Unspecified, block)
@@ -156,8 +157,8 @@ suspend fun <T, V : AnimationVector> AnimationState<T, V>.animateTo(
  * of a fling gesture.
  *
  * [animationSpec] defines the decay animation that will be used for this animation. Some options
- * for [animationSpec] include: [AndroidFlingDecaySpec][androidx.compose.foundation.animation
- * .AndroidFlingDecaySpec] and [ExponentialDecay].
+ * for [animationSpec] include: [androidFlingDecay][androidx.compose.foundation.animation
+ * .androidFlingDecay] and [exponentialDecay].
  *
  * During the animation, [block] will be invoked on every frame, and the [AnimationScope] will be
  * checked against cancellation before the animation continues. To cancel the animation from the
@@ -172,6 +173,12 @@ suspend fun <T, V : AnimationVector> AnimationState<T, V>.animateTo(
  * momentum, using the interruption time (captured in [AnimationState.lastFrameTime] creates
  * a smoother animation.
  */
+@Deprecated(
+    "Please use animateDecay that takes a [DecayAnimationSpec] instead",
+    ReplaceWith(
+        "animateDecay(animationSpec.generateDecayAnimationSpec(), sequentialAnimation, block)"
+    )
+)
 suspend fun AnimationState<Float, AnimationVector1D>.animateDecay(
     animationSpec: FloatDecayAnimationSpec,
     // Indicates whether the animation should start from last frame
@@ -179,7 +186,7 @@ suspend fun AnimationState<Float, AnimationVector1D>.animateDecay(
     block: AnimationScope<Float, AnimationVector1D>.() -> Unit = {}
 ) {
     val anim = DecayAnimation(
-        anim = animationSpec,
+        animationSpec = animationSpec,
         initialValue = value,
         initialVelocity = velocityVector.value
     )
@@ -188,6 +195,44 @@ suspend fun AnimationState<Float, AnimationVector1D>.animateDecay(
         startTime = if (sequentialAnimation) lastFrameTime else Uptime.Unspecified,
         block = block
     )
+}
+
+/**
+ * Decay animation that slows down from the current velocity and value captured in [AnimationState]
+ * until the velocity reaches 0. During the animation, the given [AnimationState] will be updated
+ * with the up-to-date value/velocity, frame time, etc. This is often used to animate the result
+ * of a fling gesture.
+ *
+ * [animationSpec] defines the decay animation that will be used for this animation. Some options
+ * for [animationSpec] include: [androidFlingDecay][androidx.compose.foundation.animation
+ * .androidFlingDecay] and [exponentialDecay].
+ *
+ * During the animation, [block] will be invoked on every frame, and the [AnimationScope] will be
+ * checked against cancellation before the animation continues. To cancel the animation from the
+ * [block], simply call [AnimationScope.cancelAnimation].  After [AnimationScope.cancelAnimation] is
+ * called, [block] will not be invoked again. The animation loop will exit after the [block]
+ * returns. All the animation related info can be accessed via [AnimationScope].
+ *
+ * [sequentialAnimation] indicates whether the animation should use the
+ * [AnimationState.lastFrameTime] as the starting time (if true), or start in a new frame. By
+ * default, [sequentialAnimation] is false, to start the animation in a few frame. In cases where
+ * an on-going animation is interrupted and a new animation is started to carry over the
+ * momentum, using the interruption time (captured in [AnimationState.lastFrameTime] creates
+ * a smoother animation.
+ */
+suspend fun <T, V : AnimationVector> AnimationState<T, V>.animateDecay(
+    animationSpec: DecayAnimationSpec<T>,
+    // Indicates whether the animation should start from last frame
+    sequentialAnimation: Boolean = false,
+    block: AnimationScope<T, V>.() -> Unit = {}
+) {
+    val anim = DecayAnimation<T, V>(
+        animationSpec = animationSpec,
+        initialValue = value,
+        initialVelocityVector = velocityVector,
+        typeConverter = typeConverter
+    )
+    animate(anim, if (sequentialAnimation) lastFrameTime else Uptime.Unspecified, block)
 }
 
 /**
@@ -211,7 +256,7 @@ suspend fun AnimationState<Float, AnimationVector1D>.animateDecay(
 // TODO: This method uses AnimationState and Animation at the same time, it's potentially confusing
 // as to which is the source of truth for initial value/velocity. Consider letting [Animation] have
 // some suspend fun differently.
-private suspend fun <T, V : AnimationVector> AnimationState<T, V>.animate(
+internal suspend fun <T, V : AnimationVector> AnimationState<T, V>.animate(
     animation: Animation<T, V>,
     startTime: Uptime = Uptime.Unspecified,
     block: AnimationScope<T, V>.() -> Unit = {}
@@ -224,7 +269,7 @@ private suspend fun <T, V : AnimationVector> AnimationState<T, V>.animate(
             if (startTime == Uptime.Unspecified) Uptime(withFrameNanos { it }) else startTime
         lateInitScope = AnimationScope(
             initialValue = initialValue,
-            typeConverter = animation.converter,
+            typeConverter = animation.typeConverter,
             initialVelocityVector = initialVelocityVector,
             lastFrameTime = startTimeSpecified,
             targetValue = animation.targetValue,
@@ -251,9 +296,11 @@ private suspend fun <T, V : AnimationVector> AnimationState<T, V>.animate(
     }
 }
 
-private fun <T, V : AnimationVector> AnimationScope<T, V>.updateState(state: AnimationState<T, V>) {
+internal fun <T, V : AnimationVector> AnimationScope<T, V>.updateState(
+    state: AnimationState<T, V>
+) {
     state.value = value
-    state.velocityVector = velocityVector
+    state.velocityVector.copyFrom(velocityVector)
     state.finishedTime = finishedTime
     state.lastFrameTime = lastFrameTime
     state.isRunning = isRunning

@@ -18,16 +18,19 @@
 
 package androidx.compose.animation
 
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.AnimationState
 import androidx.compose.animation.core.AnimationVector
 import androidx.compose.animation.core.AnimationVector1D
+import androidx.compose.animation.core.AnimationVector4D
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.TwoWayConverter
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.animateAsState
+import androidx.compose.animation.core.animateDecay
 import androidx.compose.animation.core.animateTo
 import androidx.compose.animation.core.isFinished
 import androidx.compose.animation.core.spring
@@ -580,3 +583,23 @@ fun animateAsState(
         targetValue, converter, animationSpec, finishedListener = finishedListener
     )
 }
+
+/**
+ * This [Animatable] function creates a Color value holder that automatically
+ * animates its value when the value is changed via [animateTo]. [Animatable] supports value
+ * change during an ongoing value change animation. When that happens, a new animation will
+ * transition [Animatable] from its current value (i.e. value at the point of interruption) to the
+ * new target. This ensures that the value change is *always* continuous using [animateTo]. If
+ * [spring] animation (i.e. default animation) is used with [animateTo], the velocity change will
+ * be guaranteed to be continuous as well.
+ *
+ * Unlike [AnimationState], [Animatable] ensures mutual exclusiveness on its animation. To
+ * do so, when a new animation is started via [animateTo] (or [animateDecay]), any ongoing
+ * animation job will be cancelled.
+ *
+ * @sample androidx.compose.animation.samples.AnimatableColor
+ *
+ * @param initialValue initial value of the animatable value holder
+ */
+fun Animatable(initialValue: Color): Animatable<Color, AnimationVector4D> =
+    Animatable(initialValue, (Color.VectorConverter)(initialValue.colorSpace))

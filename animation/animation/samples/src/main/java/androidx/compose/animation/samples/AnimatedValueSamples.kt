@@ -17,8 +17,10 @@
 package androidx.compose.animation.samples
 
 import androidx.annotation.Sampled
+import androidx.compose.animation.Animatable
 import androidx.compose.animation.animate
 import androidx.compose.animation.animateAsState
+import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.AnimationVector2D
 import androidx.compose.animation.core.TwoWayConverter
 import androidx.compose.foundation.background
@@ -29,8 +31,10 @@ import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
@@ -126,5 +130,28 @@ fun ColorAnimationSample() {
             if (primary) MaterialTheme.colors.primary else MaterialTheme.colors.secondary
         )
         Box(modifier = Modifier.background(color))
+    }
+}
+
+@Sampled
+fun AnimatableColor() {
+    @Composable
+    fun animate(
+        targetValue: Color,
+        animationSpec: AnimationSpec<Color>,
+        onFinished: (Color) -> Unit
+    ): Color {
+        // Creates an Animatable of Color, and remembers it.
+        val color = remember { Animatable(targetValue) }
+        val finishedListener = rememberUpdatedState(onFinished)
+        // Launches a new coroutine whenever the target value or animation spec has changed. This
+        // automatically cancels the previous job/animation.
+        LaunchedEffect(targetValue, animationSpec) {
+            color.animateTo(targetValue, animationSpec)
+            // Invokes finished listener. This line will not be executed if the job gets canceled
+            // halfway through an animation.
+            finishedListener.value(targetValue)
+        }
+        return color.value
     }
 }

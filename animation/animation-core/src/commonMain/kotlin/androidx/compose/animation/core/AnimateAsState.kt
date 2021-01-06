@@ -485,7 +485,7 @@ fun <T, V : AnimationVector> animateAsState(
     finishedListener: ((T) -> Unit)? = null
 ): State<T> {
     val animationState: AnimationState<T, V> = remember(typeConverter) {
-        AnimationState(targetValue, typeConverter = typeConverter)
+        AnimationState(typeConverter, targetValue)
     }
 
     val listener by rememberUpdatedState(finishedListener)

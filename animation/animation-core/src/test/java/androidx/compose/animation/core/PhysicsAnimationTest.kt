@@ -45,8 +45,7 @@ class PhysicsAnimationTest {
         val end = 500
         val playTime = 150L
         val animation = TargetBasedAnimation(
-            spring(), start, end, 0,
-            Int.VectorConverter
+            spring(), Int.VectorConverter, start, end, 0
         )
 
         val velocity = animation.getVelocity(playTime)
@@ -65,8 +64,7 @@ class PhysicsAnimationTest {
         val interruptionTime = 150L
 
         val animation = TargetBasedAnimation(
-            spring(), start1, end1, 0f,
-            Float.VectorConverter
+            spring(), Float.VectorConverter, start1, end1, 0f
         )
 
         val interruptionValue = animation.getValue(interruptionTime)
@@ -79,8 +77,7 @@ class PhysicsAnimationTest {
         val startVelocity2 = interruptionVelocity
 
         val animation2 = TargetBasedAnimation(
-            spring(), start2, end2, startVelocity2,
-            Float.VectorConverter
+            spring(), Float.VectorConverter, start2, end2, startVelocity2
         )
         // let's verify values after 15 ms of the second animation
         val playTime = 15L
@@ -117,7 +114,7 @@ class PhysicsAnimationTest {
             initialValue = startValue,
             targetValue = endValue,
             initialVelocity = startVelocity,
-            converter = Float.VectorConverter
+            typeConverter = Float.VectorConverter
         )
 
         assertEquals(
@@ -150,7 +147,7 @@ class PhysicsAnimationTest {
             initialValue = startValue,
             targetValue = endValue,
             initialVelocity = startVelocity,
-            converter = Float.VectorConverter
+            typeConverter = Float.VectorConverter
         )
 
         assertEquals(
@@ -183,7 +180,7 @@ class PhysicsAnimationTest {
             initialValue = startValue,
             targetValue = endValue,
             initialVelocity = startVelocity,
-            converter = Float.VectorConverter
+            typeConverter = Float.VectorConverter
         )
 
         assertEquals(
@@ -202,10 +199,10 @@ class PhysicsAnimationTest {
     fun testEndSnapping() {
         TargetBasedAnimation(
             spring(),
+            Float.VectorConverter,
             0f,
             100f,
-            0f,
-            Float.VectorConverter
+            0f
         ).also { animation ->
             assertEquals(0f, animation.getVelocityVector(animation.durationMillis).value)
             assertEquals(100f, animation.getValue(animation.durationMillis))
@@ -306,11 +303,12 @@ class PhysicsAnimationTest {
         startVelocity: Float,
         endValue: Float
     ): Animation<Float, AnimationVector1D> {
-        return this.createAnimation(
+        return TargetBasedAnimation(
+            animationSpec = this,
             initialValue = startValue,
             targetValue = endValue,
             initialVelocityVector = AnimationVector(startVelocity),
-            converter = Float.VectorConverter
+            typeConverter = Float.VectorConverter
         )
     }
 

@@ -5,6 +5,35 @@ package androidx.compose.animation.core {
     method @VisibleForTesting public static void setRootAnimationClockFactory(kotlin.jvm.functions.Function1<? super kotlinx.coroutines.CoroutineScope,? extends androidx.compose.animation.core.AnimationClockObservable> p);
   }
 
+  public final class Animatable<T, V extends androidx.compose.animation.core.AnimationVector> {
+    ctor public Animatable(T? initialValue, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, T? visibilityThreshold);
+    method public suspend Object? animateDecay(T? initialVelocity, androidx.compose.animation.core.DecayAnimationSpec<T> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.Animatable<T,V>,kotlin.Unit>? block, optional kotlin.coroutines.Continuation<? super androidx.compose.animation.core.AnimationResult<T,V>> p);
+    method public suspend Object? animateTo(T? targetValue, optional androidx.compose.animation.core.AnimationSpec<T> animationSpec, optional T? initialVelocity, optional kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.Animatable<T,V>,kotlin.Unit>? block, optional kotlin.coroutines.Continuation<? super androidx.compose.animation.core.AnimationResult<T,V>> p);
+    method public T? getLowerBound();
+    method public T! getTargetValue();
+    method public androidx.compose.animation.core.TwoWayConverter<T,V> getTypeConverter();
+    method public T? getUpperBound();
+    method public T! getValue();
+    method public T! getVelocity();
+    method public V getVelocityVector();
+    method public boolean isRunning();
+    method public void snapTo(T? targetValue);
+    method public void stop();
+    method public void updateBounds(optional T? lowerBound, optional T? upperBound);
+    property public final boolean isRunning;
+    property public final T? lowerBound;
+    property public final T! targetValue;
+    property public final androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter;
+    property public final T? upperBound;
+    property public final T! value;
+    property public final T! velocity;
+    property public final V velocityVector;
+  }
+
+  public final class AnimatableKt {
+    method public static androidx.compose.animation.core.Animatable<java.lang.Float,androidx.compose.animation.core.AnimationVector1D> Animatable(float initialValue, optional float visibilityThreshold);
+  }
+
   public final class AnimateAsStateKt {
     method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<java.lang.Float> animateAsState(float targetValue, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, optional float visibilityThreshold, optional kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit>? finishedListener);
     method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<androidx.compose.ui.unit.Bounds> animateAsState(androidx.compose.ui.unit.Bounds targetValue, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.unit.Bounds> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.Bounds,kotlin.Unit>? finishedListener);
@@ -47,15 +76,17 @@ package androidx.compose.animation.core {
   }
 
   public interface Animation<T, V extends androidx.compose.animation.core.AnimationVector> {
-    method public androidx.compose.animation.core.TwoWayConverter<T,V> getConverter();
+    method @Deprecated public default androidx.compose.animation.core.TwoWayConverter<T,V> getConverter();
     method public long getDurationMillis();
     method public T! getTargetValue();
+    method public androidx.compose.animation.core.TwoWayConverter<T,V> getTypeConverter();
     method public T! getValue(long playTime);
     method public V getVelocityVector(long playTime);
     method public default boolean isFinished(long playTime);
-    property public abstract androidx.compose.animation.core.TwoWayConverter<T,V> converter;
+    property @Deprecated public default androidx.compose.animation.core.TwoWayConverter<T,V> converter;
     property public abstract long durationMillis;
     property public abstract T! targetValue;
+    property public abstract androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter;
   }
 
   public interface AnimationClockObservable {
@@ -75,12 +106,23 @@ package androidx.compose.animation.core {
 
   public enum AnimationEndReason {
     enum_constant public static final androidx.compose.animation.core.AnimationEndReason BoundReached;
+    enum_constant public static final androidx.compose.animation.core.AnimationEndReason Finished;
     enum_constant public static final androidx.compose.animation.core.AnimationEndReason Interrupted;
     enum_constant public static final androidx.compose.animation.core.AnimationEndReason TargetReached;
   }
 
   public final class AnimationKt {
-    method public static <T, V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.TargetBasedAnimation<T,V> TargetBasedAnimation(androidx.compose.animation.core.AnimationSpec<T> animationSpec, T? initialValue, T? targetValue, T? initialVelocity, androidx.compose.animation.core.TwoWayConverter<T,V> converter);
+    method public static androidx.compose.animation.core.DecayAnimation<java.lang.Float,androidx.compose.animation.core.AnimationVector1D> DecayAnimation(androidx.compose.animation.core.FloatDecayAnimationSpec animationSpec, float initialValue, optional float initialVelocity);
+    method public static <T, V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.TargetBasedAnimation<T,V> TargetBasedAnimation(androidx.compose.animation.core.AnimationSpec<T> animationSpec, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, T? initialValue, T? targetValue, T? initialVelocity);
+    method public static <T, V extends androidx.compose.animation.core.AnimationVector> T! getVelocity(androidx.compose.animation.core.Animation<T,V>, long playTime);
+  }
+
+  public final class AnimationResult<T, V extends androidx.compose.animation.core.AnimationVector> {
+    ctor public AnimationResult(androidx.compose.animation.core.AnimationState<T,V> endState, androidx.compose.animation.core.AnimationEndReason endReason);
+    method public androidx.compose.animation.core.AnimationEndReason getEndReason();
+    method public androidx.compose.animation.core.AnimationState<T,V> getEndState();
+    property public final androidx.compose.animation.core.AnimationEndReason endReason;
+    property public final androidx.compose.animation.core.AnimationState<T,V> endState;
   }
 
   public final class AnimationScope<T, V extends androidx.compose.animation.core.AnimationVector> {
@@ -91,6 +133,7 @@ package androidx.compose.animation.core {
     method public T! getTargetValue();
     method public androidx.compose.animation.core.TwoWayConverter<T,V> getTypeConverter();
     method public T! getValue();
+    method public T! getVelocity();
     method public V getVelocityVector();
     method public boolean isRunning();
     method public androidx.compose.animation.core.AnimationState<T,V> toAnimationState();
@@ -101,6 +144,7 @@ package androidx.compose.animation.core {
     property public final T! targetValue;
     property public final androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter;
     property public final T! value;
+    property public final T! velocity;
     property public final V velocityVector;
   }
 
@@ -116,6 +160,7 @@ package androidx.compose.animation.core {
     method public long getLastFrameTime-CLVl0cY();
     method public androidx.compose.animation.core.TwoWayConverter<T,V> getTypeConverter();
     method public T! getValue();
+    method public T! getVelocity();
     method public V getVelocityVector();
     method public boolean isRunning();
     property public final long finishedTime;
@@ -123,16 +168,16 @@ package androidx.compose.animation.core {
     property public final long lastFrameTime;
     property public final androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter;
     property public T! value;
+    property public final T! velocity;
     property public final V velocityVector;
   }
 
   public final class AnimationStateKt {
-    method public static androidx.compose.animation.core.AnimationState<java.lang.Float,androidx.compose.animation.core.AnimationVector1D> AnimationState-SZyJPdc(float initialValue, optional float initialVelocity, optional long lastFrameTime, optional long endTime, optional boolean isRunning);
-    method public static androidx.compose.animation.core.AnimationState<java.lang.Float,androidx.compose.animation.core.AnimationVector1D> copy-mN48zRs(androidx.compose.animation.core.AnimationState<java.lang.Float,androidx.compose.animation.core.AnimationVector1D>, optional float value, optional float velocity, optional long lastFrameTime, optional long endTime, optional boolean isRunning);
-    method public static <T, V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.AnimationState<T,V> copy-upwry94(androidx.compose.animation.core.AnimationState<T,V>, optional T? value, optional V? velocityVector, optional long lastFrameTime, optional long endTime, optional boolean isRunning);
+    method public static <T, V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.AnimationState<T,V> AnimationState-NYxC2dI(androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, T? initialValue, T? initialVelocity, optional long lastFrameTime, optional long finishedTime, optional boolean isRunning);
+    method public static androidx.compose.animation.core.AnimationState<java.lang.Float,androidx.compose.animation.core.AnimationVector1D> AnimationState-SZyJPdc(float initialValue, optional float initialVelocity, optional long lastFrameTime, optional long finishedTime, optional boolean isRunning);
+    method public static androidx.compose.animation.core.AnimationState<java.lang.Float,androidx.compose.animation.core.AnimationVector1D> copy-mN48zRs(androidx.compose.animation.core.AnimationState<java.lang.Float,androidx.compose.animation.core.AnimationVector1D>, optional float value, optional float velocity, optional long lastFrameTime, optional long finishedTime, optional boolean isRunning);
+    method public static <T, V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.AnimationState<T,V> copy-upwry94(androidx.compose.animation.core.AnimationState<T,V>, optional T? value, optional V? velocityVector, optional long lastFrameTime, optional long finishedTime, optional boolean isRunning);
     method public static <T, V extends androidx.compose.animation.core.AnimationVector> V createZeroVectorFrom(androidx.compose.animation.core.TwoWayConverter<T,V>, T? value);
-    method public static float getVelocity(androidx.compose.animation.core.AnimationState<java.lang.Float,androidx.compose.animation.core.AnimationVector1D>);
-    method public static float getVelocity(androidx.compose.animation.core.AnimationScope<java.lang.Float,androidx.compose.animation.core.AnimationVector1D>);
     method public static boolean isFinished(androidx.compose.animation.core.AnimationState<?,?>);
   }
 
@@ -234,16 +279,33 @@ package androidx.compose.animation.core {
     method public Float! invoke(float fraction);
   }
 
-  public final class DecayAnimation implements androidx.compose.animation.core.Animation<java.lang.Float,androidx.compose.animation.core.AnimationVector1D> {
-    ctor public DecayAnimation(androidx.compose.animation.core.FloatDecayAnimationSpec anim, float initialValue, float initialVelocity);
-    method public androidx.compose.animation.core.TwoWayConverter<java.lang.Float,androidx.compose.animation.core.AnimationVector1D> getConverter();
+  public final class DecayAnimation<T, V extends androidx.compose.animation.core.AnimationVector> implements androidx.compose.animation.core.Animation<T,V> {
+    ctor @VisibleForTesting public DecayAnimation(androidx.compose.animation.core.VectorizedDecayAnimationSpec<V> animationSpec, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, T? initialValue, V initialVelocityVector);
+    ctor public DecayAnimation(androidx.compose.animation.core.DecayAnimationSpec<T> animationSpec, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, T? initialValue, V initialVelocityVector);
+    ctor public DecayAnimation(androidx.compose.animation.core.DecayAnimationSpec<T> animationSpec, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, T? initialValue, T? initialVelocity);
     method public long getDurationMillis();
-    method public Float! getTargetValue();
-    method public Float! getValue(long playTime);
-    method public androidx.compose.animation.core.AnimationVector1D getVelocityVector(long playTime);
-    property public androidx.compose.animation.core.TwoWayConverter<java.lang.Float,androidx.compose.animation.core.AnimationVector1D> converter;
+    method public T! getInitialValue();
+    method public V getInitialVelocityVector();
+    method public T! getTargetValue();
+    method public androidx.compose.animation.core.TwoWayConverter<T,V> getTypeConverter();
+    method public T! getValue(long playTime);
+    method public V getVelocityVector(long playTime);
     property public long durationMillis;
-    property public Float! targetValue;
+    property public final T! initialValue;
+    property public final V initialVelocityVector;
+    property public T! targetValue;
+    property public androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter;
+  }
+
+  public interface DecayAnimationSpec<T> {
+    method public <V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.VectorizedDecayAnimationSpec<V> vectorize(androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter);
+  }
+
+  public final class DecayAnimationSpecKt {
+    method public static <T, V extends androidx.compose.animation.core.AnimationVector> T! calculateTargetValue(androidx.compose.animation.core.DecayAnimationSpec<T>, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, T? initialValue, T? initialVelocity);
+    method public static float calculateTargetValue(androidx.compose.animation.core.DecayAnimationSpec<java.lang.Float>, float initialValue, float initialVelocity);
+    method public static <T> androidx.compose.animation.core.DecayAnimationSpec<T> exponentialDecay(optional @FloatRange(from=0.0, to=3.4E38, fromInclusive=false) float frictionMultiplier, optional @FloatRange(from=0.0, to=3.4E38, fromInclusive=false) float absVelocityThreshold);
+    method public static <T> androidx.compose.animation.core.DecayAnimationSpec<T> generateDecayAnimationSpec(androidx.compose.animation.core.FloatDecayAnimationSpec);
   }
 
   public final class DefaultAnimationClock extends androidx.compose.animation.core.BaseAnimationClock {
@@ -260,17 +322,6 @@ package androidx.compose.animation.core {
     method public static androidx.compose.animation.core.CubicBezierEasing getFastOutSlowInEasing();
     method public static kotlin.jvm.functions.Function1<java.lang.Float,java.lang.Float> getLinearEasing();
     method public static androidx.compose.animation.core.CubicBezierEasing getLinearOutSlowInEasing();
-  }
-
-  public final class ExponentialDecay implements androidx.compose.animation.core.FloatDecayAnimationSpec {
-    ctor public ExponentialDecay(@FloatRange(from=0.0, to=3.4E38, fromInclusive=false) float frictionMultiplier, @FloatRange(from=0.0, to=3.4E38, fromInclusive=false) float absVelocityThreshold);
-    ctor public ExponentialDecay();
-    method public float getAbsVelocityThreshold();
-    method public long getDurationMillis(float start, float startVelocity);
-    method public float getTarget(float start, float startVelocity);
-    method public float getValue(long playTime, float start, float startVelocity);
-    method public float getVelocity(long playTime, float start, float startVelocity);
-    property public float absVelocityThreshold;
   }
 
   public interface FiniteAnimationSpec<T> extends androidx.compose.animation.core.AnimationSpec<T> {
@@ -295,6 +346,17 @@ package androidx.compose.animation.core {
   }
 
   public final class FloatDecayAnimationSpecKt {
+  }
+
+  public final class FloatExponentialDecaySpec implements androidx.compose.animation.core.FloatDecayAnimationSpec {
+    ctor public FloatExponentialDecaySpec(@FloatRange(from=0.0, to=3.4E38, fromInclusive=false) float frictionMultiplier, @FloatRange(from=0.0, to=3.4E38, fromInclusive=false) float absVelocityThreshold);
+    ctor public FloatExponentialDecaySpec();
+    method public float getAbsVelocityThreshold();
+    method public long getDurationMillis(float start, float startVelocity);
+    method public float getTarget(float start, float startVelocity);
+    method public float getValue(long playTime, float start, float startVelocity);
+    method public float getVelocity(long playTime, float start, float startVelocity);
+    property public float absVelocityThreshold;
   }
 
   public final class FloatPropKey implements androidx.compose.animation.core.PropKey<java.lang.Float,androidx.compose.animation.core.AnimationVector1D> {
@@ -484,9 +546,10 @@ package androidx.compose.animation.core {
 
   public final class SuspendAnimationKt {
     method public static suspend Object? animate(float initialValue, float targetValue, optional float initialVelocity, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,kotlin.Unit> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public static suspend <T, V extends androidx.compose.animation.core.AnimationVector> Object? animate(T? initialValue, T? targetValue, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, optional V? initialVelocityVector, optional androidx.compose.animation.core.AnimationSpec<T> animationSpec, kotlin.jvm.functions.Function2<? super T,? super V,kotlin.Unit> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public static suspend <T, V extends androidx.compose.animation.core.AnimationVector> Object? animate(androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, T? initialValue, T? targetValue, optional T? initialVelocity, optional androidx.compose.animation.core.AnimationSpec<T> animationSpec, kotlin.jvm.functions.Function2<? super T,? super T,kotlin.Unit> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public static suspend Object? animateDecay(float initialValue, float initialVelocity, androidx.compose.animation.core.FloatDecayAnimationSpec animationSpec, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,kotlin.Unit> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public static suspend Object? animateDecay(androidx.compose.animation.core.AnimationState<java.lang.Float,androidx.compose.animation.core.AnimationVector1D>, androidx.compose.animation.core.FloatDecayAnimationSpec animationSpec, optional boolean sequentialAnimation, optional kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.AnimationScope<java.lang.Float,androidx.compose.animation.core.AnimationVector1D>,kotlin.Unit> block, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method @Deprecated public static suspend Object? animateDecay(androidx.compose.animation.core.AnimationState<java.lang.Float,androidx.compose.animation.core.AnimationVector1D>, androidx.compose.animation.core.FloatDecayAnimationSpec animationSpec, optional boolean sequentialAnimation, optional kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.AnimationScope<java.lang.Float,androidx.compose.animation.core.AnimationVector1D>,kotlin.Unit> block, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public static suspend <T, V extends androidx.compose.animation.core.AnimationVector> Object? animateDecay(androidx.compose.animation.core.AnimationState<T,V>, androidx.compose.animation.core.DecayAnimationSpec<T> animationSpec, optional boolean sequentialAnimation, optional kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.AnimationScope<T,V>,kotlin.Unit> block, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public static suspend <T, V extends androidx.compose.animation.core.AnimationVector> Object? animateTo(androidx.compose.animation.core.AnimationState<T,V>, T? targetValue, optional androidx.compose.animation.core.AnimationSpec<T> animationSpec, optional boolean sequentialAnimation, optional kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.AnimationScope<T,V>,kotlin.Unit> block, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
   }
 
@@ -502,15 +565,15 @@ package androidx.compose.animation.core {
   }
 
   public final class TargetBasedAnimation<T, V extends androidx.compose.animation.core.AnimationVector> implements androidx.compose.animation.core.Animation<T,V> {
-    ctor public TargetBasedAnimation(androidx.compose.animation.core.AnimationSpec<T> animationSpec, T? initialValue, T? targetValue, androidx.compose.animation.core.TwoWayConverter<T,V> converter, V? initialVelocityVector);
-    method public androidx.compose.animation.core.TwoWayConverter<T,V> getConverter();
+    ctor public TargetBasedAnimation(androidx.compose.animation.core.AnimationSpec<T> animationSpec, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, T? initialValue, T? targetValue, V? initialVelocityVector);
     method public long getDurationMillis();
     method public T! getTargetValue();
+    method public androidx.compose.animation.core.TwoWayConverter<T,V> getTypeConverter();
     method public T! getValue(long playTime);
     method public V getVelocityVector(long playTime);
-    property public androidx.compose.animation.core.TwoWayConverter<T,V> converter;
     property public long durationMillis;
     property public T! targetValue;
+    property public androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter;
   }
 
   public final class ToolingGlueKt {
@@ -660,6 +723,15 @@ package androidx.compose.animation.core {
   }
 
   public final class VectorizedAnimationSpecKt {
+  }
+
+  public interface VectorizedDecayAnimationSpec<V extends androidx.compose.animation.core.AnimationVector> {
+    method public float getAbsVelocityThreshold();
+    method public long getDurationMillis(V initialValue, V initialVelocity);
+    method public V getTarget(V initialValue, V initialVelocity);
+    method public V getValue(long playTime, V initialValue, V initialVelocity);
+    method public V getVelocity(long playTime, V initialValue, V initialVelocity);
+    property public abstract float absVelocityThreshold;
   }
 
   public interface VectorizedDurationBasedAnimationSpec<V extends androidx.compose.animation.core.AnimationVector> extends androidx.compose.animation.core.VectorizedFiniteAnimationSpec<V> {

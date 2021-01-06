@@ -16,80 +16,11 @@
 
 package androidx.compose.animation.demos
 
-import androidx.compose.animation.core.AnimationState
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateTo
-import androidx.compose.animation.core.isFinished
-import androidx.compose.animation.core.spring
-import androidx.compose.foundation.MutatorMutex
-import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Text
+import androidx.compose.animation.core.samples.AnimatableAnimateToGenericsType
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlin.math.roundToInt
 
 @Composable
 fun SuspendAnimationDemo() {
-    var animStateX by remember {
-        mutableStateOf(AnimationState(0f))
-    }
-    var animStateY by remember {
-        mutableStateOf(AnimationState(0f))
-    }
-    val mutex = remember { MutatorMutex() }
-
-    Box(
-        Modifier.fillMaxSize().background(Color(0xffb99aff)).pointerInput {
-            coroutineScope {
-                while (true) {
-                    val offset = awaitPointerEventScope {
-                        awaitFirstDown().current.position
-                    }
-                    val x = offset.x
-                    val y = offset.y
-                    mutex.mutate {
-                        launch {
-                            animStateX.animateTo(
-                                x,
-                                sequentialAnimation = !animStateX.isFinished,
-                                animationSpec = spring(stiffness = Spring.StiffnessLow)
-                            )
-                        }
-                        launch {
-                            animStateY.animateTo(
-                                y,
-                                sequentialAnimation = !animStateY.isFinished,
-                                animationSpec = spring(stiffness = Spring.StiffnessLow)
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    ) {
-        Text("Tap anywhere", Modifier.align(Alignment.Center))
-        Box(
-            Modifier
-                .offset { IntOffset(animStateX.value.roundToInt(), animStateY.value.roundToInt()) }
-                .size(40.dp)
-                .background(Color(0xff3c1361), CircleShape)
-        )
-    }
+    // Pulling from sample code
+    AnimatableAnimateToGenericsType()
 }

@@ -17,12 +17,12 @@
 package androidx.compose.animation.demos
 
 import androidx.compose.animation.core.AnimationState
-import androidx.compose.animation.core.ExponentialDecay
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.animateDecay
 import androidx.compose.animation.core.animateTo
+import androidx.compose.animation.core.calculateTargetValue
+import androidx.compose.animation.core.exponentialDecay
 import androidx.compose.animation.core.isFinished
-import androidx.compose.animation.core.velocity
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.MutatorMutex
@@ -90,14 +90,15 @@ fun SpringBackScrollingDemo() {
                     launch {
                         mutatorMutex.mutate {
                             animation = AnimationState(scrollPosition, velocity)
-                            val target = ExponentialDecay().getTarget(scrollPosition, velocity)
+                            val target = exponentialDecay<Float>()
+                                .calculateTargetValue(scrollPosition, velocity)
                             val springBackTarget: Float = calculateSpringBackTarget(
                                 target,
                                 velocity,
                                 itemWidth.value
                             )
 
-                            animation.animateDecay(ExponentialDecay()) {
+                            animation.animateDecay(exponentialDecay()) {
                                 scrollPosition = this.value
                                 // Spring back as soon as the target position is crossed.
                                 if ((this.velocity > 0 && value > springBackTarget) ||

@@ -140,7 +140,7 @@ sealed class BaseAnimatedValue<T, V : AnimationVector>(
 
         this.targetValue = targetValue
         val animationWrapper = TargetBasedAnimation(
-            anim, value, targetValue, typeConverter, velocityVector
+            anim, typeConverter, value, targetValue, velocityVector
         )
 
         this.onEnd = onEnd
@@ -348,7 +348,7 @@ typealias OnAnimationEnd =
 // TODO: Figure out an API for customizing the type of decay & the friction
 fun AnimatedFloat.fling(
     startVelocity: Float,
-    decay: FloatDecayAnimationSpec = ExponentialDecay(),
+    decay: FloatDecayAnimationSpec = FloatExponentialDecaySpec(),
     onEnd: OnAnimationEnd? = null
 ) {
     if (isRunning) {
@@ -381,7 +381,7 @@ fun AnimatedFloat.fling(
  */
 fun AnimatedFloat.fling(
     startVelocity: Float,
-    decay: FloatDecayAnimationSpec = ExponentialDecay(),
+    decay: FloatDecayAnimationSpec = FloatExponentialDecaySpec(),
     adjustTarget: (Float) -> TargetAnimation?,
     onEnd: OnAnimationEnd? = null
 ) {
@@ -403,9 +403,9 @@ fun AnimatedFloat.fling(
         targetValue = targetAnimation.target
         val animWrapper = TargetBasedAnimation(
             targetAnimation.animation,
+            typeConverter,
             value,
             targetAnimation.target,
-            typeConverter,
             AnimationVector1D(startVelocity)
         )
         startAnimation(animWrapper)

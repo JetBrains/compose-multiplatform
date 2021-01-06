@@ -50,5 +50,10 @@ enum class AnimationEndReason {
      * and the remaining velocity can be obtained via `onEnd` param in [AnimatedFloat.fling]
      * callback
      */
-    BoundReached
+    BoundReached,
+    // TODO: deprecate TargetReached
+    /**
+     * Animation has finished successfully without any interruption.
+     */
+    Finished
 }
