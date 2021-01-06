@@ -16,8 +16,10 @@
 
 package androidx.compose.runtime.dispatch
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.Continuation
+import kotlin.coroutines.resumeWithException
 
 /**
  * A simple frame clock.
@@ -27,6 +29,8 @@ import kotlin.coroutines.Continuation
  * recomposition work, while avoiding additional allocation where possible.
  *
  * [onNewAwaiters] will be invoked whenever the number of awaiters has changed from 0 to 1.
+ * If [onNewAwaiters] **fails** by throwing an exception it will permanently fail this
+ * [BroadcastFrameClock]; all current and future awaiters will resume with the thrown exception.
  */
 class BroadcastFrameClock(
     private val onNewAwaiters: (() -> Unit)? = null
@@ -39,6 +43,7 @@ class BroadcastFrameClock(
     }
 
     private val lock = Any()
+    private var failureCause: Throwable? = null
     private var awaiters = mutableListOf<FrameAwaiter<*>>()
     private var spareList = mutableListOf<FrameAwaiter<*>>()
 
@@ -66,9 +71,15 @@ class BroadcastFrameClock(
     override suspend fun <R> withFrameNanos(
         onFrame: (Long) -> R
     ): R = suspendCancellableCoroutine { co ->
-        val awaiter = FrameAwaiter(onFrame, co)
+        lateinit var awaiter: FrameAwaiter<R>
         @Suppress("DEPRECATION_ERROR")
         val hasNewAwaiters = synchronized(lock) {
+            val cause = failureCause
+            if (cause != null) {
+                co.resumeWithException(cause)
+                return@suspendCancellableCoroutine
+            }
+            awaiter = FrameAwaiter(onFrame, co)
             val hadAwaiters = awaiters.isNotEmpty()
             awaiters.add(awaiter)
             !hadAwaiters
@@ -82,6 +93,36 @@ class BroadcastFrameClock(
         }
 
         // Wake up anything that was waiting for someone to schedule a frame
-        if (hasNewAwaiters) onNewAwaiters?.invoke()
+        if (hasNewAwaiters && onNewAwaiters != null) {
+            try {
+                // BUG: Kotlin 1.4.21 plugin doesn't smart cast for a direct onNewAwaiters() here
+                onNewAwaiters.invoke()
+            } catch (t: Throwable) {
+                // If onNewAwaiters fails, we permanently fail the BroadcastFrameClock.
+                fail(t)
+            }
+        }
+    }
+
+    private fun fail(cause: Throwable) {
+        @Suppress("DEPRECATION_ERROR")
+        synchronized(lock) {
+            if (failureCause != null) return
+            failureCause = cause
+            for (awaiter in awaiters) {
+                awaiter.continuation.resumeWithException(cause)
+            }
+            awaiters.clear()
+        }
+    }
+
+    /**
+     * Permanently cancel this [BroadcastFrameClock] and cancel all current and future
+     * awaiters with [cancellationException].
+     */
+    fun cancel(
+        cancellationException: CancellationException = CancellationException("clock cancelled")
+    ) {
+        fail(cancellationException)
     }
 }
