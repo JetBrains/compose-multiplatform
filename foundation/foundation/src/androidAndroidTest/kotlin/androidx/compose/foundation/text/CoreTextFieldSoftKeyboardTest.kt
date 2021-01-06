@@ -24,8 +24,8 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
-import androidx.compose.ui.focus.FocusReference
-import androidx.compose.ui.focus.focusReference
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.AmbientFocusManager
 import androidx.compose.ui.platform.AmbientView
 import androidx.compose.ui.platform.testTag
@@ -80,21 +80,21 @@ class CoreTextFieldSoftKeyboardTest {
     @Test
     fun keyboardShownOnInitialFocus() {
         // Arrange.
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         lateinit var view: View
         rule.setContent {
             view = AmbientView.current
             CoreTextField(
                 value = TextFieldValue("Hello"),
                 onValueChange = {},
-                modifier = Modifier.focusReference(focusReference)
+                modifier = Modifier.focusRequester(focusRequester)
             )
         }
         view.ensureKeyboardIsHidden()
 
         // Act.
         val isSoftKeyboardShown = view.runAndWaitUntil({ view.isSoftwareKeyboardShown() }) {
-            rule.runOnIdle { focusReference.requestFocus() }
+            rule.runOnIdle { focusRequester.requestFocus() }
         }
 
         // Assert.
@@ -107,20 +107,20 @@ class CoreTextFieldSoftKeyboardTest {
         // Arrange.
         lateinit var focusManager: FocusManager
         lateinit var view: View
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         rule.setContent {
             view = AmbientView.current
             focusManager = AmbientFocusManager.current
             CoreTextField(
                 value = TextFieldValue("Hello"),
                 onValueChange = {},
-                modifier = Modifier.focusReference(focusReference)
+                modifier = Modifier.focusRequester(focusRequester)
             )
         }
         view.ensureKeyboardIsHidden()
         // Request focus and wait for keyboard.
         view.runAndWaitUntil({ view.isSoftwareKeyboardShown() }) {
-            rule.runOnIdle { focusReference.requestFocus() }
+            rule.runOnIdle { focusRequester.requestFocus() }
         }
 
         // Act.
@@ -166,8 +166,7 @@ class CoreTextFieldSoftKeyboardTest {
     @Test
     fun keyboardStaysVisibleWhenMovingFromOneTextFieldToAnother() {
         // Arrange.
-        val focusReference1 = FocusReference()
-        val focusReference2 = FocusReference()
+        val (focusRequester1, focusRequester2) = FocusRequester.createRefs()
         lateinit var view: View
         rule.setContent {
             view = AmbientView.current
@@ -175,23 +174,23 @@ class CoreTextFieldSoftKeyboardTest {
                 CoreTextField(
                     value = TextFieldValue("Hello"),
                     onValueChange = {},
-                    modifier = Modifier.focusReference(focusReference1)
+                    modifier = Modifier.focusRequester(focusRequester1)
                 )
                 CoreTextField(
                     value = TextFieldValue("Hello"),
                     onValueChange = {},
-                    modifier = Modifier.focusReference(focusReference2)
+                    modifier = Modifier.focusRequester(focusRequester2)
                 )
             }
         }
         view.ensureKeyboardIsHidden()
         view.runAndWaitUntil({ view.isSoftwareKeyboardShown() }) {
-            rule.runOnIdle { focusReference1.requestFocus() }
+            rule.runOnIdle { focusRequester1.requestFocus() }
         }
 
         // Act.
         val wasKeyboardHidden = view.runAndWaitUntil({ !view.isSoftwareKeyboardShown() }) {
-            rule.runOnIdle { focusReference2.requestFocus() }
+            rule.runOnIdle { focusRequester2.requestFocus() }
         }
 
         // Assert.

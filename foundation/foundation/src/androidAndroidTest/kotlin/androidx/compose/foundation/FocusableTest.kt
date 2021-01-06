@@ -22,8 +22,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusReference
-import androidx.compose.ui.focus.focusReference
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
@@ -96,20 +96,20 @@ class FocusableTest {
 
     @Test
     fun focusableTest_focusAcquire() {
-        val (focusReference, otherFocusReference) = FocusReference.createRefs()
+        val (focusRequester, otherFocusRequester) = FocusRequester.createRefs()
         rule.setContent {
             Box {
                 BasicText(
                     "focusableText",
                     modifier = Modifier
                         .testTag(focusTag)
-                        .focusReference(focusReference)
+                        .focusRequester(focusRequester)
                         .focusable()
                 )
                 BasicText(
                     "otherFocusableText",
                     modifier = Modifier
-                        .focusReference(otherFocusReference)
+                        .focusRequester(otherFocusRequester)
                         .focusable()
                 )
             }
@@ -119,14 +119,14 @@ class FocusableTest {
             .assertIsNotFocused()
 
         rule.runOnIdle {
-            focusReference.requestFocus()
+            focusRequester.requestFocus()
         }
 
         rule.onNodeWithTag(focusTag)
             .assertIsFocused()
 
         rule.runOnIdle {
-            otherFocusReference.requestFocus()
+            otherFocusRequester.requestFocus()
         }
 
         rule.onNodeWithTag(focusTag)
@@ -136,20 +136,20 @@ class FocusableTest {
     @Test
     fun focusableTest_interactionState() {
         val interactionState = InteractionState()
-        val (focusReference, otherFocusReference) = FocusReference.createRefs()
+        val (focusRequester, otherFocusRequester) = FocusRequester.createRefs()
         rule.setContent {
             Box {
                 BasicText(
                     "focusableText",
                     modifier = Modifier
                         .testTag(focusTag)
-                        .focusReference(focusReference)
+                        .focusRequester(focusRequester)
                         .focusable(interactionState = interactionState)
                 )
                 BasicText(
                     "otherFocusableText",
                     modifier = Modifier
-                        .focusReference(otherFocusReference)
+                        .focusRequester(otherFocusRequester)
                         .focusable()
                 )
             }
@@ -160,7 +160,7 @@ class FocusableTest {
         }
 
         rule.runOnIdle {
-            focusReference.requestFocus()
+            focusRequester.requestFocus()
         }
 
         rule.runOnIdle {
@@ -168,7 +168,7 @@ class FocusableTest {
         }
 
         rule.runOnIdle {
-            otherFocusReference.requestFocus()
+            otherFocusRequester.requestFocus()
         }
 
         rule.runOnIdle {
@@ -179,7 +179,7 @@ class FocusableTest {
     @Test
     fun focusableTest_interactionState_resetWhenDisposed() {
         val interactionState = InteractionState()
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         var emitFocusableText by mutableStateOf(true)
 
         rule.setContent {
@@ -189,7 +189,7 @@ class FocusableTest {
                         "focusableText",
                         modifier = Modifier
                             .testTag(focusTag)
-                            .focusReference(focusReference)
+                            .focusRequester(focusRequester)
                             .focusable(interactionState = interactionState)
                     )
                 }
@@ -201,7 +201,7 @@ class FocusableTest {
         }
 
         rule.runOnIdle {
-            focusReference.requestFocus()
+            focusRequester.requestFocus()
         }
 
         rule.runOnIdle {

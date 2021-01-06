@@ -40,20 +40,20 @@ class FocusManagerAmbientTest {
     fun clearFocus_singleLayout() {
         // Arrange.
         lateinit var focusManager: FocusManager
-        lateinit var focusReference: FocusReference
+        lateinit var focusRequester: FocusRequester
         var focusState = Inactive
         rule.setFocusableContent {
             focusManager = AmbientFocusManager.current
-            focusReference = FocusReference()
+            focusRequester = FocusRequester()
             Box(
                 modifier = Modifier
-                    .focusReference(focusReference)
+                    .focusRequester(focusRequester)
                     .onFocusChanged { focusState = it }
                     .focusModifier()
             )
         }
         rule.runOnIdle {
-            focusReference.requestFocus()
+            focusRequester.requestFocus()
             assertThat(focusState).isEqualTo(Active)
         }
 
@@ -68,13 +68,13 @@ class FocusManagerAmbientTest {
     fun clearFocus_entireHierarchyIsCleared() {
         // Arrange.
         lateinit var focusManager: FocusManager
-        lateinit var focusReference: FocusReference
+        lateinit var focusRequester: FocusRequester
         var focusState = Inactive
         var parentFocusState = Inactive
         var grandparentFocusState = Inactive
         rule.setFocusableContent {
             focusManager = AmbientFocusManager.current
-            focusReference = FocusReference()
+            focusRequester = FocusRequester()
             Box(
                 modifier = Modifier
                     .onFocusChanged { grandparentFocusState = it }
@@ -87,7 +87,7 @@ class FocusManagerAmbientTest {
                 ) {
                     Box(
                         modifier = Modifier
-                            .focusReference(focusReference)
+                            .focusRequester(focusRequester)
                             .onFocusChanged { focusState = it }
                             .focusModifier()
                     )
@@ -95,7 +95,7 @@ class FocusManagerAmbientTest {
             }
         }
         rule.runOnIdle {
-            focusReference.requestFocus()
+            focusRequester.requestFocus()
             assertThat(grandparentFocusState).isEqualTo(ActiveParent)
             assertThat(parentFocusState).isEqualTo(ActiveParent)
             assertThat(focusState).isEqualTo(Active)

@@ -41,19 +41,19 @@ class FreeFocusTest {
     fun active_freeFocus_retainFocusAsActive() {
         // Arrange.
         var focusState: FocusState = Active
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
-                    .focusReference(focusReference)
+                    .focusRequester(focusRequester)
                     .then(FocusModifier(focusState))
             )
         }
 
         rule.runOnIdle {
             // Act.
-            val success = focusReference.freeFocus()
+            val success = focusRequester.freeFocus()
 
             // Assert.
             Truth.assertThat(success).isTrue()
@@ -65,19 +65,19 @@ class FreeFocusTest {
     fun activeParent_freeFocus_retainFocusAsActiveParent() {
         // Arrange.
         var focusState: FocusState = ActiveParent
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
-                    .focusReference(focusReference)
+                    .focusRequester(focusRequester)
                     .then(FocusModifier(focusState))
             )
         }
 
         rule.runOnIdle {
             // Act.
-            val success = focusReference.freeFocus()
+            val success = focusRequester.freeFocus()
 
             // Assert.
             Truth.assertThat(success).isFalse()
@@ -89,19 +89,19 @@ class FreeFocusTest {
     fun captured_freeFocus_changesStateToActive() {
         // Arrange.
         var focusState: FocusState = Captured
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
-                    .focusReference(focusReference)
+                    .focusRequester(focusRequester)
                     .then(FocusModifier(focusState))
             )
         }
 
         rule.runOnIdle {
             // Act.
-            val success = focusReference.freeFocus()
+            val success = focusRequester.freeFocus()
 
             // Assert.
             Truth.assertThat(success).isTrue()
@@ -113,19 +113,19 @@ class FreeFocusTest {
     fun disabled_freeFocus_retainFocusAsDisabled() {
         // Arrange.
         var focusState: FocusState = Disabled
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
-                    .focusReference(focusReference)
+                    .focusRequester(focusRequester)
                     .then(FocusModifier(focusState))
             )
         }
 
         rule.runOnIdle {
             // Act.
-            val success = focusReference.freeFocus()
+            val success = focusRequester.freeFocus()
 
             // Assert.
             Truth.assertThat(success).isFalse()
@@ -137,19 +137,19 @@ class FreeFocusTest {
     fun inactive_freeFocus_retainFocusAsInactive() {
         // Arrange.
         var focusState: FocusState = Inactive
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
-                    .focusReference(focusReference)
+                    .focusRequester(focusRequester)
                     .then(FocusModifier(focusState))
             )
         }
 
         rule.runOnIdle {
             // Act.
-            val success = focusReference.freeFocus()
+            val success = focusRequester.freeFocus()
 
             // Assert.
             Truth.assertThat(success).isFalse()

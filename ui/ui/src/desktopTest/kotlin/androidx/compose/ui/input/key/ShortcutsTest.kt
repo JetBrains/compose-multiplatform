@@ -23,8 +23,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusModifier
-import androidx.compose.ui.focus.FocusReference
-import androidx.compose.ui.focus.focusReference
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performKeyPress
@@ -42,13 +42,13 @@ class ShortcutsTest {
 
     @Test
     fun shortcuts_triggered() {
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         var triggered = 0
         rule.setContent {
             Box(
                 modifier = Modifier
                     .size(10.dp, 10.dp)
-                    .focusReference(focusReference)
+                    .focusRequester(focusRequester)
                     .focusModifier()
                     .shortcuts {
                         on(Key.MetaLeft + Key.Enter) {
@@ -58,7 +58,7 @@ class ShortcutsTest {
             )
         }
         rule.runOnIdle {
-            focusReference.requestFocus()
+            focusRequester.requestFocus()
         }
 
         val firstKeyConsumed = rule.onRoot().performKeyPress(
@@ -92,14 +92,14 @@ class ShortcutsTest {
 
     @Test
     fun shortcuts_states() {
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         var triggered = 0
         var setShortcuts by mutableStateOf(true)
         rule.setContent {
             Box(
                 modifier = Modifier
                     .size(10.dp, 10.dp)
-                    .focusReference(focusReference)
+                    .focusRequester(focusRequester)
                     .focusModifier()
                     .shortcuts {
                         if (setShortcuts) {
@@ -112,7 +112,7 @@ class ShortcutsTest {
         }
 
         rule.runOnIdle {
-            focusReference.requestFocus()
+            focusRequester.requestFocus()
         }
 
         rule.onRoot().performKeyPress(
@@ -149,14 +149,14 @@ class ShortcutsTest {
 
     @Test
     fun shortcuts_priority() {
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         var enterTriggered = 0
         var shortcutTriggered = 0
         rule.setContent {
             Box(
                 modifier = Modifier
                     .size(10.dp, 10.dp)
-                    .focusReference(focusReference)
+                    .focusRequester(focusRequester)
                     .focusModifier()
                     .shortcuts {
                         on(Key.Enter) {
@@ -171,7 +171,7 @@ class ShortcutsTest {
         }
 
         rule.runOnIdle {
-            focusReference.requestFocus()
+            focusRequester.requestFocus()
         }
 
         rule.onRoot().performKeyPress(
@@ -217,14 +217,14 @@ class ShortcutsTest {
 
     @Test
     fun shortcuts_multiple() {
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         var aTriggered = 0
         var cTriggered = 0
         rule.setContent {
             Box(
                 modifier = Modifier
                     .size(10.dp, 10.dp)
-                    .focusReference(focusReference)
+                    .focusRequester(focusRequester)
                     .focusModifier()
                     .shortcuts {
                         on(Key.MetaLeft + Key.A) {
@@ -239,7 +239,7 @@ class ShortcutsTest {
         }
 
         rule.runOnIdle {
-            focusReference.requestFocus()
+            focusRequester.requestFocus()
         }
 
         rule.onRoot().performKeyPress(

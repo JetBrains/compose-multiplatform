@@ -23,8 +23,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusReference
-import androidx.compose.ui.focus.focusReference
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.cancel
@@ -110,7 +110,7 @@ class TextFieldInteractionsTest {
     fun coreTextField_interaction_focused() {
         val state = mutableStateOf(TextFieldValue(""))
         val interactionState = InteractionState()
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         rule.setContent {
             BasicTextField(
                 modifier = Modifier.testTag(testTag),
@@ -119,7 +119,7 @@ class TextFieldInteractionsTest {
                 interactionState = interactionState
             )
             Box(
-                modifier = Modifier.size(10.dp).focusReference(focusReference).focusable(),
+                modifier = Modifier.size(10.dp).focusRequester(focusRequester).focusable(),
             )
         }
         assertThat(interactionState.value).doesNotContain(Interaction.Focused)
@@ -128,7 +128,7 @@ class TextFieldInteractionsTest {
         assertThat(interactionState.value).contains(Interaction.Focused)
         rule.runOnIdle {
             // request focus on the box so TextField will lose it
-            focusReference.requestFocus()
+            focusRequester.requestFocus()
         }
         assertThat(interactionState.value).doesNotContain(Interaction.Focused)
     }

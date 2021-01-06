@@ -49,13 +49,13 @@ class SetRootFocusTest {
         rule.setContent {
             Column {
                 // TODO(b/163725615): Remove this after clickable is made focusable.
-                val focusReference = FocusReference()
+                val focusRequester = FocusRequester()
                 BasicText(
                     text = "ClickableText",
                     modifier = Modifier
                         .testTag(focusable)
-                        .clickable { focusReference.requestFocus() }
-                        .focusReference(focusReference)
+                        .clickable { focusRequester.requestFocus() }
+                        .focusRequester(focusRequester)
                         .onFocusChanged { isFocused = it.isFocused }
                         .focusModifier()
                 )

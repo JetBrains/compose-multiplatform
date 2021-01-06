@@ -42,9 +42,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusReference
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusModifier
-import androidx.compose.ui.focus.focusReference
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
@@ -194,16 +194,16 @@ class TextFieldTest {
 
     @Test
     fun testTextField_showHideKeyboardBasedOnFocus() {
-        val (focusReference, parentFocusReference) = FocusReference.createRefs()
+        val (focusRequester, parentFocusRequester) = FocusRequester.createRefs()
         lateinit var hostView: View
         rule.setMaterialContent {
             hostView = AmbientView.current
             Box {
                 TextField(
                     modifier = Modifier
-                        .focusReference(parentFocusReference)
+                        .focusRequester(parentFocusRequester)
                         .focusModifier()
-                        .focusReference(focusReference)
+                        .focusRequester(focusRequester)
                         .testTag(TextfieldTag),
                     value = "input",
                     onValueChange = {},
@@ -213,17 +213,17 @@ class TextFieldTest {
         }
 
         // Shows keyboard when the text field is focused.
-        rule.runOnIdle { focusReference.requestFocus() }
+        rule.runOnIdle { focusRequester.requestFocus() }
         rule.runOnIdle { assertThat(hostView.isSoftwareKeyboardShown).isTrue() }
 
         // Hides keyboard when the text field is not focused.
-        rule.runOnIdle { parentFocusReference.requestFocus() }
+        rule.runOnIdle { parentFocusRequester.requestFocus() }
         rule.runOnIdle { assertThat(hostView.isSoftwareKeyboardShown).isFalse() }
     }
 
     @Test
     fun testTextField_clickingOnTextAfterDismissingKeyboard_showsKeyboard() {
-        val (focusReference, parentFocusReference) = FocusReference.createRefs()
+        val (focusRequester, parentFocusRequester) = FocusRequester.createRefs()
         lateinit var softwareKeyboardController: SoftwareKeyboardController
         lateinit var hostView: View
         rule.setMaterialContent {
@@ -231,9 +231,9 @@ class TextFieldTest {
             Box {
                 TextField(
                     modifier = Modifier
-                        .focusReference(parentFocusReference)
+                        .focusRequester(parentFocusRequester)
                         .focusModifier()
-                        .focusReference(focusReference)
+                        .focusRequester(focusRequester)
                         .testTag(TextfieldTag),
                     value = "input",
                     onValueChange = {},
@@ -244,7 +244,7 @@ class TextFieldTest {
         }
 
         // Shows keyboard when the text field is focused.
-        rule.runOnIdle { focusReference.requestFocus() }
+        rule.runOnIdle { focusRequester.requestFocus() }
         rule.runOnIdle { assertThat(hostView.isSoftwareKeyboardShown).isTrue() }
 
         // Hide keyboard.

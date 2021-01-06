@@ -30,7 +30,7 @@ import org.junit.runner.RunWith
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-class ReusedFocusReferenceTest {
+class ReusedFocusRequesterTest {
     @get:Rule
     val rule = createComposeRule()
 
@@ -38,19 +38,19 @@ class ReusedFocusReferenceTest {
     fun oneComponent() {
         // Arrange.
         lateinit var focusState: FocusState
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
-                    .focusReference(focusReference)
+                    .focusRequester(focusRequester)
                     .focusModifier()
             )
         }
 
         rule.runOnIdle {
             // Act.
-            focusReference.requestFocus()
+            focusRequester.requestFocus()
 
             // Assert.
             assertThat(focusState).isEqualTo(Active)
@@ -62,25 +62,25 @@ class ReusedFocusReferenceTest {
         // Arrange.
         lateinit var focusState1: FocusState
         lateinit var focusState2: FocusState
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState1 = it }
-                    .focusReference(focusReference)
+                    .focusRequester(focusRequester)
                     .focusModifier()
             )
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState2 = it }
-                    .focusReference(focusReference)
+                    .focusRequester(focusRequester)
                     .focusModifier()
             )
         }
 
         rule.runOnIdle {
             // Act.
-            focusReference.requestFocus()
+            focusRequester.requestFocus()
 
             // Assert.
             assertThat(focusState1).isEqualTo(Inactive)
@@ -89,36 +89,36 @@ class ReusedFocusReferenceTest {
     }
 
     @Test
-    fun focusReferenceUsedWithThreeComponent() {
+    fun focusRequesterUsedWithThreeComponent() {
         // Arrange.
         lateinit var focusState1: FocusState
         lateinit var focusState2: FocusState
         lateinit var focusState3: FocusState
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState1 = it }
-                    .focusReference(focusReference)
+                    .focusRequester(focusRequester)
                     .focusModifier()
             )
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState2 = it }
-                    .focusReference(focusReference)
+                    .focusRequester(focusRequester)
                     .focusModifier()
             )
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState3 = it }
-                    .focusReference(focusReference)
+                    .focusRequester(focusRequester)
                     .focusModifier()
             )
         }
 
         rule.runOnIdle {
             // Act.
-            focusReference.requestFocus()
+            focusRequester.requestFocus()
 
             // Assert.
             assertThat(focusState1).isEqualTo(Inactive)
