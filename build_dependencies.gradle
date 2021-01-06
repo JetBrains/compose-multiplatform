@@ -47,10 +47,10 @@ def getSourceDokkaVersion() {
 if (System.getenv("BUILD_DOKKA") != null) {
     build_versions.dokka = getSourceDokkaVersion()
 } else {
-    build_versions.dokka = '0.9.17-g013'
+    build_versions.dokka = "0.9.17-g013"
 }
 
-rootProject.ext['build_versions'] = build_versions
+rootProject.ext["build_versions"] = build_versions
 
 def build_libs = [:]
 
@@ -75,4 +75,4 @@ build_libs.kotlinpoet = "com.squareup:kotlinpoet:1.4.0"
 
 build_libs.hilt_plugin = "com.google.dagger:hilt-android-gradle-plugin:${build_versions.hilt}"
 
-rootProject.ext['build_libs'] = build_libs
+rootProject.ext["build_libs"] = build_libs
