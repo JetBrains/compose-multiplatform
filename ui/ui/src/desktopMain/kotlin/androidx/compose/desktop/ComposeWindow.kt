@@ -16,7 +16,6 @@
 package androidx.compose.desktop
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionReference
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
@@ -47,14 +46,12 @@ class ComposeWindow : JFrame {
      *        scheduling of composition updates.
      *        If null then default root composition will be used.
      * @param content Composable content of the ComposeWindow.
-     *
-     * @return Composition of the content.
      */
     fun setContent(
         parentComposition: CompositionReference? = null,
         content: @Composable () -> Unit
-    ): Composition {
-        return layer.setContent(
+    ) {
+        layer.setContent(
             parent = parent,
             invalidate = this::needRedrawLayer,
             parentComposition = parentComposition,
