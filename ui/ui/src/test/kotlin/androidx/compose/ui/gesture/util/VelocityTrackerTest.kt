@@ -111,8 +111,8 @@ class VelocityTrackerTest {
     }
 
     private fun checkVelocity(actual: Velocity, expectedDx: Float, expectedDy: Float) {
-        assertThat(actual.pixelsPerSecond.x).isWithin(0.1f).of(expectedDx)
-        assertThat(actual.pixelsPerSecond.y).isWithin(0.1f).of(expectedDy)
+        assertThat(actual.x).isWithin(0.1f).of(expectedDx)
+        assertThat(actual.y).isWithin(0.1f).of(expectedDy)
     }
 }
 

@@ -732,9 +732,9 @@ class ScrollableTest {
                     available: Velocity,
                     onFinished: (Velocity) -> Unit
                 ) {
-                    assertThat(available.pixelsPerSecond)
+                    assertThat(available)
                         .isEqualTo(
-                            Offset(x = velocityFlung, y = 0f) - consumed.pixelsPerSecond
+                            Velocity(x = velocityFlung, y = 0f) - consumed
                         )
                     onFinished.invoke(available)
                 }
@@ -827,13 +827,13 @@ class ScrollableTest {
                 assertThat(consumed.x - expectedConsumed).isWithin(0.001f)
 
                 val preFlingConsumed = dispatcher
-                    .dispatchPreFling(Velocity(Offset(50f, 50f)))
+                    .dispatchPreFling(Velocity(50f, 50f))
                 // scrollable won't participate in the pre fling
                 assertThat(preFlingConsumed).isEqualTo(Velocity.Zero)
 
                 dispatcher.dispatchPostFling(
-                    Velocity(Offset(1000f, 1000f)),
-                    Velocity(Offset(2000f, 2000f))
+                    Velocity(1000f, 1000f),
+                    Velocity(2000f, 2000f)
                 )
                 value
             }

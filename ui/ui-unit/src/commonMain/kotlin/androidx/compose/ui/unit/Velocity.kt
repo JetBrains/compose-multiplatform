@@ -17,31 +17,139 @@
 package androidx.compose.ui.unit
 
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.util.packFloats
+import androidx.compose.ui.util.unpackFloat1
+import androidx.compose.ui.util.unpackFloat2
 
-/** A velocity in two dimensions. */
+@Deprecated("Use component constructor", ReplaceWith("Velocity(offset.x, offset.y"))
+fun Velocity(offset: Offset) = Velocity(offset.x, offset.y)
+
+/**
+ * Constructs an Velocity from the given relative x and y velocities.
+ *
+ * @param x Horizontal component of the velocity in pixels per second
+ * @param y Vertical component of the velocity in pixels per second
+ */
+@Suppress("NOTHING_TO_INLINE")
+@Stable
+inline fun Velocity(x: Float, y: Float) = Velocity(packFloats(x, y))
+
+/**
+ * A two dimensional velocity in pixels per second.
+ */
 @Suppress("EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class Velocity(
-    /** The number of pixels per second of velocity in the x and y directions. */
-    val pixelsPerSecond: Offset
-) {
-    /** Return the negation of a velocity. */
-    operator fun unaryMinus() =
-        Velocity(pixelsPerSecond = -pixelsPerSecond)
+inline class Velocity(val packedValue: Long) {
+    @Deprecated(
+        "Don't convert directly to Offset. Use the x & y components.",
+        ReplaceWith("Offset(x, y)"),
+        level = DeprecationLevel.ERROR
+    )
+    val pixelsPerSecond: Offset get() = Offset(x, y)
+
+    /**
+     * The horizontal component of the velocity in pixels per second.
+     */
+    @Stable
+    val x: Float get() = unpackFloat1(packedValue)
+
+    /**
+     * The vertical component of the velocity in pixels per second.
+     */
+    @Stable
+    val y: Float
+        get() = unpackFloat2(packedValue)
+
+    /**
+     * The horizontal component of the velocity in pixels per second.
+     */
+    @Stable
+    operator fun component1(): Float = x
+
+    /**
+     * The vertical component of the velocity in pixels per second.
+     */
+    @Stable
+    operator fun component2(): Float = y
+
+    /**
+     * Returns a copy of this [Velocity] instance optionally overriding the
+     * x or y parameter
+     */
+    fun copy(x: Float = this.x, y: Float = this.y) = Velocity(x, y)
 
     companion object {
         /**
-         * Velocity of 0 pixels per second in both x and y.
+         * An offset with zero magnitude.
+         *
+         * This can be used to represent the origin of a coordinate space.
          */
-        val Zero = Velocity(Offset(0f, 0f))
+        @Stable
+        val Zero = Velocity(0.0f, 0.0f)
     }
+
+    /**
+     * Unary negation operator.
+     *
+     * Returns a [Velocity] with the coordinates negated.
+     *
+     * If the [Velocity] represents an arrow on a plane, this operator returns the
+     * same arrow but pointing in the reverse direction.
+     */
+    @Stable
+    operator fun unaryMinus(): Velocity = Velocity(-x, -y)
+
+    /**
+     * Binary subtraction operator.
+     *
+     * Returns a [Velocity] whose [x] value is the left-hand-side operand's [x]
+     * minus the right-hand-side operand's [x] and whose [y] value is the
+     * left-hand-side operand's [y] minus the right-hand-side operand's [y].
+     */
+    @Stable
+    operator fun minus(other: Velocity): Velocity = Velocity(x - other.x, y - other.y)
+
+    /**
+     * Binary addition operator.
+     *
+     * Returns a [Velocity] whose [x] value is the sum of the [x] values of the
+     * two operands, and whose [y] value is the sum of the [y] values of the
+     * two operands.
+     */
+    @Stable
+    operator fun plus(other: Velocity): Velocity = Velocity(x + other.x, y + other.y)
+
+    /**
+     * Multiplication operator.
+     *
+     * Returns a [Velocity] whose coordinates are those of the
+     * left-hand-side operand (a [Velocity]) multiplied by the scalar
+     * right-hand-side operand (a [Float]).
+     */
+    @Stable
+    operator fun times(operand: Float): Velocity = Velocity(x * operand, y * operand)
+
+    /**
+     * Division operator.
+     *
+     * Returns a [Velocity] whose coordinates are those of the
+     * left-hand-side operand (an [Velocity]) divided by the scalar right-hand-side
+     * operand (a [Float]).
+     */
+    @Stable
+    operator fun div(operand: Float): Velocity = Velocity(x / operand, y / operand)
+
+    /**
+     * Modulo (remainder) operator.
+     *
+     * Returns a [Velocity] whose coordinates are the remainder of dividing the
+     * coordinates of the left-hand-side operand (a [Velocity]) by the scalar
+     * right-hand-side operand (a [Float]).
+     */
+    @Stable
+    operator fun rem(operand: Float) = Velocity(x % operand, y % operand)
+
+    override fun toString() = "($x, $y) px/sec"
 }
-
-/** Return the difference of two velocities. */
-operator fun Velocity.minus(other: Velocity) =
-    Velocity(pixelsPerSecond = pixelsPerSecond - other.pixelsPerSecond)
-
-/** Return the sum of two velocities. */
-operator fun Velocity.plus(other: Velocity) =
-    Velocity(pixelsPerSecond = pixelsPerSecond + other.pixelsPerSecond)

@@ -843,7 +843,7 @@ internal val <T> SwipeableState<T>.PreUpPostDownNestedScrollConnection: NestedSc
         }
 
         override fun onPreFling(available: Velocity): Velocity {
-            val toFling = available.pixelsPerSecond.toFloat()
+            val toFling = Offset(available.x, available.y).toFloat()
             return if (toFling < 0 && offset.value > minBound) {
                 performFling(velocity = toFling) {}
                 // since we go to the anchor with tween settling, consume all for the best UX
@@ -858,7 +858,7 @@ internal val <T> SwipeableState<T>.PreUpPostDownNestedScrollConnection: NestedSc
             available: Velocity,
             onFinished: (Velocity) -> Unit
         ) {
-            performFling(velocity = available.pixelsPerSecond.toFloat()) {
+            performFling(velocity = Offset(available.x, available.y).toFloat()) {
                 // since we go to the anchor with tween settling, consume all for the best UX
                 onFinished.invoke(available)
             }

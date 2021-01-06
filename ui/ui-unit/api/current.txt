@@ -480,14 +480,25 @@ package androidx.compose.ui.unit {
 
   @androidx.compose.runtime.Immutable public final inline class Velocity {
     ctor public Velocity();
-    method public static long constructor-impl(long pixelsPerSecond);
+    method @androidx.compose.runtime.Stable public static operator float component1-impl(long $this);
+    method @androidx.compose.runtime.Stable public static operator float component2-impl(long $this);
+    method public static long constructor-impl(long packedValue);
+    method public static long copy-9UxMQ8M(long $this, optional float x, optional float y);
+    method @androidx.compose.runtime.Stable public static operator long div-9UxMQ8M(long $this, float operand);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
     method public static boolean equals-impl0(long p1, long p2);
-    method public long getPixelsPerSecond-F1C5BW0();
+    method public long getPackedValue();
+    method @Deprecated public static long getPixelsPerSecond-F1C5BW0(long $this);
+    method public static float getX-impl(long $this);
+    method public static float getY-impl(long $this);
     method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(long p);
-    method @androidx.compose.runtime.Immutable public static inline String! toString-impl(long p);
-    method public static operator long unaryMinus-9UxMQ8M(long $this);
-    property public final long pixelsPerSecond;
+    method @androidx.compose.runtime.Stable public static operator long minus-TH1AsA0(long $this, long other);
+    method @androidx.compose.runtime.Stable public static operator long plus-TH1AsA0(long $this, long other);
+    method @androidx.compose.runtime.Stable public static operator long rem-9UxMQ8M(long $this, float operand);
+    method @androidx.compose.runtime.Stable public static operator long times-9UxMQ8M(long $this, float operand);
+    method public static String toString-impl(long $this);
+    method @androidx.compose.runtime.Stable public static operator long unaryMinus-9UxMQ8M(long $this);
+    property public final long packedValue;
     field public static final androidx.compose.ui.unit.Velocity.Companion Companion;
   }
 
@@ -497,8 +508,8 @@ package androidx.compose.ui.unit {
   }
 
   public final class VelocityKt {
-    method public static operator long minus-uYzo7IE(long, long other);
-    method public static operator long plus-uYzo7IE(long, long other);
+    method @androidx.compose.runtime.Stable public static inline long Velocity(float x, float y);
+    method @Deprecated public static long Velocity-k-4lQ0M(long offset);
   }
 
 }

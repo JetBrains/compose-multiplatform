@@ -46,9 +46,9 @@ class NestedScrollModifierTest {
     private val preScrollOffset = Offset(120f, 120f)
     private val scrollOffset = Offset(125f, 125f)
     private val scrollLeftOffset = Offset(32f, 32f)
-    private val preFling = Velocity(Offset(120f, 120f))
-    private val postFlingConsumed = Velocity(Offset(151f, 63f))
-    private val postFlingLeft = Velocity(Offset(11f, 13f))
+    private val preFling = Velocity(120f, 120f)
+    private val postFlingConsumed = Velocity(151f, 63f)
+    private val postFlingLeft = Velocity(11f, 13f)
 
     @Test
     fun nestedScroll_twoNodes_orderTest() {
@@ -297,7 +297,7 @@ class NestedScrollModifierTest {
     @Test
     fun nestedScroll_twoNodes_hierarchyDispatch() {
         val preScrollReturn = Offset(60f, 30f)
-        val preFlingReturn = Velocity(Offset(154f, 56f))
+        val preFlingReturn = Velocity(154f, 56f)
         var currentsource = NestedScrollSource.Drag
 
         val childConnection = object : NestedScrollConnection {}
@@ -455,9 +455,9 @@ class NestedScrollModifierTest {
 
     @Test
     fun nestedScroll_deltaCalculation_preFling() {
-        val dispatchedVelocity = Velocity(Offset(10f, 10f))
-        val grandParentConsumesPreFling = Velocity(Offset(2f, 2f))
-        val parentConsumedPreFling = Velocity(Offset(1f, 1f))
+        val dispatchedVelocity = Velocity(10f, 10f)
+        val grandParentConsumesPreFling = Velocity(2f, 2f)
+        val parentConsumedPreFling = Velocity(1f, 1f)
 
         val childConnection = object : NestedScrollConnection {}
         val grandParentConnection = object : NestedScrollConnection {
@@ -492,10 +492,10 @@ class NestedScrollModifierTest {
 
     @Test
     fun nestedScroll_deltaCalculation_fling() {
-        val dispatchedConsumedVelocity = Velocity(Offset(4f, 4f))
-        val dispatchedLeftVelocity = Velocity(Offset(10f, 10f))
-        val grandParentConsumedPostFling = Velocity(Offset(2f, 2f))
-        val parentConsumedPostFling = Velocity(Offset(1f, 1f))
+        val dispatchedConsumedVelocity = Velocity(4f, 4f)
+        val dispatchedLeftVelocity = Velocity(10f, 10f)
+        val grandParentConsumedPostFling = Velocity(2f, 2f)
+        val parentConsumedPostFling = Velocity(1f, 1f)
 
         val childConnection = object : NestedScrollConnection {}
         val grandParentConnection = object : NestedScrollConnection {
@@ -542,7 +542,7 @@ class NestedScrollModifierTest {
     @Test
     fun nestedScroll_twoNodes_flatDispatch() {
         val preScrollReturn = Offset(60f, 30f)
-        val preFlingReturn = Velocity(Offset(154f, 56f))
+        val preFlingReturn = Velocity(154f, 56f)
         var currentsource = NestedScrollSource.Drag
 
         val childConnection = object : NestedScrollConnection {}
@@ -733,7 +733,7 @@ class NestedScrollModifierTest {
     @Test
     fun nestedScroll_flatDispatch_runtimeSwapChange_orderTest() {
         val preScrollReturn = Offset(60f, 30f)
-        val preFlingReturn = Velocity(Offset(154f, 56f))
+        val preFlingReturn = Velocity(154f, 56f)
         var counter = 0
 
         val isConnection1Parent = mutableStateOf(true)
@@ -851,7 +851,7 @@ class NestedScrollModifierTest {
     @Test
     fun nestedScroll_hierarchyDispatch_runtimeSwapChange_orderTest() {
         val preScrollReturn = Offset(60f, 30f)
-        val preFlingReturn = Velocity(Offset(154f, 56f))
+        val preFlingReturn = Velocity(154f, 56f)
         var counter = 0
 
         val isConnection1Parent = mutableStateOf(true)

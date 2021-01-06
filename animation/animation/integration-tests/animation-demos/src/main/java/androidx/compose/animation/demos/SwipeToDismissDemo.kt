@@ -110,7 +110,7 @@ private fun Modifier.swipeToDismiss(dismissState: DismissState): Modifier = comp
                         }
                     }
                 }
-                val velocity = velocityTracker.calculateVelocity().pixelsPerSecond.y
+                val velocity = velocityTracker.calculateVelocity().y
                 launch {
                     // Use mutatorMutex to make sure drag gesture would cancel any on-going
                     // animation job.
