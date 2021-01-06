@@ -42,9 +42,26 @@ interface FocusManager {
 internal class FocusManagerImpl(
     private val focusModifier: FocusModifier = FocusModifier(Inactive)
 ) : FocusManager {
+
+    /**
+     * This gesture is fired when the user clicks on a non-clickable / non-focusable part of the
+     * screen. Since no other gesture handled this click, we handle it here.
+     */
     private val passThroughClickModifier = PointerInputModifierImpl(
         TapGestureFilter().apply {
-            onTap = { clearFocus() }
+            onTap = {
+                if (focusModifier.focusState == Inactive) {
+
+                    // This view does not have focus, and the user clicked on some non-clickable
+                    // part of the screen. This is an indication that the user wants to bring
+                    // this view (this app) in focus.
+                    focusModifier.focusNode.requestFocus(propagateFocus = false)
+                } else {
+                    // The user clicked on a non-clickable part of the screen when something was
+                    // focused. This is an indication that the user wants to clear focus.
+                    clearFocus()
+                }
+            }
             consumeChanges = false
         }
     )
