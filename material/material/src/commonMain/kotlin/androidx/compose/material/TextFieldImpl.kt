@@ -39,8 +39,8 @@ import androidx.compose.runtime.Providers
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.focus.FocusReference
-import androidx.compose.ui.focus.focusReference
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.takeOrElse
@@ -145,12 +145,12 @@ internal fun TextFieldImpl(
         }
     }
 
-    val focusReference = FocusReference()
+    val focusRequester = FocusRequester()
     val textFieldModifier = if (enabled) {
         modifier
-            .focusReference(focusReference)
+            .focusRequester(focusRequester)
             .clickable(interactionState = interactionState, indication = null) {
-                focusReference.requestFocus()
+                focusRequester.requestFocus()
                 // TODO(b/163109449): Showing and hiding keyboard should be handled by BaseTextField.
                 //  The requestFocus() call here should be enough to trigger the software keyboard.
                 //  Investiate why this is needed here. If it is really needed, instead of doing

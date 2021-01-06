@@ -22,33 +22,33 @@ import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.debugInspectorInfo
 
 /**
- * A [modifier][Modifier.Element] that can be used to pass in a [FocusReference] that can be used
+ * A [modifier][Modifier.Element] that can be used to pass in a [FocusRequester] that can be used
  * to request focus state changes.
  *
- * @see FocusReference
+ * @see FocusRequester
  */
-interface FocusReferenceModifier : Modifier.Element {
+interface FocusRequesterModifier : Modifier.Element {
     /**
-     * An instance of [FocusReference], that can be used to request focus state changes.
+     * An instance of [FocusRequester], that can be used to request focus state changes.
      */
-    val focusReference: FocusReference
+    val focusRequester: FocusRequester
 }
 
-internal class FocusReferenceModifierImpl(
-    override val focusReference: FocusReference,
+internal class FocusRequesterModifierImpl(
+    override val focusRequester: FocusRequester,
     inspectorInfo: InspectorInfo.() -> Unit
-) : FocusReferenceModifier, InspectorValueInfo(inspectorInfo)
+) : FocusRequesterModifier, InspectorValueInfo(inspectorInfo)
 
 /**
  * Add this modifier to a component to observe changes to focus state.
  */
-fun Modifier.focusReference(focusReference: FocusReference): Modifier {
+fun Modifier.focusRequester(focusRequester: FocusRequester): Modifier {
     return this.then(
-        FocusReferenceModifierImpl(
-            focusReference = focusReference,
+        FocusRequesterModifierImpl(
+            focusRequester = focusRequester,
             inspectorInfo = debugInspectorInfo {
-                name = "focusReference"
-                properties["focusReference"] = focusReference
+                name = "focusRequester"
+                properties["focusRequester"] = focusRequester
             }
         )
     )

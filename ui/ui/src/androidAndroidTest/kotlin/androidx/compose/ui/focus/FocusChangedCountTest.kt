@@ -42,12 +42,12 @@ class FocusChangedCountTest {
     fun initially_focusChangedIsCalledOnce() {
         // Arrange.
         val focusStates = mutableListOf<FocusState>()
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusStates.add(it) }
-                    .focusReference(focusReference)
+                    .focusRequester(focusRequester)
                     .focusModifier()
             )
         }
@@ -72,19 +72,19 @@ class FocusChangedCountTest {
     fun whenFocusIsGained_focusChangedIsCalledOnce() {
         // Arrange.
         val focusStates = mutableListOf<FocusState>()
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusStates.add(it) }
-                    .focusReference(focusReference)
+                    .focusRequester(focusRequester)
                     .focusModifier()
             )
         }
         rule.runOnIdle { focusStates.clear() }
 
         // Act.
-        rule.runOnIdle { focusReference.requestFocus() }
+        rule.runOnIdle { focusRequester.requestFocus() }
 
         // Assert.
         rule.runOnIdle { assertThat(focusStates).containsExactly(Active) }
@@ -94,22 +94,22 @@ class FocusChangedCountTest {
     fun requestingFocusWhenAlreadyFocused_onFocusChangedIsNotCalledAgain() {
         // Arrange.
         val focusStates = mutableListOf<FocusState>()
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusStates.add(it) }
-                    .focusReference(focusReference)
+                    .focusRequester(focusRequester)
                     .focusModifier()
             )
         }
         rule.runOnIdle {
-            focusReference.requestFocus()
+            focusRequester.requestFocus()
             focusStates.clear()
         }
 
         // Act.
-        rule.runOnIdle { focusReference.requestFocus() }
+        rule.runOnIdle { focusRequester.requestFocus() }
 
         // Assert.
         rule.runOnIdle { assertThat(focusStates).isEmpty() }
@@ -119,19 +119,19 @@ class FocusChangedCountTest {
     fun whenFocusIsLost_focusChangedIsCalledOnce() {
         // Arrange.
         val focusStates = mutableListOf<FocusState>()
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         lateinit var focusManager: FocusManager
         rule.setFocusableContent {
             focusManager = AmbientFocusManager.current
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusStates.add(it) }
-                    .focusReference(focusReference)
+                    .focusRequester(focusRequester)
                     .focusModifier()
             )
         }
         rule.runOnIdle {
-            focusReference.requestFocus()
+            focusRequester.requestFocus()
             focusStates.clear()
         }
 
@@ -146,19 +146,19 @@ class FocusChangedCountTest {
     fun removingActiveFocusNode_onFocusChangedIsCalledOnce() {
         // Arrange.
         val focusStates = mutableListOf<FocusState>()
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         lateinit var addFocusModifier: MutableState<Boolean>
         rule.setFocusableContent {
             addFocusModifier = remember { mutableStateOf(true) }
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusStates.add(it) }
-                    .focusReference(focusReference)
+                    .focusRequester(focusRequester)
                     .then(if (addFocusModifier.value) Modifier.focusModifier() else Modifier)
             )
         }
         rule.runOnIdle {
-            focusReference.requestFocus()
+            focusRequester.requestFocus()
             focusStates.clear()
         }
 

@@ -36,19 +36,19 @@ class CaptureFocusTest {
     fun active_captureFocus_changesStateToCaptured() {
         // Arrange.
         lateinit var focusState: FocusState
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
-                    .focusReference(focusReference)
+                    .focusRequester(focusRequester)
                     .then(FocusModifier(FocusState.Active))
             )
         }
 
         // Act.
         val success = rule.runOnIdle {
-            focusReference.captureFocus()
+            focusRequester.captureFocus()
         }
 
         // Assert.
@@ -62,19 +62,19 @@ class CaptureFocusTest {
     fun activeParent_captureFocus_retainsStateAsActiveParent() {
         // Arrange.
         var focusState: FocusState = FocusState.ActiveParent
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
-                    .focusReference(focusReference)
+                    .focusRequester(focusRequester)
                     .then(FocusModifier(focusState))
             )
         }
 
         // Act.
         val success = rule.runOnIdle {
-            focusReference.captureFocus()
+            focusRequester.captureFocus()
         }
 
         // Assert.
@@ -88,19 +88,19 @@ class CaptureFocusTest {
     fun captured_captureFocus_retainsStateAsCaptured() {
         // Arrange.
         var focusState = FocusState.Captured
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
-                    .focusReference(focusReference)
+                    .focusRequester(focusRequester)
                     .then(FocusModifier(focusState))
             )
         }
 
         // Act.
         val success = rule.runOnIdle {
-            focusReference.captureFocus()
+            focusRequester.captureFocus()
         }
 
         // Assert.
@@ -114,19 +114,19 @@ class CaptureFocusTest {
     fun disabled_captureFocus_retainsStateAsDisabled() {
         // Arrange.
         var focusState = FocusState.Disabled
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
-                    .focusReference(focusReference)
+                    .focusRequester(focusRequester)
                     .then(FocusModifier(focusState))
             )
         }
 
         // Act.
         val success = rule.runOnIdle {
-            focusReference.captureFocus()
+            focusRequester.captureFocus()
         }
 
         // Assert.
@@ -140,19 +140,19 @@ class CaptureFocusTest {
     fun inactive_captureFocus_retainsStateAsInactive() {
         // Arrange.
         var focusState = FocusState.Inactive
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
-                    .focusReference(focusReference)
+                    .focusRequester(focusRequester)
                     .then(FocusModifier(focusState))
             )
         }
 
         // Act.
         val success = rule.runOnIdle {
-            focusReference.captureFocus()
+            focusRequester.captureFocus()
         }
 
         // Assert.

@@ -18,42 +18,31 @@ package androidx.compose.ui.focus
 
 import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
-import androidx.compose.ui.node.ModifiedFocusReferenceNode
+import androidx.compose.ui.node.ModifiedFocusRequesterNode
 
-private val focusReferenceNotInitialized = "FocusReference is not initialized. One reason for " +
-    "this is that you requesting focus changes during composition. Focus references should " +
+private val focusRequesterNotInitialized = "FocusRequester is not initialized. One reason for " +
+    "this is that you requesting focus changes during composition. Focus requesters should " +
     "not be made during composition, but should be made in response to some event."
 
-@Deprecated(
-    message = "Use FocusReference instead",
-    replaceWith = ReplaceWith("FocusReference", "androidx.compose.ui.focus.FocusReference"),
-    level = DeprecationLevel.ERROR
-)
-class FocusRequester {
-    fun requestFocus() {}
-    fun captureFocus(): Boolean = false
-    fun freeFocus(): Boolean = false
-}
-
 /**
- * The [FocusReference] is used in conjunction with
- * [Modifier.focusReference][androidx.compose.ui.focus.focusReference] to send requests for focus
+ * The [FocusRequester] is used in conjunction with
+ * [Modifier.focusRequester][androidx.compose.ui.focus.focusRequester] to send requests for focus
  * state change.
  *
- * @see androidx.compose.ui.focus.focusReference
+ * @see androidx.compose.ui.focus.focusRequester
  */
-class FocusReference {
+class FocusRequester {
 
-    internal val focusReferenceNodes: MutableVector<ModifiedFocusReferenceNode> = mutableVectorOf()
+    internal val focusRequesterNodes: MutableVector<ModifiedFocusRequesterNode> = mutableVectorOf()
 
     /**
      * Use this function to request focus. If the system grants focus to a component associated
-     * with this [FocusReference], its [state][FocusState] will be set to
+     * with this [FocusRequester], its [state][FocusState] will be set to
      * [Active][FocusState.Active].
      */
     fun requestFocus() {
-        check(focusReferenceNodes.isNotEmpty()) { focusReferenceNotInitialized }
-        focusReferenceNodes.forEach { it.findFocusNode()?.requestFocus(propagateFocus = false) }
+        check(focusRequesterNodes.isNotEmpty()) { focusRequesterNotInitialized }
+        focusRequesterNodes.forEach { it.findFocusNode()?.requestFocus(propagateFocus = false) }
     }
 
     /**
@@ -66,13 +55,13 @@ class FocusReference {
      * other components are declined.
      *
      * @return true if the focus was successfully captured by one of the
-     * [focus][androidx.compose.ui.focus] modifiers associated with this [FocusReference].
+     * [focus][androidx.compose.ui.focus] modifiers associated with this [FocusRequester].
      * false otherwise.
      */
     fun captureFocus(): Boolean {
-        check(focusReferenceNodes.isNotEmpty()) { focusReferenceNotInitialized }
+        check(focusRequesterNodes.isNotEmpty()) { focusRequesterNotInitialized }
         var success = false
-        focusReferenceNodes.forEach {
+        focusRequesterNodes.forEach {
             it.findFocusNode()?.apply {
                 if (captureFocus()) {
                     success = true
@@ -84,7 +73,7 @@ class FocusReference {
 
     /**
      * Use this function to send a request to release focus when one of the components associated
-     * with this [FocusReference] is in a [Captured][FocusState.Captured] state.
+     * with this [FocusRequester] is in a [Captured][FocusState.Captured] state.
      *
      * When the node is in the [Captured][FocusState.Captured] state, it rejects all requests to
      * clear focus. Calling
@@ -94,13 +83,13 @@ class FocusReference {
      *
      * @return true if the focus was successfully released. i.e. At the end of this operation,
      * one of the components associated with this
-     * [focusReference][androidx.compose.ui.focus.focusReference] is in the
+     * [focusRequester][androidx.compose.ui.focus.focusRequester] is in the
      * [Active][FocusState.Active] state. false otherwise.
      */
     fun freeFocus(): Boolean {
-        check(focusReferenceNodes.isNotEmpty()) { focusReferenceNotInitialized }
+        check(focusRequesterNodes.isNotEmpty()) { focusRequesterNotInitialized }
         var success = false
-        focusReferenceNodes.forEach {
+        focusRequesterNodes.forEach {
             it.findFocusNode()?.apply {
                 if (freeFocus()) {
                     success = true
@@ -112,31 +101,31 @@ class FocusReference {
 
     companion object {
         /**
-         * Convenient way to create multiple [FocusReference] instances.
+         * Convenient way to create multiple [FocusRequester] instances.
          */
-        object FocusReferenceFactory {
-            operator fun component1() = FocusReference()
-            operator fun component2() = FocusReference()
-            operator fun component3() = FocusReference()
-            operator fun component4() = FocusReference()
-            operator fun component5() = FocusReference()
-            operator fun component6() = FocusReference()
-            operator fun component7() = FocusReference()
-            operator fun component8() = FocusReference()
-            operator fun component9() = FocusReference()
-            operator fun component10() = FocusReference()
-            operator fun component11() = FocusReference()
-            operator fun component12() = FocusReference()
-            operator fun component13() = FocusReference()
-            operator fun component14() = FocusReference()
-            operator fun component15() = FocusReference()
-            operator fun component16() = FocusReference()
+        object FocusRequesterFactory {
+            operator fun component1() = FocusRequester()
+            operator fun component2() = FocusRequester()
+            operator fun component3() = FocusRequester()
+            operator fun component4() = FocusRequester()
+            operator fun component5() = FocusRequester()
+            operator fun component6() = FocusRequester()
+            operator fun component7() = FocusRequester()
+            operator fun component8() = FocusRequester()
+            operator fun component9() = FocusRequester()
+            operator fun component10() = FocusRequester()
+            operator fun component11() = FocusRequester()
+            operator fun component12() = FocusRequester()
+            operator fun component13() = FocusRequester()
+            operator fun component14() = FocusRequester()
+            operator fun component15() = FocusRequester()
+            operator fun component16() = FocusRequester()
         }
 
         /**
-         * Convenient way to create multiple [FocusReference]s, which can to be used to request
+         * Convenient way to create multiple [FocusRequester]s, which can to be used to request
          * focus, or to specify a focus traversal order.
          */
-        fun createRefs() = FocusReferenceFactory
+        fun createRefs() = FocusRequesterFactory
     }
 }

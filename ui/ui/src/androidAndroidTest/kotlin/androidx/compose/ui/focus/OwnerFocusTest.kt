@@ -42,19 +42,19 @@ class OwnerFocusTest {
     fun requestFocus_bringsViewInFocus() {
         // Arrange.
         lateinit var ownerView: View
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         rule.setFocusableContent {
             ownerView = getOwner()
             Box(
                 modifier = Modifier
-                    .focusReference(focusReference)
+                    .focusRequester(focusRequester)
                     .focusModifier()
             )
         }
 
         // Act.
         rule.runOnIdle {
-            focusReference.requestFocus()
+            focusRequester.requestFocus()
         }
 
         // Assert.
@@ -69,13 +69,13 @@ class OwnerFocusTest {
         // Arrange.
         lateinit var ownerView: View
         var focusState = Inactive
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         rule.setFocusableContent {
             ownerView = getOwner()
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
-                    .focusReference(focusReference)
+                    .focusRequester(focusRequester)
                     .focusModifier()
             )
         }
@@ -97,13 +97,13 @@ class OwnerFocusTest {
         // Arrange.
         lateinit var ownerView: View
         var focusState = Inactive
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         rule.setFocusableContent {
             ownerView = getOwner()
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
-                    .focusReference(focusReference)
+                    .focusRequester(focusRequester)
                     .focusModifier()
             )
         }
@@ -124,18 +124,18 @@ class OwnerFocusTest {
         // Arrange.
         lateinit var ownerView: View
         var focusState = Inactive
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         rule.setFocusableContent {
             ownerView = getOwner()
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
-                    .focusReference(focusReference)
+                    .focusRequester(focusRequester)
                     .focusModifier()
             )
         }
         rule.runOnIdle {
-            focusReference.requestFocus()
+            focusRequester.requestFocus()
         }
 
         // Act.
@@ -154,18 +154,18 @@ class OwnerFocusTest {
         // Arrange.
         lateinit var ownerView: View
         var focusState = Inactive
-        val focusReference = FocusReference()
+        val focusRequester = FocusRequester()
         rule.setFocusableContent {
             ownerView = getOwner()
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
-                    .focusReference(focusReference)
+                    .focusRequester(focusRequester)
                     .focusModifier()
             )
         }
         rule.runOnIdle {
-            focusReference.requestFocus()
+            focusRequester.requestFocus()
         }
 
         // Act.
