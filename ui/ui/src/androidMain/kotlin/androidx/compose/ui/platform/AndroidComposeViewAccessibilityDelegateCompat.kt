@@ -1114,7 +1114,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         }
     }
 
-    private fun getVirtualViewAt(x: Float, y: Float): Int {
+    @VisibleForTesting
+    internal fun getVirtualViewAt(x: Float, y: Float): Int {
         val node = view.semanticsOwner.rootSemanticsNode
         val id = findVirtualViewAt(
             x + node.globalBounds.left,
@@ -1128,8 +1129,9 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
 
     // TODO(b/151729467): compose accessibility getVirtualViewAt needs to be more efficient
     private fun findVirtualViewAt(x: Float, y: Float, node: SemanticsNode): Int {
-        node.children.fastForEach {
-            val id = findVirtualViewAt(x, y, it)
+        val children = node.children
+        for (i in children.size - 1 downTo 0) {
+            val id = findVirtualViewAt(x, y, children[i])
             if (id != InvalidId) {
                 return id
             }
