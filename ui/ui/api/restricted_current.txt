@@ -139,15 +139,6 @@ package androidx.compose.ui {
     method @Deprecated public static androidx.compose.ui.Modifier focus(androidx.compose.ui.Modifier);
   }
 
-  @Deprecated public interface FocusObserverModifier extends androidx.compose.ui.Modifier.Element {
-    method @Deprecated public kotlin.jvm.functions.Function1<androidx.compose.ui.focus.FocusState,kotlin.Unit> getOnFocusChange();
-    property public abstract kotlin.jvm.functions.Function1<androidx.compose.ui.focus.FocusState,kotlin.Unit> onFocusChange;
-  }
-
-  public final class FocusObserverModifierKt {
-    method @Deprecated public static androidx.compose.ui.Modifier focusObserver(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.focus.FocusState,kotlin.Unit> onFocusChange);
-  }
-
   @kotlin.RequiresOptIn(message="Unstable API for use only between compose-ui modules sharing the same exact version, " + "subject to change without notice in major, minor, or patch releases.") public @interface InternalComposeUiApi {
   }
 
@@ -1501,10 +1492,8 @@ package androidx.compose.ui.input.key {
   }
 
   public final class KeyInputModifierKt {
-    method @Deprecated public static androidx.compose.ui.Modifier keyInputFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.key.KeyEvent,java.lang.Boolean> onKeyEvent);
     method public static androidx.compose.ui.Modifier onKeyEvent(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.key.KeyEvent,java.lang.Boolean> onKeyEvent);
     method public static androidx.compose.ui.Modifier onPreviewKeyEvent(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.key.KeyEvent,java.lang.Boolean> onPreviewKeyEvent);
-    method @Deprecated public static androidx.compose.ui.Modifier previewKeyInputFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.key.KeyEvent,java.lang.Boolean> onPreviewKeyEvent);
   }
 
   public final class KeyKt {
