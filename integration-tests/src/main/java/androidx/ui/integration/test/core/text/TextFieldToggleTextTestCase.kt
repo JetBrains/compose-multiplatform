@@ -109,7 +109,7 @@ class TextFieldToggleTextTestCase(
         override fun stopInput() { /*do nothing*/ }
         override fun showSoftwareKeyboard() { /*do nothing*/ }
         override fun hideSoftwareKeyboard() { /*do nothing*/ }
-        override fun onStateUpdated(oldValue: TextFieldValue?, newValue: TextFieldValue) {
+        override fun updateState(oldValue: TextFieldValue?, newValue: TextFieldValue) {
             /*do nothing*/
         }
         override fun notifyFocusedRect(rect: Rect) { /*do nothing*/ }

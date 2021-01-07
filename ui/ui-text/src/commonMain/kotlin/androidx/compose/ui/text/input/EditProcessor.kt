@@ -71,7 +71,7 @@ class EditProcessor {
 
         val oldValue = mBufferState
         mBufferState = value
-        textInputService?.onStateUpdated(token, oldValue, value)
+        textInputService?.updateState(token, oldValue, value)
     }
 
     /**

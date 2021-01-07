@@ -191,7 +191,7 @@ class TextFieldTest {
         rule.runOnIdle {
             val stateCaptor = argumentCaptor<TextFieldValue>()
             verify(textInputService, atLeastOnce())
-                .onStateUpdated(eq(inputSessionToken), any(), stateCaptor.capture())
+                .updateState(eq(inputSessionToken), any(), stateCaptor.capture())
 
             // Don't care about the intermediate state update. It should eventually be "1a2b3".
             assertThat(stateCaptor.lastValue.text).isEqualTo("1a2b3")
@@ -262,7 +262,7 @@ class TextFieldTest {
         rule.runOnIdle {
             val stateCaptor = argumentCaptor<TextFieldValue>()
             verify(textInputService, atLeastOnce())
-                .onStateUpdated(eq(inputSessionToken), any(), stateCaptor.capture())
+                .updateState(eq(inputSessionToken), any(), stateCaptor.capture())
 
             // Don't care about the intermediate state update. It should eventually be "123" since
             // the rejects if the incoming model contains alphabets.
