@@ -68,7 +68,7 @@ class HotReloadTests {
         @Composable fun text(text: String, id: Int = -1) {
             val context = AmbientContext.current
             emit<TextView, UiApplier>(
-                ctor = { TextView(context) },
+                factory = { TextView(context) },
                 update = {
                     set(id) { this.id = it }
                     set(text) { this.text = it }
@@ -79,7 +79,7 @@ class HotReloadTests {
         @Composable fun column(content: @Composable () -> Unit) {
             val context = AmbientContext.current
             emit<LinearLayout, UiApplier>(
-                ctor = { LinearLayout(context) },
+                factory = { LinearLayout(context) },
                 update = {},
                 content = content
             )

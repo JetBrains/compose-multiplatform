@@ -17,6 +17,7 @@
 package androidx.compose.ui.focus
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.focus.FocusState.Active
 import androidx.compose.ui.focus.FocusState.ActiveParent
 import androidx.compose.ui.focus.FocusState.Captured
@@ -71,7 +72,9 @@ class ClearFocusTest(val forcedClear: Boolean) {
             Box(modifier = parent) {
                 Box(modifier = modifier)
             }
-            parent.focusedChild = modifier.focusNode
+            SideEffect {
+                parent.focusedChild = modifier.focusNode
+            }
         }
 
         // Act.
@@ -112,8 +115,10 @@ class ClearFocusTest(val forcedClear: Boolean) {
                     Box(modifier = child)
                 }
             }
-            parent.focusedChild = modifier.focusNode
-            modifier.focusedChild = child.focusNode
+            SideEffect {
+                parent.focusedChild = modifier.focusNode
+                modifier.focusedChild = child.focusNode
+            }
         }
 
         // Act.
@@ -144,9 +149,11 @@ class ClearFocusTest(val forcedClear: Boolean) {
                     }
                 }
             }
-            modifier.focusedChild = child.focusNode
-            child.focusedChild = grandchild.focusNode
-            grandchild.focusedChild = greatgrandchild.focusNode
+            SideEffect {
+                modifier.focusedChild = child.focusNode
+                child.focusedChild = grandchild.focusNode
+                grandchild.focusedChild = greatgrandchild.focusNode
+            }
         }
 
         // Act.
@@ -204,7 +211,9 @@ class ClearFocusTest(val forcedClear: Boolean) {
             Box(modifier = parent) {
                 Box(modifier = modifier)
             }
-            parent.focusedChild = modifier.focusNode
+            SideEffect {
+                parent.focusedChild = modifier.focusNode
+            }
         }
 
         // Act.

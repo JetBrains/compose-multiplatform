@@ -49,10 +49,10 @@ fun TestModifierUpdaterLayout(onAttached: (TestModifierUpdater) -> Unit) {
         layout(constraints.maxWidth, constraints.maxHeight) {}
     }
     emit<LayoutNode, Applier<Any>>(
-        ctor = LayoutEmitHelper.constructor,
+        factory = LayoutEmitHelper.constructor,
         update = {
             set(measureBlocks, LayoutEmitHelper.setMeasureBlocks)
-            set(Unit) { onAttached(TestModifierUpdater(this)) }
+            init { onAttached(TestModifierUpdater(this)) }
         }
     )
 }

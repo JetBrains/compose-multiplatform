@@ -51,13 +51,14 @@ fun <T : View> AndroidView(
 ) {
     val context = AmbientContext.current
     val materialized = currentComposer.materialize(modifier)
+    val density = AmbientDensity.current
     emit<ViewBlockHolder<T>, UiApplier>(
-        ctor = { ViewBlockHolder(context) },
+        factory = { ViewBlockHolder(context) },
         update = {
-            set(Unit) { this.viewBlock = viewBlock }
+            set(viewBlock) { this.viewBlock = it }
             set(materialized) { this.modifier = it }
-            set(AmbientDensity.current) { this.density = it }
-            set(update) { this.updateBlock = update }
+            set(density) { this.density = it }
+            set(update) { this.updateBlock = it }
         }
     )
 }
