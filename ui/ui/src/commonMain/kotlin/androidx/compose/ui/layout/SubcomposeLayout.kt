@@ -67,14 +67,16 @@ fun SubcomposeLayout(
     state.compositionRef = compositionReference()
 
     val materialized = currentComposer.materialize(modifier)
+    val density = AmbientDensity.current
+    val layoutDirection = AmbientLayoutDirection.current
     emit<LayoutNode, Applier<Any>>(
-        ctor = LayoutEmitHelper.constructor,
+        factory = LayoutEmitHelper.constructor,
         update = {
-            set(Unit, state.setRoot)
+            init(state.setRoot)
             set(materialized, LayoutEmitHelper.setModifier)
             set(measureBlock, state.setMeasureBlock)
-            set(AmbientDensity.current, LayoutEmitHelper.setDensity)
-            set(AmbientLayoutDirection.current, LayoutEmitHelper.setLayoutDirection)
+            set(density, LayoutEmitHelper.setDensity)
+            set(layoutDirection, LayoutEmitHelper.setLayoutDirection)
         }
     )
 }
@@ -109,7 +111,7 @@ private class SubcomposeLayoutState :
     override var fontScale: Float = 0f
 
     // Pre-allocated lambdas to update LayoutNode
-    val setRoot: LayoutNode.(Unit) -> Unit = { root = this }
+    val setRoot: LayoutNode.() -> Unit = { root = this }
     val setMeasureBlock:
         LayoutNode.(SubcomposeMeasureScope.(Constraints) -> MeasureResult) -> Unit =
             { measureBlocks = createMeasureBlocks(it) }

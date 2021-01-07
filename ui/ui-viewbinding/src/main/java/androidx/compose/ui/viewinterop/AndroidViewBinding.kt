@@ -55,12 +55,12 @@ fun <T : ViewBinding> AndroidViewBinding(
 ) {
     val context = AmbientContext.current
     val materialized = currentComposer.materialize(modifier)
+    val density = AmbientDensity.current
     emit<ViewBindingHolder<T>, UiApplier>(
-        ctor = { ViewBindingHolder(context) },
+        factory = { ViewBindingHolder<T>(context).also { it.bindingBlock = bindingBlock } },
         update = {
-            set(Unit) { this.bindingBlock = bindingBlock }
             set(materialized) { this.modifier = it }
-            set(AmbientDensity.current) { this.density = it }
+            set(density) { this.density = it }
             set(update) { this.updateBlock = it }
         }
     )

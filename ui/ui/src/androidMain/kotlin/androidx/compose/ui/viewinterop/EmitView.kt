@@ -37,7 +37,7 @@ fun <T : View> emitView(
 ) {
     val context = AmbientContext.current
     emit<T, UiApplier>(
-        ctor = { ctor(context) },
+        factory = { ctor(context) },
         update = {
             reconcile(update)
         }
@@ -58,7 +58,7 @@ fun <T : ViewGroup> emitView(
 ) {
     val context = AmbientContext.current
     emit<T, UiApplier>(
-        ctor = { ctor(context) },
+        factory = { ctor(context) },
         update = {
             reconcile(update)
         },
