@@ -19,7 +19,9 @@ package androidx.compose.ui.graphics
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.dp
 import com.google.common.truth.Truth.assertThat
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -53,6 +55,16 @@ class GraphicsLayerScopeTest {
         scope.clip = true
         scope.reset()
         scope.assertCorrectDefaultValuesAreCorrect()
+    }
+
+    @Test
+    fun testDpPixelConversions() {
+        val scope = GraphicsLayerScope() as ReusableGraphicsLayerScope
+        scope.graphicsDensity = Density(2.0f, 3.0f)
+        with(scope) {
+            assertEquals(4.0f, 2f.dp.toPx())
+            assertEquals(6.0f, 3f.dp.toSp().toPx())
+        }
     }
 
     fun GraphicsLayerScope.assertCorrectDefaultValuesAreCorrect() {

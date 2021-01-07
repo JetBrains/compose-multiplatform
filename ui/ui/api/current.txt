@@ -665,7 +665,7 @@ package androidx.compose.ui.graphics {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier graphicsLayer-i_P0lGk(androidx.compose.ui.Modifier, optional float scaleX, optional float scaleY, optional float alpha, optional float translationX, optional float translationY, optional float shadowElevation, optional float rotationX, optional float rotationY, optional float rotationZ, optional float cameraDistance, optional long transformOrigin, optional androidx.compose.ui.graphics.Shape shape, optional boolean clip);
   }
 
-  public interface GraphicsLayerScope {
+  public interface GraphicsLayerScope extends androidx.compose.ui.unit.Density {
     method public float getAlpha();
     method public float getCameraDistance();
     method public boolean getClip();
