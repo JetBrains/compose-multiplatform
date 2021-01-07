@@ -17,7 +17,6 @@
 package androidx.compose.ui.graphics.colorspace
 
 import androidx.compose.ui.graphics.colorspace.ColorModel.Rgb
-import androidx.compose.ui.util.annotation.IntRange
 
 /**
  * A color model is required by a [ColorSpace] to describe the
@@ -31,7 +30,7 @@ enum class ColorModel(
      *
      * @return An integer between 1 and 4
      */
-    @IntRange(from = 1, to = 4)
+    /*@IntRange(from = 1, to = 4)*/
     val componentCount: Int
 ) {
     /**

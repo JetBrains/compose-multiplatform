@@ -16,8 +16,6 @@
 
 package androidx.compose.ui.graphics.colorspace
 
-import androidx.compose.ui.util.annotation.Size
-
 /**
  * A connector transforms colors from a source color space to a destination
  * color space.
@@ -83,7 +81,7 @@ internal constructor(
      * @see RenderIntent
      */
     val renderIntent: RenderIntent,
-    @Size(3) private val transform: FloatArray?
+    private val transform: FloatArray?
 ) {
     /**
      * Creates a new connector between a source and a destination color space.
@@ -128,7 +126,7 @@ internal constructor(
      *
      * @see transform
      */
-    @Size(3)
+    /*@Size(3)*/
     fun transform(r: Float, g: Float, b: Float): FloatArray {
         return transform(floatArrayOf(r, g, b))
     }
@@ -139,13 +137,13 @@ internal constructor(
      *
      * @param v A non-null array of 3 floats containing the value to transform
      * and that will hold the result of the transform
-     * @return The v array passed as a parameter, containing the specified color
+     * @return The [v] array passed as a parameter, containing the specified color
      * transformed from the source space to the destination space
      *
      * @see transform
      */
-    @Size(min = 3)
-    open fun transform(@Size(min = 3) v: FloatArray): FloatArray {
+    /*@Size(min = 3)*/
+    open fun transform(/*@Size(min = 3)*/ v: FloatArray): FloatArray {
         val xyz = transformSource.toXyz(v)
         if (transform != null) {
             xyz[0] *= transform[0]
@@ -169,7 +167,7 @@ internal constructor(
             mTransform = computeTransform(mSource, mDestination, intent)
         }
 
-        override fun transform(@Size(min = 3) v: FloatArray): FloatArray {
+        override fun transform(v: FloatArray): FloatArray {
             v[0] = mSource.eotf(v[0].toDouble()).toFloat()
             v[1] = mSource.eotf(v[1].toDouble()).toFloat()
             v[2] = mSource.eotf(v[2].toDouble()).toFloat()
@@ -196,7 +194,6 @@ internal constructor(
          * @param intent The render intent to use when compressing gamuts
          * @return An array of 9 floats containing the 3x3 matrix transform
          */
-        @Size(9)
         private fun computeTransform(
             source: Rgb,
             destination: Rgb,
@@ -293,7 +290,7 @@ internal constructor(
          */
         internal fun identity(source: ColorSpace): Connector {
             return object : Connector(source, source, RenderIntent.Relative) {
-                override fun transform(@Size(min = 3) v: FloatArray): FloatArray {
+                override fun transform(v: FloatArray): FloatArray {
                     return v
                 }
             }

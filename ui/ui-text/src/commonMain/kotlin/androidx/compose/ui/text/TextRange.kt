@@ -17,7 +17,6 @@
 package androidx.compose.ui.text
 
 import androidx.compose.runtime.Immutable
-import androidx.compose.ui.util.annotation.IntRange
 import androidx.compose.ui.util.packInts
 import androidx.compose.ui.util.unpackInt1
 import androidx.compose.ui.util.unpackInt2
@@ -44,8 +43,10 @@ inline class TextRange(val packedValue: Long) {
      * exception will be thrown.
      */
     constructor(
-        @IntRange(from = 0) start: Int,
-        @IntRange(from = 0) end: Int
+        /*@IntRange(from = 0)*/
+        start: Int,
+        /*@IntRange(from = 0)*/
+        end: Int
     ) : this(packWithCheck(start, end))
 
     val start: Int get() = unpackInt1(packedValue)

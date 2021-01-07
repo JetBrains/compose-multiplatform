@@ -40,7 +40,6 @@ import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.annotation.VisibleForTesting
 
 @OptIn(InternalTextApi::class)
 @Suppress("ModifierInspectorInfo")
@@ -119,5 +118,5 @@ internal val DefaultCursorThickness = 2.dp
 @InternalTextApi
 @Deprecated(level = DeprecationLevel.ERROR, message = "This is internal API and should not be used")
 var blinkingCursorEnabled: Boolean = true
-    @VisibleForTesting
-    set
+    /*@VisibleForTesting
+    set*/

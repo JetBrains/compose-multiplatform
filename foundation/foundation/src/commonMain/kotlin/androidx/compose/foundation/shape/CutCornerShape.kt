@@ -22,7 +22,6 @@ import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.annotation.IntRange
 
 /**
  * A shape describing the rectangle with cut corners.
@@ -160,12 +159,25 @@ class CutCornerShape(
 
 /**
  * Creates [CutCornerShape] with sizes defined in percents of the shape's smaller side.
+ *
+ * @param topLeftPercent The top left corner clip size as a percentage of the smaller side, with a
+ * range of 0 - 100.
+ * @param topRightPercent The top right corner clip size as a percentage of the smaller side, with a
+ * range of 0 - 100.
+ * @param bottomRightPercent The bottom right clip size radius as a percentage of the smaller side,
+ * with a range of 0 - 100.
+ * @param bottomLeftPercent The bottom left clip size radius as a percentage of the smaller side,
+ * with a range of 0 - 100.
  */
 /*inline*/ fun CutCornerShape(
-    @IntRange(from = 0, to = 100) topLeftPercent: Int = 0,
-    @IntRange(from = 0, to = 100) topRightPercent: Int = 0,
-    @IntRange(from = 0, to = 100) bottomRightPercent: Int = 0,
-    @IntRange(from = 0, to = 100) bottomLeftPercent: Int = 0
+    /*@IntRange(from = 0, to = 100)*/
+    topLeftPercent: Int = 0,
+    /*@IntRange(from = 0, to = 100)*/
+    topRightPercent: Int = 0,
+    /*@IntRange(from = 0, to = 100)*/
+    bottomRightPercent: Int = 0,
+    /*@IntRange(from = 0, to = 100)*/
+    bottomLeftPercent: Int = 0
 ) = CutCornerShape(
     CornerSize(topLeftPercent),
     CornerSize(topRightPercent),

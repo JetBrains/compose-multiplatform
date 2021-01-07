@@ -20,7 +20,6 @@ package androidx.compose.animation.core
 import android.os.Handler
 import android.os.Looper
 import android.view.Choreographer
-import androidx.compose.ui.util.annotation.VisibleForTesting
 import kotlinx.coroutines.CoroutineScope
 import java.util.concurrent.CountDownLatch
 
@@ -29,7 +28,7 @@ import java.util.concurrent.CountDownLatch
 var rootAnimationClockFactory: (CoroutineScope) -> AnimationClockObservable = {
     DefaultAnimationClock()
 }
-    @VisibleForTesting
+    /*@VisibleForTesting*/
     set
 
 /**

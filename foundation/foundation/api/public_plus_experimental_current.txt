@@ -2,7 +2,7 @@
 package androidx.compose.foundation {
 
   public final class BackgroundKt {
-    method public static androidx.compose.ui.Modifier background(androidx.compose.ui.Modifier, androidx.compose.ui.graphics.Brush brush, optional androidx.compose.ui.graphics.Shape shape, optional @FloatRange(from=0.0, to=1.0) float alpha);
+    method public static androidx.compose.ui.Modifier background(androidx.compose.ui.Modifier, androidx.compose.ui.graphics.Brush brush, optional androidx.compose.ui.graphics.Shape shape, optional float alpha);
     method public static androidx.compose.ui.Modifier background-1xq40Q0(androidx.compose.ui.Modifier, long color, optional androidx.compose.ui.graphics.Shape shape);
   }
 
@@ -125,7 +125,7 @@ package androidx.compose.foundation {
   }
 
   public final class ProgressSemanticsKt {
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier progressSemantics(androidx.compose.ui.Modifier, float value, optional kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> valueRange, optional @IntRange(from=0) int steps);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier progressSemantics(androidx.compose.ui.Modifier, float value, optional kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> valueRange, optional int steps);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier progressSemantics(androidx.compose.ui.Modifier);
   }
 
@@ -349,9 +349,9 @@ package androidx.compose.foundation.lazy {
   }
 
   @androidx.compose.runtime.Stable public interface LazyItemScope {
-    method public androidx.compose.ui.Modifier fillParentMaxHeight(androidx.compose.ui.Modifier, optional @FloatRange(from=0.0, to=1.0) float fraction);
-    method public androidx.compose.ui.Modifier fillParentMaxSize(androidx.compose.ui.Modifier, optional @FloatRange(from=0.0, to=1.0) float fraction);
-    method public androidx.compose.ui.Modifier fillParentMaxWidth(androidx.compose.ui.Modifier, optional @FloatRange(from=0.0, to=1.0) float fraction);
+    method public androidx.compose.ui.Modifier fillParentMaxHeight(androidx.compose.ui.Modifier, optional float fraction);
+    method public androidx.compose.ui.Modifier fillParentMaxSize(androidx.compose.ui.Modifier, optional float fraction);
+    method public androidx.compose.ui.Modifier fillParentMaxWidth(androidx.compose.ui.Modifier, optional float fraction);
   }
 
   public interface LazyListItemInfo {
@@ -394,7 +394,7 @@ package androidx.compose.foundation.lazy {
     method public androidx.compose.foundation.lazy.LazyListLayoutInfo getLayoutInfo();
     method public boolean isAnimationRunning();
     method public suspend Object? scroll(kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.ScrollScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public suspend Object? snapToItemIndex(@IntRange(from=0) int index, optional @IntRange(from=0) int scrollOffset, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? snapToItemIndex(int index, optional int scrollOffset, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     property public final int firstVisibleItemIndex;
     property public final int firstVisibleItemScrollOffset;
     property public final boolean isAnimationRunning;
@@ -449,7 +449,7 @@ package androidx.compose.foundation.shape {
 
   public final class CornerSizeKt {
     method @androidx.compose.runtime.Stable public static androidx.compose.foundation.shape.CornerSize CornerSize(float size);
-    method @androidx.compose.runtime.Stable public static androidx.compose.foundation.shape.CornerSize CornerSize(@IntRange(from=0, to=100) int percent);
+    method @androidx.compose.runtime.Stable public static androidx.compose.foundation.shape.CornerSize CornerSize(int percent);
     method @androidx.compose.runtime.Stable public static androidx.compose.foundation.shape.CornerSize CornerSize-0680j_4(float size);
     method public static androidx.compose.foundation.shape.CornerSize getZeroCornerSize();
   }
@@ -465,7 +465,7 @@ package androidx.compose.foundation.shape {
     method public static androidx.compose.foundation.shape.CutCornerShape CutCornerShape(float size);
     method public static androidx.compose.foundation.shape.CutCornerShape CutCornerShape(int percent);
     method public static androidx.compose.foundation.shape.CutCornerShape CutCornerShape(optional float topLeft, optional float topRight, optional float bottomRight, optional float bottomLeft);
-    method public static androidx.compose.foundation.shape.CutCornerShape CutCornerShape(optional @IntRange(from=0, to=100) int topLeftPercent, optional @IntRange(from=0, to=100) int topRightPercent, optional @IntRange(from=0, to=100) int bottomRightPercent, optional @IntRange(from=0, to=100) int bottomLeftPercent);
+    method public static androidx.compose.foundation.shape.CutCornerShape CutCornerShape(optional int topLeftPercent, optional int topRightPercent, optional int bottomRightPercent, optional int bottomLeftPercent);
     method public static androidx.compose.foundation.shape.CutCornerShape CutCornerShape-0680j_4(float size);
     method public static androidx.compose.foundation.shape.CutCornerShape CutCornerShape-ZmiikuI(optional float topLeft, optional float topRight, optional float bottomRight, optional float bottomLeft);
   }
@@ -487,7 +487,7 @@ package androidx.compose.foundation.shape {
     method public static androidx.compose.foundation.shape.RoundedCornerShape RoundedCornerShape(float size);
     method public static androidx.compose.foundation.shape.RoundedCornerShape RoundedCornerShape(int percent);
     method public static androidx.compose.foundation.shape.RoundedCornerShape RoundedCornerShape(optional float topLeft, optional float topRight, optional float bottomRight, optional float bottomLeft);
-    method public static androidx.compose.foundation.shape.RoundedCornerShape RoundedCornerShape(optional @IntRange(from=0, to=100) int topLeftPercent, optional @IntRange(from=0, to=100) int topRightPercent, optional @IntRange(from=0, to=100) int bottomRightPercent, optional @IntRange(from=0, to=100) int bottomLeftPercent);
+    method public static androidx.compose.foundation.shape.RoundedCornerShape RoundedCornerShape(optional int topLeftPercent, optional int topRightPercent, optional int bottomRightPercent, optional int bottomLeftPercent);
     method public static androidx.compose.foundation.shape.RoundedCornerShape RoundedCornerShape-0680j_4(float size);
     method public static androidx.compose.foundation.shape.RoundedCornerShape RoundedCornerShape-ZmiikuI(optional float topLeft, optional float topRight, optional float bottomRight, optional float bottomLeft);
     method public static androidx.compose.foundation.shape.RoundedCornerShape getCircleShape();
@@ -560,7 +560,6 @@ package androidx.compose.foundation.text {
   }
 
   public final class TextFieldCursorKt {
-    method @Deprecated @VisibleForTesting public static void setBlinkingCursorEnabled(boolean p);
   }
 
   public final class TextFieldDelegateKt {

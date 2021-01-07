@@ -44,7 +44,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
 import androidx.compose.ui.unit.width
-import androidx.compose.ui.util.annotation.VisibleForTesting
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import kotlin.math.max
@@ -104,7 +103,7 @@ fun getAdjustedCoordinates(position: Offset): Offset {
  */
 @InternalTextApi
 @Composable
-@VisibleForTesting
+/*@VisibleForTesting*/
 internal fun DefaultSelectionHandle(
     modifier: Modifier,
     isStartHandle: Boolean,
@@ -260,7 +259,7 @@ private object AllowZeroSize : LayoutModifier {
  *
  * This is for [SelectionHandlePopup] only.
  */
-@VisibleForTesting
+/*@VisibleForTesting*/
 internal class SelectionHandlePositionProvider(
     val alignment: Alignment,
     val offset: IntOffset
@@ -329,7 +328,7 @@ private fun isLeft(
  * the right. However, in Rtl context or when handles are crossed, the start handle should point to
  * the right, and the end handle should point to left.
  */
-@VisibleForTesting
+/*@VisibleForTesting*/
 internal fun isHandleLtrDirection(
     direction: ResolvedTextDirection,
     areHandlesCrossed: Boolean

@@ -2,7 +2,7 @@
 package androidx.compose.animation.core {
 
   public final class AndroidAnimationClockKt {
-    method @VisibleForTesting public static void setRootAnimationClockFactory(kotlin.jvm.functions.Function1<? super kotlinx.coroutines.CoroutineScope,? extends androidx.compose.animation.core.AnimationClockObservable> p);
+    method public static void setRootAnimationClockFactory(kotlin.jvm.functions.Function1<? super kotlinx.coroutines.CoroutineScope,? extends androidx.compose.animation.core.AnimationClockObservable> p);
   }
 
   public final class Animatable<T, V extends androidx.compose.animation.core.AnimationVector> {
@@ -280,7 +280,7 @@ package androidx.compose.animation.core {
   }
 
   public final class DecayAnimation<T, V extends androidx.compose.animation.core.AnimationVector> implements androidx.compose.animation.core.Animation<T,V> {
-    ctor @VisibleForTesting public DecayAnimation(androidx.compose.animation.core.VectorizedDecayAnimationSpec<V> animationSpec, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, T? initialValue, V initialVelocityVector);
+    ctor public DecayAnimation(androidx.compose.animation.core.VectorizedDecayAnimationSpec<V> animationSpec, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, T? initialValue, V initialVelocityVector);
     ctor public DecayAnimation(androidx.compose.animation.core.DecayAnimationSpec<T> animationSpec, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, T? initialValue, V initialVelocityVector);
     ctor public DecayAnimation(androidx.compose.animation.core.DecayAnimationSpec<T> animationSpec, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, T? initialValue, T? initialVelocity);
     method public long getDurationMillis();
@@ -304,7 +304,7 @@ package androidx.compose.animation.core {
   public final class DecayAnimationSpecKt {
     method public static <T, V extends androidx.compose.animation.core.AnimationVector> T! calculateTargetValue(androidx.compose.animation.core.DecayAnimationSpec<T>, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, T? initialValue, T? initialVelocity);
     method public static float calculateTargetValue(androidx.compose.animation.core.DecayAnimationSpec<java.lang.Float>, float initialValue, float initialVelocity);
-    method public static <T> androidx.compose.animation.core.DecayAnimationSpec<T> exponentialDecay(optional @FloatRange(from=0.0, to=3.4E38, fromInclusive=false) float frictionMultiplier, optional @FloatRange(from=0.0, to=3.4E38, fromInclusive=false) float absVelocityThreshold);
+    method public static <T> androidx.compose.animation.core.DecayAnimationSpec<T> exponentialDecay(optional float frictionMultiplier, optional float absVelocityThreshold);
     method public static <T> androidx.compose.animation.core.DecayAnimationSpec<T> generateDecayAnimationSpec(androidx.compose.animation.core.FloatDecayAnimationSpec);
   }
 
@@ -349,7 +349,7 @@ package androidx.compose.animation.core {
   }
 
   public final class FloatExponentialDecaySpec implements androidx.compose.animation.core.FloatDecayAnimationSpec {
-    ctor public FloatExponentialDecaySpec(@FloatRange(from=0.0, to=3.4E38, fromInclusive=false) float frictionMultiplier, @FloatRange(from=0.0, to=3.4E38, fromInclusive=false) float absVelocityThreshold);
+    ctor public FloatExponentialDecaySpec(float frictionMultiplier, float absVelocityThreshold);
     ctor public FloatExponentialDecaySpec();
     method public float getAbsVelocityThreshold();
     method public long getDurationMillis(float start, float startVelocity);
@@ -430,7 +430,7 @@ package androidx.compose.animation.core {
 
   public static final class KeyframesSpec.KeyframesSpecConfig<T> {
     ctor public KeyframesSpec.KeyframesSpecConfig();
-    method public infix androidx.compose.animation.core.KeyframesSpec.KeyframeEntity<T> at(T?, @IntRange(from=0) int timeStamp);
+    method public infix androidx.compose.animation.core.KeyframesSpec.KeyframeEntity<T> at(T?, int timeStamp);
     method public int getDelayMillis();
     method public int getDurationMillis();
     method public void setDelayMillis(int p);

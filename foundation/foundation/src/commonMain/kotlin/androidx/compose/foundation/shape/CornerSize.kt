@@ -21,8 +21,6 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.util.annotation.FloatRange
-import androidx.compose.ui.util.annotation.IntRange
 
 /**
  * Defines size of a corner in pixels. For example for rounded shape it can be a corner radius.
@@ -69,7 +67,7 @@ private data class PxCornerSize(private val size: Float) : CornerSize {
  * Can't be negative or larger then 100 percents.
  */
 @Stable
-fun CornerSize(@IntRange(from = 0, to = 100) percent: Int): CornerSize =
+fun CornerSize(/*@IntRange(from = 0, to = 100)*/ percent: Int): CornerSize =
     PercentCornerSize(percent.toFloat())
 
 /**
@@ -78,7 +76,8 @@ fun CornerSize(@IntRange(from = 0, to = 100) percent: Int): CornerSize =
  * Can't be negative or larger then 100 percents.
  */
 private data class PercentCornerSize(
-    @FloatRange(from = 0.0, to = 100.0) private val percent: Float
+    /*@FloatRange(from = 0.0, to = 100.0)*/
+    private val percent: Float
 ) : CornerSize {
     init {
         if (percent < 0 || percent > 100) {

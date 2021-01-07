@@ -16,8 +16,6 @@
 
 package androidx.compose.ui.graphics.colorspace
 
-import androidx.compose.ui.util.annotation.IntRange
-import androidx.compose.ui.util.annotation.Size
 import kotlin.math.pow
 
 /**
@@ -26,7 +24,7 @@ import kotlin.math.pow
  */
 internal class Lab(
     name: String,
-    @IntRange(from = MinId.toLong(), to = MaxId.toLong()) id: Int
+    id: Int
 ) : ColorSpace(
     name,
     ColorModel.Lab, id
@@ -35,15 +33,15 @@ internal class Lab(
     override val isWideGamut: Boolean
         get() = true
 
-    override fun getMinValue(@IntRange(from = 0, to = 3) component: Int): Float {
+    override fun getMinValue(component: Int): Float {
         return if (component == 0) 0.0f else -128.0f
     }
 
-    override fun getMaxValue(@IntRange(from = 0, to = 3) component: Int): Float {
+    override fun getMaxValue(component: Int): Float {
         return if (component == 0) 100.0f else 128.0f
     }
 
-    override fun toXyz(@Size(min = 3) v: FloatArray): FloatArray {
+    override fun toXyz(v: FloatArray): FloatArray {
         v[0] = v[0].coerceIn(0.0f, 100.0f)
         v[1] = v[1].coerceIn(-128.0f, 128.0f)
         v[2] = v[2].coerceIn(-128.0f, 128.0f)
@@ -62,7 +60,7 @@ internal class Lab(
         return v
     }
 
-    override fun fromXyz(@Size(min = 3) v: FloatArray): FloatArray {
+    override fun fromXyz(v: FloatArray): FloatArray {
         val x = v[0] / Illuminant.D50Xyz[0]
         val y = v[1] / Illuminant.D50Xyz[1]
         val z = v[2] / Illuminant.D50Xyz[2]

@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.Duration
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.inMilliseconds
 import androidx.compose.ui.unit.milliseconds
-import androidx.compose.ui.util.annotation.FloatRange
 import androidx.compose.ui.util.lerp
 import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriod
 import kotlin.math.atan2
@@ -263,8 +262,8 @@ val GestureScope.bottomRight: Offset
 
 /**
  * Creates an [Offset] relative to the size of the node we're interacting with. [x] and [y]
- * are fractions of the [width] and [height]. Note that `percentOffset(1f, 1f) != bottomRight`,
- * see [right] and [bottom].
+ * are fractions of the [width] and [height], between `-1` and `1`.
+ * Note that `percentOffset(1f, 1f) != bottomRight`, see [right] and [bottom].
  *
  * For example: `percentOffset(.5f, .5f)` is the same as the [center]; `centerLeft +
  * percentOffset(.1f, 0f)` is a point 10% inward from the middle of the left edge; and
@@ -272,8 +271,10 @@ val GestureScope.bottomRight: Offset
  * bottom right corner.
  */
 fun GestureScope.percentOffset(
-    @FloatRange(from = -1.0, to = 1.0) x: Float = 0f,
-    @FloatRange(from = -1.0, to = 1.0) y: Float = 0f
+    /*@FloatRange(from = -1.0, to = 1.0)*/
+    x: Float = 0f,
+    /*@FloatRange(from = -1.0, to = 1.0)*/
+    y: Float = 0f
 ): Offset {
     return Offset(x * width, y * height)
 }
@@ -419,7 +420,8 @@ fun GestureScope.pinch(
 fun GestureScope.swipeWithVelocity(
     start: Offset,
     end: Offset,
-    @FloatRange(from = 0.0, to = 3.4e38 /* POSITIVE_INFINITY */) endVelocity: Float,
+    /*@FloatRange(from = 0.0)*/
+    endVelocity: Float,
     duration: Duration = 200.milliseconds
 ) {
     require(endVelocity >= 0f) {

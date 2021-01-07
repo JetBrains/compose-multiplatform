@@ -53,7 +53,6 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.annotation.FloatRange
 import androidx.compose.ui.util.lerp
 import kotlin.math.PI
 import kotlin.math.abs
@@ -376,13 +375,15 @@ open class SwipeableState<T>(
  * @param from The state corresponding to the anchor we are moving away from.
  * @param to The state corresponding to the anchor we are moving towards.
  * @param fraction The fraction that the current position represents between [from] and [to].
+ * Must be between `0` and `1`.
  */
 @Immutable
 @ExperimentalMaterialApi
 data class SwipeProgress<T>(
     val from: T,
     val to: T,
-    @FloatRange(from = 0.0, to = 1.0) val fraction: Float
+    /*@FloatRange(from = 0.0, to = 1.0)*/
+    val fraction: Float
 )
 
 /**
@@ -583,7 +584,8 @@ data class FixedThreshold(private val offset: Dp) : ThresholdConfig {
 @Immutable
 @ExperimentalMaterialApi
 data class FractionalThreshold(
-    @FloatRange(from = 0.0, to = 1.0) private val fraction: Float
+    /*@FloatRange(from = 0.0, to = 1.0)*/
+    private val fraction: Float
 ) : ThresholdConfig {
     override fun Density.computeThreshold(fromValue: Float, toValue: Float): Float {
         return lerp(fromValue, toValue, fraction)
@@ -606,27 +608,19 @@ data class FractionalThreshold(
  * has run out of things to see, and `StiffResistanceFactor` to convey that the user cannot swipe
  * this right now. Also, you can set either factor to 0 to disable resistance at that bound.
  *
- * @param basis Specifies the maximum amount of overflow that will be consumed.
+ * @param basis Specifies the maximum amount of overflow that will be consumed. Must be positive.
  * @param factorAtMin The factor by which to scale the resistance at the minimum bound.
+ * Must not be negative.
  * @param factorAtMax The factor by which to scale the resistance at the maximum bound.
+ * Must not be negative.
  */
 @Immutable
 data class ResistanceConfig(
-    @FloatRange(
-        from = 0.0,
-        to = 3.4e38 /* POSITIVE_INFINITY */,
-        fromInclusive = false
-    )
+    /*@FloatRange(from = 0.0, fromInclusive = false)*/
     val basis: Float,
-    @FloatRange(
-        from = 0.0,
-        to = 3.4e38 /* POSITIVE_INFINITY */
-    )
+    /*@FloatRange(from = 0.0)*/
     val factorAtMin: Float = StandardResistanceFactor,
-    @FloatRange(
-        from = 0.0,
-        to = 3.4e38 /* POSITIVE_INFINITY */
-    )
+    /*@FloatRange(from = 0.0)*/
     val factorAtMax: Float = StandardResistanceFactor
 ) {
     fun computeResistance(overflow: Float): Float {

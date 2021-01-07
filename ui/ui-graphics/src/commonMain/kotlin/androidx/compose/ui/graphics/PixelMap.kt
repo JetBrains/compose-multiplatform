@@ -16,8 +16,6 @@
 
 package androidx.compose.ui.graphics
 
-import androidx.compose.ui.util.annotation.IntRange
-
 /**
  * Result of a pixel read operation. This contains the [ImageBitmap] pixel information represented
  * as a 1 dimensional array of values that supports queries of pixel values based on the 2
@@ -43,10 +41,14 @@ class PixelMap(
     val stride: Int
 ) {
     /**
-     * Obtain the color of the pixel at the given coordinate
+     * Obtain the color of the pixel at the given coordinate.
+     * @param x the horizontal pixel coordinate, minimum 1
+     * @param y the vertical pixel coordinate, minimum 1
      */
     operator fun get(
-        @IntRange(from = 0) x: Int,
-        @IntRange(from = 0) y: Int
+        /*@IntRange(from = 0)*/
+        x: Int,
+        /*@IntRange(from = 0)*/
+        y: Int
     ): Color = Color(buffer[bufferOffset + y * stride + x])
 }

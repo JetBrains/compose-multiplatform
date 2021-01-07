@@ -36,7 +36,6 @@ import androidx.compose.ui.input.pointer.consumeDownChange
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.inMilliseconds
-import androidx.compose.ui.util.annotation.VisibleForTesting
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
 import kotlinx.coroutines.CoroutineScope
@@ -81,7 +80,7 @@ internal class DoubleTapGestureFilter(
         Idle, Down, Up, SecondDown
     }
 
-    @VisibleForTesting
+    /*@VisibleForTesting*/
     internal var doubleTapTimeout = DoubleTapTimeout
 
     private var state = State.Idle

@@ -37,7 +37,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.Uptime
-import androidx.compose.ui.util.annotation.VisibleForTesting
 
 /**
  * This sets up a [Transition], and updates it with the target provided by [targetState]. When
@@ -138,7 +137,7 @@ class Transition<S> internal constructor(
      * Play time in nano-seconds. [playTimeNanos] is always non-negative. It starts from 0L at the
      * beginning of the transition and increment until all child animations have finished.
      */
-    @VisibleForTesting
+    /*@VisibleForTesting*/
     internal var playTimeNanos by mutableStateOf(0L)
     internal var startRequested: Boolean by mutableStateOf(false)
     private var startTime = Uptime.Unspecified

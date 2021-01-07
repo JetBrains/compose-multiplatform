@@ -62,7 +62,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.setProgress
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.annotation.IntRange
 import androidx.compose.ui.util.lerp
 import kotlin.math.abs
 
@@ -90,7 +89,7 @@ import kotlin.math.abs
  * this range
  * @param steps if greater than 0, specifies the amounts of discrete values, evenly distributed
  * between across the whole value range. If 0, slider will behave as a continuous slider and allow
- * to choose any value from the range specified
+ * to choose any value from the range specified. Must not be negative.
  * @param onValueChangeEnd lambda to be invoked when value change has ended. This callback
  * shouldn't be used to update the slider value (use [onValueChange] for that), but rather to
  * know when the user has completed selecting a new value by ending a drag or a click.
@@ -114,7 +113,8 @@ fun Slider(
     onValueChange: (Float) -> Unit,
     modifier: Modifier = Modifier,
     valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
-    @IntRange(from = 0) steps: Int = 0,
+    /*@IntRange(from = 0)*/
+    steps: Int = 0,
     onValueChangeEnd: () -> Unit = {},
     interactionState: InteractionState = remember { InteractionState() },
     thumbColor: Color = MaterialTheme.colors.primary,
@@ -345,7 +345,7 @@ private fun Modifier.sliderSemantics(
     position: SliderPosition,
     onValueChange: (Float) -> Unit,
     valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
-    @IntRange(from = 0) steps: Int = 0
+    steps: Int = 0
 ): Modifier {
     val coerced = value.coerceIn(position.startValue, position.endValue)
     return semantics(mergeDescendants = true) {
@@ -381,12 +381,13 @@ private fun Modifier.sliderSemantics(
  * @param valueRange range of values that Slider value can take
  * @param steps if greater than 0, specifies the amounts of discrete values, evenly distributed
  * between across the whole value range. If 0, slider will behave as a continuous slider and allow
- * to choose any value from the range specified
+ * to choose any value from the range specified. Must not be negative.
  */
 private class SliderPosition(
     initial: Float = 0f,
     val valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
-    @IntRange(from = 0) steps: Int = 0,
+    /*@IntRange(from = 0)*/
+    steps: Int = 0,
     animatedClock: AnimationClockObservable,
     var onValueChange: (Float) -> Unit
 ) {

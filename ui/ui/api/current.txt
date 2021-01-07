@@ -257,8 +257,8 @@ package androidx.compose.ui.autofill {
 package androidx.compose.ui.draw {
 
   public final class AlphaKt {
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier alpha(androidx.compose.ui.Modifier, @FloatRange(from=0.0, to=1.0) float alpha);
-    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier drawOpacity(androidx.compose.ui.Modifier, @FloatRange(from=0.0, to=1.0) float opacity);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier alpha(androidx.compose.ui.Modifier, float alpha);
+    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier drawOpacity(androidx.compose.ui.Modifier, float opacity);
   }
 
   public final class CacheDrawScope implements androidx.compose.ui.unit.Density {
@@ -2623,7 +2623,7 @@ package androidx.compose.ui.semantics {
   }
 
   public final class ProgressBarRangeInfo {
-    ctor public ProgressBarRangeInfo(float current, kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> range, @IntRange(from=0) int steps);
+    ctor public ProgressBarRangeInfo(float current, kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> range, int steps);
     method public float component1();
     method public kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> component2();
     method public int component3();
@@ -2659,7 +2659,7 @@ package androidx.compose.ui.semantics {
     property public final float value;
   }
 
-  @VisibleForTesting public final class SemanticsActions {
+  public final class SemanticsActions {
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> getCopyText();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.util.List<androidx.compose.ui.semantics.CustomAccessibilityAction>> getCustomActions();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> getCutText();
@@ -2766,7 +2766,7 @@ package androidx.compose.ui.semantics {
     method public static java.util.List<androidx.compose.ui.semantics.SemanticsNode> getAllSemanticsNodes(androidx.compose.ui.semantics.SemanticsOwner, boolean mergingEnabled);
   }
 
-  @VisibleForTesting public final class SemanticsProperties {
+  public final class SemanticsProperties {
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> getContentDescription();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> getDisabled();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> getFocused();

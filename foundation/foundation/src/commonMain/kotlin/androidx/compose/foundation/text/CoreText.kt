@@ -67,7 +67,6 @@ import androidx.compose.ui.text.subSequence
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.util.annotation.VisibleForTesting
 import androidx.compose.ui.util.fastForEach
 import kotlin.math.floor
 import kotlin.math.roundToInt
@@ -351,7 +350,7 @@ private class TextController(val state: TextState) {
     InternalTextApi::class,
     ExperimentalTextApi::class
 )
-@VisibleForTesting
+/*@VisibleForTesting*/
 internal class TextState(
     var textDelegate: TextDelegate
 ) {
@@ -453,7 +452,7 @@ private fun resolveInlineContent(
     InternalTextApi::class,
     ExperimentalTextApi::class
 )
-@VisibleForTesting
+/*@VisibleForTesting*/
 internal fun longPressDragObserver(
     state: TextState,
     selectionRegistrar: SelectionRegistrar?
