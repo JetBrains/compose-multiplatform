@@ -186,7 +186,7 @@ class RememberSavedInstanceStateTest {
             }
         }
 
-        val latch = CountDownLatch(1)
+        var registerCalled = false
 
         rule.runOnUiThread {
             registryFactory = {
@@ -196,20 +196,20 @@ class RememberSavedInstanceStateTest {
                         // asserts that we unregistered from the previous registry and then
                         // registered with the same key
                         assertThat(key).isEqualTo(unregisterCalledForKey)
-                        latch.countDown()
+                        registerCalled = true
                     }
                 }
             }
         }
 
-        assertTrue(latch.await(1, TimeUnit.SECONDS))
+        rule.mainClock.advanceTimeUntil { registerCalled }
     }
 
     @Test
     fun reregisterWhenTheKeyIsChanged() {
         var key by mutableStateOf("key1")
         val registeredKeys = mutableSetOf<String>()
-        var registerLatch = CountDownLatch(1)
+        var registerCalled = 0
 
         rule.setContent {
             WrapRegistry(
@@ -218,7 +218,7 @@ class RememberSavedInstanceStateTest {
                         override fun registerProvider(key: String, valueProvider: () -> Any?) {
                             super.registerProvider(key, valueProvider)
                             registeredKeys.add(key)
-                            registerLatch.countDown()
+                            registerCalled++
                         }
 
                         override fun unregisterProvider(key: String, valueProvider: () -> Any?) {
@@ -233,14 +233,12 @@ class RememberSavedInstanceStateTest {
             }
         }
 
-        assertTrue(registerLatch.await(1, TimeUnit.SECONDS))
-        registerLatch = CountDownLatch(1)
-
+        rule.mainClock.advanceTimeUntil { registerCalled == 1 }
         rule.runOnUiThread {
             key = "key2"
         }
 
-        assertTrue(registerLatch.await(1, TimeUnit.SECONDS))
+        rule.mainClock.advanceTimeUntil { registerCalled == 2 }
         assertThat(registeredKeys).isEqualTo(mutableSetOf("key2"))
     }
 
@@ -276,14 +274,14 @@ class RememberSavedInstanceStateTest {
     @Test
     fun unregistersWhenDisposed() {
         var doEmit by mutableStateOf(true)
-        val latch = CountDownLatch(1)
+        var onUnregisterCalled = false
 
         rule.setContent {
             WrapRegistry(
                 wrap = {
                     object : DelegateRegistry(it) {
                         override fun unregisterProvider(key: String, valueProvider: () -> Any?) {
-                            latch.countDown()
+                            onUnregisterCalled = true
                             super.unregisterProvider(key, valueProvider)
                         }
                     }
@@ -297,11 +295,11 @@ class RememberSavedInstanceStateTest {
 
         rule.runOnUiThread {
             // assert that unregister is not yet called
-            assertThat(latch.count).isEqualTo(1)
+            assertThat(onUnregisterCalled).isFalse()
             doEmit = false
         }
 
-        assertTrue(latch.await(1, TimeUnit.SECONDS))
+        rule.mainClock.advanceTimeUntil { onUnregisterCalled }
     }
 
     @Test

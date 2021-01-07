@@ -49,7 +49,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.ComposeTestRule
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.createComposeRuleLegacy
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -71,8 +71,9 @@ import org.junit.runner.RunWith
 @OptIn(ExperimentalMaterialApi::class, ExperimentalTestApi::class, ExperimentalRippleApi::class)
 class MaterialRippleThemeTest {
 
+    @Suppress("DEPRECATION")
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createComposeRuleLegacy()
 
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL)
@@ -570,6 +571,7 @@ class MaterialRippleThemeTest {
      * @param expectedCenterPixelColor the expected color for the pixel at the center of the
      * [RippleBox]
      */
+    @Suppress("DEPRECATION") // Due to clockTestRule
     private fun assertRippleMatches(
         interactionState: InteractionState,
         interaction: Interaction,

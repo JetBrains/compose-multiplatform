@@ -403,7 +403,7 @@ class TextFieldTest {
         }
 
         // click to focus
-        clickAndAdvanceClock()
+        rule.onNodeWithTag(TextfieldTag).performClick()
 
         rule.runOnIdleWithDensity {
             // size
@@ -486,7 +486,7 @@ class TextFieldTest {
             }
         }
         // click to focus
-        clickAndAdvanceClock()
+        rule.onNodeWithTag(TextfieldTag).performClick()
 
         rule.runOnIdleWithDensity {
             // size
@@ -531,7 +531,7 @@ class TextFieldTest {
             }
         }
         // click to focus
-        clickAndAdvanceClock()
+        rule.onNodeWithTag(TextfieldTag).performClick()
 
         rule.runOnIdleWithDensity {
             // size
@@ -573,7 +573,7 @@ class TextFieldTest {
         }
 
         // click to focus
-        clickAndAdvanceClock()
+        rule.onNodeWithTag(TextfieldTag).performClick()
 
         rule.runOnIdleWithDensity {
             assertThat(placeholderSize.value).isNull()
@@ -805,7 +805,7 @@ class TextFieldTest {
             }
         }
 
-        clickAndAdvanceClock()
+        rule.onNodeWithTag(TextfieldTag).performClick()
 
         rule.runOnIdle {
             verify(textInputService, atLeastOnce()).startInput(
@@ -948,11 +948,6 @@ class TextFieldTest {
         rule.runOnIdle {
             assertThat(controller).isNotNull()
         }
-    }
-
-    private fun clickAndAdvanceClock() {
-        rule.onNodeWithTag(TextfieldTag).performClick()
-        rule.clockTestRule.advanceClock(200L)
     }
 
     private val View.isSoftwareKeyboardShown: Boolean get() {

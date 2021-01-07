@@ -55,7 +55,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.CountDownLatch
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -91,26 +90,24 @@ class VectorTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun testVectorInvalidation() {
-        val latch1 = CountDownLatch(1)
-        val latch2 = CountDownLatch(1)
-        val testCase = VectorInvalidationTestCase(latch1)
+        val testCase = VectorInvalidationTestCase()
         rule.setContent {
             testCase.TestVector()
         }
 
-        latch1.await()
+        rule.waitUntil { testCase.measured }
         val size = testCase.vectorSize
         takeScreenShot(size).apply {
             assertEquals(Color.Blue.toArgb(), getPixel(5, size - 5))
             assertEquals(Color.White.toArgb(), getPixel(size - 5, 5))
         }
 
-        testCase.latch = latch2
+        testCase.measured = false
         rule.runOnUiThread {
             testCase.toggle()
         }
 
-        rule.waitForIdle()
+        rule.waitUntil { testCase.measured }
 
         takeScreenShot(size).apply {
             assertEquals(Color.White.toArgb(), getPixel(5, size - 5))

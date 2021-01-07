@@ -50,8 +50,11 @@ class TimeOutTest {
 
     private var idlingResourcePolicy: IdlingPolicy? = null
     private var masterPolicy: IdlingPolicy? = null
+    // TODO(pavlis): Improve the error messages
     private val expectedErrorDueToRecompositions =
-        ".*ComposeIdlingResource is busy due to pending recompositions.*"
+        ".*Idling resource timed out: possibly due to compose being busy.*"
+    private val expectedErrorGlobal =
+        ".*Global time out: possibly due to compose being busy.*"
 
     @Before
     fun backupTimeOutPolicies() {
@@ -101,7 +104,7 @@ class TimeOutTest {
     fun infiniteRecompositions_masterTimeout() {
         IdlingPolicies.setMasterPolicyTimeout(300, TimeUnit.MILLISECONDS)
 
-        expectError<ComposeNotIdleException>(expectedMessage = expectedErrorDueToRecompositions) {
+        expectError<ComposeNotIdleException>(expectedMessage = expectedErrorGlobal) {
             rule.setContent {
                 InfiniteCase()
             }
@@ -125,7 +128,7 @@ class TimeOutTest {
         count.value++ // Start infinite re-compositions
 
         IdlingPolicies.setMasterPolicyTimeout(300, TimeUnit.MILLISECONDS)
-        expectError<ComposeNotIdleException>(expectedMessage = expectedErrorDueToRecompositions) {
+        expectError<ComposeNotIdleException>(expectedMessage = expectedErrorGlobal) {
             rule.onNodeWithText("Hello").assertExists()
         }
     }

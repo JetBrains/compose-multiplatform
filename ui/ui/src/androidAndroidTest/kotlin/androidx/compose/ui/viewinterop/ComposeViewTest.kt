@@ -34,7 +34,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRuleLegacy
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.IntSize
 import androidx.lifecycle.Lifecycle
@@ -59,8 +59,9 @@ import java.util.concurrent.TimeUnit
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class ComposeViewTest {
+    @Suppress("DEPRECATION") // Needed because this test is setting its own content.
     @get:Rule
-    val rule = createAndroidComposeRule<ComponentActivity>()
+    val rule = createAndroidComposeRuleLegacy<ComponentActivity>()
 
     @Test
     fun composeViewComposedContent() {

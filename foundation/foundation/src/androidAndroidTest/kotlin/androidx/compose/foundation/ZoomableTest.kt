@@ -17,6 +17,7 @@
 package androidx.compose.foundation
 
 import androidx.compose.foundation.gestures.ZoomableController
+import androidx.compose.foundation.gestures.rememberZoomableController
 import androidx.compose.foundation.gestures.zoomable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
@@ -53,6 +54,7 @@ private const val EDGE_FUZZ_FACTOR = 0.2f
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalTestApi::class)
 class ZoomableTest {
+    @Suppress("DEPRECATION")
     @get:Rule
     val rule = createComposeRule()
 
@@ -69,12 +71,8 @@ class ZoomableTest {
     @Test
     fun zoomable_zoomIn() {
         var cumulativeScale = 1.0f
-        val controller = ZoomableController(
-            onZoomDelta = { cumulativeScale *= it },
-            animationClock = rule.clockTestRule.clock
-        )
 
-        setZoomableContent { Modifier.zoomable(controller) }
+        setZoomableContent { Modifier.zoomable(onZoomDelta = { cumulativeScale *= it }) }
 
         rule.onNodeWithTag(TEST_TAG).performGesture {
             val leftStartX = center.x - 10
@@ -90,7 +88,7 @@ class ZoomableTest {
             )
         }
 
-        rule.clockTestRule.advanceClock(milliseconds = 1000)
+        rule.mainClock.advanceTimeBy(milliseconds = 1000)
 
         rule.runOnIdle {
             assertWithMessage("Should have scaled at least 4x").that(cumulativeScale).isAtLeast(4f)
@@ -100,12 +98,8 @@ class ZoomableTest {
     @Test
     fun zoomable_zoomOut() {
         var cumulativeScale = 1.0f
-        val controller = ZoomableController(
-            onZoomDelta = { cumulativeScale *= it },
-            animationClock = rule.clockTestRule.clock
-        )
 
-        setZoomableContent { Modifier.zoomable(controller) }
+        setZoomableContent { Modifier.zoomable(onZoomDelta = { cumulativeScale *= it }) }
 
         rule.onNodeWithTag(TEST_TAG).performGesture {
             val leftStartX = visibleSize.toSize().width * EDGE_FUZZ_FACTOR
@@ -121,7 +115,7 @@ class ZoomableTest {
             )
         }
 
-        rule.clockTestRule.advanceClock(milliseconds = 1000)
+        rule.mainClock.advanceTimeBy(milliseconds = 1000)
 
         rule.runOnIdle {
             assertWithMessage("Should have scaled down at least 4x")
@@ -135,17 +129,13 @@ class ZoomableTest {
         var cumulativeScale = 1.0f
         var startTriggered = 0f
         var stopTriggered = 0f
-        val controller = ZoomableController(
-            onZoomDelta = { cumulativeScale *= it },
-            animationClock = rule.clockTestRule.clock
-        )
 
         setZoomableContent {
             Modifier
                 .zoomable(
-                    controller = controller,
                     onZoomStarted = { startTriggered++ },
-                    onZoomStopped = { stopTriggered++ }
+                    onZoomStopped = { stopTriggered++ },
+                    onZoomDelta = { cumulativeScale *= it }
                 )
         }
 
@@ -168,7 +158,7 @@ class ZoomableTest {
             )
         }
 
-        rule.clockTestRule.advanceClock(milliseconds = 1000)
+        rule.mainClock.advanceTimeBy(milliseconds = 1000)
 
         rule.runOnIdle {
             assertThat(startTriggered).isEqualTo(1)
@@ -180,14 +170,10 @@ class ZoomableTest {
     fun zoomable_disabledWontCallLambda() {
         val enabled = mutableStateOf(true)
         var cumulativeScale = 1.0f
-        val controller = ZoomableController(
-            onZoomDelta = { cumulativeScale *= it },
-            animationClock = rule.clockTestRule.clock
-        )
 
         setZoomableContent {
             Modifier
-                .zoomable(controller = controller, enabled = enabled.value)
+                .zoomable(enabled = enabled.value, onZoomDelta = { cumulativeScale *= it })
         }
 
         rule.onNodeWithTag(TEST_TAG).performGesture {
@@ -204,7 +190,7 @@ class ZoomableTest {
             )
         }
 
-        rule.clockTestRule.advanceClock(milliseconds = 1000)
+        rule.mainClock.advanceTimeBy(milliseconds = 1000)
 
         val prevScale = rule.runOnIdle {
             assertWithMessage("Should have scaled at least 4x").that(cumulativeScale).isAtLeast(4f)
@@ -237,17 +223,13 @@ class ZoomableTest {
     fun zoomable_callsStop_whenRemoved() {
         var cumulativeScale = 1.0f
         var stopTriggered = 0f
-        val controller = ZoomableController(
-            onZoomDelta = { cumulativeScale *= it },
-            animationClock = rule.clockTestRule.clock
-        )
 
         setZoomableContent {
             if (cumulativeScale < 2f) {
                 Modifier
                     .zoomable(
-                        controller = controller,
-                        onZoomStopped = { stopTriggered++ }
+                        onZoomStopped = { stopTriggered++ },
+                        onZoomDelta = { cumulativeScale *= it }
                     )
             } else {
                 Modifier
@@ -272,7 +254,7 @@ class ZoomableTest {
             )
         }
 
-        rule.clockTestRule.advanceClock(milliseconds = 1000)
+        rule.mainClock.advanceTimeBy(milliseconds = 1000)
 
         rule.runOnIdle {
             assertThat(cumulativeScale).isAtLeast(2f)
@@ -284,31 +266,34 @@ class ZoomableTest {
     fun zoomable_animateTo() {
         var cumulativeScale = 1.0f
         var callbackCount = 0
-        val state = ZoomableController(
-            onZoomDelta = {
-                cumulativeScale *= it
-                callbackCount += 1
-            },
-            animationClock = rule.clockTestRule.clock
-        )
 
-        setZoomableContent { Modifier.zoomable(state) }
+        lateinit var state: ZoomableController
+        setZoomableContent {
+            state = rememberZoomableController(
+                onZoomDelta = {
+                    cumulativeScale *= it
+                    callbackCount += 1
+                }
+            )
+
+            Modifier.zoomable(state)
+        }
 
         rule.runOnUiThread { state.smoothScaleBy(4f) }
 
-        rule.clockTestRule.advanceClock(milliseconds = 10)
+        rule.mainClock.advanceTimeBy(milliseconds = 10)
 
         rule.runOnIdle {
             assertWithMessage("Scrolling should have been smooth").that(callbackCount).isAtLeast(1)
         }
 
-        rule.clockTestRule.advanceClock(milliseconds = 10)
+        rule.mainClock.advanceTimeBy(milliseconds = 10)
 
         rule.runOnIdle {
             assertWithMessage("Scrolling should have been smooth").that(callbackCount).isAtLeast(2)
         }
 
-        rule.clockTestRule.advanceClock(milliseconds = 1000)
+        rule.mainClock.advanceTimeBy(milliseconds = 1000)
 
         rule.runOnIdle {
             assertWithMessage("Scrolling should have been smooth").that(callbackCount).isAtLeast(3)
@@ -319,12 +304,9 @@ class ZoomableTest {
 
     @Test
     fun testInspectorValue() {
-        val controller = ZoomableController(
-            onZoomDelta = {},
-            animationClock = rule.clockTestRule.clock
-        )
         rule.setContent {
-            val modifier = Modifier.zoomable(controller) as InspectableValue
+            val state = rememberZoomableController {}
+            val modifier = Modifier.zoomable(state) as InspectableValue
             assertThat(modifier.nameFallback).isEqualTo("zoomable")
             assertThat(modifier.valueOverride).isNull()
             assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(

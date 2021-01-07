@@ -28,12 +28,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.res.loadVectorResource
 import androidx.compose.ui.test.R
-import java.util.concurrent.CountDownLatch
 
-class VectorInvalidationTestCase(var latch: CountDownLatch) {
+class VectorInvalidationTestCase() {
 
     // Lazily initialize state as it needs to be constructed in the composition
     private var vectorState: MutableState<Int>? = null
+
+    internal var measured: Boolean = false
 
     /**
      * Queries the size of the underlying vector image to draw
@@ -55,7 +56,7 @@ class VectorInvalidationTestCase(var latch: CountDownLatch) {
                     size = width.toIntPx(),
                     modifier = WhiteBackground.paint(rememberVectorPainter(it))
                 ) {
-                    latch.countDown()
+                    measured = true
                 }
             }
         }

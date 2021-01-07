@@ -50,8 +50,6 @@ import androidx.test.filters.SdkSuppress
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
 @LargeTest
 @OptIn(ExperimentalTestApi::class)
@@ -59,7 +57,7 @@ class TextFieldCursorTest {
 
     @get:Rule
     val rule = createComposeRule().also {
-        it.clockTestRule.pauseClock()
+        it.mainClock.autoAdvance = false
     }
 
     @Before
@@ -74,7 +72,7 @@ class TextFieldCursorTest {
     fun textFieldFocused_cursorRendered() = with(rule.density) {
         val width = 10.dp
         val height = 20.dp
-        val latch = CountDownLatch(1)
+        var isFocused = false
         rule.setContent {
             BasicTextField(
                 value = "",
@@ -83,16 +81,16 @@ class TextFieldCursorTest {
                 modifier = Modifier
                     .preferredSize(width, height)
                     .background(Color.White)
-                    .onFocusChanged { if (it.isFocused) latch.countDown() },
+                    .onFocusChanged { if (it.isFocused) isFocused = true },
                 cursorColor = Color.Red
             )
         }
+
         rule.onNode(hasSetTextAction()).performClick()
-        assert(latch.await(1, TimeUnit.SECONDS))
+        rule.mainClock.advanceTimeUntil { isFocused }
 
-        rule.waitForIdle()
+        rule.mainClock.advanceTimeBy(100)
 
-        rule.clockTestRule.advanceClock(100)
         with(rule.density) {
             rule.onNode(hasSetTextAction())
                 .captureToImage()
@@ -105,7 +103,7 @@ class TextFieldCursorTest {
     fun cursorBlinkingAnimation() = with(rule.density) {
         val width = 10.dp
         val height = 20.dp
-        val latch = CountDownLatch(1)
+        var isFocused = false
         rule.setContent {
             // The padding helps if the test is run accidentally in landscape. Landscape makes
             // the cursor to be next to the navigation bar which affects the red color to be a bit
@@ -118,19 +116,17 @@ class TextFieldCursorTest {
                     modifier = Modifier
                         .preferredSize(width, height)
                         .background(Color.White)
-                        .onFocusChanged { if (it.isFocused) latch.countDown() },
+                        .onFocusChanged { if (it.isFocused) isFocused = true },
                     cursorColor = Color.Red
                 )
             }
         }
 
         rule.onNode(hasSetTextAction()).performClick()
-        assert(latch.await(1, TimeUnit.SECONDS))
-
-        rule.waitForIdle()
+        rule.mainClock.advanceTimeUntil { isFocused }
 
         // cursor visible first 500 ms
-        rule.clockTestRule.advanceClock(100)
+        rule.mainClock.advanceTimeBy(100)
         with(rule.density) {
             rule.onNode(hasSetTextAction())
                 .captureToImage()
@@ -138,7 +134,7 @@ class TextFieldCursorTest {
         }
 
         // cursor invisible during next 500 ms
-        rule.clockTestRule.advanceClock(700)
+        rule.mainClock.advanceTimeBy(700)
         rule.onNode(hasSetTextAction())
             .captureToImage()
             .assertShape(
@@ -155,7 +151,7 @@ class TextFieldCursorTest {
     fun cursorUnsetColor_noCursor() = with(rule.density) {
         val width = 10.dp
         val height = 20.dp
-        val latch = CountDownLatch(1)
+        var isFocused = false
         rule.setContent {
             // The padding helps if the test is run accidentally in landscape. Landscape makes
             // the cursor to be next to the navigation bar which affects the red color to be a bit
@@ -168,19 +164,16 @@ class TextFieldCursorTest {
                     modifier = Modifier
                         .preferredSize(width, height)
                         .background(Color.White)
-                        .onFocusChanged { if (it.isFocused) latch.countDown() },
+                        .onFocusChanged { if (it.isFocused) isFocused = true },
                     cursorColor = Color.Unspecified
                 )
             }
         }
 
         rule.onNode(hasSetTextAction()).performClick()
-        assert(latch.await(1, TimeUnit.SECONDS))
-
-        rule.waitForIdle()
+        rule.mainClock.advanceTimeUntil { isFocused }
 
         // no cursor when usually shown
-        rule.clockTestRule.advanceClock(100)
         rule.onNode(hasSetTextAction())
             .captureToImage()
             .assertShape(
@@ -192,7 +185,7 @@ class TextFieldCursorTest {
             )
 
         // no cursor when should be no cursor
-        rule.clockTestRule.advanceClock(700)
+        rule.mainClock.advanceTimeBy(700)
         rule.onNode(hasSetTextAction())
             .captureToImage()
             .assertShape(
@@ -209,7 +202,7 @@ class TextFieldCursorTest {
     fun cursorNotBlinking_whileTyping() = with(rule.density) {
         val width = 10.dp
         val height = 20.dp
-        val latch = CountDownLatch(1)
+        var isFocused = false
         rule.setContent {
             // The padding helps if the test is run accidentally in landscape. Landscape makes
             // the cursor to be next to the navigation bar which affects the red color to be a bit
@@ -223,29 +216,27 @@ class TextFieldCursorTest {
                     modifier = Modifier
                         .preferredSize(width, height)
                         .background(Color.White)
-                        .onFocusChanged { if (it.isFocused) latch.countDown() },
+                        .onFocusChanged { if (it.isFocused) isFocused = true },
                     cursorColor = Color.Red
                 )
             }
         }
 
         rule.onNode(hasSetTextAction()).performClick()
-        assert(latch.await(1, TimeUnit.SECONDS))
-        rule.waitForIdle()
+        rule.mainClock.advanceTimeUntil { isFocused }
 
         // cursor visible first 500 ms
-        rule.clockTestRule.advanceClock(500)
+        rule.mainClock.advanceTimeBy(500)
         // TODO(b/170298051) check here that cursor is visible when we have a way to control
         //  cursor position when sending a text
 
         // change text field value
         rule.onNode(hasSetTextAction())
             .performTextReplacement("", true)
-        rule.waitForIdle()
 
         // cursor would have been invisible during next 500 ms if cursor blinks while typing.
         // To prevent blinking while typing we restart animation when new symbol is typed.
-        rule.clockTestRule.advanceClock(400)
+        rule.mainClock.advanceTimeBy(400)
         with(rule.density) {
             rule.onNode(hasSetTextAction())
                 .captureToImage()

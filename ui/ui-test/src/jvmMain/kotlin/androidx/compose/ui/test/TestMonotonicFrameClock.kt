@@ -73,6 +73,11 @@ class TestMonotonicFrameClock(
     private val awaiters = mutableListOf<Awaiter<*>>()
     private var posted = false
 
+    /**
+     * Returns whether there are any awaiters on this clock.
+     */
+    val hasAwaiters: Boolean get() = synchronized(lock) { awaiters.isNotEmpty() }
+
     private class Awaiter<R>(
         private val onFrame: (Long) -> R,
         private val continuation: CancellableContinuation<R>

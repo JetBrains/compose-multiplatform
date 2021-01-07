@@ -60,7 +60,6 @@ class MenuTest {
     fun menu_canBeTriggered() {
         var expanded by mutableStateOf(false)
 
-        rule.clockTestRule.pauseClock()
         rule.setContent {
             DropdownMenu(
                 expanded = expanded,
@@ -74,21 +73,29 @@ class MenuTest {
                 }
             }
         }
-        rule.onNodeWithTag("MenuContent").assertDoesNotExist()
 
-        rule.runOnIdle { expanded = true }
+        rule.onNodeWithTag("MenuContent").assertDoesNotExist()
+        rule.mainClock.autoAdvance = false
+
+        rule.runOnUiThread { expanded = true }
+        rule.mainClock.advanceTimeByFrame() // Trigger the popup
         rule.waitForIdle()
-        rule.clockTestRule.advanceClock(InTransitionDuration.toLong())
+        rule.mainClock.advanceTimeByFrame() // Kick off the animation
+        rule.mainClock.advanceTimeBy(InTransitionDuration.toLong())
         rule.onNodeWithTag("MenuContent").assertExists()
 
-        rule.runOnIdle { expanded = false }
-        rule.waitForIdle()
-        rule.clockTestRule.advanceClock(OutTransitionDuration.toLong())
+        rule.runOnUiThread { expanded = false }
+        rule.mainClock.advanceTimeByFrame() // Trigger the popup
+        rule.mainClock.advanceTimeByFrame() // Kick off the animation
+        rule.mainClock.advanceTimeBy(OutTransitionDuration.toLong())
+        rule.mainClock.advanceTimeByFrame()
         rule.onNodeWithTag("MenuContent").assertDoesNotExist()
 
-        rule.runOnIdle { expanded = true }
+        rule.runOnUiThread { expanded = true }
+        rule.mainClock.advanceTimeByFrame() // Trigger the popup
         rule.waitForIdle()
-        rule.clockTestRule.advanceClock(InTransitionDuration.toLong())
+        rule.mainClock.advanceTimeByFrame() // Kick off the animation
+        rule.mainClock.advanceTimeBy(InTransitionDuration.toLong())
         rule.onNodeWithTag("MenuContent").assertExists()
     }
 

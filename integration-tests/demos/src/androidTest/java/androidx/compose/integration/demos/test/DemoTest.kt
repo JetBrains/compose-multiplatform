@@ -32,7 +32,7 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isDialog
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRuleLegacy
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -57,8 +57,10 @@ private val ignoredDemos = listOf(
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalTestApi::class)
 class DemoTest {
+    // We need to provide the recompose factory first to use new clock.
+    @Suppress("DEPRECATION")
     @get:Rule
-    val rule = createAndroidComposeRule<DemoActivity>()
+    val rule = createAndroidComposeRuleLegacy<DemoActivity>()
 
     @Test
     fun testFiltering() {
@@ -114,6 +116,7 @@ class DemoTest {
     @Test
     fun navigateThroughAllDemos_withInfiniteAnimations() {
         // Pause the clock in these tests and forward it manually
+        @Suppress("DEPRECATION")
         rule.clockTestRule.pauseClock()
         navigateThroughAllDemos(AllDemosWithInfiniteAnimations, fastForwardClock = true)
     }
@@ -206,6 +209,7 @@ class DemoTest {
 
     private fun fastForwardClock() {
         rule.waitForIdle()
+        @Suppress("DEPRECATION")
         rule.clockTestRule.advanceClock(5000)
     }
 

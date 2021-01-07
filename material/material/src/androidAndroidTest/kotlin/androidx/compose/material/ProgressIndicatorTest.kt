@@ -83,10 +83,12 @@ class ProgressIndicatorTest {
     fun indeterminateLinearProgressIndicator_progress() {
         val tag = "linear"
 
-        rule.clockTestRule.pauseClock()
+        rule.mainClock.autoAdvance = false
         rule.setMaterialContent {
             LinearProgressIndicator(modifier = Modifier.testTag(tag))
         }
+
+        rule.mainClock.advanceTimeByFrame() // Kick off the animation
 
         rule.onNodeWithTag(tag)
             .assertValueEquals("In progress")
@@ -94,11 +96,15 @@ class ProgressIndicatorTest {
 
     @Test
     fun indeterminateLinearProgressIndicator_Size() {
-        rule.clockTestRule.pauseClock()
-        rule
+        rule.mainClock.autoAdvance = false
+        val contentToTest = rule
             .setMaterialContentForSizeAssertions {
                 LinearProgressIndicator()
             }
+
+        rule.mainClock.advanceTimeByFrame() // Kick off the animation
+
+        contentToTest
             .assertWidthIsEqualTo(ExpectedLinearWidth)
             .assertHeightIsEqualTo(ExpectedLinearHeight)
     }
@@ -143,10 +149,12 @@ class ProgressIndicatorTest {
     fun indeterminateCircularProgressIndicator_progress() {
         val tag = "circular"
 
-        rule.clockTestRule.pauseClock()
+        rule.mainClock.autoAdvance = false
         rule.setMaterialContent {
             CircularProgressIndicator(modifier = Modifier.testTag(tag))
         }
+
+        rule.mainClock.advanceTimeByFrame() // Kick off the animation
 
         rule.onNodeWithTag(tag)
             .assertValueEquals("In progress")
@@ -154,11 +162,15 @@ class ProgressIndicatorTest {
 
     @Test
     fun indeterminateCircularProgressIndicator_Size() {
-        rule.clockTestRule.pauseClock()
-        rule
+        rule.mainClock.autoAdvance = false
+        val contentToTest = rule
             .setMaterialContentForSizeAssertions {
                 CircularProgressIndicator()
             }
+
+        rule.mainClock.advanceTimeByFrame() // Kick off the animation
+
+        contentToTest
             .assertIsSquareWithSize(40.dp)
     }
 }
