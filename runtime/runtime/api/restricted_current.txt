@@ -241,11 +241,6 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.Composable public static inline <T extends R, R> androidx.compose.runtime.State<R> collectAsState(kotlinx.coroutines.flow.Flow<? extends T>, R? initial, optional kotlin.coroutines.CoroutineContext context);
   }
 
-  @Deprecated public final class FrameManager {
-    method @Deprecated public void ensureStarted();
-    field @Deprecated public static final androidx.compose.runtime.FrameManager INSTANCE;
-  }
-
   @androidx.compose.runtime.StableMarker @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets=kotlin.annotation.AnnotationTarget) public @interface Immutable {
   }
 
@@ -435,21 +430,11 @@ package androidx.compose.runtime {
   }
 
   public final class SuspendingEffectsKt {
-    method @Deprecated @androidx.compose.runtime.Composable public static void LaunchedTask(kotlin.jvm.functions.Function2<? super kotlinx.coroutines.CoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
-    method @Deprecated @androidx.compose.runtime.Composable public static void LaunchedTask(Object? key, kotlin.jvm.functions.Function2<? super kotlinx.coroutines.CoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
-    method @Deprecated @androidx.compose.runtime.Composable public static void LaunchedTask(Object? key1, Object? key2, kotlin.jvm.functions.Function2<? super kotlinx.coroutines.CoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
-    method @Deprecated @androidx.compose.runtime.Composable public static void LaunchedTask(Object? key1, Object? key2, Object? key3, kotlin.jvm.functions.Function2<? super kotlinx.coroutines.CoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
-    method @Deprecated @androidx.compose.runtime.Composable public static void LaunchedTask(Object![]? keys, kotlin.jvm.functions.Function2<? super kotlinx.coroutines.CoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
     method @kotlin.PublishedApi internal static kotlinx.coroutines.CoroutineScope createCompositionCoroutineScope(kotlin.coroutines.CoroutineContext coroutineContext, androidx.compose.runtime.Composer<?> composer);
     method @androidx.compose.runtime.Composable public static inline kotlinx.coroutines.CoroutineScope rememberCoroutineScope(optional kotlin.jvm.functions.Function0<? extends kotlin.coroutines.CoroutineContext> getContext);
   }
 
   public final class TraceKt {
-  }
-
-  @Deprecated @androidx.compose.runtime.ExperimentalComposeApi @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface UnionType {
-    method @Deprecated public abstract Class<?>[] types();
-    property public abstract Class<?>![] types;
   }
 
   public final inline class Updater<T> {

@@ -26,6 +26,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asFlow
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -209,6 +210,7 @@ class FlowAdapterTest {
         }
     }
 
+    @Ignore("b/177256608")
     @Test
     fun observingOnCustomContext() {
         val stream = FlowChannel<String>()
