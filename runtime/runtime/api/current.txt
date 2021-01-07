@@ -239,7 +239,7 @@ package androidx.compose.runtime {
   }
 
   public final class KeyKt {
-    method @androidx.compose.runtime.Composable public static inline <T> T! key(Object![]? inputs, kotlin.jvm.functions.Function0<? extends T> block);
+    method @androidx.compose.runtime.Composable public static inline <T> T! key(Object![]? keys, kotlin.jvm.functions.Function0<? extends T> block);
   }
 
   public final class KeySourceInfoKt {
@@ -283,10 +283,10 @@ package androidx.compose.runtime {
 
   public final class ProduceStateKt {
     method @androidx.compose.runtime.Composable public static <T> androidx.compose.runtime.State<T> produceState(T? initialValue, @kotlin.BuilderInference kotlin.jvm.functions.Function2<? super androidx.compose.runtime.ProduceStateScope<T>,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> producer);
-    method @androidx.compose.runtime.Composable public static <T> androidx.compose.runtime.State<T> produceState(T? initialValue, Object? subject, @kotlin.BuilderInference kotlin.jvm.functions.Function2<? super androidx.compose.runtime.ProduceStateScope<T>,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> producer);
-    method @androidx.compose.runtime.Composable public static <T> androidx.compose.runtime.State<T> produceState(T? initialValue, Object? subject1, Object? subject2, @kotlin.BuilderInference kotlin.jvm.functions.Function2<? super androidx.compose.runtime.ProduceStateScope<T>,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> producer);
-    method @androidx.compose.runtime.Composable public static <T> androidx.compose.runtime.State<T> produceState(T? initialValue, Object? subject1, Object? subject2, Object? subject3, @kotlin.BuilderInference kotlin.jvm.functions.Function2<? super androidx.compose.runtime.ProduceStateScope<T>,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> producer);
-    method @androidx.compose.runtime.Composable public static <T> androidx.compose.runtime.State<T> produceState(T? initialValue, Object![]? subjects, @kotlin.BuilderInference kotlin.jvm.functions.Function2<? super androidx.compose.runtime.ProduceStateScope<T>,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> producer);
+    method @androidx.compose.runtime.Composable public static <T> androidx.compose.runtime.State<T> produceState(T? initialValue, Object? key1, @kotlin.BuilderInference kotlin.jvm.functions.Function2<? super androidx.compose.runtime.ProduceStateScope<T>,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> producer);
+    method @androidx.compose.runtime.Composable public static <T> androidx.compose.runtime.State<T> produceState(T? initialValue, Object? key1, Object? key2, @kotlin.BuilderInference kotlin.jvm.functions.Function2<? super androidx.compose.runtime.ProduceStateScope<T>,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> producer);
+    method @androidx.compose.runtime.Composable public static <T> androidx.compose.runtime.State<T> produceState(T? initialValue, Object? key1, Object? key2, Object? key3, @kotlin.BuilderInference kotlin.jvm.functions.Function2<? super androidx.compose.runtime.ProduceStateScope<T>,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> producer);
+    method @androidx.compose.runtime.Composable public static <T> androidx.compose.runtime.State<T> produceState(T? initialValue, Object![]? keys, @kotlin.BuilderInference kotlin.jvm.functions.Function2<? super androidx.compose.runtime.ProduceStateScope<T>,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> producer);
   }
 
   public interface ProduceStateScope<T> extends androidx.compose.runtime.MutableState<T> kotlinx.coroutines.CoroutineScope {
@@ -340,10 +340,10 @@ package androidx.compose.runtime {
 
   public final class RememberKt {
     method @androidx.compose.runtime.Composable public static inline <T> T! remember(kotlin.jvm.functions.Function0<? extends T> calculation);
-    method @androidx.compose.runtime.Composable public static inline <T, V1> T! remember(V1? v1, kotlin.jvm.functions.Function0<? extends T> calculation);
-    method @androidx.compose.runtime.Composable public static inline <T, V1, V2> T! remember(V1? v1, V2? v2, kotlin.jvm.functions.Function0<? extends T> calculation);
-    method @androidx.compose.runtime.Composable public static inline <T, V1, V2, V3> T! remember(V1? v1, V2? v2, V3? v3, kotlin.jvm.functions.Function0<? extends T> calculation);
-    method @androidx.compose.runtime.Composable public static inline <V> V! remember(Object![]? inputs, kotlin.jvm.functions.Function0<? extends V> calculation);
+    method @androidx.compose.runtime.Composable public static inline <T> T! remember(Object? key1, kotlin.jvm.functions.Function0<? extends T> calculation);
+    method @androidx.compose.runtime.Composable public static inline <T> T! remember(Object? key1, Object? key2, kotlin.jvm.functions.Function0<? extends T> calculation);
+    method @androidx.compose.runtime.Composable public static inline <T> T! remember(Object? key1, Object? key2, Object? key3, kotlin.jvm.functions.Function0<? extends T> calculation);
+    method @androidx.compose.runtime.Composable public static inline <T> T! remember(Object![]? keys, kotlin.jvm.functions.Function0<? extends T> calculation);
     method @androidx.compose.runtime.Composable public static inline <T> androidx.compose.runtime.State<T> rememberUpdatedState(T? newValue);
   }
 
@@ -353,15 +353,15 @@ package androidx.compose.runtime {
 
   public final class SideEffectKt {
     method @Deprecated @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void DisposableEffect(kotlin.jvm.functions.Function1<? super androidx.compose.runtime.DisposableEffectScope,? extends androidx.compose.runtime.DisposableEffectDisposable> effect);
-    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void DisposableEffect(Object? subject, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.DisposableEffectScope,? extends androidx.compose.runtime.DisposableEffectDisposable> effect);
-    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void DisposableEffect(Object? subject1, Object? subject2, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.DisposableEffectScope,? extends androidx.compose.runtime.DisposableEffectDisposable> effect);
-    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void DisposableEffect(Object? subject1, Object? subject2, Object? subject3, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.DisposableEffectScope,? extends androidx.compose.runtime.DisposableEffectDisposable> effect);
-    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void DisposableEffect(Object![]? subjects, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.DisposableEffectScope,? extends androidx.compose.runtime.DisposableEffectDisposable> effect);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void DisposableEffect(Object? key1, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.DisposableEffectScope,? extends androidx.compose.runtime.DisposableEffectDisposable> effect);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void DisposableEffect(Object? key1, Object? key2, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.DisposableEffectScope,? extends androidx.compose.runtime.DisposableEffectDisposable> effect);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void DisposableEffect(Object? key1, Object? key2, Object? key3, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.DisposableEffectScope,? extends androidx.compose.runtime.DisposableEffectDisposable> effect);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void DisposableEffect(Object![]? keys, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.DisposableEffectScope,? extends androidx.compose.runtime.DisposableEffectDisposable> effect);
     method @Deprecated @androidx.compose.runtime.Composable public static void LaunchedEffect(kotlin.jvm.functions.Function2<? super kotlinx.coroutines.CoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
-    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void LaunchedEffect(Object? subject, kotlin.jvm.functions.Function2<? super kotlinx.coroutines.CoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
-    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void LaunchedEffect(Object? subject1, Object? subject2, kotlin.jvm.functions.Function2<? super kotlinx.coroutines.CoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
-    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void LaunchedEffect(Object? subject1, Object? subject2, Object? subject3, kotlin.jvm.functions.Function2<? super kotlinx.coroutines.CoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
-    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void LaunchedEffect(Object![]? subjects, kotlin.jvm.functions.Function2<? super kotlinx.coroutines.CoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void LaunchedEffect(Object? key1, kotlin.jvm.functions.Function2<? super kotlinx.coroutines.CoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void LaunchedEffect(Object? key1, Object? key2, kotlin.jvm.functions.Function2<? super kotlinx.coroutines.CoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void LaunchedEffect(Object? key1, Object? key2, Object? key3, kotlin.jvm.functions.Function2<? super kotlinx.coroutines.CoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void LaunchedEffect(Object![]? keys, kotlin.jvm.functions.Function2<? super kotlinx.coroutines.CoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void SideEffect(kotlin.jvm.functions.Function0<kotlin.Unit> effect);
   }
 
