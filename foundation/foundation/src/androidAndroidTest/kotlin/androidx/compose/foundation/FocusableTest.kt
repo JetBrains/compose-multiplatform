@@ -21,6 +21,7 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -94,6 +95,7 @@ class FocusableTest {
             .assert(isNotFocusable())
     }
 
+    @ExperimentalComposeUiApi
     @Test
     fun focusableTest_focusAcquire() {
         val (focusRequester, otherFocusRequester) = FocusRequester.createRefs()
@@ -133,6 +135,7 @@ class FocusableTest {
             .assertIsNotFocused()
     }
 
+    @ExperimentalComposeUiApi
     @Test
     fun focusableTest_interactionState() {
         val interactionState = InteractionState()
