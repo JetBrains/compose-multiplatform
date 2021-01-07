@@ -112,10 +112,11 @@ data class AnnotatedString internal constructor(
      * with the range [start, end) will be returned. When [start] is bigger than [end], an empty
      * list will be returned.
      */
+    @Suppress("UNCHECKED_CAST")
     fun getStringAnnotations(tag: String, start: Int, end: Int): List<StringAnnotation> =
-        annotations.filterIsInstance<Range<String>>().filter {
-            tag == it.tag && intersect(start, end, it.start, it.end)
-        }
+        annotations.filter {
+            it.item is String && tag == it.tag && intersect(start, end, it.start, it.end)
+        } as List<StringAnnotation>
 
     /**
      * Query all of the string annotations attached on this AnnotatedString.
