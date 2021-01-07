@@ -43,7 +43,7 @@ data class TransformedText(
  * [PasswordVisualTransformation].
  */
 @Immutable
-interface VisualTransformation {
+fun interface VisualTransformation {
     /**
      * Change the visual output of given text.
      *
@@ -73,9 +73,8 @@ interface VisualTransformation {
          * A special visual transformation object indicating that no transformation is applied.
          */
         @Stable
-        val None: VisualTransformation = object : VisualTransformation {
-            override fun filter(text: AnnotatedString) =
-                TransformedText(text, OffsetMapping.Identity)
+        val None: VisualTransformation = VisualTransformation { text ->
+            TransformedText(text, OffsetMapping.Identity)
         }
     }
 }
