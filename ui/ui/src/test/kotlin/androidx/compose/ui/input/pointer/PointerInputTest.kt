@@ -393,8 +393,8 @@ class PointerInputTest {
         val pointerInputChange2 =
             createPointerInputChange(0f, 0f, true, 0f, 0f, false, 0f, 0f, false)
 
-        val (_, _, _, consumed) = pointerInputChange1.apply { consumeDownChange() }
-        val (_, _, _, consumed1) = pointerInputChange2.apply { consumeDownChange() }
+        val consumed = pointerInputChange1.apply { consumeDownChange() }.consumed
+        val consumed1 = pointerInputChange2.apply { consumeDownChange() }.consumed
 
         assertThat(consumed.downChange, `is`(true))
         assertThat(consumed1.downChange, `is`(true))
@@ -407,8 +407,8 @@ class PointerInputTest {
         val pointerInputChange2 =
             createPointerInputChange(0f, 0f, false, 0f, 0f, false, 0f, 0f, false)
 
-        val (_, _, _, consumed) = pointerInputChange1.apply { consumeDownChange() }
-        val (_, _, _, consumed1) = pointerInputChange2.apply { consumeDownChange() }
+        val consumed = pointerInputChange1.apply { consumeDownChange() }.consumed
+        val consumed1 = pointerInputChange2.apply { consumeDownChange() }.consumed
 
         assertThat(consumed.downChange, `is`(false))
         assertThat(consumed1.downChange, `is`(false))
@@ -565,16 +565,12 @@ class PointerInputTest {
     ): PointerInputChange {
         return PointerInputChange(
             PointerId(0),
-            PointerInputData(
-                Uptime.Boot + 100.milliseconds,
-                Offset(currentX, currentY),
-                currentDown
-            ),
-            PointerInputData(
-                Uptime.Boot + 0.milliseconds,
-                Offset(previousX, previousY),
-                previousDown
-            ),
+            Uptime.Boot + 100.milliseconds,
+            Offset(currentX, currentY),
+            currentDown,
+            Uptime.Boot + 0.milliseconds,
+            Offset(previousX, previousY),
+            previousDown,
             ConsumedData(
                 Offset(
                     consumedX,
@@ -627,10 +623,5 @@ private class PointerInputChangeSubject(
     }
 }
 
-private fun PointerInputChange.deepCopy() =
-    PointerInputChange(
-        id,
-        current.copy(),
-        previous.copy(),
-        ConsumedData(consumed.positionChange, consumed.downChange)
-    )
+private fun PointerInputChange.deepCopy(): PointerInputChange =
+    copy(consumed = ConsumedData(consumed.positionChange, consumed.downChange))

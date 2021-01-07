@@ -96,8 +96,8 @@ private fun Modifier.swipeToDismiss(index: Int): Modifier = composed {
                     verticalDrag(pointerId) {
                         animatedOffset.snapTo(animatedOffset.value + it.positionChange().y)
                         velocityTracker.addPosition(
-                            it.current.uptime,
-                            it.current.position
+                            it.time,
+                            it.position
                         )
                     }
                 }

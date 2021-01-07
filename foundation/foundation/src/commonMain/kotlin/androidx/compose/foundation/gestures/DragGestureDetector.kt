@@ -72,7 +72,7 @@ suspend fun AwaitPointerEventScope.awaitTouchSlopOrCancellation(
         if (dragEvent.anyPositionChangeConsumed()) {
             return null
         } else if (dragEvent.changedToUpIgnoreConsumed()) {
-            val otherDown = event.changes.firstOrNull { it.current.down }
+            val otherDown = event.changes.firstOrNull { it.pressed }
             if (otherDown == null) {
                 // This is the last "up"
                 return null
@@ -508,7 +508,7 @@ private suspend inline fun AwaitPointerEventScope.awaitDragOrUp(
         val event = awaitPointerEvent()
         val dragEvent = event.changes.firstOrNull { it.id == pointer }!!
         if (dragEvent.changedToUpIgnoreConsumed()) {
-            val otherDown = event.changes.firstOrNull { it.current.down }
+            val otherDown = event.changes.firstOrNull { it.pressed }
             if (otherDown == null) {
                 // This is the last "up"
                 return dragEvent
@@ -559,7 +559,7 @@ private suspend inline fun AwaitPointerEventScope.awaitTouchSlopOrCancellation(
         if (dragEvent.anyPositionChangeConsumed()) {
             return null
         } else if (dragEvent.changedToUpIgnoreConsumed()) {
-            val otherDown = event.changes.firstOrNull { it.current.down }
+            val otherDown = event.changes.firstOrNull { it.pressed }
             if (otherDown == null) {
                 // This is the last "up"
                 return null
@@ -567,8 +567,8 @@ private suspend inline fun AwaitPointerEventScope.awaitTouchSlopOrCancellation(
                 pointer = otherDown.id
             }
         } else {
-            val currentPosition = dragEvent.current.position
-            val previousPosition = dragEvent.previous.position
+            val currentPosition = dragEvent.position
+            val previousPosition = dragEvent.previousPosition
             val positionChange = getDragDirectionValue(currentPosition) -
                 getDragDirectionValue(previousPosition)
             totalPositionChange += positionChange
@@ -596,4 +596,4 @@ private suspend inline fun AwaitPointerEventScope.awaitTouchSlopOrCancellation(
 }
 
 private fun PointerEvent.isPointerUp(pointerId: PointerId): Boolean =
-    changes.firstOrNull { it.id == pointerId }?.current?.down != true
+    changes.firstOrNull { it.id == pointerId }?.pressed != true

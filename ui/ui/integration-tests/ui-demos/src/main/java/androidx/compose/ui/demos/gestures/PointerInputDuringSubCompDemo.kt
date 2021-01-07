@@ -115,7 +115,7 @@ internal class PointerCounterGestureFilter : PointerInputFilter() {
                 it.changedToDownIgnoreConsumed() || it.changedToUpIgnoreConsumed()
             }
             ) {
-                onPointerCountChanged.invoke(changes.count { it.current.down })
+                onPointerCountChanged.invoke(changes.count { it.pressed })
             }
         }
     }

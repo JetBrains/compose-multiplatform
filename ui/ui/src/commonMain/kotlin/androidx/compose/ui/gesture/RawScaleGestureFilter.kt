@@ -157,7 +157,7 @@ internal class RawScaleGestureFilter : PointerInputFilter() {
         if (pass == PointerEventPass.Main) {
 
             val currentlyDownChanges = changes.filter {
-                it.current.down && it.previous.down
+                it.pressed && it.previousPressed
             }
 
             val scaleObserver = scaleObserver

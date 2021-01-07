@@ -90,7 +90,7 @@ internal class RawPressStartGestureFilter : PointerInputFilter() {
                 // If we have not yet started and all of the changes changed to down, we are
                 // starting.
                 active = true
-                onPressStart(changes.first().current.position)
+                onPressStart(changes.first().position)
             } else if (changes.all { it.changedToUp() }) {
                 // If we have started and all of the changes changed to up, we are stopping.
                 active = false

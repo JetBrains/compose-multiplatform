@@ -31,45 +31,45 @@ internal fun down(
 ): PointerInputChange =
     PointerInputChange(
         PointerId(id),
-        PointerInputData(
-            Uptime.Boot + duration,
-            Offset(x, y),
-            true
-        ),
-        PointerInputData(Uptime.Boot + duration, Offset(x, y), false),
+        Uptime.Boot + duration,
+        Offset(x, y),
+        true,
+        Uptime.Boot + duration,
+        Offset(x, y),
+        false,
         ConsumedData(Offset.Zero, false)
     )
 
 internal fun PointerInputChange.moveTo(duration: Duration, x: Float = 0f, y: Float = 0f) =
     copy(
-        previous = current,
-        current = PointerInputData(
-            Uptime.Boot + duration,
-            Offset(x, y),
-            true
-        ),
+        previousTime = time,
+        previousPressed = pressed,
+        previousPosition = position,
+        currentTime = Uptime.Boot + duration,
+        currentPressed = true,
+        currentPosition = Offset(x, y),
         consumed = ConsumedData()
     )
 
 internal fun PointerInputChange.moveBy(duration: Duration, dx: Float = 0f, dy: Float = 0f) =
     copy(
-        previous = current,
-        current = PointerInputData(
-            current.uptime + duration,
-            Offset(current.position.x + dx, current.position.y + dy),
-            true
-        ),
+        previousTime = time,
+        previousPressed = pressed,
+        previousPosition = position,
+        currentTime = time + duration,
+        currentPressed = true,
+        currentPosition = Offset(position.x + dx, position.y + dy),
         consumed = ConsumedData()
     )
 
 internal fun PointerInputChange.up(duration: Duration) =
     copy(
-        previous = current,
-        current = PointerInputData(
-            Uptime.Boot + duration,
-            current.position,
-            false
-        ),
+        previousTime = time,
+        previousPressed = pressed,
+        previousPosition = position,
+        currentTime = Uptime.Boot + duration,
+        currentPressed = false,
+        currentPosition = position,
         consumed = ConsumedData()
     )
 

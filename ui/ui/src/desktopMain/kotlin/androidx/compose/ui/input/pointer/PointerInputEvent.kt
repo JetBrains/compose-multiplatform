@@ -17,8 +17,21 @@
 package androidx.compose.ui.input.pointer
 
 import androidx.compose.ui.unit.Uptime
+import androidx.compose.ui.geometry.Offset
 
-actual class PointerInputEvent(
+internal actual class PointerInputEvent(
     actual val uptime: Uptime,
     actual val pointers: List<PointerInputEventData>
 )
+
+/**
+ * This exposes PointerInputEventData for testing purposes.
+ */
+class TestPointerInputEventData(
+    val id: PointerId,
+    val uptime: Uptime,
+    val position: Offset,
+    val down: Boolean
+) {
+    internal fun toPointerInputEventData() = PointerInputEventData(id, uptime, position, down)
+}

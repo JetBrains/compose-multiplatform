@@ -66,7 +66,7 @@ fun AnimatableAnimateToGenericsType() {
             coroutineScope {
                 while (true) {
                     val offset = awaitPointerEventScope {
-                        awaitFirstDown().current.position
+                        awaitFirstDown().position
                     }
                     // Launch a new coroutine for animation so the touch detection thread is not
                     // blocked.
@@ -113,8 +113,8 @@ fun AnimatableDecayAndAnimateToSample() {
                             // Snaps the value by the amount of finger movement
                             animatedOffset.snapTo(animatedOffset.value + it.positionChange().y)
                             velocityTracker.addPosition(
-                                it.current.uptime,
-                                it.current.position
+                                it.time,
+                                it.position
                             )
                         }
                     }

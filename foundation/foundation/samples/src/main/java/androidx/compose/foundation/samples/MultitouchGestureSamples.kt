@@ -88,7 +88,7 @@ fun CalculateRotation() {
                             val event = awaitPointerEvent()
                             val rotation = event.calculateRotation()
                             angle += rotation
-                        } while (event.changes.any { it.current.down })
+                        } while (event.changes.any { it.pressed })
                     }
                 }
             }
@@ -111,7 +111,7 @@ fun CalculateZoom() {
                         do {
                             val event = awaitPointerEvent()
                             zoom *= event.calculateZoom()
-                        } while (event.changes.any { it.current.down })
+                        } while (event.changes.any { it.pressed })
                     }
                 }
             }
@@ -138,7 +138,7 @@ fun CalculatePan() {
                             val offset = event.calculatePan()
                             offsetX.value += offset.x
                             offsetY.value += offset.y
-                        } while (event.changes.any { it.current.down })
+                        } while (event.changes.any { it.pressed })
                     }
                 }
             }
@@ -161,7 +161,7 @@ fun CalculateCentroidSize() {
                 forEachGesture {
                     awaitPointerEventScope {
                         awaitFirstDown().also {
-                            position = it.current.position
+                            position = it.position
                         }
                         do {
                             val event = awaitPointerEvent()
@@ -173,7 +173,7 @@ fun CalculateCentroidSize() {
                             if (centroid != Offset.Unspecified) {
                                 position = centroid
                             }
-                        } while (event.changes.any { it.current.down })
+                        } while (event.changes.any { it.pressed })
                     }
                 }
             }
