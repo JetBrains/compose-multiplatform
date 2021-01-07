@@ -147,7 +147,7 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                 updateSelection(
                     startPosition = convertToContainerCoordinates(layoutCoordinates, startPosition),
                     endPosition = convertToContainerCoordinates(layoutCoordinates, endPosition),
-                    isStartHandle = true,
+                    isStartHandle = false,
                     longPress = true
                 )
             }
@@ -467,7 +467,6 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                 } else {
                     dragBeginPosition + dragTotalDistance
                 }
-
                 updateSelection(
                     startPosition = currentStart,
                     endPosition = currentEnd,
