@@ -65,7 +65,7 @@ class TextInputServiceAndroidOnStateUpdateTest {
 
     @Test
     fun onUpdateState_resetInputCalled_whenOnlyTextChanged() {
-        textInputService.onStateUpdated(
+        textInputService.updateState(
             oldValue = TextFieldValue("a"),
             newValue = TextFieldValue("b")
         )
@@ -77,7 +77,7 @@ class TextInputServiceAndroidOnStateUpdateTest {
     @OptIn(InternalTextApi::class)
     @Test
     fun onUpdateState_resetInputCalled_whenOnlyCompositionChanged() {
-        textInputService.onStateUpdated(
+        textInputService.updateState(
             oldValue = buildTextFieldValue("a", TextRange.Zero, TextRange.Zero),
             newValue = buildTextFieldValue("a", TextRange.Zero, null)
         )
@@ -89,7 +89,7 @@ class TextInputServiceAndroidOnStateUpdateTest {
     @InternalTextApi
     @Test
     fun onUpdateState_updateSelectionCalled_whenOnlySelectionChanged() {
-        textInputService.onStateUpdated(
+        textInputService.updateState(
             oldValue = buildTextFieldValue("a", TextRange.Zero, null),
             newValue = buildTextFieldValue("a", TextRange(1), null)
         )
@@ -101,7 +101,7 @@ class TextInputServiceAndroidOnStateUpdateTest {
     @OptIn(InternalTextApi::class)
     @Test
     fun onUpdateState_resetInputNotCalled_whenSelectionAndCompositionChanged() {
-        textInputService.onStateUpdated(
+        textInputService.updateState(
             oldValue = buildTextFieldValue("a", TextRange.Zero, TextRange.Zero),
             newValue = buildTextFieldValue("a", TextRange(1), null)
         )
@@ -112,7 +112,7 @@ class TextInputServiceAndroidOnStateUpdateTest {
 
     @Test
     fun onUpdateState_resetInputNotCalled_whenValuesAreSame() {
-        textInputService.onStateUpdated(
+        textInputService.updateState(
             oldValue = TextFieldValue("a"),
             newValue = TextFieldValue("a")
         )
