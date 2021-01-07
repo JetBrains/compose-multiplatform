@@ -972,7 +972,7 @@ package androidx.compose.ui.text.input {
     property public final androidx.compose.ui.text.AnnotatedString transformedText;
   }
 
-  @androidx.compose.runtime.Immutable public interface VisualTransformation {
+  @androidx.compose.runtime.Immutable public fun interface VisualTransformation {
     method public androidx.compose.ui.text.input.TransformedText filter(androidx.compose.ui.text.AnnotatedString text);
     field public static final androidx.compose.ui.text.input.VisualTransformation.Companion Companion;
   }
