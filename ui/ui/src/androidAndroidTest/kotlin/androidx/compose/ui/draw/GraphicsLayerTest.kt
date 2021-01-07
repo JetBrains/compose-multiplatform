@@ -45,6 +45,7 @@ import androidx.compose.ui.layout.globalPosition
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.padding
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.captureToImage
@@ -390,5 +391,30 @@ class GraphicsLayerTest {
             .assertPixels {
                 color
             }
+    }
+
+    @Test
+    fun testDpPixelConversions() {
+        var density: Density? = null
+        var testDpConversion = 0f
+        var testFontScaleConversion = 0f
+        rule.setContent {
+            density = AmbientDensity.current
+            // Verify that the current density is passed to the graphics layer
+            // implementation and that density dependent methods are consuming it
+            Box(
+                modifier = Modifier.graphicsLayer {
+                    testDpConversion = 2.dp.toPx()
+                    testFontScaleConversion = 3.dp.toSp().toPx()
+                }
+            )
+        }
+
+        rule.runOnIdle {
+            with(density!!) {
+                assertEquals(2.dp.toPx(), testDpConversion)
+                assertEquals(3.dp.toSp().toPx(), testFontScaleConversion)
+            }
+        }
     }
 }
