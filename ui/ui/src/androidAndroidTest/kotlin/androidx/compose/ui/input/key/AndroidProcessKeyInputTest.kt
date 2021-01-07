@@ -45,7 +45,7 @@ import android.view.KeyEvent as AndroidKeyEvent
  */
 @SmallTest
 @RunWith(Parameterized::class)
-class AndroidProcessKeyInputTest(val keyEventAction: Int) {
+class AndroidProcessKeyInputTest(private val keyEventAction: Int) {
     @get:Rule
     val rule = createComposeRule()
 
