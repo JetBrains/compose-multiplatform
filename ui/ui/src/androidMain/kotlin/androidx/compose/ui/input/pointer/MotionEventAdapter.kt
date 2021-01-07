@@ -118,14 +118,12 @@ internal class MotionEventAdapter {
                     "to have been the case"
             )
 
-        return PointerInputEventData(
+        return createPointerInputEventData(
             pointerId,
-            createPointerInputData(
-                Uptime(motionEvent.eventTime * NanosecondsPerMillisecond),
-                motionEvent,
-                index,
-                upIndex
-            )
+            Uptime(motionEvent.eventTime * NanosecondsPerMillisecond),
+            motionEvent,
+            index,
+            upIndex
         )
     }
 }
@@ -133,17 +131,19 @@ internal class MotionEventAdapter {
 /**
  * Creates a new PointerInputData.
  */
-private fun createPointerInputData(
+private fun createPointerInputEventData(
+    pointerId: PointerId,
     timestamp: Uptime,
     motionEvent: MotionEvent,
     index: Int,
     upIndex: Int?
-): PointerInputData {
+): PointerInputEventData {
     val pointerCoords = MotionEvent.PointerCoords()
     motionEvent.getPointerCoords(index, pointerCoords)
     val offset = Offset(pointerCoords.x, pointerCoords.y)
 
-    return PointerInputData(
+    return PointerInputEventData(
+        pointerId,
         timestamp,
         offset,
         index != upIndex

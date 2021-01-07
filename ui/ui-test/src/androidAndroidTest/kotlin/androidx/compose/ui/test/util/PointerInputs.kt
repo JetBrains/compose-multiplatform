@@ -22,7 +22,6 @@ import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputChange
-import androidx.compose.ui.input.pointer.PointerInputData
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.unit.Duration
@@ -30,12 +29,14 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.Uptime
 import com.google.common.truth.Truth.assertThat
 
-data class DataPoint(val id: PointerId, val data: PointerInputData) {
-    val timestamp get() = data.uptime
-    val position get() = data.position
-    val x get() = data.position.x
-    val y get() = data.position.y
-    val down get() = data.down
+data class DataPoint(
+    val id: PointerId,
+    val timestamp: Uptime,
+    val position: Offset,
+    val down: Boolean
+) {
+    val x get() = position.x
+    val y get() = position.y
 }
 
 class SinglePointerInputRecorder : PointerInputModifier {
@@ -47,8 +48,8 @@ class SinglePointerInputRecorder : PointerInputModifier {
 
     override val pointerInputFilter = RecordingFilter { changes ->
         changes.forEach {
-            _events.add(DataPoint(it.id, it.current))
-            velocityTracker.addPosition(it.current.uptime, it.current.position)
+            _events.add(DataPoint(it.id, it.time, it.position, it.pressed))
+            velocityTracker.addPosition(it.time, it.position)
         }
     }
 }
@@ -63,7 +64,13 @@ class MultiPointerInputRecorder : PointerInputModifier {
     val events get() = _events as List<Event>
 
     override val pointerInputFilter = RecordingFilter { changes ->
-        _events.add(Event(changes.map { DataPoint(it.id, it.current) }))
+        _events.add(
+            Event(
+                changes.map {
+                    DataPoint(it.id, it.time, it.position, it.pressed)
+                }
+            )
+        )
     }
 }
 

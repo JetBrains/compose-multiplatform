@@ -268,11 +268,11 @@ internal class RawDragGestureFilter : PointerInputFilter() {
                         velocityTrackers[it.id] = VelocityTracker()
                             .apply {
                                 addPosition(
-                                    it.current.uptime,
-                                    it.current.position
+                                    it.time,
+                                    it.position
                                 )
                             }
-                        downPositions[it.id] = it.current.position
+                        downPositions[it.id] = it.position
                     }
                 }
             }
@@ -280,7 +280,7 @@ internal class RawDragGestureFilter : PointerInputFilter() {
             // Handle moved changes.
 
             val movedChanges = changes.filter {
-                it.current.down && !it.changedToDownIgnoreConsumed()
+                it.pressed && !it.changedToDownIgnoreConsumed()
             }
 
             movedChanges.fastForEach {
@@ -291,8 +291,8 @@ internal class RawDragGestureFilter : PointerInputFilter() {
                 // TODO(b/162269614): Should be update to only have one velocity tracker that
                 //  tracks the average change overtime, instead of one for each finger.
                 velocityTrackers[it.id]?.addPosition(
-                    it.current.uptime,
-                    it.current.position
+                    it.time,
+                    it.position
                 )
             }
 

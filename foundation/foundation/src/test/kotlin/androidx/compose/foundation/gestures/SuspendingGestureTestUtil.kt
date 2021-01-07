@@ -33,7 +33,6 @@ import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputChange
-import androidx.compose.ui.input.pointer.PointerInputData
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
@@ -128,17 +127,13 @@ internal class SuspendingGestureTestUtil(
     ): PointerInputChange {
         lastTime += timeDiff
         val change = PointerInputChange(
-            PointerId(nextPointerId++),
-            PointerInputData(
-                Uptime.Boot + lastTime,
-                Offset(x, y),
-                true
-            ),
-            PointerInputData(
-                Uptime.Boot + lastTime,
-                Offset(x, y),
-                false
-            ),
+            id = PointerId(nextPointerId++),
+            time = Uptime.Boot + lastTime,
+            position = Offset(x, y),
+            pressed = true,
+            previousTime = Uptime.Boot + lastTime,
+            previousPosition = Offset(x, y),
+            previousPressed = false,
             ConsumedData(Offset.Zero, false)
         )
         activePointers[change.id] = change
@@ -175,13 +170,14 @@ internal class SuspendingGestureTestUtil(
         initial: PointerInputChange.() -> Unit = {}
     ): PointerInputChange {
         lastTime += timeDiff
-        val change = copy(
-            previous = current,
-            current = PointerInputData(
-                Uptime.Boot + lastTime,
-                current.position,
-                false
-            ),
+        val change = PointerInputChange(
+            id = id,
+            previousTime = time,
+            previousPressed = pressed,
+            previousPosition = position,
+            time = Uptime.Boot + lastTime,
+            pressed = false,
+            position = position,
             consumed = ConsumedData()
         )
         activePointers[change.id] = change
@@ -204,13 +200,14 @@ internal class SuspendingGestureTestUtil(
         initial: PointerInputChange.() -> Unit = {}
     ): PointerInputChange {
         lastTime += timeDiff
-        val change = copy(
-            previous = current,
-            current = PointerInputData(
-                Uptime.Boot + lastTime,
-                Offset(x, y),
-                true
-            ),
+        val change = PointerInputChange(
+            id = id,
+            previousTime = time,
+            previousPosition = position,
+            previousPressed = pressed,
+            time = Uptime.Boot + lastTime,
+            position = Offset(x, y),
+            pressed = true,
             consumed = ConsumedData()
         )
         initial(change)
@@ -244,8 +241,8 @@ internal class SuspendingGestureTestUtil(
         final: PointerInputChange.() -> Unit = {},
         initial: PointerInputChange.() -> Unit = {}
     ): PointerInputChange = moveTo(
-        current.position.x + offset.x,
-        current.position.y + offset.y,
+        position.x + offset.x,
+        position.y + offset.y,
         timeDiff,
         main,
         final,
@@ -259,11 +256,16 @@ internal class SuspendingGestureTestUtil(
         val currentTime = Uptime.Boot + lastTime
         activePointers.entries.forEach { entry ->
             val change = entry.value
-            if (change.current.uptime != currentTime) {
+            if (change.time != currentTime) {
                 entry.setValue(
-                    change.copy(
-                        previous = change.current,
-                        current = change.current.copy(uptime = currentTime),
+                    PointerInputChange(
+                        id = change.id,
+                        previousTime = change.time,
+                        previousPressed = change.pressed,
+                        previousPosition = change.position,
+                        time = currentTime,
+                        pressed = change.pressed,
+                        position = change.position,
                         consumed = ConsumedData()
                     )
                 )

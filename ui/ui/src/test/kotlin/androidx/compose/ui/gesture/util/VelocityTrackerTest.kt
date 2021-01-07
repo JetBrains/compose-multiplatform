@@ -17,7 +17,6 @@
 package androidx.compose.ui.gesture.util
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.pointer.PointerInputData
 import androidx.compose.ui.unit.Uptime
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.milliseconds
@@ -122,7 +121,13 @@ class VelocityTrackerTest {
  */
 private fun createPxPosition(width: Float, height: Float) = Offset(width, height)
 
-val velocityEventData: List<PointerInputData> = listOf(
+internal class PointerInputData(
+    val uptime: Uptime,
+    val position: Offset,
+    val down: Boolean
+)
+
+internal val velocityEventData: List<PointerInputData> = listOf(
     PointerInputData(
         uptime = Uptime.Boot + 216690896.milliseconds,
         down = true,
@@ -1655,7 +1660,7 @@ val velocityEventData: List<PointerInputData> = listOf(
     )
 )
 
-val interruptedVelocityEventData: List<PointerInputData> = listOf(
+internal val interruptedVelocityEventData: List<PointerInputData> = listOf(
     PointerInputData(
         uptime = Uptime.Boot + 216698321.milliseconds,
         down = true,

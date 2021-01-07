@@ -277,11 +277,12 @@ internal class SuspendingPointerInputFilter(
         val lastEvent = lastPointerEvent ?: return
 
         val newChanges = lastEvent.changes.mapNotNull { old ->
-            if (old.current.down) {
-                PointerInputChange(
-                    old.id,
-                    current = old.current.copy(down = false),
-                    previous = old.current,
+            if (old.pressed) {
+                old.copy(
+                    currentPressed = false,
+                    previousPosition = old.position,
+                    previousTime = old.time,
+                    previousPressed = old.pressed,
                     consumed = DownChangeConsumed
                 )
             } else null

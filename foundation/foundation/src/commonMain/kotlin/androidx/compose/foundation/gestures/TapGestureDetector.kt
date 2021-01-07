@@ -101,7 +101,7 @@ suspend fun PointerInputScope.detectTapGestures(
                 }
             }
             if (onPress !== NoPressGesture) {
-                launch { pressScope.onPress(down.current.position) }
+                launch { pressScope.onPress(down.position) }
             }
 
             val longPressTimeout =
@@ -136,7 +136,7 @@ suspend fun PointerInputScope.detectTapGestures(
                     onTap() // no need to check for double-tap.
                 } else {
                     // check for second tap
-                    val secondDown = detectSecondTapDown(up.current.uptime)
+                    val secondDown = detectSecondTapDown(up.time)
 
                     if (secondDown == null) {
                         onTap() // no valid second tap started
@@ -145,7 +145,7 @@ suspend fun PointerInputScope.detectTapGestures(
                         secondDown.consumeDownChange()
                         pressScope.reset()
                         if (onPress !== NoPressGesture) {
-                            launch { pressScope.onPress(secondDown.current.position) }
+                            launch { pressScope.onPress(secondDown.position) }
                         }
 
                         try {
@@ -235,7 +235,7 @@ private suspend fun PointerInputScope.consumeAllEventsUntilUp() {
             do {
                 val event = awaitPointerEvent(PointerEventPass.Initial)
                 event.changes.fastForEach { it.consumeAllChanges() }
-            } while (event.changes.fastAny { it.current.down })
+            } while (event.changes.fastAny { it.pressed })
         }
     }
 }
@@ -256,7 +256,7 @@ private suspend fun PointerInputScope.detectSecondTapDown(
             // The second tap doesn't count if it happens before DoubleTapMinTime of the first tap
             do {
                 change = awaitFirstDown()
-            } while (change.current.uptime < minUptime)
+            } while (change.time < minUptime)
             change
         }
     }

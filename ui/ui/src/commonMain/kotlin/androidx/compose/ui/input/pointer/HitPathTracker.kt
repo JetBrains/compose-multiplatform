@@ -543,8 +543,8 @@ internal class Node(val pointerInputFilter: PointerInputFilter) : NodeParent() {
         if (position != IntOffset.Zero) {
             changes.replaceEverything {
                 it.copy(
-                    current = it.current.copy(position = it.current.position.plus(position)),
-                    previous = it.previous.copy(position = it.previous.position.plus(position))
+                    currentPosition = it.position + position,
+                    previousPosition = it.previousPosition + position
                 )
             }
         }
