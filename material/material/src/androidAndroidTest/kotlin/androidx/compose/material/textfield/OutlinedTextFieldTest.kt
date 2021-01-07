@@ -261,7 +261,7 @@ class OutlinedTextFieldTest {
         }
 
         // click to focus
-        clickAndAdvanceClock(TextfieldTag, 200)
+        rule.onNodeWithTag(TextfieldTag).performClick()
 
         rule.runOnIdleWithDensity {
             // size
@@ -333,7 +333,7 @@ class OutlinedTextFieldTest {
             }
         }
         // click to focus
-        clickAndAdvanceClock(TextfieldTag, 200)
+        rule.onNodeWithTag(TextfieldTag).performClick()
 
         rule.runOnIdleWithDensity {
             // size
@@ -376,7 +376,7 @@ class OutlinedTextFieldTest {
             }
         }
         // click to focus
-        clickAndAdvanceClock(TextfieldTag, 200)
+        rule.onNodeWithTag(TextfieldTag).performClick()
 
         rule.runOnIdleWithDensity {
             // size
@@ -419,7 +419,7 @@ class OutlinedTextFieldTest {
         }
 
         // click to focus
-        clickAndAdvanceClock(TextfieldTag, 200)
+        rule.onNodeWithTag(TextfieldTag).performClick()
 
         rule.runOnIdleWithDensity {
             assertThat(placeholderSize.value).isNull()
@@ -644,7 +644,7 @@ class OutlinedTextFieldTest {
             }
         }
 
-        clickAndAdvanceClock(TextfieldTag, 200)
+        rule.onNodeWithTag(TextfieldTag).performClick()
 
         rule.runOnIdle {
             verify(textInputService, atLeastOnce()).startInput(
@@ -738,12 +738,5 @@ class OutlinedTextFieldTest {
         rule.runOnIdle {
             assertThat(controller).isNotNull()
         }
-    }
-
-    private fun clickAndAdvanceClock(tag: String, time: Long) {
-        rule.onNodeWithTag(tag).performClick()
-        rule.waitForIdle()
-        rule.clockTestRule.pauseClock()
-        rule.clockTestRule.advanceClock(time)
     }
 }

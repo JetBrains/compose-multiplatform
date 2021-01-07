@@ -82,13 +82,16 @@ class AnimationModifierTest {
         var animationStartSize: IntSize? = null
         var animationEndSize: IntSize? = null
 
-        rule.clockTestRule.pauseClock()
+        val frameDuration = 16
+        val animDuration = 10 * frameDuration
+
+        rule.mainClock.autoAdvance = false
         rule.setContent {
             Box(
                 testModifier
                     .animateContentSize(
                         tween(
-                            200,
+                            animDuration,
                             easing = LinearOutSlowInEasing
                         )
                     ) { startSize, endSize ->
@@ -100,14 +103,16 @@ class AnimationModifierTest {
             density = AmbientDensity.current.density
         }
 
-        rule.runOnIdle {
+        rule.runOnUiThread {
             width = endWidth
             height = endHeight
         }
+        rule.mainClock.advanceTimeByFrame()
+        rule.mainClock.advanceTimeByFrame()
         rule.waitForIdle()
 
-        for (i in 0..200 step 20) {
-            val fraction = LinearOutSlowInEasing.invoke(i / 200f)
+        for (i in 0..animDuration step frameDuration) {
+            val fraction = LinearOutSlowInEasing.invoke(i / animDuration.toFloat())
             assertEquals(
                 density * (startWidth * (1 - fraction) + endWidth * fraction),
                 testModifier.width.toFloat(), 1f
@@ -118,7 +123,7 @@ class AnimationModifierTest {
                 testModifier.height.toFloat(), 1f
             )
 
-            if (i == 200) {
+            if (i == animDuration) {
                 assertNotNull(animationStartSize)
                 assertEquals(
                     animationStartSize!!.width.toFloat(),
@@ -132,7 +137,7 @@ class AnimationModifierTest {
                 assertNull(animationEndSize)
             }
 
-            rule.clockTestRule.advanceClock(20)
+            rule.mainClock.advanceTimeBy(frameDuration.toLong())
             rule.waitForIdle()
         }
     }

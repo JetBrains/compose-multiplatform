@@ -28,19 +28,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.dispatch.AndroidUiDispatcher
-import androidx.compose.runtime.dispatch.withFrameNanos
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.ExperimentalTestApi
-import androidx.test.espresso.Espresso.onIdle
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import org.junit.Rule
 import org.junit.Test
 
@@ -59,21 +54,17 @@ class MonotonicFrameClockTestRuleTest {
 
     @get:Rule
     val rule = createAndroidComposeRule(driveClockByMonotonicFrameClock = true)
-    private val clockTestRule = rule.clockTestRule
 
     /**
      * Tests if advancing the clock manually works when the clock is resumed, and that idleness
      * is reported correctly when doing that.
      */
     @Test
-    fun test() = runBlocking {
+    fun test() {
         val animationState = mutableStateOf(AnimationStates.From)
         rule.setContent {
             Ui(animationState)
         }
-
-        // Before we kick off the animation, the test clock should be idle
-        assertThat(clockTestRule.clock.isIdle).isTrue()
 
         rule.runOnIdle {
             // Kick off the animation
@@ -81,18 +72,13 @@ class MonotonicFrameClockTestRuleTest {
             animationState.value = AnimationStates.To
         }
 
-        // Perform a single recomposition by awaiting the same signal as the Recomposer
-        withContext(AndroidUiDispatcher.Main) { withFrameNanos {} }
+        // Perform a single recomposition by advancing one frame
+        rule.mainClock.advanceTimeByFrame()
 
-        // After we kicked off the animation, the test clock should be non-idle
-        assertThat(clockTestRule.clock.isIdle).isFalse()
-
-        onIdle()
-
-        // After the animation is finished, ...
-        assertThat(animationRunning).isFalse()
-        // ... the test clock should be idle again
-        assertThat(clockTestRule.clock.isIdle).isTrue()
+        rule.runOnIdle {
+            // After the animation is finished, ...
+            assertThat(animationRunning).isFalse()
+        }
     }
 
     @Composable

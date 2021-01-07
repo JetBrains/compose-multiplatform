@@ -22,7 +22,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.dispatch.withFrameNanos
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -93,11 +92,10 @@ class SingleValueAnimationTest {
         var enabled by mutableStateOf(false)
         rule.setContent {
             Box {
-                var animationValue by remember { mutableStateOf(250f) }
                 // Animate from 250f to 50f when enable flips to true
-                animationValue = animateAsState(
+                val animationValue by animateAsState(
                     if (enabled) 50f else 250f, tween(200, easing = FastOutLinearInEasing)
-                ).value
+                )
                 // TODO: Properly test this with a deterministic clock when the test framework is
                 // ready
                 if (enabled) {

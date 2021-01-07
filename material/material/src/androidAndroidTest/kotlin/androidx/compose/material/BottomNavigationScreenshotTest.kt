@@ -31,7 +31,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.createComposeRuleLegacy
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -47,8 +47,9 @@ import org.junit.runner.RunWith
 @OptIn(ExperimentalMaterialApi::class, ExperimentalTestApi::class)
 class BottomNavigationScreenshotTest {
 
+    @Suppress("DEPRECATION")
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val composeTestRule = createComposeRuleLegacy()
 
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL)
@@ -273,6 +274,7 @@ class BottomNavigationScreenshotTest {
      * @param interaction the [Interaction] to assert for, or `null` if no [Interaction].
      * @param goldenIdentifier the identifier for the corresponding screenshot
      */
+    @Suppress("DEPRECATION") // Due to clockTestRule
     private fun assertBottomNavigationMatches(
         interactionState: InteractionState,
         interaction: Interaction? = null,

@@ -28,6 +28,7 @@ import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.IdlingResource
 import androidx.compose.ui.test.InternalTestApi
+import androidx.compose.ui.test.MainTestClock
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.SemanticsNodeInteractionCollection
@@ -63,6 +64,9 @@ class DesktopComposeTestRule : ComposeTestRule {
     override val clockTestRule: AnimationClockTestRule = DesktopAnimationClockTestRule()
 
     override val density: Density
+        get() = TODO()
+
+    override val mainClock: MainTestClock
         get() = TODO()
 
     override val displaySize: IntSize get() = IntSize(1024, 768)
@@ -129,6 +133,10 @@ class DesktopComposeTestRule : ComposeTestRule {
         // stabilization of the new rendering/dispatching model
         waitForIdle()
         return action().also { waitForIdle() }
+    }
+
+    override fun waitUntil(timeoutMillis: Long, condition: () -> Boolean) {
+        // TODO: implement
     }
 
     override fun registerIdlingResource(idlingResource: IdlingResource) {
@@ -201,6 +209,10 @@ class DesktopComposeTestRule : ComposeTestRule {
 
         override fun getOwners(): Set<Owner> {
             return rule.owners!!.list
+        }
+
+        override fun advanceTimeBy(millis: Long) {
+            TODO()
         }
     }
 }

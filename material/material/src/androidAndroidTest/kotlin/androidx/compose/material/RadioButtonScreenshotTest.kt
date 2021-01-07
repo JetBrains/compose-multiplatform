@@ -30,7 +30,7 @@ import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.center
 import androidx.compose.ui.test.down
 import androidx.compose.ui.test.isSelectable
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.createComposeRuleLegacy
 import androidx.compose.ui.test.move
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performGesture
@@ -49,8 +49,9 @@ import org.junit.runner.RunWith
 @OptIn(ExperimentalTestApi::class)
 class RadioButtonScreenshotTest {
 
+    @Suppress("DEPRECATION")
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createComposeRuleLegacy()
 
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL)
@@ -115,6 +116,7 @@ class RadioButtonScreenshotTest {
     }
 
     @Test
+    @Suppress("DEPRECATION") // Due to clockTestRule
     fun radioButton_notSelected_animateToSelected() {
         rule.setMaterialContent {
             val isSelected = remember { mutableStateOf(false) }
@@ -141,6 +143,7 @@ class RadioButtonScreenshotTest {
     }
 
     @Test
+    @Suppress("DEPRECATION") // Due to clockTestRule
     fun radioButton_selected_animateToNotSelected() {
         rule.setMaterialContent {
             val isSelected = remember { mutableStateOf(true) }
