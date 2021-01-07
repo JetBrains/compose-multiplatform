@@ -1168,6 +1168,60 @@ class MultiWidgetSelectionDelegateTest {
     }
 
     @Test
+    fun getTextSelectionInfo_long_press_select_ltr_drag_down() {
+        val text = "hello world\n"
+        val fontSize = 20.sp
+        val fontSizeInPx = with(defaultDensity) { fontSize.toPx() }
+
+        val textLayoutResult = simpleTextLayout(
+            text = text,
+            fontSize = fontSize,
+            density = defaultDensity
+        )
+
+        // long pressed between "h" and "e", "hello" should be selected
+        val start = Offset((fontSizeInPx * 2), (fontSizeInPx / 2))
+        val end = start
+        val selectable = mock<Selectable>()
+
+        // Act.
+        val textSelectionInfo1 = getTextSelectionInfo(
+            textLayoutResult = textLayoutResult,
+            selectionCoordinates = Pair(start, end),
+            selectable = selectable,
+            wordBasedSelection = true
+        )
+
+        // Drag downwards, after the drag the selection should remain the same.
+        val textSelectionInfo2 = getTextSelectionInfo(
+            textLayoutResult = textLayoutResult,
+            selectionCoordinates = Pair(start, end + Offset(0f, fontSizeInPx / 4)),
+            selectable = selectable,
+            wordBasedSelection = true,
+            previousSelection = textSelectionInfo1,
+            isStartHandle = false
+        )
+
+        // Assert.
+        assertThat(textSelectionInfo1).isNotNull()
+
+        assertThat(textSelectionInfo1?.start).isNotNull()
+        textSelectionInfo1?.start?.let {
+            assertThat(it.direction).isEqualTo(ResolvedTextDirection.Ltr)
+            assertThat(it.offset).isEqualTo(0)
+        }
+
+        assertThat(textSelectionInfo1?.end).isNotNull()
+        textSelectionInfo1?.end?.let {
+            assertThat(it.direction).isEqualTo(ResolvedTextDirection.Ltr)
+            assertThat(it.offset).isEqualTo("hello".length)
+        }
+
+        assertThat(textSelectionInfo2).isNotNull()
+        assertThat(textSelectionInfo2).isEqualTo(textSelectionInfo1)
+    }
+
+    @Test
     fun getTextSelectionInfo_drag_select_range_ltr() {
         with(defaultDensity) {
             val text = "hello world\n"
@@ -1480,7 +1534,7 @@ class MultiWidgetSelectionDelegateTest {
                 ),
                 handlesCrossed = false
             )
-            // "l" is selected.
+            // first "l" is selected.
             val start = Offset((fontSizeInPx * oldStartOffset), (fontSizeInPx / 2))
             val end = Offset((fontSizeInPx * oldStartOffset), (fontSizeInPx / 2))
 
@@ -1501,10 +1555,10 @@ class MultiWidgetSelectionDelegateTest {
             assertThat(textSelectionInfo?.end).isNotNull()
             textSelectionInfo?.end?.let {
                 assertThat(it.direction).isEqualTo(ResolvedTextDirection.Ltr)
-                assertThat(it.offset).isEqualTo(oldStartOffset - 1)
+                assertThat(it.offset).isEqualTo(oldStartOffset + 1)
             }
 
-            assertThat(textSelectionInfo?.handlesCrossed).isTrue()
+            assertThat(textSelectionInfo?.handlesCrossed).isFalse()
         }
     }
 
@@ -1563,10 +1617,10 @@ class MultiWidgetSelectionDelegateTest {
             assertThat(textSelectionInfo?.end).isNotNull()
             textSelectionInfo?.end?.let {
                 assertThat(it.direction).isEqualTo(ResolvedTextDirection.Rtl)
-                assertThat(it.offset).isEqualTo(oldStartOffset - 1)
+                assertThat(it.offset).isEqualTo(oldStartOffset + 1)
             }
 
-            assertThat(textSelectionInfo?.handlesCrossed).isTrue()
+            assertThat(textSelectionInfo?.handlesCrossed).isFalse()
         }
     }
 
@@ -1598,7 +1652,7 @@ class MultiWidgetSelectionDelegateTest {
                 ),
                 handlesCrossed = false
             )
-            // The Space after "o" is selected.
+            // "o" is selected.
             val start = Offset((fontSizeInPx * oldEndOffset), (fontSizeInPx / 2))
             val end = Offset((fontSizeInPx * oldEndOffset), (fontSizeInPx / 2))
 
@@ -1618,12 +1672,12 @@ class MultiWidgetSelectionDelegateTest {
             assertThat(textSelectionInfo?.start).isNotNull()
             textSelectionInfo?.start?.let {
                 assertThat(it.direction).isEqualTo(ResolvedTextDirection.Ltr)
-                assertThat(it.offset).isEqualTo((oldEndOffset + 1))
+                assertThat(it.offset).isEqualTo((oldEndOffset - 1))
             }
 
             assertThat(textSelectionInfo?.end).isEqualTo(previousSelection.end)
 
-            assertThat(textSelectionInfo?.handlesCrossed).isTrue()
+            assertThat(textSelectionInfo?.handlesCrossed).isFalse()
         }
     }
 
@@ -1655,7 +1709,7 @@ class MultiWidgetSelectionDelegateTest {
                 ),
                 handlesCrossed = true
             )
-            // "l" is selected.
+            // first "l" is selected.
             val start = Offset((fontSizeInPx * oldEndOffset), (fontSizeInPx / 2))
             val end = Offset((fontSizeInPx * oldEndOffset), (fontSizeInPx / 2))
 
@@ -1675,12 +1729,12 @@ class MultiWidgetSelectionDelegateTest {
             assertThat(textSelectionInfo?.start).isNotNull()
             textSelectionInfo?.start?.let {
                 assertThat(it.direction).isEqualTo(ResolvedTextDirection.Ltr)
-                assertThat(it.offset).isEqualTo((oldEndOffset - 1))
+                assertThat(it.offset).isEqualTo((oldEndOffset + 1))
             }
 
             assertThat(textSelectionInfo?.end).isEqualTo(previousSelection.end)
 
-            assertThat(textSelectionInfo?.handlesCrossed).isFalse()
+            assertThat(textSelectionInfo?.handlesCrossed).isTrue()
         }
     }
 
@@ -1906,7 +1960,7 @@ class MultiWidgetSelectionDelegateTest {
                 ),
                 handlesCrossed = true
             )
-            // The space after "o" is selected.
+            // "o" is selected.
             val start = Offset((fontSizeInPx * oldStartOffset), (fontSizeInPx / 2))
             val end = Offset((fontSizeInPx * oldStartOffset), (fontSizeInPx / 2))
 
@@ -1928,10 +1982,10 @@ class MultiWidgetSelectionDelegateTest {
             assertThat(textSelectionInfo?.end).isNotNull()
             textSelectionInfo?.end?.let {
                 assertThat(it.direction).isEqualTo(ResolvedTextDirection.Ltr)
-                assertThat(it.offset).isEqualTo((oldStartOffset + 1))
+                assertThat(it.offset).isEqualTo((oldStartOffset - 1))
             }
 
-            assertThat(textSelectionInfo?.handlesCrossed).isFalse()
+            assertThat(textSelectionInfo?.handlesCrossed).isTrue()
         }
     }
 
