@@ -19,14 +19,16 @@ package androidx.compose.ui.test
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
-import androidx.compose.ui.semantics.hidden
+import androidx.compose.ui.semantics.invisibleToUser
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.semantics.toggleableState
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.ExperimentalComposeUiApi
 import org.junit.Rule
 import org.junit.Test
 
@@ -46,9 +48,10 @@ class AssertsTest {
     }
 
     @Test(expected = AssertionError::class)
+    @OptIn(ExperimentalComposeUiApi::class)
     fun assertIsNotHidden_forHiddenElement_throwsError() {
         rule.setContent {
-            BoundaryNode { testTag = "test"; hidden() }
+            BoundaryNode { testTag = "test"; invisibleToUser() }
         }
 
         rule.onNodeWithTag("test")
@@ -56,9 +59,10 @@ class AssertsTest {
     }
 
     @Test
+    @OptIn(ExperimentalComposeUiApi::class)
     fun assertIsHidden_forHiddenElement_isOk() {
         rule.setContent {
-            BoundaryNode { testTag = "test"; hidden() }
+            BoundaryNode { testTag = "test"; invisibleToUser() }
         }
 
         rule.onNodeWithTag("test")
@@ -200,3 +204,11 @@ class AssertsTest {
         Column(Modifier.semantics(properties = props)) {}
     }
 }
+
+@OptIn(ExperimentalComposeUiApi::class)
+fun SemanticsNodeInteraction.assertIsHidden(): SemanticsNodeInteraction =
+    assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.InvisibleToUser))
+
+@OptIn(ExperimentalComposeUiApi::class)
+fun SemanticsNodeInteraction.assertIsNotHidden(): SemanticsNodeInteraction =
+    assert(!SemanticsMatcher.keyIsDefined(SemanticsProperties.InvisibleToUser))
