@@ -189,28 +189,6 @@ fun Slider(
 }
 
 /**
- * Object to hold constants used by the [Slider]
- */
-@Deprecated(
-    "SliderConstants has been replaced with SliderDefaults",
-    ReplaceWith(
-        "SliderDefaults",
-        "androidx.compose.material.SliderDefaults"
-    )
-)
-object SliderConstants {
-    /**
-     * Default alpha of the inactive part of the track
-     */
-    const val InactiveTrackColorAlpha = 0.24f
-
-    /**
-     * Default alpha of the ticks that are drawn on top of the track
-     */
-    const val TickColorAlpha = 0.54f
-}
-
-/**
  * Object to hold defaults used by [Slider]
  */
 object SliderDefaults {

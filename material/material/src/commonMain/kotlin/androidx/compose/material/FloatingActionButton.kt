@@ -207,55 +207,6 @@ interface FloatingActionButtonElevation {
 /**
  * Contains the default values used by [FloatingActionButton]
  */
-@Deprecated(
-    "FloatingActionButtonConstants has been replaced with FloatingActionButtonDefaults",
-    ReplaceWith(
-        "FloatingActionButtonDefaults",
-        "androidx.compose.material.FloatingActionButtonDefaults"
-    )
-)
-object FloatingActionButtonConstants {
-    // TODO: b/152525426 add support for focused and hovered states
-    /**
-     * Creates a [FloatingActionButtonElevation] that will animate between the provided values
-     * according to the Material specification.
-     *
-     * @param defaultElevation the elevation to use when the [FloatingActionButton] has no
-     * [Interaction]s
-     * @param pressedElevation the elevation to use when the [FloatingActionButton] is
-     * [Interaction.Pressed].
-     */
-    @OptIn(ExperimentalMaterialApi::class)
-    @Composable
-    @Deprecated(
-        "FloatingActionButtonConstants has been replaced with " +
-            "FloatingActionButtonDefaults",
-        ReplaceWith(
-            "FloatingActionButtonDefaults.elevation(elevation, pressedElevation, " +
-                "disabledElevation)",
-            "androidx.compose.material.FloatingActionButtonDefaults"
-        )
-    )
-    fun defaultElevation(
-        defaultElevation: Dp = 6.dp,
-        pressedElevation: Dp = 12.dp
-        // focused: Dp = 8.dp,
-        // hovered: Dp = 8.dp,
-    ): FloatingActionButtonElevation {
-        val clock = AmbientAnimationClock.current.asDisposableClock()
-        return remember(defaultElevation, pressedElevation, clock) {
-            DefaultFloatingActionButtonElevation(
-                defaultElevation = defaultElevation,
-                pressedElevation = pressedElevation,
-                clock = clock
-            )
-        }
-    }
-}
-
-/**
- * Contains the default values used by [FloatingActionButton]
- */
 object FloatingActionButtonDefaults {
     // TODO: b/152525426 add support for focused and hovered states
     /**

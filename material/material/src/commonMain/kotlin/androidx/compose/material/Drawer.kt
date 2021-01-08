@@ -536,33 +536,6 @@ fun BottomDrawerLayout(
 /**
  * Object to hold default values for [ModalDrawerLayout] and [BottomDrawerLayout]
  */
-@Deprecated(
-    "DrawerConstants has been replaced with DrawerDefaults",
-    ReplaceWith(
-        "DrawerDefaults",
-        "androidx.compose.material.DrawerDefaults"
-    )
-)
-object DrawerConstants {
-
-    /**
-     * Default Elevation for drawer sheet as specified in material specs
-     */
-    val DefaultElevation = 16.dp
-
-    val defaultScrimColor: Color
-        @Composable
-        get() = MaterialTheme.colors.onSurface.copy(alpha = ScrimDefaultOpacity)
-
-    /**
-     * Default alpha for scrim color
-     */
-    const val ScrimDefaultOpacity = 0.32f
-}
-
-/**
- * Object to hold default values for [ModalDrawerLayout] and [BottomDrawerLayout]
- */
 object DrawerDefaults {
 
     /**

@@ -67,55 +67,6 @@ fun AnimatedValue<Dp, *>.animateElevation(
  *
  * @see animateElevation
  */
-@Deprecated(
-    "ElevationConstants has been replaced with ElevationDefaults",
-    ReplaceWith(
-        "ElevationDefaults",
-        "androidx.compose.material.ElevationDefaults"
-    )
-)
-object ElevationConstants {
-    /**
-     * Returns the [AnimationSpec]s used when animating elevation to [interaction], either from a
-     * previous [Interaction], or from the default state. If [interaction] is unknown, then
-     * returns `null`.
-     *
-     * @param interaction the [Interaction] that is being animated to
-     */
-    fun incomingAnimationSpecForInteraction(interaction: Interaction): AnimationSpec<Dp>? {
-        return when (interaction) {
-            is Interaction.Pressed -> DefaultIncomingSpec
-            is Interaction.Dragged -> DefaultIncomingSpec
-            else -> null
-        }
-    }
-
-    /**
-     * Returns the [AnimationSpec]s used when animating elevation away from [interaction], to the
-     * default state. If [interaction] is unknown, then returns `null`.
-     *
-     * @param interaction the [Interaction] that is being animated away from
-     */
-    fun outgoingAnimationSpecForInteraction(interaction: Interaction): AnimationSpec<Dp>? {
-        return when (interaction) {
-            is Interaction.Pressed -> DefaultOutgoingSpec
-            is Interaction.Dragged -> DefaultOutgoingSpec
-            // TODO: use [HoveredOutgoingSpec] when hovered
-            else -> null
-        }
-    }
-}
-
-/**
- * Contains default [AnimationSpec]s used for animating elevation between different [Interaction]s.
- *
- * Typically you should use [animateElevation] instead, which uses these [AnimationSpec]s
- * internally. [animateElevation] in turn is used by the defaults for [Button] and
- * [FloatingActionButton] - inside [ButtonDefaults.elevation] and
- * [FloatingActionButtonDefaults.elevation] respectively.
- *
- * @see animateElevation
- */
 object ElevationDefaults {
     /**
      * Returns the [AnimationSpec]s used when animating elevation to [interaction], either from a
