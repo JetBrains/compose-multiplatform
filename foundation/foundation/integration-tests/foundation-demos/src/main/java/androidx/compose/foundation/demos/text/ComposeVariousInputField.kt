@@ -71,16 +71,14 @@ private val creditCardOffsetTranslator = object : OffsetMapping {
  * This filter converts up to 16 digits to hyphen connected 4 digits string.
  * For example, "1234567890123456" will be shown as "1234-5678-9012-3456".
  */
-private val creditCardFilter = object : VisualTransformation {
-    override fun filter(text: AnnotatedString): TransformedText {
-        val trimmed = if (text.text.length >= 16) text.text.substring(0..15) else text.text
-        var out = ""
-        for (i in 0 until trimmed.length) {
-            out += trimmed[i]
-            if (i % 4 == 3 && i != 15) out += "-"
-        }
-        return TransformedText(AnnotatedString(out), creditCardOffsetTranslator)
+private val creditCardFilter = VisualTransformation { text ->
+    val trimmed = if (text.text.length >= 16) text.text.substring(0..15) else text.text
+    var out = ""
+    for (i in 0 until trimmed.length) {
+        out += trimmed[i]
+        if (i % 4 == 3 && i != 15) out += "-"
     }
+    TransformedText(AnnotatedString(out), creditCardOffsetTranslator)
 }
 
 /**
@@ -154,23 +152,19 @@ private val phoneNumberOffsetTranslator = object : OffsetMapping {
  * This filter converts up to 10 digits to phone number form.
  * For example, "1234567890" will be shown as "(123) 456-7890".
  */
-private val phoneNumberFilter = object : VisualTransformation {
-    override fun filter(text: AnnotatedString): TransformedText {
-        val trimmed = if (text.text.length >= 10) text.text.substring(0..9) else text.text
-        val filled = trimmed + "_".repeat(10 - trimmed.length)
-        val res = "(" + filled.substring(0..2) + ") " + filled.substring(3..5) + "-" +
-            filled.substring(6..9)
-        return TransformedText(AnnotatedString(text = res), phoneNumberOffsetTranslator)
-    }
+private val phoneNumberFilter = VisualTransformation { text ->
+    val trimmed = if (text.text.length >= 10) text.text.substring(0..9) else text.text
+    val filled = trimmed + "_".repeat(10 - trimmed.length)
+    val res = "(" + filled.substring(0..2) + ") " + filled.substring(3..5) + "-" +
+        filled.substring(6..9)
+    TransformedText(AnnotatedString(text = res), phoneNumberOffsetTranslator)
 }
 
-private val emailFilter = object : VisualTransformation {
-    override fun filter(text: AnnotatedString): TransformedText {
-        return if (text.text.indexOf("@") == -1) {
-            TransformedText(AnnotatedString(text = text.text + "@gmail.com"), identityTranslator)
-        } else {
-            TransformedText(text, identityTranslator)
-        }
+private val emailFilter = VisualTransformation { text ->
+    if (text.text.indexOf("@") == -1) {
+        TransformedText(AnnotatedString(text = text.text + "@gmail.com"), identityTranslator)
+    } else {
+        TransformedText(text, identityTranslator)
     }
 }
 
