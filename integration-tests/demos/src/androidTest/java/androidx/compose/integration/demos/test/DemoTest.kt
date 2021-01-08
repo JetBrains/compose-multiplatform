@@ -32,7 +32,7 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isDialog
-import androidx.compose.ui.test.junit4.createAndroidComposeRuleLegacy
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -51,6 +51,7 @@ private val demosWithInifinateAnimations = listOf("Material > Progress Indicator
 private val ignoredDemos = listOf(
     // TODO(b/168695905, fresen): We don't have a way to pause suspend animations yet.
     "Animation > Suspend Animation Demos > Infinitely Animating",
+    "Animation > State Transition Demos > Infinite transition",
 )
 
 @LargeTest
@@ -58,9 +59,8 @@ private val ignoredDemos = listOf(
 @OptIn(ExperimentalTestApi::class)
 class DemoTest {
     // We need to provide the recompose factory first to use new clock.
-    @Suppress("DEPRECATION")
     @get:Rule
-    val rule = createAndroidComposeRuleLegacy<DemoActivity>()
+    val rule = createAndroidComposeRule<DemoActivity>()
 
     @Test
     fun testFiltering() {
@@ -116,8 +116,7 @@ class DemoTest {
     @Test
     fun navigateThroughAllDemos_withInfiniteAnimations() {
         // Pause the clock in these tests and forward it manually
-        @Suppress("DEPRECATION")
-        rule.clockTestRule.pauseClock()
+        rule.mainClock.autoAdvance = false
         navigateThroughAllDemos(AllDemosWithInfiniteAnimations, fastForwardClock = true)
     }
 
@@ -204,13 +203,17 @@ class DemoTest {
         rule.waitForIdle()
         Espresso.pressBack()
 
+        if (fastForwardClock) {
+            // Pump press back
+            fastForwardClock(2000)
+        }
+
         assertAppBarHasTitle(navigationTitle)
     }
 
-    private fun fastForwardClock() {
+    private fun fastForwardClock(millis: Long = 5000) {
         rule.waitForIdle()
-        @Suppress("DEPRECATION")
-        rule.clockTestRule.advanceClock(5000)
+        rule.mainClock.advanceTimeBy(millis)
     }
 
     /**

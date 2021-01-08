@@ -34,7 +34,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.preference.PreferenceManager
-import androidx.compose.ui.platform.setContent
 import androidx.compose.integration.demos.common.ActivityDemo
 import androidx.compose.integration.demos.common.Demo
 import androidx.compose.integration.demos.common.DemoCategory
@@ -47,6 +46,7 @@ import androidx.compose.runtime.savedinstancestate.Saver
 import androidx.compose.runtime.savedinstancestate.listSaver
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ComposeView
 
 /**
  * Main [Activity] containing all Compose related demos.
@@ -55,7 +55,10 @@ class DemoActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
+
+        ComposeView(this).also {
+            setContentView(it)
+        }.setContent {
             val activityStarter = fun(demo: ActivityDemo<*>) {
                 startActivity(Intent(this, demo.activityClass.java))
             }

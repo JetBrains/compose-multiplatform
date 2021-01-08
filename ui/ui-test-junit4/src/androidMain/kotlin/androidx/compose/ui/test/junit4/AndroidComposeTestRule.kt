@@ -22,8 +22,11 @@ import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.text.blinkingCursorEnabled
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Recomposer
+import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.platform.ViewRootForTest
+import androidx.compose.ui.platform.WindowRecomposerFactory
+import androidx.compose.ui.platform.WindowRecomposerPolicy
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.IdlingResource
@@ -460,6 +463,12 @@ internal constructor(
                 textInputServiceFactory = {
                     TextInputServiceForTests(it)
                 }
+                if (recomposer != null) {
+                    @OptIn(InternalComposeUiApi::class)
+                    WindowRecomposerPolicy.setWindowRecomposerFactory {
+                        recomposer
+                    }
+                }
                 base.evaluate()
             } finally {
                 if (driveClockByMonotonicFrameClock) {
@@ -470,6 +479,13 @@ internal constructor(
                     frameCoroutineScope!!.cancel()
                     @OptIn(ExperimentalCoroutinesApi::class)
                     testCoroutineDispatcher?.cleanupTestCoroutines()
+                }
+                if (recomposer != null) {
+                    @Suppress("DEPRECATION")
+                    @OptIn(InternalComposeUiApi::class)
+                    WindowRecomposerPolicy.setWindowRecomposerFactory(
+                        WindowRecomposerFactory.Global
+                    )
                 }
                 @Suppress("DEPRECATION_ERROR")
                 blinkingCursorEnabled = true

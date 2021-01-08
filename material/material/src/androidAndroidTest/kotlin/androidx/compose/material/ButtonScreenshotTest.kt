@@ -26,7 +26,7 @@ import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.center
 import androidx.compose.ui.test.down
 import androidx.compose.ui.test.hasClickAction
-import androidx.compose.ui.test.junit4.createComposeRuleLegacy
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performGesture
@@ -45,9 +45,8 @@ import org.junit.runner.RunWith
 @OptIn(ExperimentalTestApi::class)
 class ButtonScreenshotTest {
 
-    @Suppress("DEPRECATION")
     @get:Rule
-    val rule = createComposeRuleLegacy()
+    val rule = createComposeRule()
 
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL)
@@ -79,7 +78,6 @@ class ButtonScreenshotTest {
     }
 
     @Test
-    @Suppress("DEPRECATION") // Due to clockTestRule
     fun ripple() {
         rule.setMaterialContent {
             Box(Modifier.size(200.dp, 100.dp).wrapContentSize()) {
@@ -87,7 +85,7 @@ class ButtonScreenshotTest {
             }
         }
 
-        rule.clockTestRule.pauseClock()
+        rule.mainClock.autoAdvance = false
 
         // Start ripple
         rule.onNode(hasClickAction())
@@ -95,7 +93,7 @@ class ButtonScreenshotTest {
 
         // Let ripple propagate
         rule.waitForIdle()
-        rule.clockTestRule.advanceClock(50)
+        rule.mainClock.advanceTimeBy(milliseconds = 50)
 
         rule.onRoot()
             .captureToImage()
