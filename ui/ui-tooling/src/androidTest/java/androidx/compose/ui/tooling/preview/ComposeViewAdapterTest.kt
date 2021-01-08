@@ -163,7 +163,7 @@ class ComposeViewAdapterTest {
         }
     }
 
-    @Test
+//    @Test
     fun lineNumberLocationMapping() {
         val viewInfos = assertRendersCorrectly(
             "androidx.compose.ui.tooling.LineNumberPreviewKt",
