@@ -28,8 +28,8 @@ import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.platform.AmbientClipboardManager
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat
-import androidx.compose.ui.semantics.AccessibilityRangeInfo
-import androidx.compose.ui.semantics.AccessibilityScrollState
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
+import androidx.compose.ui.semantics.ScrollAxisRange
 import androidx.compose.ui.semantics.SemanticsModifierCore
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
@@ -39,11 +39,11 @@ import androidx.compose.ui.semantics.copyText
 import androidx.compose.ui.semantics.cutText
 import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.ui.semantics.stateDescriptionRange
+import androidx.compose.ui.semantics.progressBarRangeInfo
 import androidx.compose.ui.semantics.dismiss
 import androidx.compose.ui.semantics.focused
 import androidx.compose.ui.semantics.getTextLayoutResult
-import androidx.compose.ui.semantics.horizontalAccessibilityScrollState
+import androidx.compose.ui.semantics.horizontalScrollAxisRange
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.onLongClick
 import androidx.compose.ui.semantics.pasteText
@@ -53,7 +53,7 @@ import androidx.compose.ui.semantics.setSelection
 import androidx.compose.ui.semantics.setText
 import androidx.compose.ui.semantics.text
 import androidx.compose.ui.semantics.textSelectionRange
-import androidx.compose.ui.semantics.verticalAccessibilityScrollState
+import androidx.compose.ui.semantics.verticalScrollAxisRange
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextRange
@@ -174,7 +174,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
         val semanticsNode = createSemanticsNodeWithProperties(1, true) {
             disabled()
             text = AnnotatedString("text")
-            horizontalAccessibilityScrollState = AccessibilityScrollState(0f, 5f)
+            horizontalScrollAxisRange = ScrollAxisRange(0f, 5f)
             onClick { true }
             onLongClick { true }
             copyText { true }
@@ -295,7 +295,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
     fun testPopulateAccessibilityNodeInfoProperties_SeekBar() {
         val setProgressActionLabel = "setProgress"
         val semanticsNode = createSemanticsNodeWithProperties(1, true) {
-            stateDescriptionRange = AccessibilityRangeInfo(0.5f, 0f..1f, 6)
+            progressBarRangeInfo = ProgressBarRangeInfo(0.5f, 0f..1f, 6)
             setProgress(setProgressActionLabel) { true }
         }
         accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
@@ -431,14 +431,14 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
     }
 
     @Test
-    fun notSendScrollEvent_whenOnlyAccessibilityScrollStateMaxValueChanges() {
+    fun notSendScrollEvent_whenOnlyScrollAxisRangeMaxValueChanges() {
         val oldSemanticsNode = createSemanticsNodeWithProperties(1, true) {
-            this.verticalAccessibilityScrollState = AccessibilityScrollState(0f, 0f, false)
+            this.verticalScrollAxisRange = ScrollAxisRange(0f, 0f, false)
         }
         accessibilityDelegate.semanticsNodes[1] =
             AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(oldSemanticsNode)
         val newSemanticsNode = createSemanticsNodeWithProperties(1, true) {
-            this.verticalAccessibilityScrollState = AccessibilityScrollState(0f, 5f, false)
+            this.verticalScrollAxisRange = ScrollAxisRange(0f, 5f, false)
         }
         val newNodes = mutableMapOf<Int, SemanticsNode>()
         newNodes[1] = newSemanticsNode
@@ -455,14 +455,14 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
     }
 
     @Test
-    fun sendScrollEvent_whenAccessibilityScrollStateValueChanges() {
+    fun sendScrollEvent_whenScrollAxisRangeValueChanges() {
         val oldSemanticsNode = createSemanticsNodeWithProperties(2, false) {
-            this.verticalAccessibilityScrollState = AccessibilityScrollState(0f, 5f, false)
+            this.verticalScrollAxisRange = ScrollAxisRange(0f, 5f, false)
         }
         accessibilityDelegate.semanticsNodes[2] =
             AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(oldSemanticsNode)
         val newSemanticsNode = createSemanticsNodeWithProperties(2, false) {
-            this.verticalAccessibilityScrollState = AccessibilityScrollState(2f, 5f, false)
+            this.verticalScrollAxisRange = ScrollAxisRange(2f, 5f, false)
         }
         val newNodes = mutableMapOf<Int, SemanticsNode>()
         newNodes[2] = newSemanticsNode

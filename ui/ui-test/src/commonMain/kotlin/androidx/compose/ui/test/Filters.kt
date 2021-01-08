@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.test
 
-import androidx.compose.ui.semantics.AccessibilityRangeInfo
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -24,6 +24,7 @@ import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.util.fastAny
+import androidx.compose.ui.ExperimentalComposeUiApi
 
 /**
  * Returns whether the node is enabled.
@@ -214,7 +215,7 @@ fun hasSubstring(substring: String, ignoreCase: Boolean = false):
  *
  * @see SemanticsProperties.StateDescription
  */
-fun hasValue(value: String): SemanticsMatcher = SemanticsMatcher.expectValue(
+fun hasStateDescription(value: String): SemanticsMatcher = SemanticsMatcher.expectValue(
     SemanticsProperties.StateDescription, value
 )
 
@@ -223,10 +224,10 @@ fun hasValue(value: String): SemanticsMatcher = SemanticsMatcher.expectValue(
  *
  * @param rangeInfo range info to match.
  *
- * @see SemanticsProperties.AccessibilityRangeInfo
+ * @see SemanticsProperties.ProgressBarRangeInfo
  */
-fun hasRangeInfo(rangeInfo: AccessibilityRangeInfo): SemanticsMatcher = SemanticsMatcher
-    .expectValue(SemanticsProperties.AccessibilityRangeInfo, rangeInfo)
+fun hasProgressBarRangeInfo(rangeInfo: ProgressBarRangeInfo): SemanticsMatcher = SemanticsMatcher
+    .expectValue(SemanticsProperties.ProgressBarRangeInfo, rangeInfo)
 
 /**
  * Returns whether the node is annotated by the given test tag.
@@ -257,8 +258,10 @@ fun isInMutuallyExclusiveGroup(): SemanticsMatcher = isSelectable()
  *
  * @see SemanticsProperties.Hidden
  */
+@Deprecated("SemanticsMatcher.isHidden is deprecated without a replacement.")
+@OptIn(ExperimentalComposeUiApi::class)
 fun isHidden(): SemanticsMatcher =
-    SemanticsMatcher.keyIsDefined(SemanticsProperties.Hidden)
+    SemanticsMatcher.keyIsDefined(SemanticsProperties.InvisibleToUser)
 
 /**
  * Returns whether the node is not hidden. A hidden node is a node that is not visible for
@@ -268,8 +271,10 @@ fun isHidden(): SemanticsMatcher =
  *
  * @see SemanticsProperties.Hidden
  */
+@Deprecated("SemanticsMatcher.isNotHidden is deprecated without a replacement.")
+@OptIn(ExperimentalComposeUiApi::class)
 fun isNotHidden(): SemanticsMatcher =
-    !SemanticsMatcher.keyIsDefined(SemanticsProperties.Hidden)
+    !SemanticsMatcher.keyIsDefined(SemanticsProperties.InvisibleToUser)
 
 /**
  * Returns whether the node is a dialog.
