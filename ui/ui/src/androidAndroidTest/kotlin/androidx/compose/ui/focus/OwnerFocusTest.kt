@@ -23,7 +23,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusState.Active
 import androidx.compose.ui.focus.FocusState.Inactive
 import androidx.compose.ui.platform.AmbientView
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
@@ -31,6 +34,8 @@ import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -176,6 +181,33 @@ class OwnerFocusTest {
         // Assert.
         rule.runOnIdle {
             assertThat(focusState).isEqualTo(Active)
+        }
+    }
+
+    @Test
+    fun clickingOnNonClickableSpaceInApp_bringsViewInFocus() {
+        // Arrange.
+        val nonClickable = "notClickable"
+        val viewFocused = CountDownLatch(1)
+        lateinit var ownerView: View
+        rule.setFocusableContent {
+            ownerView = getOwner()
+            Box(Modifier.testTag(nonClickable))
+        }
+        rule.runOnIdle { assertThat(ownerView.isFocused).isFalse() }
+        ownerView.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                viewFocused.countDown()
+            }
+        }
+
+        // Act.
+        rule.onNodeWithTag(nonClickable).performClick()
+
+        // Assert.
+        rule.runOnIdle {
+            viewFocused.await(1L, TimeUnit.SECONDS)
+            assertThat(ownerView.isFocused).isTrue()
         }
     }
 
