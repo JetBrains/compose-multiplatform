@@ -143,12 +143,12 @@ abstract class ComposeBenchmarkBase {
             }
             assertTrue(
                 "recomposer does not have invalidations for frame",
-                recomposer.hasInvalidations()
+                recomposer.hasPendingWork
             )
             advanceUntilIdle()
             assertFalse(
                 "recomposer has invalidations for frame",
-                recomposer.hasInvalidations()
+                recomposer.hasPendingWork
             )
             runWithTimingDisabled {
                 receiver.resetCb()

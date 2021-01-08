@@ -142,12 +142,12 @@ internal class AndroidComposeTestCaseRunner<T : ComposeTestCase>(
 
     // TODO: This method may advance the global snapshot and should be just a getter
     override fun hasPendingChanges(): Boolean {
-        if (recomposer.hasInvalidations() || hasPendingChangesInFrame()) {
+        if (recomposer.hasPendingWork || hasPendingChangesInFrame()) {
             @OptIn(ExperimentalComposeApi::class)
             Snapshot.sendApplyNotifications()
         }
 
-        return recomposer.hasInvalidations()
+        return recomposer.hasPendingWork
     }
 
     /**

@@ -24,17 +24,16 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.layout.AlignmentLine
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.node.Ref
+import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.platform.setContent
@@ -89,7 +88,7 @@ open class LayoutTest {
     internal fun show(composable: @Composable () -> Unit) {
         val runnable: Runnable = object : Runnable {
             override fun run() {
-                activity.setContent(Recomposer.current(), composable)
+                activity.setContent(content = composable)
             }
         }
         activityTestRule.runOnUiThread(runnable)

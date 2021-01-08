@@ -54,6 +54,7 @@ private val TAG = "Wrapper"
  * @see Composition.dispose
  */
 // TODO: Remove this API when View/LayoutNode mixed trees work
+@Suppress("DEPRECATION")
 @OptIn(ExperimentalComposeApi::class)
 @Deprecated(
     "setViewContent was deprecated - use setContent instead",
@@ -136,6 +137,7 @@ internal actual fun subcomposeInto(
  * @param parent The parent composition reference to coordinate scheduling of composition updates
  * @param content A `@Composable` function declaring the UI contents
  */
+@Suppress("DEPRECATION")
 fun ComponentActivity.setContent(
     // Note: Recomposer.current() is the default here since all Activity view trees are hosted
     // on the main thread.
@@ -165,6 +167,7 @@ fun ComponentActivity.setContent(
  * @param parent The [Recomposer] or parent composition reference.
  * @param content Composable that will be the content of the view.
  */
+@Suppress("DEPRECATION")
 @Deprecated("Use ComposeView or AbstractComposeView instead.")
 fun ViewGroup.setContent(
     parent: CompositionReference = Recomposer.current(),

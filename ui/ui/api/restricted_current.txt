@@ -2483,7 +2483,10 @@ package androidx.compose.ui.platform {
   }
 
   @androidx.compose.ui.InternalComposeUiApi public final class WindowRecomposerPolicy {
-    method public void setWindowRecomposerFactory(androidx.compose.ui.platform.WindowRecomposerFactory factory);
+    method @kotlin.PublishedApi internal boolean compareAndSetFactory(androidx.compose.ui.platform.WindowRecomposerFactory expected, androidx.compose.ui.platform.WindowRecomposerFactory factory);
+    method @kotlin.PublishedApi internal androidx.compose.ui.platform.WindowRecomposerFactory getAndSetFactory(androidx.compose.ui.platform.WindowRecomposerFactory factory);
+    method public void setFactory(androidx.compose.ui.platform.WindowRecomposerFactory factory);
+    method public inline <R> R! withFactory(androidx.compose.ui.platform.WindowRecomposerFactory factory, kotlin.jvm.functions.Function0<? extends R> block);
     field public static final androidx.compose.ui.platform.WindowRecomposerPolicy INSTANCE;
   }
 

@@ -27,6 +27,11 @@ import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertNotSame
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Rule
 import org.junit.Test
@@ -471,6 +476,23 @@ class RecomposerTests : BaseComposeTest() {
         }.then {
             assertNotSame(snapshotId, Snapshot.current.id)
         }
+    }
+
+    @Test
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun runningRecomposerFlow() = runBlockingTest {
+        lateinit var recomposer: Recomposer
+        val recomposerJob = launch {
+            withRunningRecomposer {
+                recomposer = it
+                suspendCancellableCoroutine<Unit> { }
+            }
+        }
+        val afterLaunch = Recomposer.runningRecomposers.value
+        assertTrue("recomposer in running list", recomposer in afterLaunch)
+        recomposerJob.cancelAndJoin()
+        val afterCancel = Recomposer.runningRecomposers.value
+        assertFalse("recomposer no longer in running list", recomposer in afterCancel)
     }
 }
 

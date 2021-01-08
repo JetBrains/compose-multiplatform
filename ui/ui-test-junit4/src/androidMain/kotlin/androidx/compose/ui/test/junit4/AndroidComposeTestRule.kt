@@ -377,6 +377,7 @@ internal constructor(
         val currentActivity = activity
 
         runOnUiThread {
+            @Suppress("DEPRECATION")
             val composition = currentActivity.setContent(
                 recomposer ?: Recomposer.current(),
                 composable
@@ -486,7 +487,7 @@ internal constructor(
                 }
                 if (recomposer != null) {
                     @OptIn(InternalComposeUiApi::class)
-                    WindowRecomposerPolicy.setWindowRecomposerFactory {
+                    WindowRecomposerPolicy.setFactory {
                         recomposer
                     }
                 }
@@ -504,7 +505,7 @@ internal constructor(
                 if (recomposer != null) {
                     @Suppress("DEPRECATION")
                     @OptIn(InternalComposeUiApi::class)
-                    WindowRecomposerPolicy.setWindowRecomposerFactory(
+                    WindowRecomposerPolicy.setFactory(
                         WindowRecomposerFactory.Global
                     )
                 }

@@ -60,7 +60,7 @@ class WindowRecomposerTest {
             ActivityScenario.launch(ComponentActivity::class.java).use { scenario ->
                 scenario.onActivity { activity ->
                     weakActivityRef = WeakReference(activity)
-                    WindowRecomposerPolicy.setWindowRecomposerFactory { localRecomposer }
+                    WindowRecomposerPolicy.setFactory { localRecomposer }
                     activity.setContentView(
                         ComposeView(activity).apply {
                             setContent {
@@ -78,7 +78,7 @@ class WindowRecomposerTest {
         } finally {
             // TODO: Change this to the `with` API from a later CL
             @Suppress("DEPRECATION")
-            WindowRecomposerPolicy.setWindowRecomposerFactory(WindowRecomposerFactory.Global)
+            WindowRecomposerPolicy.setFactory(WindowRecomposerFactory.Global)
             localRecomposer.shutDown()
             runBlocking {
                 recomposerJob.join()
