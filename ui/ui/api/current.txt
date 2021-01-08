@@ -2091,7 +2091,8 @@ package androidx.compose.ui.node {
     method public androidx.compose.ui.text.input.TextInputService getTextInputService();
     method public androidx.compose.ui.platform.TextToolbar getTextToolbar();
     method public androidx.compose.ui.platform.ViewConfiguration getViewConfiguration();
-    method public androidx.compose.ui.platform.WindowManager getWindowManager();
+    method public androidx.compose.ui.platform.WindowInfo getWindowInfo();
+    method @Deprecated public default androidx.compose.ui.platform.WindowInfo! getWindowManager();
     method public void measureAndLayout();
     method public void onAttach(androidx.compose.ui.node.LayoutNode node);
     method public void onDetach(androidx.compose.ui.node.LayoutNode node);
@@ -2117,7 +2118,8 @@ package androidx.compose.ui.node {
     property public abstract androidx.compose.ui.text.input.TextInputService textInputService;
     property public abstract androidx.compose.ui.platform.TextToolbar textToolbar;
     property public abstract androidx.compose.ui.platform.ViewConfiguration viewConfiguration;
-    property public abstract androidx.compose.ui.platform.WindowManager windowManager;
+    property public abstract androidx.compose.ui.platform.WindowInfo windowInfo;
+    property @Deprecated public default androidx.compose.ui.platform.WindowInfo! windowManager;
     field public static final androidx.compose.ui.node.Owner.Companion Companion;
   }
 
@@ -2189,7 +2191,8 @@ package androidx.compose.ui.platform {
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.TextToolbar> getAmbientTextToolbar();
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.UriHandler> getAmbientUriHandler();
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.ViewConfiguration> getAmbientViewConfiguration();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.WindowManager> getAmbientWindowManager();
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.WindowInfo> getAmbientWindowInfo();
+    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.WindowInfo>! getAmbientWindowManager();
     method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.animation.core.AnimationClockObservable>! getAnimationClockAmbient();
     method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.ClipboardManager>! getClipboardManagerAmbient();
     method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.unit.Density>! getDensityAmbient();
@@ -2399,13 +2402,18 @@ package androidx.compose.ui.platform {
     property public final kotlin.jvm.functions.Function1<androidx.compose.ui.platform.ViewRootForTest,kotlin.Unit>? onViewCreatedCallback;
   }
 
-  @androidx.compose.runtime.Stable public interface WindowManager {
+  @androidx.compose.runtime.Stable public interface WindowInfo {
     method public boolean isWindowFocused();
     property public abstract boolean isWindowFocused;
   }
 
-  public final class WindowManagerKt {
-    method @androidx.compose.runtime.Composable public static void WindowFocusObserver(kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onWindowFocusChanged);
+  public final class WindowInfoKt {
+    method @Deprecated @androidx.compose.runtime.Composable public static void WindowFocusObserver(kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onWindowFocusChanged);
+  }
+
+  @Deprecated @androidx.compose.runtime.Stable public interface WindowManager {
+    method @Deprecated public boolean isWindowFocused();
+    property public abstract boolean isWindowFocused;
   }
 
   @androidx.compose.ui.InternalComposeUiApi public fun interface WindowRecomposerFactory {
