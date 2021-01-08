@@ -45,6 +45,8 @@ import kotlin.math.max
  * When children are smaller than the parent, by default they will be positioned inside
  * the [Box] according to the [contentAlignment]. For individually specifying the alignments
  * of the children layouts, use the [BoxScope.align] modifier.
+ * By default, the content will be measured without the [Box]'s incoming min constraints,
+ * unless [propagateMinConstraints] is `true`.
  * When the content has more than one layout child the layout children will be stacked one
  * on top of the other (positioned as explained above) in the composition order.
  *
@@ -53,15 +55,17 @@ import kotlin.math.max
  *
  * @param modifier The modifier to be applied to the layout.
  * @param contentAlignment The default alignment inside the Box.
+ * @param propagateMinConstraints Whether the incoming min constraints should be passed to content.
  * @param content The content of the [Box].
  */
 @Composable
 inline fun Box(
     modifier: Modifier = Modifier,
     contentAlignment: Alignment = Alignment.TopStart,
+    propagateMinConstraints: Boolean = false,
     content: @Composable BoxScope.() -> Unit
 ) {
-    val measureBlocks = rememberMeasureBlocks(contentAlignment)
+    val measureBlocks = rememberMeasureBlocks(contentAlignment, propagateMinConstraints)
     Layout(
         content = { BoxScope.content() },
         measureBlocks = measureBlocks,
@@ -72,19 +76,19 @@ inline fun Box(
 @PublishedApi
 @Composable
 internal fun rememberMeasureBlocks(
-    alignment: Alignment
+    alignment: Alignment,
+    propagateMinConstraints: Boolean
 ) = remember(alignment) {
-    if (alignment == Alignment.TopStart) {
+    if (alignment == Alignment.TopStart && !propagateMinConstraints) {
         DefaultBoxMeasureBlocks
     } else {
-        boxMeasureBlocks(alignment)
+        boxMeasureBlocks(alignment, propagateMinConstraints)
     }
 }
 
-internal val DefaultBoxMeasureBlocks: MeasureBlocks =
-    boxMeasureBlocks(Alignment.TopStart)
+internal val DefaultBoxMeasureBlocks: MeasureBlocks = boxMeasureBlocks(Alignment.TopStart, false)
 
-internal fun boxMeasureBlocks(alignment: Alignment) =
+internal fun boxMeasureBlocks(alignment: Alignment, propagateMinConstraints: Boolean) =
     MeasuringIntrinsicsMeasureBlocks { measurables, constraints ->
         if (measurables.isEmpty()) {
             return@MeasuringIntrinsicsMeasureBlocks layout(
@@ -93,7 +97,11 @@ internal fun boxMeasureBlocks(alignment: Alignment) =
             ) {}
         }
 
-        val minRelaxedConstraints = constraints.copy(minWidth = 0, minHeight = 0)
+        val contentConstraints = if (propagateMinConstraints) {
+            constraints
+        } else {
+            constraints.copy(minWidth = 0, minHeight = 0)
+        }
 
         if (measurables.size == 1) {
             val measurable = measurables[0]
@@ -101,7 +109,7 @@ internal fun boxMeasureBlocks(alignment: Alignment) =
             val boxHeight: Int
             val placeable: Placeable
             if (!measurable.matchesParentSize) {
-                placeable = measurable.measure(minRelaxedConstraints)
+                placeable = measurable.measure(contentConstraints)
                 boxWidth = max(constraints.minWidth, placeable.width)
                 boxHeight = max(constraints.minHeight, placeable.height)
             } else {
@@ -123,7 +131,7 @@ internal fun boxMeasureBlocks(alignment: Alignment) =
         var boxHeight = constraints.minHeight
         measurables.fastForEachIndexed { index, measurable ->
             if (!measurable.matchesParentSize) {
-                val placeable = measurable.measure(minRelaxedConstraints)
+                val placeable = measurable.measure(contentConstraints)
                 placeables[index] = placeable
                 boxWidth = max(boxWidth, placeable.width)
                 boxHeight = max(boxHeight, placeable.height)

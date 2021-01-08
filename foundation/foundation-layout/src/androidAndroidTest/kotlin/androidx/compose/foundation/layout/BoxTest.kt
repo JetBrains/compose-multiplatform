@@ -25,6 +25,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.AmbientLayoutDirection
@@ -492,6 +493,27 @@ class BoxTest : LayoutTest() {
         assertTrue(layoutLatch.await(1, TimeUnit.SECONDS))
         assertEquals(2, measure)
         assertEquals(2, layout)
+    }
+
+    @Test
+    fun testBox_canPropagateMinConstraints() = with(density) {
+        val measuredLatch = CountDownLatch(1)
+
+        show {
+            Box(
+                Modifier.widthIn(20.dp, 40.dp),
+                propagateMinConstraints = true
+            ) {
+                Box(
+                    Modifier.preferredWidth(10.dp).onSizeChanged {
+                        assertEquals(20.dp.toIntPx(), it.width)
+                        measuredLatch.countDown()
+                    }
+                )
+            }
+        }
+
+        assertTrue(measuredLatch.await(1, TimeUnit.SECONDS))
     }
 
     @Test
