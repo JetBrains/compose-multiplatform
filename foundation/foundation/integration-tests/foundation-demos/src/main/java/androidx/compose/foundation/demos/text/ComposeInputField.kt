@@ -68,7 +68,7 @@ fun InputFieldDemo() {
 @Composable
 internal fun EditLine(
     keyboardType: KeyboardType = KeyboardType.Text,
-    imeAction: ImeAction = ImeAction.Unspecified,
+    imeAction: ImeAction = ImeAction.Default,
     singleLine: Boolean = false,
     text: String = ""
 ) {

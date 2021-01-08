@@ -48,7 +48,7 @@ class TextActionsTest {
     @Composable
     @OptIn(ExperimentalFoundationApi::class)
     fun TextFieldUi(
-        imeAction: ImeAction = ImeAction.Unspecified,
+        imeAction: ImeAction = ImeAction.Default,
         onImeActionPerformed: (ImeAction) -> Unit = {},
         textCallback: (String) -> Unit = {}
     ) {
@@ -170,14 +170,14 @@ class TextActionsTest {
 
     @Test
     fun sendImeAction_search() {
-        var actionPerformed: ImeAction = ImeAction.Unspecified
+        var actionPerformed: ImeAction = ImeAction.Default
         rule.setContent {
             TextFieldUi(
                 imeAction = ImeAction.Search,
                 onImeActionPerformed = { actionPerformed = it }
             )
         }
-        assertThat(actionPerformed).isEqualTo(ImeAction.Unspecified)
+        assertThat(actionPerformed).isEqualTo(ImeAction.Default)
 
         rule.onNodeWithTag(fieldTag)
             .performImeAction()
@@ -189,14 +189,14 @@ class TextActionsTest {
 
     @Test
     fun sendImeAction_actionNotDefined_shouldFail() {
-        var actionPerformed: ImeAction = ImeAction.Unspecified
+        var actionPerformed: ImeAction = ImeAction.Default
         rule.setContent {
             TextFieldUi(
-                imeAction = ImeAction.Unspecified,
+                imeAction = ImeAction.Default,
                 onImeActionPerformed = { actionPerformed = it }
             )
         }
-        assertThat(actionPerformed).isEqualTo(ImeAction.Unspecified)
+        assertThat(actionPerformed).isEqualTo(ImeAction.Default)
 
         expectErrorMessageStartsWith(
             "" +

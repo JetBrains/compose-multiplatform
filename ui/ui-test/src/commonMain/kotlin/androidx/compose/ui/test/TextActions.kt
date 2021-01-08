@@ -100,9 +100,9 @@ fun SemanticsNodeInteraction.performImeAction(alreadyHasFocus: Boolean = false) 
     assert(hasSetTextAction()) { errorOnFail }
 
     val actionSpecified = node.config.getOrElse(SemanticsProperties.ImeAction) {
-        ImeAction.Unspecified
+        ImeAction.Default
     }
-    if (actionSpecified == ImeAction.Unspecified) {
+    if (actionSpecified == ImeAction.Default) {
         throw AssertionError(
             buildGeneralErrorMessage(
                 "Failed to perform IME action as current node does not specify any.", selector, node

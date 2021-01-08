@@ -45,7 +45,7 @@ class ImeOptions(
     val capitalization: KeyboardCapitalization = KeyboardCapitalization.None,
     val autoCorrect: Boolean = true,
     val keyboardType: KeyboardType = KeyboardType.Text,
-    val imeAction: ImeAction = ImeAction.Unspecified
+    val imeAction: ImeAction = ImeAction.Default
 ) {
     companion object {
         /**

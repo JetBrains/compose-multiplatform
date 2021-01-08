@@ -112,7 +112,7 @@ fun BaseTextField(
     textColor: Color = Color.Unspecified,
     textStyle: TextStyle = AmbientTextStyle.current,
     keyboardType: KeyboardType = KeyboardType.Text,
-    imeAction: ImeAction = ImeAction.Unspecified,
+    imeAction: ImeAction = ImeAction.Default,
     onImeActionPerformed: (ImeAction) -> Unit = {},
     visualTransformation: VisualTransformation = VisualTransformation.None,
     onTextLayout: (TextLayoutResult) -> Unit = {},
