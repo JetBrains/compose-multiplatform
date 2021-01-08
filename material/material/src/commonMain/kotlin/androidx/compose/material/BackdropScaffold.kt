@@ -471,48 +471,6 @@ private fun BackdropStack(
 private enum class BackdropLayers { Back, Front }
 
 /**
- * Contains useful constants for [BackdropScaffold].
- */
-@Deprecated(
-    "BackdropScaffoldConstants has been replaced with BackdropScaffoldDefaults",
-    ReplaceWith(
-        "BackdropScaffoldDefaults",
-        "androidx.compose.material.BackdropScaffoldDefaults"
-    )
-)
-object BackdropScaffoldConstants {
-
-    /**
-     * The default peek height of the back layer.
-     */
-    val DefaultPeekHeight = 56.dp
-
-    /**
-     * The default header height of the front layer.
-     */
-    val DefaultHeaderHeight = 48.dp
-
-    /**
-     * The default shape of the front layer.
-     */
-    val DefaultFrontLayerShape: Shape
-        @Composable
-        get() = MaterialTheme.shapes.large
-            .copy(topLeft = CornerSize(16.dp), topRight = CornerSize(16.dp))
-
-    /**
-     * The default elevation of the front layer.
-     */
-    val DefaultFrontLayerElevation = 1.dp
-
-    /**
-     * The default color of the scrim applied to the front layer.
-     */
-    val DefaultFrontLayerScrimColor: Color
-        @Composable get() = MaterialTheme.colors.surface.copy(alpha = 0.60f)
-}
-
-/**
  * Contains useful defaults for [BackdropScaffold].
  */
 object BackdropScaffoldDefaults {

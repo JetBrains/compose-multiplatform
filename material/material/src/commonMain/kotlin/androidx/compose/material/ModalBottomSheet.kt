@@ -330,31 +330,6 @@ private fun BottomSheetStack(
 private enum class BottomSheetStackSlot { SheetContent, Content }
 
 /**
- * Contains useful constants for [ModalBottomSheetLayout].
- */
-@Deprecated(
-    "ModalBottomSheetConstants has been replaced with ModalBottomSheetDefaults",
-    ReplaceWith(
-        "ModalBottomSheetDefaults",
-        "androidx.compose.material.ModalBottomSheetDefaults"
-    )
-)
-object ModalBottomSheetConstants {
-
-    /**
-     * The default elevation used by [ModalBottomSheetLayout].
-     */
-    val DefaultElevation = 16.dp
-
-    /**
-     * The default scrim color used by [ModalBottomSheetLayout].
-     */
-    val DefaultScrimColor: Color
-        @Composable
-        get() = MaterialTheme.colors.onSurface.copy(alpha = 0.32f)
-}
-
-/**
  * Contains useful Defaults for [ModalBottomSheetLayout].
  */
 object ModalBottomSheetDefaults {

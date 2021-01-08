@@ -425,29 +425,6 @@ private fun BottomSheetScaffoldStack(
 private val FabEndSpacing = 16.dp
 
 /**
- * Contains useful constants for [BottomSheetScaffold].
- */
-@Deprecated(
-    message = "BottomSheetScaffoldConstants has been replaced with BottomSheetScaffoldDefaults",
-    ReplaceWith(
-        "BottomSheetScaffoldDefaults",
-        "androidx.compose.material.BottomSheetScaffoldDefaults"
-    )
-)
-object BottomSheetScaffoldConstants {
-
-    /**
-     * The default elevation used by [BottomSheetScaffold].
-     */
-    val DefaultSheetElevation = 8.dp
-
-    /**
-     * The default peek height used by [BottomSheetScaffold].
-     */
-    val DefaultSheetPeekHeight = 56.dp
-}
-
-/**
  * Contains useful defaults for [BottomSheetScaffold].
  */
 object BottomSheetScaffoldDefaults {

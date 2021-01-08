@@ -95,7 +95,7 @@ fun Tab(
     selectedContentColor: Color = AmbientContentColor.current,
     unselectedContentColor: Color = selectedContentColor.copy(alpha = ContentAlpha.medium)
 ) {
-    val styledText = @Composable {
+    val styledText: @Composable () -> Unit = @Composable {
         val style = MaterialTheme.typography.button.copy(textAlign = TextAlign.Center)
         ProvideTextStyle(style, content = text)
     }
@@ -163,105 +163,6 @@ fun Tab(
             content = content
         )
     }
-}
-
-/**
- * Contains default values used by tabs from the Material specification.
- */
-@Deprecated(
-    "TabConstants has been replaced with TabDefaults",
-    ReplaceWith(
-        "TabDefaults",
-        "androidx.compose.material.TabDefaults"
-    )
-)
-object TabConstants {
-    /**
-     * Default [Divider], which will be positioned at the bottom of the [TabRow], underneath the
-     * indicator.
-     *
-     * @param modifier modifier for the divider's layout
-     * @param thickness thickness of the divider
-     * @param color color of the divider
-     */
-    @Composable
-    fun DefaultDivider(
-        modifier: Modifier = Modifier,
-        thickness: Dp = DefaultDividerThickness,
-        color: Color = AmbientContentColor.current.copy(alpha = DefaultDividerOpacity)
-    ) {
-        Divider(modifier = modifier, thickness = thickness, color = color)
-    }
-
-    /**
-     * Default indicator, which will be positioned at the bottom of the [TabRow], on top of the
-     * divider.
-     *
-     * @param modifier modifier for the indicator's layout
-     * @param height height of the indicator
-     * @param color color of the indicator
-     */
-    @Composable
-    fun DefaultIndicator(
-        modifier: Modifier = Modifier,
-        height: Dp = DefaultIndicatorHeight,
-        color: Color = AmbientContentColor.current
-    ) {
-        Box(
-            modifier
-                .fillMaxWidth()
-                .preferredHeight(height)
-                .background(color = color)
-        )
-    }
-
-    /**
-     * [Modifier] that takes up all the available width inside the [TabRow], and then animates
-     * the offset of the indicator it is applied to, depending on the [currentTabPosition].
-     *
-     * @param currentTabPosition [TabPosition] of the currently selected tab. This is used to
-     * calculate the offset of the indicator this modifier is applied to, as well as its width.
-     */
-    fun Modifier.defaultTabIndicatorOffset(
-        currentTabPosition: TabPosition
-    ): Modifier = composed(
-        inspectorInfo = debugInspectorInfo {
-            name = "defaultTabIndicatorOffset"
-            value = currentTabPosition
-        }
-    ) {
-        // TODO: should we animate the width of the indicator as it moves between tabs of different
-        // sizes inside a scrollable tab row?
-        val currentTabWidth = currentTabPosition.width
-        val indicatorOffset by animateAsState(
-            targetValue = currentTabPosition.left,
-            animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing)
-        )
-        fillMaxWidth()
-            .wrapContentSize(Alignment.BottomStart)
-            .offset(x = indicatorOffset)
-            .preferredWidth(currentTabWidth)
-    }
-
-    /**
-     * Default opacity for the color of [DefaultDivider]
-     */
-    const val DefaultDividerOpacity = 0.12f
-
-    /**
-     * Default thickness for [DefaultDivider]
-     */
-    val DefaultDividerThickness = 1.dp
-
-    /**
-     * Default height for [DefaultIndicator]
-     */
-    val DefaultIndicatorHeight = 2.dp
-
-    /**
-     * The default padding from the starting edge before a tab in a [ScrollableTabRow].
-     */
-    val DefaultScrollableTabRowPadding = 52.dp
 }
 
 /**

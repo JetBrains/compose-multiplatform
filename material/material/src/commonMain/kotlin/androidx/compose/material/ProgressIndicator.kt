@@ -258,45 +258,6 @@ private fun DrawScope.drawCircularIndicator(
 /**
  * Contains the default values used for [LinearProgressIndicator] and [CircularProgressIndicator].
  */
-@Deprecated(
-    "ProgressIndicatorConstants has been replaced with ProgressIndicatorDefaults",
-    ReplaceWith(
-        "ProgressIndicatorDefaults",
-        "androidx.compose.material.ProgressIndicatorDefaults"
-    )
-)
-object ProgressIndicatorConstants {
-    /**
-     * Default stroke width for [CircularProgressIndicator], and default height for
-     * [LinearProgressIndicator].
-     *
-     * This can be customized with the `strokeWidth` parameter on [CircularProgressIndicator],
-     * and by passing a layout modifier setting the height for [LinearProgressIndicator].
-     */
-    val DefaultStrokeWidth = 4.dp
-
-    /**
-     * The default opacity applied to the indicator color to create the background color in a
-     * [LinearProgressIndicator].
-     */
-    const val DefaultIndicatorBackgroundOpacity = 0.24f
-
-    /**
-     * The default [AnimationSpec] that should be used when animating between progress in a
-     * determinate progress indicator.
-     */
-    val DefaultProgressAnimationSpec = SpringSpec(
-        dampingRatio = Spring.DampingRatioNoBouncy,
-        stiffness = Spring.StiffnessVeryLow,
-        // The default threshold is 0.01, or 1% of the overall progress range, which is quite
-        // large and noticeable.
-        visibilityThreshold = 1 / 1000f
-    )
-}
-
-/**
- * Contains the default values used for [LinearProgressIndicator] and [CircularProgressIndicator].
- */
 object ProgressIndicatorDefaults {
     /**
      * Default stroke width for [CircularProgressIndicator], and default height for

@@ -126,52 +126,6 @@ interface RadioButtonColors {
 }
 
 /**
- * Constants used in [RadioButton].
- */
-@Deprecated(
-    "RadioButtonConstants has been replaced with RadioButtonDefaults",
-    ReplaceWith(
-        "RadioButtonDefaults",
-        "androidx.compose.material.RadioButtonDefaults"
-    )
-)
-object RadioButtonConstants {
-    /**
-     * Creates a [RadioButtonColors] that will animate between the provided colors according to
-     * the Material specification.
-     *
-     * @param selectedColor the color to use for the RadioButton when selected and enabled.
-     * @param unselectedColor the color to use for the RadioButton when unselected and enabled.
-     * @param disabledColor the color to use for the RadioButton when disabled.
-     * @return the resulting [Color] used for the RadioButton
-     */
-    @OptIn(ExperimentalMaterialApi::class)
-    @Composable
-    @Deprecated(
-        "RadioButtonConstants has been replaced with RadioButtonDefaults",
-        ReplaceWith(
-            "RadioButtonDefaults.colors(selectedColor, unselectedColor, disabledColor)",
-            "androidx.compose.material.RadioButtonDefaults"
-        )
-    )
-    fun defaultColors(
-        selectedColor: Color = MaterialTheme.colors.secondary,
-        unselectedColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f),
-        disabledColor: Color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled)
-    ): RadioButtonColors {
-        val clock = AmbientAnimationClock.current.asDisposableClock()
-        return remember(
-            selectedColor,
-            unselectedColor,
-            disabledColor,
-            clock
-        ) {
-            DefaultRadioButtonColors(selectedColor, unselectedColor, disabledColor, clock)
-        }
-    }
-}
-
-/**
  * Defaults used in [RadioButton].
  */
 object RadioButtonDefaults {
