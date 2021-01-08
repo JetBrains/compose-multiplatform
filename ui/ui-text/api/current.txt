@@ -695,10 +695,13 @@ package androidx.compose.ui.text.input {
   }
 
   public final class CommitTextCommand implements androidx.compose.ui.text.input.EditCommand {
+    ctor public CommitTextCommand(androidx.compose.ui.text.AnnotatedString annotatedString, int newCursorPosition);
     ctor public CommitTextCommand(String text, int newCursorPosition);
     method public void applyTo(androidx.compose.ui.text.input.EditingBuffer buffer);
+    method public androidx.compose.ui.text.AnnotatedString getAnnotatedString();
     method public int getNewCursorPosition();
     method public String getText();
+    property public final androidx.compose.ui.text.AnnotatedString annotatedString;
     property public final int newCursorPosition;
     property public final String text;
   }
@@ -847,10 +850,13 @@ package androidx.compose.ui.text.input {
   }
 
   public final class SetComposingTextCommand implements androidx.compose.ui.text.input.EditCommand {
+    ctor public SetComposingTextCommand(androidx.compose.ui.text.AnnotatedString annotatedString, int newCursorPosition);
     ctor public SetComposingTextCommand(String text, int newCursorPosition);
     method public void applyTo(androidx.compose.ui.text.input.EditingBuffer buffer);
+    method public androidx.compose.ui.text.AnnotatedString getAnnotatedString();
     method public int getNewCursorPosition();
     method public String getText();
+    property public final androidx.compose.ui.text.AnnotatedString annotatedString;
     property public final int newCursorPosition;
     property public final String text;
   }

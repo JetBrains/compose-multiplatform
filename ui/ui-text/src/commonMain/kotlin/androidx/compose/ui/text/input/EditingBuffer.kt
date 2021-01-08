@@ -132,6 +132,10 @@ class EditingBuffer(
         }
     }
 
+    internal fun replace(start: Int, end: Int, text: AnnotatedString) {
+        replace(start, end, text.text)
+    }
+
     /**
      * Replace the text and move the cursor to the end of inserted text.
      *
