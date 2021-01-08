@@ -37,13 +37,13 @@ import androidx.compose.ui.test.SemanticsNodeInteractionCollection
 import androidx.compose.ui.test.TestMonotonicFrameClock
 import androidx.compose.ui.test.TestOwner
 import androidx.compose.ui.test.createTestContext
-import androidx.compose.ui.test.junit4.android.AndroidOwnerRegistry
 import androidx.compose.ui.test.junit4.android.ComposeIdlingResource
 import androidx.compose.ui.test.junit4.android.ComposeIdlingResourceNew
+import androidx.compose.ui.test.junit4.android.ComposeRootRegistry
 import androidx.compose.ui.test.junit4.android.EspressoLink
-import androidx.compose.ui.test.junit4.android.awaitAndroidOwners
+import androidx.compose.ui.test.junit4.android.awaitComposeRoots
 import androidx.compose.ui.test.junit4.android.runEspressoOnIdle
-import androidx.compose.ui.test.junit4.android.waitForAndroidOwners
+import androidx.compose.ui.test.junit4.android.waitForComposeRoots
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.ImeAction
@@ -239,7 +239,7 @@ internal constructor(
     private val espressoLink = EspressoLink(idlingResourceRegistry)
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    internal val androidOwnerRegistry = AndroidOwnerRegistry()
+    internal val composeRootRegistry = ComposeRootRegistry()
 
     private val mainClockImpl: MainTestClockImpl?
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -285,7 +285,7 @@ internal constructor(
                 .also { recomposerApplyCoroutineScope.launch { it.runRecomposeAndApplyChanges() } }
             mainClockImpl = MainTestClockImpl(testCoroutineDispatcher, frameClock)
             composeIdlingResource = ComposeIdlingResourceNew(
-                androidOwnerRegistry, mainClockImpl, recomposer
+                composeRootRegistry, mainClockImpl, recomposer
             )
             _clockTestRule = MonotonicFrameClockTestRule()
         } else {
@@ -295,7 +295,7 @@ internal constructor(
             recomposerApplyCoroutineScope = null
             frameCoroutineScope = null
 
-            composeIdlingResource = ComposeIdlingResource(androidOwnerRegistry)
+            composeIdlingResource = ComposeIdlingResource(composeRootRegistry)
             _clockTestRule = AndroidAnimationClockTestRule(composeIdlingResource)
         }
 
@@ -331,7 +331,7 @@ internal constructor(
         @Suppress("NAME_SHADOWING")
         @OptIn(ExperimentalTestApi::class)
         return RuleChain
-            .outerRule { base, _ -> androidOwnerRegistry.getStatementFor(base) }
+            .outerRule { base, _ -> composeRootRegistry.getStatementFor(base) }
             .around { base, _ -> idlingResourceRegistry.getStatementFor(base) }
             .around { base, _ -> espressoLink.getStatementFor(base) }
             .around(_clockTestRule)
@@ -378,29 +378,29 @@ internal constructor(
                 "runOnIdle {}, runOnUiThread {} or setContent {}?"
         }
 
-        // First wait until we have an AndroidOwner (in case an Activity is being started)
-        androidOwnerRegistry.waitForAndroidOwners()
+        // First wait until we have a compose root (in case an Activity is being started)
+        composeRootRegistry.waitForComposeRoots()
         // Then await composition(s)
         runEspressoOnIdle()
 
-        // TODO(b/155774664): waitForAndroidOwners() may be satisfied by an AndroidOwner from an
+        // TODO(b/155774664): waitForComposeRoots() may be satisfied by a compose root from an
         //  Activity that is about to be paused, in cases where a new Activity is being started.
-        //  That means that AndroidOwnerRegistry.getOwners() may still return an empty list
-        //  between now and when the new Activity has created its AndroidOwner, even though
-        //  waitForAndroidOwners() suggests that we are now guaranteed one.
+        //  That means that ComposeRootRegistry.getComposeRoots() may still return an empty list
+        //  between now and when the new Activity has created its compose root, even though
+        //  waitForComposeRoots() suggests that we are now guaranteed one.
     }
 
     @ExperimentalTestApi
     override suspend fun awaitIdle() {
-        // TODO(b/169038516): when we can query AndroidOwners for measure or layout, remove
+        // TODO(b/169038516): when we can query compose roots for measure or layout, remove
         //  runEspressoOnIdle() and replace it with a suspend fun that loops while the
-        //  snapshot or the recomposer has pending changes, clocks are busy or owners have
+        //  snapshot or the recomposer has pending changes, clocks are busy or compose roots have
         //  pending measures or layouts; and do the await on AndroidUiDispatcher.Main
         // We use Espresso to wait for composition, measure, layout and draw,
         // and Espresso needs to be called from a non-ui thread; so use Dispatchers.IO
         withContext(Dispatchers.IO) {
-            // First wait until we have an AndroidOwner (in case an Activity is being started)
-            androidOwnerRegistry.awaitAndroidOwners()
+            // First wait until we have a compose root (in case an Activity is being started)
+            composeRootRegistry.awaitComposeRoots()
             // Then await composition(s)
             runEspressoOnIdle()
         }
@@ -550,8 +550,8 @@ internal constructor(
             //  structure. In case of multiple AndroidOwners, add a fake root
             waitForIdle()
 
-            return androidOwnerRegistry.getOwners().also {
-                // TODO(b/153632210): This check should be done by callers of collectOwners
+            return composeRootRegistry.getComposeRoots().also {
+                // TODO(b/153632210): This check should be done by callers of getOwners()
                 check(it.isNotEmpty()) {
                     "No compose views found in the app. Is your Activity resumed?"
                 }

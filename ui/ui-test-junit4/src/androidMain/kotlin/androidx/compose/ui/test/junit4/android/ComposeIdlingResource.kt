@@ -97,7 +97,7 @@ fun unregisterTestClock(clock: TestAnimationClock): Unit = throw UnsupportedOper
  * [createAndroidComposeRule].
  */
 internal class ComposeIdlingResource(
-    private val androidOwnerRegistry: AndroidOwnerRegistry
+    private val composeRootRegistry: ComposeRootRegistry
 ) : IdlingResource {
 
     @OptIn(ExperimentalTestApi::class)
@@ -119,10 +119,10 @@ internal class ComposeIdlingResource(
             hadNoSnapshotChanges = !Snapshot.current.hasPendingChanges()
             hadNoRecomposerChanges = !Recomposer.current().hasInvalidations()
             hadAnimationClocksIdle = areAllClocksIdle()
-            val owners = androidOwnerRegistry.getUnfilteredOwners()
-            hadNoPendingMeasureLayout = !owners.any { it.hasPendingMeasureOrLayout }
+            val composeRoots = composeRootRegistry.getUnfilteredComposeRoots()
+            hadNoPendingMeasureLayout = !composeRoots.any { it.hasPendingMeasureOrLayout }
             // TODO(b/174244530): Include hadNoPendingDraw when it is reliable
-//            hadNoPendingDraw = !owners.any {
+//            hadNoPendingDraw = !composeRoots.any {
 //                val hasContent = it.view.measuredWidth != 0 && it.view.measuredHeight != 0
 //                it.view.isDirty && (hasContent || it.view.isLayoutRequested)
 //            }
