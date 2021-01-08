@@ -72,7 +72,7 @@ class SingleValueAnimationTest {
                         var frameTime = startTime
                         do {
                             val playTime = (frameTime - startTime) / 1_000_000L
-                            val fraction = FastOutSlowInEasing.invoke(playTime / 100f)
+                            val fraction = FastOutSlowInEasing.transform(playTime / 100f)
                             val expected = lerp(250f, 50f, fraction)
                             assertEquals(expected.dp, animationValue)
                             frameTime = withFrameNanos { it }
@@ -105,7 +105,7 @@ class SingleValueAnimationTest {
                         var frameTime = startTime
                         do {
                             val playTime = (frameTime - startTime) / 1_000_000L
-                            val fraction = FastOutLinearInEasing.invoke(playTime / 200f)
+                            val fraction = FastOutLinearInEasing.transform(playTime / 200f)
                             val expected = lerp(250f, 50f, fraction)
                             assertEquals(expected, animationValue)
                             frameTime = withFrameNanos { it }
@@ -238,7 +238,7 @@ class SingleValueAnimationTest {
                         do {
                             val playTime = (frameTime - startTime) / 1_000_000L
 
-                            val fraction = LinearOutSlowInEasing.invoke(playTime / 100f)
+                            val fraction = LinearOutSlowInEasing.transform(playTime / 100f)
                             val expect = AnimationVector(
                                 lerp(startVal.v1, endVal.v1, fraction),
                                 lerp(startVal.v2, endVal.v2, fraction),
@@ -298,7 +298,7 @@ class SingleValueAnimationTest {
                         var frameTime = startTime
                         do {
                             val playTime = (frameTime - startTime) / 1_000_000L
-                            val fraction = LinearOutSlowInEasing.invoke(playTime / 100f)
+                            val fraction = LinearOutSlowInEasing.transform(playTime / 100f)
                             val expect = AnimationVector(
                                 lerp(startVal.v1, endVal.v1, fraction),
                                 lerp(startVal.v2, endVal.v2, fraction),
@@ -340,7 +340,7 @@ class SingleValueAnimationTest {
                         var frameTime = startTime
                         do {
                             val playTime = (frameTime - startTime) / 1_000_000L
-                            val fraction = FastOutLinearInEasing.invoke(playTime / 100f)
+                            val fraction = FastOutLinearInEasing.transform(playTime / 100f)
                             val expected = lerp(Color.Black, Color.Cyan, fraction)
                             assertEquals(expected, value)
                             frameTime = withFrameNanos { it }

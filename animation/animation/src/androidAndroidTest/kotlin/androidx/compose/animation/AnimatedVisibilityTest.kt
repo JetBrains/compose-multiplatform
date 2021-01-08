@@ -102,7 +102,7 @@ class AnimatedVisibilityTest {
         assertFalse(disposed)
 
         for (i in 0..160 step frameDuration) {
-            val fraction = LinearOutSlowInEasing.invoke(i / 160f)
+            val fraction = LinearOutSlowInEasing.transform(i / 160f)
             val animWidth = lerp(startWidth, fullSize, fraction)
             val animHeight = lerp(startHeight, fullSize, fraction)
             // Check size
@@ -124,7 +124,7 @@ class AnimatedVisibilityTest {
         val endWidth = density * 100 / 10f
         val endHeight = density * 100 / 5f
         for (i in 0..160 step frameDuration) {
-            val fraction = FastOutSlowInEasing.invoke(i / 160f)
+            val fraction = FastOutSlowInEasing.transform(i / 160f)
             val animWidth = lerp(fullSize, endWidth, fraction)
             val animHeight = lerp(fullSize, endHeight, fraction)
             // Check size
@@ -150,7 +150,7 @@ class AnimatedVisibilityTest {
         rule.mainClock.advanceTimeByFrame()
 
         for (i in 0..160 step frameDuration) {
-            val fraction = LinearOutSlowInEasing.invoke(i / 160f)
+            val fraction = LinearOutSlowInEasing.transform(i / 160f)
             val animWidth = lerp(startWidth, fullSize, fraction)
             val animHeight = lerp(startHeight, fullSize, fraction)
             // Check size
@@ -210,7 +210,7 @@ class AnimatedVisibilityTest {
         assertFalse(disposed)
 
         for (i in 0..160 step frameDuration) {
-            val fraction = LinearOutSlowInEasing.invoke(i / 160f)
+            val fraction = LinearOutSlowInEasing.transform(i / 160f)
             val animX = lerp(startX, 0f, fraction)
             val animY = lerp(startY, 0f, fraction)
             // Check size
@@ -232,7 +232,7 @@ class AnimatedVisibilityTest {
         val endX = -density * 100 / 10f
         val endY = density * 100 / 5f
         for (i in 0..160 step frameDuration) {
-            val fraction = FastOutSlowInEasing.invoke(i / 160f)
+            val fraction = FastOutSlowInEasing.transform(i / 160f)
             val animX = lerp(0f, endX, fraction)
             val animY = lerp(0f, endY, fraction)
             // Check size
@@ -258,7 +258,7 @@ class AnimatedVisibilityTest {
         rule.mainClock.advanceTimeByFrame()
 
         for (i in 0..160 step frameDuration) {
-            val fraction = LinearOutSlowInEasing.invoke(i / 160f)
+            val fraction = LinearOutSlowInEasing.transform(i / 160f)
             val animX = lerp(startX, 0f, fraction)
             val animY = lerp(startY, 0f, fraction)
             // Check size

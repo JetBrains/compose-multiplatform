@@ -192,7 +192,7 @@ class FloatTweenSpec(
     ): Float {
         val clampedPlayTime = clampPlayTime(playTime)
         val rawFraction = if (duration == 0) 1f else clampedPlayTime / duration.toFloat()
-        val fraction = easing(rawFraction.coerceIn(0f, 1f))
+        val fraction = easing.transform(rawFraction.coerceIn(0f, 1f))
         return lerp(start, end, fraction)
     }
 

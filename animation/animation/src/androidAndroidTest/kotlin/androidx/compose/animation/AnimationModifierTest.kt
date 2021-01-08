@@ -112,7 +112,7 @@ class AnimationModifierTest {
         rule.waitForIdle()
 
         for (i in 0..animDuration step frameDuration) {
-            val fraction = LinearOutSlowInEasing.invoke(i / animDuration.toFloat())
+            val fraction = LinearOutSlowInEasing.transform(i / animDuration.toFloat())
             assertEquals(
                 density * (startWidth * (1 - fraction) + endWidth * fraction),
                 testModifier.width.toFloat(), 1f
