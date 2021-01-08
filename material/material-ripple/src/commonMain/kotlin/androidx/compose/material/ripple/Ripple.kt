@@ -66,60 +66,6 @@ import androidx.compose.ui.util.fastForEach
  * @param bounded If true, ripples are clipped by the bounds of the target layout. Unbounded
  * ripples always animate from the target layout center, bounded ripples animate from the touch
  * position.
- * @param radius the radius for the ripple. If `null` is provided then the size will be calculated
- * based on the target layout size.
- * @param color the color of the ripple. This color is usually the same color used by the text or
- * iconography in the component. This color will then have [RippleTheme.rippleAlpha] applied to
- * calculate the final color used to draw the ripple. If [Color.Unspecified] is provided the color
- * used will be [RippleTheme.defaultColor] instead.
- */
-@Deprecated(
-    "Replaced with rememberRipple",
-    ReplaceWith(
-        "rememberRipple(bounded, radius, color)",
-        "androidx.compose.material.ripple.rememberRipple"
-    )
-)
-@Composable
-@OptIn(ExperimentalRippleApi::class)
-public fun rememberRippleIndication(
-    bounded: Boolean = true,
-    radius: Dp? = null,
-    color: Color = Color.Unspecified
-): Indication {
-    val theme = AmbientRippleTheme.current
-    val clock = AmbientAnimationClock.current.asDisposableClock()
-    val resolvedColor = color.takeOrElse { theme.defaultColor() }
-    val colorState = remember { mutableStateOf(resolvedColor, structuralEqualityPolicy()) }
-    colorState.value = resolvedColor
-    val rippleAlpha = theme.rippleAlpha()
-    return remember(bounded, radius, theme, clock) {
-        Ripple(bounded, radius ?: Dp.Unspecified, colorState, rippleAlpha, clock)
-    }
-}
-
-/**
- * Creates and [remember]s a Ripple using values provided by [RippleTheme].
- *
- * A Ripple is a Material implementation of [Indication] that expresses different [Interaction]s
- * by drawing ripple animations and state layers.
- *
- * A Ripple responds to [Interaction.Pressed] by starting a new [RippleAnimation], and
- * responds to other [Interaction]s by showing a fixed [StateLayer] with varying alpha values
- * depending on the [Interaction].
- *
- * If you are using MaterialTheme in your hierarchy, a Ripple will be used as the default
- * [Indication] inside components such as [androidx.compose.foundation.clickable] and
- * [androidx.compose.foundation.indication]. You can also manually provide Ripples through
- * [androidx.compose.foundation.AmbientIndication] for the same effect if you are not using
- * MaterialTheme.
- *
- * You can also explicitly create a Ripple and provide it to components in order to change the
- * parameters from the default, such as to create an unbounded ripple with a fixed size.
- *
- * @param bounded If true, ripples are clipped by the bounds of the target layout. Unbounded
- * ripples always animate from the target layout center, bounded ripples animate from the touch
- * position.
  * @param radius the radius for the ripple. If [Dp.Unspecified] is provided then the size will be
  * calculated based on the target layout size.
  * @param color the color of the ripple. This color is usually the same color used by the text or

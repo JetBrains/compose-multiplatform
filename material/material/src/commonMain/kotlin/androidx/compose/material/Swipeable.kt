@@ -722,57 +722,6 @@ private fun <T> Map<Float, T>.getOffset(state: T): Float? {
 }
 
 /**
- * Contains useful constants for [swipeable] and [SwipeableState].
- */
-@Deprecated(
-    "SwipeableConstants has been replaced with SwipeableDefaults",
-    ReplaceWith(
-        "SwipeableDefaults",
-        "androidx.compose.material.SwipeableDefaults"
-    )
-)
-object SwipeableConstants {
-    /**
-     * The default animation used by [SwipeableState].
-     */
-    val DefaultAnimationSpec = SpringSpec<Float>()
-
-    /**
-     * The default velocity threshold (1.8 dp per millisecond) used by [swipeable].
-     */
-    val DefaultVelocityThreshold = 125.dp
-
-    /**
-     * A stiff resistance factor which indicates that swiping isn't available right now.
-     */
-    const val StiffResistanceFactor = 20f
-
-    /**
-     * A standard resistance factor which indicates that the user has run out of things to see.
-     */
-    const val StandardResistanceFactor = 10f
-
-    /**
-     * The default resistance config used by [swipeable].
-     *
-     * This returns `null` if there is one anchor. If there are at least two anchors, it returns
-     * a [ResistanceConfig] with the resistance basis equal to the distance between the two bounds.
-     */
-    fun defaultResistanceConfig(
-        anchors: Set<Float>,
-        factorAtMin: Float = StandardResistanceFactor,
-        factorAtMax: Float = StandardResistanceFactor
-    ): ResistanceConfig? {
-        return if (anchors.size <= 1) {
-            null
-        } else {
-            val basis = anchors.maxOrNull()!! - anchors.minOrNull()!!
-            ResistanceConfig(basis, factorAtMin, factorAtMax)
-        }
-    }
-}
-
-/**
  * Contains useful defaults for [swipeable] and [SwipeableState].
  */
 object SwipeableDefaults {

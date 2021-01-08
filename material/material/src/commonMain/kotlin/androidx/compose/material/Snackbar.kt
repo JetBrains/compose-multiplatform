@@ -154,7 +154,7 @@ fun Snackbar(
 ) {
     val actionLabel = snackbarData.actionLabel
     val actionComposable: (@Composable () -> Unit)? = if (actionLabel != null) {
-        {
+        @Composable {
             TextButton(
                 colors = ButtonDefaults.textButtonColors(contentColor = actionColor),
                 onClick = { snackbarData.performAction() },
@@ -174,62 +174,6 @@ fun Snackbar(
         contentColor = contentColor,
         elevation = elevation
     )
-}
-
-/**
- * Object to hold constants used by the [Snackbar]
- */
-@Deprecated(
-    "SnackbarConstants has been replaced with SnackbarDefaults",
-    ReplaceWith(
-        "SnackbarDefaults",
-        "androidx.compose.material.SnackbarDefaults"
-    )
-)
-object SnackbarConstants {
-
-    /**
-     * Default alpha of the overlay in the [defaultBackgroundColor]
-     */
-    private const val SnackbarOverlayAlpha = 0.8f
-
-    /**
-     * Default background color of the [Snackbar]
-     */
-    val defaultBackgroundColor: Color
-        @Composable
-        get() =
-            MaterialTheme.colors.onSurface
-                .copy(alpha = SnackbarOverlayAlpha)
-                .compositeOver(MaterialTheme.colors.surface)
-
-    /**
-     * Provides a best-effort 'primary' color to be used as the primary color inside a [Snackbar].
-     * Given that [Snackbar]s have an 'inverted' theme, i.e in a light theme they appear dark, and
-     * in a dark theme they appear light, just using [Colors.primary] will not work, and has
-     * incorrect contrast.
-     *
-     * If your light theme has a corresponding dark theme, you should instead directly use
-     * [Colors.primary] from the dark theme when in a light theme, and use
-     * [Colors.primaryVariant] from the dark theme when in a dark theme.
-     *
-     * When in a light theme, this function applies a color overlay to [Colors.primary] from
-     * [MaterialTheme.colors] to attempt to reduce the contrast, and when in a dark theme this
-     * function uses [Colors.primaryVariant].
-     */
-    val defaultActionPrimaryColor: Color
-        @Composable
-        get() {
-            val colors = MaterialTheme.colors
-            return if (colors.isLight) {
-                val primary = colors.primary
-                val overlayColor = colors.surface.copy(alpha = 0.6f)
-
-                overlayColor.compositeOver(primary)
-            } else {
-                colors.primaryVariant
-            }
-        }
 }
 
 /**
