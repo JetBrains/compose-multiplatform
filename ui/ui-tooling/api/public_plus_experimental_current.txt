@@ -103,6 +103,7 @@ package androidx.compose.ui.tooling {
 package androidx.compose.ui.tooling.inspector {
 
   public final class InspectorNode {
+    method public int[] getBounds();
     method public java.util.List<androidx.compose.ui.tooling.inspector.InspectorNode> getChildren();
     method public String getFileName();
     method public int getHeight();
@@ -116,6 +117,7 @@ package androidx.compose.ui.tooling.inspector {
     method public java.util.List<androidx.compose.ui.tooling.inspector.RawParameter> getParameters();
     method public int getTop();
     method public int getWidth();
+    property public final int[] bounds;
     property public final java.util.List<androidx.compose.ui.tooling.inspector.InspectorNode> children;
     property public final String fileName;
     property public final int height;
@@ -129,6 +131,9 @@ package androidx.compose.ui.tooling.inspector {
     property public final java.util.List<androidx.compose.ui.tooling.inspector.RawParameter> parameters;
     property public final int top;
     property public final int width;
+  }
+
+  public final class InspectorNodeKt {
   }
 
   public final class LayoutInspectorTree {

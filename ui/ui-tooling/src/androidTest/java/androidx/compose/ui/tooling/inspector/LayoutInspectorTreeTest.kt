@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.material.Button
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalDrawerLayout
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -35,6 +36,7 @@ import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.resetSourceInfo
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.text.TextStyle
@@ -64,6 +66,7 @@ private const val DEBUG = false
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
+@SdkSuppress(minSdkVersion = 29) // Render id is not returned for api < 29
 class LayoutInspectorTreeTest : ToolingTest() {
     private lateinit var density: Density
     private lateinit var view: View
@@ -82,7 +85,6 @@ class LayoutInspectorTreeTest : ToolingTest() {
         isDebugInspectorInfoEnabled = false
     }
 
-    @SdkSuppress(minSdkVersion = 29) // Render id is not returned for api < 29
     @Test
     fun buildTree() {
         val slotTableRecord = CompositionDataRecord.create()
@@ -110,6 +112,7 @@ class LayoutInspectorTreeTest : ToolingTest() {
         validate(nodes, builder, checkParameters = false) {
             node(
                 name = "Box",
+                isRenderNode = true,
                 fileName = "",
                 left = 0.0.dp, top = 0.0.dp, width = viewWidth, height = viewHeight,
                 children = listOf("Column")
@@ -143,6 +146,7 @@ class LayoutInspectorTreeTest : ToolingTest() {
             node(
                 name = "Button",
                 fileName = "LayoutInspectorTreeTest.kt",
+                isRenderNode = true,
                 left = 0.0.dp,
                 top = 42.9.dp, width = 64.0.dp, height = 36.0.dp,
                 children = listOf("Text")
@@ -152,6 +156,54 @@ class LayoutInspectorTreeTest : ToolingTest() {
                 isRenderNode = true,
                 fileName = "LayoutInspectorTreeTest.kt",
                 left = 21.7.dp, top = 51.6.dp, width = 20.9.dp, height = 18.9.dp,
+            )
+        }
+    }
+
+    @Test
+    fun buildTreeWithTransformedText() {
+        val slotTableRecord = CompositionDataRecord.create()
+
+        show {
+            Inspectable(slotTableRecord) {
+                MaterialTheme {
+                    Text(
+                        text = "Hello World",
+                        modifier = Modifier.graphicsLayer(rotationZ = 225f)
+                    )
+                }
+            }
+        }
+
+        // TODO: Find out if we can set "settings put global debug_view_attributes 1" in tests
+        view.setTag(R.id.inspection_slot_table_set, slotTableRecord.store)
+        val viewWidth = with(density) { view.width.toDp() }
+        val viewHeight = with(density) { view.height.toDp() }
+        val builder = LayoutInspectorTree()
+        val nodes = builder.convert(view)
+        dumpNodes(nodes, builder)
+
+        validate(nodes, builder, checkParameters = false) {
+            node(
+                name = "Box",
+                isRenderNode = true,
+                fileName = "",
+                left = 0.0.dp, top = 0.0.dp, width = viewWidth, height = viewHeight,
+                children = listOf("MaterialTheme")
+            )
+            node(
+                name = "MaterialTheme",
+                hasTransformations = true,
+                fileName = "LayoutInspectorTreeTest.kt",
+                left = 65.8.dp, top = 48.7.dp, width = 86.2.dp, height = 21.4.dp,
+                children = listOf("Text")
+            )
+            node(
+                name = "Text",
+                isRenderNode = true,
+                hasTransformations = true,
+                fileName = "LayoutInspectorTreeTest.kt",
+                left = 65.8.dp, top = 48.7.dp, width = 86.2.dp, height = 21.4.dp,
             )
         }
     }
@@ -296,7 +348,6 @@ class LayoutInspectorTreeTest : ToolingTest() {
         assertThat(node?.parameters).isNotEmpty()
     }
 
-    @SdkSuppress(minSdkVersion = 29) // Render id is not returned for api < 29
     @Test
     fun testTextId() {
         val slotTableRecord = CompositionDataRecord.create()
@@ -339,7 +390,9 @@ class LayoutInspectorTreeTest : ToolingTest() {
             name: String,
             fileName: String? = null,
             lineNumber: Int = -1,
-            isRenderNode: Boolean? = null,
+            isRenderNode: Boolean = false,
+            hasTransformations: Boolean = false,
+
             left: Dp = Dp.Unspecified,
             top: Dp = Dp.Unspecified,
             width: Dp = Dp.Unspecified,
@@ -357,12 +410,15 @@ class LayoutInspectorTreeTest : ToolingTest() {
             if (lineNumber != -1) {
                 assertWithMessage(message).that(node.lineNumber).isEqualTo(lineNumber)
             }
-            if (isRenderNode != null) {
-                if (isRenderNode) {
-                    assertWithMessage(message).that(node.id).isGreaterThan(0L)
-                } else {
-                    assertWithMessage(message).that(node.id).isLessThan(0L)
-                }
+            if (isRenderNode) {
+                assertWithMessage(message).that(node.id).isGreaterThan(0L)
+            } else {
+                assertWithMessage(message).that(node.id).isLessThan(0L)
+            }
+            if (hasTransformations) {
+                assertWithMessage(message).that(node.bounds).isNotEmpty()
+            } else {
+                assertWithMessage(message).that(node.bounds).isEmpty()
             }
             if (left != Dp.Unspecified) {
                 with(density) {
