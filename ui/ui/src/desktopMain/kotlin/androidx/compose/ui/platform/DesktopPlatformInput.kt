@@ -123,10 +123,14 @@ internal class DesktopPlatformInput(val component: DesktopComponent) :
                     command.invoke(listOf(BackspaceCommand()))
                 }
                 KeyEvent.VK_ENTER -> {
-                    if (input.imeAction == ImeAction.Unspecified) {
+                    @Suppress("DEPRECATION")
+                    if (input.imeAction == ImeAction.Unspecified ||
+                        input.imeAction == ImeAction.Default
+                    ) {
                         command.invoke(listOf(CommitTextCommand("\n", 1)))
-                    } else
+                    } else {
                         input.onImeActionPerformed.invoke(input.imeAction)
+                    }
                 }
                 else -> Unit
             }

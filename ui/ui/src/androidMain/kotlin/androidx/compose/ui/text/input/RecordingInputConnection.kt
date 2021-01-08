@@ -273,7 +273,7 @@ internal class RecordingInputConnection(
     override fun performEditorAction(editorAction: Int): Boolean {
         if (DEBUG) { Log.d(TAG, "performEditorAction($editorAction)") }
         val imeAction = when (editorAction) {
-            EditorInfo.IME_ACTION_UNSPECIFIED -> ImeAction.Unspecified
+            EditorInfo.IME_ACTION_UNSPECIFIED -> ImeAction.Default
             EditorInfo.IME_ACTION_DONE -> ImeAction.Done
             EditorInfo.IME_ACTION_SEND -> ImeAction.Send
             EditorInfo.IME_ACTION_SEARCH -> ImeAction.Search
@@ -282,7 +282,7 @@ internal class RecordingInputConnection(
             EditorInfo.IME_ACTION_GO -> ImeAction.Go
             else -> {
                 Log.w(TAG, "IME sends unsupported Editor Action: $editorAction")
-                ImeAction.Unspecified
+                ImeAction.Default
             }
         }
         eventCallback.onImeAction(imeAction)

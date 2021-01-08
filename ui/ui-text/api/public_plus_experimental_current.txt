@@ -805,14 +805,16 @@ package androidx.compose.ui.text.input {
   }
 
   public enum ImeAction {
+    enum_constant public static final androidx.compose.ui.text.input.ImeAction Default;
     enum_constant public static final androidx.compose.ui.text.input.ImeAction Done;
     enum_constant public static final androidx.compose.ui.text.input.ImeAction Go;
     enum_constant public static final androidx.compose.ui.text.input.ImeAction Next;
-    enum_constant public static final androidx.compose.ui.text.input.ImeAction NoAction;
+    enum_constant @Deprecated public static final androidx.compose.ui.text.input.ImeAction NoAction;
+    enum_constant public static final androidx.compose.ui.text.input.ImeAction None;
     enum_constant public static final androidx.compose.ui.text.input.ImeAction Previous;
     enum_constant public static final androidx.compose.ui.text.input.ImeAction Search;
     enum_constant public static final androidx.compose.ui.text.input.ImeAction Send;
-    enum_constant public static final androidx.compose.ui.text.input.ImeAction Unspecified;
+    enum_constant @Deprecated public static final androidx.compose.ui.text.input.ImeAction Unspecified;
   }
 
   @androidx.compose.runtime.Immutable public final class ImeOptions {
