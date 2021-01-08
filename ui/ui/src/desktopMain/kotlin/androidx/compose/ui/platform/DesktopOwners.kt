@@ -23,6 +23,7 @@ import androidx.compose.ui.input.mouse.MouseScrollEvent
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputEvent
 import androidx.compose.ui.input.pointer.PointerInputEventData
+import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.node.InternalCoreApi
 import kotlinx.coroutines.yield
 import org.jetbrains.skija.Canvas
@@ -176,7 +177,8 @@ class DesktopOwners(
                     PointerId(pointerId),
                     time,
                     Offset(x.toFloat(), y.toFloat()),
-                    down
+                    down,
+                    PointerType.Mouse
                 )
             )
         )

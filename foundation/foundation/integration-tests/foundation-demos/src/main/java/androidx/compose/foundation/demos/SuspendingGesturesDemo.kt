@@ -25,6 +25,7 @@ import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectMultitouchGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -55,6 +56,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerInputScope
+import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
@@ -75,6 +77,7 @@ val CoroutineGestureDemos = listOf(
     ComposableDemo("Drag 2D") { Drag2DGestures() },
     ComposableDemo("Rotation/Pan/Zoom") { MultitouchGestureDetector() },
     ComposableDemo("Rotation/Pan/Zoom with Lock") { MultitouchLockGestureDetector() },
+    ComposableDemo("Pointer type input") { PointerTypeInput() },
 )
 
 fun hueToColor(hue: Float): Color {
@@ -461,5 +464,27 @@ fun MultitouchLockGestureDetector() {
             panZoomLock = true,
             onGesture = it
         )
+    }
+}
+
+@Composable
+fun PointerTypeInput() {
+    var pointerType by remember { mutableStateOf<PointerType?>(null) }
+    Box(
+        Modifier.pointerInput {
+            forEachGesture {
+                awaitPointerEventScope {
+                    val pointer = awaitPointerEvent().changes.first()
+                    pointerType = pointer.type
+                    do {
+                        val event = awaitPointerEvent()
+                    } while (event.changes.first().pressed)
+                    pointerType = null
+                }
+            }
+        }
+    ) {
+        Text("Touch or click the area to see what type of input it is.")
+        Text("PointerType: ${pointerType ?: ""}", Modifier.align(Alignment.BottomStart))
     }
 }

@@ -40,7 +40,8 @@ internal fun PointerInputEventData(
         PointerId(id.toLong()),
         uptime,
         position,
-        down
+        down,
+        PointerType.Touch
     )
 }
 
@@ -178,8 +179,11 @@ internal fun MotionEvent(
 }
 
 @Suppress("TestFunctionName")
-internal fun PointerProperties(id: Int) =
-    MotionEvent.PointerProperties().apply { this.id = id }
+internal fun PointerProperties(id: Int, toolType: Int = MotionEvent.TOOL_TYPE_FINGER) =
+    MotionEvent.PointerProperties().apply {
+        this.id = id
+        this.toolType = toolType
+    }
 
 @Suppress("TestFunctionName")
 internal fun PointerCoords(x: Float, y: Float) =

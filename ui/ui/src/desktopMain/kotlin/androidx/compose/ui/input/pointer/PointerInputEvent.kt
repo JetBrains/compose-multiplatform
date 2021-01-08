@@ -32,5 +32,6 @@ class TestPointerInputEventData(
     val position: Offset,
     val down: Boolean
 ) {
-    internal fun toPointerInputEventData() = PointerInputEventData(id, uptime, position, down)
+    internal fun toPointerInputEventData() =
+        PointerInputEventData(id, uptime, position, down, PointerType.Mouse)
 }
