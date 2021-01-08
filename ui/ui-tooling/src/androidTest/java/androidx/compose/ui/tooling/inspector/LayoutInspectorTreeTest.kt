@@ -39,10 +39,10 @@ import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.CompositionDataRecord
 import androidx.compose.ui.tooling.Group
 import androidx.compose.ui.tooling.Inspectable
 import androidx.compose.ui.tooling.R
-import androidx.compose.ui.tooling.CompositionDataRecord
 import androidx.compose.ui.tooling.ToolingTest
 import androidx.compose.ui.tooling.asTree
 import androidx.compose.ui.tooling.position
@@ -56,7 +56,6 @@ import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import org.junit.After
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import kotlin.math.roundToInt
@@ -299,7 +298,6 @@ class LayoutInspectorTreeTest : ToolingTest() {
 
     @SdkSuppress(minSdkVersion = 29) // Render id is not returned for api < 29
     @Test
-    @Ignore("b/174152464")
     fun testTextId() {
         val slotTableRecord = CompositionDataRecord.create()
 
@@ -313,9 +311,9 @@ class LayoutInspectorTreeTest : ToolingTest() {
         val builder = LayoutInspectorTree()
         val node = builder.convert(view)
             .flatMap { flatten(it) }
-            .firstOrNull { it.name == "CoreText" }
+            .firstOrNull { it.name == "Text" }
 
-        // LayoutNode id should be captured by the CoreText node:
+        // LayoutNode id should be captured by the Text node:
         assertThat(node?.id).isGreaterThan(0)
     }
 
