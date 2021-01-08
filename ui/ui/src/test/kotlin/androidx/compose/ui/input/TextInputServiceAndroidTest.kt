@@ -63,7 +63,7 @@ class TextInputServiceAndroidTest {
             value = TextFieldValue(""),
             imeOptions = ImeOptions(
                 keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Unspecified
+                imeAction = ImeAction.Default
             ),
             onEditCommand = {},
             onImeActionPerformed = {}
@@ -85,7 +85,7 @@ class TextInputServiceAndroidTest {
             value = TextFieldValue(""),
             imeOptions = ImeOptions(
                 keyboardType = KeyboardType.Ascii,
-                imeAction = ImeAction.Unspecified
+                imeAction = ImeAction.Default
             ),
             onEditCommand = {},
             onImeActionPerformed = {}
@@ -108,7 +108,7 @@ class TextInputServiceAndroidTest {
             value = TextFieldValue(""),
             imeOptions = ImeOptions(
                 keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Unspecified
+                imeAction = ImeAction.Default
             ),
             onEditCommand = {},
             onImeActionPerformed = {}
@@ -130,7 +130,7 @@ class TextInputServiceAndroidTest {
             value = TextFieldValue(""),
             imeOptions = ImeOptions(
                 keyboardType = KeyboardType.Phone,
-                imeAction = ImeAction.Unspecified
+                imeAction = ImeAction.Default
             ),
             onEditCommand = {},
             onImeActionPerformed = {}
@@ -152,7 +152,7 @@ class TextInputServiceAndroidTest {
             value = TextFieldValue(""),
             imeOptions = ImeOptions(
                 keyboardType = KeyboardType.Uri,
-                imeAction = ImeAction.Unspecified
+                imeAction = ImeAction.Default
             ),
             onEditCommand = {},
             onImeActionPerformed = {}
@@ -175,7 +175,7 @@ class TextInputServiceAndroidTest {
             value = TextFieldValue(""),
             imeOptions = ImeOptions(
                 keyboardType = KeyboardType.Email,
-                imeAction = ImeAction.Unspecified
+                imeAction = ImeAction.Default
             ),
             onEditCommand = {},
             onImeActionPerformed = {}
@@ -198,7 +198,7 @@ class TextInputServiceAndroidTest {
             value = TextFieldValue(""),
             imeOptions = ImeOptions(
                 keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Unspecified
+                imeAction = ImeAction.Default
             ),
             onEditCommand = {},
             onImeActionPerformed = {}
@@ -221,7 +221,7 @@ class TextInputServiceAndroidTest {
             value = TextFieldValue(""),
             imeOptions = ImeOptions(
                 keyboardType = KeyboardType.NumberPassword,
-                imeAction = ImeAction.Unspecified
+                imeAction = ImeAction.Default
             ),
             onEditCommand = {},
             onImeActionPerformed = {}
@@ -244,7 +244,7 @@ class TextInputServiceAndroidTest {
             value = TextFieldValue(""),
             imeOptions = ImeOptions(
                 keyboardType = KeyboardType.Ascii,
-                imeAction = ImeAction.NoAction
+                imeAction = ImeAction.None
             ),
             onEditCommand = {},
             onImeActionPerformed = {}
@@ -446,7 +446,7 @@ class TextInputServiceAndroidTest {
             imeOptions = ImeOptions(
                 singleLine = true,
                 keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Unspecified,
+                imeAction = ImeAction.Default
             ),
             onEditCommand = {},
             onImeActionPerformed = {}

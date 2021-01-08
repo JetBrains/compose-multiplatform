@@ -423,7 +423,7 @@ class TextFieldTest {
             .assertTextEquals("")
             .assertHasClickAction()
             .assert(hasSetTextAction())
-            .assert(hasImeAction(ImeAction.Unspecified))
+            .assert(hasImeAction(ImeAction.Default))
             .assert(isNotFocused())
             .assert(
                 SemanticsMatcher.expectValue(

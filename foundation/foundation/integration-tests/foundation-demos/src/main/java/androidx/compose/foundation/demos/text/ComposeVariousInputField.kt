@@ -238,7 +238,7 @@ fun VariousInputFieldDemo() {
 @Composable
 private fun VariousEditLine(
     keyboardType: KeyboardType = KeyboardType.Text,
-    imeAction: ImeAction = ImeAction.Unspecified,
+    imeAction: ImeAction = ImeAction.Default,
     onValueChange: (String, String) -> String = { _, new -> new },
     visualTransformation: VisualTransformation
 ) {

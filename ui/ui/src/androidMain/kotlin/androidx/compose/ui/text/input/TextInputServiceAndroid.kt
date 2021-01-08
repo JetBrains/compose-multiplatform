@@ -210,7 +210,7 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
      */
     private fun fillEditorInfo(outInfo: EditorInfo) {
         outInfo.imeOptions = when (imeOptions.imeAction) {
-            ImeAction.Unspecified -> {
+            ImeAction.Default, @Suppress("DEPRECATION") ImeAction.Unspecified -> {
                 if (imeOptions.singleLine) {
                     // this is the last resort to enable single line
                     // Android IME still show return key even if multi line is not send
@@ -220,7 +220,8 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
                     EditorInfo.IME_ACTION_UNSPECIFIED
                 }
             }
-            ImeAction.NoAction -> EditorInfo.IME_ACTION_NONE
+            ImeAction.None, @Suppress("DEPRECATION") ImeAction.NoAction ->
+                EditorInfo.IME_ACTION_NONE
             ImeAction.Go -> EditorInfo.IME_ACTION_GO
             ImeAction.Next -> EditorInfo.IME_ACTION_NEXT
             ImeAction.Previous -> EditorInfo.IME_ACTION_PREVIOUS

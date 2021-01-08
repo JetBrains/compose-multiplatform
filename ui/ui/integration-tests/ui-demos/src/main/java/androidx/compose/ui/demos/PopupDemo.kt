@@ -513,7 +513,7 @@ private fun ClickableTextWithBackground(
 private fun EditLine(
     modifier: Modifier = Modifier,
     keyboardType: KeyboardType = KeyboardType.Text,
-    imeAction: ImeAction = ImeAction.Unspecified,
+    imeAction: ImeAction = ImeAction.Default,
     onValueChange: (String) -> Unit = {},
     initialText: String = "",
     color: Color = Color.White
