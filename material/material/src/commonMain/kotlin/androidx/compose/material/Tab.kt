@@ -16,12 +16,12 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.ColorPropKey
+import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateAsState
-import androidx.compose.animation.core.transitionDefinition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.transition
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
@@ -257,8 +257,6 @@ object TabDefaults {
     val ScrollableTabRowPadding = 52.dp
 }
 
-private val TabTintColor = ColorPropKey()
-
 /**
  * [transition] defining how the tint color for a tab animates, when a new tab is selected. This
  * component uses [AmbientContentColor] to provide an interpolated value between [activeColor]
@@ -271,34 +269,25 @@ private fun TabTransition(
     selected: Boolean,
     content: @Composable () -> Unit
 ) {
-    val transitionDefinition = remember(activeColor, inactiveColor) {
-        transitionDefinition<Boolean> {
-            state(true) {
-                this[TabTintColor] = activeColor
-            }
-
-            state(false) {
-                this[TabTintColor] = inactiveColor
-            }
-
-            transition(toState = false, fromState = true) {
-                TabTintColor using tween(
+    val transition = updateTransition(selected)
+    val color by transition.animateColor(
+        transitionSpec = {
+            if (false isTransitioningTo true) {
+                tween(
                     durationMillis = TabFadeInAnimationDuration,
                     delayMillis = TabFadeInAnimationDelay,
                     easing = LinearEasing
                 )
-            }
-
-            transition(fromState = true, toState = false) {
-                TabTintColor using tween(
+            } else {
+                tween(
                     durationMillis = TabFadeOutAnimationDuration,
                     easing = LinearEasing
                 )
             }
         }
+    ) {
+        if (it) activeColor else inactiveColor
     }
-    val state = transition(transitionDefinition, selected)
-    val color = state[TabTintColor]
     Providers(
         AmbientContentColor provides color.copy(alpha = 1f),
         AmbientContentAlpha provides color.alpha,
