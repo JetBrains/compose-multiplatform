@@ -385,12 +385,12 @@ package androidx.compose.ui.focus {
   }
 
   public static final class FocusRequester.Companion {
-    method public androidx.compose.ui.focus.FocusRequester.Companion.FocusRequesterFactory createRefs();
+    method @androidx.compose.ui.ExperimentalComposeUiApi public androidx.compose.ui.focus.FocusRequester.Companion.FocusRequesterFactory createRefs();
     method public androidx.compose.ui.focus.FocusRequester getDefault();
     property public final androidx.compose.ui.focus.FocusRequester Default;
   }
 
-  public static final class FocusRequester.Companion.FocusRequesterFactory {
+  @androidx.compose.ui.ExperimentalComposeUiApi public static final class FocusRequester.Companion.FocusRequesterFactory {
     method public operator androidx.compose.ui.focus.FocusRequester component1();
     method public operator androidx.compose.ui.focus.FocusRequester component10();
     method public operator androidx.compose.ui.focus.FocusRequester component11();
