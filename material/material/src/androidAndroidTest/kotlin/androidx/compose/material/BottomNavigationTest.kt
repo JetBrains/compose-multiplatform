@@ -21,8 +21,8 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.samples.BottomNavigationSample
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.layout.globalPosition
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHeightIsEqualTo
@@ -105,7 +105,7 @@ class BottomNavigationTest {
             itemCoords.forEach { (index, coord) ->
                 Truth.assertThat(coord.size.width).isEqualTo(expectedItemWidth)
                 Truth.assertThat(coord.size.height).isEqualTo(expectedItemHeight)
-                Truth.assertThat(coord.globalPosition.x)
+                Truth.assertThat(coord.positionInWindow().x)
                     .isEqualTo((expectedItemWidth * index).toFloat())
             }
         }

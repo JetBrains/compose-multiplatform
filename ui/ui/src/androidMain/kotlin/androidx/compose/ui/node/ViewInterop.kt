@@ -169,7 +169,7 @@ internal fun AndroidViewHolder.toLayoutNode(): LayoutNode {
 }
 
 private fun View.layoutAccordingTo(layoutNode: LayoutNode) {
-    val position = layoutNode.coordinates.positionInRoot
+    val position = layoutNode.coordinates.positionInRoot()
     val x = position.x.roundToInt()
     val y = position.y.roundToInt()
     layout(x, y, x + measuredWidth, y + measuredHeight)

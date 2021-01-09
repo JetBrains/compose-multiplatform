@@ -274,7 +274,7 @@ class TextFieldTest {
                             fontSize = 10.sp,
                             modifier = Modifier
                                 .onGloballyPositioned {
-                                    labelPosition.value = it.positionInRoot
+                                    labelPosition.value = it.positionInRoot()
                                     labelSize.value = it.size
                                 }
                         )
@@ -315,7 +315,7 @@ class TextFieldTest {
                             fontSize = 10.sp,
                             modifier = Modifier
                                 .onGloballyPositioned {
-                                    labelPosition.value = it.positionInRoot
+                                    labelPosition.value = it.positionInRoot()
                                     labelSize.value = it.size
                                 }
                         )
@@ -355,7 +355,7 @@ class TextFieldTest {
                         Text(
                             text = "label",
                             modifier = Modifier.onGloballyPositioned {
-                                labelPosition.value = it.positionInRoot
+                                labelPosition.value = it.positionInRoot()
                                 labelSize.value = it.size
                             }
                         )
@@ -394,7 +394,7 @@ class TextFieldTest {
                         Text(
                             text = "label",
                             modifier = Modifier.onGloballyPositioned {
-                                labelPosition.value = it.positionInRoot
+                                labelPosition.value = it.positionInRoot()
                                 labelSize.value = it.size
                                 baseline.value = it[FirstBaseline].toFloat() +
                                     labelPosition.value!!.y
@@ -437,7 +437,7 @@ class TextFieldTest {
                         Text(
                             text = "label",
                             modifier = Modifier.onGloballyPositioned {
-                                labelPosition.value = it.positionInRoot
+                                labelPosition.value = it.positionInRoot()
                                 labelSize.value = it.size
                                 baseline.value =
                                     it[FirstBaseline].toFloat() + labelPosition.value!!.y
@@ -480,7 +480,7 @@ class TextFieldTest {
                         Text(
                             text = "placeholder",
                             modifier = Modifier.onGloballyPositioned {
-                                placeholderPosition.value = it.positionInRoot
+                                placeholderPosition.value = it.positionInRoot()
                                 placeholderSize.value = it.size
                             }
                         )
@@ -525,7 +525,7 @@ class TextFieldTest {
                             text = "placeholder",
                             modifier = Modifier.height(20.dp)
                                 .onGloballyPositioned {
-                                    placeholderPosition.value = it.positionInRoot
+                                    placeholderPosition.value = it.positionInRoot()
                                     placeholderSize.value = it.size
                                 }
                         )
@@ -566,7 +566,7 @@ class TextFieldTest {
                         Text(
                             text = "placeholder",
                             modifier = Modifier.onGloballyPositioned {
-                                placeholderPosition.value = it.positionInRoot
+                                placeholderPosition.value = it.positionInRoot()
                                 placeholderSize.value = it.size
                             }
                         )
@@ -633,7 +633,7 @@ class TextFieldTest {
                 leadingIcon = {
                     Box(
                         Modifier.preferredSize(size).onGloballyPositioned {
-                            leadingPosition.value = it.positionInRoot
+                            leadingPosition.value = it.positionInRoot()
                             leadingSize.value = it.size
                         }
                     )
@@ -641,7 +641,7 @@ class TextFieldTest {
                 trailingIcon = {
                     Box(
                         Modifier.preferredSize(size).onGloballyPositioned {
-                            trailingPosition.value = it.positionInRoot
+                            trailingPosition.value = it.positionInRoot()
                             trailingSize.value = it.size
                         }
                     )
@@ -686,7 +686,7 @@ class TextFieldTest {
                         Text(
                             text = "label",
                             modifier = Modifier.onGloballyPositioned {
-                                labelPosition.value = it.positionInRoot
+                                labelPosition.value = it.positionInRoot()
                             }
                         )
                     },
@@ -718,7 +718,7 @@ class TextFieldTest {
                         Text(
                             text = "label",
                             modifier = Modifier.onGloballyPositioned {
-                                labelPosition.value = it.positionInRoot
+                                labelPosition.value = it.positionInRoot()
                             }
                         )
                     },

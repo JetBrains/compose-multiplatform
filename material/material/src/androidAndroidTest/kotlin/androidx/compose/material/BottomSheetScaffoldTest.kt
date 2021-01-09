@@ -280,7 +280,7 @@ class BottomSheetScaffoldTest {
                     Box(
                         Modifier
                             .onGloballyPositioned { positioned: LayoutCoordinates ->
-                                appbarPosition = positioned.localToGlobal(Offset.Zero)
+                                appbarPosition = positioned.localToWindow(Offset.Zero)
                                 appbarSize = positioned.size
                             }
                             .fillMaxWidth()
@@ -294,7 +294,7 @@ class BottomSheetScaffoldTest {
             ) {
                 Box(
                     Modifier
-                        .onGloballyPositioned { contentPosition = it.localToGlobal(Offset.Zero) }
+                        .onGloballyPositioned { contentPosition = it.localToWindow(Offset.Zero) }
                         .fillMaxWidth()
                         .preferredHeight(50.dp)
                         .background(Color.Blue)

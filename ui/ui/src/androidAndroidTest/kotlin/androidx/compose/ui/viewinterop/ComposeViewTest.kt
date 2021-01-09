@@ -27,7 +27,7 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.layout.globalBounds
+import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.platform.ComposeView
@@ -229,7 +229,7 @@ class ComposeViewTest {
                     Modifier.testTag("box").fillMaxSize().onGloballyPositioned {
                         val position = IntArray(2)
                         composeView.getLocationOnScreen(position)
-                        globalBounds = it.globalBounds.translate(
+                        globalBounds = it.boundsInWindow().translate(
                             -position[0].toFloat(), -position[1].toFloat()
                         )
                         latch.countDown()

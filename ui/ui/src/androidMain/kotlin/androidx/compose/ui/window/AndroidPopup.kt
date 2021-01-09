@@ -143,6 +143,7 @@ internal actual fun ActualPopup(
         modifier = Modifier.onGloballyPositioned { childCoordinates ->
             val coordinates = childCoordinates.parentCoordinates!!
             // Get the global position of the parent
+            @Suppress("DEPRECATION")
             val layoutPosition = coordinates.localToGlobal(Offset.Zero).round()
             val layoutSize = coordinates.size
 

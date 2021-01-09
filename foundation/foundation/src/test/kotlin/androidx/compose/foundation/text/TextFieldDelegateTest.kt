@@ -395,15 +395,25 @@ class TextFieldDelegateTest {
         override val isAttached: Boolean
             get() = true
         override fun globalToLocal(global: Offset): Offset = localOffset
+        override fun windowToLocal(relativeToWindow: Offset): Offset = localOffset
 
         override fun localToGlobal(local: Offset): Offset = globalOffset
+        override fun localToWindow(relativeToLocal: Offset): Offset = globalOffset
 
-        override fun localToRoot(local: Offset): Offset = rootOffset
+        override fun localToRoot(relativeToLocal: Offset): Offset = rootOffset
+        override fun localPositionOf(
+            sourceCoordinates: LayoutCoordinates,
+            relativeToSource: Offset
+        ): Offset = Offset.Zero
 
         override fun childToLocal(child: LayoutCoordinates, childLocal: Offset): Offset =
             Offset.Zero
 
         override fun childBoundingBox(child: LayoutCoordinates): Rect = Rect.Zero
+        override fun localBoundingBoxOf(
+            sourceCoordinates: LayoutCoordinates,
+            clipBounds: Boolean
+        ): Rect = Rect.Zero
 
         override fun get(line: AlignmentLine): Int = 0
     }

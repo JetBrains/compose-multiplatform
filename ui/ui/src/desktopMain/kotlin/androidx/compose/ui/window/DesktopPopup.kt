@@ -62,7 +62,7 @@ private fun PopupLayout(
         modifier = Modifier.onGloballyPositioned { childCoordinates ->
             val coordinates = childCoordinates.parentCoordinates!!
             parentBounds.value = IntBounds(
-                coordinates.localToGlobal(Offset.Zero).round(),
+                coordinates.localToWindow(Offset.Zero).round(),
                 coordinates.size
             )
         },

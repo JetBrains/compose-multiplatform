@@ -83,14 +83,14 @@ class ModifierInfoTest : ToolingTest() {
                     "${boxModifierInfo[0].modifier}",
                 boxModifierInfo[0].modifier is LayoutModifier
             )
-            assertEquals(10f, boxModifierInfo[0].coordinates.positionInRoot.x)
+            assertEquals(10f, boxModifierInfo[0].coordinates.positionInRoot().x)
 
             assertTrue(
                 "Box should only have LayoutModifiers, but the second was " +
                     "${boxModifierInfo[1].modifier}",
                 boxModifierInfo[1].modifier is LayoutModifier
             )
-            assertEquals(15f, boxModifierInfo[1].coordinates.positionInRoot.x)
+            assertEquals(15f, boxModifierInfo[1].coordinates.positionInRoot().x)
 
             val columnModifierInfo = modifierInfo[1]
             assertEquals(3, columnModifierInfo.size)
@@ -99,20 +99,20 @@ class ModifierInfoTest : ToolingTest() {
                     "but was ${columnModifierInfo[0].modifier}",
                 columnModifierInfo[0].modifier is LayoutModifier
             )
-            assertEquals(0f, columnModifierInfo[0].coordinates.positionInRoot.x)
+            assertEquals(0f, columnModifierInfo[0].coordinates.positionInRoot().x)
             assertTrue(
                 "The second modifier in the column should be a LayoutModifier" +
                     "but was ${columnModifierInfo[1].modifier}",
                 columnModifierInfo[1].modifier is LayoutModifier
             )
             assertTrue(columnModifierInfo[2].extra is OwnedLayer)
-            assertEquals(10f, columnModifierInfo[1].coordinates.positionInRoot.x)
+            assertEquals(10f, columnModifierInfo[1].coordinates.positionInRoot().x)
             assertTrue(
                 "The third modifier in the column should be a DrawModifier" +
                     "but was ${columnModifierInfo[2].modifier}",
                 columnModifierInfo[2].modifier is DrawModifier
             )
-            assertEquals(10f, columnModifierInfo[2].coordinates.positionInRoot.x)
+            assertEquals(10f, columnModifierInfo[2].coordinates.positionInRoot().x)
         }
     }
 }

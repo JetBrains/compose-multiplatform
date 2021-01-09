@@ -130,6 +130,7 @@ private fun Autofill(
     }
 }
 
+@Suppress("DEPRECATION")
 private fun LayoutCoordinates.boundingBox() = localToGlobal(Offset.Zero).run {
     Rect(
         x.toInt(),

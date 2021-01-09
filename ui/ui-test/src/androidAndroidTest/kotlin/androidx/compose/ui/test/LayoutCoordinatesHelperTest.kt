@@ -71,7 +71,7 @@ class LayoutCoordinatesHelperTest {
         assertTrue(latch.await(1, TimeUnit.SECONDS))
         assertEquals(
             Offset.Zero,
-            parentCoordinates!!.childToLocal(childCoordinates!!, Offset.Zero)
+            parentCoordinates!!.localPositionOf(childCoordinates!!, Offset.Zero)
         )
     }
 
@@ -106,7 +106,7 @@ class LayoutCoordinatesHelperTest {
         assertTrue(latch.await(1, TimeUnit.SECONDS))
         assertEquals(
             Offset(5f, 0f),
-            parentCoordinates!!.childToLocal(childCoordinates!!, Offset.Zero)
+            parentCoordinates!!.localPositionOf(childCoordinates!!, Offset.Zero)
         )
     }
 }

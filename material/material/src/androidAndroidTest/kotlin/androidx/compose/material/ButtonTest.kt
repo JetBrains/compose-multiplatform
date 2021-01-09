@@ -540,8 +540,8 @@ class ButtonTest {
         }
 
         rule.runOnIdle {
-            val buttonBounds = buttonCoordinates!!.boundsInRoot
-            val contentBounds = contentCoordinates!!.boundsInRoot
+            val buttonBounds = buttonCoordinates!!.boundsInRoot()
+            val contentBounds = contentCoordinates!!.boundsInRoot()
             assertThat(contentBounds.width).isLessThan(buttonBounds.width)
             assertThat(contentBounds.height).isLessThan(buttonBounds.height)
             with(rule.density) {
@@ -577,14 +577,14 @@ class ButtonTest {
             Column {
                 Spacer(
                     Modifier.size(10.dp).weight(1f).onGloballyPositioned {
-                        item1Bounds = it.boundsInRoot
+                        item1Bounds = it.boundsInRoot()
                     }
                 )
 
                 Button(
                     onClick = {},
                     modifier = Modifier.weight(1f).onGloballyPositioned {
-                        buttonBounds = it.boundsInRoot
+                        buttonBounds = it.boundsInRoot()
                     }
                 ) {
                     Text("Button")
@@ -607,17 +607,17 @@ class ButtonTest {
             Button(
                 onClick = {},
                 modifier = Modifier.onGloballyPositioned {
-                    buttonBounds = it.boundsInRoot
+                    buttonBounds = it.boundsInRoot()
                 }
             ) {
                 Spacer(
                     Modifier.size(10.dp).onGloballyPositioned {
-                        item1Bounds = it.boundsInRoot
+                        item1Bounds = it.boundsInRoot()
                     }
                 )
                 Spacer(
                     Modifier.width(10.dp).height(5.dp).onGloballyPositioned {
-                        item2Bounds = it.boundsInRoot
+                        item2Bounds = it.boundsInRoot()
                     }
                 )
             }
@@ -647,8 +647,8 @@ class ButtonTest {
         }
 
         rule.runOnIdle {
-            val topLeft = childCoordinates!!.localToGlobal(Offset.Zero).x -
-                parentCoordinates!!.localToGlobal(Offset.Zero).x
+            val topLeft = childCoordinates!!.localToWindow(Offset.Zero).x -
+                parentCoordinates!!.localToWindow(Offset.Zero).x
             val currentPadding = with(rule.density) {
                 padding.toIntPx().toFloat()
             }

@@ -3939,13 +3939,28 @@ class LayoutCoordinatesStub(
         TODO("not implemented")
     }
 
+    override fun windowToLocal(relativeToWindow: Offset): Offset {
+        TODO("Not yet implemented")
+    }
+
     override fun localToGlobal(local: Offset): Offset {
         assertThat(isAttached).isTrue()
         return local + additionalOffset
     }
 
-    override fun localToRoot(local: Offset): Offset {
+    override fun localToWindow(relativeToLocal: Offset): Offset {
+        TODO("Not yet implemented")
+    }
+
+    override fun localToRoot(relativeToLocal: Offset): Offset {
         TODO("not implemented")
+    }
+
+    override fun localPositionOf(
+        sourceCoordinates: LayoutCoordinates,
+        relativeToSource: Offset
+    ): Offset {
+        TODO("Not yet implemented")
     }
 
     override fun childToLocal(child: LayoutCoordinates, childLocal: Offset): Offset {
@@ -3954,6 +3969,13 @@ class LayoutCoordinatesStub(
 
     override fun childBoundingBox(child: LayoutCoordinates): Rect {
         TODO("not implemented")
+    }
+
+    override fun localBoundingBoxOf(
+        sourceCoordinates: LayoutCoordinates,
+        clipBounds: Boolean
+    ): Rect {
+        TODO("Not yet implemented")
     }
 
     override fun get(line: AlignmentLine): Int {
