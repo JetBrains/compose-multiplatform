@@ -19,6 +19,7 @@ package androidx.compose.ui.focus
 import android.view.View
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusState.Active
 import androidx.compose.ui.focus.FocusState.Inactive
@@ -250,6 +251,7 @@ class FocusRequesterTest {
         }
     }
 
+    @ExperimentalComposeUiApi
     @Test
     fun requestFocusForAnyChild_triggersOnFocusChangedInParent() {
         // Arrange.

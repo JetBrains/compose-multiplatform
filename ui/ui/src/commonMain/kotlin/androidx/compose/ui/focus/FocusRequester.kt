@@ -18,6 +18,7 @@ package androidx.compose.ui.focus
 
 import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.node.ModifiedFocusRequesterNode
 
 private const val focusRequesterNotInitialized = "FocusRequester is not initialized. One reason " +
@@ -110,6 +111,7 @@ class FocusRequester {
         /**
          * Convenient way to create multiple [FocusRequester] instances.
          */
+        @ExperimentalComposeUiApi
         object FocusRequesterFactory {
             operator fun component1() = FocusRequester()
             operator fun component2() = FocusRequester()
@@ -133,6 +135,7 @@ class FocusRequester {
          * Convenient way to create multiple [FocusRequester]s, which can to be used to request
          * focus, or to specify a focus traversal order.
          */
+        @ExperimentalComposeUiApi
         fun createRefs() = FocusRequesterFactory
     }
 }

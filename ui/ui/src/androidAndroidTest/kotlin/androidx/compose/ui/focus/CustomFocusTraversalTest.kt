@@ -22,6 +22,7 @@ import android.view.KeyEvent.META_SHIFT_ON
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key.Companion.Tab
 import androidx.compose.ui.input.key.Key.Companion.DPadUp
@@ -40,6 +41,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import com.google.common.truth.Truth.assertThat
 
+@ExperimentalComposeUiApi
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class CustomFocusTraversalTest {

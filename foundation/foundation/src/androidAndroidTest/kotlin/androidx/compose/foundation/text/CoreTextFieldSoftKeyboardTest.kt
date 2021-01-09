@@ -22,6 +22,7 @@ import android.view.WindowInsets
 import android.view.WindowInsetsAnimation
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
@@ -163,6 +164,7 @@ class CoreTextFieldSoftKeyboardTest {
         assertThat(isSoftKeyboardVisible).isTrue()
     }
 
+    @OptIn(ExperimentalComposeUiApi::class)
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.R)
     @Test
     fun keyboardStaysVisibleWhenMovingFromOneTextFieldToAnother() {
