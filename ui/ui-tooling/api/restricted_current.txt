@@ -135,7 +135,10 @@ package androidx.compose.ui.tooling.inspector {
     ctor public LayoutInspectorTree();
     method public java.util.List<androidx.compose.ui.tooling.inspector.InspectorNode> convert(android.view.View view);
     method public java.util.List<androidx.compose.ui.tooling.inspector.NodeParameter> convertParameters(androidx.compose.ui.tooling.inspector.InspectorNode node);
+    method public boolean getHideSystemNodes();
     method public void resetGeneratedId();
+    method public void setHideSystemNodes(boolean p);
+    property public final boolean hideSystemNodes;
   }
 
   public final class LayoutInspectorTreeKt {
