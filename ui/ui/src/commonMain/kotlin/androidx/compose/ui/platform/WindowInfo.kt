@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,14 +23,13 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshots.snapshotFlow
-import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 
 /**
  * Provides information about the Window that is hosting this compose hierarchy.
  */
 @Stable
-interface WindowManager {
+interface WindowInfo {
     /**
      * Indicates whether the window hosting this compose hierarchy is in focus.
      *
@@ -41,23 +40,45 @@ interface WindowManager {
     val isWindowFocused: Boolean
 }
 
+// TODO(b/177085155): Remove after Alpha 11.
+/**
+ * Provides information about the Window that is hosting this compose hierarchy.
+ */
+@Stable
+@Deprecated(
+    message = "Use WindowInfo instead.",
+    replaceWith = ReplaceWith("WindowInfo", "androidx.compose.ui.platform.WindowInfo"),
+    level = DeprecationLevel.ERROR
+)
+interface WindowManager {
+    val isWindowFocused: Boolean
+}
+
+// TODO(b/177085040):  Remove after Alpha 11.
 /**
  * Provides a callback that is called whenever the window gains or loses focus.
  */
-@OptIn(
-    ExperimentalComposeApi::class,
-    InternalCoroutinesApi::class
+@Deprecated(
+    message = "Use AmbientWindowInfo.current.isWIndowFocused instead.",
+    level = DeprecationLevel.ERROR
 )
 @Composable
 fun WindowFocusObserver(onWindowFocusChanged: (isWindowFocused: Boolean) -> Unit) {
-    val windowManager = AmbientWindowManager.current
+    WindowFocusObserver1(onWindowFocusChanged)
+}
+
+// TODO(b/177085040): Rename this to WindowFocusObserver after removing WindowFocusObserver.
+@OptIn(ExperimentalComposeApi::class)
+@Composable
+internal fun WindowFocusObserver1(onWindowFocusChanged: (isWindowFocused: Boolean) -> Unit) {
+    val windowInfo = AmbientWindowInfo.current
     val callback = rememberUpdatedState(onWindowFocusChanged)
-    LaunchedEffect(windowManager) {
-        snapshotFlow { windowManager.isWindowFocused }.collect { callback.value(it) }
+    LaunchedEffect(windowInfo) {
+        snapshotFlow { windowInfo.isWindowFocused }.collect { callback.value(it) }
     }
 }
 
-internal class WindowManagerImpl : WindowManager {
+internal class WindowInfoImpl : WindowInfo {
     private val _isWindowFocused = mutableStateOf(false)
     override var isWindowFocused: Boolean
         set(value) { _isWindowFocused.value = value }

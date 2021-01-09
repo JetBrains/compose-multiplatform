@@ -32,7 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.LightGray
 import androidx.compose.ui.graphics.Color.Companion.White
-import androidx.compose.ui.platform.AmbientWindowManager
+import androidx.compose.ui.platform.AmbientWindowInfo
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
@@ -42,9 +42,9 @@ fun FocusInPopup() {
     var showPopup by remember { mutableStateOf(false) }
     var mainText by remember { mutableStateOf(TextFieldValue("Enter Value")) }
     var popupText by remember { mutableStateOf(TextFieldValue("Enter Value")) }
-    val windowManager = AmbientWindowManager.current
+    val windowInfo = AmbientWindowInfo.current
 
-    Column(Modifier.background(if (windowManager.isWindowFocused) White else LightGray)) {
+    Column(Modifier.background(if (windowInfo.isWindowFocused) White else LightGray)) {
         Text("Click the button to show the popup. Click outside the popup to dismiss it.")
         Spacer(Modifier.height(10.dp))
         Button(onClick = { showPopup = true }) {
@@ -75,6 +75,6 @@ fun FocusInPopup() {
 
 @Composable
 private fun FocusStatus() {
-    val windowManager = AmbientWindowManager.current
-    Text("Status: Window ${if (windowManager.isWindowFocused) "is" else "is not"} focused.")
+    val windowInfo = AmbientWindowInfo.current
+    Text("Status: Window ${if (windowInfo.isWindowFocused) "is" else "is not"} focused.")
 }

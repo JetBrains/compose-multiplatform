@@ -25,13 +25,13 @@ import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.ViewConfiguration
+import androidx.compose.ui.platform.WindowInfo
 import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.platform.WindowManager
 
 /**
  * Owner implements the connection to the underlying view system. On Android, this connects
@@ -91,7 +91,17 @@ interface Owner {
     /**
      * Provide information about the window that hosts this [Owner].
      */
-    val windowManager: WindowManager
+    @Deprecated(
+        message = "Renamed to windowInfo",
+        replaceWith = ReplaceWith("windowInfo"),
+        level = DeprecationLevel.ERROR
+    )
+    val windowManager get() = windowInfo
+
+    /**
+     * Provide information about the window that hosts this [Owner].
+     */
+    val windowInfo: WindowInfo
 
     val fontLoader: Font.ResourceLoader
 

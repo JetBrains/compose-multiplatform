@@ -114,9 +114,9 @@ internal class AndroidComposeView(context: Context) :
     override val focusManager: FocusManager
         get() = _focusManager
 
-    private val _windowManager: WindowManagerImpl = WindowManagerImpl()
-    override val windowManager: WindowManager
-        get() = _windowManager
+    private val _windowInfo: WindowInfoImpl = WindowInfoImpl()
+    override val windowInfo: WindowInfo
+        get() = _windowInfo
 
     private val keyInputModifier = KeyInputModifier(null, null)
 
@@ -297,7 +297,7 @@ internal class AndroidComposeView(context: Context) :
     }
 
     override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
-        _windowManager.isWindowFocused = hasWindowFocus
+        _windowInfo.isWindowFocused = hasWindowFocus
         super.onWindowFocusChanged(hasWindowFocus)
     }
 
