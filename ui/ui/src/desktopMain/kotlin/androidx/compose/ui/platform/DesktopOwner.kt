@@ -84,10 +84,10 @@ class DesktopOwner(
     override val focusManager: FocusManager
         get() = _focusManager
 
-    // TODO: set/clear _windowManager.isWindowFocused when the window gains/loses focus.
-    private val _windowManager: WindowManagerImpl = WindowManagerImpl()
-    override val windowManager: WindowManager
-        get() = _windowManager
+    // TODO: set/clear _windowInfo.isWindowFocused when the window gains/loses focus.
+    private val _windowInfo: WindowInfoImpl = WindowInfoImpl()
+    override val windowInfo: WindowInfo
+        get() = _windowInfo
 
     private val keyInputModifier = KeyInputModifier(null, null)
 

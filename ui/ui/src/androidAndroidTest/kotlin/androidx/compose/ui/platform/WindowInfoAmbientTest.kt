@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit.SECONDS
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-class WindowManagerAmbientTest {
+class WindowInfoAmbientTest {
     @get:Rule
     val rule = createComposeRule()
 
@@ -41,12 +41,13 @@ class WindowManagerAmbientTest {
     @Test
     fun windowIsFocused_onLaunch() {
         // Arrange.
-        lateinit var windowManager: WindowManager
+        lateinit var windowInfo: WindowInfo
         val windowFocusGain = CountDownLatch(1)
         rule.setContent {
             BasicText("Main Window")
-            windowManager = AmbientWindowManager.current
-            WindowFocusObserver { if (it) windowFocusGain.countDown() }
+            windowInfo = AmbientWindowInfo.current
+            @Suppress("DEPRECATION")
+            WindowFocusObserver1 { if (it) windowFocusGain.countDown() }
         }
 
         // Act.
@@ -54,26 +55,26 @@ class WindowManagerAmbientTest {
 
         // Assert.
         windowFocusGain.await(5, SECONDS)
-        assertThat(windowManager.isWindowFocused).isTrue()
+        assertThat(windowInfo.isWindowFocused).isTrue()
     }
 
     @Test
     fun mainWindowIsNotFocused_whenPopupIsVisible() {
         // Arrange.
-        lateinit var mainWindowManager: WindowManager
-        lateinit var popupWindowManager: WindowManager
+        lateinit var mainWindowInfo: WindowInfo
+        lateinit var popupWindowInfo: WindowInfo
         val mainWindowFocusLoss = CountDownLatch(1)
         val popupFocusGain = CountDownLatch(1)
         val showPopup = mutableStateOf(false)
         rule.setContent {
             BasicText("Main Window")
-            mainWindowManager = AmbientWindowManager.current
-            WindowFocusObserver { if (!it) mainWindowFocusLoss.countDown() }
+            mainWindowInfo = AmbientWindowInfo.current
+            WindowFocusObserver1 { if (!it) mainWindowFocusLoss.countDown() }
             if (showPopup.value) {
                 Popup(isFocusable = true, onDismissRequest = { showPopup.value = false }) {
                     BasicText("Popup Window")
-                    popupWindowManager = AmbientWindowManager.current
-                    WindowFocusObserver { if (it) popupFocusGain.countDown() }
+                    popupWindowInfo = AmbientWindowInfo.current
+                    WindowFocusObserver1 { if (it) popupFocusGain.countDown() }
                 }
             }
         }
@@ -85,25 +86,25 @@ class WindowManagerAmbientTest {
         rule.waitForIdle()
         assertThat(mainWindowFocusLoss.await(5, SECONDS)).isTrue()
         assertThat(popupFocusGain.await(5, SECONDS)).isTrue()
-        assertThat(mainWindowManager.isWindowFocused).isFalse()
-        assertThat(popupWindowManager.isWindowFocused).isTrue()
+        assertThat(mainWindowInfo.isWindowFocused).isFalse()
+        assertThat(popupWindowInfo.isWindowFocused).isTrue()
     }
 
     @Test
     fun windowIsFocused_whenPopupIsDismissed() {
         // Arrange.
-        lateinit var mainWindowManager: WindowManager
+        lateinit var mainWindowInfo: WindowInfo
         var mainWindowFocusGain = CountDownLatch(1)
         val popupFocusGain = CountDownLatch(1)
         val showPopup = mutableStateOf(false)
         rule.setContent {
             BasicText(text = "Main Window")
-            mainWindowManager = AmbientWindowManager.current
-            WindowFocusObserver { if (it) mainWindowFocusGain.countDown() }
+            mainWindowInfo = AmbientWindowInfo.current
+            WindowFocusObserver1 { if (it) mainWindowFocusGain.countDown() }
             if (showPopup.value) {
                 Popup(isFocusable = true, onDismissRequest = { showPopup.value = false }) {
                     BasicText(text = "Popup Window")
-                    WindowFocusObserver { if (it) popupFocusGain.countDown() }
+                    WindowFocusObserver1 { if (it) popupFocusGain.countDown() }
                 }
             }
         }
@@ -118,26 +119,26 @@ class WindowManagerAmbientTest {
         // Assert.
         rule.waitForIdle()
         assertThat(mainWindowFocusGain.await(5, SECONDS)).isTrue()
-        assertThat(mainWindowManager.isWindowFocused).isTrue()
+        assertThat(mainWindowInfo.isWindowFocused).isTrue()
     }
 
     @Test
     fun mainWindowIsNotFocused_whenDialogIsVisible() {
         // Arrange.
-        lateinit var mainWindowManager: WindowManager
-        lateinit var dialogWindowManager: WindowManager
+        lateinit var mainWindowInfo: WindowInfo
+        lateinit var dialogWindowInfo: WindowInfo
         val mainWindowFocusLoss = CountDownLatch(1)
         val dialogFocusGain = CountDownLatch(1)
         val showDialog = mutableStateOf(false)
         rule.setContent {
             BasicText("Main Window")
-            mainWindowManager = AmbientWindowManager.current
-            WindowFocusObserver { if (!it) mainWindowFocusLoss.countDown() }
+            mainWindowInfo = AmbientWindowInfo.current
+            WindowFocusObserver1 { if (!it) mainWindowFocusLoss.countDown() }
             if (showDialog.value) {
                 Dialog(onDismissRequest = { showDialog.value = false }) {
                     BasicText("Popup Window")
-                    dialogWindowManager = AmbientWindowManager.current
-                    WindowFocusObserver { if (it) dialogFocusGain.countDown() }
+                    dialogWindowInfo = AmbientWindowInfo.current
+                    WindowFocusObserver1 { if (it) dialogFocusGain.countDown() }
                 }
             }
         }
@@ -149,25 +150,25 @@ class WindowManagerAmbientTest {
         rule.waitForIdle()
         assertThat(mainWindowFocusLoss.await(5, SECONDS)).isTrue()
         assertThat(dialogFocusGain.await(5, SECONDS)).isTrue()
-        assertThat(mainWindowManager.isWindowFocused).isFalse()
-        assertThat(dialogWindowManager.isWindowFocused).isTrue()
+        assertThat(mainWindowInfo.isWindowFocused).isFalse()
+        assertThat(dialogWindowInfo.isWindowFocused).isTrue()
     }
 
     @Test
     fun windowIsFocused_whenDialogIsDismissed() {
         // Arrange.
-        lateinit var mainWindowManager: WindowManager
+        lateinit var mainWindowInfo: WindowInfo
         var mainWindowFocusGain = CountDownLatch(1)
         val dialogFocusGain = CountDownLatch(1)
         val showDialog = mutableStateOf(false)
         rule.setContent {
             BasicText(text = "Main Window")
-            mainWindowManager = AmbientWindowManager.current
-            WindowFocusObserver { if (it) mainWindowFocusGain.countDown() }
+            mainWindowInfo = AmbientWindowInfo.current
+            WindowFocusObserver1 { if (it) mainWindowFocusGain.countDown() }
             if (showDialog.value) {
                 Dialog(onDismissRequest = { showDialog.value = false }) {
                     BasicText(text = "Popup Window")
-                    WindowFocusObserver { if (it) dialogFocusGain.countDown() }
+                    WindowFocusObserver1 { if (it) dialogFocusGain.countDown() }
                 }
             }
         }
@@ -182,6 +183,6 @@ class WindowManagerAmbientTest {
         // Assert.
         rule.waitForIdle()
         assertThat(mainWindowFocusGain.await(5, SECONDS)).isTrue()
-        assertThat(mainWindowManager.isWindowFocused).isTrue()
+        assertThat(mainWindowInfo.isWindowFocused).isTrue()
     }
 }

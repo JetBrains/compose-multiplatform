@@ -260,10 +260,24 @@ val ViewConfigurationAmbient get() = AmbientViewConfiguration
  */
 val AmbientViewConfiguration = staticAmbientOf<ViewConfiguration>()
 
+// TODO(b/177085155): Remove after Alpha 11.
 /**
  * The ambient that provides information about the window that hosts the current [Owner].
  */
-val AmbientWindowManager = staticAmbientOf<WindowManager>()
+@Deprecated(
+    message = "Renamed to AmbientWindowInfo",
+    replaceWith = ReplaceWith(
+        "AmbientWindowInfo",
+        "androidx.compose.ui.platform.AmbientWindowInfo"
+    ),
+    level = DeprecationLevel.ERROR
+)
+val AmbientWindowManager get() = AmbientWindowInfo
+
+/**
+ * The ambient that provides information about the window that hosts the current [Owner].
+ */
+val AmbientWindowInfo = staticAmbientOf<WindowInfo>()
 
 @ExperimentalComposeUiApi
 @Composable
@@ -287,7 +301,7 @@ internal fun ProvideCommonAmbients(
         AmbientTextToolbar provides owner.textToolbar,
         AmbientUriHandler provides uriHandler,
         AmbientViewConfiguration provides owner.viewConfiguration,
-        AmbientWindowManager provides owner.windowManager,
+        AmbientWindowInfo provides owner.windowInfo,
         content = content
     )
 }
