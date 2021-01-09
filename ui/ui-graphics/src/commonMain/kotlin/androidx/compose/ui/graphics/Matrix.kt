@@ -48,9 +48,12 @@ inline class Matrix(
     fun map(point: Offset): Offset {
         val x = point.x
         val y = point.y
+        val z = this[0, 3] * x + this[1, 3] * y + this[3, 3]
+        val pZ = if (z == 0f) 0f else 1f / z
+
         return Offset(
-            x = this[0, 0] * x + this[1, 0] * y + this[3, 0],
-            y = this[0, 1] * x + this[1, 1] * y + this[3, 1]
+            x = pZ * (this[0, 0] * x + this[1, 0] * y + this[3, 0]),
+            y = pZ * (this[0, 1] * x + this[1, 1] * y + this[3, 1])
         )
     }
 
