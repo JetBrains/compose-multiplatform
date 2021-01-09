@@ -2252,7 +2252,7 @@ class AndroidLayoutDrawTest {
         activity.runOnUiThread {
             assertEquals(size, resultCoordinates?.size?.height)
             assertEquals(size, resultCoordinates?.size?.width)
-            assertEquals(IntOffset(offset, offset).toOffset(), resultCoordinates?.positionInRoot)
+            assertEquals(IntOffset(offset, offset).toOffset(), resultCoordinates?.positionInRoot())
         }
     }
 
@@ -2307,7 +2307,7 @@ class AndroidLayoutDrawTest {
         activity.runOnUiThread {
             assertEquals(coordinates?.size?.height, convenienceCoordinates?.size?.height)
             assertEquals(coordinates?.size?.width, convenienceCoordinates?.size?.width)
-            assertEquals(coordinates?.positionInRoot, convenienceCoordinates?.positionInRoot)
+            assertEquals(coordinates?.positionInRoot(), convenienceCoordinates?.positionInRoot())
         }
     }
 

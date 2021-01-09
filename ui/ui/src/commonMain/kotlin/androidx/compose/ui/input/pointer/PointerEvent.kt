@@ -102,6 +102,7 @@ abstract class PointerInputFilter {
      */
     val size: IntSize
         get() = layoutCoordinates?.size ?: IntSize.Zero
+    @Suppress("DEPRECATION")
     internal val position: IntOffset
         get() = layoutCoordinates?.run { localToGlobal(Offset.Zero).round() } ?: IntOffset.Zero
     internal val isAttached: Boolean

@@ -52,7 +52,7 @@ class SelectionManagerTest {
 
     private val containerLayoutCoordinates = mock<LayoutCoordinates> {
         on { isAttached } doReturn true
-        on { childToLocal(any(), Offset(any())) } doAnswer Offset.Zero
+        on { localPositionOf(any(), Offset(any())) } doAnswer Offset.Zero
     }
     private val startSelectable = mock<Selectable>()
     private val endSelectable = mock<Selectable>()

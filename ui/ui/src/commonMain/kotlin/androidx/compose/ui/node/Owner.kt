@@ -146,6 +146,11 @@ interface Owner {
     fun calculatePosition(): IntOffset
 
     /**
+     * Returns the most position of the owner relative to the window.
+     */
+    fun calculatePositionInWindow(): IntOffset
+
+    /**
      * Ask the system to provide focus to this owner.
      *
      * @return true if the system granted focus to this owner. False otherwise.

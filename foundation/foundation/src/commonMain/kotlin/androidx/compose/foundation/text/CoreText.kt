@@ -41,8 +41,8 @@ import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.MeasureBlock
-import androidx.compose.ui.layout.globalPosition
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AmbientFontLoader
 import androidx.compose.ui.selection.AmbientSelectionRegistrar
@@ -228,7 +228,7 @@ private class TextController(val state: TextState) {
         state.layoutCoordinates = it
         selectionRegistrar?.let { selectionRegistrar ->
             if (state.selectionRange != null) {
-                val newGlobalPosition = it.globalPosition
+                val newGlobalPosition = it.positionInWindow()
                 if (newGlobalPosition != state.previousGlobalPosition) {
                     selectionRegistrar.notifyPositionChange()
                 }

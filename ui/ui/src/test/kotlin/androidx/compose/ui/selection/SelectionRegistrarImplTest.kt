@@ -81,10 +81,10 @@ class SelectionRegistrarImplTest {
         val relativeCoordinates3 = Offset(5f, 24f)
 
         val containerLayoutCoordinates = mock<LayoutCoordinates> {
-            on { childToLocal(layoutCoordinates0, Offset.Zero) } doAnswer relativeCoordinates0
-            on { childToLocal(layoutCoordinates1, Offset.Zero) } doAnswer relativeCoordinates1
-            on { childToLocal(layoutCoordinates2, Offset.Zero) } doAnswer relativeCoordinates2
-            on { childToLocal(layoutCoordinates3, Offset.Zero) } doAnswer relativeCoordinates3
+            on { localPositionOf(layoutCoordinates0, Offset.Zero) } doAnswer relativeCoordinates0
+            on { localPositionOf(layoutCoordinates1, Offset.Zero) } doAnswer relativeCoordinates1
+            on { localPositionOf(layoutCoordinates2, Offset.Zero) } doAnswer relativeCoordinates2
+            on { localPositionOf(layoutCoordinates3, Offset.Zero) } doAnswer relativeCoordinates3
         }
 
         val selectionRegistrar = SelectionRegistrarImpl()
@@ -129,10 +129,10 @@ class SelectionRegistrarImplTest {
         val relativeCoordinates3 = Offset(5f, 24f)
 
         val containerLayoutCoordinates = mock<LayoutCoordinates> {
-            on { childToLocal(layoutCoordinates0, Offset.Zero) } doAnswer relativeCoordinates0
-            on { childToLocal(layoutCoordinates1, Offset.Zero) } doAnswer relativeCoordinates1
-            on { childToLocal(layoutCoordinates2, Offset.Zero) } doAnswer relativeCoordinates2
-            on { childToLocal(layoutCoordinates3, Offset.Zero) } doAnswer relativeCoordinates3
+            on { localPositionOf(layoutCoordinates0, Offset.Zero) } doAnswer relativeCoordinates0
+            on { localPositionOf(layoutCoordinates1, Offset.Zero) } doAnswer relativeCoordinates1
+            on { localPositionOf(layoutCoordinates2, Offset.Zero) } doAnswer relativeCoordinates2
+            on { localPositionOf(layoutCoordinates3, Offset.Zero) } doAnswer relativeCoordinates3
         }
 
         val selectionRegistrar = SelectionRegistrarImpl()
@@ -159,7 +159,7 @@ class SelectionRegistrarImplTest {
         val layoutCoordinates0 = mock<LayoutCoordinates>()
         whenever(handler0.getLayoutCoordinates()).thenReturn(layoutCoordinates0)
         val containerLayoutCoordinates = mock<LayoutCoordinates> {
-            on { childToLocal(layoutCoordinates0, Offset.Zero) } doAnswer Offset.Zero
+            on { localPositionOf(layoutCoordinates0, Offset.Zero) } doAnswer Offset.Zero
         }
 
         val selectionRegistrar = SelectionRegistrarImpl()
@@ -181,7 +181,7 @@ class SelectionRegistrarImplTest {
         val layoutCoordinates0 = mock<LayoutCoordinates>()
         whenever(handler0.getLayoutCoordinates()).thenReturn(layoutCoordinates0)
         val containerLayoutCoordinates = mock<LayoutCoordinates> {
-            on { childToLocal(layoutCoordinates0, Offset.Zero) } doAnswer Offset.Zero
+            on { localPositionOf(layoutCoordinates0, Offset.Zero) } doAnswer Offset.Zero
         }
 
         val selectionRegistrar = SelectionRegistrarImpl()

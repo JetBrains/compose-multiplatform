@@ -18,9 +18,9 @@ package androidx.compose.ui.tooling
 
 import androidx.compose.runtime.CompositionData
 import androidx.compose.runtime.CompositionGroup
-import androidx.compose.ui.layout.globalPosition
 import androidx.compose.ui.layout.LayoutInfo
 import androidx.compose.ui.layout.ModifierInfo
+import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.unit.IntBounds
 import java.lang.reflect.Field
 import kotlin.math.max
@@ -480,7 +480,7 @@ private fun boundsOfLayoutNode(node: LayoutInfo): IntBounds {
             bottom = node.height
         )
     }
-    val position = node.coordinates.globalPosition
+    val position = node.coordinates.positionInWindow()
     val size = node.coordinates.size
     val left = position.x.roundToInt()
     val top = position.y.roundToInt()

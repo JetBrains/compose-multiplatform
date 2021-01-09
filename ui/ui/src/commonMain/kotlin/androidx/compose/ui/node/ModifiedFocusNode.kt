@@ -314,7 +314,7 @@ internal class ModifiedFocusNode(
     // TODO(b/175900268): Add API to allow a parent to extends the bounds of the focus Modifier.
     //  For now we just use the bounds of this node.
     internal val focusRect: Rect
-        get() = boundsInRoot
+        get() = boundsInRoot()
 
     // TODO(b/152051577): Measure the performance of focusableChildren.
     //  Consider caching the children.

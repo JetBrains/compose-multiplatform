@@ -21,9 +21,9 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.globalBounds
-import androidx.compose.ui.layout.globalPosition
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.layout.LayoutInfo
+import androidx.compose.ui.layout.globalPosition
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNodeWrapper
 import androidx.compose.ui.node.Owner
@@ -100,7 +100,7 @@ class SemanticsNode internal constructor(
      */
     val boundsInRoot: Rect
         get() {
-            return this.layoutNode.coordinates.boundsInRoot
+            return this.layoutNode.coordinates.boundsInRoot()
         }
 
     /**
@@ -109,7 +109,7 @@ class SemanticsNode internal constructor(
      */
     val positionInRoot: Offset
         get() {
-            return this.layoutNode.coordinates.positionInRoot
+            return this.layoutNode.coordinates.positionInRoot()
         }
 
     /**
@@ -118,6 +118,7 @@ class SemanticsNode internal constructor(
      */
     val globalBounds: Rect
         get() {
+            @Suppress("DEPRECATION")
             return this.layoutNode.coordinates.globalBounds
         }
 
@@ -126,6 +127,7 @@ class SemanticsNode internal constructor(
      */
     val globalPosition: Offset
         get() {
+            @Suppress("DEPRECATION")
             return this.layoutNode.coordinates.globalPosition
         }
 
