@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.sp
  * @param restLine the amount of indentation applied to every line except the first line.
  */
 @Immutable
-data class TextIndent(
+class TextIndent(
     val firstLine: TextUnit = 0.sp,
     val restLine: TextUnit = 0.sp
 ) {
@@ -39,6 +39,31 @@ data class TextIndent(
          */
         @Stable
         val None = TextIndent()
+    }
+
+    fun copy(
+        firstLine: TextUnit = this.firstLine,
+        restLine: TextUnit = this.restLine
+    ): TextIndent {
+        return TextIndent(firstLine, restLine)
+    }
+
+    override operator fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is TextIndent) return false
+        if (firstLine != other.firstLine) return false
+        if (restLine != other.restLine) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = firstLine.hashCode()
+        result = 31 * result + restLine.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "TextIndent(firstLine=$firstLine, restLine=$restLine)"
     }
 }
 

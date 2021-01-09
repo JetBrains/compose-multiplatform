@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.isUnspecified
  * @throws IllegalArgumentException if [TextUnit.Unspecified] is passed to [width] or [height].
  */
 @Immutable
-data class Placeholder(
+class Placeholder(
     val width: TextUnit,
     val height: TextUnit,
     val placeholderVerticalAlign: PlaceholderVerticalAlign
@@ -42,6 +42,42 @@ data class Placeholder(
     init {
         require(!width.isUnspecified) { "width cannot be TextUnit.Unspecified" }
         require(!height.isUnspecified) { "height cannot be TextUnit.Unspecified" }
+    }
+
+    fun copy(
+        width: TextUnit = this.width,
+        height: TextUnit = this.height,
+        placeholderVerticalAlign: PlaceholderVerticalAlign = this.placeholderVerticalAlign
+    ): Placeholder {
+        return Placeholder(
+            width = width,
+            height = height,
+            placeholderVerticalAlign = placeholderVerticalAlign
+        )
+    }
+
+    override operator fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Placeholder) return false
+        if (width != other.width) return false
+        if (height != other.height) return false
+        if (placeholderVerticalAlign != other.placeholderVerticalAlign) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = width.hashCode()
+        result = 31 * result + height.hashCode()
+        result = 31 * result + placeholderVerticalAlign.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "Placeholder(" +
+            "width=$width, " +
+            "height=$height, " +
+            "placeholderVerticalAlign=$placeholderVerticalAlign" +
+            ")"
     }
 }
 /**
