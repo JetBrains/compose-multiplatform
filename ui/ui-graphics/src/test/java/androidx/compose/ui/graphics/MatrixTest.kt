@@ -56,6 +56,27 @@ class MatrixTest {
     }
 
     @Test
+    fun mapPoint() {
+        val matrix = Matrix()
+        matrix.rotateZ(45f)
+        val zPoint = matrix.map(Offset(10f, 0f))
+        assertEquals(7.071f, zPoint.x, 0.01f)
+        assertEquals(7.071f, zPoint.y, 0.01f)
+
+        matrix.reset()
+        matrix.rotateX(45f)
+        val xPoint = matrix.map(Offset(0f, 10f))
+        assertEquals(0f, xPoint.x, 0.01f)
+        assertEquals(7.071f, xPoint.y, 0.01f)
+
+        matrix.reset()
+        matrix.rotateY(45f)
+        val yPoint = matrix.map(Offset(10f, 0f))
+        assertEquals(7.071f, yPoint.x, 0.01f)
+        assertEquals(0f, yPoint.y, 0.01f)
+    }
+
+    @Test
     fun mapRect() {
         val matrix = Matrix()
 
