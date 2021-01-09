@@ -76,16 +76,15 @@ fun GestureAnimationSample() {
 
     // Defines a color animation as a child animation of the transition.
     val color: Color by transition.animateColor(
-        transitionSpec = { transitionStates ->
-            if (transitionStates.initialState == ComponentState.Pressed &&
-                transitionStates.targetState == ComponentState.Released
-            ) {
-                // Uses spring for the transition going from pressed to released
-                spring(stiffness = 50f)
-            } else {
-                // Uses tween for all the other transitions. (In this case there is
-                // only one other transition. i.e. released -> pressed.)
-                tween(durationMillis = 500)
+        transitionSpec = {
+            when {
+                ComponentState.Pressed isTransitioningTo ComponentState.Released ->
+                    // Uses spring for the transition going from pressed to released
+                    spring(stiffness = 50f)
+                else ->
+                    // Uses tween for all the other transitions. (In this case there is
+                    // only one other transition. i.e. released -> pressed.)
+                    tween(durationMillis = 500)
             }
         }
     ) { state ->
@@ -139,21 +138,21 @@ fun AnimateFloatSample() {
         // target state of the a transition run using `transitionSpec`.
         val alpha: Float by transition.animateFloat(
             transitionSpec = {
-                if (it.initialState == ButtonStatus.Initial &&
-                    it.targetState == ButtonStatus.Pressed
-                ) {
-                    keyframes {
-                        durationMillis = 225
-                        0f at 0 // optional
-                        0.3f at 75
-                        0.2f at 225 // optional
+                when {
+                    ButtonStatus.Initial isTransitioningTo ButtonStatus.Pressed -> {
+                        keyframes {
+                            durationMillis = 225
+                            0f at 0 // optional
+                            0.3f at 75
+                            0.2f at 225 // optional
+                        }
                     }
-                } else if (it.initialState == ButtonStatus.Pressed &&
-                    it.targetState == ButtonStatus.Released
-                ) {
-                    tween(durationMillis = 220)
-                } else {
-                    snap()
+                    ButtonStatus.Pressed isTransitioningTo ButtonStatus.Released -> {
+                        tween(durationMillis = 220)
+                    }
+                    else -> {
+                        snap()
+                    }
                 }
             }
         ) { state ->

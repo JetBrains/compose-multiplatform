@@ -181,7 +181,7 @@ fun <T> repeatable(
 fun <T> infiniteRepeatable(
     animation: DurationBasedAnimationSpec<T>,
     repeatMode: RepeatMode = RepeatMode.Restart
-): AnimationSpec<T> =
+): InfiniteRepeatableSpec<T> =
     InfiniteRepeatableSpec(animation, repeatMode)
 
 /**
