@@ -26,15 +26,11 @@ import androidx.compose.runtime.snapshots.SnapshotReadObserver
 import androidx.compose.runtime.snapshots.SnapshotWriteObserver
 import androidx.compose.runtime.snapshots.fastForEach
 import androidx.compose.runtime.snapshots.takeMutableSnapshot
-import kotlinx.collections.immutable.PersistentSet
 import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -577,33 +573,6 @@ class Recomposer(
     }
 
     companion object {
-        @OptIn(ExperimentalCoroutinesApi::class)
-        private val mainRecomposer: Recomposer by lazy {
-            val embeddingContext = EmbeddingContext()
-            val mainScope = CoroutineScope(
-                NonCancellable + embeddingContext.mainThreadCompositionContext()
-            )
-
-            Recomposer(mainScope.coroutineContext).also {
-                // NOTE: Launching undispatched so that compositions created with the
-                // Recomposer.current() singleton instance can assume the recomposer is running
-                // when they perform initial composition. The relevant Recomposer code is
-                // appropriately thread-safe for this.
-                mainScope.launch(start = CoroutineStart.UNDISPATCHED) {
-                    it.runRecomposeAndApplyChanges()
-                }
-            }
-        }
-
-        /**
-         * Retrieves [Recomposer] for the current thread. Needs to be the main thread.
-         */
-        @TestOnly
-        @Deprecated(
-            "Avoid singleton Recomposers; use Recomposer.runningRecomposers for an active set in " +
-                "tests"
-        )
-        fun current(): Recomposer = mainRecomposer
 
         private val _runningRecomposers = MutableStateFlow(persistentSetOf<RecomposerInfo>())
 

@@ -29,7 +29,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.activity.ComponentActivity
-import androidx.compose.runtime.Composition
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.dispatch.MonotonicFrameClock
@@ -68,8 +67,6 @@ internal class AndroidComposeTestCaseRunner<T : ComposeTestCase>(
 
     internal var view: View? = null
         private set
-
-    private var composition: Composition? = null
 
     override var didLastRecomposeHaveChanges = false
         private set
@@ -133,7 +130,7 @@ internal class AndroidComposeTestCaseRunner<T : ComposeTestCase>(
             "Need to call onPreEmitContent before emitContent!"
         }
 
-        composition = activity.setContent(recomposer) { testCase!!.Content() }
+        activity.setContent(recomposer) { testCase!!.Content() }
         view = findViewRootForTest(activity)!!.view
         @OptIn(ExperimentalComposeApi::class)
         Snapshot.notifyObjectsInitialized()
@@ -249,14 +246,14 @@ internal class AndroidComposeTestCaseRunner<T : ComposeTestCase>(
             return
         }
 
-        composition?.dispose()
+        // Clear the view; this will also dispose the underlying composition
+        // by the default disposal policy. This happens **before** advanceUntilIdle.
+        val rootView = activity.findViewById(android.R.id.content) as ViewGroup
+        rootView.removeAllViews()
 
         // Dispatcher will clean up the cancelled coroutines when it advances to them
         testCoroutineDispatcher.advanceUntilIdle()
 
-        // Clear the view
-        val rootView = activity.findViewById(android.R.id.content) as ViewGroup
-        rootView.removeAllViews()
         // Important so we can set the content again.
         view = null
         testCase = null

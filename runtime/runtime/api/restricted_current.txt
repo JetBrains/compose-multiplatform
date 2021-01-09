@@ -382,7 +382,6 @@ package androidx.compose.runtime {
   }
 
   public static final class Recomposer.Companion {
-    method @Deprecated @org.jetbrains.annotations.TestOnly public androidx.compose.runtime.Recomposer current();
     method public kotlinx.coroutines.flow.StateFlow<java.util.Set<androidx.compose.runtime.RecomposerInfo>> getRunningRecomposers();
     property public final kotlinx.coroutines.flow.StateFlow<java.util.Set<androidx.compose.runtime.RecomposerInfo>> runningRecomposers;
   }

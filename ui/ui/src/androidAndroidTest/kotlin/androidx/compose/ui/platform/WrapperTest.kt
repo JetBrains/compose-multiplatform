@@ -55,7 +55,8 @@ class WrapperTest {
     @Before
     fun setup() {
         activityScenario = ActivityScenario.launch(TestActivity::class.java)
-        activityScenario.moveToState(Lifecycle.State.CREATED)
+        // Default Recomposer will not recompose if the lifecycle state is not at least STARTED
+        activityScenario.moveToState(Lifecycle.State.STARTED)
     }
 
     @Test

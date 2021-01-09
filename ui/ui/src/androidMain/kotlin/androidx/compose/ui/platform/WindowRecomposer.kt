@@ -98,28 +98,15 @@ fun interface WindowRecomposerFactory {
         val LifecycleAware: WindowRecomposerFactory = WindowRecomposerFactory { rootView ->
             rootView.createLifecycleAwareViewTreeRecomposer()
         }
-
-        /**
-         * A [WindowRecomposerFactory] that always returns references to the global,
-         * soon to be deprecated, application main thread-bound [Recomposer.current].
-         * The existence of this API/constant is only temporary while other Compose UI
-         * infrastructure migrates to [LifecycleAware] recomposers.
-         */
-        @Suppress("DEPRECATION")
-        @Deprecated(
-            "Global Recomposer.current will be removed without replacement; prefer LifecycleAware"
-        )
-        val Global: WindowRecomposerFactory = WindowRecomposerFactory {
-            Recomposer.current()
-        }
     }
 }
 
 @InternalComposeUiApi
 object WindowRecomposerPolicy {
-    // TODO: Change default to LifecycleScoped when code expecting Recomposer.current() migrates
-    @Suppress("DEPRECATION")
-    private val factory = AtomicReference<WindowRecomposerFactory>(WindowRecomposerFactory.Global)
+
+    private val factory = AtomicReference<WindowRecomposerFactory>(
+        WindowRecomposerFactory.LifecycleAware
+    )
 
     // Don't expose the actual AtomicReference as @PublishedApi; we might convert to atomicfu later
     @PublishedApi

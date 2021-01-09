@@ -2217,12 +2217,15 @@ package androidx.compose.ui.platform {
     method public final void disposeComposition();
     method public final boolean getHasComposition();
     method protected boolean getShouldCreateCompositionOnAttachedToWindow();
+    method public final boolean getShowLayoutBounds();
     method protected final void onLayout(boolean changed, int left, int top, int right, int bottom);
     method protected final void onMeasure(int widthMeasureSpec, int heightMeasureSpec);
     method public final void setParentCompositionReference(androidx.compose.runtime.CompositionReference? parent);
+    method public final void setShowLayoutBounds(boolean value);
     method public final void setViewCompositionStrategy(androidx.compose.ui.platform.ViewCompositionStrategy strategy);
     property public final boolean hasComposition;
     property protected boolean shouldCreateCompositionOnAttachedToWindow;
+    property public final boolean showLayoutBounds;
   }
 
   public final class AmbientsKt {
@@ -2470,9 +2473,7 @@ package androidx.compose.ui.platform {
   }
 
   public static final class WindowRecomposerFactory.Companion {
-    method @Deprecated public androidx.compose.ui.platform.WindowRecomposerFactory getGlobal();
     method public androidx.compose.ui.platform.WindowRecomposerFactory getLifecycleAware();
-    property @Deprecated public final androidx.compose.ui.platform.WindowRecomposerFactory Global;
     property public final androidx.compose.ui.platform.WindowRecomposerFactory LifecycleAware;
   }
 
@@ -2491,10 +2492,8 @@ package androidx.compose.ui.platform {
   }
 
   public final class WrapperKt {
-    method public static androidx.compose.runtime.Composition setContent(androidx.activity.ComponentActivity, optional androidx.compose.runtime.CompositionReference parent, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method @Deprecated public static androidx.compose.runtime.Composition setContent(android.view.ViewGroup, optional androidx.compose.runtime.CompositionReference parent, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method @Deprecated public static androidx.compose.runtime.Composition setViewContent(android.view.ViewGroup, optional androidx.compose.runtime.CompositionReference parent, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
-    method @Deprecated public static androidx.compose.runtime.Composition setViewContent(android.app.Activity, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
+    method public static void setContent(androidx.activity.ComponentActivity, optional androidx.compose.runtime.CompositionReference? parent, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @Deprecated public static androidx.compose.runtime.Composition setContent(android.view.ViewGroup, androidx.compose.runtime.CompositionReference parent, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
 }

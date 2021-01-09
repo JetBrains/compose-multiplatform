@@ -18,12 +18,12 @@ package androidx.compose.material.icons
 
 import android.graphics.Bitmap
 import android.os.Build
+import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Composition
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
@@ -104,10 +104,9 @@ class IconComparisonTest(
         iconSublist.forEach { (property, drawableName) ->
             var xmlVector: ImageVector? = null
             val programmaticVector = property.get()
-            var composition: Composition? = null
 
             rule.activityRule.scenario.onActivity {
-                composition = it.setContent {
+                it.setContent {
                     xmlVector = drawableName.toImageVector()
                     DrawVectors(programmaticVector, xmlVector!!)
                 }
@@ -131,8 +130,8 @@ class IconComparisonTest(
             )
 
             // Dispose between composing each pair of icons to ensure correctness
-            rule.runOnUiThread {
-                composition?.dispose()
+            rule.activityRule.scenario.onActivity {
+                it.setContentView(View(it))
             }
         }
     }

@@ -15,12 +15,10 @@
  */
 package androidx.compose.ui.platform
 
-import android.app.Activity
 import android.os.Build
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.annotation.MainThread
 import androidx.compose.runtime.Composable
@@ -46,70 +44,6 @@ import java.util.Collections
 import java.util.WeakHashMap
 
 private val TAG = "Wrapper"
-
-/**
- * Composes the children of the view with the passed in [composable].
- *
- * @see setViewContent
- * @see Composition.dispose
- */
-// TODO: Remove this API when View/LayoutNode mixed trees work
-@Suppress("DEPRECATION")
-@OptIn(ExperimentalComposeApi::class)
-@Deprecated(
-    "setViewContent was deprecated - use setContent instead",
-    ReplaceWith(
-        "setContent(parent, composable)",
-        "androidx.compose.ui.platform.setContent"
-    )
-)
-fun ViewGroup.setViewContent(
-    parent: CompositionReference = Recomposer.current(),
-    composable: @Composable () -> Unit
-): Composition = compositionFor(
-    this,
-    UiApplier(this),
-    parent,
-    onCreated = {
-        removeAllViews()
-    }
-).apply {
-    setContent {
-        Providers(AmbientContext provides this@setViewContent.context) {
-            composable()
-        }
-    }
-}
-
-/**
- * Sets the contentView of an activity to a FrameLayout, and composes the contents of the layout
- * with the passed in [composable].
- *
- * @see setContent
- * @see Activity.setContentView
- */
-// TODO: Remove this API when View/LayoutNode mixed trees work
-@Deprecated(
-    "setViewContent was deprecated - use setContent instead",
-    ReplaceWith(
-        "setContent(composable)",
-        "androidx.compose.ui.platform.setContent"
-    )
-)
-fun Activity.setViewContent(composable: @Composable () -> Unit): Composition {
-    // TODO(lmr): add ambients here, or remove API entirely if we can
-    // If there is already a FrameLayout in the root, we assume we want to compose
-    // into it instead of create a new one. This allows for `setContent` to be
-    // called multiple times.
-    GlobalSnapshotManager.ensureStarted()
-    val root = window
-        .decorView
-        .findViewById<ViewGroup>(android.R.id.content)
-        .getChildAt(0) as? ViewGroup
-        ?: FrameLayout(this).also { setContentView(it) }
-    @Suppress("DEPRECATION")
-    return root.setViewContent(composable = composable)
-}
 
 // TODO(chuckj): This is a temporary work-around until subframes exist so that
 // nextFrame() inside recompose() doesn't really start a new frame, but a new subframe
@@ -137,21 +71,24 @@ internal actual fun subcomposeInto(
  * @param parent The parent composition reference to coordinate scheduling of composition updates
  * @param content A `@Composable` function declaring the UI contents
  */
-@Suppress("DEPRECATION")
 fun ComponentActivity.setContent(
-    // Note: Recomposer.current() is the default here since all Activity view trees are hosted
-    // on the main thread.
-    parent: CompositionReference = Recomposer.current(),
+    parent: CompositionReference? = null,
     content: @Composable () -> Unit
-): Composition {
-    GlobalSnapshotManager.ensureStarted()
-    val composeView: AndroidComposeView = window.decorView
+) {
+    val existingComposeView = window.decorView
         .findViewById<ViewGroup>(android.R.id.content)
-        .getChildAt(0) as? AndroidComposeView
-        ?: AndroidComposeView(this).also {
-            setContentView(it.view, DefaultLayoutParams)
-        }
-    return doSetContent(composeView, parent, content)
+        .getChildAt(0) as? ComposeView
+
+    if (existingComposeView != null) with(existingComposeView) {
+        setParentCompositionReference(parent)
+        setContent(content)
+    } else ComposeView(this).apply {
+        // Set content and parent **before** setContentView
+        // to have ComposeView create the composition on attach
+        setParentCompositionReference(parent)
+        setContent(content)
+        setContentView(this, DefaultLayoutParams)
+    }
 }
 
 /**
@@ -170,7 +107,7 @@ fun ComponentActivity.setContent(
 @Suppress("DEPRECATION")
 @Deprecated("Use ComposeView or AbstractComposeView instead.")
 fun ViewGroup.setContent(
-    parent: CompositionReference = Recomposer.current(),
+    parent: CompositionReference,
     content: @Composable () -> Unit
 ): Composition {
     GlobalSnapshotManager.ensureStarted()

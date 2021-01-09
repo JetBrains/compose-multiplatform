@@ -129,16 +129,12 @@ class SuspendingEffectsTests : BaseComposeTest() {
     @Test
     fun testRememberCoroutineScopeActiveWithComposition() {
         lateinit var coroutineScope: CoroutineScope
-        val tester = compose {
+        compose {
             coroutineScope = rememberCoroutineScope()
         }.then {
             assertTrue(coroutineScope.isActive, "coroutine scope was active before dispose")
-        }
-        val composition = tester.composition
-        tester.then {
-            composition.dispose()
-            assertFalse(coroutineScope.isActive, "coroutine scope was inactive after dispose")
-        }
+        }.done()
+        assertFalse(coroutineScope.isActive, "coroutine scope was inactive after dispose")
     }
 
     @Test
