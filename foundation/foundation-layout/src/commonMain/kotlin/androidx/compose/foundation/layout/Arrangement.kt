@@ -297,7 +297,7 @@ object Arrangement {
     /**
      * Place children such that each two adjacent ones are spaced by a fixed [space] distance across
      * the main axis. The spacing will be subtracted from the available space that the children
-     * can occupy.
+     * can occupy. The [space] can be negative, in which case children will overlap.
      *
      * @param space The space between adjacent children.
      */
@@ -309,7 +309,8 @@ object Arrangement {
      * Place children horizontally such that each two adjacent ones are spaced by a fixed [space]
      * distance. The spacing will be subtracted from the available width that the children
      * can occupy. An [alignment] can be specified to align the spaced children horizontally
-     * inside the parent, in case there is empty width remaining.
+     * inside the parent, in case there is empty width remaining. The [space] can be negative,
+     * in which case children will overlap.
      *
      * @param space The space between adjacent children.
      * @param alignment The alignment of the spaced children inside the parent.
@@ -324,7 +325,8 @@ object Arrangement {
      * Place children vertically such that each two adjacent ones are spaced by a fixed [space]
      * distance. The spacing will be subtracted from the available height that the children
      * can occupy. An [alignment] can be specified to align the spaced children vertically
-     * inside the parent, in case there is empty height remaining.
+     * inside the parent, in case there is empty height remaining. The [space] can be negative,
+     * in which case children will overlap.
      *
      * @param space The space between adjacent children.
      * @param alignment The alignment of the spaced children inside the parent.
