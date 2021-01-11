@@ -35,9 +35,8 @@ import kotlin.coroutines.EmptyCoroutineContext
  * @param context [CoroutineContext] to use for collecting.
  */
 @ExperimentalCoroutinesApi
-@Suppress("NOTHING_TO_INLINE")
 @Composable
-inline fun <T> StateFlow<T>.collectAsState(
+fun <T> StateFlow<T>.collectAsState(
     context: CoroutineContext = EmptyCoroutineContext
 ): State<T> = collectAsState(value, context)
 
@@ -50,9 +49,8 @@ inline fun <T> StateFlow<T>.collectAsState(
  *
  * @param context [CoroutineContext] to use for collecting.
  */
-@Suppress("NOTHING_TO_INLINE")
 @Composable
-inline fun <T : R, R> Flow<T>.collectAsState(
+fun <T : R, R> Flow<T>.collectAsState(
     initial: R,
     context: CoroutineContext = EmptyCoroutineContext
 ): State<R> = produceState(initial, this, context) {
