@@ -153,6 +153,7 @@ package androidx.compose.animation {
 
   public final class TransitionKt {
     method @androidx.compose.runtime.Composable public static inline <S> androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> animateColor(androidx.compose.animation.core.Transition<S>, optional kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.Transition.States<S>,? extends androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.graphics.Color>> transitionSpec, kotlin.jvm.functions.Function1<? super S,androidx.compose.ui.graphics.Color> targetValueByState);
+    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> animateColor-Baa6hxQ(androidx.compose.animation.core.InfiniteTransition, long initialValue, long targetValue, androidx.compose.animation.core.InfiniteRepeatableSpec<androidx.compose.ui.graphics.Color> animationSpec);
     method @androidx.compose.runtime.Composable public static <T> androidx.compose.animation.core.TransitionState transition(androidx.compose.animation.core.TransitionDefinition<T> definition, T? toState, optional androidx.compose.animation.core.AnimationClockObservable clock, optional T? initState, optional String? label, optional kotlin.jvm.functions.Function1<? super T,kotlin.Unit>? onStateChangeFinished);
   }
 

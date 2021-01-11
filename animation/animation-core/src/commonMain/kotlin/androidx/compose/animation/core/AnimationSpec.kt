@@ -232,7 +232,7 @@ class InfiniteRepeatableSpec<T>(
     }
 
     override fun equals(other: Any?): Boolean =
-        if (other is RepeatableSpec<*>) {
+        if (other is InfiniteRepeatableSpec<*>) {
             other.animation == this.animation && other.repeatMode == this.repeatMode
         } else {
             false

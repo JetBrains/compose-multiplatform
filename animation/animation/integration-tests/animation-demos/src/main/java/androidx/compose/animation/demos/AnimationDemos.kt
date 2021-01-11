@@ -30,6 +30,7 @@ val AnimationDemos = DemoCategory(
                 ComposableDemo("Repeating rotation") { RepeatedRotationDemo() },
                 ComposableDemo("Manual animation clock") { AnimatableSeekBarDemo() },
                 ComposableDemo("Gesture based animation") { GestureBasedAnimationDemo() },
+                ComposableDemo("Infinite transition") { InfiniteTransitionDemo() },
             )
         ),
         DemoCategory(

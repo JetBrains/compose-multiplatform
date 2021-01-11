@@ -103,7 +103,7 @@ class TransitionTest {
             val transition = updateTransition(target.value)
             animFloat.value = transition.animateFloat(
                 {
-                    if (it.initialState == AnimStates.From && it.targetState == AnimStates.To) {
+                    if (AnimStates.From isTransitioningTo AnimStates.To) {
                         spring(dampingRatio = Spring.DampingRatioHighBouncy)
                     } else {
                         spring(
@@ -130,7 +130,7 @@ class TransitionTest {
 
             animFloatWithKeyframes.value = transition.animateFloat(
                 transitionSpec = {
-                    if (it.initialState == AnimStates.From && it.targetState == AnimStates.To) {
+                    if (AnimStates.From isTransitioningTo AnimStates.To) {
                         keyframes1
                     } else {
                         keyframes2

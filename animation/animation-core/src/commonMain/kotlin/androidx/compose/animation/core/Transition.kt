@@ -24,18 +24,18 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.dispatch.withFrameNanos
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.Bounds
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.Uptime
 
 /**
@@ -186,12 +186,8 @@ class Transition<S> internal constructor(
     // roll back. The
     internal fun updateTarget(targetState: S) {
         if (transitionStates.targetState != targetState) {
-            if (currentState == targetState) {
-                // Going backwards
-                transitionStates = States(this.targetState, targetState)
-            } else {
-                transitionStates = States(currentState, targetState)
-            }
+            // Starting state should be the "next" state when waypoints are impl'ed
+            transitionStates = States(this.targetState, targetState)
         }
         this.targetState = targetState
     }
@@ -282,7 +278,18 @@ class Transition<S> internal constructor(
      * transition. These states will be used to obtain the animation spec that will be used for this
      * transition from the child animations.
      */
-    class States<S>(val initialState: S, val targetState: S)
+    class States<S>(val initialState: S, val targetState: S) {
+        @Deprecated("transitionSpec no longer takes a parameter", ReplaceWith("this"))
+        val it = this
+
+        /**
+         * Returns whether the provided state matches the [initialState] && the provided
+         * [targetState] matches [States.targetState].
+         */
+        infix fun S.isTransitioningTo(targetState: S): Boolean {
+            return this == initialState && targetState == this@States.targetState
+        }
+    }
 }
 
 /**
@@ -311,7 +318,7 @@ class Transition<S> internal constructor(
 @Composable
 inline fun <S, T, V : AnimationVector> Transition<S>.animateValue(
     typeConverter: TwoWayConverter<T, V>,
-    noinline transitionSpec: @Composable (Transition.States<S>) -> FiniteAnimationSpec<T> =
+    noinline transitionSpec: @Composable Transition.States<S>.() -> FiniteAnimationSpec<T> =
         { spring() },
     targetValueByState: @Composable (state: S) -> T
 ): State<T> {
@@ -367,7 +374,7 @@ inline fun <S, T, V : AnimationVector> Transition<S>.animateValue(
 @Composable
 inline fun <S> Transition<S>.animateFloat(
     noinline transitionSpec:
-        @Composable (Transition.States<S>) -> FiniteAnimationSpec<Float> = { spring() },
+        @Composable Transition.States<S>.() -> FiniteAnimationSpec<Float> = { spring() },
     targetValueByState: @Composable (state: S) -> Float
 ): State<Float> =
     animateValue(Float.VectorConverter, transitionSpec, targetValueByState)
@@ -393,7 +400,7 @@ inline fun <S> Transition<S>.animateFloat(
  */
 @Composable
 inline fun <S> Transition<S>.animateDp(
-    noinline transitionSpec: @Composable (Transition.States<S>) -> FiniteAnimationSpec<Dp> = {
+    noinline transitionSpec: @Composable Transition.States<S>.() -> FiniteAnimationSpec<Dp> = {
         spring(visibilityThreshold = Dp.VisibilityThreshold)
     },
     targetValueByState: @Composable (state: S) -> Dp
@@ -421,7 +428,7 @@ inline fun <S> Transition<S>.animateDp(
  */
 @Composable
 inline fun <S> Transition<S>.animateOffset(
-    noinline transitionSpec: @Composable (Transition.States<S>) -> FiniteAnimationSpec<Offset> = {
+    noinline transitionSpec: @Composable Transition.States<S>.() -> FiniteAnimationSpec<Offset> = {
         spring(visibilityThreshold = Offset.VisibilityThreshold)
     },
     targetValueByState: @Composable (state: S) -> Offset
@@ -449,9 +456,8 @@ inline fun <S> Transition<S>.animateOffset(
  */
 @Composable
 inline fun <S> Transition<S>.animatePosition(
-    noinline transitionSpec: @Composable (Transition.States<S>) -> FiniteAnimationSpec<DpOffset> = {
-        spring(visibilityThreshold = DpOffset.VisibilityThreshold)
-    },
+    noinline transitionSpec: @Composable Transition.States<S>.() -> FiniteAnimationSpec<DpOffset> =
+        { spring(visibilityThreshold = DpOffset.VisibilityThreshold) },
     targetValueByState: @Composable (state: S) -> DpOffset
 ): State<DpOffset> =
     animateValue(DpOffset.VectorConverter, transitionSpec, targetValueByState)
@@ -477,7 +483,7 @@ inline fun <S> Transition<S>.animatePosition(
  */
 @Composable
 inline fun <S> Transition<S>.animateSize(
-    noinline transitionSpec: @Composable (Transition.States<S>) -> FiniteAnimationSpec<Size> = {
+    noinline transitionSpec: @Composable Transition.States<S>.() -> FiniteAnimationSpec<Size> = {
         spring(visibilityThreshold = Size.VisibilityThreshold)
     },
     targetValueByState: @Composable (state: S) -> Size
@@ -505,7 +511,7 @@ inline fun <S> Transition<S>.animateSize(
  */
 @Composable
 inline fun <S> Transition<S>.animateIntOffset(
-    noinline transitionSpec: @Composable (Transition.States<S>) -> FiniteAnimationSpec<IntOffset> =
+    noinline transitionSpec: @Composable Transition.States<S>.() -> FiniteAnimationSpec<IntOffset> =
         { spring(visibilityThreshold = IntOffset(1, 1)) },
     targetValueByState: @Composable (state: S) -> IntOffset
 ): State<IntOffset> =
@@ -532,7 +538,7 @@ inline fun <S> Transition<S>.animateIntOffset(
  */
 @Composable
 inline fun <S> Transition<S>.animateInt(
-    noinline transitionSpec: @Composable (Transition.States<S>) -> FiniteAnimationSpec<Int> = {
+    noinline transitionSpec: @Composable Transition.States<S>.() -> FiniteAnimationSpec<Int> = {
         spring(visibilityThreshold = 1)
     },
     targetValueByState: @Composable (state: S) -> Int
@@ -560,7 +566,7 @@ inline fun <S> Transition<S>.animateInt(
  */
 @Composable
 inline fun <S> Transition<S>.animateIntSize(
-    noinline transitionSpec: @Composable (Transition.States<S>) -> FiniteAnimationSpec<IntSize> = {
+    noinline transitionSpec: @Composable Transition.States<S>.() -> FiniteAnimationSpec<IntSize> = {
         spring(visibilityThreshold = IntSize(1, 1))
     },
     targetValueByState: @Composable (state: S) -> IntSize
@@ -588,7 +594,7 @@ inline fun <S> Transition<S>.animateIntSize(
  */
 @Composable
 inline fun <S> Transition<S>.animateBounds(
-    noinline transitionSpec: @Composable (Transition.States<S>) -> FiniteAnimationSpec<Bounds> = {
+    noinline transitionSpec: @Composable Transition.States<S>.() -> FiniteAnimationSpec<Bounds> = {
         spring(visibilityThreshold = Bounds.VisibilityThreshold)
     },
     targetValueByState: @Composable (state: S) -> Bounds
@@ -616,7 +622,7 @@ inline fun <S> Transition<S>.animateBounds(
  */
 @Composable
 inline fun <S> Transition<S>.animateRect(
-    noinline transitionSpec: @Composable (Transition.States<S>) -> FiniteAnimationSpec<Rect> =
+    noinline transitionSpec: @Composable Transition.States<S>.() -> FiniteAnimationSpec<Rect> =
         { spring(visibilityThreshold = Rect.VisibilityThreshold) },
     targetValueByState: @Composable (state: S) -> Rect
 ): State<Rect> =
