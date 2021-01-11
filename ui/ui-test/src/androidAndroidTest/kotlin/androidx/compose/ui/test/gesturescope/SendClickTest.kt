@@ -33,15 +33,12 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.util.ClickableTestBox
 import androidx.compose.ui.test.util.RecordingFilter
-import androidx.test.filters.FlakyTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
-// TODO(b/176953083): Fix this flaky test.
-@FlakyTest
 @MediumTest
 @RunWith(Parameterized::class)
 class SendClickTest(private val config: TestConfig) {
