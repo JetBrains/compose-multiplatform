@@ -30,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.testutils.MockAnimationClock
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.nestedscroll.nestedScroll
@@ -1511,7 +1512,7 @@ class SwipeableTest {
 
     @Test
     fun testInspectorValue() {
-        val state = SwipeableState("A", clock)
+        val state = SwipeableState("A", MockAnimationClock())
         val anchors = mapOf(0f to "A", 100f to "B")
         rule.setContent {
             val modifier = Modifier.swipeable(
@@ -1576,7 +1577,6 @@ class SwipeableTest {
                 moveBy(Offset(x = 0f, y = -1500f))
                 up()
             }
-        advanceClock()
 
         rule.runOnIdle {
             assertThat(swipeableState.value).isEqualTo("B")
@@ -1589,8 +1589,6 @@ class SwipeableTest {
                 moveBy(Offset(x = 0f, y = 1500f))
                 up()
             }
-
-        advanceClock()
 
         rule.runOnIdle {
             assertThat(swipeableState.value).isEqualTo("A")
@@ -1643,8 +1641,6 @@ class SwipeableTest {
                 )
             }
 
-        advanceClock()
-
         rule.runOnIdle {
             assertThat(swipeableState.value).isEqualTo("B")
             // should eat all velocity, no internal scroll
@@ -1660,8 +1656,6 @@ class SwipeableTest {
                     endVelocity = 20000f
                 )
             }
-
-        advanceClock()
 
         rule.runOnIdle {
             assertThat(swipeableState.value).isEqualTo("A")
@@ -1717,16 +1711,12 @@ class SwipeableTest {
                 )
             }
 
-        advanceClock()
-
         rule.runOnIdle {
             assertThat(swipeableState.value).isEqualTo("B")
             assertThat(scrollState.value).isEqualTo(0f)
             // set value again to test overshoot
             scrollState.scrollBy(500f)
         }
-
-        advanceClock()
 
         rule.runOnIdle {
             assertThat(swipeableState.value).isEqualTo("B")
@@ -1743,8 +1733,6 @@ class SwipeableTest {
                     endVelocity = 20000f
                 )
             }
-
-        advanceClock()
 
         rule.runOnIdle {
             assertThat(swipeableState.value).isEqualTo("A")
