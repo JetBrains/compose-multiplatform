@@ -27,7 +27,6 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.milliseconds
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.viewinterop.AndroidViewHolder
@@ -218,7 +217,7 @@ internal class PointerInteropFilter : PointerInputModifier {
                 // cancel event, otherwise, we should not.
                 if (state === DispatchToViewState.Dispatching) {
                     emptyCancelMotionEventScope(
-                        SystemClock.uptimeMillis().milliseconds
+                        SystemClock.uptimeMillis()
                     ) { motionEvent ->
                         onTouchEvent(motionEvent)
                     }

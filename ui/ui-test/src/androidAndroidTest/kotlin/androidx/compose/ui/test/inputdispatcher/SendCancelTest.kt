@@ -21,7 +21,7 @@ import android.view.MotionEvent.ACTION_DOWN
 import android.view.MotionEvent.ACTION_POINTER_DOWN
 import androidx.compose.ui.geometry.Offset
 import androidx.test.filters.SmallTest
-import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriod
+import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriodMillis
 import androidx.compose.ui.test.AndroidInputDispatcher
 import androidx.compose.ui.test.util.assertHasValidEventTimes
 import androidx.compose.testutils.expectError
@@ -65,7 +65,7 @@ class SendCancelTest : InputDispatcherTest() {
             this[0].verifyEvent(1, ACTION_DOWN, 0, t) // pointer1
             this[0].verifyPointer(pointer1, position1_1)
 
-            t += eventPeriod
+            t += eventPeriodMillis
             this[1].verifyEvent(1, ACTION_CANCEL, 0, t)
             this[1].verifyPointer(pointer1, position1_1)
         }
@@ -74,7 +74,7 @@ class SendCancelTest : InputDispatcherTest() {
     @Test
     fun onePointerWithDelay() {
         subject.generateDownAndCheck(pointer1, position1_1)
-        subject.generateCancelAndCheckPointers(2 * eventPeriod)
+        subject.generateCancelAndCheckPointers(2 * eventPeriodMillis)
         subject.verifyNoGestureInProgress()
         subject.sendAllSynchronous()
         recorder.assertHasValidEventTimes()
@@ -85,7 +85,7 @@ class SendCancelTest : InputDispatcherTest() {
             this[0].verifyEvent(1, ACTION_DOWN, 0, t) // pointer1
             this[0].verifyPointer(pointer1, position1_1)
 
-            t += 2 * eventPeriod
+            t += 2 * eventPeriodMillis
             this[1].verifyEvent(1, ACTION_CANCEL, 0, t)
             this[1].verifyPointer(pointer1, position1_1)
         }
@@ -110,7 +110,7 @@ class SendCancelTest : InputDispatcherTest() {
             this[1].verifyPointer(pointer1, position1_1)
             this[1].verifyPointer(pointer2, position2_1)
 
-            t += eventPeriod
+            t += eventPeriodMillis
             this[2].verifyEvent(2, ACTION_CANCEL, 0, t)
             this[2].verifyPointer(pointer1, position1_1)
             this[2].verifyPointer(pointer2, position2_1)

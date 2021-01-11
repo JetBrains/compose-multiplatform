@@ -281,7 +281,7 @@ internal class SuspendingPointerInputFilter(
                 old.copy(
                     currentPressed = false,
                     previousPosition = old.position,
-                    previousTime = old.time,
+                    previousTime = old.uptimeMillis,
                     previousPressed = old.pressed,
                     consumed = DownChangeConsumed
                 )

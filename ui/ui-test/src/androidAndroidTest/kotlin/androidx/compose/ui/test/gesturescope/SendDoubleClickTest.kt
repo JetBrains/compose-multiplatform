@@ -19,20 +19,18 @@ package androidx.compose.ui.test.gesturescope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.doubleTapGestureFilter
-import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriod
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriodMillis
 import androidx.compose.ui.test.doubleClick
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performGesture
-import androidx.compose.ui.unit.Duration
-import androidx.compose.ui.unit.milliseconds
-import androidx.test.filters.MediumTest
 import androidx.compose.ui.test.util.ClickableTestBox
 import androidx.compose.ui.test.util.ClickableTestBox.defaultSize
 import androidx.compose.ui.test.util.ClickableTestBox.defaultTag
 import androidx.compose.ui.test.util.InputDispatcherTestRule
 import androidx.compose.ui.test.util.SinglePointerInputRecorder
-import androidx.compose.ui.test.util.recordedDuration
+import androidx.compose.ui.test.util.recordedDurationMillis
+import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -43,14 +41,14 @@ import org.junit.runners.Parameterized
 @MediumTest
 @RunWith(Parameterized::class)
 class SendDoubleClickTest(private val config: TestConfig) {
-    data class TestConfig(val position: Offset?, val delay: Duration?)
+    data class TestConfig(val position: Offset?, val delayMillis: Long?)
 
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
         fun createTestSet(): List<TestConfig> {
             return mutableListOf<TestConfig>().apply {
-                for (delay in listOf(null, 50.milliseconds)) {
+                for (delay in listOf(null, 50L)) {
                     for (x in listOf(1.0f, 33.0f, 99.0f)) {
                         for (y in listOf(1.0f, 33.0f, 99.0f)) {
                             add(TestConfig(Offset(x, y), delay))
@@ -72,8 +70,8 @@ class SendDoubleClickTest(private val config: TestConfig) {
     private val expectedClickPosition =
         config.position ?: Offset(defaultSize / 2, defaultSize / 2)
     // The delay plus 2 clicks
-    private val expectedDuration =
-        (config.delay ?: 145.milliseconds) + (2 * eventPeriod).milliseconds
+    private val expectedDurationMillis =
+        (config.delayMillis ?: 145L) + (2 * eventPeriodMillis)
 
     private fun recordDoubleClick(position: Offset) {
         recordedDoubleClicks.add(position)
@@ -93,12 +91,12 @@ class SendDoubleClickTest(private val config: TestConfig) {
 
         // When we inject a double click
         rule.onNodeWithTag(defaultTag).performGesture {
-            if (config.position != null && config.delay != null) {
-                doubleClick(config.position, config.delay)
+            if (config.position != null && config.delayMillis != null) {
+                doubleClick(config.position, config.delayMillis)
             } else if (config.position != null) {
                 doubleClick(config.position)
-            } else if (config.delay != null) {
-                doubleClick(delay = config.delay)
+            } else if (config.delayMillis != null) {
+                doubleClick(delayMillis = config.delayMillis)
             } else {
                 doubleClick()
             }
@@ -110,6 +108,6 @@ class SendDoubleClickTest(private val config: TestConfig) {
         assertThat(recordedDoubleClicks).isEqualTo(listOf(expectedClickPosition))
 
         // And that the duration was as expected
-        assertThat(recorder.recordedDuration).isEqualTo(expectedDuration)
+        assertThat(recorder.recordedDurationMillis).isEqualTo(expectedDurationMillis)
     }
 }

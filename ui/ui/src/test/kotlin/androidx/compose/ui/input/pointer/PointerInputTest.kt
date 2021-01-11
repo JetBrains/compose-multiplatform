@@ -17,10 +17,9 @@
 package androidx.compose.ui.input.pointer
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.unit.Uptime
-import androidx.compose.ui.unit.milliseconds
 import com.google.common.truth.FailureMetadata
 import com.google.common.truth.Subject
+import com.google.common.truth.Subject.Factory
 import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import org.hamcrest.CoreMatchers.`is`
@@ -565,10 +564,10 @@ class PointerInputTest {
     ): PointerInputChange {
         return PointerInputChange(
             PointerId(0),
-            Uptime.Boot + 100.milliseconds,
+            100,
             Offset(currentX, currentY),
             currentDown,
-            Uptime.Boot + 0.milliseconds,
+            0,
             Offset(previousX, previousY),
             previousDown,
             ConsumedData(

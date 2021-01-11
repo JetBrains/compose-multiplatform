@@ -19,11 +19,9 @@ package androidx.compose.ui.test.partialgesturescope
 import android.os.SystemClock.sleep
 import androidx.compose.testutils.expectError
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.unit.milliseconds
-import androidx.test.filters.MediumTest
 import androidx.compose.ui.test.cancel
-import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.down
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.move
 import androidx.compose.ui.test.movePointerTo
 import androidx.compose.ui.test.moveTo
@@ -34,6 +32,7 @@ import androidx.compose.ui.test.util.InputDispatcherTestRule
 import androidx.compose.ui.test.util.MultiPointerInputRecorder
 import androidx.compose.ui.test.util.assertTimestampsAreIncreasing
 import androidx.compose.ui.test.util.verify
+import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Rule
@@ -84,7 +83,7 @@ class SendMoveToTest() {
                 var t = events[0].getPointer(0).timestamp
                 val pointerId = events[0].getPointer(0).id
 
-                t += 10.milliseconds
+                t += 10
                 assertThat(events[1].pointerCount).isEqualTo(1)
                 events[1].getPointer(0).verify(t, pointerId, true, moveToPosition1)
             }
@@ -109,12 +108,12 @@ class SendMoveToTest() {
                 val pointerId1 = events[0].getPointer(0).id
                 val pointerId2 = events[1].getPointer(1).id
 
-                t += 10.milliseconds
+                t += 10
                 assertThat(events[2].pointerCount).isEqualTo(2)
                 events[2].getPointer(0).verify(t, pointerId1, true, moveToPosition1)
                 events[2].getPointer(1).verify(t, pointerId2, true, downPosition2)
 
-                t += 10.milliseconds
+                t += 10
                 assertThat(events[3].pointerCount).isEqualTo(2)
                 events[3].getPointer(0).verify(t, pointerId1, true, moveToPosition1)
                 events[3].getPointer(1).verify(t, pointerId2, true, moveToPosition2)
@@ -142,7 +141,7 @@ class SendMoveToTest() {
                 val pointerId1 = events[0].getPointer(0).id
                 val pointerId2 = events[1].getPointer(1).id
 
-                t += 10.milliseconds
+                t += 10
                 assertThat(events[2].pointerCount).isEqualTo(2)
                 events[2].getPointer(0).verify(t, pointerId1, true, moveToPosition1)
                 events[2].getPointer(1).verify(t, pointerId2, true, moveToPosition2)

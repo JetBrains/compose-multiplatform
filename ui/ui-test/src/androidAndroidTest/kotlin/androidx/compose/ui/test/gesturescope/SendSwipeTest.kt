@@ -57,7 +57,6 @@ import androidx.compose.ui.test.util.assertSame
 import androidx.compose.ui.test.util.assertTimestampsAreIncreasing
 import androidx.compose.ui.test.util.isAlmostEqualTo
 import androidx.compose.ui.test.util.verify
-import androidx.compose.ui.unit.milliseconds
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
@@ -139,7 +138,7 @@ class SendSwipeTest {
     @Test
     fun swipeShort() {
         rule.setContent { Ui(Alignment.Center) }
-        rule.onNodeWithTag(tag).performGesture { swipe(topLeft, bottomRight, 1.milliseconds) }
+        rule.onNodeWithTag(tag).performGesture { swipe(topLeft, bottomRight, 1) }
         rule.runOnIdle {
             recorder.run {
                 assertTimestampsAreIncreasing()
@@ -151,7 +150,7 @@ class SendSwipeTest {
                 // DOWN is in top left corner (0, 0)
                 events[0].verify(null, null, true, Offset(0f, 0f))
 
-                val t = events[0].timestamp + 1.milliseconds
+                val t = events[0].timestamp + 1
                 val pointerId = events[0].id
 
                 // MOVE is in bottom right corner (box is 100x100, so corner is (99, 99))

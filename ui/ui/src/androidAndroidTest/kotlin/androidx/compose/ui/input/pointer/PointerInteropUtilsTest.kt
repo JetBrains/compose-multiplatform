@@ -21,7 +21,6 @@ import android.view.View
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.PointerCoords
 import androidx.compose.ui.gesture.PointerProperties
-import androidx.compose.ui.unit.milliseconds
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
@@ -56,7 +55,7 @@ class PointerInteropUtilsTest {
             listOf(
                 down(
                     1,
-                    2.milliseconds,
+                    2,
                     3f,
                     4f
                 )
@@ -84,7 +83,7 @@ class PointerInteropUtilsTest {
                 arrayOf(PointerCoords(3f, 4f))
             )
         val pointerEvent = PointerEvent(
-            listOf(down(1, 2.milliseconds, 3f, 4f).up(5.milliseconds)),
+            listOf(down(1, 2, 3f, 4f).up(5)),
             expected
         )
 
@@ -98,8 +97,8 @@ class PointerInteropUtilsTest {
 
     @Test
     fun toMotionEventScope_2ndPointerDownEventAs1stPointer_motionEventIsCorrect() {
-        val pointer1 = down(1, 2.milliseconds, 3f, 4f).moveTo(7.milliseconds, 3f, 4f)
-        val pointer2 = down(8, 7.milliseconds, 10f, 11f)
+        val pointer1 = down(1, 2, 3f, 4f).moveTo(7, 3f, 4f)
+        val pointer2 = down(8, 7, 10f, 11f)
         val expected =
             MotionEvent(
                 7,
@@ -127,8 +126,8 @@ class PointerInteropUtilsTest {
 
     @Test
     fun toMotionEventScope_2ndPointerDownEventAs2ndPointer_motionEventIsCorrect() {
-        val pointer1 = down(1, 2.milliseconds, 3f, 4f).moveTo(7.milliseconds, 3f, 4f)
-        val pointer2 = down(8, 7.milliseconds, 10f, 11f)
+        val pointer1 = down(1, 2, 3f, 4f).moveTo(7, 3f, 4f)
+        val pointer2 = down(8, 7, 10f, 11f)
         val expected =
             MotionEvent(
                 7,
@@ -156,8 +155,8 @@ class PointerInteropUtilsTest {
 
     @Test
     fun toMotionEventScope_2ndPointerUpEventAs1stPointer_motionEventIsCorrect() {
-        val pointer1 = down(1, 2.milliseconds, 3f, 4f).moveTo(7.milliseconds, 3f, 4f)
-        val pointer2 = down(8, 2.milliseconds, 10f, 11f).up(7.milliseconds)
+        val pointer1 = down(1, 2, 3f, 4f).moveTo(7, 3f, 4f)
+        val pointer2 = down(8, 2, 10f, 11f).up(7)
         val expected =
             MotionEvent(
                 7,
@@ -185,8 +184,8 @@ class PointerInteropUtilsTest {
 
     @Test
     fun toMotionEventScope_2ndPointerUpEventAs2ndPointer_motionEventIsCorrect() {
-        val pointer1 = down(1, 2.milliseconds, 3f, 4f).moveTo(7.milliseconds, 3f, 4f)
-        val pointer2 = down(8, 2.milliseconds, 10f, 11f).up(7.milliseconds)
+        val pointer1 = down(1, 2, 3f, 4f).moveTo(7, 3f, 4f)
+        val pointer2 = down(8, 2, 10f, 11f).up(7)
         val expected =
             MotionEvent(
                 7,
@@ -214,7 +213,7 @@ class PointerInteropUtilsTest {
 
     @Test
     fun toMotionEventScope_moveEvent1Pointer_motionEventIsCorrect() {
-        val pointer1 = down(1, 2.milliseconds, 3f, 4f).moveTo(7.milliseconds, 8f, 9f)
+        val pointer1 = down(1, 2, 3f, 4f).moveTo(7, 8f, 9f)
         val expected =
             MotionEvent(
                 7,
@@ -239,8 +238,8 @@ class PointerInteropUtilsTest {
 
     @Test
     fun toMotionEventScope_moveEvent2Pointers_motionEventIsCorrect() {
-        val pointer1 = down(1, 2.milliseconds, 3f, 4f).moveTo(7.milliseconds, 8f, 9f)
-        val pointer2 = down(11, 12.milliseconds, 13f, 14f).moveTo(17.milliseconds, 18f, 19f)
+        val pointer1 = down(1, 2, 3f, 4f).moveTo(7, 8f, 9f)
+        val pointer2 = down(11, 12, 13f, 14f).moveTo(17, 18f, 19f)
         val expected =
             MotionEvent(
                 7,
@@ -268,7 +267,7 @@ class PointerInteropUtilsTest {
 
     @Test
     fun toMotionEventScope_globalOffsetsSet1Pointer_motionEventIsCorrect() {
-        val pointer1 = down(1, 2.milliseconds, 3f, 4f)
+        val pointer1 = down(1, 2, 3f, 4f)
         val expected =
             MotionEvent(
                 2,
@@ -293,8 +292,8 @@ class PointerInteropUtilsTest {
 
     @Test
     fun toMotionEventScope_globalOffsetsSet2Pointers_motionEventIsCorrect() {
-        val pointer1 = down(1, 2.milliseconds, 3f, 4f).moveTo(7.milliseconds, 3f, 4f)
-        val pointer2 = down(8, 7.milliseconds, 10f, 11f)
+        val pointer1 = down(1, 2, 3f, 4f).moveTo(7, 3f, 4f)
+        val pointer2 = down(8, 7, 10f, 11f)
         val expected =
             MotionEvent(
                 7,
@@ -331,7 +330,7 @@ class PointerInteropUtilsTest {
 
     @Test
     fun toCancelMotionEventScope_1Pointer_motionEventIsCorrect() {
-        val pointer1 = down(1, 2.milliseconds, 3f, 4f).moveTo(7.milliseconds, 8f, 9f)
+        val pointer1 = down(1, 2, 3f, 4f).moveTo(7, 8f, 9f)
         val expected =
             MotionEvent(
                 7,
@@ -356,8 +355,8 @@ class PointerInteropUtilsTest {
 
     @Test
     fun toCancelMotionEventScope_2Pointers_motionEventIsCorrect() {
-        val pointer1 = down(1, 2.milliseconds, 3f, 4f).moveTo(7.milliseconds, 8f, 9f)
-        val pointer2 = down(11, 12.milliseconds, 13f, 14f).moveTo(17.milliseconds, 18f, 19f)
+        val pointer1 = down(1, 2, 3f, 4f).moveTo(7, 8f, 9f)
+        val pointer2 = down(11, 12, 13f, 14f).moveTo(17, 18f, 19f)
         val expected =
             MotionEvent(
                 7,
@@ -385,8 +384,8 @@ class PointerInteropUtilsTest {
 
     @Test
     fun toCancelMotionEventScope_2PointersAltOrder_motionEventIsCorrect() {
-        val pointer1 = down(1, 2.milliseconds, 3f, 4f).moveTo(7.milliseconds, 8f, 9f)
-        val pointer2 = down(11, 12.milliseconds, 13f, 14f).moveTo(7.milliseconds, 18f, 19f)
+        val pointer1 = down(1, 2, 3f, 4f).moveTo(7, 8f, 9f)
+        val pointer2 = down(11, 12, 13f, 14f).moveTo(7, 18f, 19f)
         val expected =
             MotionEvent(
                 7,
@@ -414,7 +413,7 @@ class PointerInteropUtilsTest {
 
     @Test
     fun toCancelMotionEventScope_globalOffsetsSet1Pointer_motionEventIsCorrect() {
-        val pointer1 = down(1, 2.milliseconds, 3f, 4f)
+        val pointer1 = down(1, 2, 3f, 4f)
         val expected =
             MotionEvent(
                 2,
@@ -439,8 +438,8 @@ class PointerInteropUtilsTest {
 
     @Test
     fun toCancelMotionEventScope_globalOffsetsSet2Pointers_motionEventIsCorrect() {
-        val pointer1 = down(1, 2.milliseconds, 3f, 4f).moveTo(7.milliseconds, 3f, 4f)
-        val pointer2 = down(8, 7.milliseconds, 10f, 11f)
+        val pointer1 = down(1, 2, 3f, 4f).moveTo(7, 3f, 4f)
+        val pointer2 = down(8, 7, 10f, 11f)
         val expected =
             MotionEvent(
                 7,
@@ -480,7 +479,7 @@ class PointerInteropUtilsTest {
             )
         lateinit var actual: MotionEvent
 
-        emptyCancelMotionEventScope(76.milliseconds) {
+        emptyCancelMotionEventScope(76) {
             actual = it
         }
 

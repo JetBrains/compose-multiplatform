@@ -19,7 +19,7 @@ package androidx.compose.ui.test.inputdispatcher
 import android.view.MotionEvent
 import androidx.compose.ui.geometry.Offset
 import androidx.test.filters.SmallTest
-import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriod
+import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriodMillis
 import androidx.compose.ui.test.AndroidInputDispatcher
 import androidx.compose.ui.test.util.assertHasValidEventTimes
 import androidx.compose.ui.test.util.verify
@@ -61,8 +61,8 @@ class SendClickTest(config: TestConfig) : InputDispatcherTest() {
         recorder.events.apply {
             assertThat(size).isEqualTo(3)
             this[0].verify(position, MotionEvent.ACTION_DOWN, 0)
-            this[1].verify(position, MotionEvent.ACTION_MOVE, eventPeriod)
-            this[2].verify(position, MotionEvent.ACTION_UP, eventPeriod)
+            this[1].verify(position, MotionEvent.ACTION_MOVE, eventPeriodMillis)
+            this[2].verify(position, MotionEvent.ACTION_UP, eventPeriodMillis)
         }
     }
 }

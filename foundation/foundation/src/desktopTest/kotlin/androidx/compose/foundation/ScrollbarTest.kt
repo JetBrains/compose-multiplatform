@@ -51,7 +51,6 @@ import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.swipe
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.milliseconds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -277,7 +276,7 @@ class ScrollbarTest {
             rule.awaitIdle()
 
             rule.onNodeWithTag("scrollbar").performGesture {
-                swipe(start = Offset(0f, 0f), end = Offset(0f, 11f), duration = 1.milliseconds)
+                swipe(start = Offset(0f, 0f), end = Offset(0f, 11f), durationMillis = 1)
             }
             onFrame()
             assertEquals(2, state.firstVisibleItemIndex)
@@ -305,7 +304,7 @@ class ScrollbarTest {
             rule.awaitIdle()
 
             rule.onNodeWithTag("scrollbar").performGesture {
-                swipe(start = Offset(0f, 0f), end = Offset(0f, 26f), duration = 1.milliseconds)
+                swipe(start = Offset(0f, 0f), end = Offset(0f, 26f), durationMillis = 1)
             }
             onFrame()
             assertEquals(5, state.firstVisibleItemIndex)
@@ -333,14 +332,14 @@ class ScrollbarTest {
             rule.awaitIdle()
 
             rule.onNodeWithTag("scrollbar").performGesture {
-                swipe(start = Offset(0f, 0f), end = Offset(0f, 10000f), duration = 1.milliseconds)
+                swipe(start = Offset(0f, 0f), end = Offset(0f, 10000f), durationMillis = 1)
             }
             onFrame()
             assertEquals(15, state.firstVisibleItemIndex)
             assertEquals(0, state.firstVisibleItemScrollOffset)
 
             rule.onNodeWithTag("scrollbar").performGesture {
-                swipe(start = Offset(0f, 99f), end = Offset(0f, -10000f), duration = 1.milliseconds)
+                swipe(start = Offset(0f, 99f), end = Offset(0f, -10000f), durationMillis = 1)
             }
             onFrame()
             assertEquals(0, state.firstVisibleItemIndex)

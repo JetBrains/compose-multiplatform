@@ -22,7 +22,7 @@ import android.view.MotionEvent.ACTION_POINTER_DOWN
 import android.view.MotionEvent.ACTION_POINTER_UP
 import androidx.compose.ui.geometry.Offset
 import androidx.test.filters.SmallTest
-import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriod
+import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriodMillis
 import androidx.compose.ui.test.AndroidInputDispatcher
 import androidx.compose.ui.test.util.assertHasValidEventTimes
 import androidx.compose.testutils.expectError
@@ -165,7 +165,7 @@ class SendDownTest : InputDispatcherTest() {
             this[0].verifyEvent(1, ACTION_DOWN, 0, t) // pointer3
             this[0].verifyPointer(pointer3, position3)
 
-            t += eventPeriod
+            t += eventPeriodMillis
             this[1].verifyEvent(1, ACTION_MOVE, 0, t)
             this[1].verifyPointer(pointer3, position3)
 
@@ -179,7 +179,7 @@ class SendDownTest : InputDispatcherTest() {
             this[3].verifyPointer(pointer3, position3)
 
             for (i in 4..6) {
-                t += eventPeriod
+                t += eventPeriodMillis
                 this[i].verifyEvent(3, ACTION_MOVE, 0, t)
                 this[i].verifyPointer(pointer1, position1)
                 this[i].verifyPointer(pointer2, position2)
@@ -219,7 +219,7 @@ class SendDownTest : InputDispatcherTest() {
             this[1].verifyPointer(pointer1, position1)
             this[1].verifyPointer(pointer2, position2)
 
-            t += eventPeriod
+            t += eventPeriodMillis
             this[2].verifyEvent(2, ACTION_MOVE, 0, t)
             this[2].verifyPointer(pointer1, position1)
             this[2].verifyPointer(pointer2, position2)
@@ -228,7 +228,7 @@ class SendDownTest : InputDispatcherTest() {
             this[3].verifyPointer(pointer1, position1)
             this[3].verifyPointer(pointer2, position2)
 
-            t += eventPeriod
+            t += eventPeriodMillis
             this[4].verifyEvent(1, ACTION_MOVE, 0, t)
             this[4].verifyPointer(pointer2, position2)
 
@@ -264,7 +264,7 @@ class SendDownTest : InputDispatcherTest() {
             this[1].verifyPointer(pointer1, position1)
             this[1].verifyPointer(pointer2, position2)
 
-            t += eventPeriod
+            t += eventPeriodMillis
             this[2].verifyEvent(2, ACTION_MOVE, 0, t)
             this[2].verifyPointer(pointer1, position1)
             this[2].verifyPointer(pointer2, position2)
@@ -273,7 +273,7 @@ class SendDownTest : InputDispatcherTest() {
             this[3].verifyPointer(pointer1, position1)
             this[3].verifyPointer(pointer2, position2)
 
-            t += eventPeriod
+            t += eventPeriodMillis
             this[4].verifyEvent(1, ACTION_MOVE, 0, t)
             this[4].verifyPointer(pointer2, position2)
 

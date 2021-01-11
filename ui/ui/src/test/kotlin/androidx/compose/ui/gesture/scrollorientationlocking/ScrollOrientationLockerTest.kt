@@ -20,15 +20,14 @@ import androidx.compose.ui.input.pointer.CustomEventDispatcher
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.down
-import androidx.compose.ui.unit.milliseconds
 import com.google.common.truth.Truth
 import com.nhaarman.mockitokotlin2.mock
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
-val c1 = down(1, 0.milliseconds, x = 1f, y = 1f)
-val c2 = down(2, 0.milliseconds, x = 2f, y = 2f)
+val c1 = down(1, 0, x = 1f, y = 1f)
+val c2 = down(2, 0, x = 2f, y = 2f)
 
 class LockingConfig(
     val changes: List<PointerInputChange>,

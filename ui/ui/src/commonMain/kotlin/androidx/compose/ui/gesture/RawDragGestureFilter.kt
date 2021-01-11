@@ -268,7 +268,7 @@ internal class RawDragGestureFilter : PointerInputFilter() {
                         velocityTrackers[it.id] = VelocityTracker()
                             .apply {
                                 addPosition(
-                                    it.time,
+                                    it.uptimeMillis,
                                     it.position
                                 )
                             }
@@ -291,7 +291,7 @@ internal class RawDragGestureFilter : PointerInputFilter() {
                 // TODO(b/162269614): Should be update to only have one velocity tracker that
                 //  tracks the average change overtime, instead of one for each finger.
                 velocityTrackers[it.id]?.addPosition(
-                    it.time,
+                    it.uptimeMillis,
                     it.position
                 )
             }

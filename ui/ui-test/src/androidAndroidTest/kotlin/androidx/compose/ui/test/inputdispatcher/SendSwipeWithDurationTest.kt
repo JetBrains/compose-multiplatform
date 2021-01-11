@@ -20,14 +20,11 @@ import android.view.MotionEvent.ACTION_DOWN
 import android.view.MotionEvent.ACTION_MOVE
 import android.view.MotionEvent.ACTION_UP
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.unit.Duration
-import androidx.compose.ui.unit.inMilliseconds
-import androidx.compose.ui.unit.milliseconds
-import androidx.test.filters.SmallTest
-import androidx.compose.ui.test.InputDispatcher
 import androidx.compose.ui.test.AndroidInputDispatcher
+import androidx.compose.ui.test.InputDispatcher
 import androidx.compose.ui.test.util.assertHasValidEventTimes
 import androidx.compose.ui.test.util.verify
+import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,14 +34,14 @@ import org.junit.runners.Parameterized
  * Tests if the [AndroidInputDispatcher.enqueueSwipe] gesture works when specifying the gesture as a
  * function between two positions. Verifies if the generated MotionEvents for a gesture with a
  * given duration have the expected timestamps. The timestamps should divide the duration as
- * equally as possible with as close to [InputDispatcher.eventPeriod] between each
+ * equally as possible with as close to [InputDispatcher.eventPeriodMillis] between each
  * successive event as possible.
  */
 @SmallTest
 @RunWith(Parameterized::class)
 class SendSwipeWithDurationTest(private val config: TestConfig) : InputDispatcherTest() {
     data class TestConfig(
-        val duration: Duration,
+        val durationMillis: Long,
         val expectedTimestamps: List<Long>
     )
 
@@ -60,32 +57,32 @@ class SendSwipeWithDurationTest(private val config: TestConfig) : InputDispatche
                 // With eventPeriod of 10.ms, 0 events is 0.ms and 1 event is 10.ms
                 // Even though 1.ms is closer to 0.ms than to 10.ms, split into 1 event as we
                 // must have at least 1 move event to have movement.
-                TestConfig(1.milliseconds, listOf(1)),
+                TestConfig(1, listOf(1)),
                 // With eventPeriod of 10.ms, 0 events is 0.ms and 1 event is 10.ms
                 // Split 7.ms in 1 event as 7.ms is closer to 10.ms than to 0.ms
-                TestConfig(7.milliseconds, listOf(7)),
+                TestConfig(7, listOf(7)),
                 // With eventPeriod of 10.ms, a duration of 10.ms is exactly 1 event
-                TestConfig(10.milliseconds, listOf(10)),
+                TestConfig(10, listOf(10)),
                 // With eventPeriod of 10.ms, 1 event is 10.ms and 2 events is 20.ms
                 // Split 14.ms in 1 event as 14.ms is closer to 10.ms than to 20.ms
-                TestConfig(14.milliseconds, listOf(14)),
+                TestConfig(14, listOf(14)),
                 // With eventPeriod of 10.ms, 1 event is 10.ms and 2 events is 20.ms
                 // 15.ms is as close to 10.ms as it is to 20.ms, in which case the larger number
                 // of events is preferred -> 2 events
-                TestConfig(15.milliseconds, listOf(8, 15)),
+                TestConfig(15, listOf(8, 15)),
                 // With eventPeriod of 10.ms, 1 event is 10.ms and 2 events is 20.ms
                 // Split 19.ms in 2 events as 19.ms is closer to 20.ms than to 10.ms
-                TestConfig(19.milliseconds, listOf(10, 19)),
+                TestConfig(19, listOf(10, 19)),
                 // With eventPeriod of 10.ms, 2 events is 20.ms and 3 events is 30.ms
                 // Split 24.ms in 2 events as 24.ms is closer to 20.ms than to 30.ms
-                TestConfig(24.milliseconds, listOf(12, 24)),
+                TestConfig(24, listOf(12, 24)),
                 // With eventPeriod of 10.ms, 2 events is 20.ms and 3 events is 30.ms
                 // 25.ms is as close to 20.ms as it is to 30.ms, in which case the larger number
                 // of events is preferred -> 3 events
-                TestConfig(25.milliseconds, listOf(8, 17, 25)),
+                TestConfig(25, listOf(8, 17, 25)),
                 // With eventPeriod of 10.ms, 9 event is 90.ms and 10 events is 100.ms
                 // Split 97.ms in 10 events as 97.ms is closer to 100.ms than to 90.ms
-                TestConfig(97.milliseconds, listOf(10, 19, 29, 39, 49, 58, 68, 78, 87, 97))
+                TestConfig(97, listOf(10, 19, 29, 39, 49, 58, 68, 78, 87, 97))
             )
         }
     }
@@ -93,7 +90,7 @@ class SendSwipeWithDurationTest(private val config: TestConfig) : InputDispatche
     @Test
     fun swipeWithDuration() {
         // Given a swipe with a given duration
-        subject.enqueueSwipe(curve = curve, duration = config.duration)
+        subject.enqueueSwipe(curve = curve, durationMillis = config.durationMillis)
         subject.sendAllSynchronous()
 
         // then
@@ -103,7 +100,7 @@ class SendSwipeWithDurationTest(private val config: TestConfig) : InputDispatche
             // down + up + #move
             assertThat(size).isEqualTo(2 + expectedNumberOfMoveEvents)
 
-            val durationMs = config.duration.inMilliseconds()
+            val durationMs = config.durationMillis
             // First is down, last is up
             first().verify(curve, ACTION_DOWN, expectedRelativeTime = 0)
             last().verify(curve, ACTION_UP, expectedRelativeTime = durationMs)

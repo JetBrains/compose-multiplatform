@@ -18,7 +18,6 @@ package androidx.compose.ui.input.pointer
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.node.InternalCoreApi
-import androidx.compose.ui.unit.Uptime
 
 /**
  * The normalized data structure for pointer input event information that is taken in processed by
@@ -28,7 +27,7 @@ import androidx.compose.ui.unit.Uptime
  */
 @InternalCoreApi
 internal expect class PointerInputEvent {
-    val uptime: Uptime
+    val uptime: Long
     val pointers: List<PointerInputEventData>
 }
 
@@ -39,7 +38,7 @@ internal expect class PointerInputEvent {
  */
 internal data class PointerInputEventData(
     val id: PointerId,
-    val uptime: Uptime,
+    val uptime: Long,
     val position: Offset,
     val down: Boolean
 )

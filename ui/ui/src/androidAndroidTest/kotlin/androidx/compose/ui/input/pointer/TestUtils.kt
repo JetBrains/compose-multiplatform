@@ -25,7 +25,6 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.Uptime
 import com.google.common.truth.FailureMetadata
 import com.google.common.truth.Subject
 import com.google.common.truth.Subject.Factory
@@ -33,7 +32,7 @@ import com.google.common.truth.Truth
 
 internal fun PointerInputEventData(
     id: Int,
-    uptime: Uptime,
+    uptime: Long,
     position: Offset,
     down: Boolean
 ): PointerInputEventData {
@@ -47,7 +46,7 @@ internal fun PointerInputEventData(
 
 internal fun PointerInputEvent(
     id: Int,
-    uptime: Uptime,
+    uptime: Long,
     position: Offset,
     down: Boolean
 ): PointerInputEvent {
@@ -59,7 +58,7 @@ internal fun PointerInputEvent(
 }
 
 internal fun PointerInputEvent(
-    uptime: Uptime,
+    uptime: Long,
     pointers: List<PointerInputEventData>
 ) = PointerInputEvent(
     uptime,
@@ -310,14 +309,14 @@ internal class PointerEventSubject(
                 .that(actualChanges[i].position)
                 .isEqualTo(expectedChanges[i].position)
             check("currentTime")
-                .that(actualChanges[i].time)
-                .isEqualTo(expectedChanges[i].time)
+                .that(actualChanges[i].uptimeMillis)
+                .isEqualTo(expectedChanges[i].uptimeMillis)
             check("currentPressed")
                 .that(actualChanges[i].pressed)
                 .isEqualTo(expectedChanges[i].pressed)
             check("previousTime")
-                .that(actualChanges[i].previousTime)
-                .isEqualTo(expectedChanges[i].previousTime)
+                .that(actualChanges[i].previousUptimeMillis)
+                .isEqualTo(expectedChanges[i].previousUptimeMillis)
             check("previousPosition")
                 .that(actualChanges[i].previousPosition)
                 .isEqualTo(expectedChanges[i].previousPosition)
@@ -382,11 +381,11 @@ internal class PointerInputChangeSubject(
             .that(actual.previousPosition)
             .isEqualTo(expected.previousPosition)
         check("currentTime")
-            .that(actual.time)
-            .isEqualTo(expected.time)
+            .that(actual.uptimeMillis)
+            .isEqualTo(expected.uptimeMillis)
         check("previousTime")
-            .that(actual.previousTime)
-            .isEqualTo(expected.previousTime)
+            .that(actual.previousUptimeMillis)
+            .isEqualTo(expected.previousUptimeMillis)
         check("currentPressed")
             .that(actual.pressed)
             .isEqualTo(expected.pressed)

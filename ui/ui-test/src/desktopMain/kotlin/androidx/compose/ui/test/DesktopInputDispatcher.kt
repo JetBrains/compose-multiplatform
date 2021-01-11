@@ -20,7 +20,6 @@ import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.TestPointerInputEventData
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.platform.DesktopOwner
-import androidx.compose.ui.unit.Uptime
 
 internal actual fun createInputDispatcher(testContext: TestContext, owner: Owner): InputDispatcher {
     return DesktopInputDispatcher(testContext, owner as DesktopOwner)
@@ -63,7 +62,7 @@ internal class DesktopInputDispatcher(
     }
 
     private fun PartialGesture.pointerInputEvent(down: Boolean): List<TestPointerInputEventData> {
-        val time = Uptime(lastEventTime * 1_000_000)
+        val time = lastEventTime
         val offset = lastPositions[lastPositions.keys.sorted()[0]]!!
         val event = listOf(
             TestPointerInputEventData(
@@ -82,7 +81,7 @@ internal class DesktopInputDispatcher(
         copy.forEach {
             val eventTime = it.first().uptime
             if (dispatchInRealTime) {
-                val delayMs = (eventTime.nanoseconds / 1_000_000) - now
+                val delayMs = eventTime - now
                 if (delayMs > 0) {
                     Thread.sleep(delayMs)
                 }

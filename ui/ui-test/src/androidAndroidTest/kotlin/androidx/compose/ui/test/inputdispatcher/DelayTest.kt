@@ -19,12 +19,9 @@ package androidx.compose.ui.test.inputdispatcher
 import android.view.MotionEvent.ACTION_DOWN
 import android.view.MotionEvent.ACTION_UP
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.unit.Duration
-import androidx.compose.ui.unit.inMilliseconds
-import androidx.compose.ui.unit.milliseconds
-import androidx.test.filters.SmallTest
-import androidx.compose.ui.test.InputDispatcher
 import androidx.compose.ui.test.AndroidInputDispatcher
+import androidx.compose.ui.test.InputDispatcher
+import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -39,8 +36,8 @@ import org.junit.runners.Parameterized
 @RunWith(Parameterized::class)
 class DelayTest(private val config: TestConfig) : InputDispatcherTest() {
     data class TestConfig(
-        val firstDelay: Duration,
-        val secondDelay: Duration,
+        val firstDelayMillis: Long,
+        val secondDelayMillis: Long,
         val firstGesture: Gesture,
         val secondGesture: Gesture,
         val thirdGesture: Gesture
@@ -48,7 +45,7 @@ class DelayTest(private val config: TestConfig) : InputDispatcherTest() {
 
     enum class Gesture(internal val function: (InputDispatcher) -> Unit) {
         Click({ it.enqueueClick(anyPosition) }),
-        Swipe({ it.enqueueSwipe(anyPosition, anyPosition, 107.milliseconds) })
+        Swipe({ it.enqueueSwipe(anyPosition, anyPosition, 107) })
     }
 
     companion object {
@@ -58,15 +55,15 @@ class DelayTest(private val config: TestConfig) : InputDispatcherTest() {
         @Parameterized.Parameters(name = "{0}")
         fun createTestSet(): List<TestConfig> {
             return mutableListOf<TestConfig>().apply {
-                for (delay1 in listOf(0, 23)) {
-                    for (delay2 in listOf(0, 47)) {
+                for (delay1 in listOf(0L, 23L)) {
+                    for (delay2 in listOf(0L, 47L)) {
                         for (gesture1 in Gesture.values()) {
                             for (gesture2 in Gesture.values()) {
                                 for (gesture3 in Gesture.values()) {
                                     add(
                                         TestConfig(
-                                            firstDelay = delay1.milliseconds,
-                                            secondDelay = delay2.milliseconds,
+                                            firstDelayMillis = delay1,
+                                            secondDelayMillis = delay2,
                                             firstGesture = gesture1,
                                             secondGesture = gesture2,
                                             thirdGesture = gesture3
@@ -85,15 +82,15 @@ class DelayTest(private val config: TestConfig) : InputDispatcherTest() {
     fun testDelay() {
         // Perform two gestures with a delay in between
         config.firstGesture.function(subject)
-        subject.enqueueDelay(config.firstDelay)
+        subject.enqueueDelay(config.firstDelayMillis)
         config.secondGesture.function(subject)
-        subject.enqueueDelay(config.secondDelay)
+        subject.enqueueDelay(config.secondDelayMillis)
         config.thirdGesture.function(subject)
         subject.sendAllSynchronous()
 
         // Check if the time between the gestures was exactly the delay
-        val expectedFirstDelay = config.firstDelay.inMilliseconds()
-        val expectedSecondDelay = config.secondDelay.inMilliseconds()
+        val expectedFirstDelay = config.firstDelayMillis
+        val expectedSecondDelay = config.secondDelayMillis
         recorder.events.filter { it.action in listOf(ACTION_DOWN, ACTION_UP) }.apply {
             assertThat(this).hasSize(6) // 3x (DOWN + UP)
             assertThat(this[0].action).isEqualTo(ACTION_DOWN)

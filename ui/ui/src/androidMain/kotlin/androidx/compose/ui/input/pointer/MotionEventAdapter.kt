@@ -24,8 +24,6 @@ import android.view.MotionEvent.ACTION_POINTER_UP
 import android.view.MotionEvent.ACTION_UP
 import androidx.annotation.VisibleForTesting
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.unit.NanosecondsPerMillisecond
-import androidx.compose.ui.unit.Uptime
 
 /**
  * Converts Android framework [MotionEvent]s into Compose [PointerInputEvent]s.
@@ -84,7 +82,7 @@ internal class MotionEventAdapter {
         }
 
         return PointerInputEvent(
-            Uptime(motionEvent.eventTime * NanosecondsPerMillisecond),
+            motionEvent.eventTime,
             pointers,
             motionEvent
         )
@@ -120,7 +118,7 @@ internal class MotionEventAdapter {
 
         return createPointerInputEventData(
             pointerId,
-            Uptime(motionEvent.eventTime * NanosecondsPerMillisecond),
+            motionEvent.eventTime,
             motionEvent,
             index,
             upIndex
@@ -133,7 +131,7 @@ internal class MotionEventAdapter {
  */
 private fun createPointerInputEventData(
     pointerId: PointerId,
-    timestamp: Uptime,
+    timestamp: Long,
     motionEvent: MotionEvent,
     index: Int,
     upIndex: Int?

@@ -16,20 +16,17 @@
 
 package androidx.compose.ui.platform
 
-import androidx.compose.ui.unit.Duration
-import androidx.compose.ui.unit.milliseconds
-
 class AndroidViewConfiguration(
     private val viewConfiguration: android.view.ViewConfiguration
 ) : ViewConfiguration {
-    override val longPressTimeout: Duration
-        get() = android.view.ViewConfiguration.getLongPressTimeout().milliseconds
+    override val longPressTimeoutMillis: Long
+        get() = android.view.ViewConfiguration.getLongPressTimeout().toLong()
 
-    override val doubleTapTimeout: Duration
-        get() = android.view.ViewConfiguration.getDoubleTapTimeout().milliseconds
+    override val doubleTapTimeoutMillis: Long
+        get() = android.view.ViewConfiguration.getDoubleTapTimeout().toLong()
 
-    override val doubleTapMinTime: Duration
-        get() = 40.milliseconds
+    override val doubleTapMinTimeMillis: Long
+        get() = 40
 
     override val touchSlop: Float
         get() = viewConfiguration.scaledTouchSlop.toFloat()
