@@ -16,15 +16,12 @@
 
 package androidx.compose.ui.graphics.colorspace
 
-import androidx.compose.ui.util.annotation.IntRange
-import androidx.compose.ui.util.annotation.Size
-
 /**
  * Implementation of the CIE XYZ color space. Assumes the white point is D50.
  */
 internal class Xyz(
     name: String,
-    @IntRange(from = MinId.toLong(), to = MaxId.toLong()) id: Int
+    id: Int
 ) : ColorSpace(
     name,
     ColorModel.Xyz, id
@@ -33,22 +30,22 @@ internal class Xyz(
     override val isWideGamut: Boolean
         get() = true
 
-    override fun getMinValue(@IntRange(from = 0, to = 3) component: Int): Float {
+    override fun getMinValue(component: Int): Float {
         return -2.0f
     }
 
-    override fun getMaxValue(@IntRange(from = 0, to = 3) component: Int): Float {
+    override fun getMaxValue(component: Int): Float {
         return 2.0f
     }
 
-    override fun toXyz(@Size(min = 3) v: FloatArray): FloatArray {
+    override fun toXyz(v: FloatArray): FloatArray {
         v[0] = clamp(v[0])
         v[1] = clamp(v[1])
         v[2] = clamp(v[2])
         return v
     }
 
-    override fun fromXyz(@Size(min = 3) v: FloatArray): FloatArray {
+    override fun fromXyz(v: FloatArray): FloatArray {
         v[0] = clamp(v[0])
         v[1] = clamp(v[1])
         v[2] = clamp(v[2])

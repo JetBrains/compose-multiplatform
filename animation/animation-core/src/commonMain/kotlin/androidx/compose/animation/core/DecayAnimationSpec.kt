@@ -17,7 +17,6 @@
 package androidx.compose.animation.core
 
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.util.annotation.FloatRange
 
 /**
  * [DecayAnimationSpec] stores the specification of an animation, including 1) the data type to be
@@ -94,20 +93,22 @@ fun DecayAnimationSpec<Float>.calculateTargetValue(
  * shorter distance the animation will travel with the same starting condition.
  * [absVelocityThreshold] describes the absolute value of a velocity threshold, below which the
  * animation is considered finished.
+ *
+ * @param frictionMultiplier The decay friction multiplier. This must be greater than `0`.
+ * @param absVelocityThreshold The minimum speed, below which the animation is considered finished.
+ * Must be greater than `0`.
  */
 fun <T> exponentialDecay(
-    @FloatRange(
+    /*@FloatRange(
         from = 0.0,
-        // TODO(b/158069385): use POSITIVE_INFINITY constant once it's possible to do in MPP code.
-        to = 3.4e38, // POSITIVE_INFINITY,
         fromInclusive = false
-    ) frictionMultiplier: Float = 1f,
-    @FloatRange(
+    )*/
+    frictionMultiplier: Float = 1f,
+    /*@FloatRange(
         from = 0.0,
-        // TODO(b/158069385): use POSITIVE_INFINITY constant once it's possible to do in MPP code.
-        to = 3.4e38, // POSITIVE_INFINITY,
         fromInclusive = false
-    ) absVelocityThreshold: Float = 0.1f
+    )*/
+    absVelocityThreshold: Float = 0.1f
 ): DecayAnimationSpec<T> =
     FloatExponentialDecaySpec(frictionMultiplier, absVelocityThreshold).generateDecayAnimationSpec()
 

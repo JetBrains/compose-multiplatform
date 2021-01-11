@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.util.annotation.VisibleForTesting
 
 /**
  * The data class which holds the set of parameters of the text layout computation.
@@ -344,7 +343,7 @@ data class TextLayoutResult internal constructor(
     fun getPathForRange(start: Int, end: Int): Path = multiParagraph.getPathForRange(start, end)
 }
 
-@VisibleForTesting
+/*@VisibleForTesting*/
 fun createTextLayoutResult(
     layoutInput: TextLayoutInput =
         TextLayoutInput(

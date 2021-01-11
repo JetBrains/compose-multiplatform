@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.colorspace.ColorModel
 import androidx.compose.ui.graphics.colorspace.ColorSpace
 import androidx.compose.ui.graphics.colorspace.ColorSpaces
 import androidx.compose.ui.graphics.colorspace.ColorSpaces.ColorSpacesArray
+import androidx.compose.ui.graphics.colorspace.ColorSpaces.SrgbTransferParameters
 import androidx.compose.ui.graphics.colorspace.Connector
 import androidx.compose.ui.graphics.colorspace.Illuminant
 import androidx.compose.ui.graphics.colorspace.RenderIntent
@@ -32,7 +33,6 @@ import androidx.compose.ui.graphics.colorspace.connect
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
@@ -721,7 +721,7 @@ class ColorSpaceTest {
         assertNotNull(colorSpace.transferParameters)
 
         colorSpace = ColorSpaces.ExtendedSrgb
-        assertNull(colorSpace.transferParameters)
+        assertSame(SrgbTransferParameters, colorSpace.transferParameters)
     }
 
     @Test

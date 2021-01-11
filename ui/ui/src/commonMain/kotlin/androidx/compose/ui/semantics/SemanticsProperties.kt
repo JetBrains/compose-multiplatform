@@ -22,8 +22,6 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.util.annotation.IntRange
-import androidx.compose.ui.util.annotation.VisibleForTesting
 import androidx.compose.ui.ExperimentalComposeUiApi
 import kotlin.reflect.KProperty
 
@@ -33,7 +31,7 @@ import kotlin.reflect.KProperty
  * Each of these is intended to be set by the respective SemanticsPropertyReceiver extension
  * instead of used directly.
  */
-@VisibleForTesting
+/*@VisibleForTesting*/
 object SemanticsProperties {
     /**
      * @see SemanticsPropertyReceiver.contentDescription
@@ -187,7 +185,7 @@ object SemanticsProperties {
  * Each of these is intended to be set by the respective SemanticsPropertyReceiver extension
  * instead of used directly.
  */
-@VisibleForTesting
+/*@VisibleForTesting*/
 object SemanticsActions {
     /**
      * @see SemanticsPropertyReceiver.getTextLayoutResult
@@ -335,13 +333,15 @@ data class CustomAccessibilityAction(val label: CharSequence, val action: () -> 
  *
  * @param current current value in the range
  * @param range range of this node
- * @param steps if greater than 0, specifies the number of discrete values, evenly distributed
- * between across the whole value range. If 0, any value from the range specified can be chosen.
+ * @param steps if greater than `0`, specifies the number of discrete values, evenly distributed
+ * between across the whole value range. If `0`, any value from the range specified can be chosen.
+ * Cannot be less than `0`.
  */
 data class ProgressBarRangeInfo(
     val current: Float,
     val range: ClosedFloatingPointRange<Float>,
-    @IntRange(from = 0) val steps: Int = 0
+    /*@IntRange(from = 0)*/
+    val steps: Int = 0
 )
 
 /**

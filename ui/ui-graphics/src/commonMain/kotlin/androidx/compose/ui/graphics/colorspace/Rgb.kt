@@ -16,8 +16,6 @@
 
 package androidx.compose.ui.graphics.colorspace
 
-import androidx.compose.ui.util.annotation.IntRange
-import androidx.compose.ui.util.annotation.Size
 import kotlin.math.abs
 import kotlin.math.pow
 
@@ -183,10 +181,10 @@ class Rgb
  *  * The ID is not between [ColorSpace.MinId] and [ColorSpace.MaxId].
  */
 internal constructor(
-    @Size(min = 1) name: String,
-    @Size(min = 6, max = 9) primaries: FloatArray,
+    name: String,
+    primaries: FloatArray,
     val whitePoint: WhitePoint,
-    @Size(9) transform: FloatArray?,
+    transform: FloatArray?,
     oetf: (Double) -> Double,
     eotf: (Double) -> Double,
     private val min: Float,
@@ -205,7 +203,7 @@ internal constructor(
      * [TransferParameters]
      */
     val transferParameters: TransferParameters?,
-    @IntRange(from = MinId.toLong(), to = MaxId.toLong()) id: Int
+    id: Int
 ) : ColorSpace(name, ColorModel.Rgb, id) {
 
     internal val primaries: FloatArray
@@ -310,7 +308,7 @@ internal constructor(
      *
      * @see whitePoint
      */
-    @Size(6)
+    /*@Size(6)*/
     fun getPrimaries(): FloatArray = primaries.copyOf()
 
     /**
@@ -327,7 +325,7 @@ internal constructor(
      *
      * @see getInverseTransform
      */
-    @Size(9)
+    /*@Size(9)*/
     fun getTransform(): FloatArray = transform.copyOf()
 
     /**
@@ -344,7 +342,7 @@ internal constructor(
      *
      * @see getTransform
      */
-    @Size(9)
+    /*@Size(9)*/
     fun getInverseTransform(): FloatArray = inverseTransform.copyOf()
 
     /**
@@ -365,10 +363,11 @@ internal constructor(
      *  * The OETF is null or the EOTF is null.
      *  * The minimum valid value is >= the maximum valid value.
      */
-    // TODO(mount): restore MinId after const vals work with IR module
     constructor(
-        @Size(min = 1) name: String,
-        @Size(9) toXYZ: FloatArray,
+        /*@Size(min = 1)*/
+        name: String,
+        /*@Size(9)*/
+        toXYZ: FloatArray,
         oetf: (Double) -> Double,
         eotf: (Double) -> Double
     ) : this(
@@ -381,7 +380,7 @@ internal constructor(
         0.0f,
         1.0f,
         null,
-        -1 /*MinId*/
+        MinId
     )
 
     /**
@@ -417,16 +416,17 @@ internal constructor(
      *  * The OETF is null or the EOTF is null.
      *  * The minimum valid value is >= the maximum valid value.
      */
-    // TODO(mount): restore MinId after const vals work with IR module
     constructor(
-        @Size(min = 1) name: String,
-        @Size(min = 6, max = 9) primaries: FloatArray,
+        /*@Size(min = 1)*/
+        name: String,
+        /*@Size(min = 6, max = 9)*/
+        primaries: FloatArray,
         whitePoint: WhitePoint,
         oetf: (Double) -> Double,
         eotf: (Double) -> Double,
         min: Float,
         max: Float
-    ) : this(name, primaries, whitePoint, null, oetf, eotf, min, max, null, -1 /*MinId*/)
+    ) : this(name, primaries, whitePoint, null, oetf, eotf, min, max, null, MinId)
 
     /**
      * Creates a new RGB color space using a 3x3 column-major transform matrix.
@@ -444,12 +444,13 @@ internal constructor(
      *  * The name is null or has a length of 0.
      *  * Gamma is negative.
      */
-    // TODO(mount): restore MinId after const vals work with IR module
     constructor(
-        @Size(min = 1) name: String,
-        @Size(9) toXYZ: FloatArray,
+        /*@Size(min = 1)*/
+        name: String,
+        /*@Size(9)*/
+        toXYZ: FloatArray,
         function: TransferParameters
-    ) : this(name, computePrimaries(toXYZ), computeWhitePoint(toXYZ), function, -1 /*MinId*/)
+    ) : this(name, computePrimaries(toXYZ), computeWhitePoint(toXYZ), function, MinId)
 
     /**
      * Creates a new RGB color space using a specified set of primaries
@@ -480,13 +481,14 @@ internal constructor(
      *  * The white point array is null or has a length that is neither 2 or 3.
      *  * The transfer parameters are invalid.
      */
-    // TODO(mount): restore MinId after const vals work with IR module
     constructor(
-        @Size(min = 1) name: String,
-        @Size(min = 6, max = 9) primaries: FloatArray,
+        /*@Size(min = 1)*/
+        name: String,
+        /*@Size(min = 6, max = 9)*/
+        primaries: FloatArray,
         whitePoint: WhitePoint,
         function: TransferParameters
-    ) : this(name, primaries, whitePoint, function, -1 /*MinId*/)
+    ) : this(name, primaries, whitePoint, function, MinId)
 
     /**
      * Creates a new RGB color space using a specified set of primaries
@@ -523,11 +525,11 @@ internal constructor(
      * @see get
      */
     internal constructor(
-        @Size(min = 1) name: String,
-        @Size(min = 6, max = 9) primaries: FloatArray,
+        name: String,
+        primaries: FloatArray,
         whitePoint: WhitePoint,
         function: TransferParameters,
-        @IntRange(from = MinId.toLong(), to = MaxId.toLong()) id: Int
+        id: Int
     ) : this(
         name, primaries, whitePoint, null,
         if (function.e == 0.0 && function.f == 0.0) { x ->
@@ -581,14 +583,15 @@ internal constructor(
      *
      * @see get
      */
-    // TODO(mount): restore MinId after const vals work with IR module
     constructor(
-        @Size(min = 1) name: String,
-        @Size(9) toXYZ: FloatArray,
+        /*@Size(min = 1)*/
+        name: String,
+        /*@Size(9)*/
+        toXYZ: FloatArray,
         gamma: Double
     ) : this(
         name, computePrimaries(toXYZ), computeWhitePoint(toXYZ), gamma, 0.0f, 1.0f,
-        -1 /*MinId*/
+        MinId
     )
 
     /**
@@ -622,13 +625,14 @@ internal constructor(
      *
      * @see get
      */
-    // TODO(mount): restore MinId after const vals work with IR module
     constructor(
-        @Size(min = 1) name: String,
-        @Size(min = 6, max = 9) primaries: FloatArray,
+        /*@Size(min = 1)*/
+        name: String,
+        /*@Size(min = 6, max = 9)*/
+        primaries: FloatArray,
         whitePoint: WhitePoint,
         gamma: Double
-    ) : this(name, primaries, whitePoint, gamma, 0.0f, 1.0f, -1 /*MinId*/)
+    ) : this(name, primaries, whitePoint, gamma, 0.0f, 1.0f, MinId)
 
     /**
      * Creates a new RGB color space using a specified set of primaries
@@ -668,13 +672,13 @@ internal constructor(
      * @see get
      */
     internal constructor(
-        @Size(min = 1) name: String,
-        @Size(min = 6, max = 9) primaries: FloatArray,
+        name: String,
+        primaries: FloatArray,
         whitePoint: WhitePoint,
         gamma: Double,
         min: Float,
         max: Float,
-        @IntRange(from = MinId.toLong(), to = MaxId.toLong()) id: Int
+        id: Int
     ) : this(
         name, primaries, whitePoint, null,
         if (gamma == 1.0) DoubleIdentity
@@ -692,16 +696,15 @@ internal constructor(
      *
      * @param colorSpace The color space to create a copy of
      */
-    // TODO(mount): restore MinId after const vals work with IR module
     internal constructor(
         colorSpace: Rgb,
-        @Size(9) transform: FloatArray,
+        transform: FloatArray,
         whitePoint: WhitePoint
     ) : this(
         colorSpace.name, colorSpace.primaries, whitePoint, transform,
         colorSpace.oetfOrig, colorSpace.eotfOrig, colorSpace.min, colorSpace.max,
         colorSpace.transferParameters,
-        -1 /*MinId*/
+        MinId
     )
 
     /**
@@ -713,12 +716,12 @@ internal constructor(
      * @param primaries The destination array, cannot be null, its length
      * must be >= 6
      *
-     * @return The destination array passed as a parameter
+     * @return [primaries] array, modified to contain the primaries of this color space.
      *
      * @see getPrimaries
      */
-    @Size(min = 6)
-    fun getPrimaries(@Size(min = 6) primaries: FloatArray): FloatArray {
+    /*@Size(min = 6)*/
+    fun getPrimaries(/*@Size(min = 6)*/ primaries: FloatArray): FloatArray {
         return this.primaries.copyInto(primaries)
     }
 
@@ -735,12 +738,12 @@ internal constructor(
      * @param transform The destination array, cannot be null, its length
      * must be >= 9
      *
-     * @return The destination array passed as a parameter
+     * @return [transform], modified to contain the transform for this color space.
      *
      * @see getInverseTransform
      */
-    @Size(min = 9)
-    fun getTransform(@Size(min = 9) transform: FloatArray): FloatArray {
+    /*@Size(min = 9)*/
+    fun getTransform(/*@Size(min = 9)*/ transform: FloatArray): FloatArray {
         return this.transform.copyInto(transform)
     }
 
@@ -757,12 +760,13 @@ internal constructor(
      * @param inverseTransform The destination array, cannot be null, its length
      * must be >= 9
      *
-     * @return The destination array passed as a parameter
+     * @return The [inverseTransform] array passed as a parameter, modified to contain the
+     * inverse transform of this color space.
      *
      * @see getTransform
      */
-    @Size(min = 9)
-    fun getInverseTransform(@Size(min = 9) inverseTransform: FloatArray): FloatArray {
+    /*@Size(min = 9)*/
+    fun getInverseTransform(/*@Size(min = 9)*/ inverseTransform: FloatArray): FloatArray {
         return this.inverseTransform.copyInto(inverseTransform)
     }
 
@@ -791,7 +795,7 @@ internal constructor(
      * @see toLinear
      * @see fromLinear
      */
-    @Size(3)
+    /*@Size(3)*/
     fun toLinear(r: Float, g: Float, b: Float): FloatArray {
         return toLinear(floatArrayOf(r, g, b))
     }
@@ -808,13 +812,13 @@ internal constructor(
      *
      * @param v A non-null array of non-linear RGB values, its length
      * must be at least 3
-     * @return The specified array
+     * @return [v], containing linear RGB values
      *
      * @see toLinear
      * @see fromLinear
      */
-    @Size(min = 3)
-    fun toLinear(@Size(min = 3) v: FloatArray): FloatArray {
+    /*@Size(min = 3)*/
+    fun toLinear(/*@Size(min = 3)*/ v: FloatArray): FloatArray {
         v[0] = eotf(v[0].toDouble()).toFloat()
         v[1] = eotf(v[1].toDouble()).toFloat()
         v[2] = eotf(v[2].toDouble()).toFloat()
@@ -838,7 +842,7 @@ internal constructor(
      * @see fromLinear
      * @see toLinear
      */
-    @Size(3)
+    /*@Size(3)*/
     fun fromLinear(r: Float, g: Float, b: Float): FloatArray {
         return fromLinear(floatArrayOf(r, g, b))
     }
@@ -855,29 +859,27 @@ internal constructor(
      *
      * @param v A non-null array of linear RGB values, its length
      * must be at least 3
-     * @return A new array of 3 floats containing non-linear RGB values
+     * @return [v], containing non-linear RGB values
      *
      * @see fromLinear
      * @see toLinear
      */
-    @Size(min = 3)
-    fun fromLinear(@Size(min = 3) v: FloatArray): FloatArray {
+    /*@Size(min = 3)*/
+    fun fromLinear(/*@Size(min = 3) */v: FloatArray): FloatArray {
         v[0] = oetf(v[0].toDouble()).toFloat()
         v[1] = oetf(v[1].toDouble()).toFloat()
         v[2] = oetf(v[2].toDouble()).toFloat()
         return v
     }
 
-    @Size(min = 3)
-    override fun toXyz(@Size(min = 3) v: FloatArray): FloatArray {
+    override fun toXyz(v: FloatArray): FloatArray {
         v[0] = eotf(v[0].toDouble()).toFloat()
         v[1] = eotf(v[1].toDouble()).toFloat()
         v[2] = eotf(v[2].toDouble()).toFloat()
         return mul3x3Float3(transform, v)
     }
 
-    @Size(min = 3)
-    override fun fromXyz(@Size(min = 3) v: FloatArray): FloatArray {
+    override fun fromXyz(v: FloatArray): FloatArray {
         mul3x3Float3(inverseTransform, v)
         v[0] = oetf(v[0].toDouble()).toFloat()
         v[1] = oetf(v[1].toDouble()).toFloat()
@@ -943,13 +945,13 @@ internal constructor(
          * @see isSrgb
          */
         private fun isSrgb(
-            @Size(6) primaries: FloatArray,
+            primaries: FloatArray,
             whitePoint: WhitePoint,
             OETF: (Double) -> Double,
             EOTF: (Double) -> Double,
             min: Float,
             max: Float,
-            @IntRange(from = MinId.toLong(), to = MaxId.toLong()) id: Int
+            id: Int
         ): Boolean {
             if (id == 0) return true
             if (!compare(primaries, ColorSpaces.SrgbPrimaries)) {
@@ -1012,7 +1014,7 @@ internal constructor(
          * @see area
          */
         private fun isWideGamut(
-            @Size(6) primaries: FloatArray,
+            primaries: FloatArray,
             min: Float,
             max: Float
         ): Boolean {
@@ -1039,7 +1041,7 @@ internal constructor(
          *
          * @see isWideGamut
          */
-        private fun area(@Size(6) primaries: FloatArray): Float {
+        private fun area(primaries: FloatArray): Float {
             val rx = primaries[0]
             val ry = primaries[1]
             val gx = primaries[2]
@@ -1118,13 +1120,13 @@ internal constructor(
          *   -->  -->
          *   BZ x GB >= 0
          *
-         * @param p1 The enclosing triangle
-         * @param p2 The enclosed triangle
+         * @param p1 The enclosing triangle as 6 floats
+         * @param p2 The enclosed triangle as 6 floats
          * @return True if the triangle p1 contains the triangle p2
          *
          * @see isWideGamut
          */
-        private fun contains(@Size(6) p1: FloatArray, @Size(6) p2: FloatArray): Boolean {
+        private fun contains(p1: FloatArray, p2: FloatArray): Boolean {
             // Translate the vertices p1 in the coordinates system
             // with the vertices p2 as the origin
             val p0 = floatArrayOf(
@@ -1194,8 +1196,7 @@ internal constructor(
          * @return A new array of 6 floats containing the color space's
          * primaries in CIE xyY
          */
-        @Size(6)
-        internal fun computePrimaries(@Size(9) toXYZ: FloatArray): FloatArray {
+        internal fun computePrimaries(toXYZ: FloatArray): FloatArray {
             val r = mul3x3Float3(
                 toXYZ,
                 floatArrayOf(1.0f, 0.0f, 0.0f)
@@ -1229,8 +1230,7 @@ internal constructor(
          * @return A new array of 2 floats containing the color space's
          * white point in CIE xyY
          */
-        @Size(2)
-        private fun computeWhitePoint(@Size(9) toXYZ: FloatArray): WhitePoint {
+        private fun computeWhitePoint(toXYZ: FloatArray): WhitePoint {
             val w = mul3x3Float3(
                 toXYZ,
                 floatArrayOf(1.0f, 1.0f, 1.0f)
@@ -1244,13 +1244,10 @@ internal constructor(
          * can be specified as an array of 6 floats (in CIE xyY) or 9 floats
          * (in CIE XYZ). If no conversion is needed, the input array is copied.
          *
-         * @param primaries The primaries in xyY or XYZ
+         * @param primaries The primaries in xyY or XYZ, in an array of 6 floats.
          * @return A new array of 6 floats containing the primaries in xyY
          */
-        @Size(6)
-        private fun xyPrimaries(
-            @Size(min = 6, max = 9) primaries: FloatArray
-        ): FloatArray {
+        private fun xyPrimaries(primaries: FloatArray): FloatArray {
             val xyPrimaries = FloatArray(6)
 
             // XYZ to xyY
@@ -1274,30 +1271,6 @@ internal constructor(
         }
 
         /**
-         * Converts the specified white point to xyY if needed. The white point
-         * can be specified as an array of 2 floats (in CIE xyY) or 3 floats
-         * (in CIE XYZ). If no conversion is needed, the input array is copied.
-         *
-         * @param whitePoint The white point in xyY or XYZ
-         * @return A new array of 2 floats containing the white point in xyY
-         */
-        @Size(2)
-        internal fun xyWhitePoint(@Size(min = 2, max = 3) whitePoint: FloatArray): FloatArray {
-            val xyWhitePoint = FloatArray(2)
-
-            // XYZ to xyY
-            if (whitePoint.size == 3) {
-                val sum = whitePoint[0] + whitePoint[1] + whitePoint[2]
-                xyWhitePoint[0] = whitePoint[0] / sum
-                xyWhitePoint[1] = whitePoint[1] / sum
-            } else {
-                whitePoint.copyInto(xyWhitePoint, endIndex = 2)
-            }
-
-            return xyWhitePoint
-        }
-
-        /**
          * Computes the matrix that converts from RGB to XYZ based on RGB
          * primaries and a white point, both specified in the CIE xyY space.
          * The Y component of the primaries and white point is implied to be 1.
@@ -1306,9 +1279,8 @@ internal constructor(
          * @param whitePoint The white point in xyY, as an array of 2 floats
          * @return A 3x3 matrix as a new array of 9 floats
          */
-        @Size(9)
         private fun computeXYZMatrix(
-            @Size(6) primaries: FloatArray,
+            primaries: FloatArray,
             whitePoint: WhitePoint
         ): FloatArray {
             val rx = primaries[0]

@@ -48,10 +48,3 @@ package androidx.compose.ui.util {
 
 }
 
-package androidx.compose.ui.util.annotation {
-
-  public final class AndroidAnnotationKt {
-  }
-
-}
-

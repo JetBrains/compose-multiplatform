@@ -51,7 +51,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.annotation.FloatRange
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -234,7 +233,8 @@ private fun BottomNavigationTransition(
 private fun BottomNavigationItemBaselineLayout(
     icon: @Composable () -> Unit,
     label: @Composable () -> Unit,
-    @FloatRange(from = 0.0, to = 1.0) iconPositionAnimationProgress: Float
+    /*@FloatRange(from = 0.0, to = 1.0)*/
+    iconPositionAnimationProgress: Float
 ) {
     Layout(
         {
@@ -309,7 +309,8 @@ private fun MeasureScope.placeLabelAndIcon(
     labelPlaceable: Placeable,
     iconPlaceable: Placeable,
     constraints: Constraints,
-    @FloatRange(from = 0.0, to = 1.0) iconPositionAnimationProgress: Float
+    /*@FloatRange(from = 0.0, to = 1.0)*/
+    iconPositionAnimationProgress: Float
 ): MeasureResult {
     val height = constraints.maxHeight
 

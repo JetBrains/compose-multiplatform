@@ -44,7 +44,6 @@ import androidx.compose.ui.text.input.getTextAfterSelection
 import androidx.compose.ui.text.input.getTextBeforeSelection
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.annotation.VisibleForTesting
 import kotlin.math.max
 import kotlin.math.min
 
@@ -390,7 +389,7 @@ internal class TextFieldSelectionManager() {
         setSelectionStatus(false)
     }
 
-    @VisibleForTesting
+    /*@VisibleForTesting*/
     internal fun selectAll() {
         setSelectionStatus(true)
 

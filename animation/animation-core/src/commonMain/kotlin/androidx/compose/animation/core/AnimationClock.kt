@@ -16,8 +16,6 @@
 
 package androidx.compose.animation.core
 
-import androidx.compose.ui.util.annotation.CallSuper
-
 /**
  * A custom clock whose frame time can be manually updated via mutating [clockTimeMillis].
  * Observers will be called immediately with the current time when they are subscribed. Use
@@ -92,7 +90,7 @@ abstract class BaseAnimationClock : AnimationClockObservable {
         addToPendingActions(RemoveAction, observer)
     }
 
-    @CallSuper
+    /*@CallSuper*/
     internal open fun dispatchTime(frameTimeMillis: Long) {
         processPendingActions()
 

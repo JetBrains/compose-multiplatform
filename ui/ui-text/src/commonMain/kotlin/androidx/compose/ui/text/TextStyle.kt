@@ -36,7 +36,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.isUnspecified
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.util.annotation.VisibleForTesting
 
 /** The default font size if none is specified. */
 private val DefaultFontSize = 14.sp
@@ -286,7 +285,7 @@ fun resolveDefaults(style: TextStyle, direction: LayoutDirection) = TextStyle(
  * If [textDirection] is null returns a [TextDirection] based on
  * [layoutDirection].
  */
-@VisibleForTesting
+/*@VisibleForTesting*/
 internal fun resolveTextDirection(
     layoutDirection: LayoutDirection,
     textDirection: TextDirection?

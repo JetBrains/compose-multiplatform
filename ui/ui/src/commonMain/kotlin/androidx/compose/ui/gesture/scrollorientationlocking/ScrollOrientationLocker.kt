@@ -24,7 +24,6 @@ import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.changedToDownIgnoreConsumed
 import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
-import androidx.compose.ui.util.annotation.VisibleForTesting
 import androidx.compose.ui.util.fastForEach
 
 // TODO(shepshapard): This should be in a more generic place.
@@ -208,7 +207,7 @@ class ScrollOrientationLocker(private val customEventDispatcher: CustomEventDisp
     }
 }
 
-@VisibleForTesting
+/*@VisibleForTesting*/
 internal class InternalScrollOrientationLocker {
     private val pointerLocks: MutableMap<PointerId, Orientation> = mutableMapOf()
 
@@ -229,7 +228,7 @@ internal class InternalScrollOrientationLocker {
     }
 }
 
-@VisibleForTesting
+/*@VisibleForTesting*/
 internal class ShareScrollOrientationLockerEvent(
     val scrollOrientationLocker: InternalScrollOrientationLocker
 ) : CustomEvent

@@ -16,8 +16,6 @@
 
 package androidx.compose.animation.core
 
-import androidx.compose.ui.util.annotation.VisibleForTesting
-
 /**
  * This interface provides a convenient way to query from an [VectorizedAnimationSpec] or
  * [FloatDecayAnimationSpec]: It spares the need to pass the starting conditions and in some cases
@@ -100,7 +98,7 @@ fun <T, V : AnimationVector> Animation<T, V>.getVelocity(playTime: Long): T =
  * @param initialVelocity the initial velocity to start the animation at
  * @suppress
  */
-@VisibleForTesting(otherwise = 3 /*PACKAGE_PRIVATE*/)
+/*@VisibleForTesting(otherwise = PACKAGE_PRIVATE)*/
 fun <V : AnimationVector> VectorizedAnimationSpec<V>.createAnimation(
     initialValue: V,
     targetValue: V,
@@ -275,7 +273,7 @@ class TargetBasedAnimation<T, V : AnimationVector> internal constructor(
  * @see Animatable.animateDecay
  * @see AnimationState.animateDecay
  */
-class DecayAnimation<T, V : AnimationVector> @VisibleForTesting constructor(
+class DecayAnimation<T, V : AnimationVector> /*@VisibleForTesting*/ constructor(
     private val animationSpec: VectorizedDecayAnimationSpec<V>,
     override val typeConverter: TwoWayConverter<T, V>,
     val initialValue: T,

@@ -18,7 +18,6 @@ package androidx.compose.ui.autofill
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.util.annotation.GuardedBy
 
 /**
  * Autofill API.
@@ -75,7 +74,7 @@ data class AutofillNode(
     val onFill: ((String) -> Unit)?
 ) {
     internal companion object {
-        @GuardedBy("this")
+        /*@GuardedBy("this")*/
         private var previousId = 0
 
         @Suppress("DEPRECATION_ERROR")

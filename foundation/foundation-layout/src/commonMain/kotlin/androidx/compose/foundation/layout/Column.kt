@@ -26,7 +26,6 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measured
 import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.platform.debugInspectorInfo
-import androidx.compose.ui.util.annotation.FloatRange
 
 /**
  * A layout composable that places its children in a vertical sequence. For a layout composable
@@ -176,11 +175,15 @@ interface ColumnScope {
      * Otherwise, the element is allowed to be smaller - this will result in [Column] being smaller,
      * as the unused allocated height will not be redistributed to other siblings.
      *
+     * @param weight The proportional height to give to this element, as related to the total of
+     * all weighted siblings. Must be positive.
+     * @param fill When `true`, the element will occupy the whole height allocated.
+     *
      * @sample androidx.compose.foundation.layout.samples.SimpleColumn
      */
     @Stable
     fun Modifier.weight(
-        @FloatRange(from = 0.0, to = 3.4e38 /* POSITIVE_INFINITY */, fromInclusive = false)
+        /*@FloatRange(from = 0.0, fromInclusive = false)*/
         weight: Float,
         fill: Boolean = true
     ): Modifier {

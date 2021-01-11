@@ -35,6 +35,7 @@ import android.view.accessibility.AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTE
 import android.view.accessibility.AccessibilityNodeProvider
 import androidx.annotation.IntRange
 import androidx.annotation.RequiresApi
+import androidx.annotation.VisibleForTesting
 import androidx.collection.ArraySet
 import androidx.collection.SparseArrayCompat
 import androidx.compose.ui.R
@@ -55,7 +56,6 @@ import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.length
 import androidx.compose.ui.text.platform.toAccessibilitySpannableString
-import androidx.compose.ui.util.annotation.VisibleForTesting
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.core.view.AccessibilityDelegateCompat

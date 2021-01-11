@@ -402,7 +402,7 @@ package androidx.compose.ui.text {
   }
 
   public final class TextLayoutResultKt {
-    method @VisibleForTesting public static androidx.compose.ui.text.TextLayoutResult createTextLayoutResult-2H_Vf2E(optional androidx.compose.ui.text.TextLayoutInput layoutInput, optional androidx.compose.ui.text.MultiParagraph multiParagraph, optional long size);
+    method public static androidx.compose.ui.text.TextLayoutResult createTextLayoutResult-2H_Vf2E(optional androidx.compose.ui.text.TextLayoutInput layoutInput, optional androidx.compose.ui.text.MultiParagraph multiParagraph, optional long size);
   }
 
   public final class TextPainter {
@@ -958,7 +958,6 @@ package androidx.compose.ui.text.input {
   }
 
   public final class TextInputServiceKt {
-    method @Deprecated @VisibleForTesting public static void setTextInputServiceFactory(kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.PlatformTextInputService,? extends androidx.compose.ui.text.input.TextInputService> p);
     field public static final int INVALID_SESSION = -1; // 0xffffffff
     field public static final int NO_SESSION = 0; // 0x0
   }
