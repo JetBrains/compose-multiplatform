@@ -83,8 +83,7 @@ To temporarily work around this issue, users can try a couple of things (after d
 * `sudo spctl --master-disable`
 * Try right-clicking on the app, and select "Open", then when the dialog pops up, select "Open" again.
 
-A more correct fix is to manually sign the application: [Apple's Code Signing Guide](https://developer.apple.com/library/archive/documentation/Security/Conceptual/CodeSigningGuide/Procedures/Procedures.html)
-
+A more correct fix is to manually sign & notarize the application: [Apple's Guide on Signing & Notarizing Applications](https://developer.apple.com/documentation/xcode/notarizing_macos_software_before_distribution)
 
 ## Customizing JDK version
 
