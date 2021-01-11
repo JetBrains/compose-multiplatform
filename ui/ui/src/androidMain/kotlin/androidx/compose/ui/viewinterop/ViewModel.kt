@@ -31,13 +31,13 @@ import androidx.lifecycle.ViewModelStoreOwner
  * finished or process is killed).
  *
  * @param key The key to use to identify the [ViewModel].
- * @return A [ViewModel] that is an instance of the given [VM] type.
+ * @return A [ViewModel] that is an instance of the given [T] type.
  */
 @Composable
-inline fun <reified VM : ViewModel> viewModel(
+inline fun <reified T : ViewModel> viewModel(
     key: String? = null,
     factory: ViewModelProvider.Factory? = null
-): VM = viewModel(VM::class.java, key, factory)
+): T = viewModel(T::class.java, key, factory)
 
 /**
  * Returns an existing [ViewModel] or creates a new one in the scope (usually, a fragment or
@@ -50,28 +50,28 @@ inline fun <reified VM : ViewModel> viewModel(
  * @param modelClass The class of the [ViewModel] to create an instance of it if it is not
  * present.
  * @param key The key to use to identify the [ViewModel].
- * @return A [ViewModel] that is an instance of the given [VM] type.
+ * @return A [ViewModel] that is an instance of the given [T] type.
  */
 @Composable
-fun <VM : ViewModel> viewModel(
-    modelClass: Class<VM>,
+fun <T : ViewModel> viewModel(
+    modelClass: Class<T>,
     key: String? = null,
     factory: ViewModelProvider.Factory? = null
-): VM = AmbientViewModelStoreOwner.current.get(modelClass, key, factory)
+): T = AmbientViewModelStoreOwner.current.get(modelClass, key, factory)
 
-private fun <VM : ViewModel> ViewModelStoreOwner.get(
-    javaClass: Class<VM>,
+private fun <T : ViewModel> ViewModelStoreOwner.get(
+    javaClass: Class<T>,
     key: String? = null,
     factory: ViewModelProvider.Factory? = null
-): VM {
+): T {
     val provider = if (factory != null) {
         ViewModelProvider(this, factory)
     } else {
         ViewModelProvider(this)
     }
     return if (key != null) {
-        provider.get<VM>(key, javaClass)
+        provider.get<T>(key, javaClass)
     } else {
-        provider.get<VM>(javaClass)
+        provider.get<T>(javaClass)
     }
 }
