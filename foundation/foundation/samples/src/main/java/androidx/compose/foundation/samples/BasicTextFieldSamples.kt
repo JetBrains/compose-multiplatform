@@ -101,7 +101,7 @@ fun TextFieldWithIconSample() {
                     .background(Color.LightGray, RoundedCornerShape(percent = 30))
                     .padding(16.dp)
             ) {
-                Icon(Icons.Default.MailOutline)
+                Icon(Icons.Default.MailOutline, contentDescription = null)
                 Spacer(Modifier.width(16.dp))
                 innerTextField()
             }

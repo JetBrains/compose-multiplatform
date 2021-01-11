@@ -60,6 +60,7 @@ fun InfiniteTransitionDemo() {
     Box(Modifier.fillMaxSize()) {
         Icon(
             Icons.Filled.Favorite,
+            null,
             Modifier.align(Alignment.Center)
                 .graphicsLayer(
                     scaleX = scale,

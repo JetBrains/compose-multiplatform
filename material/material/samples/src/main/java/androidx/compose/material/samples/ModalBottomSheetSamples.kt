@@ -50,7 +50,12 @@ fun ModalBottomSheetSample() {
                 items(50) {
                     ListItem(
                         text = { Text("Item $it") },
-                        icon = { Icon(Icons.Default.Favorite) }
+                        icon = {
+                            Icon(
+                                Icons.Default.Favorite,
+                                contentDescription = "Localized description"
+                            )
+                        }
                     )
                 }
             }

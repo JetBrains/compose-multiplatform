@@ -89,7 +89,7 @@ fun BottomSheetScaffoldSample() {
                 title = { Text("Bottom sheet scaffold") },
                 navigationIcon = {
                     IconButton(onClick = { scaffoldState.drawerState.open() }) {
-                        Icon(Icons.Default.Menu)
+                        Icon(Icons.Default.Menu, contentDescription = "Localized description")
                     }
                 }
             )
@@ -104,7 +104,7 @@ fun BottomSheetScaffoldSample() {
                     }
                 }
             ) {
-                Icon(Icons.Default.Favorite)
+                Icon(Icons.Default.Favorite, contentDescription = "Localized description")
             }
         },
         floatingActionButtonPosition = FabPosition.End,

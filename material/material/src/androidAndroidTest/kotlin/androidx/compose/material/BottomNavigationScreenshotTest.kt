@@ -316,18 +316,18 @@ private fun DefaultBottomNavigation(
     Box(Modifier.semantics(mergeDescendants = true) {}.testTag(Tag)) {
         BottomNavigation {
             BottomNavigationItem(
-                icon = { Icon(Icons.Filled.Favorite) },
+                icon = { Icon(Icons.Filled.Favorite, null) },
                 selected = true,
                 onClick = {},
                 interactionState = interactionState
             )
             BottomNavigationItem(
-                icon = { Icon(Icons.Filled.Favorite) },
+                icon = { Icon(Icons.Filled.Favorite, null) },
                 selected = false,
                 onClick = {}
             )
             BottomNavigationItem(
-                icon = { Icon(Icons.Filled.Favorite) },
+                icon = { Icon(Icons.Filled.Favorite, null) },
                 selected = false,
                 onClick = {}
             )
@@ -359,7 +359,7 @@ private fun CustomBottomNavigation(
     Box(Modifier.semantics(mergeDescendants = true) {}.testTag(Tag)) {
         BottomNavigation(backgroundColor = backgroundColor) {
             BottomNavigationItem(
-                icon = { Icon(Icons.Filled.Favorite) },
+                icon = { Icon(Icons.Filled.Favorite, null) },
                 selected = true,
                 onClick = {},
                 interactionState = interactionState,
@@ -367,14 +367,14 @@ private fun CustomBottomNavigation(
                 unselectedContentColor = unselectedContentColor
             )
             BottomNavigationItem(
-                icon = { Icon(Icons.Filled.Favorite) },
+                icon = { Icon(Icons.Filled.Favorite, null) },
                 selected = false,
                 onClick = {},
                 selectedContentColor = selectedContentColor,
                 unselectedContentColor = unselectedContentColor
             )
             BottomNavigationItem(
-                icon = { Icon(Icons.Filled.Favorite) },
+                icon = { Icon(Icons.Filled.Favorite, null) },
                 selected = false,
                 onClick = {},
                 selectedContentColor = selectedContentColor,

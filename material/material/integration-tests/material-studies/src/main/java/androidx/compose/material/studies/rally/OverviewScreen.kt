@@ -33,6 +33,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.studies.R
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,6 +41,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import java.util.Locale
 
@@ -126,7 +128,7 @@ private fun AlertItem(message: String) {
             onClick = {},
             modifier = Modifier.align(Alignment.Top)
         ) {
-            Icon(Icons.Filled.Sort)
+            Icon(Icons.Filled.Sort, contentDescription = stringResource(R.string.sort))
         }
     }
 }

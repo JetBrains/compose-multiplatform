@@ -58,7 +58,11 @@ fun TextButtonSample() {
 @Composable
 fun ButtonWithIconSample() {
     Button(onClick = { /* Do something! */ }) {
-        Icon(Icons.Filled.Favorite, Modifier.size(ButtonDefaults.IconSize))
+        Icon(
+            Icons.Filled.Favorite,
+            contentDescription = null,
+            modifier = Modifier.size(ButtonDefaults.IconSize)
+        )
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
         Text("Like")
     }

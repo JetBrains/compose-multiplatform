@@ -114,7 +114,7 @@ class TabTest {
     fun iconTab_height() {
         rule
             .setMaterialContentForSizeAssertions {
-                Tab(icon = { Icon(icon) }, selected = true, onClick = {})
+                Tab(icon = { Icon(icon, null) }, selected = true, onClick = {})
             }
             .assertHeightIsEqualTo(ExpectedSmallTabHeight)
     }
@@ -126,7 +126,7 @@ class TabTest {
                 Surface {
                     Tab(
                         text = { Text("Text and Icon") },
-                        icon = { Icon(icon) },
+                        icon = { Icon(icon, null) },
                         selected = true,
                         onClick = {}
                     )
@@ -245,7 +245,7 @@ class TabTest {
                             text = {
                                 Text(title, Modifier.testTag("text"))
                             },
-                            icon = { Icon(Icons.Filled.Favorite) },
+                            icon = { Icon(Icons.Filled.Favorite, null) },
                             selected = state == index,
                             onClick = { state = index }
                         )

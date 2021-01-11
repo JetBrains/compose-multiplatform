@@ -285,7 +285,7 @@ class ScaffoldTest {
                         },
                         onClick = {}
                     ) {
-                        Icon(Icons.Filled.Favorite)
+                        Icon(Icons.Filled.Favorite, null)
                     }
                 },
                 floatingActionButtonPosition = FabPosition.Center,
@@ -321,7 +321,7 @@ class ScaffoldTest {
                         },
                         onClick = {}
                     ) {
-                        Icon(Icons.Filled.Favorite)
+                        Icon(Icons.Filled.Favorite, null)
                     }
                 },
                 floatingActionButtonPosition = FabPosition.End,
@@ -394,7 +394,7 @@ class ScaffoldTest {
                         },
                         onClick = {}
                     ) {
-                        Icon(Icons.Filled.Favorite)
+                        Icon(Icons.Filled.Favorite, null)
                     }
                 }
             }

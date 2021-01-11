@@ -78,7 +78,7 @@ fun MenuInstance(modifier: Modifier = Modifier) {
 
     val iconButton = @Composable {
         IconButton(onClick = { expanded = true }) {
-            Icon(Icons.Default.MoreVert)
+            Icon(Icons.Default.MoreVert, null)
         }
     }
     DropdownMenu(
