@@ -21,8 +21,8 @@ import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.snap
-import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -75,16 +75,14 @@ private fun RippleRectFromState(
     // TODO: Auto transition to Initial
     val alpha by transition.animateFloat(
         transitionSpec = {
-            if (it.initialState == ButtonStatus.Initial && it.targetState == ButtonStatus.Pressed) {
+            if (ButtonStatus.Initial isTransitioningTo ButtonStatus.Pressed) {
                 keyframes {
                     durationMillis = 225
                     0f at 0 // optional
                     0.2f at 75
                     0.2f at 225 // optional
                 }
-            } else if (it.initialState == ButtonStatus.Pressed &&
-                it.targetState == ButtonStatus.Released
-            ) {
+            } else if (ButtonStatus.Pressed isTransitioningTo ButtonStatus.Released) {
                 tween(durationMillis = 220)
             } else {
                 snap()
@@ -96,7 +94,7 @@ private fun RippleRectFromState(
 
     val radius by transition.animateDp(
         transitionSpec = {
-            if (it.initialState == ButtonStatus.Initial && it.targetState == ButtonStatus.Pressed) {
+            if (ButtonStatus.Initial isTransitioningTo ButtonStatus.Pressed) {
                 tween(225)
             } else {
                 snap()
