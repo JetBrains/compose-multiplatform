@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontListFontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.GenericFontFamily
 import org.jetbrains.skija.FontMgr
 import org.jetbrains.skija.Typeface
 import org.jetbrains.skija.paragraph.FontCollection
@@ -27,6 +28,44 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import androidx.compose.ui.text.font.Font as uiFont
+import org.jetbrains.skija.FontStyle as SkFontStyle
+
+internal val GenericFontFamiliesMapping by lazy {
+    when (Platform.Current) {
+        Platform.Windows ->
+            mapOf(
+                FontFamily.SansSerif.name to listOf("Arial"),
+                FontFamily.Serif.name to listOf("Times New Roman"),
+                FontFamily.Monospace.name to listOf("Consolas"),
+                FontFamily.Cursive.name to listOf("Comic Sans MS")
+            )
+        Platform.MacOS ->
+            mapOf(
+                FontFamily.SansSerif.name to listOf(
+                    "Helvetica Neue",
+                    "Helvetica"
+                ),
+                FontFamily.Serif.name to listOf("Times"),
+                FontFamily.Monospace.name to listOf("Courier"),
+                FontFamily.Cursive.name to listOf("Apple Chancery")
+            )
+        Platform.Linux ->
+            mapOf(
+                FontFamily.SansSerif.name to listOf("Noto Sans", "DejaVu Sans"),
+                FontFamily.Serif.name to listOf("Noto Serif", "DejaVu Serif", "Times New Roman"),
+                FontFamily.Monospace.name to listOf("Noto Sans Mono", "DejaVu Sans Mono"),
+                // better alternative?
+                FontFamily.Cursive.name to listOf("Comic Sans MS")
+            )
+        Platform.Unknown ->
+            mapOf(
+                FontFamily.SansSerif.name to listOf("Arial"),
+                FontFamily.Serif.name to listOf("Times New Roman"),
+                FontFamily.Monospace.name to listOf("Consolas"),
+                FontFamily.Cursive.name to listOf("Comic Sans MS")
+            )
+    }
+}
 
 data class Font(
     val alias: String,
@@ -51,9 +90,15 @@ class FontLoader() : uiFont.ResourceLoader {
         fonts.setAssetFontManager(fontProvider)
     }
 
+    private fun mapGenericFontFamily(generic: GenericFontFamily): List<String> {
+        return GenericFontFamiliesMapping[generic.name]
+            ?: error("Unknown generic font family ${generic.name}")
+    }
+
     fun ensureRegistered(fontFamily: FontFamily): List<String> =
         when (fontFamily) {
             is FontListFontFamily -> fontFamily.fonts.map { load(it) }
+            is GenericFontFamily -> mapGenericFontFamily(fontFamily)
             FontFamily.Default -> listOf()
             else -> throw IllegalArgumentException("Unknown font family type: $fontFamily")
         }
@@ -80,6 +125,9 @@ class FontLoader() : uiFont.ResourceLoader {
             is FontListFontFamily -> {
                 val alias = load(fontFamily.fonts.first())
                 return registered[alias]!!
+            }
+            is GenericFontFamily -> {
+                Typeface.makeFromName(mapGenericFontFamily(fontFamily).first(), SkFontStyle.NORMAL)
             }
             FontFamily.Default -> Typeface.makeDefault()
             else -> throw IllegalArgumentException("Unknown font family type: $fontFamily")
@@ -108,4 +156,23 @@ fun getFontPathAsString(resourcePath: String): String {
     Files.createDirectories(tempPath.parent)
     Files.copy(stream, tempPath, StandardCopyOption.REPLACE_EXISTING)
     return tempFile.absolutePath
+}
+
+private enum class Platform {
+    Linux,
+    Windows,
+    MacOS,
+    Unknown;
+
+    companion object {
+        val Current by lazy {
+            val name = System.getProperty("os.name")
+            when {
+                name.startsWith("Linux") -> Linux
+                name.startsWith("Win") -> Windows
+                name == "Mac OS X" -> MacOS
+                else -> Unknown
+            }
+        }
+    }
 }
