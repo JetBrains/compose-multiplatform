@@ -24,7 +24,6 @@ import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.annotation.IntRange
 
 /**
  * A shape describing the rectangle with rounded corners.
@@ -164,12 +163,25 @@ val CircleShape = RoundedCornerShape(50)
 
 /**
  * Creates [RoundedCornerShape] with sizes defined in percents of the shape's smaller side.
+ *
+ * @param topLeftPercent The top left corner radius as a percentage of the smaller side, with a
+ * range of 0 - 100.
+ * @param topRightPercent The top right corner radius as a percentage of the smaller side, with a
+ * range of 0 - 100.
+ * @param bottomRightPercent The bottom right corner radius as a percentage of the smaller side,
+ * with a range of 0 - 100.
+ * @param bottomLeftPercent The bottom left corner radius as a percentage of the smaller side,
+ * with a range of 0 - 100.
  */
 /*inline*/ fun RoundedCornerShape(
-    @IntRange(from = 0, to = 100) topLeftPercent: Int = 0,
-    @IntRange(from = 0, to = 100) topRightPercent: Int = 0,
-    @IntRange(from = 0, to = 100) bottomRightPercent: Int = 0,
-    @IntRange(from = 0, to = 100) bottomLeftPercent: Int = 0
+    /*@IntRange(from = 0, to = 100)*/
+    topLeftPercent: Int = 0,
+    /*@IntRange(from = 0, to = 100)*/
+    topRightPercent: Int = 0,
+    /*@IntRange(from = 0, to = 100)*/
+    bottomRightPercent: Int = 0,
+    /*@IntRange(from = 0, to = 100)*/
+    bottomLeftPercent: Int = 0
 ) = RoundedCornerShape(
     CornerSize(topLeftPercent),
     CornerSize(topRightPercent),

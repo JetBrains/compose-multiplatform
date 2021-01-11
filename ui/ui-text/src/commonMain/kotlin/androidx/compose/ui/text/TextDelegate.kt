@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.constrain
-import androidx.compose.ui.util.annotation.VisibleForTesting
 import kotlin.math.ceil
 
 /**
@@ -83,7 +82,7 @@ class TextDelegate(
     val resourceLoader: Font.ResourceLoader,
     val placeholders: List<AnnotatedString.Range<Placeholder>> = listOf()
 ) {
-    @VisibleForTesting
+    /*@VisibleForTesting*/
     internal var paragraphIntrinsics: MultiParagraphIntrinsics? = null
     internal var intrinsicsLayoutDirection: LayoutDirection? = null
 

@@ -16,7 +16,6 @@
 
 package androidx.compose.animation.core
 
-import androidx.compose.ui.util.annotation.FloatRange
 import kotlin.math.abs
 import kotlin.math.exp
 import kotlin.math.ln
@@ -94,24 +93,27 @@ typealias ExponentialDecay = FloatExponentialDecaySpec
 
 /**
  * This is a decay animation where the friction/deceleration is always proportional to the velocity.
- * As a result, the velocity goes under an exponential decay. The constructor parameter, friction
- * multiplier, can be tuned to adjust the amount of friction applied in the decay. The higher the
+ * As a result, the velocity goes under an exponential decay. The constructor parameter,
+ * `frictionMultiplier`, can be tuned to adjust the amount of friction applied in the decay. The
+ * higher the
  * multiplier, the higher the friction, the sooner the animation will stop, and the shorter distance
  * the animation will travel with the same starting condition.
+ * @param frictionMultiplier The friction multiplier, indicating how quickly the animation should
+ * stop. This should be greater than `0`, with a default value of `1.0`.
+ * @param absVelocityThreshold The speed at which the animation is considered close enough to
+ * rest for the animation to finish.
  */
 class FloatExponentialDecaySpec(
-    @FloatRange(
+    /*@FloatRange(
         from = 0.0,
-        // TODO(b/158069385): use POSITIVE_INFINITY constant once it's possible to do in MPP code.
-        to = 3.4e38, // POSITIVE_INFINITY,
         fromInclusive = false
-    ) frictionMultiplier: Float = 1f,
-    @FloatRange(
+    )*/
+    frictionMultiplier: Float = 1f,
+    /*@FloatRange(
         from = 0.0,
-        // TODO(b/158069385): use POSITIVE_INFINITY constant once it's possible to do in MPP code.
-        to = 3.4e38, // POSITIVE_INFINITY,
         fromInclusive = false
-    ) absVelocityThreshold: Float = 0.1f
+    )*/
+    absVelocityThreshold: Float = 0.1f
 ) : FloatDecayAnimationSpec {
 
     override val absVelocityThreshold: Float = max(0.0000001f, abs(absVelocityThreshold))

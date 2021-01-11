@@ -170,14 +170,14 @@ package androidx.compose.ui.test {
     method public static void movePointerTo-NAWZHwc(androidx.compose.ui.test.GestureScope, int pointerId, long position);
     method public static void moveTo-NAWZHwc(androidx.compose.ui.test.GestureScope, int pointerId, long position);
     method public static void moveTo-ssxj34k(androidx.compose.ui.test.GestureScope, long position);
-    method public static long percentOffset(androidx.compose.ui.test.GestureScope, optional @FloatRange(from=-1.0, to=1.0) float x, optional @FloatRange(from=-1.0, to=1.0) float y);
+    method public static long percentOffset(androidx.compose.ui.test.GestureScope, optional float x, optional float y);
     method public static void pinch-cILxG1Y(androidx.compose.ui.test.GestureScope, long start0, long end0, long start1, long end1, optional long duration);
     method public static void swipe-4SDgcys(androidx.compose.ui.test.GestureScope, long start, long end, optional long duration);
     method public static void swipeDown(androidx.compose.ui.test.GestureScope);
     method public static void swipeLeft(androidx.compose.ui.test.GestureScope);
     method public static void swipeRight(androidx.compose.ui.test.GestureScope);
     method public static void swipeUp(androidx.compose.ui.test.GestureScope);
-    method public static void swipeWithVelocity-f-x_cs4(androidx.compose.ui.test.GestureScope, long start, long end, @FloatRange(from=0.0, to=3.4E38) float endVelocity, optional long duration);
+    method public static void swipeWithVelocity-f-x_cs4(androidx.compose.ui.test.GestureScope, long start, long end, float endVelocity, optional long duration);
     method public static void up(androidx.compose.ui.test.GestureScope, optional int pointerId);
   }
 
@@ -209,10 +209,10 @@ package androidx.compose.ui.test {
   }
 
   public final class OutputKt {
-    method public static void printToLog(androidx.compose.ui.test.SemanticsNodeInteraction, String tag, optional @IntRange(from=0) int maxDepth);
-    method public static void printToLog(androidx.compose.ui.test.SemanticsNodeInteractionCollection, String tag, optional @IntRange(from=0) int maxDepth);
-    method public static String printToString(androidx.compose.ui.test.SemanticsNodeInteraction, optional @IntRange(from=0) int maxDepth);
-    method public static String printToString(androidx.compose.ui.test.SemanticsNodeInteractionCollection, optional @IntRange(from=0) int maxDepth);
+    method public static void printToLog(androidx.compose.ui.test.SemanticsNodeInteraction, String tag, optional int maxDepth);
+    method public static void printToLog(androidx.compose.ui.test.SemanticsNodeInteractionCollection, String tag, optional int maxDepth);
+    method public static String printToString(androidx.compose.ui.test.SemanticsNodeInteraction, optional int maxDepth);
+    method public static String printToString(androidx.compose.ui.test.SemanticsNodeInteractionCollection, optional int maxDepth);
   }
 
   public final class SelectionResult {

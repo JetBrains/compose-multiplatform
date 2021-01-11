@@ -36,7 +36,6 @@ import androidx.compose.ui.input.pointer.consumeDownChange
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.inMilliseconds
-import androidx.compose.ui.util.annotation.VisibleForTesting
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
 import kotlinx.coroutines.CoroutineScope
@@ -74,7 +73,7 @@ internal class LongPressGestureFilter(
 ) : PointerInputFilter() {
     lateinit var onLongPress: (Offset) -> Unit
 
-    @VisibleForTesting
+    /*@VisibleForTesting*/
     internal var longPressTimeout = LongPressTimeout
 
     private enum class State {

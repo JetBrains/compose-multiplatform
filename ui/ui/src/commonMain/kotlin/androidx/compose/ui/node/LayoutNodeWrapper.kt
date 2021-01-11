@@ -44,7 +44,6 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.minus
 import androidx.compose.ui.unit.plus
 import androidx.compose.ui.unit.toOffset
-import androidx.compose.ui.util.annotation.CallSuper
 
 /**
  * Measurable and Placeable type that has a position.
@@ -158,7 +157,7 @@ internal abstract class LayoutNodeWrapper(
     /**
      * Places the modified child.
      */
-    @CallSuper
+    /*@CallSuper*/
     override fun placeAt(
         position: IntOffset,
         zIndex: Float,

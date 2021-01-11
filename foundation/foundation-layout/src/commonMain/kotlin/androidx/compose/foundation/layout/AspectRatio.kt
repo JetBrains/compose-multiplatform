@@ -30,7 +30,6 @@ import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.isSatisfiedBy
-import androidx.compose.ui.util.annotation.FloatRange
 import kotlin.math.roundToInt
 
 /**
@@ -53,7 +52,7 @@ import kotlin.math.roundToInt
  */
 @Stable
 fun Modifier.aspectRatio(
-    @FloatRange(from = 0.0, to = 3.4e38 /* POSITIVE_INFINITY */, fromInclusive = false)
+    /*@FloatRange(from = 0.0, fromInclusive = false)*/
     ratio: Float,
     matchHeightConstraintsFirst: Boolean = false
 ) = this.then(

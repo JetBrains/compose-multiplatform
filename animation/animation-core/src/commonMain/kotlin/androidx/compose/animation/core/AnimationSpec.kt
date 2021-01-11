@@ -20,7 +20,6 @@ import androidx.compose.animation.core.AnimationConstants.DefaultDurationMillis
 import androidx.compose.animation.core.KeyframesSpec.KeyframesSpecConfig
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.util.annotation.IntRange
 
 object AnimationConstants {
     /**
@@ -311,15 +310,17 @@ class KeyframesSpec<T>(val config: KeyframesSpecConfig<T>) : DurationBasedAnimat
      */
     class KeyframesSpecConfig<T> {
         /**
-         * Duration of the animation in milliseconds. Defaults to [DefaultDurationMillis]
+         * Duration of the animation in milliseconds. The minimum is `0` and defaults to
+         * [DefaultDurationMillis]
          */
-        @IntRange(from = 0)
+        /*@IntRange(from = 0)*/
         var durationMillis: Int = DefaultDurationMillis
 
         /**
-         * The amount of time that the animation should be delayed. Defaults to 0.
+         * The amount of time that the animation should be delayed. The minimum is `0` and defaults
+         * to 0.
          */
-        @IntRange(from = 0)
+        /*@IntRange(from = 0)*/
         var delayMillis: Int = 0
 
         internal val keyframes = mutableMapOf<Int, KeyframeEntity<T>>()
@@ -328,11 +329,12 @@ class KeyframesSpec<T>(val config: KeyframesSpecConfig<T>) : DurationBasedAnimat
          * Adds a keyframe so that animation value will be [this] at time: [timeStamp]. For example:
          *     0.8f at 150 // ms
          *
-         * @param timeStamp The time in the during when animation should reach value: [this]
+         * @param timeStamp The time in the during when animation should reach value: [this], with
+         * a minimum value of `0`.
          * @return an [KeyframeEntity] so a custom [Easing] can be added by [with] method.
          */
         // TODO: Need a IntRange equivalent annotation
-        infix fun T.at(@IntRange(from = 0) timeStamp: Int): KeyframeEntity<T> {
+        infix fun T.at(/*@IntRange(from = 0)*/ timeStamp: Int): KeyframeEntity<T> {
             return KeyframeEntity(this).also {
                 keyframes[timeStamp] = it
             }

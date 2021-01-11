@@ -41,7 +41,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.AmbientAnimationClock
-import androidx.compose.ui.util.annotation.VisibleForTesting
 
 /**
  * [transition] composable creates a state-based transition using the animation configuration
@@ -122,8 +121,8 @@ fun <T> transition(
         "pause the animation clock and advance it manually"
 )
 var transitionsEnabled = true
-    @VisibleForTesting
-    set
+    /*@VisibleForTesting
+    set*/
 
 // TODO(Doris): Use Clock idea instead of TransitionModel with pulse
 /**

@@ -353,7 +353,7 @@ package androidx.compose.material {
   }
 
   @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Immutable public final class FractionalThreshold implements androidx.compose.material.ThresholdConfig {
-    ctor public FractionalThreshold(@FloatRange(from=0.0, to=1.0) float fraction);
+    ctor public FractionalThreshold(float fraction);
     method public float computeThreshold(androidx.compose.ui.unit.Density, float fromValue, float toValue);
     method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Immutable public androidx.compose.material.FractionalThreshold copy(float fraction);
   }
@@ -442,10 +442,10 @@ package androidx.compose.material {
   }
 
   public final class ProgressIndicatorKt {
-    method @androidx.compose.runtime.Composable public static void CircularProgressIndicator-vFL-O2w(@FloatRange(from=0.0, to=1.0) float progress, optional androidx.compose.ui.Modifier modifier, optional long color, optional float strokeWidth);
+    method @androidx.compose.runtime.Composable public static void CircularProgressIndicator-vFL-O2w(float progress, optional androidx.compose.ui.Modifier modifier, optional long color, optional float strokeWidth);
     method @androidx.compose.runtime.Composable public static void CircularProgressIndicator-y0SQU_c(optional androidx.compose.ui.Modifier modifier, optional long color, optional float strokeWidth);
     method @androidx.compose.runtime.Composable public static void LinearProgressIndicator-BeBJghs(optional androidx.compose.ui.Modifier modifier, optional long color, optional long backgroundColor);
-    method @androidx.compose.runtime.Composable public static void LinearProgressIndicator-kLDug40(@FloatRange(from=0.0, to=1.0) float progress, optional androidx.compose.ui.Modifier modifier, optional long color, optional long backgroundColor);
+    method @androidx.compose.runtime.Composable public static void LinearProgressIndicator-kLDug40(float progress, optional androidx.compose.ui.Modifier modifier, optional long color, optional long backgroundColor);
   }
 
   @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public interface RadioButtonColors {
@@ -462,7 +462,7 @@ package androidx.compose.material {
   }
 
   @androidx.compose.runtime.Immutable public final class ResistanceConfig {
-    ctor public ResistanceConfig(@FloatRange(from=0.0, to=3.4E38, fromInclusive=false) float basis, @FloatRange(from=0.0, to=3.4E38) float factorAtMin, @FloatRange(from=0.0, to=3.4E38) float factorAtMax);
+    ctor public ResistanceConfig(float basis, float factorAtMin, float factorAtMax);
     method public float component1();
     method public float component2();
     method public float component3();
@@ -514,7 +514,7 @@ package androidx.compose.material {
   }
 
   public final class SliderKt {
-    method @androidx.compose.runtime.Composable public static void Slider-B7rb6FQ(float value, kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> valueRange, optional @IntRange(from=0) int steps, optional kotlin.jvm.functions.Function0<kotlin.Unit> onValueChangeEnd, optional androidx.compose.foundation.InteractionState interactionState, optional long thumbColor, optional long activeTrackColor, optional long inactiveTrackColor, optional long activeTickColor, optional long inactiveTickColor);
+    method @androidx.compose.runtime.Composable public static void Slider-B7rb6FQ(float value, kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> valueRange, optional int steps, optional kotlin.jvm.functions.Function0<kotlin.Unit> onValueChangeEnd, optional androidx.compose.foundation.InteractionState interactionState, optional long thumbColor, optional long activeTrackColor, optional long inactiveTrackColor, optional long activeTickColor, optional long inactiveTickColor);
   }
 
   @androidx.compose.material.ExperimentalMaterialApi public interface SnackbarData {
@@ -569,7 +569,7 @@ package androidx.compose.material {
   }
 
   @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Immutable public final class SwipeProgress<T> {
-    ctor public SwipeProgress(T? from, T? to, @FloatRange(from=0.0, to=1.0) float fraction);
+    ctor public SwipeProgress(T? from, T? to, float fraction);
     method public T! component1();
     method public T! component2();
     method public float component3();

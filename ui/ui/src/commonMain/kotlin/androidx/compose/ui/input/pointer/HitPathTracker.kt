@@ -19,7 +19,6 @@ package androidx.compose.ui.input.pointer
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.plus
-import androidx.compose.ui.util.annotation.VisibleForTesting
 
 /**
  * Organizes pointers and the [PointerInputFilter]s that they hit into a hierarchy such that
@@ -28,7 +27,7 @@ import androidx.compose.ui.util.annotation.VisibleForTesting
 @OptIn(InternalCoreApi::class)
 internal class HitPathTracker {
 
-    @VisibleForTesting
+    /*@VisibleForTesting*/
     internal val root: NodeParent = NodeParent()
 
     private val hitPathsToRetain: MutableMap<PointerId, Int> = mutableMapOf()
@@ -154,7 +153,7 @@ internal class HitPathTracker {
      *
      * @return The resulting [PointerInputChange]s.
      */
-    @VisibleForTesting
+    /*@VisibleForTesting*/
     internal fun dispatchCustomEvent(
         event: CustomEvent,
         dispatchingNode: Node
@@ -264,7 +263,7 @@ internal class HitPathTracker {
  * necessarily has a root that is very similar to all other nodes, except that it does not track any
  * pointer or [PointerInputFilter] information.
  */
-@VisibleForTesting
+/*@VisibleForTesting*/
 @OptIn(InternalCoreApi::class)
 internal open class NodeParent {
     val children: MutableSet<Node> = mutableSetOf()
@@ -387,7 +386,7 @@ internal open class NodeParent {
  * Represents a single Node in the tree that also tracks a [PointerInputFilter] and which pointers
  * hit it (tracked as [PointerId]s).
  */
-@VisibleForTesting
+/*@VisibleForTesting*/
 @OptIn(InternalCoreApi::class)
 internal class Node(val pointerInputFilter: PointerInputFilter) : NodeParent() {
 

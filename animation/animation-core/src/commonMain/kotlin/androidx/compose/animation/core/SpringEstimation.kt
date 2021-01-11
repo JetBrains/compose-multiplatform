@@ -16,8 +16,6 @@
 
 package androidx.compose.animation.core
 
-import androidx.compose.ui.util.annotation.VisibleForTesting
-
 import kotlin.math.abs
 import kotlin.math.exp
 import kotlin.math.ln
@@ -28,7 +26,7 @@ import kotlin.math.sqrt
  * Returns the estimated time that the spring will last be at [delta]
  * @suppress
  */
-@VisibleForTesting(otherwise = 3 /* VisibleForTesting.PACKAGE_PRIVATE */)
+/*@VisibleForTesting(otherwise = VisibleForTesting.PACKAGE_PRIVATE)*/
 fun estimateAnimationDurationMillis(
     stiffness: Float,
     dampingRatio: Float,
@@ -47,7 +45,7 @@ fun estimateAnimationDurationMillis(
  * Returns the estimated time that the spring will last be at [delta]
  * @suppress
  */
-@VisibleForTesting(otherwise = 3 /* VisibleForTesting.PACKAGE_PRIVATE */)
+/*@VisibleForTesting(otherwise = VisibleForTesting.PACKAGE_PRIVATE)*/
 fun estimateAnimationDurationMillis(
     stiffness: Double,
     dampingRatio: Double,
@@ -71,7 +69,7 @@ fun estimateAnimationDurationMillis(
  * Returns the estimated time that the spring will last be at [delta]
  * @suppress
  */
-@VisibleForTesting(otherwise = 3 /* VisibleForTesting.PACKAGE_PRIVATE */)
+/*@VisibleForTesting(otherwise = VisibleForTesting.PACKAGE_PRIVATE)*/
 fun estimateAnimationDurationMillis(
     springConstant: Double,
     dampingCoefficient: Double,

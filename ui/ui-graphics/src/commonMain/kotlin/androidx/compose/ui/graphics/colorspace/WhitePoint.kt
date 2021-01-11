@@ -16,8 +16,6 @@
 
 package androidx.compose.ui.graphics.colorspace
 
-import androidx.compose.ui.util.annotation.Size
-
 /**
  * Class for constructing white points used in [RGB][Rgb] color space. The value is
  * stored in the CIE xyY color space. The Y component of the white point is assumed
@@ -40,7 +38,7 @@ data class WhitePoint(val x: Float, val y: Float) {
      *
      * @return A new float array of length 3 containing XYZ values
      */
-    @Size(3)
+    /*@Size(3)*/
     internal fun toXyz(): FloatArray {
         return floatArrayOf(x / y, 1.0f, (1f - x - y) / y)
     }

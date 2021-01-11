@@ -18,7 +18,6 @@ package androidx.compose.ui.text.input
 
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.util.annotation.VisibleForTesting
 
 /**
  * The core editing implementation
@@ -32,12 +31,12 @@ import androidx.compose.ui.util.annotation.VisibleForTesting
 class EditProcessor {
 
     // The last known state of the EditingBuffer
-    @VisibleForTesting
+    /*@VisibleForTesting*/
     var mBufferState: TextFieldValue = TextFieldValue("", TextRange.Zero, null)
         private set
 
     // The editing buffer used for applying editor commands from IME.
-    @VisibleForTesting
+    /*@VisibleForTesting*/
     internal var mBuffer: EditingBuffer = EditingBuffer(
         initialText = "",
         initialSelection = TextRange.Zero

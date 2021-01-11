@@ -18,8 +18,6 @@
 
 package androidx.compose.ui.graphics.colorspace
 
-import androidx.compose.ui.util.annotation.Size
-
 object ColorSpaces {
     internal val SrgbPrimaries = floatArrayOf(0.640f, 0.330f, 0.300f, 0.600f, 0.150f, 0.060f)
     internal val Ntsc1953Primaries = floatArrayOf(0.67f, 0.33f, 0.21f, 0.71f, 0.14f, 0.08f)
@@ -81,7 +79,7 @@ object ColorSpaces {
                 2.4
             )
         },
-        -0.799f, 2.399f, null, // FIXME: Use SrgbTransferParameters
+        -0.799f, 2.399f, SrgbTransferParameters,
         id = 2
     )
 
@@ -281,7 +279,8 @@ object ColorSpaces {
      * @return A non-null [ColorSpace] if a match is found, null otherwise
      */
     fun match(
-        @Size(9) toXYZD50: FloatArray,
+        /*@Size(9)*/
+        toXYZD50: FloatArray,
         function: TransferParameters
     ): ColorSpace? {
         for (colorSpace in ColorSpacesArray) {

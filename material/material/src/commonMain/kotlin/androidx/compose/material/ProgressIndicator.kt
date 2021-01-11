@@ -43,7 +43,6 @@ import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.annotation.FloatRange
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.max
@@ -65,7 +64,8 @@ import kotlin.math.max
  */
 @Composable
 fun LinearProgressIndicator(
-    @FloatRange(from = 0.0, to = 1.0) progress: Float,
+    /*@FloatRange(from = 0.0, to = 1.0)*/
+    progress: Float,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colors.primary,
     backgroundColor: Color = color.copy(alpha = IndicatorBackgroundOpacity)
@@ -171,7 +171,8 @@ private fun DrawScope.drawLinearIndicatorBackground(
  */
 @Composable
 fun CircularProgressIndicator(
-    @FloatRange(from = 0.0, to = 1.0) progress: Float,
+    /*@FloatRange(from = 0.0, to = 1.0)*/
+    progress: Float,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colors.primary,
     strokeWidth: Dp = ProgressIndicatorDefaults.StrokeWidth

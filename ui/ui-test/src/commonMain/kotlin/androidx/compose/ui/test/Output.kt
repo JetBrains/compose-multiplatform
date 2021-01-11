@@ -20,7 +20,6 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.semantics.SemanticsConfiguration
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsProperties
-import androidx.compose.ui.util.annotation.IntRange
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.toSize
 
@@ -36,9 +35,11 @@ internal expect fun printToLog(tag: String, message: String)
  * collected before. So the output can change over time if the tree changes.
  *
  * @param maxDepth Max depth of the nodes in hierarchy to print. Zero will print just this node.
+ * Must not be negative.
  */
 fun SemanticsNodeInteraction.printToString(
-    @IntRange(from = 0) maxDepth: Int = Int.MAX_VALUE
+    /*@IntRange(from = 0)*/
+    maxDepth: Int = Int.MAX_VALUE
 ): String {
     val result = fetchSemanticsNode()
     return result.printToString(maxDepth)
@@ -55,10 +56,12 @@ fun SemanticsNodeInteraction.printToString(
  *
  * @param tag The tag to be used in the log messages.
  * @param maxDepth Max depth of the nodes in hierarchy to print. Zero will print just this node.
+ * Must not be negative.
  */
 fun SemanticsNodeInteraction.printToLog(
     tag: String,
-    @IntRange(from = 0) maxDepth: Int = Int.MAX_VALUE
+    /*@IntRange(from = 0)*/
+    maxDepth: Int = Int.MAX_VALUE
 ) {
     val result = "printToLog:\n" + printToString(maxDepth)
     printToLog(tag, result)
@@ -74,10 +77,11 @@ fun SemanticsNodeInteraction.printToLog(
  * collected before. So the output can change over time if the tree changes.
  *
  * @param maxDepth Max depth of the nodes in hierarchy to print. Zero will print nodes in this
- * collection only.
+ * collection only. Must not be negative.
  */
 fun SemanticsNodeInteractionCollection.printToString(
-    @IntRange(from = 0) maxDepth: Int = 0
+    /*@IntRange(from = 0)*/
+    maxDepth: Int = 0
 ): String {
     val nodes = fetchSemanticsNodes()
     return if (nodes.isEmpty()) {
@@ -96,13 +100,14 @@ fun SemanticsNodeInteractionCollection.printToString(
  * Note that this will fetch the latest snapshot of nodes it sees in the hierarchy for the IDs it
  * collected before. So the output can change over time if the tree changes.
  *
- * @param tag The tag to be used in the log messages.
+ * @param tag The tag to be used in the log messages. Must not be negative.
  * @param maxDepth Max depth of the nodes in hierarchy to print. Zero will print nodes in this
  * collection only.
  */
 fun SemanticsNodeInteractionCollection.printToLog(
     tag: String,
-    @IntRange(from = 0) maxDepth: Int = 0
+    /*@IntRange(from = 0)*/
+    maxDepth: Int = 0
 ) {
     val result = "printToLog:\n" + printToString(maxDepth)
     printToLog(tag, result)

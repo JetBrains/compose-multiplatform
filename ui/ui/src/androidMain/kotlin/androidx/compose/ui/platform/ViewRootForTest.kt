@@ -17,8 +17,8 @@
 package androidx.compose.ui.platform
 
 import android.view.View
+import androidx.annotation.VisibleForTesting
 import androidx.compose.ui.node.Owner
-import androidx.compose.ui.util.annotation.VisibleForTesting
 
 /**
  * The marker interface to be implemented by the [View] backing the composition.
