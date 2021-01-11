@@ -71,6 +71,21 @@ The following formats available for the supported operating systems:
 * Windows — `.exe` (`TargetFormat.Exe`), `.msi` (`TargetFormat.Msi`)
 * Linux — `.deb` (`TargetFormat.Deb`), `.rpm` (`TargetFormat.Rpm`)
 
+## Distributing Artifacts
+
+By default, Apple does not allow users to execute unsigned applications downloaded from the internet.  Users attempting
+to run such applications will be faced with an error like this:
+
+![](attrs-error.png)
+
+To temporarily work around this issue, users can try a couple of things (after downloading to target machine, try commands in this order, do not attempt out of order):
+* `xattr -cr  MyFancyProgram.app`
+* `sudo spctl --master-disable`
+* Try right-clicking on the app, and select "Open", then when the dialog pops up, select "Open" again.
+
+A more correct fix is to manually sign the application: [Apple's Code Signing Guide](https://developer.apple.com/library/archive/documentation/Security/Conceptual/CodeSigningGuide/Procedures/Procedures.html)
+
+
 ## Customizing JDK version
 
 The plugin uses `jpackage`, which is available since [JDK 14](https://openjdk.java.net/projects/jdk/14/).
