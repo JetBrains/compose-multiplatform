@@ -32,6 +32,7 @@ import androidx.build.gradle.getByType
 import androidx.build.gradle.isRoot
 import androidx.build.jacoco.Jacoco
 import androidx.build.license.configureExternalDependencyLicenseCheck
+import androidx.build.resources.configurePublicResourcesStub
 import androidx.build.studio.StudioTask
 import androidx.build.testConfiguration.addAppApkToTestConfigGeneration
 import androidx.build.testConfiguration.configureTestConfigGeneration
@@ -286,6 +287,7 @@ class AndroidXPlugin : Plugin<Project> {
             check(!excludes.contains("/META-INF/*.kotlin_module"))
         }
 
+        project.configurePublicResourcesStub(libraryExtension)
         project.configureSourceJarForAndroid(libraryExtension)
         project.configureVersionFileWriter(libraryExtension, androidXExtension)
         project.addCreateLibraryBuildInfoFileTask(androidXExtension)

@@ -18,11 +18,14 @@ package androidx.build.resources
 
 import androidx.build.checkapi.ApiLocation
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
@@ -39,6 +42,10 @@ abstract class GenerateResourceApiTask : DefaultTask() {
     @get:InputFiles // InputFiles allows non-existent files, whereas InputFile does not.
     abstract val builtApi: RegularFileProperty
 
+    /** Source files against which API signatures will be validated. */
+    @get:[InputFiles PathSensitive(PathSensitivity.RELATIVE)]
+    var sourcePaths: Collection<File> = emptyList()
+
     /** Text file to which API signatures will be written. */
     @get:Internal
     abstract val apiLocation: Property<ApiLocation>
@@ -54,7 +61,15 @@ abstract class GenerateResourceApiTask : DefaultTask() {
         val sortedApiLines = if (builtApiFile.exists()) {
             builtApiFile.readLines().toSortedSet()
         } else {
-            emptySet<String>()
+            val errorMessage = """No public resources defined
+
+At least one public resource must be defined to prevent all resources from
+appearing public by  default.
+
+This exception should never occur for AndroidX projects, as a <public />
+resource is added by default to all library project. Please contact the
+AndroidX Core team for assistance."""
+            throw GradleException(errorMessage)
         }
 
         val outputApiFile = apiLocation.get().resourceFile
