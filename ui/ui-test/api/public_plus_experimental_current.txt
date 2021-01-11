@@ -23,11 +23,6 @@ package androidx.compose.ui.test {
   public final class AndroidOutputKt {
   }
 
-  public final class AnimationClocksKt {
-    method @androidx.compose.ui.test.ExperimentalTestApi public static androidx.compose.animation.core.MonotonicFrameAnimationClock monotonicFrameAnimationClockOf(kotlin.coroutines.CoroutineContext coroutineContext, androidx.compose.runtime.dispatch.MonotonicFrameClock clock);
-    method @androidx.compose.ui.test.ExperimentalTestApi public static androidx.compose.animation.core.MonotonicFrameAnimationClock monotonicFrameAnimationClockOf(kotlin.coroutines.CoroutineContext coroutineContext);
-  }
-
   public final class AssertionsKt {
     method public static androidx.compose.ui.test.SemanticsNodeInteraction assert(androidx.compose.ui.test.SemanticsNodeInteraction, androidx.compose.ui.test.SemanticsMatcher matcher, optional kotlin.jvm.functions.Function0<java.lang.String>? messagePrefixOnError);
     method public static androidx.compose.ui.test.SemanticsNodeInteractionCollection assertAll(androidx.compose.ui.test.SemanticsNodeInteractionCollection, androidx.compose.ui.test.SemanticsMatcher matcher);
