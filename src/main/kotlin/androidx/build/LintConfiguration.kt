@@ -87,6 +87,9 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
             isAbortOnError = true
             isIgnoreWarnings = true
 
+            // Workaround for b/177359055 where 27.2.0-beta04 incorrectly computes severity.
+            isCheckAllWarnings = true
+
             // Skip lintVital tasks on assemble. We explicitly run lintRelease for libraries.
             isCheckReleaseBuilds = false
 
@@ -116,6 +119,9 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
 
             // Disable until it works for our projects, b/171986505
             disable("JavaPluginLanguageLevel")
+
+            // Disable the TODO check until we have a policy that requires it.
+            disable("StopShip")
 
             // Provide stricter enforcement for project types intended to run on a device.
             if (extension.type.compilationTarget == CompilationTarget.DEVICE) {
@@ -152,35 +158,26 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
                 lintConfig = project.rootProject.file("buildSrc/lint.xml")
             }
 
-            // Teams shouldn't be able to generate new baseline files or add new violations to
-            // existing files; they should only be able to burn down existing violations. That's
-            // hard to enforce, though, so we'll just prevent them from creating new ones.
-            //
-            // If you are working on enabling a new check -- and ONLY if you are working on a new
-            // check, then you may need to comment out this line  so that you can suppress all
-            // the new failures.
-            if (lintBaseline.exists()) {
-                if (updateLintBaseline) {
-                    // Continue generating baselines regardless of errors
-                    isAbortOnError = false
-                    // Avoid printing every single lint error to the terminal
-                    textReport = false
-                    val lintDebugTask = tasks.named("lintDebug")
-                    lintDebugTask.configure {
-                        it.doFirst {
-                            lintBaseline.delete()
-                        }
+            if (updateLintBaseline) {
+                // Continue generating baselines regardless of errors
+                isAbortOnError = false
+                // Avoid printing every single lint error to the terminal
+                textReport = false
+                val lintDebugTask = tasks.named("lintDebug")
+                lintDebugTask.configure {
+                    it.doFirst {
+                        lintBaseline.delete()
                     }
-                    val lintTask = tasks.named("lint")
-                    lintTask.configure {
-                        it.doFirst {
-                            lintBaseline.delete()
-                        }
-                    }
-                    System.setProperty(LINT_BASELINE_CONTINUE, "true")
                 }
-                baseline(lintBaseline)
+                val lintTask = tasks.named("lint")
+                lintTask.configure {
+                    it.doFirst {
+                        lintBaseline.delete()
+                    }
+                }
+                System.setProperty(LINT_BASELINE_CONTINUE, "true")
             }
+            baseline(lintBaseline)
         }
     }
 }
