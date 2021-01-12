@@ -17,8 +17,8 @@ package androidx.compose.ui.window
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCompositionReference
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -109,8 +109,10 @@ private fun PopupLayout(
         owner to composition
     }
     owner.density = density
-    onDispose {
-        composition.dispose()
-        owner.dispose()
+    DisposableEffect(Unit) {
+        onDispose {
+            composition.dispose()
+            owner.dispose()
+        }
     }
 }

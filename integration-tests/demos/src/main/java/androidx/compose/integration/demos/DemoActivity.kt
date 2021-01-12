@@ -28,7 +28,6 @@ import androidx.activity.OnBackPressedDispatcher
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.Lifecycle
@@ -42,6 +41,7 @@ import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.savedinstancestate.Saver
 import androidx.compose.runtime.savedinstancestate.listSaver
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
@@ -122,7 +122,7 @@ private fun DemoTheme(
         val statusBarColor = with(MaterialTheme.colors) {
             (if (isLight) primaryVariant else Color.Black).toArgb()
         }
-        onCommit(statusBarColor) {
+        SideEffect {
             window.statusBarColor = statusBarColor
         }
         content()

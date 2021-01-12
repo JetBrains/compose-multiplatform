@@ -35,11 +35,11 @@ import androidx.compose.animation.core.animateTo
 import androidx.compose.animation.core.isFinished
 import androidx.compose.animation.core.spring
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
@@ -458,7 +458,7 @@ fun <T, V : AnimationVector> animate(
         AnimatedValueModel(target, converter, clock, visibilityThreshold)
     }
     // TODO: Support changing animation while keeping the same target
-    onCommit(target) {
+    DisposableEffect(target) {
         if (endListener != null) {
             anim.animateTo(target, animSpec) { reason, value ->
                 if (reason == AnimationEndReason.TargetReached) {
@@ -467,6 +467,9 @@ fun <T, V : AnimationVector> animate(
             }
         } else {
             anim.animateTo(target, animSpec)
+        }
+        onDispose {
+            anim.stop()
         }
     }
     return anim.value

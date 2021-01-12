@@ -25,7 +25,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onDispose
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticAmbientOf
@@ -175,8 +175,10 @@ private fun Scrollbar(
     interactionState: InteractionState,
     isVertical: Boolean
 ) = with(AmbientDensity.current) {
-    onDispose {
-        interactionState.removeInteraction(Interaction.Dragged)
+    DisposableEffect(interactionState) {
+        onDispose {
+            interactionState.removeInteraction(Interaction.Dragged)
+        }
     }
 
     var containerSize by remember { mutableStateOf(0) }

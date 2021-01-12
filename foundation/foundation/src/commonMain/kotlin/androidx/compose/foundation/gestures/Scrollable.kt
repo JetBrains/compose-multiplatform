@@ -31,9 +31,9 @@ import androidx.compose.foundation.animation.defaultFlingConfig
 import androidx.compose.foundation.animation.fling
 import androidx.compose.runtime.AtomicReference
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -326,9 +326,11 @@ fun Modifier.scrollable(
 ): Modifier = composed(
     factory = {
         controller.update(orientation, reverseDirection)
-        onDispose {
-            controller.stopAnimation()
-            controller.interactionState?.removeInteraction(Interaction.Dragged)
+        DisposableEffect(controller) {
+            onDispose {
+                controller.stopAnimation()
+                controller.interactionState?.removeInteraction(Interaction.Dragged)
+            }
         }
 
         val scrollCallback = object : ScrollCallback {

@@ -28,7 +28,7 @@ import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onDispose
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.runtime.setValue
@@ -436,7 +436,9 @@ fun CoreTextField(
     val cursorModifier =
         Modifier.cursor(state, value, offsetMapping, cursorColor, enabled && !readOnly)
 
-    onDispose { manager.hideSelectionToolbar() }
+    DisposableEffect(manager) {
+        onDispose { manager.hideSelectionToolbar() }
+    }
 
     // Modifiers that should be applied to the outer text field container. Usually those include
     // gesture and semantics modifiers.

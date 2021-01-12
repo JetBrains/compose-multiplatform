@@ -43,8 +43,9 @@ class ProduceStateTests {
                 }
             }
 
-            onCommit(state) {
+            DisposableEffect(state) {
                 observedResult = state
+                onDispose { }
             }
         }
 

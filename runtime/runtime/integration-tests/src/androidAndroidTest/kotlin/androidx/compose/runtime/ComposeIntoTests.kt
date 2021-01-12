@@ -52,8 +52,11 @@ class ComposeIntoTests : BaseComposeTest() {
         var commitCount = 0
         @OptIn(ExperimentalComposeApi::class)
         val composable = @Composable @ComposableContract(tracked = false) {
-            onActive { initializationCount++ }
-            onCommit { commitCount++ }
+            DisposableEffect(Unit) {
+                initializationCount++
+                onDispose { }
+            }
+            SideEffect { commitCount++ }
         }
 
         activity.show(composable)

@@ -19,7 +19,7 @@ package androidx.compose.animation
 import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.AnimationClockObserver
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.onCommit
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 
 /**
@@ -34,7 +34,7 @@ import androidx.compose.runtime.remember
 @Composable
 fun AnimationClockObservable.asDisposableClock(): DisposableAnimationClock {
     val disposable = remember(this) { DisposableAnimationClock(this) }
-    onCommit(disposable) {
+    DisposableEffect(disposable) {
         onDispose {
             disposable.dispose()
         }

@@ -37,8 +37,8 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.key
-import androidx.compose.runtime.onCommit
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -118,7 +118,10 @@ private fun FilterField(
         textStyle = AmbientTextStyle.current,
         cursorColor = AmbientContentColor.current
     )
-    onCommit { focusRequester.requestFocus() }
+    DisposableEffect(focusRequester) {
+        focusRequester.requestFocus()
+        onDispose { }
+    }
 }
 
 /**

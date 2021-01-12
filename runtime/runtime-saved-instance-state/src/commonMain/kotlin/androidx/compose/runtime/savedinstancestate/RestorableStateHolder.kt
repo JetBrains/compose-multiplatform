@@ -17,10 +17,10 @@
 package androidx.compose.runtime.savedinstancestate
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.key
-import androidx.compose.runtime.onActive
 import androidx.compose.runtime.remember
 
 @RequiresOptIn(
@@ -103,7 +103,7 @@ private class RestorableStateHolderImpl<T : Any>(
                 AmbientUiSavedStateRegistry provides registryHolder.registry,
                 content = content
             )
-            onActive {
+            DisposableEffect(key) {
                 require(key !in registryHolders) { "Key $key was used multiple times " }
                 savedStates -= key
                 registryHolders[key] = registryHolder

@@ -18,7 +18,7 @@ package androidx.compose.foundation.text
 
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
-import androidx.compose.runtime.onDispose
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -41,8 +41,10 @@ internal fun Modifier.dragPositionGestureFilter(
     // TODO(shepshapard): PressIndicator doesn't seem to be the right thing to use here.  It
     //  actually may be functionally correct, but might mostly suggest that it should not
     //  actually be called PressIndicator, but instead something else.
-    onDispose {
-        interactionState?.removeInteraction(Interaction.Pressed)
+    DisposableEffect(interactionState) {
+        onDispose {
+            interactionState?.removeInteraction(Interaction.Pressed)
+        }
     }
     pressIndicatorGestureFilter(
         onStart = {

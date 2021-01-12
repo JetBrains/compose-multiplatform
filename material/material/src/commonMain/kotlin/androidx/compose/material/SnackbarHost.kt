@@ -25,6 +25,7 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.RecomposeScope
 import androidx.compose.runtime.Stable
@@ -32,7 +33,6 @@ import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -319,7 +319,7 @@ private fun animatedOpacity(
     onAnimationFinish: () -> Unit = {}
 ): AnimatedFloat {
     val animatedFloat = animatedFloat(if (!visible) 1f else 0f)
-    onCommit(visible) {
+    DisposableEffect(visible) {
         animatedFloat.animateTo(
             if (visible) 1f else 0f,
             anim = animation,
@@ -327,6 +327,9 @@ private fun animatedOpacity(
                 if (reason == AnimationEndReason.TargetReached) onAnimationFinish()
             }
         )
+        onDispose {
+            animatedFloat.stop()
+        }
     }
     return animatedFloat
 }
@@ -334,11 +337,14 @@ private fun animatedOpacity(
 @Composable
 private fun animatedScale(animation: AnimationSpec<Float>, visible: Boolean): AnimatedFloat {
     val animatedFloat = animatedFloat(if (!visible) 1f else 0.8f)
-    onCommit(visible) {
+    DisposableEffect(visible) {
         animatedFloat.animateTo(
             if (visible) 1f else 0.8f,
             anim = animation
         )
+        onDispose {
+            animatedFloat.stop()
+        }
     }
     return animatedFloat
 }

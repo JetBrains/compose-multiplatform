@@ -30,12 +30,13 @@ import androidx.compose.material.SwipeableDefaults.StandardResistanceFactor
 import androidx.compose.material.SwipeableDefaults.VelocityThreshold
 import androidx.compose.material.SwipeableDefaults.resistanceConfig
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.Saver
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
@@ -446,16 +447,18 @@ internal fun <T : Any> rememberSwipeableStateFor(
         animationSpec = animationSpec
     )
     val forceAnimationCheck = remember { mutableStateOf(false) }
-    onCommit(value, forceAnimationCheck.value) {
+    DisposableEffect(value, forceAnimationCheck.value) {
         if (value != swipeableState.value) {
             swipeableState.animateTo(value)
         }
+        onDispose { }
     }
-    onCommit(swipeableState.value) {
+    DisposableEffect(swipeableState.value) {
         if (value != swipeableState.value) {
             onValueChange(swipeableState.value)
             forceAnimationCheck.value = !forceAnimationCheck.value
         }
+        onDispose { }
     }
     return swipeableState
 }
@@ -528,7 +531,7 @@ fun <T> Modifier.swipeable(
         "You cannot have two anchors mapped to the same state."
     }
     val density = AmbientDensity.current
-    onCommit(anchors) {
+    DisposableEffect(anchors) {
         state.anchors = anchors
         state.thresholds = { a, b ->
             val from = anchors.getValue(a)
@@ -538,8 +541,9 @@ fun <T> Modifier.swipeable(
         with(density) {
             state.velocityThreshold = velocityThreshold.toPx()
         }
+        onDispose { }
     }
-    onCommit {
+    SideEffect {
         state.resistance = resistance
     }
 

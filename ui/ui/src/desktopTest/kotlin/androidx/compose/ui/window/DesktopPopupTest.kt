@@ -19,7 +19,7 @@ package androidx.compose.ui.window
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onDispose
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticAmbientOf
 import androidx.compose.ui.platform.AmbientDensity
@@ -60,8 +60,10 @@ class DesktopPopupTest {
         rule.setContent {
             if (isPopupShowing) {
                 Popup {
-                    onDispose {
-                        isDisposed = true
+                    DisposableEffect(Unit) {
+                        onDispose {
+                            isDisposed = true
+                        }
                     }
                 }
             }

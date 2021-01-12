@@ -18,7 +18,7 @@ package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
-import androidx.compose.runtime.onDispose
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.junit4.StateRestorationTester
@@ -89,8 +89,10 @@ class LazyItemStateRestoration {
                 items((0..1).toList()) {
                     if (it == 0) {
                         realState = rememberSavedInstanceState { counter0++ }
-                        onDispose {
-                            itemDisposed = true
+                        DisposableEffect(Unit) {
+                            onDispose {
+                                itemDisposed = true
+                            }
                         }
                     }
                     Box(Modifier.size(30.dp))
@@ -184,8 +186,10 @@ class LazyItemStateRestoration {
                         LazyRow {
                             item {
                                 realState = rememberSavedInstanceState { counter0++ }
-                                onDispose {
-                                    itemDisposed = true
+                                DisposableEffect(Unit) {
+                                    onDispose {
+                                        itemDisposed = true
+                                    }
                                 }
                                 Box(Modifier.size(30.dp))
                             }
