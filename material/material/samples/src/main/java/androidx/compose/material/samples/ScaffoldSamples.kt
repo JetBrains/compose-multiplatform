@@ -19,7 +19,6 @@ package androidx.compose.material.samples
 import androidx.annotation.Sampled
 import androidx.compose.animation.animatedFloat
 import androidx.compose.animation.core.TweenSpec
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -28,6 +27,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -105,8 +105,8 @@ fun SimpleScaffoldWithTopBar() {
             )
         },
         bodyContent = { innerPadding ->
-            ScrollableColumn(contentPadding = innerPadding) {
-                repeat(100) {
+            LazyColumn(contentPadding = innerPadding) {
+                items(100) {
                     Box(
                         Modifier
                             .fillMaxWidth()
@@ -176,8 +176,8 @@ fun ScaffoldWithBottomBarAndCutout() {
         floatingActionButtonPosition = FabPosition.Center,
         isFloatingActionButtonDocked = true,
         bodyContent = { innerPadding ->
-            ScrollableColumn(contentPadding = innerPadding) {
-                repeat(100) {
+            LazyColumn(contentPadding = innerPadding) {
+                items(100) {
                     Box(
                         Modifier
                             .fillMaxWidth()

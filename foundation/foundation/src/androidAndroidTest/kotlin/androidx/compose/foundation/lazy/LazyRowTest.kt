@@ -508,15 +508,13 @@ class LazyRowTest {
 
     @Test
     fun scrollsLeftInRtl() {
-        val items = (1..4).map { it.toString() }
-
         rule.setContent {
             Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
                 Box(Modifier.preferredWidth(100.dp)) {
                     LazyRow(Modifier.testTag(LazyListTag)) {
-                        items(items) {
+                        items(4) {
                             Spacer(
-                                Modifier.preferredWidth(101.dp).fillParentMaxHeight().testTag(it)
+                                Modifier.preferredWidth(101.dp).fillParentMaxHeight().testTag("$it")
                             )
                         }
                     }
@@ -527,10 +525,10 @@ class LazyRowTest {
         rule.onNodeWithTag(LazyListTag)
             .scrollBy(x = (-150).dp, density = rule.density)
 
-        rule.onNodeWithTag("1")
+        rule.onNodeWithTag("0")
             .assertDoesNotExist()
 
-        rule.onNodeWithTag("2")
+        rule.onNodeWithTag("1")
             .assertIsDisplayed()
     }
 
@@ -721,7 +719,6 @@ class LazyRowTest {
 
     @Test
     fun stateUpdatedAfterScroll() {
-        val items by mutableStateOf((1..20).toList())
         lateinit var state: LazyListState
         rule.setContent {
             state = rememberLazyListState()
@@ -729,7 +726,7 @@ class LazyRowTest {
                 Modifier.size(100.dp).testTag(LazyListTag),
                 state = state
             ) {
-                items(items) {
+                items(20) {
                     Spacer(Modifier.size(20.dp).testTag("$it"))
                 }
             }
@@ -758,7 +755,6 @@ class LazyRowTest {
 
     @Test
     fun stateUpdatedAfterScrollWithinTheSameItem() {
-        val items by mutableStateOf((1..20).toList())
         lateinit var state: LazyListState
         rule.setContent {
             state = rememberLazyListState()
@@ -766,7 +762,7 @@ class LazyRowTest {
                 Modifier.size(100.dp).testTag(LazyListTag),
                 state = state
             ) {
-                items(items) {
+                items(20) {
                     Spacer(Modifier.size(20.dp).testTag("$it"))
                 }
             }
@@ -788,13 +784,12 @@ class LazyRowTest {
 
     @Test
     fun initialScrollIsApplied() {
-        val items by mutableStateOf((0..20).toList())
         lateinit var state: LazyListState
         val expectedOffset = with(rule.density) { 10.dp.toIntPx() }
         rule.setContent {
             state = rememberLazyListState(2, expectedOffset)
             LazyRow(Modifier.size(100.dp).testTag(LazyListTag), state = state) {
-                items(items) {
+                items(20) {
                     Spacer(Modifier.size(20.dp).testTag("$it"))
                 }
             }
@@ -812,7 +807,6 @@ class LazyRowTest {
     @Test
     fun stateIsRestored() {
         val restorationTester = StateRestorationTester(rule)
-        val items by mutableStateOf((1..20).toList())
         var state: LazyListState? = null
         restorationTester.setContent {
             state = rememberLazyListState()
@@ -820,7 +814,7 @@ class LazyRowTest {
                 Modifier.size(100.dp).testTag(LazyListTag),
                 state = state!!
             ) {
-                items(items) {
+                items(20) {
                     Spacer(Modifier.size(20.dp).testTag("$it"))
                 }
             }
@@ -845,7 +839,6 @@ class LazyRowTest {
 
     @Test
     fun snapToItemIndex() {
-        val items by mutableStateOf((1..20).toList())
         lateinit var state: LazyListState
         rule.setContent {
             state = rememberLazyListState()
@@ -853,7 +846,7 @@ class LazyRowTest {
                 Modifier.size(100.dp).testTag(LazyListTag),
                 state = state
             ) {
-                items(items) {
+                items(20) {
                     Spacer(Modifier.size(20.dp).testTag("$it"))
                 }
             }
@@ -870,11 +863,10 @@ class LazyRowTest {
 
     @Test
     fun itemsAreNotRedrawnDuringScroll() {
-        val items = (0..20).toList()
         val redrawCount = Array(6) { 0 }
         rule.setContent {
             LazyRow(Modifier.size(100.dp).testTag(LazyListTag)) {
-                items(items) {
+                items(21) {
                     Spacer(
                         Modifier.size(20.dp)
                             .drawBehind { redrawCount[it]++ }
@@ -896,12 +888,11 @@ class LazyRowTest {
 
     @Test
     fun itemInvalidationIsNotCausingAnotherItemToRedraw() {
-        val items = (0..1).toList()
         val redrawCount = Array(2) { 0 }
         var stateUsedInDrawScope by mutableStateOf(false)
         rule.setContent {
             LazyRow(Modifier.size(100.dp).testTag(LazyListTag)) {
-                items(items) {
+                items(2) {
                     Spacer(
                         Modifier.size(50.dp)
                             .drawBehind {
@@ -984,6 +975,54 @@ class LazyRowTest {
 
         rule.onNodeWithTag(LazyListTag)
             .assertHeightIsEqualTo(30.dp)
+    }
+
+    @Test
+    fun usedWithArray() {
+        val items = arrayOf("1", "2", "3")
+
+        val itemSize = with(rule.density) { 15.toDp() }
+
+        rule.setContent {
+            LazyRow {
+                items(items) {
+                    Spacer(Modifier.size(itemSize).testTag(it))
+                }
+            }
+        }
+
+        rule.onNodeWithTag("1")
+            .assertLeftPositionInRootIsEqualTo(0.dp)
+
+        rule.onNodeWithTag("2")
+            .assertLeftPositionInRootIsEqualTo(itemSize)
+
+        rule.onNodeWithTag("3")
+            .assertLeftPositionInRootIsEqualTo(itemSize * 2)
+    }
+
+    @Test
+    fun usedWithArrayIndexed() {
+        val items = arrayOf("1", "2", "3")
+
+        val itemSize = with(rule.density) { 15.toDp() }
+
+        rule.setContent {
+            LazyRow {
+                itemsIndexed(items) { index, item ->
+                    Spacer(Modifier.size(itemSize).testTag("$index*$item"))
+                }
+            }
+        }
+
+        rule.onNodeWithTag("0*1")
+            .assertLeftPositionInRootIsEqualTo(0.dp)
+
+        rule.onNodeWithTag("1*2")
+            .assertLeftPositionInRootIsEqualTo(itemSize)
+
+        rule.onNodeWithTag("2*3")
+            .assertLeftPositionInRootIsEqualTo(itemSize * 2)
     }
 
     private fun LazyListState.scrollBy(offset: Dp) {

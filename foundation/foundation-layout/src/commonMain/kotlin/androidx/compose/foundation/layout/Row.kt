@@ -61,7 +61,6 @@ import androidx.compose.ui.platform.debugInspectorInfo
  * @param verticalAlignment The vertical alignment of the layout's children.
  *
  * @see Column
- * @see [androidx.compose.foundation.ScrollableRow]
  * @see [androidx.compose.foundation.lazy.LazyRow]
  */
 @Composable

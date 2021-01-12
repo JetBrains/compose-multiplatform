@@ -107,17 +107,6 @@ sealed class GridCells {
  */
 interface LazyGridScope {
     /**
-     * Adds a list of items and their content to the scope.
-     *
-     * @param items the data list
-     * @param itemContent the content displayed by a single item
-     */
-    fun <T> items(
-        items: List<T>,
-        itemContent: @Composable LazyItemScope.(item: T) -> Unit
-    )
-
-    /**
      * Adds a single item to the scope.
      *
      * @param content the content of the item
@@ -125,15 +114,64 @@ interface LazyGridScope {
     fun item(content: @Composable LazyItemScope.() -> Unit)
 
     /**
-     * Adds a list of items to the scope where the content of an item is aware of its index.
+     * Adds a [count] of items.
      *
-     * @param items the data list
+     * @param count the items count
      * @param itemContent the content displayed by a single item
      */
-    fun <T> itemsIndexed(
-        items: List<T>,
-        itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
-    )
+    fun items(count: Int, itemContent: @Composable LazyItemScope.(index: Int) -> Unit)
+}
+
+/**
+ * Adds a list of items.
+ *
+ * @param items the data list
+ * @param itemContent the content displayed by a single item
+ */
+inline fun <T> LazyGridScope.items(
+    items: List<T>,
+    crossinline itemContent: @Composable LazyItemScope.(item: T) -> Unit
+) = items(items.size) {
+    itemContent(items[it])
+}
+
+/**
+ * Adds a list of items where the content of an item is aware of its index.
+ *
+ * @param items the data list
+ * @param itemContent the content displayed by a single item
+ */
+inline fun <T> LazyGridScope.itemsIndexed(
+    items: List<T>,
+    crossinline itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
+) = items(items.size) {
+    itemContent(it, items[it])
+}
+
+/**
+ * Adds an array of items.
+ *
+ * @param items the data array
+ * @param itemContent the content displayed by a single item
+ */
+inline fun <T> LazyGridScope.items(
+    items: Array<T>,
+    crossinline itemContent: @Composable LazyItemScope.(item: T) -> Unit
+) = items(items.size) {
+    itemContent(items[it])
+}
+
+/**
+ * Adds an array of items where the content of an item is aware of its index.
+ *
+ * @param items the data array
+ * @param itemContent the content displayed by a single item
+ */
+inline fun <T> LazyGridScope.itemsIndexed(
+    items: Array<T>,
+    crossinline itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
+) = items(items.size) {
+    itemContent(it, items[it])
 }
 
 @Composable
@@ -204,27 +242,13 @@ internal class LazyGridScopeImpl : LazyGridScope {
         return interval.content(scope, localIntervalIndex)
     }
 
-    override fun <T> items(
-        items: List<T>,
-        itemContent: @Composable LazyItemScope.(item: T) -> Unit
-    ) {
-        intervals.add(items.size) { index ->
-            val item = items[index]
-            @Composable { itemContent(item) }
-        }
-    }
-
     override fun item(content: @Composable LazyItemScope.() -> Unit) {
         intervals.add(1) { @Composable { content() } }
     }
 
-    override fun <T> itemsIndexed(
-        items: List<T>,
-        itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
-    ) {
-        intervals.add(items.size) { index ->
-            val item = items[index]
-            @Composable { itemContent(index, item) }
+    override fun items(count: Int, itemContent: @Composable LazyItemScope.(index: Int) -> Unit) {
+        intervals.add(count) {
+            @Composable { itemContent(it) }
         }
     }
 }

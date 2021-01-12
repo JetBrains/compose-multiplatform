@@ -56,7 +56,8 @@ import androidx.compose.ui.unit.dp
     ReplaceWith(
         "LazyColumn(modifier, state, contentPadding, horizontalAlignment = " +
             "horizontalAlignment) { \n items(items, itemContent) \n }",
-        "androidx.compose.foundation.lazy.LazyColumn"
+        "androidx.compose.foundation.lazy.LazyColumn",
+        "androidx.compose.foundation.lazy.items"
     )
 )
 fun <T> LazyColumnFor(
@@ -117,7 +118,8 @@ fun <T> LazyColumnFor(
     ReplaceWith(
         "LazyColumn(modifier, state, contentPadding, horizontalAlignment = " +
             "horizontalAlignment) { \n itemsIndexed(items, itemContent) \n }",
-        "androidx.compose.foundation.lazy.LazyColumn"
+        "androidx.compose.foundation.lazy.LazyColumn",
+        "androidx.compose.foundation.lazy.itemsIndexed"
     )
 )
 fun <T> LazyColumnForIndexed(
@@ -175,7 +177,8 @@ fun <T> LazyColumnForIndexed(
     ReplaceWith(
         "LazyRow(modifier, state, contentPadding, verticalAlignment = " +
             "verticalAlignment) { \n items(items, itemContent) \n }",
-        "androidx.compose.foundation.lazy.LazyColumn"
+        "androidx.compose.foundation.lazy.LazyRow",
+        "androidx.compose.foundation.lazy.items"
     )
 )
 fun <T> LazyRowFor(
@@ -235,7 +238,8 @@ fun <T> LazyRowFor(
     ReplaceWith(
         "LazyRow(modifier, state, contentPadding, verticalAlignment = " +
             "verticalAlignment) { \n itemsIndexed(items, itemContent) \n }",
-        "androidx.compose.foundation.lazy.LazyColumn"
+        "androidx.compose.foundation.lazy.LazyRow",
+        "androidx.compose.foundation.lazy.itemsIndexed"
     )
 )
 fun <T> LazyRowForIndexed(

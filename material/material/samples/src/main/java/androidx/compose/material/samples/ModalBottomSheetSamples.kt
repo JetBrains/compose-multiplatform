@@ -47,9 +47,9 @@ fun ModalBottomSheetSample() {
         sheetState = state,
         sheetContent = {
             LazyColumn {
-                for (i in 1..50) item {
+                items(50) {
                     ListItem(
-                        text = { Text("Item $i") },
+                        text = { Text("Item $it") },
                         icon = { Icon(Icons.Default.Favorite) }
                     )
                 }

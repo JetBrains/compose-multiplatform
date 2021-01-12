@@ -17,7 +17,6 @@
 package androidx.compose.material.demos
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,6 +25,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
@@ -44,11 +45,11 @@ fun ElevationDemo() {
             val text = getMessage(MaterialTheme.colors.isLight)
             Text(text)
         }
-        ScrollableColumn(
+        LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(25.dp)
         ) {
-            elevations.forEach { elevation ->
+            items(elevations) { elevation ->
                 ElevatedCard(elevation)
             }
         }

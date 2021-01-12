@@ -16,13 +16,14 @@
 
 package androidx.compose.foundation.demos.text
 
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -42,7 +43,7 @@ val link = SpanStyle(color = Color(0xFF03a9f4))
 val highlight = SpanStyle(background = Color(0xFFefefef))
 val rectColor = Color(0xFFffb74d)
 
-val langContent = arrayOf(
+val langContent = listOf(
     arrayOf(
         "Jetpack يؤلف أساسيات",
         "Jetpack Compose عبارة عن مجموعة أدوات حديثة لبناء واجهة مستخدم " +
@@ -71,16 +72,24 @@ val langContent = arrayOf(
 
 @Composable
 fun TextSelectionSample() {
-    ScrollableColumn {
-        SelectionContainer {
-            Column(Modifier.padding(12.dp)) {
+    SelectionContainer {
+        LazyColumn(Modifier.padding(12.dp)) {
+            item {
                 Basics()
+            }
+            item {
                 AddTextElement()
-                langContent.forEach {
-                    MultiLanguage(it[0], it[1])
-                }
+            }
+            items(langContent) {
+                MultiLanguage(it[0], it[1])
+            }
+            item {
                 Basics()
+            }
+            item {
                 MultiParagraph()
+            }
+            item {
                 AddTextElement()
             }
         }

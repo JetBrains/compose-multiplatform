@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation.demos.text
 
-import androidx.compose.foundation.ScrollableColumn
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
@@ -27,17 +27,27 @@ import androidx.compose.ui.text.TextStyle
 
 @Composable
 fun BasicTextFieldMinMaxDemo() {
-    ScrollableColumn {
-        TagLine("empty text, no maxLines")
-        TextFieldWithMaxLines("", maxLines = Int.MAX_VALUE)
-        TagLine("maxLines == line count")
-        TextFieldWithMaxLines("abc", maxLines = 1)
-        TagLine("empty text, maxLines > line count")
-        TextFieldWithMaxLines("", maxLines = 2)
-        TagLine("maxLines > line count")
-        TextFieldWithMaxLines("abc", maxLines = 4)
-        TagLine("maxLines < line count")
-        TextFieldWithMaxLines("abc".repeat(20), maxLines = 1)
+    LazyColumn {
+        item {
+            TagLine("empty text, no maxLines")
+            TextFieldWithMaxLines("", maxLines = Int.MAX_VALUE)
+        }
+        item {
+            TagLine("maxLines == line count")
+            TextFieldWithMaxLines("abc", maxLines = 1)
+        }
+        item {
+            TagLine("empty text, maxLines > line count")
+            TextFieldWithMaxLines("", maxLines = 2)
+        }
+        item {
+            TagLine("maxLines > line count")
+            TextFieldWithMaxLines("abc", maxLines = 4)
+        }
+        item {
+            TagLine("maxLines < line count")
+            TextFieldWithMaxLines("abc".repeat(20), maxLines = 1)
+        }
     }
 }
 

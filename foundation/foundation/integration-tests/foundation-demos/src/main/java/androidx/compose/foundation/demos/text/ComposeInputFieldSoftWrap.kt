@@ -16,8 +16,8 @@
 
 package androidx.compose.foundation.demos.text
 
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.layout.defaultMinSizeConstraints
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.CoreTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
@@ -29,9 +29,13 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun SoftWrapDemo() {
-    ScrollableColumn {
-        CoreTextFieldWithWrap(false)
-        CoreTextFieldWithWrap(true)
+    LazyColumn {
+        item {
+            CoreTextFieldWithWrap(false)
+        }
+        item {
+            CoreTextFieldWithWrap(true)
+        }
     }
 }
 

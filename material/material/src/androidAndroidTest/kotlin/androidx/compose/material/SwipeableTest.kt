@@ -19,13 +19,14 @@ package androidx.compose.material
 import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.ManualAnimationClock
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -1556,9 +1557,8 @@ class SwipeableTest {
                         orientation = Orientation.Horizontal
                     )
             ) {
-                ScrollableColumn(
-                    scrollState = scrollState,
-                    modifier = Modifier.fillMaxWidth().testTag(swipeableTag)
+                Column(
+                    Modifier.fillMaxWidth().testTag(swipeableTag).verticalScroll(scrollState)
                 ) {
                     repeat(100) {
                         Text(text = it.toString(), modifier = Modifier.height(50.dp))
@@ -1616,9 +1616,8 @@ class SwipeableTest {
                         orientation = Orientation.Horizontal
                     )
             ) {
-                ScrollableColumn(
-                    scrollState = scrollState,
-                    modifier = Modifier.fillMaxWidth().testTag(swipeableTag)
+                Column(
+                    Modifier.fillMaxWidth().testTag(swipeableTag).verticalScroll(scrollState)
                 ) {
                     repeat(100) {
                         Text(text = it.toString(), modifier = Modifier.height(50.dp))
@@ -1683,9 +1682,8 @@ class SwipeableTest {
                         orientation = Orientation.Horizontal
                     )
             ) {
-                ScrollableColumn(
-                    scrollState = scrollState,
-                    modifier = Modifier.fillMaxWidth().testTag(swipeableTag)
+                Column(
+                    Modifier.fillMaxWidth().testTag(swipeableTag).verticalScroll(scrollState)
                 ) {
                     repeat(100) {
                         Text(text = it.toString(), modifier = Modifier.height(50.dp))

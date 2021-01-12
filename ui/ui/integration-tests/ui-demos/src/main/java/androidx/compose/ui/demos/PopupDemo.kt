@@ -17,7 +17,6 @@
 package androidx.compose.ui.demos
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,9 +32,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.Text
@@ -446,8 +447,10 @@ private fun ColumnScope.PopupWithChangingSize() {
 
 @Composable
 private fun ColumnScope.PopupInsideScroller() {
-    ScrollableColumn(
-        modifier = Modifier.preferredSize(200.dp, 400.dp).align(Alignment.CenterHorizontally)
+    Column(
+        Modifier.preferredSize(200.dp, 400.dp)
+            .align(Alignment.CenterHorizontally)
+            .verticalScroll(rememberScrollState())
     ) {
         Column(Modifier.fillMaxHeight()) {
             Box(

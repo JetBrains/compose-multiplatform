@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation.demos.text
 
-import androidx.compose.foundation.ScrollableColumn
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
@@ -33,17 +33,27 @@ val lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas f
 
 @Composable
 fun MultiParagraphDemo() {
-    ScrollableColumn {
-        TagLine(tag = "multiple paragraphs basic")
-        TextDemoParagraph()
-        TagLine(tag = "multiple paragraphs TextAlign")
-        TextDemoParagraphTextAlign()
-        TagLine(tag = "multiple paragraphs line height")
-        TextDemoParagraphLineHeight()
-        TagLine(tag = "multiple paragraphs TextIndent")
-        TextDemoParagraphIndent()
-        TagLine(tag = "multiple paragraphs TextDirection")
-        TextDemoParagraphTextDirection()
+    LazyColumn {
+        item {
+            TagLine(tag = "multiple paragraphs basic")
+            TextDemoParagraph()
+        }
+        item {
+            TagLine(tag = "multiple paragraphs TextAlign")
+            TextDemoParagraphTextAlign()
+        }
+        item {
+            TagLine(tag = "multiple paragraphs line height")
+            TextDemoParagraphLineHeight()
+        }
+        item {
+            TagLine(tag = "multiple paragraphs TextIndent")
+            TextDemoParagraphIndent()
+        }
+        item {
+            TagLine(tag = "multiple paragraphs TextDirection")
+            TextDemoParagraphTextDirection()
+        }
     }
 }
 

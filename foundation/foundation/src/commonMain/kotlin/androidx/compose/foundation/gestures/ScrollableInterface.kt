@@ -16,12 +16,6 @@
 
 package androidx.compose.foundation.gestures
 
-import androidx.compose.foundation.ScrollableColumn
-// ktlint doesn't detect this being used in a doc comment
-import androidx.compose.foundation.animation.smoothScrollBy // ktlint-disable
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-
 /**
  * Scope used for suspending scroll blocks
  */
@@ -36,16 +30,17 @@ interface ScrollScope {
 
 /**
  * A an object representing something that can be scrolled. This interface is implemented by states
- * of scrollable containers such as [ScrollableColumn] and [LazyColumn] in order to provide
- * low-level scrolling control via [scroll], as well as allowing for higher-level scrolling
- * functions like  [Scrollable.smoothScrollBy] to be implemented as extension functions on
- * [Scrollable].
+ * of scrollable containers such as [androidx.compose.foundation.lazy.LazyListState] or
+ * [androidx.compose.foundation.ScrollState] in order to provide low-level scrolling control via
+ * [scroll], as well as allowing for higher-level scrolling functions like
+ * [androidx.compose.foundation.animation.smoothScrollBy] to be implemented as extension
+ * functions on [Scrollable].
  *
  * Subclasses may also have their own methods that are specific to their interaction paradigm, such
- * as [LazyListState.snapToItemIndex].
+ * as [androidx.compose.foundation.lazy.LazyListState.snapToItemIndex].
  *
  * @see ScrollableController
- * @see Scrollable.smoothScrollBy
+ * @see androidx.compose.foundation.animation.smoothScrollBy
  */
 interface Scrollable {
     /**

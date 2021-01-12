@@ -16,9 +16,9 @@
 
 package androidx.compose.foundation.demos.text
 
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -32,11 +32,15 @@ private val LongText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 
 @Composable
 fun ScrollableTextFieldDemo() {
-    ScrollableColumn {
-        TagLine("Multiline with 200.dp height")
-        MultilineTextField()
-        TagLine("Single line with 200.dp width")
-        SingleLineTextField()
+    LazyColumn {
+        item {
+            TagLine("Multiline with 200.dp height")
+            MultilineTextField()
+        }
+        item {
+            TagLine("Single line with 200.dp width")
+            SingleLineTextField()
+        }
     }
 }
 

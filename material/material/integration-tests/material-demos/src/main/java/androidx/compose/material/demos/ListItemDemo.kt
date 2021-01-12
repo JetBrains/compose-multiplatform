@@ -16,7 +16,7 @@
 
 package androidx.compose.material.demos
 
-import androidx.compose.foundation.ScrollableColumn
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.samples.ClickableListItems
@@ -35,11 +35,19 @@ fun ListItemDemo() {
     val icon40 = imageResource(R.drawable.ic_account_box)
     val icon56 = imageResource(R.drawable.ic_android)
     val vectorIcon = Icons.Default.Call
-    ScrollableColumn {
-        ClickableListItems()
-        OneLineListItems(icon24, icon40, icon56, vectorIcon)
-        TwoLineListItems(icon24, icon40)
-        ThreeLineListItems(icon24, vectorIcon)
+    LazyColumn {
+        item {
+            ClickableListItems()
+        }
+        item {
+            OneLineListItems(icon24, icon40, icon56, vectorIcon)
+        }
+        item {
+            TwoLineListItems(icon24, icon40)
+        }
+        item {
+            ThreeLineListItems(icon24, vectorIcon)
+        }
     }
 }
 
@@ -47,9 +55,15 @@ fun ListItemDemo() {
 fun MixedRtlLtrListItemDemo() {
     val icon24 = imageResource(R.drawable.ic_bluetooth)
     val icon40 = imageResource(R.drawable.ic_account_box)
-    ScrollableColumn {
-        OneLineRtlLtrListItems(icon24, icon40)
-        TwoLineRtlLtrListItems(icon40)
-        ThreeLineRtlLtrListItems(icon40)
+    LazyColumn {
+        item {
+            OneLineRtlLtrListItems(icon24, icon40)
+        }
+        item {
+            TwoLineRtlLtrListItems(icon40)
+        }
+        item {
+            ThreeLineRtlLtrListItems(icon40)
+        }
     }
 }
