@@ -297,8 +297,8 @@ internal data class DropdownMenuPositionProvider(
     val onPositionCalculated: (IntBounds, IntBounds) -> Unit = { _, _ -> }
 ) : PopupPositionProvider {
     override fun calculatePosition(
-        parentGlobalBounds: IntBounds,
-        windowGlobalBounds: IntBounds,
+        anchorBounds: IntBounds,
+        windowSize: IntSize,
         layoutDirection: LayoutDirection,
         popupContentSize: IntSize
     ): IntOffset {
@@ -309,30 +309,30 @@ internal data class DropdownMenuPositionProvider(
         val contentOffsetY = with(density) { contentOffset.y.toIntPx() }
 
         // Compute horizontal position.
-        val toRight = parentGlobalBounds.left + contentOffsetX
-        val toLeft = parentGlobalBounds.right - contentOffsetX - popupContentSize.width
-        val toDisplayRight = windowGlobalBounds.width - popupContentSize.width
+        val toRight = anchorBounds.left + contentOffsetX
+        val toLeft = anchorBounds.right - contentOffsetX - popupContentSize.width
+        val toDisplayRight = windowSize.width - popupContentSize.width
         val toDisplayLeft = 0
         val x = if (layoutDirection == LayoutDirection.Ltr) {
             sequenceOf(toRight, toLeft, toDisplayRight)
         } else {
             sequenceOf(toLeft, toRight, toDisplayLeft)
         }.firstOrNull {
-            it >= 0 && it + popupContentSize.width <= windowGlobalBounds.width
+            it >= 0 && it + popupContentSize.width <= windowSize.width
         } ?: toLeft
 
         // Compute vertical position.
-        val toBottom = maxOf(parentGlobalBounds.bottom + contentOffsetY, verticalMargin)
-        val toTop = parentGlobalBounds.top - contentOffsetY - popupContentSize.height
-        val toCenter = parentGlobalBounds.top - popupContentSize.height / 2
-        val toDisplayBottom = windowGlobalBounds.height - popupContentSize.height - verticalMargin
+        val toBottom = maxOf(anchorBounds.bottom + contentOffsetY, verticalMargin)
+        val toTop = anchorBounds.top - contentOffsetY - popupContentSize.height
+        val toCenter = anchorBounds.top - popupContentSize.height / 2
+        val toDisplayBottom = windowSize.height - popupContentSize.height - verticalMargin
         val y = sequenceOf(toBottom, toTop, toCenter, toDisplayBottom).firstOrNull {
             it >= verticalMargin &&
-                it + popupContentSize.height <= windowGlobalBounds.height - verticalMargin
+                it + popupContentSize.height <= windowSize.height - verticalMargin
         } ?: toTop
 
         onPositionCalculated(
-            parentGlobalBounds,
+            anchorBounds,
             IntBounds(x, y, x + popupContentSize.width, y + popupContentSize.height)
         )
         return IntOffset(x, y)

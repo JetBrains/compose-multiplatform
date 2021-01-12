@@ -49,10 +49,14 @@ import androidx.compose.ui.semantics.popup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntBounds
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.height
+import androidx.compose.ui.unit.plus
 import androidx.compose.ui.unit.round
+import androidx.compose.ui.unit.width
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.ViewTreeViewModelStoreOwner
 import androidx.savedstate.ViewTreeSavedStateRegistryOwner
@@ -137,17 +141,20 @@ internal actual fun ActualPopup(
 
     // TODO(soboleva): Look at module arrangement so that Box can be
     // used instead of this custom Layout
-    // Get the parent's global position, size and layout direction
+    // Get the parent's position, size and layout direction
     Layout(
         content = emptyContent(),
         modifier = Modifier.onGloballyPositioned { childCoordinates ->
             val coordinates = childCoordinates.parentCoordinates!!
-            // Get the global position of the parent
-            @Suppress("DEPRECATION")
-            val layoutPosition = coordinates.localToGlobal(Offset.Zero).round()
+            // TODO: b/177320418 use localToWindow
+            val composeViewWindowLocation = IntArray(2).apply {
+                view.getLocationInWindow(this)
+            }
+            val windowOffset = IntOffset(composeViewWindowLocation[0], composeViewWindowLocation[1])
+            val layoutPosition = (coordinates.localToRoot(Offset.Zero) + windowOffset).round()
             val layoutSize = coordinates.size
 
-            popupLayout.parentGlobalBounds = IntBounds(layoutPosition, layoutSize)
+            popupLayout.parentBounds = IntBounds(layoutPosition, layoutSize)
             // Update the popup's position
             popupLayout.updatePosition()
         }
@@ -215,7 +222,7 @@ private class PopupLayout(
     private var positionProvider: PopupPositionProvider? = null
 
     // Position params
-    var parentGlobalBounds = IntBounds(0, 0, 0, 0)
+    var parentBounds = IntBounds(0, 0, 0, 0)
     var popupContentSize = IntSize.Zero
     var parentLayoutDirection: LayoutDirection = LayoutDirection.Ltr
 
@@ -247,7 +254,7 @@ private class PopupLayout(
 
     private var content: @Composable () -> Unit by mutableStateOf(emptyContent())
 
-    protected override var shouldCreateCompositionOnAttachedToWindow: Boolean = false
+    override var shouldCreateCompositionOnAttachedToWindow: Boolean = false
         private set
 
     fun setContent(parent: CompositionReference, content: @Composable () -> Unit) {
@@ -316,26 +323,21 @@ private class PopupLayout(
     fun updatePosition() {
         val provider = positionProvider ?: return
 
-        val windowGlobalBounds = Rect().let {
-            composeView.rootView.getWindowVisibleDisplayFrame(it)
-            it.toIntBounds()
+        val windowSize = Rect().let {
+            composeView.getWindowVisibleDisplayFrame(it)
+            val bounds = it.toIntBounds()
+            IntSize(width = bounds.width, height = bounds.height)
         }
 
-        val popupGlobalPosition = provider.calculatePosition(
-            parentGlobalBounds,
-            windowGlobalBounds,
+        val popupPosition = provider.calculatePosition(
+            parentBounds,
+            windowSize,
             parentLayoutDirection,
             popupContentSize
         )
 
-        // WindowManager treats the given coordinates as relative to our window, not relative to the
-        // screen. Which means that we need to translate them. Other option would be to only work
-        // with window relative coordinates but our layout APIs don't provide this value so it
-        // could be confusing for the implementors of position provider.
-        val rootViewLocation = IntArray(2)
-        composeView.rootView.getLocationOnScreen(rootViewLocation)
-        params.x = popupGlobalPosition.x - rootViewLocation[0]
-        params.y = popupGlobalPosition.y - rootViewLocation[1]
+        params.x = popupPosition.x
+        params.y = popupPosition.y
 
         if (!viewAdded) {
             windowManager.addView(this, params)
