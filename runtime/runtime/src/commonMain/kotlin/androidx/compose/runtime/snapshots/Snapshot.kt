@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.ThreadLocal
+import androidx.compose.runtime.synchronized
 
 /**
  * Take a snapshot of the current value of all state objects. The values are preserved until
@@ -1362,7 +1363,6 @@ private val threadSnapshot = ThreadLocal<Snapshot>()
 internal val lock = Any()
 
 @PublishedApi
-@Suppress("DEPRECATION_ERROR")
 internal inline fun <T> sync(block: () -> T): T = synchronized(lock, block)
 
 // The following variables should only be written when sync is taken

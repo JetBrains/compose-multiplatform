@@ -21,6 +21,7 @@ package androidx.compose.runtime {
   }
 
   public final class ActualJvmKt {
+    method @kotlin.PublishedApi internal static inline <R> R! synchronized(Object lock, kotlin.jvm.functions.Function0<? extends R> block);
   }
 
   @androidx.compose.runtime.Stable public abstract sealed class Ambient<T> {
@@ -231,6 +232,7 @@ package androidx.compose.runtime {
   }
 
   public final class ExpectKt {
+    method @kotlin.PublishedApi internal static inline <R> R! synchronized(Object lock, kotlin.jvm.functions.Function0<? extends R> block);
   }
 
   @kotlin.RequiresOptIn(level=kotlin.RequiresOptIn.Level, message="This is an experimental API for Compose and is likely to change before becoming " + "stable.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface ExperimentalComposeApi {
