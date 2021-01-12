@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 import androidx.build.SupportConfigKt
 
 import static androidx.build.AndroidXPlugin.BUILD_ON_SERVER_TASK
@@ -44,12 +42,6 @@ kotlin {
             implementation(SKIKO_CURRENT_OS)
             implementation project(":compose:desktop:desktop")
         }
-    }
-}
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        useIR = true
     }
 }
 

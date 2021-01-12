@@ -15,9 +15,7 @@
  */
 
 import androidx.build.LibraryGroups
-import androidx.build.LibraryVersions
 import androidx.build.Publish
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 import static androidx.build.dependencies.DependenciesKt.*
 
@@ -62,10 +60,4 @@ androidx {
     inceptionYear = "2019"
     description = "Compose tooling library. This library exposes information to our tools for better IDE support."
     legacyDisableKotlinStrictApiMode = true
-}
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        useIR = true
-    }
 }

@@ -94,12 +94,6 @@ androidx {
 
 tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
-        useIR = true
-    }
-}
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
         freeCompilerArgs += ["-Xallow-jvm-ir-dependencies"]
     }
 }

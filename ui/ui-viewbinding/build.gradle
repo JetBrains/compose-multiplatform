@@ -15,9 +15,7 @@
  */
 
 import androidx.build.LibraryGroups
-import androidx.build.LibraryVersions
 import androidx.build.Publish
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 import static androidx.build.dependencies.DependenciesKt.*
 
@@ -49,18 +47,6 @@ androidx {
     description = "Compose integration with ViewBinding"
     legacyDisableKotlinStrictApiMode = true
 }
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        useIR = true
-    }
-}
-
-//android.buildTypes.all {
-//    buildFeatures {
-//        viewBinding true
-//    }
-//}
 
 android {
     buildFeatures {
