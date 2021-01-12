@@ -1,38 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="5" by="lint 4.2.0-alpha15" client="gradle" variant="debug" version="4.2.0-alpha15">
-
-    <issue
-        id="SuspiciousImport"
-        message="Don&apos;t include `android.R` here; use a fully qualified name for each usage instead"
-        errorLine1="import android.R"
-        errorLine2="~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/androidx/compose/androidview/adapters/LayoutAdapter.kt"
-            line="19"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="DefaultLocale"
-        message="Implicitly using the default locale is a common source of bugs: Use `toLowerCase(Locale)` instead. For strings meant to be internal use `Locale.ROOT`, otherwise `Locale.getDefault()`."
-        errorLine1="                val prefixString = prefix.toString().toLowerCase()"
-        errorLine2="                                                     ~~~~~~~~~~~">
-        <location
-            file="src/main/java/androidx/compose/androidview/adapters/ArrayAdapter.kt"
-            line="149"
-            column="54"/>
-    </issue>
-
-    <issue
-        id="DefaultLocale"
-        message="Implicitly using the default locale is a common source of bugs: Use `toLowerCase(Locale)` instead. For strings meant to be internal use `Locale.ROOT`, otherwise `Locale.getDefault()`."
-        errorLine1="                    val valueText = value.toString().toLowerCase()"
-        errorLine2="                                                     ~~~~~~~~~~~">
-        <location
-            file="src/main/java/androidx/compose/androidview/adapters/ArrayAdapter.kt"
-            line="158"
-            column="54"/>
-    </issue>
+<issues format="5" by="lint 4.2.0-beta02" client="gradle" variant="debug" version="4.2.0-beta02">
 
     <issue
         id="BanUncheckedReflection"
@@ -41,41 +8,8 @@
         errorLine2="                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/androidx/compose/androidview/adapters/LayoutBuilder.kt"
-            line="93"
+            line="96"
             column="26"/>
-    </issue>
-
-    <issue
-        id="UseSwitchCompatOrMaterialCode"
-        message="Use `SwitchCompat` from AppCompat or `SwitchMaterial` from Material library"
-        errorLine1="fun Switch.setSwitchMinWidth(switchMinWidth: Dimension) ="
-        errorLine2="    ~~~~~~">
-        <location
-            file="src/main/java/androidx/compose/androidview/adapters/SwitchAttributeAdapter.kt"
-            line="23"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="UseSwitchCompatOrMaterialCode"
-        message="Use `SwitchCompat` from AppCompat or `SwitchMaterial` from Material library"
-        errorLine1="fun Switch.setSwitchPadding(switchPadding: Dimension) ="
-        errorLine2="    ~~~~~~">
-        <location
-            file="src/main/java/androidx/compose/androidview/adapters/SwitchAttributeAdapter.kt"
-            line="25"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="UseSwitchCompatOrMaterialCode"
-        message="Use `SwitchCompat` from AppCompat or `SwitchMaterial` from Material library"
-        errorLine1="fun Switch.setThumbTextPadding(thumbTextPadding: Dimension) ="
-        errorLine2="    ~~~~~~">
-        <location
-            file="src/main/java/androidx/compose/androidview/adapters/SwitchAttributeAdapter.kt"
-            line="27"
-            column="5"/>
     </issue>
 
     <issue

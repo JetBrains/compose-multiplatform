@@ -1,16 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="5" by="lint 4.2.0-alpha15" client="gradle" variant="debug" version="4.2.0-alpha15">
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 26 (current min is 21): `android.content.res.Configuration#UI_MODE_TYPE_VR_HEADSET`"
-        errorLine1="        UI_MODE_TYPE_VR_HEADSET,"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/androidx/ui/tooling/preview/UiMode.kt"
-            line="52"
-            column="9"/>
-    </issue>
+<issues format="5" by="lint 4.2.0-beta02" client="gradle" variant="debug" version="4.2.0-beta02">
 
     <issue
         id="BanUncheckedReflection"
