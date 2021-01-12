@@ -22,7 +22,7 @@ import android.view.ViewGroup
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.platform.setContent
-import androidx.compose.ui.test.junit4.android.AndroidOwnerRegistry
+import androidx.compose.ui.test.junit4.android.ComposeRootRegistry
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
@@ -32,71 +32,72 @@ import org.junit.Test
 import org.junit.rules.RuleChain
 
 @LargeTest
-class AndroidOwnerRegistryTest {
+class ComposeRootRegistryTest {
 
     private val activityRule = ActivityScenarioRule(ComponentActivity::class.java)
-    private val androidOwnerRegistry = AndroidOwnerRegistry()
+    private val composeRootRegistry = ComposeRootRegistry()
 
     @get:Rule
     val testRule: RuleChain = RuleChain
-        .outerRule { base, _ -> androidOwnerRegistry.getStatementFor(base) }
+        .outerRule { base, _ -> composeRootRegistry.getStatementFor(base) }
         .around(activityRule)
 
     private val onRegistrationChangedListener =
-        object : AndroidOwnerRegistry.OnRegistrationChangedListener {
+        object : ComposeRootRegistry.OnRegistrationChangedListener {
             val recordedChanges = mutableListOf<Pair<ViewRootForTest, Boolean>>()
-            override fun onRegistrationChanged(owner: ViewRootForTest, registered: Boolean) {
-                recordedChanges.add(Pair(owner, registered))
+            override fun onRegistrationChanged(composeRoot: ViewRootForTest, registered: Boolean) {
+                recordedChanges.add(Pair(composeRoot, registered))
             }
         }
 
     @Before
     fun setUp() {
-        assertThat(androidOwnerRegistry.getUnfilteredOwners()).isEmpty()
-        androidOwnerRegistry.addOnRegistrationChangedListener(onRegistrationChangedListener)
+        assertThat(composeRootRegistry.getUnfilteredComposeRoots()).isEmpty()
+        composeRootRegistry.addOnRegistrationChangedListener(onRegistrationChangedListener)
     }
 
     @Test
     fun registryIsSetUpAndEmpty() {
-        assertThat(androidOwnerRegistry.isSetUp).isTrue()
-        assertThat(androidOwnerRegistry.getUnfilteredOwners()).isEmpty()
+        assertThat(composeRootRegistry.isSetUp).isTrue()
+        assertThat(composeRootRegistry.getUnfilteredComposeRoots()).isEmpty()
     }
 
     @Test
-    fun registerOwner() {
+    fun registerComposeRoot() {
         activityRule.scenario.onActivity { activity ->
-            // set the composable content and find an owner
+            // set the composable content and find a compose root
             activity.setContent { }
-            val owner = activity.findRootForTest()
+            val composeRoot = activity.findRootForTest()
 
             // Then it is registered
-            assertThat(androidOwnerRegistry.getUnfilteredOwners()).isEqualTo(setOf(owner))
-            assertThat(androidOwnerRegistry.getOwners()).isEqualTo(setOf(owner))
+            assertThat(composeRootRegistry.getUnfilteredComposeRoots())
+                .isEqualTo(setOf(composeRoot))
+            assertThat(composeRootRegistry.getComposeRoots()).isEqualTo(setOf(composeRoot))
             // And our listener was notified
             assertThat(onRegistrationChangedListener.recordedChanges).isEqualTo(
-                listOf(Pair(owner, true))
+                listOf(Pair(composeRoot, true))
             )
         }
     }
 
     @Test
-    fun unregisterOwner() {
+    fun unregisterViewRoot() {
         activityRule.scenario.onActivity { activity ->
-            // set the composable content and find an owner
+            // set the composable content and find a compose root
             activity.setContent { }
-            val owner = activity.findRootForTest()
+            val composeRoot = activity.findRootForTest()
 
             // And remove it from the hierarchy
             activity.setContentView(View(activity))
 
             // Then it is not registered now
-            assertThat(androidOwnerRegistry.getUnfilteredOwners()).isEmpty()
-            assertThat(androidOwnerRegistry.getOwners()).isEmpty()
+            assertThat(composeRootRegistry.getUnfilteredComposeRoots()).isEmpty()
+            assertThat(composeRootRegistry.getComposeRoots()).isEmpty()
             // But our listener was notified of addition and removal
             assertThat(onRegistrationChangedListener.recordedChanges).isEqualTo(
                 listOf(
-                    Pair(owner, true),
-                    Pair(owner, false)
+                    Pair(composeRoot, true),
+                    Pair(composeRoot, false)
                 )
             )
         }
@@ -105,21 +106,21 @@ class AndroidOwnerRegistryTest {
     @Test
     fun tearDownRegistry() {
         activityRule.scenario.onActivity { activity ->
-            // set the composable content and find an owner
+            // set the composable content and find a compose root
             activity.setContent { }
-            val owner = activity.findRootForTest()
+            val composeRoot = activity.findRootForTest()
 
             // When we tear down the registry
-            androidOwnerRegistry.tearDownRegistry()
+            composeRootRegistry.tearDownRegistry()
 
             // Then the registry is empty
-            assertThat(androidOwnerRegistry.getUnfilteredOwners()).isEmpty()
-            assertThat(androidOwnerRegistry.getOwners()).isEmpty()
+            assertThat(composeRootRegistry.getUnfilteredComposeRoots()).isEmpty()
+            assertThat(composeRootRegistry.getComposeRoots()).isEmpty()
             // And our listener was notified of addition and removal
             assertThat(onRegistrationChangedListener.recordedChanges).isEqualTo(
                 listOf(
-                    Pair(owner, true),
-                    Pair(owner, false)
+                    Pair(composeRoot, true),
+                    Pair(composeRoot, false)
                 )
             )
         }
@@ -135,9 +136,9 @@ private fun View.findRootForTest(): ViewRootForTest? {
     if (this is ViewRootForTest) return this
     if (this is ViewGroup) {
         for (i in 0 until childCount) {
-            val owner = getChildAt(i).findRootForTest()
-            if (owner != null) {
-                return owner
+            val composeRoot = getChildAt(i).findRootForTest()
+            if (composeRoot != null) {
+                return composeRoot
             }
         }
     }

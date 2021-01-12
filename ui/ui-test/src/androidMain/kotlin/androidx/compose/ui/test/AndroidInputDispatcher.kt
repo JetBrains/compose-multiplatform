@@ -46,9 +46,9 @@ internal actual fun createInputDispatcher(testContext: TestContext, owner: Owner
 
 internal class AndroidInputDispatcher(
     private val testContext: TestContext,
-    owner: Owner?,
+    composeRoot: ViewRootForTest?,
     private val sendEvent: (MotionEvent) -> Unit
-) : InputDispatcher(testContext, owner) {
+) : InputDispatcher(testContext, composeRoot) {
 
     private val batchLock = Any()
     // Batched events are generated just-in-time, given the "lateness" of the dispatching (see
