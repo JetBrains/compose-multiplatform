@@ -24,9 +24,7 @@ import androidx.compose.ui.platform.Keyboard
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.window.MenuBar
-import java.awt.Dimension
 import java.awt.Frame
-import java.awt.Toolkit
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.awt.event.WindowAdapter
@@ -392,12 +390,12 @@ class AppWindow : AppFrame {
     }
 
     /**
-     * Sets the window to the center of the screen.
+     * Sets the window to the center of the current screen.
      */
     override fun setWindowCentered() {
-        val dim: Dimension = Toolkit.getDefaultToolkit().getScreenSize()
-        val x = dim.width / 2 - width / 2
-        val y = dim.height / 2 - height / 2
+        val screenBounds = window.graphicsConfiguration.getBounds()
+        val x = (screenBounds.width - width) / 2 + screenBounds.x
+        val y = (screenBounds.height - height) / 2 + screenBounds.y
         window.setLocation(x, y)
     }
 
