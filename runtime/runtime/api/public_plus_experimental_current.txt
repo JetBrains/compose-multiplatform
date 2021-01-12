@@ -209,8 +209,8 @@ package androidx.compose.runtime {
   }
 
   public final class FlowAdapterKt {
-    method @androidx.compose.runtime.Composable @kotlinx.coroutines.ExperimentalCoroutinesApi public static inline <T> androidx.compose.runtime.State<T> collectAsState(kotlinx.coroutines.flow.StateFlow<? extends T>, optional kotlin.coroutines.CoroutineContext context);
-    method @androidx.compose.runtime.Composable public static inline <T extends R, R> androidx.compose.runtime.State<R> collectAsState(kotlinx.coroutines.flow.Flow<? extends T>, R? initial, optional kotlin.coroutines.CoroutineContext context);
+    method @androidx.compose.runtime.Composable @kotlinx.coroutines.ExperimentalCoroutinesApi public static <T> androidx.compose.runtime.State<T> collectAsState(kotlinx.coroutines.flow.StateFlow<? extends T>, optional kotlin.coroutines.CoroutineContext context);
+    method @androidx.compose.runtime.Composable public static <T extends R, R> androidx.compose.runtime.State<R> collectAsState(kotlinx.coroutines.flow.Flow<? extends T>, R? initial, optional kotlin.coroutines.CoroutineContext context);
   }
 
   @androidx.compose.runtime.StableMarker @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets=kotlin.annotation.AnnotationTarget) public @interface Immutable {
