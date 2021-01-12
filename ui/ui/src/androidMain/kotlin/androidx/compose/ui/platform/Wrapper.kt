@@ -30,7 +30,6 @@ import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.Recomposer
-import androidx.compose.runtime.compositionFor
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.tooling.InspectionTables
@@ -54,7 +53,7 @@ internal actual fun subcomposeInto(
     container: LayoutNode,
     parent: CompositionReference,
     composable: @Composable () -> Unit
-): Composition = compositionFor(
+): Composition = Composition(
     container,
     UiApplier(container),
     parent
@@ -134,7 +133,7 @@ private fun doSetContent(
         enableDebugInspectorInfo()
     }
     @OptIn(ExperimentalComposeApi::class)
-    val original = compositionFor(owner.root, UiApplier(owner.root), parent)
+    val original = Composition(owner.root, UiApplier(owner.root), parent)
     val wrapped = owner.view.getTag(R.id.wrapped_composition_tag)
         as? WrappedComposition
         ?: WrappedComposition(owner, original).also {
@@ -215,7 +214,8 @@ private class WrappedComposition(
         original.dispose()
     }
 
-    override fun hasInvalidations() = original.hasInvalidations()
+    override val hasInvalidations get() = original.hasInvalidations
+    override val isDisposed: Boolean get() = original.isDisposed
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         if (event == Lifecycle.Event.ON_DESTROY) {

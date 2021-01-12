@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-@file:OptIn(ExperimentalComposeApi::class)
+@file:OptIn(InternalComposeApi::class)
 package androidx.compose.runtime
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -43,10 +43,10 @@ class CompoundHashKeyTests : BaseComposeTest() {
         @Composable
         fun recordHashKeys() {
             invalidates.add(currentRecomposeScope)
-            outerKeys.add(currentComposer.currentCompoundKeyHash)
+            outerKeys.add(currentComposer.compoundKeyHash)
             subCompose {
                 invalidates.add(currentRecomposeScope)
-                innerKeys.add(currentComposer.currentCompoundKeyHash)
+                innerKeys.add(currentComposer.compoundKeyHash)
             }
         }
 

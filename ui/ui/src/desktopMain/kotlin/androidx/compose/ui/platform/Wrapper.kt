@@ -22,7 +22,6 @@ import androidx.compose.runtime.EmbeddingContext
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.Recomposer
-import androidx.compose.runtime.compositionFor
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.node.LayoutNode
 import kotlinx.coroutines.CoroutineScope
@@ -65,7 +64,7 @@ fun DesktopOwner.setContent(
 ): Composition {
     GlobalSnapshotManager.ensureStarted()
 
-    val composition = compositionFor(
+    val composition = Composition(
         root,
         DesktopUiApplier(root),
         parent ?: GlobalDefaultRecomposer
@@ -107,7 +106,7 @@ internal actual fun subcomposeInto(
     container: LayoutNode,
     parent: CompositionReference,
     composable: @Composable () -> Unit
-): Composition = compositionFor(
+): Composition = Composition(
     container,
     DesktopUiApplier(container),
     parent

@@ -58,7 +58,6 @@ internal fun Inspectable(
     compositionDataRecord: CompositionDataRecord,
     content: @Composable () -> Unit
 ) {
-    currentComposer.collectKeySourceInformation()
     currentComposer.collectParameterInformation()
     val store = (compositionDataRecord as CompositionDataRecordImpl).store
     store.add(currentComposer.compositionData)

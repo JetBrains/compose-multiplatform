@@ -502,7 +502,7 @@ class AmbientTests : BaseComposeTest() {
         return {
             @OptIn(ExperimentalComposeApi::class)
             // TODO(b/150390669): Review use of @ComposableContract(tracked = false)
-            compositionFor(
+            Composition(
                 container,
                 UiApplier(container),
                 ref.value

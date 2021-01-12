@@ -150,7 +150,7 @@ private class SubcomposeLayoutState :
         val nodeState = nodeToNodeState.getOrPut(node) {
             NodeState(slotId, emptyContent())
         }
-        val hasPendingChanges = nodeState.composition?.hasInvalidations() ?: true
+        val hasPendingChanges = nodeState.composition?.hasInvalidations ?: true
         if (nodeState.content !== content || hasPendingChanges) {
             nodeState.content = content
             subcompose(node, nodeState)

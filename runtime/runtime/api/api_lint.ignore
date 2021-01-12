@@ -1,6 +1,4 @@
 // Baseline format: 1.0
-CallbackName: androidx.compose.runtime.CompositionLifecycleObserver:
-    Class should be named CompositionLifecycleCallback
 CallbackName: androidx.compose.runtime.snapshots.SnapshotStateObserver:
     Class should be named SnapshotStateCallback
 
@@ -11,7 +9,7 @@ DocumentExceptions: androidx.compose.runtime.snapshots.SnapshotApplyResult.Failu
     Method Failure.check appears to be throwing androidx.compose.runtime.snapshots.SnapshotApplyConflictException; this should be recorded with a @Throws annotation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
 
 
-MissingNullability: androidx.compose.runtime.SkippableUpdater#constructor-impl(androidx.compose.runtime.Composer<?>):
+MissingNullability: androidx.compose.runtime.SkippableUpdater#constructor-impl(androidx.compose.runtime.Composer):
     Missing nullability on method `constructor-impl` return
 MissingNullability: androidx.compose.runtime.SkippableUpdater#equals-impl(androidx.compose.runtime.Composer, Object) parameter #0:
     Missing nullability on parameter `p` in method `equals-impl`
@@ -21,7 +19,7 @@ MissingNullability: androidx.compose.runtime.SkippableUpdater#toString-impl(andr
     Missing nullability on method `toString-impl` return
 MissingNullability: androidx.compose.runtime.SkippableUpdater#toString-impl(androidx.compose.runtime.Composer) parameter #0:
     Missing nullability on parameter `p` in method `toString-impl`
-MissingNullability: androidx.compose.runtime.Updater#constructor-impl(androidx.compose.runtime.Composer<?>):
+MissingNullability: androidx.compose.runtime.Updater#constructor-impl(androidx.compose.runtime.Composer):
     Missing nullability on method `constructor-impl` return
 MissingNullability: androidx.compose.runtime.Updater#equals-impl(androidx.compose.runtime.Composer, Object) parameter #0:
     Missing nullability on parameter `p` in method `equals-impl`

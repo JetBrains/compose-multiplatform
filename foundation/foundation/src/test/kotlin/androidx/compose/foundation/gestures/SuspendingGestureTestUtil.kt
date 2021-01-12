@@ -23,6 +23,7 @@ import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.Recomposer
+import androidx.compose.runtime.ControlledComposition
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.dispatch.MonotonicFrameClock
 import androidx.compose.runtime.withRunningRecomposer
@@ -298,15 +299,15 @@ internal class SuspendingGestureTestUtil(
     private fun compose(
         recomposer: Recomposer,
         block: @Composable () -> Unit
-    ): Composer<Unit> {
-        return Composer(
+    ) {
+        ControlledComposition(
             EmptyApplier(),
             recomposer
         ).apply {
-            composeInitial {
+            composeContent {
                 @Suppress("UNCHECKED_CAST")
-                val fn = block as (Composer<*>, Int) -> Unit
-                fn(this, 0)
+                val fn = block as (Composer, Int) -> Unit
+                fn(currentComposer, 0)
             }
             applyChanges()
             verifyConsistent()

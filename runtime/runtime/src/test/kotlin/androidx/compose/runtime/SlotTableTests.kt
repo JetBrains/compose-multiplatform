@@ -815,7 +815,7 @@ class SlotTableTests {
             reader.beginEmpty()
             reader.startGroup()
             assertEquals(true, reader.inEmpty)
-            assertEquals(EMPTY, reader.next())
+            assertEquals(Composer.Empty, reader.next())
             reader.endGroup()
             reader.endEmpty()
         }
@@ -1752,7 +1752,7 @@ class SlotTableTests {
         slots.write { writer ->
             assertEquals(object1, writer.groupAux(object1Index))
             assertEquals(object2, writer.groupAux(object2Index))
-            assertEquals(EMPTY, writer.groupAux(emptyIndex))
+            assertEquals(Composer.Empty, writer.groupAux(emptyIndex))
         }
     }
 

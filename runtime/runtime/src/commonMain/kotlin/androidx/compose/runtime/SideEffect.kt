@@ -40,6 +40,7 @@ import kotlinx.coroutines.launch
  */
 @Composable
 @ComposableContract(restartable = false)
+@OptIn(InternalComposeApi::class)
 fun SideEffect(
     effect: () -> Unit
 ) {
@@ -316,6 +317,7 @@ fun LaunchedEffect(
  */
 @Composable
 @ComposableContract(restartable = false)
+@OptIn(InternalComposeApi::class)
 fun LaunchedEffect(
     key1: Any?,
     block: suspend CoroutineScope.() -> Unit
@@ -337,6 +339,7 @@ fun LaunchedEffect(
  */
 @Composable
 @ComposableContract(restartable = false)
+@OptIn(InternalComposeApi::class)
 fun LaunchedEffect(
     key1: Any?,
     key2: Any?,
@@ -359,6 +362,7 @@ fun LaunchedEffect(
  */
 @Composable
 @ComposableContract(restartable = false)
+@OptIn(InternalComposeApi::class)
 fun LaunchedEffect(
     key1: Any?,
     key2: Any?,
@@ -383,6 +387,7 @@ fun LaunchedEffect(
 @Composable
 @ComposableContract(restartable = false)
 @Suppress("ArrayReturn")
+@OptIn(InternalComposeApi::class)
 fun LaunchedEffect(
     vararg keys: Any?,
     block: suspend CoroutineScope.() -> Unit
