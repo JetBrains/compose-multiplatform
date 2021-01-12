@@ -220,6 +220,14 @@ fun hasStateDescription(value: String): SemanticsMatcher = SemanticsMatcher.expe
 )
 
 /**
+ * Returns whether the node is marked as an accessibility header.
+ *
+ * @see SemanticsProperties.Heading
+ */
+fun isHeading(): SemanticsMatcher =
+    SemanticsMatcher.keyIsDefined(SemanticsProperties.Heading)
+
+/**
  * Returns whether the node's range info matches exactly to the given accessibility range info.
  *
  * @param rangeInfo range info to match.
