@@ -49,7 +49,7 @@ class TweenAnimationTest {
     @Test
     fun easingIsApplied() {
         val totalDuration = 300
-        val accelerateEasing: Easing = { fraction -> fraction * 2f }
+        val accelerateEasing: Easing = Easing { fraction -> fraction * 2f }
         val animation = VectorizedTweenSpec<AnimationVector1D>(
             durationMillis = totalDuration,
             easing = accelerateEasing
@@ -57,7 +57,7 @@ class TweenAnimationTest {
 
         val fraction = 0.3f
         val value = animation.at((totalDuration * fraction).toLong())
-        val expectedValue = accelerateEasing(fraction)
+        val expectedValue = accelerateEasing.transform(fraction)
         assertThat(value).isEqualTo(expectedValue)
     }
 

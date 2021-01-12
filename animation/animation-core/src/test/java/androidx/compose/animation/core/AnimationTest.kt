@@ -91,7 +91,7 @@ class AnimationTest {
             if (i <= 100) {
                 fraction = 0f
             } else {
-                fraction = FastOutLinearInEasing.invoke((i - 100) / 100f)
+                fraction = FastOutLinearInEasing.transform((i - 100) / 100f)
             }
             val animValue = AnimationVector(
                 lerp(startValue.v1, endValue.v1, fraction),
@@ -131,7 +131,7 @@ class AnimationTest {
         val animValue1D = AnimationVector(
             lerp(
                 start1D.value, end1D.value,
-                FastOutSlowInEasing.invoke(100f / tween1D.durationMillis)
+                FastOutSlowInEasing.transform(100f / tween1D.durationMillis)
             )
         )
         assertEquals(
@@ -167,9 +167,21 @@ class AnimationTest {
             tween3D.getValue(tween3D.delayMillis.toLong(), start3D, end3D, start3D)
         )
         val animValue3D = AnimationVector(
-            lerp(start3D.v1, end3D.v1, FastOutLinearInEasing.invoke(100f / tween3D.durationMillis)),
-            lerp(start3D.v2, end3D.v2, FastOutLinearInEasing.invoke(100f / tween3D.durationMillis)),
-            lerp(start3D.v3, end3D.v3, FastOutLinearInEasing.invoke(100f / tween3D.durationMillis))
+            lerp(
+                start3D.v1,
+                end3D.v1,
+                FastOutLinearInEasing.transform(100f / tween3D.durationMillis)
+            ),
+            lerp(
+                start3D.v2,
+                end3D.v2,
+                FastOutLinearInEasing.transform(100f / tween3D.durationMillis)
+            ),
+            lerp(
+                start3D.v3,
+                end3D.v3,
+                FastOutLinearInEasing.transform(100f / tween3D.durationMillis)
+            )
         )
         assertEquals(
             animValue3D,
@@ -186,10 +198,22 @@ class AnimationTest {
             tween4D.getValue(tween4D.delayMillis.toLong(), start4D, end4D, start4D)
         )
         val animValue4D = AnimationVector(
-            lerp(start4D.v1, end4D.v1, FastOutSlowInEasing.invoke(100f / tween4D.durationMillis)),
-            lerp(start4D.v2, end4D.v2, FastOutSlowInEasing.invoke(100f / tween4D.durationMillis)),
-            lerp(start4D.v3, end4D.v3, FastOutSlowInEasing.invoke(100f / tween4D.durationMillis)),
-            lerp(start4D.v4, end4D.v4, FastOutSlowInEasing.invoke(100f / tween4D.durationMillis))
+            lerp(
+                start4D.v1,
+                end4D.v1,
+                FastOutSlowInEasing.transform(100f / tween4D.durationMillis)
+            ),
+            lerp(
+                start4D.v2,
+                end4D.v2,
+                FastOutSlowInEasing.transform(100f / tween4D.durationMillis)
+            ),
+            lerp(
+                start4D.v3,
+                end4D.v3,
+                FastOutSlowInEasing.transform(100f / tween4D.durationMillis)
+            ),
+            lerp(start4D.v4, end4D.v4, FastOutSlowInEasing.transform(100f / tween4D.durationMillis))
         )
         assertEquals(
             animValue4D,

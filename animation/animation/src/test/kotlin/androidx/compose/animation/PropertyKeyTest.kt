@@ -57,7 +57,7 @@ class PropertyKeyTest {
         anim.toState(1)
 
         while (anim.isRunning) {
-            val fraction = FastOutLinearInEasing.invoke(clock.clockTimeMillis / 400f)
+            val fraction = FastOutLinearInEasing.transform(clock.clockTimeMillis / 400f)
             val left = start.left * (1 - fraction) + end.left * fraction
             val top = start.top * (1 - fraction) + end.top * fraction
             val right = start.right * (1 - fraction) + end.right * fraction

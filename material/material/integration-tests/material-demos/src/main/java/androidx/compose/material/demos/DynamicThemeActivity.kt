@@ -151,7 +151,7 @@ private fun Card(index: Int) {
 }
 
 private fun interpolateTheme(fraction: Float): Colors {
-    val interpolatedFraction = FastOutSlowInEasing(fraction)
+    val interpolatedFraction = FastOutSlowInEasing.transform(fraction)
 
     val primary = lerp(Color(0xFF6200EE), Color(0xFF303030), interpolatedFraction)
     val secondary = lerp(Color(0xFF03DAC6), Color(0xFFBB86FC), interpolatedFraction)

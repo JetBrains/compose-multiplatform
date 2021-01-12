@@ -212,7 +212,9 @@ class VectorizedKeyframesSpec<V : AnimationVector>(
         }
 
         // Now interpolate
-        val fraction = easing((clampedPlayTime - startTime) / (endTime - startTime).toFloat())
+        val fraction = easing.transform(
+            (clampedPlayTime - startTime) / (endTime - startTime).toFloat()
+        )
         init(start)
         for (i in 0 until startVal.size) {
             valueVector[i] = lerp(startVal[i], endVal[i], fraction)
