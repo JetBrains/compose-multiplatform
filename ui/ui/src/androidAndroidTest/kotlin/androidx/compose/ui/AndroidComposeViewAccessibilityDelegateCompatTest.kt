@@ -35,6 +35,7 @@ import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsWrapper
+import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.copyText
 import androidx.compose.ui.semantics.cutText
 import androidx.compose.ui.semantics.disabled
@@ -128,6 +129,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
         val stateDescription = "checked"
         val semanticsNode = createSemanticsNodeWithProperties(1, true) {
             this.stateDescription = stateDescription
+            heading()
             onClick(clickActionLabel) { true }
             dismiss(dismissActionLabel) { true }
         }
@@ -165,6 +167,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
             }
         }
         assertEquals(stateDescription, stateDescriptionResult)
+        assertTrue(info.isHeading)
         assertTrue(info.isClickable)
         assertTrue(info.isVisibleToUser)
     }

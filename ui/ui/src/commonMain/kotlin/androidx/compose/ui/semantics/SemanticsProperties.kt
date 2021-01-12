@@ -59,6 +59,13 @@ object SemanticsProperties {
         SemanticsPropertyKey<ProgressBarRangeInfo>("ProgressBarRangeInfo")
 
     /**
+     * The node is marked as heading for accessibility.
+     *
+     * @see SemanticsPropertyReceiver.heading
+     */
+    val Heading = SemanticsPropertyKey<Unit>("Heading")
+
+    /**
      * @see SemanticsPropertyReceiver.disabled
      */
     val Disabled = SemanticsPropertyKey<Unit>("Disabled")
@@ -438,6 +445,15 @@ var SemanticsPropertyReceiver.progressBarRangeInfo by SemanticsProperties.Progre
     ReplaceWith("progressBarRangeInfo", "androidx.compose.ui.semantics")
 )
 var SemanticsPropertyReceiver.stateDescriptionRange by SemanticsProperties.ProgressBarRangeInfo
+
+/**
+ * The node is marked as heading for accessibility.
+ *
+ * @see SemanticsProperties.Heading
+ */
+fun SemanticsPropertyReceiver.heading() {
+    this[SemanticsProperties.Heading] = Unit
+}
 
 /**
  * Whether this semantics node is disabled. Note that proper [SemanticsActions] should still
