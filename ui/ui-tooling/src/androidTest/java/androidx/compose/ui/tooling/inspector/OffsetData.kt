@@ -32,8 +32,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 /**
  * WARNING: Any modification of this *requires* a change to OffsetInformationTest
@@ -53,7 +53,7 @@ fun OffsetData() {
                 style = TextStyle(
                     color = Color.Magenta,
                     background = Color.White,
-                    fontSize = TextUnit.Sp(30)
+                    fontSize = 30.sp
                 )
             )
             Greeting("Android")
