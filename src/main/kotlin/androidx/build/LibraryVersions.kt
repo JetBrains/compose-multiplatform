@@ -35,7 +35,7 @@ object LibraryVersions {
     val BIOMETRIC = Version("1.2.0-alpha02")
     val BROWSER = Version("1.3.0-rc01")
     val BUILDSRC_TESTS = Version("1.0.0-alpha01")
-    val CAMERA = Version("1.0.0-rc01")
+    val CAMERA = Version("1.1.0-alpha01")
     val CAMERA_EXTENSIONS = Version("1.0.0-alpha21")
     val CAMERA_PIPE = Version("1.0.0-alpha01")
     val CAMERA_VIDEO = Version("1.0.0-alpha01")
