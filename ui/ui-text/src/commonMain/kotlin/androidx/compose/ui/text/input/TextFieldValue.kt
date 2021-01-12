@@ -27,55 +27,6 @@ import kotlin.math.max
 import kotlin.math.min
 
 /**
- * Stores an input state for IME
- *
- * IME can request editor state with calling getTextBeforeCursor, getSelectedText, etc.
- * This class stores a snapshot of the input state of the edit buffer and provide utility functions
- * for answering these information retrieval requests.
- */
-@Immutable
-@Deprecated(
-    "Please use androidx.compose.ui.text.input.TextFieldValue instead",
-    ReplaceWith("TextFieldValue", "androidx.compose.ui.text.input.TextFieldValue")
-)
-data class EditorValue(
-    /**
-     * A text visible to IME
-     */
-    val text: String = "",
-
-    /**
-     * A selection range visible to IME.
-     * The selection range must be valid range in the given text.
-     */
-    val selection: TextRange = TextRange.Zero,
-
-    /**
-     * A composition range visible to IME.
-     * If null, there is no composition range.
-     * If non-null, the composition range must be valid range in the given text.
-     */
-    val composition: TextRange? = null
-) {
-    /**
-     * Helper function for getting text before selection range.
-     */
-    fun getTextBeforeSelection(maxChars: Int): String =
-        text.substring(max(0, selection.min - maxChars), selection.min)
-
-    /**
-     * Helper function for getting text after selection range.
-     */
-    fun getTextAfterSelection(maxChars: Int): String =
-        text.substring(selection.max, min(selection.max + maxChars, text.length))
-
-    /**
-     * Helper function for getting text currently selected.
-     */
-    fun getSelectedText(): String = text.substring(selection)
-}
-
-/**
  * A class holding information about the editing state.
  *
  * The input service updates text selection, cursor, text and text composition. This class

@@ -22,7 +22,7 @@ import androidx.compose.runtime.Stable
  * Defines a horizontal line to be drawn on the text.
  */
 @Immutable
-data class TextDecoration internal constructor(val mask: Int) {
+class TextDecoration internal constructor(val mask: Int) {
 
     companion object {
         @Stable
@@ -93,5 +93,16 @@ data class TextDecoration internal constructor(val mask: Int) {
             return "TextDecoration.${values[0]}"
         }
         return "TextDecoration[${values.joinToString(separator = ", ")}]"
+    }
+
+    override operator fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is TextDecoration) return false
+        if (mask != other.mask) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return mask
     }
 }

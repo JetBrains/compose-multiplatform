@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.LayoutDirection
 /**
  * The data class which holds the set of parameters of the text layout computation.
  */
-data class TextLayoutInput(
+class TextLayoutInput(
     /**
      * The text used for computing text layout.
      */
@@ -86,12 +86,86 @@ data class TextLayoutInput(
      * The minimum width provided while calculating this text layout.
      */
     val constraints: Constraints
-)
+) {
+
+    fun copy(
+        text: AnnotatedString = this.text,
+        style: TextStyle = this.style,
+        placeholders: List<AnnotatedString.Range<Placeholder>> = this.placeholders,
+        maxLines: Int = this.maxLines,
+        softWrap: Boolean = this.softWrap,
+        overflow: TextOverflow = this.overflow,
+        density: Density = this.density,
+        layoutDirection: LayoutDirection = this.layoutDirection,
+        resourceLoader: Font.ResourceLoader = this.resourceLoader,
+        constraints: Constraints = this.constraints
+    ): TextLayoutInput {
+        return TextLayoutInput(
+            text = text,
+            style = style,
+            placeholders = placeholders,
+            maxLines = maxLines,
+            softWrap = softWrap,
+            overflow = overflow,
+            density = density,
+            layoutDirection = layoutDirection,
+            resourceLoader = resourceLoader,
+            constraints = constraints
+        )
+    }
+
+    override operator fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is TextLayoutInput) return false
+
+        if (text != other.text) return false
+        if (style != other.style) return false
+        if (placeholders != other.placeholders) return false
+        if (maxLines != other.maxLines) return false
+        if (softWrap != other.softWrap) return false
+        if (overflow != other.overflow) return false
+        if (density != other.density) return false
+        if (layoutDirection != other.layoutDirection) return false
+        if (resourceLoader != other.resourceLoader) return false
+        if (constraints != other.constraints) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = text.hashCode()
+        result = 31 * result + style.hashCode()
+        result = 31 * result + placeholders.hashCode()
+        result = 31 * result + maxLines
+        result = 31 * result + softWrap.hashCode()
+        result = 31 * result + overflow.hashCode()
+        result = 31 * result + density.hashCode()
+        result = 31 * result + layoutDirection.hashCode()
+        result = 31 * result + resourceLoader.hashCode()
+        result = 31 * result + constraints.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "TextLayoutInput(" +
+            "text=$text, " +
+            "style=$style, " +
+            "placeholders=$placeholders, " +
+            "maxLines=$maxLines, " +
+            "softWrap=$softWrap, " +
+            "overflow=$overflow, " +
+            "density=$density, " +
+            "layoutDirection=$layoutDirection, " +
+            "resourceLoader=$resourceLoader, " +
+            "constraints=$constraints" +
+            ")"
+    }
+}
 
 /**
  * The data class which holds text layout result.
  */
-data class TextLayoutResult internal constructor(
+class TextLayoutResult internal constructor(
     /**
      * The parameters used for computing this text layout result.
      */
@@ -341,6 +415,52 @@ data class TextLayoutResult internal constructor(
      * @return a drawing path
      */
     fun getPathForRange(start: Int, end: Int): Path = multiParagraph.getPathForRange(start, end)
+
+    fun copy(
+        layoutInput: TextLayoutInput = this.layoutInput,
+        size: IntSize = this.size
+    ): TextLayoutResult {
+        return TextLayoutResult(
+            layoutInput = layoutInput,
+            multiParagraph = multiParagraph,
+            size = size
+        )
+    }
+
+    override operator fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is TextLayoutResult) return false
+
+        if (layoutInput != other.layoutInput) return false
+        if (multiParagraph != other.multiParagraph) return false
+        if (size != other.size) return false
+        if (firstBaseline != other.firstBaseline) return false
+        if (lastBaseline != other.lastBaseline) return false
+        if (placeholderRects != other.placeholderRects) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = layoutInput.hashCode()
+        result = 31 * result + multiParagraph.hashCode()
+        result = 31 * result + size.hashCode()
+        result = 31 * result + firstBaseline.hashCode()
+        result = 31 * result + lastBaseline.hashCode()
+        result = 31 * result + placeholderRects.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "TextLayoutResult(" +
+            "layoutInput=$layoutInput, " +
+            "multiParagraph=$multiParagraph, " +
+            "size=$size, " +
+            "firstBaseline=$firstBaseline, " +
+            "lastBaseline=$lastBaseline, " +
+            "placeholderRects=$placeholderRects" +
+            ")"
+    }
 }
 
 /*@VisibleForTesting*/

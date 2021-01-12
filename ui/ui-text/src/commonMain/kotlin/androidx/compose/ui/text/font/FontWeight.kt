@@ -28,13 +28,7 @@ import androidx.compose.ui.util.lerp
  * @see FontFamily
  */
 @Immutable
-/* inline */ data class FontWeight(val weight: Int) : Comparable<FontWeight> {
-
-    init {
-        require(weight in 1..1000) {
-            "Font weight can be in range [1, 1000]. Current value: $weight"
-        }
-    }
+class FontWeight(val weight: Int) : Comparable<FontWeight> {
 
     companion object {
         /** [Thin] */
@@ -109,8 +103,29 @@ import androidx.compose.ui.util.lerp
         )
     }
 
-    override fun compareTo(other: FontWeight): Int {
+    init {
+        require(weight in 1..1000) {
+            "Font weight can be in range [1, 1000]. Current value: $weight"
+        }
+    }
+
+    override operator fun compareTo(other: FontWeight): Int {
         return weight.compareTo(other.weight)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is FontWeight) return false
+        if (weight != other.weight) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return weight
+    }
+
+    override fun toString(): String {
+        return "FontWeight(weight=$weight)"
     }
 }
 
