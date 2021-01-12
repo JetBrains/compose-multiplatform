@@ -71,7 +71,7 @@ class FocusManagerTest(private val initialFocusState: FocusState) {
     }
 
     @Test
-    fun clearFocus_changesStateToInactive() {
+    fun releaseFocus_changesStateToInactive() {
         // Arrange.
         focusModifier.focusState = initialFocusState
         if (initialFocusState == ActiveParent) {
@@ -89,6 +89,56 @@ class FocusManagerTest(private val initialFocusState: FocusState) {
             when (initialFocusState) {
                 Active, ActiveParent, Captured, Inactive -> Inactive
                 Disabled -> initialFocusState
+            }
+        )
+    }
+
+    @Test
+    fun clearFocus_forced() {
+        // Arrange.
+        focusModifier.focusState = initialFocusState
+        if (initialFocusState == ActiveParent) {
+            val childLayoutNode = LayoutNode()
+            val child = ModifiedFocusNode(InnerPlaceable(childLayoutNode), FocusModifier(Active))
+            focusModifier.focusNode.layoutNode._children.add(childLayoutNode)
+            focusModifier.focusedChild = child
+        }
+
+        // Act.
+        focusManager.clearFocus(forcedClear = true)
+
+        // Assert.
+        assertThat(focusModifier.focusState).isEqualTo(
+            when (initialFocusState) {
+                // If the initial state was focused, assert that after clearing the hierarchy,
+                // the root is set to Active.
+                Active, ActiveParent, Captured -> Active
+                Disabled, Inactive -> initialFocusState
+            }
+        )
+    }
+
+    @Test
+    fun clearFocus_notForced() {
+        // Arrange.
+        focusModifier.focusState = initialFocusState
+        if (initialFocusState == ActiveParent) {
+            val childLayoutNode = LayoutNode()
+            val child = ModifiedFocusNode(InnerPlaceable(childLayoutNode), FocusModifier(Active))
+            focusModifier.focusNode.layoutNode._children.add(childLayoutNode)
+            focusModifier.focusedChild = child
+        }
+
+        // Act.
+        focusManager.clearFocus(forcedClear = false)
+
+        // Assert.
+        assertThat(focusModifier.focusState).isEqualTo(
+            when (initialFocusState) {
+                // If the initial state was focused, assert that after clearing the hierarchy,
+                // the root is set to Active.
+                Active, ActiveParent -> Active
+                Captured, Disabled, Inactive -> initialFocusState
             }
         )
     }

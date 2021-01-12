@@ -18,6 +18,9 @@ package androidx.compose.ui.focus
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusState.Active
+import androidx.compose.ui.focus.FocusState.ActiveParent
+import androidx.compose.ui.focus.FocusState.Captured
+import androidx.compose.ui.focus.FocusState.Disabled
 import androidx.compose.ui.focus.FocusState.Inactive
 import androidx.compose.ui.gesture.PointerInputModifierImpl
 import androidx.compose.ui.gesture.TapGestureFilter
@@ -50,17 +53,9 @@ internal class FocusManagerImpl(
     private val passThroughClickModifier = PointerInputModifierImpl(
         TapGestureFilter().apply {
             onTap = {
-                if (focusModifier.focusState == Inactive) {
-
-                    // This view does not have focus, and the user clicked on some non-clickable
-                    // part of the screen. This is an indication that the user wants to bring
-                    // this view (this app) in focus.
-                    focusModifier.focusNode.requestFocus(propagateFocus = false)
-                } else {
-                    // The user clicked on a non-clickable part of the screen when something was
-                    // focused. This is an indication that the user wants to clear focus.
-                    clearFocus()
-                }
+                // The user clicked on a non-clickable part of the screen when something was
+                // focused. This is an indication that the user wants to clear focus.
+                clearFocus()
             }
             consumeChanges = false
         }
@@ -110,7 +105,15 @@ internal class FocusManagerImpl(
      * component.
      */
     override fun clearFocus(forcedClear: Boolean) {
-        if (focusModifier.focusNode.clearFocus(forcedClear)) {
+        // If this hierarchy had focus before clearing it, it indicates that the host view has
+        // focus. So after clearing focus within the compose hierarchy, we should reset the root
+        // focus modifier to "Active" to maintain consistency with the host view.
+        val rootWasFocused = when (focusModifier.focusState) {
+            Active, ActiveParent, Captured -> true
+            Disabled, Inactive -> false
+        }
+
+        if (focusModifier.focusNode.clearFocus(forcedClear) && rootWasFocused) {
             focusModifier.focusState = Active
         }
     }
