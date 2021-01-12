@@ -17,6 +17,7 @@
 package androidx.compose.foundation
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,6 +25,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
@@ -381,9 +383,8 @@ class ScrollbarTest {
         Box(Modifier.size(size)) {
             val state = rememberScrollState()
 
-            ScrollableColumn(
-                Modifier.fillMaxSize().testTag("column"),
-                state
+            Column(
+                Modifier.fillMaxSize().testTag("column").verticalScroll(state)
             ) {
                 repeat(childCount) {
                     Box(Modifier.size(childSize).testTag("box$it"))
@@ -409,9 +410,8 @@ class ScrollbarTest {
         Box(Modifier.size(size)) {
             val state = rememberScrollState()
 
-            ScrollableColumn(
-                Modifier.fillMaxSize().testTag("column"),
-                state,
+            Column(
+                Modifier.fillMaxSize().testTag("column").verticalScroll(state),
                 content = scrollableContent
             )
 

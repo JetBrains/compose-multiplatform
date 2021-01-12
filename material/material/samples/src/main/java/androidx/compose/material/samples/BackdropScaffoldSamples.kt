@@ -86,13 +86,13 @@ fun BackdropScaffoldSample() {
         },
         backLayerContent = {
             LazyColumn {
-                for (i in 1..5) item {
+                items(5) {
                     ListItem(
                         Modifier.clickable {
-                            selection.value = i
+                            selection.value = it
                             scaffoldState.conceal()
                         },
-                        text = { Text("Select $i") }
+                        text = { Text("Select $it") }
                     )
                 }
             }
@@ -100,9 +100,9 @@ fun BackdropScaffoldSample() {
         frontLayerContent = {
             Text("Selection: ${selection.value}")
             LazyColumn {
-                for (i in 1..50) item {
+                items(50) {
                     ListItem(
-                        text = { Text("Item $i") },
+                        text = { Text("Item $it") },
                         icon = { Icon(Icons.Default.Favorite) }
                     )
                 }

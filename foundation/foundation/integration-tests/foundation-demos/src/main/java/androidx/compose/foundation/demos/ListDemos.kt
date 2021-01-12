@@ -19,7 +19,6 @@ package androidx.compose.foundation.demos
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.animation.smoothScrollBy
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -43,9 +42,12 @@ import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.samples.StickyHeaderSample
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.AmbientTextStyle
@@ -120,7 +122,7 @@ private fun ListAddRemoveItemsDemo() {
             Button(modifier = buttonModifier, onClick = { offset++ }) { Text("Offset") }
         }
         LazyColumn(Modifier.fillMaxWidth()) {
-            items((1..numItems).map { it + offset }.toList()) {
+            items((1..numItems).map { it + offset }) {
                 Text("$it", style = AmbientTextStyle.current.copy(fontSize = 40.sp))
             }
         }
@@ -193,7 +195,7 @@ private fun ListHoistedStateDemo() {
             Modifier.fillMaxWidth(),
             state = state
         ) {
-            items((0..1000).toList()) {
+            items(1000) {
                 Text("$it", style = AmbientTextStyle.current.copy(fontSize = 40.sp))
             }
         }
@@ -215,7 +217,7 @@ fun Button(modifier: Modifier = Modifier, onClick: () -> Unit, content: @Composa
 @Composable
 private fun LazyRowItemsDemo() {
     LazyRow {
-        items((1..1000).toList()) {
+        items(1000) {
             Square(it)
         }
     }
@@ -253,12 +255,12 @@ private fun ListWithIndexSample() {
 private fun RtlListDemo() {
     Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
         LazyRow(Modifier.fillMaxWidth()) {
-            itemsIndexed((0..100).toList()) { index, item ->
+            items(100) {
                 Text(
-                    "$item",
+                    "$it",
                     Modifier
                         .size(100.dp)
-                        .background(if (index % 2 == 0) Color.LightGray else Color.Transparent)
+                        .background(if (it % 2 == 0) Color.LightGray else Color.Transparent)
                         .padding(16.dp)
                 )
             }
@@ -287,7 +289,7 @@ private val colors = listOf(
 @Composable
 private fun LazyColumnScope() {
     LazyColumn {
-        items((1..10).toList()) {
+        items(10) {
             Text("$it", fontSize = 40.sp)
         }
 
@@ -305,7 +307,7 @@ private fun LazyColumnScope() {
 @Composable
 private fun LazyRowScope() {
     LazyRow {
-        items((1..10).toList()) {
+        items(10) {
             Text("$it", fontSize = 40.sp)
         }
 
@@ -359,11 +361,14 @@ private fun LazyListArrangements() {
                         .border(1.dp, Color.Cyan)
                 )
             }
-            ScrollableColumn(
+            Column(
                 verticalArrangement = Arrangements[arrangement],
-                modifier = Modifier.weight(1f).fillMaxHeight()
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .verticalScroll(rememberScrollState())
             ) {
-                (1..count).forEach {
+                repeat(count) {
                     item()
                 }
             }
@@ -371,7 +376,7 @@ private fun LazyListArrangements() {
                 verticalArrangement = Arrangements[arrangement],
                 modifier = Modifier.weight(1f).fillMaxHeight()
             ) {
-                items((1..count).toList()) {
+                items(count) {
                     item()
                 }
             }
@@ -427,19 +432,20 @@ fun ReverseLayout() {
             val item2 = @Composable { index: Int ->
                 Text("After $index")
             }
-            ScrollableColumn(
-                reverseScrollDirection = reverse,
+            Column(
                 verticalArrangement = if (reverse) Arrangement.Bottom else Arrangement.Top,
-                scrollState = scrollState,
-                modifier = Modifier.weight(1f).fillMaxHeight()
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .verticalScroll(scrollState, reverseScrolling = reverse)
             ) {
                 if (reverse) {
-                    (count downTo 1).forEach {
+                    (count - 1 downTo 0).forEach {
                         item2(it)
                         item1(it)
                     }
                 } else {
-                    (1..count).forEach {
+                    (0 until count).forEach {
                         item1(it)
                         item2(it)
                     }
@@ -450,7 +456,7 @@ fun ReverseLayout() {
                 state = lazyState,
                 modifier = Modifier.weight(1f).fillMaxHeight()
             ) {
-                items((1..count).toList()) {
+                items(count) {
                     item1(it)
                     item2(it)
                 }
@@ -475,12 +481,12 @@ private fun NestedLazyDemo() {
     LazyColumn {
         item {
             LazyRow {
-                items(List(100) { it }) {
+                items(100) {
                     item(it)
                 }
             }
         }
-        items(List(100) { it }) {
+        items(100) {
             item(it)
         }
     }
@@ -512,9 +518,7 @@ private fun LazyGridForMode(mode: GridCells) {
     LazyVerticalGrid(
         cells = mode
     ) {
-        items(
-            items = (1..100).toList()
-        ) {
+        items(100) {
             Text(
                 text = "$it",
                 fontSize = 20.sp,

@@ -18,13 +18,16 @@ package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
+import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
@@ -231,5 +234,73 @@ class LazyGridTest {
 
         rule.onNodeWithTag("3")
             .assertDoesNotExist()
+    }
+
+    @Test
+    fun usedWithArray() {
+        val items = arrayOf("1", "2", "3", "4")
+
+        val itemSize = with(rule.density) { 15.toDp() }
+
+        rule.setContent {
+            LazyVerticalGrid(
+                GridCells.Fixed(2),
+                Modifier.width(itemSize * 2)
+            ) {
+                items(items) {
+                    Spacer(Modifier.height(itemSize).testTag(it))
+                }
+            }
+        }
+
+        rule.onNodeWithTag("1")
+            .assertTopPositionInRootIsEqualTo(0.dp)
+            .assertLeftPositionInRootIsEqualTo(0.dp)
+
+        rule.onNodeWithTag("2")
+            .assertTopPositionInRootIsEqualTo(0.dp)
+            .assertLeftPositionInRootIsEqualTo(itemSize)
+
+        rule.onNodeWithTag("3")
+            .assertTopPositionInRootIsEqualTo(itemSize)
+            .assertLeftPositionInRootIsEqualTo(0.dp)
+
+        rule.onNodeWithTag("4")
+            .assertTopPositionInRootIsEqualTo(itemSize)
+            .assertLeftPositionInRootIsEqualTo(itemSize)
+    }
+
+    @Test
+    fun usedWithArrayIndexed() {
+        val items = arrayOf("1", "2", "3", "4")
+
+        val itemSize = with(rule.density) { 15.toDp() }
+
+        rule.setContent {
+            LazyVerticalGrid(
+                GridCells.Fixed(2),
+                Modifier.width(itemSize * 2)
+            ) {
+                itemsIndexed(items) { index, item ->
+                    Spacer(Modifier.height(itemSize).testTag("$index*$item"))
+                }
+            }
+        }
+
+        rule.onNodeWithTag("0*1")
+            .assertTopPositionInRootIsEqualTo(0.dp)
+            .assertLeftPositionInRootIsEqualTo(0.dp)
+
+        rule.onNodeWithTag("1*2")
+            .assertTopPositionInRootIsEqualTo(0.dp)
+            .assertLeftPositionInRootIsEqualTo(itemSize)
+
+        rule.onNodeWithTag("2*3")
+            .assertTopPositionInRootIsEqualTo(itemSize)
+            .assertLeftPositionInRootIsEqualTo(0.dp)
+
+        rule.onNodeWithTag("3*4")
+            .assertTopPositionInRootIsEqualTo(itemSize)
+            .assertLeftPositionInRootIsEqualTo(itemSize)
     }
 }

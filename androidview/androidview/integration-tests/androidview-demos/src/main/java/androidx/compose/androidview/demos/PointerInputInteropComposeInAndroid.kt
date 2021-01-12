@@ -25,12 +25,11 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.compose.androidview.adapters.setOnClick
-import androidx.compose.foundation.ScrollableColumn
-import androidx.compose.foundation.ScrollableRow
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,6 +38,8 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.integration.demos.common.ActivityDemo
 import androidx.compose.integration.demos.common.DemoCategory
 import androidx.compose.material.Button
@@ -240,12 +241,13 @@ open class ComposeScrollInAndroidScrollSameOrientation : ComponentActivity() {
         container.addView(
             ComposeView(this).apply {
                 setContent {
-                    ScrollableColumn(
+                    Column(
                         modifier = Modifier
                             .padding(48.dp)
                             .background(color = Color.Gray)
                             .fillMaxWidth()
                             .preferredHeight(456.dp)
+                            .verticalScroll(rememberScrollState())
                     ) {
                         Box(
                             Modifier
@@ -285,12 +287,13 @@ open class ComposeScrollInAndroidScrollDifferentOrientation : ComponentActivity(
         container.addView(
             ComposeView(this).apply {
                 setContent {
-                    ScrollableRow(
+                    Row(
                         modifier = Modifier
                             .padding(48.dp)
                             .background(color = Color.Gray)
                             .fillMaxWidth()
                             .preferredHeight(456.dp)
+                            .verticalScroll(rememberScrollState())
                     ) {
                         Box(
                             Modifier

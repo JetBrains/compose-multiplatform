@@ -20,15 +20,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -105,7 +107,7 @@ class IsDisplayedTest(val config: TestConfig) {
     @Test
     fun componentInScrollable_isDisplayed() {
         rule.setContent {
-            ScrollableColumn(modifier = Modifier.size(100.dp)) {
+            Column(modifier = Modifier.size(100.dp).verticalScroll(rememberScrollState())) {
                 repeat(10) { Item(it, height = 30.dp) }
             }
         }
@@ -117,7 +119,7 @@ class IsDisplayedTest(val config: TestConfig) {
     @Test
     fun componentInScrollable_isNotDisplayed() {
         rule.setContent {
-            ScrollableColumn(modifier = Modifier.size(100.dp)) {
+            Column(modifier = Modifier.size(100.dp).verticalScroll(rememberScrollState())) {
                 repeat(10) { Item(it, height = 30.dp) }
             }
         }

@@ -70,7 +70,7 @@ import kotlin.math.roundToInt
  * Create and [remember] the [ScrollState] based on the currently appropriate scroll
  * configuration to allow changing scroll position or observing scroll behavior.
  *
- * Learn how to control [ScrollableColumn] or [ScrollableRow]:
+ * Learn how to control the state of [Modifier.verticalScroll] or [Modifier.horizontalScroll]:
  * @sample androidx.compose.foundation.samples.ControlledScrollableRowSample
  *
  * @param initial initial scroller position to start with
@@ -100,13 +100,13 @@ fun rememberScrollState(
 
 /**
  * State of the scroll. Allows the developer to change the scroll position or get current state by
- * calling methods on this object. To be hosted and passed to [ScrollableRow], [ScrollableColumn],
- * [Modifier.verticalScroll] or [Modifier.horizontalScroll]
+ * calling methods on this object. To be hosted and passed to [Modifier.verticalScroll] or
+ * [Modifier.horizontalScroll]
  *
  * To create and automatically remember [ScrollState] with default parameters use
  * [rememberScrollState].
  *
- * Learn how to control [ScrollableColumn] or [ScrollableRow]:
+ * Learn how to control the state of [Modifier.verticalScroll] or [Modifier.horizontalScroll]:
  * @sample androidx.compose.foundation.samples.ControlledScrollableRowSample
  *
  * @param initial value of the scroll
@@ -256,8 +256,6 @@ class ScrollState(
  *
  * The content of the [ScrollableColumn] is clipped to its bounds.
  *
- * @sample androidx.compose.foundation.samples.ScrollableColumnSample
- *
  * @param modifier modifier for this [ScrollableColumn]
  * @param scrollState state of the scroll, such as current offset and max offset
  * @param verticalArrangement The vertical arrangement of the layout's children
@@ -270,6 +268,19 @@ class ScrollState(
  * padding for the content after it has been clipped, which is not possible via [modifier] param
  */
 @Composable
+@Deprecated(
+    "Prefer to use LazyColumn instead. Or you can use Column(Modifier.verticalScroll" +
+        "(rememberScrollState()) if your scrolling content is small enough.",
+    ReplaceWith(
+        "LazyColumn(modifier = modifier, contentPadding = contentPadding, " +
+            "reverseLayout = reverseScrollDirection, horizontalAlignment = horizontalAlignment) {" +
+            "\n // use `item` for separate elements like headers" +
+            "\n // and `items` for lists of identical elements" +
+            "\n item (content)" +
+            "\n }",
+        "androidx.compose.foundation.lazy.LazyColumn"
+    )
+)
 fun ScrollableColumn(
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(0f),
@@ -299,8 +310,6 @@ fun ScrollableColumn(
  *
  * The content of the [ScrollableRow] is clipped to its bounds.
  *
- * @sample androidx.compose.foundation.samples.ScrollableRowSample
- *
  * @param modifier modifier for this [ScrollableRow]
  * @param scrollState state of the scroll, such as current offset and max offset
  * @param horizontalArrangement The horizontal arrangement of the layout's children
@@ -313,6 +322,19 @@ fun ScrollableColumn(
  * padding for the content after it has been clipped, which is not possible via [modifier] param.
  */
 @Composable
+@Deprecated(
+    "Prefer to use LazyRow instead. Or you can use Row(Modifier.horizontalScroll" +
+        "(rememberScrollState()) if your scrolling content is small enough.",
+    ReplaceWith(
+        "LazyRow(modifier = modifier, contentPadding = contentPadding, " +
+            "reverseLayout = reverseScrollDirection, verticalAlignment = verticalAlignment) {" +
+            "\n // use `item` for separate elements like headers" +
+            "\n // and `items` for lists of identical elements" +
+            "\n item (content)" +
+            "\n }",
+        "androidx.compose.foundation.lazy.LazyRow"
+    )
+)
 fun ScrollableRow(
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(0f),

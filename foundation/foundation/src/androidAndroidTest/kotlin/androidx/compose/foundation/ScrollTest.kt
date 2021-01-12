@@ -22,6 +22,8 @@ import androidx.compose.animation.core.FloatExponentialDecaySpec
 import androidx.compose.animation.core.ManualAnimationClock
 import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.text.BasicText
@@ -557,9 +559,11 @@ class ScrollTest {
         val itemCount = mutableStateOf(100)
         rule.setContent {
             Box {
-                ScrollableColumn(
-                    scrollState = scrollState,
-                    modifier = Modifier.preferredSize(100.dp).testTag(scrollerTag)
+                Column(
+                    Modifier
+                        .preferredSize(100.dp)
+                        .testTag(scrollerTag)
+                        .verticalScroll(scrollState)
                 ) {
                     for (i in 0..itemCount.value) {
                         BasicText(i.toString())
@@ -663,7 +667,7 @@ class ScrollTest {
 
         restorationTester.setContent {
             scrollState = rememberScrollState()
-            ScrollableColumn(scrollState = scrollState!!) {
+            Column(Modifier.verticalScroll(scrollState!!)) {
                 repeat(50) {
                     Box(Modifier.preferredHeight(100.dp))
                 }
@@ -765,12 +769,11 @@ class ScrollTest {
         with(rule.density) {
             rule.setContent {
                 Box {
-                    ScrollableColumn(
-                        scrollState = scrollState,
-                        reverseScrollDirection = isReversed,
+                    Column(
                         modifier = Modifier
                             .preferredSize(width.toDp(), height.toDp())
                             .testTag(scrollerTag)
+                            .verticalScroll(scrollState, reverseScrolling = isReversed)
                     ) {
                         colors.forEach { color ->
                             Box(
@@ -802,12 +805,11 @@ class ScrollTest {
                 val direction = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
                 Providers(AmbientLayoutDirection provides direction) {
                     Box {
-                        ScrollableRow(
-                            reverseScrollDirection = isReversed,
-                            scrollState = scrollState,
+                        Row(
                             modifier = Modifier
                                 .preferredSize(width.toDp(), height.toDp())
                                 .testTag(scrollerTag)
+                                .horizontalScroll(scrollState, reverseScrolling = isReversed)
                         ) {
                             colors.forEach { color ->
                                 Box(
@@ -879,20 +881,19 @@ class ScrollTest {
                     Modifier.preferredSize(width, height).background(Color.White)
                 ) {
                     if (isVertical) {
-                        ScrollableColumn(
-                            Modifier.testTag(scrollerTag),
-                            scrollState = scrollState,
-                            reverseScrollDirection = isReversed
+                        Column(
+                            Modifier
+                                .testTag(scrollerTag)
+                                .verticalScroll(scrollState, reverseScrolling = isReversed)
                         ) {
                             content()
                         }
                     } else {
                         val direction = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
                         Providers(AmbientLayoutDirection provides direction) {
-                            ScrollableRow(
-                                Modifier.testTag(scrollerTag),
-                                scrollState = scrollState,
-                                reverseScrollDirection = isReversed
+                            Row(
+                                Modifier.testTag(scrollerTag)
+                                    .horizontalScroll(scrollState, reverseScrolling = isReversed)
                             ) {
                                 content()
                             }

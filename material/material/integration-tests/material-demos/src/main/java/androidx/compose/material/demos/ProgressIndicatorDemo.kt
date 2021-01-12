@@ -17,9 +17,9 @@
 package androidx.compose.material.demos
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.CircularProgressIndicator
@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun ProgressIndicatorDemo() {
-    ScrollableColumn {
+    Column {
         val modifier = Modifier.weight(1f, true)
             .align(Alignment.CenterHorizontally)
             .fillMaxWidth()

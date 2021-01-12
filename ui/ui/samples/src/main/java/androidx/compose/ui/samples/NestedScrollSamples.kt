@@ -134,7 +134,7 @@ fun NestedScrollSample() {
             ) {
                 // hypothetical scrollable child which we will listen in connection above
                 LazyColumn {
-                    items(listOf(1, 2, 3, 4, 5)) {
+                    items(5) {
                         Text(
                             "Magenta text above will change first when you scroll me",
                             modifier = Modifier.padding(5.dp)

@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation.demos.text
 
-import androidx.compose.foundation.ScrollableColumn
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
@@ -27,12 +27,16 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun InputFieldTrickyUseCase() {
-    ScrollableColumn {
-        TagLine(tag = "don't set if non number is added")
-        RejectNonDigits()
+    LazyColumn {
+        item {
+            TagLine(tag = "don't set if non number is added")
+            RejectNonDigits()
+        }
 
-        TagLine(tag = "always clear composition")
-        RejectComposition()
+        item {
+            TagLine(tag = "always clear composition")
+            RejectComposition()
+        }
     }
 }
 

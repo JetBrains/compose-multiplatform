@@ -29,33 +29,19 @@ import androidx.compose.ui.unit.dp
  */
 interface LazyListScope {
     /**
-     * Adds a list of items and their content to the scope.
-     *
-     * @param items the data list
-     * @param itemContent the content displayed by a single item
-     */
-    fun <T> items(
-        items: List<T>,
-        itemContent: @Composable LazyItemScope.(item: T) -> Unit
-    )
-
-    /**
-     * Adds a single item to the scope.
+     * Adds a single item.
      *
      * @param content the content of the item
      */
     fun item(content: @Composable LazyItemScope.() -> Unit)
 
     /**
-     * Adds a list of items to the scope where the content of an item is aware of its index.
+     * Adds a [count] of items.
      *
-     * @param items the data list
+     * @param count the items count
      * @param itemContent the content displayed by a single item
      */
-    fun <T> itemsIndexed(
-        items: List<T>,
-        itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
-    )
+    fun items(count: Int, itemContent: @Composable LazyItemScope.(index: Int) -> Unit)
 
     /**
      * Adds a sticky header item, which will remain pinned even when scrolling after it.
@@ -67,6 +53,58 @@ interface LazyListScope {
      */
     @ExperimentalFoundationApi
     fun stickyHeader(content: @Composable LazyItemScope.() -> Unit)
+}
+
+/**
+ * Adds a list of items.
+ *
+ * @param items the data list
+ * @param itemContent the content displayed by a single item
+ */
+inline fun <T> LazyListScope.items(
+    items: List<T>,
+    crossinline itemContent: @Composable LazyItemScope.(item: T) -> Unit
+) = items(items.size) {
+    itemContent(items[it])
+}
+
+/**
+ * Adds a list of items where the content of an item is aware of its index.
+ *
+ * @param items the data list
+ * @param itemContent the content displayed by a single item
+ */
+inline fun <T> LazyListScope.itemsIndexed(
+    items: List<T>,
+    crossinline itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
+) = items(items.size) {
+    itemContent(it, items[it])
+}
+
+/**
+ * Adds an array of items.
+ *
+ * @param items the data array
+ * @param itemContent the content displayed by a single item
+ */
+inline fun <T> LazyListScope.items(
+    items: Array<T>,
+    crossinline itemContent: @Composable LazyItemScope.(item: T) -> Unit
+) = items(items.size) {
+    itemContent(items[it])
+}
+
+/**
+ * Adds an array of items where the content of an item is aware of its index.
+ *
+ * @param items the data array
+ * @param itemContent the content displayed by a single item
+ */
+inline fun <T> LazyListScope.itemsIndexed(
+    items: Array<T>,
+    crossinline itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
+) = items(items.size) {
+    itemContent(it, items[it])
 }
 
 internal class LazyListScopeImpl : LazyListScope {
@@ -82,28 +120,14 @@ internal class LazyListScopeImpl : LazyListScope {
         return interval.content(scope, localIntervalIndex)
     }
 
-    override fun <T> items(
-        items: List<T>,
-        itemContent: @Composable LazyItemScope.(item: T) -> Unit
-    ) {
-        intervals.add(items.size) { index ->
-            val item = items[index]
-            @Composable { itemContent(item) }
+    override fun items(count: Int, itemContent: @Composable LazyItemScope.(index: Int) -> Unit) {
+        intervals.add(count) { index ->
+            @Composable { itemContent(index) }
         }
     }
 
     override fun item(content: @Composable LazyItemScope.() -> Unit) {
         intervals.add(1) { @Composable { content() } }
-    }
-
-    override fun <T> itemsIndexed(
-        items: List<T>,
-        itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
-    ) {
-        intervals.add(items.size) { index ->
-            val item = items[index]
-            @Composable { itemContent(index, item) }
-        }
     }
 
     @ExperimentalFoundationApi

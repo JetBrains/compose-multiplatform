@@ -18,7 +18,7 @@ package androidx.compose.foundation.demos.text
 
 import android.os.Handler
 import android.os.Looper
-import androidx.compose.foundation.ScrollableColumn
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Button
 import androidx.compose.material.Text
@@ -30,68 +30,73 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.intl.Locale
 
 @OptIn(ExperimentalTextApi::class)
 @Composable
 fun TextFieldValueDemo() {
-    ScrollableColumn {
-        TagLine("Empty callback")
-        val textFieldValue1 = remember { TextFieldValue("") }
-        BasicTextField(
-            value = textFieldValue1,
-            onValueChange = {},
-            textStyle = TextStyle(fontSize = fontSize8),
-            modifier = demoTextFieldModifiers
-        )
-
-        TagLine("Regular string overload")
-        var string by remember { mutableStateOf("") }
-        BasicTextField(
-            value = string,
-            onValueChange = {
-                string = it
-            },
-            textStyle = TextStyle(fontSize = fontSize8),
-            modifier = demoTextFieldModifiers
-        )
-
-        TagLine("Reformat by uppercase ")
-        var uppercaseValue by remember { mutableStateOf("") }
-        BasicTextField(
-            value = uppercaseValue,
-            onValueChange = {
-                uppercaseValue = it.toUpperCase(java.util.Locale.US)
-            },
-            textStyle = TextStyle(fontSize = fontSize8),
-            modifier = demoTextFieldModifiers
-        )
-
-        TagLine("Clear text")
-        var clearedValue by remember { mutableStateOf("") }
-        BasicTextField(
-            value = clearedValue,
-            onValueChange = {
-                clearedValue = it
-            },
-            textStyle = TextStyle(fontSize = fontSize8),
-            modifier = demoTextFieldModifiers
-        )
-        Button(onClick = { clearedValue = "" }) {
-            Text("Clear")
+    LazyColumn {
+        item {
+            TagLine("Empty callback")
+            val textFieldValue1 = remember { TextFieldValue("") }
+            BasicTextField(
+                value = textFieldValue1,
+                onValueChange = {},
+                textStyle = TextStyle(fontSize = fontSize8),
+                modifier = demoTextFieldModifiers
+            )
         }
-
-        TagLine("Delayed callback")
-        var text by remember { mutableStateOf("") }
-        val handler = remember { Handler(Looper.getMainLooper()) }
-        BasicTextField(
-            value = text,
-            onValueChange = {
-                handler.removeCallbacksAndMessages(null)
-                handler.postDelayed({ text = it }, 50)
-            },
-            textStyle = TextStyle(fontSize = fontSize8),
-            modifier = demoTextFieldModifiers
-        )
+        item {
+            TagLine("Regular string overload")
+            var string by remember { mutableStateOf("") }
+            BasicTextField(
+                value = string,
+                onValueChange = {
+                    string = it
+                },
+                textStyle = TextStyle(fontSize = fontSize8),
+                modifier = demoTextFieldModifiers
+            )
+        }
+        item {
+            TagLine("Reformat by uppercase ")
+            var uppercaseValue by remember { mutableStateOf("") }
+            BasicTextField(
+                value = uppercaseValue,
+                onValueChange = {
+                    uppercaseValue = it.toUpperCase(java.util.Locale.US)
+                },
+                textStyle = TextStyle(fontSize = fontSize8),
+                modifier = demoTextFieldModifiers
+            )
+        }
+        item {
+            TagLine("Clear text")
+            var clearedValue by remember { mutableStateOf("") }
+            BasicTextField(
+                value = clearedValue,
+                onValueChange = {
+                    clearedValue = it
+                },
+                textStyle = TextStyle(fontSize = fontSize8),
+                modifier = demoTextFieldModifiers
+            )
+            Button(onClick = { clearedValue = "" }) {
+                Text("Clear")
+            }
+        }
+        item {
+            TagLine("Delayed callback")
+            var text by remember { mutableStateOf("") }
+            val handler = remember { Handler(Looper.getMainLooper()) }
+            BasicTextField(
+                value = text,
+                onValueChange = {
+                    handler.removeCallbacksAndMessages(null)
+                    handler.postDelayed({ text = it }, 50)
+                },
+                textStyle = TextStyle(fontSize = fontSize8),
+                modifier = demoTextFieldModifiers
+            )
+        }
     }
 }

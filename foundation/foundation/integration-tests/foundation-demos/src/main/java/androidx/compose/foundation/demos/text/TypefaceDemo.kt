@@ -17,7 +17,7 @@
 package androidx.compose.foundation.demos.text
 
 import android.graphics.Typeface
-import androidx.compose.foundation.ScrollableColumn
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.AmbientContext
@@ -28,13 +28,19 @@ import androidx.compose.ui.text.font.typeface
 
 @Composable
 fun TypefaceDemo() {
-    ScrollableColumn {
-        TagLine(tag = "Android Typeface")
-        AndroidTypefaceDemo()
-        TagLine(tag = "Typeface from FontFamily")
-        TypefaceFromFontFamilyDemo()
-        TagLine(tag = "FontFamily from Android Typeface")
-        FontFamilyFromAndroidTypeface()
+    LazyColumn {
+        item {
+            TagLine(tag = "Android Typeface")
+            AndroidTypefaceDemo()
+        }
+        item {
+            TagLine(tag = "Typeface from FontFamily")
+            TypefaceFromFontFamilyDemo()
+        }
+        item {
+            TagLine(tag = "FontFamily from Android Typeface")
+            FontFamilyFromAndroidTypeface()
+        }
     }
 }
 

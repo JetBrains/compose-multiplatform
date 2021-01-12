@@ -23,9 +23,9 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.transition
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayout
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -33,6 +33,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSizeIn
 import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -138,10 +140,11 @@ fun DropdownMenu(
                     elevation = MenuElevation
                 ) {
                     @OptIn(ExperimentalLayout::class)
-                    ScrollableColumn(
+                    Column(
                         modifier = dropdownModifier
                             .padding(vertical = DropdownMenuVerticalPadding)
-                            .preferredWidth(IntrinsicSize.Max),
+                            .preferredWidth(IntrinsicSize.Max)
+                            .verticalScroll(rememberScrollState()),
                         content = dropdownContent
                     )
                 }
