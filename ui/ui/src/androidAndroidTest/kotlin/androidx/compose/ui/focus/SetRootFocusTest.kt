@@ -25,9 +25,9 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -41,7 +41,7 @@ class SetRootFocusTest {
     private val focusable = "Focusable"
     private val nonFocusable = "NotFocusable"
 
-    @FlakyTest // b/171959479
+    @Ignore // b/171959479
     @Test
     fun clearFocus_byClickingOutsideFocusableComponent() {
         // Arrange.
