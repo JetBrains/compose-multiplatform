@@ -16,6 +16,8 @@
 
 package androidx.compose.animation.core
 
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import kotlin.math.absoluteValue
 
 /**
@@ -27,7 +29,10 @@ import kotlin.math.absoluteValue
  *
  * An [Easing] must map fraction=0.0 to 0.0 and fraction=1.0 to 1.0.
  */
-typealias Easing = (fraction: Float) -> Float
+@Stable
+fun interface Easing {
+    fun transform(fraction: Float): Float
+}
 
 /**
  * Elements that begin and end at rest use this standard easing. They speed up quickly
@@ -38,7 +43,7 @@ typealias Easing = (fraction: Float) -> Float
  *
  * This is equivalent to the Android `FastOutSlowInInterpolator`
  */
-val FastOutSlowInEasing = CubicBezierEasing(0.4f, 0.0f, 0.2f, 1.0f)
+val FastOutSlowInEasing: Easing = CubicBezierEasing(0.4f, 0.0f, 0.2f, 1.0f)
 
 /**
  * Incoming elements are animated using deceleration easing, which starts a transition
@@ -46,7 +51,7 @@ val FastOutSlowInEasing = CubicBezierEasing(0.4f, 0.0f, 0.2f, 1.0f)
  *
  * This is equivalent to the Android `LinearOutSlowInInterpolator`
  */
-val LinearOutSlowInEasing = CubicBezierEasing(0.0f, 0.0f, 0.2f, 1.0f)
+val LinearOutSlowInEasing: Easing = CubicBezierEasing(0.0f, 0.0f, 0.2f, 1.0f)
 
 /**
  * Elements exiting a screen use acceleration easing, where they start at rest and
@@ -54,13 +59,13 @@ val LinearOutSlowInEasing = CubicBezierEasing(0.0f, 0.0f, 0.2f, 1.0f)
  *
  * This is equivalent to the Android `FastOutLinearInInterpolator`
  */
-val FastOutLinearInEasing = CubicBezierEasing(0.4f, 0.0f, 1.0f, 1.0f)
+val FastOutLinearInEasing: Easing = CubicBezierEasing(0.4f, 0.0f, 1.0f, 1.0f)
 
 /**
  * It returns fraction unmodified. This is useful as a default value for
  * cases where a [Easing] is required but no actual easing is desired.
  */
-val LinearEasing: Easing = { fraction -> fraction }
+val LinearEasing: Easing = Easing { fraction -> fraction }
 
 /**
  * A cubic polynomial easing.
@@ -89,6 +94,7 @@ val LinearEasing: Easing = { fraction -> fraction }
  *          The line through the point (1, 1) and the second control point is tangent
  *          to the easing at the point (1, 1).
  */
+@Immutable
 class CubicBezierEasing(
     private val a: Float,
     private val b: Float,
@@ -102,7 +108,7 @@ class CubicBezierEasing(
             /*                      */ m * m * m
     }
 
-    override fun invoke(fraction: Float): Float {
+    override fun transform(fraction: Float): Float {
         if (fraction > 0f && fraction < 1f) {
             var start = 0.0f
             var end = 1.0f
@@ -119,6 +125,15 @@ class CubicBezierEasing(
         } else {
             return fraction
         }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return other is CubicBezierEasing && a == other.a && b == other.b && c == other.c &&
+            d == other.d
+    }
+
+    override fun hashCode(): Int {
+        return ((a.hashCode() * 31 + b.hashCode()) * 31 + c.hashCode()) * 31 + d.hashCode()
     }
 }
 

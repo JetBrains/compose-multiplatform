@@ -274,9 +274,9 @@ package androidx.compose.animation.core {
   public final class ComplexDoubleKt {
   }
 
-  public final class CubicBezierEasing implements kotlin.jvm.functions.Function1<java.lang.Float,java.lang.Float> {
+  @androidx.compose.runtime.Immutable public final class CubicBezierEasing implements androidx.compose.animation.core.Easing {
     ctor public CubicBezierEasing(float a, float b, float c, float d);
-    method public Float! invoke(float fraction);
+    method public float transform(float fraction);
   }
 
   public final class DecayAnimation<T, V extends androidx.compose.animation.core.AnimationVector> implements androidx.compose.animation.core.Animation<T,V> {
@@ -317,11 +317,15 @@ package androidx.compose.animation.core {
     method public <V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.VectorizedDurationBasedAnimationSpec<V> vectorize(androidx.compose.animation.core.TwoWayConverter<T,V> converter);
   }
 
+  @androidx.compose.runtime.Stable public fun interface Easing {
+    method public float transform(float fraction);
+  }
+
   public final class EasingKt {
-    method public static androidx.compose.animation.core.CubicBezierEasing getFastOutLinearInEasing();
-    method public static androidx.compose.animation.core.CubicBezierEasing getFastOutSlowInEasing();
-    method public static kotlin.jvm.functions.Function1<java.lang.Float,java.lang.Float> getLinearEasing();
-    method public static androidx.compose.animation.core.CubicBezierEasing getLinearOutSlowInEasing();
+    method public static androidx.compose.animation.core.Easing getFastOutLinearInEasing();
+    method public static androidx.compose.animation.core.Easing getFastOutSlowInEasing();
+    method public static androidx.compose.animation.core.Easing getLinearEasing();
+    method public static androidx.compose.animation.core.Easing getLinearOutSlowInEasing();
   }
 
   public interface FiniteAnimationSpec<T> extends androidx.compose.animation.core.AnimationSpec<T> {
@@ -380,7 +384,7 @@ package androidx.compose.animation.core {
   }
 
   public final class FloatTweenSpec implements androidx.compose.animation.core.FloatAnimationSpec {
-    ctor public FloatTweenSpec(int duration, int delay, kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> easing);
+    ctor public FloatTweenSpec(int duration, int delay, androidx.compose.animation.core.Easing easing);
     ctor public FloatTweenSpec();
     method public int getDelay();
     method public int getDuration();
@@ -444,7 +448,7 @@ package androidx.compose.animation.core {
     method public int getDurationMillis();
     method public void setDelayMillis(int p);
     method public void setDurationMillis(int p);
-    method public infix void with(androidx.compose.animation.core.KeyframesSpec.KeyframeEntity<T>, kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> easing);
+    method public infix void with(androidx.compose.animation.core.KeyframesSpec.KeyframeEntity<T>, androidx.compose.animation.core.Easing easing);
     property public final int delayMillis;
     property public final int durationMillis;
   }
@@ -665,7 +669,7 @@ package androidx.compose.animation.core {
     method @androidx.compose.runtime.Stable public static <T> androidx.compose.animation.core.SnapSpec<T> snap(optional int delayMillis);
     method @androidx.compose.runtime.Stable public static <T> androidx.compose.animation.core.SpringSpec<T> spring(optional float dampingRatio, optional float stiffness, optional T? visibilityThreshold);
     method public static <T> androidx.compose.animation.core.TransitionDefinition<T> transitionDefinition(kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.TransitionDefinition<T>,kotlin.Unit> init);
-    method @androidx.compose.runtime.Stable public static <T> androidx.compose.animation.core.TweenSpec<T> tween(optional int durationMillis, optional int delayMillis, optional kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> easing);
+    method @androidx.compose.runtime.Stable public static <T> androidx.compose.animation.core.TweenSpec<T> tween(optional int durationMillis, optional int delayMillis, optional androidx.compose.animation.core.Easing easing);
   }
 
   public final class TransitionKt {
@@ -698,15 +702,15 @@ package androidx.compose.animation.core {
   }
 
   @androidx.compose.runtime.Immutable public final class TweenSpec<T> implements androidx.compose.animation.core.DurationBasedAnimationSpec<T> {
-    ctor public TweenSpec(int durationMillis, int delay, kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> easing);
+    ctor public TweenSpec(int durationMillis, int delay, androidx.compose.animation.core.Easing easing);
     ctor public TweenSpec();
     method public int getDelay();
     method public int getDurationMillis();
-    method public kotlin.jvm.functions.Function1<java.lang.Float,java.lang.Float> getEasing();
+    method public androidx.compose.animation.core.Easing getEasing();
     method public <V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.VectorizedTweenSpec<V> vectorize(androidx.compose.animation.core.TwoWayConverter<T,V> converter);
     property public final int delay;
     property public final int durationMillis;
-    property public final kotlin.jvm.functions.Function1<java.lang.Float,java.lang.Float> easing;
+    property public final androidx.compose.animation.core.Easing easing;
   }
 
   public interface TwoWayConverter<T, V extends androidx.compose.animation.core.AnimationVector> {
@@ -769,7 +773,7 @@ package androidx.compose.animation.core {
   }
 
   public final class VectorizedKeyframesSpec<V extends androidx.compose.animation.core.AnimationVector> implements androidx.compose.animation.core.VectorizedDurationBasedAnimationSpec<V> {
-    ctor public VectorizedKeyframesSpec(java.util.Map<java.lang.Integer,? extends kotlin.Pair<? extends V,? extends kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float>>> keyframes, int durationMillis, int delayMillis);
+    ctor public VectorizedKeyframesSpec(java.util.Map<java.lang.Integer,? extends kotlin.Pair<? extends V,? extends androidx.compose.animation.core.Easing>> keyframes, int durationMillis, int delayMillis);
     method public int getDelayMillis();
     method public int getDurationMillis();
     method public V getValue(long playTime, V start, V end, V startVelocity);
@@ -805,16 +809,16 @@ package androidx.compose.animation.core {
   }
 
   public final class VectorizedTweenSpec<V extends androidx.compose.animation.core.AnimationVector> implements androidx.compose.animation.core.VectorizedDurationBasedAnimationSpec<V> {
-    ctor public VectorizedTweenSpec(int durationMillis, int delayMillis, kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> easing);
+    ctor public VectorizedTweenSpec(int durationMillis, int delayMillis, androidx.compose.animation.core.Easing easing);
     ctor public VectorizedTweenSpec();
     method public int getDelayMillis();
     method public int getDurationMillis();
-    method public kotlin.jvm.functions.Function1<java.lang.Float,java.lang.Float> getEasing();
+    method public androidx.compose.animation.core.Easing getEasing();
     method public V getValue(long playTime, V start, V end, V startVelocity);
     method public V getVelocity(long playTime, V start, V end, V startVelocity);
     property public int delayMillis;
     property public int durationMillis;
-    property public final kotlin.jvm.functions.Function1<java.lang.Float,java.lang.Float> easing;
+    property public final androidx.compose.animation.core.Easing easing;
   }
 
   public final class VisibilityThresholdsKt {
