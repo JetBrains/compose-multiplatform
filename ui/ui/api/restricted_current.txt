@@ -3010,8 +3010,8 @@ package androidx.compose.ui.viewinterop {
   }
 
   public final class ViewModelKt {
-    method @androidx.compose.runtime.Composable public static <VM extends androidx.lifecycle.ViewModel> VM viewModel(Class<VM> modelClass, optional String? key, optional androidx.lifecycle.ViewModelProvider.Factory? factory);
-    method @androidx.compose.runtime.Composable public static inline <reified VM extends androidx.lifecycle.ViewModel> VM! viewModel(optional String key, optional androidx.lifecycle.ViewModelProvider.Factory? factory);
+    method @androidx.compose.runtime.Composable public static <T extends androidx.lifecycle.ViewModel> T viewModel(Class<T> modelClass, optional String? key, optional androidx.lifecycle.ViewModelProvider.Factory? factory);
+    method @androidx.compose.runtime.Composable public static inline <reified T extends androidx.lifecycle.ViewModel> T! viewModel(optional String key, optional androidx.lifecycle.ViewModelProvider.Factory? factory);
   }
 
 }
