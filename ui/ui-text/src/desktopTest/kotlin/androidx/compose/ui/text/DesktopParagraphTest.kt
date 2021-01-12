@@ -81,13 +81,13 @@ class DesktopParagraphTest {
             )
 
             Truth.assertThat(paragraph.getBoundingBox(0))
-                .isEqualTo(Rect(0f, 0.37f, fontSizeInPx, 60.37f))
+                .isEqualTo(Rect(0f, 0f, fontSizeInPx, 60f))
 
             Truth.assertThat(paragraph.getBoundingBox(1))
-                .isEqualTo(Rect(fontSizeInPx, 0.37f, fontSizeInPx * 2, 66f))
+                .isEqualTo(Rect(fontSizeInPx, 0f, fontSizeInPx * 2.5f, 60f))
 
             Truth.assertThat(paragraph.getBoundingBox(5))
-                .isEqualTo(Rect(fontSizeInPx, 0.37f, fontSizeInPx * 2, 66f))
+                .isEqualTo(Rect(fontSizeInPx, 0f, fontSizeInPx * 2.5f, 60f))
         }
     }
 
