@@ -40,16 +40,16 @@ class SynchronizationMethodsTest {
     // Note: don't add `@get:Rule` to avoid the Rule from being applied. Except for the
     // AndroidOwnerRegistry, it doesn't need to be initialized in these tests.
     private val rule = createAndroidComposeRule<ComponentActivity>()
-    private val androidOwnerRegistry = rule.androidOwnerRegistry
+    private val composeRootRegistry = rule.composeRootRegistry
 
     @get:Rule
     val registryRule: TestRule = RuleChain.outerRule { base, _ ->
-        androidOwnerRegistry.getStatementFor(base)
+        composeRootRegistry.getStatementFor(base)
     }
 
     @Before
-    fun addMockResumedOwner() {
-        androidOwnerRegistry.registerOwner(mockResumedRootForTest())
+    fun addResumedComposeRootMock() {
+        composeRootRegistry.registerComposeRoot(mockResumedComposeRoot())
     }
 
     @Test
@@ -117,9 +117,9 @@ class SynchronizationMethodsTest {
         }
     }
 
-    private fun mockResumedRootForTest(): ViewRootForTest {
-        val owner = mock<ViewRootForTest>()
-        doReturn(true).whenever(owner).isLifecycleInResumedState
-        return owner
+    private fun mockResumedComposeRoot(): ViewRootForTest {
+        val composeRoot = mock<ViewRootForTest>()
+        doReturn(true).whenever(composeRoot).isLifecycleInResumedState
+        return composeRoot
     }
 }

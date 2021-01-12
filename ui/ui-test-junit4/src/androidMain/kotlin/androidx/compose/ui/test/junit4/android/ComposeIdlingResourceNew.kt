@@ -31,7 +31,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
  * [createAndroidComposeRule].
  */
 internal class ComposeIdlingResourceNew(
-    private val androidOwnerRegistry: AndroidOwnerRegistry,
+    private val composeRootRegistry: ComposeRootRegistry,
     private val clock: MainTestClockImpl,
     private val mainRecomposer: Recomposer
 ) : IdlingResource {
@@ -60,8 +60,8 @@ internal class ComposeIdlingResourceNew(
                 ++i
             }
 
-            val owners = androidOwnerRegistry.getOwners()
-            hadPendingMeasureLayout = owners.any { it.hasPendingMeasureOrLayout }
+            val composeRoots = composeRootRegistry.getComposeRoots()
+            hadPendingMeasureLayout = composeRoots.any { it.hasPendingMeasureOrLayout }
 
             return !shouldPumpTime() && !hadPendingMeasureLayout
         }
