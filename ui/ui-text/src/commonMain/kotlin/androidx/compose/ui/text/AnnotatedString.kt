@@ -46,7 +46,7 @@ typealias StringAnnotation = Range<String>
  * can use [Builder].
  */
 @Immutable
-data class AnnotatedString internal constructor(
+class AnnotatedString internal constructor(
     val text: String,
     val spanStyles: List<SpanStyleRange> = listOf(),
     val paragraphStyles: List<ParagraphStyleRange> = listOf(),
@@ -147,6 +147,30 @@ data class AnnotatedString internal constructor(
         annotations.filter {
             it.item is TtsAnnotation && intersect(start, end, it.start, it.end)
         } as List<Range<TtsAnnotation>>
+
+    override operator fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is AnnotatedString) return false
+        if (text != other.text) return false
+        if (spanStyles != other.spanStyles) return false
+        if (paragraphStyles != other.paragraphStyles) return false
+        if (annotations != other.annotations) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = text.hashCode()
+        result = 31 * result + spanStyles.hashCode()
+        result = 31 * result + paragraphStyles.hashCode()
+        result = 31 * result + annotations.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        // AnnotatedString.toString has special value, it converts it into regular String
+        // rather than debug string.
+        return text
+    }
 
     /**
      * The information attached on the text such as a [SpanStyle].

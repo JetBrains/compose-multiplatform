@@ -65,11 +65,44 @@ interface Font {
  *
  * @see FontFamily
  */
-data class ResourceFont(
+class ResourceFont(
     val resId: Int,
     override val weight: FontWeight = FontWeight.Normal,
     override val style: FontStyle = FontStyle.Normal
-) : Font
+) : Font {
+
+    fun copy(
+        resId: Int = this.resId,
+        weight: FontWeight = this.weight,
+        style: FontStyle = this.style
+    ): ResourceFont {
+        return ResourceFont(
+            resId = resId,
+            weight = weight,
+            style = style
+        )
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ResourceFont) return false
+        if (resId != other.resId) return false
+        if (weight != other.weight) return false
+        if (style != other.style) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = resId
+        result = 31 * result + weight.hashCode()
+        result = 31 * result + style.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "ResourceFont(resId=$resId, weight=$weight, style=$style)"
+    }
+}
 
 /**
  * Creates a Font with using resource ID.

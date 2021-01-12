@@ -181,8 +181,12 @@ class ParagraphBenchmark(
         textBenchmarkRule.generator { textGenerator ->
             benchmarkRule.measureRepeated {
                 val (paragraph, canvas) = runWithTimingDisabled {
-                    val (text, style) = text(textGenerator)
-                    val paragraph = paragraph(text, style, width)
+                    val annotatedString = text(textGenerator)
+                    val paragraph = paragraph(
+                        annotatedString.text,
+                        annotatedString.spanStyles,
+                        width
+                    )
                     val canvas = Canvas(
                         ImageBitmap(paragraph.width.roundToInt(), paragraph.height.roundToInt())
                     )
@@ -199,10 +203,10 @@ class ParagraphBenchmark(
     @Test
     fun paint() {
         textBenchmarkRule.generator { textGenerator ->
-            val (text, style) = text(textGenerator)
+            val annotatedString = text(textGenerator)
             // create a new paragraph and use a smaller width to get
             // some line breaking in the result
-            val paragraph = paragraph(text, style, width)
+            val paragraph = paragraph(annotatedString.text, annotatedString.spanStyles, width)
             val canvas = Canvas(
                 ImageBitmap(paragraph.width.roundToInt(), paragraph.height.roundToInt())
             )

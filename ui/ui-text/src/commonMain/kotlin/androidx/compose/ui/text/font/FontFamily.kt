@@ -91,7 +91,7 @@ sealed class SystemFontFamily : FontFamily(true)
  * @sample androidx.compose.ui.text.samples.CustomFontFamilySample
  */
 @Immutable
-data class FontListFontFamily(val fonts: List<Font>) : FileBasedFontFamily(), List<Font> by fonts {
+class FontListFontFamily(val fonts: List<Font>) : FileBasedFontFamily(), List<Font> by fonts {
     init {
         check(fonts.isNotEmpty()) { "At least one font should be passed to FontFamily" }
         check(fonts.distinctBy { Pair(it.weight, it.style) }.size == fonts.size) {
@@ -99,23 +99,22 @@ data class FontListFontFamily(val fonts: List<Font>) : FileBasedFontFamily(), Li
                 "FontFamily"
         }
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is FontListFontFamily) return false
+        if (fonts != other.fonts) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return fonts.hashCode()
+    }
+
+    override fun toString(): String {
+        return "FontListFontFamily(fonts=$fonts)"
+    }
 }
-
-/**
- * Construct a font family that contains list of custom font files.
- *
- * @param fonts list of font files
- */
-@Stable
-fun fontFamily(fonts: List<Font>) = FontListFontFamily(fonts)
-
-/**
- * Construct a font family that contains list of custom font files.
- *
- * @param fonts list of font files
- */
-@Stable
-fun fontFamily(vararg fonts: Font) = FontListFontFamily(fonts.asList())
 
 /**
  * Defines a font family with an generic font family name.
@@ -142,11 +141,43 @@ internal class DefaultFontFamily : SystemFontFamily()
  *
  * @param typeface A typeface instance.
  */
-data class LoadedFontFamily(val typeface: Typeface) : FontFamily(true)
+class LoadedFontFamily(val typeface: Typeface) : FontFamily(true) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is LoadedFontFamily) return false
+        if (typeface != other.typeface) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return typeface.hashCode()
+    }
+
+    override fun toString(): String {
+        return "LoadedFontFamily(typeface=$typeface)"
+    }
+}
+
+/**
+ * Construct a font family that contains list of custom font files.
+ *
+ * @param fonts list of font files
+ */
+@Stable
+fun fontFamily(fonts: List<Font>) = FontListFontFamily(fonts)
+
+/**
+ * Construct a font family that contains list of custom font files.
+ *
+ * @param fonts list of font files
+ */
+@Stable
+fun fontFamily(vararg fonts: Font) = FontListFontFamily(fonts.asList())
 
 /**
  * Construct a font family that contains loaded font family: Typeface.
  *
  * @param typeface A typeface instance.
  */
+@Stable
 fun fontFamily(typeface: Typeface) = LoadedFontFamily(typeface)
