@@ -128,6 +128,36 @@ expect class PointerEvent @OptIn(InternalCoreApi::class) internal constructor(
 }
 
 /**
+ * The device type that produces a [PointerInputChange], such as a mouse or stylus.
+ */
+enum class PointerType {
+    /**
+     * An unknown device type or the device type isn't relevant.
+     */
+    Unknown,
+
+    /**
+     * Touch (finger) input.
+     */
+    Touch,
+
+    /**
+     * A mouse pointer.
+     */
+    Mouse,
+
+    /**
+     * A stylus.
+     */
+    Stylus,
+
+    /**
+     * An eraser or an inverted stylus.
+     */
+    Eraser
+}
+
+/**
  * Describes a change that has occurred for a particular pointer, as well as how much of the change
  * has been consumed (meaning, used by a node in the UI).
  *
@@ -159,6 +189,8 @@ expect class PointerEvent @OptIn(InternalCoreApi::class) internal constructor(
  * a finter was touching the screen or a mouse button was pressed, [previousPressed] would be
  * `true`.
  * @param consumed Which aspects of this change have been consumed.
+ * @param type The device type that produced the event, such as [mouse][PointerType.Mouse],
+ * or [touch][PointerType.Touch].git
  */
 @Immutable
 class PointerInputChange(
@@ -169,7 +201,8 @@ class PointerInputChange(
     val previousTime: Uptime,
     val previousPosition: Offset,
     val previousPressed: Boolean,
-    val consumed: ConsumedData
+    val consumed: ConsumedData,
+    val type: PointerType = PointerType.Touch
 ) {
     fun copy(
         id: PointerId = this.id,
@@ -179,7 +212,8 @@ class PointerInputChange(
         previousTime: Uptime = this.previousTime,
         previousPosition: Offset = this.previousPosition,
         previousPressed: Boolean = this.previousPressed,
-        consumed: ConsumedData = this.consumed
+        consumed: ConsumedData = this.consumed,
+        type: PointerType = this.type
     ): PointerInputChange = PointerInputChange(
         id,
         currentTime,
@@ -188,7 +222,8 @@ class PointerInputChange(
         previousTime,
         previousPosition,
         previousPressed,
-        consumed
+        consumed,
+        type
     )
 }
 
