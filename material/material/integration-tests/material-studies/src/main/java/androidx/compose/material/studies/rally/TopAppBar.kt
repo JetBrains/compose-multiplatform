@@ -20,6 +20,7 @@ import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,6 +35,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -75,6 +77,7 @@ private fun RallyTab(
                 .selectable(
                     selected = selected,
                     onClick = onSelected,
+                    interactionState = remember { InteractionState() },
                     indication = rememberRipple(bounded = false)
                 )
         ) {

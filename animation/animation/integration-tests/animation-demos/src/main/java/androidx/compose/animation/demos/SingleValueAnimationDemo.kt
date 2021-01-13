@@ -20,6 +20,7 @@ import androidx.compose.animation.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.animateAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -45,7 +46,14 @@ fun SingleValueAnimationDemo() {
         println("Finished at color $it")
     }
     Box(
-        Modifier.fillMaxSize().clickable(indication = null) { enabled.value = !enabled.value }
+        Modifier.fillMaxSize().clickable(
+            indication = null,
+            interactionState = remember { InteractionState() }
+        ) {
+            enabled
+                .value = !enabled
+                .value
+        }
             .graphicsLayer(alpha = alpha)
             .background(color)
     )

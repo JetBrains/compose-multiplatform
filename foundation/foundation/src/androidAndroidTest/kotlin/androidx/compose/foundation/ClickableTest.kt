@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.InspectableValue
@@ -416,7 +417,10 @@ class ClickableTest {
                     "ClickableText",
                     modifier = Modifier
                         .testTag("myClickable")
-                        .clickable(interactionState = interactionState) {}
+                        .clickable(
+                            interactionState = interactionState,
+                            indication = null
+                        ) {}
                 )
             }
         }
@@ -452,7 +456,10 @@ class ClickableTest {
                         "ClickableText",
                         modifier = Modifier
                             .testTag("myClickable")
-                            .clickable(interactionState = interactionState) {}
+                            .clickable(
+                                interactionState = interactionState,
+                                indication = null
+                            ) {}
                     )
                 }
             }
@@ -586,7 +593,7 @@ class ClickableTest {
     }
 
     @Test
-    fun testInspectorValue() {
+    fun clickable_testInspectorValue_noIndicationOverload() {
         val onClick: () -> Unit = { }
         rule.setContent {
             val modifier = Modifier.clickable(onClick = onClick) as InspectableValue
@@ -597,6 +604,29 @@ class ClickableTest {
                 "onClickLabel",
                 "role",
                 "onClick",
+                "onDoubleClick",
+                "onLongClick",
+                "onLongClickLabel"
+            )
+        }
+    }
+
+    @Test
+    fun clickable_testInspectorValue_fullParamsOverload() {
+        val onClick: () -> Unit = { }
+        rule.setContent {
+            val modifier = Modifier.clickable(
+                onClick = onClick,
+                interactionState = remember { InteractionState() },
+                indication = null
+            ) as InspectableValue
+            assertThat(modifier.nameFallback).isEqualTo("clickable")
+            assertThat(modifier.valueOverride).isNull()
+            assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
+                "enabled",
+                "onClickLabel",
+                "onClick",
+                "role",
                 "onDoubleClick",
                 "onLongClick",
                 "onLongClickLabel",

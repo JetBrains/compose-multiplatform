@@ -86,12 +86,12 @@ class SelectableTest {
     @Test
     fun selectable_defaultClicks() {
         rule.setContent {
-            val (selected, onSelected) = remember { mutableStateOf(false) }
+            val state = remember { mutableStateOf(false) }
             BasicText(
                 "Text in item",
                 modifier = Modifier.selectable(
-                    selected = selected,
-                    onClick = { onSelected(!selected) }
+                    selected = state.value,
+                    onClick = { state.value = !state.value }
                 )
             )
         }
@@ -133,6 +133,7 @@ class SelectableTest {
                     Modifier.selectable(
                         selected = true,
                         interactionState = interactionState,
+                        indication = null,
                         onClick = {}
                     )
                 ) {
@@ -172,6 +173,7 @@ class SelectableTest {
                         Modifier.selectable(
                             selected = true,
                             interactionState = interactionState,
+                            indication = null,
                             onClick = {}
                         )
                     ) {
@@ -203,9 +205,28 @@ class SelectableTest {
     }
 
     @Test
-    fun testInspectorValue() {
+    fun selectableTest_testInspectorValue_noIndication() {
         rule.setContent {
             val modifier = Modifier.selectable(false) {} as InspectableValue
+            assertThat(modifier.nameFallback).isEqualTo("selectable")
+            assertThat(modifier.valueOverride).isNull()
+            assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
+                "selected",
+                "enabled",
+                "role",
+                "onClick"
+            )
+        }
+    }
+
+    @Test
+    fun selectableTest_testInspectorValue_fullParams() {
+        rule.setContent {
+            val modifier = Modifier.selectable(
+                false,
+                interactionState = remember { InteractionState() },
+                indication = null
+            ) {} as InspectableValue
             assertThat(modifier.nameFallback).isEqualTo("selectable")
             assertThat(modifier.valueOverride).isNull()
             assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
