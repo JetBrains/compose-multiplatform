@@ -16,11 +16,10 @@
 
 package androidx.compose.material.studies.rally
 
-import androidx.compose.animation.ColorPropKey
+import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.transitionDefinition
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.transition
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,7 +33,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -93,39 +92,33 @@ private fun TabTransition(
     selected: Boolean,
     content: @Composable (color: Color) -> Unit
 ) {
-    val color = MaterialTheme.colors.onSurface
-    val transitionDefinition = remember {
-        transitionDefinition<Boolean> {
-            state(true) {
-                this[TabTintColorKey] = color
-            }
-
-            state(false) {
-                this[TabTintColorKey] = color.copy(alpha = InactiveTabOpacity)
-            }
-
-            transition(fromState = false, toState = true) {
-                TabTintColorKey using tween(
+    val transition = updateTransition(selected)
+    val tintColor by transition.animateColor(
+        transitionSpec = {
+            if (true isTransitioningTo false) {
+                tween(
+                    durationMillis = TabFadeOutAnimationDuration,
+                    delayMillis = TabFadeInAnimationDelay,
+                    easing = LinearEasing
+                )
+            } else {
+                tween(
                     durationMillis = TabFadeInAnimationDuration,
                     delayMillis = TabFadeInAnimationDelay,
                     easing = LinearEasing
                 )
             }
-
-            transition(fromState = true, toState = false) {
-                TabTintColorKey using tween(
-                    durationMillis = TabFadeOutAnimationDuration,
-                    delayMillis = TabFadeInAnimationDelay,
-                    easing = LinearEasing
-                )
-            }
+        }
+    ) {
+        if (it) {
+            MaterialTheme.colors.onSurface
+        } else {
+            MaterialTheme.colors.onSurface.copy(alpha = InactiveTabOpacity)
         }
     }
-    val state = transition(transitionDefinition, selected)
-    content(state[TabTintColorKey])
+    content(tintColor)
 }
 
-private val TabTintColorKey = ColorPropKey()
 private val TabHeight = 56.dp
 private const val InactiveTabOpacity = 0.60f
 
