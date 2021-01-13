@@ -17,13 +17,18 @@
 package androidx.compose.material.studies.rally
 
 import androidx.compose.animation.core.CubicBezierEasing
-import androidx.compose.animation.core.FloatPropKey
 import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.transitionDefinition
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.transition
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.onActive
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -33,31 +38,6 @@ import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.dp
 
 private const val DividerLengthInDegrees = 1.8f
-private val AngleOffset = FloatPropKey()
-private val Shift = FloatPropKey()
-
-private val CircularTransition = transitionDefinition<Int> {
-    state(0) {
-        this[AngleOffset] = 0f
-        this[Shift] = 0f
-    }
-    state(1) {
-        this[AngleOffset] = 360f
-        this[Shift] = 30f
-    }
-    transition(fromState = 0, toState = 1) {
-        AngleOffset using tween(
-            delayMillis = 500,
-            durationMillis = 900,
-            easing = CubicBezierEasing(0f, 0.75f, 0.35f, 0.85f)
-        )
-        Shift using tween(
-            delayMillis = 500,
-            durationMillis = 900,
-            easing = LinearOutSlowInEasing
-        )
-    }
-}
 
 /** when calculating a proportion of N elements, the sum of elements has to be (1 - N * 0.005)
  * because there will be N dividers of size 1.8 degrees */
@@ -68,7 +48,40 @@ fun AnimatedCircle(
     colors: List<Color>
 ) {
     val stroke = Stroke(5.dp.value * AmbientDensity.current.density)
-    val state = transition(definition = CircularTransition, initState = 0, toState = 1)
+    var targetState by remember { mutableStateOf(0) }
+    // Start animating when added to the tree
+    onActive {
+        targetState = 1
+    }
+    val transition = updateTransition(targetState)
+    val angleOffset by transition.animateFloat(
+        transitionSpec = {
+            if (0 isTransitioningTo 1) {
+                tween(
+                    delayMillis = 500,
+                    durationMillis = 900,
+                    easing = CubicBezierEasing(0f, 0.75f, 0.35f, 0.85f)
+                )
+            } else {
+                spring()
+            }
+        }
+    ) { if (it == 1) 360f else 0f }
+    val shift by transition.animateFloat(
+        transitionSpec = {
+            if (0 isTransitioningTo 1) {
+                tween(
+                    delayMillis = 500,
+                    durationMillis = 900,
+                    easing = LinearOutSlowInEasing
+                )
+            } else {
+                spring()
+            }
+        }
+    ) {
+        if (it == 1) 30f else 0f
+    }
     Canvas(modifier) {
         val innerRadius = (size.minDimension - stroke.width) / 2
         val halfSize = size / 2.0f
@@ -77,9 +90,9 @@ fun AnimatedCircle(
             halfSize.height - innerRadius
         )
         val size = Size(innerRadius * 2, innerRadius * 2)
-        var startAngle = state[Shift] - 90f
+        var startAngle = shift - 90f
         proportions.forEachIndexed { index, proportion ->
-            val sweep = proportion * state[AngleOffset]
+            val sweep = proportion * angleOffset
             drawArc(
                 color = colors[index],
                 startAngle = startAngle + DividerLengthInDegrees / 2,

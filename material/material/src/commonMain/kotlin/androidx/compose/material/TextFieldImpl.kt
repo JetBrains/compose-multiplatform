@@ -16,14 +16,13 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.ColorPropKey
-import androidx.compose.animation.DpPropKey
-import androidx.compose.animation.core.FloatPropKey
+import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.TransitionSpec
-import androidx.compose.animation.core.transitionDefinition
+import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.transition
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
@@ -36,6 +35,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -341,12 +341,6 @@ internal fun Modifier.iconPadding(start: Dp = 0.dp, end: Dp = 0.dp) =
     )
 
 private object TextFieldTransitionScope {
-    private val LabelColorProp = ColorPropKey()
-    private val LabelProgressProp = FloatPropKey()
-    private val IndicatorColorProp = ColorPropKey()
-    private val IndicatorWidthProp = DpPropKey()
-    private val PlaceholderOpacityProp = FloatPropKey()
-
     @Composable
     fun Transition(
         inputState: InputPhase,
@@ -362,106 +356,82 @@ private object TextFieldTransitionScope {
             placeholderOpacity: Float
         ) -> Unit
     ) {
-        val definition = remember(
-            showLabel,
-            activeColor,
-            labelInactiveColor,
-            indicatorInactiveColor
+        // Transitions from/to InputPhase.Focused are the most critical in the transition below.
+        // UnfocusedEmpty <-> UnfocusedNotEmpty are needed when a single state is used to control
+        // multiple text fields.
+        val transition = updateTransition(inputState)
+        val labelColor by transition.animateColor(
+            transitionSpec = { tween(durationMillis = AnimationDuration) }
         ) {
-            generateLabelTransitionDefinition(
-                showLabel,
-                activeColor,
-                labelInactiveColor,
-                indicatorInactiveColor
-            )
+            when (it) {
+                InputPhase.Focused -> activeColor
+                InputPhase.UnfocusedEmpty -> labelInactiveColor
+                InputPhase.UnfocusedNotEmpty -> labelInactiveColor
+            }
         }
-        val state = transition(definition = definition, toState = inputState)
+        val indicatorColor by transition.animateColor(
+            transitionSpec = { tween(durationMillis = AnimationDuration) }
+        ) {
+            when (it) {
+                InputPhase.Focused -> activeColor
+                InputPhase.UnfocusedEmpty -> indicatorInactiveColor
+                InputPhase.UnfocusedNotEmpty -> indicatorInactiveColor
+            }
+        }
+
+        val labelProgress by transition.animateFloat(
+            transitionSpec = { tween(durationMillis = AnimationDuration) }
+        ) {
+            when (it) {
+                InputPhase.Focused -> 1f
+                InputPhase.UnfocusedEmpty -> 0f
+                InputPhase.UnfocusedNotEmpty -> 1f
+            }
+        }
+
+        val indicatorWidth by transition.animateDp(
+            transitionSpec = { tween(durationMillis = AnimationDuration) }
+        ) {
+            when (it) {
+                InputPhase.Focused -> IndicatorFocusedWidth
+                InputPhase.UnfocusedEmpty -> IndicatorUnfocusedWidth
+                InputPhase.UnfocusedNotEmpty -> IndicatorUnfocusedWidth
+            }
+        }
+
+        val placeholderOpacity by transition.animateFloat(
+            transitionSpec = {
+                if (InputPhase.Focused isTransitioningTo InputPhase.UnfocusedEmpty) {
+                    tween(
+                        durationMillis = PlaceholderAnimationDelayOrDuration,
+                        easing = LinearEasing
+                    )
+                } else if (InputPhase.UnfocusedEmpty isTransitioningTo InputPhase.Focused ||
+                    InputPhase.UnfocusedNotEmpty isTransitioningTo InputPhase.UnfocusedEmpty
+                ) {
+                    tween(
+                        durationMillis = PlaceholderAnimationDuration,
+                        delayMillis = PlaceholderAnimationDelayOrDuration,
+                        easing = LinearEasing
+                    )
+                } else {
+                    spring()
+                }
+            }
+        ) {
+            when (it) {
+                InputPhase.Focused -> 1f
+                InputPhase.UnfocusedEmpty -> if (showLabel) 0f else 1f
+                InputPhase.UnfocusedNotEmpty -> 0f
+            }
+        }
+
         content(
-            state[LabelProgressProp],
-            state[LabelColorProp],
-            state[IndicatorWidthProp],
-            state[IndicatorColorProp],
-            state[PlaceholderOpacityProp]
-        )
-    }
-
-    private fun generateLabelTransitionDefinition(
-        showLabel: Boolean,
-        activeColor: Color,
-        labelInactiveColor: Color,
-        indicatorInactiveColor: Color
-    ) = transitionDefinition<InputPhase> {
-        state(InputPhase.Focused) {
-            this[LabelColorProp] = activeColor
-            this[IndicatorColorProp] = activeColor
-            this[LabelProgressProp] = 1f
-            this[IndicatorWidthProp] = IndicatorFocusedWidth
-            this[PlaceholderOpacityProp] = 1f
-        }
-        state(InputPhase.UnfocusedEmpty) {
-            this[LabelColorProp] = labelInactiveColor
-            this[IndicatorColorProp] = indicatorInactiveColor
-            this[LabelProgressProp] = 0f
-            this[IndicatorWidthProp] = IndicatorUnfocusedWidth
-            this[PlaceholderOpacityProp] = if (showLabel) 0f else 1f
-        }
-        state(InputPhase.UnfocusedNotEmpty) {
-            this[LabelColorProp] = labelInactiveColor
-            this[IndicatorColorProp] = indicatorInactiveColor
-            this[LabelProgressProp] = 1f
-            this[IndicatorWidthProp] = 1.dp
-            this[PlaceholderOpacityProp] = 0f
-        }
-
-        transition(fromState = InputPhase.Focused, toState = InputPhase.UnfocusedEmpty) {
-            labelTransition()
-            indicatorTransition()
-            placeholderDisappearTransition()
-        }
-        transition(fromState = InputPhase.Focused, toState = InputPhase.UnfocusedNotEmpty) {
-            indicatorTransition()
-        }
-        transition(fromState = InputPhase.UnfocusedNotEmpty, toState = InputPhase.Focused) {
-            indicatorTransition()
-        }
-        transition(fromState = InputPhase.UnfocusedEmpty, toState = InputPhase.Focused) {
-            labelTransition()
-            indicatorTransition()
-            placeholderAppearTransition()
-        }
-        // below states are needed to support case when a single state is used to control multiple
-        // text fields.
-        transition(fromState = InputPhase.UnfocusedNotEmpty, toState = InputPhase.UnfocusedEmpty) {
-            labelTransition()
-            placeholderAppearTransition()
-        }
-        transition(fromState = InputPhase.UnfocusedEmpty, toState = InputPhase.UnfocusedNotEmpty) {
-            labelTransition()
-        }
-    }
-
-    private fun TransitionSpec<InputPhase>.indicatorTransition() {
-        IndicatorColorProp using tween(durationMillis = AnimationDuration)
-        IndicatorWidthProp using tween(durationMillis = AnimationDuration)
-    }
-
-    private fun TransitionSpec<InputPhase>.labelTransition() {
-        LabelColorProp using tween(durationMillis = AnimationDuration)
-        LabelProgressProp using tween(durationMillis = AnimationDuration)
-    }
-
-    private fun TransitionSpec<InputPhase>.placeholderAppearTransition() {
-        PlaceholderOpacityProp using tween(
-            durationMillis = PlaceholderAnimationDuration,
-            delayMillis = PlaceholderAnimationDelayOrDuration,
-            easing = LinearEasing
-        )
-    }
-
-    private fun TransitionSpec<InputPhase>.placeholderDisappearTransition() {
-        PlaceholderOpacityProp using tween(
-            durationMillis = PlaceholderAnimationDelayOrDuration,
-            easing = LinearEasing
+            labelProgress,
+            labelColor,
+            indicatorWidth,
+            indicatorColor,
+            placeholderOpacity
         )
     }
 }
