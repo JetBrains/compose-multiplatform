@@ -57,7 +57,7 @@ class KeyTest {
     }
 
     @Test
-    fun composeKey_to_unknownDesktopKeyLocation() {
+    fun composeKey_to_standardDesktopKeyLocation() {
         // Arrange.
         val key = Key.A
 
@@ -65,7 +65,7 @@ class KeyTest {
         val desktopKeyLocation = key.nativeKeyLocation
 
         // Arrange.
-        assertThat(desktopKeyLocation).isEqualTo(KeyEvent.KEY_LOCATION_UNKNOWN)
+        assertThat(desktopKeyLocation).isEqualTo(KeyEvent.KEY_LOCATION_STANDARD)
     }
 
     @Test
