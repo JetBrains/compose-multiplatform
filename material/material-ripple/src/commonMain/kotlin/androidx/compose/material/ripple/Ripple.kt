@@ -16,9 +16,7 @@
 
 package androidx.compose.material.ripple
 
-import androidx.compose.animation.AnimatedFloatModel
-import androidx.compose.animation.asDisposableClock
-import androidx.compose.animation.core.AnimationClockObservable
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.TweenSpec
@@ -32,6 +30,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.geometry.Offset
@@ -40,9 +39,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.takeOrElse
-import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.isUnspecified
 import androidx.compose.ui.util.fastForEach
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 /**
  * Creates and [remember]s a Ripple using values provided by [RippleTheme].
@@ -81,13 +82,13 @@ public fun rememberRipple(
     color: Color = Color.Unspecified
 ): Indication {
     val theme = AmbientRippleTheme.current
-    val clock = AmbientAnimationClock.current.asDisposableClock()
+    val scope = rememberCoroutineScope()
     val resolvedColor = color.takeOrElse { theme.defaultColor() }
     val colorState = remember { mutableStateOf(resolvedColor, structuralEqualityPolicy()) }
     colorState.value = resolvedColor
     val rippleAlpha = theme.rippleAlpha()
-    return remember(bounded, radius, theme, clock) {
-        Ripple(bounded, radius, colorState, rippleAlpha, clock)
+    return remember(bounded, radius, theme, scope) {
+        Ripple(bounded, radius, colorState, rippleAlpha, scope)
     }
 }
 
@@ -115,10 +116,10 @@ private class Ripple(
     private val radius: Dp,
     private val color: State<Color>,
     private val rippleAlpha: RippleAlpha,
-    private val clock: AnimationClockObservable
+    private val scope: CoroutineScope
 ) : Indication {
     override fun createInstance(): IndicationInstance {
-        return RippleIndicationInstance(bounded, radius, color, rippleAlpha, clock)
+        return RippleIndicationInstance(bounded, radius, color, rippleAlpha, scope)
     }
 
     // to force stability on this indication we need equals and hashcode, there's no value in
@@ -131,7 +132,7 @@ private class Ripple(
         if (radius != other.radius) return false
         if (color != other.color) return false
         if (rippleAlpha != other.rippleAlpha) return false
-        if (clock != other.clock) return false
+        if (scope != other.scope) return false
 
         return true
     }
@@ -141,7 +142,7 @@ private class Ripple(
         result = 31 * result + radius.hashCode()
         result = 31 * result + color.hashCode()
         result = 31 * result + rippleAlpha.hashCode()
-        result = 31 * result + clock.hashCode()
+        result = 31 * result + scope.hashCode()
         return result
     }
 }
@@ -152,10 +153,10 @@ private class RippleIndicationInstance constructor(
     private val radius: Dp,
     private val color: State<Color>,
     private val rippleAlpha: RippleAlpha,
-    private val clock: AnimationClockObservable
+    private val scope: CoroutineScope
 ) : IndicationInstance {
 
-    private val stateLayer = StateLayer(clock, bounded, rippleAlpha)
+    private val stateLayer = StateLayer(bounded, rippleAlpha, scope)
 
     private val ripples = mutableStateListOf<RippleAnimation>()
     private var currentPressPosition: Offset? = null
@@ -163,8 +164,7 @@ private class RippleIndicationInstance constructor(
 
     override fun ContentDrawScope.drawIndication(interactionState: InteractionState) {
         val color = color.value
-        // TODO: b/174310811 use library function instead of manual logic here
-        val targetRadius = if (radius == Dp.Unspecified) {
+        val targetRadius = if (radius.isUnspecified) {
             getRippleEndRadius(bounded, size)
         } else {
             radius.toPx()
@@ -189,7 +189,7 @@ private class RippleIndicationInstance constructor(
         val pxSize = Size(size.width, size.height)
         val center = Offset(size.width / 2f, size.height / 2f)
         val position = if (bounded) pressPosition else center
-        val ripple = RippleAnimation(pxSize, position, targetRadius, bounded, clock) { ripple ->
+        val ripple = RippleAnimation(pxSize, position, targetRadius, scope, bounded) { ripple ->
             ripples.remove(ripple)
             if (currentRipple == ripple) {
                 currentRipple = null
@@ -248,11 +248,11 @@ private class RippleIndicationInstance constructor(
  */
 @ExperimentalRippleApi
 private class StateLayer(
-    clock: AnimationClockObservable,
     private val bounded: Boolean,
-    private val rippleAlpha: RippleAlpha
+    private val rippleAlpha: RippleAlpha,
+    private val scope: CoroutineScope
 ) {
-    private val animatedAlpha = AnimatedFloatModel(0f, clock)
+    private val animatedAlpha = Animatable(0f)
     private var previousInteractions: Set<Interaction> = emptySet()
     private var lastDrawnInteraction: Interaction? = null
 
@@ -285,7 +285,9 @@ private class StateLayer(
             val incomingAnimationSpec = IncomingStateLayerAnimationSpecs[interaction]
                 ?: TweenSpec(durationMillis = 15, easing = LinearEasing)
 
-            animatedAlpha.animateTo(targetAlpha, incomingAnimationSpec)
+            scope.launch {
+                animatedAlpha.animateTo(targetAlpha, incomingAnimationSpec)
+            }
 
             lastDrawnInteraction = interaction
             handled = true
@@ -301,7 +303,9 @@ private class StateLayer(
                 val outgoingAnimationSpec = OutgoingStateLayerAnimationSpecs[previousInteraction]
                     ?: TweenSpec(durationMillis = 15, easing = LinearEasing)
 
-                animatedAlpha.animateTo(0f, outgoingAnimationSpec)
+                scope.launch {
+                    animatedAlpha.animateTo(0f, outgoingAnimationSpec)
+                }
 
                 lastDrawnInteraction = null
             }
