@@ -97,7 +97,7 @@ class RoundedCornerShape(
         return result
     }
 
-    private /*inline*/ fun Float.toRadius() = CornerRadius(this)
+    private fun Float.toRadius() = CornerRadius(this)
 }
 
 /**
@@ -109,32 +109,32 @@ val CircleShape = RoundedCornerShape(50)
  * Creates [RoundedCornerShape] with the same size applied for all four corners.
  * @param corner [CornerSize] to apply.
  */
-/*inline*/ fun RoundedCornerShape(corner: CornerSize) =
+fun RoundedCornerShape(corner: CornerSize) =
     RoundedCornerShape(corner, corner, corner, corner)
 
 /**
  * Creates [RoundedCornerShape] with the same size applied for all four corners.
  * @param size Size in [Dp] to apply.
  */
-/*inline*/ fun RoundedCornerShape(size: Dp) = RoundedCornerShape(CornerSize(size))
+fun RoundedCornerShape(size: Dp) = RoundedCornerShape(CornerSize(size))
 
 /**
  * Creates [RoundedCornerShape] with the same size applied for all four corners.
  * @param size Size in pixels to apply.
  */
-/*inline*/ fun RoundedCornerShape(size: Float) = RoundedCornerShape(CornerSize(size))
+fun RoundedCornerShape(size: Float) = RoundedCornerShape(CornerSize(size))
 
 /**
  * Creates [RoundedCornerShape] with the same size applied for all four corners.
  * @param percent Size in percents to apply.
  */
-/*inline*/ fun RoundedCornerShape(percent: Int) =
+fun RoundedCornerShape(percent: Int) =
     RoundedCornerShape(CornerSize(percent))
 
 /**
  * Creates [RoundedCornerShape] with sizes defined in [Dp].
  */
-/*inline*/ fun RoundedCornerShape(
+fun RoundedCornerShape(
     topLeft: Dp = 0.dp,
     topRight: Dp = 0.dp,
     bottomRight: Dp = 0.dp,
@@ -149,7 +149,7 @@ val CircleShape = RoundedCornerShape(50)
 /**
  * Creates [RoundedCornerShape] with sizes defined in pixels.
  */
-/*inline*/ fun RoundedCornerShape(
+fun RoundedCornerShape(
     topLeft: Float = 0.0f,
     topRight: Float = 0.0f,
     bottomRight: Float = 0.0f,
@@ -173,7 +173,7 @@ val CircleShape = RoundedCornerShape(50)
  * @param bottomLeftPercent The bottom left corner radius as a percentage of the smaller side,
  * with a range of 0 - 100.
  */
-/*inline*/ fun RoundedCornerShape(
+fun RoundedCornerShape(
     /*@IntRange(from = 0, to = 100)*/
     topLeftPercent: Int = 0,
     /*@IntRange(from = 0, to = 100)*/
