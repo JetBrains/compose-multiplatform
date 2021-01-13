@@ -85,10 +85,9 @@ internal fun Modifier.textFieldScrollable(
     }
     val scroll = Modifier.scrollable(
         orientation = scrollerPosition.orientation,
-        canScroll = { scrollerPosition.maximum != 0f },
         reverseDirection = reverseDirection,
         controller = controller,
-        enabled = enabled
+        enabled = enabled && scrollerPosition.maximum != 0f
     )
     scroll
 }

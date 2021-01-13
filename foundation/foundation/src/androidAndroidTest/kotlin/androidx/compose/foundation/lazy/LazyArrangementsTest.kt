@@ -205,7 +205,7 @@ class LazyArrangementsTest {
 
     @Test
     fun column_spacing_scrolledToTheBottom() {
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(itemSize),
                 modifier = Modifier.size(itemSize * 3.5f).testTag(ContainerTag)
@@ -248,7 +248,7 @@ class LazyArrangementsTest {
 
     @Test
     fun row_spacing_scrolledToTheEnd() {
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(itemSize),
                 modifier = Modifier.size(itemSize * 3.5f).testTag(ContainerTag)

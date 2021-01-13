@@ -40,6 +40,7 @@ import androidx.compose.ui.gesture.nestedscroll.NestedScrollDispatcher
 import androidx.compose.ui.gesture.nestedscroll.NestedScrollSource
 import androidx.compose.ui.gesture.nestedscroll.nestedScroll
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
+import androidx.compose.ui.platform.AmbientViewConfiguration
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
@@ -848,6 +849,137 @@ class ScrollableTest {
 
     @Test
     @OptIn(ExperimentalTestApi::class)
+    fun scrollable_nestedScroll_allowParentWhenDisabled() =
+        runBlockingWithManualClock { clock ->
+            var childValue = 0f
+            var parentValue = 0f
+            val animationClock = monotonicFrameAnimationClockOf(coroutineContext)
+            val childController = ScrollableController(
+                consumeScrollDelta = {
+                    childValue += it
+                    it
+                },
+                flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
+                animationClock = animationClock
+            )
+            val parentController = ScrollableController(
+                consumeScrollDelta = {
+                    parentValue += it
+                    it
+                },
+                flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
+                animationClock = animationClock
+            )
+
+            rule.setContent {
+                Box {
+                    Box(
+                        modifier = Modifier.preferredSize(300.dp)
+
+                            .scrollable(
+                                controller = parentController,
+                                orientation = Orientation.Horizontal
+                            )
+                    ) {
+                        Box(
+                            Modifier.preferredSize(200.dp)
+                                .testTag(scrollableBoxTag)
+                                .scrollable(
+                                    enabled = false,
+                                    orientation = Orientation.Horizontal,
+                                    controller = childController
+                                )
+                        )
+                    }
+                }
+            }
+
+            rule.runOnIdle {
+                assertThat(parentValue).isEqualTo(0f)
+                assertThat(childValue).isEqualTo(0f)
+            }
+
+            rule.onNodeWithTag(scrollableBoxTag)
+                .performGesture {
+                    swipe(center, center.copy(x = center.x + 100f))
+                }
+
+            advanceClockWhileAwaitersExist(clock)
+            advanceClockWhileAwaitersExist(clock)
+
+            rule.runOnIdle {
+                assertThat(childValue).isEqualTo(0f)
+                assertThat(parentValue).isGreaterThan(0f)
+            }
+        }
+
+    @Test
+    @OptIn(ExperimentalTestApi::class)
+    fun scrollable_onStart_properPositionPassed() =
+        runBlockingWithManualClock { clock ->
+            var touchSlop = 0f
+            var value = 0f
+            var startPosition = Offset.Zero
+            val animationClock = monotonicFrameAnimationClockOf(coroutineContext)
+            val controller = ScrollableController(
+                consumeScrollDelta = {
+                    value += it
+                    it
+                },
+                flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
+                animationClock = animationClock
+            )
+
+            rule.setContent {
+                touchSlop = AmbientViewConfiguration.current.touchSlop
+                Box {
+                    Box(
+                        modifier = Modifier.preferredSize(300.dp)
+                            .testTag(scrollableBoxTag)
+                            .scrollable(
+                                controller = controller,
+                                onScrollStarted = {
+                                    startPosition = it
+                                },
+                                orientation = Orientation.Horizontal
+                            )
+                    )
+                }
+            }
+
+            var expectedPosition = Offset.Zero
+
+            rule.onNodeWithTag(scrollableBoxTag)
+                .performGesture {
+                    val end = center.copy(x = center.x + 100f)
+                    expectedPosition = center.copy(x = center.x + touchSlop)
+                    swipe(center, end)
+                }
+
+            advanceClockWhileAwaitersExist(clock)
+            advanceClockWhileAwaitersExist(clock)
+
+            rule.runOnIdle {
+                assertThat(startPosition).isEqualTo(expectedPosition)
+            }
+
+            rule.onNodeWithTag(scrollableBoxTag)
+                .performGesture {
+                    val end = center.copy(x = center.x - 100f)
+                    expectedPosition = center.copy(x = center.x - touchSlop)
+                    swipe(center, end)
+                }
+
+            advanceClockWhileAwaitersExist(clock)
+            advanceClockWhileAwaitersExist(clock)
+
+            rule.runOnIdle {
+                assertThat(startPosition).isEqualTo(expectedPosition)
+            }
+        }
+
+    @Test
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_interactionState() = runBlocking {
         val interactionState = InteractionState()
         var total = 0f
@@ -964,7 +1096,6 @@ class ScrollableTest {
                 "controller",
                 "enabled",
                 "reverseDirection",
-                "canScroll",
                 "onScrollStarted",
                 "onScrollStopped",
             )

@@ -237,7 +237,7 @@ class LazyListState constructor(
         ) {
             return 0f
         }
-        check(abs(scrollToBeConsumed) < 0.5f) {
+        check(abs(scrollToBeConsumed) <= 0.5f) {
             "entered drag with non-zero pending scroll: $scrollToBeConsumed"
         }
         scrollToBeConsumed += distance
@@ -245,12 +245,12 @@ class LazyListState constructor(
         // scrollToBeConsumed will be consumed synchronously during the forceRemeasure invocation
         // inside measuring we do scrollToBeConsumed.roundToInt() so there will be no scroll if
         // we have less than 0.5 pixels
-        if (abs(scrollToBeConsumed) >= 0.5f) {
+        if (abs(scrollToBeConsumed) > 0.5f) {
             remeasurement.forceRemeasure()
         }
 
         // here scrollToBeConsumed is already consumed during the forceRemeasure invocation
-        if (abs(scrollToBeConsumed) < 0.5f) {
+        if (abs(scrollToBeConsumed) <= 0.5f) {
             // We consumed all of it - we'll hold onto the fractional scroll for later, so report
             // that we consumed the whole thing
             return distance

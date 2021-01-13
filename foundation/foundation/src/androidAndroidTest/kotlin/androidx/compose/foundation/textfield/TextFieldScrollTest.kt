@@ -44,6 +44,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.node.Ref
+import androidx.compose.ui.platform.AmbientViewConfiguration
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
@@ -392,8 +393,10 @@ class TextFieldScrollTest {
             FlingConfig(FloatExponentialDecaySpec()),
             ManualAnimationClock(0)
         )
+        var touchSlop = 0f
 
         rule.setContent {
+            touchSlop = AmbientViewConfiguration.current.touchSlop
             Column(
                 Modifier
                     .preferredSize(size)
@@ -419,11 +422,14 @@ class TextFieldScrollTest {
         with(rule.density) {
             val x = 10.dp.toPx()
             val start = Offset(x, 40.dp.toPx())
+            // not to exceed 50dp
+            val slopStartY = minOf(40.dp.toPx() + touchSlop, 49.dp.toPx())
+            val slopStart = Offset(x, slopStartY)
             val end = Offset(x, 0f)
             rule.onNodeWithTag(TextfieldTag)
                 .performGesture {
                     // scroll first two lines
-                    swipe(start, end)
+                    swipe(slopStart, end)
                     // scroll last two lines
                     swipe(start, end)
                     // scroll Scrollable column
