@@ -2220,6 +2220,7 @@ package androidx.compose.ui.platform {
     method public static androidx.compose.runtime.ProvidableAmbient<android.content.res.Configuration> getAmbientConfiguration();
     method public static androidx.compose.runtime.ProvidableAmbient<android.content.Context> getAmbientContext();
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.lifecycle.LifecycleOwner> getAmbientLifecycleOwner();
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.savedstate.SavedStateRegistryOwner> getAmbientSavedStateRegistryOwner();
     method public static androidx.compose.runtime.ProvidableAmbient<android.view.View> getAmbientView();
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.lifecycle.ViewModelStoreOwner> getAmbientViewModelStoreOwner();
     method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<android.content.res.Configuration>! getConfigurationAmbient();
