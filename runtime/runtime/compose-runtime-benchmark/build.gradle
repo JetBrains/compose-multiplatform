@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 import static androidx.build.dependencies.DependenciesKt.*
 
 plugins {
@@ -64,10 +61,4 @@ dependencies {
     androidTestImplementation(KOTLIN_REFLECT)
     androidTestImplementation(project(":benchmark:benchmark-junit4"))
     androidTestImplementation "androidx.activity:activity:1.2.0-alpha02"
-}
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        useIR = true
-    }
 }
