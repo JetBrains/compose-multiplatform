@@ -332,7 +332,6 @@ package androidx.compose.ui.unit {
     method public static float getValue-impl(long $this);
     method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(long p);
     method public static boolean isEm-impl(long $this);
-    method @Deprecated public static boolean isInherit-impl(long $this);
     method public static boolean isSp-impl(long $this);
     method public static inline operator long minus--R2X_6o(long $this, long other);
     method public static inline operator long plus--R2X_6o(long $this, long other);
@@ -352,9 +351,7 @@ package androidx.compose.ui.unit {
     method public long Sp-XSAIIZE(int value);
     method public long Sp-XSAIIZE(float value);
     method public long Sp-XSAIIZE(double value);
-    method @Deprecated public long getInherit-XSAIIZE();
     method public long getUnspecified-XSAIIZE();
-    property @Deprecated public final long Inherit;
     property public final long Unspecified;
   }
 
@@ -384,10 +381,7 @@ package androidx.compose.ui.unit {
   }
 
   public enum TextUnitType {
-    method public final int getValue();
-    property public final int value;
     enum_constant public static final androidx.compose.ui.unit.TextUnitType Em;
-    enum_constant @Deprecated public static final androidx.compose.ui.unit.TextUnitType Inherit;
     enum_constant public static final androidx.compose.ui.unit.TextUnitType Sp;
     enum_constant public static final androidx.compose.ui.unit.TextUnitType Unspecified;
   }

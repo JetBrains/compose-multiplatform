@@ -67,7 +67,7 @@ private val TextUnit.spanUnit: Int
     get() = when (type) {
         TextUnitType.Sp -> PlaceholderSpan.UNIT_SP
         TextUnitType.Em -> PlaceholderSpan.UNIT_EM
-        TextUnitType.Unspecified, TextUnitType.Inherit -> PlaceholderSpan.UNIT_UNSPECIFIED
+        TextUnitType.Unspecified -> PlaceholderSpan.UNIT_UNSPECIFIED
     }
 
 /**

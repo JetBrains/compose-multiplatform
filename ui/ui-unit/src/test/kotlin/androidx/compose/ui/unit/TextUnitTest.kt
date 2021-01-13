@@ -1053,21 +1053,6 @@ class TextUnitTest {
     }
 
     @Test
-    @Suppress("DEPRECATION")
-    fun inherit_isEqualTo_unspecified() {
-        assertThat(TextUnit.Unspecified).isEqualTo(TextUnit.Inherit)
-    }
-
-    @Test
-    @Suppress("DEPRECATION")
-    fun isInherit_isEqualTo_isUnspecified() {
-        assertThat(TextUnit.Unspecified.isInherit).isTrue()
-        assertThat(TextUnit.Inherit.isUnspecified).isTrue()
-        assertThat(1.em.isUnspecified).isFalse()
-        assertThat(1.em.isInherit).isFalse()
-    }
-
-    @Test
     fun testIsSpecified() {
         Assert.assertFalse(TextUnit.Unspecified.isSpecified)
         Assert.assertTrue(1.sp.isSpecified)

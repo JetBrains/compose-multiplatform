@@ -452,7 +452,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
             when (value.type) {
                 TextUnitType.Sp -> NodeParameter(name, ParameterType.DimensionSp, value.value)
                 TextUnitType.Em -> NodeParameter(name, ParameterType.DimensionEm, value.value)
-                TextUnitType.Inherit, TextUnitType.Unspecified ->
+                TextUnitType.Unspecified ->
                     NodeParameter(name, ParameterType.String, "Unspecified")
             }
 

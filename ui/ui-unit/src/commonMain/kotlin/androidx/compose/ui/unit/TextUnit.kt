@@ -42,15 +42,10 @@ private const val UNIT_TYPE_EM = 0x02L shl 32 // 0x2_0000_0000
 /**
  * An enum class defining for type of [TextUnit].
  */
-enum class TextUnitType(val value: Int) {
-    @Deprecated(
-        "Renamed to TextUnitType.Unspecified",
-        replaceWith = ReplaceWith("TextUnitType.Unspecified", "androidx.compose.ui.unit")
-    )
-    Inherit(0),
-    Unspecified(0),
-    Sp(1),
-    Em(2)
+enum class TextUnitType {
+    Unspecified,
+    Sp,
+    Em
 }
 
 /**
@@ -189,7 +184,6 @@ inline class TextUnit(val packedValue: Long) {
     override fun toString(): String {
         return when (type) {
             TextUnitType.Unspecified -> "Unspecified"
-            TextUnitType.Inherit -> "Inherit"
             TextUnitType.Sp -> "$value.sp"
             TextUnitType.Em -> "$value.em"
         }
@@ -234,16 +228,6 @@ inline class TextUnit(val packedValue: Long) {
          */
         @Stable
         val Unspecified = pack(UNIT_TYPE_UNSPECIFIED, Float.NaN)
-
-        /**
-         * A special [TextUnit] instance for representing inheriting from parent value.
-         */
-        @Stable
-        @Deprecated(
-            "Renamed to TextUnit.Unspecified",
-            replaceWith = ReplaceWith("TextUnit.Unspecified", "androidx.compose.ui.unit")
-        )
-        val Inherit = Unspecified
     }
 
     /**
@@ -260,15 +244,6 @@ inline class TextUnit(val packedValue: Long) {
      * @throws RuntimeException if unknown unknown unit type is appeared.
      */
     val type: TextUnitType get() = TextUnitTypes[(rawType ushr 32).toInt()]
-
-    /**
-     * True if this is [TextUnit.Unspecified], otherwise false.
-     */
-    @Deprecated(
-        "Renamed to TextUnit.isUnspecified",
-        replaceWith = ReplaceWith("isUnspecified", "androidx.compose.ui.unit")
-    )
-    val isInherit get() = isUnspecified
 
     /**
      * True if this is a SP unit type.
