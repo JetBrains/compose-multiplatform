@@ -18,10 +18,7 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.AnimatedValueModel
-import androidx.compose.animation.asDisposableClock
-import androidx.compose.animation.core.AnimationClockObservable
-import androidx.compose.animation.core.AnimationVector1D
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.foundation.AmbientIndication
 import androidx.compose.foundation.BorderStroke
@@ -37,15 +34,18 @@ import androidx.compose.foundation.layout.defaultMinSizeConstraints
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.compositeOver
-import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -108,13 +108,13 @@ fun Button(
     // the ripple below the clip once http://b/157687898 is fixed and we have
     // more flexibility to move the clickable modifier (see candidate approach
     // aosp/1361921)
-    val contentColor = colors.contentColor(enabled)
+    val contentColor by colors.contentColor(enabled)
     Surface(
         shape = shape,
-        color = colors.backgroundColor(enabled),
+        color = colors.backgroundColor(enabled).value,
         contentColor = contentColor.copy(alpha = 1f),
         border = border,
-        elevation = elevation?.elevation(enabled, interactionState) ?: 0.dp,
+        elevation = elevation?.elevation(enabled, interactionState)?.value ?: 0.dp,
         modifier = modifier.clickable(
             onClick = onClick,
             enabled = enabled,
@@ -281,7 +281,8 @@ interface ButtonElevation {
      * @param enabled whether the button is enabled
      * @param interactionState the [InteractionState] for this button
      */
-    fun elevation(enabled: Boolean, interactionState: InteractionState): Dp
+    @Composable
+    fun elevation(enabled: Boolean, interactionState: InteractionState): State<Dp>
 }
 
 /**
@@ -300,14 +301,16 @@ interface ButtonColors {
      *
      * @param enabled whether the button is enabled
      */
-    fun backgroundColor(enabled: Boolean): Color
+    @Composable
+    fun backgroundColor(enabled: Boolean): State<Color>
 
     /**
      * Represents the content color for this button, depending on [enabled].
      *
      * @param enabled whether the button is enabled
      */
-    fun contentColor(enabled: Boolean): Color
+    @Composable
+    fun contentColor(enabled: Boolean): State<Color>
 }
 
 /**
@@ -373,13 +376,11 @@ object ButtonDefaults {
         // hovered: Dp = 4.dp,
         disabledElevation: Dp = 0.dp
     ): ButtonElevation {
-        val clock = AmbientAnimationClock.current.asDisposableClock()
-        return remember(defaultElevation, pressedElevation, disabledElevation, clock) {
+        return remember(defaultElevation, pressedElevation, disabledElevation) {
             DefaultButtonElevation(
                 defaultElevation = defaultElevation,
                 pressedElevation = pressedElevation,
-                disabledElevation = disabledElevation,
-                clock = clock
+                disabledElevation = disabledElevation
             )
         }
     }
@@ -492,13 +493,9 @@ private class DefaultButtonElevation(
     private val defaultElevation: Dp,
     private val pressedElevation: Dp,
     private val disabledElevation: Dp,
-    private val clock: AnimationClockObservable
 ) : ButtonElevation {
-    private val lazyAnimatedElevation = LazyAnimatedValue<Dp, AnimationVector1D> { target ->
-        AnimatedValueModel(initialValue = target, typeConverter = Dp.VectorConverter, clock = clock)
-    }
-
-    override fun elevation(enabled: Boolean, interactionState: InteractionState): Dp {
+    @Composable
+    override fun elevation(enabled: Boolean, interactionState: InteractionState): State<Dp> {
         val interaction = interactionState.value.lastOrNull {
             it is Interaction.Pressed
         }
@@ -512,18 +509,18 @@ private class DefaultButtonElevation(
             }
         }
 
-        val animatedElevation = lazyAnimatedElevation.animatedValueForTarget(target)
+        val animatable = remember { Animatable(target, Dp.VectorConverter) }
 
-        if (animatedElevation.targetValue != target) {
-            if (!enabled) {
-                // No transition when moving to a disabled state
-                animatedElevation.snapTo(target)
-            } else {
-                val lastInteraction = when (animatedElevation.targetValue) {
+        if (!enabled) {
+            // No transition when moving to a disabled state
+            animatable.snapTo(target)
+        } else {
+            LaunchedEffect(target) {
+                val lastInteraction = when (animatable.targetValue) {
                     pressedElevation -> Interaction.Pressed
                     else -> null
                 }
-                animatedElevation.animateElevation(
+                animatable.animateElevation(
                     from = lastInteraction,
                     to = interaction,
                     target = target
@@ -531,7 +528,7 @@ private class DefaultButtonElevation(
             }
         }
 
-        return animatedElevation.value
+        return animatable.asState()
     }
 }
 
@@ -546,12 +543,14 @@ private class DefaultButtonColors(
     private val contentColor: Color,
     private val disabledContentColor: Color
 ) : ButtonColors {
-    override fun backgroundColor(enabled: Boolean): Color {
-        return if (enabled) backgroundColor else disabledBackgroundColor
+    @Composable
+    override fun backgroundColor(enabled: Boolean): State<Color> {
+        return rememberUpdatedState(if (enabled) backgroundColor else disabledBackgroundColor)
     }
 
-    override fun contentColor(enabled: Boolean): Color {
-        return if (enabled) contentColor else disabledContentColor
+    @Composable
+    override fun contentColor(enabled: Boolean): State<Color> {
+        return rememberUpdatedState(if (enabled) contentColor else disabledContentColor)
     }
 
     override fun equals(other: Any?): Boolean {

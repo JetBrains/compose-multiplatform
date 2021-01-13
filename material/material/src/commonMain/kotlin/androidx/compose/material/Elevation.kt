@@ -16,7 +16,7 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.core.AnimatedValue
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.dp
  * @param target the [Dp] target elevation for this component, corresponding to the elevation
  * desired for the [to] state.
  */
-fun AnimatedValue<Dp, *>.animateElevation(
+suspend fun Animatable<Dp, *>.animateElevation(
     from: Interaction? = null,
     to: Interaction? = null,
     target: Dp

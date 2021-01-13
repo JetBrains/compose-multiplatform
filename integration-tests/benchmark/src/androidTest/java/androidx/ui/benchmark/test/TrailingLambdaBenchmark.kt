@@ -44,22 +44,22 @@ class TrailingLambdaBenchmark {
 
     @Test
     fun withTrailingLambdas_compose() {
-        benchmarkRule.benchmarkFirstCompose { WithTrailingLambdas() }
+        benchmarkRule.benchmarkFirstCompose({ WithTrailingLambdas() })
     }
 
     @Test
     fun withTrailingLambdas_recompose() {
-        benchmarkRule.toggleStateBenchmarkRecompose { WithTrailingLambdas() }
+        benchmarkRule.toggleStateBenchmarkRecompose({ WithTrailingLambdas() })
     }
 
     @Test
     fun withoutTrailingLambdas_compose() {
-        benchmarkRule.benchmarkFirstCompose { WithoutTrailingLambdas() }
+        benchmarkRule.benchmarkFirstCompose({ WithoutTrailingLambdas() })
     }
 
     @Test
     fun withoutTrailingLambdas_recompose() {
-        benchmarkRule.toggleStateBenchmarkRecompose { WithoutTrailingLambdas() }
+        benchmarkRule.toggleStateBenchmarkRecompose({ WithoutTrailingLambdas() })
     }
 }
 

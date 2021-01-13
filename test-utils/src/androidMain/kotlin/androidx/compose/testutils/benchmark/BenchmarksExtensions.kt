@@ -147,8 +147,16 @@ fun ComposeBenchmarkRule.benchmarkDrawPerf(caseFactory: () -> ComposeTestCase) {
 
 /**
  * Measures the time of the first composition of the given compose test case.
+ *
+ * @param assertNoPendingRecompositions whether the benchmark will fail if there are pending
+ * recompositions after the first composition. By default this is true to enforce correctness in
+ * the benchmark, but for components that have an initial animation after being composed this can
+ * be turned off to benchmark just the first composition without any pending animations.
  */
-fun ComposeBenchmarkRule.benchmarkFirstCompose(caseFactory: () -> ComposeTestCase) {
+fun ComposeBenchmarkRule.benchmarkFirstCompose(
+    caseFactory: () -> ComposeTestCase,
+    assertNoPendingRecompositions: Boolean = true
+) {
     runBenchmarkFor(caseFactory) {
         measureRepeated {
             runWithTimingDisabled {
@@ -158,7 +166,9 @@ fun ComposeBenchmarkRule.benchmarkFirstCompose(caseFactory: () -> ComposeTestCas
             emitContent()
 
             runWithTimingDisabled {
-                assertNoPendingChanges()
+                if (assertNoPendingRecompositions) {
+                    assertNoPendingChanges()
+                }
                 disposeContent()
             }
         }
@@ -311,9 +321,15 @@ fun AndroidBenchmarkRule.benchmarkFirstDraw(caseFactory: () -> AndroidTestCase) 
 
 /**
  *  Measures recomposition time of the hierarchy after changing a state.
+ *
+ * @param assertOneRecomposition whether the benchmark will fail if there are pending
+ * recompositions after the first recomposition. By default this is true to enforce correctness in
+ * the benchmark, but for components that have animations after being recomposed this can
+ * be turned off to benchmark just the first recomposition without any pending animations.
  */
 fun <T> ComposeBenchmarkRule.toggleStateBenchmarkRecompose(
-    caseFactory: () -> T
+    caseFactory: () -> T,
+    assertOneRecomposition: Boolean = true
 ) where T : ComposeTestCase, T : ToggleableTestCase {
     runBenchmarkFor(caseFactory) {
         doFramesUntilNoChangesPending()
@@ -323,17 +339,25 @@ fun <T> ComposeBenchmarkRule.toggleStateBenchmarkRecompose(
                 getTestCase().toggleState()
             }
             recomposeAssertHadChanges()
-            assertNoPendingChanges()
+            if (assertOneRecomposition) {
+                assertNoPendingChanges()
+            }
         }
     }
 }
 
 /**
  *  Measures measure time of the hierarchy after changing a state.
+ *
+ * @param assertOneRecomposition whether the benchmark will fail if there are pending
+ * recompositions after the first recomposition. By default this is true to enforce correctness in
+ * the benchmark, but for components that have animations after being recomposed this can
+ * be turned off to benchmark just the first remeasure without any pending animations.
  */
 fun <T> ComposeBenchmarkRule.toggleStateBenchmarkMeasure(
     caseFactory: () -> T,
-    toggleCausesRecompose: Boolean = true
+    toggleCausesRecompose: Boolean = true,
+    assertOneRecomposition: Boolean = true
 ) where T : ComposeTestCase, T : ToggleableTestCase {
     runBenchmarkFor(caseFactory) {
         doFramesUntilNoChangesPending()
@@ -345,20 +369,30 @@ fun <T> ComposeBenchmarkRule.toggleStateBenchmarkMeasure(
                     recomposeAssertHadChanges()
                 }
                 requestLayout()
-                assertNoPendingChanges()
+                if (assertOneRecomposition) {
+                    assertNoPendingChanges()
+                }
             }
             measure()
-            assertNoPendingChanges()
+            if (assertOneRecomposition) {
+                assertNoPendingChanges()
+            }
         }
     }
 }
 
 /**
  *  Measures layout time of the hierarchy after changing a state.
+ *
+ * @param assertOneRecomposition whether the benchmark will fail if there are pending
+ * recompositions after the first recomposition. By default this is true to enforce correctness in
+ * the benchmark, but for components that have animations after being recomposed this can
+ * be turned off to benchmark just the first relayout without any pending animations.
  */
 fun <T> ComposeBenchmarkRule.toggleStateBenchmarkLayout(
     caseFactory: () -> T,
-    toggleCausesRecompose: Boolean = true
+    toggleCausesRecompose: Boolean = true,
+    assertOneRecomposition: Boolean = true
 ) where T : ComposeTestCase, T : ToggleableTestCase {
     runBenchmarkFor(caseFactory) {
         doFramesUntilNoChangesPending()
@@ -371,20 +405,30 @@ fun <T> ComposeBenchmarkRule.toggleStateBenchmarkLayout(
                 }
                 requestLayout()
                 measure()
-                assertNoPendingChanges()
+                if (assertOneRecomposition) {
+                    assertNoPendingChanges()
+                }
             }
             layout()
-            assertNoPendingChanges()
+            if (assertOneRecomposition) {
+                assertNoPendingChanges()
+            }
         }
     }
 }
 
 /**
  *  Measures draw time of the hierarchy after changing a state.
+ *
+ * @param assertOneRecomposition whether the benchmark will fail if there are pending
+ * recompositions after the first recomposition. By default this is true to enforce correctness in
+ * the benchmark, but for components that have animations after being recomposed this can
+ * be turned off to benchmark just the first redraw without any pending animations.
  */
 fun <T> ComposeBenchmarkRule.toggleStateBenchmarkDraw(
     caseFactory: () -> T,
-    toggleCausesRecompose: Boolean = true
+    toggleCausesRecompose: Boolean = true,
+    assertOneRecomposition: Boolean = true
 ) where T : ComposeTestCase, T : ToggleableTestCase {
     runBenchmarkFor(caseFactory) {
         doFramesUntilNoChangesPending()
@@ -395,7 +439,9 @@ fun <T> ComposeBenchmarkRule.toggleStateBenchmarkDraw(
                 if (toggleCausesRecompose) {
                     recomposeAssertHadChanges()
                 }
-                assertNoPendingChanges()
+                if (assertOneRecomposition) {
+                    assertNoPendingChanges()
+                }
                 requestLayout()
                 measure()
                 layout()
@@ -472,9 +518,16 @@ fun <T> AndroidBenchmarkRule.toggleStateBenchmarkDraw(
 
 /**
  *  Measures recompose, measure and layout time after changing a state.
+ *
+ * @param assertOneRecomposition whether the benchmark will fail if there are pending
+ * recompositions after the first recomposition. By default this is true to enforce correctness in
+ * the benchmark, but for components that have animations after being recomposed this can
+ * be turned off to benchmark just the first recompose, remeasure and relayout without any pending
+ * animations.
  */
 fun <T> ComposeBenchmarkRule.toggleStateBenchmarkComposeMeasureLayout(
-    caseFactory: () -> T
+    caseFactory: () -> T,
+    assertOneRecomposition: Boolean = true
 ) where T : ComposeTestCase, T : ToggleableTestCase {
     runBenchmarkFor(caseFactory) {
         doFramesUntilNoChangesPending()
@@ -482,7 +535,9 @@ fun <T> ComposeBenchmarkRule.toggleStateBenchmarkComposeMeasureLayout(
         measureRepeated {
             getTestCase().toggleState()
             recomposeAssertHadChanges()
-            assertNoPendingChanges()
+            if (assertOneRecomposition) {
+                assertNoPendingChanges()
+            }
             measure()
             layout()
             runWithTimingDisabled {
@@ -496,9 +551,15 @@ fun <T> ComposeBenchmarkRule.toggleStateBenchmarkComposeMeasureLayout(
 
 /**
  *  Measures measure and layout time after changing a state.
+ *
+ * @param assertOneRecomposition whether the benchmark will fail if there are pending
+ * recompositions after the first recomposition. By default this is true to enforce correctness in
+ * the benchmark, but for components that have animations after being recomposed this can
+ * be turned off to benchmark just the first remeasure and relayout without any pending animations.
  */
 fun <T> ComposeBenchmarkRule.toggleStateBenchmarkMeasureLayout(
-    caseFactory: () -> T
+    caseFactory: () -> T,
+    assertOneRecomposition: Boolean = true
 ) where T : ComposeTestCase, T : ToggleableTestCase {
     runBenchmarkFor(caseFactory) {
         doFramesUntilNoChangesPending()
@@ -506,10 +567,14 @@ fun <T> ComposeBenchmarkRule.toggleStateBenchmarkMeasureLayout(
         measureRepeated {
             runWithTimingDisabled {
                 getTestCase().toggleState()
-                assertNoPendingChanges()
+                if (assertOneRecomposition) {
+                    assertNoPendingChanges()
+                }
             }
             measure()
-            assertNoPendingChanges()
+            if (assertOneRecomposition) {
+                assertNoPendingChanges()
+            }
         }
     }
 }

@@ -127,8 +127,8 @@ package androidx.compose.material {
   }
 
   @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public interface ButtonColors {
-    method public long backgroundColor-0d7_KjU(boolean enabled);
-    method public long contentColor-0d7_KjU(boolean enabled);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> backgroundColor(boolean enabled);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> contentColor(boolean enabled);
   }
 
   public final class ButtonDefaults {
@@ -157,7 +157,7 @@ package androidx.compose.material {
   }
 
   @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public interface ButtonElevation {
-    method public float elevation-D9Ej5fM(boolean enabled, androidx.compose.foundation.InteractionState interactionState);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.unit.Dp> elevation(boolean enabled, androidx.compose.foundation.InteractionState interactionState);
   }
 
   public final class ButtonKt {
@@ -171,9 +171,9 @@ package androidx.compose.material {
   }
 
   @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public interface CheckboxColors {
-    method public long borderColor-0d7_KjU(boolean enabled, androidx.compose.ui.state.ToggleableState state);
-    method public long boxColor-0d7_KjU(boolean enabled, androidx.compose.ui.state.ToggleableState state);
-    method public long checkmarkColor-0d7_KjU(androidx.compose.ui.state.ToggleableState state);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> borderColor(boolean enabled, androidx.compose.ui.state.ToggleableState state);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> boxColor(boolean enabled, androidx.compose.ui.state.ToggleableState state);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> checkmarkColor(androidx.compose.ui.state.ToggleableState state);
   }
 
   public final class CheckboxDefaults {
@@ -313,7 +313,7 @@ package androidx.compose.material {
   }
 
   public final class ElevationKt {
-    method public static void animateElevation-K5VTZl0(androidx.compose.animation.core.AnimatedValue<androidx.compose.ui.unit.Dp,?>, optional androidx.compose.foundation.Interaction? from, optional androidx.compose.foundation.Interaction? to, float target);
+    method public static suspend Object? animateElevation-_EXKJ8o(androidx.compose.animation.core.Animatable<androidx.compose.ui.unit.Dp,?>, optional androidx.compose.foundation.Interaction? from, optional androidx.compose.foundation.Interaction? to, float target, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.unit.Dp> getAmbientAbsoluteElevation();
   }
 
@@ -344,7 +344,7 @@ package androidx.compose.material {
   }
 
   @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public interface FloatingActionButtonElevation {
-    method public float elevation-D9Ej5fM(androidx.compose.foundation.InteractionState interactionState);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.unit.Dp> elevation(androidx.compose.foundation.InteractionState interactionState);
   }
 
   public final class FloatingActionButtonKt {
@@ -449,7 +449,7 @@ package androidx.compose.material {
   }
 
   @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public interface RadioButtonColors {
-    method public long radioColor-0d7_KjU(boolean enabled, boolean selected);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> radioColor(boolean enabled, boolean selected);
   }
 
   public final class RadioButtonDefaults {
@@ -628,8 +628,8 @@ package androidx.compose.material {
   }
 
   @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public interface SwitchColors {
-    method public long thumbColor-0d7_KjU(boolean enabled, boolean checked);
-    method public long trackColor-0d7_KjU(boolean enabled, boolean checked);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> thumbColor(boolean enabled, boolean checked);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> trackColor(boolean enabled, boolean checked);
   }
 
   public final class SwitchDefaults {
