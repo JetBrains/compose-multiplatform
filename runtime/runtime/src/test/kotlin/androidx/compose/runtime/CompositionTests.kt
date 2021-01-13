@@ -137,10 +137,10 @@ class CompositionTests {
     fun testInsertAContact() = compositionTest {
         val model =
             testModel(mutableListOf(bob, jon))
-        var changed = {}
+        var scope: RecomposeScope? = null
 
         compose {
-            changed = invalidate
+            scope = currentRecomposeScope
             SelectContact(model)
         }
 
@@ -158,7 +158,7 @@ class CompositionTests {
         }
 
         model.add(steve, after = bob)
-        changed()
+        scope?.invalidate()
         expectChanges()
 
         validate {
@@ -185,15 +185,15 @@ class CompositionTests {
                 jon
             )
         )
-        var changed = {}
+        var scope: RecomposeScope? = null
 
         compose {
-            changed = invalidate
+            scope = currentRecomposeScope
             SelectContact(model)
         }
 
         model.move(steve, after = jon)
-        changed()
+        scope?.invalidate()
         expectChanges()
 
         validate {
@@ -220,15 +220,15 @@ class CompositionTests {
                 jon
             )
         )
-        var changed = {}
+        var scope: RecomposeScope? = null
 
         compose {
-            changed = invalidate
+            scope = currentRecomposeScope
             SelectContact(model)
         }
 
         model.filter = "Jon"
-        changed()
+        scope?.invalidate()
         expectChanges()
 
         validate {
@@ -268,9 +268,9 @@ class CompositionTests {
             rob_reports_to_alice,
             clark_reports_to_lois
         )
-        var changed = { }
+        var scope: RecomposeScope? = null
         compose {
-            changed = invalidate
+            scope = currentRecomposeScope
             ReportsReport(reports)
         }
 
@@ -279,7 +279,7 @@ class CompositionTests {
             clark_reports_to_lois,
             rob_reports_to_alice
         )
-        changed()
+        scope?.invalidate()
         expectChanges()
 
         validate {
@@ -290,11 +290,11 @@ class CompositionTests {
     @Test
     fun testReplace() = compositionTest {
         var includeA = true
-        var changed = { }
+        var scope: RecomposeScope? = null
 
         @Composable
         fun Composition() {
-            changed = invalidate
+            scope = currentRecomposeScope
             Text("Before")
             if (includeA) {
                 Linear {
@@ -327,25 +327,25 @@ class CompositionTests {
         }
 
         includeA = false
-        changed()
+        scope?.invalidate()
         expectChanges()
         validate {
             this.Composition()
         }
         includeA = true
-        changed()
+        scope?.invalidate()
         expectChanges()
         validate {
             this.Composition()
         }
-        changed()
+        scope?.invalidate()
         expectNoChanges()
     }
 
     @Test
     fun testInsertWithMultipleRoots() = compositionTest {
         var chars = listOf('a', 'b', 'c')
-        var changed = { }
+        var scope: RecomposeScope? = null
 
         @Composable
         fun TextOf(c: Char) {
@@ -366,7 +366,7 @@ class CompositionTests {
         }
 
         compose {
-            changed = invalidate
+            scope = currentRecomposeScope
             Chars(chars)
             Chars(chars)
             Chars(chars)
@@ -379,7 +379,7 @@ class CompositionTests {
         }
 
         chars = listOf('a', 'b', 'x', 'c')
-        changed()
+        scope?.invalidate()
         expectChanges()
 
         validate {
@@ -392,15 +392,15 @@ class CompositionTests {
     @Test
     fun testSimpleSkipping() = compositionTest {
         val points = listOf(Point(1, 2), Point(2, 3))
-        var changed = {}
+        var scope: RecomposeScope? = null
         compose {
-            changed = invalidate
+            scope = currentRecomposeScope
             Points(points)
         }
 
         validate { Points(points) }
 
-        changed()
+        scope?.invalidate()
         expectNoChanges()
     }
 
@@ -412,9 +412,9 @@ class CompositionTests {
             Point(4, 5),
             Point(6, 7)
         )
-        var changed = { }
+        var scope: RecomposeScope? = null
         compose {
-            changed = invalidate
+            scope = currentRecomposeScope
             Points(points)
         }
 
@@ -426,7 +426,7 @@ class CompositionTests {
             Point(2, 3),
             Point(6, 7)
         )
-        changed()
+        scope?.invalidate()
         expectChanges()
 
         validate { Points(points) }
@@ -584,11 +584,11 @@ class CompositionTests {
 
         var showThree = false
 
-        var changed = { }
+        var scope: RecomposeScope? = null
 
         @Composable
         fun Test() {
-            changed = invalidate
+            scope = currentRecomposeScope
             Test(showThree)
         }
 
@@ -613,7 +613,7 @@ class CompositionTests {
         validate()
 
         showThree = true
-        changed()
+        scope?.invalidate()
         expectChanges()
         validate()
     }
@@ -635,9 +635,9 @@ class CompositionTests {
         }
 
         var value = 42
-        var changed = { }
+        var scope: RecomposeScope? = null
         compose {
-            changed = invalidate
+            scope = currentRecomposeScope
             CallOne(value)
         }
 
@@ -646,7 +646,7 @@ class CompositionTests {
         }
 
         value = 43
-        changed()
+        scope?.invalidate()
         expectChanges()
 
         validate {
@@ -671,9 +671,9 @@ class CompositionTests {
         }
 
         var value = 42
-        var changed = { }
+        var scope: RecomposeScope? = null
         compose {
-            changed = invalidate
+            scope = currentRecomposeScope
             CallOne(value)
         }
 
@@ -682,25 +682,25 @@ class CompositionTests {
         }
 
         value = 43
-        changed()
+        scope?.invalidate()
         expectChanges()
 
         validate {
             this.One(43)
         }
 
-        changed()
+        scope?.invalidate()
         expectNoChanges()
     }
 
     @Test
     fun testComposePartOfTree() = compositionTest {
-        var recomposeLois = { }
+        var loisScope: RecomposeScope? = null
 
         @Composable
         fun Reporter(report: Report? = null) {
             if (report != null) {
-                if (report.from == "Lois" || report.to == "Lois") recomposeLois = invalidate
+                if (report.from == "Lois" || report.to == "Lois") loisScope = currentRecomposeScope
                 Text(report.from)
                 Text("reports to")
                 Text(report.to)
@@ -744,7 +744,7 @@ class CompositionTests {
         r.to = "Lois"
 
         // Compose only the Lois report
-        recomposeLois()
+        loisScope?.invalidate()
 
         expectChanges()
 
@@ -760,13 +760,13 @@ class CompositionTests {
 
     @Test
     fun testRecomposeWithReplace() = compositionTest {
-        var recomposeLois = { }
+        var loisScope: RecomposeScope? = null
         var key = 0
 
         @Composable
         fun Reporter(report: Report? = null) {
             if (report != null) {
-                if (report.from == "Lois" || report.to == "Lois") recomposeLois = invalidate
+                if (report.from == "Lois" || report.to == "Lois") loisScope = currentRecomposeScope
                 key(key) {
                     Text(report.from)
                     Text("reports to")
@@ -814,7 +814,7 @@ class CompositionTests {
         key = 2
 
         // Compose only the Lois report
-        recomposeLois()
+        loisScope?.invalidate()
 
         expectChanges()
 
@@ -830,14 +830,14 @@ class CompositionTests {
 
     @Test
     fun testInvalidationAfterRemoval() = compositionTest {
-        var recomposeLois = { }
+        var loisScope: RecomposeScope? = null
         val key = 0
 
         @Composable
         fun Reporter(report: Report? = null) {
             if (report != null) {
-                val callback = invalidate
-                if (report.from == "Lois" || report.to == "Lois") recomposeLois = callback
+                val scope = currentRecomposeScope
+                if (report.from == "Lois" || report.to == "Lois") loisScope = scope
                 key(key) {
                     Text(report.from)
                     Text("reports to")
@@ -873,9 +873,9 @@ class CompositionTests {
         val notLois: (report: Report) -> Boolean = { it.from != "Lois" && it.to != "Lois" }
 
         var filter = all
-        var changed = { }
+        var scope: RecomposeScope? = null
         compose {
-            changed = invalidate
+            scope = currentRecomposeScope
             ReportsReport(reports, filter)
         }
 
@@ -889,7 +889,7 @@ class CompositionTests {
         }
 
         filter = notLois
-        changed()
+        scope?.invalidate()
         expectChanges()
 
         validate {
@@ -900,7 +900,7 @@ class CompositionTests {
         }
 
         // Invalidate Lois which is now removed.
-        recomposeLois()
+        loisScope?.invalidate()
         expectNoChanges()
 
         validate {
@@ -916,7 +916,7 @@ class CompositionTests {
     @Test
     fun testSimpleRemember() = compositionTest {
         var count = 0
-        var changed = { }
+        var scope: RecomposeScope? = null
 
         class Wrapper(val value: Int) {
             init {
@@ -926,7 +926,7 @@ class CompositionTests {
 
         @Composable
         fun Test(value: Int) {
-            changed = invalidate
+            scope = currentRecomposeScope
             val w = remember { Wrapper(value) }
             Text("value = ${w.value}")
         }
@@ -943,7 +943,7 @@ class CompositionTests {
 
         assertEquals(1, count)
 
-        changed()
+        scope?.invalidate()
         expectNoChanges()
 
         // Expect the previous instance to be remembered
@@ -971,21 +971,21 @@ class CompositionTests {
         }
 
         var value = 1
-        var changed = { }
+        var scope: RecomposeScope? = null
         compose {
-            changed = invalidate
+            scope = currentRecomposeScope
             Test(value)
         }
 
         validate { this.Test(1) }
 
         value = 2
-        changed()
+        scope?.invalidate()
         expectChanges()
 
         validate { this.Test(2) }
 
-        changed()
+        scope?.invalidate()
         expectNoChanges()
 
         validate { this.Test(2) }
@@ -1015,10 +1015,10 @@ class CompositionTests {
 
         var p1 = 1
         var p2 = 2
-        var changed = { }
+        var scope: RecomposeScope? = null
 
         compose {
-            changed = invalidate
+            scope = currentRecomposeScope
             Test(p1, p2)
         }
 
@@ -1026,12 +1026,12 @@ class CompositionTests {
 
         p1 = 2
         p2 = 3
-        changed()
+        scope?.invalidate()
         expectChanges()
 
         validate { this.Test(2, 3) }
 
-        changed()
+        scope?.invalidate()
         expectNoChanges()
 
         validate { this.Test(2, 3) }
@@ -1060,21 +1060,21 @@ class CompositionTests {
         }
 
         var p3 = 3
-        var changed = { }
+        var scope: RecomposeScope? = null
         compose {
-            changed = invalidate
+            scope = currentRecomposeScope
             Test(1, 2, p3)
         }
 
         validate { this.Test(1, 2, 3) }
 
         p3 = 4
-        changed()
+        scope?.invalidate()
         expectChanges()
 
         validate { this.Test(1, 2, 4) }
 
-        changed()
+        scope?.invalidate()
         expectNoChanges()
 
         validate { this.Test(1, 2, 4) }
@@ -1104,10 +1104,10 @@ class CompositionTests {
 
         var p3 = 3
         var p4 = 4
-        var changed = { }
+        var scope: RecomposeScope? = null
 
         compose {
-            changed = invalidate
+            scope = currentRecomposeScope
             Test(1, 2, p3, p4)
         }
 
@@ -1115,12 +1115,12 @@ class CompositionTests {
 
         p3 = 4
         p4 = 5
-        changed()
+        scope?.invalidate()
         expectChanges()
 
         validate { this.Test(1, 2, 4, 5) }
 
-        changed()
+        scope?.invalidate()
         expectNoChanges()
 
         validate { this.Test(1, 2, 4, 5) }
@@ -1149,16 +1149,16 @@ class CompositionTests {
         }
 
         var lastParameter = 5
-        var changed = { }
+        var scope: RecomposeScope? = null
         compose {
-            changed = invalidate
+            scope = currentRecomposeScope
             Test(1, 2, 3, 4, lastParameter)
         }
 
         validate { this.Test(1, 2, 3, 4, 5) }
 
         lastParameter = 6
-        changed()
+        scope?.invalidate()
 
         expectChanges()
 
@@ -1356,13 +1356,13 @@ class CompositionTests {
     @Test
     fun testJoinInvalidate() = compositionTest {
         var texts = 5
-        var invalidateOuter = { }
-        var invalidateInner = { }
+        var outerScope: RecomposeScope? = null
+        var innerScope: RecomposeScope? = null
         var forceInvalidate = false
 
         @Composable fun Composition() {
             Linear {
-                invalidateOuter = invalidate
+                outerScope = currentRecomposeScope
                 for (i in 1..texts) {
                     Text("Some text")
                 }
@@ -1371,10 +1371,10 @@ class CompositionTests {
                     Text("Some text")
 
                     // Force the invalidation to survive the compose
-                    val innerInvalidate = invalidate
-                    invalidateInner = innerInvalidate
+                    val innerInvalidate = currentRecomposeScope
+                    innerScope = innerInvalidate
                     if (forceInvalidate) {
-                        innerInvalidate()
+                        innerInvalidate.invalidate()
                         forceInvalidate = false
                     }
                 }
@@ -1384,13 +1384,13 @@ class CompositionTests {
         compose { Composition() }
 
         texts = 4
-        invalidateOuter()
-        invalidateInner()
+        outerScope?.invalidate()
+        innerScope?.invalidate()
         forceInvalidate = true
         expectChanges()
 
         texts = 3
-        invalidateOuter()
+        outerScope?.invalidate()
         forceInvalidate = true
         expectChanges()
 
@@ -1414,12 +1414,12 @@ class CompositionTests {
             }
         }
 
-        var changed = { }
+        var scope: RecomposeScope? = null
 
         @Composable
         fun Composition() {
             Linear {
-                changed = invalidate
+                scope = currentRecomposeScope
                 remember { rememberedObject }
                 Text("Some text")
             }
@@ -1438,7 +1438,7 @@ class CompositionTests {
 
         assertEquals(1, rememberedObject.count, "object should have been notified of a remember")
 
-        changed()
+        scope?.invalidate()
         expectNoChanges()
         validate { this.Composition() }
 
@@ -1540,24 +1540,24 @@ class CompositionTests {
             }
         }
 
-        var changed = { }
+        var scope: RecomposeScope? = null
         var value = true
         compose {
-            changed = invalidate
+            scope = currentRecomposeScope
             Composition(value)
         }
         validate { this.Composition(true) }
 
         assertEquals(1, rememberObject.count, "object should have been notified of a remember")
 
-        changed()
+        scope?.invalidate()
         expectNoChanges()
         validate { this.Composition(true) }
 
         assertEquals(1, rememberObject.count, "Object should have only been notified once")
 
         value = false
-        changed()
+        scope?.invalidate()
         expectChanges()
         validate { this.Composition(false) }
 
@@ -1644,9 +1644,9 @@ class CompositionTests {
         var a = true
         var b = false
         var c = false
-        var changed = { }
+        var scope: RecomposeScope? = null
         compose {
-            changed = invalidate
+            scope = currentRecomposeScope
             Composition(a = a, b = b, c = c)
         }
         validate {
@@ -1665,7 +1665,7 @@ class CompositionTests {
 
         expectedRemember = false
         expectedForget = false
-        changed()
+        scope?.invalidate()
         expectNoChanges()
         validate {
             this.Composition(
@@ -1685,7 +1685,7 @@ class CompositionTests {
         a = false
         b = true
         c = false
-        changed()
+        scope?.invalidate()
         expectChanges()
         validate {
             this.Composition(
@@ -1701,7 +1701,7 @@ class CompositionTests {
         a = false
         b = false
         c = true
-        changed()
+        scope?.invalidate()
         expectChanges()
         validate {
             this.Composition(
@@ -1717,7 +1717,7 @@ class CompositionTests {
         a = true
         b = false
         c = false
-        changed()
+        scope?.invalidate()
         expectChanges()
         validate {
             this.Composition(
@@ -1733,7 +1733,7 @@ class CompositionTests {
         a = false
         b = false
         c = false
-        changed()
+        scope?.invalidate()
         expectChanges()
         validate {
             this.Composition(
@@ -1778,7 +1778,7 @@ class CompositionTests {
         }
 
         var rememberObject: Any = rememberObject1
-        var changed = {}
+        var scope: RecomposeScope? = null
 
         @Composable
         fun Composition(obj: Any) {
@@ -1801,7 +1801,7 @@ class CompositionTests {
         }
 
         compose {
-            changed = invalidate
+            scope = currentRecomposeScope
             Composition(obj = rememberObject)
         }
         validate { this.Composition() }
@@ -1809,14 +1809,14 @@ class CompositionTests {
         assertEquals(0, rememberObject2.count, "second object should not have entered")
 
         rememberObject = rememberObject2
-        changed()
+        scope?.invalidate()
         expectChanges()
         validate { Composition() }
         assertEquals(0, rememberObject1.count, "first object should have left")
         assertEquals(2, rememberObject2.count, "second object should have entered")
 
         rememberObject = object {}
-        changed()
+        scope?.invalidate()
         expectChanges()
         validate { Composition() }
         assertEquals(0, rememberObject1.count, "first object should have left")
@@ -1952,16 +1952,16 @@ class CompositionTests {
         val innerKeys = mutableListOf<Int>()
         var previousOuterKeysSize = 0
         var previousInnerKeysSize = 0
-        var outerInvalidate: (() -> Unit) = {}
-        var innerInvalidate: (() -> Unit) = {}
+        var outerScope: RecomposeScope? = null
+        var innerScope: RecomposeScope? = null
 
         @Composable
         fun Test() {
-            outerInvalidate = invalidate
+            outerScope = currentRecomposeScope
             outerKeys.add(currentComposer.currentCompoundKeyHash)
             Container {
                 Linear {
-                    innerInvalidate = invalidate
+                    innerScope = currentRecomposeScope
                     innerKeys.add(currentComposer.currentCompoundKeyHash)
                 }
             }
@@ -1977,12 +1977,12 @@ class CompositionTests {
         assertNotEquals(previousInnerKeysSize, innerKeys.size)
 
         previousOuterKeysSize = outerKeys.size
-        outerInvalidate()
+        outerScope?.invalidate()
         expectNoChanges()
         assertNotEquals(previousOuterKeysSize, outerKeys.size)
 
         previousInnerKeysSize = innerKeys.size
-        innerInvalidate()
+        innerScope?.invalidate()
         expectNoChanges()
         assertNotEquals(previousInnerKeysSize, innerKeys.size)
 
@@ -1998,14 +1998,14 @@ class CompositionTests {
     @Test // b/152753046
     fun testSwappingGroups() = compositionTest {
         val items = mutableListOf(0, 1, 2, 3, 4)
-        var invalidateComposition = {}
+        var scope: RecomposeScope? = null
 
         @Composable
         fun NoNodes() { }
 
         @Composable
         fun Test() {
-            invalidateComposition = invalidate
+            scope = currentRecomposeScope
             for (item in items) {
                 key(item) {
                     NoNodes()
@@ -2020,7 +2020,7 @@ class CompositionTests {
         // Swap 2 and 3
         items[2] = 3
         items[3] = 2
-        invalidateComposition()
+        scope?.invalidate()
 
         expectChanges()
     }
@@ -2036,9 +2036,9 @@ class CompositionTests {
             )
         )
 
-        val invalidates = mutableListOf<() -> Unit>()
+        val invalidates = mutableListOf<RecomposeScope>()
         fun invalidateComposition() {
-            invalidates.forEach { it() }
+            invalidates.forEach { it.invalidate() }
             invalidates.clear()
         }
 
@@ -2046,7 +2046,7 @@ class CompositionTests {
         fun Numbers(numbers: List<Int>) {
             Linear {
                 Linear {
-                    invalidates.add(invalidate)
+                    invalidates.add(currentRecomposeScope)
                     for (number in numbers) {
                         Text("$number")
                     }
@@ -2057,7 +2057,7 @@ class CompositionTests {
         @Composable
         fun Item(number: Int, numbers: List<Int>) {
             Linear {
-                invalidates.add(invalidate)
+                invalidates.add(currentRecomposeScope)
                 Text("$number")
                 Numbers(numbers)
             }
@@ -2065,10 +2065,10 @@ class CompositionTests {
 
         @Composable
         fun Test() {
-            invalidates.add(invalidate)
+            invalidates.add(currentRecomposeScope)
 
             Linear {
-                invalidates.add(invalidate)
+                invalidates.add(currentRecomposeScope)
                 for ((number, numbers) in items) {
                     Item(number, numbers)
                 }
@@ -2131,21 +2131,21 @@ class CompositionTests {
             1 to listOf(0, 1, 2, 3, 4)
         )
 
-        val invalidates = mutableListOf<() -> Unit>()
+        val invalidates = mutableListOf<RecomposeScope>()
         fun invalidateComposition() {
-            invalidates.forEach { it() }
+            invalidates.forEach { it.invalidate() }
             invalidates.clear()
         }
 
         @Composable
         fun Test() {
-            invalidates.add(invalidate)
+            invalidates.add(currentRecomposeScope)
 
             Linear {
                 for ((item, numbers) in items) {
                     Text(item.toString())
                     Linear {
-                        invalidates.add(invalidate)
+                        invalidates.add(currentRecomposeScope)
                         for (number in numbers) {
                             Text(number.toString())
                         }
@@ -2188,11 +2188,11 @@ class CompositionTests {
     fun evenOddRecomposeGroup() = compositionTest {
         var includeEven = true
         var includeOdd = true
-        val invalidates = mutableListOf<() -> Unit>()
+        val invalidates = mutableListOf<RecomposeScope>()
 
         fun invalidateComposition() {
-            for (invalidate in invalidates) {
-                invalidate()
+            for (scope in invalidates) {
+                scope.invalidate()
             }
             invalidates.clear()
         }
@@ -2204,7 +2204,7 @@ class CompositionTests {
 
         @Composable
         fun EmitText() {
-            invalidates.add(invalidate)
+            invalidates.add(currentRecomposeScope)
             if (includeOdd) {
                 key(1) {
                     Text("odd 1")
@@ -2317,18 +2317,18 @@ class CompositionTests {
         var includeEven = true
         var includeOdd = true
         var order = listOf(1, 2, 3, 4)
-        val invalidates = mutableListOf<() -> Unit>()
+        val invalidates = mutableListOf<RecomposeScope>()
 
         fun invalidateComposition() {
-            for (invalidate in invalidates) {
-                invalidate()
+            for (scope in invalidates) {
+                scope.invalidate()
             }
             invalidates.clear()
         }
 
         @Composable
         fun EmitText(all: Boolean) {
-            invalidates.add(invalidate)
+            invalidates.add(currentRecomposeScope)
             for (i in order) {
                 if (i % 2 == 1 && (all || includeOdd)) {
                     key(i) {
@@ -2346,7 +2346,7 @@ class CompositionTests {
         @Composable
         fun Test() {
             Linear {
-                invalidates.add(invalidate)
+                invalidates.add(currentRecomposeScope)
                 for (i in order) {
                     key(i) {
                         Text("group $i")
@@ -2540,12 +2540,12 @@ class CompositionTests {
 
     @Test // regression test for b/172660922
     fun testInvalidationOfRemovedContent() = compositionTest {
-        var markS1Invalid: () -> Unit = {}
+        var S1Scope: RecomposeScope? = null
         var viewS1 by mutableStateOf(true)
         var performBackwardsWrite = true
         @Composable
         fun S1() {
-            markS1Invalid = invalidate
+            S1Scope = currentRecomposeScope
             Text("In s1")
         }
 
@@ -2566,7 +2566,7 @@ class CompositionTests {
 
             if (performBackwardsWrite) {
                 // This forces the equivalent of a backwards write.
-                markS1Invalid()
+                S1Scope?.invalidate()
                 performBackwardsWrite = false
             }
         }
@@ -2595,7 +2595,7 @@ class CompositionTests {
 
         validate()
 
-        markS1Invalid()
+        S1Scope?.invalidate()
         performBackwardsWrite = true
         expectNoChanges()
 
@@ -2645,14 +2645,14 @@ class CompositionTests {
         localRecomposerTest { recomposer ->
             val composer = Composer(EmptyApplier(), recomposer)
             try {
-                lateinit var invalidator: () -> Unit
+                lateinit var scope: RecomposeScope
                 val parentReferences = mutableListOf<CompositionReference>()
                 recomposer.composeInitial(composer) {
-                    invalidator = invalidate
-                    parentReferences += compositionReference()
+                    scope = currentRecomposeScope
+                    parentReferences += rememberCompositionReference()
                 }
                 composer.applyChanges()
-                invalidator()
+                scope.invalidate()
                 advanceUntilIdle()
                 assert(parentReferences.size > 1) { "expected to be composed more than once" }
                 assert(parentReferences.toSet().size == 1) {
@@ -2780,7 +2780,7 @@ class CompositionTests {
 private fun TestSubcomposition(
     content: @Composable () -> Unit
 ) {
-    val parentRef = compositionReference()
+    val parentRef = rememberCompositionReference()
     val currentContent by rememberUpdatedState(content)
     DisposableEffect(parentRef) {
         val subcomposer = Composer(EmptyApplier(), parentRef)

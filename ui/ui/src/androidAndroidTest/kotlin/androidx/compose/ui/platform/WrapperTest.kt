@@ -19,11 +19,11 @@ import android.widget.FrameLayout
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.ambientOf
-import androidx.compose.runtime.compositionReference
-import androidx.compose.runtime.invalidate
+import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.onActive
 import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.onDispose
+import androidx.compose.runtime.rememberCompositionReference
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
@@ -42,8 +42,10 @@ import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-@Composable private fun Recompose(body: @Composable (recompose: () -> Unit) -> Unit) =
-    body(invalidate)
+@Composable private fun Recompose(body: @Composable (recompose: () -> Unit) -> Unit) {
+    val scope = currentRecomposeScope
+    body { scope.invalidate() }
+}
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -149,7 +151,7 @@ class WrapperTest {
             it.setContent {
                 val ambient = ambientOf<Float>()
                 Providers(ambient provides 1f) {
-                    val composition = compositionReference()
+                    val composition = rememberCompositionReference()
 
                     AndroidView({ frameLayout })
                     onCommit {

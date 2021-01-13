@@ -249,14 +249,14 @@ class RecomposerTests : BaseComposeTest() {
     @Composable fun RecomposeTestComponentsB(counter: Counter, listener: ClickAction, id: Int = 0) {
         counter.inc("$id")
 
-        val recompose = invalidate
+        val scope = currentRecomposeScope
 
         TextView(
             id = id,
             onClickListener = View.OnClickListener {
                 @Suppress("DEPRECATION")
                 when (listener) {
-                    is ClickAction.Recompose -> recompose()
+                    is ClickAction.Recompose -> scope.invalidate()
                     is ClickAction.PerformOnView -> listener.action.invoke(it)
                 }
             }
@@ -265,13 +265,13 @@ class RecomposerTests : BaseComposeTest() {
 
     @Composable fun RecomposeTestComponentsA(counter: Counter, listener: ClickAction) {
         counter.inc("A")
-        val recompose = invalidate
+        val scope = currentRecomposeScope
         LinearLayout(
             id = 99,
             onClickListener = View.OnClickListener {
                 @Suppress("DEPRECATION")
                 when (listener) {
-                    is ClickAction.Recompose -> recompose()
+                    is ClickAction.Recompose -> scope.invalidate()
                     is ClickAction.PerformOnView -> listener.action.invoke(it)
                 }
             }

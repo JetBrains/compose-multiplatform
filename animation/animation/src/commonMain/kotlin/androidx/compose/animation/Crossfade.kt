@@ -22,7 +22,8 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.invalidate
+import androidx.compose.runtime.RecomposeScope
+import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.key
 import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
@@ -65,7 +66,7 @@ fun <T> Crossfade(
                         if (key == state.current) {
                             // leave only the current in the list
                             state.items.removeAll { it.key != state.current }
-                            state.invalidate()
+                            state.scope?.invalidate()
                         }
                     }
                 )
@@ -76,7 +77,7 @@ fun <T> Crossfade(
         }
     }
     Box(modifier) {
-        state.invalidate = invalidate
+        state.scope = currentRecomposeScope
         state.items.fastForEach { (item, alpha) ->
             key(item) {
                 alpha {
@@ -91,7 +92,7 @@ private class CrossfadeState<T> {
     // we use Any here as something which will not be equals to the real initial value
     var current: Any? = Any()
     var items = mutableListOf<CrossfadeAnimationItem<T>>()
-    var invalidate: () -> Unit = { }
+    var scope: RecomposeScope? = null
 }
 
 private data class CrossfadeAnimationItem<T>(

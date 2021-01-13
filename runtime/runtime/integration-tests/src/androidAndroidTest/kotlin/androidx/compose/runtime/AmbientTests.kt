@@ -125,11 +125,11 @@ class AmbientTests : BaseComposeTest() {
     @Test
     fun recompose_Dynamic() {
         val tvId = 100
-        val invalidates = mutableListOf<() -> Unit>()
-        fun doInvalidate() = invalidates.forEach { it() }.also { invalidates.clear() }
+        val invalidates = mutableListOf<RecomposeScope>()
+        fun doInvalidate() = invalidates.forEach { it.invalidate() }.also { invalidates.clear() }
         var someText = "Unmodified"
         compose {
-            invalidates.add(invalidate)
+            invalidates.add(currentRecomposeScope)
             Providers(
                 someTextAmbient provides someText
             ) {
@@ -151,12 +151,12 @@ class AmbientTests : BaseComposeTest() {
     @Test
     fun recompose_Static() {
         val tvId = 100
-        val invalidates = mutableListOf<() -> Unit>()
-        fun doInvalidate() = invalidates.forEach { it() }.also { invalidates.clear() }
+        val invalidates = mutableListOf<RecomposeScope>()
+        fun doInvalidate() = invalidates.forEach { it.invalidate() }.also { invalidates.clear() }
         val staticStringAmbient = staticAmbientOf { "Default" }
         var someText = "Unmodified"
         compose {
-            invalidates.add(invalidate)
+            invalidates.add(currentRecomposeScope)
             Providers(
                 staticStringAmbient provides someText
             ) {
@@ -178,11 +178,11 @@ class AmbientTests : BaseComposeTest() {
     @Test
     fun subCompose_Dynamic() {
         val tvId = 100
-        val invalidates = mutableListOf<() -> Unit>()
-        fun doInvalidate() = invalidates.forEach { it() }.also { invalidates.clear() }
+        val invalidates = mutableListOf<RecomposeScope>()
+        fun doInvalidate() = invalidates.forEach { it.invalidate() }.also { invalidates.clear() }
         var someText = "Unmodified"
         compose {
-            invalidates.add(invalidate)
+            invalidates.add(currentRecomposeScope)
 
             Providers(
                 someTextAmbient provides someText,
@@ -224,14 +224,14 @@ class AmbientTests : BaseComposeTest() {
     @Test
     fun subCompose_Static() {
         val tvId = 100
-        val invalidates = mutableListOf<() -> Unit>()
-        fun doInvalidate() = invalidates.forEach { it() }.also { invalidates.clear() }
+        val invalidates = mutableListOf<RecomposeScope>()
+        fun doInvalidate() = invalidates.forEach { it.invalidate() }.also { invalidates.clear() }
         val staticSomeTextAmbient =
             staticAmbientOf { "Default" }
         val staticSomeIntAmbient = staticAmbientOf { -1 }
         var someText = "Unmodified"
         compose {
-            invalidates.add(invalidate)
+            invalidates.add(currentRecomposeScope)
 
             Providers(
                 staticSomeTextAmbient provides someText,
@@ -270,12 +270,12 @@ class AmbientTests : BaseComposeTest() {
     @Test
     fun deferredSubCompose_Dynamic() {
         val tvId = 100
-        val invalidates = mutableListOf<() -> Unit>()
-        fun doInvalidate() = invalidates.forEach { it() }.also { invalidates.clear() }
+        val invalidates = mutableListOf<RecomposeScope>()
+        fun doInvalidate() = invalidates.forEach { it.invalidate() }.also { invalidates.clear() }
         var someText = "Unmodified"
         var doSubCompose: () -> Unit = { error("Sub-compose callback not set") }
         compose {
-            invalidates.add(invalidate)
+            invalidates.add(currentRecomposeScope)
 
             Providers(
                 someTextAmbient provides someText,
@@ -323,15 +323,15 @@ class AmbientTests : BaseComposeTest() {
     @Test
     fun deferredSubCompose_Static() {
         val tvId = 100
-        val invalidates = mutableListOf<() -> Unit>()
-        fun doInvalidate() = invalidates.forEach { it() }.also { invalidates.clear() }
+        val invalidates = mutableListOf<RecomposeScope>()
+        fun doInvalidate() = invalidates.forEach { it.invalidate() }.also { invalidates.clear() }
         var someText = "Unmodified"
         var doSubCompose: () -> Unit = { error("Sub-compose callback not set") }
         val staticSomeTextAmbient =
             staticAmbientOf { "Default" }
         val staticSomeIntAmbient = staticAmbientOf { -1 }
         compose {
-            invalidates.add(invalidate)
+            invalidates.add(currentRecomposeScope)
 
             Providers(
                 staticSomeTextAmbient provides someText,
@@ -374,15 +374,15 @@ class AmbientTests : BaseComposeTest() {
     @Test
     fun deferredSubCompose_Nested_Static() {
         val tvId = 100
-        val invalidates = mutableListOf<() -> Unit>()
-        fun doInvalidate() = invalidates.forEach { it() }.also { invalidates.clear() }
+        val invalidates = mutableListOf<RecomposeScope>()
+        fun doInvalidate() = invalidates.forEach { it.invalidate() }.also { invalidates.clear() }
         var someText = "Unmodified"
         var doSubCompose1: () -> Unit = { error("Sub-compose-1 callback not set") }
         var doSubCompose2: () -> Unit = { error("Sub-compose-2 callback not set") }
         val staticSomeTextAmbient = staticAmbientOf { "Default" }
         val staticSomeIntAmbient = staticAmbientOf { -1 }
         compose {
-            invalidates.add(invalidate)
+            invalidates.add(currentRecomposeScope)
 
             Providers(
                 staticSomeTextAmbient provides someText,
@@ -423,8 +423,8 @@ class AmbientTests : BaseComposeTest() {
 
     @Test
     fun insertShouldSeePreviouslyProvidedValues() {
-        val invalidates = mutableListOf<() -> Unit>()
-        fun doInvalidate() = invalidates.forEach { it() }.also { invalidates.clear() }
+        val invalidates = mutableListOf<RecomposeScope>()
+        fun doInvalidate() = invalidates.forEach { it.invalidate() }.also { invalidates.clear() }
         val someStaticString =
             staticAmbientOf { "Default" }
         var shouldRead = false
@@ -433,7 +433,7 @@ class AmbientTests : BaseComposeTest() {
                 someStaticString provides "Provided A"
             ) {
                 Observe {
-                    invalidates.add(invalidate)
+                    invalidates.add(currentRecomposeScope)
                     if (shouldRead)
                         ReadStringAmbient(someStaticString)
                 }
@@ -449,8 +449,8 @@ class AmbientTests : BaseComposeTest() {
 
     @Test
     fun providingANewDataClassValueShouldNotRecompose() {
-        val invalidates = mutableListOf<() -> Unit>()
-        fun doInvalidate() = invalidates.forEach { it() }.also { invalidates.clear() }
+        val invalidates = mutableListOf<RecomposeScope>()
+        fun doInvalidate() = invalidates.forEach { it.invalidate() }.also { invalidates.clear() }
         val someDataAmbient = ambientOf(structuralEqualityPolicy()) { SomeData() }
         var composed = false
 
@@ -462,7 +462,7 @@ class AmbientTests : BaseComposeTest() {
 
         compose {
             Observe {
-                invalidates.add(invalidate)
+                invalidates.add(currentRecomposeScope)
                 Providers(
                     someDataAmbient provides SomeData("provided")
                 ) {
@@ -492,7 +492,7 @@ class AmbientTests : BaseComposeTest() {
     }
 
     @Composable fun narrowInvalidateForReference(ref: Ref<CompositionReference>) {
-        ref.value = compositionReference()
+        ref.value = rememberCompositionReference()
     }
 
     @Composable fun deferredSubCompose(block: @Composable () -> Unit): () -> Unit {
