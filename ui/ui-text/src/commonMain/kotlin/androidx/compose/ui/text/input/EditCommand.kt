@@ -18,7 +18,6 @@ package androidx.compose.ui.text.input
 
 import androidx.compose.ui.util.findFollowingBreak
 import androidx.compose.ui.util.findPrecedingBreak
-import androidx.compose.ui.util.isSurrogatePair
 
 /**
  * [EditCommand] is a command representation for the platform IME API function calls. The
@@ -532,3 +531,10 @@ class DeleteAllCommand : EditCommand {
         return "DeleteAllCommand()"
     }
 }
+
+/**
+ * Helper function that returns true when [high] is a Unicode high-surrogate code unit and [low]
+ * is a Unicode low-surrogate code unit.
+ */
+private fun isSurrogatePair(high: Char, low: Char): Boolean =
+    high.isHighSurrogate() && low.isLowSurrogate()
