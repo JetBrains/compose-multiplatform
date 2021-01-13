@@ -107,30 +107,30 @@ class CutCornerShape(
  * Creates [CutCornerShape] with the same size applied for all four corners.
  * @param corner [CornerSize] to apply.
  */
-/*inline*/ fun CutCornerShape(corner: CornerSize) = CutCornerShape(corner, corner, corner, corner)
+fun CutCornerShape(corner: CornerSize) = CutCornerShape(corner, corner, corner, corner)
 
 /**
  * Creates [CutCornerShape] with the same size applied for all four corners.
  * @param size Size in [Dp] to apply.
  */
-/*inline*/ fun CutCornerShape(size: Dp) = CutCornerShape(CornerSize(size))
+fun CutCornerShape(size: Dp) = CutCornerShape(CornerSize(size))
 
 /**
  * Creates [CutCornerShape] with the same size applied for all four corners.
  * @param size Size in pixels to apply.
  */
-/*inline*/ fun CutCornerShape(size: Float) = CutCornerShape(CornerSize(size))
+fun CutCornerShape(size: Float) = CutCornerShape(CornerSize(size))
 
 /**
  * Creates [CutCornerShape] with the same size applied for all four corners.
  * @param percent Size in percents to apply.
  */
-/*inline*/ fun CutCornerShape(percent: Int) = CutCornerShape(CornerSize(percent))
+fun CutCornerShape(percent: Int) = CutCornerShape(CornerSize(percent))
 
 /**
  * Creates [CutCornerShape] with sizes defined in [Dp].
  */
-/*inline*/ fun CutCornerShape(
+fun CutCornerShape(
     topLeft: Dp = 0.dp,
     topRight: Dp = 0.dp,
     bottomRight: Dp = 0.dp,
@@ -145,7 +145,7 @@ class CutCornerShape(
 /**
  * Creates [CutCornerShape] with sizes defined in float.
  */
-/*inline*/ fun CutCornerShape(
+fun CutCornerShape(
     topLeft: Float = 0.0f,
     topRight: Float = 0.0f,
     bottomRight: Float = 0.0f,
@@ -169,7 +169,7 @@ class CutCornerShape(
  * @param bottomLeftPercent The bottom left clip size radius as a percentage of the smaller side,
  * with a range of 0 - 100.
  */
-/*inline*/ fun CutCornerShape(
+fun CutCornerShape(
     /*@IntRange(from = 0, to = 100)*/
     topLeftPercent: Int = 0,
     /*@IntRange(from = 0, to = 100)*/
