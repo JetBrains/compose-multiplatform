@@ -50,7 +50,7 @@ abstract class MetalavaTask @Inject constructor(
 
     /** Source files against which API signatures will be validated. */
     @get:[InputFiles PathSensitive(PathSensitivity.RELATIVE)]
-    var sourcePaths: Collection<File> = emptyList()
+    var sourcePaths: FileCollection = project.files()
 
     @get:[Optional InputFile PathSensitive(PathSensitivity.NONE)]
     abstract val manifestPath: RegularFileProperty
