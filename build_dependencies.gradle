@@ -26,7 +26,7 @@ build_versions.kotlin = "1.4.21"
 build_versions.kotlin_coroutines = "1.4.1"
 build_versions.ksp = "1.4.20-dev-experimental-20201204"
 
-build_versions.hilt = "2.29.1-alpha"
+build_versions.hilt = "DEV-SNAPSHOT"
 
 def agpOverride = System.getenv("GRADLE_PLUGIN_VERSION")
 if (agpOverride != null) {
