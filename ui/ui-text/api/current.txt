@@ -934,10 +934,8 @@ package androidx.compose.ui.text.intl {
     ctor public LocaleList(java.util.List<androidx.compose.ui.text.intl.Locale> localeList);
     ctor public LocaleList(String languageTags);
     ctor public LocaleList(androidx.compose.ui.text.intl.Locale... locales);
-    method public java.util.List<androidx.compose.ui.text.intl.Locale> component1();
     method public operator boolean contains(androidx.compose.ui.text.intl.Locale element);
     method public boolean containsAll(java.util.Collection<?> elements);
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.text.intl.LocaleList copy(java.util.List<androidx.compose.ui.text.intl.Locale> localeList);
     method public operator androidx.compose.ui.text.intl.Locale get(int i);
     method public java.util.List<androidx.compose.ui.text.intl.Locale> getLocaleList();
     method public int getSize();

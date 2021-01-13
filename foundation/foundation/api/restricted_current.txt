@@ -533,9 +533,6 @@ package androidx.compose.foundation.text {
 
   @androidx.compose.runtime.Immutable public final class InlineTextContent {
     ctor public InlineTextContent(androidx.compose.ui.text.Placeholder placeholder, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit> children);
-    method public androidx.compose.ui.text.Placeholder component1();
-    method public kotlin.jvm.functions.Function1<java.lang.String,kotlin.Unit> component2();
-    method @androidx.compose.runtime.Immutable public androidx.compose.foundation.text.InlineTextContent copy(androidx.compose.ui.text.Placeholder placeholder, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit> children);
     method public kotlin.jvm.functions.Function1<java.lang.String,kotlin.Unit> getChildren();
     method public androidx.compose.ui.text.Placeholder getPlaceholder();
     property public final kotlin.jvm.functions.Function1<java.lang.String,kotlin.Unit> children;
