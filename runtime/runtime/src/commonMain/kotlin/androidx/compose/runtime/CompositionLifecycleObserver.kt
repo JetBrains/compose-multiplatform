@@ -34,6 +34,10 @@ package androidx.compose.runtime
  * multiple threads. Implementations intending to support this use case should implement atomic
  * reference counting or a similar strategy to correctly manage resources.
  */
+@Deprecated(
+    message = "CompositionLifecycleObserver is deprecated. Use RememberObserver instead",
+    replaceWith = ReplaceWith("RememberObserver")
+)
 interface CompositionLifecycleObserver {
     /**
      * Called when this object successfully enters a composition.
@@ -54,7 +58,9 @@ interface CompositionLifecycleObserver {
  *
  * The holder can be used as a key for the identity of the instance.
  */
-internal class CompositionLifecycleObserverHolder(val instance: CompositionLifecycleObserver) {
+internal class CompositionLifecycleObserverHolder(
+    @Suppress("DEPRECATION") val instance: CompositionLifecycleObserver
+) {
     var count: Int = 0
     override fun equals(other: Any?): Boolean =
         other is CompositionLifecycleObserverHolder && instance === other.instance

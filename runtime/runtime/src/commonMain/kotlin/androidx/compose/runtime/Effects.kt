@@ -41,7 +41,7 @@ private val emptyCommit: CommitScope.() -> Unit = {}
 @PublishedApi
 internal class PreCommitScopeImpl(
     internal val onCommit: CommitScope.() -> Unit
-) : CommitScope, CompositionLifecycleObserver {
+) : CommitScope, RememberObserver {
     internal var disposeCallback = emptyDispose
 
     override fun onDispose(callback: () -> Unit) {
@@ -51,11 +51,15 @@ internal class PreCommitScopeImpl(
         disposeCallback = callback
     }
 
-    override fun onEnter() {
+    override fun onRemembered() {
         onCommit(this)
     }
 
-    override fun onLeave() {
+    override fun onForgotten() {
+        disposeCallback()
+    }
+
+    override fun onAbandoned() {
         disposeCallback()
     }
 }

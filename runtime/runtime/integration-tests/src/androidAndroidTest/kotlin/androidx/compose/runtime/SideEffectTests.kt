@@ -32,6 +32,7 @@ import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
+import kotlin.test.fail
 
 @Suppress("UNUSED_VARIABLE")
 @MediumTest
@@ -77,16 +78,20 @@ class SideEffectTests : BaseComposeTest() {
      */
     @Test
     fun testSideEffectsRunAfterLifecycleObservers() {
-        class MyObserver : CompositionLifecycleObserver {
+        class MyObserver : RememberObserver {
             var isPresent: Boolean = false
                 private set
 
-            override fun onEnter() {
+            override fun onRemembered() {
                 isPresent = true
             }
 
-            override fun onLeave() {
+            override fun onForgotten() {
                 isPresent = false
+            }
+
+            override fun onAbandoned() {
+                fail("Unexpected call to onAbandoned")
             }
         }
 
