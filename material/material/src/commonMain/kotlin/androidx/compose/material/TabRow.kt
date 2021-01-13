@@ -112,12 +112,12 @@ fun TabRow(
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.colors.primarySurface,
     contentColor: Color = contentColorFor(backgroundColor),
-    indicator: @Composable (tabPositions: List<TabPosition>) -> Unit = { tabPositions ->
+    indicator: @Composable (tabPositions: List<TabPosition>) -> Unit = @Composable { tabPositions ->
         TabDefaults.Indicator(
             Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex])
         )
     },
-    divider: @Composable () -> Unit = {
+    divider: @Composable () -> Unit = @Composable {
         TabDefaults.Divider()
     },
     tabs: @Composable () -> Unit
@@ -193,12 +193,12 @@ fun ScrollableTabRow(
     backgroundColor: Color = MaterialTheme.colors.primarySurface,
     contentColor: Color = contentColorFor(backgroundColor),
     edgePadding: Dp = TabDefaults.ScrollableTabRowPadding,
-    indicator: @Composable (tabPositions: List<TabPosition>) -> Unit = { tabPositions ->
+    indicator: @Composable (tabPositions: List<TabPosition>) -> Unit = @Composable { tabPositions ->
         TabDefaults.Indicator(
             Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex])
         )
     },
-    divider: @Composable () -> Unit = {
+    divider: @Composable () -> Unit = @Composable {
         TabDefaults.Divider()
     },
     tabs: @Composable () -> Unit
@@ -279,8 +279,28 @@ fun ScrollableTabRow(
  * @property width the width of this tab
  */
 @Immutable
-data class TabPosition internal constructor(val left: Dp, val width: Dp) {
+class TabPosition internal constructor(val left: Dp, val width: Dp) {
     val right: Dp get() = left + width
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is TabPosition) return false
+
+        if (left != other.left) return false
+        if (width != other.width) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = left.hashCode()
+        result = 31 * result + width.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "TabPosition(left=$left, right=$right, width=$width)"
+    }
 }
 
 private enum class TabSlots {

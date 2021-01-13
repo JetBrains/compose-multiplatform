@@ -65,7 +65,7 @@ import androidx.compose.ui.unit.sp
  * annotate imagery or to introduce a headline.
  */
 @Immutable
-data class Typography internal constructor(
+class Typography internal constructor(
     val h1: TextStyle,
     val h2: TextStyle,
     val h3: TextStyle,
@@ -189,6 +189,83 @@ data class Typography internal constructor(
         caption = caption.withDefaultFontFamily(defaultFontFamily),
         overline = overline.withDefaultFontFamily(defaultFontFamily)
     )
+
+    /**
+     * Returns a copy of this Typography, optionally overriding some of the values.
+     */
+    fun copy(
+        h1: TextStyle = this.h1,
+        h2: TextStyle = this.h2,
+        h3: TextStyle = this.h3,
+        h4: TextStyle = this.h4,
+        h5: TextStyle = this.h5,
+        h6: TextStyle = this.h6,
+        subtitle1: TextStyle = this.subtitle1,
+        subtitle2: TextStyle = this.subtitle2,
+        body1: TextStyle = this.body1,
+        body2: TextStyle = this.body2,
+        button: TextStyle = this.button,
+        caption: TextStyle = this.caption,
+        overline: TextStyle = this.overline
+    ): Typography = Typography(
+        h1 = h1,
+        h2 = h2,
+        h3 = h3,
+        h4 = h4,
+        h5 = h5,
+        h6 = h6,
+        subtitle1 = subtitle1,
+        subtitle2 = subtitle2,
+        body1 = body1,
+        body2 = body2,
+        button = button,
+        caption = caption,
+        overline = overline
+    )
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Typography) return false
+
+        if (h1 != other.h1) return false
+        if (h2 != other.h2) return false
+        if (h3 != other.h3) return false
+        if (h4 != other.h4) return false
+        if (h5 != other.h5) return false
+        if (h6 != other.h6) return false
+        if (subtitle1 != other.subtitle1) return false
+        if (subtitle2 != other.subtitle2) return false
+        if (body1 != other.body1) return false
+        if (body2 != other.body2) return false
+        if (button != other.button) return false
+        if (caption != other.caption) return false
+        if (overline != other.overline) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = h1.hashCode()
+        result = 31 * result + h2.hashCode()
+        result = 31 * result + h3.hashCode()
+        result = 31 * result + h4.hashCode()
+        result = 31 * result + h5.hashCode()
+        result = 31 * result + h6.hashCode()
+        result = 31 * result + subtitle1.hashCode()
+        result = 31 * result + subtitle2.hashCode()
+        result = 31 * result + body1.hashCode()
+        result = 31 * result + body2.hashCode()
+        result = 31 * result + button.hashCode()
+        result = 31 * result + caption.hashCode()
+        result = 31 * result + overline.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "Typography(h1=$h1, h2=$h2, h3=$h3, h4=$h4, h5=$h5, h6=$h6, " +
+            "subtitle1=$subtitle1, subtitle2=$subtitle2, body1=$body1, " +
+            "body2=$body2, button=$button, caption=$caption, overline=$overline)"
+    }
 }
 
 /**
