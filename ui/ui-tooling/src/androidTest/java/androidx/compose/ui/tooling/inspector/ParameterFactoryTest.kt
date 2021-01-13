@@ -614,8 +614,6 @@ class ParameterFactoryTest {
 
     @Test
     fun testTextUnit() {
-        @Suppress("DEPRECATION")
-        assertThat(lookup(TextUnit.Inherit)).isEqualTo(ParameterType.String to "Unspecified")
         assertThat(lookup(TextUnit.Unspecified)).isEqualTo(ParameterType.String to "Unspecified")
         assertThat(lookup(12.0.sp)).isEqualTo(ParameterType.DimensionSp to 12.0f)
         assertThat(lookup(2.0.em)).isEqualTo(ParameterType.DimensionEm to 2.0f)

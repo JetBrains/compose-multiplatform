@@ -47,7 +47,7 @@ internal fun AndroidTextPaint.applySpanStyle(
         TextUnitType.Em -> {
             textSize *= style.fontSize.value
         }
-        TextUnitType.Unspecified, TextUnitType.Inherit -> {} // Do nothing
+        TextUnitType.Unspecified -> {} // Do nothing
     }
 
     if (style.hasFontAttributes()) {
@@ -70,7 +70,7 @@ internal fun AndroidTextPaint.applySpanStyle(
     when (style.letterSpacing.type) {
         TextUnitType.Em -> { letterSpacing = style.letterSpacing.value }
         TextUnitType.Sp -> {} // Sp will be handled by applying a span
-        TextUnitType.Unspecified, TextUnitType.Inherit -> {} // Do nothing
+        TextUnitType.Unspecified -> {} // Do nothing
     }
 
     if (style.fontFeatureSettings != null && style.fontFeatureSettings != "") {
