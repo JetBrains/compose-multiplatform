@@ -23,17 +23,35 @@ import androidx.compose.ui.text.AnnotatedString
 /**
  * The transformed text with offset offset mapping
  */
-data class TransformedText(
+class TransformedText(
     /**
      * The transformed text
      */
-    val transformedText: AnnotatedString,
+    val text: AnnotatedString,
 
     /**
      * The map used for bidirectional offset mapping from original to transformed text.
      */
     val offsetMapping: OffsetMapping
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is TransformedText) return false
+        if (text != other.text) return false
+        if (offsetMapping != other.offsetMapping) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = text.hashCode()
+        result = 31 * result + offsetMapping.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "TransformedText(transformedText=$text, offsetMapping=$offsetMapping)"
+    }
+}
 
 /**
  * Interface used for changing visual output of the input field.

@@ -163,12 +163,16 @@ fun CoreTextField(
     val selectionBackgroundColor = AmbientTextSelectionColors.current.backgroundColor
 
     // State
-    val (visualText, offsetMapping) = remember(value, visualTransformation) {
+    val transformedText = remember(value, visualTransformation) {
         val transformed = visualTransformation.filter(AnnotatedString(value.text))
         value.composition?.let {
             TextFieldDelegate.applyCompositionDecoration(it, transformed)
         } ?: transformed
     }
+
+    val visualText = transformedText.text
+    val offsetMapping = transformedText.offsetMapping
+
     val state = remember {
         TextFieldState(
             TextDelegate(

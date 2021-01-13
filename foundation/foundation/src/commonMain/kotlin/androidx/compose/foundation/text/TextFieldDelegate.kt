@@ -302,7 +302,7 @@ class TextFieldDelegate {
             transformed: TransformedText
         ): TransformedText =
             TransformedText(
-                AnnotatedString.Builder(transformed.transformedText).apply {
+                AnnotatedString.Builder(transformed.text).apply {
                     addStyle(
                         SpanStyle(textDecoration = TextDecoration.Underline),
                         transformed.offsetMapping.originalToTransformed(compositionRange.start),
