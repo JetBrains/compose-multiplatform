@@ -98,7 +98,6 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 
 tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
-        useIR = true
         incremental = false
     }
 }
