@@ -28,7 +28,6 @@ import org.gradle.api.attributes.Attribute
 import org.gradle.api.tasks.ClasspathNormalizer
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.findByType
-import org.gradle.kotlin.dsl.invoke
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -68,9 +67,9 @@ class AndroidXUiPlugin : Plugin<Project> {
                     }.files
 
                     project.tasks.withType(KotlinCompile::class.java).configureEach { compile ->
+                        compile.kotlinOptions.useIR = true
                         // TODO(b/157230235): remove when this is enabled by default
-                        compile.kotlinOptions.freeCompilerArgs +=
-                            "-Xopt-in=kotlin.RequiresOptIn"
+                        compile.kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
                         compile.inputs.files(kotlinPlugin)
                             .withPropertyName("composeCompilerExtension")
                             .withNormalizer(ClasspathNormalizer::class.java)
