@@ -506,28 +506,28 @@ private val RowColumnParentData?.crossAxisAlignment: CrossAxisAlignment?
 private val RowColumnParentData?.isRelative: Boolean
     get() = this.crossAxisAlignment?.isRelative ?: false
 
-private /*inline*/ fun MinIntrinsicWidthMeasureBlock(orientation: LayoutOrientation) =
+private fun MinIntrinsicWidthMeasureBlock(orientation: LayoutOrientation) =
     if (orientation == LayoutOrientation.Horizontal) {
         IntrinsicMeasureBlocks.HorizontalMinWidth
     } else {
         IntrinsicMeasureBlocks.VerticalMinWidth
     }
 
-private /*inline*/ fun MinIntrinsicHeightMeasureBlock(orientation: LayoutOrientation) =
+private fun MinIntrinsicHeightMeasureBlock(orientation: LayoutOrientation) =
     if (orientation == LayoutOrientation.Horizontal) {
         IntrinsicMeasureBlocks.HorizontalMinHeight
     } else {
         IntrinsicMeasureBlocks.VerticalMinHeight
     }
 
-private /*inline*/ fun MaxIntrinsicWidthMeasureBlock(orientation: LayoutOrientation) =
+private fun MaxIntrinsicWidthMeasureBlock(orientation: LayoutOrientation) =
     if (orientation == LayoutOrientation.Horizontal) {
         IntrinsicMeasureBlocks.HorizontalMaxWidth
     } else {
         IntrinsicMeasureBlocks.VerticalMaxWidth
     }
 
-private /*inline*/ fun MaxIntrinsicHeightMeasureBlock(orientation: LayoutOrientation) =
+private fun MaxIntrinsicHeightMeasureBlock(orientation: LayoutOrientation) =
     if (orientation == LayoutOrientation.Horizontal) {
         IntrinsicMeasureBlocks.HorizontalMaxHeight
     } else {
