@@ -198,7 +198,6 @@ package androidx.compose.foundation.animation {
   public final class FlingConfigKt {
     method public static androidx.compose.foundation.animation.FlingConfig FlingConfig(java.util.List<java.lang.Float> anchors, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, optional androidx.compose.animation.core.FloatDecayAnimationSpec decayAnimation);
     method @androidx.compose.runtime.Composable public static androidx.compose.foundation.animation.FlingConfig defaultFlingConfig(optional kotlin.jvm.functions.Function1<? super java.lang.Float,androidx.compose.animation.core.TargetAnimation> adjustTarget);
-    method public static void fling(androidx.compose.animation.core.AnimatedFloat, float startVelocity, androidx.compose.foundation.animation.FlingConfig config, optional kotlin.jvm.functions.Function3<? super androidx.compose.animation.core.AnimationEndReason,? super java.lang.Float,? super java.lang.Float,kotlin.Unit>? onAnimationEnd);
   }
 
   public final class FloatAndroidFlingDecaySpec implements androidx.compose.animation.core.FloatDecayAnimationSpec {
