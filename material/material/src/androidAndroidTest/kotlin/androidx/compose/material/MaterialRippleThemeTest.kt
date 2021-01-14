@@ -49,7 +49,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.ComposeTestRule
-import androidx.compose.ui.test.junit4.createComposeRuleLegacy
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -71,9 +71,8 @@ import org.junit.runner.RunWith
 @OptIn(ExperimentalMaterialApi::class, ExperimentalTestApi::class, ExperimentalRippleApi::class)
 class MaterialRippleThemeTest {
 
-    @Suppress("DEPRECATION")
     @get:Rule
-    val rule = createComposeRuleLegacy()
+    val rule = createComposeRule()
 
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL)
@@ -571,14 +570,13 @@ class MaterialRippleThemeTest {
      * @param expectedCenterPixelColor the expected color for the pixel at the center of the
      * [RippleBox]
      */
-    @Suppress("DEPRECATION") // Due to clockTestRule
     private fun assertRippleMatches(
         interactionState: InteractionState,
         interaction: Interaction,
         goldenIdentifier: String,
         expectedCenterPixelColor: Color
     ) {
-        rule.clockTestRule.pauseClock()
+        rule.mainClock.autoAdvance = false
 
         // Start ripple
         rule.runOnUiThread {
@@ -592,7 +590,7 @@ class MaterialRippleThemeTest {
         // Advance to somewhere in the middle of the animation for a ripple, or at the end of a
         // state layer transition
         rule.waitForIdle()
-        rule.clockTestRule.advanceClock(50)
+        rule.mainClock.advanceTimeBy(milliseconds = 50)
 
         // Capture and compare screenshots
         rule.onNodeWithTag(Tag)
@@ -601,8 +599,7 @@ class MaterialRippleThemeTest {
 
         // Advance until after the end of the ripple animation, so we have a stable final opacity
         rule.waitForIdle()
-        rule.clockTestRule.advanceClock(50)
-        rule.waitForIdle()
+        rule.mainClock.advanceTimeBy(milliseconds = 50)
 
         // Compare expected and actual pixel color
         val centerPixel = rule.onNodeWithTag(Tag)

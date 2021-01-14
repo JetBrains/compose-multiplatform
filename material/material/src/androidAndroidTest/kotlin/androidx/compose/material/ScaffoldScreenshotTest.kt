@@ -34,7 +34,7 @@ import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.captureToImage
-import androidx.compose.ui.test.junit4.createComposeRuleLegacy
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -51,9 +51,8 @@ import org.junit.runner.RunWith
 @OptIn(ExperimentalMaterialApi::class)
 class ScaffoldScreenshotTest {
 
-    @Suppress("DEPRECATION")
     @get:Rule
-    val composeTestRule = createComposeRuleLegacy()
+    val composeTestRule = createComposeRule()
 
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL)

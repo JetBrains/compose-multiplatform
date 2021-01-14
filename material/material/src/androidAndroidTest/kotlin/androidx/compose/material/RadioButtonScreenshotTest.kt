@@ -30,7 +30,7 @@ import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.center
 import androidx.compose.ui.test.down
 import androidx.compose.ui.test.isSelectable
-import androidx.compose.ui.test.junit4.createComposeRuleLegacy
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.move
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performGesture
@@ -49,9 +49,8 @@ import org.junit.runner.RunWith
 @OptIn(ExperimentalTestApi::class)
 class RadioButtonScreenshotTest {
 
-    @Suppress("DEPRECATION")
     @get:Rule
-    val rule = createComposeRuleLegacy()
+    val rule = createComposeRule()
 
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL)
@@ -116,7 +115,6 @@ class RadioButtonScreenshotTest {
     }
 
     @Test
-    @Suppress("DEPRECATION") // Due to clockTestRule
     fun radioButton_notSelected_animateToSelected() {
         rule.setMaterialContent {
             val isSelected = remember { mutableStateOf(false) }
@@ -128,22 +126,21 @@ class RadioButtonScreenshotTest {
             }
         }
 
-        rule.clockTestRule.pauseClock()
+        rule.mainClock.autoAdvance = false
 
         rule.onNode(isSelectable())
             // split click into (down) and (move, up) to enforce a composition in between
             .performGesture { down(center) }
             .performGesture { move(); up() }
 
-        rule.waitForIdle()
-
-        rule.clockTestRule.advanceClock(60)
+        rule.mainClock.advanceTimeByFrame()
+        rule.waitForIdle() // Wait for measure
+        rule.mainClock.advanceTimeBy(milliseconds = 80)
 
         assertSelectableAgainstGolden("radioButton_animateToSelected")
     }
 
     @Test
-    @Suppress("DEPRECATION") // Due to clockTestRule
     fun radioButton_selected_animateToNotSelected() {
         rule.setMaterialContent {
             val isSelected = remember { mutableStateOf(true) }
@@ -155,16 +152,16 @@ class RadioButtonScreenshotTest {
             }
         }
 
-        rule.clockTestRule.pauseClock()
+        rule.mainClock.autoAdvance = false
 
         rule.onNode(isSelectable())
             // split click into (down) and (move, up) to enforce a composition in between
             .performGesture { down(center) }
             .performGesture { move(); up() }
 
-        rule.waitForIdle()
-
-        rule.clockTestRule.advanceClock(60)
+        rule.mainClock.advanceTimeByFrame()
+        rule.waitForIdle() // Wait for measure
+        rule.mainClock.advanceTimeBy(milliseconds = 80)
 
         assertSelectableAgainstGolden("radioButton_animateToNotSelected")
     }
