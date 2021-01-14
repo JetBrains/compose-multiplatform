@@ -141,7 +141,7 @@ internal class TextFieldSelectionManager() {
             }
 
             // selection never started
-            if (value.text == "") return
+            if (value.text.isEmpty()) return
             enterSelectionMode()
             state?.layoutResult?.let { layoutResult ->
                 val offset = layoutResult.getOffsetForPosition(pxPosition)
@@ -159,7 +159,7 @@ internal class TextFieldSelectionManager() {
 
         override fun onDrag(dragDistance: Offset): Offset {
             // selection never started, did not consume any drag
-            if (value.text == "") return Offset.Zero
+            if (value.text.isEmpty()) return Offset.Zero
 
             dragTotalDistance += dragDistance
             state?.layoutResult?.let { layoutResult ->
@@ -206,7 +206,7 @@ internal class TextFieldSelectionManager() {
 
         override fun onDrag(dragDistance: Offset): Offset {
             // selection never started, did not consume any drag
-            if (value.text == "") return Offset.Zero
+            if (value.text.isEmpty()) return Offset.Zero
 
             dragTotalDistance += dragDistance
             state?.layoutResult?.let { layoutResult ->
