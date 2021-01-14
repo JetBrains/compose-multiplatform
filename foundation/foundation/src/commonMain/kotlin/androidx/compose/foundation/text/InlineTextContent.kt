@@ -61,7 +61,7 @@ fun AnnotatedString.Builder.appendInlineContent(
  * @see Placeholder
  */
 @Immutable
-data class InlineTextContent(
+class InlineTextContent(
     /**
      * The setting object that defines the size and vertical alignment of this composable in the
      * text line. This is different from the measure of Layout
