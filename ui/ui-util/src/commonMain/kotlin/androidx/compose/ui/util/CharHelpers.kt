@@ -15,8 +15,6 @@
  */
 package androidx.compose.ui.util
 
-fun isSurrogatePair(high: Char, low: Char): Boolean = high.isHighSurrogate() && low.isLowSurrogate()
-
 // Returns -1 if cannot go back.
 expect fun String.findPrecedingBreak(index: Int): Int
 
