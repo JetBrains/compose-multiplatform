@@ -36,6 +36,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.up
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
@@ -113,8 +114,8 @@ class RadioButtonScreenshotTest {
         }
         assertSelectableAgainstGolden("radioButton_disabled_notSelected")
     }
-
     @Test
+    @FlakyTest // b/178407863 Fails on Cuttlefish API 29 consistently
     fun radioButton_notSelected_animateToSelected() {
         rule.setMaterialContent {
             val isSelected = remember { mutableStateOf(false) }
@@ -141,6 +142,7 @@ class RadioButtonScreenshotTest {
     }
 
     @Test
+    @FlakyTest // b/178407863 Fails on Cuttlefish API 29 consistently
     fun radioButton_selected_animateToNotSelected() {
         rule.setMaterialContent {
             val isSelected = remember { mutableStateOf(true) }

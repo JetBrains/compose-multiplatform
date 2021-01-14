@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.graphics
 
-import org.jetbrains.skija.ColorFilter as SkijaColorFilter
 import org.jetbrains.skija.FilterQuality as SkijaFilterQuality
 import org.jetbrains.skija.PaintMode as SkijaPaintMode
 import org.jetbrains.skija.PaintStrokeCap as SkijaPaintStrokeCap
@@ -103,14 +102,7 @@ class DesktopPaint : Paint {
 
     override var colorFilter: ColorFilter? = null
         set(value) {
-            skija.colorFilter = if (value != null) {
-                SkijaColorFilter.makeBlend(
-                    value.color.toArgb(),
-                    value.blendMode.toSkija()
-                )
-            } else {
-                null
-            }
+            skija.colorFilter = value?.asDesktopColorFilter()
             field = value
         }
 

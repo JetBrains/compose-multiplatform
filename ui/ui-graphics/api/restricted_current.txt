@@ -40,6 +40,11 @@ package androidx.compose.ui.graphics {
     method public static android.graphics.Canvas getNativeCanvas(androidx.compose.ui.graphics.Canvas);
   }
 
+  public final class AndroidColorFilterKt {
+    method public static android.graphics.ColorFilter asAndroidColorFilter(androidx.compose.ui.graphics.ColorFilter);
+    method public static androidx.compose.ui.graphics.ColorFilter asComposeColorFilter(android.graphics.ColorFilter);
+  }
+
   public final class AndroidImageBitmapKt {
     method public static android.graphics.Bitmap asAndroidBitmap(androidx.compose.ui.graphics.ImageBitmap);
     method @Deprecated public static androidx.compose.ui.graphics.ImageBitmap asImageAsset(android.graphics.Bitmap);
@@ -342,18 +347,17 @@ package androidx.compose.ui.graphics {
   }
 
   @androidx.compose.runtime.Immutable public final class ColorFilter {
-    method public long component1-0d7_KjU();
-    method public androidx.compose.ui.graphics.BlendMode component2();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.graphics.ColorFilter copy-aamYUWA(long color, androidx.compose.ui.graphics.BlendMode blendMode);
-    method public androidx.compose.ui.graphics.BlendMode getBlendMode();
-    method public long getColor-0d7_KjU();
-    property public final androidx.compose.ui.graphics.BlendMode blendMode;
-    property public final long color;
     field public static final androidx.compose.ui.graphics.ColorFilter.Companion Companion;
   }
 
   public static final class ColorFilter.Companion {
-    method @androidx.compose.runtime.Stable public androidx.compose.ui.graphics.ColorFilter tint-8_81llA(long color);
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.graphics.ColorFilter colorMatrix-jHG-Opc(float[] colorMatrix);
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.graphics.ColorFilter lighting-6xK2E-Q(long multiply, long add);
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.graphics.ColorFilter tint-aamYUWA(long color, optional androidx.compose.ui.graphics.BlendMode blendMode);
+  }
+
+  public final class ColorFilterKt {
+    method @Deprecated public static androidx.compose.ui.graphics.ColorFilter ColorFilter-aamYUWA(long color, androidx.compose.ui.graphics.BlendMode blendMode);
   }
 
   public final class ColorKt {
@@ -369,6 +373,29 @@ package androidx.compose.ui.graphics {
     method public static inline long takeOrElse-iYUlWp8(long, kotlin.jvm.functions.Function0<androidx.compose.ui.graphics.Color> block);
     method @androidx.compose.runtime.Stable public static int toArgb-8_81llA(long);
     method @Deprecated public static inline long useOrElse-iYUlWp8(long, kotlin.jvm.functions.Function0<androidx.compose.ui.graphics.Color> block);
+  }
+
+  public final inline class ColorMatrix {
+    ctor public ColorMatrix();
+    method public static float[]! constructor-impl(float[] values);
+    method public static void convertRgbToYuv-impl(float[]! $this);
+    method public static void convertYuvToRgb-impl(float[]! $this);
+    method public static inline boolean equals-impl(float[]! p, Object? p1);
+    method public static boolean equals-impl0(float[] p1, float[] p2);
+    method public static inline operator float get-impl(float[] $this, int row, int column);
+    method public float[] getValues();
+    method public static inline int hashCode-impl(float[]! p);
+    method public static void reset-impl(float[]! $this);
+    method public static inline operator void set-impl(float[] $this, int row, int column, float v);
+    method public static void set-jHG-Opc(float[] $this, float[] src);
+    method public static void setToRotateBlue-impl(float[] $this, float degrees);
+    method public static void setToRotateGreen-impl(float[] $this, float degrees);
+    method public static void setToRotateRed-impl(float[] $this, float degrees);
+    method public static void setToSaturation-impl(float[] $this, float sat);
+    method public static void setToScale-impl(float[] $this, float redScale, float greenScale, float blueScale, float alphaScale);
+    method public static operator void timesAssign-jHG-Opc(float[] $this, float[] colorMatrix);
+    method public static inline String! toString-impl(float[]! p);
+    property public final float[] values;
   }
 
   public final class DegreesKt {
