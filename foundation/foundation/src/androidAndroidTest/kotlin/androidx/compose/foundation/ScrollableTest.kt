@@ -471,13 +471,13 @@ class ScrollableTest {
             }
         }
         launch {
-            controller.smoothScrollBy(300f)
+            (controller as Scrollable).smoothScrollBy(300f)
         }
         advanceClockWhileAwaitersExist(clock)
         assertThat(total).isEqualTo(300f)
 
         launch {
-            controller.smoothScrollBy(200f)
+            (controller as Scrollable).smoothScrollBy(200f)
         }
         // don't advance clocks yet, toggle disposed value
         disposed.value = true
