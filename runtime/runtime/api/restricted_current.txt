@@ -122,6 +122,7 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.ComposeCompilerApi public void startReplaceableGroup(int key, String? sourceInformation);
     method @androidx.compose.runtime.ComposeCompilerApi public void startRestartGroup(int key);
     method @androidx.compose.runtime.ComposeCompilerApi public void startRestartGroup(int key, String? sourceInformation);
+    method @kotlin.PublishedApi internal void updateCachedValue(Object? value);
     method @kotlin.PublishedApi internal void updateValue(Object? value);
     method @kotlin.PublishedApi internal void useNode();
     method @androidx.compose.runtime.InternalComposeApi public void verifyConsistent();
@@ -177,9 +178,9 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.ExperimentalComposeApi public static androidx.compose.runtime.Composition compositionFor(Object key, androidx.compose.runtime.Applier<?> applier, androidx.compose.runtime.CompositionReference parent, optional kotlin.jvm.functions.Function0<kotlin.Unit> onCreated);
   }
 
-  public interface CompositionLifecycleObserver {
-    method public default void onEnter();
-    method public default void onLeave();
+  @Deprecated public interface CompositionLifecycleObserver {
+    method @Deprecated public default void onEnter();
+    method @Deprecated public default void onLeave();
   }
 
   public abstract class CompositionReference {
@@ -188,9 +189,12 @@ package androidx.compose.runtime {
   public final class CompositionReferenceKt {
   }
 
-  @kotlin.PublishedApi internal final class CompositionScopedCoroutineScopeCanceller implements androidx.compose.runtime.CompositionLifecycleObserver {
+  @kotlin.PublishedApi internal final class CompositionScopedCoroutineScopeCanceller implements androidx.compose.runtime.RememberObserver {
     ctor public CompositionScopedCoroutineScopeCanceller(kotlinx.coroutines.CoroutineScope coroutineScope);
     method public kotlinx.coroutines.CoroutineScope getCoroutineScope();
+    method public void onAbandoned();
+    method public void onForgotten();
+    method public void onRemembered();
     property public final kotlinx.coroutines.CoroutineScope coroutineScope;
   }
 
@@ -309,9 +313,12 @@ package androidx.compose.runtime {
     property public final boolean isPaused;
   }
 
-  @kotlin.PublishedApi internal final class PreCommitScopeImpl implements androidx.compose.runtime.CommitScope androidx.compose.runtime.CompositionLifecycleObserver {
+  @kotlin.PublishedApi internal final class PreCommitScopeImpl implements androidx.compose.runtime.CommitScope androidx.compose.runtime.RememberObserver {
     ctor public PreCommitScopeImpl(kotlin.jvm.functions.Function1<? super androidx.compose.runtime.CommitScope,kotlin.Unit> onCommit);
+    method public void onAbandoned();
     method public void onDispose(kotlin.jvm.functions.Function0<kotlin.Unit> callback);
+    method public void onForgotten();
+    method public void onRemembered();
   }
 
   public final class ProduceStateKt {
@@ -378,6 +385,12 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.Composable public static inline <T> T! remember(Object? key1, Object? key2, Object? key3, kotlin.jvm.functions.Function0<? extends T> calculation);
     method @androidx.compose.runtime.Composable public static inline <T> T! remember(Object![]? keys, kotlin.jvm.functions.Function0<? extends T> calculation);
     method @androidx.compose.runtime.Composable public static inline <T> androidx.compose.runtime.State<T> rememberUpdatedState(T? newValue);
+  }
+
+  public interface RememberObserver {
+    method public void onAbandoned();
+    method public void onForgotten();
+    method public void onRemembered();
   }
 
   @androidx.compose.runtime.ComposeCompilerApi public interface ScopeUpdateScope {

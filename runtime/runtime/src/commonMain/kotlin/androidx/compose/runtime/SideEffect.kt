@@ -31,8 +31,8 @@ import kotlinx.coroutines.launch
  *
  * [effect] will always be run on the composition's apply dispatcher and appliers are never run
  * concurrent with themselves, one another, applying changes to the composition tree, or running
- * [CompositionLifecycleObserver] event callbacks. [SideEffect]s are always run after
- * [CompositionLifecycleObserver] event callbacks.
+ * [RememberObserver] event callbacks. [SideEffect]s are always run after [RememberObserver]
+ * event callbacks.
  *
  * A [SideEffect] runs after **every** recomposition. To launch an ongoing task spanning
  * potentially many recompositions, see [LaunchedEffect]. To manage an event subscription or other
@@ -72,16 +72,20 @@ private val InternalDisposableEffectScope = DisposableEffectScope()
 
 private class DisposableEffectImpl(
     private val effect: DisposableEffectScope.() -> DisposableEffectDisposable
-) : CompositionLifecycleObserver {
+) : RememberObserver {
     private var onDispose: DisposableEffectDisposable? = null
 
-    override fun onEnter() {
+    override fun onRemembered() {
         onDispose = InternalDisposableEffectScope.effect()
     }
 
-    override fun onLeave() {
+    override fun onForgotten() {
         onDispose?.dispose()
         onDispose = null
+    }
+
+    override fun onAbandoned() {
+        // Nothing to do as [onRemembered] was not called.
     }
 }
 
@@ -129,8 +133,8 @@ fun DisposableEffect(
  * There is guaranteed to be one call to [dispose][DisposableEffectScope.onDispose] for every call
  * to [effect]. Both [effect] and [dispose][DisposableEffectScope.onDispose] will always be run
  * on the composition's apply dispatcher and appliers are never run concurrent with themselves,
- * one another, applying changes to the composition tree, or running [CompositionLifecycleObserver]
- * event callbacks.
+ * one another, applying changes to the composition tree, or running [RememberObserver] event
+ * callbacks.
  */
 @Composable
 @ComposableContract(restartable = false)
@@ -168,7 +172,7 @@ fun DisposableEffect(
  * There is guaranteed to be one call to [dispose][DisposableEffectScope.onDispose] for every call
  * to [effect]. Both [effect] and [dispose][DisposableEffectScope.onDispose] will always be run
  * on the composition's apply dispatcher and appliers are never run concurrent with themselves,
- * one another, applying changes to the composition tree, or running [CompositionLifecycleObserver]
+ * one another, applying changes to the composition tree, or running [RememberObserver]
  * event callbacks.
  */
 @Composable
@@ -208,8 +212,8 @@ fun DisposableEffect(
  * There is guaranteed to be one call to [dispose][DisposableEffectScope.onDispose] for every call
  * to [effect]. Both [effect] and [dispose][DisposableEffectScope.onDispose] will always be run
  * on the composition's apply dispatcher and appliers are never run concurrent with themselves,
- * one another, applying changes to the composition tree, or running [CompositionLifecycleObserver]
- * event callbacks.
+ * one another, applying changes to the composition tree, or running [RememberObserver] event
+ * callbacks.
  */
 @Composable
 @ComposableContract(restartable = false)
@@ -249,8 +253,8 @@ fun DisposableEffect(
  * There is guaranteed to be one call to [dispose][DisposableEffectScope.onDispose] for every call
  * to [effect]. Both [effect] and [dispose][DisposableEffectScope.onDispose] will always be run
  * on the composition's apply dispatcher and appliers are never run concurrent with themselves,
- * one another, applying changes to the composition tree, or running [CompositionLifecycleObserver]
- * event callbacks.
+ * one another, applying changes to the composition tree, or running [RememberObserver] event
+ * callbacks.
  */
 @Composable
 @ComposableContract(restartable = false)
@@ -265,17 +269,21 @@ fun DisposableEffect(
 internal class LaunchedEffectImpl(
     parentCoroutineContext: CoroutineContext,
     private val task: suspend CoroutineScope.() -> Unit
-) : CompositionLifecycleObserver {
-
+) : RememberObserver {
     private val scope = CoroutineScope(parentCoroutineContext)
     private var job: Job? = null
 
-    override fun onEnter() {
+    override fun onRemembered() {
         job?.cancel("Old job was still running!")
         job = scope.launch(block = task)
     }
 
-    override fun onLeave() {
+    override fun onForgotten() {
+        job?.cancel()
+        job = null
+    }
+
+    override fun onAbandoned() {
         job?.cancel()
         job = null
     }

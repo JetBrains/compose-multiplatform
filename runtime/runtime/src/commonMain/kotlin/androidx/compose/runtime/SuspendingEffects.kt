@@ -27,8 +27,16 @@ import kotlin.coroutines.EmptyCoroutineContext
 @PublishedApi
 internal class CompositionScopedCoroutineScopeCanceller(
     val coroutineScope: CoroutineScope
-) : CompositionLifecycleObserver {
-    override fun onLeave() {
+) : RememberObserver {
+    override fun onRemembered() {
+        // Nothing to do
+    }
+
+    override fun onForgotten() {
+        coroutineScope.cancel()
+    }
+
+    override fun onAbandoned() {
         coroutineScope.cancel()
     }
 }

@@ -1398,15 +1398,19 @@ class CompositionTests {
     }
 
     @Test
-    fun testLifecycle_Enter_Simple() = compositionTest {
-        val lifecycleObject = object : CompositionLifecycleObserver {
+    fun testRememberObserver_Remember_Simple() = compositionTest {
+        val rememberedObject = object : RememberObserver {
             var count = 0
-            override fun onEnter() {
+            override fun onRemembered() {
                 count++
             }
 
-            override fun onLeave() {
+            override fun onForgotten() {
                 count--
+            }
+
+            override fun onAbandoned() {
+                assertEquals(0, count, "onRemember called on an abandon object")
             }
         }
 
@@ -1416,7 +1420,7 @@ class CompositionTests {
         fun Composition() {
             Linear {
                 changed = invalidate
-                remember { lifecycleObject }
+                remember { rememberedObject }
                 Text("Some text")
             }
         }
@@ -1432,25 +1436,29 @@ class CompositionTests {
         }
         validate { this.Composition() }
 
-        assertEquals(1, lifecycleObject.count, "object should have been notified of an enter")
+        assertEquals(1, rememberedObject.count, "object should have been notified of a remember")
 
         changed()
         expectNoChanges()
         validate { this.Composition() }
 
-        assertEquals(1, lifecycleObject.count, "Object should have only been notified once")
+        assertEquals(1, rememberedObject.count, "Object should have only been notified once")
     }
 
     @Test
-    fun testLifecycle_Enter_SingleNotification() = compositionTest {
-        val lifecycleObject = object : CompositionLifecycleObserver {
+    fun testRememberObserver_Remember_SingleNotification() = compositionTest {
+        val rememberedObject = object : RememberObserver {
             var count = 0
-            override fun onEnter() {
+            override fun onRemembered() {
                 count++
             }
 
-            override fun onLeave() {
+            override fun onForgotten() {
                 count--
+            }
+
+            override fun onAbandoned() {
+                assertEquals(0, count, "onRemember called on an abandon object")
             }
         }
 
@@ -1458,13 +1466,13 @@ class CompositionTests {
         @Composable
         fun Composition() {
             Linear {
-                val l = remember { lifecycleObject }
-                assertEquals(lifecycleObject, l, "Lifecycle object should be returned")
+                val l = remember { rememberedObject }
+                assertEquals(rememberedObject, l, "remembered object should be returned")
                 Text("Some text $value")
             }
             Linear {
-                val l = remember { lifecycleObject }
-                assertEquals(lifecycleObject, l, "Lifecycle object should be returned")
+                val l = remember { rememberedObject }
+                assertEquals(rememberedObject, l, "remembered object should be returned")
                 Text("Some other text $value")
             }
         }
@@ -1483,44 +1491,48 @@ class CompositionTests {
         }
         validate { this.Composition() }
 
-        assertEquals(1, lifecycleObject.count, "object should have been notified of an enter")
+        assertEquals(2, rememberedObject.count, "object should have been notified remembered twice")
 
         value++
         expectChanges()
         validate { this.Composition() }
 
-        assertEquals(1, lifecycleObject.count, "Object should have only been notified once")
+        assertEquals(2, rememberedObject.count, "Object should have only been notified twice")
     }
 
     @Test
-    fun testLifecycle_Leave_Simple() = compositionTest {
-        val lifecycleObject = object : CompositionLifecycleObserver {
+    fun testRememberObserver_Forget_Simple() = compositionTest {
+        val rememberObject = object : RememberObserver {
             var count = 0
-            override fun onEnter() {
+            override fun onRemembered() {
                 count++
             }
 
-            override fun onLeave() {
+            override fun onForgotten() {
                 count--
+            }
+
+            override fun onAbandoned() {
+                assertEquals(0, count, "onRemember called on an abandon object")
             }
         }
 
         @Composable
-        fun Composition(includeLifecycleObject: Boolean) {
+        fun Composition(includeRememberObject: Boolean) {
             Linear {
-                if (includeLifecycleObject) {
+                if (includeRememberObject) {
                     Linear {
-                        val l = remember { lifecycleObject }
-                        assertEquals(lifecycleObject, l, "Lifecycle object should be returned")
+                        val l = remember { rememberObject }
+                        assertEquals(rememberObject, l, "Remember object should be returned")
                         Text("Some text")
                     }
                 }
             }
         }
 
-        fun MockViewValidator.Composition(includeLifecycleObject: Boolean) {
+        fun MockViewValidator.Composition(includeRememberObject: Boolean) {
             Linear {
-                if (includeLifecycleObject) {
+                if (includeRememberObject) {
                     Linear {
                         Text("Some text")
                     }
@@ -1536,36 +1548,40 @@ class CompositionTests {
         }
         validate { this.Composition(true) }
 
-        assertEquals(1, lifecycleObject.count, "object should have been notified of an enter")
+        assertEquals(1, rememberObject.count, "object should have been notified of a remember")
 
         changed()
         expectNoChanges()
         validate { this.Composition(true) }
 
-        assertEquals(1, lifecycleObject.count, "Object should have only been notified once")
+        assertEquals(1, rememberObject.count, "Object should have only been notified once")
 
         value = false
         changed()
         expectChanges()
         validate { this.Composition(false) }
 
-        assertEquals(0, lifecycleObject.count, "Object should have been notified of a leave")
+        assertEquals(0, rememberObject.count, "Object should have been notified of a forget")
     }
 
     @Test
-    fun testLifecycle_Leave_NoLeaveOnReenter() = compositionTest {
-        var expectedEnter = true
-        var expectedLeave = true
-        val lifecycleObject = object : CompositionLifecycleObserver {
+    fun testRemember_Forget_NoForgetOnRemember() = compositionTest {
+        var expectedRemember = true
+        var expectedForget = true
+        val rememberObject = object : RememberObserver {
             var count = 0
-            override fun onEnter() {
-                count++
-                assertTrue(expectedEnter, "No enter expected")
+            override fun onRemembered() {
+                val remembered = count++ == 0
+                assertTrue(remembered && expectedRemember, "No remember expected")
             }
 
-            override fun onLeave() {
-                count--
-                assertTrue(expectedLeave, "No leave expected")
+            override fun onForgotten() {
+                val forgotten = --count == 0
+                assertTrue(forgotten && expectedForget, "No forget expected")
+            }
+
+            override fun onAbandoned() {
+                assertEquals(0, count, "onAbandon called after onRemember")
             }
         }
 
@@ -1575,8 +1591,8 @@ class CompositionTests {
                 if (a) {
                     key(1) {
                         Linear {
-                            val l = remember { lifecycleObject }
-                            assertEquals(lifecycleObject, l, "Lifecycle object should be returned")
+                            val l = remember { rememberObject }
+                            assertEquals(rememberObject, l, "Lifecycle object should be returned")
                             Text("a")
                         }
                     }
@@ -1584,8 +1600,8 @@ class CompositionTests {
                 if (b) {
                     key(2) {
                         Linear {
-                            val l = remember { lifecycleObject }
-                            assertEquals(lifecycleObject, l, "Lifecycle object should be returned")
+                            val l = remember { rememberObject }
+                            assertEquals(rememberObject, l, "Lifecycle object should be returned")
                             Text("b")
                         }
                     }
@@ -1593,8 +1609,8 @@ class CompositionTests {
                 if (c) {
                     key(3) {
                         Linear {
-                            val l = remember { lifecycleObject }
-                            assertEquals(lifecycleObject, l, "Lifecycle object should be returned")
+                            val l = remember { rememberObject }
+                            assertEquals(rememberObject, l, "Lifecycle object should be returned")
                             Text("c")
                         }
                     }
@@ -1622,8 +1638,8 @@ class CompositionTests {
             }
         }
 
-        expectedEnter = true
-        expectedLeave = false
+        expectedRemember = true
+        expectedForget = false
 
         var a = true
         var b = false
@@ -1643,12 +1659,12 @@ class CompositionTests {
 
         assertEquals(
             1,
-            lifecycleObject.count,
+            rememberObject.count,
             "object should have been notified of an enter"
         )
 
-        expectedEnter = false
-        expectedLeave = false
+        expectedRemember = false
+        expectedForget = false
         changed()
         expectNoChanges()
         validate {
@@ -1660,12 +1676,12 @@ class CompositionTests {
         }
         assertEquals(
             1,
-            lifecycleObject.count,
+            rememberObject.count,
             "Object should have only been notified once"
         )
 
-        expectedEnter = false
-        expectedLeave = false
+        expectedRemember = false
+        expectedForget = false
         a = false
         b = true
         c = false
@@ -1678,10 +1694,10 @@ class CompositionTests {
                 c = false
             )
         }
-        assertEquals(1, lifecycleObject.count, "No enter or leaves")
+        assertEquals(1, rememberObject.count, "No enter or leaves")
 
-        expectedEnter = false
-        expectedLeave = false
+        expectedRemember = false
+        expectedForget = false
         a = false
         b = false
         c = true
@@ -1694,10 +1710,10 @@ class CompositionTests {
                 c = true
             )
         }
-        assertEquals(1, lifecycleObject.count, "No enter or leaves")
+        assertEquals(1, rememberObject.count, "No enter or leaves")
 
-        expectedEnter = false
-        expectedLeave = false
+        expectedRemember = false
+        expectedForget = false
         a = true
         b = false
         c = false
@@ -1710,10 +1726,10 @@ class CompositionTests {
                 c = false
             )
         }
-        assertEquals(1, lifecycleObject.count, "No enter or leaves")
+        assertEquals(1, rememberObject.count, "No enter or leaves")
 
-        expectedEnter = false
-        expectedLeave = true
+        expectedRemember = false
+        expectedForget = true
         a = false
         b = false
         c = false
@@ -1726,34 +1742,42 @@ class CompositionTests {
                 c = false
             )
         }
-        assertEquals(0, lifecycleObject.count, "A leave")
+        assertEquals(0, rememberObject.count, "A leave")
     }
 
     @Test
-    fun testLifecycle_Leave_LeaveOnReplace() = compositionTest {
-        val lifecycleObject1 = object : CompositionLifecycleObserver {
+    fun testRemember_Forget_ForgetOnReplace() = compositionTest {
+        val rememberObject1 = object : RememberObserver {
             var count = 0
-            override fun onEnter() {
+            override fun onRemembered() {
                 count++
             }
 
-            override fun onLeave() {
+            override fun onForgotten() {
                 count--
+            }
+
+            override fun onAbandoned() {
+                assertEquals(0, count, "onAbandon called after onRemember")
             }
         }
 
-        val lifecycleObject2 = object : CompositionLifecycleObserver {
+        val rememberObject2 = object : RememberObserver {
             var count = 0
-            override fun onEnter() {
+            override fun onRemembered() {
                 count++
             }
 
-            override fun onLeave() {
+            override fun onForgotten() {
                 count--
+            }
+
+            override fun onAbandoned() {
+                assertEquals(0, count, "onAbandon called after onRemember")
             }
         }
 
-        var lifecycleObject: Any = lifecycleObject1
+        var rememberObject: Any = rememberObject1
         var changed = {}
 
         @Composable
@@ -1778,59 +1802,63 @@ class CompositionTests {
 
         compose {
             changed = invalidate
-            Composition(obj = lifecycleObject)
+            Composition(obj = rememberObject)
         }
         validate { this.Composition() }
-        assertEquals(1, lifecycleObject1.count, "first object should enter")
-        assertEquals(0, lifecycleObject2.count, "second object should not have entered")
+        assertEquals(2, rememberObject1.count, "first object should enter")
+        assertEquals(0, rememberObject2.count, "second object should not have entered")
 
-        lifecycleObject = lifecycleObject2
+        rememberObject = rememberObject2
         changed()
         expectChanges()
         validate { Composition() }
-        assertEquals(0, lifecycleObject1.count, "first object should have left")
-        assertEquals(1, lifecycleObject2.count, "second object should have entered")
+        assertEquals(0, rememberObject1.count, "first object should have left")
+        assertEquals(2, rememberObject2.count, "second object should have entered")
 
-        lifecycleObject = object {}
+        rememberObject = object {}
         changed()
         expectChanges()
         validate { Composition() }
-        assertEquals(0, lifecycleObject1.count, "first object should have left")
-        assertEquals(0, lifecycleObject2.count, "second object should have left")
+        assertEquals(0, rememberObject1.count, "first object should have left")
+        assertEquals(0, rememberObject2.count, "second object should have left")
     }
 
     @Test
-    fun testLifecycle_EnterLeaveOrder() = compositionTest {
+    fun testRemember_RememberForgetOrder() = compositionTest {
         var order = 0
         val objects = mutableListOf<Any>()
-        val newLifecycleObject = { name: String ->
+        val newRememberObject = { name: String ->
             object :
-                CompositionLifecycleObserver,
+                RememberObserver,
                 Counted,
                 Ordered,
                 Named {
                 override var name = name
                 override var count = 0
-                override var enterOrder = -1
-                override var leaveOrder = -1
-                override fun onEnter() {
-                    assertEquals(-1, enterOrder, "Only one call to onEnter expected")
-                    enterOrder = order++
+                override var rememberOrder = -1
+                override var forgetOrder = -1
+                override fun onRemembered() {
+                    assertEquals(-1, rememberOrder, "Only one call to onRemembered expected")
+                    rememberOrder = order++
                     count++
                 }
 
-                override fun onLeave() {
-                    assertEquals(-1, leaveOrder, "Only one call to onLeave expected")
-                    leaveOrder = order++
+                override fun onForgotten() {
+                    assertEquals(-1, forgetOrder, "Only one call to onForgotten expected")
+                    forgetOrder = order++
                     count--
+                }
+
+                override fun onAbandoned() {
+                    assertEquals(0, count, "onAbandoned called after onRemembered")
                 }
             }.also { objects.add(it) }
         }
 
         @Composable
-        fun LifecycleUser(name: String) {
+        fun RememberUser(name: String) {
             Linear {
-                remember(name) { newLifecycleObject(name) }
+                remember(name) { newRememberObject(name) }
                 Text(value = name)
             }
         }
@@ -1854,23 +1882,23 @@ class CompositionTests {
         @Composable
         fun Tree() {
             Linear {
-                LifecycleUser("A")
+                RememberUser("A")
                 Linear {
-                    LifecycleUser("B")
+                    RememberUser("B")
                     Linear {
-                        LifecycleUser("C")
-                        LifecycleUser("D")
+                        RememberUser("C")
+                        RememberUser("D")
                     }
-                    LifecycleUser("E")
-                    LifecycleUser("F")
+                    RememberUser("E")
+                    RememberUser("F")
                     Linear {
-                        LifecycleUser("G")
-                        LifecycleUser("H")
+                        RememberUser("G")
+                        RememberUser("H")
                         Linear {
-                            LifecycleUser("I")
+                            RememberUser("I")
                         }
                     }
-                    LifecycleUser("J")
+                    RememberUser("J")
                 }
             }
         }
@@ -1904,7 +1932,7 @@ class CompositionTests {
         assertArrayEquals(
             "Expected enter order",
             arrayOf("A", "B", "C", "D", "E", "F", "G", "H", "I", "J"),
-            objects.mapNotNull { it as? Ordered }.sortedBy { it.enterOrder }.map {
+            objects.mapNotNull { it as? Ordered }.sortedBy { it.rememberOrder }.map {
                 (it as Named).name
             }.toTypedArray()
         )
@@ -1912,7 +1940,7 @@ class CompositionTests {
         assertArrayEquals(
             "Expected leave order",
             arrayOf("J", "I", "H", "G", "F", "E", "D", "C", "B", "A"),
-            objects.mapNotNull { it as? Ordered }.sortedBy { it.leaveOrder }.map {
+            objects.mapNotNull { it as? Ordered }.sortedBy { it.forgetOrder }.map {
                 (it as Named).name
             }.toTypedArray()
         )
@@ -2473,9 +2501,9 @@ class CompositionTests {
             // as the last expression in a unit lambda (the argument to `compose {}`). The remember
             // lambda is in turn interpreted as returning Unit, the object expression is dropped
             // on the floor for the gc, and Unit is written into the slot table.
-            remember<CompositionLifecycleObserver> {
-                object : CompositionLifecycleObserver {
-                    override fun onEnter() {
+            remember<RememberObserver> {
+                object : RememberObserver {
+                    override fun onRemembered() {
                         assertEquals(
                             1,
                             myApplier.onBeginChangesCalled,
@@ -2486,7 +2514,15 @@ class CompositionTests {
                             myApplier.onEndChangesCalled,
                             "onEndChanges during lifecycle observer"
                         )
-                        checks += "CompositionLifecycleObserver"
+                        checks += "RememberObserver"
+                    }
+
+                    override fun onForgotten() {
+                        // Nothing to do
+                    }
+
+                    override fun onAbandoned() {
+                        // Nothing to do
                     }
                 }
             }
@@ -2494,7 +2530,7 @@ class CompositionTests {
         assertEquals(
             listOf(
                 "composition",
-                "CompositionLifecycleObserver",
+                "RememberObserver",
                 "SideEffect"
             ),
             checks,
@@ -2713,7 +2749,7 @@ class CompositionTests {
                     // Read the state here so that the emit removal will invalidate it
                     stateMutatedOnRemove.value
                     if (shouldEmitNode) {
-                        emit<Unit, MutateOnRemoveApplier>({ Unit }) {}
+                        emit<Unit, MutateOnRemoveApplier>({ }) {}
                     }
                 }
                 // Initial composition should not contain the node we will remove. We want to test
@@ -2816,8 +2852,8 @@ private interface Counted {
 }
 
 private interface Ordered {
-    val enterOrder: Int
-    val leaveOrder: Int
+    val rememberOrder: Int
+    val forgetOrder: Int
 }
 
 private interface Named {

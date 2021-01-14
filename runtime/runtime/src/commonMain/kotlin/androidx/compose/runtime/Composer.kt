@@ -29,7 +29,7 @@ import kotlinx.collections.immutable.persistentHashMapOf
 internal typealias Change<N> = (
     applier: Applier<N>,
     slots: SlotWriter,
-    lifecycleManager: LifecycleManager
+    rememberManager: RememberManager
 ) -> Unit
 
 private class GroupInfo(
@@ -50,9 +50,11 @@ private class GroupInfo(
     var nodeCount: Int
 )
 
-internal interface LifecycleManager {
-    fun entering(instance: CompositionLifecycleObserver)
-    fun leaving(instance: CompositionLifecycleObserver)
+internal interface RememberManager {
+    fun entering(@Suppress("DEPRECATION") instance: CompositionLifecycleObserver)
+    fun leaving(@Suppress("DEPRECATION") instance: CompositionLifecycleObserver)
+    fun remembering(instance: RememberObserver)
+    fun forgetting(instance: RememberObserver)
     fun sideEffect(effect: () -> Unit)
 }
 
@@ -366,6 +368,7 @@ class Composer<N>(
         CompositionLifecycleObserverHolder,
         CompositionLifecycleObserverHolder
         >()
+    private val abandonSet = HashSet<RememberObserver>()
     private val pendingStack = Stack<Pending?>()
     private var pending: Pending? = null
     private var nodeIndex: Int = 0
@@ -725,21 +728,23 @@ class Composer<N>(
     }
 
     /**
-     * Helper for collecting lifecycle enter and leave events for later strictly ordered dispatch.
-     * [lifecycleObservers] should be the long-lived set of observers tracked over time; brand new
-     * additions or leaves from this set will be tracked by the [LifecycleManager] callback methods.
-     * Call [dispatchLifecycleObservers] to invoke the observers in LIFO order - last in,
-     * first out.
+     * Helper for collecting remember observers for later strictly ordered dispatch.
+     *
+     * This includes support for the deprecated [CompositionLifecycleObserver] which should be
+     * removed with it.
      */
-    private class LifecycleEventDispatcher(
+    private class RememberEventDispatcher(
         private val lifecycleObservers: MutableMap<CompositionLifecycleObserverHolder,
-            CompositionLifecycleObserverHolder>
-    ) : LifecycleManager {
+            CompositionLifecycleObserverHolder>,
+        private val abandoning: MutableSet<RememberObserver>
+    ) : RememberManager {
         private val enters = mutableSetOf<CompositionLifecycleObserverHolder>()
         private val leaves = mutableSetOf<CompositionLifecycleObserverHolder>()
+        private val remembering = mutableListOf<RememberObserver>()
+        private val forgetting = mutableListOf<RememberObserver>()
         private val sideEffects = mutableListOf<() -> Unit>()
 
-        override fun entering(instance: CompositionLifecycleObserver) {
+        override fun entering(@Suppress("DEPRECATION") instance: CompositionLifecycleObserver) {
             val holder = CompositionLifecycleObserverHolder(instance)
             lifecycleObservers.getOrPut(holder) {
                 enters.add(holder)
@@ -747,7 +752,7 @@ class Composer<N>(
             }.apply { count++ }
         }
 
-        override fun leaving(instance: CompositionLifecycleObserver) {
+        override fun leaving(@Suppress("DEPRECATION") instance: CompositionLifecycleObserver) {
             val holder = CompositionLifecycleObserverHolder(instance)
             val left = lifecycleObservers[holder]?.let {
                 if (--it.count == 0) {
@@ -756,6 +761,28 @@ class Composer<N>(
                 } else null
             }
             if (left != null) lifecycleObservers.remove(left)
+        }
+
+        override fun remembering(instance: RememberObserver) {
+            forgetting.lastIndexOf(instance).let { index ->
+                if (index >= 0) {
+                    forgetting.removeAt(index)
+                    abandoning.remove(instance)
+                } else {
+                    remembering.add(instance)
+                }
+            }
+        }
+
+        override fun forgetting(instance: RememberObserver) {
+            remembering.lastIndexOf(instance).let { index ->
+                if (index >= 0) {
+                    remembering.removeAt(index)
+                    abandoning.remove(instance)
+                } else {
+                    forgetting.add(instance)
+                }
+            }
         }
 
         override fun sideEffect(effect: () -> Unit) {
@@ -776,10 +803,26 @@ class Composer<N>(
                 }
             }
 
+            // Send forgets
+            if (forgetting.isNotEmpty()) {
+                for (instance in forgetting.reversed()) {
+                    if (instance !in abandoning)
+                        instance.onForgotten()
+                }
+            }
+
             // Send lifecycle enters
             if (enters.isNotEmpty()) {
                 for (holder in enters) {
                     holder.instance.onEnter()
+                }
+            }
+
+            // Send remembers
+            if (remembering.isNotEmpty()) {
+                for (instance in remembering) {
+                    abandoning.remove(instance)
+                    instance.onRemembered()
                 }
             }
         }
@@ -790,6 +833,17 @@ class Composer<N>(
                     sideEffect()
                 }
                 sideEffects.clear()
+            }
+        }
+
+        fun dispatchAbandons() {
+            if (abandoning.isNotEmpty()) {
+                val iterator = abandoning.iterator()
+                while (iterator.hasNext()) {
+                    val instance = iterator.next()
+                    iterator.remove()
+                    instance.onAbandoned()
+                }
             }
         }
     }
@@ -806,42 +860,45 @@ class Composer<N>(
                 invalidations.map { reader.anchor(it.location) to it }
             }
 
-            val manager = LifecycleEventDispatcher(lifecycleObservers)
+            val manager = RememberEventDispatcher(lifecycleObservers, abandonSet)
+            try {
+                applier.onBeginChanges()
 
-            applier.onBeginChanges()
-
-            // Apply all changes
-            slotTable.write { slots ->
-                val applier = applier
-                changes.forEach { change ->
-                    change(applier, slots, manager)
+                // Apply all changes
+                slotTable.write { slots ->
+                    val applier = applier
+                    changes.forEach { change ->
+                        change(applier, slots, manager)
+                    }
+                    changes.clear()
                 }
-                changes.clear()
-            }
 
-            applier.onEndChanges()
+                applier.onEndChanges()
 
-            providerUpdates.clear()
+                providerUpdates.clear()
 
-            @Suppress("ReplaceManualRangeWithIndicesCalls") // Avoids allocation of an iterator
-            for (index in 0 until invalidationAnchors.size) {
-                val (anchor, invalidation) = invalidationAnchors[index]
-                if (anchor.valid) {
-                    invalidation.location = anchor.toIndexFor(slotTable)
-                } else {
-                    invalidations.remove(invalidation)
+                @Suppress("ReplaceManualRangeWithIndicesCalls") // Avoids allocation of an iterator
+                for (index in 0 until invalidationAnchors.size) {
+                    val (anchor, invalidation) = invalidationAnchors[index]
+                    if (anchor.valid) {
+                        invalidation.location = anchor.toIndexFor(slotTable)
+                    } else {
+                        invalidations.remove(invalidation)
+                    }
                 }
-            }
 
-            // Side effects run after lifecycle observers so that any remembered objects
-            // that implement CompositionLifecycleObserver receive onEnter before a side effect
-            // that captured it and operates on it can run.
-            manager.dispatchLifecycleObservers()
-            manager.dispatchSideEffects()
+                // Side effects run after lifecycle observers so that any remembered objects
+                // that implement CompositionLifecycleObserver receive onEnter before a side effect
+                // that captured it and operates on it can run.
+                manager.dispatchLifecycleObservers()
+                manager.dispatchSideEffects()
 
-            if (pendingInvalidScopes) {
-                pendingInvalidScopes = false
-                observations.removeValueIf { _, scope -> !scope.valid }
+                if (pendingInvalidScopes) {
+                    pendingInvalidScopes = false
+                    observations.removeValueIf { _, scope -> !scope.valid }
+                }
+            } finally {
+                manager.dispatchAbandons()
             }
         }
     }
@@ -856,7 +913,7 @@ class Composer<N>(
             changes.clear()
             applier.clear()
             if (slotTable.groupsSize > 0) {
-                val manager = LifecycleEventDispatcher(lifecycleObservers)
+                val manager = RememberEventDispatcher(lifecycleObservers, abandonSet)
                 slotTable.write { writer ->
                     writer.removeCurrentGroup(manager)
                 }
@@ -1122,17 +1179,29 @@ class Composer<N>(
     internal fun updateValue(value: Any?) {
         if (inserting) {
             writer.update(value)
+            @Suppress("DEPRECATION")
             if (value is CompositionLifecycleObserver) {
                 record { _, _, lifecycleManager -> lifecycleManager.entering(value) }
             }
+            if (value is RememberObserver) {
+                record { _, _, rememberManager -> rememberManager.remembering(value) }
+            }
         } else {
             val groupSlotIndex = reader.groupSlotIndex - 1
-            recordSlotTableOperation(forParent = true) { _, slots, lifecycleManager ->
+            recordSlotTableOperation(forParent = true) { _, slots, rememberManager ->
+                @Suppress("DEPRECATION")
                 if (value is CompositionLifecycleObserver)
-                    lifecycleManager.entering(value)
+                    rememberManager.entering(value)
+                if (value is RememberObserver) {
+                    abandonSet.add(value)
+                    rememberManager.remembering(value)
+                }
+                @Suppress("DEPRECATION")
                 when (val previous = slots.set(groupSlotIndex, value)) {
                     is CompositionLifecycleObserver ->
-                        lifecycleManager.leaving(previous)
+                        rememberManager.leaving(previous)
+                    is RememberObserver ->
+                        rememberManager.forgetting(previous)
                     is RecomposeScope -> {
                         if (previous.composer != null) {
                             previous.composer = null
@@ -1144,6 +1213,20 @@ class Composer<N>(
         }
     }
 
+    /**
+     * Schedule the current value in the slot table to be updated to [value].
+     *
+     * @param value the value to schedule to be written to the slot table.
+     */
+    @PublishedApi
+    @OptIn(InternalComposeApi::class)
+    internal fun updateCachedValue(value: Any?) {
+        if (inserting && value is RememberObserver) {
+            abandonSet.add(value)
+        }
+        updateValue(value)
+    }
+
     @InternalComposeApi
     val compositionData: CompositionData get() = slotTable
 
@@ -1151,7 +1234,7 @@ class Composer<N>(
      * Schedule a side effect to run when we apply composition changes.
      */
     internal fun recordSideEffect(effect: () -> Unit) {
-        record { _, _, lifecycleManager -> lifecycleManager.sideEffect(effect) }
+        record { _, _, rememberManager -> rememberManager.sideEffect(effect) }
     }
 
     /**
@@ -2245,10 +2328,10 @@ class Composer<N>(
             insertFixups.clear()
             realizeUps()
             realizeDowns()
-            recordSlotEditingOperation { applier, slots, lifecycleManager ->
+            recordSlotEditingOperation { applier, slots, rememberManager ->
                 insertTable.write { writer ->
                     for (fixup in fixups) {
-                        fixup(applier, writer, lifecycleManager)
+                        fixup(applier, writer, rememberManager)
                     }
                 }
                 slots.beginInsert()
@@ -2403,7 +2486,7 @@ class Composer<N>(
      * that will not have its reference made visible to user code.
      */
     // This warning becomes an error if its advice is followed since Composer needs its type param
-    @Suppress("RemoveRedundantQualifierName")
+    @Suppress("RemoveRedundantQualifierName", "DEPRECATION")
     private class CompositionReferenceHolder<T>(
         val ref: Composer<T>.CompositionReferenceImpl
     ) : CompositionLifecycleObserver {
@@ -2662,7 +2745,7 @@ inline class SkippableUpdater<T> constructor(
     }
 }
 
-private fun SlotWriter.removeCurrentGroup(lifecycleManager: LifecycleManager) {
+private fun SlotWriter.removeCurrentGroup(rememberManager: RememberManager) {
     // Notify the lifecycle manager of any observers leaving the slot table
     // The notification order should ensure that listeners are notified of leaving
     // in opposite order that they are notified of entering.
@@ -2671,9 +2754,13 @@ private fun SlotWriter.removeCurrentGroup(lifecycleManager: LifecycleManager) {
     // of the group tree, and then call `leaves` in the inverse order.
 
     for (slot in groupSlots()) {
+        @Suppress("DEPRECATION")
         when (slot) {
             is CompositionLifecycleObserver -> {
-                lifecycleManager.leaving(slot)
+                rememberManager.leaving(slot)
+            }
+            is RememberObserver -> {
+                rememberManager.forgetting(slot)
             }
             is RecomposeScope -> {
                 val composer = slot.composer
@@ -2953,8 +3040,8 @@ private fun SlotReader.nearestCommonRootOf(a: Int, b: Int, common: Int): Int {
     return currentA
 }
 
-private val removeCurrentGroupInstance: Change<*> = { _, slots, lifecycleManager ->
-    slots.removeCurrentGroup(lifecycleManager)
+private val removeCurrentGroupInstance: Change<*> = { _, slots, rememberManager ->
+    slots.removeCurrentGroup(rememberManager)
 }
 private val endGroupInstance: Change<*> = { _, slots, _ -> slots.endGroup() }
 
