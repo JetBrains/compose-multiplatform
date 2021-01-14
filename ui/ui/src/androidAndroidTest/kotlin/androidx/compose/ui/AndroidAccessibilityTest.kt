@@ -63,6 +63,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
@@ -349,6 +350,7 @@ class AndroidAccessibilityTest {
     }
 
     @Test
+    @FlakyTest(bugId = 177511084, detail = "sync issues with suspend input")
     fun sendStateChangeEvent_whenClickToggleable() {
         rule.onNodeWithTag(ToggleableTag)
             .assertIsOn()
