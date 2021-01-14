@@ -75,7 +75,7 @@ interface Density {
      * Convert [Dp] to Sp. Sp is used for font size, etc.
      */
     @Stable
-    fun Dp.toSp(): TextUnit = TextUnit.Sp(value / fontScale)
+    fun Dp.toSp(): TextUnit = (value / fontScale).sp
 
     /**
      * Convert Sp to pixels. Pixels are used to paint to Canvas.
