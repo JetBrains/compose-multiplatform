@@ -131,7 +131,7 @@ internal class TextFieldSelectionManager() {
                     hapticFeedBack?.performHapticFeedback(HapticFeedbackType.TextHandleMove)
 
                     val newValue = createTextFieldValue(
-                        text = value.text,
+                        annotatedString = value.annotatedString,
                         selection = TextRange(offset, offset)
                     )
                     enterSelectionMode()
@@ -324,13 +324,13 @@ internal class TextFieldSelectionManager() {
         if (value.selection.collapsed) return
 
         // TODO(b/171947959) check if original or transformed should be copied
-        clipboardManager?.setText(AnnotatedString(value.getSelectedText()))
+        clipboardManager?.setText(value.getSelectedText())
 
         if (!cancelSelection) return
 
         val newCursorOffset = value.selection.max
         val newValue = createTextFieldValue(
-            text = value.text,
+            annotatedString = value.annotatedString,
             selection = TextRange(newCursorOffset, newCursorOffset)
         )
         onValueChange(newValue)
@@ -347,7 +347,7 @@ internal class TextFieldSelectionManager() {
      * newly added text.
      */
     internal fun paste() {
-        val text = clipboardManager?.getText()?.text ?: return
+        val text = clipboardManager?.getText() ?: return
 
         val newText = value.getTextBeforeSelection(value.text.length) +
             text +
@@ -355,7 +355,7 @@ internal class TextFieldSelectionManager() {
         val newCursorOffset = value.selection.min + text.length
 
         val newValue = createTextFieldValue(
-            text = newText,
+            annotatedString = newText,
             selection = TextRange(newCursorOffset, newCursorOffset)
         )
         onValueChange(newValue)
@@ -375,14 +375,14 @@ internal class TextFieldSelectionManager() {
         if (value.selection.collapsed) return
 
         // TODO(b/171947959) check if original or transformed should be cut
-        clipboardManager?.setText(AnnotatedString(value.getSelectedText()))
+        clipboardManager?.setText(value.getSelectedText())
 
         val newText = value.getTextBeforeSelection(value.text.length) +
             value.getTextAfterSelection(value.text.length)
         val newCursorOffset = value.selection.min
 
         val newValue = createTextFieldValue(
-            text = newText,
+            annotatedString = newText,
             selection = TextRange(newCursorOffset, newCursorOffset)
         )
         onValueChange(newValue)
@@ -394,7 +394,7 @@ internal class TextFieldSelectionManager() {
         setSelectionStatus(true)
 
         val newValue = createTextFieldValue(
-            text = value.text,
+            annotatedString = value.annotatedString,
             selection = TextRange(0, value.text.length)
         )
         onValueChange(newValue)
@@ -546,7 +546,7 @@ internal class TextFieldSelectionManager() {
         hapticFeedBack?.performHapticFeedback(HapticFeedbackType.TextHandleMove)
 
         val newValue = createTextFieldValue(
-            text = value.text,
+            annotatedString = value.annotatedString,
             selection = originalSelection
         )
         onValueChange(newValue)
@@ -559,10 +559,13 @@ internal class TextFieldSelectionManager() {
     }
 
     private fun createTextFieldValue(
-        text: String,
+        annotatedString: AnnotatedString,
         selection: TextRange
     ): TextFieldValue {
-        return TextFieldValue(text = text, selection = selection.constrain(0, text.length))
+        return TextFieldValue(
+            annotatedString = annotatedString,
+            selection = selection.constrain(0, annotatedString.length)
+        )
     }
 
     /** Returns true if the screen coordinates position (x,y) corresponds to a character displayed

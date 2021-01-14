@@ -724,7 +724,6 @@ package androidx.compose.ui.text.input {
   }
 
   public final class EditingBuffer {
-    field public static final int NOWHERE = -1; // 0xffffffff
   }
 
   public final class FinishComposingTextCommand implements androidx.compose.ui.text.input.EditCommand {
@@ -857,10 +856,14 @@ package androidx.compose.ui.text.input {
 
   @androidx.compose.runtime.Immutable public final class TextFieldValue {
     method public androidx.compose.ui.text.input.TextFieldValue commitComposition();
-    method public androidx.compose.ui.text.input.TextFieldValue copy-rJy5ZHU(optional String text, optional long selection);
+    method public androidx.compose.ui.text.input.TextFieldValue copy-5zc-tL8(optional long selection);
+    method public androidx.compose.ui.text.input.TextFieldValue copy-bLOX0OE(optional androidx.compose.ui.text.AnnotatedString annotatedString, optional long selection);
+    method public androidx.compose.ui.text.input.TextFieldValue copy-rJy5ZHU(String text, optional long selection);
+    method public androidx.compose.ui.text.AnnotatedString getAnnotatedString();
     method public androidx.compose.ui.text.TextRange? getComposition-MzsxiRA();
     method public long getSelection-d9O1mEE();
     method public String getText();
+    property public final androidx.compose.ui.text.AnnotatedString annotatedString;
     property public final androidx.compose.ui.text.TextRange? composition;
     property public final long selection;
     property public final String text;
@@ -873,9 +876,9 @@ package androidx.compose.ui.text.input {
   }
 
   public final class TextFieldValueKt {
-    method public static String getSelectedText(androidx.compose.ui.text.input.TextFieldValue);
-    method public static String getTextAfterSelection(androidx.compose.ui.text.input.TextFieldValue, int maxChars);
-    method public static String getTextBeforeSelection(androidx.compose.ui.text.input.TextFieldValue, int maxChars);
+    method public static androidx.compose.ui.text.AnnotatedString getSelectedText(androidx.compose.ui.text.input.TextFieldValue);
+    method public static androidx.compose.ui.text.AnnotatedString getTextAfterSelection(androidx.compose.ui.text.input.TextFieldValue, int maxChars);
+    method public static androidx.compose.ui.text.AnnotatedString getTextBeforeSelection(androidx.compose.ui.text.input.TextFieldValue, int maxChars);
   }
 
   public class TextInputService {
