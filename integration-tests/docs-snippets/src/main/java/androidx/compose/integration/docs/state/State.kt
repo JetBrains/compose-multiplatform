@@ -209,10 +209,10 @@ private object StateSnippet10 {
         override var value: T
     }
      */
-    interface DummyState<T> : State<T> {
+    interface FakeState<T> : State<T> {
         override var value: T
     }
-    interface DummMutableState<T> : MutableState<String>
+    interface FakeMutableState<T> : MutableState<String>
 }
 
 private object StateSnippet11 {
@@ -250,7 +250,7 @@ private object StateSnippet11 {
 
 private object StateSnippet12 {
     // this stateful composable is only responsible for holding internal state
-// and defers the UI to the stateless composable
+    // and defers the UI to the stateless composable
     @Composable
     fun ExpandingCard(title: String, body: String) {
         var expanded by remember { mutableStateOf(false) }
@@ -264,7 +264,7 @@ private object StateSnippet12 {
     }
 
     // this stateless composable is responsible for describing the UI based on the state
-// passed to it and firing events in response to the buttons being pressed
+    // passed to it and firing events in response to the buttons being pressed
     @Composable
     fun ExpandingCard(
         title: String,

@@ -136,8 +136,7 @@ private object TestingSnippet3 {
 
 @Composable private fun TestingSnippets7() {
     // Single matcher:
-    composeTestRule.onNode(matcher).assert(hasText("Button")) // hasText is a
-    // SemanticsMatcher
+    composeTestRule.onNode(matcher).assert(hasText("Button")) // hasText is a SemanticsMatcher
     // Multiple matchers can use and / or
     composeTestRule.onNode(matcher).assert(hasText("Button") or hasText("Button2"))
 }
