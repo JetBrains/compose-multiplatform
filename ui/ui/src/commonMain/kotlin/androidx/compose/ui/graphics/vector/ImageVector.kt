@@ -17,7 +17,9 @@
 package androidx.compose.ui.graphics.vector
 
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
@@ -28,7 +30,7 @@ import androidx.compose.ui.unit.Dp
  * It can be composed and rendered by passing it as an argument to [rememberVectorPainter]
  */
 @Immutable
-data class ImageVector internal constructor(
+class ImageVector internal constructor(
 
     /**
      * Name of the Vector asset
@@ -60,7 +62,17 @@ data class ImageVector internal constructor(
     /**
      * Root group of the vector asset that contains all the child groups and paths
      */
-    val root: VectorGroup
+    val root: VectorGroup,
+
+    /**
+     * Optional tint color to be applied to the vector graphic
+     */
+    val tintColor: Color,
+
+    /**
+     * Blend mode used to apply [tintColor]
+     */
+    val tintBlendMode: BlendMode
 ) {
     /**
      * Builder used to construct a Vector graphic tree.
@@ -99,7 +111,17 @@ data class ImageVector internal constructor(
          * Used to define the height of the viewport space. Viewport is basically the virtual canvas
          * where the paths are drawn on.
          */
-        private val viewportHeight: Float
+        private val viewportHeight: Float,
+
+        /**
+         * Optional color used to tint the entire vector image
+         */
+        private val tintColor: Color = Color.Unspecified,
+
+        /**
+         * Blend mode used to apply the tint color
+         */
+        private val tintBlendMode: BlendMode = BlendMode.SrcIn
     ) {
         private val nodes = Stack<GroupParams>()
 
@@ -321,7 +343,9 @@ data class ImageVector internal constructor(
                 defaultHeight,
                 viewportWidth,
                 viewportHeight,
-                root.asVectorGroup()
+                root.asVectorGroup(),
+                tintColor,
+                tintBlendMode
             )
 
             isConsumed = true
@@ -374,6 +398,34 @@ data class ImageVector internal constructor(
             var clipPathData: List<PathNode> = EmptyPath,
             var children: MutableList<VectorNode> = mutableListOf()
         )
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ImageVector) return false
+
+        if (name != other.name) return false
+        if (defaultWidth != other.defaultWidth) return false
+        if (defaultHeight != other.defaultHeight) return false
+        if (viewportWidth != other.viewportWidth) return false
+        if (viewportHeight != other.viewportHeight) return false
+        if (root != other.root) return false
+        if (tintColor != other.tintColor) return false
+        if (tintBlendMode != other.tintBlendMode) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + defaultWidth.hashCode()
+        result = 31 * result + defaultHeight.hashCode()
+        result = 31 * result + viewportWidth.hashCode()
+        result = 31 * result + viewportHeight.hashCode()
+        result = 31 * result + root.hashCode()
+        result = 31 * result + tintColor.hashCode()
+        result = 31 * result + tintBlendMode.hashCode()
+        return result
     }
 }
 

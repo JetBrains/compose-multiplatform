@@ -114,6 +114,8 @@ internal class VectorComponent : VNode() {
 
     internal var invalidateCallback = {}
 
+    internal var intrinsicColorFilter: ColorFilter? = null
+
     var viewportWidth: Float = 0f
         set(value) {
             if (field != value) {
@@ -140,6 +142,11 @@ internal class VectorComponent : VNode() {
     }
 
     fun DrawScope.draw(alpha: Float, colorFilter: ColorFilter?) {
+        val targetColorFilter = if (colorFilter != null) {
+            colorFilter
+        } else {
+            intrinsicColorFilter
+        }
         // If the content of the vector has changed, or we are drawing a different size
         // update the cached image to ensure we are scaling the vector appropriately
         if (isDirty || previousDrawSize != size) {
@@ -154,7 +161,7 @@ internal class VectorComponent : VNode() {
             isDirty = false
             previousDrawSize = size
         }
-        cacheDrawScope.drawInto(this, alpha, colorFilter)
+        cacheDrawScope.drawInto(this, alpha, targetColorFilter)
     }
 
     override fun DrawScope.draw() {

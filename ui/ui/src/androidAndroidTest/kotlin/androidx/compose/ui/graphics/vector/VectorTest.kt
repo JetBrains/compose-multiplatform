@@ -77,6 +77,22 @@ class VectorTest {
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
+    fun testVectorIntrinsicTint() {
+        rule.setContent {
+            val background = Modifier.paint(
+                createTestVectorPainter(200, Color.Magenta),
+                alignment = Alignment.Center
+            )
+            AtLeastSize(size = 200, modifier = background) {
+            }
+        }
+        takeScreenShot(200).apply {
+            assertEquals(getPixel(100, 100), Color.Magenta.toArgb())
+        }
+    }
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
     fun testVectorAlignment() {
         rule.setContent {
             VectorTint(minimumSize = 500, alignment = Alignment.BottomEnd)
@@ -293,7 +309,6 @@ class VectorTest {
         minimumSize: Int = size,
         alignment: Alignment = Alignment.Center
     ) {
-
         val background = Modifier.paint(
             createTestVectorPainter(size),
             colorFilter = ColorFilter.tint(Color.Cyan),
@@ -304,7 +319,10 @@ class VectorTest {
     }
 
     @Composable
-    private fun createTestVectorPainter(size: Int = 200): VectorPainter {
+    private fun createTestVectorPainter(
+        size: Int = 200,
+        tintColor: Color = Color.Unspecified
+    ): VectorPainter {
         val sizePx = size.toFloat()
         val sizeDp = (size / AmbientDensity.current.density).dp
         return rememberVectorPainter(
@@ -320,7 +338,8 @@ class VectorTest {
                     },
                     fill = SolidColor(Color.Black)
                 )
-            }
+            },
+            tintColor = tintColor
         )
     }
 

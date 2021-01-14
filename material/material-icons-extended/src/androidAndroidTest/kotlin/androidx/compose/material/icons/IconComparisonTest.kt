@@ -31,6 +31,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.VectorGroup
+import androidx.compose.ui.graphics.vector.VectorPath
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.platform.AmbientDensity
@@ -134,6 +136,71 @@ class IconComparisonTest(
             }
         }
     }
+}
+
+/**
+ * Helper method to copy the existing [ImageVector] modifying the name
+ * for use in equality checks.
+ */
+private fun ImageVector.copy(name: String): ImageVector {
+    val builder = ImageVector.Builder(
+        name, defaultWidth, defaultHeight, viewportWidth, viewportHeight, tintColor, tintBlendMode
+    )
+    val root = this.root
+    // Stack of vector groups and current child index being traversed
+    val stack = ArrayList<Pair<Int, VectorGroup>>()
+    stack.add(Pair(0, root))
+
+    while (!stack.isEmpty()) {
+        val current = stack[stack.size - 1]
+        var currentIndex = current.first
+        var currentGroup = current.second
+        while (currentIndex < currentGroup.size) {
+            val vectorNode = currentGroup[currentIndex]
+            when (vectorNode) {
+                is VectorGroup -> {
+                    // keep track of the current index to continue parsing groups
+                    // when we eventually "pop" the stack of groups
+                    stack.add(Pair(currentIndex + 1, currentGroup))
+                    builder.addGroup(
+                        name = vectorNode.name,
+                        rotate = vectorNode.rotation,
+                        pivotX = vectorNode.pivotX,
+                        pivotY = vectorNode.pivotY,
+                        scaleX = vectorNode.scaleX,
+                        scaleY = vectorNode.scaleY,
+                        translationX = vectorNode.translationX,
+                        translationY = vectorNode.translationY,
+                        clipPathData = vectorNode.clipPathData
+                    )
+                    currentGroup = vectorNode
+                    currentIndex = 0
+                }
+                is VectorPath -> {
+                    builder.addPath(
+                        name = vectorNode.name,
+                        pathData = vectorNode.pathData,
+                        pathFillType = vectorNode.pathFillType,
+                        fill = vectorNode.fill,
+                        fillAlpha = vectorNode.fillAlpha,
+                        stroke = vectorNode.stroke,
+                        strokeAlpha = vectorNode.strokeAlpha,
+                        strokeLineWidth = vectorNode.strokeLineWidth,
+                        strokeLineCap = vectorNode.strokeLineCap,
+                        strokeLineJoin = vectorNode.strokeLineJoin,
+                        strokeLineMiter = vectorNode.strokeLineMiter,
+                        trimPathStart = vectorNode.trimPathStart,
+                        trimPathEnd = vectorNode.trimPathEnd,
+                        trimPathOffset = vectorNode.trimPathOffset
+                    )
+                }
+            }
+            currentIndex++
+        }
+        // "pop" the most recent group after we have examined each of the children
+        stack.removeAt(stack.size - 1)
+    }
+    return builder.build()
 }
 
 /**
