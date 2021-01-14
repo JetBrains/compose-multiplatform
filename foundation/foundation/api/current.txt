@@ -144,8 +144,8 @@ package androidx.compose.foundation {
     method public float getValue();
     method public boolean isAnimationRunning();
     method public suspend Object? scroll(kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.ScrollScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public void scrollBy(float value);
-    method public void scrollTo(float value);
+    method @Deprecated public void scrollBy(float value);
+    method public suspend Object? scrollTo(float value, kotlin.coroutines.Continuation<? super java.lang.Float> p);
     method @Deprecated public void smoothScrollBy(float value, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> spec, optional kotlin.jvm.functions.Function2<? super androidx.compose.animation.core.AnimationEndReason,? super java.lang.Float,kotlin.Unit> onEnd);
     method @Deprecated public void smoothScrollTo(float value, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> spec, optional kotlin.jvm.functions.Function2<? super androidx.compose.animation.core.AnimationEndReason,? super java.lang.Float,kotlin.Unit> onEnd);
     method public suspend Object? smoothScrollTo(float value, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> spec, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
@@ -211,7 +211,8 @@ package androidx.compose.foundation.animation {
     property public float absVelocityThreshold;
   }
 
-  public final class SmoothScrollKt {
+  public final class ScrollingKt {
+    method public static suspend Object? scrollBy(androidx.compose.foundation.gestures.Scrollable, float value, kotlin.coroutines.Continuation<? super java.lang.Float> p);
     method public static suspend Object? smoothScrollBy(androidx.compose.foundation.gestures.Scrollable, float value, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> spec, optional kotlin.coroutines.Continuation<? super java.lang.Float> p);
   }
 

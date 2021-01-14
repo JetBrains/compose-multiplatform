@@ -19,6 +19,8 @@ package androidx.compose.material
 import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.ManualAnimationClock
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.animation.scrollBy
+import androidx.compose.foundation.gestures.Scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -40,6 +42,7 @@ import androidx.compose.ui.platform.AmbientViewConfiguration
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.center
 import androidx.compose.ui.test.centerX
 import androidx.compose.ui.test.centerY
@@ -59,6 +62,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -1666,8 +1670,9 @@ class SwipeableTest {
         }
     }
 
+    @OptIn(ExperimentalTestApi::class)
     @Test
-    fun swipeable_nestedScroll_postFlings() {
+    fun swipeable_nestedScroll_postFlings() = runBlocking {
         lateinit var swipeableState: SwipeableState<String>
         lateinit var anchors: MutableState<Map<Float, String>>
         lateinit var scrollState: ScrollState
@@ -1696,10 +1701,9 @@ class SwipeableTest {
             }
         }
 
-        rule.runOnIdle {
-            assertThat(swipeableState.value).isEqualTo("B")
-            assertThat(scrollState.value).isEqualTo(5000f)
-        }
+        rule.awaitIdle()
+        assertThat(swipeableState.value).isEqualTo("B")
+        assertThat(scrollState.value).isEqualTo(5000f)
 
         rule.onNodeWithTag(swipeableTag)
             .performGesture {
@@ -1713,12 +1717,11 @@ class SwipeableTest {
                 )
             }
 
-        rule.runOnIdle {
-            assertThat(swipeableState.value).isEqualTo("B")
-            assertThat(scrollState.value).isEqualTo(0f)
-            // set value again to test overshoot
-            scrollState.scrollBy(500f)
-        }
+        rule.awaitIdle()
+        assertThat(swipeableState.value).isEqualTo("B")
+        assertThat(scrollState.value).isEqualTo(0f)
+        // set value again to test overshoot
+        (scrollState as Scrollable).scrollBy(500f)
 
         rule.runOnIdle {
             assertThat(swipeableState.value).isEqualTo("B")

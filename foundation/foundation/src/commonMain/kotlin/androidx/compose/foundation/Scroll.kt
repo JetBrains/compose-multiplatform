@@ -24,6 +24,7 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.animation.defaultFlingConfig
+import androidx.compose.foundation.animation.scrollBy
 import androidx.compose.foundation.animation.smoothScrollBy
 import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.Scrollable
@@ -41,6 +42,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.savedinstancestate.Saver
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.runtime.setValue
@@ -65,6 +67,7 @@ import androidx.compose.ui.semantics.verticalScrollAxisRange
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 /**
@@ -252,12 +255,20 @@ class ScrollState(
     }
 
     /**
-     * Instantly jump to position in pixels
+     * Instantly jump to the given position in pixels.
      *
-     * @param value target value in pixels to jump to, value will be coerced to 0..maxPosition
+     * Cancels the currently running scroll, if any, and suspends until the cancellation is
+     * complete.
+     *
+     * @see smoothScrollTo for an animated version
+     *
+     * @param value number of pixels to scroll by
+     * @return the amount of scroll consumed
      */
-    fun scrollTo(value: Float) {
-        this.value = value.coerceIn(0f, maxValue)
+    suspend fun scrollTo(
+        value: Float
+    ): Float {
+        return (this as Scrollable).scrollBy(value - this.value)
     }
 
     /**
@@ -265,8 +276,9 @@ class ScrollState(
      *
      * @param value delta in pixels to jump by, total value will be coerced to 0..maxPosition
      */
+    @Deprecated("Use suspend version") // TODO(DO NOT MERGE): add ReplaceWith
     fun scrollBy(value: Float) {
-        scrollTo(this.value + value)
+        this.value = (this.value + value).coerceIn(0f, maxValue)
     }
 
     companion object {
@@ -449,6 +461,7 @@ private fun Modifier.scroll(
     isVertical: Boolean
 ) = composed(
     factory = {
+        val coroutineScope = rememberCoroutineScope()
         val semantics = Modifier.semantics {
             if (isScrollable) {
                 val accessibilityScrollState = ScrollAxisRange(
@@ -464,10 +477,12 @@ private fun Modifier.scroll(
                 // when b/156389287 is fixed, this should be proper scrollTo with reverse handling
                 scrollBy(
                     action = { x: Float, y: Float ->
-                        if (isVertical) {
-                            state.scrollBy(y)
-                        } else {
-                            state.scrollBy(x)
+                        coroutineScope.launch {
+                            if (isVertical) {
+                                (state as Scrollable).scrollBy(y)
+                            } else {
+                                (state as Scrollable).scrollBy(x)
+                            }
                         }
                         return@scrollBy true
                     }
