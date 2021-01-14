@@ -28,12 +28,14 @@ class PasswordVisualTransformationTest {
     fun check_visual_output_is_masked_with_asterisk() {
         val transformation = PasswordVisualTransformation(mask = '*')
         val text = AnnotatedString("12345")
-        val (transformedText, map) = transformation.filter(text)
+        val transformedText = transformation.filter(text)
+        val visualText = transformedText.text
+        val offsetMapping = transformedText.offsetMapping
 
-        assertEquals("*****", transformedText.text)
-        for (i in 0..transformedText.text.length) {
-            assertEquals(i, map.originalToTransformed(i))
-            assertEquals(i, map.transformedToOriginal(i))
+        assertEquals("*****", visualText.text)
+        for (i in 0..visualText.text.length) {
+            assertEquals(i, offsetMapping.originalToTransformed(i))
+            assertEquals(i, offsetMapping.transformedToOriginal(i))
         }
     }
 
@@ -41,12 +43,14 @@ class PasswordVisualTransformationTest {
     fun check_visual_output_is_masked_with_default() {
         val filter = PasswordVisualTransformation()
         val text = AnnotatedString("1234567890")
-        val (filtered, map) = filter.filter(text)
+        val transformedText = filter.filter(text)
+        val visualText = transformedText.text
+        val offsetMapping = transformedText.offsetMapping
 
-        assertEquals("\u2022".repeat(10), filtered.text)
-        for (i in 0..filtered.text.length) {
-            assertEquals(i, map.originalToTransformed(i))
-            assertEquals(i, map.transformedToOriginal(i))
+        assertEquals("\u2022".repeat(10), visualText.text)
+        for (i in 0..visualText.text.length) {
+            assertEquals(i, offsetMapping.originalToTransformed(i))
+            assertEquals(i, offsetMapping.transformedToOriginal(i))
         }
     }
 }

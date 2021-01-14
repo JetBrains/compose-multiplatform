@@ -312,8 +312,11 @@ class TextFieldDelegateTest {
 
     @Test
     fun use_identity_mapping_if_none_visual_transformation() {
-        val (visualText, offsetMapping) =
-            VisualTransformation.None.filter(AnnotatedString(text = "Hello, World"))
+        val transformedText = VisualTransformation.None.filter(
+            AnnotatedString(text = "Hello, World")
+        )
+        val visualText = transformedText.text
+        val offsetMapping = transformedText.offsetMapping
 
         assertEquals("Hello, World", visualText.text)
         for (i in 0..visualText.text.length) {
@@ -331,7 +334,7 @@ class TextFieldDelegateTest {
         }
 
         val input = TransformedText(
-            transformedText = AnnotatedString.Builder().apply {
+            text = AnnotatedString.Builder().apply {
                 pushStyle(SpanStyle(color = Color.Red))
                 append("Hello, World")
             }.toAnnotatedString(),
@@ -343,9 +346,9 @@ class TextFieldDelegateTest {
             transformed = input
         )
 
-        assertThat(result.transformedText.text).isEqualTo(input.transformedText.text)
-        assertThat(result.transformedText.spanStyles.size).isEqualTo(2)
-        assertThat(result.transformedText.spanStyles).contains(
+        assertThat(result.text.text).isEqualTo(input.text.text)
+        assertThat(result.text.spanStyles.size).isEqualTo(2)
+        assertThat(result.text.spanStyles).contains(
             AnnotatedString.Range(SpanStyle(textDecoration = TextDecoration.Underline), 3, 6)
         )
     }
@@ -359,7 +362,7 @@ class TextFieldDelegateTest {
         }
 
         val input = TransformedText(
-            transformedText = AnnotatedString.Builder().apply {
+            text = AnnotatedString.Builder().apply {
                 append(" ".repeat(offsetAmount))
                 append("Hello World")
             }.toAnnotatedString(),
@@ -372,8 +375,8 @@ class TextFieldDelegateTest {
             transformed = input
         )
 
-        assertThat(result.transformedText.spanStyles.size).isEqualTo(1)
-        assertThat(result.transformedText.spanStyles).contains(
+        assertThat(result.text.spanStyles.size).isEqualTo(1)
+        assertThat(result.text.spanStyles).contains(
             AnnotatedString.Range(
                 SpanStyle(textDecoration = TextDecoration.Underline),
                 range.start + offsetAmount,

@@ -48,7 +48,7 @@ internal fun InactiveTextField(
 ) {
     val transformedText = remember(value, visualTransformation) {
         visualTransformation.filter(AnnotatedString(value.text))
-    }.transformedText
+    }.text
 
     val text: @Composable (Modifier) -> Unit = @Composable { textModifier ->
         BasicText(

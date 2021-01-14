@@ -889,14 +889,11 @@ package androidx.compose.ui.text.input {
   }
 
   public final class TransformedText {
-    ctor public TransformedText(androidx.compose.ui.text.AnnotatedString transformedText, androidx.compose.ui.text.input.OffsetMapping offsetMapping);
-    method public androidx.compose.ui.text.AnnotatedString component1();
-    method public androidx.compose.ui.text.input.OffsetMapping component2();
-    method public androidx.compose.ui.text.input.TransformedText copy(androidx.compose.ui.text.AnnotatedString transformedText, androidx.compose.ui.text.input.OffsetMapping offsetMapping);
+    ctor public TransformedText(androidx.compose.ui.text.AnnotatedString text, androidx.compose.ui.text.input.OffsetMapping offsetMapping);
     method public androidx.compose.ui.text.input.OffsetMapping getOffsetMapping();
-    method public androidx.compose.ui.text.AnnotatedString getTransformedText();
+    method public androidx.compose.ui.text.AnnotatedString getText();
     property public final androidx.compose.ui.text.input.OffsetMapping offsetMapping;
-    property public final androidx.compose.ui.text.AnnotatedString transformedText;
+    property public final androidx.compose.ui.text.AnnotatedString text;
   }
 
   @androidx.compose.runtime.Immutable public fun interface VisualTransformation {
