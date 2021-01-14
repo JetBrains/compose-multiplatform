@@ -127,16 +127,37 @@ object WindowRecomposerPolicy {
     internal fun createAndInstallWindowRecomposer(rootView: View): Recomposer {
         val newRecomposer = factory.createRecomposer(rootView)
         rootView.setTag(R.id.androidx_compose_ui_view_composition_reference, newRecomposer)
-        GlobalScope.launch(
+
+        // If the Recomposer shuts down, unregister it so that a future request for a window
+        // recomposer will consult the factory for a new one.
+        val unsetJob = GlobalScope.launch(
             rootView.handler.asCoroutineDispatcher("windowRecomposer cleanup").immediate
         ) {
-            newRecomposer.join()
-            val viewTagRecomposer =
-                rootView.getTag(R.id.androidx_compose_ui_view_composition_reference)
-            if (viewTagRecomposer === newRecomposer) {
-                rootView.setTag(R.id.androidx_compose_ui_view_composition_reference, null)
+            try {
+                newRecomposer.join()
+            } finally {
+                // Unset if the view is detached. (See below for the attach state change listener.)
+                // Since this is in a finally in this coroutine, even if this job is cancelled we
+                // will resume on the window's UI thread and perform this manipulation there.
+                val viewTagRecomposer =
+                    rootView.getTag(R.id.androidx_compose_ui_view_composition_reference)
+                if (viewTagRecomposer === newRecomposer) {
+                    rootView.setTag(R.id.androidx_compose_ui_view_composition_reference, null)
+                }
             }
         }
+
+        // If the root view is detached, cancel the await for recomposer shutdown above.
+        // This will also unset the tag reference to this recomposer during its cleanup.
+        rootView.addOnAttachStateChangeListener(
+            object : View.OnAttachStateChangeListener {
+                override fun onViewAttachedToWindow(v: View) {}
+                override fun onViewDetachedFromWindow(v: View) {
+                    unsetJob.cancel()
+                    v.removeOnAttachStateChangeListener(this)
+                }
+            }
+        )
         return newRecomposer
     }
 }
