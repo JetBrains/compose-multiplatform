@@ -30,6 +30,7 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.animateAsState
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
@@ -3333,6 +3334,39 @@ class AndroidLayoutDrawTest {
         assertFalse(drawLatch.await(300, TimeUnit.MILLISECONDS))
         assertEquals(1, parentInvalidationCount)
         assertEquals(1, childInvalidationCount)
+    }
+
+    /**
+     * invalidateDescendants should invalidate all layout layers.
+     */
+    @Test
+    fun invalidateDescendants() {
+        var color = Color.White
+        activityTestRule.runOnUiThread {
+            activity.setContent {
+                FixedSize(30, Modifier.background(Color.Blue)) {
+                    FixedSize(30, Modifier.graphicsLayer()) {
+                        with(AmbientDensity.current) {
+                            Canvas(Modifier.size(10.toDp())) {
+                                drawRect(color)
+                                drawLatch.countDown()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        validateSquareColors(outerColor = Color.Blue, innerColor = Color.White, size = 10)
+
+        color = Color.Yellow
+
+        activityTestRule.runOnUiThread {
+            drawLatch = CountDownLatch(1)
+            val view = activityTestRule.findAndroidComposeView() as AndroidComposeView
+            view.invalidateDescendants()
+        }
+        validateSquareColors(outerColor = Color.Blue, innerColor = Color.Yellow, size = 10)
     }
 
     private fun composeSquares(model: SquareModel) {
