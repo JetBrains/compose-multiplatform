@@ -564,7 +564,7 @@ internal constructor(
             //  structure. In case of multiple AndroidOwners, add a fake root
             waitForIdle()
 
-            return composeRootRegistry.getComposeRoots().also {
+            return composeRootRegistry.getRegisteredComposeRoots().also {
                 // TODO(b/153632210): This check should be done by callers of getOwners()
                 check(it.isNotEmpty()) {
                     "No compose views found in the app. Is your Activity resumed?"
