@@ -28,7 +28,7 @@ actual typealias NativeKeyEvent = java.awt.event.KeyEvent
  * The key that was pressed.
  */
 actual val KeyEvent.key: Key
-    get() = Key(nativeKeyEvent.keyCode)
+    get() = Key(nativeKeyEvent.keyCode, nativeKeyEvent.keyLocation)
 
 /**
  * The UTF16 value corresponding to the key event that was pressed. The unicode character
