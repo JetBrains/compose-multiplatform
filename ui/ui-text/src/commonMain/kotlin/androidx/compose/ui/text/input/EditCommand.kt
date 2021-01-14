@@ -16,8 +16,9 @@
 
 package androidx.compose.ui.text.input
 
-import androidx.compose.ui.util.findFollowingBreak
-import androidx.compose.ui.util.findPrecedingBreak
+import androidx.compose.ui.text.InternalTextApi
+import androidx.compose.ui.text.findFollowingBreak
+import androidx.compose.ui.text.findPrecedingBreak
 
 /**
  * [EditCommand] is a command representation for the platform IME API function calls. The
@@ -427,6 +428,7 @@ class FinishComposingTextCommand : EditCommand {
  */
 class BackspaceCommand : EditCommand {
 
+    @OptIn(InternalTextApi::class)
     override fun applyTo(buffer: EditingBuffer) {
         if (buffer.hasComposition()) {
             buffer.delete(buffer.compositionStart, buffer.compositionEnd)
@@ -473,6 +475,7 @@ class MoveCursorCommand(
     val amount: Int
 ) : EditCommand {
 
+    @OptIn(InternalTextApi::class)
     override fun applyTo(buffer: EditingBuffer) {
         if (buffer.cursor == -1) {
             buffer.cursor = buffer.selectionStart

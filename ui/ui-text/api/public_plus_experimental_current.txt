@@ -80,6 +80,11 @@ package androidx.compose.ui.text {
   public final class JvmAnnotatedStringKt {
   }
 
+  public final class JvmCharHelpersKt {
+    method @androidx.compose.ui.text.InternalTextApi public static int findFollowingBreak(String, int index);
+    method @androidx.compose.ui.text.InternalTextApi public static int findPrecedingBreak(String, int index);
+  }
+
   public final class MultiParagraph {
     ctor public MultiParagraph(androidx.compose.ui.text.MultiParagraphIntrinsics intrinsics, int maxLines, boolean ellipsis, float width);
     ctor public MultiParagraph(androidx.compose.ui.text.AnnotatedString annotatedString, androidx.compose.ui.text.TextStyle style, java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, int maxLines, boolean ellipsis, float width, androidx.compose.ui.unit.Density density, androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader);
