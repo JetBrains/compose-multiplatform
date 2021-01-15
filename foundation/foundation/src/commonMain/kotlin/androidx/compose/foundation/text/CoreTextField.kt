@@ -22,6 +22,7 @@ import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.text.selection.TextFieldSelectionHandle
 import androidx.compose.foundation.text.selection.TextFieldSelectionManager
+import androidx.compose.foundation.text.selection.isSelectionHandleInVisibleBound
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
@@ -331,8 +332,13 @@ fun CoreTextField(
         if (textInputService != null) {
             state.layoutCoordinates = it
             if (state.selectionIsOn) {
-                if (state.showFloatingToolbar) manager.showSelectionToolbar()
-                else manager.hideSelectionToolbar()
+                if (state.showFloatingToolbar) {
+                    manager.showSelectionToolbar()
+                } else {
+                    manager.hideSelectionToolbar()
+                }
+                state.showSelectionHandleStart = manager.isSelectionHandleInVisibleBound(true)
+                state.showSelectionHandleEnd = manager.isSelectionHandleInVisibleBound(false)
             }
             state.layoutResult?.let { layoutResult ->
                 TextFieldDelegate.notifyFocusedRect(
@@ -453,7 +459,13 @@ fun CoreTextField(
             }
         }
 
-        if (state.hasFocus && state.selectionIsOn && !isMouseInput) {
+        if (
+            state.hasFocus &&
+            state.selectionIsOn &&
+            state.layoutCoordinates != null &&
+            state.layoutCoordinates!!.isAttached &&
+            !isMouseInput
+        ) {
             manager.state?.layoutResult?.let {
                 if (!value.selection.collapsed) {
                     val startOffset = offsetMapping.originalToTransformed(value.selection.start)
@@ -461,16 +473,20 @@ fun CoreTextField(
                     val startDirection = it.getBidiRunDirection(startOffset)
                     val endDirection = it.getBidiRunDirection(max(endOffset - 1, 0))
                     val directions = Pair(startDirection, endDirection)
-                    TextFieldSelectionHandle(
-                        isStartHandle = true,
-                        directions = directions,
-                        manager = manager
-                    )
-                    TextFieldSelectionHandle(
-                        isStartHandle = false,
-                        directions = directions,
-                        manager = manager
-                    )
+                    if (state.showSelectionHandleStart) {
+                        TextFieldSelectionHandle(
+                            isStartHandle = true,
+                            directions = directions,
+                            manager = manager
+                        )
+                    }
+                    if (state.showSelectionHandleEnd) {
+                        TextFieldSelectionHandle(
+                            isStartHandle = false,
+                            directions = directions,
+                            manager = manager
+                        )
+                    }
                 }
 
                 manager.state?.let {
@@ -484,7 +500,9 @@ fun CoreTextField(
                     }
                 }
             }
-        } else manager.hideSelectionToolbar()
+        } else {
+            manager.hideSelectionToolbar()
+        }
     }
 }
 
@@ -533,6 +551,16 @@ internal class TextFieldState(
      * A flag to check if the floating toolbar should show.
      */
     var showFloatingToolbar = false
+
+    /**
+     * A flag to check if the start selection handle should show.
+     */
+    var showSelectionHandleStart by mutableStateOf(false)
+
+    /**
+     * A flag to check if the end selection handle should show.
+     */
+    var showSelectionHandleEnd by mutableStateOf(false)
 
     var onImeActionPerformed: (ImeAction) -> Unit = {}
         private set
