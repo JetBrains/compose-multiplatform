@@ -52,7 +52,6 @@ import kotlin.coroutines.resume
  * automatically, but can be decoupled from it and live separately when desired.
  */
 @Stable
-@ExperimentalMaterialApi
 class SnackbarHostState {
 
     /**
@@ -106,7 +105,6 @@ class SnackbarHostState {
     }
 
     @Stable
-    @OptIn(ExperimentalMaterialApi::class)
     private class SnackbarDataImpl(
         override val message: String,
         override val actionLabel: String?,
@@ -145,7 +143,6 @@ class SnackbarHostState {
  * appearance based on the [SnackbarData] provided as a param
  */
 @Composable
-@ExperimentalMaterialApi
 fun SnackbarHost(
     hostState: SnackbarHostState,
     modifier: Modifier = Modifier,
@@ -172,7 +169,6 @@ fun SnackbarHost(
  * @property actionLabel optional action label to show as button in the Snackbar
  * @property duration duration of the snackbar
  */
-@ExperimentalMaterialApi
 interface SnackbarData {
     val message: String
     val actionLabel: String?
@@ -234,7 +230,6 @@ private fun SnackbarDuration.toMillis() = when (this) {
 // TODO: to be replaced with the public customizable implementation
 // it's basically tweaked nullable version of Crossfade
 @Composable
-@OptIn(ExperimentalMaterialApi::class)
 private fun FadeInFadeOutWithScale(
     current: SnackbarData?,
     modifier: Modifier = Modifier,
