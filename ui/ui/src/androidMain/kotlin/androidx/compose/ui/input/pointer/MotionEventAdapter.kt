@@ -139,12 +139,21 @@ private fun createPointerInputEventData(
     val pointerCoords = MotionEvent.PointerCoords()
     motionEvent.getPointerCoords(index, pointerCoords)
     val offset = Offset(pointerCoords.x, pointerCoords.y)
+    val toolType = when (motionEvent.getToolType(index)) {
+        MotionEvent.TOOL_TYPE_UNKNOWN -> PointerType.Unknown
+        MotionEvent.TOOL_TYPE_FINGER -> PointerType.Touch
+        MotionEvent.TOOL_TYPE_STYLUS -> PointerType.Stylus
+        MotionEvent.TOOL_TYPE_MOUSE -> PointerType.Mouse
+        MotionEvent.TOOL_TYPE_ERASER -> PointerType.Eraser
+        else -> PointerType.Unknown
+    }
 
     return PointerInputEventData(
         pointerId,
         timestamp,
         offset,
-        index != upIndex
+        index != upIndex,
+        toolType
     )
 }
 
