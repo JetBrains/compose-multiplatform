@@ -59,7 +59,7 @@ fun keyTypedEvent(key: Key): KeyEvent {
             0,
             VK_UNDEFINED,
             KeyEventAwt.getKeyText(key.nativeKeyCode)[0],
-            key.nativeKeyLocation
+            java.awt.event.KeyEvent.KEY_LOCATION_UNKNOWN
         )
     )
 }

@@ -17,10 +17,10 @@
 package androidx.compose.ui.input.key
 
 import java.awt.event.KeyEvent
-import java.awt.event.KeyEvent.KEY_LOCATION_LEFT as LocationLeft
-import java.awt.event.KeyEvent.KEY_LOCATION_NUMPAD as LocationNumpad
-import java.awt.event.KeyEvent.KEY_LOCATION_RIGHT as LocationRight
-import java.awt.event.KeyEvent.KEY_LOCATION_UNKNOWN as LocationUnknown
+import java.awt.event.KeyEvent.KEY_LOCATION_LEFT
+import java.awt.event.KeyEvent.KEY_LOCATION_NUMPAD
+import java.awt.event.KeyEvent.KEY_LOCATION_RIGHT
+import java.awt.event.KeyEvent.KEY_LOCATION_STANDARD
 import androidx.compose.ui.util.unpackInt1
 
 // TODO(demin): implement most of key codes
@@ -82,22 +82,22 @@ actual inline class Key(val keyCode: Long) {
         actual val Z = Key(KeyEvent.VK_Z)
         actual val Comma = Key(KeyEvent.VK_COMMA)
         actual val Period = Key(KeyEvent.VK_PERIOD)
-        actual val AltLeft = Key(KeyEvent.VK_ALT, LocationLeft)
-        actual val AltRight = Key(KeyEvent.VK_ALT, LocationRight)
-        actual val ShiftLeft = Key(KeyEvent.VK_SHIFT, LocationLeft)
-        actual val ShiftRight = Key(KeyEvent.VK_SHIFT, LocationRight)
+        actual val AltLeft = Key(KeyEvent.VK_ALT, KEY_LOCATION_LEFT)
+        actual val AltRight = Key(KeyEvent.VK_ALT, KEY_LOCATION_RIGHT)
+        actual val ShiftLeft = Key(KeyEvent.VK_SHIFT, KEY_LOCATION_LEFT)
+        actual val ShiftRight = Key(KeyEvent.VK_SHIFT, KEY_LOCATION_RIGHT)
         actual val Tab = Key(KeyEvent.VK_TAB)
         actual val Spacebar = Key(KeyEvent.VK_SPACE)
         actual val Enter = Key(KeyEvent.VK_ENTER)
         actual val Backspace = Key(KeyEvent.VK_BACK_SPACE)
         actual val Delete = Key(KeyEvent.VK_DELETE)
         actual val Escape = Key(KeyEvent.VK_ESCAPE)
-        actual val CtrlLeft = Key(KeyEvent.VK_CONTROL, LocationLeft)
-        actual val CtrlRight = Key(KeyEvent.VK_CONTROL, LocationRight)
+        actual val CtrlLeft = Key(KeyEvent.VK_CONTROL, KEY_LOCATION_LEFT)
+        actual val CtrlRight = Key(KeyEvent.VK_CONTROL, KEY_LOCATION_RIGHT)
         actual val CapsLock = Key(KeyEvent.VK_CAPS_LOCK)
         actual val ScrollLock = Key(KeyEvent.VK_SCROLL_LOCK)
-        actual val MetaLeft = Key(KeyEvent.VK_META, LocationLeft)
-        actual val MetaRight = Key(KeyEvent.VK_META, LocationRight)
+        actual val MetaLeft = Key(KeyEvent.VK_META, KEY_LOCATION_LEFT)
+        actual val MetaRight = Key(KeyEvent.VK_META, KEY_LOCATION_RIGHT)
         actual val PrintScreen = Key(KeyEvent.VK_PRINTSCREEN)
         actual val Grave = Key(KeyEvent.VK_BACK_QUOTE)
         actual val LeftBracket = Key(KeyEvent.VK_OPEN_BRACKET)
@@ -121,27 +121,27 @@ actual inline class Key(val keyCode: Long) {
         actual val F10 = Key(KeyEvent.VK_F10)
         actual val F11 = Key(KeyEvent.VK_F11)
         actual val F12 = Key(KeyEvent.VK_F12)
-        actual val NumLock = Key(KeyEvent.VK_NUM_LOCK, LocationNumpad)
-        actual val NumPad0 = Key(KeyEvent.VK_NUMPAD0, LocationNumpad)
-        actual val NumPad1 = Key(KeyEvent.VK_NUMPAD1, LocationNumpad)
-        actual val NumPad2 = Key(KeyEvent.VK_NUMPAD2, LocationNumpad)
-        actual val NumPad3 = Key(KeyEvent.VK_NUMPAD3, LocationNumpad)
-        actual val NumPad4 = Key(KeyEvent.VK_NUMPAD4, LocationNumpad)
-        actual val NumPad5 = Key(KeyEvent.VK_NUMPAD5, LocationNumpad)
-        actual val NumPad6 = Key(KeyEvent.VK_NUMPAD6, LocationNumpad)
-        actual val NumPad7 = Key(KeyEvent.VK_NUMPAD7, LocationNumpad)
-        actual val NumPad8 = Key(KeyEvent.VK_NUMPAD8, LocationNumpad)
-        actual val NumPad9 = Key(KeyEvent.VK_NUMPAD9, LocationNumpad)
-        actual val NumPadDivide = Key(KeyEvent.VK_DIVIDE, LocationNumpad)
-        actual val NumPadMultiply = Key(KeyEvent.VK_MULTIPLY, LocationNumpad)
-        actual val NumPadSubtract = Key(KeyEvent.VK_SUBTRACT, LocationNumpad)
-        actual val NumPadAdd = Key(KeyEvent.VK_ADD, LocationNumpad)
-        actual val NumPadDot = Key(KeyEvent.VK_PERIOD, LocationNumpad)
-        actual val NumPadComma = Key(KeyEvent.VK_COMMA, LocationNumpad)
-        actual val NumPadEnter = Key(KeyEvent.VK_ENTER, LocationNumpad)
-        actual val NumPadEquals = Key(KeyEvent.VK_EQUALS, LocationNumpad)
-        actual val NumPadLeftParenthesis = Key(KeyEvent.VK_LEFT_PARENTHESIS, LocationNumpad)
-        actual val NumPadRightParenthesis = Key(KeyEvent.VK_RIGHT_PARENTHESIS, LocationNumpad)
+        actual val NumLock = Key(KeyEvent.VK_NUM_LOCK, KEY_LOCATION_NUMPAD)
+        actual val NumPad0 = Key(KeyEvent.VK_NUMPAD0, KEY_LOCATION_NUMPAD)
+        actual val NumPad1 = Key(KeyEvent.VK_NUMPAD1, KEY_LOCATION_NUMPAD)
+        actual val NumPad2 = Key(KeyEvent.VK_NUMPAD2, KEY_LOCATION_NUMPAD)
+        actual val NumPad3 = Key(KeyEvent.VK_NUMPAD3, KEY_LOCATION_NUMPAD)
+        actual val NumPad4 = Key(KeyEvent.VK_NUMPAD4, KEY_LOCATION_NUMPAD)
+        actual val NumPad5 = Key(KeyEvent.VK_NUMPAD5, KEY_LOCATION_NUMPAD)
+        actual val NumPad6 = Key(KeyEvent.VK_NUMPAD6, KEY_LOCATION_NUMPAD)
+        actual val NumPad7 = Key(KeyEvent.VK_NUMPAD7, KEY_LOCATION_NUMPAD)
+        actual val NumPad8 = Key(KeyEvent.VK_NUMPAD8, KEY_LOCATION_NUMPAD)
+        actual val NumPad9 = Key(KeyEvent.VK_NUMPAD9, KEY_LOCATION_NUMPAD)
+        actual val NumPadDivide = Key(KeyEvent.VK_DIVIDE, KEY_LOCATION_NUMPAD)
+        actual val NumPadMultiply = Key(KeyEvent.VK_MULTIPLY, KEY_LOCATION_NUMPAD)
+        actual val NumPadSubtract = Key(KeyEvent.VK_SUBTRACT, KEY_LOCATION_NUMPAD)
+        actual val NumPadAdd = Key(KeyEvent.VK_ADD, KEY_LOCATION_NUMPAD)
+        actual val NumPadDot = Key(KeyEvent.VK_PERIOD, KEY_LOCATION_NUMPAD)
+        actual val NumPadComma = Key(KeyEvent.VK_COMMA, KEY_LOCATION_NUMPAD)
+        actual val NumPadEnter = Key(KeyEvent.VK_ENTER, KEY_LOCATION_NUMPAD)
+        actual val NumPadEquals = Key(KeyEvent.VK_EQUALS, KEY_LOCATION_NUMPAD)
+        actual val NumPadLeftParenthesis = Key(KeyEvent.VK_LEFT_PARENTHESIS, KEY_LOCATION_NUMPAD)
+        actual val NumPadRightParenthesis = Key(KeyEvent.VK_RIGHT_PARENTHESIS, KEY_LOCATION_NUMPAD)
 
         // Unsupported Keys. These keys will never be sent by the desktop. However we need unique
         // keycodes so that these constants can be used in a when statement without a warning.
@@ -330,7 +330,13 @@ actual inline class Key(val keyCode: Long) {
     }
 }
 
-fun Key(nativeKeyCode: Int, nativeKeyLocation: Int = LocationUnknown): Key {
+/**
+ * Creates instance of [Key].
+ *
+ * @param nativeKeyCode represents this key as defined in [java.awt.event.KeyEvent]
+ * @param nativeKeyLocation represents the location of key as defined in [java.awt.event.KeyEvent]
+ */
+fun Key(nativeKeyCode: Int, nativeKeyLocation: Int = KEY_LOCATION_STANDARD): Key {
     // First 32 bits are for keycode.
     val keyCode = nativeKeyCode.toLong().shl(32)
 
