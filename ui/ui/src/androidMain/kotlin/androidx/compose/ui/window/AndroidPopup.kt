@@ -39,9 +39,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AmbientView
@@ -54,13 +54,12 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
-import androidx.compose.ui.unit.plus
-import androidx.compose.ui.unit.round
 import androidx.compose.ui.unit.width
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.ViewTreeViewModelStoreOwner
 import androidx.savedstate.ViewTreeSavedStateRegistryOwner
 import org.jetbrains.annotations.TestOnly
+import kotlin.math.roundToInt
 
 /**
  * Android specific properties to configure a popup.
@@ -146,13 +145,10 @@ internal actual fun ActualPopup(
         content = emptyContent(),
         modifier = Modifier.onGloballyPositioned { childCoordinates ->
             val coordinates = childCoordinates.parentCoordinates!!
-            // TODO: b/177320418 use localToWindow
-            val composeViewWindowLocation = IntArray(2).apply {
-                view.getLocationInWindow(this)
-            }
-            val windowOffset = IntOffset(composeViewWindowLocation[0], composeViewWindowLocation[1])
-            val layoutPosition = (coordinates.localToRoot(Offset.Zero) + windowOffset).round()
             val layoutSize = coordinates.size
+
+            val position = coordinates.positionInWindow()
+            val layoutPosition = IntOffset(position.x.roundToInt(), position.y.roundToInt())
 
             popupLayout.parentBounds = IntBounds(layoutPosition, layoutSize)
             // Update the popup's position
