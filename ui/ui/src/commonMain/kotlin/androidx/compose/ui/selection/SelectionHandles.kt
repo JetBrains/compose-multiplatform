@@ -265,18 +265,18 @@ internal class SelectionHandlePositionProvider(
     val offset: IntOffset
 ) : PopupPositionProvider {
     override fun calculatePosition(
-        parentGlobalBounds: IntBounds,
-        windowGlobalBounds: IntBounds,
+        anchorBounds: IntBounds,
+        windowSize: IntSize,
         layoutDirection: LayoutDirection,
         popupContentSize: IntSize
     ): IntOffset {
         // TODO: Decide which is the best way to round to result without reimplementing Alignment.align
-        var popupGlobalPosition = IntOffset(0, 0)
+        var popupPosition = IntOffset(0, 0)
 
         // Get the aligned point inside the parent
         val parentAlignmentPoint = alignment.align(
             IntSize.Zero,
-            IntSize(parentGlobalBounds.width, parentGlobalBounds.height),
+            IntSize(anchorBounds.width, anchorBounds.height),
             layoutDirection
         )
         // Get the aligned point inside the child
@@ -286,20 +286,20 @@ internal class SelectionHandlePositionProvider(
             layoutDirection
         )
 
-        // Add the global position of the parent
-        popupGlobalPosition += IntOffset(parentGlobalBounds.left, parentGlobalBounds.top)
+        // Add the position of the parent
+        popupPosition += IntOffset(anchorBounds.left, anchorBounds.top)
 
         // Add the distance between the parent's top left corner and the alignment point
-        popupGlobalPosition += parentAlignmentPoint
+        popupPosition += parentAlignmentPoint
 
         // Subtract the distance between the children's top left corner and the alignment point
-        popupGlobalPosition -= IntOffset(relativePopupPos.x, relativePopupPos.y)
+        popupPosition -= IntOffset(relativePopupPos.x, relativePopupPos.y)
 
         // Add the user offset
         val resolvedOffset = IntOffset(offset.x, offset.y)
-        popupGlobalPosition += resolvedOffset
+        popupPosition += resolvedOffset
 
-        return popupGlobalPosition
+        return popupPosition
     }
 }
 
