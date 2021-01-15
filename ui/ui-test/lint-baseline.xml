@@ -1,15 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="5" by="lint 4.2.0-alpha15" client="gradle" variant="debug" version="4.2.0-alpha15">
+<issues format="5" by="lint 4.2.0-beta02" client="gradle" variant="debug" version="4.2.0-beta02">
 
     <issue
-        id="IllegalExperimentalApiUsage"
-        message="Experimental/OptIn APIs should only be used from within the same library or libraries within the same requireSameVersion group"
-        errorLine1="    performKeyPress(keyEvent)"
-        errorLine2="    ~~~~~~~~~~~~~~~">
+        id="UnknownIssueId"
+        message="Unknown issue id &quot;ComposableLambdaParameterNaming&quot;">
         <location
-            file="src/commonMain/kotlin/androidx/ui/test/ActionsStubs.kt"
-            line="44"
-            column="5"/>
+            file="build.gradle"/>
+    </issue>
+
+    <issue
+        id="UnknownIssueId"
+        message="Unknown issue id &quot;ComposableLambdaParameterPosition&quot;">
+        <location
+            file="build.gradle"/>
+    </issue>
+
+    <issue
+        id="UnknownIssueId"
+        message="Unknown issue id &quot;ComposableNaming&quot;">
+        <location
+            file="build.gradle"/>
     </issue>
 
     <issue
@@ -19,7 +29,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/test/android/WindowCapture.kt"
-            line="57"
+            line="59"
             column="40"/>
     </issue>
 
@@ -30,7 +40,7 @@
         errorLine2="              ~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/test/android/WindowCapture.kt"
-            line="93"
+            line="95"
             column="15"/>
     </issue>
 

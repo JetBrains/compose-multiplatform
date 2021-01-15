@@ -1,26 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="5" by="lint 4.2.0-alpha15" client="gradle" variant="debug" version="4.2.0-alpha15">
+<issues format="5" by="lint 4.2.0-beta02" client="gradle" variant="debug" version="4.2.0-beta02">
 
     <issue
-        id="DiscouragedPrivateApi"
-        message="Reflective access to freeTextLayoutCaches, which is not part of the public SDK and therefore likely to change in future Android releases"
-        errorLine1="            val freeCaches = Canvas::class.java.getDeclaredMethod(&quot;freeTextLayoutCaches&quot;)"
-        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        id="UnknownIssueId"
+        message="Unknown issue id &quot;ComposableLambdaParameterNaming&quot;">
         <location
-            file="src/main/java/androidx/ui/integration/test/TextBenchmarkTestRule.kt"
-            line="80"
-            column="30"/>
+            file="build.gradle"/>
     </issue>
 
     <issue
-        id="UnusedAttribute"
-        message="Attribute `fillType` is only used in API level 24 and higher (current min is 21)"
-        errorLine1="        android:fillType=&quot;evenOdd&quot;"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        id="UnknownIssueId"
+        message="Unknown issue id &quot;ComposableLambdaParameterPosition&quot;">
         <location
-            file="src/main/res/drawable/ic_pathfill_sample.xml"
-            line="29"
-            column="9"/>
+            file="build.gradle"/>
+    </issue>
+
+    <issue
+        id="UnknownIssueId"
+        message="Unknown issue id &quot;ComposableNaming&quot;">
+        <location
+            file="build.gradle"/>
     </issue>
 
     <issue
@@ -32,127 +31,6 @@
             file="src/main/java/androidx/ui/integration/test/TextBenchmarkTestRule.kt"
             line="82"
             column="13"/>
-    </issue>
-
-    <issue
-        id="InflateParams"
-        message="Avoid passing `null` as the view root (needed to resolve layout parameters on the inflated layout&apos;s root element)"
-        errorLine1="            .inflate(androidx.ui.integration.test.R.layout.simple_store, null) as ViewGroup"
-        errorLine2="                                                                         ~~~~">
-        <location
-            file="src/main/java/androidx/ui/integration/test/view/AndroidNestedScrollViewTestCase.kt"
-            line="38"
-            column="74"/>
-    </issue>
-
-    <issue
-        id="PxUsage"
-        message="Avoid using &quot;`px`&quot; as units; use &quot;`dp`&quot; instead"
-        errorLine1="          android:layout_width=&quot;350px&quot;"
-        errorLine2="          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/store_item.xml"
-            line="9"
-            column="11"/>
-    </issue>
-
-    <issue
-        id="PxUsage"
-        message="Avoid using &quot;`px`&quot; as units; use &quot;`dp`&quot; instead"
-        errorLine1="          android:layout_height=&quot;350px&quot;"
-        errorLine2="          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/store_item.xml"
-            line="10"
-            column="11"/>
-    </issue>
-
-    <issue
-        id="PxUsage"
-        message="Avoid using &quot;`px`&quot; as units; use &quot;`dp`&quot; instead"
-        errorLine1="              android:textSize=&quot;60px&quot;/>"
-        errorLine2="              ~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/store_item.xml"
-            line="15"
-            column="15"/>
-    </issue>
-
-    <issue
-        id="PxUsage"
-        message="Avoid using &quot;`px`&quot; as units; use &quot;`dp`&quot; instead"
-        errorLine1="                  android:text=&quot;3.5 ★&quot; android:textSize=&quot;40px&quot;/>"
-        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/store_item.xml"
-            line="22"
-            column="40"/>
-    </issue>
-
-    <issue
-        id="PxUsage"
-        message="Avoid using &quot;`px`&quot; as units; use &quot;`dp`&quot; instead"
-        errorLine1="        &lt;View android:layout_width=&quot;40px&quot;"
-        errorLine2="              ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/store_item.xml"
-            line="23"
-            column="15"/>
-    </issue>
-
-    <issue
-        id="PxUsage"
-        message="Avoid using &quot;`px`&quot; as units; use &quot;`dp`&quot; instead"
-        errorLine1="              android:layout_height=&quot;40px&quot;"
-        errorLine2="              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/store_item.xml"
-            line="24"
-            column="15"/>
-    </issue>
-
-    <issue
-        id="SetTextI18n"
-        message="String literal in `setText` can not be translated. Use Android resources instead."
-        errorLine1="            text.text = &quot;Check Me!&quot;"
-        errorLine2="                         ~~~~~~~~~">
-        <location
-            file="src/main/java/androidx/ui/integration/test/view/AndroidCheckboxesInLinearLayoutTestCase.kt"
-            line="52"
-            column="26"/>
-    </issue>
-
-    <issue
-        id="SetTextI18n"
-        message="String literal in `setText` can not be translated. Use Android resources instead."
-        errorLine1="            text.text = &quot;Hello World Hello World Hello W&quot;"
-        errorLine2="                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/androidx/ui/integration/test/view/AndroidTextViewsInLinearLayoutTestCase.kt"
-            line="45"
-            column="26"/>
-    </issue>
-
-    <issue
-        id="HardcodedText"
-        message="Hardcoded string &quot;Some title&quot;, should use `@string` resource"
-        errorLine1="              android:text=&quot;Some title&quot;"
-        errorLine2="              ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/store_item.xml"
-            line="14"
-            column="15"/>
-    </issue>
-
-    <issue
-        id="HardcodedText"
-        message="Hardcoded string &quot;3.5 ★&quot;, should use `@string` resource"
-        errorLine1="                  android:text=&quot;3.5 ★&quot; android:textSize=&quot;40px&quot;/>"
-        errorLine2="                  ~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/store_item.xml"
-            line="22"
-            column="19"/>
     </issue>
 
 </issues>
