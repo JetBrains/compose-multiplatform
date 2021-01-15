@@ -39,6 +39,7 @@ import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onParent
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.swipeDown
@@ -225,6 +226,91 @@ class DrawerTest {
 
         rule.runOnIdle {
             assertThat(drawerClicks).isEqualTo(1)
+            assertThat(bodyClicks).isEqualTo(1)
+        }
+    }
+
+    @Test
+    @LargeTest
+    fun modalDrawer_drawerContent_doesntPropagateClicksWhenOpen() {
+        var bodyClicks = 0
+        lateinit var drawerState: DrawerState
+        rule.setMaterialContent {
+            drawerState = rememberDrawerState(DrawerValue.Closed)
+            ModalDrawerLayout(
+                drawerState = drawerState,
+                drawerContent = {
+                    Box(Modifier.fillMaxSize().testTag("Drawer"))
+                },
+                bodyContent = {
+                    Box(Modifier.fillMaxSize().clickable { bodyClicks += 1 })
+                }
+            )
+        }
+
+        // Click in the middle of the drawer
+        rule.onNodeWithTag("Drawer").performClick()
+
+        rule.runOnIdle {
+            assertThat(bodyClicks).isEqualTo(1)
+            drawerState.open()
+        }
+        sleep(100) // TODO(147586311): remove this sleep when opening the drawer triggers a wait
+
+        // Click on the left-center pixel of the drawer
+        rule.onNodeWithTag("Drawer").performGesture {
+            click(centerLeft)
+        }
+
+        rule.runOnIdle {
+            assertThat(bodyClicks).isEqualTo(1)
+        }
+    }
+
+    @Test
+    @LargeTest
+    fun bottomDrawer_drawerContent_doesntPropagateClicksWhenOpen() {
+        var bodyClicks = 0
+        lateinit var drawerState: BottomDrawerState
+        rule.setMaterialContent {
+            drawerState = rememberBottomDrawerState(BottomDrawerValue.Closed)
+            BottomDrawerLayout(
+                drawerState = drawerState,
+                drawerContent = {
+                    Box(Modifier.fillMaxSize().testTag("Drawer"))
+                },
+                bodyContent = {
+                    Box(Modifier.fillMaxSize().clickable { bodyClicks += 1 })
+                }
+            )
+        }
+
+        // Click in the middle of the drawer
+        rule.onNodeWithTag("Drawer").performClick()
+
+        rule.runOnIdle {
+            assertThat(bodyClicks).isEqualTo(1)
+            drawerState.open()
+        }
+        sleep(100) // TODO(147586311): remove this sleep when opening the drawer triggers a wait
+
+        // Click on the left-center pixel of the drawer
+        rule.onNodeWithTag("Drawer").performGesture {
+            click(centerLeft)
+        }
+
+        rule.runOnIdle {
+            assertThat(bodyClicks).isEqualTo(1)
+            drawerState.expand()
+        }
+        sleep(100) // TODO(147586311): remove this sleep when opening the drawer triggers a wait
+
+        // Click on the left-center pixel of the drawer once again in a new state
+        rule.onNodeWithTag("Drawer").performGesture {
+            click(centerLeft)
+        }
+
+        rule.runOnIdle {
             assertThat(bodyClicks).isEqualTo(1)
         }
     }

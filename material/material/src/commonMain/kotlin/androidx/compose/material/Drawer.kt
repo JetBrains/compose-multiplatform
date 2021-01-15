@@ -19,8 +19,9 @@ package androidx.compose.material
 import androidx.compose.animation.asDisposableClock
 import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.AnimationEndReason
-import androidx.compose.animation.core.SpringSpec
+import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -39,6 +40,7 @@ import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientDensity
@@ -364,6 +366,11 @@ fun ModalDrawerLayout(
 
         val anchors = mapOf(minValue to DrawerValue.Closed, maxValue to DrawerValue.Open)
         val isRtl = AmbientLayoutDirection.current == LayoutDirection.Rtl
+        val blockClicks = if (drawerState.isOpen) {
+            Modifier.pointerInput { detectTapGestures {} }
+        } else {
+            Modifier
+        }
         Box(
             Modifier.swipeable(
                 state = drawerState,
@@ -387,12 +394,13 @@ fun ModalDrawerLayout(
             )
             Surface(
                 modifier = with(AmbientDensity.current) {
-                    Modifier.preferredSizeIn(
-                        minWidth = constraints.minWidth.toDp(),
-                        minHeight = constraints.minHeight.toDp(),
-                        maxWidth = constraints.maxWidth.toDp(),
-                        maxHeight = constraints.maxHeight.toDp()
-                    )
+                    Modifier
+                        .preferredSizeIn(
+                            minWidth = constraints.minWidth.toDp(),
+                            minHeight = constraints.minHeight.toDp(),
+                            maxWidth = constraints.maxWidth.toDp(),
+                            maxHeight = constraints.maxHeight.toDp()
+                        )
                 }
                     .semantics {
                         if (drawerState.isOpen) {
@@ -400,13 +408,13 @@ fun ModalDrawerLayout(
                         }
                     }
                     .offset { IntOffset(drawerState.offset.value.roundToInt(), 0) }
-                    .padding(end = VerticalDrawerPadding),
+                    .padding(end = EndDrawerPadding),
                 shape = drawerShape,
                 color = drawerBackgroundColor,
                 contentColor = drawerContentColor,
                 elevation = drawerElevation
             ) {
-                Column(Modifier.fillMaxSize(), content = drawerContent)
+                Column(Modifier.fillMaxSize().then(blockClicks), content = drawerContent)
             }
         }
     }
@@ -485,6 +493,11 @@ fun BottomDrawerLayout(
                     minValue to BottomDrawerValue.Expanded
                 )
             }
+        val blockClicks = if (drawerState.isClosed) {
+            Modifier
+        } else {
+            Modifier.pointerInput { detectTapGestures {} }
+        }
         Box(
             Modifier
                 .nestedScroll(drawerState.nestedScrollConnection)
@@ -527,7 +540,7 @@ fun BottomDrawerLayout(
                 contentColor = drawerContentColor,
                 elevation = drawerElevation
             ) {
-                Column(Modifier.fillMaxSize(), content = drawerContent)
+                Column(Modifier.fillMaxSize().then(blockClicks), content = drawerContent)
             }
         }
     }
@@ -578,11 +591,11 @@ private fun Scrim(
     }
 }
 
-private val VerticalDrawerPadding = 56.dp
+private val EndDrawerPadding = 56.dp
 private val DrawerVelocityThreshold = 400.dp
 
-private const val DrawerStiffness = 1000f
-
-private val AnimationSpec = SpringSpec<Float>(stiffness = DrawerStiffness)
+// TODO: b/177571613 this should be a proper decay settling
+// this is taken from the DrawerLayout's DragViewHelper as a min duration.
+private val AnimationSpec = TweenSpec<Float>(durationMillis = 256)
 
 internal const val BottomDrawerOpenFraction = 0.5f
