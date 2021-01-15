@@ -264,6 +264,10 @@ open class SwipeableState<T>(
     @ExperimentalMaterialApi
     fun snapTo(targetValue: T) {
         val targetOffset = anchors.getOffset(targetValue)
+        require(anchors.isNotEmpty()) {
+            "State $this is not attached to a component. Have you passed state object to " +
+                "a component?"
+        }
         requireNotNull(targetOffset) {
             "The target value must have an associated anchor."
         }
@@ -285,6 +289,10 @@ open class SwipeableState<T>(
         onEnd: ((AnimationEndReason, T) -> Unit)? = null
     ) {
         val targetOffset = anchors.getOffset(targetValue)
+        require(anchors.isNotEmpty()) {
+            "State $this is not attached to a component. Have you passed state object to " +
+                "a component?"
+        }
         requireNotNull(targetOffset) {
             "The target value must have an associated anchor."
         }
