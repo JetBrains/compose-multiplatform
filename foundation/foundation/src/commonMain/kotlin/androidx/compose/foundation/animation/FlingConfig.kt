@@ -98,7 +98,7 @@ fun FlingConfig(
  * or being interrupted by gesture input.
  * Consider second boolean param "cancelled" to know what happened.
  */
-fun AnimatedFloat.fling(
+internal fun AnimatedFloat.fling(
     startVelocity: Float,
     config: FlingConfig,
     onAnimationEnd: OnAnimationEnd? = null
