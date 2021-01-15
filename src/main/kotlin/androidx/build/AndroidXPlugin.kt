@@ -581,7 +581,7 @@ class AndroidXPlugin : Plugin<Project> {
              * Ignore -PuseMaxDepVersions when verifying dependency versions because it is a
              * hypothetical build which is only intended to check for forward compatibility.
              */
-            if (hasProperty(USE_MAX_DEP_VERSIONS)) {
+            if (project.usingMaxDepVersions()) {
                 return null
             }
 
@@ -671,13 +671,6 @@ class AndroidXPlugin : Plugin<Project> {
          * Fail the build if a non-Studio task runs for more than 30 minutes.
          */
         const val TASK_TIMEOUT_MINUTES = 30L
-
-        /**
-         * Setting this property indicates that a build is being performed to check for forward
-         * compatibility.
-         */
-        // TODO(alanv): This property should be prefixed with `androidx.`.
-        const val USE_MAX_DEP_VERSIONS = "useMaxDepVersions"
     }
 }
 
@@ -752,7 +745,7 @@ private fun Project.configureJavaCompilationWarnings(androidXExtension: AndroidX
             if (hasProperty(ALL_WARNINGS_AS_ERRORS)) {
                 // If we're running a hypothetical test build confirming that tip-of-tree versions
                 // are compatible, then we're not concerned about warnings
-                if (!hasProperty(AndroidXPlugin.USE_MAX_DEP_VERSIONS)) {
+                if (!project.usingMaxDepVersions()) {
                     task.options.compilerArgs.add("-Werror")
                     task.options.compilerArgs.add("-Xlint:unchecked")
                     if (androidXExtension.failOnDeprecationWarnings) {
@@ -766,7 +759,7 @@ private fun Project.configureJavaCompilationWarnings(androidXExtension: AndroidX
 
 private fun Project.configureJavaCompilationWarnings(task: KotlinCompile) {
     if (hasProperty(ALL_WARNINGS_AS_ERRORS) &&
-        !hasProperty(AndroidXPlugin.USE_MAX_DEP_VERSIONS)
+        !project.usingMaxDepVersions()
     ) {
         task.kotlinOptions.allWarningsAsErrors = true
     }

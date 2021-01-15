@@ -64,6 +64,13 @@ const val ENABLE_DOCUMENTATION = "androidx.enableDocumentation"
 const val SUMMARIZE_STANDARD_ERROR = "androidx.summarizeStderr"
 
 /**
+ * Setting this property indicates that a build is being performed to check for forward
+ * compatibility.
+ */
+// TODO(alanv): This property should be prefixed with `androidx.`.
+const val USE_MAX_DEP_VERSIONS = "useMaxDepVersions"
+
+/**
  * Setting this property enables writing versioned API files
  */
 const val WRITE_VERSIONED_API_FILES = "androidx.writeVersionedApiFiles"
@@ -177,10 +184,21 @@ fun Project.isDocumentationEnabled(): Boolean {
 }
 
 /**
+ * Returns whether the build is for checking forward compatibility across projets
+ */
+fun Project.usingMaxDepVersions(): Boolean {
+    return project.hasProperty(USE_MAX_DEP_VERSIONS)
+}
+
+/**
  * Returns whether the project has coverage enabled.
  */
-fun Project.isCoverageEnabled(): Boolean =
-    (project.findProperty(COVERAGE_ENABLED) as? String)?.toBoolean() ?: false
+fun Project.isCoverageEnabled(): Boolean {
+    if (project.usingMaxDepVersions()) {
+        return false
+    }
+    return (project.findProperty(COVERAGE_ENABLED) as? String)?.toBoolean() ?: false
+}
 
 /**
  * Returns the Studio type for the project's studio task
