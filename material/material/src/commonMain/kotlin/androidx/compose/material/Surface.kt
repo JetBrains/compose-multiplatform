@@ -19,6 +19,7 @@ package androidx.compose.material
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.Modifier
@@ -27,7 +28,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
@@ -99,14 +99,15 @@ fun Surface(
     } else {
         color
     }
-    SurfaceLayout(
+    Box(
         modifier.graphicsLayer(shadowElevation = elevationPx, shape = shape)
             .then(if (border != null) Modifier.border(border, shape) else Modifier)
             .background(
                 color = backgroundColor,
                 shape = shape
             )
-            .clip(shape)
+            .clip(shape),
+        propagateMinConstraints = true
     ) {
         Providers(
             AmbientContentColor provides contentColor,
@@ -126,26 +127,3 @@ fun Surface(
  * @return [Colors.primary] if in light theme, else [Colors.surface]
  */
 val Colors.primarySurface: Color get() = if (isLight) primary else surface
-
-/**
- * A simple layout which just reserves a space for a [Surface].
- * It positions the only child in the left top corner.
- */
-// TODO("Andrey: Should be replaced with some basic layout implementation when we have it")
-@Composable
-private fun SurfaceLayout(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    Layout(content, modifier) { measurables, constraints ->
-        if (measurables.size > 1) {
-            throw IllegalStateException("Surface can have only one direct measurable child!")
-        }
-        val measurable = measurables.firstOrNull()
-        if (measurable == null) {
-            layout(constraints.minWidth, constraints.minHeight) {}
-        } else {
-            val placeable = measurable.measure(constraints)
-            layout(placeable.width, placeable.height) {
-                placeable.place(0, 0)
-            }
-        }
-    }
-}
