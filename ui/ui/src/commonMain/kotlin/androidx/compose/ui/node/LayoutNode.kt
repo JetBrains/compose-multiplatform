@@ -60,7 +60,6 @@ import androidx.compose.ui.semantics.SemanticsWrapper
 import androidx.compose.ui.semantics.outerSemantics
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.util.deleteAt
 import kotlin.math.roundToInt
@@ -642,7 +641,6 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
             }
             val addedCallback = hasNewPositioningCallback()
             onPositionedCallbacks.clear()
-            onRemeasuredCallbacks.clear()
 
             // Create a new chain of LayoutNodeWrappers, reusing existing ones from wrappers
             // when possible.
@@ -650,9 +648,6 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
                 var wrapper = toWrap
                 if (mod is OnGloballyPositionedModifier) {
                     onPositionedCallbacks += mod
-                }
-                if (mod is OnRemeasuredModifier) {
-                    onRemeasuredCallbacks += mod
                 }
                 if (mod is RemeasurementModifier) {
                     mod.onRemeasurementAvailable(this)
@@ -698,6 +693,9 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
                     }
                     if (mod is SemanticsModifier) {
                         wrapper = SemanticsWrapper(wrapper, mod).assignChained(toWrap)
+                    }
+                    if (mod is OnRemeasuredModifier) {
+                        wrapper = RemeasureModifierWrapper(wrapper, mod).assignChained(toWrap)
                     }
                 }
                 wrapper
@@ -768,11 +766,6 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
      * List of all OnPositioned callbacks in the modifier chain.
      */
     private val onPositionedCallbacks = mutableVectorOf<OnGloballyPositionedModifier>()
-
-    /**
-     * List of all OnSizeChangedModifiers in the modifier chain.
-     */
-    private val onRemeasuredCallbacks = mutableVectorOf<OnRemeasuredModifier>()
 
     /**
      * Flag used by [OnPositionedDispatcher] to identify LayoutNodes that have already
@@ -1070,16 +1063,6 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
         innerLayoutNodeWrapper.measureResult = measureResult
         this.providedAlignmentLines.clear()
         this.providedAlignmentLines += measureResult.alignmentLines
-
-        if (onRemeasuredCallbacks.isNotEmpty()) {
-            val invokeRemeasureCallbacks = {
-                val content = innerLayoutNodeWrapper
-                val size = IntSize(content.measuredWidth, content.measuredHeight)
-                onRemeasuredCallbacks.forEach { it.onRemeasured(size) }
-            }
-            owner?.snapshotObserver?.pauseSnapshotReadObservation(invokeRemeasureCallbacks)
-                ?: invokeRemeasureCallbacks.invoke()
-        }
     }
 
     /**

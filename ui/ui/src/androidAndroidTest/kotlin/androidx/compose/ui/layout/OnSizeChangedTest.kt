@@ -92,6 +92,43 @@ class OnSizeChangedTest {
     }
 
     @Test
+    @SmallTest
+    fun internalSizeChange() {
+        var latch = CountDownLatch(1)
+        var changedSize = IntSize.Zero
+        var sizePx by mutableStateOf(10)
+
+        rule.runOnUiThread {
+            activity.setContent {
+                with(AmbientDensity.current) {
+                    Box(
+                        Modifier.padding(10.toDp())
+                            .onSizeChanged {
+                                changedSize = it
+                                latch.countDown()
+                            }.padding(sizePx.toDp())
+                    ) {
+                        Box(Modifier.size(10.toDp()))
+                    }
+                }
+            }
+        }
+
+        // Initial setting will call onSizeChanged
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+        assertEquals(30, changedSize.height)
+        assertEquals(30, changedSize.width)
+
+        latch = CountDownLatch(1)
+        sizePx = 20
+
+        // We've changed the size of the contents, so we should receive a onSizeChanged call
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+        assertEquals(50, changedSize.height)
+        assertEquals(50, changedSize.width)
+    }
+
+    @Test
     fun onlyInnerSizeChange() {
         var latch = CountDownLatch(1)
         var changedSize = IntSize.Zero

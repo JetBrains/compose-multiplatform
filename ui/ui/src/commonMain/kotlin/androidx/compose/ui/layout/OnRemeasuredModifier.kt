@@ -23,14 +23,17 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.unit.IntSize
 
 /**
- * Invoke [onSizeChanged] with the size of the content after it has been measured.
- * This will only be invoked either the first time measurement happens or when the content
+ * Invoke [onSizeChanged] when the size of the modifier immediately after it has changed. If
+ * there is no modifier following [onSizeChanged], the content size of the layout is reported.
+ *
+ * [onSizeChanged] will only be invoked during the first time measurement or when the
  * size has changed.
  *
- * Use [Layout] or [SubcomposeLayout] to have the size of one component to affect the size
+ * Use [Layout] or [SubcomposeLayout] to have the size of one component affect the size
  * of another component. Using the size received from the [onSizeChanged] callback in a
  * [MutableState] to affect layout will cause the new value to be recomposed and read only in the
- * following frame, causing a one frame lag.
+ * following frame, causing a one frame lag. You can use [onSizeChanged] to affect
+ * drawing operations.
  *
  * Example usage:
  * @sample androidx.compose.ui.samples.OnSizeChangedSample
