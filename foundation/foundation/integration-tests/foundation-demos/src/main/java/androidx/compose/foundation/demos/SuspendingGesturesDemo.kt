@@ -22,7 +22,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.foundation.gestures.detectMultitouchGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.gestures.forEachGesture
@@ -443,7 +443,7 @@ fun MultitouchGestureDetector() {
     MultitouchArea(
         "Zoom, Pan, and Rotate"
     ) {
-        detectMultitouchGestures(
+        detectTransformGestures(
             panZoomLock = false,
             onGesture = it
         )
@@ -460,7 +460,7 @@ fun MultitouchLockGestureDetector() {
     MultitouchArea(
         "Zoom, Pan, and Rotate Locking to Zoom"
     ) {
-        detectMultitouchGestures(
+        detectTransformGestures(
             panZoomLock = true,
             onGesture = it
         )

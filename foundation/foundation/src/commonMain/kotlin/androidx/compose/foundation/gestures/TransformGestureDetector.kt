@@ -45,9 +45,9 @@ import kotlin.math.atan2
  * gestures are detected.
  *
  * Example Usage:
- * @sample androidx.compose.foundation.samples.DetectMultitouchGestures
+ * @sample androidx.compose.foundation.samples.DetectTransformGestures
  */
-suspend fun PointerInputScope.detectMultitouchGestures(
+suspend fun PointerInputScope.detectTransformGestures(
     panZoomLock: Boolean = false,
     onGesture: (centroid: Offset, pan: Offset, zoom: Float, rotation: Float) -> Unit
 ) {

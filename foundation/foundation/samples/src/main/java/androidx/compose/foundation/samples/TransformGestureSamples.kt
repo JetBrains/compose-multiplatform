@@ -23,7 +23,7 @@ import androidx.compose.foundation.gestures.calculateCentroidSize
 import androidx.compose.foundation.gestures.calculatePan
 import androidx.compose.foundation.gestures.calculateRotation
 import androidx.compose.foundation.gestures.calculateZoom
-import androidx.compose.foundation.gestures.detectMultitouchGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Box
@@ -45,7 +45,7 @@ import kotlin.math.roundToInt
 
 @Composable
 @Sampled
-fun DetectMultitouchGestures() {
+fun DetectTransformGestures() {
     var angle by remember { mutableStateOf(0f) }
     var zoom by remember { mutableStateOf(1f) }
     var offsetX by remember { mutableStateOf(0f) }
@@ -59,7 +59,7 @@ fun DetectMultitouchGestures() {
             )
             .background(Color.Blue)
             .pointerInput {
-                detectMultitouchGestures(
+                detectTransformGestures(
                     onGesture = { _, pan, gestureZoom, gestureRotate ->
                         angle += gestureRotate
                         zoom *= gestureZoom
