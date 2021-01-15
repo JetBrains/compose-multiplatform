@@ -22,11 +22,11 @@ import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionReference
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.RememberObserver
-import androidx.compose.runtime.compositionReference
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.emit
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCompositionReference
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.materialize
 import androidx.compose.ui.node.LayoutEmitHelper
@@ -64,7 +64,7 @@ fun SubcomposeLayout(
     measureBlock: SubcomposeMeasureScope.(Constraints) -> MeasureResult
 ) {
     val state = remember { SubcomposeLayoutState() }
-    state.compositionRef = compositionReference()
+    state.compositionRef = rememberCompositionReference()
 
     val materialized = currentComposer.materialize(modifier)
     val density = AmbientDensity.current

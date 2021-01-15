@@ -22,10 +22,11 @@ import androidx.compose.runtime.Composition
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.Recomposer
+import androidx.compose.runtime.RecomposeScope
 import androidx.compose.runtime.compositionFor
 import androidx.compose.runtime.currentComposer
+import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.dispatch.MonotonicFrameClock
-import androidx.compose.runtime.invalidate
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.withRunningRecomposer
 import kotlinx.coroutines.channels.Channel
@@ -110,10 +111,10 @@ class ComposedModifierTest {
         // Manually invalidate the composition of the modifier instead of using mutableStateOf
         // Snapshot-based recomposition requires explicit snapshot commits/global write observers.
         var value = 0
-        lateinit var invalidator: () -> Unit
+        lateinit var scope: RecomposeScope
 
         val sourceMod = Modifier.composed {
-            invalidator = invalidate
+            scope = currentRecomposeScope
             testTag("changing", value)
         }
 
@@ -132,7 +133,7 @@ class ComposedModifierTest {
                 )
 
                 value = 5
-                invalidator()
+                scope.invalidate()
                 frameClock.frame(0L)
 
                 assertEquals(
@@ -146,9 +147,9 @@ class ComposedModifierTest {
 
     @Test
     fun rememberComposedModifier() = runBlocking {
-        lateinit var invalidator: () -> Unit
+        lateinit var scope: RecomposeScope
         val sourceMod = Modifier.composed {
-            invalidator = invalidate
+            scope = currentRecomposeScope
             val state = remember { Any() }
             testTag("remembered", state)
         }
@@ -168,7 +169,7 @@ class ComposedModifierTest {
                 assertTrue("one item added for initial composition", results.size == 1)
                 assertNotNull("remembered object not null", results[0])
 
-                invalidator()
+                scope.invalidate()
                 frameClock.frame(0)
 
                 assertEquals("two items added after recomposition", 2, results.size)

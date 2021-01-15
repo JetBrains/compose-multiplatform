@@ -22,7 +22,7 @@ import androidx.compose.runtime.ComposeCompilerApi
 import androidx.compose.runtime.Composer
 import androidx.compose.runtime.EMPTY
 import androidx.compose.runtime.InternalComposeApi
-import androidx.compose.runtime.RecomposeScope
+import androidx.compose.runtime.RecomposeScopeImpl
 import androidx.compose.runtime.Stable
 
 private const val SLOTS_PER_INT = 10
@@ -78,8 +78,8 @@ class ComposableLambda<
     Function21<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18,
         Composer<*>, Int, Int, R> {
     private var _block: Any? = null
-    private var scope: RecomposeScope? = null
-    private var scopes: MutableList<RecomposeScope>? = null
+    private var scope: RecomposeScopeImpl? = null
+    private var scopes: MutableList<RecomposeScopeImpl>? = null
 
     private fun trackWrite() {
         if (tracked) {
@@ -111,7 +111,7 @@ class ComposableLambda<
                 } else {
                     val lastScopes = scopes
                     if (lastScopes == null) {
-                        val newScopes = mutableListOf<RecomposeScope>()
+                        val newScopes = mutableListOf<RecomposeScopeImpl>()
                         scopes = newScopes
                         newScopes.add(scope)
                     } else {
@@ -1174,7 +1174,7 @@ class ComposableLambda<
     }
 }
 
-private fun RecomposeScope?.replacableWith(other: RecomposeScope) =
+private fun RecomposeScopeImpl?.replacableWith(other: RecomposeScopeImpl) =
     this == null || !this.valid || this == other || this.anchor == other.anchor
 
 @OptIn(ComposeCompilerApi::class)

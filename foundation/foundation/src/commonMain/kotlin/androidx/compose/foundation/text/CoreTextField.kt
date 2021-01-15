@@ -23,9 +23,9 @@ import androidx.compose.foundation.focusable
 import androidx.compose.foundation.text.selection.TextFieldSelectionHandle
 import androidx.compose.foundation.text.selection.TextFieldSelectionManager
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.invalidate
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.remember
@@ -153,7 +153,7 @@ fun CoreTextField(
 ) {
     // If developer doesn't pass new value to TextField, recompose won't happen but internal state
     // and IME may think it is updated. To fix this inconsistent state, enforce recompose.
-    val recompose = invalidate
+    val scope = currentRecomposeScope
     val focusRequester = FocusRequester()
 
     // Ambients
@@ -197,7 +197,7 @@ fun CoreTextField(
 
     val onValueChangeWrapper: (TextFieldValue) -> Unit = {
         state.onValueChange(it)
-        recompose()
+        scope.invalidate()
     }
     val onImeActionPerformedWrapper: (ImeAction) -> Unit = {
         state.onImeActionPerformed(it)

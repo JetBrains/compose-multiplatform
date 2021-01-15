@@ -17,12 +17,12 @@
 package androidx.compose.ui.graphics.vector
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.compositionReference
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCompositionReference
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
@@ -220,7 +220,7 @@ class VectorPainter internal constructor() : Painter() {
         }
         val composition = composeVector(
             vector,
-            compositionReference(),
+            rememberCompositionReference(),
             content
         )
 

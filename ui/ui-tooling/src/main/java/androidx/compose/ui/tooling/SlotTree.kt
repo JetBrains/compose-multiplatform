@@ -519,7 +519,7 @@ private const val internalFieldPrefix = parameterPrefix + parameterPrefix
 private const val defaultFieldName = "${internalFieldPrefix}default"
 private const val changedFieldName = "${internalFieldPrefix}changed"
 private const val jacocoDataField = "${parameterPrefix}jacoco"
-private const val recomposeScopeNameSuffix = ".RecomposeScope"
+private const val recomposeScopeNameSuffix = ".RecomposeScopeImpl"
 
 private fun extractParameterInfo(
     data: List<Any?>,

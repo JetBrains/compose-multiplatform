@@ -31,11 +31,11 @@ import androidx.compose.runtime.CompositionReference
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.compositionReference
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCompositionReference
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -95,7 +95,7 @@ internal actual fun ActualDialog(
 ) {
     val view = AmbientView.current
     val density = AmbientDensity.current
-    val composition = compositionReference()
+    val composition = rememberCompositionReference()
     val currentContent by rememberUpdatedState(content)
     val dialog = remember(view, density) {
         DialogWrapper(view, density).apply {
