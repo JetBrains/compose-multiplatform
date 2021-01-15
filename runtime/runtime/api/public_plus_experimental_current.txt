@@ -165,6 +165,7 @@ package androidx.compose.runtime {
   }
 
   public final class CompositionReferenceKt {
+    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.CompositionReference rememberCompositionReference();
   }
 
   public final class DerivedStateKt {
@@ -181,8 +182,8 @@ package androidx.compose.runtime {
   }
 
   public final class EffectsKt {
-    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.CompositionReference compositionReference();
-    method @androidx.compose.runtime.Composable public static kotlin.jvm.functions.Function0<kotlin.Unit> getInvalidate();
+    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.runtime.CompositionReference compositionReference();
+    method @Deprecated @androidx.compose.runtime.Composable public static kotlin.jvm.functions.Function0<kotlin.Unit> getInvalidate();
     method @androidx.compose.runtime.Composable public static void onActive(kotlin.jvm.functions.Function1<? super androidx.compose.runtime.CommitScope,kotlin.Unit> callback);
     method @androidx.compose.runtime.Composable public static inline void onCommit(kotlin.jvm.functions.Function1<? super androidx.compose.runtime.CommitScope,kotlin.Unit> callback);
     method @androidx.compose.runtime.Composable public static <V1> void onCommit(V1? v1, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.CommitScope,kotlin.Unit> callback);
@@ -305,6 +306,14 @@ package androidx.compose.runtime {
     property public final androidx.compose.runtime.Ambient<T> ambient;
     property public final boolean canOverride;
     property public final T! value;
+  }
+
+  public interface RecomposeScope {
+    method public void invalidate();
+  }
+
+  public final class RecomposeScopeImplKt {
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(readonly=true) public static androidx.compose.runtime.RecomposeScope getCurrentRecomposeScope();
   }
 
   public final class Recomposer extends androidx.compose.runtime.CompositionReference {

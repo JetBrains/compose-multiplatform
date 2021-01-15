@@ -570,7 +570,7 @@ class EffectsTests : BaseComposeTest() {
     fun testAmbient2() {
         val MyAmbient = ambientOf<Int> { throw Exception("not set") }
 
-        var requestRecompose: (() -> Unit)? = null
+        var scope: RecomposeScope? = null
         var ambientValue = 1
 
         @Composable fun SimpleComposable2() {
@@ -579,7 +579,7 @@ class EffectsTests : BaseComposeTest() {
         }
 
         @Composable fun SimpleComposable() {
-            requestRecompose = invalidate
+            scope = currentRecomposeScope
             Providers(MyAmbient provides ambientValue++) {
                 SimpleComposable2()
                 Button(id = 123)
@@ -597,7 +597,7 @@ class EffectsTests : BaseComposeTest() {
         }.then {
             firstButton = it.findViewById<Button>(123)
             assertTrue("Expected button to be created", firstButton != null)
-            requestRecompose?.invoke()
+            scope?.invalidate()
         }.then {
             assertEquals(
                 "Expected button to not be recreated",
@@ -611,7 +611,7 @@ class EffectsTests : BaseComposeTest() {
     fun testAmbient_RecomposeScope() {
         val MyAmbient = ambientOf<Int> { throw Exception("not set") }
 
-        var requestRecompose: (() -> Unit)? = null
+        var scope: RecomposeScope? = null
         var componentComposed = false
         var ambientValue = 1
 
@@ -622,7 +622,7 @@ class EffectsTests : BaseComposeTest() {
         }
 
         @Composable fun SimpleComposable() {
-            requestRecompose = invalidate
+            scope = currentRecomposeScope
             Providers(MyAmbient provides ambientValue++) {
                 SimpleComposable2()
                 Button(id = 123)
@@ -642,7 +642,7 @@ class EffectsTests : BaseComposeTest() {
             firstButton = it.findViewById<Button>(123)
             assertTrue("Expected button to be created", firstButton != null)
             componentComposed = false
-            requestRecompose?.invoke()
+            scope?.invalidate()
         }.then {
             assertTrue("Expected component to be composed", componentComposed)
 

@@ -26,9 +26,10 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.RecomposeScope
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.invalidate
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onCommit
@@ -265,7 +266,7 @@ private fun FadeInFadeOutWithScale(
                         if (key != state.current) {
                             // leave only the current in the list
                             state.items.removeAll { it.key == key }
-                            state.invalidate()
+                            state.scope?.invalidate()
                         }
                     }
                 )
@@ -291,7 +292,7 @@ private fun FadeInFadeOutWithScale(
         }
     }
     Box(modifier) {
-        state.invalidate = invalidate
+        state.scope = currentRecomposeScope
         state.items.fastForEach { (item, opacity) ->
             key(item) {
                 opacity {
@@ -306,7 +307,7 @@ private class FadeInFadeOutState<T> {
     // we use Any here as something which will not be equals to the real initial value
     var current: Any? = Any()
     var items = mutableListOf<FadeInFadeOutAnimationItem<T>>()
-    var invalidate: () -> Unit = { }
+    var scope: RecomposeScope? = null
 }
 
 private data class FadeInFadeOutAnimationItem<T>(

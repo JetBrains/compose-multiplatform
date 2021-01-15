@@ -21,7 +21,7 @@ import androidx.compose.desktop.AppWindowAmbient
 import androidx.compose.desktop.WindowEvents
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.compositionReference
+import androidx.compose.runtime.rememberCompositionReference
 import androidx.compose.runtime.onActive
 import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.remember
@@ -78,7 +78,7 @@ internal actual fun ActualDialog(
         return
     }
 
-    val parentComposition = compositionReference()
+    val parentComposition = rememberCompositionReference()
     val dialog = remember {
         AppWindow(
             attached = attached,

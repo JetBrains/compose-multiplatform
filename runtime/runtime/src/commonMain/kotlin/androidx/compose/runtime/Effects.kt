@@ -201,6 +201,10 @@ fun onCommit(vararg inputs: Any?, callback: CommitScope.() -> Unit) {
  * An Effect to get the nearest invalidation lambda to the current point of composition. This can be used to
  * trigger an invalidation on the composition locally to cause a recompose.
  */
+@Deprecated(
+    "Use currentRecomposeScope's invalidate method instead",
+    replaceWith = ReplaceWith("currentRecomposeScope")
+)
 val invalidate: () -> Unit @Composable get() {
     val scope = currentComposer.currentRecomposeScope ?: error("no recompose scope found")
     scope.used = true
@@ -212,6 +216,10 @@ val invalidate: () -> Unit @Composable get() {
  * to run a separate composition in the context of the current one, preserving ambients and propagating
  * invalidations. When this call leaves the composition, the reference is invalidated.
  */
+@Deprecated(
+    "Use rememberCompositionReference instead",
+    replaceWith = ReplaceWith("rememberCompositionReference()")
+)
 @Composable
 @OptIn(ComposeCompilerApi::class)
 fun compositionReference(): CompositionReference {
