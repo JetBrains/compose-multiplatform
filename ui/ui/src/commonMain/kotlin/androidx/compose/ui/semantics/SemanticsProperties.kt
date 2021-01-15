@@ -59,6 +59,18 @@ object SemanticsProperties {
         SemanticsPropertyKey<ProgressBarRangeInfo>("ProgressBarRangeInfo")
 
     /**
+     * @see SemanticsPropertyReceiver.paneTitle
+     */
+    val PaneTitle = SemanticsPropertyKey<String>(
+        name = "PaneTitle",
+        mergePolicy = { _, _ ->
+            throw IllegalStateException(
+                "merge function called on unmergeable property PaneTitle."
+            )
+        }
+    )
+
+    /**
      * The node is marked as heading for accessibility.
      *
      * @see SemanticsPropertyReceiver.heading
@@ -454,6 +466,17 @@ var SemanticsPropertyReceiver.stateDescriptionRange by SemanticsProperties.Progr
 fun SemanticsPropertyReceiver.heading() {
     this[SemanticsProperties.Heading] = Unit
 }
+
+/**
+ * Accessibility-friendly title for a screen's pane. For accessibility purposes, a pane is a
+ * visually distinct portion of a window, such as the contents of a open drawer. In order for
+ * accessibility services to understand a pane's window-like behavior, you should give
+ * descriptive titles to your app's panes. Accessibility services can then provide more granular
+ * information to users when a pane's appearance or content changes.
+ *
+ * @see SemanticsProperties.PaneTitle
+ */
+var SemanticsPropertyReceiver.paneTitle by SemanticsProperties.PaneTitle
 
 /**
  * Whether this semantics node is disabled. Note that proper [SemanticsActions] should still

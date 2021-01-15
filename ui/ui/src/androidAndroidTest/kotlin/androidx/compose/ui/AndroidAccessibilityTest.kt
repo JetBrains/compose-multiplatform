@@ -46,6 +46,7 @@ import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompa
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.paneTitle
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.textSelectionRange
 import androidx.compose.ui.test.SemanticsMatcher
@@ -74,6 +75,7 @@ import com.nhaarman.mockitokotlin2.atLeastOnce
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.spy
+import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -97,7 +99,6 @@ import org.mockito.internal.matchers.apachecommons.ReflectionEquals
     ExperimentalComposeApi::class
 )
 class AndroidAccessibilityTest {
-    @Suppress("DEPRECATION")
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>()
 
@@ -110,6 +111,8 @@ class AndroidAccessibilityTest {
     private val argument = ArgumentCaptor.forClass(AccessibilityEvent::class.java)
     private var isTextFieldVisible by mutableStateOf(true)
     private var textFieldSelectionOne = false
+    private var isPaneVisible by mutableStateOf(false)
+    private var paneTestTitle by mutableStateOf(PaneTitleOne)
 
     companion object {
         private const val TimeOutInitialization: Long = 5000
@@ -121,6 +124,9 @@ class AndroidAccessibilityTest {
         private const val ParentForOverlappedChildrenTag = "parentForOverlappedChildren"
         private const val OverlappedChildOneTag = "overlappedChildOne"
         private const val OverlappedChildTwoTag = "overlappedChildTwo"
+        private const val PaneTag = "pane"
+        private const val PaneTitleOne = "pane title one"
+        private const val PaneTitleTwo = "pane title two"
         private const val InputText = "hello"
         private const val InitialText = "h"
     }
@@ -198,6 +204,13 @@ class AndroidAccessibilityTest {
                             onTextLayout = { textLayoutResult = it }
                         )
                     }
+                }
+                if (isPaneVisible) {
+                    Box(
+                        Modifier
+                            .testTag(PaneTag)
+                            .semantics { paneTitle = paneTestTitle }
+                    ) {}
                 }
             }
             androidComposeView = container.getChildAt(0) as AndroidComposeView
@@ -290,9 +303,7 @@ class AndroidAccessibilityTest {
             .assertIsDisplayed()
             .assertIsOn()
 
-        rule.mainClock.advanceTimeBy(TimeOutInitialization)
-        rule.waitForIdle()
-
+        waitForSubtreeEventToSend()
         val toggleableNode = rule.onNodeWithTag(ToggleableTag)
             .fetchSemanticsNode("couldn't find node with tag $ToggleableTag")
         rule.runOnUiThread {
@@ -334,9 +345,7 @@ class AndroidAccessibilityTest {
             .assertIsDisplayed()
             .assertIsOn()
 
-        rule.mainClock.advanceTimeBy(TimeOutInitialization)
-        rule.waitForIdle()
-
+        waitForSubtreeEventToSend()
         val toggleableNode = rule.onNodeWithTag(DisabledToggleableTag)
             .fetchSemanticsNode("couldn't find node with tag $DisabledToggleableTag")
         rule.runOnUiThread {
@@ -381,8 +390,7 @@ class AndroidAccessibilityTest {
             .assertIsDisplayed()
             .assertIsOn()
 
-        rule.mainClock.advanceTimeBy(TimeOutInitialization)
-        rule.waitForIdle()
+        waitForSubtreeEventToSend()
         rule.onNodeWithTag(ToggleableTag)
             .performClick()
             .assertIsOff()
@@ -411,8 +419,7 @@ class AndroidAccessibilityTest {
             .assertIsDisplayed()
             .assertTextEquals(InitialText)
 
-        rule.mainClock.advanceTimeBy(TimeOutInitialization)
-        rule.waitForIdle()
+        waitForSubtreeEventToSend()
         rule.onNodeWithTag(TextFieldTag)
             .performSemanticsAction(SemanticsActions.SetText) { it(AnnotatedString(InputText)) }
         rule.onNodeWithTag(TextFieldTag)
@@ -496,9 +503,7 @@ class AndroidAccessibilityTest {
             .assertIsDisplayed()
             .fetchSemanticsNode("couldn't find node with tag $TextFieldTag")
 
-        rule.mainClock.advanceTimeBy(TimeOutInitialization)
-        rule.waitForIdle()
-
+        waitForSubtreeEventToSend()
         val args = Bundle()
         args.putInt(
             AccessibilityNodeInfoCompat.ACTION_ARGUMENT_MOVEMENT_GRANULARITY_INT,
@@ -684,6 +689,103 @@ class AndroidAccessibilityTest {
         assertNull(provider.createAccessibilityNodeInfo(overlappedChildTwoNode.id))
     }
 
+    @Test
+    fun testPaneAppear() {
+        rule.onNodeWithTag(PaneTag).assertDoesNotExist()
+        isPaneVisible = true
+        rule.onNodeWithTag(PaneTag)
+            .assert(
+                SemanticsMatcher.expectValue(
+                    SemanticsProperties.PaneTitle,
+                    PaneTitleOne
+                )
+            )
+            .assertIsDisplayed()
+        waitForSubtreeEventToSend()
+        val paneNode = rule.onNodeWithTag(PaneTag).fetchSemanticsNode()
+        rule.runOnIdle {
+            verify(container, times(1)).requestSendAccessibilityEvent(
+                eq(androidComposeView),
+                argThat(
+                    ArgumentMatcher {
+                        getAccessibilityEventSourceSemanticsNodeId(it) == paneNode.id &&
+                            it.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED &&
+                            it.contentChangeTypes ==
+                            AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_APPEARED
+                    }
+                )
+            )
+        }
+    }
+
+    @Test
+    fun testPaneTitleChange() {
+        rule.onNodeWithTag(PaneTag).assertDoesNotExist()
+        isPaneVisible = true
+        rule.onNodeWithTag(PaneTag)
+            .assert(
+                SemanticsMatcher.expectValue(
+                    SemanticsProperties.PaneTitle,
+                    PaneTitleOne
+                )
+            )
+            .assertIsDisplayed()
+        waitForSubtreeEventToSend()
+        val paneNode = rule.onNodeWithTag(PaneTag).fetchSemanticsNode()
+        paneTestTitle = PaneTitleTwo
+        rule.onNodeWithTag(PaneTag)
+            .assert(
+                SemanticsMatcher.expectValue(
+                    SemanticsProperties.PaneTitle,
+                    PaneTitleTwo
+                )
+            )
+        rule.runOnIdle {
+            verify(container, times(1)).requestSendAccessibilityEvent(
+                eq(androidComposeView),
+                argThat(
+                    ArgumentMatcher {
+                        getAccessibilityEventSourceSemanticsNodeId(it) == paneNode.id &&
+                            it.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED &&
+                            it.contentChangeTypes ==
+                            AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_TITLE
+                    }
+                )
+            )
+        }
+    }
+
+    @Test
+    fun testPaneDisappear() {
+        rule.onNodeWithTag(PaneTag).assertDoesNotExist()
+        isPaneVisible = true
+        rule.onNodeWithTag(PaneTag)
+            .assert(
+                SemanticsMatcher.expectValue(
+                    SemanticsProperties.PaneTitle,
+                    PaneTitleOne
+                )
+            )
+            .assertIsDisplayed()
+        waitForSubtreeEventToSend()
+        val paneNode = rule.onNodeWithTag(PaneTag).fetchSemanticsNode()
+        isPaneVisible = false
+        rule.onNodeWithTag(PaneTag).assertDoesNotExist()
+        rule.runOnIdle {
+            verify(container, times(1)).requestSendAccessibilityEvent(
+                eq(androidComposeView),
+                argThat(
+                    ArgumentMatcher {
+                        getAccessibilityEventSourceSemanticsNodeId(it) == paneNode.id &&
+                            it.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED &&
+                            it.contentChangeTypes ==
+                            AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED
+                    }
+                )
+            )
+        }
+    }
+
     private fun eventIndex(list: List<AccessibilityEvent>, event: AccessibilityEvent): Int {
         for (i in list.indices) {
             if (ReflectionEquals(list[i], null).matches(event)) {
@@ -708,5 +810,12 @@ class AndroidAccessibilityTest {
         // TODO(aelias): Make this wait after the 100ms delay to check the second batch is also correct
         rule.waitForIdle()
         verify()
+    }
+
+    private fun waitForSubtreeEventToSend() {
+        // When the subtree events are sent, we will also update our previousSemanticsNodes,
+        // which will affect our next accessibility events from semantics tree comparison.
+        rule.mainClock.advanceTimeBy(TimeOutInitialization)
+        rule.waitForIdle()
     }
 }
