@@ -30,7 +30,7 @@ import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.center
 import androidx.compose.ui.test.down
 import androidx.compose.ui.test.isToggleable
-import androidx.compose.ui.test.junit4.createComposeRuleLegacy
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.move
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performGesture
@@ -49,9 +49,8 @@ import org.junit.runner.RunWith
 @OptIn(ExperimentalTestApi::class)
 class CheckboxScreenshotTest {
 
-    @Suppress("DEPRECATION")
     @get:Rule
-    val rule = createComposeRuleLegacy()
+    val rule = createComposeRule()
 
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL)
@@ -145,7 +144,6 @@ class CheckboxScreenshotTest {
     }
 
     @Test
-    @Suppress("DEPRECATION") // Due to clockTestRule
     fun checkBoxTest_unchecked_animateToChecked() {
         rule.setMaterialContent {
             val isChecked = remember { mutableStateOf(false) }
@@ -158,22 +156,21 @@ class CheckboxScreenshotTest {
             }
         }
 
-        rule.clockTestRule.pauseClock()
+        rule.mainClock.autoAdvance = false
 
         rule.onNode(isToggleable())
             // split click into (down) and (move, up) to enforce a composition in between
             .performGesture { down(center) }
             .performGesture { move(); up() }
 
-        rule.waitForIdle()
-
-        rule.clockTestRule.advanceClock(60)
+        rule.mainClock.advanceTimeByFrame()
+        rule.waitForIdle() // Wait for measure
+        rule.mainClock.advanceTimeBy(milliseconds = 80)
 
         assertToggeableAgainstGolden("checkbox_animateToChecked")
     }
 
     @Test
-    @Suppress("DEPRECATION") // Due to clockTestRule
     fun checkBoxTest_checked_animateToUnchecked() {
         rule.setMaterialContent {
             val isChecked = remember { mutableStateOf(true) }
@@ -186,16 +183,16 @@ class CheckboxScreenshotTest {
             }
         }
 
-        rule.clockTestRule.pauseClock()
+        rule.mainClock.autoAdvance = false
 
         rule.onNode(isToggleable())
             // split click into (down) and (move, up) to enforce a composition in between
             .performGesture { down(center) }
             .performGesture { move(); up() }
 
-        rule.waitForIdle()
-
-        rule.clockTestRule.advanceClock(60)
+        rule.mainClock.advanceTimeByFrame()
+        rule.waitForIdle() // Wait for measure
+        rule.mainClock.advanceTimeBy(milliseconds = 80)
 
         assertToggeableAgainstGolden("checkbox_animateToUnchecked")
     }

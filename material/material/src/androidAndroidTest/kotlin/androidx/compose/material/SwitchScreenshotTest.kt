@@ -34,7 +34,7 @@ import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.center
 import androidx.compose.ui.test.down
 import androidx.compose.ui.test.isToggleable
-import androidx.compose.ui.test.junit4.createComposeRuleLegacy
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.move
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performGesture
@@ -55,9 +55,8 @@ import org.junit.runner.RunWith
 @OptIn(ExperimentalTestApi::class)
 class SwitchScreenshotTest {
 
-    @Suppress("DEPRECATION")
     @get:Rule
-    val rule = createComposeRuleLegacy()
+    val rule = createComposeRule()
 
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL)
@@ -173,7 +172,6 @@ class SwitchScreenshotTest {
     }
 
     @Test
-    @Suppress("DEPRECATION") // Due to clockTestRule
     fun switchTest_unchecked_animateToChecked() {
         rule.setMaterialContent {
             val isChecked = remember { mutableStateOf(false) }
@@ -185,7 +183,7 @@ class SwitchScreenshotTest {
             }
         }
 
-        rule.clockTestRule.pauseClock()
+        rule.mainClock.autoAdvance = false
 
         rule.onNode(isToggleable())
             // split click into (down) and (move, up) to enforce a composition in between
@@ -193,8 +191,7 @@ class SwitchScreenshotTest {
             .performGesture { move(); up() }
 
         rule.waitForIdle()
-
-        rule.clockTestRule.advanceClock(60)
+        rule.mainClock.advanceTimeBy(milliseconds = 96)
 
         assertToggeableAgainstGolden("switch_animateToChecked")
     }
@@ -212,7 +209,7 @@ class SwitchScreenshotTest {
             }
         }
 
-        rule.clockTestRule.pauseClock()
+        rule.mainClock.autoAdvance = false
 
         rule.onNode(isToggleable())
             // split click into (down) and (move, up) to enforce a composition in between
@@ -220,8 +217,7 @@ class SwitchScreenshotTest {
             .performGesture { move(); up() }
 
         rule.waitForIdle()
-
-        rule.clockTestRule.advanceClock(60)
+        rule.mainClock.advanceTimeBy(milliseconds = 96)
 
         assertToggeableAgainstGolden("switch_animateToUnchecked")
     }

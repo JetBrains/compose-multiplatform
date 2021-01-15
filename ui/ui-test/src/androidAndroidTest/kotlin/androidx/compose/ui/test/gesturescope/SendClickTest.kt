@@ -28,7 +28,7 @@ import androidx.compose.ui.test.ActivityWithActionBar
 import androidx.test.filters.MediumTest
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.click
-import androidx.compose.ui.test.junit4.createAndroidComposeRuleLegacy
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.util.ClickableTestBox
@@ -85,9 +85,8 @@ class SendClickTest(private val config: TestConfig) {
         }
     }
 
-    @Suppress("DEPRECATION") // Needed because this test is setting its own content.
     @get:Rule
-    val rule = createAndroidComposeRuleLegacy(config.activityClass)
+    val rule = createAndroidComposeRule(config.activityClass)
 
     private val recordedClicks = mutableListOf<ClickData>()
     private val expectedClickPosition =

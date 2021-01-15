@@ -19,7 +19,7 @@ package androidx.compose.material
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.test.junit4.createComposeRuleLegacy
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -30,7 +30,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -41,9 +40,8 @@ import org.junit.runner.RunWith
 @OptIn(ExperimentalMaterialApi::class)
 class SnackbarHostTest {
 
-    @Suppress("DEPRECATION")
     @get:Rule
-    val rule = createComposeRuleLegacy()
+    val rule = createComposeRule()
 
     @Test
     fun snackbarHost_observePushedData() {
@@ -67,9 +65,8 @@ class SnackbarHostTest {
             hostState.showSnackbar("3")
             Truth.assertThat(resultedInvocation).isEqualTo("123")
         }
-        runBlocking {
-            job.join()
-        }
+
+        rule.waitUntil { job.isCompleted }
     }
 
     @Test
@@ -96,9 +93,8 @@ class SnackbarHostTest {
                 hostState.showSnackbar(it.toString())
             }
         }
-        runBlocking {
-            parent.children.forEach { it.join() }
-        }
+
+        rule.waitUntil { parent.children.all { it.isCompleted } }
         Truth.assertThat(resultedInvocation).isEqualTo("0123456789")
     }
 
@@ -119,9 +115,9 @@ class SnackbarHostTest {
         }
         rule.onNodeWithText("press")
             .performClick()
-        runBlocking {
-            job1.join()
-        }
+
+        rule.waitUntil { job1.isCompleted }
+
         val job2 = scope.launch {
             val result = hostState.showSnackbar(
                 message = "1",
@@ -129,9 +125,8 @@ class SnackbarHostTest {
             )
             Truth.assertThat(result).isEqualTo(SnackbarResult.Dismissed)
         }
-        runBlocking {
-            job2.join()
-        }
+
+        rule.waitUntil(timeoutMillis = 5_000) { job2.isCompleted }
     }
 
     @Test
@@ -155,9 +150,7 @@ class SnackbarHostTest {
             delay(10)
             switchState.value = false
         }
-        runBlocking {
-            job2.join()
-            job1.join()
-        }
+
+        rule.waitUntil { job1.isCompleted && job2.isCompleted }
     }
 }
