@@ -22,11 +22,13 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
+@Suppress("Deprecation")
+
 @RunWith(JUnit4::class)
 class TextUnitTest {
     @Test
     fun construct_sp_from_float() {
-        TextUnit.Sp(5f).also {
+        5f.sp.also {
             assertThat(it.isSp).isTrue()
             assertThat(it.isUnspecified).isFalse()
             assertThat(it.isEm).isFalse()
@@ -37,7 +39,7 @@ class TextUnitTest {
 
     @Test
     fun construct_sp_from_int() {
-        TextUnit.Sp(5).also {
+        5.sp.also {
             assertThat(it.isSp).isTrue()
             assertThat(it.isUnspecified).isFalse()
             assertThat(it.isEm).isFalse()
@@ -48,7 +50,7 @@ class TextUnitTest {
 
     @Test
     fun construct_sp_from_double() {
-        TextUnit.Sp(5.0).also {
+        5.0.sp.also {
             assertThat(it.isSp).isTrue()
             assertThat(it.isUnspecified).isFalse()
             assertThat(it.isEm).isFalse()
@@ -92,7 +94,7 @@ class TextUnitTest {
 
     @Test
     fun construct_em_from_float() {
-        TextUnit.Em(5f).also {
+        5f.em.also {
             assertThat(it.isSp).isFalse()
             assertThat(it.isUnspecified).isFalse()
             assertThat(it.isEm).isTrue()
@@ -103,7 +105,7 @@ class TextUnitTest {
 
     @Test
     fun construct_em_from_int() {
-        TextUnit.Em(5).also {
+        5.em.also {
             assertThat(it.isSp).isFalse()
             assertThat(it.isUnspecified).isFalse()
             assertThat(it.isEm).isTrue()
@@ -114,7 +116,7 @@ class TextUnitTest {
 
     @Test
     fun construct_em_from_double() {
-        TextUnit.Em(5.0).also {
+        5.0.em.also {
             assertThat(it.isSp).isFalse()
             assertThat(it.isUnspecified).isFalse()
             assertThat(it.isEm).isTrue()

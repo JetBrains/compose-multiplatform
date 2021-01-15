@@ -617,12 +617,12 @@ class ParameterFactoryTest {
         assertThat(lookup(TextUnit.Unspecified)).isEqualTo(ParameterType.String to "Unspecified")
         assertThat(lookup(12.0.sp)).isEqualTo(ParameterType.DimensionSp to 12.0f)
         assertThat(lookup(2.0.em)).isEqualTo(ParameterType.DimensionEm to 2.0f)
-        assertThat(lookup(TextUnit.Sp(9.0f))).isEqualTo(ParameterType.DimensionSp to 9.0f)
-        assertThat(lookup(TextUnit.Sp(10))).isEqualTo(ParameterType.DimensionSp to 10.0f)
-        assertThat(lookup(TextUnit.Sp(26.0))).isEqualTo(ParameterType.DimensionSp to 26.0f)
-        assertThat(lookup(TextUnit.Em(2.0f))).isEqualTo(ParameterType.DimensionEm to 2.0f)
-        assertThat(lookup(TextUnit.Em(1))).isEqualTo(ParameterType.DimensionEm to 1.0f)
-        assertThat(lookup(TextUnit.Em(3.0))).isEqualTo(ParameterType.DimensionEm to 3.0f)
+        assertThat(lookup(9.0f.sp)).isEqualTo(ParameterType.DimensionSp to 9.0f)
+        assertThat(lookup(10.sp)).isEqualTo(ParameterType.DimensionSp to 10.0f)
+        assertThat(lookup(26.0.sp)).isEqualTo(ParameterType.DimensionSp to 26.0f)
+        assertThat(lookup(2.0f.em)).isEqualTo(ParameterType.DimensionEm to 2.0f)
+        assertThat(lookup(1.em)).isEqualTo(ParameterType.DimensionEm to 1.0f)
+        assertThat(lookup(3.0.em)).isEqualTo(ParameterType.DimensionEm to 3.0f)
     }
 
     @Test
