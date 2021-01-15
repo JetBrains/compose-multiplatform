@@ -34,8 +34,6 @@ import androidx.compose.ui.platform.TextToolbarStatus
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.InternalTextApi
-import androidx.compose.ui.text.length
-import androidx.compose.ui.text.subSequence
 import kotlin.math.max
 import kotlin.math.min
 

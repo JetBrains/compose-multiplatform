@@ -492,4 +492,10 @@ class AnnotatedStringTest {
             )
         )
     }
+
+    @Test
+    fun toString_returns_the_plain_string() {
+        val text = "abc"
+        assertThat(AnnotatedString(text).toString()).isEqualTo(text)
+    }
 }

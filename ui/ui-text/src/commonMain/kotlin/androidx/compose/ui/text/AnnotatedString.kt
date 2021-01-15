@@ -48,10 +48,10 @@ typealias StringAnnotation = Range<String>
 @Immutable
 class AnnotatedString internal constructor(
     val text: String,
-    val spanStyles: List<SpanStyleRange> = listOf(),
-    val paragraphStyles: List<ParagraphStyleRange> = listOf(),
-    internal val annotations: List<Range<out Any>> = listOf()
-) {
+    val spanStyles: List<SpanStyleRange> = emptyList(),
+    val paragraphStyles: List<ParagraphStyleRange> = emptyList(),
+    internal val annotations: List<Range<out Any>> = emptyList()
+) : CharSequence {
     /**
      * The basic data structure of text with multiple styles. To construct an [AnnotatedString]
      * you can use [Builder].
@@ -88,6 +88,43 @@ class AnnotatedString internal constructor(
             }
             lastStyleEnd = paragraphStyle.end
         }
+    }
+
+    override val length: Int
+        get() = text.length
+
+    override operator fun get(index: Int): Char = text[index]
+
+    /**
+     * Return a substring for the AnnotatedString and include the styles in the range of [startIndex]
+     * (inclusive) and [endIndex] (exclusive).
+     *
+     * @param startIndex the inclusive start offset of the range
+     * @param endIndex the exclusive end offset of the range
+     */
+    override fun subSequence(startIndex: Int, endIndex: Int): AnnotatedString {
+        require(startIndex <= endIndex) {
+            "start ($startIndex) should be less or equal to end ($endIndex)"
+        }
+        if (startIndex == 0 && endIndex == text.length) return this
+        val text = text.substring(startIndex, endIndex)
+        return AnnotatedString(
+            text = text,
+            spanStyles = filterRanges(spanStyles, startIndex, endIndex),
+            paragraphStyles = filterRanges(paragraphStyles, startIndex, endIndex),
+            annotations = filterRanges(annotations, startIndex, endIndex)
+        )
+    }
+
+    /**
+     * Return a substring for the AnnotatedString and include the styles in the given [range].
+     *
+     * @param range the text range
+     *
+     * @see subSequence(start: Int, end: Int)
+     */
+    fun subSequence(range: TextRange): AnnotatedString {
+        return subSequence(range.min, range.max)
     }
 
     @Stable
@@ -148,7 +185,7 @@ class AnnotatedString internal constructor(
             it.item is TtsAnnotation && intersect(start, end, it.start, it.end)
         } as List<Range<TtsAnnotation>>
 
-    override operator fun equals(other: Any?): Boolean {
+    override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is AnnotatedString) return false
         if (text != other.text) return false
@@ -241,8 +278,6 @@ class AnnotatedString internal constructor(
          * Returns the length of the [String].
          */
         val length: Int get() = text.length
-
-        override fun toString(): String = text.toString()
 
         /**
          * Appends the given [String] to this [Builder].
@@ -639,11 +674,6 @@ internal expect fun AnnotatedString.transform(
 ): AnnotatedString
 
 /**
- * Returns the length of the [AnnotatedString].
- */
-val AnnotatedString.length: Int get() = text.length
-
-/**
  * Pushes [style] to the [AnnotatedString.Builder], executes [block] and then pops the [style].
  *
  * @sample androidx.compose.ui.text.samples.AnnotatedStringBuilderWithStyleSample
@@ -710,25 +740,6 @@ private fun <T> filterRanges(ranges: List<Range<out T>>, start: Int, end: Int): 
             tag = it.tag
         )
     }
-}
-
-/**
- * Return a substring for the AnnotatedString and include the styles in the range of [start]
- * (inclusive) and [end] (exclusive).
- *
- * @param start the inclusive start offset of the range
- * @param end the exclusive end offset of the range
- */
-fun AnnotatedString.subSequence(start: Int, end: Int): AnnotatedString {
-    require(start <= end) { "start ($start) should be less or equal to end ($end)" }
-    if (start == 0 && end == text.length) return this
-    val text = text.substring(start, end)
-    return AnnotatedString(
-        text = text,
-        spanStyles = filterRanges(spanStyles, start, end),
-        paragraphStyles = filterRanges(paragraphStyles, start, end),
-        annotations = filterRanges(annotations, start, end)
-    )
 }
 
 /**
