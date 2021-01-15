@@ -442,23 +442,11 @@ package androidx.compose.ui.focus {
 package androidx.compose.ui.gesture {
 
   public final class ConstantsKt {
-    method public static long getDoubleTapMinTime();
-    method public static float getDoubleTapSlop();
-    method public static long getDoubleTapTimeout();
-    method public static float getDoubleTapTouchSlop();
-    method public static float getHoverTapSlop();
-    method public static long getHoverTapTimeout();
-    method public static long getJumpTapTimeout();
-    method public static long getLongPressTimeout();
-    method public static float getMaxFlingVelocity();
-    method public static float getMinFlingVelocity();
-    method public static float getPagingTouchSlop();
-    method public static float getPanSlop();
-    method public static long getPressTimeout();
     method public static float getScaleSlop();
     method public static float getTouchSlop();
-    method public static float getWindowTouchSlop();
-    method public static long getZoomControlsTimeout();
+    field public static final long DoubleTapTimeoutMillis = 300L; // 0x12cL
+    field public static final long LongPressTimeoutMillis = 500L; // 0x1f4L
+    field public static final long PressTimeoutMillis = 100L; // 0x64L
   }
 
   public enum Direction {
@@ -648,7 +636,7 @@ package androidx.compose.ui.gesture.util {
 
   public final class VelocityTracker {
     ctor public VelocityTracker();
-    method public void addPosition-cJzGd7g(long uptime, long position);
+    method public void addPosition-OX7LsLU(long timeMillis, long position);
     method public long calculateVelocity-9UxMQ8M();
     method public void resetTracking();
   }
@@ -1629,25 +1617,25 @@ package androidx.compose.ui.input.pointer {
   }
 
   @androidx.compose.runtime.Immutable public final class PointerInputChange {
-    method public androidx.compose.ui.input.pointer.PointerInputChange copy-5jpCamc(optional long id, optional long currentTime, optional long currentPosition, optional boolean currentPressed, optional long previousTime, optional long previousPosition, optional boolean previousPressed, optional androidx.compose.ui.input.pointer.ConsumedData consumed, optional androidx.compose.ui.input.pointer.PointerType type);
+    method public androidx.compose.ui.input.pointer.PointerInputChange copy-aJ2ieLA(optional long id, optional long currentTime, optional long currentPosition, optional boolean currentPressed, optional long previousTime, optional long previousPosition, optional boolean previousPressed, optional androidx.compose.ui.input.pointer.ConsumedData consumed, optional androidx.compose.ui.input.pointer.PointerType type);
     method public androidx.compose.ui.input.pointer.ConsumedData getConsumed();
     method public long getId-J3iCeTQ();
     method public long getPosition-F1C5BW0();
     method public boolean getPressed();
     method public long getPreviousPosition-F1C5BW0();
     method public boolean getPreviousPressed();
-    method public long getPreviousTime-CLVl0cY();
-    method public long getTime-CLVl0cY();
+    method public long getPreviousUptimeMillis();
     method public androidx.compose.ui.input.pointer.PointerType getType();
+    method public long getUptimeMillis();
     property public final androidx.compose.ui.input.pointer.ConsumedData consumed;
     property public final long id;
     property public final long position;
     property public final boolean pressed;
     property public final long previousPosition;
     property public final boolean previousPressed;
-    property public final long previousTime;
-    property public final long time;
+    property public final long previousUptimeMillis;
     property public final androidx.compose.ui.input.pointer.PointerType type;
+    property public final long uptimeMillis;
   }
 
   public final class PointerInputEventProcessorKt {
@@ -2314,13 +2302,13 @@ package androidx.compose.ui.platform {
 
   public final class AndroidViewConfiguration implements androidx.compose.ui.platform.ViewConfiguration {
     ctor public AndroidViewConfiguration(android.view.ViewConfiguration viewConfiguration);
-    method public long getDoubleTapMinTime-ojFfpTE();
-    method public long getDoubleTapTimeout-ojFfpTE();
-    method public long getLongPressTimeout-ojFfpTE();
+    method public long getDoubleTapMinTimeMillis();
+    method public long getDoubleTapTimeoutMillis();
+    method public long getLongPressTimeoutMillis();
     method public float getTouchSlop();
-    property public long doubleTapMinTime;
-    property public long doubleTapTimeout;
-    property public long longPressTimeout;
+    property public long doubleTapMinTimeMillis;
+    property public long doubleTapTimeoutMillis;
+    property public long longPressTimeoutMillis;
     property public float touchSlop;
   }
 
@@ -2454,13 +2442,13 @@ package androidx.compose.ui.platform {
   }
 
   public interface ViewConfiguration {
-    method public long getDoubleTapMinTime-ojFfpTE();
-    method public long getDoubleTapTimeout-ojFfpTE();
-    method public long getLongPressTimeout-ojFfpTE();
+    method public long getDoubleTapMinTimeMillis();
+    method public long getDoubleTapTimeoutMillis();
+    method public long getLongPressTimeoutMillis();
     method public float getTouchSlop();
-    property public abstract long doubleTapMinTime;
-    property public abstract long doubleTapTimeout;
-    property public abstract long longPressTimeout;
+    property public abstract long doubleTapMinTimeMillis;
+    property public abstract long doubleTapTimeoutMillis;
+    property public abstract long longPressTimeoutMillis;
     property public abstract float touchSlop;
   }
 

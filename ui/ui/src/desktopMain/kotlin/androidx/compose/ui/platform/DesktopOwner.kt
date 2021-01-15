@@ -55,7 +55,6 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.Uptime
 
 @OptIn(
     ExperimentalComposeUiApi::class,
@@ -212,7 +211,7 @@ class DesktopOwner(
         pointerInputEventProcessor.process(event)
     }
 
-    fun processPointerInput(time: Uptime, pointers: List<TestPointerInputEventData>) {
+    fun processPointerInput(time: Long, pointers: List<TestPointerInputEventData>) {
         processPointerInput(
             PointerInputEvent(
                 time,

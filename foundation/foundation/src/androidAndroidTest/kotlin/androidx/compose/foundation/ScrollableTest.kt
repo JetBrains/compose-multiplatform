@@ -56,7 +56,6 @@ import androidx.compose.ui.test.swipeWithVelocity
 import androidx.compose.ui.test.up
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.milliseconds
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
@@ -111,7 +110,7 @@ class ScrollableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         advanceClockWhileAwaitersExist(clock)
@@ -124,7 +123,7 @@ class ScrollableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x, this.center.y + 100f),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         advanceClockWhileAwaitersExist(clock)
@@ -136,7 +135,7 @@ class ScrollableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x - 100f, this.center.y),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         advanceClockWhileAwaitersExist(clock)
@@ -167,7 +166,7 @@ class ScrollableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x, this.center.y + 100f),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         advanceClockWhileAwaitersExist(clock)
@@ -180,7 +179,7 @@ class ScrollableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         advanceClockWhileAwaitersExist(clock)
@@ -192,7 +191,7 @@ class ScrollableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x, this.center.y - 100f),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         advanceClockWhileAwaitersExist(clock)
@@ -231,7 +230,7 @@ class ScrollableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         // don't wait for animation so stop is 0, as we flinging still
@@ -271,7 +270,7 @@ class ScrollableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         advanceClockWhileAwaitersExist(clock)
@@ -284,7 +283,7 @@ class ScrollableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         advanceClockWhileAwaitersExist(clock)
@@ -320,7 +319,7 @@ class ScrollableTest {
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
                 endVelocity = 112f,
-                duration = 100.milliseconds
+                durationMillis = 100
 
             )
         }
@@ -331,7 +330,7 @@ class ScrollableTest {
                 start = this.center,
                 end = Offset(this.center.x - 100f, this.center.y),
                 endVelocity = 312f,
-                duration = 100.milliseconds
+                durationMillis = 100
 
             )
         }
@@ -363,7 +362,7 @@ class ScrollableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         // don't advance clocks
@@ -375,7 +374,7 @@ class ScrollableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 114f, this.center.y),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         rule.runOnIdle {
@@ -415,7 +414,7 @@ class ScrollableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100, this.center.y),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         rule.runOnIdle {
@@ -539,7 +538,7 @@ class ScrollableTest {
             this.swipeWithVelocity(
                 start = this.center,
                 end = Offset(this.center.x + 200f, this.center.y),
-                duration = 300.milliseconds,
+                durationMillis = 300,
                 endVelocity = 0f
             )
         }
@@ -611,7 +610,7 @@ class ScrollableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 200f, this.center.y),
-                duration = 300.milliseconds
+                durationMillis = 300
             )
         }
         val lastEqualDrag = rule.runOnIdle {
@@ -684,7 +683,7 @@ class ScrollableTest {
                 this.swipe(
                     start = this.center,
                     end = Offset(this.center.x + 200f, this.center.y),
-                    duration = 300.milliseconds
+                    durationMillis = 300
                 )
             }
 
@@ -764,7 +763,7 @@ class ScrollableTest {
                 this.swipeWithVelocity(
                     start = this.center,
                     end = Offset(this.center.x + 500f, this.center.y),
-                    duration = 300.milliseconds,
+                    durationMillis = 300,
                     endVelocity = velocityFlung
                 )
             }

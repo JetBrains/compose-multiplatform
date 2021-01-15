@@ -34,7 +34,7 @@ import org.junit.runners.model.Statement
  * two consecutive injected motion events injected by this [InputDispatcher]. If not
  * set, the event period of 10 milliseconds is unchanged.
  *
- * @see InputDispatcher.eventPeriod
+ * @see InputDispatcher.eventPeriodMillis
  */
 internal class InputDispatcherTestRule(
     private val disableDispatchInRealTime: Boolean = false,
@@ -51,7 +51,7 @@ internal class InputDispatcherTestRule(
                 InputDispatcher.dispatchInRealTime = false
             }
             if (eventPeriodOverride != null) {
-                InputDispatcher.eventPeriod = eventPeriodOverride
+                InputDispatcher.eventPeriodMillis = eventPeriodOverride
             }
             try {
                 base.evaluate()
@@ -60,7 +60,7 @@ internal class InputDispatcherTestRule(
                     InputDispatcher.dispatchInRealTime = true
                 }
                 if (eventPeriodOverride != null) {
-                    InputDispatcher.eventPeriod = 10L
+                    InputDispatcher.eventPeriodMillis = 10L
                 }
             }
         }

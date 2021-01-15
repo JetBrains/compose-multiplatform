@@ -41,10 +41,7 @@ import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AmbientViewConfiguration
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.Duration
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.Uptime
-import androidx.compose.ui.unit.milliseconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.test.runBlockingTest
@@ -64,7 +61,7 @@ internal class SuspendingGestureTestUtil(
     private var nextPointerId = 0L
     private val activePointers = mutableMapOf<PointerId, PointerInputChange>()
     private var pointerInputFilter: PointerInputFilter? = null
-    private var lastTime = Duration.Zero
+    private var lastTime = 0L
     private var isExecuting = false
 
     /**
@@ -89,7 +86,7 @@ internal class SuspendingGestureTestUtil(
         } finally {
             isExecuting = false
             pointerInputFilter = null
-            lastTime = Duration.Zero
+            lastTime = 0
             activePointers.clear()
         }
     }
@@ -112,7 +109,7 @@ internal class SuspendingGestureTestUtil(
     }
 
     /**
-     * Creates a new pointer being down at [timeDiff] from the previous event. The position
+     * Creates a new pointer being down at [timeDiffMillis] from the previous event. The position
      * [x], [y] is used for the touch point. The [PointerInputChange] may be mutated
      * prior to invoking the change on all passes in [initial], if provided. All other "down"
      * pointers will also be included in the change event.
@@ -120,18 +117,18 @@ internal class SuspendingGestureTestUtil(
     suspend fun down(
         x: Float,
         y: Float,
-        timeDiff: Duration = 10.milliseconds,
+        timeDiffMillis: Long = 10,
         main: PointerInputChange.() -> Unit = {},
         final: PointerInputChange.() -> Unit = {},
         initial: PointerInputChange.() -> Unit = {}
     ): PointerInputChange {
-        lastTime += timeDiff
+        lastTime += timeDiffMillis
         val change = PointerInputChange(
             id = PointerId(nextPointerId++),
-            time = Uptime.Boot + lastTime,
+            uptimeMillis = lastTime,
             position = Offset(x, y),
             pressed = true,
-            previousTime = Uptime.Boot + lastTime,
+            previousUptimeMillis = lastTime,
             previousPosition = Offset(x, y),
             previousPressed = false,
             ConsumedData(Offset.Zero, false)
@@ -142,40 +139,40 @@ internal class SuspendingGestureTestUtil(
     }
 
     /**
-     * Creates a new pointer being down at [timeDiff] from the previous event. The position
+     * Creates a new pointer being down at [timeDiffMillis] from the previous event. The position
      * [offset] is used for the touch point. The [PointerInputChange] may be mutated
      * prior to invoking the change on all passes in [initial], if provided. All other "down"
      * pointers will also be included in the change event.
      */
     suspend fun down(
         offset: Offset = Offset.Zero,
-        timeDiff: Duration = 10.milliseconds,
+        timeDiffMillis: Long = 10,
         main: PointerInputChange.() -> Unit = {},
         final: PointerInputChange.() -> Unit = {},
         initial: PointerInputChange.() -> Unit = {}
     ): PointerInputChange {
-        return down(offset.x, offset.y, timeDiff, main, final, initial)
+        return down(offset.x, offset.y, timeDiffMillis, main, final, initial)
     }
 
     /**
      * Raises the pointer. [initial] will be called on the [PointerInputChange] prior to the
      * event being invoked on all passes. After [up], the event will no longer participate
-     * in other events. [timeDiff] indicates the [Duration] from the previous event that
+     * in other events. [timeDiffMillis] indicates the time from the previous event that
      * the [up] takes place.
      */
     suspend fun PointerInputChange.up(
-        timeDiff: Duration = 10.milliseconds,
+        timeDiffMillis: Long = 10,
         main: PointerInputChange.() -> Unit = {},
         final: PointerInputChange.() -> Unit = {},
         initial: PointerInputChange.() -> Unit = {}
     ): PointerInputChange {
-        lastTime += timeDiff
+        lastTime += timeDiffMillis
         val change = PointerInputChange(
             id = id,
-            previousTime = time,
+            previousUptimeMillis = uptimeMillis,
             previousPressed = pressed,
             previousPosition = position,
-            time = Uptime.Boot + lastTime,
+            uptimeMillis = lastTime,
             pressed = false,
             position = position,
             consumed = ConsumedData()
@@ -187,25 +184,25 @@ internal class SuspendingGestureTestUtil(
     }
 
     /**
-     * Moves an existing [down] pointer to a new position at [timeDiff] from the most recent
+     * Moves an existing [down] pointer to a new position at [timeDiffMillis] from the most recent
      * event. [initial] will be called on the [PointerInputChange] prior to invoking the event
      * on all passes.
      */
     suspend fun PointerInputChange.moveTo(
         x: Float,
         y: Float,
-        timeDiff: Duration = 10.milliseconds,
+        timeDiffMillis: Long = 10,
         main: PointerInputChange.() -> Unit = {},
         final: PointerInputChange.() -> Unit = {},
         initial: PointerInputChange.() -> Unit = {}
     ): PointerInputChange {
-        lastTime += timeDiff
+        lastTime += timeDiffMillis
         val change = PointerInputChange(
             id = id,
-            previousTime = time,
+            previousUptimeMillis = uptimeMillis,
             previousPosition = position,
             previousPressed = pressed,
-            time = Uptime.Boot + lastTime,
+            uptimeMillis = lastTime,
             position = Offset(x, y),
             pressed = true,
             consumed = ConsumedData()
@@ -217,33 +214,33 @@ internal class SuspendingGestureTestUtil(
     }
 
     /**
-     * Moves an existing [down] pointer to a new position at [timeDiff] from the most recent
+     * Moves an existing [down] pointer to a new position at [timeDiffMillis] from the most recent
      * event. [initial] will be called on the [PointerInputChange] prior to invoking the event
      * on all passes.
      */
     suspend fun PointerInputChange.moveTo(
         offset: Offset,
-        timeDiff: Duration = 10.milliseconds,
+        timeDiffMillis: Long = 10,
         main: PointerInputChange.() -> Unit = {},
         final: PointerInputChange.() -> Unit = {},
         initial: PointerInputChange.() -> Unit = {}
-    ): PointerInputChange = moveTo(offset.x, offset.y, timeDiff, main, final, initial)
+    ): PointerInputChange = moveTo(offset.x, offset.y, timeDiffMillis, main, final, initial)
 
     /**
-     * Moves an existing [down] pointer to a new position at [timeDiff] from the most recent
+     * Moves an existing [down] pointer to a new position at [timeDiffMillis] from the most recent
      * event. [initial] will be called on the [PointerInputChange] prior to invoking the event
      * on all passes.
      */
     suspend fun PointerInputChange.moveBy(
         offset: Offset,
-        timeDiff: Duration = 10.milliseconds,
+        timeDiffMillis: Long = 10,
         main: PointerInputChange.() -> Unit = {},
         final: PointerInputChange.() -> Unit = {},
         initial: PointerInputChange.() -> Unit = {}
     ): PointerInputChange = moveTo(
         position.x + offset.x,
         position.y + offset.y,
-        timeDiff,
+        timeDiffMillis,
         main,
         final,
         initial
@@ -253,17 +250,17 @@ internal class SuspendingGestureTestUtil(
      * Updates all changes so that all events are at the current time.
      */
     private fun updateCurrentTime() {
-        val currentTime = Uptime.Boot + lastTime
+        val currentTime = lastTime
         activePointers.entries.forEach { entry ->
             val change = entry.value
-            if (change.time != currentTime) {
+            if (change.uptimeMillis != currentTime) {
                 entry.setValue(
                     PointerInputChange(
                         id = change.id,
-                        previousTime = change.time,
+                        previousUptimeMillis = change.uptimeMillis,
                         previousPressed = change.pressed,
                         previousPosition = change.position,
-                        time = currentTime,
+                        uptimeMillis = currentTime,
                         pressed = change.pressed,
                         position = change.position,
                         consumed = ConsumedData()
@@ -350,14 +347,14 @@ internal class SuspendingGestureTestUtil(
     }
 
     private class TestViewConfiguration : ViewConfiguration {
-        override val longPressTimeout: Duration
-            get() = 500.milliseconds
+        override val longPressTimeoutMillis: Long
+            get() = 500
 
-        override val doubleTapTimeout: Duration
-            get() = 300.milliseconds
+        override val doubleTapTimeoutMillis: Long
+            get() = 300
 
-        override val doubleTapMinTime: Duration
-            get() = 40.milliseconds
+        override val doubleTapMinTimeMillis: Long
+            get() = 40
 
         override val touchSlop: Float
             get() = 18f

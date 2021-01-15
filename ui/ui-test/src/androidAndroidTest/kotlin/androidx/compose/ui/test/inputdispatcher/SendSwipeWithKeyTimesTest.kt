@@ -19,14 +19,11 @@ package androidx.compose.ui.test.inputdispatcher
 import android.view.MotionEvent.ACTION_DOWN
 import android.view.MotionEvent.ACTION_MOVE
 import android.view.MotionEvent.ACTION_UP
-import androidx.compose.ui.unit.Duration
-import androidx.compose.ui.unit.inMilliseconds
-import androidx.compose.ui.unit.milliseconds
-import androidx.test.filters.SmallTest
-import androidx.compose.ui.test.InputDispatcher
 import androidx.compose.ui.test.AndroidInputDispatcher
+import androidx.compose.ui.test.InputDispatcher
 import androidx.compose.ui.test.util.assertHasValidEventTimes
 import androidx.compose.ui.test.util.verify
+import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Test
@@ -38,13 +35,13 @@ import org.junit.runners.Parameterized
  * function between two positions. Verifies if the generated MotionEvents for a gesture with a
  * given duration and a set of keyTimes have the expected timestamps. The timestamps should
  * include all keyTimes, and divide the duration between those keyTimes as equally as possible
- * with as close to [InputDispatcher.eventPeriod] between each successive event as possible.
+ * with as close to [InputDispatcher.eventPeriodMillis] between each successive event as possible.
  */
 @SmallTest
 @RunWith(Parameterized::class)
 class SendSwipeWithKeyTimesTest(private val config: TestConfig) : InputDispatcherTest() {
     data class TestConfig(
-        val duration: Duration,
+        val durationMillis: Long,
         val keyTimes: List<Long>,
         val expectedTimestamps: List<Long>
     )
@@ -60,22 +57,22 @@ class SendSwipeWithKeyTimesTest(private val config: TestConfig) : InputDispatche
             return listOf(
                 // 10.ms normally splits into 1 event, but here we add a keyTime that must yield
                 // an event at that time
-                TestConfig(10.milliseconds, listOf(1), listOf(1, 10)),
-                TestConfig(10.milliseconds, listOf(2), listOf(2, 10)),
-                TestConfig(10.milliseconds, listOf(3), listOf(3, 10)),
-                TestConfig(10.milliseconds, listOf(4), listOf(4, 10)),
-                TestConfig(10.milliseconds, listOf(5), listOf(5, 10)),
-                TestConfig(10.milliseconds, listOf(6), listOf(6, 10)),
-                TestConfig(10.milliseconds, listOf(7), listOf(7, 10)),
-                TestConfig(10.milliseconds, listOf(8), listOf(8, 10)),
-                TestConfig(10.milliseconds, listOf(9), listOf(9, 10)),
+                TestConfig(10, listOf(1), listOf(1, 10)),
+                TestConfig(10, listOf(2), listOf(2, 10)),
+                TestConfig(10, listOf(3), listOf(3, 10)),
+                TestConfig(10, listOf(4), listOf(4, 10)),
+                TestConfig(10, listOf(5), listOf(5, 10)),
+                TestConfig(10, listOf(6), listOf(6, 10)),
+                TestConfig(10, listOf(7), listOf(7, 10)),
+                TestConfig(10, listOf(8), listOf(8, 10)),
+                TestConfig(10, listOf(9), listOf(9, 10)),
                 // With 2 keyTimes we expect to see both those keyTimes in the generated events
-                TestConfig(10.milliseconds, listOf(1, 9), listOf(1, 9, 10)),
+                TestConfig(10, listOf(1, 9), listOf(1, 9, 10)),
                 // Same for 3 keyTimes
-                TestConfig(10.milliseconds, listOf(1, 5, 9), listOf(1, 5, 9, 10)),
+                TestConfig(10, listOf(1, 5, 9), listOf(1, 5, 9, 10)),
                 // If two keyTimes are longer than eventPeriod apart from each other, that period
                 // must be split as usual (here: between 10 and 28)
-                TestConfig(30.milliseconds, listOf(5, 10, 28), listOf(5, 10, 19, 28, 30))
+                TestConfig(30, listOf(5, 10, 28), listOf(5, 10, 19, 28, 30))
             )
         }
     }
@@ -90,7 +87,11 @@ class SendSwipeWithKeyTimesTest(private val config: TestConfig) : InputDispatche
     @Test
     fun swipeWithKeyTimes() {
         // Given a swipe with a given duration and set of keyTimes
-        subject.enqueueSwipe(curve = curve, duration = config.duration, keyTimes = config.keyTimes)
+        subject.enqueueSwipe(
+            curve = curve,
+            durationMillis = config.durationMillis,
+            keyTimes = config.keyTimes
+        )
         subject.sendAllSynchronous()
 
         // then
@@ -100,7 +101,7 @@ class SendSwipeWithKeyTimesTest(private val config: TestConfig) : InputDispatche
             // down + up + #move
             assertThat(size).isEqualTo(2 + expectedNumberOfMoveEvents)
 
-            val durationMs = config.duration.inMilliseconds()
+            val durationMs = config.durationMillis
             // First is down, last is up
             first().verify(curve, ACTION_DOWN, expectedRelativeTime = 0)
             last().verify(curve, ACTION_UP, expectedRelativeTime = durationMs)

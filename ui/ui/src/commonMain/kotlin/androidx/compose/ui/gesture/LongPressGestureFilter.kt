@@ -35,7 +35,6 @@ import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
 import androidx.compose.ui.input.pointer.consumeDownChange
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.inMilliseconds
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
 import kotlinx.coroutines.CoroutineScope
@@ -74,7 +73,7 @@ internal class LongPressGestureFilter(
     lateinit var onLongPress: (Offset) -> Unit
 
     /*@VisibleForTesting*/
-    internal var longPressTimeout = LongPressTimeout
+    internal var longPressTimeout = LongPressTimeoutMillis
 
     private enum class State {
         Idle, Primed, Fired
@@ -170,7 +169,7 @@ internal class LongPressGestureFilter(
     private fun primeToFire() {
         state = State.Primed
         job = coroutineScope.launch {
-            delay(longPressTimeout.inMilliseconds())
+            delay(longPressTimeout)
             fireLongPress()
         }
     }

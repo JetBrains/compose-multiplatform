@@ -30,9 +30,7 @@ import androidx.compose.ui.input.pointer.invokeOverPasses
 import androidx.compose.ui.input.pointer.moveBy
 import androidx.compose.ui.input.pointer.moveTo
 import androidx.compose.ui.input.pointer.up
-import androidx.compose.ui.unit.Duration
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.milliseconds
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.mock
@@ -75,9 +73,9 @@ class RawDragGestureFilterTest {
     @Test
     fun onPointerEvent_blockedAndMove_onStartAndOnDragNotCalled() {
 
-        val down = down(0, 0.milliseconds)
+        val down = down(0, 0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
-        val move = down.moveBy(10.milliseconds, 1f, 0f)
+        val move = down.moveBy(10, 1f, 0f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
 
         assertThat(log.filter { it.methodName == "onStart" }).isEmpty()
@@ -86,11 +84,11 @@ class RawDragGestureFilterTest {
 
     @Test
     fun onPointerEvent_unblockedNoMove_onStartAndOnDragNotCalled() {
-        val down = down(0, 0.milliseconds)
+        val down = down(0, 0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
         dragStartBlocked = false
 
-        val move = down.moveBy(10.milliseconds, 0f, 0f)
+        val move = down.moveBy(10, 0f, 0f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
 
         assertThat(log.filter { it.methodName == "onStart" }).isEmpty()
@@ -105,7 +103,7 @@ class RawDragGestureFilterTest {
         dragStartBlocked = false
 
         val move1 =
-            down1.moveBy(10.milliseconds, 1f, 1f).apply { consumePositionChange(1f, 1f) }
+            down1.moveBy(10, 1f, 1f).apply { consumePositionChange(1f, 1f) }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move1))
 
         assertThat(log.filter { it.methodName == "onStart" }).isEmpty()
@@ -120,8 +118,8 @@ class RawDragGestureFilterTest {
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down1, down2))
         dragStartBlocked = false
 
-        val move1 = down1.moveBy(10.milliseconds, 1f, 1f)
-        val move2 = down2.moveBy(10.milliseconds, -1f, -1f)
+        val move1 = down1.moveBy(10, 1f, 1f)
+        val move2 = down2.moveBy(10, -1f, -1f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move1, move2))
 
         assertThat(log.filter { it.methodName == "onStart" }).isEmpty()
@@ -142,19 +140,19 @@ class RawDragGestureFilterTest {
         // These movements average to no movement.
         pointers[0] =
             pointers[0].moveBy(
-                100.milliseconds,
+                100,
                 -1f,
                 -1f
             )
         pointers[1] =
             pointers[1].moveBy(
-                100.milliseconds,
+                100,
                 1f,
                 -1f
             )
         pointers[2] =
             pointers[2].moveBy(
-                100.milliseconds,
+                100,
                 0f,
                 2f
             )
@@ -170,11 +168,11 @@ class RawDragGestureFilterTest {
     @Test
     fun onPointerEvent_unblockedAndMoveOnX_onStartAndOnDragCalledOnce() {
 
-        val down = down(0, 0.milliseconds)
+        val down = down(0, 0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
         dragStartBlocked = false
 
-        val move = down.moveBy(10.milliseconds, 1f, 0f)
+        val move = down.moveBy(10, 1f, 0f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
 
         assertThat(log.filter { it.methodName == "onStart" }).hasSize(1)
@@ -184,11 +182,11 @@ class RawDragGestureFilterTest {
     @Test
     fun onPointerEvent_unblockedAndMoveOnY_oonStartAndOnDragCalledOnce() {
 
-        val down = down(0, 0.milliseconds)
+        val down = down(0, 0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
         dragStartBlocked = false
 
-        val move = down.moveBy(10.milliseconds, 0f, 1f)
+        val move = down.moveBy(10, 0f, 1f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
 
         assertThat(log.filter { it.methodName == "onStart" }).hasSize(1)
@@ -198,11 +196,11 @@ class RawDragGestureFilterTest {
     @Test
     fun onPointerEvent_unblockedAndMoveConsumedBeyond0_onStartAndOnDragCalledOnce() {
 
-        val down = down(0, 0.milliseconds)
+        val down = down(0, 0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
         dragStartBlocked = false
 
-        val move = down.moveBy(10.milliseconds, 1f, 0f).apply { consumePositionChange(2f, 0f) }
+        val move = down.moveBy(10, 1f, 0f).apply { consumePositionChange(2f, 0f) }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
 
         assertThat(log.filter { it.methodName == "onStart" }).hasSize(1)
@@ -213,11 +211,11 @@ class RawDragGestureFilterTest {
 
     @Test
     fun onPointerEvent_unblockedMove_onDragCalledWithTotalDistance() {
-        var change = down(0, 0.milliseconds)
+        var change = down(0, 0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
         dragStartBlocked = false
 
-        change = change.moveBy(100.milliseconds, 5f, -2f)
+        change = change.moveBy(100, 5f, -2f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
 
         val onDragLog = log.filter { it.methodName == "onDrag" }
@@ -230,20 +228,20 @@ class RawDragGestureFilterTest {
 
         // Arrange
 
-        var change = down(0, 0.milliseconds)
+        var change = down(0, 0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
         dragStartBlocked = false
 
         // Act
 
-        change = change.moveBy(100.milliseconds, 3f, -5f)
+        change = change.moveBy(100, 3f, -5f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
-        change = change.moveBy(100.milliseconds, -3f, 7f)
+        change = change.moveBy(100, -3f, 7f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
-        change = change.moveBy(100.milliseconds, 11f, 13f)
+        change = change.moveBy(100, 11f, 13f)
             .apply { consumePositionChange(5f, 3f) }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
-        change = change.moveBy(100.milliseconds, -13f, -11f)
+        change = change.moveBy(100, -13f, -11f)
             .apply { consumePositionChange(-3f, -5f) }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
 
@@ -270,9 +268,9 @@ class RawDragGestureFilterTest {
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2, pointer3))
         dragStartBlocked = false
 
-        pointer1 = pointer1.moveBy(100.milliseconds, 9f, -12f)
-        pointer2 = pointer2.moveBy(100.milliseconds, 0f, 0f)
-        pointer3 = pointer3.moveBy(100.milliseconds, 0f, 0f)
+        pointer1 = pointer1.moveBy(100, 9f, -12f)
+        pointer2 = pointer2.moveBy(100, 0f, 0f)
+        pointer3 = pointer3.moveBy(100, 0f, 0f)
 
         // Act
 
@@ -291,11 +289,11 @@ class RawDragGestureFilterTest {
 
     @Test
     fun onPointerEvent_blockedDownMoveUp_onStopNotCalled() {
-        var change = down(0, 0.milliseconds)
+        var change = down(0, 0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
-        change = change.moveTo(10.milliseconds, 1f, 1f)
+        change = change.moveTo(10, 1f, 1f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
-        change = change.up(20.milliseconds)
+        change = change.up(20)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
 
         assertThat(log.filter { it.methodName == "onStop" }).hasSize(0)
@@ -303,10 +301,10 @@ class RawDragGestureFilterTest {
 
     @Test
     fun onPointerEvent_unBlockedDownUp_onStopNotCalled() {
-        var change = down(0, 0.milliseconds)
+        var change = down(0, 0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
         dragStartBlocked = false
-        change = change.up(20.milliseconds)
+        change = change.up(20)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
 
         assertThat(log.filter { it.methodName == "onStop" }).hasSize(0)
@@ -318,11 +316,11 @@ class RawDragGestureFilterTest {
         var change2 = down(2)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change1, change2))
         dragStartBlocked = false
-        change1 = change1.moveBy(10.milliseconds, 1f, 1f)
-        change2 = change2.moveBy(10.milliseconds, -1f, -1f)
+        change1 = change1.moveBy(10, 1f, 1f)
+        change2 = change2.moveBy(10, -1f, -1f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change1, change2))
-        change1 = change1.up(20.milliseconds)
-        change2 = change2.up(20.milliseconds)
+        change1 = change1.up(20)
+        change2 = change2.up(20)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change1, change2))
         assertThat(log.filter { it.methodName == "onStop" }).isEmpty()
     }
@@ -331,12 +329,12 @@ class RawDragGestureFilterTest {
 
     @Test
     fun onPointerEvent_unblockedDownMoveUp_onStopCalledOnce() {
-        var change = down(0, 0.milliseconds)
+        var change = down(0, 0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
         dragStartBlocked = false
-        change = change.moveTo(10.milliseconds, 1f, 1f)
+        change = change.moveTo(10, 1f, 1f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
-        change = change.up(20.milliseconds)
+        change = change.up(20)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
 
         assertThat(log.filter { it.methodName == "onStop" }).hasSize(1)
@@ -365,23 +363,23 @@ class RawDragGestureFilterTest {
     ) {
         log.clear()
 
-        var time = 0.milliseconds
+        var time = 0L
 
         var change = down(0, time)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
         dragStartBlocked = false
 
         repeat(11) {
-            time += 10.milliseconds
+            time += 10
             change = change.moveBy(
-                10.milliseconds,
+                10,
                 incrementPerMilliX,
                 incrementPerMilliY
             )
             filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
         }
 
-        time += 10.milliseconds
+        time += 10
         change = change.up(time)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
 
@@ -396,17 +394,17 @@ class RawDragGestureFilterTest {
 
     @Test
     fun onPointerEvent_unblockDownMoveUp_callBacksOccurInCorrectOrder() {
-        var change = down(0, 0.milliseconds)
+        var change = down(0, 0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
         dragStartBlocked = false
 
         change = change.moveTo(
-            10.milliseconds,
+            10,
             0f,
             1f
         )
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
-        change = change.up(20.milliseconds)
+        change = change.up(20)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
 
         assertThat(log).hasSize(3)
@@ -427,10 +425,10 @@ class RawDragGestureFilterTest {
     @Test
     fun onPointerEvent_blockedDownMove_distanceChangeNotConsumed() {
 
-        var change = down(0, 0.milliseconds)
+        var change = down(0, 0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
         change = change.moveTo(
-            10.milliseconds,
+            10,
             1f,
             0f
         )
@@ -454,12 +452,12 @@ class RawDragGestureFilterTest {
     fun onPointerEvent_unblockedDownMoveCallBackDoesNotConsume_distanceChangeNotConsumed() {
         dragObserver.dragConsume = Offset.Zero
 
-        var change = down(0, 0.milliseconds)
+        var change = down(0, 0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
         dragStartBlocked = false
 
         change = change.moveTo(
-            10.milliseconds,
+            10,
             1f,
             1f
         )
@@ -472,12 +470,12 @@ class RawDragGestureFilterTest {
     fun onPointerEvent_unblockedMoveOccursDefaultOnDrag_distanceChangeNotConsumed() {
         dragObserver.dragConsume = null
 
-        var change = down(0, 0.milliseconds)
+        var change = down(0, 0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
         dragStartBlocked = false
 
         change = change.moveTo(
-            10.milliseconds,
+            10,
             1f,
             1f
         )
@@ -488,12 +486,12 @@ class RawDragGestureFilterTest {
 
     @Test
     fun onPointerEvent_moveCallBackConsumes_changeDistanceConsumedByCorrectAmount() {
-        var change = down(0, 0.milliseconds)
+        var change = down(0, 0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change), IntSize(0, 0))
         dragStartBlocked = false
 
         change = change.moveTo(
-            10.milliseconds,
+            10,
             3f,
             -5f
         )
@@ -515,17 +513,17 @@ class RawDragGestureFilterTest {
 
     @Test
     fun onPointerEvent_onStopConsumesUp() {
-        var change = down(0, 0.milliseconds)
+        var change = down(0, 0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
         dragStartBlocked = false
 
         change = change.moveTo(
-            10.milliseconds,
+            10,
             1f,
             0f
         )
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
-        change = change.up(20.milliseconds)
+        change = change.up(20)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
 
         assertThat(change.consumed.downChange).isTrue()
@@ -533,11 +531,11 @@ class RawDragGestureFilterTest {
 
     @Test
     fun onPointerEvent_move_onStartCalledWithDownPosition() {
-        val down = down(0, 0.milliseconds, x = 3f, y = 4f)
+        val down = down(0, 0, x = 3f, y = 4f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
         dragStartBlocked = false
 
-        val move = down.moveBy(Duration(milliseconds = 10), 1f, 0f)
+        val move = down.moveBy(10, 1f, 0f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
 
         assertThat(log.first { it.methodName == "onStart" }.pxPosition)
@@ -552,9 +550,9 @@ class RawDragGestureFilterTest {
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2, pointer3))
         dragStartBlocked = false
 
-        pointer1 = pointer1.moveBy(100.milliseconds, 1f, 0f)
-        pointer2 = pointer2.moveBy(100.milliseconds, 0f, 0f)
-        pointer3 = pointer3.moveBy(100.milliseconds, 0f, 0f)
+        pointer1 = pointer1.moveBy(100, 1f, 0f)
+        pointer2 = pointer2.moveBy(100, 0f, 0f)
+        pointer3 = pointer3.moveBy(100, 0f, 0f)
 
         // Act
 
@@ -599,8 +597,8 @@ class RawDragGestureFilterTest {
         filter.orientation = Orientation.Vertical
 
         val downA = down(0)
-        val upA = downA.up(1.milliseconds)
-        val downB = down(1, 2.milliseconds)
+        val upA = downA.up(1)
+        val downB = down(1, 2)
 
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(downA))
 
@@ -678,7 +676,7 @@ class RawDragGestureFilterTest {
         )
 
         val down = down(0)
-        val move = down.moveBy(1.milliseconds, 3f, 5f)
+        val move = down.moveBy(1, 3f, 5f)
 
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
 
@@ -773,7 +771,7 @@ class RawDragGestureFilterTest {
         )
 
         val down = down(0)
-        val move = down.moveBy(1.milliseconds, dx, dy)
+        val move = down.moveBy(1, dx, dy)
 
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
 
@@ -814,7 +812,7 @@ class RawDragGestureFilterTest {
         // This pointer is going to be locked to vertical.
         pointers[0] =
             pointers[0].moveBy(
-                100.milliseconds,
+                100,
                 100f,
                 0f
             )
@@ -823,13 +821,13 @@ class RawDragGestureFilterTest {
         // These pointers average to no movement.
         pointers[1] =
             pointers[1].moveBy(
-                100.milliseconds,
+                100,
                 1f,
                 0f
             )
         pointers[2] =
             pointers[2].moveBy(
-                100.milliseconds,
+                100,
                 -1f,
                 0f
             )
@@ -856,12 +854,12 @@ class RawDragGestureFilterTest {
         )
 
         // One finger down
-        var time = 0.milliseconds
+        var time = 0L
         var pointer1 = down(0, time)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1))
 
         // 2nd finger comes into play
-        time = 10.milliseconds
+        time = 10L
         pointer1.moveTo(time)
         var pointer2 = down(1, time)
 
@@ -873,14 +871,14 @@ class RawDragGestureFilterTest {
 
         // Both pointers move a bunch.
         repeat(11) {
-            time = 10.milliseconds
+            time = 10
             pointer1 = pointer1.moveBy(
-                10.milliseconds,
+                10,
                 1f,
                 0f
             )
             pointer2 = pointer2.moveBy(
-                10.milliseconds,
+                10,
                 1f,
                 0f
             )
@@ -890,7 +888,7 @@ class RawDragGestureFilterTest {
         // Act 1
 
         // Only Pointer 1 goes up
-        time = 10.milliseconds
+        time = 10
         pointer1 = pointer1.up(time)
         pointer2 = pointer2.moveTo(time)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
@@ -904,7 +902,7 @@ class RawDragGestureFilterTest {
         // Act 2
 
         // 2nd is up
-        time = 10.milliseconds
+        time = 10
         pointer2 = pointer2.up(time)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer2))
 
@@ -930,14 +928,14 @@ class RawDragGestureFilterTest {
             ShareScrollOrientationLockerEvent(scrollOrientationLocker)
         )
 
-        var time = 0.milliseconds
+        var time = 0L
 
         // One finger down
         var pointer1 = down(0, time)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1))
 
         // 2nd finger comes into play
-        time += 10.milliseconds
+        time += 10L
         pointer1.moveTo(time)
         var pointer2 = down(1, time)
 
@@ -949,14 +947,14 @@ class RawDragGestureFilterTest {
 
         // Both pointers move a bunch.
         repeat(11) {
-            time += 10.milliseconds
+            time += 10
             pointer1 = pointer1.moveBy(
-                10.milliseconds,
+                10,
                 1f,
                 0f
             )
             pointer2 = pointer2.moveBy(
-                10.milliseconds,
+                10,
                 1f,
                 0f
             )
@@ -966,9 +964,9 @@ class RawDragGestureFilterTest {
         // Act 1
 
         // Only Pointer 2 goes up
-        time += 10.milliseconds
+        time += 10
         pointer1 = pointer1.moveBy(
-            10.milliseconds,
+            10,
             1f,
             0f
         )
@@ -984,7 +982,7 @@ class RawDragGestureFilterTest {
         // Act 2
 
         // 2nd is up
-        time += 10.milliseconds
+        time += 10
         pointer1 = pointer1.up(time)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1))
 
@@ -1001,7 +999,7 @@ class RawDragGestureFilterTest {
 
     @Test
     fun onCancel_downCancel_onCancelNotCalled() {
-        val down = down(0, 0.milliseconds)
+        val down = down(0, 0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
         dragStartBlocked = false
         filter.onCancel()
@@ -1011,10 +1009,10 @@ class RawDragGestureFilterTest {
 
     @Test
     fun onCancel_blockedDownMoveCancel_onCancelNotCalled() {
-        val down = down(0, 0.milliseconds)
+        val down = down(0, 0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
         dragStartBlocked = true
-        val move = down.moveBy(1.milliseconds, 1f, 0f)
+        val move = down.moveBy(1, 1f, 0f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
         filter.onCancel()
 
@@ -1025,10 +1023,10 @@ class RawDragGestureFilterTest {
 
     @Test
     fun onCancel_downMoveCancel_onCancelCalledOnce() {
-        val down = down(0, 0.milliseconds)
+        val down = down(0, 0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
         dragStartBlocked = false
-        val move = down.moveBy(1.milliseconds, 1f, 0f)
+        val move = down.moveBy(1, 1f, 0f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
         filter.onCancel()
 
@@ -1047,7 +1045,7 @@ class RawDragGestureFilterTest {
         val down2 = down(2, x = 7f, y = 11f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down2))
 
-        val move = down2.moveBy(Duration(milliseconds = 10), 1f, 0f)
+        val move = down2.moveBy(10, 1f, 0f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
 
         assertThat(log.first { it.methodName == "onStart" }.pxPosition)
@@ -1060,12 +1058,12 @@ class RawDragGestureFilterTest {
         // Act.
 
         // Down, move, cancel.
-        var change = down(0, duration = 0.milliseconds)
+        var change = down(0, durationMillis = 0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
         dragStartBlocked = false
         repeat(11) {
             change = change.moveBy(
-                10.milliseconds,
+                10,
                 -1f,
                 -1f
             )
@@ -1074,18 +1072,18 @@ class RawDragGestureFilterTest {
         filter.onCancel()
 
         // Down, Move, Up
-        change = down(1, duration = 200.milliseconds)
+        change = down(1, durationMillis = 200)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
         dragStartBlocked = false
         repeat(11) {
             change = change.moveBy(
-                10.milliseconds,
+                10,
                 1f,
                 1f
             )
             filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
         }
-        change = change.up(310.milliseconds)
+        change = change.up(310)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
 
         // Assert.

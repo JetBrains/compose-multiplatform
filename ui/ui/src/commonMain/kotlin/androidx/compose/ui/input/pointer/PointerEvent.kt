@@ -28,7 +28,6 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.Uptime
 import androidx.compose.ui.unit.round
 
 /**
@@ -177,12 +176,13 @@ enum class PointerType {
  * [previousPosition] will report (0, 0).
  *
  * @param id The unique id of the pointer associated with this [PointerInputChange].
- * @param time The [Uptime] of the current pointer event
+ * @param uptimeMillis The time of the current pointer event, in milliseconds. The start (`0`) time
+ * is platform-dependent
  * @param position The [Offset] of the current pointer event, relative to the containing
  * element
  * @param pressed `true` if the pointer event is considered "pressed." For example, finger
  * touching the screen or a mouse button is pressed [pressed] would be `true`.
- * @param previousTime The [Uptime] of the previous pointer event
+ * @param previousUptimeMillis The [uptimeMillis] of the previous pointer event
  * @param previousPosition The [Offset] of the previous pointer event, offset to the
  * [position] and relative to the containing element.
  * @param previousPressed `true` if the pointer event was considered "pressed." For example , if
@@ -195,10 +195,10 @@ enum class PointerType {
 @Immutable
 class PointerInputChange(
     val id: PointerId,
-    val time: Uptime,
+    val uptimeMillis: Long,
     val position: Offset,
     val pressed: Boolean,
-    val previousTime: Uptime,
+    val previousUptimeMillis: Long,
     val previousPosition: Offset,
     val previousPressed: Boolean,
     val consumed: ConsumedData,
@@ -206,10 +206,10 @@ class PointerInputChange(
 ) {
     fun copy(
         id: PointerId = this.id,
-        currentTime: Uptime = this.time,
+        currentTime: Long = this.uptimeMillis,
         currentPosition: Offset = this.position,
         currentPressed: Boolean = this.pressed,
-        previousTime: Uptime = this.previousTime,
+        previousTime: Long = this.previousUptimeMillis,
         previousPosition: Offset = this.previousPosition,
         previousPressed: Boolean = this.previousPressed,
         consumed: ConsumedData = this.consumed,

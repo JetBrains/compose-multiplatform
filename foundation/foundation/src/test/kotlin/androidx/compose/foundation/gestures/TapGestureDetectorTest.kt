@@ -16,12 +16,10 @@
 
 package androidx.compose.foundation.gestures
 
-import androidx.compose.ui.gesture.DoubleTapTimeout
-import androidx.compose.ui.gesture.LongPressTimeout
+import androidx.compose.ui.gesture.DoubleTapTimeoutMillis
+import androidx.compose.ui.gesture.LongPressTimeoutMillis
 import androidx.compose.ui.input.pointer.consumeDownChange
 import androidx.compose.ui.input.pointer.consumePositionChange
-import androidx.compose.ui.unit.inMilliseconds
-import androidx.compose.ui.unit.milliseconds
 import kotlinx.coroutines.delay
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -94,7 +92,7 @@ class TapGestureDetectorTest {
         assertFalse(tapped)
         assertFalse(released)
 
-        val up = down.up(50.milliseconds)
+        val up = down.up(50)
         assertTrue(up.consumed.downChange)
 
         assertTrue(tapped)
@@ -112,7 +110,7 @@ class TapGestureDetectorTest {
 
         assertTrue(pressed)
 
-        val up = down.up(50.milliseconds)
+        val up = down.up(50)
         assertTrue(up.consumed.downChange)
 
         assertTrue(released)
@@ -122,7 +120,7 @@ class TapGestureDetectorTest {
         assertFalse(tapped)
         assertFalse(doubleTapped)
 
-        delay(DoubleTapTimeout.inMilliseconds() + 10)
+        delay(DoubleTapTimeoutMillis + 10)
 
         assertTrue(tapped)
         assertFalse(doubleTapped)
@@ -145,7 +143,7 @@ class TapGestureDetectorTest {
         pressed = false
         released = false
 
-        val up2 = down(5f, 5f, 50.milliseconds)
+        val up2 = down(5f, 5f, 50)
             .up()
         assertTrue(up2.consumed.downChange)
 
@@ -164,11 +162,11 @@ class TapGestureDetectorTest {
         assertTrue(down.consumed.downChange)
 
         assertTrue(pressed)
-        delay(LongPressTimeout.inMilliseconds() + 10)
+        delay(LongPressTimeoutMillis + 10)
 
         assertTrue(longPressed)
 
-        val up = down.up(500.milliseconds)
+        val up = down.up(500)
         assertTrue(up.consumed.downChange)
 
         assertFalse(tapped)
@@ -203,7 +201,7 @@ class TapGestureDetectorTest {
         val pointer = down(5f, 5f)
             .moveTo(15f, 15f)
 
-        delay(DoubleTapTimeout.inMilliseconds() + 10)
+        delay(DoubleTapTimeoutMillis + 10)
         val up = pointer.up()
         assertFalse(up.consumed.downChange)
 
@@ -231,7 +229,7 @@ class TapGestureDetectorTest {
         pressed = false
         released = false
 
-        val up2 = down(5f, 5f, 50.milliseconds)
+        val up2 = down(5f, 5f, 50)
             .moveTo(15f, 15f)
             .up()
 
@@ -318,7 +316,7 @@ class TapGestureDetectorTest {
             .moveTo(6f, 2f) {
                 consumePositionChange(1f, -3f)
             }
-            .up(50.milliseconds)
+            .up(50)
 
         assertFalse(tapped)
         assertTrue(pressed)
@@ -374,7 +372,7 @@ class TapGestureDetectorTest {
         assertFalse(tapped)
         assertTrue(canceled)
 
-        val up2 = down2.up(50.milliseconds)
+        val up2 = down2.up(50)
         assertFalse(up2.consumed.downChange)
 
         assertFalse(tapped)
@@ -398,18 +396,18 @@ class TapGestureDetectorTest {
         pressed = false
         released = false
 
-        val secondDown = down(5f, 5f, 50.milliseconds)
+        val secondDown = down(5f, 5f, 50)
 
         assertTrue(pressed)
 
-        delay(LongPressTimeout.inMilliseconds() + 10)
+        delay(LongPressTimeoutMillis + 10)
 
         assertTrue(tapped)
         assertTrue(longPressed)
         assertFalse(released)
         assertFalse(canceled)
 
-        secondDown.up(500.milliseconds)
+        secondDown.up(500)
         assertTrue(released)
     }
 }

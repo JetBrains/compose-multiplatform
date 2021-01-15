@@ -28,7 +28,6 @@ import androidx.compose.ui.input.pointer.moveBy
 import androidx.compose.ui.input.pointer.moveTo
 import androidx.compose.ui.input.pointer.up
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.milliseconds
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
@@ -45,7 +44,7 @@ import java.util.concurrent.TimeUnit
 @RunWith(JUnit4::class)
 class LongPressGestureFilterTest {
 
-    private val LongPressTimeoutMillis = 100.milliseconds
+    private val LongPressTimeoutMillis = 100L
     @Suppress("DEPRECATION")
     private val testContext = kotlinx.coroutines.test.TestCoroutineContext()
     private val onLongPress: (Offset) -> Unit = mock()
@@ -64,7 +63,7 @@ class LongPressGestureFilterTest {
 
     @Test
     fun onPointerEvent_down_eventNotFired() {
-        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down(0, 0.milliseconds)))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down(0, 0)))
 
         verify(onLongPress, never()).invoke(any())
         verify(customEventDispatcher, never()).dispatchCustomEvent(any())
@@ -72,7 +71,7 @@ class LongPressGestureFilterTest {
 
     @Test
     fun onPointerEvent_downWithinTimeout_eventNotFired() {
-        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down(0, 0.milliseconds)))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down(0, 0)))
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
 
         verify(onLongPress, never()).invoke(any())
@@ -83,7 +82,7 @@ class LongPressGestureFilterTest {
     fun onPointerEvent_DownMoveConsumed_eventNotFired() {
         val down = down(0)
         val move =
-            down.moveBy(50.milliseconds, 1f, 1f).apply { consumePositionChange(1f, 0f) }
+            down.moveBy(50, 1f, 1f).apply { consumePositionChange(1f, 0f) }
 
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
         testContext.advanceTimeBy(50, TimeUnit.MILLISECONDS)
@@ -99,8 +98,8 @@ class LongPressGestureFilterTest {
         val down0 = down(0)
         val down1 = down(1)
         val move0 =
-            down0.moveBy(50.milliseconds, 1f, 1f).apply { consumePositionChange(1f, 0f) }
-        val move1 = down0.moveBy(50.milliseconds, 0f, 0f)
+            down0.moveBy(50, 1f, 1f).apply { consumePositionChange(1f, 0f) }
+        val move1 = down0.moveBy(50, 0f, 0f)
 
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down0, down1))
         testContext.advanceTimeBy(50, TimeUnit.MILLISECONDS)
@@ -114,7 +113,7 @@ class LongPressGestureFilterTest {
     @Test
     fun onPointerEvent_DownUpConsumed_eventNotFired() {
         val down = down(0)
-        val up = down.up(50.milliseconds).apply { consumeDownChange() }
+        val up = down.up(50).apply { consumeDownChange() }
 
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
         testContext.advanceTimeBy(50, TimeUnit.MILLISECONDS)
@@ -128,7 +127,7 @@ class LongPressGestureFilterTest {
     @Test
     fun onPointerEvent_DownUpNotConsumed_eventNotFired() {
         val down = down(0)
-        val up = down.up(50.milliseconds)
+        val up = down.up(50)
 
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
         testContext.advanceTimeBy(50, TimeUnit.MILLISECONDS)
@@ -146,9 +145,9 @@ class LongPressGestureFilterTest {
 
         val down0 = down(0)
 
-        val up0 = down0.up(50.milliseconds)
+        val up0 = down0.up(50)
 
-        val down1 = down(1, 51.milliseconds)
+        val down1 = down(1, 51)
 
         // Act
 
@@ -170,9 +169,9 @@ class LongPressGestureFilterTest {
 
     @Test
     fun onPointerEvent_downMoveOutOfBoundsWait_eventNotFired() {
-        var pointer = down(0, 0.milliseconds)
+        var pointer = down(0, 0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer), IntSize(1, 1))
-        pointer = pointer.moveTo(50.milliseconds, 1f, 0f)
+        pointer = pointer.moveTo(50, 1f, 0f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer), IntSize(1, 1))
         testContext.advanceTimeBy(100, TimeUnit.MILLISECONDS)
 
@@ -184,7 +183,7 @@ class LongPressGestureFilterTest {
 
     @Test
     fun onPointerEvent_downBeyondTimeout_eventFiredOnce() {
-        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down(0, 0.milliseconds)))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down(0, 0)))
         testContext.advanceTimeBy(100, TimeUnit.MILLISECONDS)
 
         verify(onLongPress).invoke(any())
@@ -202,15 +201,15 @@ class LongPressGestureFilterTest {
 
     @Test
     fun onPointerEvent_downMoveOutOfBoundsWaitUpThenDownWait_eventFiredOnce() {
-        var pointer = down(0, 0.milliseconds)
+        var pointer = down(0, 0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer), IntSize(1, 1))
-        pointer = pointer.moveTo(50.milliseconds, 1f, 0f)
+        pointer = pointer.moveTo(50, 1f, 0f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer), IntSize(1, 1))
         testContext.advanceTimeBy(100, TimeUnit.MILLISECONDS)
-        pointer = pointer.up(105.milliseconds)
+        pointer = pointer.up(105)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer), IntSize(1, 1))
 
-        pointer = down(1, 200.milliseconds)
+        pointer = down(1, 200)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer), IntSize(1, 1))
         testContext.advanceTimeBy(100, TimeUnit.MILLISECONDS)
 
@@ -225,11 +224,11 @@ class LongPressGestureFilterTest {
 
         val down0 = down(0)
 
-        val move0 = down0.moveTo(50.milliseconds, 0f, 0f)
-        val down1 = down(1, 50.milliseconds)
+        val move0 = down0.moveTo(50, 0f, 0f)
+        val down1 = down(1, 50)
 
-        val up0 = move0.up(75.milliseconds)
-        val move1 = down1.moveTo(75.milliseconds, 0f, 0f)
+        val up0 = move0.up(75)
+        val move1 = down1.moveTo(75, 0f, 0f)
 
         // Act
 
@@ -258,7 +257,7 @@ class LongPressGestureFilterTest {
     @Test
     fun onPointerEvent_downMoveNotConsumed_eventFiredOnce() {
         val down = down(0)
-        val move = down.moveBy(50.milliseconds, 1f, 1f)
+        val move = down.moveBy(50, 1f, 1f)
 
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
         testContext.advanceTimeBy(50, TimeUnit.MILLISECONDS)
@@ -284,7 +283,7 @@ class LongPressGestureFilterTest {
     @Test
     fun onPointerEvent_downMove_onLongPressCalledWithMovePosition() {
         val down = down(0, x = 13f, y = 17f)
-        val move = down.moveTo(50.milliseconds, 7f, 5f)
+        val move = down.moveTo(50, 7f, 5f)
 
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
         testContext.advanceTimeBy(50, TimeUnit.MILLISECONDS)
@@ -298,8 +297,8 @@ class LongPressGestureFilterTest {
     fun onPointerEvent_downThenDown_onLongPressCalledWithFirstDownPosition() {
         val down0 = down(0, x = 13f, y = 17f)
 
-        val move0 = down0.moveBy(50.milliseconds, 0f, 0f)
-        val down1 = down(1, 50.milliseconds, 11f, 19f)
+        val move0 = down0.moveBy(50, 0f, 0f)
+        val down1 = down(1, 50, 11f, 19f)
 
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down0))
         testContext.advanceTimeBy(50, TimeUnit.MILLISECONDS)
@@ -313,11 +312,11 @@ class LongPressGestureFilterTest {
     fun onPointerEvent_down0ThenDown1ThenUp0_onLongPressCalledWithDown1Position() {
         val down0 = down(0, x = 13f, y = 17f)
 
-        val move0 = down0.moveTo(50.milliseconds, 27f, 29f)
-        val down1 = down(1, 50.milliseconds, 11f, 19f)
+        val move0 = down0.moveTo(50, 27f, 29f)
+        val down1 = down(1, 50, 11f, 19f)
 
-        val up0 = move0.up(75.milliseconds)
-        val move1 = down1.moveBy(25.milliseconds, 0f, 0f)
+        val up0 = move0.up(75)
+        val move1 = down1.moveBy(25, 0f, 0f)
 
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down0))
         testContext.advanceTimeBy(50, TimeUnit.MILLISECONDS)
@@ -333,8 +332,8 @@ class LongPressGestureFilterTest {
     fun onPointerEvent_down0ThenMove0AndDown1_onLongPressCalledWithMove0Position() {
         val down0 = down(0, x = 13f, y = 17f)
 
-        val move0 = down0.moveTo(50.milliseconds, 27f, 29f)
-        val down1 = down(1, 50.milliseconds, 11f, 19f)
+        val move0 = down0.moveTo(50, 27f, 29f)
+        val down1 = down(1, 50, 11f, 19f)
 
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down0))
         testContext.advanceTimeBy(50, TimeUnit.MILLISECONDS)
@@ -348,11 +347,11 @@ class LongPressGestureFilterTest {
     fun onPointerEvent_down0Down1Move1Up0_onLongPressCalledWithMove1Position() {
         val down0 = down(0, x = 13f, y = 17f)
 
-        val move0 = down0.moveBy(25.milliseconds, 0f, 0f)
-        val down1 = down(1, 25.milliseconds, 11f, 19f)
+        val move0 = down0.moveBy(25, 0f, 0f)
+        val down1 = down(1, 25, 11f, 19f)
 
-        val up0 = move0.up(50.milliseconds)
-        val move1 = down1.moveTo(50.milliseconds, 27f, 23f)
+        val up0 = move0.up(50)
+        val move1 = down1.moveTo(50, 27f, 23f)
 
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down0))
         testContext.advanceTimeBy(25, TimeUnit.MILLISECONDS)
@@ -378,7 +377,7 @@ class LongPressGestureFilterTest {
 
         // Arrange
 
-        val down0 = down(0, 0.milliseconds)
+        val down0 = down(0, 0)
         filter::onPointerEvent.invokeOverAllPasses(
             pointerEventOf(down0)
         )
@@ -386,8 +385,8 @@ class LongPressGestureFilterTest {
         // Act
 
         testContext.advanceTimeBy(10, TimeUnit.MILLISECONDS)
-        val move0 = down0.moveTo(10.milliseconds, 0f, 0f)
-        val down1 = down(0, 10.milliseconds)
+        val move0 = down0.moveTo(10, 0f, 0f)
+        val down1 = down(0, 10)
         filter::onPointerEvent.invokeOverAllPasses(
             pointerEventOf(move0, down1)
         )
@@ -403,7 +402,7 @@ class LongPressGestureFilterTest {
 
         // Arrange
 
-        val down0 = down(0, 0.milliseconds)
+        val down0 = down(0, 0)
         filter::onPointerEvent.invokeOverAllPasses(
             pointerEventOf(down0)
         )
@@ -411,7 +410,7 @@ class LongPressGestureFilterTest {
         // Act
 
         testContext.advanceTimeBy(50, TimeUnit.MILLISECONDS)
-        val up = down0.up(50.milliseconds)
+        val up = down0.up(50)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up))
 
         // Assert
@@ -424,7 +423,7 @@ class LongPressGestureFilterTest {
 
         // Arrange
 
-        val down0 = down(0, 0.milliseconds)
+        val down0 = down(0, 0)
         filter::onPointerEvent.invokeOverAllPasses(
             pointerEventOf(down0)
         )
@@ -432,7 +431,7 @@ class LongPressGestureFilterTest {
         // Act
 
         testContext.advanceTimeBy(101, TimeUnit.MILLISECONDS)
-        val up0 = down0.up(100.milliseconds)
+        val up0 = down0.up(100)
         filter.onPointerEvent(
             pointerEventOf(up0),
             PointerEventPass.Initial,
@@ -449,16 +448,16 @@ class LongPressGestureFilterTest {
 
         // Arrange
 
-        var pointer = down(0, 0.milliseconds)
+        var pointer = down(0, 0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
         testContext.advanceTimeBy(50, TimeUnit.MILLISECONDS)
-        pointer = pointer.moveTo(50.milliseconds, 5f).apply { consumePositionChange(1f, 0f) }
+        pointer = pointer.moveTo(50, 5f).apply { consumePositionChange(1f, 0f) }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
 
         // Act
 
         testContext.advanceTimeBy(51, TimeUnit.MILLISECONDS)
-        pointer = pointer.up(100.milliseconds)
+        pointer = pointer.up(100)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
 
         // Assert
@@ -470,7 +469,7 @@ class LongPressGestureFilterTest {
 
     @Test
     fun onCancel_downCancelBeyondTimeout_eventNotFired() {
-        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down(0, 0.milliseconds)))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down(0, 0)))
         filter.onCancel()
         testContext.advanceTimeBy(100, TimeUnit.MILLISECONDS)
 
@@ -480,7 +479,7 @@ class LongPressGestureFilterTest {
 
     @Test
     fun onCancel_downAlmostTimeoutCancelTimeout_eventNotFired() {
-        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down(0, 0.milliseconds)))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down(0, 0)))
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
         filter.onCancel()
         testContext.advanceTimeBy(1, TimeUnit.MILLISECONDS)
@@ -491,10 +490,10 @@ class LongPressGestureFilterTest {
 
     @Test
     fun onCancel_downCancelDownTimeExpires_eventFiredOnce() {
-        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down(0, 0.milliseconds)))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down(0, 0)))
         testContext.advanceTimeBy(99, TimeUnit.MILLISECONDS)
         filter.onCancel()
-        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down(0, 0.milliseconds)))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down(0, 0)))
         testContext.advanceTimeBy(100, TimeUnit.MILLISECONDS)
 
         verify(onLongPress).invoke(any())
@@ -505,7 +504,7 @@ class LongPressGestureFilterTest {
 
     @Test
     fun onCustomEvent_downCustomEventTimeout_eventNotFired() {
-        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down(0, 0.milliseconds)))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down(0, 0)))
         filter::onCustomEvent.invokeOverAllPasses(LongPressFiredEvent)
         testContext.advanceTimeBy(100, TimeUnit.MILLISECONDS)
 
@@ -515,10 +514,10 @@ class LongPressGestureFilterTest {
 
     @Test
     fun onCustomEvent_downCustomEventTimeoutDownTimeout_eventFiredOnce() {
-        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down(0, 0.milliseconds)))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down(0, 0)))
         filter::onCustomEvent.invokeOverAllPasses(LongPressFiredEvent)
         testContext.advanceTimeBy(100, TimeUnit.MILLISECONDS)
-        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down(0, 0.milliseconds)))
+        filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down(0, 0)))
         testContext.advanceTimeBy(100, TimeUnit.MILLISECONDS)
 
         verify(onLongPress).invoke(any())
