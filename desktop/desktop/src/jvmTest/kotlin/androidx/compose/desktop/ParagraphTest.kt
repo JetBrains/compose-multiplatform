@@ -33,11 +33,11 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.fontFamily
-import androidx.compose.ui.text.platform.font
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.test.junit4.DesktopScreenshotTestRule
 import androidx.compose.ui.test.TestComposeWindow
+import androidx.compose.ui.text.platform.font
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
@@ -69,8 +69,8 @@ class ParagraphTest {
             "}"
 
     val fontFamily = fontFamily(
-        font("Noto", "NotoSans-Regular.ttf"),
-        font("Noto", "NotoSans-Italic.ttf", style = FontStyle.Italic)
+        font("NotoSans-Regular.ttf"),
+        font("NotoSans-Italic.ttf", style = FontStyle.Italic)
     )
 
     // TODO(b/168298835)
