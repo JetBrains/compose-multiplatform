@@ -117,7 +117,8 @@ private class PointerInputChangeEventProducer {
                 val previous = previousPointerInputData[it.id] ?: PointerInputData(
                     it.uptime,
                     it.position,
-                    false
+                    false,
+                    it.type
                 )
                 changes[it.id] =
                     PointerInputChange(
@@ -128,13 +129,15 @@ private class PointerInputChangeEventProducer {
                         previous.uptime,
                         previous.position,
                         previous.down,
-                        ConsumedData()
+                        ConsumedData(),
+                        it.type
                     )
                 if (it.down) {
                     previousPointerInputData[it.id] = PointerInputData(
                         it.uptime,
                         it.position,
-                        it.down
+                        it.down,
+                        it.type
                     )
                 } else {
                     previousPointerInputData.remove(it.id)
@@ -153,7 +156,8 @@ private class PointerInputChangeEventProducer {
     private class PointerInputData(
         val uptime: Long,
         val position: Offset,
-        val down: Boolean
+        val down: Boolean,
+        val type: PointerType
     )
 }
 

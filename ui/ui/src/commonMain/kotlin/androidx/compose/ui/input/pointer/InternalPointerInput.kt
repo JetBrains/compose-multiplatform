@@ -40,7 +40,8 @@ internal data class PointerInputEventData(
     val id: PointerId,
     val uptime: Long,
     val position: Offset,
-    val down: Boolean
+    val down: Boolean,
+    val type: PointerType
 )
 
 /**

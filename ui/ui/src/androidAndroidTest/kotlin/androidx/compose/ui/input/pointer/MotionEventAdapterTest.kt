@@ -42,6 +42,41 @@ class MotionEventAdapterTest {
     }
 
     @Test
+    fun convertToolType() {
+        val types = mapOf(
+            MotionEvent.TOOL_TYPE_FINGER to PointerType.Touch,
+            MotionEvent.TOOL_TYPE_UNKNOWN to PointerType.Unknown,
+            MotionEvent.TOOL_TYPE_ERASER to PointerType.Eraser,
+            MotionEvent.TOOL_TYPE_STYLUS to PointerType.Stylus,
+            MotionEvent.TOOL_TYPE_MOUSE to PointerType.Mouse,
+        )
+        types.forEach { toolType, pointerType ->
+            motionEventAdapter = MotionEventAdapter()
+            val motionEvent = MotionEvent(
+                2894,
+                ACTION_DOWN,
+                1,
+                0,
+                arrayOf(
+                    PointerProperties(1000, toolType),
+                ),
+                arrayOf(
+                    PointerCoords(2967f, 5928f),
+                )
+            )
+            val pointerInputEvent = motionEventAdapter.convertToPointerInputEvent(motionEvent)!!
+            assertPointerInputEventData(
+                pointerInputEvent.pointers[0],
+                PointerId(0),
+                true,
+                2967f,
+                5928f,
+                pointerType
+            )
+        }
+    }
+
+    @Test
     fun convertToPointerInputEvent_1pointerActionDown_convertsCorrectly() {
         val motionEvent = MotionEvent(
             2894,
@@ -1518,10 +1553,12 @@ private fun assertPointerInputEventData(
     id: PointerId,
     isDown: Boolean,
     x: Float,
-    y: Float
+    y: Float,
+    type: PointerType = PointerType.Touch
 ) {
     assertThat(actual.id).isEqualTo(id)
     assertThat(actual.down).isEqualTo(isDown)
     assertThat(actual.position.x).isEqualTo(x)
     assertThat(actual.position.y).isEqualTo(y)
+    assertThat(actual.type).isEqualTo(type)
 }

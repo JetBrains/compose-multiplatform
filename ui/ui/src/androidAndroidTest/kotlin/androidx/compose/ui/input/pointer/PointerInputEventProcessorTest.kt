@@ -94,6 +94,70 @@ class PointerInputEventProcessorTest {
     }
 
     @Test
+    fun pointerTypePassed() {
+        val pointerTypes = PointerType.values()
+
+        // Arrange
+        val pointerInputFilter = PointerInputFilterMock()
+        val layoutNode = LayoutNode(
+            0,
+            0,
+            500,
+            500,
+            PointerInputModifierImpl2(
+                pointerInputFilter
+            )
+        )
+
+        root.insertAt(0, layoutNode)
+
+        val offset = Offset(100f, 200f)
+        val previousEvents = mutableListOf<PointerInputEventData>()
+        val events = pointerTypes.mapIndexed { index, pointerType ->
+            previousEvents += PointerInputEventData(
+                id = PointerId(index.toLong()),
+                uptime = index.toLong(),
+                position = Offset(offset.x + index, offset.y + index),
+                down = true,
+                type = pointerType
+            )
+            val data = previousEvents.map {
+                it.copy(uptime = index.toLong())
+            }
+            PointerInputEvent(index.toLong(), data)
+        }
+
+        // Act
+
+        events.forEach { pointerInputEventProcessor.process(it) }
+
+        // Assert
+
+        val log = pointerInputFilter.log.getOnPointerEventLog()
+
+        // Verify call count
+        assertThat(log)
+            .hasSize(PointerEventPass.values().size * pointerTypes.size)
+
+        // Verify types of the pointers
+        repeat(pointerTypes.size) { eventIndex ->
+            PointerEventPass.values().forEachIndexed { passIndex, pass ->
+                val item = log[passIndex + (eventIndex * PointerEventPass.values().size)]
+                assertThat(item.pass).isEqualTo(pass)
+
+                val changes = item.pointerEvent.changes
+                assertThat(changes.size).isEqualTo(eventIndex + 1)
+
+                for (i in 0..eventIndex) {
+                    val pointerType = pointerTypes[i]
+                    val change = changes[i]
+                    assertThat(change.type).isEqualTo(pointerType)
+                }
+            }
+        }
+    }
+
+    @Test
     fun process_downMoveUp_convertedCorrectlyAndTraversesAllPassesInCorrectOrder() {
 
         // Arrange
