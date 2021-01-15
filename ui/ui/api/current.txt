@@ -742,23 +742,20 @@ package androidx.compose.ui.graphics {
 package androidx.compose.ui.graphics.vector {
 
   @androidx.compose.runtime.Immutable public final class ImageVector {
-    method public String component1();
-    method public float component2-D9Ej5fM();
-    method public float component3-D9Ej5fM();
-    method public float component4();
-    method public float component5();
-    method public androidx.compose.ui.graphics.vector.VectorGroup component6();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.graphics.vector.ImageVector copy-pRTh4Qo(String name, float defaultWidth, float defaultHeight, float viewportWidth, float viewportHeight, androidx.compose.ui.graphics.vector.VectorGroup root);
     method public float getDefaultHeight-D9Ej5fM();
     method public float getDefaultWidth-D9Ej5fM();
     method public String getName();
     method public androidx.compose.ui.graphics.vector.VectorGroup getRoot();
+    method public androidx.compose.ui.graphics.BlendMode getTintBlendMode();
+    method public long getTintColor-0d7_KjU();
     method public float getViewportHeight();
     method public float getViewportWidth();
     property public final float defaultHeight;
     property public final float defaultWidth;
     property public final String name;
     property public final androidx.compose.ui.graphics.vector.VectorGroup root;
+    property public final androidx.compose.ui.graphics.BlendMode tintBlendMode;
+    property public final long tintColor;
     property public final float viewportHeight;
     property public final float viewportWidth;
   }
@@ -859,7 +856,7 @@ package androidx.compose.ui.graphics.vector {
     method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.VectorPainter VectorPainter(androidx.compose.ui.graphics.vector.ImageVector image);
     method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.VectorPainter VectorPainter-RKTc9UI(float defaultWidth, float defaultHeight, optional float viewportWidth, optional float viewportHeight, optional String name, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,kotlin.Unit> children);
     method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.VectorPainter rememberVectorPainter(androidx.compose.ui.graphics.vector.ImageVector image);
-    method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.VectorPainter rememberVectorPainter-RKTc9UI(float defaultWidth, float defaultHeight, optional float viewportWidth, optional float viewportHeight, optional String name, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.VectorPainter rememberVectorPainter-u_AqRoo(float defaultWidth, float defaultHeight, optional float viewportWidth, optional float viewportHeight, optional String name, optional long tintColor, optional androidx.compose.ui.graphics.BlendMode tintBlendMode, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,kotlin.Unit> content);
     field public static final String RootGroupName = "VectorRootGroup";
   }
 

@@ -16,8 +16,10 @@
 
 package androidx.compose.ui.graphics.vector.compat
 
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.PathNode
 import androidx.compose.ui.graphics.vector.VectorGroup
 import androidx.compose.ui.graphics.vector.VectorNode
@@ -158,6 +160,57 @@ class XmlVectorParserTest {
         }
 
         path[2].assertType<PathNode.Close>()
+    }
+
+    @Test
+    fun testParsePlus() {
+        val asset = loadVector(R.drawable.ic_triangle_plus)
+        assertEquals(Color.Blue, asset.tintColor)
+        assertEquals(BlendMode.Plus, asset.tintBlendMode)
+    }
+
+    @Test
+    fun testParseScreen() {
+        val asset = loadVector(R.drawable.ic_triangle_screen)
+        assertEquals(Color.Blue, asset.tintColor)
+        assertEquals(BlendMode.Screen, asset.tintBlendMode)
+    }
+
+    @Test
+    fun testParseSrcAtop() {
+        val asset = loadVector(R.drawable.ic_triangle_src_atop)
+        assertEquals(Color.Blue, asset.tintColor)
+        assertEquals(BlendMode.SrcAtop, asset.tintBlendMode)
+    }
+
+    @Test
+    fun testParseSrcIn() {
+        val asset = loadVector(R.drawable.ic_triangle_src_in)
+        assertEquals(Color.Blue, asset.tintColor)
+        assertEquals(BlendMode.SrcIn, asset.tintBlendMode)
+    }
+
+    @Test
+    fun testParseModulate() {
+        val asset = loadVector(R.drawable.ic_triangle_modulate)
+        assertEquals(Color.Blue, asset.tintColor)
+        assertEquals(BlendMode.Modulate, asset.tintBlendMode)
+    }
+
+    @Test
+    fun testParseSrcOver() {
+        val asset = loadVector(R.drawable.ic_triangle_src_over)
+        assertEquals(Color.Blue, asset.tintColor)
+        assertEquals(BlendMode.SrcOver, asset.tintBlendMode)
+    }
+
+    private fun loadVector(id: Int): ImageVector {
+        val res = InstrumentationRegistry.getInstrumentation().targetContext.resources
+        return loadVectorResource(
+            null,
+            res,
+            id
+        )
     }
 
     /**
