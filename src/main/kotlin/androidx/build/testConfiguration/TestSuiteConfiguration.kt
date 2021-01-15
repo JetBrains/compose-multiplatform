@@ -34,13 +34,22 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
 import java.io.File
 
+/**
+ * Creates and configures the test config generation task for a project. Configuration includes
+ * populating the task with relevant data from the first 4 params, and setting whether the task
+ * is enabled.
+ *
+ * @param overrideProject Allows the config task for one project to get registered to an
+ * alternative project. Default is for the project to register the new config task to itself
+ */
 fun Project.createTestConfigurationGenerationTask(
     variantName: String,
     artifacts: Artifacts,
     minSdk: Int,
-    testRunner: String
+    testRunner: String,
+    overrideProject: Project = this
 ) {
-    val generateTestConfigurationTask = this.tasks.register(
+    val generateTestConfigurationTask = overrideProject.tasks.register(
         "${AndroidXPlugin.GENERATE_TEST_CONFIGURATION_TASK}$variantName",
         GenerateTestConfigurationTask::class.java
     ) { task ->
@@ -73,13 +82,14 @@ fun Project.createTestConfigurationGenerationTask(
         .dependsOn(generateTestConfigurationTask)
 }
 
-fun Project.addAppApkToTestConfigGeneration() {
+fun Project.addAppApkToTestConfigGeneration(overrideProject: Project = this) {
     extensions.getByType<ApplicationAndroidComponentsExtension>().apply {
         onVariants(selector().withBuildType("debug")) { debugVariant ->
-            tasks.withType(GenerateTestConfigurationTask::class.java).configureEach {
-                it.appFolder.set(debugVariant.artifacts.get(ArtifactType.APK))
-                it.appLoader.set(debugVariant.artifacts.getBuiltArtifactsLoader())
-            }
+            overrideProject.tasks.withType(GenerateTestConfigurationTask::class.java)
+                .configureEach {
+                    it.appFolder.set(debugVariant.artifacts.get(ArtifactType.APK))
+                    it.appLoader.set(debugVariant.artifacts.getBuiltArtifactsLoader())
+                }
         }
     }
 }
@@ -87,14 +97,15 @@ fun Project.addAppApkToTestConfigGeneration() {
 private fun getOrCreateMediaTestConfigTask(project: Project, isMedia2: Boolean):
     TaskProvider<GenerateMediaTestConfigurationTask> {
         val mediaPrefix = getMediaConfigTaskPrefix(isMedia2)
-        if (!project.parent!!.tasks.withType(GenerateMediaTestConfigurationTask::class.java)
+        val parentProject = project.parent!!
+        if (!parentProject.tasks.withType(GenerateMediaTestConfigurationTask::class.java)
             .names.contains(
                     "support-$mediaPrefix-test${
                     AndroidXPlugin.GENERATE_TEST_CONFIGURATION_TASK
                     }"
                 )
         ) {
-            val task = project.parent!!.tasks.register(
+            val task = parentProject.tasks.register(
                 "support-$mediaPrefix-test${AndroidXPlugin.GENERATE_TEST_CONFIGURATION_TASK}",
                 GenerateMediaTestConfigurationTask::class.java
             ) { task ->
@@ -109,7 +120,7 @@ private fun getOrCreateMediaTestConfigTask(project: Project, isMedia2: Boolean):
                 .dependsOn(task)
             return task
         } else {
-            return project.parent!!.tasks.withType(GenerateMediaTestConfigurationTask::class.java)
+            return parentProject.tasks.withType(GenerateMediaTestConfigurationTask::class.java)
                 .named(
                     "support-$mediaPrefix-test${
                     AndroidXPlugin.GENERATE_TEST_CONFIGURATION_TASK
@@ -178,6 +189,66 @@ fun Project.createOrUpdateMediaTestConfigurationGenerationTask(
     }
 }
 
+private fun Project.getOrCreateMacrobenchmarkConfigTask(variantName: String):
+    TaskProvider<GenerateTestConfigurationTask> {
+        val parentProject = this.parent!!
+        return if (
+            parentProject.tasks.withType(GenerateTestConfigurationTask::class.java).isEmpty()
+        ) {
+            parentProject.tasks.register(
+                "${AndroidXPlugin.GENERATE_TEST_CONFIGURATION_TASK}$variantName",
+                GenerateTestConfigurationTask::class.java
+            )
+        } else {
+            parentProject.tasks.withType(GenerateTestConfigurationTask::class.java)
+                .named("${AndroidXPlugin.GENERATE_TEST_CONFIGURATION_TASK}$variantName")
+        }
+    }
+
+private fun Project.configureMacrobenchmarkConfigTask(
+    variantName: String,
+    artifacts: Artifacts,
+    minSdk: Int,
+    testRunner: String
+) {
+    val configTask = getOrCreateMacrobenchmarkConfigTask(variantName)
+    if (path.endsWith("macrobenchmark")) {
+        configTask.configure { task ->
+            task.testFolder.set(artifacts.get(ArtifactType.APK))
+            task.testLoader.set(artifacts.getBuiltArtifactsLoader())
+            task.outputXml.fileValue(
+                File(
+                    this.getTestConfigDirectory(),
+                    "${this.path.asFilenamePrefix()}$variantName.xml"
+                )
+            )
+            task.minSdk.set(minSdk)
+            task.hasBenchmarkPlugin.set(this.hasBenchmarkPlugin())
+            task.testRunner.set(testRunner)
+            task.projectPath.set(this.path)
+            task.affectedModuleDetectorSubset.set(
+                project.provider {
+                    AffectedModuleDetector.getProjectSubset(project)
+                }
+            )
+            AffectedModuleDetector.configureTaskGuard(task)
+        }
+        // Disable xml generation for projects that have no test sources
+        this.afterEvaluate {
+            configTask.configure {
+                it.enabled = this.hasAndroidTestSourceCode()
+            }
+        }
+        this.rootProject.tasks.findByName(AndroidXPlugin.ZIP_TEST_CONFIGS_WITH_APKS_TASK)!!
+            .dependsOn(configTask)
+    } else if (path.endsWith("macrobenchmark-target")) {
+        configTask.configure { task ->
+            task.appFolder.set(artifacts.get(ArtifactType.APK))
+            task.appLoader.set(artifacts.getBuiltArtifactsLoader())
+        }
+    }
+}
+
 fun Project.configureTestConfigGeneration(testedExtension: TestedExtension) {
     extensions.getByType<AndroidComponentsExtension<*, *>>().apply {
         androidTest(selector().all()) { androidTest ->
@@ -198,6 +269,15 @@ fun Project.configureTestConfigGeneration(testedExtension: TestedExtension) {
                         testedExtension.defaultConfig.minSdk!!,
                         testedExtension.defaultConfig.testInstrumentationRunner!!,
                         isMedia2 = false
+                    )
+                }
+                path.endsWith("macrobenchmark") ||
+                    path.endsWith("macrobenchmark-target") -> {
+                    configureMacrobenchmarkConfigTask(
+                        androidTest.name,
+                        androidTest.artifacts,
+                        testedExtension.defaultConfig.minSdk!!,
+                        testedExtension.defaultConfig.testInstrumentationRunner!!
                     )
                 }
                 else -> {
