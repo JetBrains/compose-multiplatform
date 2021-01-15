@@ -25,9 +25,8 @@ import android.util.AttributeSet
 import android.util.Log
 import android.widget.FrameLayout
 import androidx.annotation.VisibleForTesting
-import androidx.compose.animation.TransitionModel
-import androidx.compose.animation.core.AnimationClockObserver
 import androidx.compose.animation.core.InternalAnimationApi
+import androidx.compose.animation.core.Transition
 import androidx.compose.runtime.AtomicReference
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
@@ -36,16 +35,15 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientFontLoader
-import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewRootForTest
+import androidx.compose.ui.tooling.CompositionDataRecord
 import androidx.compose.ui.tooling.Group
 import androidx.compose.ui.tooling.Inspectable
-import androidx.compose.ui.tooling.CompositionDataRecord
 import androidx.compose.ui.tooling.SourceLocation
 import androidx.compose.ui.tooling.asTree
 import androidx.compose.ui.tooling.preview.animation.PreviewAnimationClock
@@ -100,9 +98,8 @@ data class ViewInfo(
  *  for debugging purposes.
  *  - `tools:printViewInfos`: If true, the [ComposeViewAdapter] will log the tree of [ViewInfo]
  *  to logcat for debugging.
- *  - `tools:animationClockStartTime`: When set, the [AnimationClockAmbient] will provide a
- *  [PreviewAnimationClock] using this value as start time. The clock will control the animations
- *  in the [ComposeViewAdapter] context.
+ *  - `tools:animationClockStartTime`: When set, a [PreviewAnimationClock] will control the
+ *  animations in the [ComposeViewAdapter] context.
  *
  * @suppress
  */
@@ -258,7 +255,7 @@ internal class ComposeViewAdapter : FrameLayout {
         processViewInfos()
         if (composableName.isNotEmpty()) {
             // TODO(b/160126628): support other APIs, e.g. animate
-            findAndSubscribeTransitions()
+            findAndTrackTransitions()
         }
     }
 
@@ -267,32 +264,33 @@ internal class ComposeViewAdapter : FrameLayout {
      * `@Composable` being previewed. We only return animations defined in the user code, i.e.
      * the ones we've got source information for.
      */
+    @Suppress("UNCHECKED_CAST")
     @OptIn(InternalAnimationApi::class)
-    private fun findAndSubscribeTransitions() {
+    private fun findAndTrackTransitions() {
         val slotTrees = slotTableRecord.store.map { it.asTree() }
-        val observers = mutableSetOf<AnimationClockObserver>()
+        val transitions = mutableSetOf<Transition<Any>>()
         // Check all the slot tables, since some animations might not be present in the same
         // table as the one containing the `@Composable` being previewed, e.g. when they're
         // defined using sub-composition.
         slotTrees.forEach { tree ->
-            observers.addAll(
+            transitions.addAll(
                 tree.findAll {
-                    // Find `transition` calls in the user code, i.e. when source location is known
-                    it.name == "transition" && it.location != null
+                    // Find `updateTransition` calls in the user code, i.e. when source location is
+                    // known.
+                    it.name == "updateTransition" && it.location != null
                 }.mapNotNull {
                     val rememberCall =
                         it.firstOrNull { it.name == "remember" } ?: return@mapNotNull null
-                    val transitionModel = rememberCall.data.firstOrNull { data ->
-                        data is TransitionModel<*>
-                    } as? TransitionModel<*>
-                    transitionModel?.anim?.animationClockObserver
+                    rememberCall.data.firstOrNull { data ->
+                        data is Transition<*>
+                    } as? Transition<Any>
                 }
             )
         }
-        hasAnimations = observers.isNotEmpty()
-        // Subscribe all the observers found to the `PreviewAnimationClock`
+        hasAnimations = transitions.isNotEmpty()
+        // Make the `PreviewAnimationClock` track all the transitions found.
         if (::clock.isInitialized) {
-            observers.forEach { clock.subscribe(it) }
+            transitions.forEach { clock.trackTransition(it) }
         }
     }
 
@@ -396,8 +394,8 @@ internal class ComposeViewAdapter : FrameLayout {
      * @param debugPaintBounds if true, the view will paint the boundaries around the layout
      * elements.
      * @param debugViewInfos if true, it will generate the [ViewInfo] structures and will log it.
-     * @param animationClockStartTime if positive, the [AnimationClockAmbient] will provide
-     * [clock] instead of the default clock, setting this value as the clock's initial time.
+     * @param animationClockStartTime if positive, [clock] will be defined and will control the
+     * animations defined in the context of the `@Composable` being previewed.
      * @param forceCompositionInvalidation if true, the composition will be invalidated on every
      * draw, forcing it to recompose on next render.
      * @param onCommit callback invoked after every commit of the preview composable.
@@ -453,23 +451,23 @@ internal class ComposeViewAdapter : FrameLayout {
                     }
                 }
                 if (animationClockStartTime >= 0) {
-                    // Provide a custom clock when animation inspection is enabled, i.e. when a
-                    // valid `animationClockStartTime` is passed. This clock will control the
-                    // animations defined in this `ComposeViewAdapter` from Android Studio.
-                    clock = PreviewAnimationClock(animationClockStartTime) {
+                    // When animation inspection is enabled, i.e. when a valid (non-negative)
+                    // `animationClockStartTime` is passed, set the Preview Animation Clock. This
+                    // clock will control the animations defined in this `ComposeViewAdapter`
+                    // from Android Studio.
+                    clock = PreviewAnimationClock {
                         // Invalidate the descendants of this ComposeViewAdapter's only grandchild
                         // (an AndroidOwner) when setting the clock time to make sure the Compose
                         // Preview will animate when the states are read inside the draw scope.
                         val composeView = getChildAt(0) as ComposeView
                         (composeView.getChildAt(0) as? ViewRootForTest)
                             ?.invalidateDescendants()
+                        // Send pending apply notifications to ensure the animation duration will
+                        // be read in the correct frame.
+                        Snapshot.sendApplyNotifications()
                     }
-                    Providers(AmbientAnimationClock provides clock) {
-                        composable()
-                    }
-                } else {
-                    composable()
                 }
+                composable()
             }
         }
         composeView.setContent(previewComposition)
