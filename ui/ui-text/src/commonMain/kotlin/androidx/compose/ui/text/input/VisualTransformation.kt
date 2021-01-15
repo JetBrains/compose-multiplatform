@@ -49,7 +49,7 @@ class TransformedText(
     }
 
     override fun toString(): String {
-        return "TransformedText(transformedText=$text, offsetMapping=$offsetMapping)"
+        return "TransformedText(text=$text, offsetMapping=$offsetMapping)"
     }
 }
 
