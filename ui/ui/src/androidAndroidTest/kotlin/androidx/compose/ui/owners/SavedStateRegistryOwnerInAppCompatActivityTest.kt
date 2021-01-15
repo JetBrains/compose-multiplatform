@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.lifecycleowner
+package androidx.compose.ui.owners
 
-import androidx.activity.ComponentActivity
-import androidx.compose.ui.platform.AmbientLifecycleOwner
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.platform.AmbientSavedStateRegistryOwner
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.setContent
-import androidx.lifecycle.LifecycleOwner
+import androidx.savedstate.SavedStateRegistryOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import org.junit.Assert.assertEquals
@@ -34,13 +34,13 @@ import java.util.concurrent.TimeUnit
 
 @SmallTest
 @RunWith(AndroidJUnit4::class)
-class LifecycleOwnerInComponentActivityTest {
+class SavedStateRegistryOwnerInAppCompatActivityTest {
     @Suppress("DEPRECATION")
     @get:Rule
-    val activityTestRule = androidx.test.rule.ActivityTestRule<ComponentActivity>(
-        ComponentActivity::class.java
+    val activityTestRule = androidx.test.rule.ActivityTestRule(
+        AppCompatActivity::class.java
     )
-    private lateinit var activity: ComponentActivity
+    private lateinit var activity: AppCompatActivity
 
     @Before
     fun setup() {
@@ -48,13 +48,13 @@ class LifecycleOwnerInComponentActivityTest {
     }
 
     @Test
-    fun lifecycleOwnerIsAvailable() {
+    fun ownerIsAvailable() {
         val latch = CountDownLatch(1)
-        var owner: LifecycleOwner? = null
+        var owner: SavedStateRegistryOwner? = null
 
         activityTestRule.runOnUiThread {
             activity.setContent {
-                owner = AmbientLifecycleOwner.current
+                owner = AmbientSavedStateRegistryOwner.current
                 latch.countDown()
             }
         }
@@ -64,15 +64,15 @@ class LifecycleOwnerInComponentActivityTest {
     }
 
     @Test
-    fun lifecycleOwnerIsAvailableWhenComposedIntoViewGroup() {
+    fun ownerIsAvailableWhenComposedIntoView() {
         val latch = CountDownLatch(1)
-        var owner: LifecycleOwner? = null
+        var owner: SavedStateRegistryOwner? = null
 
         activityTestRule.runOnUiThread {
             val view = ComposeView(activity)
             activity.setContentView(view)
             view.setContent {
-                owner = AmbientLifecycleOwner.current
+                owner = AmbientSavedStateRegistryOwner.current
                 latch.countDown()
             }
         }

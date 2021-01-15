@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.lifecycleowner
+package androidx.compose.ui.owners
 
 import android.os.Bundle
 import android.view.LayoutInflater

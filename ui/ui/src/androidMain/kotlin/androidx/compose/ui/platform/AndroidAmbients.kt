@@ -37,6 +37,7 @@ import androidx.compose.runtime.staticAmbientOf
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelStoreOwner
+import androidx.savedstate.SavedStateRegistryOwner
 
 /**
  * The Android [Configuration]. The [Configuration] is useful for determining how to organize the
@@ -96,6 +97,11 @@ val LifecycleOwnerAmbient get() = AmbientLifecycleOwner
  * The ambient containing the current [LifecycleOwner].
  */
 val AmbientLifecycleOwner = staticAmbientOf<LifecycleOwner>()
+
+/**
+ * The ambient containing the current [SavedStateRegistryOwner].
+ */
+val AmbientSavedStateRegistryOwner = staticAmbientOf<SavedStateRegistryOwner>()
 
 /**
  * The ambient containing the current Compose [View].
@@ -169,6 +175,7 @@ internal fun ProvideAndroidAmbients(owner: AndroidComposeView, content: @Composa
         AmbientConfiguration provides configuration,
         AmbientContext provides context,
         AmbientLifecycleOwner provides viewTreeOwners.lifecycleOwner,
+        AmbientSavedStateRegistryOwner provides viewTreeOwners.savedStateRegistryOwner,
         AmbientUiSavedStateRegistry provides uiSavedStateRegistry,
         AmbientView provides owner.view,
         AmbientViewModelStoreOwner provides viewTreeOwners.viewModelStoreOwner
