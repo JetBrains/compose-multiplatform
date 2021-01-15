@@ -20,10 +20,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.unit.inMilliseconds
-import androidx.compose.ui.unit.milliseconds
-import androidx.test.filters.MediumTest
-import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriod
+import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriodMillis
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performGesture
@@ -32,11 +29,12 @@ import androidx.compose.ui.test.util.ClickableTestBox
 import androidx.compose.ui.test.util.MultiPointerInputRecorder
 import androidx.compose.ui.test.util.assertTimestampsAreIncreasing
 import androidx.compose.ui.test.util.isMonotonicBetween
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -62,7 +60,7 @@ class SendPinchTest {
         val end0 = Offset(8f, 50f)
         val start1 = Offset(60f, 50f)
         val end1 = Offset(92f, 50f)
-        val duration = 400.milliseconds
+        val duration = 400L
 
         rule.onNodeWithTag(TAG).performGesture {
             pinch(start0, end0, start1, end1, duration)
@@ -72,7 +70,7 @@ class SendPinchTest {
             recorder.run {
                 assertTimestampsAreIncreasing()
 
-                val expectedMoveEvents = duration.inMilliseconds() / eventPeriod
+                val expectedMoveEvents = duration / eventPeriodMillis
                 // expect up and down events for each pointer as well as the move events
                 assertThat(events.size).isEqualTo(4 + expectedMoveEvents)
 

@@ -19,7 +19,6 @@ package androidx.compose.ui.input.pointer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
-import androidx.compose.ui.unit.Uptime
 import androidx.compose.ui.util.fastForEach
 
 /**
@@ -152,7 +151,7 @@ private class PointerInputChangeEventProducer {
     }
 
     private class PointerInputData(
-        val uptime: Uptime,
+        val uptime: Long,
         val position: Offset,
         val down: Boolean
     )

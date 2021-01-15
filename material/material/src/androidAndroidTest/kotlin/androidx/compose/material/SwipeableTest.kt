@@ -54,7 +54,6 @@ import androidx.compose.ui.test.up
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.milliseconds
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
@@ -1635,7 +1634,7 @@ class SwipeableTest {
                 swipeWithVelocity(
                     center,
                     center.copy(y = centerY - 500, x = centerX),
-                    duration = 50.milliseconds,
+                    durationMillis = 50,
                     endVelocity = 20000f
                 )
             }
@@ -1651,7 +1650,7 @@ class SwipeableTest {
                 swipeWithVelocity(
                     center,
                     center.copy(y = centerY + 500, x = centerX),
-                    duration = 50.milliseconds,
+                    durationMillis = 50,
                     endVelocity = 20000f
                 )
             }
@@ -1704,7 +1703,7 @@ class SwipeableTest {
                 swipeWithVelocity(
                     center,
                     center.copy(y = centerY + 1500, x = centerX),
-                    duration = 50.milliseconds,
+                    durationMillis = 50,
                     endVelocity = 20000f
                 )
             }
@@ -1727,7 +1726,7 @@ class SwipeableTest {
                 swipeWithVelocity(
                     center,
                     center.copy(y = centerY + 1500, x = centerX),
-                    duration = 50.milliseconds,
+                    durationMillis = 50,
                     endVelocity = 20000f
                 )
             }

@@ -21,9 +21,6 @@ import android.view.InputDevice
 import android.view.MotionEvent
 import android.view.MotionEvent.ACTION_CANCEL
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.unit.Duration
-import androidx.compose.ui.unit.NanosecondsPerMillisecond
-import androidx.compose.ui.unit.milliseconds
 
 /**
  * Converts to a [MotionEvent] and runs [block] with it.
@@ -52,11 +49,10 @@ internal fun PointerEvent.toCancelMotionEventScope(
 }
 
 internal fun emptyCancelMotionEventScope(
-    now: Duration = SystemClock.uptimeMillis().milliseconds,
+    nowMillis: Long = SystemClock.uptimeMillis(),
     block: (MotionEvent) -> Unit
 ) {
     // Does what ViewGroup does when it needs to send a minimal ACTION_CANCEL event.
-    val nowMillis = now.nanoseconds / NanosecondsPerMillisecond
     val motionEvent =
         MotionEvent.obtain(nowMillis, nowMillis, ACTION_CANCEL, 0.0f, 0.0f, 0)
     motionEvent.source = InputDevice.SOURCE_UNKNOWN

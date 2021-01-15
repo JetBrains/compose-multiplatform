@@ -30,10 +30,7 @@ import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.TestActivity
-import androidx.compose.ui.unit.Duration
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.Uptime
-import androidx.compose.ui.unit.milliseconds
 import androidx.lifecycle.Lifecycle
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -173,10 +170,10 @@ class SuspendingPointerInputFilterTest {
                 listOf(
                     PointerInputChange(
                         PointerId(0),
-                        Uptime.Boot,
+                        0,
                         Offset(6f, 6f),
                         false,
-                        Uptime.Boot,
+                        0,
                         Offset(6f, 6f),
                         true,
                         consumed = ConsumedData(downChange = true)
@@ -283,14 +280,14 @@ private val PointerEvent.firstChange get() = changes.first()
 
 private class PointerInputChangeEmitter(id: Int = 0) {
     val pointerId = PointerId(id.toLong())
-    var previousTime = Uptime.Boot
+    var previousTime = 0L
     var previousPosition = Offset.Zero
     var previousPressed = false
 
     fun nextChange(
         position: Offset = Offset.Zero,
         down: Boolean = true,
-        time: Uptime = Uptime.Boot
+        time: Long = 0
     ): PointerInputChange {
         return PointerInputChange(
             id = pointerId,
@@ -310,12 +307,12 @@ private class PointerInputChangeEmitter(id: Int = 0) {
 }
 
 private class FakeViewConfiguration : ViewConfiguration {
-    override val longPressTimeout: Duration
-        get() = 500.milliseconds
-    override val doubleTapTimeout: Duration
-        get() = 300.milliseconds
-    override val doubleTapMinTime: Duration
-        get() = 40.milliseconds
+    override val longPressTimeoutMillis: Long
+        get() = 500
+    override val doubleTapTimeoutMillis: Long
+        get() = 300
+    override val doubleTapMinTimeMillis: Long
+        get() = 40
     override val touchSlop: Float
         get() = 18f
 }

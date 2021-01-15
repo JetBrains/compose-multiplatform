@@ -18,14 +18,13 @@ package androidx.compose.ui.test.inputdispatcher
 
 import android.view.MotionEvent
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.unit.milliseconds
-import androidx.test.filters.SmallTest
 import androidx.compose.ui.test.AndroidInputDispatcher
 import androidx.compose.ui.test.util.assertHasValidEventTimes
 import androidx.compose.ui.test.util.isMonotonicBetween
 import androidx.compose.ui.test.util.moveEvents
 import androidx.compose.ui.test.util.splitsDurationEquallyInto
 import androidx.compose.ui.test.util.verify
+import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -64,7 +63,7 @@ class SendSwipeLineTest(private val config: TestConfig) : InputDispatcherTest(co
 
     @Test
     fun swipeByLine() {
-        subject.enqueueSwipe(start, end, duration.milliseconds)
+        subject.enqueueSwipe(start, end, duration)
         subject.sendAllSynchronous()
 
         recorder.assertHasValidEventTimes()

@@ -113,7 +113,7 @@ fun AnimatableDecayAndAnimateToSample() {
                             // Snaps the value by the amount of finger movement
                             animatedOffset.snapTo(animatedOffset.value + it.positionChange().y)
                             velocityTracker.addPosition(
-                                it.time,
+                                it.uptimeMillis,
                                 it.position
                             )
                         }

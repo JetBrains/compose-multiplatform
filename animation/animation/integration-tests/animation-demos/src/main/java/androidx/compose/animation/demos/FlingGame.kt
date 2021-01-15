@@ -58,7 +58,7 @@ fun FlingGame() {
                             drag(pointerId) {
                                 anim.snapTo(anim.value + it.positionChange())
                                 velocityTracker.addPosition(
-                                    it.time,
+                                    it.uptimeMillis,
                                     it.position
                                 )
                             }

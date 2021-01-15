@@ -40,7 +40,6 @@ import androidx.compose.ui.test.swipe
 import androidx.compose.ui.test.swipeWithVelocity
 import androidx.compose.ui.test.up
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.milliseconds
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
@@ -79,7 +78,7 @@ class DraggableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         val lastTotal = rule.runOnIdle {
@@ -90,7 +89,7 @@ class DraggableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x, this.center.y + 100f),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         rule.runOnIdle {
@@ -100,7 +99,7 @@ class DraggableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x - 100f, this.center.y),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         rule.runOnIdle {
@@ -118,7 +117,7 @@ class DraggableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x, this.center.y + 100f),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         val lastTotal = rule.runOnIdle {
@@ -129,7 +128,7 @@ class DraggableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         rule.runOnIdle {
@@ -139,7 +138,7 @@ class DraggableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x, this.center.y - 100f),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         rule.runOnIdle {
@@ -166,7 +165,7 @@ class DraggableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         rule.runOnIdle {
@@ -188,7 +187,7 @@ class DraggableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         val prevTotal = rule.runOnIdle {
@@ -200,7 +199,7 @@ class DraggableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         rule.runOnIdle {
@@ -224,7 +223,7 @@ class DraggableTest {
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
                 endVelocity = 112f,
-                duration = 100.milliseconds
+                durationMillis = 100
 
             )
         }
@@ -245,7 +244,7 @@ class DraggableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         rule.runOnIdle {
@@ -271,7 +270,7 @@ class DraggableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         rule.runOnIdle {
@@ -310,7 +309,7 @@ class DraggableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 200f, this.center.y),
-                duration = 300.milliseconds
+                durationMillis = 300
             )
         }
         rule.runOnIdle {

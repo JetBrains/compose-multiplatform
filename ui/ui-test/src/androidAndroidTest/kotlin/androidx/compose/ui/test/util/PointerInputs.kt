@@ -24,14 +24,12 @@ import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
-import androidx.compose.ui.unit.Duration
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.Uptime
 import com.google.common.truth.Truth.assertThat
 
 data class DataPoint(
     val id: PointerId,
-    val timestamp: Uptime,
+    val timestamp: Long,
     val position: Offset,
     val down: Boolean
 ) {
@@ -48,8 +46,8 @@ class SinglePointerInputRecorder : PointerInputModifier {
 
     override val pointerInputFilter = RecordingFilter { changes ->
         changes.forEach {
-            _events.add(DataPoint(it.id, it.time, it.position, it.pressed))
-            velocityTracker.addPosition(it.time, it.position)
+            _events.add(DataPoint(it.id, it.uptimeMillis, it.position, it.pressed))
+            velocityTracker.addPosition(it.uptimeMillis, it.position)
         }
     }
 }
@@ -67,7 +65,7 @@ class MultiPointerInputRecorder : PointerInputModifier {
         _events.add(
             Event(
                 changes.map {
-                    DataPoint(it.id, it.time, it.position, it.pressed)
+                    DataPoint(it.id, it.uptimeMillis, it.position, it.pressed)
                 }
             )
         )
@@ -94,7 +92,7 @@ class RecordingFilter(
 
 val SinglePointerInputRecorder.downEvents get() = events.filter { it.down }
 
-val SinglePointerInputRecorder.recordedDuration: Duration
+val SinglePointerInputRecorder.recordedDurationMillis: Long
     get() {
         check(events.isNotEmpty()) { "No events recorded" }
         return events.last().timestamp - events.first().timestamp
@@ -129,7 +127,7 @@ fun SinglePointerInputRecorder.assertOnlyLastEventIsUp() {
 }
 
 fun DataPoint.verify(
-    expectedTimestamp: Uptime?,
+    expectedTimestamp: Long?,
     expectedId: PointerId?,
     expectedDown: Boolean,
     expectedPosition: Offset

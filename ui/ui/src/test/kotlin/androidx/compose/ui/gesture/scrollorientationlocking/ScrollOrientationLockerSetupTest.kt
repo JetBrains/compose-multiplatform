@@ -23,7 +23,6 @@ import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.down
 import androidx.compose.ui.input.pointer.moveTo
 import androidx.compose.ui.input.pointer.up
-import androidx.compose.ui.unit.milliseconds
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argumentCaptor
@@ -52,7 +51,7 @@ class ScrollOrientationLockerSetupTest {
             )
         )
 
-        val down = down(0, 0.milliseconds)
+        val down = down(0, 0)
 
         scrollOrientationLocker.onPointerInputAllPasses(listOf(down))
 
@@ -69,7 +68,7 @@ class ScrollOrientationLockerSetupTest {
         val scrollOrientationLocker = ScrollOrientationLocker(customEventDispatcher)
 
         val down = down(0, x = 0f, y = 0f)
-        val moveA = down.moveTo(1.milliseconds, 1f, 0f)
+        val moveA = down.moveTo(1, 1f, 0f)
 
         scrollOrientationLocker.onPointerInputAllPasses(listOf(down))
 
@@ -92,7 +91,7 @@ class ScrollOrientationLockerSetupTest {
         val scrollOrientationLocker = ScrollOrientationLocker(customEventDispatcher)
 
         val down = down(0, x = 0f, y = 0f)
-        val up = down.up(1.milliseconds)
+        val up = down.up(1)
 
         scrollOrientationLocker.onPointerInputAllPasses(listOf(down))
 
@@ -162,7 +161,7 @@ class ScrollOrientationLockerSetupTest {
             object : CustomEvent {}
         )
 
-        val down = down(0, 0.milliseconds)
+        val down = down(0, 0)
 
         scrollOrientationLocker.onPointerInputAllPasses(listOf(down))
 
@@ -177,7 +176,7 @@ class ScrollOrientationLockerSetupTest {
 
         val downA = down(0, x = 0f, y = 0f)
 
-        val moveA = downA.moveTo(1.milliseconds, 0f, 0f)
+        val moveA = downA.moveTo(1, 0f, 0f)
         val downB = down(1)
 
         scrollOrientationLocker.onPointerInputAllPasses(listOf(downA))
@@ -207,7 +206,7 @@ class ScrollOrientationLockerSetupTest {
 
         val downA = down(0, x = 0f, y = 0f)
 
-        val moveA = downA.moveTo(1.milliseconds, 0f, 0f)
+        val moveA = downA.moveTo(1, 0f, 0f)
         val downB = down(1)
 
         scrollOrientationLocker.onPointerInputAllPasses(listOf(downA))
@@ -242,7 +241,7 @@ class ScrollOrientationLockerSetupTest {
         val scrollOrientationLocker = ScrollOrientationLocker(customEventDispatcher)
 
         val downA = down(0)
-        val upA = downA.up(1.milliseconds)
+        val upA = downA.up(1)
         val downB = down(1)
 
         scrollOrientationLocker.onPointerInputAllPasses(listOf(downA))
@@ -264,7 +263,7 @@ class ScrollOrientationLockerSetupTest {
         val scrollOrientationLocker = ScrollOrientationLocker(customEventDispatcher)
 
         val downA = down(0, x = 0f, y = 0f)
-        val upA = downA.up(1.milliseconds)
+        val upA = downA.up(1)
         val downB = down(1)
 
         scrollOrientationLocker.onPointerInputAllPasses(listOf(downA))
@@ -352,9 +351,9 @@ class ScrollOrientationLockerSetupTest {
             )
         )
 
-        val downA = down(0, 0.milliseconds)
-        val upA = downA.up(1.milliseconds)
-        val downB = down(1, 2.milliseconds)
+        val downA = down(0, 0)
+        val upA = downA.up(1)
+        val downB = down(1, 2)
 
         scrollOrientationLocker.onPointerInputAllPasses(listOf(downA))
         scrollOrientationLocker.onPointerInputAllPasses(listOf(upA))
@@ -372,12 +371,12 @@ class ScrollOrientationLockerSetupTest {
         val customEventDispatcher: CustomEventDispatcher = mock()
         val scrollOrientationLocker = ScrollOrientationLocker(customEventDispatcher)
 
-        val downA = down(0, 0.milliseconds, x = 0f, y = 0f)
+        val downA = down(0, 0, x = 0f, y = 0f)
 
-        val moveA1 = downA.moveTo(1.milliseconds, 1f, 0f)
+        val moveA1 = downA.moveTo(1, 1f, 0f)
 
-        val moveA2 = moveA1.moveTo(2.milliseconds, 1f, 0f)
-        val downB = down(0, 2.milliseconds, x = 0f, y = 0f)
+        val moveA2 = moveA1.moveTo(2, 1f, 0f)
+        val downB = down(0, 2, x = 0f, y = 0f)
 
         scrollOrientationLocker.onPointerInputAllPasses(listOf(downA))
         scrollOrientationLocker.onPointerInputAllPasses(listOf(moveA1))
@@ -400,12 +399,12 @@ class ScrollOrientationLockerSetupTest {
         val customEventDispatcher: CustomEventDispatcher = mock()
         val scrollOrientationLocker = ScrollOrientationLocker(customEventDispatcher)
 
-        val downA = down(0, 0.milliseconds, x = 0f, y = 0f)
+        val downA = down(0, 0, x = 0f, y = 0f)
 
-        val moveA1 = downA.moveTo(1.milliseconds, 1f, 0f)
+        val moveA1 = downA.moveTo(1, 1f, 0f)
 
-        val moveA2 = moveA1.moveTo(2.milliseconds, 1f, 0f)
-        val downB = down(0, 2.milliseconds, x = 0f, y = 0f)
+        val moveA2 = moveA1.moveTo(2, 1f, 0f)
+        val downB = down(0, 2, x = 0f, y = 0f)
 
         scrollOrientationLocker.onPointerInputAllPasses(listOf(downA))
         val expected =

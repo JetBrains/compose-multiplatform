@@ -24,7 +24,6 @@ import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputEvent
 import androidx.compose.ui.input.pointer.PointerInputEventData
 import androidx.compose.ui.node.InternalCoreApi
-import androidx.compose.ui.unit.Uptime
 import kotlinx.coroutines.yield
 import org.jetbrains.skija.Canvas
 import java.awt.event.InputMethodEvent
@@ -169,7 +168,7 @@ class DesktopOwners(
     }
 
     private fun pointerInputEvent(x: Int, y: Int, down: Boolean): PointerInputEvent {
-        val time = Uptime(System.nanoTime())
+        val time = System.nanoTime() / 1_000_000L
         return PointerInputEvent(
             time,
             listOf(

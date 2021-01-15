@@ -22,7 +22,7 @@ import android.view.MotionEvent.ACTION_POINTER_UP
 import android.view.MotionEvent.ACTION_UP
 import androidx.compose.ui.geometry.Offset
 import androidx.test.filters.SmallTest
-import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriod
+import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriodMillis
 import androidx.compose.ui.test.AndroidInputDispatcher
 import androidx.compose.ui.test.util.assertHasValidEventTimes
 import androidx.compose.testutils.expectError
@@ -69,7 +69,7 @@ class SendUpTest : InputDispatcherTest() {
     @Test
     fun onePointerWithDelay() {
         subject.generateDownAndCheck(pointer1, position1_1)
-        subject.generateUpAndCheck(pointer1, 2 * eventPeriod)
+        subject.generateUpAndCheck(pointer1, 2 * eventPeriodMillis)
         subject.verifyNoGestureInProgress()
         subject.sendAllSynchronous()
 
@@ -81,7 +81,7 @@ class SendUpTest : InputDispatcherTest() {
             this[0].verifyEvent(1, ACTION_DOWN, 0, t) // pointer1
             this[0].verifyPointer(pointer1, position1_1)
 
-            t += 2 * eventPeriod
+            t += 2 * eventPeriodMillis
             this[1].verifyEvent(1, ACTION_UP, 0, t) // pointer1
             this[1].verifyPointer(pointer1, position1_1)
         }
