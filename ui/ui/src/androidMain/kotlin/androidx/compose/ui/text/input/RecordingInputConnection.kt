@@ -232,17 +232,17 @@ internal class RecordingInputConnection(
 
     override fun getTextBeforeCursor(maxChars: Int, flags: Int): CharSequence {
         if (DEBUG) { Log.d(TAG, "getTextBeforeCursor($maxChars, $flags)") }
-        return mTextFieldValue.getTextBeforeSelection(maxChars)
+        return mTextFieldValue.getTextBeforeSelection(maxChars).toString()
     }
 
     override fun getTextAfterCursor(maxChars: Int, flags: Int): CharSequence {
         if (DEBUG) { Log.d(TAG, "getTextAfterCursor($maxChars, $flags)") }
-        return mTextFieldValue.getTextAfterSelection(maxChars)
+        return mTextFieldValue.getTextAfterSelection(maxChars).toString()
     }
 
     override fun getSelectedText(flags: Int): CharSequence {
         if (DEBUG) { Log.d(TAG, "getSelectedText($flags)") }
-        return mTextFieldValue.getSelectedText()
+        return mTextFieldValue.getSelectedText().toString()
     }
 
     override fun requestCursorUpdates(cursorUpdateMode: Int): Boolean {

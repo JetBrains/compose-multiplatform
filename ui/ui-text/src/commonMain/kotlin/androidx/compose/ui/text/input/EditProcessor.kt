@@ -18,6 +18,7 @@ package androidx.compose.ui.text.input
 
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.emptyAnnotatedString
 
 /**
  * The core editing implementation
@@ -32,14 +33,14 @@ class EditProcessor {
 
     // The last known state of the EditingBuffer
     /*@VisibleForTesting*/
-    var mBufferState: TextFieldValue = TextFieldValue("", TextRange.Zero, null)
+    var mBufferState: TextFieldValue = TextFieldValue(emptyAnnotatedString(), TextRange.Zero, null)
         private set
 
     // The editing buffer used for applying editor commands from IME.
     /*@VisibleForTesting*/
     internal var mBuffer: EditingBuffer = EditingBuffer(
-        initialText = "",
-        initialSelection = TextRange.Zero
+        text = mBufferState.annotatedString,
+        selection = mBufferState.selection
     )
 
     /**
@@ -53,10 +54,10 @@ class EditProcessor {
         textInputService: TextInputService?,
         token: InputSessionToken
     ) {
-        if (mBufferState.text != value.text) {
+        if (mBufferState.annotatedString != value.annotatedString) {
             mBuffer = EditingBuffer(
-                initialText = value.text,
-                initialSelection = value.selection
+                text = value.annotatedString,
+                selection = value.selection
             )
         } else if (mBufferState.selection != value.selection) {
             mBuffer.setSelection(value.selection.min, value.selection.max)
@@ -83,7 +84,7 @@ class EditProcessor {
         ops.forEach { it.applyTo(mBuffer) }
 
         val newState = TextFieldValue(
-            text = mBuffer.toString(),
+            annotatedString = mBuffer.toAnnotatedString(),
             selection = TextRange(mBuffer.selectionStart, mBuffer.selectionEnd),
             composition = if (mBuffer.hasComposition()) {
                 TextRange(mBuffer.compositionStart, mBuffer.compositionEnd)

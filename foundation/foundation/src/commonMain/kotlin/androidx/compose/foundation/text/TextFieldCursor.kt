@@ -55,7 +55,7 @@ internal fun Modifier.cursor(
     val cursorAlpha = remember(animationClocks) { AnimatedFloatModel(0f, animationClocks) }
 
     if (state.hasFocus && value.selection.collapsed && cursorColor != Color.Unspecified) {
-        onCommit(cursorColor, value.text) {
+        onCommit(cursorColor, value.annotatedString) {
             if (@Suppress("DEPRECATION_ERROR") blinkingCursorEnabled) {
                 cursorAlpha.animateTo(0f, anim = cursorAnimationSpec)
             } else {

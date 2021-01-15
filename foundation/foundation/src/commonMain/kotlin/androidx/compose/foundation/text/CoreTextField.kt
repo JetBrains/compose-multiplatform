@@ -164,7 +164,7 @@ fun CoreTextField(
 
     // State
     val transformedText = remember(value, visualTransformation) {
-        val transformed = visualTransformation.filter(AnnotatedString(value.text))
+        val transformed = visualTransformation.filter(value.annotatedString)
         value.composition?.let {
             TextFieldDelegate.applyCompositionDecoration(it, transformed)
         } ?: transformed
@@ -352,7 +352,7 @@ fun CoreTextField(
     val semanticsModifier = Modifier.semantics {
         // focused semantics are handled by Modifier.focusable()
         this.imeAction = imeOptions.imeAction
-        this.text = AnnotatedString(value.text)
+        this.text = value.annotatedString
         this.textSelectionRange = value.selection
         getTextLayoutResult {
             if (state.layoutResult != null) {
@@ -370,7 +370,7 @@ fun CoreTextField(
             if (start == value.selection.start && end == value.selection.end) {
                 false
             } else if (start.coerceAtMost(end) >= 0 &&
-                start.coerceAtLeast(end) <= value.text.length
+                start.coerceAtLeast(end) <= value.annotatedString.length
             ) {
                 // Do not show toolbar if it's a traversal mode (with the volume keys), or
                 // if the cursor just moved to beginning or end.
@@ -379,7 +379,7 @@ fun CoreTextField(
                 } else {
                     manager.enterSelectionMode()
                 }
-                onValueChangeWrapper(TextFieldValue(value.text, TextRange(start, end)))
+                onValueChangeWrapper(TextFieldValue(value.annotatedString, TextRange(start, end)))
                 true
             } else {
                 manager.exitSelectionMode()

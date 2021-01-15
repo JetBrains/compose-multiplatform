@@ -19,10 +19,11 @@ package androidx.compose.ui.text.input
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.savedinstancestate.Saver
 import androidx.compose.runtime.savedinstancestate.listSaver
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.constrain
-import androidx.compose.ui.text.substring
+import androidx.compose.ui.text.emptyAnnotatedString
 import kotlin.math.max
 import kotlin.math.min
 
@@ -36,7 +37,7 @@ import kotlin.math.min
  * This class stores a snapshot of the input state of the edit buffer and provide utility functions
  * for answering IME requests such as getTextBeforeCursor, getSelectedText.
  *
- * @param text the text to be rendered.
+ * @param annotatedString the text to be rendered.
  * @param selection the selection range. If the selection is collapsed, it represents cursor
  * location. When selection range is out of bounds, it is constrained with the text length.
  * @param composition the composition range, null means empty composition or commit if a
@@ -44,10 +45,19 @@ import kotlin.math.min
  */
 @Immutable
 class TextFieldValue internal constructor(
-    val text: String = "",
+    val annotatedString: AnnotatedString = emptyAnnotatedString(),
     selection: TextRange = TextRange.Zero,
     composition: TextRange? = null
 ) {
+    /**
+     * Internal utility constructor.
+     */
+    internal constructor(
+        text: String = "",
+        selection: TextRange = TextRange.Zero,
+        composition: TextRange? = null
+    ) : this(AnnotatedString(text), selection, composition)
+
     /**
      * @param text the text to be rendered.
      * @param selection the selection range. If the selection is collapsed, it represents cursor
@@ -56,7 +66,22 @@ class TextFieldValue internal constructor(
     constructor(
         text: String = "",
         selection: TextRange = TextRange.Zero
-    ) : this(text, selection, null)
+    ) : this(AnnotatedString(text), selection, null)
+
+    /**
+     * TextFieldValue accepts AnnotatedString for providing the API for future, however
+     * multi-style text editing is not implemented yet.
+     *
+     * @param annotatedString the text to be rendered.
+     * @param selection the selection range. If the selection is collapsed, it represents cursor
+     * location. When selection range is out of bounds, it is constrained with the text length.
+     */
+    constructor(
+        annotatedString: AnnotatedString,
+        selection: TextRange = TextRange.Zero
+    ) : this(annotatedString, selection, null)
+
+    val text: String get() = annotatedString.text
 
     /**
      * The selection range. If the selection is collapsed, it represents cursor
@@ -80,10 +105,32 @@ class TextFieldValue internal constructor(
     val composition: TextRange? = composition?.constrain(0, text.length)
 
     /**
-     * Returns a copy of the TextField.
+     * Returns a copy of the TextFieldValue.
      */
-    fun copy(text: String = this.text, selection: TextRange = this.selection): TextFieldValue {
-        return TextFieldValue(text, selection, composition)
+    fun copy(
+        annotatedString: AnnotatedString = this.annotatedString,
+        selection: TextRange = this.selection
+    ): TextFieldValue {
+        return TextFieldValue(annotatedString, selection, composition)
+    }
+
+    /**
+     * Returns a copy of the TextFieldValue.
+     */
+    fun copy(
+        text: String,
+        selection: TextRange = this.selection
+    ): TextFieldValue {
+        return TextFieldValue(AnnotatedString(text), selection, composition)
+    }
+
+    /**
+     * Returns a copy of the TextFieldValue.
+     */
+    fun copy(
+        selection: TextRange = this.selection
+    ): TextFieldValue {
+        return copy(this.annotatedString, selection)
     }
 
     /**
@@ -94,7 +141,7 @@ class TextFieldValue internal constructor(
      * @see composition
      */
     fun commitComposition() = TextFieldValue(
-        text = text,
+        annotatedString = annotatedString,
         selection = selection,
         composition = null
     )
@@ -103,21 +150,24 @@ class TextFieldValue internal constructor(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is TextFieldValue) return false
-        return text == other.text &&
+        return annotatedString == other.annotatedString &&
             selection == other.selection &&
             composition == other.composition
     }
 
     // auto generated hashCode method
     override fun hashCode(): Int {
-        var result = text.hashCode()
+        var result = annotatedString.hashCode()
         result = 31 * result + selection.hashCode()
         result = 31 * result + (composition?.hashCode() ?: 0)
         return result
     }
 
     override fun toString(): String {
-        return "TextFieldValue(text='$text', selection=$selection, composition=$composition)"
+        return "TextFieldValue(" +
+            "text='$annotatedString', " +
+            "selection=$selection, " +
+            "composition=$composition)"
     }
 
     companion object {
@@ -126,10 +176,13 @@ class TextFieldValue internal constructor(
          */
         val Saver = listSaver<TextFieldValue, Any>(
             save = {
-                listOf(it.text, it.selection.start, it.selection.end)
+                listOf(it.annotatedString, it.selection.start, it.selection.end)
             },
             restore = {
-                TextFieldValue(it[0] as String, TextRange(it[1] as Int, it[2] as Int))
+                TextFieldValue(
+                    annotatedString = it[0] as AnnotatedString,
+                    selection = TextRange(it[1] as Int, it[2] as Int)
+                )
             }
         )
     }
@@ -138,19 +191,19 @@ class TextFieldValue internal constructor(
 /**
  * Returns the text before the selection.
  */
-fun TextFieldValue.getTextBeforeSelection(maxChars: Int): String =
-    text.substring(max(0, selection.min - maxChars), selection.min)
+fun TextFieldValue.getTextBeforeSelection(maxChars: Int): AnnotatedString =
+    annotatedString.subSequence(max(0, selection.min - maxChars), selection.min)
 
 /**
  * Returns the text after the selection.
  */
-fun TextFieldValue.getTextAfterSelection(maxChars: Int): String =
-    text.substring(selection.max, min(selection.max + maxChars, text.length))
+fun TextFieldValue.getTextAfterSelection(maxChars: Int): AnnotatedString =
+    annotatedString.subSequence(selection.max, min(selection.max + maxChars, text.length))
 
 /**
  * Returns the currently selected text.
  */
-fun TextFieldValue.getSelectedText(): String = text.substring(selection)
+fun TextFieldValue.getSelectedText(): AnnotatedString = annotatedString.subSequence(selection)
 
 /**
  * Temporary constructor until we figure out how to enforce composition for internal values
@@ -163,4 +216,4 @@ fun buildTextFieldValue(
     text: String,
     selection: TextRange,
     composition: TextRange?
-): TextFieldValue = TextFieldValue(text, selection, composition)
+): TextFieldValue = TextFieldValue(AnnotatedString(text), selection, composition)
