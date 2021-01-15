@@ -1136,6 +1136,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
         forEachDelegate { wrapper ->
             wrapper.layer?.invalidate()
         }
+        innerLayoutNodeWrapper.layer?.invalidate()
     }
 
     /**
