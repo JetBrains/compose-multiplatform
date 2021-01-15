@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.lifecycleowner
+package androidx.compose.ui.owners
 
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.ComponentActivity
 import androidx.compose.ui.platform.AmbientLifecycleOwner
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.setContent
@@ -34,13 +34,13 @@ import java.util.concurrent.TimeUnit
 
 @SmallTest
 @RunWith(AndroidJUnit4::class)
-class LifecycleOwnerInAppCompatActivityTest {
+class LifecycleOwnerInComponentActivityTest {
     @Suppress("DEPRECATION")
     @get:Rule
-    val activityTestRule = androidx.test.rule.ActivityTestRule<AppCompatActivity>(
-        AppCompatActivity::class.java
+    val activityTestRule = androidx.test.rule.ActivityTestRule<ComponentActivity>(
+        ComponentActivity::class.java
     )
-    private lateinit var activity: AppCompatActivity
+    private lateinit var activity: ComponentActivity
 
     @Before
     fun setup() {
