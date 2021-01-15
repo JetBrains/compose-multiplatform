@@ -80,6 +80,9 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@Suppress("unused")
+private fun topLevelFunction() {}
+
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class ParameterFactoryTest {
@@ -239,8 +242,10 @@ class ParameterFactoryTest {
     fun testComposableLambda() = runBlocking {
         val c: @Composable () -> Unit = { Text(text = "Hello World") }
         val result = lookup(c as Any) ?: error("Lookup of ComposableLambda failed")
+        val array = result.second as Array<*>
         assertThat(result.first).isEqualTo(ParameterType.Lambda)
-        assertThat(result.second!!.javaClass.name).isEqualTo(
+        assertThat(array).hasLength(1)
+        assertThat(array[0]?.javaClass?.name).isEqualTo(
             "${ParameterFactoryTest::class.java.name}\$testComposableLambda\$1\$c\$1"
         )
     }
@@ -357,6 +362,20 @@ class ParameterFactoryTest {
     }
 
     @Test
+    fun testFunctionReference() {
+        val ref1 = ::testInt
+        val map1 = lookup(ref1)!!
+        val array1 = map1.second as Array<*>
+        assertThat(map1.first).isEqualTo(ParameterType.FunctionReference)
+        assertThat(array1.contentEquals(arrayOf(ref1, "testInt"))).isTrue()
+        val ref2 = ::topLevelFunction
+        val map2 = lookup(ref2)!!
+        val array2 = map2.second as Array<*>
+        assertThat(map2.first).isEqualTo(ParameterType.FunctionReference)
+        assertThat(array2.contentEquals(arrayOf(ref2, "topLevelFunction"))).isTrue()
+    }
+
+    @Test
     fun testPaddingValues() {
         validate(factory.create(node, "padding", PaddingValues(2.0.dp, 0.5.dp, 2.5.dp, 0.7.dp))!!) {
             parameter("padding", ParameterType.String, PaddingValues::class.java.simpleName) {
@@ -376,7 +395,10 @@ class ParameterFactoryTest {
     @Test
     fun testLambda() {
         val a: (Int) -> Int = { it }
-        assertThat(lookup(a)).isEqualTo(ParameterType.Lambda to a)
+        val map = lookup(a)!!
+        val array = map.second as Array<*>
+        assertThat(map.first).isEqualTo(ParameterType.Lambda)
+        assertThat(array.contentEquals(arrayOf<Any>(a))).isTrue()
     }
 
     @Test

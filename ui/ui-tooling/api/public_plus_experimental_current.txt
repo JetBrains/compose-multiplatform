@@ -166,6 +166,7 @@ package androidx.compose.ui.tooling.inspector {
     enum_constant public static final androidx.compose.ui.tooling.inspector.ParameterType DimensionSp;
     enum_constant public static final androidx.compose.ui.tooling.inspector.ParameterType Double;
     enum_constant public static final androidx.compose.ui.tooling.inspector.ParameterType Float;
+    enum_constant public static final androidx.compose.ui.tooling.inspector.ParameterType FunctionReference;
     enum_constant public static final androidx.compose.ui.tooling.inspector.ParameterType Int32;
     enum_constant public static final androidx.compose.ui.tooling.inspector.ParameterType Int64;
     enum_constant public static final androidx.compose.ui.tooling.inspector.ParameterType Lambda;
