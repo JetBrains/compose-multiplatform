@@ -22,12 +22,12 @@ import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.TargetAnimation
 import androidx.compose.animation.core.TweenSpec
+import androidx.compose.animation.core.fling
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.animation.defaultFlingConfig
-import androidx.compose.foundation.animation.fling
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.indication
@@ -138,7 +138,11 @@ fun Slider(
         val flingConfig = sliderFlingConfig(position, position.anchorsPx)
         val gestureEndAction = { velocity: Float ->
             if (flingConfig != null) {
-                position.holder.fling(velocity, flingConfig) { reason, endValue, _ ->
+                position.holder.fling(
+                    velocity,
+                    flingConfig.decayAnimation,
+                    flingConfig.adjustTarget
+                ) { reason, endValue, _ ->
                     if (reason != AnimationEndReason.Interrupted) {
                         position.holder.snapTo(endValue)
                         onValueChangeEnd()
