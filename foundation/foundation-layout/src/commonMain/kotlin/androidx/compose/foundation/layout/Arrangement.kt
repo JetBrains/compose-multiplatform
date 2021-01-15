@@ -117,6 +117,8 @@ object Arrangement {
             placeRightOrBottom(totalSize, sizes, outPositions)
             outPositions.reverse()
         }
+
+        override fun toString() = "Arrangement#Start"
     }
 
     /**
@@ -138,6 +140,8 @@ object Arrangement {
             placeLeftOrTop(sizes, outPositions)
             outPositions.reverse()
         }
+
+        override fun toString() = "Arrangement#End"
     }
 
     /**
@@ -152,6 +156,8 @@ object Arrangement {
             sizes: IntArray,
             outPositions: IntArray
         ) = placeLeftOrTop(sizes, outPositions)
+
+        override fun toString() = "Arrangement#Top"
     }
 
     /**
@@ -166,6 +172,8 @@ object Arrangement {
             sizes: IntArray,
             outPositions: IntArray
         ) = placeRightOrBottom(totalSize, sizes, outPositions)
+
+        override fun toString() = "Arrangement#Start"
     }
 
     /**
@@ -194,6 +202,8 @@ object Arrangement {
             sizes: IntArray,
             outPositions: IntArray
         ) = placeCenter(totalSize, sizes, outPositions)
+
+        override fun toString() = "Arrangement#Center"
     }
 
     /**
@@ -223,6 +233,8 @@ object Arrangement {
             sizes: IntArray,
             outPositions: IntArray
         ) = placeSpaceEvenly(totalSize, sizes, outPositions)
+
+        override fun toString() = "Arrangement#SpaceEvenly"
     }
 
     /**
@@ -252,6 +264,8 @@ object Arrangement {
             sizes: IntArray,
             outPositions: IntArray
         ) = placeSpaceBetween(totalSize, sizes, outPositions)
+
+        override fun toString() = "Arrangement#SpaceBetween"
     }
 
     /**
@@ -282,6 +296,8 @@ object Arrangement {
             sizes: IntArray,
             outPositions: IntArray
         ) = placeSpaceAround(totalSize, sizes, outPositions)
+
+        override fun toString() = "Arrangement#SpaceAround"
     }
 
     /**
@@ -366,6 +382,8 @@ object Arrangement {
                 layoutDirection: LayoutDirection,
                 outPositions: IntArray
             ) = placeLeftOrTop(sizes, outPositions)
+
+            override fun toString() = "AbsoluteArrangement#Left"
         }
 
         /**
@@ -384,6 +402,8 @@ object Arrangement {
                 layoutDirection: LayoutDirection,
                 outPositions: IntArray
             ) = placeCenter(totalSize, sizes, outPositions)
+
+            override fun toString() = "AbsoluteArrangement#Center"
         }
 
         /**
@@ -403,6 +423,8 @@ object Arrangement {
                 layoutDirection: LayoutDirection,
                 outPositions: IntArray
             ) = placeRightOrBottom(totalSize, sizes, outPositions)
+
+            override fun toString() = "AbsoluteArrangement#Right"
         }
 
         /**
@@ -422,6 +444,8 @@ object Arrangement {
                 layoutDirection: LayoutDirection,
                 outPositions: IntArray
             ) = placeSpaceBetween(totalSize, sizes, outPositions)
+
+            override fun toString() = "AbsoluteArrangement#SpaceBetween"
         }
 
         /**
@@ -441,6 +465,8 @@ object Arrangement {
                 layoutDirection: LayoutDirection,
                 outPositions: IntArray
             ) = placeSpaceEvenly(totalSize, sizes, outPositions)
+
+            override fun toString() = "AbsoluteArrangement#SpaceEvenly"
         }
 
         /**
@@ -461,6 +487,8 @@ object Arrangement {
                 layoutDirection: LayoutDirection,
                 outPositions: IntArray
             ) = placeSpaceAround(totalSize, sizes, outPositions)
+
+            override fun toString() = "AbsoluteArrangement#SpaceAround"
         }
 
         /**
@@ -568,11 +596,15 @@ object Arrangement {
 
             if (layoutDirection == LayoutDirection.Rtl && rtlMirror) outPositions.reverse()
         }
+
         override fun Density.arrange(
             totalSize: Int,
             sizes: IntArray,
             outPositions: IntArray
         ) = arrange(totalSize, sizes, LayoutDirection.Ltr, outPositions)
+
+        override fun toString() =
+            "${if (rtlMirror) "" else "Absolute"}Arrangement#spacedAligned($space, $alignment)"
     }
 
     internal fun placeRightOrBottom(
