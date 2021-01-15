@@ -20,11 +20,12 @@ package androidx.compose.ui.layout
 
 import androidx.compose.runtime.Applier
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.SkippableUpdater
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.currentComposer
-import androidx.compose.runtime.emit
+import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.GraphicsLayerScope
@@ -232,7 +233,7 @@ fun measureBlocksOf(
     @OptIn(ExperimentalComposeApi::class)
     val density = AmbientDensity.current
     val layoutDirection = AmbientLayoutDirection.current
-    emit<LayoutNode, Applier<Any>>(
+    ComposeNode<LayoutNode, Applier<Any>>(
         factory = LayoutEmitHelper.constructor,
         update = {
             set(measureBlocks, LayoutEmitHelper.setMeasureBlocks)
@@ -271,7 +272,7 @@ fun MultiMeasureLayout(
     val layoutDirection = AmbientLayoutDirection.current
 
     @OptIn(ExperimentalComposeApi::class)
-    emit<LayoutNode, Applier<Any>>(
+    ComposeNode<LayoutNode, Applier<Any>>(
         factory = LayoutEmitHelper.constructor,
         update = {
             set(materialized, LayoutEmitHelper.setModifier)

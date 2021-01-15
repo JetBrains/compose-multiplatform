@@ -23,7 +23,7 @@ import android.widget.TextView
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.clearRoots
-import androidx.compose.runtime.emit
+import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.simulateHotReload
 import androidx.compose.ui.Modifier
@@ -67,7 +67,7 @@ class HotReloadTests {
 
         @Composable fun text(text: String, id: Int = -1) {
             val context = AmbientContext.current
-            emit<TextView, UiApplier>(
+            ComposeNode<TextView, UiApplier>(
                 factory = { TextView(context) },
                 update = {
                     set(id) { this.id = it }
@@ -78,7 +78,7 @@ class HotReloadTests {
 
         @Composable fun column(content: @Composable () -> Unit) {
             val context = AmbientContext.current
-            emit<LinearLayout, UiApplier>(
+            ComposeNode<LinearLayout, UiApplier>(
                 factory = { LinearLayout(context) },
                 update = {},
                 content = content

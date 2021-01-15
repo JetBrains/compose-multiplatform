@@ -23,7 +23,7 @@ import androidx.compose.runtime.Composition
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.compositionFor
-import androidx.compose.runtime.emit
+import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -78,14 +78,14 @@ fun CustomTreeComposition() {
 
     // Composable equivalents could be created
     @Composable fun Text(text: String, onClick: () -> Unit = {}) {
-        emit<TextNode, NodeApplier>(::TextNode) {
+        ComposeNode<TextNode, NodeApplier>(::TextNode) {
             set(text) { this.text = it }
             set(onClick) { this.onClick = it }
         }
     }
 
     @Composable fun Group(content: @Composable () -> Unit) {
-        emit<GroupNode, NodeApplier>(::GroupNode, {}, content)
+        ComposeNode<GroupNode, NodeApplier>(::GroupNode, {}, content)
     }
 
     // and then a sample tree could be composed:
