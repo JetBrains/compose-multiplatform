@@ -2,6 +2,27 @@
 <issues format="5" by="lint 4.2.0-beta02" client="gradle" variant="debug" version="4.2.0-beta02">
 
     <issue
+        id="UnknownIssueId"
+        message="Unknown issue id &quot;ComposableLambdaParameterNaming&quot;">
+        <location
+            file="build.gradle"/>
+    </issue>
+
+    <issue
+        id="UnknownIssueId"
+        message="Unknown issue id &quot;ComposableLambdaParameterPosition&quot;">
+        <location
+            file="build.gradle"/>
+    </issue>
+
+    <issue
+        id="UnknownIssueId"
+        message="Unknown issue id &quot;ComposableNaming&quot;">
+        <location
+            file="build.gradle"/>
+    </issue>
+
+    <issue
         id="UnsafeNewApiCall"
         message="This call is to a method from API 29, the call containing class androidx.compose.ui.graphics.AndroidPaintKt is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
         errorLine1="        this.blendMode = mode.toAndroidBlendMode()"

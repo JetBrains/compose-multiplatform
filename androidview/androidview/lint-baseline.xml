@@ -2,6 +2,27 @@
 <issues format="5" by="lint 4.2.0-beta02" client="gradle" variant="debug" version="4.2.0-beta02">
 
     <issue
+        id="UnknownIssueId"
+        message="Unknown issue id &quot;ComposableLambdaParameterNaming&quot;">
+        <location
+            file="build.gradle"/>
+    </issue>
+
+    <issue
+        id="UnknownIssueId"
+        message="Unknown issue id &quot;ComposableLambdaParameterPosition&quot;">
+        <location
+            file="build.gradle"/>
+    </issue>
+
+    <issue
+        id="UnknownIssueId"
+        message="Unknown issue id &quot;ComposableNaming&quot;">
+        <location
+            file="build.gradle"/>
+    </issue>
+
+    <issue
         id="BanUncheckedReflection"
         message="Calling Method.invoke without an SDK check"
         errorLine1="        val lp = prev ?: genDefaultLayoutParams.invoke(parent) as? ViewGroup.LayoutParams"
