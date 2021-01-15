@@ -32,6 +32,7 @@ import androidx.activity.ComponentActivity
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
@@ -49,6 +50,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.textSelectionRange
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertTextEquals
@@ -60,6 +62,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
 import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -75,6 +78,7 @@ import com.nhaarman.mockitokotlin2.verify
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Ignore
@@ -108,13 +112,15 @@ class AndroidAccessibilityTest {
     private var textFieldSelectionOne = false
 
     companion object {
+        private const val TimeOutInitialization: Long = 5000
         private const val TopColTag = "topColumn"
         private const val ToggleableTag = "toggleable"
         private const val DisabledToggleableTag = "disabledToggleable"
         private const val TextFieldTag = "textField"
         private const val TextNodeTag = "textNode"
-        private const val OverlappedChildOneTag = "OverlappedChildOne"
-        private const val OverlappedChildTwoTag = "OverlappedChildTwo"
+        private const val ParentForOverlappedChildrenTag = "parentForOverlappedChildren"
+        private const val OverlappedChildOneTag = "overlappedChildOne"
+        private const val OverlappedChildTwoTag = "overlappedChildTwo"
         private const val InputText = "hello"
         private const val InitialText = "h"
     }
@@ -161,9 +167,20 @@ class AndroidAccessibilityTest {
                             BasicText("ToggleableText")
                         }
                     )
-                    Box {
-                        BasicText("Child One", Modifier.zIndex(1f).testTag(OverlappedChildOneTag))
-                        BasicText("Child Two", Modifier.testTag(OverlappedChildTwoTag))
+                    Box(Modifier.testTag(ParentForOverlappedChildrenTag)) {
+                        BasicText(
+                            "Child One",
+                            Modifier
+                                .zIndex(1f)
+                                .testTag(OverlappedChildOneTag)
+                                .size(50.dp)
+                        )
+                        BasicText(
+                            "Child Two",
+                            Modifier
+                                .testTag(OverlappedChildTwoTag)
+                                .size(50.dp)
+                        )
                     }
                     if (isTextFieldVisible) {
                         BasicTextField(
@@ -270,7 +287,12 @@ class AndroidAccessibilityTest {
     @Test
     fun testPerformAction_succeedOnEnabledNodes() {
         rule.onNodeWithTag(ToggleableTag)
+            .assertIsDisplayed()
             .assertIsOn()
+
+        rule.mainClock.advanceTimeBy(TimeOutInitialization)
+        rule.waitForIdle()
+
         val toggleableNode = rule.onNodeWithTag(ToggleableTag)
             .fetchSemanticsNode("couldn't find node with tag $ToggleableTag")
         rule.runOnUiThread {
@@ -280,6 +302,7 @@ class AndroidAccessibilityTest {
             .assertIsOff()
 
         val textFieldNode = rule.onNodeWithTag(TextFieldTag)
+            .assertIsDisplayed()
             .fetchSemanticsNode("couldn't find node with tag $TextFieldTag")
         rule.runOnUiThread {
             assertTrue(provider.performAction(textFieldNode.id, ACTION_CLICK, null))
@@ -308,7 +331,12 @@ class AndroidAccessibilityTest {
     @Test
     fun testPerformAction_failOnDisabledNodes() {
         rule.onNodeWithTag(DisabledToggleableTag)
+            .assertIsDisplayed()
             .assertIsOn()
+
+        rule.mainClock.advanceTimeBy(TimeOutInitialization)
+        rule.waitForIdle()
+
         val toggleableNode = rule.onNodeWithTag(DisabledToggleableTag)
             .fetchSemanticsNode("couldn't find node with tag $DisabledToggleableTag")
         rule.runOnUiThread {
@@ -350,7 +378,12 @@ class AndroidAccessibilityTest {
     @Test
     fun sendStateChangeEvent_whenClickToggleable() {
         rule.onNodeWithTag(ToggleableTag)
+            .assertIsDisplayed()
             .assertIsOn()
+
+        rule.mainClock.advanceTimeBy(TimeOutInitialization)
+        rule.waitForIdle()
+        rule.onNodeWithTag(ToggleableTag)
             .performClick()
             .assertIsOff()
 
@@ -375,7 +408,12 @@ class AndroidAccessibilityTest {
     @Test
     fun sendTextEvents_whenSetText() {
         rule.onNodeWithTag(TextFieldTag)
+            .assertIsDisplayed()
             .assertTextEquals(InitialText)
+
+        rule.mainClock.advanceTimeBy(TimeOutInitialization)
+        rule.waitForIdle()
+        rule.onNodeWithTag(TextFieldTag)
             .performSemanticsAction(SemanticsActions.SetText) { it(AnnotatedString(InputText)) }
         rule.onNodeWithTag(TextFieldTag)
             .assertTextEquals(InputText)
@@ -455,7 +493,11 @@ class AndroidAccessibilityTest {
     @Test
     fun traverseEventBeforeSelectionEvent_whenTraverseTextField() {
         val textFieldNode = rule.onNodeWithTag(TextFieldTag)
+            .assertIsDisplayed()
             .fetchSemanticsNode("couldn't find node with tag $TextFieldTag")
+
+        rule.mainClock.advanceTimeBy(TimeOutInitialization)
+        rule.waitForIdle()
 
         val args = Bundle()
         args.putInt(
@@ -624,6 +666,22 @@ class AndroidAccessibilityTest {
         )
         assertEquals(overlappedChildOneNode.id, overlappedChildNodeId)
         assertNotEquals(overlappedChildTwoNode.id, overlappedChildNodeId)
+    }
+
+    @Test
+    fun testAccessibilityNodeInfoTreePruned() {
+        val parentNode = rule.onNodeWithTag(ParentForOverlappedChildrenTag)
+            .fetchSemanticsNode("couldn't find node with tag $ParentForOverlappedChildrenTag")
+        val overlappedChildOneNode = rule.onNodeWithTag(OverlappedChildOneTag)
+            .fetchSemanticsNode("couldn't find node with tag $OverlappedChildOneTag")
+        val overlappedChildTwoNode = rule.onNodeWithTag(OverlappedChildTwoTag)
+            .fetchSemanticsNode("couldn't find node with tag $OverlappedChildTwoTag")
+        assertEquals(1, provider.createAccessibilityNodeInfo(parentNode.id).childCount)
+        assertEquals(
+            "Child One",
+            provider.createAccessibilityNodeInfo(overlappedChildOneNode.id).text.toString()
+        )
+        assertNull(provider.createAccessibilityNodeInfo(overlappedChildTwoNode.id))
     }
 
     private fun eventIndex(list: List<AccessibilityEvent>, event: AccessibilityEvent): Int {

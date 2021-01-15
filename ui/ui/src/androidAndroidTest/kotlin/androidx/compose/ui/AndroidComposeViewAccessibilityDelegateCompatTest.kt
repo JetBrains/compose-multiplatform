@@ -438,8 +438,11 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
         val oldSemanticsNode = createSemanticsNodeWithProperties(1, true) {
             this.verticalScrollAxisRange = ScrollAxisRange(0f, 0f, false)
         }
-        accessibilityDelegate.semanticsNodes[1] =
-            AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(oldSemanticsNode)
+        accessibilityDelegate.previousSemanticsNodes[1] =
+            AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(
+                oldSemanticsNode,
+                mapOf()
+            )
         val newSemanticsNode = createSemanticsNodeWithProperties(1, true) {
             this.verticalScrollAxisRange = ScrollAxisRange(0f, 5f, false)
         }
@@ -462,8 +465,11 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
         val oldSemanticsNode = createSemanticsNodeWithProperties(2, false) {
             this.verticalScrollAxisRange = ScrollAxisRange(0f, 5f, false)
         }
-        accessibilityDelegate.semanticsNodes[2] =
-            AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(oldSemanticsNode)
+        accessibilityDelegate.previousSemanticsNodes[2] =
+            AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(
+                oldSemanticsNode,
+                mapOf()
+            )
         val newSemanticsNode = createSemanticsNodeWithProperties(2, false) {
             this.verticalScrollAxisRange = ScrollAxisRange(2f, 5f, false)
         }
@@ -490,8 +496,11 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
     @Test
     fun sendWindowContentChangeUndefinedEventByDefault_whenPropertyAdded() {
         val oldSemanticsNode = createSemanticsNodeWithProperties(1, false) {}
-        accessibilityDelegate.semanticsNodes[1] =
-            AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(oldSemanticsNode)
+        accessibilityDelegate.previousSemanticsNodes[1] =
+            AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(
+                oldSemanticsNode,
+                mapOf()
+            )
         val newSemanticsNode = createSemanticsNodeWithProperties(1, false) {
             disabled()
         }
@@ -515,8 +524,11 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
         val oldSemanticsNode = createSemanticsNodeWithProperties(1, false) {
             disabled()
         }
-        accessibilityDelegate.semanticsNodes[1] =
-            AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(oldSemanticsNode)
+        accessibilityDelegate.previousSemanticsNodes[1] =
+            AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(
+                oldSemanticsNode,
+                mapOf()
+            )
         val newSemanticsNode = createSemanticsNodeWithProperties(1, false) {}
         val newNodes = mutableMapOf<Int, SemanticsNode>()
         newNodes[1] = newSemanticsNode
@@ -538,8 +550,11 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
         val oldSemanticsNode = createSemanticsNodeWithProperties(1, false) {
             disabled()
         }
-        accessibilityDelegate.semanticsNodes[1] =
-            AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(oldSemanticsNode)
+        accessibilityDelegate.previousSemanticsNodes[1] =
+            AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(
+                oldSemanticsNode,
+                mapOf()
+            )
         val newSemanticsNode = createSemanticsNodeWithProperties(1, false) {
             onClick { true }
         }
