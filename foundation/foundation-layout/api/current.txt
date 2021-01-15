@@ -55,7 +55,7 @@ package androidx.compose.foundation.layout {
   }
 
   @androidx.compose.runtime.Immutable public static interface Arrangement.Horizontal {
-    method public void arrange(int totalSize, int[] size, androidx.compose.ui.unit.LayoutDirection layoutDirection, androidx.compose.ui.unit.Density density, int[] outPosition);
+    method public void arrange(androidx.compose.ui.unit.Density, int totalSize, int[] sizes, androidx.compose.ui.unit.LayoutDirection layoutDirection, int[] outPositions);
     method public default float getSpacing-D9Ej5fM();
     property public default float spacing;
   }
@@ -65,7 +65,7 @@ package androidx.compose.foundation.layout {
   }
 
   @androidx.compose.runtime.Immutable public static interface Arrangement.Vertical {
-    method public void arrange(int totalSize, int[] size, androidx.compose.ui.unit.Density density, int[] outPosition);
+    method public void arrange(androidx.compose.ui.unit.Density, int totalSize, int[] sizes, int[] outPositions);
     method public default float getSpacing-D9Ej5fM();
     property public default float spacing;
   }

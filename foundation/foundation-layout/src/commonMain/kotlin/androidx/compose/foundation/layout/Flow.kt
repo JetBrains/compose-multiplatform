@@ -239,12 +239,9 @@ private fun Flow(
                 // TODO(soboleva): rtl support
                 // Handle vertical direction
                 val mainAxisPositions = IntArray(childrenMainAxisSizes.size) { 0 }
-                arrangement.arrange(
-                    mainAxisLayoutSize,
-                    childrenMainAxisSizes,
-                    this@Layout,
-                    mainAxisPositions
-                )
+                with(arrangement) {
+                    arrange(mainAxisLayoutSize, childrenMainAxisSizes, mainAxisPositions)
+                }
                 placeables.fastForEachIndexed { j, placeable ->
                     val crossAxis = when (crossAxisAlignment) {
                         FlowCrossAxisAlignment.Start -> 0

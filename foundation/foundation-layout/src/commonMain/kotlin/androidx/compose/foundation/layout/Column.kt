@@ -81,7 +81,7 @@ inline fun Column(
 internal val DefaultColumnMeasureBlocks = rowColumnMeasureBlocks(
     orientation = LayoutOrientation.Vertical,
     arrangement = { totalSize, size, _, density, outPosition ->
-        Arrangement.Top.arrange(totalSize, size, density, outPosition)
+        with(Arrangement.Top) { density.arrange(totalSize, size, outPosition) }
     },
     arrangementSpacing = Arrangement.Top.spacing,
     crossAxisAlignment = CrossAxisAlignment.horizontal(Alignment.Start),
@@ -100,7 +100,7 @@ internal fun columnMeasureBlocks(
         rowColumnMeasureBlocks(
             orientation = LayoutOrientation.Vertical,
             arrangement = { totalSize, size, _, density, outPosition ->
-                verticalArrangement.arrange(totalSize, size, density, outPosition)
+                with(verticalArrangement) { density.arrange(totalSize, size, outPosition) }
             },
             arrangementSpacing = verticalArrangement.spacing,
             crossAxisAlignment = CrossAxisAlignment.horizontal(horizontalAlignment),
