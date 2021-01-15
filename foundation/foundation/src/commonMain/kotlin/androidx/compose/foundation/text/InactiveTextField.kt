@@ -25,7 +25,6 @@ import androidx.compose.ui.selection.DisableSelection
 import androidx.compose.ui.selection.SelectionContainer
 import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
@@ -47,7 +46,7 @@ internal fun InactiveTextField(
     interactionState: InteractionState? = null
 ) {
     val transformedText = remember(value, visualTransformation) {
-        visualTransformation.filter(AnnotatedString(value.text))
+        visualTransformation.filter(value.annotatedString)
     }.text
 
     val text: @Composable (Modifier) -> Unit = @Composable { textModifier ->

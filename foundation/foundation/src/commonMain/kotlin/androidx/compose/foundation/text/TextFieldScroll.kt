@@ -38,7 +38,6 @@ import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.debugInspectorInfo
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
@@ -86,9 +85,8 @@ internal fun Modifier.textFieldScroll(
         val cursorOffset = scrollerPosition.getOffsetToFollow(textFieldValue.selection)
         scrollerPosition.previousSelection = textFieldValue.selection
 
-        val transformedText = visualTransformation.filter(
-            AnnotatedString(textFieldValue.text)
-        )
+        val transformedText = visualTransformation.filter(textFieldValue.annotatedString)
+
         val layout = when (orientation) {
             Orientation.Vertical ->
                 VerticalScrollLayoutModifier(
