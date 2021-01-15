@@ -95,8 +95,7 @@ private object MentalModelSnippet5 {
             Column {
                 for (item in myList) {
                     Text("Item: $item")
-                    items++ // this is a side-effect of the Column recomposing
-                    // and should be avoided
+                    items++ // Avoid! Side-effect of the column recomposing.
                 }
             }
             Text("Count: $items")
