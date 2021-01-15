@@ -17,6 +17,7 @@
 package androidx.compose.ui.test.junit4
 
 import android.annotation.SuppressLint
+import android.content.Context
 import androidx.activity.ComponentActivity
 import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.text.blinkingCursorEnabled
@@ -28,11 +29,11 @@ import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.platform.WindowRecomposerFactory
 import androidx.compose.ui.platform.WindowRecomposerPolicy
 import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.semantics.SemanticsNode
+import androidx.compose.ui.test.ComposeTimeoutException
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.IdlingResource
 import androidx.compose.ui.test.InternalTestApi
-import androidx.compose.ui.semantics.SemanticsNode
-import androidx.compose.ui.test.ComposeTimeoutException
 import androidx.compose.ui.test.MainTestClock
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
@@ -53,6 +54,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.textInputServiceFactory
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -313,19 +315,11 @@ internal constructor(
     private var activity: A? = null
 
     override val density: Density by lazy {
-        // Using a cached activity is fine for density
-        if (activity == null) {
-            activity = activityProvider(activityRule)
-        }
-        Density(activity!!.resources.displayMetrics.density)
+        Density(ApplicationProvider.getApplicationContext())
     }
 
     override val displaySize by lazy {
-        // Using a cached activity is fine for display size
-        if (activity == null) {
-            activity = activityProvider(activityRule)
-        }
-        activity!!.resources.displayMetrics.let {
+        ApplicationProvider.getApplicationContext<Context>().resources.displayMetrics.let {
             IntSize(it.widthPixels, it.heightPixels)
         }
     }
