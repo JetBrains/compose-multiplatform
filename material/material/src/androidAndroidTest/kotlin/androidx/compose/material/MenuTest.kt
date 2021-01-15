@@ -133,7 +133,7 @@ class MenuTest {
         val screenWidth = 500
         val screenHeight = 1000
         val density = Density(1f)
-        val windowBounds = IntBounds(0, 0, screenWidth, screenHeight)
+        val windowSize = IntSize(screenWidth, screenHeight)
         val anchorPosition = IntOffset(100, 200)
         val anchorSize = IntSize(10, 20)
         val offsetX = 20
@@ -145,7 +145,7 @@ class MenuTest {
             density
         ).calculatePosition(
             IntBounds(anchorPosition, anchorSize),
-            windowBounds,
+            windowSize,
             LayoutDirection.Ltr,
             popupSize
         )
@@ -162,7 +162,7 @@ class MenuTest {
             density
         ).calculatePosition(
             IntBounds(anchorPosition, anchorSize),
-            windowBounds,
+            windowSize,
             LayoutDirection.Rtl,
             popupSize
         )
@@ -180,7 +180,7 @@ class MenuTest {
         val screenWidth = 500
         val screenHeight = 1000
         val density = Density(1f)
-        val windowBounds = IntBounds(0, 0, screenWidth, screenHeight)
+        val windowSize = IntSize(screenWidth, screenHeight)
         val anchorPosition = IntOffset(450, 950)
         val anchorPositionRtl = IntOffset(50, 950)
         val anchorSize = IntSize(10, 20)
@@ -193,7 +193,7 @@ class MenuTest {
             density
         ).calculatePosition(
             IntBounds(anchorPosition, anchorSize),
-            windowBounds,
+            windowSize,
             LayoutDirection.Ltr,
             popupSize
         )
@@ -210,7 +210,7 @@ class MenuTest {
             density
         ).calculatePosition(
             IntBounds(anchorPositionRtl, anchorSize),
-            windowBounds,
+            windowSize,
             LayoutDirection.Rtl,
             popupSize
         )
@@ -228,7 +228,7 @@ class MenuTest {
         val screenWidth = 500
         val screenHeight = 1000
         val density = Density(1f)
-        val windowBounds = IntBounds(0, 0, screenWidth, screenHeight)
+        val windowSize = IntSize(screenWidth, screenHeight)
         val anchorPosition = IntOffset(0, 0)
         val anchorSize = IntSize(50, 20)
         val popupSize = IntSize(150, 500)
@@ -242,7 +242,7 @@ class MenuTest {
             density
         ).calculatePosition(
             IntBounds(anchorPosition, anchorSize),
-            windowBounds,
+            windowSize,
             LayoutDirection.Ltr,
             popupSize
         )
@@ -257,7 +257,7 @@ class MenuTest {
         val screenWidth = 500
         val screenHeight = 1000
         val density = Density(1f)
-        val windowBounds = IntBounds(0, 0, screenWidth, screenHeight)
+        val windowSize = IntSize(screenWidth, screenHeight)
         val anchorPosition = IntOffset(100, 200)
         val anchorSize = IntSize(10, 20)
         val offsetX = 20
@@ -274,7 +274,7 @@ class MenuTest {
             obtainedMenuBounds = menuBounds
         }.calculatePosition(
             IntBounds(anchorPosition, anchorSize),
-            windowBounds,
+            windowSize,
             LayoutDirection.Ltr,
             popupSize
         )
