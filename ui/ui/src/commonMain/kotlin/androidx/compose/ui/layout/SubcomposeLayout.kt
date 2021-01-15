@@ -19,9 +19,9 @@ package androidx.compose.ui.layout
 import androidx.compose.runtime.Applier
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
-import androidx.compose.runtime.CompositionLifecycleObserver
 import androidx.compose.runtime.CompositionReference
 import androidx.compose.runtime.ExperimentalComposeApi
+import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.compositionReference
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.emit
@@ -102,7 +102,7 @@ interface SubcomposeMeasureScope : MeasureScope {
 
 private class SubcomposeLayoutState :
     SubcomposeMeasureScope,
-    CompositionLifecycleObserver {
+    RememberObserver {
     var compositionRef: CompositionReference? = null
 
     // MeasureScope delegation
@@ -215,17 +215,19 @@ private class SubcomposeLayoutState :
         }
     }
 
-    override fun onEnter() {
+    override fun onRemembered() {
         // do nothing
     }
 
-    override fun onLeave() {
+    override fun onForgotten() {
         nodeToNodeState.values.forEach {
             it.composition!!.dispose()
         }
         nodeToNodeState.clear()
         slodIdToNode.clear()
     }
+
+    override fun onAbandoned() = onForgotten()
 
     private class NodeState(
         val slotId: Any?,
