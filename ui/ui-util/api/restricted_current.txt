@@ -14,11 +14,6 @@ package androidx.compose.ui.util {
     method public static inline int unpackInt2(long value);
   }
 
-  public final class JvmCharHelpersKt {
-    method public static int findFollowingBreak(String, int index);
-    method public static int findPrecedingBreak(String, int index);
-  }
-
   public final class JvmMiscHelpersKt {
     method public static StringBuilder deleteAt(StringBuilder, int index);
     method public static String format(String, java.lang.Object?... args);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,10 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package androidx.compose.ui.util
 
-// Returns -1 if cannot go back.
-expect fun String.findPrecedingBreak(index: Int): Int
+package androidx.compose.ui.text
 
-// Returns -1 if cannot go forward.
-expect fun String.findFollowingBreak(index: Int): Int
+import java.text.BreakIterator
+
+@InternalTextApi
+actual fun String.findPrecedingBreak(index: Int): Int {
+    val it = BreakIterator.getCharacterInstance()
+    it.setText(this)
+    return it.preceding(index)
+}
+
+@InternalTextApi
+actual fun String.findFollowingBreak(index: Int): Int {
+    val it = BreakIterator.getCharacterInstance()
+    it.setText(this)
+    return it.following(index)
+}
