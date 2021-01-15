@@ -735,7 +735,11 @@ internal class ParagraphBuilder(
 
     internal val defaultFont by lazy {
         val typeface = textStyle.fontFamily?.let {
-            fontLoader.defaultTypeface(it)
+            fontLoader.findTypeface(
+                fontFamily = it,
+                textStyle.fontWeight ?: FontWeight.Normal,
+                textStyle.fontStyle ?: FontStyle.Normal
+            )
         } ?: Typeface.makeDefault()
         SkFont(typeface, defaultStyle.fontSize)
     }
