@@ -19,6 +19,7 @@ package androidx.compose.ui.tooling.inspector
 import android.view.View
 import androidx.compose.runtime.CompositionData
 import androidx.compose.runtime.InternalComposeApi
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutInfo
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.OwnedLayer
@@ -28,10 +29,13 @@ import androidx.compose.ui.tooling.ParameterInformation
 import androidx.compose.ui.tooling.R
 import androidx.compose.ui.tooling.asTree
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.toSize
 import java.util.ArrayDeque
 import java.util.Collections
 import java.util.IdentityHashMap
 import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 
 private val systemPackages = setOf(
     packageNameHash("androidx.compose.animation"),
@@ -300,6 +304,9 @@ class LayoutInspectorTree {
                 node.layoutNodes.forEach { claimedNodes.getOrPut(it) { resultNode } }
                 parentNode.children.add(resultNode)
             }
+            if (node.bounds.isNotEmpty() && sameBoundingRectangle(parentNode, node)) {
+                parentNode.bounds = node.bounds
+            }
             parentNode.layoutNodes.addAll(node.layoutNodes)
             release(node)
         }
@@ -310,7 +317,11 @@ class LayoutInspectorTree {
     private fun parse(group: Group): MutableInspectorNode {
         val node = newNode()
         node.id = getRenderNode(group)
-        ((group as? NodeGroup)?.node as? LayoutInfo)?.let { node.layoutNodes.add(it) }
+        parsePosition(group, node)
+        parseLayoutInfo(group, node)
+        if (node.height <= 0 && node.width <= 0) {
+            return markUnwanted(node)
+        }
         if (!parseCallLocation(group, node) && group.name.isNullOrEmpty()) {
             return markUnwanted(node)
         }
@@ -318,22 +329,49 @@ class LayoutInspectorTree {
         if (unwantedGroup(node)) {
             return markUnwanted(node)
         }
+        addParameters(group.parameters, node)
+        return node
+    }
+
+    private fun parsePosition(group: Group, node: MutableInspectorNode) {
         val box = group.box
         node.top = box.top
         node.left = box.left
         node.height = box.bottom - box.top
         node.width = box.right - box.left
-        if (node.height <= 0 && node.width <= 0) {
-            return markUnwanted(node)
-        }
-        addParameters(group.parameters, node)
-        return node
     }
 
-    private fun markUnwanted(node: MutableInspectorNode): MutableInspectorNode {
-        node.resetExceptIdLayoutNodesAndChildren()
-        return node
+    private fun parseLayoutInfo(group: Group, node: MutableInspectorNode) {
+        val layoutInfo = (group as? NodeGroup)?.node as? LayoutInfo ?: return
+        node.layoutNodes.add(layoutInfo)
+        val box = group.box
+        val size = box.toSize().toSize()
+        val coordinates = layoutInfo.coordinates
+        val topLeft = toIntOffset(coordinates.localToWindow(Offset.Zero))
+        val topRight = toIntOffset(coordinates.localToWindow(Offset(size.width, 0f)))
+        val bottomRight = toIntOffset(coordinates.localToWindow(Offset(size.width, size.height)))
+        val bottomLeft = toIntOffset(coordinates.localToWindow(Offset(0f, size.height)))
+        if (
+            topLeft.x == box.left && topLeft.y == box.top &&
+            topRight.x == box.right && topRight.y == box.top &&
+            bottomRight.x == box.right && bottomRight.y == box.bottom &&
+            bottomLeft.x == box.left && bottomLeft.y == box.bottom
+        ) {
+            return
+        }
+        node.bounds = intArrayOf(
+            topLeft.x, topLeft.y,
+            topRight.x, topRight.y,
+            bottomRight.x, bottomRight.y,
+            bottomLeft.x, bottomLeft.y
+        )
     }
+
+    private fun toIntOffset(offset: Offset): IntOffset =
+        IntOffset(offset.x.roundToInt(), offset.y.roundToInt())
+
+    private fun markUnwanted(node: MutableInspectorNode): MutableInspectorNode =
+        node.apply { markUnwanted() }
 
     private fun parseCallLocation(group: Group, node: MutableInspectorNode): Boolean {
         val location = group.location ?: return false
@@ -387,4 +425,13 @@ class LayoutInspectorTree {
         release(node)
         return result
     }
+
+    private fun sameBoundingRectangle(
+        node1: MutableInspectorNode,
+        node2: MutableInspectorNode
+    ): Boolean =
+        node1.left == node2.left &&
+            node1.top == node2.top &&
+            node1.width == node2.width &&
+            node1.height == node2.height
 }
