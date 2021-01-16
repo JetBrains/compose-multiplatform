@@ -18,7 +18,7 @@ package androidx.compose.runtime.mock
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposableContract
-import androidx.compose.runtime.emit
+import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.key
 
 @Composable
@@ -35,7 +35,7 @@ fun <T : Any> Repeated(
 
 @Composable
 fun Linear(content: @Composable () -> Unit) {
-    emit<View, ViewApplier>(
+    ComposeNode<View, ViewApplier>(
         factory = { View().also { it.name = "linear" } },
         update = { }
     ) {
@@ -45,7 +45,7 @@ fun Linear(content: @Composable () -> Unit) {
 
 @Composable @ComposableContract(restartable = false)
 fun Text(value: String) {
-    emit<View, ViewApplier>(
+    ComposeNode<View, ViewApplier>(
         factory = { View().also { it.name = "text" } },
         update = { set(value) { text = it } }
     )
@@ -53,7 +53,7 @@ fun Text(value: String) {
 
 @Composable
 fun Edit(value: String) {
-    emit<View, ViewApplier>(
+    ComposeNode<View, ViewApplier>(
         factory = { View().also { it.name = "edit" } },
         update = { set(value) { this.value = it } }
     )
@@ -65,7 +65,7 @@ fun SelectBox(
     content: @Composable () -> Unit
 ) {
     if (selected) {
-        emit<View, ViewApplier>(
+        ComposeNode<View, ViewApplier>(
             factory = { View().also { it.name = "box" } },
             update = { },
             content = { content() }

@@ -2538,10 +2538,10 @@ class Composer<N>(
 }
 
 /**
- * A helper receiver scope class used by [emit] to help write code to initialized and update a
+ * A helper receiver scope class used by [ComposeNode] to help write code to initialized and update a
  * node.
  *
- * @see emit
+ * @see ComposeNode
  */
 @Suppress("EXPERIMENTAL_FEATURE_WARNING")
 inline class Updater<T> constructor(
@@ -2589,7 +2589,7 @@ inline class Updater<T> constructor(
      *
      * Schedules [block] to be run when [value] is different than the previous composition. It is
      * different than [set] in that it does not run when the node is created. This is used when
-     * initial value set by the [emit] in the constructor callback already has the correct value.
+     * initial value set by the [ComposeNode] in the constructor callback already has the correct value.
      * For example, use [update} when [value] is passed into of the classes constructor
      * parameters.
      *
@@ -2611,7 +2611,7 @@ inline class Updater<T> constructor(
      *
      * Schedules [block] to be run when [value] is different than the previous composition. It is
      * different than [set] in that it does not run when the node is created. This is used when
-     * initial value set by the [emit] in the constructor callback already has the correct value.
+     * initial value set by the [ComposeNode] in the constructor callback already has the correct value.
      * For example, use [update} when [value] is passed into of the classes constructor
      * parameters.
      *
@@ -2645,7 +2645,7 @@ inline class Updater<T> constructor(
      * Reconcile the node to the current state.
      *
      * This is used when [set] and [update] are insufficient to update the state of the node
-     * based on changes passed to the function calling [emit].
+     * based on changes passed to the function calling [ComposeNode].
      *
      * Schedules [block] to execute. As this unconditionally schedules [block] to executed it
      * might be executed unnecessarily as no effort is taken to ensure it only executes when the

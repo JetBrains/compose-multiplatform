@@ -23,7 +23,7 @@ import androidx.compose.runtime.CompositionReference
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.currentComposer
-import androidx.compose.runtime.emit
+import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionReference
@@ -69,7 +69,7 @@ fun SubcomposeLayout(
     val materialized = currentComposer.materialize(modifier)
     val density = AmbientDensity.current
     val layoutDirection = AmbientLayoutDirection.current
-    emit<LayoutNode, Applier<Any>>(
+    ComposeNode<LayoutNode, Applier<Any>>(
         factory = LayoutEmitHelper.constructor,
         update = {
             init(state.setRoot)
