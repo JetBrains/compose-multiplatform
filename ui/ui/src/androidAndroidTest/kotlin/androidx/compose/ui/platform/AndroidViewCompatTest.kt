@@ -36,7 +36,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Applier
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.emit
+import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -590,7 +590,7 @@ class AndroidViewCompatTest {
                         }
                     ) {
                         it.setContent {
-                            emit<LayoutNode, Applier<Any>>(
+                            ComposeNode<LayoutNode, Applier<Any>>(
                                 factory = LayoutEmitHelper.constructor,
                                 update = {
                                     init { node = this }

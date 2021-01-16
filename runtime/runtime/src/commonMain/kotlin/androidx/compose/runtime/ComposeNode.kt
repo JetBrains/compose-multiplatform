@@ -32,16 +32,10 @@ package androidx.compose.runtime
  *
  * @see Updater
  * @see Applier
- * @see emit
  * @see compositionFor
  */
-@Suppress("ComposableNaming")
-@Deprecated(
-    "emit has been renamed to ComposeNode",
-    replaceWith = ReplaceWith("emit(factory, update)")
-)
 @OptIn(ComposeCompilerApi::class)
-@Composable inline fun <T : Any, reified E : Applier<*>> emit(
+@Composable inline fun <T : Any, reified E : Applier<*>> ComposeNode(
     noinline factory: () -> T,
     update: @ComposableContract(preventCapture = true) Updater<T>.() -> Unit
 ) {
@@ -56,9 +50,6 @@ package androidx.compose.runtime
     currentComposer.endNode()
 }
 
-// TODO(lmr): make assert more informative
-// TODO(lmr): consider invoking children manually
-// TODO(lmr): consider ComposableContract for this
 /**
  * Emits a node into the composition of type [T]. Nodes emitted inside of [content] will become
  * children of the emitted node.
@@ -76,17 +67,11 @@ package androidx.compose.runtime
  *
  * @see Updater
  * @see Applier
- * @see emit
  * @see compositionFor
  */
-@Suppress("ComposableNaming")
-@Deprecated(
-    "emit has been renamed to ComposeNode",
-    replaceWith = ReplaceWith("emit(factory, update, content)")
-)
 @OptIn(ComposeCompilerApi::class)
 @Composable
-inline fun <T : Any?, reified E : Applier<*>> emit(
+inline fun <T : Any?, reified E : Applier<*>> ComposeNode(
     noinline factory: () -> T,
     update: @ComposableContract(preventCapture = true) Updater<T>.() -> Unit,
     content: @Composable () -> Unit
@@ -126,17 +111,11 @@ inline fun <T : Any?, reified E : Applier<*>> emit(
  * @see Updater
  * @see SkippableUpdater
  * @see Applier
- * @see emit
  * @see compositionFor
  */
-@Suppress("ComposableNaming")
-@Deprecated(
-    "emit has been renamed to ComposeNode",
-    replaceWith = ReplaceWith("emit(factory, update, skippableUpdate, content)")
-)
 @OptIn(ComposeCompilerApi::class)
 @Composable @ComposableContract(readonly = true)
-inline fun <T, reified E : Applier<*>> emit(
+inline fun <T, reified E : Applier<*>> ComposeNode(
     noinline factory: () -> T,
     update: @ComposableContract(preventCapture = true) Updater<T>.() -> Unit,
     noinline skippableUpdate: @Composable SkippableUpdater<T>.() -> Unit,
@@ -156,3 +135,6 @@ inline fun <T, reified E : Applier<*>> emit(
     currentComposer.endReplaceableGroup()
     currentComposer.endNode()
 }
+
+@PublishedApi
+internal fun invalidApplier(): Unit = error("Invalid applier")

@@ -77,6 +77,12 @@ package androidx.compose.runtime {
     method public static inline kotlin.jvm.functions.Function0<kotlin.Unit> orEmpty(kotlin.jvm.functions.Function0<kotlin.Unit>?);
   }
 
+  public final class ComposeNodeKt {
+    method @androidx.compose.runtime.Composable public static inline <T extends java.lang.Object, reified E extends androidx.compose.runtime.Applier<?>> void ComposeNode(kotlin.jvm.functions.Function0<? extends T> factory, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> update);
+    method @androidx.compose.runtime.Composable public static inline <T extends java.lang.Object, reified E extends androidx.compose.runtime.Applier<?>> void ComposeNode(kotlin.jvm.functions.Function0<? extends T> factory, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> update, kotlin.jvm.functions.Function0<? extends kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(readonly=true) public static inline <T, reified E extends androidx.compose.runtime.Applier<?>> void ComposeNode(kotlin.jvm.functions.Function0<? extends T> factory, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> update, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.SkippableUpdater<T>,? extends kotlin.Unit> skippableUpdate, kotlin.jvm.functions.Function0<? extends kotlin.Unit> content);
+  }
+
   public final class Composer<N> {
     ctor public Composer(@kotlin.PublishedApi androidx.compose.runtime.Applier<N> applier, androidx.compose.runtime.CompositionReference parentReference);
     method @androidx.compose.runtime.InternalComposeApi public void applyChanges();

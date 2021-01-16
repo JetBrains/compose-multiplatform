@@ -18,7 +18,7 @@ package androidx.compose.ui.layout
 
 import androidx.compose.runtime.Applier
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.emit
+import androidx.compose.runtime.ComposeNode
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.node.LayoutEmitHelper
 import androidx.compose.ui.node.LayoutNode
@@ -47,7 +47,7 @@ fun TestModifierUpdaterLayout(onAttached: (TestModifierUpdater) -> Unit) {
     val measureBlocks = MeasuringIntrinsicsMeasureBlocks { _, constraints ->
         layout(constraints.maxWidth, constraints.maxHeight) {}
     }
-    emit<LayoutNode, Applier<Any>>(
+    ComposeNode<LayoutNode, Applier<Any>>(
         factory = LayoutEmitHelper.constructor,
         update = {
             set(measureBlocks, LayoutEmitHelper.setMeasureBlocks)

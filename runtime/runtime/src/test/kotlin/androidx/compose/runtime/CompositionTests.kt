@@ -2749,7 +2749,7 @@ class CompositionTests {
                     // Read the state here so that the emit removal will invalidate it
                     stateMutatedOnRemove.value
                     if (shouldEmitNode) {
-                        emit<Unit, MutateOnRemoveApplier>({ }) {}
+                        ComposeNode<Unit, MutateOnRemoveApplier>({ }) {}
                     }
                 }
                 // Initial composition should not contain the node we will remove. We want to test
