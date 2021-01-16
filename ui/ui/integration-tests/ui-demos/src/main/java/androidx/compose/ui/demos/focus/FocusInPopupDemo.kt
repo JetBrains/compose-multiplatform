@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 
 @Composable
-fun FocusInPopup() {
+fun FocusInPopupDemo() {
     var showPopup by remember { mutableStateOf(false) }
     var mainText by remember { mutableStateOf(TextFieldValue("Enter Value")) }
     var popupText by remember { mutableStateOf(TextFieldValue("Enter Value")) }

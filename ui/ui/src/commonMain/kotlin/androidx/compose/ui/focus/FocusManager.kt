@@ -34,6 +34,17 @@ interface FocusManager {
      *  any components that have [Captured][FocusState.Captured] focus.
      */
     fun clearFocus(forcedClear: Boolean = false)
+
+    /**
+     * Moves focus in the specified direction.
+     *
+     * Focus moving is still being implemented. Right now, focus will move only if the user
+     * specified a custom focus traversal order for the item that is currently focused. (Using the
+     * [Modifier.focusOrder()][focusOrder] API).
+     *
+     * @return true if focus was moved successfully. false if the focused item is unchanged.
+     */
+    fun moveFocus(focusDirection: FocusDirection): Boolean
 }
 
 /**
@@ -116,5 +127,18 @@ internal class FocusManagerImpl(
         if (focusModifier.focusNode.clearFocus(forcedClear) && rootWasFocused) {
             focusModifier.focusState = Active
         }
+    }
+
+    /**
+     * Moves focus in the specified direction.
+     *
+     * Focus moving is still being implemented. Right now, focus will move only if the user
+     * specified a custom focus traversal order for the item that is currently focused. (Using the
+     * [Modifier.focusOrder()][focusOrder] API).
+     *
+     * @return true if focus was moved successfully. false if the focused item is unchanged.
+     */
+    override fun moveFocus(focusDirection: FocusDirection): Boolean {
+        return focusModifier.focusNode.moveFocus(focusDirection)
     }
 }

@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 
 @Composable
-fun FocusInDialog() {
+fun FocusInDialogDemo() {
     var showDialog by remember { mutableStateOf(false) }
     var mainText by remember { mutableStateOf(TextFieldValue("Enter Value")) }
     var dialogText by remember { mutableStateOf(TextFieldValue("Enter Value")) }

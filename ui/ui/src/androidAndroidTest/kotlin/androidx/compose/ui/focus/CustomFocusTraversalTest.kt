@@ -31,22 +31,29 @@ import androidx.compose.ui.input.key.Key.Companion.DPadLeft
 import androidx.compose.ui.input.key.Key.Companion.DPadRight
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.nativeKeyCode
+import androidx.compose.ui.platform.AmbientFocusManager
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performKeyPress
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import com.google.common.truth.Truth.assertThat
+import org.junit.runners.Parameterized
 
 @ExperimentalComposeUiApi
 @MediumTest
-@RunWith(AndroidJUnit4::class)
-class CustomFocusTraversalTest {
+@RunWith(Parameterized::class)
+class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
     @get:Rule
     val rule = createComposeRule()
+
+    companion object {
+        @JvmStatic
+        @Parameterized.Parameters(name = "moveFocusProgrammatically = {0}")
+        fun initParameters() = listOf(true, false)
+    }
 
     @Test
     fun focusOrder_next() {
@@ -55,7 +62,9 @@ class CustomFocusTraversalTest {
         var item2Focused = false
         var item3Focused = false
         val (item1, item3) = FocusRequester.createRefs()
+        lateinit var focusManager: FocusManager
         rule.setFocusableContent {
+            focusManager = AmbientFocusManager.current
             Row {
                 Box(
                     Modifier
@@ -79,7 +88,11 @@ class CustomFocusTraversalTest {
         rule.runOnIdle { item1.requestFocus() }
 
         // Act.
-        rule.onRoot().performKeyPress(KeyEvent(AndroidKeyEvent(KeyDown, Tab.nativeKeyCode)))
+        if (moveFocusProgrammatically) {
+            focusManager.moveFocus(FocusDirection.Next)
+        } else {
+            rule.onRoot().performKeyPress(KeyEvent(AndroidKeyEvent(KeyDown, Tab.nativeKeyCode)))
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -96,7 +109,9 @@ class CustomFocusTraversalTest {
         var item2Focused = false
         var item3Focused = false
         val (item1, item3) = FocusRequester.createRefs()
+        lateinit var focusManager: FocusManager
         rule.setFocusableContent {
+            focusManager = AmbientFocusManager.current
             Row {
                 Box(
                     Modifier
@@ -120,8 +135,12 @@ class CustomFocusTraversalTest {
         rule.runOnIdle { item3.requestFocus() }
 
         // Act.
-        val nativeKeyEvent = AndroidKeyEvent(0L, 0L, KeyDown, Tab.nativeKeyCode, 0, META_SHIFT_ON)
-        rule.onRoot().performKeyPress(KeyEvent(nativeKeyEvent))
+        if (moveFocusProgrammatically) {
+            focusManager.moveFocus(FocusDirection.Previous)
+        } else {
+            val nativeEvent = AndroidKeyEvent(0L, 0L, KeyDown, Tab.nativeKeyCode, 0, META_SHIFT_ON)
+            rule.onRoot().performKeyPress(KeyEvent(nativeEvent))
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -138,7 +157,9 @@ class CustomFocusTraversalTest {
         var item2Focused = false
         var item3Focused = false
         val (item1, item3) = FocusRequester.createRefs()
+        lateinit var focusManager: FocusManager
         rule.setFocusableContent {
+            focusManager = AmbientFocusManager.current
             Column {
                 Box(
                     Modifier
@@ -162,7 +183,11 @@ class CustomFocusTraversalTest {
         rule.runOnIdle { item3.requestFocus() }
 
         // Act.
-        rule.onRoot().performKeyPress(KeyEvent(AndroidKeyEvent(KeyDown, DPadUp.nativeKeyCode)))
+        if (moveFocusProgrammatically) {
+            focusManager.moveFocus(FocusDirection.Up)
+        } else {
+            rule.onRoot().performKeyPress(KeyEvent(AndroidKeyEvent(KeyDown, DPadUp.nativeKeyCode)))
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -179,7 +204,9 @@ class CustomFocusTraversalTest {
         var item2Focused = false
         var item3Focused = false
         val (item1, item3) = FocusRequester.createRefs()
+        lateinit var focusManager: FocusManager
         rule.setFocusableContent {
+            focusManager = AmbientFocusManager.current
             Column {
                 Box(
                     Modifier
@@ -203,7 +230,12 @@ class CustomFocusTraversalTest {
         rule.runOnIdle { item1.requestFocus() }
 
         // Act.
-        rule.onRoot().performKeyPress(KeyEvent(AndroidKeyEvent(KeyDown, DPadDown.nativeKeyCode)))
+        if (moveFocusProgrammatically) {
+            focusManager.moveFocus(FocusDirection.Down)
+        } else {
+            val nativeKeyEvent = AndroidKeyEvent(KeyDown, DPadDown.nativeKeyCode)
+            rule.onRoot().performKeyPress(KeyEvent(nativeKeyEvent))
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -220,7 +252,9 @@ class CustomFocusTraversalTest {
         var item2Focused = false
         var item3Focused = false
         val (item1, item3) = FocusRequester.createRefs()
+        lateinit var focusManager: FocusManager
         rule.setFocusableContent {
+            focusManager = AmbientFocusManager.current
             Row {
                 Box(
                     Modifier
@@ -244,7 +278,12 @@ class CustomFocusTraversalTest {
         rule.runOnIdle { item3.requestFocus() }
 
         // Act.
-        rule.onRoot().performKeyPress(KeyEvent(AndroidKeyEvent(KeyDown, DPadLeft.nativeKeyCode)))
+        if (moveFocusProgrammatically) {
+            focusManager.moveFocus(FocusDirection.Left)
+        } else {
+            val nativeKeyEvent = AndroidKeyEvent(KeyDown, DPadLeft.nativeKeyCode)
+            rule.onRoot().performKeyPress(KeyEvent(nativeKeyEvent))
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -261,7 +300,9 @@ class CustomFocusTraversalTest {
         var item2Focused = false
         var item3Focused = false
         val (item1, item3) = FocusRequester.createRefs()
+        lateinit var focusManager: FocusManager
         rule.setFocusableContent {
+            focusManager = AmbientFocusManager.current
             Row {
                 Box(
                     Modifier
@@ -285,7 +326,12 @@ class CustomFocusTraversalTest {
         rule.runOnIdle { item1.requestFocus() }
 
         // Act.
-        rule.onRoot().performKeyPress(KeyEvent(AndroidKeyEvent(KeyDown, DPadRight.nativeKeyCode)))
+        if (moveFocusProgrammatically) {
+            focusManager.moveFocus(FocusDirection.Right)
+        } else {
+            val nativeKeyEvent = AndroidKeyEvent(KeyDown, DPadRight.nativeKeyCode)
+            rule.onRoot().performKeyPress(KeyEvent(nativeKeyEvent))
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -304,7 +350,9 @@ class CustomFocusTraversalTest {
         var item2Focused = false
         var item3Focused = false
         val (item1, item3) = FocusRequester.createRefs()
+        lateinit var focusManager: FocusManager
         rule.setFocusableContent {
+            focusManager = AmbientFocusManager.current
             Row {
                 Box(
                     Modifier
@@ -328,7 +376,12 @@ class CustomFocusTraversalTest {
         rule.runOnIdle { item3.requestFocus() }
 
         // Act.
-        rule.onRoot().performKeyPress(KeyEvent(AndroidKeyEvent(KeyDown, DPadLeft.nativeKeyCode)))
+        if (moveFocusProgrammatically) {
+            focusManager.moveFocus(FocusDirection.Left)
+        } else {
+            val nativeKeyEvent = AndroidKeyEvent(KeyDown, DPadLeft.nativeKeyCode)
+            rule.onRoot().performKeyPress(KeyEvent(nativeKeyEvent))
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -347,7 +400,9 @@ class CustomFocusTraversalTest {
         var item2Focused = false
         var item3Focused = false
         val (item1, item3) = FocusRequester.createRefs()
+        lateinit var focusManager: FocusManager
         rule.setFocusableContent {
+            focusManager = AmbientFocusManager.current
             Row {
                 Box(
                     Modifier
@@ -371,7 +426,12 @@ class CustomFocusTraversalTest {
         rule.runOnIdle { item1.requestFocus() }
 
         // Act.
-        rule.onRoot().performKeyPress(KeyEvent(AndroidKeyEvent(KeyDown, DPadRight.nativeKeyCode)))
+        if (moveFocusProgrammatically) {
+            focusManager.moveFocus(FocusDirection.Right)
+        } else {
+            val nativeKeyEvent = AndroidKeyEvent(KeyDown, DPadRight.nativeKeyCode)
+            rule.onRoot().performKeyPress(KeyEvent(nativeKeyEvent))
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -389,7 +449,9 @@ class CustomFocusTraversalTest {
         var item3Focused = false
         var item4Focused = false
         val (item1, item3, item4) = FocusRequester.createRefs()
+        lateinit var focusManager: FocusManager
         rule.setFocusableContent {
+            focusManager = AmbientFocusManager.current
             Row {
                 Box(Modifier.focusOrder { next = item4 }) {
                     Box(
@@ -421,7 +483,11 @@ class CustomFocusTraversalTest {
         rule.runOnIdle { item1.requestFocus() }
 
         // Act.
-        rule.onRoot().performKeyPress(KeyEvent(AndroidKeyEvent(KeyDown, Tab.nativeKeyCode)))
+        if (moveFocusProgrammatically) {
+            focusManager.moveFocus(FocusDirection.Next)
+        } else {
+            rule.onRoot().performKeyPress(KeyEvent(AndroidKeyEvent(KeyDown, Tab.nativeKeyCode)))
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -439,7 +505,9 @@ class CustomFocusTraversalTest {
         var item2Focused = false
         var item3Focused = false
         val (item1, item3) = FocusRequester.createRefs()
+        lateinit var focusManager: FocusManager
         rule.setFocusableContent {
+            focusManager = AmbientFocusManager.current
             Row {
                 Box(Modifier.focusOrder { next = FocusRequester.Default }) {
                     Box(
@@ -465,7 +533,11 @@ class CustomFocusTraversalTest {
         rule.runOnIdle { item1.requestFocus() }
 
         // Act.
-        rule.onRoot().performKeyPress(KeyEvent(AndroidKeyEvent(KeyDown, Tab.nativeKeyCode)))
+        if (moveFocusProgrammatically) {
+            focusManager.moveFocus(FocusDirection.Next)
+        } else {
+            rule.onRoot().performKeyPress(KeyEvent(AndroidKeyEvent(KeyDown, Tab.nativeKeyCode)))
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -484,7 +556,9 @@ class CustomFocusTraversalTest {
         var item2Focused = false
         var item3Focused = false
         val (item1, item3) = FocusRequester.createRefs()
+        lateinit var focusManager: FocusManager
         rule.setFocusableContent {
+            focusManager = AmbientFocusManager.current
             Row {
                 Box(Modifier.focusOrder { }) {
                     Box(
@@ -510,7 +584,11 @@ class CustomFocusTraversalTest {
         rule.runOnIdle { item1.requestFocus() }
 
         // Act.
-        rule.onRoot().performKeyPress(KeyEvent(AndroidKeyEvent(KeyDown, Tab.nativeKeyCode)))
+        if (moveFocusProgrammatically) {
+            focusManager.moveFocus(FocusDirection.Next)
+        } else {
+            rule.onRoot().performKeyPress(KeyEvent(AndroidKeyEvent(KeyDown, Tab.nativeKeyCode)))
+        }
 
         // Assert.
         rule.runOnIdle {
