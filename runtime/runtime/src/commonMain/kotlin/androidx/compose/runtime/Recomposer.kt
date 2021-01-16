@@ -24,9 +24,9 @@ import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.snapshots.SnapshotApplyResult
 import androidx.compose.runtime.snapshots.SnapshotReadObserver
 import androidx.compose.runtime.snapshots.SnapshotWriteObserver
+import androidx.compose.runtime.snapshots.fastForEach
 import androidx.compose.runtime.snapshots.takeMutableSnapshot
-import kotlinx.collections.immutable.PersistentSet
-import kotlinx.collections.immutable.persistentSetOf
+import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -37,14 +37,14 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.coroutineContext
+import kotlin.coroutines.resume
 
 // TODO: Can we use rootKey for this since all compositions will have an eventual Recomposer parent?
 private const val RecomposerCompoundHashKey = 1000
@@ -60,14 +60,6 @@ suspend fun <R> withRunningRecomposer(
     launch { recomposer.runRecomposeAndApplyChanges() }
     block(recomposer).also {
         recomposer.shutDown()
-    }
-}
-
-private inline fun <reified T> Array<T>.without(toRemove: T): Array<T> {
-    val foundAt = indexOf(toRemove)
-    if (foundAt < 0) return this
-    return Array(size - 1) { i ->
-        if (i < foundAt) this[i] else this[i + 1]
     }
 }
 
@@ -93,21 +85,19 @@ class Recomposer(
         private set
 
     private val broadcastFrameClock = BroadcastFrameClock {
-        while (true) {
-            val old = _state.value
-            // If we're shutting down or shut down, we're not going to wake back up.
-            // Cancel the BroadcastFrameClock with an exception to free any current or future
-            // awaiters.
-            val new = old.withFrameClockAwaiters() ?: throw CancellationException(
-                "Recomposer shutdown; frame clock awaiter will never resume",
-                old.closeCause
-            )
-            if (_state.compareAndSet(old, new)) break
-        }
+        synchronized(stateLock) {
+            deriveStateLocked().also {
+                if (_state.value <= State.ShuttingDown) throw CancellationException(
+                    "Recomposer shutdown; frame clock awaiter will never resume",
+                    closeCause
+                )
+            }
+        }?.resume(Unit)
     }
 
     /**
      * A [Job] used as a parent of any effects created by this [Recomposer]'s compositions.
+     * Its cleanup is used to advance to [State.ShuttingDown] or [State.ShutDown].
      */
     private val effectJob = Job(effectCoroutineContext[Job]).apply {
         invokeOnCompletion { throwable ->
@@ -115,31 +105,26 @@ class Recomposer(
             // kick it out and make sure no new ones start if we have one.
             val cancellation = CancellationException("Recomposer effect job completed", throwable)
 
-            while (true) {
-                val old = _state.value
-                if (old.runnerJob != null) {
-                    // If we have a runner job we need to cancel it and wait until it's complete
-                    // before we consider the recomposer to be fully shut down. We are still
-                    // in the _process_ of shutting down until then.
-                    val new = old.shuttingDown(cancellation)
-                    if (_state.compareAndSet(old, new)) {
-                        old.runnerJob.cancel(cancellation)
-                        old.runnerJob.invokeOnCompletion { runnerJobCause ->
-                            _state.value = old.shutDown(
-                                throwable?.apply {
-                                    runnerJobCause
-                                        ?.takeIf { it !is CancellationException }
-                                        ?.let { addSuppressed(it) }
-                                }
-                            )
+            synchronized(stateLock) {
+                val runnerJob = runnerJob
+                if (runnerJob != null) {
+                    _state.value = State.ShuttingDown
+                    // This will cancel frameContinuation if needed
+                    runnerJob.cancel(cancellation)
+                    frameContinuation = null
+                    runnerJob.invokeOnCompletion { runnerJobCause ->
+                        synchronized(stateLock) {
+                            closeCause = throwable?.apply {
+                                runnerJobCause
+                                    ?.takeIf { it !is CancellationException }
+                                    ?.let { addSuppressed(it) }
+                            }
+                            _state.value = State.ShutDown
                         }
-                        break
                     }
                 } else {
-                    // If we didn't have a runner job to await, the completion of the effect job
-                    // represents the full and successful shutdown of the Recomposer.
-                    val new = old.shutDown(cancellation)
-                    if (_state.compareAndSet(old, new)) break
+                    closeCause = cancellation
+                    _state.value = State.ShutDown
                 }
             }
         }
@@ -199,237 +184,76 @@ class Recomposer(
         PendingWork
     }
 
+    private val stateLock = Any()
+    private var runnerJob: Job? = null
+    private var closeCause: Throwable? = null
+    private val knownComposers = mutableListOf<Composer<*>>()
+    private val snapshotInvalidations = mutableListOf<Set<Any>>()
+    private val composerInvalidations = mutableListOf<Composer<*>>()
+    private var frameContinuation: CancellableContinuation<Unit>? = null
+
+    private val _state = MutableStateFlow(State.Inactive)
+
     /**
-     * Primary atomic/immutable state object used with [_state].
-     * Each `with` method creates and returns a copy with the requested changes.
-     * If a copy method returns `null`, the requested state cannot be reached from
-     * the current state.
+     * Determine the new value of [_state]. Call only while locked on [stateLock].
+     * If it returns a continuation, that continuation should be resumed after releasing the lock.
      */
-    private class StateInfo private constructor(
-        val state: State,
-        val runnerJob: Job?,
-        val closeCause: Throwable?,
-        private val knownComposers: PersistentSet<Composer<*>>,
-        private val snapshotInvalidations: Any?,
-        private val composerInvalidations: Any?,
-        val hasFrameClockAwaiters: Boolean
-    ) {
-        /**
-         * Internal implementation detail for other utilities that copy while preserving
-         * required invariants. Generates the appropriate [state] for the new [StateInfo].
-         */
-        private fun copy(
-            runnerJob: Job? = this.runnerJob,
-            closeCause: Throwable? = this.closeCause,
-            knownComposers: PersistentSet<Composer<*>> = this.knownComposers,
-            snapshotInvalidations: Any? = this.snapshotInvalidations,
-            composerInvalidations: Any? = this.composerInvalidations,
-            hasFrameClockAwaiters: Boolean = this.hasFrameClockAwaiters
-        ): StateInfo {
-            val newRunnerJob = runnerJob.takeIf { state > State.ShuttingDown }
-            val newSnapshotInvalidations = snapshotInvalidations.takeIf { newRunnerJob != null }
-            val newComposerInvalidations = composerInvalidations.takeIf { newRunnerJob != null }
-            val hasWork = hasFrameClockAwaiters ||
-                newSnapshotInvalidations != null ||
-                newComposerInvalidations != null
-            val newState = when {
-                // Maintain existing shutdown state if copied
-                state <= State.ShuttingDown -> state
-                newRunnerJob != null -> {
-                    if (hasWork) State.PendingWork else State.Idle
-                }
-                else -> {
-                    if (hasWork) State.InactivePendingWork else State.Inactive
-                }
+    private fun deriveStateLocked(): CancellableContinuation<Unit>? {
+        if (_state.value <= State.ShuttingDown) {
+            knownComposers.clear()
+            snapshotInvalidations.clear()
+            composerInvalidations.clear()
+            frameContinuation?.cancel()
+            frameContinuation = null
+            return null
+        }
+
+        val newState = when {
+            runnerJob == null -> {
+                snapshotInvalidations.clear()
+                composerInvalidations.clear()
+                if (broadcastFrameClock.hasAwaiters) State.InactivePendingWork else State.Inactive
             }
-            return StateInfo(
-                state = newState,
-                runnerJob = newRunnerJob,
-                closeCause = closeCause,
-                knownComposers = knownComposers,
-                snapshotInvalidations = newSnapshotInvalidations,
-                composerInvalidations = newComposerInvalidations,
-                hasFrameClockAwaiters = hasFrameClockAwaiters
-            )
+            composerInvalidations.isNotEmpty() || snapshotInvalidations.isNotEmpty() ||
+                broadcastFrameClock.hasAwaiters -> State.PendingWork
+            else -> State.Idle
         }
 
-        /**
-         * `true` if the current state has pending work that requires performing a frame
-         */
-        val hasFrameWork: Boolean
-            get() = hasFrameClockAwaiters || hasComposerInvalidations
-
-        val hasSnapshotChanges: Boolean
-            get() = snapshotInvalidations != null
-
-        /**
-         * `true` if one or more [Composer]s want to recompose.
-         */
-        val hasComposerInvalidations: Boolean
-            get() = composerInvalidations != null
-
-        fun withKnownComposer(
-            composer: Composer<*>
-        ) = if (state <= State.ShuttingDown) null else copy(
-            knownComposers = knownComposers.add(composer)
-        )
-
-        @Suppress("UNCHECKED_CAST")
-        fun withoutKnownComposer(
-            composer: Composer<*>
-        ) = if (composer !in knownComposers) this else copy(
-            knownComposers = knownComposers.remove(composer),
-            composerInvalidations = when (composerInvalidations) {
-                null -> null
-                is Composer<*> -> composerInvalidations.takeUnless<Any?> { it === composer }
-                is Array<*> -> (composerInvalidations as Array<Composer<*>>).without(composer)
-                else -> error("invalid composerInvalidations $composerInvalidations")
+        _state.value = newState
+        return if (newState == State.PendingWork) {
+            frameContinuation.also {
+                frameContinuation = null
             }
-        )
-
-        inline fun forEachKnownComposer(
-            block: (Composer<*>) -> Unit
-        ) {
-            knownComposers.forEach(block)
-        }
-
-        fun withRunnerJob(runnerJob: Job) = when {
-            closeCause != null -> throw closeCause
-            this.runnerJob != null -> error("Recomposer is already running")
-            else -> copy(runnerJob = runnerJob)
-        }
-
-        fun withoutRunnerJob(runnerJob: Job) = when {
-            this.runnerJob !== runnerJob -> null
-            state < State.Idle -> null
-            else -> copy(
-                runnerJob = null,
-                composerInvalidations = null,
-                snapshotInvalidations = null
-            )
-        }
-
-        fun withSnapshotInvalidation(changed: Set<Any>) =
-            if (state < State.Idle) null else copy(
-                snapshotInvalidations = @Suppress("UNCHECKED_CAST") when (snapshotInvalidations) {
-                    null -> changed
-                    is Set<*> -> arrayOf(snapshotInvalidations, changed)
-                    is Array<*> -> (snapshotInvalidations as Array<Set<Any>>) + changed
-                    else -> error("invalid snapshotInvalidations $snapshotInvalidations")
-                }
-            )
-
-        inline fun forEachSnapshotInvalidation(block: (Set<Any>) -> Unit) {
-            @Suppress("UNCHECKED_CAST")
-            when (snapshotInvalidations) {
-                null -> return
-                is Set<*> -> block(snapshotInvalidations as Set<Any>)
-                is Array<*> -> for (changed in snapshotInvalidations) {
-                    block(changed as Set<Any>)
-                }
-                else -> error("invalid snapshotInvalidations $snapshotInvalidations")
-            }
-        }
-
-        fun hasComposerInvalidation(composer: Composer<*>): Boolean = when (composerInvalidations) {
-            null -> false
-            is Composer<*> -> composerInvalidations === composer
-            is Array<*> -> composer in composerInvalidations
-            else -> error("invalid composerInvalidations $composerInvalidations")
-        }
-
-        fun withComposerInvalidation(composer: Composer<*>) =
-            if (state < State.Idle) null else copy(
-                composerInvalidations = @Suppress("UNCHECKED_CAST") when (composerInvalidations) {
-                    null -> composer
-                    is Composer<*> -> arrayOf(composerInvalidations, composer)
-                    is Array<*> -> (composerInvalidations as Array<Composer<*>>) + composer
-                    else -> error("invalid composerInvalidations $composerInvalidations")
-                }
-            )
-
-        inline fun forEachInvalidComposer(block: (Composer<*>) -> Unit) {
-            when (composerInvalidations) {
-                null -> return
-                is Composer<*> -> block(composerInvalidations)
-                is Array<*> -> for (composer in composerInvalidations) {
-                    block(composer as Composer<*>)
-                }
-                else -> error("invalid composerInvalidations $composerInvalidations")
-            }
-        }
-
-        fun withFrameClockAwaiters() = if (state <= State.ShuttingDown) null else copy(
-            hasFrameClockAwaiters = true
-        )
-
-        fun withoutInvalidSnapshots() = if (state <= State.ShuttingDown) null else copy(
-            snapshotInvalidations = null
-        )
-
-        fun withoutFrameClockAwaiters() = if (state <= State.ShuttingDown) null else copy(
-            hasFrameClockAwaiters = false
-        )
-
-        fun withoutInvalidComposers() = if (state <= State.ShuttingDown) null else copy(
-            composerInvalidations = null
-        )
-
-        fun shuttingDown(cause: Throwable) = StateInfo(
-            state = State.ShuttingDown,
-            runnerJob = runnerJob,
-            closeCause = cause,
-            knownComposers = knownComposers,
-            snapshotInvalidations = null,
-            composerInvalidations = null,
-            hasFrameClockAwaiters = false
-        )
-
-        fun shutDown(cause: Throwable? = null) = StateInfo(
-            state = State.ShutDown,
-            runnerJob = null,
-            closeCause = cause,
-            knownComposers = persistentSetOf(),
-            snapshotInvalidations = null,
-            composerInvalidations = null,
-            hasFrameClockAwaiters = false
-        )
-
-        companion object {
-            val Inactive = StateInfo(
-                state = State.Inactive,
-                runnerJob = null,
-                closeCause = null,
-                knownComposers = persistentSetOf(),
-                snapshotInvalidations = null,
-                composerInvalidations = null,
-                hasFrameClockAwaiters = false
-            )
-        }
+        } else null
     }
-
-    /**
-     * The primary state driving the recomposer. Always updated via compareAndSet.
-     */
-    private val _state = MutableStateFlow(StateInfo.Inactive)
 
     /**
      * The current [State] of this [Recomposer]. See each [State] value for its meaning.
      */
-    public val state: Flow<State> = _state.map { it.state }.distinctUntilChanged()
+    public val state: Flow<State>
+        get() = _state
 
-    private fun recordComposerModifications() {
-        while (true) {
-            val old = _state.value
-            val minusSnapshots = old.withoutInvalidSnapshots() ?: break
-            if (_state.compareAndSet(old, minusSnapshots)) {
-                old.forEachSnapshotInvalidation { changes ->
-                    old.forEachKnownComposer { composer ->
-                        composer.recordModificationsOf(changes)
-                    }
+    private fun recordComposerModificationsLocked() {
+        if (snapshotInvalidations.isNotEmpty()) {
+            snapshotInvalidations.fastForEach { changes ->
+                knownComposers.fastForEach { composer ->
+                    composer.recordModificationsOf(changes)
                 }
-                break
             }
+            snapshotInvalidations.clear()
+            if (deriveStateLocked() != null) {
+                error("called outside of runRecomposeAndApplyChanges")
+            }
+        }
+    }
+
+    private fun registerRunnerJob(callingJob: Job) {
+        synchronized(stateLock) {
+            closeCause?.let { throw it }
+            if (_state.value <= State.ShuttingDown) error("Recomposer shut down")
+            if (runnerJob != null) error("Recomposer already running")
+            runnerJob = callingJob
+            deriveStateLocked()
         }
     }
 
@@ -441,44 +265,59 @@ class Recomposer(
      * more invalid composers awaiting recomposition.
      *
      * This method never returns. Cancel the calling [CoroutineScope] to stop.
+     * Unhandled failure exceptions from child coroutines will be thrown by this method.
      */
     suspend fun runRecomposeAndApplyChanges(): Nothing {
         val parentFrameClock = coroutineContext[MonotonicFrameClock] ?: DefaultMonotonicFrameClock
         withContext(broadcastFrameClock) {
             // Enforce mutual exclusion of callers; register self as current runner
-            val runnerJob = coroutineContext.job
-            while (true) {
-                val old = _state.value
-                val new = old.withRunnerJob(runnerJob)
-                if (_state.compareAndSet(old, new)) break
-            }
+            val callingJob = coroutineContext.job
+            registerRunnerJob(callingJob)
 
             // Observe snapshot changes and propagate them to known composers only from
             // this caller's dispatcher, never working with the same composer in parallel.
             // unregisterApplyObserver is called as part of the big finally below
             val unregisterApplyObserver = Snapshot.registerApplyObserver { changed, _ ->
-                while (true) {
-                    val old = _state.value
-                    val new = old.withSnapshotInvalidation(changed) ?: break
-                    if (_state.compareAndSet(old, new)) break
-                }
+                synchronized(stateLock) {
+                    if (_state.value >= State.Idle) {
+                        snapshotInvalidations += changed
+                        deriveStateLocked()
+                    } else null
+                }?.resume(Unit)
             }
 
             try {
                 // Invalidate all registered composers when we start since we weren't observing
                 // snapshot changes on their behalf. Assume anything could have changed.
-                _state.value.forEachKnownComposer { it.invalidateAll() }
+                synchronized(stateLock) {
+                    knownComposers.fastForEach { it.invalidateAll() }
+                    // Don't need to deriveStateLocked here; invalidate will do it if needed.
+                }
 
-                // Used to suspend until there is work to process
-                val awaitPendingWorkFlow = _state.takeWhile { it.state != State.PendingWork }
-
+                val toRecompose = mutableListOf<Composer<*>>()
                 while (true) {
                     // Await something to do
-                    awaitPendingWorkFlow.collect()
+                    if (_state.value < State.PendingWork) {
+                        suspendCancellableCoroutine<Unit> { co ->
+                            synchronized(stateLock) {
+                                if (_state.value == State.PendingWork) {
+                                    co.resume(Unit)
+                                } else {
+                                    frameContinuation = co
+                                }
+                            }
+                        }
+                    }
 
-                    recordComposerModifications()
-
-                    if (!_state.value.hasFrameWork) continue
+                    // Don't await a new frame if we don't have frame-scoped work
+                    if (
+                        synchronized(stateLock) {
+                            if (!hasFrameWorkLocked) {
+                                recordComposerModificationsLocked()
+                                !hasFrameWorkLocked
+                            } else false
+                        }
+                    ) continue
 
                     // Align work with the next frame to coalesce changes.
                     // Note: it is possible to resume from the above with no recompositions pending,
@@ -490,16 +329,7 @@ class Recomposer(
                         trace("recomposeFrame") {
                             // Dispatch MonotonicFrameClock frames first; this may produce new
                             // composer invalidations that we must handle during the same frame.
-                            if (_state.value.hasFrameClockAwaiters) {
-                                // Remove the hasFrameClockAwaiters bit before sending a frame.
-                                // New awaiters *during* the frame may set it back and we'll
-                                // produce another frame later.
-                                while (true) {
-                                    val old = _state.value
-                                    val new = old.withoutFrameClockAwaiters() ?: break
-                                    if (_state.compareAndSet(old, new)) break
-                                }
-
+                            if (broadcastFrameClock.hasAwaiters) {
                                 // Propagate the frame time to anyone who is awaiting from the
                                 // recomposer clock.
                                 broadcastFrameClock.sendFrame(frameTime)
@@ -508,31 +338,38 @@ class Recomposer(
                                 Snapshot.sendApplyNotifications()
                             }
 
-                            // Drain any composer invalidations from snapshot changes
-                            recordComposerModifications()
+                            // Drain any composer invalidations from snapshot changes and record
+                            // composers to work on
+                            synchronized(stateLock) {
+                                recordComposerModificationsLocked()
+
+                                composerInvalidations.fastForEach { toRecompose += it }
+                                composerInvalidations.clear()
+                            }
 
                             // Perform recomposition for any invalidated composers
-                            var changes = false
-                            while (true) {
-                                val old = _state.value
-                                val new = old.withoutInvalidComposers() ?: break
-                                if (_state.compareAndSet(old, new)) {
-                                    old.forEachInvalidComposer { composer ->
-                                        changes = performRecompose(composer) || changes
-                                    }
-                                    break
+                            try {
+                                var changes = false
+                                toRecompose.fastForEach { composer ->
+                                    changes = performRecompose(composer) || changes
                                 }
+                                if (changes) changeCount++
+                            } finally {
+                                toRecompose.clear()
                             }
-                            if (changes) changeCount++
+                            synchronized(stateLock) {
+                                deriveStateLocked()
+                            }
                         }
                     }
                 }
             } finally {
                 unregisterApplyObserver()
-                while (true) {
-                    val old = _state.value
-                    val new = old.withoutRunnerJob(runnerJob) ?: break
-                    if (_state.compareAndSet(old, new)) break
+                synchronized(stateLock) {
+                    if (runnerJob === callingJob) {
+                        runnerJob = null
+                    }
+                    deriveStateLocked()
                 }
             }
         }
@@ -571,10 +408,12 @@ class Recomposer(
         }
         composer.applyChanges()
 
-        while (true) {
-            val old = _state.value
-            val new = old.withKnownComposer(composer) ?: break
-            if (_state.compareAndSet(old, new)) break
+        synchronized(stateLock) {
+            if (_state.value > State.ShuttingDown) {
+                if (composer !in knownComposers) {
+                    knownComposers += composer
+                }
+            }
         }
 
         if (!composerWasComposing) {
@@ -626,9 +465,12 @@ class Recomposer(
     /**
      * Returns true if any pending invalidations have been scheduled.
      */
-    fun hasInvalidations(): Boolean = with(_state.value) {
-        hasSnapshotChanges || hasFrameWork
+    fun hasInvalidations(): Boolean = synchronized(stateLock) {
+        snapshotInvalidations.isNotEmpty() || hasFrameWorkLocked
     }
+
+    private val hasFrameWorkLocked: Boolean
+        get() = composerInvalidations.isNotEmpty() || broadcastFrameClock.hasAwaiters
 
     /**
      * Suspends until the currently pending recomposition frame is complete.
@@ -664,20 +506,18 @@ class Recomposer(
     }
 
     internal override fun unregisterComposerWithRoot(composer: Composer<*>) {
-        while (true) {
-            val old = _state.value
-            val new = old.withoutKnownComposer(composer)
-            if (_state.compareAndSet(old, new)) break
+        synchronized(stateLock) {
+            knownComposers -= composer
         }
     }
 
     internal override fun invalidate(composer: Composer<*>) {
-        while (true) {
-            val old = _state.value
-            if (old.hasComposerInvalidation(composer)) break
-            val new = old.withComposerInvalidation(composer) ?: break
-            if (_state.compareAndSet(old, new)) break
-        }
+        synchronized(stateLock) {
+            if (composer !in composerInvalidations) {
+                composerInvalidations += composer
+                deriveStateLocked()
+            } else null
+        }?.resume(Unit)
     }
 
     companion object {
