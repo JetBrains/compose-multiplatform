@@ -680,7 +680,7 @@ internal class AndroidComposeView(context: Context) :
     override fun calculatePosition(): IntOffset = globalPosition
 
     override fun calculatePositionInWindow(): IntOffset {
-        getLocationOnScreen(tmpPositionArray)
+        getLocationInWindow(tmpPositionArray)
         return IntOffset(tmpPositionArray[0], tmpPositionArray[1])
     }
 
