@@ -43,7 +43,7 @@ private const val size = 200f
 private enum class CurrentShape { Circle, Square }
 
 @Composable
-fun ReuseFocusRequester() {
+fun ReuseFocusRequesterDemo() {
     Column(
         verticalArrangement = Arrangement.Top
     ) {

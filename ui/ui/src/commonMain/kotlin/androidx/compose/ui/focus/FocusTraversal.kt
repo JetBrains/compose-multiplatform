@@ -24,14 +24,13 @@ import androidx.compose.ui.focus.FocusDirection.Next
 import androidx.compose.ui.focus.FocusDirection.Previous
 import androidx.compose.ui.focus.FocusDirection.Right
 import androidx.compose.ui.focus.FocusDirection.Up
-import androidx.compose.ui.focus.FocusState.Active
 import androidx.compose.ui.focus.FocusRequester.Companion.Default
 import androidx.compose.ui.node.ModifiedFocusNode
 
 /**
  * This enum specifies the direction of the requested focus change.
  */
-internal enum class FocusDirection { Next, Previous, Left, Right, Up, Down }
+enum class FocusDirection { Next, Previous, Left, Right, Up, Down }
 
 /**
  * Moves focus based on the requested focus direction.
@@ -40,13 +39,18 @@ internal enum class FocusDirection { Next, Previous, Left, Right, Up, Down }
  * @return whether focus was moved or not.
  */
 internal fun ModifiedFocusNode.moveFocus(focusDirection: FocusDirection): Boolean {
-    check(modifier.focusState == Active)
+    val activeNode = findActiveFocusNode()
+
+    // If there is no active node in this sub-hierarchy, we can't move focus.
+    if (activeNode == null) {
+        return false
+    }
 
     // TODO(b/175899779) If the direction is "Next", cache the current node so we can come back
     //  to the same place if the user requests "Previous"
 
     // Check if a custom focus traversal order is specified.
-    val nextFocusRequester = customFocusSearch(focusDirection)
+    val nextFocusRequester = activeNode.customFocusSearch(focusDirection)
     if (nextFocusRequester != Default) {
         // TODO(b/175899786): We ideally need to check if the nextFocusRequester points to something
         //  that is visible and focusable in the current mode (Touch/Non-Touch mode).
