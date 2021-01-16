@@ -26,8 +26,6 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import com.google.common.truth.Truth.assertThat
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -41,7 +39,6 @@ class SetRootFocusTest {
     private val focusable = "Focusable"
     private val nonFocusable = "NotFocusable"
 
-    @Ignore // b/171959479
     @Test
     fun clearFocus_byClickingOutsideFocusableComponent() {
         // Arrange.
@@ -66,12 +63,12 @@ class SetRootFocusTest {
             }
         }
         rule.onNodeWithTag(focusable).performClick()
-        rule.runOnIdle { assertThat(isFocused).isTrue() }
+        rule.waitUntil { isFocused == true }
 
         // Act.
         rule.onNodeWithTag(nonFocusable).performClick()
 
         // Assert.
-        rule.runOnIdle { assertThat(isFocused).isFalse() }
+        rule.waitUntil { isFocused == false }
     }
 }
