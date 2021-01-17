@@ -274,11 +274,13 @@ private class TextController(val state: TextState) {
         )
         if (state.layoutResult != layoutResult) {
             state.onTextLayout(layoutResult)
-            if (state.layoutResult != null) {
-                // Notify the SelectionContainer that this CoreText has changed and previous
-                // selection is invalid.
-                state.selectable?.let {
-                    selectionRegistrar?.notifySelectableChange(it)
+
+            state.layoutResult?.let { prevLayoutResult ->
+                // If the input text of this CoreText has changed, notify the SelectionContainer.
+                if (prevLayoutResult.layoutInput.text != layoutResult.layoutInput.text) {
+                    state.selectable?.let { selectable ->
+                        selectionRegistrar?.notifySelectableChange(selectable)
+                    }
                 }
             }
         }

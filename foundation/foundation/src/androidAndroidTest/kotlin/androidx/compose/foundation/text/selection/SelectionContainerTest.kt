@@ -40,7 +40,6 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.AmbientHapticFeedback
 import androidx.compose.ui.platform.AmbientLayoutDirection
-import androidx.compose.ui.platform.AmbientView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.selection.Selection
 import androidx.compose.ui.selection.SelectionContainer
@@ -96,7 +95,15 @@ class SelectionContainerTest {
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>()
 
-    private var composeViewAbsolutePos = IntOffset(0, 0)
+    private val composeViewAbsolutePos: IntOffset get() {
+        // Get the view position on screen
+        val positionArray = IntArray(2)
+        view.getLocationOnScreen(positionArray)
+        return IntOffset(
+            positionArray[0],
+            positionArray[1]
+        )
+    }
 
     private lateinit var view: View
 
@@ -266,41 +273,31 @@ class SelectionContainerTest {
         val measureLatch = CountDownLatch(1)
 
         val layoutDirection = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
-        with(rule.density) {
-            rule.setContent {
-                // Get the compose view position on screen
-                val composeView = AmbientView.current
-                val positionArray = IntArray(2)
-                composeView.getLocationOnScreen(positionArray)
-                composeViewAbsolutePos = IntOffset(
-                    positionArray[0],
-                    positionArray[1]
-                )
-                Providers(
-                    AmbientHapticFeedback provides hapticFeedback,
-                    AmbientLayoutDirection provides layoutDirection
-                ) {
-                    TestParent(Modifier.testTag("selectionContainer").gestureSpy(log)) {
-                        SelectionContainer(
-                            modifier = Modifier.onGloballyPositioned {
-                                measureLatch.countDown()
-                            },
-                            selection = selection.value,
-                            onSelectionChange = {
-                                selection.value = it
-                            }
-                        ) {
-                            CoreText(
-                                AnnotatedString(textContent),
-                                Modifier.fillMaxSize(),
-                                style = TextStyle(fontFamily = fontFamily, fontSize = fontSize),
-                                softWrap = true,
-                                overflow = TextOverflow.Clip,
-                                maxLines = Int.MAX_VALUE,
-                                inlineContent = mapOf(),
-                                onTextLayout = {}
-                            )
+        rule.setContent {
+            Providers(
+                AmbientHapticFeedback provides hapticFeedback,
+                AmbientLayoutDirection provides layoutDirection
+            ) {
+                TestParent(Modifier.testTag("selectionContainer").gestureSpy(log)) {
+                    SelectionContainer(
+                        modifier = Modifier.onGloballyPositioned {
+                            measureLatch.countDown()
+                        },
+                        selection = selection.value,
+                        onSelectionChange = {
+                            selection.value = it
                         }
+                    ) {
+                        CoreText(
+                            AnnotatedString(textContent),
+                            Modifier.fillMaxSize(),
+                            style = TextStyle(fontFamily = fontFamily, fontSize = fontSize),
+                            softWrap = true,
+                            overflow = TextOverflow.Clip,
+                            maxLines = Int.MAX_VALUE,
+                            inlineContent = mapOf(),
+                            onTextLayout = {}
+                        )
                     }
                 }
             }
