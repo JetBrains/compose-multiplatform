@@ -19,8 +19,11 @@ package androidx.compose.ui.inspection
 import android.view.View
 import android.view.inspector.WindowInspector
 import androidx.compose.ui.inspection.compose.AndroidComposeViewWrapper
+import androidx.compose.ui.inspection.compose.convertParameters
+import androidx.compose.ui.inspection.compose.flatten
 import androidx.compose.ui.inspection.framework.flatten
 import androidx.compose.ui.inspection.proto.StringTable
+import androidx.compose.ui.inspection.proto.convertAll
 import androidx.compose.ui.inspection.util.ThreadUtils
 import androidx.inspection.Connection
 import androidx.inspection.Inspector
@@ -29,6 +32,8 @@ import androidx.inspection.InspectorFactory
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Command
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetComposablesCommand
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetComposablesResponse
+import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetParametersCommand
+import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetParametersResponse
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Response
 
 private const val LAYOUT_INSPECTION_ID = "layoutinspector.compose.inspection"
@@ -54,6 +59,9 @@ class ComposeLayoutInspector(
         when (command.specializedCase) {
             Command.SpecializedCase.GET_COMPOSABLES_COMMAND -> {
                 handleGetComposablesCommand(command.getComposablesCommand, callback)
+            }
+            Command.SpecializedCase.GET_PARAMETERS_COMMAND -> {
+                handleGetParametersCommand(command.getParametersCommand, callback)
             }
             else -> error("Unexpected compose inspector command case: ${command.specializedCase}")
         }
@@ -82,6 +90,37 @@ class ComposeLayoutInspector(
                         addAllStrings(stringTable.toStringEntries())
                         addAllRoots(composeRoots)
                     }.build()
+                }
+            }
+        }
+    }
+
+    private fun handleGetParametersCommand(
+        getParametersCommand: GetParametersCommand,
+        callback: CommandCallback
+    ) {
+        ThreadUtils.runOnMainThread {
+            val foundComposable = getRootViews()
+                .asSequence()
+                .flatMap { it.flatten() }
+                .mapNotNull { AndroidComposeViewWrapper.tryCreateFor(it) }
+                .flatMap { it.inspectorNodes }
+                .flatMap { it.flatten() }
+                .firstOrNull { it.id == getParametersCommand.composableId }
+
+            environment.executors().primary().execute {
+                callback.reply {
+                    getParametersResponse = if (foundComposable != null) {
+                        val stringTable = StringTable()
+                        val parameters = foundComposable.convertParameters().convertAll(stringTable)
+                        GetParametersResponse.newBuilder().apply {
+                            composableId = getParametersCommand.composableId
+                            addAllStrings(stringTable.toStringEntries())
+                            addAllParameters(parameters)
+                        }.build()
+                    } else {
+                        GetParametersResponse.getDefaultInstance()
+                    }
                 }
             }
         }

@@ -16,8 +16,11 @@
 
 package androidx.compose.ui.inspection.proto
 import androidx.compose.ui.tooling.inspector.InspectorNode
+import androidx.compose.ui.tooling.inspector.NodeParameter
+import androidx.compose.ui.tooling.inspector.ParameterType
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Bounds
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.ComposableNode
+import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Parameter
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Quad
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Rect
 
@@ -64,6 +67,71 @@ private fun InspectorNode.toComposableNodeImpl(stringTable: StringTable): Compos
     }
 }
 
+fun ParameterType.convert(): Parameter.Type {
+    return when (this) {
+        ParameterType.String -> Parameter.Type.STRING
+        ParameterType.Boolean -> Parameter.Type.BOOLEAN
+        ParameterType.Double -> Parameter.Type.DOUBLE
+        ParameterType.Float -> Parameter.Type.FLOAT
+        ParameterType.Int32 -> Parameter.Type.INT32
+        ParameterType.Int64 -> Parameter.Type.INT64
+        ParameterType.Color -> Parameter.Type.COLOR
+        ParameterType.Resource -> Parameter.Type.RESOURCE
+        ParameterType.DimensionDp -> Parameter.Type.DIMENSION_DP
+        ParameterType.DimensionSp -> Parameter.Type.DIMENSION_SP
+        ParameterType.DimensionEm -> Parameter.Type.DIMENSION_EM
+        ParameterType.Lambda -> Parameter.Type.LAMBDA
+    }
+}
+
+private fun Parameter.Builder.setValue(stringTable: StringTable, value: Any?) {
+    when (type) {
+        Parameter.Type.STRING -> {
+            int32Value = stringTable.put(value as String)
+        }
+        Parameter.Type.BOOLEAN -> {
+            int32Value = if (value as Boolean) 1 else 0
+        }
+        Parameter.Type.DOUBLE -> {
+            doubleValue = value as Double
+        }
+        Parameter.Type.FLOAT,
+        Parameter.Type.DIMENSION_DP,
+        Parameter.Type.DIMENSION_SP,
+        Parameter.Type.DIMENSION_EM -> {
+            floatValue = value as Float
+        }
+        Parameter.Type.INT32,
+        Parameter.Type.COLOR -> {
+            int32Value = value as Int
+        }
+        Parameter.Type.INT64 -> {
+            int64Value = value as Long
+        }
+        Parameter.Type.RESOURCE -> {
+            // TODO: handle resource type
+        }
+        Parameter.Type.LAMBDA -> {
+            // TODO: Use environment tooling to query data so we can extract lambda information
+        }
+        else -> error("Unknown Composable parameter type: $type")
+    }
+}
+
+fun NodeParameter.convert(stringTable: StringTable): Parameter {
+    val nodeParam = this
+    return Parameter.newBuilder().apply {
+        name = stringTable.put(nodeParam.name)
+        type = nodeParam.type.convert()
+        setValue(stringTable, nodeParam.value)
+        addAllElements(nodeParam.elements.map { it.convert(stringTable) })
+    }.build()
+}
+
 fun Iterable<InspectorNode>.toComposableNodes(stringTable: StringTable): List<ComposableNode> {
     return this.map { it.toComposableNode(stringTable) }
+}
+
+fun Iterable<NodeParameter>.convertAll(stringTable: StringTable): List<Parameter> {
+    return this.map { it.convert(stringTable) }
 }
