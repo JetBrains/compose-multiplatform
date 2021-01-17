@@ -20,10 +20,90 @@ option java_outer_classname = "LayoutInspectorComposeProtocol";
 
 // ======= MESSAGES =======
 
+// A mapping of |string| to |int32|, so strings can be efficiently reused across nodes
+// Any time a text value in any of these messages has an |int32| type, it means it will do a
+// lookup in a string table on the client.
+message StringEntry {
+    int32 id = 1;
+    string str = 2;
+}
+
+message Point {
+    int32 x = 1;
+    int32 y = 2;
+}
+
+message Rect {
+    int32 x = 1;
+    int32 y = 2;
+    int32 w = 3;
+    int32 h = 4;
+}
+
+// A Quad will be the result of a Rect after applying some affine or perspective transformations.
+// While the transformed points can be skewed in a complex manner, the untransformed Rect source of
+// the coordinates will always be consistent:
+// 0 = top left, 1 = top right, 2 = bot left, 3 = bot right
+message Quad {
+    sint32 x0 = 1;
+    sint32 y0 = 2;
+    sint32 x1 = 3;
+    sint32 y1 = 4;
+    sint32 x2 = 5;
+    sint32 y2 = 6;
+    sint32 x3 = 7;
+    sint32 y3 = 8;
+}
+
+message Bounds {
+    // The bounds of some element in the layout tree
+    Rect layout = 1;
+    // Bounds transformed in preparation for final rendering
+    Quad render = 2;
+}
+
+message ComposableRoot {
+    // The ID of the View this Composable tree is rooted underneath
+    int64 view_id = 1;
+    // All composables owned by this view (usually just one but could be more)
+    repeated ComposableNode nodes = 2;
+}
+
+message ComposableNode {
+    sint64 id = 1;
+    repeated ComposableNode children = 2;
+
+    // The hash of the file's package, for disambiguating same filenames in different folders
+    int32 package_hash = 3;
+    int32 filename = 4; // The file this Composable is defined in
+    int32 line_number = 5;  // The line number within the file
+    int32 offset = 6; // Offset into the file for the exact character position
+
+    int32 name = 7;
+
+    Bounds bounds = 8;
+}
+
 // ======= COMMANDS, RESPONSES, AND EVENTS =======
 
+// Request all composables found under a layout tree rooted under the specified view
+message GetComposablesCommand {
+   int64 root_view_id = 1;
+}
+message GetComposablesResponse {
+    // A collection of all text referenced by other fields in this message
+    repeated StringEntry strings = 1;
+    repeated ComposableRoot roots = 2;
+}
+
 message Command {
+  oneof specialized {
+    GetComposablesCommand get_composables_command = 1;
+  }
 }
 
 message Response {
+  oneof specialized {
+    GetComposablesResponse get_composables_response = 1;
+  }
 }
