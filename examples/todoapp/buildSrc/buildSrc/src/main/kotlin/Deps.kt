@@ -12,7 +12,7 @@ object Deps {
 
         object Compose {
             // __LATEST_COMPOSE_RELEASE_VERSION__
-            private const val VERSION = "0.3.0-build135"
+            private const val VERSION = "0.3.0-build140"
             const val gradlePlugin = "org.jetbrains.compose:compose-gradle-plugin:$VERSION"
         }
     }
@@ -45,7 +45,7 @@ object Deps {
         }
 
         object Decompose {
-            private const val VERSION = "0.1.4"
+            private const val VERSION = "0.1.6"
             const val decompose = "com.arkivanov.decompose:decompose:$VERSION"
             const val decomposeIosX64 = "com.arkivanov.decompose:decompose-iosx64:$VERSION"
             const val decomposeIosArm64 = "com.arkivanov.decompose:decompose-iosarm64:$VERSION"
