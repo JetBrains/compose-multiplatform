@@ -28,6 +28,8 @@ import androidx.compose.ui.gesture.LongPressDragObserver
 import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.TextToolbarStatus
@@ -51,7 +53,7 @@ import kotlin.math.min
  * A bridge class between user interaction to the text field selection.
  */
 @OptIn(InternalTextApi::class)
-internal class TextFieldSelectionManager() {
+internal class TextFieldSelectionManager {
 
     /**
      * The current [OffsetMapping] for text field.
@@ -550,6 +552,12 @@ internal class TextFieldSelectionManager() {
             selection = originalSelection
         )
         onValueChange(newValue)
+
+        // showSelectionHandleStart/End might be set to false when scrolled out of the view.
+        // When the selection is updated, they must also be updated so that handles will be shown
+        // or hidden correctly.
+        state?.showSelectionHandleStart = isSelectionHandleInVisibleBound(true)
+        state?.showSelectionHandleEnd = isSelectionHandleInVisibleBound(false)
     }
 
     private fun setSelectionStatus(on: Boolean) {
@@ -598,3 +606,30 @@ internal fun TextFieldSelectionHandle(
         handle = null
     )
 }
+
+/**
+ * Whether the selection handle is in the visible bound of the TextField.
+ */
+internal fun TextFieldSelectionManager.isSelectionHandleInVisibleBound(
+    isStartHandle: Boolean
+): Boolean = state?.layoutCoordinates?.visibleBounds()?.containsInclusive(
+    getHandlePosition(isStartHandle)
+) ?: false
+
+/** Returns the boundary of the visible area in this [LayoutCoordinates]. */
+internal fun LayoutCoordinates.visibleBounds(): Rect {
+    // globalBounds is the global boundaries of this LayoutCoordinates after it's clipped by
+    // parents. We can think it as the global visible bounds of this Layout. Here globalBounds
+    // is convert to local, which is the boundary of the visible area within the LayoutCoordinates.
+    val boundsInWindow = boundsInWindow()
+    return Rect(
+        windowToLocal(boundsInWindow.topLeft),
+        windowToLocal(boundsInWindow.bottomRight)
+    )
+}
+
+/**
+ * Returns true is the [offset] is contained by this [Rect]
+ */
+internal fun Rect.containsInclusive(offset: Offset): Boolean =
+    offset.x in left..right && offset.y in top..bottom
