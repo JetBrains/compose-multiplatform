@@ -30,7 +30,7 @@ internal class TestTodoMainStoreDatabase : TodoMainStoreProvider.Database {
 
     override fun add(text: String): Completable =
         completableFromFunction {
-            val id = items.maxBy(TodoItem::id)?.id?.inc() ?: 1L
+            val id = items.maxByOrNull(TodoItem::id)?.id?.inc() ?: 1L
             this.items += TodoItem(id = id, order = id, text = text)
         }
 
