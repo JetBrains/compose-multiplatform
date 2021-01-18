@@ -19,6 +19,7 @@ package androidx.compose.ui.draw
 import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,6 +33,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
@@ -40,6 +42,7 @@ import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
@@ -263,6 +266,36 @@ class DrawModifierTest {
                 assertEquals(Color.Red.toArgb(), getPixel(1, 1))
                 assertEquals(Color.Red.toArgb(), getPixel(width - 2, height - 2))
             }
+        }
+    }
+
+    @Test
+    fun testCacheInvalidatedAfterLayoutDirectionChange() {
+        var cacheBuildCount = 0
+        var layoutDirection by mutableStateOf(LayoutDirection.Ltr)
+        var realLayoutDirection: LayoutDirection? = null
+        rule.setContent {
+            Providers(AmbientLayoutDirection provides layoutDirection) {
+                AtLeastSize(
+                    size = 10,
+                    modifier = Modifier.drawWithCache {
+                        realLayoutDirection = layoutDirection
+                        cacheBuildCount++
+                        onDrawBehind {}
+                    }
+                ) { }
+            }
+        }
+
+        rule.runOnIdle {
+            assertEquals(1, cacheBuildCount)
+            assertEquals(LayoutDirection.Ltr, realLayoutDirection)
+            layoutDirection = LayoutDirection.Rtl
+        }
+
+        rule.runOnIdle {
+            assertEquals(2, cacheBuildCount)
+            assertEquals(LayoutDirection.Rtl, realLayoutDirection)
         }
     }
 
