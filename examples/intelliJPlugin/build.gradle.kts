@@ -36,9 +36,3 @@ tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions.jvmTarget = "11"
 }
-
-compose.desktop {
-    application {
-        mainClass = "com.jetbrains.compose.ComposeDemoActionKt"
-    }
-}

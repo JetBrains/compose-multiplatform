@@ -32,12 +32,6 @@ class ComposeDemoAction : DumbAwareAction() {
         }
 
         override fun createCenterPanel(): JComponent {
-//            //Kotlin UI DSL example
-//            return panel {
-//                row("Text:") {textField({"Type something"}, {}, 30)}
-//                row("Text:") {textField({"Type something"}, {}, 30)}
-//                row {checkBox("Fooo")}
-//            }
             return ComposePanel().apply {
                 setContent {
                     Button(onClick = { println("Hi") }) {
