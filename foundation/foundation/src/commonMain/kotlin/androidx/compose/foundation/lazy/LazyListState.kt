@@ -83,6 +83,7 @@ fun rememberLazyListState(
  *
  * @param firstVisibleItemIndex the initial value for [LazyListState.firstVisibleItemIndex]
  * @param firstVisibleItemScrollOffset the initial value for
+ * [LazyListState.firstVisibleItemScrollOffset]
  * @param interactionState [InteractionState] that will be updated when the element with this
  * state is being scrolled by dragging, using [Interaction.Dragged]. If you want to know whether
  * the fling (or smooth scroll) is in progress, use [LazyListState.isAnimationRunning].
