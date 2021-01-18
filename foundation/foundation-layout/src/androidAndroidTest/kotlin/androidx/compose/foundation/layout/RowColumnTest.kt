@@ -25,7 +25,6 @@ import androidx.compose.ui.layout.HorizontalAlignmentLine
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.VerticalAlignmentLine
-import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.positionInParent
@@ -1660,11 +1659,11 @@ class RowColumnTest : LayoutTest() {
             WithInfiniteConstraints {
                 ConstrainedBox(DpConstraints(minWidth = rowMinWidth)) {
                     Row {
-                        WithConstraints {
+                        BoxWithConstraints {
                             assertEquals(Constraints(), constraints)
                             FixedSizeLayout(noWeightChildWidth.toIntPx(), 0, mapOf())
                         }
-                        WithConstraints {
+                        BoxWithConstraints {
                             assertEquals(Constraints(), constraints)
                             FixedSizeLayout(noWeightChildWidth.toIntPx(), 0, mapOf())
                         }
@@ -1705,7 +1704,7 @@ class RowColumnTest : LayoutTest() {
                     )
                 ) {
                     Row {
-                        WithConstraints {
+                        BoxWithConstraints {
                             assertEquals(
                                 Constraints(
                                     maxWidth = availableWidth.toIntPx(),
@@ -1715,7 +1714,7 @@ class RowColumnTest : LayoutTest() {
                             )
                             FixedSizeLayout(childWidth.toIntPx(), childHeight.toIntPx(), mapOf())
                         }
-                        WithConstraints {
+                        BoxWithConstraints {
                             assertEquals(
                                 Constraints(
                                     maxWidth = availableWidth.toIntPx() - childWidth.toIntPx(),
@@ -2132,11 +2131,11 @@ class RowColumnTest : LayoutTest() {
                 WithInfiniteConstraints {
                     ConstrainedBox(DpConstraints(minHeight = columnMinHeight)) {
                         Column {
-                            WithConstraints {
+                            BoxWithConstraints {
                                 assertEquals(Constraints(), constraints)
                                 FixedSizeLayout(0, noWeightChildHeight.toIntPx(), mapOf())
                             }
-                            WithConstraints {
+                            BoxWithConstraints {
                                 assertEquals(Constraints(), constraints)
                                 FixedSizeLayout(0, noWeightChildHeight.toIntPx(), mapOf())
                             }
@@ -2176,7 +2175,7 @@ class RowColumnTest : LayoutTest() {
                     )
                 ) {
                     Column {
-                        WithConstraints {
+                        BoxWithConstraints {
                             assertEquals(
                                 Constraints(
                                     maxWidth = availableWidth.toIntPx(),
@@ -2186,7 +2185,7 @@ class RowColumnTest : LayoutTest() {
                             )
                             FixedSizeLayout(childWidth.toIntPx(), childHeight.toIntPx(), mapOf())
                         }
-                        WithConstraints {
+                        BoxWithConstraints {
                             assertEquals(
                                 Constraints(
                                     maxWidth = availableWidth.toIntPx(),

@@ -1842,7 +1842,7 @@ package androidx.compose.ui.layout {
     method @androidx.compose.runtime.Composable public static inline void Layout(kotlin.jvm.functions.Function0<kotlin.Unit> content, androidx.compose.ui.node.MeasureBlocks measureBlocks, optional androidx.compose.ui.Modifier modifier);
     method public static androidx.compose.ui.node.MeasureBlocks MeasuringIntrinsicsMeasureBlocks(kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.MeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.Measurable>,? super androidx.compose.ui.unit.Constraints,? extends androidx.compose.ui.layout.MeasureResult> measureBlock);
     method @Deprecated @androidx.compose.runtime.Composable public static void MultiMeasureLayout(optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function0<kotlin.Unit> children, kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.MeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.Measurable>,? super androidx.compose.ui.unit.Constraints,? extends androidx.compose.ui.layout.MeasureResult> measureBlock);
-    method @androidx.compose.runtime.Composable public static void WithConstraints(optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.WithConstraintsScope,kotlin.Unit> content);
+    method @Deprecated @androidx.compose.runtime.Composable public static void WithConstraints(optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.WithConstraintsScope,kotlin.Unit> content);
     method public static androidx.compose.ui.node.MeasureBlocks measureBlocksOf(kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.IntrinsicMeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.IntrinsicMeasurable>,? super java.lang.Integer,java.lang.Integer> minIntrinsicWidthMeasureBlock, kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.IntrinsicMeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.IntrinsicMeasurable>,? super java.lang.Integer,java.lang.Integer> minIntrinsicHeightMeasureBlock, kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.IntrinsicMeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.IntrinsicMeasurable>,? super java.lang.Integer,java.lang.Integer> maxIntrinsicWidthMeasureBlock, kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.IntrinsicMeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.IntrinsicMeasurable>,? super java.lang.Integer,java.lang.Integer> maxIntrinsicHeightMeasureBlock, kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.MeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.Measurable>,? super androidx.compose.ui.unit.Constraints,? extends androidx.compose.ui.layout.MeasureResult> measureBlock);
   }
 
@@ -2016,12 +2016,12 @@ package androidx.compose.ui.layout {
     ctor public VerticalAlignmentLine(kotlin.jvm.functions.Function2<? super java.lang.Integer,? super java.lang.Integer,java.lang.Integer> merger);
   }
 
-  @androidx.compose.runtime.Stable public interface WithConstraintsScope {
-    method public long getConstraints-msEJaDk();
-    method public float getMaxHeight-D9Ej5fM();
-    method public float getMaxWidth-D9Ej5fM();
-    method public float getMinHeight-D9Ej5fM();
-    method public float getMinWidth-D9Ej5fM();
+  @Deprecated @androidx.compose.runtime.Stable public interface WithConstraintsScope {
+    method @Deprecated public long getConstraints-msEJaDk();
+    method @Deprecated public float getMaxHeight-D9Ej5fM();
+    method @Deprecated public float getMaxWidth-D9Ej5fM();
+    method @Deprecated public float getMinHeight-D9Ej5fM();
+    method @Deprecated public float getMinWidth-D9Ej5fM();
     property public abstract long constraints;
     property public abstract float maxHeight;
     property public abstract float maxWidth;

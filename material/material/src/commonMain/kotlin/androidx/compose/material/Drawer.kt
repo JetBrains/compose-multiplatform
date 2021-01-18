@@ -23,6 +23,7 @@ import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,7 +42,6 @@ import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AmbientLayoutDirection
@@ -355,13 +355,14 @@ fun ModalDrawerLayout(
     scrimColor: Color = DrawerDefaults.scrimColor,
     bodyContent: @Composable () -> Unit
 ) {
-    WithConstraints(modifier.fillMaxSize()) {
+    BoxWithConstraints(modifier.fillMaxSize()) {
+        val modalDrawerConstraints = constraints
         // TODO : think about Infinite max bounds case
-        if (!constraints.hasBoundedWidth) {
+        if (!modalDrawerConstraints.hasBoundedWidth) {
             throw IllegalStateException("Drawer shouldn't have infinite width")
         }
 
-        val minValue = -constraints.maxWidth.toFloat()
+        val minValue = -modalDrawerConstraints.maxWidth.toFloat()
         val maxValue = 0f
 
         val anchors = mapOf(minValue to DrawerValue.Closed, maxValue to DrawerValue.Open)
@@ -396,10 +397,10 @@ fun ModalDrawerLayout(
                 modifier = with(AmbientDensity.current) {
                     Modifier
                         .preferredSizeIn(
-                            minWidth = constraints.minWidth.toDp(),
-                            minHeight = constraints.minHeight.toDp(),
-                            maxWidth = constraints.maxWidth.toDp(),
-                            maxHeight = constraints.maxHeight.toDp()
+                            minWidth = modalDrawerConstraints.minWidth.toDp(),
+                            minHeight = modalDrawerConstraints.minHeight.toDp(),
+                            maxWidth = modalDrawerConstraints.maxWidth.toDp(),
+                            maxHeight = modalDrawerConstraints.maxHeight.toDp()
                         )
                 }
                     .semantics {
@@ -464,17 +465,18 @@ fun BottomDrawerLayout(
     scrimColor: Color = DrawerDefaults.scrimColor,
     bodyContent: @Composable () -> Unit
 ) {
-    WithConstraints(modifier.fillMaxSize()) {
+    BoxWithConstraints(modifier.fillMaxSize()) {
+        val modalDrawerConstraints = constraints
         // TODO : think about Infinite max bounds case
-        if (!constraints.hasBoundedHeight) {
+        if (!modalDrawerConstraints.hasBoundedHeight) {
             throw IllegalStateException("Drawer shouldn't have infinite height")
         }
 
         val minValue = 0f
-        val maxValue = constraints.maxHeight.toFloat()
+        val maxValue = modalDrawerConstraints.maxHeight.toFloat()
 
         // TODO: add proper landscape support
-        val isLandscape = constraints.maxWidth > constraints.maxHeight
+        val isLandscape = modalDrawerConstraints.maxWidth > modalDrawerConstraints.maxHeight
         val openValue = if (isLandscape) minValue else lerp(
             minValue,
             maxValue,
@@ -524,10 +526,10 @@ fun BottomDrawerLayout(
             Surface(
                 modifier = with(AmbientDensity.current) {
                     Modifier.preferredSizeIn(
-                        minWidth = constraints.minWidth.toDp(),
-                        minHeight = constraints.minHeight.toDp(),
-                        maxWidth = constraints.maxWidth.toDp(),
-                        maxHeight = constraints.maxHeight.toDp()
+                        minWidth = modalDrawerConstraints.minWidth.toDp(),
+                        minHeight = modalDrawerConstraints.minHeight.toDp(),
+                        maxWidth = modalDrawerConstraints.maxWidth.toDp(),
+                        maxHeight = modalDrawerConstraints.maxHeight.toDp()
                     )
                 }
                     .semantics {

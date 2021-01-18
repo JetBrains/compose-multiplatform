@@ -516,19 +516,13 @@ private inline fun Density.MeasuringMaxIntrinsicHeight(
     return layoutResult.height
 }
 
-/**
- * A composable that defines its own content according to the available space, based on the incoming
- * constraints or the current [LayoutDirection]. Example usage:
- * @sample androidx.compose.ui.samples.WithConstraintsSample
- *
- * The composable will compose the given children, and will position the resulting layout composables
- * in a parent [Layout]. This layout will be as small as possible such that it can fit its
- * children. If the composition yields multiple layout children, these will be all placed at the
- * top left of the WithConstraints, so consider wrapping them in an additional common
- * parent if different positioning is preferred.
- *
- * @param modifier Modifier to be applied to the introduced layout.
- */
+@Deprecated(
+    "WithConstraints was reworked as BoxWithConstraints.",
+    ReplaceWith(
+        "BoxWithConstraints(modifier, content)",
+        "androidx.compose.foundation.layout.BoxWithConstraints"
+    )
+)
 @Composable
 fun WithConstraints(
     modifier: Modifier = Modifier,
@@ -552,9 +546,13 @@ fun WithConstraints(
     }
 }
 
-/**
- * Receiver scope being used by the children parameter of [WithConstraints]
- */
+@Deprecated(
+    "WithConstraints was reworked as BoxWithConstraints.",
+    ReplaceWith(
+        "BoxWithConstraintsScope",
+        "androidx.compose.foundation.layout.BoxWithConstraintsScope"
+    )
+)
 @Stable
 interface WithConstraintsScope {
     /**

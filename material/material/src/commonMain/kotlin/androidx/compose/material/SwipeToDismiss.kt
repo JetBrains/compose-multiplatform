@@ -19,6 +19,7 @@ package androidx.compose.material
 import androidx.compose.animation.asDisposableClock
 import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.AnimationEndReason.Interrupted
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Box
@@ -35,7 +36,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.Saver
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientLayoutDirection
@@ -200,7 +200,7 @@ fun SwipeToDismiss(
     dismissThresholds: (DismissDirection) -> ThresholdConfig = { FractionalThreshold(0.5f) },
     background: @Composable RowScope.() -> Unit,
     dismissContent: @Composable RowScope.() -> Unit
-) = WithConstraints(modifier) {
+) = BoxWithConstraints(modifier) {
     val width = constraints.maxWidth.toFloat()
     val isRtl = AmbientLayoutDirection.current == LayoutDirection.Rtl
 

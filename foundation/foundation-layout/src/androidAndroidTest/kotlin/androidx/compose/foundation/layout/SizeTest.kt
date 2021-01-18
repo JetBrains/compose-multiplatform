@@ -22,7 +22,6 @@ import androidx.compose.runtime.Providers
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.node.Ref
@@ -1293,13 +1292,13 @@ class SizeTest : LayoutTest() {
         val latch = CountDownLatch(1)
         // Capture constraints and assert on test thread
         var actualConstraints: Constraints? = null
-        // Clear contents before each test so that we don't recompose the WithConstraints call;
+        // Clear contents before each test so that we don't recompose the BoxWithConstraints call;
         // doing so would recompose the old subcomposition with old constraints in the presence of
         // new content before the measurement performs explicit composition the new constraints.
         show(emptyContent())
         show {
             Layout({
-                WithConstraints(modifier) {
+                BoxWithConstraints(modifier) {
                     actualConstraints = constraints
                     latch.countDown()
                 }

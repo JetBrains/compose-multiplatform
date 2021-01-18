@@ -22,6 +22,7 @@ import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -43,7 +44,6 @@ import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientDensity
@@ -297,7 +297,7 @@ fun BottomSheetScaffold(
     contentColor: Color = contentColorFor(backgroundColor),
     bodyContent: @Composable (PaddingValues) -> Unit
 ) {
-    WithConstraints(modifier) {
+    BoxWithConstraints(modifier) {
         val fullHeight = constraints.maxHeight.toFloat()
         val peekHeightPx = with(AmbientDensity.current) { sheetPeekHeight.toPx() }
         var bottomSheetHeight by remember { mutableStateOf(fullHeight) }
