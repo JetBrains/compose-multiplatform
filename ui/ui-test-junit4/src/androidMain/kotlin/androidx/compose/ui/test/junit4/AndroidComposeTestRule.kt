@@ -318,6 +318,10 @@ internal constructor(
         Density(ApplicationProvider.getApplicationContext())
     }
 
+    @Deprecated(
+        "This utility was deprecated without replacement. It is recommend to use " +
+            "the root size for any assertions."
+    )
     override val displaySize by lazy {
         ApplicationProvider.getApplicationContext<Context>().resources.displayMetrics.let {
             IntSize(it.widthPixels, it.heightPixels)

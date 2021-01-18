@@ -69,7 +69,12 @@ class DesktopComposeTestRule : ComposeTestRule {
     override val mainClock: MainTestClock
         get() = TODO()
 
-    override val displaySize: IntSize get() = IntSize(1024, 768)
+    @Deprecated(
+        "This utility was deprecated without replacement. It is recommend to use " +
+            "the root size for any assertions."
+    )
+    override val displaySize: IntSize get() = testDisplaySize
+    internal val testDisplaySize: IntSize get() = IntSize(1024, 768)
 
     val executionQueue = LinkedList<() -> Unit>()
 
@@ -167,14 +172,14 @@ class DesktopComposeTestRule : ComposeTestRule {
     }
 
     private fun performSetContent(composable: @Composable() () -> Unit) {
-        val surface = Surface.makeRasterN32Premul(displaySize.width, displaySize.height)!!
+        val surface = Surface.makeRasterN32Premul(testDisplaySize.width, testDisplaySize.height)!!
         val canvas = surface.canvas
         val owners = DesktopOwners(invalidate = {}).also {
             owners = it
         }
         val owner = DesktopOwner(owners)
         owner.setContent(content = composable)
-        owner.setSize(displaySize.width, displaySize.height)
+        owner.setSize(testDisplaySize.width, testDisplaySize.height)
         owner.measureAndLayout()
         owner.draw(canvas)
         this.owner = owner
