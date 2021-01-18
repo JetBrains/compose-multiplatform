@@ -160,14 +160,16 @@ internal class ComposeLayer {
             override fun mousePressed(event: MouseEvent) = events.post {
                 owners?.onMousePressed(
                     (event.x * density.density).toInt(),
-                    (event.y * density.density).toInt()
+                    (event.y * density.density).toInt(),
+                    event
                 )
             }
 
             override fun mouseReleased(event: MouseEvent) = events.post {
                 owners?.onMouseReleased(
                     (event.x * density.density).toInt(),
-                    (event.y * density.density).toInt()
+                    (event.y * density.density).toInt(),
+                    event
                 )
             }
         })
@@ -175,7 +177,8 @@ internal class ComposeLayer {
             override fun mouseDragged(event: MouseEvent) = events.post {
                 owners?.onMouseDragged(
                     (event.x * density.density).toInt(),
-                    (event.y * density.density).toInt()
+                    (event.y * density.density).toInt(),
+                    event
                 )
             }
 
