@@ -18,6 +18,7 @@ package androidx.compose.material.studies.rally
 
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
@@ -25,10 +26,7 @@ import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onActive
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -48,12 +46,9 @@ fun AnimatedCircle(
     colors: List<Color>
 ) {
     val stroke = Stroke(5.dp.value * AmbientDensity.current.density)
-    var targetState by remember { mutableStateOf(0) }
     // Start animating when added to the tree
-    onActive {
-        targetState = 1
-    }
-    val transition = updateTransition(targetState)
+    val states = remember { MutableTransitionState(0).apply { targetState = 1 } }
+    val transition = updateTransition(states)
     val angleOffset by transition.animateFloat(
         transitionSpec = {
             if (0 isTransitioningTo 1) {

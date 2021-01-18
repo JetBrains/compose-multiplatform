@@ -263,6 +263,14 @@ class TransitionDefinition<T> {
     private val defaultTransitionSpec = TransitionSpec<T>(arrayOf(null to null))
 
     /**
+     * [MutableTransitionState] is used in [TransitionDefinition] for constructing various
+     * [TransitionState]s with corresponding properties and their values.
+     */
+    interface MutableTransitionState {
+        operator fun <T, V : AnimationVector> set(propKey: PropKey<T, V>, prop: T)
+    }
+
+    /**
      * Defines all the properties and their values associated with the state with the name: [name]
      * The first state defined in the transition definition will be the default state, whose
      * property values will be used as its initial values to createAnimation from.
