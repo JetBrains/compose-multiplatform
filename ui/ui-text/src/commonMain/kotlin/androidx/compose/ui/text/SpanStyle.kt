@@ -138,7 +138,7 @@ class SpanStyle(
         baselineShift: BaselineShift? = this.baselineShift,
         textGeometricTransform: TextGeometricTransform? = this.textGeometricTransform,
         localeList: LocaleList? = this.localeList,
-        background: Color = this.color,
+        background: Color = this.background,
         textDecoration: TextDecoration? = this.textDecoration,
         shadow: Shadow? = this.shadow
     ): SpanStyle {
