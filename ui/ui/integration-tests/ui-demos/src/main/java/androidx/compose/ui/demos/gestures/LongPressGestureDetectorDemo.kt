@@ -19,6 +19,7 @@ package androidx.compose.ui.demos.gestures
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,11 +32,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.longPressGestureFilter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 
 /**
- * Simple [longPressGestureFilter] demo.
+ * Simple [detectTapGestures] demo for long press.
  */
 @Composable
 fun LongPressGestureDetectorDemo() {
@@ -51,7 +52,7 @@ fun LongPressGestureDetectorDemo() {
             Modifier.fillMaxSize()
                 .wrapContentSize(Alignment.Center)
                 .preferredSize(192.dp)
-                .longPressGestureFilter(onLongPress)
+                .pointerInput { detectTapGestures(onLongPress = onLongPress) }
                 .background(color.value)
                 .border(BorderStroke(2.dp, BorderColor))
         )

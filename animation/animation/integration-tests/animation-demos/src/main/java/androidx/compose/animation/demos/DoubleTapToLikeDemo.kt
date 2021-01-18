@@ -24,6 +24,7 @@ import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Icon
@@ -36,9 +37,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.gesture.doubleTapGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 
 private enum class LikedStates {
     Initial,
@@ -55,13 +56,18 @@ fun DoubleTapToLikeDemo() {
     }
 
     Box(
-        Modifier.fillMaxSize().doubleTapGestureFilter {
-            // This creates a new `MutableTransitionState` object. When a new
-            // `MutableTransitionState` object gets passed to `updateTransition`, a new transition
-            // will be created. All existing values, velocities will be lost as a result. Hence, in
-            // most cases, this is not recommended. The exception is when it's more important
-            // to respond immediately to user interaction than preserving continuity.
-            transitionState = MutableTransitionState(LikedStates.Initial)
+        Modifier.fillMaxSize().pointerInput {
+            detectTapGestures(
+                onDoubleTap = {
+                    // This creates a new `MutableTransitionState` object. When a new
+                    // `MutableTransitionState` object gets passed to `updateTransition`, a new
+                    // transition will be created. All existing values, velocities will be lost as a
+                    // result. Hence, in most cases, this is not recommended. The exception is
+                    // when it's more important to respond immediately to user interaction than
+                    // preserving continuity.
+                    transitionState = MutableTransitionState(LikedStates.Initial)
+                }
+            )
         }
     ) {
         // This ensures sequential states: Initial -> Liked -> Disappeared

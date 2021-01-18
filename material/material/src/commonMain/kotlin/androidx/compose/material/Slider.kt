@@ -29,6 +29,7 @@ import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.animation.defaultFlingConfig
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.layout.Box
@@ -50,11 +51,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.lerp
-import androidx.compose.ui.gesture.pressIndicatorGestureFilter
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AmbientLayoutDirection
@@ -155,19 +156,17 @@ fun Slider(
             }
         }
 
-        val press = Modifier.pressIndicatorGestureFilter(
-            onStart = { pos ->
-                position.holder.snapTo(if (isRtl) maxPx - pos.x else pos.x)
-                interactionState.addInteraction(Interaction.Pressed, pos)
-            },
-            onStop = {
-                gestureEndAction(0f)
-                interactionState.removeInteraction(Interaction.Pressed)
-            },
-            onCancel = {
-                interactionState.removeInteraction(Interaction.Pressed)
-            }
-        )
+        val press = Modifier.pointerInput {
+            detectTapGestures(
+                onPress = { pos ->
+                    position.holder.snapTo(if (isRtl) maxPx - pos.x else pos.x)
+                    interactionState.addInteraction(Interaction.Pressed, pos)
+                    val success = tryAwaitRelease()
+                    if (success) gestureEndAction(0f)
+                    interactionState.removeInteraction(Interaction.Pressed)
+                }
+            )
+        }
 
         val drag = Modifier.draggable(
             orientation = Orientation.Horizontal,

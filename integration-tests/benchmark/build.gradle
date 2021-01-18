@@ -41,6 +41,7 @@ dependencies {
     implementation(TRUTH)
 
     androidTestImplementation project(":compose:foundation:foundation-layout")
+    androidTestImplementation project(":compose:foundation:foundation")
     androidTestImplementation project(":compose:material:material")
     androidTestImplementation project(":compose:runtime:runtime")
     androidTestImplementation project(":compose:test-utils")

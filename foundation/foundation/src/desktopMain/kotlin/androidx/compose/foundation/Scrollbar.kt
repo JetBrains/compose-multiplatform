@@ -244,6 +244,7 @@ private fun Scrollbar(
     )
 }
 
+@Suppress("DEPRECATION") // press gesture filter
 private fun Modifier.scrollOnPressOutsideSlider(
     isVertical: Boolean,
     sliderAdapter: SliderAdapter,

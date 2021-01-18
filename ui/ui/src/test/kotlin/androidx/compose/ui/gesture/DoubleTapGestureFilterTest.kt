@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.gesture
 
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.customevents.DelayUpEvent
 import androidx.compose.ui.gesture.customevents.DelayUpMessage
@@ -28,7 +27,6 @@ import androidx.compose.ui.input.pointer.down
 import androidx.compose.ui.input.pointer.invokeOverAllPasses
 import androidx.compose.ui.input.pointer.moveTo
 import androidx.compose.ui.input.pointer.up
-import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.unit.IntSize
 import com.google.common.truth.Truth.assertThat
@@ -977,14 +975,5 @@ class DoubleTapGestureFilterTest {
         verify(customEventDispatcher)
             .retainHitPaths(setOf(PointerId(456)))
         verifyNoMoreInteractions(customEventDispatcher)
-    }
-
-    @Test
-    fun testInspectableValue() {
-        val onDoubleTap: (Offset) -> Unit = {}
-        val modifier = Modifier.doubleTapGestureFilter(onDoubleTap) as InspectableValue
-        assertThat(modifier.nameFallback).isEqualTo("doubleTapGestureFilter")
-        assertThat(modifier.valueOverride).isEqualTo(onDoubleTap)
-        assertThat(modifier.inspectableElements.asIterable()).isEmpty()
     }
 }

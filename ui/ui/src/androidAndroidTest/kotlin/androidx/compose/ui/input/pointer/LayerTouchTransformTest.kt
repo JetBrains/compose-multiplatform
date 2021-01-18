@@ -17,6 +17,7 @@
 package androidx.compose.ui.input.pointer
 
 import android.os.Build
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
@@ -26,14 +27,13 @@ import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.pressIndicatorGestureFilter
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.testTag
@@ -112,7 +112,15 @@ class LayerTouchTransformTest {
                                 }
                                 .then(latchDrawModifier)
                                 .preferredSize(boxDp)
-                                .pressIndicatorGestureFilter(onStart, onStop, onStop)
+                                .pointerInput {
+                                    detectTapGestures(
+                                        onPress = {
+                                            onStart.invoke(it)
+                                            val success = tryAwaitRelease()
+                                            if (success) onStop.invoke() else onStop.invoke()
+                                        }
+                                    )
+                                }
                         )
                     }
                 }
