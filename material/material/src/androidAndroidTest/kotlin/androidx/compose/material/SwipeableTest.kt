@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.nestedscroll.nestedScroll
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
+import androidx.compose.ui.platform.AmbientViewConfiguration
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
@@ -1129,7 +1130,9 @@ class SwipeableTest {
     @Test
     fun swipeable_progress_multipleSwipes() {
         val state = SwipeableState("A", clock)
+        var slop = 0f
         setSwipeableContent {
+            slop = AmbientViewConfiguration.current.touchSlop
             Modifier.swipeable(
                 state = state,
                 anchors = mapOf(0f to "A", 100f to "B"),
@@ -1148,7 +1151,7 @@ class SwipeableTest {
         rule.onNodeWithTag(swipeableTag).performGesture {
             swipe(
                 start = center,
-                end = Offset(x = center.x + 125f, y = center.y)
+                end = Offset(x = center.x + 125f - slop, y = center.y)
             )
             swipe(
                 start = center,
@@ -1175,7 +1178,7 @@ class SwipeableTest {
         rule.onNodeWithTag(swipeableTag).performGesture {
             swipe(
                 start = center,
-                end = Offset(x = center.x - 125f, y = center.y)
+                end = Offset(x = center.x - 125f + slop, y = center.y)
             )
             swipe(
                 start = center,
@@ -1206,7 +1209,9 @@ class SwipeableTest {
     @Test
     fun swipeable_direction_multipleSwipes() {
         val state = SwipeableState("A", clock)
+        var slop = 0f
         setSwipeableContent {
+            slop = AmbientViewConfiguration.current.touchSlop
             Modifier.swipeable(
                 state = state,
                 anchors = mapOf(0f to "A", 100f to "B"),
@@ -1223,7 +1228,7 @@ class SwipeableTest {
         rule.onNodeWithTag(swipeableTag).performGesture {
             swipe(
                 start = center,
-                end = Offset(x = center.x + 125f, y = center.y)
+                end = Offset(x = center.x + 125f - slop, y = center.y)
             )
             swipe(
                 start = center,
@@ -1246,7 +1251,7 @@ class SwipeableTest {
         rule.onNodeWithTag(swipeableTag).performGesture {
             swipe(
                 start = center,
-                end = Offset(x = center.x - 125f, y = center.y)
+                end = Offset(x = center.x - 125f + slop, y = center.y)
             )
             swipe(
                 start = center,

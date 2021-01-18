@@ -26,8 +26,8 @@ import androidx.compose.animation.core.SpringSpec
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.material.SwipeableDefaults.AnimationSpec
-import androidx.compose.material.SwipeableDefaults.VelocityThreshold
 import androidx.compose.material.SwipeableDefaults.StandardResistanceFactor
+import androidx.compose.material.SwipeableDefaults.VelocityThreshold
 import androidx.compose.material.SwipeableDefaults.resistanceConfig
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
