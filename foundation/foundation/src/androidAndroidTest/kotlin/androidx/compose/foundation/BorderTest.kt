@@ -24,19 +24,26 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Providers
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.graphics.toPixelMap
+import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
@@ -64,6 +71,18 @@ class BorderTest(val shape: Shape) {
     val rule = createComposeRule()
 
     val testTag = "BorderParent"
+
+    private val rtlAwareShape = object : Shape {
+        override fun createOutline(
+            size: Size,
+            layoutDirection: LayoutDirection,
+            density: Density
+        ) = if (layoutDirection == LayoutDirection.Ltr) {
+            Outline.Rectangle(Rect(0f, 1f, 0f, 1f))
+        } else {
+            shape.createOutline(size, layoutDirection, density)
+        }
+    }
 
     @Test
     fun border_color() {
@@ -188,7 +207,7 @@ class BorderTest(val shape: Shape) {
     @Test
     fun border_triangle_shape() {
         val testTag = "testTag"
-        val triangle = GenericShape() { size ->
+        val triangle = GenericShape { size, _ ->
             lineTo(size.width, 0f)
             lineTo(size.width, size.height)
             close()
@@ -215,6 +234,59 @@ class BorderTest(val shape: Shape) {
             // inside triangle
             assertEquals(Color.White, map[floor(width * 3f / 4f).toInt(), height / 2])
         }
+    }
+
+    @Test
+    fun border_rtl_initially() {
+        rule.setContent {
+            SemanticParent {
+                Box(
+                    Modifier.preferredSize(40.0f.toDp(), 40.0f.toDp())
+                        .background(color = Color.Blue)
+                        .border(BorderStroke(10.0f.toDp(), Color.Red), rtlAwareShape)
+                ) {}
+            }
+        }
+        rule.onNodeWithTag(testTag).captureToImage().assertShape(
+            density = rule.density,
+            backgroundColor = Color.Red,
+            shape = shape,
+            backgroundShape = shape,
+            shapeSizeX = 20.0f,
+            shapeSizeY = 20.0f,
+            shapeColor = Color.Blue,
+            shapeOverlapPixelCount = 3.0f
+        )
+    }
+
+    @Test
+    fun border_rtl_after_switch() {
+        val direction = mutableStateOf(LayoutDirection.Ltr)
+        rule.setContent {
+            SemanticParent {
+                Providers(AmbientLayoutDirection provides direction.value) {
+                    Box(
+                        Modifier.preferredSize(40.0f.toDp(), 40.0f.toDp())
+                            .background(color = Color.Blue)
+                            .border(BorderStroke(10.0f.toDp(), Color.Red), rtlAwareShape)
+                    ) {}
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            direction.value = LayoutDirection.Rtl
+        }
+        rule.onNodeWithTag(testTag).captureToImage().assertShape(
+            density = rule.density,
+            backgroundColor = Color.Red,
+            shape = shape,
+            backgroundShape = shape,
+            shapeSizeX = 20.0f,
+            shapeSizeY = 20.0f,
+            shapeColor = Color.Blue,
+            shapeOverlapPixelCount = 3.0f
+        )
     }
 
     @Composable

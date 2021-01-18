@@ -2093,7 +2093,7 @@ package androidx.compose.ui.node {
     method public void move--gyyYBs(long position);
     method public void resize-ozmzZPI(long size);
     method public void updateDisplayList();
-    method public void updateLayerProperties-LsE73-w(float scaleX, float scaleY, float alpha, float translationX, float translationY, float shadowElevation, float rotationX, float rotationY, float rotationZ, float cameraDistance, long transformOrigin, androidx.compose.ui.graphics.Shape shape, boolean clip);
+    method public void updateLayerProperties-y8e2Zg0(float scaleX, float scaleY, float alpha, float translationX, float translationY, float shadowElevation, float rotationX, float rotationY, float rotationZ, float cameraDistance, long transformOrigin, androidx.compose.ui.graphics.Shape shape, boolean clip, androidx.compose.ui.unit.LayoutDirection layoutDirection);
     property public abstract long layerId;
   }
 

@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.asDesktopPath
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.toSkijaRect
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -49,7 +50,8 @@ class SkijaLayer(
 ) : OwnedLayer {
     private var size = IntSize.Zero
     private var position = IntOffset.Zero
-    private var outlineCache = OutlineCache(owner.density, size, RectangleShape)
+    private var outlineCache =
+        OutlineCache(owner.density, size, RectangleShape, LayoutDirection.Ltr)
     private val matrix = Matrix()
     private val pictureRecorder = PictureRecorder()
     private var picture: Picture? = null
@@ -108,7 +110,8 @@ class SkijaLayer(
         cameraDistance: Float,
         transformOrigin: TransformOrigin,
         shape: Shape,
-        clip: Boolean
+        clip: Boolean,
+        layoutDirection: LayoutDirection
     ) {
         this.transformOrigin = transformOrigin
         this.translationX = translationX
@@ -122,6 +125,7 @@ class SkijaLayer(
         this.clip = clip
         this.shadowElevation = shadowElevation
         outlineCache.shape = shape
+        outlineCache.layoutDirection = layoutDirection
         updateMatrix()
         invalidate()
     }

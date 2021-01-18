@@ -54,6 +54,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -382,8 +383,11 @@ class GraphicsLayerTest {
     @Test
     fun testEmptyClip() {
         val EmptyRectangle = object : Shape {
-            override fun createOutline(size: Size, density: Density): Outline =
-                Outline.Rectangle(Rect.Zero)
+            override fun createOutline(
+                size: Size,
+                layoutDirection: LayoutDirection,
+                density: Density
+            ) = Outline.Rectangle(Rect.Zero)
         }
         val tag = "testTag"
         rule.setContent {

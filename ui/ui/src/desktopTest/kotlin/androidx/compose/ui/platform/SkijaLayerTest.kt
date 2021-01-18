@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.round
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -336,7 +337,7 @@ class SkijaLayerTest {
     ) {
         updateLayerProperties(
             scaleX, scaleY, alpha, translationX, translationY, shadowElevation, rotationX,
-            rotationY, rotationZ, cameraDistance, transformOrigin, shape, clip
+            rotationY, rotationZ, cameraDistance, transformOrigin, shape, clip, LayoutDirection.Ltr
         )
     }
 }

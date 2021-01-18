@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import org.junit.Assert
 import kotlin.math.roundToInt
 
@@ -180,7 +181,7 @@ fun ImageBitmap.assertShape(
     Assert.assertTrue(centerX - sizeX / 2 >= 0.0f)
     Assert.assertTrue(centerY + sizeY / 2 <= height)
     Assert.assertTrue(centerY - sizeY / 2 >= 0.0f)
-    val outline = shape.createOutline(Size(shapeSizeX, shapeSizeY), density)
+    val outline = shape.createOutline(Size(shapeSizeX, shapeSizeY), LayoutDirection.Ltr, density)
     val path = Path()
     path.addOutline(outline)
     val shapeOffset = Offset(
@@ -188,7 +189,9 @@ fun ImageBitmap.assertShape(
         (centerY - shapeSizeY / 2f)
     )
     val backgroundPath = Path()
-    backgroundPath.addOutline(backgroundShape.createOutline(Size(sizeX, sizeY), density))
+    backgroundPath.addOutline(
+        backgroundShape.createOutline(Size(sizeX, sizeY), LayoutDirection.Ltr, density)
+    )
     for (x in centerX - sizeX / 2 until centerX + sizeX / 2) {
         for (y in centerY - sizeY / 2 until centerY + sizeY / 2) {
             val point = Offset(x.toFloat(), y.toFloat())

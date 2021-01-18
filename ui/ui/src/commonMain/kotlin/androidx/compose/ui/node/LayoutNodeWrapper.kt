@@ -263,7 +263,8 @@ internal abstract class LayoutNodeWrapper(
                 cameraDistance = graphicsLayerScope.cameraDistance,
                 transformOrigin = graphicsLayerScope.transformOrigin,
                 shape = graphicsLayerScope.shape,
-                clip = graphicsLayerScope.clip
+                clip = graphicsLayerScope.clip,
+                layoutDirection = layoutNode.layoutDirection
             )
             isClipping = graphicsLayerScope.clip
         } else {

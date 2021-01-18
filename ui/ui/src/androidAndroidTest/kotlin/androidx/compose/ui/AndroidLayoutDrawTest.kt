@@ -139,6 +139,7 @@ class AndroidLayoutDrawTest {
     val activityTestRule = androidx.test.rule.ActivityTestRule<TestActivity>(
         TestActivity::class.java
     )
+
     @get:Rule
     val excessiveAssertions = AndroidOwnerExtraAssertionsRule()
     private lateinit var activity: TestActivity
@@ -252,7 +253,8 @@ class AndroidLayoutDrawTest {
                 cameraDistance = cameraDistance,
                 transformOrigin = TransformOrigin.Center,
                 shape = RectangleShape,
-                clip = true
+                clip = true,
+                layoutDirection = LayoutDirection.Ltr
             )
         }
         // Verify that the camera distance is applied properly even after accounting for
@@ -365,12 +367,9 @@ class AndroidLayoutDrawTest {
         activityTestRule.runOnUiThreadIR {
             // there isn't going to be a normal draw because we are just moving the repaint
             // boundary, but we should have a draw cycle
-            activityTestRule.findAndroidComposeView().viewTreeObserver.addOnDrawListener(object :
-                    ViewTreeObserver.OnDrawListener {
-                    override fun onDraw() {
-                        drawLatch.countDown()
-                    }
-                })
+            activityTestRule.findAndroidComposeView().viewTreeObserver.addOnDrawListener {
+                drawLatch.countDown()
+            }
             offset.value = 20
         }
 
@@ -2465,15 +2464,18 @@ class AndroidLayoutDrawTest {
     @Test
     fun layerModifier_noClip() {
         val triangleShape = object : Shape {
-            override fun createOutline(size: Size, density: Density): Outline =
-                Outline.Generic(
-                    Path().apply {
-                        moveTo(size.width / 2f, 0f)
-                        lineTo(size.width, size.height)
-                        lineTo(0f, size.height)
-                        close()
-                    }
-                )
+            override fun createOutline(
+                size: Size,
+                layoutDirection: LayoutDirection,
+                density: Density
+            ) = Outline.Generic(
+                Path().apply {
+                    moveTo(size.width / 2f, 0f)
+                    lineTo(size.width, size.height)
+                    lineTo(0f, size.height)
+                    close()
+                }
+            )
         }
         activityTestRule.runOnUiThread {
             activity.setContent {

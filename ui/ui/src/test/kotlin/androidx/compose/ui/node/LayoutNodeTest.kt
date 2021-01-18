@@ -1797,7 +1797,8 @@ private class MockOwner(
                 cameraDistance: Float,
                 transformOrigin: TransformOrigin,
                 shape: Shape,
-                clip: Boolean
+                clip: Boolean,
+                layoutDirection: LayoutDirection
             ) {
             }
 

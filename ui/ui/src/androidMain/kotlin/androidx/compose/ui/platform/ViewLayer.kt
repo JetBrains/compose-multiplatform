@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.setFrom
 import androidx.compose.ui.node.OwnedLayer
+import androidx.compose.ui.unit.LayoutDirection
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 
@@ -98,7 +99,8 @@ internal class ViewLayer(
         cameraDistance: Float,
         transformOrigin: TransformOrigin,
         shape: Shape,
-        clip: Boolean
+        clip: Boolean,
+        layoutDirection: LayoutDirection
     ) {
         this.mTransformOrigin = transformOrigin
         this.scaleX = scaleX
@@ -121,7 +123,8 @@ internal class ViewLayer(
             shape,
             this.alpha,
             this.clipToOutline,
-            this.elevation
+            this.elevation,
+            layoutDirection
         )
         updateOutlineResolver()
         val isClippingManually = manualClipPath != null

@@ -23,6 +23,7 @@ import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
@@ -191,5 +192,5 @@ class RoundedCornerShapeTest {
         ).isFalse()
     }
 
-    private fun Shape.toOutline() = createOutline(size, density)
+    private fun Shape.toOutline() = createOutline(size, LayoutDirection.Ltr, density)
 }

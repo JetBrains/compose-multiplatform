@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
@@ -177,7 +178,7 @@ class CutCornerShapeTest {
         ).isFalse()
     }
 
-    private fun Shape.toOutline() = createOutline(size, density)
+    private fun Shape.toOutline() = createOutline(size, LayoutDirection.Ltr, density)
 }
 
 fun assertPathsEquals(path1: Path, path2: Path) {

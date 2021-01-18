@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.addOutline
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import kotlin.math.sqrt
 
@@ -203,12 +204,16 @@ private data class BottomAppBarCutoutShape(
     val fabPlacement: FabPlacement
 ) : Shape {
 
-    override fun createOutline(size: Size, density: Density): Outline {
+    override fun createOutline(
+        size: Size,
+        layoutDirection: LayoutDirection,
+        density: Density
+    ): Outline {
         val boundingRectangle = Path().apply {
             addRect(Rect(0f, 0f, size.width, size.height))
         }
         val path = Path().apply {
-            addCutoutShape(density)
+            addCutoutShape(layoutDirection, density)
             // Subtract this path from the bounding rectangle
             op(boundingRectangle, this, PathOperation.difference)
         }
@@ -219,7 +224,7 @@ private data class BottomAppBarCutoutShape(
      * Adds the filled [cutoutShape] to the [Path]. The path can the be subtracted from the main
      * rectangle path used for the app bar, to create the resulting cutout shape.
      */
-    private fun Path.addCutoutShape(density: Density) {
+    private fun Path.addCutoutShape(layoutDirection: LayoutDirection, density: Density) {
         // The gap on all sides between the FAB and the cutout
         val cutoutOffset = with(density) { BottomAppBarCutoutOffset.toPx() }
 
@@ -236,7 +241,7 @@ private data class BottomAppBarCutoutShape(
         // cut into the app bar
         val cutoutStartY = -cutoutRadius
 
-        addOutline(cutoutShape.createOutline(cutoutSize, density))
+        addOutline(cutoutShape.createOutline(cutoutSize, layoutDirection, density))
         translate(Offset(cutoutStartX, cutoutStartY))
 
         // TODO: consider exposing the custom cutout shape instead of just replacing circle shapes?

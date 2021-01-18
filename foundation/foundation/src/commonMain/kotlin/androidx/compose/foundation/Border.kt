@@ -74,7 +74,7 @@ fun Modifier.border(width: Dp, brush: Brush, shape: Shape): Modifier = composed(
     factory = {
         this.then(
             Modifier.drawWithCache {
-                val outline: Outline = shape.createOutline(size, this)
+                val outline: Outline = shape.createOutline(size, layoutDirection, this)
                 val borderSize = if (width == Dp.Hairline) 1f else width.toPx()
 
                 var insetOutline: Outline? = null // outline used for roundrect/generic shapes
@@ -104,7 +104,7 @@ fun Modifier.border(width: Dp, brush: Brush, shape: Shape): Modifier = composed(
                             size.width - inset * 2,
                             size.height - inset * 2
                         )
-                        insetOutline = shape.createOutline(insetSize, this)
+                        insetOutline = shape.createOutline(insetSize, layoutDirection, this)
                         stroke = Stroke(strokeWidth)
                         pathClip = if (outline is Outline.Rounded) {
                             Path().apply { addRoundRect(outline.roundRect) }
