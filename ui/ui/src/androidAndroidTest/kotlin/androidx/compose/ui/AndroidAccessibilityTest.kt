@@ -52,7 +52,7 @@ import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.junit4.createAndroidComposeRuleLegacy
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performSemanticsAction
@@ -63,7 +63,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
@@ -78,6 +77,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -85,8 +85,6 @@ import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatcher
 import org.mockito.ArgumentMatchers.any
 import org.mockito.internal.matchers.apachecommons.ReflectionEquals
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -97,7 +95,7 @@ import java.util.concurrent.TimeUnit
 class AndroidAccessibilityTest {
     @Suppress("DEPRECATION")
     @get:Rule
-    val rule = createAndroidComposeRuleLegacy<ComponentActivity>()
+    val rule = createAndroidComposeRule<ComponentActivity>()
 
     private lateinit var androidComposeView: AndroidComposeView
     private lateinit var container: OpenComposeView
@@ -107,7 +105,7 @@ class AndroidAccessibilityTest {
 
     private val argument = ArgumentCaptor.forClass(AccessibilityEvent::class.java)
     private var isTextFieldVisible by mutableStateOf(true)
-    private var textFieldSelectionOneLatch = CountDownLatch(1)
+    private var textFieldSelectionOne = false
 
     companion object {
         private const val TopColTag = "topColumn"
@@ -174,7 +172,7 @@ class AndroidAccessibilityTest {
                                     // Make sure this block will be executed when selection changes.
                                     this.textSelectionRange = value.selection
                                     if (value.selection == TextRange(1)) {
-                                        textFieldSelectionOneLatch.countDown()
+                                        textFieldSelectionOne = true
                                     }
                                 }
                                 .testTag(TextFieldTag),
@@ -292,12 +290,12 @@ class AndroidAccessibilityTest {
         argument.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, 1)
         argument.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT, 1)
         rule.runOnUiThread {
-            textFieldSelectionOneLatch = CountDownLatch(1)
+            textFieldSelectionOne = false
             assertTrue(provider.performAction(textFieldNode.id, ACTION_SET_SELECTION, argument))
         }
-        if (!textFieldSelectionOneLatch.await(5, TimeUnit.SECONDS)) {
-            throw AssertionError("Failed to wait for text selection change.")
-        }
+
+        rule.waitUntil { textFieldSelectionOne }
+
         rule.onNodeWithTag(TextFieldTag)
             .assert(
                 SemanticsMatcher.expectValue(
@@ -350,7 +348,6 @@ class AndroidAccessibilityTest {
     }
 
     @Test
-    @FlakyTest(bugId = 177511084, detail = "sync issues with suspend input")
     fun sendStateChangeEvent_whenClickToggleable() {
         rule.onNodeWithTag(ToggleableTag)
             .assertIsOn()
@@ -416,6 +413,7 @@ class AndroidAccessibilityTest {
     }
 
     @Test
+    @Ignore("b/177656801")
     fun sendSubtreeChangeEvents_whenNodeRemoved() {
         val topColumn = rule.onNodeWithTag(TopColTag)
             .fetchSemanticsNode("couldn't find node with tag $TopColTag")
@@ -509,6 +507,7 @@ class AndroidAccessibilityTest {
     }
 
     @Test
+    @Ignore("b/177656801")
     fun semanticsNodeBeingMergedLayoutChange_sendThrottledSubtreeEventsForMergedSemanticsNode() {
         val toggleableNode = rule.onNodeWithTag(ToggleableTag)
             .fetchSemanticsNode("couldn't find node with tag $ToggleableTag")
@@ -550,6 +549,7 @@ class AndroidAccessibilityTest {
     }
 
     @Test
+    @Ignore("b/177656801")
     fun layoutNodeWithoutSemanticsLayoutChange_sendThrottledSubtreeEventsForMergedSemanticsNode() {
         val toggleableNode = rule.onNodeWithTag(ToggleableTag)
             .fetchSemanticsNode("couldn't find node with tag $ToggleableTag")
