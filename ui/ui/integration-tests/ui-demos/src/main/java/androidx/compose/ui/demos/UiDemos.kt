@@ -29,7 +29,6 @@ import androidx.compose.ui.demos.gestures.LongPressDragGestureFilterDemo
 import androidx.compose.ui.demos.gestures.LongPressGestureDetectorDemo
 import androidx.compose.ui.demos.gestures.NestedLongPressDemo
 import androidx.compose.ui.demos.gestures.NestedPressingDemo
-import androidx.compose.ui.demos.gestures.NestedScalingDemo
 import androidx.compose.ui.demos.gestures.NestedScrollingDemo
 import androidx.compose.ui.demos.gestures.PointerInputDuringSubComp
 import androidx.compose.ui.demos.gestures.PopupDragDemo
@@ -83,7 +82,6 @@ private val GestureDemos = DemoCategory(
                     VerticalScrollerInDrawerDemo()
                 },
                 ComposableDemo("Nested Scrolling") { NestedScrollingDemo() },
-                ComposableDemo("Nested Scaling") { NestedScalingDemo() },
                 ComposableDemo("Drag and Scale") { DragAndScaleGestureFilterDemo() },
                 ComposableDemo("Popup Drag") { PopupDragDemo() },
                 ComposableDemo("Double Tap in Tap") { DoubleTapInTapDemo() },
