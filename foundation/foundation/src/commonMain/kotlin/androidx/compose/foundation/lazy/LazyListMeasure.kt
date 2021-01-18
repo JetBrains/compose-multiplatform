@@ -265,11 +265,13 @@ internal fun MeasureScope.layoutLazyList(
             }
             val positions = IntArray(items.size) { 0 }
             if (isVertical) {
-                requireNotNull(verticalArrangement)
-                    .arrange(mainAxisLayoutSize, sizes, density, positions)
+                with(requireNotNull(verticalArrangement)) {
+                    density.arrange(mainAxisLayoutSize, sizes, positions)
+                }
             } else {
-                requireNotNull(horizontalArrangement)
-                    .arrange(mainAxisLayoutSize, sizes, layoutDirection, density, positions)
+                with(requireNotNull(horizontalArrangement)) {
+                    density.arrange(mainAxisLayoutSize, sizes, layoutDirection, positions)
+                }
             }
             positions.forEachIndexed { index, position ->
                 items[index].place(this, layoutWidth, layoutHeight, position, reverseLayout)

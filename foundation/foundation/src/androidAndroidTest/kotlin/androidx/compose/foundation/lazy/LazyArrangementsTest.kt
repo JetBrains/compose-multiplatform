@@ -340,7 +340,7 @@ class LazyArrangementsTest {
         with(rule.density) {
             val sizes = IntArray(2) { itemSize.toIntPx() }
             val outPositions = IntArray(2) { 0 }
-            arrangement.arrange(containerSize.toIntPx(), sizes, this, outPositions)
+            with(arrangement) { arrange(containerSize.toIntPx(), sizes, outPositions) }
 
             outPositions.forEachIndexed { index, position ->
                 val realIndex = if (reversedItemsOrder) if (index == 0) 1 else 0 else index
@@ -358,7 +358,9 @@ class LazyArrangementsTest {
         with(rule.density) {
             val sizes = IntArray(2) { itemSize.toIntPx() }
             val outPositions = IntArray(2) { 0 }
-            arrangement.arrange(containerSize.toIntPx(), sizes, layoutDirection, this, outPositions)
+            with(arrangement) {
+                arrange(containerSize.toIntPx(), sizes, layoutDirection, outPositions)
+            }
 
             outPositions.forEachIndexed { index, position ->
                 val realIndex = if (reversedItemsOrder) if (index == 0) 1 else 0 else index

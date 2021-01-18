@@ -46,18 +46,16 @@ object Arrangement {
          * Horizontally places the layout children.
          *
          * @param totalSize Available space that can be occupied by the children.
-         * @param size An array of sizes of all children.
+         * @param sizes An array of sizes of all children.
          * @param layoutDirection A layout direction, left-to-right or right-to-left, of the parent
          * layout that should be taken into account when determining positions of the children.
-         * @param density The current density.
-         * @param outPosition An array of the size of [size] that returns the calculated positions.
+         * @param outPositions An array of the size of [sizes] that returns the calculated positions.
          */
-        fun arrange(
+        fun Density.arrange(
             totalSize: Int,
-            size: IntArray,
+            sizes: IntArray,
             layoutDirection: LayoutDirection,
-            density: Density,
-            outPosition: IntArray
+            outPositions: IntArray
         )
     }
 
@@ -75,15 +73,13 @@ object Arrangement {
          * Vertically places the layout children.
          *
          * @param totalSize Available space that can be occupied by the children.
-         * @param size An array of sizes of all children.
-         * @param density The current density.
-         * @param outPosition An array of the size of [size] that returns the calculated positions.
+         * @param sizes An array of sizes of all children.
+         * @param outPositions An array of the size of [sizes] that returns the calculated positions.
          */
-        fun arrange(
+        fun Density.arrange(
             totalSize: Int,
-            size: IntArray,
-            density: Density,
-            outPosition: IntArray
+            sizes: IntArray,
+            outPositions: IntArray
         )
     }
 
@@ -106,18 +102,17 @@ object Arrangement {
      */
     @Stable
     val Start = object : Horizontal {
-        override fun arrange(
+        override fun Density.arrange(
             totalSize: Int,
-            size: IntArray,
+            sizes: IntArray,
             layoutDirection: LayoutDirection,
-            density: Density,
-            outPosition: IntArray
+            outPositions: IntArray
         ) = if (layoutDirection == LayoutDirection.Ltr) {
-            placeLeftOrTop(size, outPosition)
+            placeLeftOrTop(sizes, outPositions)
         } else {
-            size.reverse()
-            placeRightOrBottom(totalSize, size, outPosition)
-            outPosition.reverse()
+            sizes.reverse()
+            placeRightOrBottom(totalSize, sizes, outPositions)
+            outPositions.reverse()
         }
     }
 
@@ -127,18 +122,17 @@ object Arrangement {
      */
     @Stable
     val End = object : Horizontal {
-        override fun arrange(
+        override fun Density.arrange(
             totalSize: Int,
-            size: IntArray,
+            sizes: IntArray,
             layoutDirection: LayoutDirection,
-            density: Density,
-            outPosition: IntArray
+            outPositions: IntArray
         ) = if (layoutDirection == LayoutDirection.Ltr) {
-            placeRightOrBottom(totalSize, size, outPosition)
+            placeRightOrBottom(totalSize, sizes, outPositions)
         } else {
-            size.reverse()
-            placeLeftOrTop(size, outPosition)
-            outPosition.reverse()
+            sizes.reverse()
+            placeLeftOrTop(sizes, outPositions)
+            outPositions.reverse()
         }
     }
 
@@ -148,12 +142,11 @@ object Arrangement {
      */
     @Stable
     val Top = object : Vertical {
-        override fun arrange(
+        override fun Density.arrange(
             totalSize: Int,
-            size: IntArray,
-            density: Density,
-            outPosition: IntArray
-        ) = placeLeftOrTop(size, outPosition)
+            sizes: IntArray,
+            outPositions: IntArray
+        ) = placeLeftOrTop(sizes, outPositions)
     }
 
     /**
@@ -162,12 +155,11 @@ object Arrangement {
      */
     @Stable
     val Bottom = object : Vertical {
-        override fun arrange(
+        override fun Density.arrange(
             totalSize: Int,
-            size: IntArray,
-            density: Density,
-            outPosition: IntArray
-        ) = placeRightOrBottom(totalSize, size, outPosition)
+            sizes: IntArray,
+            outPositions: IntArray
+        ) = placeRightOrBottom(totalSize, sizes, outPositions)
     }
 
     /**
@@ -177,26 +169,24 @@ object Arrangement {
     val Center = object : HorizontalOrVertical {
         override val spacing = 0.dp
 
-        override fun arrange(
+        override fun Density.arrange(
             totalSize: Int,
-            size: IntArray,
+            sizes: IntArray,
             layoutDirection: LayoutDirection,
-            density: Density,
-            outPosition: IntArray
+            outPositions: IntArray
         ) = if (layoutDirection == LayoutDirection.Ltr) {
-            placeCenter(totalSize, size, outPosition)
+            placeCenter(totalSize, sizes, outPositions)
         } else {
-            size.reverse()
-            placeCenter(totalSize, size, outPosition)
-            outPosition.reverse()
+            sizes.reverse()
+            placeCenter(totalSize, sizes, outPositions)
+            outPositions.reverse()
         }
 
-        override fun arrange(
+        override fun Density.arrange(
             totalSize: Int,
-            size: IntArray,
-            density: Density,
-            outPosition: IntArray
-        ) = placeCenter(totalSize, size, outPosition)
+            sizes: IntArray,
+            outPositions: IntArray
+        ) = placeCenter(totalSize, sizes, outPositions)
     }
 
     /**
@@ -207,26 +197,24 @@ object Arrangement {
     val SpaceEvenly = object : HorizontalOrVertical {
         override val spacing = 0.dp
 
-        override fun arrange(
+        override fun Density.arrange(
             totalSize: Int,
-            size: IntArray,
+            sizes: IntArray,
             layoutDirection: LayoutDirection,
-            density: Density,
-            outPosition: IntArray
+            outPositions: IntArray
         ) = if (layoutDirection == LayoutDirection.Ltr) {
-            placeSpaceEvenly(totalSize, size, outPosition)
+            placeSpaceEvenly(totalSize, sizes, outPositions)
         } else {
-            size.reverse()
-            placeSpaceEvenly(totalSize, size, outPosition)
-            outPosition.reverse()
+            sizes.reverse()
+            placeSpaceEvenly(totalSize, sizes, outPositions)
+            outPositions.reverse()
         }
 
-        override fun arrange(
+        override fun Density.arrange(
             totalSize: Int,
-            size: IntArray,
-            density: Density,
-            outPosition: IntArray
-        ) = placeSpaceEvenly(totalSize, size, outPosition)
+            sizes: IntArray,
+            outPositions: IntArray
+        ) = placeSpaceEvenly(totalSize, sizes, outPositions)
     }
 
     /**
@@ -237,26 +225,24 @@ object Arrangement {
     val SpaceBetween = object : HorizontalOrVertical {
         override val spacing = 0.dp
 
-        override fun arrange(
+        override fun Density.arrange(
             totalSize: Int,
-            size: IntArray,
+            sizes: IntArray,
             layoutDirection: LayoutDirection,
-            density: Density,
-            outPosition: IntArray
+            outPositions: IntArray
         ) = if (layoutDirection == LayoutDirection.Ltr) {
-            placeSpaceBetween(totalSize, size, outPosition)
+            placeSpaceBetween(totalSize, sizes, outPositions)
         } else {
-            size.reverse()
-            placeSpaceBetween(totalSize, size, outPosition)
-            outPosition.reverse()
+            sizes.reverse()
+            placeSpaceBetween(totalSize, sizes, outPositions)
+            outPositions.reverse()
         }
 
-        override fun arrange(
+        override fun Density.arrange(
             totalSize: Int,
-            size: IntArray,
-            density: Density,
-            outPosition: IntArray
-        ) = placeSpaceBetween(totalSize, size, outPosition)
+            sizes: IntArray,
+            outPositions: IntArray
+        ) = placeSpaceBetween(totalSize, sizes, outPositions)
     }
 
     /**
@@ -268,26 +254,24 @@ object Arrangement {
     val SpaceAround = object : HorizontalOrVertical {
         override val spacing = 0.dp
 
-        override fun arrange(
+        override fun Density.arrange(
             totalSize: Int,
-            size: IntArray,
+            sizes: IntArray,
             layoutDirection: LayoutDirection,
-            density: Density,
-            outPosition: IntArray
+            outPositions: IntArray
         ) = if (layoutDirection == LayoutDirection.Ltr) {
-            placeSpaceAround(totalSize, size, outPosition)
+            placeSpaceAround(totalSize, sizes, outPositions)
         } else {
-            size.reverse()
-            placeSpaceAround(totalSize, size, outPosition)
-            outPosition.reverse()
+            sizes.reverse()
+            placeSpaceAround(totalSize, sizes, outPositions)
+            outPositions.reverse()
         }
 
-        override fun arrange(
+        override fun Density.arrange(
             totalSize: Int,
-            size: IntArray,
-            density: Density,
-            outPosition: IntArray
-        ) = placeSpaceAround(totalSize, size, outPosition)
+            sizes: IntArray,
+            outPositions: IntArray
+        ) = placeSpaceAround(totalSize, sizes, outPositions)
     }
 
     /**
@@ -364,13 +348,12 @@ object Arrangement {
          */
         @Stable
         val Left = object : Horizontal {
-            override fun arrange(
+            override fun Density.arrange(
                 totalSize: Int,
-                size: IntArray,
+                sizes: IntArray,
                 layoutDirection: LayoutDirection,
-                density: Density,
-                outPosition: IntArray
-            ) = placeLeftOrTop(size, outPosition)
+                outPositions: IntArray
+            ) = placeLeftOrTop(sizes, outPositions)
         }
 
         /**
@@ -381,13 +364,12 @@ object Arrangement {
          */
         @Stable
         val Center = object : Horizontal {
-            override fun arrange(
+            override fun Density.arrange(
                 totalSize: Int,
-                size: IntArray,
+                sizes: IntArray,
                 layoutDirection: LayoutDirection,
-                density: Density,
-                outPosition: IntArray
-            ) = placeCenter(totalSize, size, outPosition)
+                outPositions: IntArray
+            ) = placeCenter(totalSize, sizes, outPositions)
         }
 
         /**
@@ -399,13 +381,12 @@ object Arrangement {
          */
         @Stable
         val Right = object : Horizontal {
-            override fun arrange(
+            override fun Density.arrange(
                 totalSize: Int,
-                size: IntArray,
+                sizes: IntArray,
                 layoutDirection: LayoutDirection,
-                density: Density,
-                outPosition: IntArray
-            ) = placeRightOrBottom(totalSize, size, outPosition)
+                outPositions: IntArray
+            ) = placeRightOrBottom(totalSize, sizes, outPositions)
         }
 
         /**
@@ -417,13 +398,12 @@ object Arrangement {
          */
         @Stable
         val SpaceBetween = object : Horizontal {
-            override fun arrange(
+            override fun Density.arrange(
                 totalSize: Int,
-                size: IntArray,
+                sizes: IntArray,
                 layoutDirection: LayoutDirection,
-                density: Density,
-                outPosition: IntArray
-            ) = placeSpaceBetween(totalSize, size, outPosition)
+                outPositions: IntArray
+            ) = placeSpaceBetween(totalSize, sizes, outPositions)
         }
 
         /**
@@ -435,13 +415,12 @@ object Arrangement {
          */
         @Stable
         val SpaceEvenly = object : Horizontal {
-            override fun arrange(
+            override fun Density.arrange(
                 totalSize: Int,
-                size: IntArray,
+                sizes: IntArray,
                 layoutDirection: LayoutDirection,
-                density: Density,
-                outPosition: IntArray
-            ) = placeSpaceEvenly(totalSize, size, outPosition)
+                outPositions: IntArray
+            ) = placeSpaceEvenly(totalSize, sizes, outPositions)
         }
 
         /**
@@ -454,13 +433,12 @@ object Arrangement {
          */
         @Stable
         val SpaceAround = object : Horizontal {
-            override fun arrange(
+            override fun Density.arrange(
                 totalSize: Int,
-                size: IntArray,
+                sizes: IntArray,
                 layoutDirection: LayoutDirection,
-                density: Density,
-                outPosition: IntArray
-            ) = placeSpaceAround(totalSize, size, outPosition)
+                outPositions: IntArray
+            ) = placeSpaceAround(totalSize, sizes, outPositions)
         }
 
         /**
@@ -540,41 +518,39 @@ object Arrangement {
 
         override val spacing = space
 
-        override fun arrange(
+        override fun Density.arrange(
             totalSize: Int,
-            size: IntArray,
+            sizes: IntArray,
             layoutDirection: LayoutDirection,
-            density: Density,
-            outPosition: IntArray
+            outPositions: IntArray
         ) {
-            if (size.isEmpty()) return
+            if (sizes.isEmpty()) return
             val spacePx = with(density) { space.toIntPx() }
 
             var occupied = 0
             var lastSpace = 0
-            if (layoutDirection == LayoutDirection.Rtl && rtlMirror) size.reverse()
-            size.forEachIndexed { index, it ->
-                outPosition[index] = min(occupied, totalSize - it)
-                lastSpace = min(spacePx, totalSize - outPosition[index] - it)
-                occupied = outPosition[index] + it + lastSpace
+            if (layoutDirection == LayoutDirection.Rtl && rtlMirror) sizes.reverse()
+            sizes.forEachIndexed { index, it ->
+                outPositions[index] = min(occupied, totalSize - it)
+                lastSpace = min(spacePx, totalSize - outPositions[index] - it)
+                occupied = outPositions[index] + it + lastSpace
             }
             occupied -= lastSpace
 
             if (alignment != null && occupied < totalSize) {
                 val groupPosition = alignment.invoke(totalSize - occupied, layoutDirection)
-                for (index in outPosition.indices) {
-                    outPosition[index] += groupPosition
+                for (index in outPositions.indices) {
+                    outPositions[index] += groupPosition
                 }
             }
 
-            if (layoutDirection == LayoutDirection.Rtl && rtlMirror) outPosition.reverse()
+            if (layoutDirection == LayoutDirection.Rtl && rtlMirror) outPositions.reverse()
         }
-        override fun arrange(
+        override fun Density.arrange(
             totalSize: Int,
-            size: IntArray,
-            density: Density,
-            outPosition: IntArray
-        ) = arrange(totalSize, size, LayoutDirection.Ltr, density, outPosition)
+            sizes: IntArray,
+            outPositions: IntArray
+        ) = arrange(totalSize, sizes, LayoutDirection.Ltr, outPositions)
     }
 
     internal fun placeRightOrBottom(
