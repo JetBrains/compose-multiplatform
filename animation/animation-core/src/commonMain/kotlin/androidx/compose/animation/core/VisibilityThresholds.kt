@@ -114,3 +114,5 @@ val Rect.Companion.VisibilityThreshold: Rect
  */
 val Bounds.Companion.VisibilityThreshold: Bounds
     get() = boundsVisibilityThreshold
+
+// TODO: Add Dp.DefaultAnimation = spring<Dp>(visibilityThreshold = Dp.VisibilityThreshold)

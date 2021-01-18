@@ -17,7 +17,7 @@
 package androidx.compose.ui.demos.focus
 
 import androidx.compose.animation.core.TweenSpec
-import androidx.compose.animation.core.animateAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -76,7 +76,7 @@ fun ReuseFocusRequesterDemo() {
 @Composable
 private fun Circle(modifier: Modifier = Modifier, nextShape: () -> Unit) {
     var isFocused by remember { mutableStateOf(false) }
-    val scale by animateAsState(if (isFocused) 0f else 1f, TweenSpec(2000)) {
+    val scale by animateFloatAsState(if (isFocused) 0f else 1f, TweenSpec(2000)) {
         if (it == 0f) {
             nextShape()
         }
@@ -99,7 +99,7 @@ private fun Circle(modifier: Modifier = Modifier, nextShape: () -> Unit) {
 @Composable
 private fun Square(modifier: Modifier = Modifier, nextShape: () -> Unit) {
     var isFocused by remember { mutableStateOf(false) }
-    val scale by animateAsState(if (isFocused) 0f else 1f, TweenSpec(2000)) {
+    val scale by animateFloatAsState(if (isFocused) 0f else 1f, TweenSpec(2000)) {
         if (it == 0f) {
             nextShape()
         }

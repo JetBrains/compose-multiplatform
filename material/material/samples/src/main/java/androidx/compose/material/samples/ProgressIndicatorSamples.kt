@@ -17,7 +17,7 @@
 package androidx.compose.material.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.animation.core.animateAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun LinearProgressIndicatorSample() {
     var progress by remember { mutableStateOf(0.1f) }
-    val animatedProgress by animateAsState(
+    val animatedProgress by animateFloatAsState(
         targetValue = progress,
         animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec
     )
@@ -61,7 +61,7 @@ fun LinearProgressIndicatorSample() {
 @Composable
 fun CircularProgressIndicatorSample() {
     var progress by remember { mutableStateOf(0.1f) }
-    val animatedProgress by animateAsState(
+    val animatedProgress by animateFloatAsState(
         targetValue = progress,
         animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec
     )
