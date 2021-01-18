@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.AmbientContentAlpha
 import androidx.compose.material.AmbientContentColor
@@ -60,6 +61,7 @@ import androidx.compose.ui.platform.AmbientView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertHeightIsEqualTo
+import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -99,7 +101,8 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalTestApi::class)
 class TextFieldTest {
 
-    private val ExpectedMinimumTextFieldHeight = 56.dp
+    private val ExpectedDefaultTextFieldHeight = 56.dp
+    private val ExpectedDefaultTextFieldWidth = 280.dp
     private val ExpectedPadding = 16.dp
     private val IconPadding = 12.dp
     private val ExpectedBaselineOffset = 20.dp
@@ -120,7 +123,32 @@ class TextFieldTest {
                 modifier = Modifier.preferredHeight(20.dp)
             )
         }
-            .assertHeightIsEqualTo(ExpectedMinimumTextFieldHeight)
+            .assertHeightIsEqualTo(20.dp)
+    }
+
+    @Test
+    fun testTextField_setSmallWidth() {
+        rule.setMaterialContentForSizeAssertions {
+            TextField(
+                value = "input",
+                onValueChange = {},
+                label = {},
+                modifier = Modifier.width(40.dp)
+            )
+        }
+            .assertWidthIsEqualTo(40.dp)
+    }
+
+    @Test
+    fun testTextField_defaultWidth() {
+        rule.setMaterialContentForSizeAssertions {
+            TextField(
+                value = "input",
+                onValueChange = {},
+                label = {}
+            )
+        }
+            .assertWidthIsEqualTo(ExpectedDefaultTextFieldWidth)
     }
 
     @Test
@@ -294,7 +322,7 @@ class TextFieldTest {
                 ExpectedPadding.toIntPx().toFloat()
             )
             assertThat(labelPosition.value?.y).isEqualTo(
-                ((ExpectedMinimumTextFieldHeight.toIntPx() - labelSize.value!!.height) / 2f)
+                ((ExpectedDefaultTextFieldHeight.toIntPx() - labelSize.value!!.height) / 2f)
                     .roundToInt().toFloat()
             )
         }
@@ -953,11 +981,12 @@ class TextFieldTest {
         }
     }
 
-    private val View.isSoftwareKeyboardShown: Boolean get() {
-        val inputMethodManager =
-            context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        // TODO(b/163742556): This is just a proxy for software keyboard visibility. Find a better
-        //  way to check if the software keyboard is shown.
-        return inputMethodManager.isAcceptingText()
-    }
+    private val View.isSoftwareKeyboardShown: Boolean
+        get() {
+            val inputMethodManager =
+                context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            // TODO(b/163742556): This is just a proxy for software keyboard visibility. Find a better
+            //  way to check if the software keyboard is shown.
+            return inputMethodManager.isAcceptingText()
+        }
 }

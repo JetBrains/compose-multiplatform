@@ -30,7 +30,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.defaultMinSizeConstraints
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredSizeIn
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
@@ -123,7 +122,7 @@ internal fun TextFieldImpl(
         ) {
             BasicTextField(
                 value = value,
-                modifier = tagModifier.defaultMinSizeConstraints(minWidth = TextFieldMinWidth),
+                modifier = tagModifier,
                 textStyle = mergedTextStyle,
                 enabled = enabled,
                 readOnly = readOnly,
@@ -224,12 +223,11 @@ internal fun TextFieldImpl(
         when (type) {
             TextFieldType.Filled -> {
                 TextFieldLayout(
-                    modifier = Modifier
-                        .preferredSizeIn(
+                    modifier = textFieldModifier
+                        .defaultMinSizeConstraints(
                             minWidth = TextFieldMinWidth,
                             minHeight = TextFieldMinHeight
-                        )
-                        .then(textFieldModifier),
+                        ),
                     decoratedTextField = decoratedTextField,
                     decoratedPlaceholder = decoratedPlaceholder,
                     decoratedLabel = decoratedLabel,
@@ -247,12 +245,11 @@ internal fun TextFieldImpl(
             }
             TextFieldType.Outlined -> {
                 OutlinedTextFieldLayout(
-                    modifier = Modifier
-                        .preferredSizeIn(
+                    modifier = textFieldModifier
+                        .defaultMinSizeConstraints(
                             minWidth = TextFieldMinWidth,
                             minHeight = TextFieldMinHeight + OutlinedTextFieldTopPadding
                         )
-                        .then(textFieldModifier)
                         .padding(top = OutlinedTextFieldTopPadding),
                     decoratedTextField = decoratedTextField,
                     decoratedPlaceholder = decoratedPlaceholder,

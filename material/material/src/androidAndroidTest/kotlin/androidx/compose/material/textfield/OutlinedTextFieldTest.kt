@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.AmbientContentAlpha
 import androidx.compose.material.AmbientContentColor
@@ -29,9 +30,11 @@ import androidx.compose.material.AmbientTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldPadding
 import androidx.compose.material.runOnIdleWithDensity
 import androidx.compose.material.setMaterialContent
+import androidx.compose.material.setMaterialContentForSizeAssertions
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,6 +51,7 @@ import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.AmbientTextInputService
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -84,6 +88,7 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalTestApi::class)
 class OutlinedTextFieldTest {
     private val ExpectedMinimumTextFieldHeight = 56.dp
+    private val ExpectedDefaultTextFieldWidth = 280.dp
     private val ExpectedPadding = 16.dp
     private val IconPadding = 12.dp
     private val IconColorAlpha = 0.54f
@@ -91,6 +96,31 @@ class OutlinedTextFieldTest {
 
     @get:Rule
     val rule = createComposeRule()
+
+    @Test
+    fun testTextField_setSmallWidth() {
+        rule.setMaterialContentForSizeAssertions {
+            TextField(
+                value = "input",
+                onValueChange = {},
+                label = {},
+                modifier = Modifier.width(40.dp)
+            )
+        }
+            .assertWidthIsEqualTo(40.dp)
+    }
+
+    @Test
+    fun testTextField_defaultWidth() {
+        rule.setMaterialContentForSizeAssertions {
+            TextField(
+                value = "input",
+                onValueChange = {},
+                label = {}
+            )
+        }
+            .assertWidthIsEqualTo(ExpectedDefaultTextFieldWidth)
+    }
 
     @Test
     fun testOutlinedTextFields_singleFocus() {
