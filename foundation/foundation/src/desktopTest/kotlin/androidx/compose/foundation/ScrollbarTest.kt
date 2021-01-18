@@ -68,7 +68,7 @@ class ScrollbarTest {
     val rule = createComposeRule()
 
     // don't inline, surface controls canvas life time
-    private val surface = Surface.makeRasterN32Premul(100, 100)!!
+    private val surface = Surface.makeRasterN32Premul(100, 100)
     private val canvas = surface.canvas
 
     @Test

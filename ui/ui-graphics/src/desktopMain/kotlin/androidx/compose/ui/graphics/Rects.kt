@@ -24,7 +24,7 @@ fun Rect.toSkijaRect(): org.jetbrains.skija.Rect {
         top,
         right,
         bottom
-    )!!
+    )
 }
 
 fun org.jetbrains.skija.Rect.toComposeRect() =

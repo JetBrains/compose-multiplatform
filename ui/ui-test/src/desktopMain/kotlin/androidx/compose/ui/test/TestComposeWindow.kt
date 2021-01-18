@@ -32,7 +32,7 @@ class TestComposeWindow(
     val density: Density = Density(1f, 1f),
     var desktopPlatform: DesktopPlatform = DesktopPlatform.Linux
 ) {
-    val surface = Surface.makeRasterN32Premul(width, height)!!
+    val surface = Surface.makeRasterN32Premul(width, height)
     val canvas = surface.canvas
     val owners = DesktopOwners(invalidate = {})
 
