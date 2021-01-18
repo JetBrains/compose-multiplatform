@@ -37,7 +37,7 @@ internal actual fun SemanticsNodeInteraction.checkIsDisplayed(): Boolean {
         return false
     }
 
-    (node.owner as? ViewRootForTest)?.let {
+    (node.root as? ViewRootForTest)?.let {
         if (!ViewMatchers.isDisplayed().matches(it.view)) {
             return false
         }
@@ -53,7 +53,7 @@ internal actual fun SemanticsNodeInteraction.checkIsDisplayed(): Boolean {
 }
 
 internal actual fun SemanticsNode.clippedNodeBoundsInWindow(): Rect {
-    val composeView = (owner as ViewRootForTest).view
+    val composeView = (root as ViewRootForTest).view
     val rootLocationInWindow = intArrayOf(0, 0).let {
         composeView.getLocationInWindow(it)
         Offset(it[0].toFloat(), it[1].toFloat())
@@ -62,7 +62,7 @@ internal actual fun SemanticsNode.clippedNodeBoundsInWindow(): Rect {
 }
 
 internal actual fun SemanticsNode.isInScreenBounds(): Boolean {
-    val composeView = (owner as ViewRootForTest).view
+    val composeView = (root as ViewRootForTest).view
 
     // Window relative bounds of our node
     val nodeBoundsInWindow = clippedNodeBoundsInWindow()

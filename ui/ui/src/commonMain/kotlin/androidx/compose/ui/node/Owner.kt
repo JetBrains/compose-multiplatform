@@ -21,12 +21,10 @@ import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.hapticfeedback.HapticFeedback
-import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.WindowInfo
-import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.unit.Density
@@ -38,12 +36,14 @@ import androidx.compose.ui.unit.LayoutDirection
  * to Android [views][android.view.View] and all layout, draw, input, and accessibility is hooked
  * through them.
  */
-interface Owner {
+internal interface Owner {
 
     /**
      * The root layout node in the component tree.
      */
     val root: LayoutNode
+
+    val rootForTest: RootForTest
 
     /**
      * Provide haptic feedback to the user. Use the Android version of haptic feedback.
@@ -78,8 +78,6 @@ interface Owner {
     val autofill: Autofill?
 
     val density: Density
-
-    val semanticsOwner: SemanticsOwner
 
     val textInputService: TextInputService
 
@@ -156,13 +154,6 @@ interface Owner {
      * @return true if the system granted focus to this owner. False otherwise.
      */
     fun requestFocus(): Boolean
-
-    /**
-     * Send this [KeyEvent] to the focused component in this [Owner].
-     *
-     * @return true if the event was consumed. False otherwise.
-     */
-    fun sendKeyEvent(keyEvent: KeyEvent): Boolean
 
     /**
      * Iterates through all LayoutNodes that have requested layout and measures and lays them out

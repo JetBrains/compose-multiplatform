@@ -18,17 +18,20 @@ package androidx.compose.ui.test
 
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.TestPointerInputEventData
-import androidx.compose.ui.node.Owner
+import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.platform.DesktopOwner
 
-internal actual fun createInputDispatcher(testContext: TestContext, owner: Owner): InputDispatcher {
-    return DesktopInputDispatcher(testContext, owner as DesktopOwner)
+internal actual fun createInputDispatcher(
+    testContext: TestContext,
+    root: RootForTest
+): InputDispatcher {
+    return DesktopInputDispatcher(testContext, root as DesktopOwner)
 }
 
 internal class DesktopInputDispatcher(
     testContext: TestContext,
-    val owner: DesktopOwner
-) : InputDispatcher(testContext, owner) {
+    val root: DesktopOwner
+) : InputDispatcher(testContext, root) {
     companion object {
         var gesturePointerId = 0L
     }
@@ -86,7 +89,7 @@ internal class DesktopInputDispatcher(
                     Thread.sleep(delayMs)
                 }
             }
-            owner.processPointerInput(eventTime, it)
+            root.processPointerInput(eventTime, it)
         }
     }
 

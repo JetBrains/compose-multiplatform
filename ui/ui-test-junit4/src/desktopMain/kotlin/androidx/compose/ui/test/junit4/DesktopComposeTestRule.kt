@@ -20,7 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.snapshots.Snapshot
-import androidx.compose.ui.node.Owner
+import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.platform.DesktopOwner
 import androidx.compose.ui.platform.DesktopOwners
 import androidx.compose.ui.platform.setContent
@@ -207,7 +207,7 @@ class DesktopComposeTestRule : ComposeTestRule {
             return rule.runOnUiThread(action)
         }
 
-        override fun getOwners(): Set<Owner> {
+        override fun getRoots(): Set<RootForTest> {
             return rule.owners!!.list
         }
 
