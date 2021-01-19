@@ -37,7 +37,7 @@ class FirstDrawTest {
 
     /**
      * Tests that the compose tree has been drawn at least once when
-     * [ComposeTestRule.setContent] finishes.
+     * [ComposeContentTestRule.setContent] finishes.
      */
     @Test
     fun waitsForFirstDraw_withoutOnIdle() {

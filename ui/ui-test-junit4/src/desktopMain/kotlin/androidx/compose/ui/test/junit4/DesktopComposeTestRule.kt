@@ -48,10 +48,10 @@ import java.util.concurrent.FutureTask
 import javax.swing.SwingUtilities.invokeAndWait
 import javax.swing.SwingUtilities.isEventDispatchThread
 
-actual fun createComposeRule(): ComposeTestRule = DesktopComposeTestRule()
+actual fun createComposeRule(): ComposeContentTestRule = DesktopComposeTestRule()
 
 @OptIn(InternalTestApi::class)
-class DesktopComposeTestRule : ComposeTestRule {
+class DesktopComposeTestRule : ComposeContentTestRule {
 
     companion object {
         var current: DesktopComposeTestRule? = null

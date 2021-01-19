@@ -48,7 +48,7 @@ import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.captureToImage
-import androidx.compose.ui.test.junit4.ComposeTestRule
+import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -439,7 +439,7 @@ class TextFieldScrollTest {
         }
     }
 
-    private fun ComposeTestRule.setupHorizontallyScrollableContent(
+    private fun ComposeContentTestRule.setupHorizontallyScrollableContent(
         scrollerPosition: TextFieldScrollerPosition,
         text: String,
         modifier: Modifier = Modifier
@@ -455,7 +455,7 @@ class TextFieldScrollTest {
         }
     }
 
-    private fun ComposeTestRule.setupVerticallyScrollableContent(
+    private fun ComposeContentTestRule.setupVerticallyScrollableContent(
         scrollerPosition: TextFieldScrollerPosition,
         text: String,
         modifier: Modifier = Modifier,
