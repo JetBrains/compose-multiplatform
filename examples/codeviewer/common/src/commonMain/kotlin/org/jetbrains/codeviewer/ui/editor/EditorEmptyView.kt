@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.sp
 fun EditorEmptyView() = Box(Modifier.fillMaxSize()) {
     Column(Modifier.align(Alignment.Center)) {
         Icon(
-            Icons.Default.Code.copy(defaultWidth = 48.dp, defaultHeight = 48.dp),
+            Icons.Default.Code,
             tint = AmbientContentColor.current.copy(alpha = 0.60f),
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )

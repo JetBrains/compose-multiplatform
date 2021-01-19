@@ -9,10 +9,12 @@ fun <T : Any> loadable(load: () -> T): MutableState<T?> {
     return loadableScoped { load() }
 }
 
+private val loadingKey = Any()
+
 @Composable
 fun <T : Any> loadableScoped(load: CoroutineScope.() -> T): MutableState<T?> {
     val state: MutableState<T?> = remember { mutableStateOf(null) }
-    LaunchedTask {
+    LaunchedEffect(loadingKey) {
         try {
             state.value = load()
         } catch (e: CancellationException) {
