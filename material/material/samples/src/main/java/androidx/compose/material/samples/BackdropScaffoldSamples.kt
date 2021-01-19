@@ -58,11 +58,11 @@ fun BackdropScaffoldSample() {
                 navigationIcon = {
                     if (scaffoldState.isConcealed) {
                         IconButton(onClick = { scaffoldState.reveal() }) {
-                            Icon(Icons.Default.Menu)
+                            Icon(Icons.Default.Menu, contentDescription = "Localized description")
                         }
                     } else {
                         IconButton(onClick = { scaffoldState.conceal() }) {
-                            Icon(Icons.Default.Close)
+                            Icon(Icons.Default.Close, contentDescription = "Localized description")
                         }
                     }
                 },
@@ -77,7 +77,7 @@ fun BackdropScaffoldSample() {
                             }
                         }
                     ) {
-                        Icon(Icons.Default.Favorite)
+                        Icon(Icons.Default.Favorite, contentDescription = "Localized description")
                     }
                 },
                 elevation = 0.dp,
@@ -103,7 +103,12 @@ fun BackdropScaffoldSample() {
                 items(50) {
                     ListItem(
                         text = { Text("Item $it") },
-                        icon = { Icon(Icons.Default.Favorite) }
+                        icon = {
+                            Icon(
+                                Icons.Default.Favorite,
+                                contentDescription = "Localized description"
+                            )
+                        }
                     )
                 }
             }

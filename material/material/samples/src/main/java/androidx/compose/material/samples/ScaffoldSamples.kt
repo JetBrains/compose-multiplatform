@@ -91,7 +91,7 @@ fun SimpleScaffoldWithTopBar() {
                             scaffoldState.drawerState.open()
                         }
                     ) {
-                        Icon(Icons.Filled.Menu)
+                        Icon(Icons.Filled.Menu, contentDescription = "Localized description")
                     }
                 }
             )
@@ -161,7 +161,7 @@ fun ScaffoldWithBottomBarAndCutout() {
                         scaffoldState.drawerState.open()
                     }
                 ) {
-                    Icon(Icons.Filled.Menu)
+                    Icon(Icons.Filled.Menu, contentDescription = "Localized description")
                 }
             }
         },

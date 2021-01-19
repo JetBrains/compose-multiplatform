@@ -171,7 +171,7 @@ private fun IconToggleButtonDisabled() {
 
     IconToggleButton(checked = checked, enabled = false, onCheckedChange = { checked = it }) {
         val tint by animateAsState(if (checked) Color(0xFFEC407A) else Color(0xFFB0BEC5))
-        Icon(Icons.Filled.Favorite, tint = tint)
+        Icon(Icons.Filled.Favorite, contentDescription = "Favorite", tint = tint)
     }
 }
 

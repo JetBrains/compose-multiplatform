@@ -111,6 +111,7 @@ fun DrawWithCacheContentSample() {
     }
     Image(
         painter = vectorPainter,
+        contentDescription = null,
         modifier = Modifier.size(120.dp).drawWithCache {
             val gradient = Brush.linearGradient(
                 colors = listOf(Color.Red, Color.Blue),

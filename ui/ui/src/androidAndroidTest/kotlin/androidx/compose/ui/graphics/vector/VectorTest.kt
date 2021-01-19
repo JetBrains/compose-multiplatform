@@ -233,13 +233,14 @@ class VectorTest {
             val clickState = remember { mutableStateOf(false) }
             Image(
                 imageVector = if (clickState.value) icon1 else icon2,
+                contentDescription = null,
                 modifier = Modifier
                     .testTag(testTag)
                     .preferredSize(icon1.defaultWidth, icon1.defaultHeight)
                     .background(Color.Red)
                     .clickable { clickState.value = !clickState.value },
-                contentScale = ContentScale.FillHeight,
-                alignment = Alignment.TopStart
+                alignment = Alignment.TopStart,
+                contentScale = ContentScale.FillHeight
             )
         }
 
@@ -292,6 +293,7 @@ class VectorTest {
             }
             Image(
                 painter = vectorPainter,
+                contentDescription = null,
                 modifier = Modifier
                     .testTag(testTag)
                     .preferredSize(defaultWidth * 7, defaultHeight * 3)

@@ -93,7 +93,8 @@ fun suspendAnimateFloatVariant() {
         Box(Modifier.fillMaxSize()) {
             Icon(
                 Icons.Filled.Favorite,
-                Modifier.align(Alignment.Center)
+                contentDescription = null,
+                modifier = Modifier.align(Alignment.Center)
                     .graphicsLayer(
                         scaleX = 3.0f,
                         scaleY = 3.0f,

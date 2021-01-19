@@ -121,7 +121,11 @@ fun SwipeToDismissListItems() {
                         Modifier.fillMaxSize().background(color).padding(horizontal = 20.dp),
                         contentAlignment = alignment
                     ) {
-                        Icon(icon, Modifier.scale(scale))
+                        Icon(
+                            icon,
+                            contentDescription = "Localized description",
+                            modifier = Modifier.scale(scale)
+                        )
                     }
                 },
                 dismissContent = {

@@ -81,7 +81,7 @@ class BottomNavigationTest {
                 BottomNavigation {
                     repeat(4) { index ->
                         BottomNavigationItem(
-                            icon = { Icon(Icons.Filled.Favorite) },
+                            icon = { Icon(Icons.Filled.Favorite, null) },
                             label = { Text("Item $index") },
                             selected = index == 0,
                             onClick = {},
@@ -119,7 +119,7 @@ class BottomNavigationTest {
                     BottomNavigationItem(
                         modifier = Modifier.testTag("item"),
                         icon = {
-                            Icon(Icons.Filled.Favorite, Modifier.testTag("icon"))
+                            Icon(Icons.Filled.Favorite, null, Modifier.testTag("icon"))
                         },
                         label = {
                             Text("ItemText")
@@ -164,7 +164,7 @@ class BottomNavigationTest {
                     BottomNavigationItem(
                         modifier = Modifier.testTag("item"),
                         icon = {
-                            Icon(Icons.Filled.Favorite, Modifier.testTag("icon"))
+                            Icon(Icons.Filled.Favorite, null, Modifier.testTag("icon"))
                         },
                         label = {
                             Text("ItemText")
@@ -198,7 +198,7 @@ class BottomNavigationTest {
                     BottomNavigationItem(
                         modifier = Modifier.testTag("item"),
                         icon = {
-                            Icon(Icons.Filled.Favorite, Modifier.testTag("icon"))
+                            Icon(Icons.Filled.Favorite, null, Modifier.testTag("icon"))
                         },
                         label = {},
                         selected = false,

@@ -71,7 +71,7 @@ class ListItemTest {
             .setMaterialContentForSizeAssertions {
                 ListItem(
                     text = { Text("Primary text") },
-                    icon = { Icon(icon24x24) }
+                    icon = { Icon(icon24x24, null) }
                 )
             }
             .assertHeightIsEqualTo(expectedHeightSmallIcon)
@@ -85,7 +85,7 @@ class ListItemTest {
             .setMaterialContentForSizeAssertions {
                 ListItem(
                     text = { Text("Primary text") },
-                    icon = { Icon(icon56x56) }
+                    icon = { Icon(icon56x56, null) }
                 )
             }
             .assertHeightIsEqualTo(expectedHeightLargeIcon)
@@ -115,7 +115,7 @@ class ListItemTest {
                 ListItem(
                     text = { Text("Primary text") },
                     secondaryText = { Text("Secondary text") },
-                    icon = { Icon(icon24x24) }
+                    icon = { Icon(icon24x24, null) }
                 )
             }
             .assertHeightIsEqualTo(expectedHeightWithIcon)
@@ -199,7 +199,7 @@ class ListItemTest {
                 ListItem(
                     text = { Text("Primary text", Modifier.saveLayout(textPosition, textSize)) },
                     trailing = {
-                        Image(icon24x24, Modifier.saveLayout(trailingPosition, trailingSize))
+                        Image(icon24x24, null, Modifier.saveLayout(trailingPosition, trailingSize))
                     }
                 )
             }
@@ -238,7 +238,7 @@ class ListItemTest {
             Box {
                 ListItem(
                     text = { Text("Primary text", Modifier.saveLayout(textPosition, textSize)) },
-                    icon = { Image(icon24x24, Modifier.saveLayout(iconPosition, iconSize)) }
+                    icon = { Image(icon24x24, null, Modifier.saveLayout(iconPosition, iconSize)) }
                 )
             }
         }
@@ -365,7 +365,7 @@ class ListItemTest {
                         )
                     },
                     icon = {
-                        Image(icon24x24, Modifier.saveLayout(iconPosition, iconSize))
+                        Image(icon24x24, null, Modifier.saveLayout(iconPosition, iconSize))
                     }
                 )
             }
@@ -436,10 +436,10 @@ class ListItemTest {
                         )
                     },
                     icon = {
-                        Image(icon40x40, Modifier.saveLayout(iconPosition, iconSize))
+                        Image(icon40x40, null, Modifier.saveLayout(iconPosition, iconSize))
                     },
                     trailing = {
-                        Image(icon24x24, Modifier.saveLayout(trailingPosition, trailingSize))
+                        Image(icon24x24, null, Modifier.saveLayout(trailingPosition, trailingSize))
                     }
                 )
             }
@@ -518,10 +518,10 @@ class ListItemTest {
                     },
                     singleLineSecondaryText = false,
                     icon = {
-                        Image(icon24x24, Modifier.saveLayout(iconPosition, iconSize))
+                        Image(icon24x24, null, Modifier.saveLayout(iconPosition, iconSize))
                     },
                     trailing = {
-                        Image(icon24x24, Modifier.saveLayout(trailingPosition, trailingSize))
+                        Image(icon24x24, null, Modifier.saveLayout(trailingPosition, trailingSize))
                     }
                 )
             }
@@ -613,6 +613,7 @@ class ListItemTest {
                     icon = {
                         Image(
                             icon40x40,
+                            null,
                             Modifier.saveLayout(iconPosition, iconSize)
                         )
                     },

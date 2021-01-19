@@ -34,7 +34,7 @@ import androidx.compose.ui.graphics.Color
 @Composable
 fun IconButtonSample() {
     IconButton(onClick = { /* doSomething() */ }) {
-        Icon(Icons.Filled.Favorite)
+        Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
     }
 }
 
@@ -45,6 +45,6 @@ fun IconToggleButtonSample() {
 
     IconToggleButton(checked = checked, onCheckedChange = { checked = it }) {
         val tint by animateAsState(if (checked) Color(0xFFEC407A) else Color(0xFFB0BEC5))
-        Icon(Icons.Filled.Favorite, tint = tint)
+        Icon(Icons.Filled.Favorite, contentDescription = "Localized description", tint = tint)
     }
 }

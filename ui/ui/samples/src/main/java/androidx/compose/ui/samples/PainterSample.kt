@@ -66,6 +66,7 @@ fun PainterResourceSample() {
     // in the landscape orientation based on the res/drawable and res/drawable-land-hdpi folders
     Image(
         painterResource(R.drawable.ic_vector_or_png),
+        contentDescription = null,
         modifier = Modifier.size(50.dp)
     )
 }

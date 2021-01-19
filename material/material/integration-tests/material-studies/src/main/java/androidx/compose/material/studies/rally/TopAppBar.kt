@@ -38,7 +38,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import java.util.Locale
 
@@ -65,7 +65,7 @@ fun RallyTopAppBar(
 @Composable
 private fun RallyTab(
     text: String,
-    icon: ImageVector,
+    icon: ScreenIcon,
     onSelected: () -> Unit,
     selected: Boolean
 ) {
@@ -81,7 +81,11 @@ private fun RallyTab(
                     indication = rememberRipple(bounded = false)
                 )
         ) {
-            Icon(icon, tint = tabTintColor)
+            Icon(
+                imageVector = icon.icon,
+                contentDescription = stringResource(icon.contentDescription),
+                tint = tabTintColor
+            )
             if (selected) {
                 Spacer(Modifier.preferredWidth(12.dp))
                 Text(text, color = tabTintColor)

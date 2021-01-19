@@ -182,21 +182,21 @@ private object AppBarIcons {
             LayoutDirection.Rtl -> Icons.Filled.ArrowForward
         }
         IconButton(onClick = onClick) {
-            Icon(icon)
+            Icon(icon, null)
         }
     }
 
     @Composable
     fun Filter(onClick: () -> Unit) {
         IconButton(modifier = Modifier.testTag(Tags.FilterButton), onClick = onClick) {
-            Icon(Icons.Filled.Search)
+            Icon(Icons.Filled.Search, null)
         }
     }
 
     @Composable
     fun Settings(onClick: () -> Unit) {
         IconButton(onClick = onClick) {
-            Icon(Icons.Filled.Settings)
+            Icon(Icons.Filled.Settings, null)
         }
     }
 }

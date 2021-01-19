@@ -36,16 +36,16 @@ fun SimpleTopAppBar() {
         title = { Text("Simple TopAppBar") },
         navigationIcon = {
             IconButton(onClick = { /* doSomething() */ }) {
-                Icon(Icons.Filled.Menu)
+                Icon(Icons.Filled.Menu, contentDescription = null)
             }
         },
         actions = {
             // RowScope here, so these icons will be placed horizontally
             IconButton(onClick = { /* doSomething() */ }) {
-                Icon(Icons.Filled.Favorite)
+                Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
             }
             IconButton(onClick = { /* doSomething() */ }) {
-                Icon(Icons.Filled.Favorite)
+                Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
             }
         }
     )
@@ -56,15 +56,15 @@ fun SimpleTopAppBar() {
 fun SimpleBottomAppBar() {
     BottomAppBar {
         IconButton(onClick = { /* doSomething() */ }) {
-            Icon(Icons.Filled.Menu)
+            Icon(Icons.Filled.Menu, contentDescription = "Localized description")
         }
         // The actions should be at the end of the BottomAppBar
         Spacer(Modifier.weight(1f, true))
         IconButton(onClick = { /* doSomething() */ }) {
-            Icon(Icons.Filled.Favorite)
+            Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
         }
         IconButton(onClick = { /* doSomething() */ }) {
-            Icon(Icons.Filled.Favorite)
+            Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
         }
     }
 }

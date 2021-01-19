@@ -88,7 +88,7 @@ fun FilterAppBar(
         }
         TopAppBar(backgroundColor = appBarColor, contentColor = onSurface) {
             IconButton(modifier = Modifier.align(Alignment.CenterVertically), onClick = onClose) {
-                Icon(Icons.Filled.Close)
+                Icon(Icons.Filled.Close, null)
             }
             FilterField(
                 filterText,

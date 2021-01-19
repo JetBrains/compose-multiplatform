@@ -17,14 +17,26 @@
 package androidx.compose.material.studies.rally
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.studies.R
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 
 enum class RallyScreenState(
-    val icon: ImageVector,
+    val icon: ScreenIcon,
     val body: @Composable () -> Unit
 ) {
-    Overview(Icons.Filled.PieChart, { OverviewBody() }),
-    Accounts(Icons.Filled.AttachMoney, { AccountsBody(UserData.accounts) }),
-    Bills(Icons.Filled.MoneyOff, { BillsBody(UserData.bills) })
+    Overview(
+        ScreenIcon(Icons.Filled.PieChart, contentDescription = R.string.overview),
+        @Composable { OverviewBody() }
+    ),
+    Accounts(
+        ScreenIcon(Icons.Filled.AttachMoney, contentDescription = R.string.account),
+        @Composable { AccountsBody(UserData.accounts) }
+    ),
+    Bills(
+        ScreenIcon(Icons.Filled.MoneyOff, contentDescription = R.string.bills),
+        @Composable { BillsBody(UserData.bills) }
+    )
 }
+
+class ScreenIcon(val icon: ImageVector, val contentDescription: Int)

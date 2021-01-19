@@ -47,6 +47,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.viewModel
 import androidx.lifecycle.LiveData
@@ -235,12 +236,18 @@ private object StateSnippet11 {
                     Text(text = body, Modifier.padding(top = 8.dp))
                     // change expanded in response to click events
                     IconButton(onClick = { expanded = false }, modifier = Modifier.fillMaxWidth()) {
-                        Icon(Icons.Default.ExpandLess)
+                        Icon(
+                            Icons.Default.ExpandLess,
+                            contentDescription = stringResource(R.string.expand_less)
+                        )
                     }
                 } else {
                     // change expanded in response to click events
                     IconButton(onClick = { expanded = true }, modifier = Modifier.fillMaxWidth()) {
-                        Icon(Icons.Default.ExpandMore)
+                        Icon(
+                            Icons.Default.ExpandMore,
+                            contentDescription = stringResource(R.string.expand_more)
+                        )
                     }
                 }
             }
@@ -284,12 +291,18 @@ private object StateSnippet12 {
                 if (expanded) {
                     Spacer(Modifier.height(8.dp))
                     Text(body)
-                    IconButton(onClick = onCollapse, Modifier.fillMaxWidth()) {
-                        Icon(Icons.Default.ExpandLess)
+                    IconButton(onClick = onCollapse, modifier = Modifier.fillMaxWidth()) {
+                        Icon(
+                            Icons.Default.ExpandLess,
+                            contentDescription = stringResource(R.string.expand_less)
+                        )
                     }
                 } else {
-                    IconButton(onClick = onExpand, Modifier.fillMaxWidth()) {
-                        Icon(Icons.Default.ExpandMore)
+                    IconButton(onClick = onExpand, modifier = Modifier.fillMaxWidth()) {
+                        Icon(
+                            Icons.Default.ExpandMore,
+                            contentDescription = stringResource(R.string.expand_more)
+                        )
                     }
                 }
             }
@@ -322,6 +335,13 @@ private object binding {
 
     object textInput {
         fun doAfterTextChanged(function: () -> Unit) { }
+    }
+}
+
+private object R {
+    object string {
+        const val expand_less = 0
+        const val expand_more = 1
     }
 }
 

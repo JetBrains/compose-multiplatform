@@ -170,7 +170,11 @@ fun AnimatedFloatingActionButton() {
         modifier = with(ColumnScope) { Modifier.align(Alignment.CenterHorizontally) }
     ) {
         Row(Modifier.padding(start = 12.dp, end = 12.dp)) {
-            Icon(Icons.Default.Favorite, Modifier.align(Alignment.CenterVertically))
+            Icon(
+                Icons.Default.Favorite,
+                contentDescription = "Favorite",
+                modifier = Modifier.align(Alignment.CenterVertically)
+            )
             AnimatedVisibility(
                 expanded,
                 modifier = Modifier.align(Alignment.CenterVertically)

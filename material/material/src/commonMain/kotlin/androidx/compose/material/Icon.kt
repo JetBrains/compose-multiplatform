@@ -31,6 +31,8 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toolingGraphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 
 /**
@@ -38,6 +40,10 @@ import androidx.compose.ui.unit.dp
  * clickable icon, see [IconButton].
  *
  * @param imageVector [ImageVector] to draw inside this Icon
+ * @param contentDescription text used by accessibility services to describe what this icon
+ * represents. This should always be provided unless this icon is used for decorative purposes,
+ * and does not represent a meaningful action that a user can take. This text should be
+ * localized, such as by using [androidx.compose.ui.res.stringResource] or similar
  * @param modifier optional [Modifier] for this Icon
  * @param tint tint to be applied to [imageVector]. If [Color.Unspecified] is provided, then no
  *  tint is applied
@@ -45,11 +51,13 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun Icon(
     imageVector: ImageVector,
+    contentDescription: String?,
     modifier: Modifier = Modifier,
     tint: Color = AmbientContentColor.current.copy(alpha = AmbientContentAlpha.current)
 ) {
     Icon(
         painter = rememberVectorPainter(imageVector),
+        contentDescription = contentDescription,
         modifier = modifier,
         tint = tint
     )
@@ -60,6 +68,10 @@ fun Icon(
  * clickable icon, see [IconButton].
  *
  * @param bitmap [ImageBitmap] to draw inside this Icon
+ * @param contentDescription text used by accessibility services to describe what this icon
+ * represents. This should always be provided unless this icon is used for decorative purposes,
+ * and does not represent a meaningful action that a user can take. This text should be
+ * localized, such as by using [androidx.compose.ui.res.stringResource] or similar
  * @param modifier optional [Modifier] for this Icon
  * @param tint tint to be applied to [bitmap]. If [Color.Unspecified] is provided, then no
  *  tint is applied
@@ -67,12 +79,14 @@ fun Icon(
 @Composable
 fun Icon(
     bitmap: ImageBitmap,
+    contentDescription: String?,
     modifier: Modifier = Modifier,
     tint: Color = AmbientContentColor.current
 ) {
     val painter = remember(bitmap) { ImagePainter(bitmap) }
     Icon(
         painter = painter,
+        contentDescription = contentDescription,
         modifier = modifier,
         tint = tint
     )
@@ -83,6 +97,10 @@ fun Icon(
  * clickable icon, see [IconButton].
  *
  * @param painter [Painter] to draw inside this Icon
+ * @param contentDescription text used by accessibility services to describe what this icon
+ * represents. This should always be provided unless this icon is used for decorative purposes,
+ * and does not represent a meaningful action that a user can take. This text should be
+ * localized, such as by using [androidx.compose.ui.res.stringResource] or similar
  * @param modifier optional [Modifier] for this Icon
  * @param tint tint to be applied to [painter]. If [Color.Unspecified] is provided, then no
  *  tint is applied
@@ -90,6 +108,7 @@ fun Icon(
 @Composable
 fun Icon(
     painter: Painter,
+    contentDescription: String?,
     modifier: Modifier = Modifier,
     tint: Color = AmbientContentColor.current.copy(alpha = AmbientContentAlpha.current)
 ) {
@@ -97,9 +116,15 @@ fun Icon(
     // size that this icon will be forced to take up.
     // TODO: b/149735981 semantics for content description
     val colorFilter = if (tint == Color.Unspecified) null else ColorFilter.tint(tint)
+    val semantics = if (contentDescription != null) {
+        Modifier.semantics { this.contentDescription = contentDescription }
+    } else {
+        Modifier
+    }
     Box(
         modifier.toolingGraphicsLayer().defaultSizeFor(painter)
             .paint(painter, colorFilter = colorFilter)
+            .then(semantics)
     )
 }
 
