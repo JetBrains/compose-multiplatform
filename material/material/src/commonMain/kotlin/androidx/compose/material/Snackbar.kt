@@ -141,7 +141,6 @@ fun Snackbar(
  * of the shadow below the SnackBar
  */
 @Composable
-@OptIn(ExperimentalMaterialApi::class)
 fun Snackbar(
     snackbarData: SnackbarData,
     modifier: Modifier = Modifier,

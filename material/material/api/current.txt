@@ -514,7 +514,7 @@ package androidx.compose.material {
     method @androidx.compose.runtime.Composable public static void Slider-B7rb6FQ(float value, kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> valueRange, optional int steps, optional kotlin.jvm.functions.Function0<kotlin.Unit> onValueChangeEnd, optional androidx.compose.foundation.InteractionState interactionState, optional long thumbColor, optional long activeTrackColor, optional long inactiveTrackColor, optional long activeTickColor, optional long inactiveTickColor);
   }
 
-  @androidx.compose.material.ExperimentalMaterialApi public interface SnackbarData {
+  public interface SnackbarData {
     method public void dismiss();
     method public String? getActionLabel();
     method public androidx.compose.material.SnackbarDuration getDuration();
@@ -540,10 +540,10 @@ package androidx.compose.material {
   }
 
   public final class SnackbarHostKt {
-    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static void SnackbarHost(androidx.compose.material.SnackbarHostState hostState, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function1<? super androidx.compose.material.SnackbarData,kotlin.Unit> snackbar);
+    method @androidx.compose.runtime.Composable public static void SnackbarHost(androidx.compose.material.SnackbarHostState hostState, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function1<? super androidx.compose.material.SnackbarData,kotlin.Unit> snackbar);
   }
 
-  @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public final class SnackbarHostState {
+  @androidx.compose.runtime.Stable public final class SnackbarHostState {
     ctor public SnackbarHostState();
     method public androidx.compose.material.SnackbarData? getCurrentSnackbarData();
     method public suspend Object? showSnackbar(String message, optional String? actionLabel, optional androidx.compose.material.SnackbarDuration duration, optional kotlin.coroutines.Continuation<? super androidx.compose.material.SnackbarResult> p);
