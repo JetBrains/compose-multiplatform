@@ -327,7 +327,7 @@ class BottomSheetScaffoldTest {
                             }.testTag(fabTag),
                         onClick = {}
                     ) {
-                        Icon(Icons.Filled.Favorite)
+                        Icon(Icons.Filled.Favorite, null)
                     }
                 },
                 bodyContent = { Text("Content") }

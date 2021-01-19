@@ -117,7 +117,7 @@ private fun App() {
                 TopAppBar(
                     title = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Outlined.Home)
+                            Icon(Icons.Outlined.Home, "Home")
                             Text(title)
                         }
                     }
@@ -137,7 +137,7 @@ private fun App() {
                     IconButton(
                         onClick = {}
                     ) {
-                        Icon(Icons.Filled.Menu, Modifier.size(ButtonDefaults.IconSize))
+                        Icon(Icons.Filled.Menu, "Menu", Modifier.size(ButtonDefaults.IconSize))
                     }
                 }
             },
@@ -397,11 +397,13 @@ private fun ScrollableContent(scrollState: ScrollState) {
         Row {
             Image(
                 imageResource("androidx/compose/desktop/example/circus.jpg"),
+                "Localized description",
                 Modifier.size(200.dp)
             )
 
             Icon(
                 vectorXmlResource("androidx/compose/desktop/example/ic_baseline_deck_24.xml"),
+                "Localized description",
                 Modifier.size(100.dp).align(Alignment.CenterVertically),
                 tint = Color.Blue.copy(alpha = 0.5f)
             )

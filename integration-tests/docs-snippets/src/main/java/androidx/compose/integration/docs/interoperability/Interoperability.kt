@@ -210,6 +210,7 @@ private object InteropSnippet6 {
 
     Icon(
         imageVector = vectorResource(R.drawable.ic_plane),
+        contentDescription = stringResource(R.string.plane_description),
         tint = colorResource(R.color.Blue700)
     )
 }
@@ -421,15 +422,16 @@ private object R {
     }
     object string {
         const val ok = 4
+        const val plane_description = 5
     }
     object dimen {
-        const val padding_small = 5
+        const val padding_small = 6
     }
     object drawable {
-        const val ic_plane = 6
+        const val ic_plane = 7
     }
     object color {
-        const val Blue700 = 7
+        const val Blue700 = 8
     }
 }
 

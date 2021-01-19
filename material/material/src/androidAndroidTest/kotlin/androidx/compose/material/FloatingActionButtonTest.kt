@@ -65,7 +65,7 @@ class FloatingActionButtonTest {
         rule.setMaterialContent {
             Box {
                 FloatingActionButton(modifier = Modifier.testTag("myButton"), onClick = {}) {
-                    Icon(Icons.Filled.Favorite)
+                    Icon(Icons.Filled.Favorite, null)
                 }
             }
         }
@@ -99,7 +99,7 @@ class FloatingActionButtonTest {
         rule
             .setMaterialContentForSizeAssertions {
                 FloatingActionButton(onClick = {}) {
-                    Icon(Icons.Filled.Favorite)
+                    Icon(Icons.Filled.Favorite, null)
                 }
             }
             .assertIsSquareWithSize(56.dp)
@@ -111,7 +111,7 @@ class FloatingActionButtonTest {
             ExtendedFloatingActionButton(
                 modifier = Modifier.testTag("FAB"),
                 text = { Text("Extended FAB Text") },
-                icon = { Icon(Icons.Filled.Favorite) },
+                icon = { Icon(Icons.Filled.Favorite, null) },
                 onClick = {}
             )
         }

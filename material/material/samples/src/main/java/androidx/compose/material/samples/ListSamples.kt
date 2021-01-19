@@ -104,17 +104,35 @@ fun OneLineListItems(
         Divider()
         ListItem(
             text = { Text("One line list item with 24x24 icon") },
-            icon = { Image(icon24x24, colorFilter = ColorFilter.tint(AmbientContentColor.current)) }
+            icon = {
+                Image(
+                    icon24x24,
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                )
+            }
         )
         Divider()
         ListItem(
             text = { Text("One line list item with 40x40 icon") },
-            icon = { Image(icon40x40, colorFilter = ColorFilter.tint(AmbientContentColor.current)) }
+            icon = {
+                Image(
+                    icon40x40,
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                )
+            }
         )
         Divider()
         ListItem(
             text = { Text("One line list item with 56x56 icon") },
-            icon = { Image(icon56x56, colorFilter = ColorFilter.tint(AmbientContentColor.current)) }
+            icon = {
+                Image(
+                    icon56x56,
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                )
+            }
         )
         Divider()
         ListItem(
@@ -122,6 +140,7 @@ fun OneLineListItems(
             icon = {
                 Image(
                     icon56x56,
+                    contentDescription = null,
                     colorFilter = ColorFilter.tint(AmbientContentColor.current)
                 )
             },
@@ -130,7 +149,7 @@ fun OneLineListItems(
         Divider()
         ListItem(
             text = { Text("One line list item with trailing icon") },
-            trailing = { Icon(vectorIcon) }
+            trailing = { Icon(vectorIcon, contentDescription = "Localized description") }
         )
         Divider()
         ListItem(
@@ -138,10 +157,11 @@ fun OneLineListItems(
             icon = {
                 Image(
                     icon40x40,
+                    contentDescription = null,
                     colorFilter = ColorFilter.tint(AmbientContentColor.current)
                 )
             },
-            trailing = { Icon(vectorIcon) }
+            trailing = { Icon(vectorIcon, contentDescription = "Localized description") }
         )
         Divider()
     }
@@ -165,13 +185,25 @@ fun TwoLineListItems(icon24x24: ImageBitmap, icon40x40: ImageBitmap) {
         ListItem(
             text = { Text("Two line list item with 24x24 icon") },
             secondaryText = { Text("Secondary text") },
-            icon = { Image(icon24x24, colorFilter = ColorFilter.tint(AmbientContentColor.current)) }
+            icon = {
+                Image(
+                    icon24x24,
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                )
+            }
         )
         Divider()
         ListItem(
             text = { Text("Two line list item with 40x40 icon") },
             secondaryText = { Text("Secondary text") },
-            icon = { Image(icon40x40, colorFilter = ColorFilter.tint(AmbientContentColor.current)) }
+            icon = {
+                Image(
+                    icon40x40,
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                )
+            }
         )
         Divider()
         ListItem(
@@ -181,6 +213,7 @@ fun TwoLineListItems(icon24x24: ImageBitmap, icon40x40: ImageBitmap) {
             icon = {
                 Image(
                     icon40x40,
+                    contentDescription = null,
                     colorFilter = ColorFilter.tint(AmbientContentColor.current)
                 )
             }
@@ -220,7 +253,13 @@ fun ThreeLineListItems(icon24x24: ImageBitmap, vectorIcon: ImageVector) {
                 )
             },
             singleLineSecondaryText = false,
-            icon = { Image(icon24x24, colorFilter = ColorFilter.tint(AmbientContentColor.current)) }
+            icon = {
+                Image(
+                    icon24x24,
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                )
+            }
         )
         Divider()
         ListItem(
@@ -232,7 +271,7 @@ fun ThreeLineListItems(icon24x24: ImageBitmap, vectorIcon: ImageVector) {
                 )
             },
             singleLineSecondaryText = false,
-            trailing = { Icon(vectorIcon) }
+            trailing = { Icon(vectorIcon, "Localized description") }
         )
         Divider()
         ListItem(
@@ -254,12 +293,24 @@ fun OneLineRtlLtrListItems(icon24x24: ImageBitmap, icon40x40: ImageBitmap) {
         Divider()
         ListItem(
             text = { Text("פריט ברשימה אחת עם תמונה.") },
-            icon = { Image(icon40x40, colorFilter = ColorFilter.tint(AmbientContentColor.current)) }
+            icon = {
+                Image(
+                    icon40x40,
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                )
+            }
         )
         Divider()
         ListItem(
             text = { Text("One line list item with 24x24 icon") },
-            icon = { Image(icon40x40, colorFilter = ColorFilter.tint(AmbientContentColor.current)) }
+            icon = {
+                Image(
+                    icon40x40,
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                )
+            }
         )
         Divider()
         ListItem(
@@ -267,6 +318,7 @@ fun OneLineRtlLtrListItems(icon24x24: ImageBitmap, icon40x40: ImageBitmap) {
             trailing = {
                 Image(
                     icon24x24,
+                    contentDescription = null,
                     colorFilter = ColorFilter.tint(AmbientContentColor.current)
                 )
             }
@@ -300,6 +352,7 @@ fun TwoLineRtlLtrListItems(icon40x40: ImageBitmap) {
             icon = {
                 Image(
                     icon40x40,
+                    contentDescription = null,
                     colorFilter = ColorFilter.tint(AmbientContentColor.current)
                 )
             }
@@ -311,6 +364,7 @@ fun TwoLineRtlLtrListItems(icon40x40: ImageBitmap) {
             icon = {
                 Image(
                     icon40x40,
+                    contentDescription = null,
                     colorFilter = ColorFilter.tint(AmbientContentColor.current)
                 )
             },
@@ -345,7 +399,13 @@ fun ThreeLineRtlLtrListItems(icon40x40: ImageBitmap) {
             text = { Text("ثلاثة عناصر قائمة مع رمز") },
             overlineText = { Text("فوق الخط") },
             secondaryText = { Text("نص ثانوي") },
-            icon = { Image(icon40x40, colorFilter = ColorFilter.tint(AmbientContentColor.current)) }
+            icon = {
+                Image(
+                    icon40x40,
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                )
+            }
         )
         Divider()
     }

@@ -87,7 +87,7 @@ fun IconTabs() {
         TabRow(selectedTabIndex = state) {
             icons.forEachIndexed { index, icon ->
                 Tab(
-                    icon = { Icon(icon) },
+                    icon = { Icon(icon, contentDescription = "Favorite") },
                     selected = state == index,
                     onClick = { state = index }
                 )
@@ -114,7 +114,7 @@ fun TextAndIconTabs() {
             titlesAndIcons.forEachIndexed { index, (title, icon) ->
                 Tab(
                     text = { Text(title) },
-                    icon = { Icon(icon) },
+                    icon = { Icon(icon, contentDescription = null) },
                     selected = state == index,
                     onClick = { state = index }
                 )

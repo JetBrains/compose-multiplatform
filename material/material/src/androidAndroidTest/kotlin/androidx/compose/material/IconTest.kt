@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.painter.ImagePainter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.captureToImage
@@ -41,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
+import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -58,7 +60,7 @@ class IconTest {
         val vector = Icons.Filled.Menu
         rule
             .setMaterialContentForSizeAssertions {
-                Icon(vector)
+                Icon(vector, null)
             }
             .assertWidthIsEqualTo(width)
             .assertHeightIsEqualTo(height)
@@ -74,7 +76,7 @@ class IconTest {
         ).build()
         rule
             .setMaterialContentForSizeAssertions {
-                Icon(vector)
+                Icon(vector, null)
             }
             .assertWidthIsEqualTo(width)
             .assertHeightIsEqualTo(height)
@@ -90,7 +92,7 @@ class IconTest {
                     ImageBitmap(width.toIntPx(), height.toIntPx())
                 }
 
-                Icon(image)
+                Icon(image, null)
             }
             .assertWidthIsEqualTo(width)
             .assertHeightIsEqualTo(height)
@@ -107,7 +109,7 @@ class IconTest {
                     ImageBitmap(width.toIntPx(), height.toIntPx())
                 }
 
-                Icon(image)
+                Icon(image, null)
             }
             .assertWidthIsEqualTo(width)
             .assertHeightIsEqualTo(height)
@@ -120,7 +122,7 @@ class IconTest {
         val painter = ColorPainter(Color.Red)
         rule
             .setMaterialContentForSizeAssertions {
-                Icon(painter)
+                Icon(painter, null)
             }
             .assertWidthIsEqualTo(width)
             .assertHeightIsEqualTo(height)
@@ -138,7 +140,7 @@ class IconTest {
                 }
 
                 val imagePainter = ImagePainter(image)
-                Icon(imagePainter)
+                Icon(imagePainter, null)
             }
             .assertWidthIsEqualTo(width)
             .assertHeightIsEqualTo(height)
@@ -160,7 +162,7 @@ class IconTest {
                     Color.Red
                 )
             }
-            Icon(image, modifier = Modifier.testTag(testTag), tint = Color.Unspecified)
+            Icon(image, null, modifier = Modifier.testTag(testTag), tint = Color.Unspecified)
         }
 
         // With no color provided for a tint, the icon should render the original pixels
@@ -183,11 +185,29 @@ class IconTest {
                     Color.Red
                 )
             }
-            Icon(image, modifier = Modifier.testTag(testTag), tint = Color.Blue)
+            Icon(image, null, modifier = Modifier.testTag(testTag), tint = Color.Blue)
         }
 
         // With a tint color provided, all pixels should be blue
         rule.onNodeWithTag(testTag).captureToImage().assertPixels { Color.Blue }
+    }
+
+    @Test
+    fun contentDescriptionAppliedToIcon() {
+        val testTag = "TestTag"
+        rule.setContent {
+            Icon(
+                bitmap = ImageBitmap(100, 100),
+                contentDescription = "qwerty",
+                modifier = Modifier.testTag(testTag)
+            )
+        }
+
+        rule.onNodeWithTag(testTag).fetchSemanticsNode().let {
+            assertThat(it.config.contains(SemanticsProperties.ContentDescription)).isTrue()
+            assertThat(it.config[SemanticsProperties.ContentDescription])
+                .isEqualTo("qwerty")
+        }
     }
 
     private fun createBitmapWithColor(

@@ -75,8 +75,8 @@ fun TextFieldWithIcons() {
         value = text,
         onValueChange = { text = it },
         placeholder = { Text("placeholder") },
-        leadingIcon = { Icon(Icons.Filled.Favorite) },
-        trailingIcon = { Icon(Icons.Filled.Info) }
+        leadingIcon = { Icon(Icons.Filled.Favorite, contentDescription = "Localized description") },
+        trailingIcon = { Icon(Icons.Filled.Info, contentDescription = "Localized description") }
     )
 }
 

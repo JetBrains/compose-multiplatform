@@ -56,6 +56,7 @@ import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -113,7 +114,11 @@ class ImageTest {
                     .background(color = Color.White)
                     .wrapContentSize(Alignment.Center)
             ) {
-                Image(modifier = Modifier.testTag(contentTag), bitmap = createImageBitmap())
+                Image(
+                    modifier = Modifier.testTag(contentTag),
+                    contentDescription = null,
+                    bitmap = createImageBitmap()
+                )
             }
         }
 
@@ -162,7 +167,8 @@ class ImageTest {
                             imageHeight / 2 - subsectionHeight / 2
                         ),
                         IntSize(subsectionWidth, subsectionHeight)
-                    )
+                    ),
+                    null
                 )
             }
         }
@@ -258,6 +264,7 @@ class ImageTest {
                 // the bounds
                 Image(
                     bitmap = createImageBitmap(),
+                    contentDescription = null,
                     modifier = Modifier
                         .testTag(contentTag)
                         .preferredSize(
@@ -325,6 +332,7 @@ class ImageTest {
             ) {
                 Image(
                     bitmap = ImageBitmap,
+                    contentDescription = null,
                     modifier = Modifier
                         .testTag(contentTag)
                         .preferredSize(
@@ -357,6 +365,7 @@ class ImageTest {
                 // ImageBitmap that is to be drawn in the bottom end section of the composable
                 Image(
                     bitmap = createImageBitmap(),
+                    contentDescription = null,
                     modifier = Modifier
                         .testTag(contentTag)
                         .preferredSize(
@@ -420,6 +429,7 @@ class ImageTest {
                 loadVectorResource(R.drawable.ic_vector_asset_test).resource.resource?.let {
                     Image(
                         it,
+                        null,
                         modifier = Modifier.preferredSizeIn(
                             minWidth = minWidth,
                             minHeight = minHeight
@@ -505,6 +515,7 @@ class ImageTest {
             val heightDp = asset.height / AmbientDensity.current.density
             Image(
                 asset,
+                null,
                 modifier = Modifier
                     .testTag(testTag)
                     .background(Color.Green)
@@ -540,14 +551,15 @@ class ImageTest {
             }
             Image(
                 painterResource(painterId.value),
-                contentScale = ContentScale.FillBounds,
+                null,
                 modifier = Modifier.testTag(testTag).clickable {
                     if (painterId.value == R.drawable.ic_vector_square_asset_test) {
                         painterId.value = R.drawable.ic_image_test
                     } else {
                         painterId.value = R.drawable.ic_vector_square_asset_test
                     }
-                }
+                },
+                contentScale = ContentScale.FillBounds
             )
         }
 
@@ -558,5 +570,21 @@ class ImageTest {
         rule.waitForIdle()
 
         rule.onNodeWithTag(testTag).captureToImage().assertPixels { imageColor }
+    }
+
+    @Test
+    fun testImageContentDescription() {
+        val testTag = "TestTag"
+        rule.setContent {
+            Image(
+                bitmap = ImageBitmap(100, 100),
+                modifier = Modifier.testTag(testTag),
+                contentDescription = "asdf"
+            )
+        }
+        rule.onNodeWithTag(testTag).fetchSemanticsNode().let {
+            Assert.assertTrue(it.config.contains(SemanticsProperties.ContentDescription))
+            Assert.assertEquals(it.config[SemanticsProperties.ContentDescription], "asdf")
+        }
     }
 }

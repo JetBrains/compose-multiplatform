@@ -51,6 +51,7 @@ fun VectorGraphicsDemo() {
         imageVector.resource.resource?.let {
             Image(
                 imageVector = it,
+                contentDescription = "Crane",
                 modifier = Modifier.preferredSize(200.dp, 200.dp),
                 contentScale = ContentScale.Inside
             )
@@ -60,6 +61,7 @@ fun VectorGraphicsDemo() {
         complexImageVector.resource.resource?.let {
             Image(
                 imageVector = it,
+                contentDescription = "Hourglass",
                 modifier = Modifier.preferredSize(64.dp, 64.dp),
                 contentScale = ContentScale.Fit
             )
@@ -67,6 +69,7 @@ fun VectorGraphicsDemo() {
 
         Image(
             painter = vectorShape(120.dp, 120.dp),
+            contentDescription = null,
             modifier = Modifier.preferredSize(200.dp, 150.dp)
         )
     }

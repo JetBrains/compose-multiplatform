@@ -174,8 +174,12 @@ fun MaterialTextFieldDemo() {
                                 "Label" + if (selectedOption == Option.Error) "*" else ""
                             Text(text = label)
                         },
-                        leadingIcon = { if (leadingChecked) Icon(Icons.Filled.Favorite) },
-                        trailingIcon = { if (trailingChecked) Icon(Icons.Filled.Info) },
+                        leadingIcon = {
+                            if (leadingChecked) Icon(Icons.Filled.Favorite, "Favorite")
+                        },
+                        trailingIcon = {
+                            if (trailingChecked) Icon(Icons.Filled.Info, "Info")
+                        },
                         isErrorValue = selectedOption == Option.Error,
                         modifier = Modifier.width(300.dp)
                     )
@@ -191,8 +195,12 @@ fun MaterialTextFieldDemo() {
                                 "Label" + if (selectedOption == Option.Error) "*" else ""
                             Text(text = label)
                         },
-                        leadingIcon = { if (leadingChecked) Icon(Icons.Filled.Favorite) },
-                        trailingIcon = { if (trailingChecked) Icon(Icons.Filled.Info) },
+                        leadingIcon = {
+                            if (leadingChecked) Icon(Icons.Filled.Favorite, "Favorite")
+                        },
+                        trailingIcon = {
+                            if (trailingChecked) Icon(Icons.Filled.Info, "Info")
+                        },
                         isErrorValue = selectedOption == Option.Error,
                         modifier = Modifier.width(300.dp)
                     )

@@ -115,7 +115,7 @@ private fun ColorPicker(onColorChange: (Color) -> Unit) {
         )
 
         Box(Modifier.fillMaxSize()) {
-            Image(modifier = inputModifier, bitmap = colorWheel.image)
+            Image(modifier = inputModifier, contentDescription = null, bitmap = colorWheel.image)
             val color = colorWheel.colorForPosition(position)
             if (color.isSpecified) {
                 Magnifier(visible = isDragging, position = position, color = color)

@@ -100,8 +100,9 @@ private fun BaseRow(
         Spacer(Modifier.preferredWidth(16.dp))
         Icon(
             Icons.Filled.ArrowForwardIos,
-            tint = Color.White.copy(alpha = 0.6f),
+            contentDescription = null,
             modifier = Modifier.preferredSize(12.dp).align(Alignment.CenterVertically),
+            tint = Color.White.copy(alpha = 0.6f)
         )
     }
     RallyDivider()

@@ -93,7 +93,7 @@ class LayoutInspectorTreeTest : ToolingTest() {
             Inspectable(slotTableRecord) {
                 Column {
                     Text(text = "Hello World", color = Color.Green)
-                    Icon(Icons.Filled.FavoriteBorder)
+                    Icon(Icons.Filled.FavoriteBorder, null)
                     Surface {
                         Button(onClick = {}) { Text(text = "OK") }
                     }
@@ -309,7 +309,7 @@ class LayoutInspectorTreeTest : ToolingTest() {
                 Column {
                     Text(text = "Hello World", color = Color.Green)
                     Spacer(Modifier.preferredHeight(16.dp))
-                    Image(Icons.Filled.Call)
+                    Image(Icons.Filled.Call, null)
                 }
             }
         }

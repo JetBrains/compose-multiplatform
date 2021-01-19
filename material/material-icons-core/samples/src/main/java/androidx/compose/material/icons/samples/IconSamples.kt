@@ -38,7 +38,7 @@ fun AppIcons() {
 @Sampled
 @Composable
 fun DrawIcon() {
-    Icon(Icons.Rounded.Menu)
+    Icon(Icons.Rounded.Menu, contentDescription = "Localized description")
 }
 
 @Composable
