@@ -16,7 +16,7 @@
   -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="androidx.compose.runtime.savedinstancestate">
+    package="androidx.compose.runtime.saveable">
     <application
         android:requestLegacyExternalStorage="true"
         android:debuggable="false"

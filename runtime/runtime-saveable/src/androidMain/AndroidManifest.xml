@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   Copyright 2020 The Android Open Source Project
 
@@ -13,5 +14,4 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   -->
-
-<manifest package="androidx.compose.runtime.savedinstancestate.samples" />
+<manifest package="androidx.compose.runtime.saveable" />

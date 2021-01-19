@@ -113,7 +113,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 }
 
 androidx {
-    name = "Compose Saved Instance State support"
+    name = "Compose Saveable"
     publish = Publish.SNAPSHOT_AND_RELEASE
     mavenGroup = LibraryGroups.Compose.RUNTIME
     inceptionYear = "2020"

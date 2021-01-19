@@ -23,7 +23,7 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.test.R
+import androidx.compose.runtime.saveable.test.R
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.setContent
 import androidx.fragment.app.Fragment
