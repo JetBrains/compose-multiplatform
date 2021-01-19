@@ -45,11 +45,12 @@ object Arrangement {
         /**
          * Horizontally places the layout children.
          *
-         * @param totalSize Available space that can be occupied by the children.
-         * @param sizes An array of sizes of all children.
+         * @param totalSize Available space that can be occupied by the children, in pixels.
+         * @param sizes An array of sizes of all children, in pixels.
          * @param layoutDirection A layout direction, left-to-right or right-to-left, of the parent
          * layout that should be taken into account when determining positions of the children.
-         * @param outPositions An array of the size of [sizes] that returns the calculated positions.
+         * @param outPositions An array of the size of [sizes] that returns the calculated
+         * positions relative to the left, in pixels.
          */
         fun Density.arrange(
             totalSize: Int,
@@ -72,9 +73,10 @@ object Arrangement {
         /**
          * Vertically places the layout children.
          *
-         * @param totalSize Available space that can be occupied by the children.
-         * @param sizes An array of sizes of all children.
-         * @param outPositions An array of the size of [sizes] that returns the calculated positions.
+         * @param totalSize Available space that can be occupied by the children, in pixels.
+         * @param sizes An array of sizes of all children, in pixels.
+         * @param outPositions An array of the size of [sizes] that returns the calculated
+         * positions relative to the top, in pixels.
          */
         fun Density.arrange(
             totalSize: Int,
@@ -98,7 +100,8 @@ object Arrangement {
 
     /**
      * Place children horizontally such that they are as close as possible to the beginning of the
-     * main axis.
+     * horizontal axis (left if the layout direction is LTR, right otherwise).
+     * Visually: 123#### for LTR and ####321.
      */
     @Stable
     val Start = object : Horizontal {
@@ -119,6 +122,7 @@ object Arrangement {
     /**
      * Place children horizontally such that they are as close as possible to the end of the main
      * axis.
+     * Visually: ####123 for LTR and 321#### for RTL.
      */
     @Stable
     val End = object : Horizontal {
@@ -139,6 +143,7 @@ object Arrangement {
     /**
      * Place children vertically such that they are as close as possible to the top of the main
      * axis.
+     * Visually: (top) 123#### (bottom)
      */
     @Stable
     val Top = object : Vertical {
@@ -152,6 +157,7 @@ object Arrangement {
     /**
      * Place children vertically such that they are as close as possible to the bottom of the main
      * axis.
+     * Visually: (top) ####123 (bottom)
      */
     @Stable
     val Bottom = object : Vertical {
@@ -164,6 +170,7 @@ object Arrangement {
 
     /**
      * Place children such that they are as close as possible to the middle of the main axis.
+     * Visually: ##123## for LTR and ##321## for RTL.
      */
     @Stable
     val Center = object : HorizontalOrVertical {
@@ -192,6 +199,7 @@ object Arrangement {
     /**
      * Place children such that they are spaced evenly across the main axis, including free
      * space before the first child and after the last child.
+     * Visually: #1#2#3# for LTR and #3#2#1# for RTL.
      */
     @Stable
     val SpaceEvenly = object : HorizontalOrVertical {
@@ -220,6 +228,7 @@ object Arrangement {
     /**
      * Place children such that they are spaced evenly across the main axis, without free
      * space before the first child or after the last child.
+     * Visually: 1##2##3 for LTR or 3##2##1 for RTL.
      */
     @Stable
     val SpaceBetween = object : HorizontalOrVertical {
@@ -249,6 +258,7 @@ object Arrangement {
      * Place children such that they are spaced evenly across the main axis, including free
      * space before the first child and after the last child, but half the amount of space
      * existing otherwise between two consecutive children.
+     * Visually: #1##2##3# for LTR and #3##2##1# for RTL
      */
     @Stable
     val SpaceAround = object : HorizontalOrVertical {
@@ -345,6 +355,8 @@ object Arrangement {
          *
          * Unlike [Arrangement.Start], when the layout direction is RTL, the children will not be
          * mirrored and as such children will appear in the order they are composed inside the [Row].
+         *
+         * Visually: 123####
          */
         @Stable
         val Left = object : Horizontal {
@@ -361,6 +373,8 @@ object Arrangement {
          *
          * Unlike [Arrangement.Center], when the layout direction is RTL, the children will not be
          * mirrored and as such children will appear in the order they are composed inside the [Row].
+         *
+         * Visually: ##123##
          */
         @Stable
         val Center = object : Horizontal {
@@ -378,6 +392,8 @@ object Arrangement {
          *
          * Unlike [Arrangement.End], when the layout direction is RTL, the children will not be
          * mirrored and as such children will appear in the order they are composed inside the [Row].
+         *
+         * Visually: ####123
          */
         @Stable
         val Right = object : Horizontal {
@@ -395,6 +411,8 @@ object Arrangement {
          *
          * Unlike [Arrangement.SpaceBetween], when the layout direction is RTL, the children will not be
          * mirrored and as such children will appear in the order they are composed inside the [Row].
+         *
+         * Visually: 1##2##3
          */
         @Stable
         val SpaceBetween = object : Horizontal {
@@ -412,6 +430,8 @@ object Arrangement {
          *
          * Unlike [Arrangement.SpaceEvenly], when the layout direction is RTL, the children will not be
          * mirrored and as such children will appear in the order they are composed inside the [Row].
+         *
+         * Visually: #1#2#3#
          */
         @Stable
         val SpaceEvenly = object : Horizontal {
@@ -430,6 +450,8 @@ object Arrangement {
          *
          * Unlike [Arrangement.SpaceAround], when the layout direction is RTL, the children will not be
          * mirrored and as such children will appear in the order they are composed inside the [Row].
+         *
+         * Visually: #1##2##3##4#
          */
         @Stable
         val SpaceAround = object : Horizontal {
