@@ -57,7 +57,7 @@ class RadioGroupBenchmark {
 
     @Test
     fun first_compose() {
-        benchmarkRule.benchmarkFirstCompose(radioCaseFactory)
+        benchmarkRule.benchmarkFirstCompose(radioCaseFactory, assertNoPendingRecompositions = false)
     }
 
     @Test
@@ -77,22 +77,25 @@ class RadioGroupBenchmark {
 
     @Test
     fun toggleRadio_recompose() {
-        benchmarkRule.toggleStateBenchmarkRecompose(radioCaseFactory)
+        benchmarkRule.toggleStateBenchmarkRecompose(
+            radioCaseFactory,
+            assertOneRecomposition = false
+        )
     }
 
     @Test
     fun toggleRadio_measure() {
-        benchmarkRule.toggleStateBenchmarkMeasure(radioCaseFactory)
+        benchmarkRule.toggleStateBenchmarkMeasure(radioCaseFactory, assertOneRecomposition = false)
     }
 
     @Test
     fun toggleRadio_layout() {
-        benchmarkRule.toggleStateBenchmarkLayout(radioCaseFactory)
+        benchmarkRule.toggleStateBenchmarkLayout(radioCaseFactory, assertOneRecomposition = false)
     }
 
     @Test
     fun toggleRadio_draw() {
-        benchmarkRule.toggleStateBenchmarkDraw(radioCaseFactory)
+        benchmarkRule.toggleStateBenchmarkDraw(radioCaseFactory, assertOneRecomposition = false)
     }
 }
 

@@ -52,17 +52,17 @@ class WithConstraintsBenchmark {
 
     @Test
     fun no_withconstraints_inner_recompose() {
-        benchmarkRule.toggleStateBenchmarkComposeMeasureLayout { NoWithConstraintsTestCase() }
+        benchmarkRule.toggleStateBenchmarkComposeMeasureLayout({ NoWithConstraintsTestCase() })
     }
 
     @Test
     fun withconstraints_inner_recompose() {
-        benchmarkRule.toggleStateBenchmarkComposeMeasureLayout { WithConstraintsTestCase() }
+        benchmarkRule.toggleStateBenchmarkComposeMeasureLayout({ WithConstraintsTestCase() })
     }
 
     @Test
     fun withconstraints_changing_constraints() {
-        benchmarkRule.toggleStateBenchmarkMeasureLayout { ChangingConstraintsTestCase() }
+        benchmarkRule.toggleStateBenchmarkMeasureLayout({ ChangingConstraintsTestCase() })
     }
 }
 

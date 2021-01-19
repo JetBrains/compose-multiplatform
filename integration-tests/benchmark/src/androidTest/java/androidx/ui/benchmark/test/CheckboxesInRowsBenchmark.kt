@@ -54,7 +54,10 @@ class CheckboxesInRowsBenchmark(private val numberOfCheckboxes: Int) {
 
     @Test
     fun first_compose() {
-        benchmarkRule.benchmarkFirstCompose(checkboxCaseFactory)
+        benchmarkRule.benchmarkFirstCompose(
+            checkboxCaseFactory,
+            assertNoPendingRecompositions = false
+        )
     }
 
     @Test
@@ -74,22 +77,31 @@ class CheckboxesInRowsBenchmark(private val numberOfCheckboxes: Int) {
 
     @Test
     fun toggleCheckbox_recompose() {
-        benchmarkRule.toggleStateBenchmarkRecompose(checkboxCaseFactory)
+        benchmarkRule.toggleStateBenchmarkRecompose(
+            checkboxCaseFactory,
+            assertOneRecomposition = false
+        )
     }
 
     @Test
     fun toggleCheckbox_measure() {
-        benchmarkRule.toggleStateBenchmarkMeasure(checkboxCaseFactory)
+        benchmarkRule.toggleStateBenchmarkMeasure(
+            checkboxCaseFactory,
+            assertOneRecomposition = false
+        )
     }
 
     @Test
     fun toggleCheckbox_layout() {
-        benchmarkRule.toggleStateBenchmarkLayout(checkboxCaseFactory)
+        benchmarkRule.toggleStateBenchmarkLayout(
+            checkboxCaseFactory,
+            assertOneRecomposition = false
+        )
     }
 
     @Test
     fun toggleCheckbox_draw() {
-        benchmarkRule.toggleStateBenchmarkDraw(checkboxCaseFactory)
+        benchmarkRule.toggleStateBenchmarkDraw(checkboxCaseFactory, assertOneRecomposition = false)
     }
 
     @Test

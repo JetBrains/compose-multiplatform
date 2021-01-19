@@ -20,6 +20,7 @@ import androidx.compose.animation.core.AnimationEndReason.BoundReached
 import androidx.compose.animation.core.AnimationEndReason.Finished
 import androidx.compose.animation.core.AnimationEndReason.Interrupted
 import androidx.compose.runtime.AtomicReference
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -380,6 +381,13 @@ class Animatable<T, V : AnimationVector>(
         currentJob.getAndSet(null)?.cancelAnimation()
         endAnimation()
     }
+
+    /**
+     * Returns a [State] representing the current [value] of this animation. This allows
+     * hoisting the animation's current value without causing unnecessary recompositions
+     * when the value changes.
+     */
+    fun asState(): State<T> = internalState
 
     private fun Job.cancelAnimation() {
         cancel(AnimationCancellationException())
