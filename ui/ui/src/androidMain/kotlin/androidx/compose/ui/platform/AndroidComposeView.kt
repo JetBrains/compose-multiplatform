@@ -64,6 +64,7 @@ import androidx.compose.ui.node.MeasureAndLayoutDelegate
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.node.OwnerSnapshotObserver
+import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.semantics.SemanticsModifierCore
 import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.text.InternalTextApi
@@ -129,6 +130,8 @@ internal class AndroidComposeView(context: Context) :
             .then(_focusManager.modifier)
             .then(keyInputModifier)
     }
+
+    override val rootForTest: RootForTest = this
 
     override val semanticsOwner: SemanticsOwner = SemanticsOwner(root)
     private val accessibilityDelegate = AndroidComposeViewAccessibilityDelegateCompat(this)

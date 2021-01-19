@@ -27,7 +27,7 @@ import android.view.MotionEvent.ACTION_POINTER_UP
 import android.view.MotionEvent.ACTION_UP
 import androidx.compose.runtime.dispatch.AndroidUiDispatcher
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.node.Owner
+import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.platform.ViewRootForTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -35,20 +35,23 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlin.math.max
 
-internal actual fun createInputDispatcher(testContext: TestContext, owner: Owner): InputDispatcher {
-    require(owner is ViewRootForTest) {
+internal actual fun createInputDispatcher(
+    testContext: TestContext,
+    root: RootForTest
+): InputDispatcher {
+    require(root is ViewRootForTest) {
         "InputDispatcher currently only supports dispatching to ViewRootForTest, not to " +
-            owner::class.java.simpleName
+            root::class.java.simpleName
     }
-    val view = owner.view
-    return AndroidInputDispatcher(testContext, owner) { view.dispatchTouchEvent(it) }
+    val view = root.view
+    return AndroidInputDispatcher(testContext, root) { view.dispatchTouchEvent(it) }
 }
 
 internal class AndroidInputDispatcher(
     private val testContext: TestContext,
-    composeRoot: ViewRootForTest?,
+    root: ViewRootForTest?,
     private val sendEvent: (MotionEvent) -> Unit
-) : InputDispatcher(testContext, composeRoot) {
+) : InputDispatcher(testContext, root) {
 
     private val batchLock = Any()
     // Batched events are generated just-in-time, given the "lateness" of the dispatching (see

@@ -17,11 +17,14 @@ package androidx.compose.ui.test
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.lerp
-import androidx.compose.ui.node.Owner
+import androidx.compose.ui.node.RootForTest
 import kotlin.math.max
 import kotlin.math.roundToInt
 
-internal expect fun createInputDispatcher(testContext: TestContext, owner: Owner): InputDispatcher
+internal expect fun createInputDispatcher(
+    testContext: TestContext,
+    root: RootForTest
+): InputDispatcher
 
 /**
  * Dispatcher to inject full and partial gestures. An [InputDispatcher] is created at the
@@ -52,7 +55,7 @@ internal expect fun createInputDispatcher(testContext: TestContext, owner: Owner
  */
 internal abstract class InputDispatcher(
     private val testContext: TestContext,
-    private val owner: Owner?
+    private val root: RootForTest?
 ) {
     companion object {
         /**
@@ -122,7 +125,7 @@ internal abstract class InputDispatcher(
     protected abstract val now: Long
 
     init {
-        val state = testContext.states.remove(owner)
+        val state = testContext.states.remove(root)
         if (state?.partialGesture != null) {
             nextDownTime = state.nextDownTime
             gestureLateness = state.gestureLateness
@@ -130,9 +133,9 @@ internal abstract class InputDispatcher(
         }
     }
 
-    protected open fun saveState(owner: Owner?) {
-        if (owner != null) {
-            testContext.states[owner] =
+    protected open fun saveState(root: RootForTest?) {
+        if (root != null) {
+            testContext.states[root] =
                 InputDispatcherState(
                     nextDownTime,
                     gestureLateness,
@@ -567,7 +570,7 @@ internal abstract class InputDispatcher(
      * Called when this [InputDispatcher] is about to be discarded, from [GestureScope.dispose].
      */
     fun dispose() {
-        saveState(owner)
+        saveState(root)
         onDispose()
     }
 

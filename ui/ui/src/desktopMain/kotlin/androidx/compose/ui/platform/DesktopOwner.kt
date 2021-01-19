@@ -46,6 +46,7 @@ import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.MeasureAndLayoutDelegate
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.node.OwnerSnapshotObserver
+import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.semantics.SemanticsModifierCore
 import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.text.input.TextInputService
@@ -64,7 +65,7 @@ import androidx.compose.ui.unit.LayoutDirection
 class DesktopOwner(
     val container: DesktopOwners,
     density: Density = Density(1f, 1f)
-) : Owner {
+) : Owner, RootForTest {
     internal var size by mutableStateOf(IntSize(0, 0))
 
     override var density by mutableStateOf(density)
@@ -96,6 +97,8 @@ class DesktopOwner(
             .then(_focusManager.modifier)
             .then(keyInputModifier)
     }
+
+    override val rootForTest = this
 
     override val snapshotObserver = OwnerSnapshotObserver { command ->
         command()

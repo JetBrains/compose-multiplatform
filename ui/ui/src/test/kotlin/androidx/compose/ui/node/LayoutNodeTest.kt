@@ -30,7 +30,6 @@ import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedback
-import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.layout.LayoutModifier
@@ -44,7 +43,6 @@ import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.WindowInfo
-import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.unit.Constraints
@@ -1720,6 +1718,8 @@ private class MockOwner(
     val onDetachParams = mutableListOf<LayoutNode>()
     var layoutChangeCount = 0
 
+    override val rootForTest: RootForTest
+        get() = TODO("Not yet implemented")
     override val hapticFeedBack: HapticFeedback
         get() = TODO("Not yet implemented")
     override val clipboardManager: ClipboardManager
@@ -1734,8 +1734,6 @@ private class MockOwner(
         get() = TODO("Not yet implemented")
     override val density: Density
         get() = Density(1f)
-    override val semanticsOwner: SemanticsOwner
-        get() = TODO("Not yet implemented")
     override val textInputService: TextInputService
         get() = TODO("Not yet implemented")
     override val focusManager: FocusManager
@@ -1770,8 +1768,6 @@ private class MockOwner(
     override fun calculatePositionInWindow(): IntOffset = position
 
     override fun requestFocus(): Boolean = false
-
-    override fun sendKeyEvent(keyEvent: KeyEvent): Boolean = false
 
     override fun measureAndLayout() {
     }

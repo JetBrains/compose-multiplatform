@@ -248,7 +248,7 @@ internal actual fun <R> SemanticsNodeInteraction.withDensity(
     operation: Density.(SemanticsNode) -> R
 ): R {
     val node = fetchSemanticsNode("Failed to retrieve density for the node.")
-    val density = node.owner!!.density
+    val density = node.root!!.density
     return operation.invoke(density, node)
 }
 
@@ -256,7 +256,7 @@ internal actual fun SemanticsNodeInteraction.withUnclippedBoundsInRoot(
     assertion: Density.(Rect) -> Unit
 ): SemanticsNodeInteraction {
     val node = fetchSemanticsNode("Failed to retrieve bounds of the node.")
-    val density = node.owner!!.density
+    val density = node.root!!.density
 
     assertion.invoke(density, node.unclippedBoundsInRoot)
     return this

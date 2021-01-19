@@ -24,7 +24,7 @@ import androidx.compose.foundation.text.blinkingCursorEnabled
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Recomposer
 import androidx.compose.ui.InternalComposeUiApi
-import androidx.compose.ui.node.Owner
+import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.platform.WindowRecomposerFactory
 import androidx.compose.ui.platform.WindowRecomposerPolicy
@@ -530,7 +530,7 @@ internal constructor(
 
         @SuppressLint("DocumentExceptions")
         override fun sendTextInputCommand(node: SemanticsNode, command: List<EditCommand>) {
-            val owner = node.owner as ViewRootForTest
+            val owner = node.root as ViewRootForTest
 
             @Suppress("DEPRECATION")
             runOnUiThread {
@@ -543,7 +543,7 @@ internal constructor(
 
         @SuppressLint("DocumentExceptions")
         override fun sendImeAction(node: SemanticsNode, actionSpecified: ImeAction) {
-            val owner = node.owner as ViewRootForTest
+            val owner = node.root as ViewRootForTest
 
             @Suppress("DEPRECATION")
             runOnUiThread {
@@ -559,7 +559,7 @@ internal constructor(
             return androidx.compose.ui.test.junit4.runOnUiThread(action)
         }
 
-        override fun getOwners(): Set<Owner> {
+        override fun getRoots(): Set<RootForTest> {
             // TODO(pavlis): Instead of returning a flatMap, let all consumers handle a tree
             //  structure. In case of multiple AndroidOwners, add a fake root
             waitForIdle()
