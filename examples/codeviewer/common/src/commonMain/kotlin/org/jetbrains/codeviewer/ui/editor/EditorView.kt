@@ -145,41 +145,42 @@ private fun LineContent(content: Editor.Content, modifier: Modifier, settings: S
 
 private fun codeString(str: String) = buildAnnotatedString {
     withStyle(AppTheme.code.simple) {
-        append(str.replace("\t", "    "))
-        addStyle(AppTheme.code.punctuation, ":")
-        addStyle(AppTheme.code.punctuation, "=")
-        addStyle(AppTheme.code.punctuation, "\"")
-        addStyle(AppTheme.code.punctuation, "[")
-        addStyle(AppTheme.code.punctuation, "]")
-        addStyle(AppTheme.code.punctuation, "{")
-        addStyle(AppTheme.code.punctuation, "}")
-        addStyle(AppTheme.code.punctuation, "(")
-        addStyle(AppTheme.code.punctuation, ")")
-        addStyle(AppTheme.code.punctuation, ",")
-        addStyle(AppTheme.code.keyword, "fun ")
-        addStyle(AppTheme.code.keyword, "val ")
-        addStyle(AppTheme.code.keyword, "var ")
-        addStyle(AppTheme.code.keyword, "private ")
-        addStyle(AppTheme.code.keyword, "internal ")
-        addStyle(AppTheme.code.keyword, "for ")
-        addStyle(AppTheme.code.keyword, "expect ")
-        addStyle(AppTheme.code.keyword, "actual ")
-        addStyle(AppTheme.code.keyword, "import ")
-        addStyle(AppTheme.code.keyword, "package ")
-        addStyle(AppTheme.code.value, "true")
-        addStyle(AppTheme.code.value, "false")
-        addStyle(AppTheme.code.value, Regex("[0-9]*"))
-        addStyle(AppTheme.code.annotation, Regex("^@[a-zA-Z_]*"))
-        addStyle(AppTheme.code.comment, Regex("^\\s*//.*"))
+        val strFormatted = str.replace("\t", "    ")
+        append(strFormatted)
+        addStyle(AppTheme.code.punctuation, strFormatted, ":")
+        addStyle(AppTheme.code.punctuation, strFormatted, "=")
+        addStyle(AppTheme.code.punctuation, strFormatted, "\"")
+        addStyle(AppTheme.code.punctuation, strFormatted, "[")
+        addStyle(AppTheme.code.punctuation, strFormatted, "]")
+        addStyle(AppTheme.code.punctuation, strFormatted, "{")
+        addStyle(AppTheme.code.punctuation, strFormatted, "}")
+        addStyle(AppTheme.code.punctuation, strFormatted, "(")
+        addStyle(AppTheme.code.punctuation, strFormatted, ")")
+        addStyle(AppTheme.code.punctuation, strFormatted, ",")
+        addStyle(AppTheme.code.keyword, strFormatted, "fun ")
+        addStyle(AppTheme.code.keyword, strFormatted, "val ")
+        addStyle(AppTheme.code.keyword, strFormatted, "var ")
+        addStyle(AppTheme.code.keyword, strFormatted, "private ")
+        addStyle(AppTheme.code.keyword, strFormatted, "internal ")
+        addStyle(AppTheme.code.keyword, strFormatted, "for ")
+        addStyle(AppTheme.code.keyword, strFormatted, "expect ")
+        addStyle(AppTheme.code.keyword, strFormatted, "actual ")
+        addStyle(AppTheme.code.keyword, strFormatted, "import ")
+        addStyle(AppTheme.code.keyword, strFormatted, "package ")
+        addStyle(AppTheme.code.value, strFormatted, "true")
+        addStyle(AppTheme.code.value, strFormatted, "false")
+        addStyle(AppTheme.code.value, strFormatted, Regex("[0-9]*"))
+        addStyle(AppTheme.code.annotation, strFormatted, Regex("^@[a-zA-Z_]*"))
+        addStyle(AppTheme.code.comment, strFormatted, Regex("^\\s*//.*"))
     }
 }
 
-private fun AnnotatedString.Builder.addStyle(style: SpanStyle, regexp: String) {
-    addStyle(style, fromLiteral(regexp))
+private fun AnnotatedString.Builder.addStyle(style: SpanStyle, text: String, regexp: String) {
+    addStyle(style, text, fromLiteral(regexp))
 }
 
-private fun AnnotatedString.Builder.addStyle(style: SpanStyle, regexp: Regex) {
-    for (result in regexp.findAll(toString())) {
+private fun AnnotatedString.Builder.addStyle(style: SpanStyle, text: String, regexp: Regex) {
+    for (result in regexp.findAll(text)) {
         addStyle(style, result.range.first, result.range.last + 1)
     }
 }
