@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.offset
  * Padding is applied before content measurement and takes precedence; content may only be as large
  * as the remaining space.
  *
- * Negative padding is not permitted. See [offset].
+ * Negative padding is not permitted. See [Modifier.offset].
  *
  * Example usage:
  * @sample androidx.compose.foundation.layout.samples.PaddingModifier
@@ -74,7 +74,7 @@ fun Modifier.padding(
  * Padding is applied before content measurement and takes precedence; content may only be as large
  * as the remaining space.
  *
- * Negative padding is not permitted. See [offset].
+ * Negative padding is not permitted. See [Modifier.offset].
  *
  * Example usage:
  * @sample androidx.compose.foundation.layout.samples.SymmetricPaddingModifier
@@ -103,7 +103,7 @@ fun Modifier.padding(
  * Padding is applied before content measurement and takes precedence; content may only be as large
  * as the remaining space.
  *
- * Negative padding is not permitted. See [offset].
+ * Negative padding is not permitted. See [Modifier.offset].
  *
  * Example usage:
  * @sample androidx.compose.foundation.layout.samples.PaddingAllModifier
@@ -129,7 +129,7 @@ fun Modifier.padding(all: Dp) =
  * top, right and bottom. Padding is applied before content measurement and takes precedence;
  * content may only be as large as the remaining space.
  *
- * Negative padding is not permitted. See [offset].
+ * Negative padding is not permitted. See [Modifier.offset].
  *
  * Example usage:
  * @sample androidx.compose.foundation.layout.samples.PaddingValuesModifier
@@ -158,7 +158,7 @@ fun Modifier.padding(padding: PaddingValues) =
  * [padding] to apply relative paddings. Padding is applied before content measurement and takes
  * precedence; content may only be as large as the remaining space.
  *
- * Negative padding is not permitted. See [offset].
+ * Negative padding is not permitted. See [Modifier.offset].
  *
  * Example usage:
  * @sample androidx.compose.foundation.layout.samples.AbsolutePaddingModifier
