@@ -35,7 +35,8 @@ internal fun Modifier.dragPositionGestureFilter(
     onPress: (Offset) -> Unit,
     onRelease: (Offset) -> Unit,
     interactionState: InteractionState?,
-): Modifier = composed {
+    enabled: Boolean = true
+): Modifier = if (enabled) composed {
     val tracker = remember { DragEventTracker() }
     // TODO(shepshapard): PressIndicator doesn't seem to be the right thing to use here.  It
     //  actually may be functionally correct, but might mostly suggest that it should not
@@ -66,7 +67,7 @@ internal fun Modifier.dragPositionGestureFilter(
                 }
             }
         )
-}
+} else this
 
 /**
  * Helper class for tracking dragging event.

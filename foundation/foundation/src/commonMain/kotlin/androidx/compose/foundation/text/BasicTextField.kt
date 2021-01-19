@@ -22,12 +22,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.node.Ref
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SoftwareKeyboardController
@@ -67,8 +64,13 @@ import androidx.compose.ui.text.input.VisualTransformation
  * composable is designed to be used when a custom implementation for different design system is
  * needed.
  *
- * For example, if you need to include a hint in your TextField you can write a composable as below:
+ * For example, if you need to include a placeholder in your TextField, you can write a composable
+ * using the decoration box like this:
  * @sample androidx.compose.foundation.samples.PlaceholderBasicTextFieldSample
+ *
+ * If you want to add decorations to your text field, such as icon or similar, and increase the
+ * hit target area, use the decoration box:
+ * @sample androidx.compose.foundation.samples.TextFieldWithIconSample
  *
  * @param value the input [String] text to be shown in the text field
  * @param onValueChange the callback that is triggered when the input service updates the text. An
@@ -77,8 +79,8 @@ import androidx.compose.ui.text.input.VisualTransformation
  * @param enabled controls the enabled state of the [BasicTextField]. When `false`, the text
  * field will be neither editable nor focusable, the input of the text field will not be selectable
  * @param readOnly controls the editable state of the [BasicTextField]. When `true`, the text
- * fields will not be editable but otherwise operable. Read-only text fields are usually used to
- * display the pre-filled text that user cannot edit
+ * field can not be modified, however, a user can focus it and copy text from it. Read-only text
+ * fields are usually used to display pre-filled forms that user can not edit
  * @param textStyle Style configuration that applies at character level such as color, font etc.
  * @param keyboardOptions software keyboard options that contains configuration such as
  * [KeyboardType] and [ImeAction].
@@ -104,6 +106,12 @@ import androidx.compose.ui.text.input.VisualTransformation
  * if you want to read the [InteractionState] and customize the appearance / behavior of this
  * TextField in different [Interaction]s.
  * @param cursorColor Color of the cursor. If [Color.Unspecified], there will be no cursor drawn
+ * @param decorationBox Composable lambda that allows to add decorations around text field, such
+ * as icon, placeholder, helper messages or similar, and automatically increase the hit target area
+ * of the text field. To allow you to control the placement of the inner text field relative to your
+ * decorations, the text field implementation will pass in a framework-controlled composable
+ * parameter "innerTextField" to the decorationBox lambda you provide. You must call
+ * innerTextField exactly once.
  */
 @OptIn(ExperimentalTextApi::class)
 @Composable
@@ -122,7 +130,9 @@ fun BasicTextField(
     onTextLayout: (TextLayoutResult) -> Unit = {},
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
     interactionState: InteractionState = remember { InteractionState() },
-    cursorColor: Color = Color.Black
+    cursorColor: Color = Color.Black,
+    decorationBox: @Composable (innerTextField: @Composable () -> Unit) -> Unit =
+        @Composable { innerTextField -> innerTextField() }
 ) {
     var textFieldValueState by remember { mutableStateOf(TextFieldValue(text = value)) }
     val textFieldValue = textFieldValueState.copy(text = value)
@@ -147,7 +157,8 @@ fun BasicTextField(
         onTextInputStarted = onTextInputStarted,
         cursorColor = cursorColor,
         interactionState = interactionState,
-        singleLine = singleLine
+        singleLine = singleLine,
+        decorationBox = decorationBox
     )
 }
 
@@ -178,8 +189,14 @@ fun BasicTextField(
  * composable is designed to be used when a custom implementation for different design system is
  * needed.
  *
- * For example, if you need to include a hint in your TextField you can write a composable as below:
+ * For example, if you need to include a placeholder in your TextField, you can write a composable
+ * using the decoration box like this:
  * @sample androidx.compose.foundation.samples.PlaceholderBasicTextFieldSample
+ *
+ *
+ * If you want to add decorations to your text field, such as icon or similar, and increase the
+ * hit target area, use the decoration box:
+ * @sample androidx.compose.foundation.samples.TextFieldWithIconSample
  *
  * @param value The [androidx.compose.ui.text.input.TextFieldValue] to be shown in the
  * [BasicTextField].
@@ -188,8 +205,8 @@ fun BasicTextField(
  * @param enabled controls the enabled state of the [BasicTextField]. When `false`, the text
  * field will be neither editable nor focusable, the input of the text field will not be selectable
  * @param readOnly controls the editable state of the [BasicTextField]. When `true`, the text
- * fields will not be editable but otherwise operable. Read-only text fields are usually used to
- * display the pre-filled text that user cannot edit
+ * field can not be modified, however, a user can focus it and copy text from it. Read-only text
+ * fields are usually used to display pre-filled forms that user can not edit
  * @param textStyle Style configuration that applies at character level such as color, font etc.
  * @param keyboardOptions software keyboard options that contains configuration such as
  * [KeyboardType] and [ImeAction].
@@ -215,6 +232,12 @@ fun BasicTextField(
  * if you want to read the [InteractionState] and customize the appearance / behavior of this
  * TextField in different [Interaction]s.
  * @param cursorColor Color of the cursor. If [Color.Unspecified], there will be no cursor drawn
+ * @param decorationBox Composable lambda that allows to add decorations around text field, such
+ * as icon, placeholder, helper messages or similar, and automatically increase the hit target area
+ * of the text field. To allow you to control the placement of the inner text field relative to your
+ * decorations, the text field implementation will pass in a framework-controlled composable
+ * parameter "innerTextField" to the decorationBox lambda you provide. You must call
+ * innerTextField exactly once.
  */
 @Composable
 @OptIn(InternalTextApi::class, ExperimentalTextApi::class)
@@ -233,60 +256,26 @@ fun BasicTextField(
     onTextLayout: (TextLayoutResult) -> Unit = {},
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
     interactionState: InteractionState = remember { InteractionState() },
-    cursorColor: Color = Color.Black
+    cursorColor: Color = Color.Black,
+    decorationBox: @Composable (innerTextField: @Composable () -> Unit) -> Unit =
+        @Composable { innerTextField -> innerTextField() }
 ) {
-    val orientation = if (singleLine) Orientation.Horizontal else Orientation.Vertical
-    val scrollerPosition = rememberSavedInstanceState(saver = TextFieldScrollerPosition.Saver) {
-        TextFieldScrollerPosition()
-    }
-
-    // We use it to get the cursor position
-    val textLayoutResult: Ref<TextLayoutResult?> = remember { Ref() }
-
-    val textFieldModifier = modifier
-        .maxLinesHeight(if (singleLine) 1 else maxLines, textStyle)
-        .textFieldScroll(
-            orientation,
-            scrollerPosition,
-            value,
-            visualTransformation,
-            interactionState,
-            textLayoutResult,
-            enabled
-        )
-
-    if (enabled && !readOnly) {
-        CoreTextField(
-            value = value,
-            onValueChange = onValueChange,
-            textStyle = textStyle,
-            onImeActionPerformed = onImeActionPerformed,
-            visualTransformation = visualTransformation,
-            onTextLayout = {
-                textLayoutResult.value = it
-                onTextLayout(it)
-            },
-            interactionState = interactionState,
-            onTextInputStarted = onTextInputStarted,
-            cursorColor = cursorColor,
-            imeOptions = keyboardOptions.toImeOptions(singleLine = singleLine),
-            softWrap = !singleLine,
-            modifier = textFieldModifier
-        )
-    } else {
-        InactiveTextField(
-            value = value,
-            modifier = textFieldModifier,
-            enabled = enabled,
-            textStyle = textStyle,
-            singleLine = singleLine,
-            maxLines = maxLines,
-            visualTransformation = visualTransformation,
-            onTextLayout = {
-                textLayoutResult.value = it
-                onTextLayout(it)
-            },
-            interactionState = interactionState
-        )
-    }
+    CoreTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = modifier,
+        textStyle = textStyle,
+        onImeActionPerformed = onImeActionPerformed,
+        visualTransformation = visualTransformation,
+        onTextLayout = onTextLayout,
+        interactionState = interactionState,
+        onTextInputStarted = onTextInputStarted,
+        cursorColor = cursorColor,
+        imeOptions = keyboardOptions.toImeOptions(singleLine = singleLine),
+        softWrap = !singleLine,
+        maxLines = if (singleLine) 1 else maxLines,
+        decorationBox = decorationBox,
+        enabled = enabled,
+        readOnly = readOnly
+    )
 }

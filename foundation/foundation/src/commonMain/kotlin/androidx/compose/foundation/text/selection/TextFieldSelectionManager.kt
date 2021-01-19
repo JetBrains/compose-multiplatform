@@ -19,6 +19,9 @@ package androidx.compose.foundation.text.selection
 import androidx.compose.foundation.text.TextFieldDelegate
 import androidx.compose.foundation.text.TextFieldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.Offset
@@ -96,6 +99,11 @@ internal class TextFieldSelectionManager {
     var focusRequester: FocusRequester? = null
 
     /**
+     * Defines if paste and cut toolbar menu actions should be shown
+     */
+    var editable by mutableStateOf(true)
+
+    /**
      * The beginning position of the drag gesture. Every time a new drag gesture starts, it wil be
      * recalculated.
      */
@@ -123,7 +131,7 @@ internal class TextFieldSelectionManager {
             }
 
             // Long Press at the blank area, the cursor should show up at the end of the line.
-            if (!isPositionOnText(pxPosition)) {
+            if (state?.layoutResult?.isPositionOnText(pxPosition) != true) {
                 state?.layoutResult?.let { layoutResult ->
                     val offset = offsetMapping.transformedToOriginal(
                         layoutResult.getLineEnd(
@@ -245,7 +253,7 @@ internal class TextFieldSelectionManager {
             override fun onDrag(dragDistance: Offset): Offset {
                 dragTotalDistance += dragDistance
 
-                state?.layoutResult?.let { layoutResult ->
+                state?.layoutResult?.value?.let { layoutResult ->
                     val startOffset = if (isStartHandle)
                         layoutResult.getOffsetForPosition(dragBeginPosition + dragTotalDistance)
                     else
@@ -305,7 +313,8 @@ internal class TextFieldSelectionManager {
         if (!value.selection.collapsed) {
             // if selection was not collapsed, set a default cursor location, otherwise
             // don't change the location of the cursor.
-            val newValue = value.copy(selection = TextRange.Zero)
+            val newCursorOffset = value.selection.max
+            val newValue = value.copy(selection = TextRange(newCursorOffset))
             onValueChange(newValue)
         }
         setSelectionStatus(false)
@@ -405,7 +414,7 @@ internal class TextFieldSelectionManager {
     internal fun getHandlePosition(isStartHandle: Boolean): Offset {
         val offset = if (isStartHandle) value.selection.start else value.selection.end
         return getSelectionHandleCoordinates(
-            textLayoutResult = state?.layoutResult!!,
+            textLayoutResult = state?.layoutResult!!.value,
             offset = offsetMapping.originalToTransformed(offset),
             isStart = isStartHandle,
             areHandlesCrossed = value.selection.reversed
@@ -448,8 +457,8 @@ internal class TextFieldSelectionManager {
         textToolbar?.showMenu(
             rect = getContentRect(),
             onCopyRequested = copy,
-            onPasteRequested = paste,
-            onCutRequested = cut,
+            onPasteRequested = if (editable) paste else null,
+            onCutRequested = if (editable) cut else null,
             onSelectAllRequested = selectAll
         )
     }
@@ -483,7 +492,7 @@ internal class TextFieldSelectionManager {
                 state?.layoutCoordinates?.localToRoot(
                     Offset(
                         0f,
-                        it.layoutResult?.getCursorRect(
+                        it.layoutResult?.value?.getCursorRect(
                             value.selection.start.coerceIn(
                                 0,
                                 max(0, value.text.length - 1)
@@ -495,7 +504,7 @@ internal class TextFieldSelectionManager {
                 state?.layoutCoordinates?.localToRoot(
                     Offset(
                         0f,
-                        it.layoutResult?.getCursorRect(
+                        it.layoutResult?.value?.getCursorRect(
                             value.selection.end.coerceIn(
                                 0,
                                 max(0, value.text.length - 1)
@@ -529,7 +538,7 @@ internal class TextFieldSelectionManager {
         )
 
         val newTransformedSelection = getTextFieldSelection(
-            textLayoutResult = state?.layoutResult,
+            textLayoutResult = state?.layoutResult?.value,
             rawStartOffset = transformedStartOffset,
             rawEndOffset = transformedEndOffset,
             previousSelection = if (transformedSelection.collapsed) null else transformedSelection,
@@ -574,18 +583,6 @@ internal class TextFieldSelectionManager {
             annotatedString = annotatedString,
             selection = selection.constrain(0, annotatedString.length)
         )
-    }
-
-    /** Returns true if the screen coordinates position (x,y) corresponds to a character displayed
-     * in the view. Returns false when the position is in the empty space of left/right of text.
-     */
-    private fun isPositionOnText(offset: Offset): Boolean {
-        state?.layoutResult?.let {
-            val line = it.getLineForVerticalPosition(offset.y)
-            if (offset.x < it.getLineLeft(line) || offset.x > it.getLineRight(line)) return false
-            return true
-        }
-        return false
     }
 }
 

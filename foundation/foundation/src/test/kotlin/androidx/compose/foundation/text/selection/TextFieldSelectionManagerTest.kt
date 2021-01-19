@@ -17,6 +17,7 @@
 package androidx.compose.foundation.text.selection
 
 import androidx.compose.foundation.text.TextFieldState
+import androidx.compose.foundation.text.TextLayoutResultProxy
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -28,6 +29,7 @@ import androidx.compose.ui.platform.TextToolbarStatus
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextLayoutInput
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.OffsetMapping
@@ -49,7 +51,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import org.mockito.ArgumentMatchers
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 
@@ -62,7 +63,7 @@ class TextFieldSelectionManagerTest {
     private var value = TextFieldValue(text)
     private val lambda: (TextFieldValue) -> Unit = { value = it }
     private val spyLambda = spy(lambda)
-    private val state = TextFieldState(mock())
+    private lateinit var state: TextFieldState
 
     private val dragBeginPosition = Offset.Zero
     private val dragDistance = Offset(300f, 15f)
@@ -70,7 +71,8 @@ class TextFieldSelectionManagerTest {
     private val dragOffset = text.indexOf('r')
     private val fakeTextRange = TextRange(0, "Hello".length)
     private val dragTextRange = TextRange("Hello".length + 1, text.length)
-
+    private val layoutResult: TextLayoutResult = mock()
+    private val layoutResultProxy: TextLayoutResultProxy = mock()
     private val manager = TextFieldSelectionManager()
 
     private val clipboardManager = mock<ClipboardManager>()
@@ -82,17 +84,13 @@ class TextFieldSelectionManagerTest {
     fun setup() {
         manager.offsetMapping = offsetMapping
         manager.onValueChange = lambda
-        manager.state = state
         manager.value = value
         manager.clipboardManager = clipboardManager
         manager.textToolbar = textToolbar
         manager.hapticFeedBack = hapticFeedback
         manager.focusRequester = focusRequester
 
-        state.layoutResult = mock()
-        state.textDelegate = mock()
-        whenever(state.textDelegate.density).thenReturn(density)
-        whenever(state.layoutResult!!.layoutInput).thenReturn(
+        whenever(layoutResult.layoutInput).thenReturn(
             TextLayoutInput(
                 text = AnnotatedString(text),
                 style = TextStyle.Default,
@@ -106,21 +104,27 @@ class TextFieldSelectionManagerTest {
                 constraints = Constraints()
             )
         )
-        whenever(state.layoutResult!!.getOffsetForPosition(dragBeginPosition)).thenReturn(
-            beginOffset
-        )
-        whenever(state.layoutResult!!.getOffsetForPosition(dragDistance)).thenReturn(dragOffset)
 
-        whenever(
-            state.layoutResult!!.getWordBoundary(ArgumentMatchers.intThat { it in 0 until 5 })
-        ).thenAnswer(TextRangeAnswer(fakeTextRange))
-        whenever(
-            state.layoutResult!!.getWordBoundary(ArgumentMatchers.intThat { it in 6 until 11 })
-        ).thenAnswer(TextRangeAnswer(dragTextRange))
-
-        whenever(state.layoutResult!!.getBidiRunDirection(any()))
+        whenever(layoutResult.getWordBoundary(beginOffset))
+            .thenAnswer(TextRangeAnswer(fakeTextRange))
+        whenever(layoutResult.getWordBoundary(dragOffset))
+            .thenAnswer(TextRangeAnswer(dragTextRange))
+        whenever(layoutResult.getBidiRunDirection(any()))
             .thenReturn(ResolvedTextDirection.Ltr)
-        whenever(state.layoutResult!!.getBoundingBox(any())).thenReturn(Rect.Zero)
+        whenever(layoutResult.getBoundingBox(any())).thenReturn(Rect.Zero)
+        // left or right handle drag
+        whenever(layoutResult.getOffsetForPosition(dragBeginPosition)).thenReturn(beginOffset)
+        whenever(layoutResult.getOffsetForPosition(dragDistance)).thenReturn(dragOffset)
+        // touch drag
+        whenever(layoutResultProxy.getOffsetForPosition(dragBeginPosition)).thenReturn(beginOffset)
+        whenever(layoutResultProxy.getOffsetForPosition(dragDistance)).thenReturn(dragOffset)
+
+        whenever(layoutResultProxy.value).thenReturn(layoutResult)
+
+        state = TextFieldState(mock())
+        state.layoutResult = layoutResultProxy
+        manager.state = state
+        whenever(state.textDelegate.density).thenReturn(density)
     }
 
     @Test
@@ -133,6 +137,7 @@ class TextFieldSelectionManagerTest {
 
     @Test
     fun TextFieldSelectionManager_touchSelectionObserver_onLongPress() {
+        whenever(layoutResultProxy.isPositionOnText(dragBeginPosition)).thenReturn(true)
 
         manager.touchSelectionObserver.onLongPress(dragBeginPosition)
 
@@ -155,11 +160,12 @@ class TextFieldSelectionManagerTest {
         // Setup
         val fakeLineNumber = 0
         val fakeLineEnd = text.length
-        whenever(state.layoutResult!!.getLineForVerticalPosition(dragBeginPosition.y))
+        whenever(layoutResultProxy.isPositionOnText(dragBeginPosition)).thenReturn(false)
+        whenever(layoutResultProxy.getLineForVerticalPosition(dragBeginPosition.y))
             .thenReturn(fakeLineNumber)
-        whenever(state.layoutResult!!.getLineLeft(fakeLineNumber))
+        whenever(layoutResult.getLineLeft(fakeLineNumber))
             .thenReturn(dragBeginPosition.x + 1.0f)
-        whenever(state.layoutResult!!.getLineEnd(fakeLineNumber)).thenReturn(fakeLineEnd)
+        whenever(layoutResultProxy.getLineEnd(fakeLineNumber)).thenReturn(fakeLineEnd)
 
         // Act
         manager.touchSelectionObserver.onLongPress(dragBeginPosition)
@@ -281,7 +287,7 @@ class TextFieldSelectionManagerTest {
         manager.deselect()
 
         verify(textToolbar, times(1)).hide()
-        assertThat(value.selection).isEqualTo(TextRange.Zero)
+        assertThat(value.selection).isEqualTo(TextRange("Hello".length))
         assertThat(state.selectionIsOn).isFalse()
     }
 

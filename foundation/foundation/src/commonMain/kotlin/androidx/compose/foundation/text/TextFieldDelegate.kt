@@ -214,7 +214,7 @@ class TextFieldDelegate {
          * Sets the cursor position. Should be called when TextField has focus.
          *
          * @param position The event position in composable coordinate.
-         * @param textLayoutResult The text layout result
+         * @param textLayoutResult The text layout result proxy
          * @param editProcessor The edit processor
          * @param offsetMapping The offset map
          * @param onValueChange The callback called when the new editor state arrives.
@@ -222,7 +222,7 @@ class TextFieldDelegate {
         @JvmStatic
         internal fun setCursorOffset(
             position: Offset,
-            textLayoutResult: TextLayoutResult,
+            textLayoutResult: TextLayoutResultProxy,
             editProcessor: EditProcessor,
             offsetMapping: OffsetMapping,
             onValueChange: (TextFieldValue) -> Unit

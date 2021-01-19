@@ -19,7 +19,9 @@ package androidx.compose.material
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.defaultMinSizeConstraints
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -70,8 +72,8 @@ import kotlin.math.roundToInt
  * be neither editable nor focusable, the input of the text field will not be selectable,
  * visually text field will appear in the disabled UI state
  * @param readOnly controls the editable state of the [OutlinedTextField]. When `true`, the text
- * fields will not be editable but otherwise operable. Read-only text fields are usually used to
- * display the pre-filled text that user cannot edit
+ * field can not be modified, however, a user can focus it and copy text from it. Read-only text
+ * fields are usually used to display pre-filled forms that user can not edit
  * @param textStyle the style to be applied to the input text. The default [textStyle] uses the
  * [AmbientTextStyle] defined by the theme
  * @param label the optional label to be displayed inside the text field container. The default
@@ -195,8 +197,8 @@ fun OutlinedTextField(
  * be neither editable nor focusable, the input of the text field will not be selectable,
  * visually text field will appear in the disabled UI state
  * @param readOnly controls the editable state of the [OutlinedTextField]. When `true`, the text
- * fields will not be editable but otherwise operable. Read-only text fields are usually used to
- * display the pre-filled text that user cannot edit
+ * field can not be modified, however, a user can focus it and copy text from it. Read-only text
+ * fields are usually used to display pre-filled forms that user can not edit
  * @param textStyle the style to be applied to the input text. The default [textStyle] uses the
  * [AmbientTextStyle] defined by the theme
  * @param label the optional label to be displayed inside the text field container. The default
@@ -295,18 +297,29 @@ fun OutlinedTextField(
 
 @Composable
 internal fun OutlinedTextFieldLayout(
-    modifier: Modifier = Modifier,
-    decoratedTextField: @Composable (Modifier) -> Unit,
+    modifier: Modifier,
+    value: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
+    enabled: Boolean,
+    readOnly: Boolean,
+    keyboardOptions: KeyboardOptions,
+    textStyle: TextStyle,
+    singleLine: Boolean,
+    maxLines: Int = Int.MAX_VALUE,
+    onImeActionPerformed: (ImeAction) -> Unit = {},
+    visualTransformation: VisualTransformation,
+    onTextInputStarted: (SoftwareKeyboardController) -> Unit,
+    interactionState: InteractionState,
     decoratedPlaceholder: @Composable ((Modifier) -> Unit)?,
     decoratedLabel: @Composable (() -> Unit)?,
     leading: @Composable (() -> Unit)?,
     trailing: @Composable (() -> Unit)?,
-    singleLine: Boolean,
     leadingColor: Color,
     trailingColor: Color,
     labelProgress: Float,
     indicatorWidth: Dp,
-    indicatorColor: Color
+    indicatorColor: Color,
+    cursorColor: Color
 ) {
     val outlinedBorderParams = remember {
         OutlinedBorderParams(
@@ -321,24 +334,47 @@ internal fun OutlinedTextFieldLayout(
         outlinedBorderParams.borderWidth.value = indicatorWidth
     }
 
-    // places leading icon, input field, label, placeholder, trailing icon
-    IconsWithTextFieldLayout(
-        modifier = modifier.drawOutlinedBorder(outlinedBorderParams),
-        textField = decoratedTextField,
-        leading = leading,
-        trailing = trailing,
+    BasicTextField(
+        value = value,
+        modifier = modifier
+            .defaultMinSizeConstraints(
+                minWidth = TextFieldMinWidth,
+                minHeight = TextFieldMinHeight + OutlinedTextFieldTopPadding,
+            )
+            .padding(top = OutlinedTextFieldTopPadding)
+            .drawOutlinedBorder(outlinedBorderParams),
+        onValueChange = onValueChange,
+        enabled = enabled,
+        readOnly = readOnly,
+        textStyle = textStyle,
+        cursorColor = cursorColor,
+        visualTransformation = visualTransformation,
+        keyboardOptions = keyboardOptions,
+        interactionState = interactionState,
+        onImeActionPerformed = onImeActionPerformed,
+        onTextInputStarted = onTextInputStarted,
         singleLine = singleLine,
-        leadingColor = leadingColor,
-        trailingColor = trailingColor,
-        onLabelMeasured = {
-            val labelWidth = it * labelProgress
-            if (outlinedBorderParams.labelWidth.value != labelWidth) {
-                outlinedBorderParams.labelWidth.value = labelWidth
-            }
-        },
-        animationProgress = labelProgress,
-        placeholder = decoratedPlaceholder,
-        label = decoratedLabel
+        maxLines = maxLines,
+        decorationBox = @Composable { coreTextField ->
+            // places leading icon, input field, label, placeholder, trailing icon
+            IconsWithTextFieldLayout(
+                textField = coreTextField,
+                leading = leading,
+                trailing = trailing,
+                singleLine = singleLine,
+                leadingColor = leadingColor,
+                trailingColor = trailingColor,
+                onLabelMeasured = {
+                    val labelWidth = it * labelProgress
+                    if (outlinedBorderParams.labelWidth.value != labelWidth) {
+                        outlinedBorderParams.labelWidth.value = labelWidth
+                    }
+                },
+                animationProgress = labelProgress,
+                placeholder = decoratedPlaceholder,
+                label = decoratedLabel
+            )
+        }
     )
 }
 
@@ -350,8 +386,7 @@ internal fun OutlinedTextFieldLayout(
 \ */
 @Composable
 private fun IconsWithTextFieldLayout(
-    modifier: Modifier = Modifier,
-    textField: @Composable (Modifier) -> Unit,
+    textField: @Composable () -> Unit,
     placeholder: @Composable ((Modifier) -> Unit)?,
     label: @Composable (() -> Unit)?,
     leading: @Composable (() -> Unit)?,
@@ -384,17 +419,14 @@ private fun IconsWithTextFieldLayout(
                 placeholder(Modifier.layoutId(PlaceholderId).padding(horizontal = TextFieldPadding))
             }
 
-            textField(
-                Modifier
-                    .layoutId(TextFieldId)
-                    .padding(horizontal = TextFieldPadding)
-            )
+            Box(Modifier.layoutId(TextFieldId).padding(horizontal = TextFieldPadding)) {
+                textField()
+            }
 
             if (label != null) {
                 Box(modifier = Modifier.layoutId(LabelId)) { label() }
             }
-        },
-        modifier = modifier
+        }
     ) { measurables, incomingConstraints ->
         // used to calculate the constraints for measuring elements that will be placed in a row
         var occupiedSpaceHorizontally = 0
@@ -683,3 +715,9 @@ private class OutlinedBorderParams(
 // TODO(b/158077409) support shape in OutlinedTextField
 private val OutlinedTextFieldCornerRadius = 4.dp
 private val OutlinedTextFieldInnerPadding = 4.dp
+/*
+This padding is used to allow label not overlap with the content above it. This 8.dp will work
+for default cases when developers do not override the label's font size. If they do, they will
+need to add additional padding themselves
+*/
+private val OutlinedTextFieldTopPadding = 8.dp

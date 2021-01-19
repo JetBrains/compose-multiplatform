@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
@@ -195,7 +194,7 @@ fun MaterialTextFieldDemo() {
                         leadingIcon = { if (leadingChecked) Icon(Icons.Filled.Favorite) },
                         trailingIcon = { if (trailingChecked) Icon(Icons.Filled.Info) },
                         isErrorValue = selectedOption == Option.Error,
-                        modifier = Modifier.widthIn(max = 300.dp)
+                        modifier = Modifier.width(300.dp)
                     )
             }
         }
