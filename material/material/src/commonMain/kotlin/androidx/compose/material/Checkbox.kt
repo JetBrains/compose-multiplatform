@@ -16,11 +16,7 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.AnimatedValueModel
-import androidx.compose.animation.VectorConverter
-import androidx.compose.animation.asDisposableClock
-import androidx.compose.animation.core.AnimationClockObservable
-import androidx.compose.animation.core.AnimationVector4D
+import androidx.compose.animation.animateAsState
 import androidx.compose.animation.core.FloatPropKey
 import androidx.compose.animation.core.TransitionSpec
 import androidx.compose.animation.core.keyframes
@@ -39,7 +35,10 @@ import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
@@ -52,7 +51,6 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
@@ -169,7 +167,8 @@ interface CheckboxColors {
      *
      * @param state the [ToggleableState] of the checkbox
      */
-    fun checkmarkColor(state: ToggleableState): Color
+    @Composable
+    fun checkmarkColor(state: ToggleableState): State<Color>
 
     /**
      * Represents the color used for the box (background) of the checkbox, depending on [enabled]
@@ -178,7 +177,8 @@ interface CheckboxColors {
      * @param enabled whether the checkbox is enabled or not
      * @param state the [ToggleableState] of the checkbox
      */
-    fun boxColor(enabled: Boolean, state: ToggleableState): Color
+    @Composable
+    fun boxColor(enabled: Boolean, state: ToggleableState): State<Color>
 
     /**
      * Represents the color used for the border of the checkbox, depending on [enabled] and [state].
@@ -186,7 +186,8 @@ interface CheckboxColors {
      * @param enabled whether the checkbox is enabled or not
      * @param state the [ToggleableState] of the checkbox
      */
-    fun borderColor(enabled: Boolean, state: ToggleableState): Color
+    @Composable
+    fun borderColor(enabled: Boolean, state: ToggleableState): State<Color>
 }
 
 /**
@@ -213,14 +214,12 @@ object CheckboxDefaults {
         disabledColor: Color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled),
         disabledIndeterminateColor: Color = checkedColor.copy(alpha = ContentAlpha.disabled)
     ): CheckboxColors {
-        val clock = AmbientAnimationClock.current.asDisposableClock()
         return remember(
             checkedColor,
             uncheckedColor,
             checkmarkColor,
             disabledColor,
             disabledIndeterminateColor,
-            clock
         ) {
             DefaultCheckboxColors(
                 checkedBorderColor = checkedColor,
@@ -234,7 +233,6 @@ object CheckboxDefaults {
                 uncheckedBorderColor = uncheckedColor,
                 disabledBorderColor = disabledColor,
                 disabledIndeterminateBorderColor = disabledIndeterminateColor,
-                clock = clock
             )
         }
     }
@@ -250,11 +248,10 @@ private fun CheckboxImpl(
 ) {
     val state = transition(definition = TransitionDefinition, toState = value)
     val checkCache = remember { CheckDrawingCache() }
+    val checkColor by colors.checkmarkColor(value)
+    val boxColor by colors.boxColor(enabled, value)
+    val borderColor by colors.borderColor(enabled, value)
     Canvas(modifier.wrapContentSize(Alignment.Center).size(CheckboxSize)) {
-        val checkColor = colors.checkmarkColor(value)
-        val boxColor = colors.boxColor(enabled, value)
-        val borderColor = colors.borderColor(enabled, value)
-
         val strokeWidthPx = StrokeWidth.toPx()
         drawBox(
             boxColor = boxColor,
@@ -357,36 +354,22 @@ private class DefaultCheckboxColors(
     private val checkedBorderColor: Color,
     private val uncheckedBorderColor: Color,
     private val disabledBorderColor: Color,
-    private val disabledIndeterminateBorderColor: Color,
-    private val clock: AnimationClockObservable
+    private val disabledIndeterminateBorderColor: Color
 ) : CheckboxColors {
-    private val lazyAnimatedCheckmarkColor = LazyAnimatedValue<Color, AnimationVector4D> { target ->
-        AnimatedValueModel(target, (Color.VectorConverter)(target.colorSpace), clock)
-    }
-    private val lazyAnimatedBoxColor = LazyAnimatedValue<Color, AnimationVector4D> { target ->
-        AnimatedValueModel(target, (Color.VectorConverter)(target.colorSpace), clock)
-    }
-    private val lazyAnimatedBorderColor = LazyAnimatedValue<Color, AnimationVector4D> { target ->
-        AnimatedValueModel(target, (Color.VectorConverter)(target.colorSpace), clock)
-    }
-
-    override fun checkmarkColor(state: ToggleableState): Color {
+    @Composable
+    override fun checkmarkColor(state: ToggleableState): State<Color> {
         val target = if (state == ToggleableState.Off) {
             uncheckedCheckmarkColor
         } else {
             checkedCheckmarkColor
         }
 
-        val animatedCheckmarkColor = lazyAnimatedCheckmarkColor.animatedValueForTarget(target)
-
-        if (animatedCheckmarkColor.targetValue != target) {
-            val duration = if (state == ToggleableState.Off) BoxOutDuration else BoxInDuration
-            animatedCheckmarkColor.animateTo(target, tween(durationMillis = duration))
-        }
-        return animatedCheckmarkColor.value
+        val duration = if (state == ToggleableState.Off) BoxOutDuration else BoxInDuration
+        return animateAsState(target, tween(durationMillis = duration))
     }
 
-    override fun boxColor(enabled: Boolean, state: ToggleableState): Color {
+    @Composable
+    override fun boxColor(enabled: Boolean, state: ToggleableState): State<Color> {
         val target = if (enabled) {
             when (state) {
                 ToggleableState.On, ToggleableState.Indeterminate -> checkedBoxColor
@@ -403,19 +386,15 @@ private class DefaultCheckboxColors(
         // If not enabled 'snap' to the disabled state, as there should be no animations between
         // enabled / disabled.
         return if (enabled) {
-            val animatedBoxColor = lazyAnimatedBoxColor.animatedValueForTarget(target)
-
-            if (animatedBoxColor.targetValue != target) {
-                val duration = if (state == ToggleableState.Off) BoxOutDuration else BoxInDuration
-                animatedBoxColor.animateTo(target, tween(durationMillis = duration))
-            }
-            animatedBoxColor.value
+            val duration = if (state == ToggleableState.Off) BoxOutDuration else BoxInDuration
+            animateAsState(target, tween(durationMillis = duration))
         } else {
-            target
+            rememberUpdatedState(target)
         }
     }
 
-    override fun borderColor(enabled: Boolean, state: ToggleableState): Color {
+    @Composable
+    override fun borderColor(enabled: Boolean, state: ToggleableState): State<Color> {
         val target = if (enabled) {
             when (state) {
                 ToggleableState.On, ToggleableState.Indeterminate -> checkedBorderColor
@@ -431,15 +410,10 @@ private class DefaultCheckboxColors(
         // If not enabled 'snap' to the disabled state, as there should be no animations between
         // enabled / disabled.
         return if (enabled) {
-            val animatedBorderColor = lazyAnimatedBorderColor.animatedValueForTarget(target)
-
-            if (animatedBorderColor.targetValue != target) {
-                val duration = if (state == ToggleableState.Off) BoxOutDuration else BoxInDuration
-                animatedBorderColor.animateTo(target, tween(durationMillis = duration))
-            }
-            animatedBorderColor.value
+            val duration = if (state == ToggleableState.Off) BoxOutDuration else BoxInDuration
+            animateAsState(target, tween(durationMillis = duration))
         } else {
-            target
+            rememberUpdatedState(target)
         }
     }
 }

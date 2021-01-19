@@ -9,6 +9,7 @@ package androidx.compose.animation.core {
     ctor public Animatable(T? initialValue, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, T? visibilityThreshold);
     method public suspend Object? animateDecay(T? initialVelocity, androidx.compose.animation.core.DecayAnimationSpec<T> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.Animatable<T,V>,kotlin.Unit>? block, optional kotlin.coroutines.Continuation<? super androidx.compose.animation.core.AnimationResult<T,V>> p);
     method public suspend Object? animateTo(T? targetValue, optional androidx.compose.animation.core.AnimationSpec<T> animationSpec, optional T? initialVelocity, optional kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.Animatable<T,V>,kotlin.Unit>? block, optional kotlin.coroutines.Continuation<? super androidx.compose.animation.core.AnimationResult<T,V>> p);
+    method public androidx.compose.runtime.State<T> asState();
     method public T? getLowerBound();
     method public T! getTargetValue();
     method public androidx.compose.animation.core.TwoWayConverter<T,V> getTypeConverter();
