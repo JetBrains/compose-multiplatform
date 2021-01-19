@@ -69,7 +69,6 @@ import androidx.compose.ui.unit.dp
  * in different states. This controls the size of the shadow below the FAB.
  * @param content the content of this FAB - this is typically an [Icon].
  */
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun FloatingActionButton(
     onClick: () -> Unit,
@@ -191,7 +190,6 @@ fun ExtendedFloatingActionButton(
  * See [FloatingActionButtonDefaults.elevation] for the default elevation used in a
  * [FloatingActionButton] and [ExtendedFloatingActionButton].
  */
-@ExperimentalMaterialApi
 @Stable
 interface FloatingActionButtonElevation {
     /**
@@ -217,7 +215,6 @@ object FloatingActionButtonDefaults {
      * @param pressedElevation the elevation to use when the [FloatingActionButton] is
      * [Interaction.Pressed].
      */
-    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     fun elevation(
         defaultElevation: Dp = 6.dp,
@@ -237,7 +234,6 @@ object FloatingActionButtonDefaults {
 /**
  * Default [FloatingActionButtonElevation] implementation.
  */
-@OptIn(ExperimentalMaterialApi::class)
 @Stable
 private class DefaultFloatingActionButtonElevation(
     private val defaultElevation: Dp,

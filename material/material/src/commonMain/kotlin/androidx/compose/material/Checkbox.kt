@@ -77,7 +77,6 @@ import androidx.compose.ui.util.lerp
  * @param colors [CheckboxColors] that will be used to determine the color of the checkmark / box
  * / border in different states. See [CheckboxDefaults.colors].
  */
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun Checkbox(
     checked: Boolean,
@@ -121,7 +120,6 @@ fun Checkbox(
  * @param colors [CheckboxColors] that will be used to determine the color of the checkmark / box
  * / border in different states. See [CheckboxDefaults.colors].
  */
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TriStateCheckbox(
     state: ToggleableState,
@@ -158,7 +156,6 @@ fun TriStateCheckbox(
  * See [CheckboxDefaults.colors] for the default implementation that follows Material
  * specifications.
  */
-@ExperimentalMaterialApi
 @Stable
 interface CheckboxColors {
 
@@ -205,7 +202,6 @@ object CheckboxDefaults {
      * @param disabledIndeterminateColor color that will be used for the box and
      * border in a [TriStateCheckbox] when disabled AND in an [ToggleableState.Indeterminate] state.
      */
-    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     fun colors(
         checkedColor: Color = MaterialTheme.colors.secondary,
@@ -238,7 +234,6 @@ object CheckboxDefaults {
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun CheckboxImpl(
     enabled: Boolean,
@@ -341,7 +336,6 @@ private class CheckDrawingCache(
 /**
  * Default [CheckboxColors] implementation.
  */
-@OptIn(ExperimentalMaterialApi::class)
 @Stable
 private class DefaultCheckboxColors(
     private val checkedCheckmarkColor: Color,
