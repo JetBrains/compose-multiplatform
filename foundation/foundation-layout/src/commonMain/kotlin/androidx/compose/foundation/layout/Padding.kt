@@ -258,5 +258,14 @@ data class PaddingValues(
     @Stable
     val bottom: Dp = 0.dp
 ) {
+    /**
+     * Describes a padding of [all] dp along all 4 edges.
+     */
     constructor(all: Dp) : this(all, all, all, all)
+
+    /**
+     * Describes a padding of [horizontal] dp along the left and right edges, and of [vertical]
+     * dp along the top and bottom edges.
+     */
+    constructor(horizontal: Dp, vertical: Dp) : this(horizontal, vertical, horizontal, vertical)
 }
