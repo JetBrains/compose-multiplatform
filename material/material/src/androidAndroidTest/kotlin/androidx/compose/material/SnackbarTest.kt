@@ -365,7 +365,6 @@ class SnackbarTest {
     }
 
     @Test
-    @OptIn(ExperimentalMaterialApi::class)
     fun defaultSnackbar_dataVersion_proxiesParameters() {
         var clicked = false
         val snackbarData = object : SnackbarData {

@@ -32,7 +32,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomAppBar
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ExtendedFloatingActionButton
 import androidx.compose.material.FabPosition
 import androidx.compose.material.Icon
@@ -192,7 +191,6 @@ fun ScaffoldWithBottomBarAndCutout() {
 
 @Sampled
 @Composable
-@OptIn(ExperimentalMaterialApi::class)
 fun ScaffoldWithSimpleSnackbar() {
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
@@ -220,7 +218,6 @@ fun ScaffoldWithSimpleSnackbar() {
 }
 
 @Sampled
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ScaffoldWithCustomSnackbar() {
     val scaffoldState = rememberScaffoldState()
@@ -258,7 +255,7 @@ fun ScaffoldWithCustomSnackbar() {
 }
 
 @Sampled
-@OptIn(ExperimentalMaterialApi::class, ExperimentalCoroutinesApi::class, FlowPreview::class)
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @Composable
 fun ScaffoldWithCoroutinesSnackbar() {
     // decouple snackbar host state from scaffold state for demo purposes

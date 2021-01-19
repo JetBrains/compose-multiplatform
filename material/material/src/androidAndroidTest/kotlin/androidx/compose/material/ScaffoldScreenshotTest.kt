@@ -48,7 +48,6 @@ import org.junit.runner.RunWith
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-@OptIn(ExperimentalMaterialApi::class)
 class ScaffoldScreenshotTest {
 
     @get:Rule
@@ -602,7 +601,6 @@ class ScaffoldScreenshotTest {
  * @param rtl whether to set [LayoutDirection.Rtl] as the [LayoutDirection] for this Scaffold and
  * its content
  */
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun ScreenshotScaffold(
     showTopAppBar: Boolean,
