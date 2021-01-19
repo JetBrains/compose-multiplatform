@@ -43,6 +43,10 @@ interface ComposeTestRule : TestRule, SemanticsNodeInteractionsProvider {
     /**
      * Current device display's size.
      */
+    @Deprecated(
+        "This utility was deprecated without replacement. It is recommend to use " +
+            "the root size for any assertions."
+    )
     val displaySize: IntSize get
 
     /**
