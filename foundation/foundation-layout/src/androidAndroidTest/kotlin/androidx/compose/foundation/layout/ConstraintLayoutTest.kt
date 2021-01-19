@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.layout
 
+import android.content.Context
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
@@ -34,6 +35,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
@@ -52,11 +54,17 @@ class ConstraintLayoutTest : LayoutTest() {
     @get:Rule
     val rule = createComposeRule()
 
+    var displaySize: IntSize = IntSize.Zero
+
     // region sizing tests
 
     @Before
     fun before() {
         isDebugInspectorInfoEnabled = true
+        displaySize = ApplicationProvider
+            .getApplicationContext<Context>().resources.displayMetrics.let {
+                IntSize(it.widthPixels, it.heightPixels)
+            }
     }
 
     @After
@@ -68,6 +76,7 @@ class ConstraintLayoutTest : LayoutTest() {
     fun dividerMatchTextHeight_spread() = with(density) {
         val aspectRatioBoxSize = Ref<IntSize>()
         val dividerSize = Ref<IntSize>()
+
         rule.setContent {
             ConstraintLayout(
                 // Make CL fixed width and wrap content height.
@@ -85,7 +94,7 @@ class ConstraintLayoutTest : LayoutTest() {
                             height = Dimension.wrapContent
                         }
                         // Try to be large to make wrap content impossible.
-                        .preferredWidth((rule.displaySize.width).toDp())
+                        .preferredWidth((displaySize.width).toDp())
                         // This could be any (width in height out child) e.g. text
                         .aspectRatio(2f)
                         .onGloballyPositioned { coordinates ->
@@ -108,12 +117,12 @@ class ConstraintLayoutTest : LayoutTest() {
         rule.runOnIdle {
             // The aspect ratio could not wrap and it is wrap suggested, so it respects constraints.
             assertEquals(
-                (rule.displaySize.width / 2),
+                (displaySize.width / 2),
                 aspectRatioBoxSize.value!!.width
             )
             // Aspect ratio is preserved.
             assertEquals(
-                (rule.displaySize.width / 2 / 2),
+                (displaySize.width / 2 / 2),
                 aspectRatioBoxSize.value!!.height
             )
             // Divider has fixed width 1.dp in constraint set.
@@ -145,7 +154,7 @@ class ConstraintLayoutTest : LayoutTest() {
                             height = Dimension.preferredWrapContent
                         }
                         // Try to be large to make wrap content impossible.
-                        .preferredWidth((rule.displaySize.width).toDp())
+                        .preferredWidth((displaySize.width).toDp())
                         // This could be any (width in height out child) e.g. text
                         .aspectRatio(2f)
                         .onGloballyPositioned { coordinates ->
@@ -168,12 +177,12 @@ class ConstraintLayoutTest : LayoutTest() {
         rule.runOnIdle {
             // The aspect ratio could not wrap and it is wrap suggested, so it respects constraints.
             assertEquals(
-                (rule.displaySize.width / 2),
+                (displaySize.width / 2),
                 aspectRatioBoxSize.value!!.width
             )
             // Aspect ratio is preserved.
             assertEquals(
-                (rule.displaySize.width / 2 / 2),
+                (displaySize.width / 2 / 2),
                 aspectRatioBoxSize.value!!.height
             )
             // Divider has fixed width 1.dp in constraint set.
@@ -205,7 +214,7 @@ class ConstraintLayoutTest : LayoutTest() {
                             height = Dimension.wrapContent
                         }
                         // Try to be large to make wrap content impossible.
-                        .preferredWidth((rule.displaySize.width).toDp())
+                        .preferredWidth((displaySize.width).toDp())
                         // This could be any (width in height out child) e.g. text
                         .aspectRatio(2f)
                         .onGloballyPositioned { coordinates ->
@@ -229,12 +238,12 @@ class ConstraintLayoutTest : LayoutTest() {
         rule.runOnIdle {
             // The aspect ratio could not wrap and it is wrap suggested, so it respects constraints.
             assertEquals(
-                (rule.displaySize.width / 2),
+                (displaySize.width / 2),
                 aspectRatioBoxSize.value!!.width
             )
             // Aspect ratio is preserved.
             assertEquals(
-                (rule.displaySize.width / 2 / 2),
+                (displaySize.width / 2 / 2),
                 aspectRatioBoxSize.value!!.height
             )
             // Divider has fixed width 1.dp in constraint set.
@@ -267,7 +276,7 @@ class ConstraintLayoutTest : LayoutTest() {
                             height = Dimension.wrapContent
                         }
                         // Try to be large to make wrap content impossible.
-                        .preferredWidth((rule.displaySize.width).toDp())
+                        .preferredWidth((displaySize.width).toDp())
                         // This could be any (width in height out child) e.g. text
                         .aspectRatio(2f)
                         .onGloballyPositioned { coordinates ->
@@ -291,12 +300,12 @@ class ConstraintLayoutTest : LayoutTest() {
         rule.runOnIdle {
             // The aspect ratio could not wrap and it is wrap suggested, so it respects constraints.
             assertEquals(
-                (rule.displaySize.width / 2),
+                (displaySize.width / 2),
                 aspectRatioBoxSize.value!!.width
             )
             // Aspect ratio is preserved.
             assertEquals(
-                (rule.displaySize.width / 2 / 2),
+                (displaySize.width / 2 / 2),
                 aspectRatioBoxSize.value!!.height
             )
             // Divider has fixed width 1.dp in constraint set.
@@ -423,8 +432,8 @@ class ConstraintLayoutTest : LayoutTest() {
             }
         }
 
-        val displayWidth = rule.displaySize.width
-        val displayHeight = rule.displaySize.height
+        val displayWidth = displaySize.width
+        val displayHeight = displaySize.height
 
         rule.runOnIdle {
             assertEquals(
@@ -493,8 +502,8 @@ class ConstraintLayoutTest : LayoutTest() {
             }
         }
 
-        val displayWidth = rule.displaySize.width
-        val displayHeight = rule.displaySize.height
+        val displayWidth = displaySize.width
+        val displayHeight = displaySize.height
 
         rule.runOnIdle {
             assertEquals(
@@ -569,8 +578,8 @@ class ConstraintLayoutTest : LayoutTest() {
             }
         }
 
-        val displayWidth = rule.displaySize.width
-        val displayHeight = rule.displaySize.height
+        val displayWidth = displaySize.width
+        val displayHeight = displaySize.height
 
         rule.runOnIdle {
             assertEquals(
