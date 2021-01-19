@@ -26,12 +26,7 @@ import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.defaultMinSizeConstraints
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredSizeIn
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
@@ -39,8 +34,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.takeOrElse
@@ -52,6 +45,7 @@ import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -72,7 +66,7 @@ internal enum class TextFieldType {
  * Implementation of the [TextField] and [OutlinedTextField]
  */
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, InternalTextApi::class)
 internal fun TextFieldImpl(
     type: TextFieldType,
     enabled: Boolean,
@@ -113,55 +107,6 @@ internal fun TextFieldImpl(
         isFocused -> InputPhase.Focused
         value.text.isEmpty() -> InputPhase.UnfocusedEmpty
         else -> InputPhase.UnfocusedNotEmpty
-    }
-
-    val decoratedTextField: @Composable (Modifier) -> Unit = @Composable { tagModifier ->
-        Decoration(
-            contentColor = inactiveColor,
-            typography = MaterialTheme.typography.subtitle1,
-            contentAlpha = if (enabled) ContentAlpha.high else ContentAlpha.disabled
-        ) {
-            BasicTextField(
-                value = value,
-                modifier = tagModifier.defaultMinSizeConstraints(minWidth = TextFieldMinWidth),
-                textStyle = mergedTextStyle,
-                enabled = enabled,
-                readOnly = readOnly,
-                onValueChange = onValueChange,
-                cursorColor = if (isErrorValue) errorColor else activeColor,
-                visualTransformation = visualTransformation,
-                keyboardOptions = keyboardOptions,
-                maxLines = maxLines,
-                interactionState = interactionState,
-                onImeActionPerformed = {
-                    onImeActionPerformed(it, keyboardController.value)
-                },
-                onTextInputStarted = {
-                    keyboardController.value = it
-                    onTextInputStarted(it)
-                },
-                singleLine = singleLine
-            )
-        }
-    }
-
-    val focusRequester = FocusRequester()
-    val textFieldModifier = if (enabled) {
-        modifier
-            .focusRequester(focusRequester)
-            .clickable(interactionState = interactionState, indication = null) {
-                focusRequester.requestFocus()
-                // TODO(b/163109449): Showing and hiding keyboard should be handled by BaseTextField.
-                //  The requestFocus() call here should be enough to trigger the software keyboard.
-                //  Investiate why this is needed here. If it is really needed, instead of doing
-                //  this in the onClick callback, we should move this logic to onFocusChanged
-                //  so that it can show or hide the keyboard based on the focus state.
-                if (!readOnly) {
-                    keyboardController.value?.showSoftwareKeyboard()
-                }
-            }
-    } else {
-        modifier
     }
 
     TextFieldTransitionScope.Transition(
@@ -221,50 +166,69 @@ internal fun TextFieldImpl(
                 }
             } else null
 
+        val cursorColor = if (isErrorValue) errorColor else activeColor
+        val onImeActionPerformedAction: (ImeAction) -> Unit = {
+            onImeActionPerformed(it, keyboardController.value)
+        }
+        val onTextInputStartedAction: (SoftwareKeyboardController) -> Unit = {
+            keyboardController.value = it
+            onTextInputStarted(it)
+        }
         when (type) {
             TextFieldType.Filled -> {
                 TextFieldLayout(
-                    modifier = Modifier
-                        .preferredSizeIn(
-                            minWidth = TextFieldMinWidth,
-                            minHeight = TextFieldMinHeight
-                        )
-                        .then(textFieldModifier),
-                    decoratedTextField = decoratedTextField,
+                    modifier = modifier,
+                    value = value,
+                    onValueChange = onValueChange,
+                    enabled = enabled,
+                    readOnly = readOnly,
+                    keyboardOptions = keyboardOptions,
+                    textStyle = mergedTextStyle,
+                    singleLine = singleLine,
+                    maxLines = maxLines,
+                    onImeActionPerformed = onImeActionPerformedAction,
+                    visualTransformation = visualTransformation,
+                    onTextInputStarted = onTextInputStartedAction,
+                    interactionState = interactionState,
                     decoratedPlaceholder = decoratedPlaceholder,
                     decoratedLabel = decoratedLabel,
                     leading = leading,
                     trailing = trailing,
-                    singleLine = singleLine,
                     leadingColor = leadingColor,
                     trailingColor = trailingColor,
                     labelProgress = labelProgress,
                     indicatorWidth = indicatorWidth,
                     indicatorColor = indicatorColor,
                     backgroundColor = backgroundColor,
+                    cursorColor = cursorColor,
                     shape = shape
                 )
             }
             TextFieldType.Outlined -> {
                 OutlinedTextFieldLayout(
-                    modifier = Modifier
-                        .preferredSizeIn(
-                            minWidth = TextFieldMinWidth,
-                            minHeight = TextFieldMinHeight + OutlinedTextFieldTopPadding
-                        )
-                        .then(textFieldModifier)
-                        .padding(top = OutlinedTextFieldTopPadding),
-                    decoratedTextField = decoratedTextField,
+                    modifier = modifier,
+                    value = value,
+                    onValueChange = onValueChange,
+                    enabled = enabled,
+                    readOnly = readOnly,
+                    keyboardOptions = keyboardOptions,
+                    textStyle = mergedTextStyle,
+                    singleLine = singleLine,
+                    maxLines = maxLines,
+                    onImeActionPerformed = onImeActionPerformedAction,
+                    visualTransformation = visualTransformation,
+                    onTextInputStarted = onTextInputStartedAction,
+                    interactionState = interactionState,
                     decoratedPlaceholder = decoratedPlaceholder,
                     decoratedLabel = decoratedLabel,
                     leading = leading,
                     trailing = trailing,
-                    singleLine = singleLine,
                     leadingColor = leadingColor,
                     trailingColor = trailingColor,
                     labelProgress = labelProgress,
                     indicatorWidth = indicatorWidth,
-                    indicatorColor = indicatorColor
+                    indicatorColor = indicatorColor,
+                    cursorColor = cursorColor
                 )
             }
         }
@@ -461,17 +425,10 @@ private const val PlaceholderAnimationDelayOrDuration = 67
 private val IndicatorUnfocusedWidth = 1.dp
 private val IndicatorFocusedWidth = 2.dp
 private const val TrailingLeadingAlpha = 0.54f
-private val TextFieldMinHeight = 56.dp
-private val TextFieldMinWidth = 280.dp
+internal val TextFieldMinHeight = 56.dp
+internal val TextFieldMinWidth = 280.dp
 internal val TextFieldPadding = 16.dp
 internal val HorizontalIconPadding = 12.dp
 
 // Filled text field uses 42% opacity to meet the contrast requirements for accessibility reasons
 private const val IndicatorInactiveAlpha = 0.42f
-
-/*
-This padding is used to allow label not overlap with the content above it. This 8.dp will work
-for default cases when developers do not override the label's font size. If they do, they will
-need to add additional padding themselves
-*/
-private val OutlinedTextFieldTopPadding = 8.dp

@@ -20,8 +20,10 @@ import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.defaultMinSizeConstraints
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.ZeroCornerSize
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -96,9 +98,9 @@ import kotlin.math.roundToInt
  * @param enabled controls the enabled state of the [TextField]. When `false`, the text field will
  * be neither editable nor focusable, the input of the text field will not be selectable,
  * visually text field will appear in the disabled UI state
- * @param readOnly controls the editable state of the [TextField]. When `true`, the text fields
- * will not be editable but otherwise operable. Read-only text fields are usually used to display
- * the pre-filled text that user cannot edit
+ * @param readOnly controls the editable state of the [TextField]. When `true`, the text
+ * field can not be modified, however, a user can focus it and copy text from it. Read-only text
+ * fields are usually used to display pre-filled forms that user can not edit
  * @param textStyle the style to be applied to the input text. The default [textStyle] uses the
  * [AmbientTextStyle] defined by the theme
  * @param label the optional label to be displayed inside the text field container. The default
@@ -228,9 +230,9 @@ fun TextField(
  * @param enabled controls the enabled state of the [TextField]. When `false`, the text field will
  * be neither editable nor focusable, the input of the text field will not be selectable,
  * visually text field will appear in the disabled UI state
- * @param readOnly controls the editable state of the [TextField]. When `true`, the text fields
- * will not be editable but otherwise operable. Read-only text fields are usually used to display
- * the pre-filled text that user cannot edit
+ * @param readOnly controls the editable state of the [TextField]. When `true`, the text
+ * field can not be modified, however, a user can focus it and copy text from it. Read-only text
+ * fields are usually used to display pre-filled forms that user can not edit
  * @param textStyle the style to be applied to the input text. The default [textStyle] uses the
  * [AmbientTextStyle] defined by the theme
  * @param label the optional label to be displayed inside the text field container. The default
@@ -334,41 +336,67 @@ fun TextField(
 
 @Composable
 internal fun TextFieldLayout(
-    modifier: Modifier = Modifier,
-    decoratedTextField: @Composable (Modifier) -> Unit,
+    modifier: Modifier,
+    value: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
+    enabled: Boolean,
+    readOnly: Boolean,
+    keyboardOptions: KeyboardOptions,
+    textStyle: TextStyle,
+    singleLine: Boolean,
+    maxLines: Int = Int.MAX_VALUE,
+    onImeActionPerformed: (ImeAction) -> Unit = {},
+    visualTransformation: VisualTransformation,
+    onTextInputStarted: (SoftwareKeyboardController) -> Unit,
+    interactionState: InteractionState,
     decoratedPlaceholder: @Composable ((Modifier) -> Unit)?,
     decoratedLabel: @Composable (() -> Unit)?,
     leading: @Composable (() -> Unit)?,
     trailing: @Composable (() -> Unit)?,
-    singleLine: Boolean,
     leadingColor: Color,
     trailingColor: Color,
     labelProgress: Float,
     indicatorWidth: Dp,
     indicatorColor: Color,
     backgroundColor: Color,
+    cursorColor: Color,
     shape: Shape
 ) {
-    // places leading icon, text field with label and placeholder, trailing icon
-    IconsWithTextFieldLayout(
+    BasicTextField(
+        value = value,
         modifier = modifier
-            .background(
-                color = backgroundColor,
-                shape = shape
+            .defaultMinSizeConstraints(
+                minWidth = TextFieldMinWidth,
+                minHeight = TextFieldMinHeight
             )
-            .drawIndicatorLine(
-                lineWidth = indicatorWidth,
-                color = indicatorColor
-            ),
-        textField = decoratedTextField,
-        placeholder = decoratedPlaceholder,
-        label = decoratedLabel,
-        leading = leading,
-        trailing = trailing,
+            .background(color = backgroundColor, shape = shape)
+            .drawIndicatorLine(lineWidth = indicatorWidth, color = indicatorColor),
+        onValueChange = onValueChange,
+        enabled = enabled,
+        readOnly = readOnly,
+        textStyle = textStyle,
+        cursorColor = cursorColor,
+        visualTransformation = visualTransformation,
+        keyboardOptions = keyboardOptions,
+        interactionState = interactionState,
+        onImeActionPerformed = onImeActionPerformed,
+        onTextInputStarted = onTextInputStarted,
         singleLine = singleLine,
-        leadingColor = leadingColor,
-        trailingColor = trailingColor,
-        animationProgress = labelProgress
+        maxLines = maxLines,
+        decorationBox = @Composable { coreTextField ->
+            // places leading icon, text field with label and placeholder, trailing icon
+            IconsWithTextFieldLayout(
+                textField = coreTextField,
+                placeholder = decoratedPlaceholder,
+                label = decoratedLabel,
+                leading = leading,
+                trailing = trailing,
+                singleLine = singleLine,
+                leadingColor = leadingColor,
+                trailingColor = trailingColor,
+                animationProgress = labelProgress
+            )
+        }
     )
 }
 
@@ -378,8 +406,7 @@ internal fun TextFieldLayout(
  */
 @Composable
 private fun IconsWithTextFieldLayout(
-    modifier: Modifier = Modifier,
-    textField: @Composable (Modifier) -> Unit,
+    textField: @Composable () -> Unit,
     label: @Composable (() -> Unit)?,
     placeholder: @Composable ((Modifier) -> Unit)?,
     leading: @Composable (() -> Unit)?,
@@ -421,9 +448,8 @@ private fun IconsWithTextFieldLayout(
                         )
                 ) { label() }
             }
-            textField(Modifier.layoutId(TextFieldId).then(padding))
-        },
-        modifier = modifier
+            Box(Modifier.layoutId(TextFieldId).then(padding)) { textField() }
+        }
     ) { measurables, incomingConstraints ->
         val topBottomPadding = TextFieldPadding.toIntPx()
         val baseLineOffset = FirstBaselineOffset.toIntPx()
@@ -681,7 +707,7 @@ private fun Placeable.PlacementScope.placeWithoutLabel(
 /**
  * A draw modifier that draws a bottom indicator line in [TextField]
  */
-private fun Modifier.drawIndicatorLine(lineWidth: Dp, color: Color): Modifier {
+internal fun Modifier.drawIndicatorLine(lineWidth: Dp, color: Color): Modifier {
     return drawBehind {
         val strokeWidth = lineWidth.value * density
         val y = size.height - strokeWidth / 2

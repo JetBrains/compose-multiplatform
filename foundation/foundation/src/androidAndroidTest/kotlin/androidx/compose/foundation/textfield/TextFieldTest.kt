@@ -21,11 +21,18 @@ package androidx.compose.foundation.textfield
 
 import android.os.Build
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Interaction
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
@@ -40,6 +47,7 @@ import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -55,6 +63,7 @@ import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.click
 import androidx.compose.ui.test.hasImeAction
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.isFocused
@@ -63,6 +72,7 @@ import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
@@ -77,6 +87,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextFieldValue.Companion.Saver
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
@@ -634,6 +645,44 @@ class TextFieldTest {
 
         rule.runOnIdle {
             assertThat(lastSeenText).isEqualTo("")
+        }
+    }
+
+    @Test
+    fun decorationBox_clickable() {
+        val interactionState = InteractionState()
+        rule.setContent {
+            Column {
+                BasicTextField(
+                    value = "test",
+                    onValueChange = {},
+                    textStyle = TextStyle(fontSize = 2.sp),
+                    modifier = Modifier.height(100.dp).fillMaxWidth(),
+                    decorationBox = {
+                        // the core text field is at the very bottom
+                        Column {
+                            BasicText("Label", Modifier.testTag("label"))
+                            Spacer(Modifier.weight(1f))
+                            it()
+                        }
+                    },
+                    interactionState = interactionState
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(interactionState.contains(Interaction.Focused)).isFalse()
+        }
+
+        // click outside core text field area
+        rule.onNodeWithTag("label")
+            .performGesture {
+                click(Offset.Zero)
+            }
+
+        rule.runOnIdle {
+            assertThat(interactionState.contains(Interaction.Focused)).isTrue()
         }
     }
 }

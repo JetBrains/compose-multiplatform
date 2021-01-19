@@ -16,14 +16,18 @@
 
 package androidx.compose.foundation.text
 
+import androidx.compose.animation.asDisposableClock
 import androidx.compose.foundation.InteractionState
-import androidx.compose.foundation.gestures.rememberScrollableController
+import androidx.compose.foundation.animation.defaultFlingConfig
+import androidx.compose.foundation.gestures.ScrollableController
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.offset
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.savedinstancestate.Saver
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.savedinstancestate.listSaver
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Modifier
@@ -35,7 +39,7 @@ import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
-import androidx.compose.ui.node.Ref
+import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.text.TextLayoutResult
@@ -49,79 +53,96 @@ import androidx.compose.ui.unit.LayoutDirection
 import kotlin.math.min
 import kotlin.math.roundToInt
 
+// Scrollable
+internal fun Modifier.textFieldScrollable(
+    scrollerPosition: TextFieldScrollerPosition,
+    interactionState: InteractionState? = null,
+    enabled: Boolean = true
+) = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "textFieldScrollable"
+        properties["scrollerPosition"] = scrollerPosition
+        properties["interactionState"] = interactionState
+        properties["enabled"] = enabled
+    }
+) {
+    // do not reverse direction only in case of RTL in horizontal orientation
+    val rtl = AmbientLayoutDirection.current == LayoutDirection.Rtl
+    val reverseDirection = scrollerPosition.orientation == Orientation.Vertical || !rtl
+    val controller = rememberScrollableController(
+        scrollerPosition,
+        interactionState = interactionState
+    ) { delta ->
+        val newOffset = scrollerPosition.offset + delta
+        val consumedDelta = when {
+            newOffset > scrollerPosition.maximum ->
+                scrollerPosition.maximum - scrollerPosition.offset
+            newOffset < 0f -> -scrollerPosition.offset
+            else -> delta
+        }
+        scrollerPosition.offset += consumedDelta
+        consumedDelta
+    }
+    val scroll = Modifier.scrollable(
+        orientation = scrollerPosition.orientation,
+        canScroll = { scrollerPosition.maximum != 0f },
+        reverseDirection = reverseDirection,
+        controller = controller,
+        enabled = enabled
+    )
+    scroll
+}
+
+// Layout
 internal fun Modifier.textFieldScroll(
-    orientation: Orientation,
     scrollerPosition: TextFieldScrollerPosition,
     textFieldValue: TextFieldValue,
     visualTransformation: VisualTransformation,
-    interactionState: InteractionState,
-    textLayoutResult: Ref<TextLayoutResult?>,
-    enabled: Boolean = true
-) = composed(
-    factory = {
-        // do not reverse direction only in case of RTL in horizontal orientation
-        val rtl = AmbientLayoutDirection.current == LayoutDirection.Rtl
-        val reverseDirection = orientation == Orientation.Vertical || !rtl
-        val controller =
-            rememberScrollableController(interactionState = interactionState) { delta ->
-                val newOffset = scrollerPosition.offset + delta
-                val consumedDelta = when {
-                    newOffset > scrollerPosition.maximum ->
-                        scrollerPosition.maximum - scrollerPosition.offset
-                    newOffset < 0f -> -scrollerPosition.offset
-                    else -> delta
-                }
-                scrollerPosition.offset += consumedDelta
-                consumedDelta
-            }
-        val scroll = Modifier.scrollable(
-            orientation = orientation,
-            canScroll = { scrollerPosition.maximum != 0f },
-            reverseDirection = reverseDirection,
-            controller = controller,
-            enabled = enabled
-        )
+    textLayoutResultProvider: () -> TextLayoutResultProxy?
+): Modifier {
+    val orientation = scrollerPosition.orientation
+    val cursorOffset = scrollerPosition.getOffsetToFollow(textFieldValue.selection)
+    scrollerPosition.previousSelection = textFieldValue.selection
 
-        val cursorOffset = scrollerPosition.getOffsetToFollow(textFieldValue.selection)
-        scrollerPosition.previousSelection = textFieldValue.selection
+    val transformedText = visualTransformation.filter(textFieldValue.annotatedString)
 
-        val transformedText = visualTransformation.filter(textFieldValue.annotatedString)
-
-        val layout = when (orientation) {
-            Orientation.Vertical ->
-                VerticalScrollLayoutModifier(
-                    scrollerPosition,
-                    cursorOffset,
-                    transformedText,
-                    textLayoutResult
-                )
-            Orientation.Horizontal ->
-                HorizontalScrollLayoutModifier(
-                    scrollerPosition,
-                    cursorOffset,
-                    transformedText,
-                    textLayoutResult
-                )
-        }
-        this.then(scroll).clipToBounds().then(layout)
-    },
-    inspectorInfo = debugInspectorInfo {
-        name = "textFieldScroll"
-        properties["orientation"] = orientation
-        properties["scrollerPosition"] = scrollerPosition
-        properties["enabled"] = enabled
-        properties["textFieldValue"] = textFieldValue
-        properties["visualTransformation"] = visualTransformation
-        properties["interactionState"] = interactionState
-        properties["textLayoutResult"] = textLayoutResult
+    val layout = when (orientation) {
+        Orientation.Vertical ->
+            VerticalScrollLayoutModifier(
+                scrollerPosition,
+                cursorOffset,
+                transformedText,
+                textLayoutResultProvider
+            )
+        Orientation.Horizontal ->
+            HorizontalScrollLayoutModifier(
+                scrollerPosition,
+                cursorOffset,
+                transformedText,
+                textLayoutResultProvider
+            )
     }
-)
+    return this.clipToBounds().then(layout)
+}
+
+@Composable
+private fun rememberScrollableController(
+    vararg inputs: Any?,
+    interactionState: InteractionState? = null,
+    consumeScrollDelta: (Float) -> Float
+): ScrollableController {
+    val clocks = AmbientAnimationClock.current.asDisposableClock()
+    val flingConfig = defaultFlingConfig()
+    return remember(inputs, clocks, flingConfig, interactionState) {
+        ScrollableController(consumeScrollDelta, flingConfig, clocks, interactionState)
+    }
+}
 
 private data class VerticalScrollLayoutModifier(
     val scrollerPosition: TextFieldScrollerPosition,
     val cursorOffset: Int,
     val transformedText: TransformedText,
-    val textLayoutResult: Ref<TextLayoutResult?>
+    val textLayoutResultProvider: () -> TextLayoutResultProxy?
 ) : LayoutModifier {
     override fun MeasureScope.measure(
         measurable: Measurable,
@@ -135,7 +156,7 @@ private data class VerticalScrollLayoutModifier(
             val cursorRect = getCursorRectInScroller(
                 cursorOffset = cursorOffset,
                 transformedText = transformedText,
-                textLayoutResult = textLayoutResult.value,
+                textLayoutResult = textLayoutResultProvider()?.value,
                 rtl = false,
                 textFieldWidth = placeable.width
             )
@@ -157,7 +178,7 @@ private data class HorizontalScrollLayoutModifier(
     val scrollerPosition: TextFieldScrollerPosition,
     val cursorOffset: Int,
     val transformedText: TransformedText,
-    val textLayoutResult: Ref<TextLayoutResult?>
+    val textLayoutResultProvider: () -> TextLayoutResultProxy?
 ) : LayoutModifier {
     override fun MeasureScope.measure(
         measurable: Measurable,
@@ -171,7 +192,7 @@ private data class HorizontalScrollLayoutModifier(
             val cursorRect = getCursorRectInScroller(
                 cursorOffset = cursorOffset,
                 transformedText = transformedText,
-                textLayoutResult = textLayoutResult.value,
+                textLayoutResult = textLayoutResultProvider()?.value,
                 rtl = layoutDirection == LayoutDirection.Rtl,
                 textFieldWidth = placeable.width
             )
@@ -216,7 +237,14 @@ private fun Density.getCursorRectInScroller(
 }
 
 @Stable
-internal class TextFieldScrollerPosition(initial: Float = 0f) {
+internal class TextFieldScrollerPosition(
+    initialOrientation: Orientation,
+    initial: Float = 0f,
+) {
+
+    /*@VisibleForTesting*/
+    constructor() : this(Orientation.Vertical)
+
     /**
      * Left or top offset. Takes values from 0 to [maximum].
      * Taken with the opposite sign defines the x or y position of the text field in the
@@ -242,6 +270,8 @@ internal class TextFieldScrollerPosition(initial: Float = 0f) {
      * in the new selection, and decide which selection offset (start, end) to follow.
      */
     var previousSelection: TextRange = TextRange.Zero
+
+    var orientation by mutableStateOf(initialOrientation, structuralEqualityPolicy())
 
     fun update(
         orientation: Orientation,
@@ -283,11 +313,14 @@ internal class TextFieldScrollerPosition(initial: Float = 0f) {
     }
 
     companion object {
-        val Saver = Saver<TextFieldScrollerPosition, Float>(
-            save = { it.offset },
+        val Saver = listSaver<TextFieldScrollerPosition, Any>(
+            save = {
+                listOf(it.offset, it.orientation == Orientation.Vertical)
+            },
             restore = { restored ->
                 TextFieldScrollerPosition(
-                    initial = restored
+                    if (restored[1] as Boolean) Orientation.Vertical else Orientation.Horizontal,
+                    restored[0] as Float
                 )
             }
         )
