@@ -25,12 +25,12 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.MediumTest
+import androidx.test.filters.LargeTest
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@MediumTest
+@LargeTest
 @RunWith(AndroidJUnit4::class)
 class SetRootFocusTest {
     @get:Rule
@@ -63,12 +63,12 @@ class SetRootFocusTest {
             }
         }
         rule.onNodeWithTag(focusable).performClick()
-        rule.waitUntil { isFocused == true }
+        rule.waitUntil(5_000) { isFocused == true }
 
         // Act.
         rule.onNodeWithTag(nonFocusable).performClick()
 
         // Assert.
-        rule.waitUntil { isFocused == false }
+        rule.waitUntil(5_000) { isFocused == false }
     }
 }
