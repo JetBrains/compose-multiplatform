@@ -18,7 +18,7 @@ package androidx.compose.animation.demos
 
 import androidx.compose.animation.Animatable
 import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.core.animateAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.background
@@ -38,7 +38,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 @Composable
 fun SingleValueAnimationDemo() {
     val enabled = remember { mutableStateOf(true) }
-    val alpha: Float by animateAsState(if (enabled.value) 1f else 0.5f)
+    val alpha: Float by animateFloatAsState(if (enabled.value) 1f else 0.5f)
     val color = myAnimate(
         if (enabled.value) Color.Green else Color.Magenta,
         spring()

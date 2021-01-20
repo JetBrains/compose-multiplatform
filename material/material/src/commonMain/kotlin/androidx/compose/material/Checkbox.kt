@@ -16,7 +16,7 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.animateAsState
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FloatPropKey
 import androidx.compose.animation.core.TransitionSpec
 import androidx.compose.animation.core.keyframes
@@ -365,7 +365,7 @@ private class DefaultCheckboxColors(
         }
 
         val duration = if (state == ToggleableState.Off) BoxOutDuration else BoxInDuration
-        return animateAsState(target, tween(durationMillis = duration))
+        return animateColorAsState(target, tween(durationMillis = duration))
     }
 
     @Composable
@@ -387,7 +387,7 @@ private class DefaultCheckboxColors(
         // enabled / disabled.
         return if (enabled) {
             val duration = if (state == ToggleableState.Off) BoxOutDuration else BoxInDuration
-            animateAsState(target, tween(durationMillis = duration))
+            animateColorAsState(target, tween(durationMillis = duration))
         } else {
             rememberUpdatedState(target)
         }
@@ -411,7 +411,7 @@ private class DefaultCheckboxColors(
         // enabled / disabled.
         return if (enabled) {
             val duration = if (state == ToggleableState.Off) BoxOutDuration else BoxInDuration
-            animateAsState(target, tween(durationMillis = duration))
+            animateColorAsState(target, tween(durationMillis = duration))
         } else {
             rememberUpdatedState(target)
         }

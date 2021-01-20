@@ -18,7 +18,7 @@ package androidx.compose.ui.platform
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.TweenSpec
-import androidx.compose.animation.core.animateAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -214,7 +214,7 @@ class DesktopOwnerTest {
         var targetValue by mutableStateOf(10f)
 
         setContent {
-            val value by animateAsState(
+            val value by animateFloatAsState(
                 targetValue,
                 animationSpec = TweenSpec(durationMillis = 30, easing = LinearEasing)
             )
