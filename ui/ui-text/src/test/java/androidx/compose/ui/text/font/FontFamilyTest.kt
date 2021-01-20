@@ -28,21 +28,21 @@ class FontFamilyTest {
 
     @Test(expected = IllegalStateException::class)
     fun `cannot be instantiated with empty font list`() {
-        fontFamily(listOf())
+        FontFamily(listOf())
     }
 
     @Test
     fun `two equal family declarations are equal`() {
-        val fontFamily = fontFamily(
-            font(
+        val fontFamily = FontFamily(
+            Font(
                 resId = resourceId1,
                 weight = FontWeight.W900,
                 style = FontStyle.Italic
             )
         )
 
-        val otherFontFamily = fontFamily(
-            font(
+        val otherFontFamily = FontFamily(
+            Font(
                 resId = resourceId1,
                 weight = FontWeight.W900,
                 style = FontStyle.Italic
@@ -54,16 +54,16 @@ class FontFamilyTest {
 
     @Test
     fun `two non equal family declarations are not equal`() {
-        val fontFamily = fontFamily(
-            font(
+        val fontFamily = FontFamily(
+            Font(
                 resId = resourceId1,
                 weight = FontWeight.W900,
                 style = FontStyle.Italic
             )
         )
 
-        val otherFontFamily = fontFamily(
-            font(
+        val otherFontFamily = FontFamily(
+            Font(
                 resId = resourceId1,
                 weight = FontWeight.W800,
                 style = FontStyle.Italic
@@ -75,13 +75,13 @@ class FontFamilyTest {
 
     @Test(expected = IllegalStateException::class)
     fun `cannot add two fonts that have the same FontWeight and FontStyle`() {
-        fontFamily(
-            font(
+        FontFamily(
+            Font(
                 resId = resourceId1,
                 weight = FontWeight.W900,
                 style = FontStyle.Italic
             ),
-            font(
+            Font(
                 resId = resourceId2,
                 weight = FontWeight.W900,
                 style = FontStyle.Italic

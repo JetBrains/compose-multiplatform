@@ -29,7 +29,6 @@ import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.GenericFontFamily
 import androidx.compose.ui.text.font.LoadedFontFamily
-import androidx.compose.ui.text.font.font
 
 /**
  * Creates a Typeface based on generic font family or a custom [FontFamily].
@@ -226,7 +225,7 @@ internal open class TypefaceAdapter(
      *
      * @param fontStyle the font style to create the typeface in
      * @param fontWeight the font weight to create the typeface in
-     * @param fontFamily [FontFamily] that contains the list of [font]s
+     * @param fontFamily [FontFamily] that contains the list of [Font]s
      * @param fontSynthesis [FontSynthesis] which attributes of the font family to synthesize
      *        custom fonts for if they are not already present in the font family
      */

@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.text
 
-import androidx.compose.ui.text.font.asFontFamily
+import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextDirection
@@ -40,7 +40,7 @@ class MultiParagraphIntegrationTextDirectionTest {
     private lateinit var defaultLocale: Locale
     private val context = InstrumentationRegistry.getInstrumentation().context
     private val defaultDensity = Density(density = 1f)
-    private val fontFamilyMeasureFont = FontTestData.BASIC_MEASURE_FONT.asFontFamily()
+    private val fontFamilyMeasureFont = FontTestData.BASIC_MEASURE_FONT.toFontFamily()
     private val ltrLocaleList = LocaleList("en")
     private val rtlLocaleList = LocaleList("ar")
     private val ltrLocale = Locale.ENGLISH

@@ -42,7 +42,7 @@ class FontMatcherTest {
     @Test
     fun `family with single italic font matches`() {
         val font = FontMatcher().matchFont(
-            fontFamily(FONT_100_ITALIC),
+            FontFamily(FONT_100_ITALIC),
             FontWeight.W100,
             FontStyle.Italic
         )
@@ -53,7 +53,7 @@ class FontMatcherTest {
     @Test
     fun `family with single normal font matches`() {
         val font = FontMatcher().matchFont(
-            fontFamily(FONT_100_REGULAR),
+            FontFamily(FONT_100_REGULAR),
             FontWeight.W100,
             FontStyle.Normal
         )
@@ -64,7 +64,7 @@ class FontMatcherTest {
     @Test
     fun `italic query against family with multiple fonts matches`() {
         val font = FontMatcher().matchFont(
-            fontFamily(
+            FontFamily(
                 FONT_100_REGULAR,
                 FONT_100_ITALIC,
                 FONT_200_REGULAR,
@@ -80,7 +80,7 @@ class FontMatcherTest {
     @Test
     fun `normal style query against family with multiple fonts matches`() {
         val font = FontMatcher().matchFont(
-            fontFamily(
+            FontFamily(
                 FONT_100_REGULAR,
                 FONT_200_REGULAR,
                 FONT_300_REGULAR
@@ -101,7 +101,7 @@ class FontMatcherTest {
         // --> followed by weights above the desired weight in ascending order
         // until a match is found.
         val font = FontMatcher().matchFont(
-            fontFamily(
+            FontFamily(
                 FONT_100_REGULAR,
                 FONT_100_ITALIC,
                 FONT_300_REGULAR,
@@ -124,7 +124,7 @@ class FontMatcherTest {
         // --> (THIS TEST) followed by weights above the desired weight in ascending order
         // until a match is found.
         val font = FontMatcher().matchFont(
-            fontFamily(
+            FontFamily(
                 FONT_100_REGULAR,
                 FONT_200_REGULAR,
                 FONT_300_REGULAR,
@@ -147,7 +147,7 @@ class FontMatcherTest {
         // --> followed by weights below the desired weight in descending order
         // until a match is found.
         val font = FontMatcher().matchFont(
-            fontFamily(
+            FontFamily(
                 FONT_100_ITALIC,
                 FONT_300_ITALIC,
                 FONT_400_ITALIC,
@@ -172,7 +172,7 @@ class FontMatcherTest {
         // --> (THIS TEST) followed by weights below the desired weight in descending order
         // until a match is found.
         val font = FontMatcher().matchFont(
-            fontFamily(
+            FontFamily(
                 FONT_300_ITALIC,
                 FONT_400_REGULAR,
                 FONT_400_ITALIC,
@@ -197,7 +197,7 @@ class FontMatcherTest {
         // --> followed by weights greater than 500,
         // until a match is found.
         val font = FontMatcher().matchFont(
-            fontFamily(
+            FontFamily(
                 FONT_300_ITALIC,
                 FONT_400_REGULAR,
                 FONT_500_REGULAR,
@@ -221,7 +221,7 @@ class FontMatcherTest {
         // --> followed by weights greater than 500,
         // until a match is found.
         val font = FontMatcher().matchFont(
-            fontFamily(
+            FontFamily(
                 FONT_300_ITALIC,
                 FONT_500_REGULAR,
                 FONT_600_ITALIC
@@ -243,7 +243,7 @@ class FontMatcherTest {
         // --> followed by weights greater than 500,
         // until a match is found.
         val font = FontMatcher().matchFont(
-            fontFamily(
+            FontFamily(
                 FONT_300_ITALIC,
                 FONT_500_REGULAR,
                 FONT_600_ITALIC
@@ -265,7 +265,7 @@ class FontMatcherTest {
         // --> (THIS TEST) followed by weights greater than 500,
         // until a match is found.
         val font = FontMatcher().matchFont(
-            fontFamily(
+            FontFamily(
                 FONT_300_REGULAR,
                 FONT_400_REGULAR,
                 FONT_500_REGULAR,
@@ -288,7 +288,7 @@ class FontMatcherTest {
         // --> (THIS TEST) followed by weights greater than 500,
         // until a match is found.
         val font = FontMatcher().matchFont(
-            fontFamily(
+            FontFamily(
                 FONT_300_REGULAR,
                 FONT_400_REGULAR,
                 FONT_500_REGULAR,
@@ -304,7 +304,7 @@ class FontMatcherTest {
     @Test
     fun `italic style returns another italic if exists`() {
         val font = FontMatcher().matchFont(
-            fontFamily(
+            FontFamily(
                 FONT_100_REGULAR,
                 FONT_200_REGULAR,
                 FONT_400_REGULAR,
@@ -321,7 +321,7 @@ class FontMatcherTest {
     @Test
     fun `italic style returns another italic if exists even when smaller`() {
         val font = FontMatcher().matchFont(
-            fontFamily(
+            FontFamily(
                 FONT_100_ITALIC,
                 FONT_200_REGULAR,
                 FONT_400_REGULAR,
@@ -338,7 +338,7 @@ class FontMatcherTest {
     @Test
     fun `italic style returns same weight regular if no other italic exists`() {
         val font = FontMatcher().matchFont(
-            fontFamily(
+            FontFamily(
                 FONT_200_REGULAR,
                 FONT_300_REGULAR,
                 FONT_400_REGULAR
@@ -353,7 +353,7 @@ class FontMatcherTest {
     @Test
     fun `italic style at 500 returns larger weight regular if no other italic exists`() {
         val font = FontMatcher().matchFont(
-            fontFamily(
+            FontFamily(
                 FONT_400_REGULAR,
                 FONT_500_REGULAR,
                 FONT_600_REGULAR,

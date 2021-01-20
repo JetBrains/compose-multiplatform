@@ -29,7 +29,7 @@ class LoadedFontFamilyTest {
     fun testCreateAndGetTypeface() {
         val typeface = TestTypeface(FontFamily.Monospace)
 
-        val loadedFontFamily = fontFamily(typeface)
+        val loadedFontFamily = FontFamily(typeface) as LoadedFontFamily
 
         assertThat(loadedFontFamily.typeface).isEqualTo(typeface)
     }

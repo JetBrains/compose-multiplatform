@@ -33,10 +33,10 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.asFontFamily
-import androidx.compose.ui.text.font.font
+import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -431,11 +431,11 @@ class AccessibilityIteratorsTest {
                 BasicText(
                     style = TextStyle(
                         fontSize = fontSize,
-                        fontFamily = font(
+                        fontFamily = Font(
                             resId = androidx.compose.ui.text.font.test.R.font.sample_font,
                             weight = FontWeight.Normal,
                             style = FontStyle.Normal
-                        ).asFontFamily()
+                        ).toFontFamily()
                     ),
                     text = AnnotatedString(text),
                     modifier = Modifier.width(width.toDp()),

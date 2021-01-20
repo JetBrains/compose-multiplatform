@@ -52,11 +52,10 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontListFontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.ResourceFont
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.BaselineShift
@@ -323,12 +322,12 @@ class ParameterFactoryTest {
 
     @Test
     fun testFontListFontFamily() {
-        val family = FontListFontFamily(
+        val family = FontFamily(
             listOf(
-                ResourceFont(1234, FontWeight.Normal, FontStyle.Italic),
-                ResourceFont(1235, FontWeight.Normal, FontStyle.Normal),
-                ResourceFont(1236, FontWeight.Bold, FontStyle.Italic),
-                ResourceFont(1237, FontWeight.Bold, FontStyle.Normal)
+                Font(1234, FontWeight.Normal, FontStyle.Italic),
+                Font(1235, FontWeight.Normal, FontStyle.Normal),
+                Font(1236, FontWeight.Bold, FontStyle.Italic),
+                Font(1237, FontWeight.Bold, FontStyle.Normal)
             )
         )
         assertThat(lookup(family)).isEqualTo(ParameterType.Resource to 1235)

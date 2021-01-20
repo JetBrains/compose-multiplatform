@@ -88,8 +88,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.fontFamily
-import androidx.compose.ui.text.platform.font
+import androidx.compose.ui.text.platform.Font
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextDecoration.Companion.Underline
@@ -101,7 +100,7 @@ import androidx.compose.ui.unit.sp
 
 private const val title = "Desktop Compose Elements"
 
-val italicFont = fontFamily(font("NotoSans-Italic.ttf"))
+val italicFont = FontFamily(Font("NotoSans-Italic.ttf"))
 
 fun main() {
     Window(title, IntSize(1024, 850)) {
