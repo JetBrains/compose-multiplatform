@@ -223,10 +223,10 @@ private object ThemingSnippet11 {
         small = RoundedCornerShape(percent = 50),
         medium = RoundedCornerShape(0f),
         large = CutCornerShape(
-            topLeft = 16.dp,
-            topRight = 0.dp,
-            bottomRight = 0.dp,
-            bottomLeft = 16.dp
+            topStart = 16.dp,
+            topEnd = 0.dp,
+            bottomEnd = 0.dp,
+            bottomStart = 16.dp
         )
     )
 

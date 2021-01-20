@@ -172,7 +172,7 @@ fun TextField(
     errorColor: Color = MaterialTheme.colors.error,
     backgroundColor: Color = MaterialTheme.colors.onSurface.copy(alpha = ContainerAlpha),
     shape: Shape =
-        MaterialTheme.shapes.small.copy(bottomLeft = ZeroCornerSize, bottomRight = ZeroCornerSize)
+        MaterialTheme.shapes.small.copy(bottomEnd = ZeroCornerSize, bottomStart = ZeroCornerSize)
 ) {
     var textFieldValueState by remember { mutableStateOf(TextFieldValue(text = value)) }
     val textFieldValue = textFieldValueState.copy(text = value)
@@ -304,7 +304,7 @@ fun TextField(
     errorColor: Color = MaterialTheme.colors.error,
     backgroundColor: Color = MaterialTheme.colors.onSurface.copy(alpha = ContainerAlpha),
     shape: Shape =
-        MaterialTheme.shapes.small.copy(bottomLeft = ZeroCornerSize, bottomRight = ZeroCornerSize)
+        MaterialTheme.shapes.small.copy(bottomEnd = ZeroCornerSize, bottomStart = ZeroCornerSize)
 ) {
     TextFieldImpl(
         type = TextFieldType.Filled,

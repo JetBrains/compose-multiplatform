@@ -21,44 +21,55 @@ import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.LayoutDirection.Ltr
 import androidx.compose.ui.unit.dp
 
 /**
  * A shape describing the rectangle with cut corners.
  * Corner size is representing the cut length - the size of both legs of the cut's right triangle.
  *
- * @param topLeft a size of the top left corner
- * @param topRight a size of the top right corner
- * @param bottomRight a size of the bottom left corner
- * @param bottomLeft a size of the bottom right corner
+ * This shape will automatically mirror the corner sizes in [LayoutDirection.Rtl], use
+ * [AbsoluteCutCornerShape] for the layout direction unaware version of this shape.
+ *
+ * @param topStart a size of the top start corner
+ * @param topEnd a size of the top end corner
+ * @param bottomEnd a size of the bottom end corner
+ * @param bottomStart a size of the bottom start corner
  */
 class CutCornerShape(
-    topLeft: CornerSize,
-    topRight: CornerSize,
-    bottomRight: CornerSize,
-    bottomLeft: CornerSize
-) : CornerBasedShape(topLeft, topRight, bottomRight, bottomLeft) {
+    topStart: CornerSize,
+    topEnd: CornerSize,
+    bottomEnd: CornerSize,
+    bottomStart: CornerSize
+) : CornerBasedShape(
+    topStart = topStart,
+    topEnd = topEnd,
+    bottomEnd = bottomEnd,
+    bottomStart = bottomStart
+) {
 
     override fun createOutline(
         size: Size,
-        topLeft: Float,
-        topRight: Float,
-        bottomRight: Float,
-        bottomLeft: Float
-    ) = if (topLeft + topRight + bottomLeft + bottomRight == 0.0f) {
+        topStart: Float,
+        topEnd: Float,
+        bottomEnd: Float,
+        bottomStart: Float,
+        layoutDirection: LayoutDirection
+    ) = if (topStart + topEnd + bottomStart + bottomEnd == 0.0f) {
         Outline.Rectangle(size.toRect())
     } else Outline.Generic(
         Path().apply {
-            var cornerSize = topLeft
+            var cornerSize = if (layoutDirection == Ltr) topStart else topEnd
             moveTo(0f, cornerSize)
             lineTo(cornerSize, 0f)
-            cornerSize = topRight
+            cornerSize = if (layoutDirection == Ltr) topEnd else topStart
             lineTo(size.width - cornerSize, 0f)
             lineTo(size.width, cornerSize)
-            cornerSize = bottomRight
+            cornerSize = if (layoutDirection == Ltr) bottomEnd else bottomStart
             lineTo(size.width, size.height - cornerSize)
             lineTo(size.width - cornerSize, size.height)
-            cornerSize = bottomLeft
+            cornerSize = if (layoutDirection == Ltr) bottomStart else bottomEnd
             lineTo(cornerSize, size.height)
             lineTo(0f, size.height - cornerSize)
             close()
@@ -66,39 +77,39 @@ class CutCornerShape(
     )
 
     override fun copy(
-        topLeft: CornerSize,
-        topRight: CornerSize,
-        bottomRight: CornerSize,
-        bottomLeft: CornerSize
+        topStart: CornerSize,
+        topEnd: CornerSize,
+        bottomEnd: CornerSize,
+        bottomStart: CornerSize
     ) = CutCornerShape(
-        topLeft = topLeft,
-        topRight = topRight,
-        bottomRight = bottomRight,
-        bottomLeft = bottomLeft
+        topStart = topStart,
+        topEnd = topEnd,
+        bottomEnd = bottomEnd,
+        bottomStart = bottomStart
     )
 
     override fun toString(): String {
-        return "CutCornerShape(topLeft = $topLeft, topRight = $topRight, bottomRight = " +
-            "$bottomRight, bottomLeft = $bottomLeft)"
+        return "CutCornerShape(topStart = $topStart, topEnd = $topEnd, bottomEnd = " +
+            "$bottomEnd, bottomStart = $bottomStart)"
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is CutCornerShape) return false
 
-        if (topLeft != other.topLeft) return false
-        if (topRight != other.topRight) return false
-        if (bottomRight != other.bottomRight) return false
-        if (bottomLeft != other.bottomLeft) return false
+        if (topStart != other.topStart) return false
+        if (topEnd != other.topEnd) return false
+        if (bottomEnd != other.bottomEnd) return false
+        if (bottomStart != other.bottomStart) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        var result = topLeft.hashCode()
-        result = 31 * result + topRight.hashCode()
-        result = 31 * result + bottomRight.hashCode()
-        result = 31 * result + bottomLeft.hashCode()
+        var result = topStart.hashCode()
+        result = 31 * result + topEnd.hashCode()
+        result = 31 * result + bottomEnd.hashCode()
+        result = 31 * result + bottomStart.hashCode()
         return result
     }
 }
@@ -131,56 +142,56 @@ fun CutCornerShape(percent: Int) = CutCornerShape(CornerSize(percent))
  * Creates [CutCornerShape] with sizes defined in [Dp].
  */
 fun CutCornerShape(
-    topLeft: Dp = 0.dp,
-    topRight: Dp = 0.dp,
-    bottomRight: Dp = 0.dp,
-    bottomLeft: Dp = 0.dp
+    topStart: Dp = 0.dp,
+    topEnd: Dp = 0.dp,
+    bottomEnd: Dp = 0.dp,
+    bottomStart: Dp = 0.dp
 ) = CutCornerShape(
-    CornerSize(topLeft),
-    CornerSize(topRight),
-    CornerSize(bottomRight),
-    CornerSize(bottomLeft)
+    topStart = CornerSize(topStart),
+    topEnd = CornerSize(topEnd),
+    bottomEnd = CornerSize(bottomEnd),
+    bottomStart = CornerSize(bottomStart)
 )
 
 /**
  * Creates [CutCornerShape] with sizes defined in float.
  */
 fun CutCornerShape(
-    topLeft: Float = 0.0f,
-    topRight: Float = 0.0f,
-    bottomRight: Float = 0.0f,
-    bottomLeft: Float = 0.0f
+    topStart: Float = 0.0f,
+    topEnd: Float = 0.0f,
+    bottomEnd: Float = 0.0f,
+    bottomStart: Float = 0.0f
 ) = CutCornerShape(
-    CornerSize(topLeft),
-    CornerSize(topRight),
-    CornerSize(bottomRight),
-    CornerSize(bottomLeft)
+    topStart = CornerSize(topStart),
+    topEnd = CornerSize(topEnd),
+    bottomEnd = CornerSize(bottomEnd),
+    bottomStart = CornerSize(bottomStart)
 )
 
 /**
  * Creates [CutCornerShape] with sizes defined in percents of the shape's smaller side.
  *
- * @param topLeftPercent The top left corner clip size as a percentage of the smaller side, with a
+ * @param topStartPercent The top start corner clip size as a percentage of the smaller side, with a
  * range of 0 - 100.
- * @param topRightPercent The top right corner clip size as a percentage of the smaller side, with a
+ * @param topEndPercent The top end corner clip size as a percentage of the smaller side, with a
  * range of 0 - 100.
- * @param bottomRightPercent The bottom right clip size radius as a percentage of the smaller side,
+ * @param bottomEndPercent The bottom end clip size radius as a percentage of the smaller side,
  * with a range of 0 - 100.
- * @param bottomLeftPercent The bottom left clip size radius as a percentage of the smaller side,
+ * @param bottomStartPercent The bottom start clip size radius as a percentage of the smaller side,
  * with a range of 0 - 100.
  */
 fun CutCornerShape(
     /*@IntRange(from = 0, to = 100)*/
-    topLeftPercent: Int = 0,
+    topStartPercent: Int = 0,
     /*@IntRange(from = 0, to = 100)*/
-    topRightPercent: Int = 0,
+    topEndPercent: Int = 0,
     /*@IntRange(from = 0, to = 100)*/
-    bottomRightPercent: Int = 0,
+    bottomEndPercent: Int = 0,
     /*@IntRange(from = 0, to = 100)*/
-    bottomLeftPercent: Int = 0
+    bottomStartPercent: Int = 0
 ) = CutCornerShape(
-    CornerSize(topLeftPercent),
-    CornerSize(topRightPercent),
-    CornerSize(bottomRightPercent),
-    CornerSize(bottomLeftPercent)
+    topStart = CornerSize(topStartPercent),
+    topEnd = CornerSize(topEndPercent),
+    bottomEnd = CornerSize(bottomEndPercent),
+    bottomStart = CornerSize(bottomStartPercent)
 )

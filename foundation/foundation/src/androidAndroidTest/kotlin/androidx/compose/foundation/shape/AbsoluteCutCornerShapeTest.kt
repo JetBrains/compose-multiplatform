@@ -20,28 +20,34 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
-import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 
 @SmallTest
-@RunWith(AndroidJUnit4::class)
-class CutCornerShapeTest {
+@RunWith(Parameterized::class)
+class AbsoluteCutCornerShapeTest(val layoutDirection: LayoutDirection) {
+    companion object {
+        @JvmStatic
+        @Parameterized.Parameters(name = "{0}")
+        fun initParameters(): Array<LayoutDirection> = arrayOf(
+            LayoutDirection.Ltr,
+            LayoutDirection.Rtl
+        )
+    }
 
     private val density = Density(2f)
     private val size = Size(100.0f, 150.0f)
 
     @Test
     fun cutCornersUniformCorners() {
-        val cut = CutCornerShape(10.0f)
+        val cut = AbsoluteCutCornerShape(10.0f)
 
         val outline = cut.toOutline() as Outline.Generic
         assertPathsEquals(
@@ -66,7 +72,7 @@ class CutCornerShapeTest {
         val size2 = 22f
         val size3 = 32f
         val size4 = 42f
-        val cut = CutCornerShape(
+        val cut = AbsoluteCutCornerShape(
             size1,
             size2,
             size3,
@@ -91,38 +97,8 @@ class CutCornerShapeTest {
     }
 
     @Test
-    fun cutCornersDifferentCorners_rtl() {
-        val size1 = 12f
-        val size2 = 22f
-        val size3 = 32f
-        val size4 = 42f
-        val cut = CutCornerShape(
-            size1,
-            size2,
-            size3,
-            size4
-        )
-
-        val outline = cut.toOutline(LayoutDirection.Rtl) as Outline.Generic
-        assertPathsEquals(
-            outline.path,
-            Path().apply {
-                moveTo(0f, size2)
-                lineTo(size2, 0f)
-                lineTo(size.width - size1, 0f)
-                lineTo(size.width, size1)
-                lineTo(size.width, size.height - size4)
-                lineTo(size.width - size4, size.height)
-                lineTo(size3, size.height)
-                lineTo(0f, size.height - size3)
-                close()
-            }
-        )
-    }
-
-    @Test
     fun createsRectangleOutlineForZeroSizedCorners() {
-        val rounded = CutCornerShape(
+        val rounded = AbsoluteCutCornerShape(
             0.0f,
             0.0f,
             0.0f,
@@ -135,35 +111,35 @@ class CutCornerShapeTest {
 
     @Test
     fun cutCornerShapesAreEquals() {
-        assertThat(CutCornerShape(10.0f))
-            .isEqualTo(CutCornerShape(10.0f))
+        assertThat(AbsoluteCutCornerShape(10.0f))
+            .isEqualTo(AbsoluteCutCornerShape(10.0f))
     }
 
     @Test
     fun cutCornerUpdateAllCornerSize() {
         assertThat(
-            CutCornerShape(10.0f).copy(
+            AbsoluteCutCornerShape(10.0f).copy(
                 CornerSize(
                     5.0f
                 )
             )
         )
-            .isEqualTo(CutCornerShape(5.0f))
+            .isEqualTo(AbsoluteCutCornerShape(5.0f))
     }
 
     @Test
     fun cutCornerUpdateTwoCornerSizes() {
         assertThat(
-            CutCornerShape(10.0f).copy(
+            AbsoluteCutCornerShape(10.0f).copy(
                 topEnd = CornerSize(3.dp),
                 bottomEnd = CornerSize(50)
             )
         ).isEqualTo(
-            CutCornerShape(
-                topStart = CornerSize(10.0f),
-                topEnd = CornerSize(3.dp),
-                bottomStart = CornerSize(10.0f),
-                bottomEnd = CornerSize(50)
+            AbsoluteCutCornerShape(
+                topLeft = CornerSize(10.0f),
+                topRight = CornerSize(3.dp),
+                bottomLeft = CornerSize(10.0f),
+                bottomRight = CornerSize(50)
             )
         )
     }
@@ -172,17 +148,17 @@ class CutCornerShapeTest {
     fun objectsWithTheSameCornersAreEquals() {
         @Suppress("ReplaceCallWithBinaryOperator")
         assertThat(
-            CutCornerShape(
-                topStart = CornerSize(4.0f),
-                topEnd = CornerSize(3.0f),
-                bottomStart = CornerSize(3.dp),
-                bottomEnd = CornerSize(50)
+            AbsoluteCutCornerShape(
+                topLeft = CornerSize(4.0f),
+                topRight = CornerSize(3.0f),
+                bottomLeft = CornerSize(3.dp),
+                bottomRight = CornerSize(50)
             ).equals(
-                CutCornerShape(
-                    topStart = CornerSize(4.0f),
-                    topEnd = CornerSize(3.0f),
-                    bottomStart = CornerSize(3.dp),
-                    bottomEnd = CornerSize(50)
+                AbsoluteCutCornerShape(
+                    topLeft = CornerSize(4.0f),
+                    topRight = CornerSize(3.0f),
+                    bottomLeft = CornerSize(3.dp),
+                    bottomRight = CornerSize(50)
                 )
             )
         ).isTrue()
@@ -192,33 +168,22 @@ class CutCornerShapeTest {
     fun objectsWithDifferentCornersAreNotEquals() {
         @Suppress("ReplaceCallWithBinaryOperator")
         assertThat(
-            CutCornerShape(
-                topStart = CornerSize(4.0f),
-                topEnd = CornerSize(3.0f),
-                bottomStart = CornerSize(3.dp),
-                bottomEnd = CornerSize(50)
+            AbsoluteCutCornerShape(
+                topLeft = CornerSize(4.0f),
+                topRight = CornerSize(3.0f),
+                bottomLeft = CornerSize(3.dp),
+                bottomRight = CornerSize(50)
             ).equals(
-                CutCornerShape(
-                    topStart = CornerSize(4.0f),
-                    topEnd = CornerSize(5.0f),
-                    bottomStart = CornerSize(3.dp),
-                    bottomEnd = CornerSize(50)
+                AbsoluteCutCornerShape(
+                    topLeft = CornerSize(4.0f),
+                    topRight = CornerSize(5.0f),
+                    bottomLeft = CornerSize(3.dp),
+                    bottomRight = CornerSize(50)
                 )
             )
         ).isFalse()
     }
 
-    private fun Shape.toOutline(direction: LayoutDirection = LayoutDirection.Ltr) =
-        createOutline(size, direction, density)
-}
-
-fun assertPathsEquals(path1: Path, path2: Path) {
-    val diff = Path()
-    val reverseDiff = Path()
-    Assert.assertTrue(
-        diff.op(path1, path2, PathOperation.difference) &&
-            reverseDiff.op(path2, path1, PathOperation.difference) &&
-            diff.isEmpty &&
-            reverseDiff.isEmpty
-    )
+    private fun Shape.toOutline() =
+        createOutline(size, layoutDirection, density)
 }
