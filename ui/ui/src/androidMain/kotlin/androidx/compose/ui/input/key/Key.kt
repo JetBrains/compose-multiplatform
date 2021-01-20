@@ -147,6 +147,13 @@ actual inline class Key(val keyCode: Long) {
          *
          * May also be synthesized from trackball motions.
          */
+        @Deprecated(
+            message = "Use DirectionDown instead.",
+            replaceWith = ReplaceWith(
+                "DirectionDown",
+                "androidx.compose.ui.input.key.Key.Companion.DirectionDown"
+            )
+        )
         actual val DPadDown = DirectionDown
 
         /**
@@ -162,6 +169,13 @@ actual inline class Key(val keyCode: Long) {
          *
          * May also be synthesized from trackball motions.
          */
+        @Deprecated(
+            message = "Use DirectionLeft instead.",
+            replaceWith = ReplaceWith(
+                "DirectionLeft",
+                "androidx.compose.ui.input.key.Key.Companion.DirectionLeft"
+            )
+        )
         actual val DPadLeft = DirectionLeft
 
         /**
@@ -199,6 +213,13 @@ actual inline class Key(val keyCode: Long) {
          *
          * May also be synthesized from trackball motions.
          */
+        @Deprecated(
+            message = "Use DirectionCenter instead.",
+            replaceWith = ReplaceWith(
+                "DirectionCenter",
+                "androidx.compose.ui.input.key.Key.Companion.DirectionCenter"
+            )
+        )
         actual val DPadCenter = DirectionCenter
 
         /** Directional Pad Up-Left. */
