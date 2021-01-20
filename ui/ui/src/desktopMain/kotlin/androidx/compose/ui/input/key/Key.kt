@@ -82,6 +82,13 @@ actual inline class Key(val keyCode: Long) {
          *
          * May also be synthesized from trackball motions.
          */
+        @Deprecated(
+            message = "Use DirectionDown instead.",
+            replaceWith = ReplaceWith(
+                "DirectionDown",
+                "androidx.compose.ui.input.key.Key.Companion.DirectionDown"
+            )
+        )
         actual val DPadDown = DirectionDown
 
         /**
@@ -97,6 +104,13 @@ actual inline class Key(val keyCode: Long) {
          *
          * May also be synthesized from trackball motions.
          */
+        @Deprecated(
+            message = "Use DirectionLeft instead.",
+            replaceWith = ReplaceWith(
+                "DirectionLeft",
+                "androidx.compose.ui.input.key.Key.Companion.DirectionLeft"
+            )
+        )
         actual val DPadLeft = DirectionLeft
 
         /**
@@ -475,15 +489,65 @@ actual inline class Key(val keyCode: Long) {
         actual val Call = Key(-1000000012)
         actual val EndCall = Key(-1000000013)
         actual val DirectionCenter = Key(-1000000014)
+
+        // TODO(b/177954493): Remove after Alpha 11.
+        @Deprecated(
+            message = "Use DirectionCenter instead.",
+            replaceWith = ReplaceWith(
+                "DirectionCenter",
+                "androidx.compose.ui.input.key.Key.Companion.DirectionCenter"
+            )
+        )
         actual val DPadCenter = DirectionCenter
+
         actual val DirectionUpLeft = Key(-1000000015)
+
+        // TODO(b/177954493): Remove after Alpha 11.
+        @Deprecated(
+            message = "Use DirectionUpLeft instead.",
+            replaceWith = ReplaceWith(
+                "DirectionUpLeft",
+                "androidx.compose.ui.input.key.Key.Companion.DirectionUpLeft"
+            )
+        )
         actual val DPadUpLeft = DirectionUpLeft
+
         actual val DirectionDownLeft = Key(-1000000016)
+
+        // TODO(b/177954493): Remove after Alpha 11.
+        @Deprecated(
+            message = "Use DirectionDownLeft instead.",
+            replaceWith = ReplaceWith(
+                "DirectionDownLeft",
+                "androidx.compose.ui.input.key.Key.Companion.DirectionDownLeft"
+            )
+        )
         actual val DPadDownLeft = DirectionDownLeft
+
         actual val DirectionUpRight = Key(-1000000017)
+
+        // TODO(b/177954493): Remove after Alpha 11.
+        @Deprecated(
+            message = "Use DirectionUpRight instead.",
+            replaceWith = ReplaceWith(
+                "DirectionUpRight",
+                "androidx.compose.ui.input.key.Key.Companion.DirectionUpRight"
+            )
+        )
         actual val DPadUpRight = DirectionUpRight
+
         actual val DirectionDownRight = Key(-1000000018)
+
+        // TODO(b/177954493): Remove after Alpha 11.
+        @Deprecated(
+            message = "Use DirectionDownRight instead.",
+            replaceWith = ReplaceWith(
+                "DirectionDownRight",
+                "androidx.compose.ui.input.key.Key.Companion.DirectionDownRight"
+            )
+        )
         actual val DPadDownRight = DirectionDownRight
+
         actual val VolumeUp = Key(-1000000019)
         actual val VolumeDown = Key(-1000000020)
         actual val Power = Key(-1000000021)
