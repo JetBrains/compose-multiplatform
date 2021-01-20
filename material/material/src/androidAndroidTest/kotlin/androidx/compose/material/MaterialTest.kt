@@ -28,6 +28,7 @@ import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.getAlignmentLinePosition
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
@@ -37,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
 import androidx.compose.ui.unit.width
 
-fun ComposeTestRule.setMaterialContent(
+fun ComposeContentTestRule.setMaterialContent(
     modifier: Modifier = Modifier,
     composable: @Composable () -> Unit
 ) {
@@ -71,7 +72,7 @@ fun ComposeTestRule.rootHeight(): Dp = onRoot().getUnclippedBoundsInRoot().heigh
 val BigTestMaxWidth = 5000.dp
 val BigTestMaxHeight = 5000.dp
 
-fun ComposeTestRule.setMaterialContentForSizeAssertions(
+fun ComposeContentTestRule.setMaterialContentForSizeAssertions(
     parentMaxWidth: Dp = BigTestMaxWidth,
     parentMaxHeight: Dp = BigTestMaxHeight,
     // TODO : figure out better way to make it flexible

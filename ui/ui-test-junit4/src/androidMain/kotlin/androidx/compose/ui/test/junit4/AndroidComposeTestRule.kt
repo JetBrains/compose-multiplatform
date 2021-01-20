@@ -70,7 +70,7 @@ import org.junit.runner.Description
 import org.junit.runners.model.Statement
 
 /**
- * Factory method to provide implementation of [ComposeTestRule].
+ * Factory method to provide implementation of [ComposeContentTestRule].
  *
  * This is a legacy version of [createComposeRule] that does not use the new test clock. With this
  * version you can still use [ComposeTestRule.clockTestRule] instead of [ComposeTestRule.mainClock].
@@ -82,7 +82,7 @@ import org.junit.runners.model.Statement
         "androidx.compose.ui.test.junit4.createComposeRule"
     )
 )
-fun createComposeRuleLegacy(): ComposeTestRule {
+fun createComposeRuleLegacy(): ComposeContentTestRule {
     @OptIn(ExperimentalTestApi::class)
     return createAndroidComposeRule<ComponentActivity>(
         ComponentActivity::class.java,
@@ -90,7 +90,7 @@ fun createComposeRuleLegacy(): ComposeTestRule {
     )
 }
 
-actual fun createComposeRule(): ComposeTestRule =
+actual fun createComposeRule(): ComposeContentTestRule =
     createAndroidComposeRule<ComponentActivity>()
 
 /**
@@ -215,7 +215,25 @@ private fun <A : ComponentActivity> createAndroidComposeRule(
 )
 
 /**
- * Android specific implementation of [ComposeTestRule].
+ * Factory method to provide an implementation of [ComposeTestRule] that doesn't create a host
+ * for you in which you can set content. Use this if you don't want the test rule to launch an
+ * activity for you, which is typically the case when you launch your activity during the test
+ * instead of before the test.
+ */
+fun createEmptyComposeRule(): ComposeTestRule =
+    @OptIn(ExperimentalTestApi::class)
+    AndroidComposeTestRule<TestRule, ComponentActivity>(
+        activityRule = TestRule { base, _ -> base },
+        activityProvider = {
+            error(
+                "createEmptyComposeRule() does not provide an Activity to set Compose content in." +
+                    " Launch and use the Activity yourself, or use createAndroidComposeRule()."
+            )
+        }
+    )
+
+/**
+ * Android specific implementation of [ComposeContentTestRule].
  *
  * This rule wraps around the given [activityRule], which is responsible for launching the activity.
  * The [activityProvider] should return the launched activity instance when the [activityRule] is
@@ -232,7 +250,7 @@ internal constructor(
     val activityRule: R,
     private val activityProvider: (R) -> A,
     private val driveClockByMonotonicFrameClock: Boolean = true
-) : ComposeTestRule {
+) : ComposeContentTestRule {
 
     @OptIn(ExperimentalTestApi::class)
     constructor(

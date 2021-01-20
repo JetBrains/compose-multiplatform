@@ -48,7 +48,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
-import androidx.compose.ui.test.junit4.ComposeTestRule
+import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
@@ -644,7 +644,7 @@ private fun RippleBox(interactionState: InteractionState, ripple: Indication) {
  * @param lightTheme whether the theme is light or dark
  * @param contentColor the contentColor that will be used for the ripple color
  */
-private fun ComposeTestRule.setRippleContent(
+private fun ComposeContentTestRule.setRippleContent(
     interactionState: InteractionState,
     bounded: Boolean,
     lightTheme: Boolean,
