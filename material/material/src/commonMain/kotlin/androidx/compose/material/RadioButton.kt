@@ -67,7 +67,6 @@ import androidx.compose.ui.unit.dp
  * @param colors [RadioButtonColors] that will be used to resolve the color used for this
  * RadioButton in different states. See [RadioButtonDefaults.colors].
  */
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun RadioButton(
     selected: Boolean,
@@ -109,7 +108,6 @@ fun RadioButton(
  * See [RadioButtonDefaults.colors] for the default implementation that follows Material
  * specifications.
  */
-@ExperimentalMaterialApi
 @Stable
 interface RadioButtonColors {
     /**
@@ -136,7 +134,6 @@ object RadioButtonDefaults {
      * @param disabledColor the color to use for the RadioButton when disabled.
      * @return the resulting [Color] used for the RadioButton
      */
-    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     fun colors(
         selectedColor: Color = MaterialTheme.colors.secondary,
@@ -164,7 +161,6 @@ private fun DrawScope.drawRadio(color: Color, dotRadius: Dp) {
 /**
  * Default [RadioButtonColors] implementation.
  */
-@OptIn(ExperimentalMaterialApi::class)
 @Stable
 private class DefaultRadioButtonColors(
     private val selectedColor: Color,

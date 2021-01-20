@@ -90,7 +90,6 @@ import androidx.compose.ui.unit.dp
  * this button in different states. See [ButtonDefaults.buttonColors].
  * @param contentPadding The spacing values to apply internally between the container and the content
  */
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun Button(
     onClick: () -> Unit,
@@ -181,7 +180,6 @@ fun Button(
  * this button in different states. See [ButtonDefaults.outlinedButtonColors].
  * @param contentPadding The spacing values to apply internally between the container and the content
  */
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 inline fun OutlinedButton(
     noinline onClick: () -> Unit,
@@ -241,7 +239,6 @@ inline fun OutlinedButton(
  * this button in different states. See [ButtonDefaults.textButtonColors].
  * @param contentPadding The spacing values to apply internally between the container and the content
  */
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 inline fun TextButton(
     noinline onClick: () -> Unit,
@@ -272,7 +269,6 @@ inline fun TextButton(
  *
  * See [ButtonDefaults.elevation] for the default elevation used in a [Button].
  */
-@ExperimentalMaterialApi
 @Stable
 interface ButtonElevation {
     /**
@@ -293,7 +289,6 @@ interface ButtonElevation {
  * [OutlinedButton].
  * See [ButtonDefaults.textButtonColors] for the default colors used in a [TextButton].
  */
-@ExperimentalMaterialApi
 @Stable
 interface ButtonColors {
     /**
@@ -367,7 +362,6 @@ object ButtonDefaults {
      * is [Interaction.Pressed].
      * @param disabledElevation the elevation to use when the [Button] is not enabled.
      */
-    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     fun elevation(
         defaultElevation: Dp = 2.dp,
@@ -394,7 +388,6 @@ object ButtonDefaults {
      * @param contentColor the content color of this [Button] when enabled
      * @param disabledContentColor the content color of this [Button] when not enabled
      */
-    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     fun buttonColors(
         backgroundColor: Color = MaterialTheme.colors.primary,
@@ -418,7 +411,6 @@ object ButtonDefaults {
      * @param contentColor the content color of this [OutlinedButton] when enabled
      * @param disabledContentColor the content color of this [OutlinedButton] when not enabled
      */
-    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     fun outlinedButtonColors(
         backgroundColor: Color = MaterialTheme.colors.surface,
@@ -440,7 +432,6 @@ object ButtonDefaults {
      * @param contentColor the content color of this [TextButton] when enabled
      * @param disabledContentColor the content color of this [TextButton] when not enabled
      */
-    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     fun textButtonColors(
         backgroundColor: Color = Color.Transparent,
@@ -487,7 +478,6 @@ object ButtonDefaults {
 /**
  * Default [ButtonElevation] implementation.
  */
-@OptIn(ExperimentalMaterialApi::class)
 @Stable
 private class DefaultButtonElevation(
     private val defaultElevation: Dp,
@@ -535,7 +525,6 @@ private class DefaultButtonElevation(
 /**
  * Default [ButtonColors] implementation.
  */
-@OptIn(ExperimentalMaterialApi::class)
 @Immutable
 private class DefaultButtonColors(
     private val backgroundColor: Color,
