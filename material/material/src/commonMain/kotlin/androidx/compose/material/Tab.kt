@@ -74,6 +74,8 @@ import kotlin.math.max
  * @param selected whether this tab is selected or not
  * @param onClick the callback to be invoked when this tab is selected
  * @param modifier optional [Modifier] for this tab
+ * @param enabled controls the enabled state of this tab. When `false`, this tab will not
+ * be clickable and will appear disabled to accessibility services.
  * @param text the text label displayed in this tab
  * @param icon the icon displayed in this tab
  * @param interactionState the [InteractionState] representing the different [Interaction]s
@@ -89,6 +91,7 @@ fun Tab(
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     text: @Composable () -> Unit = emptyContent(),
     icon: @Composable () -> Unit = emptyContent(),
     interactionState: InteractionState = remember { InteractionState() },
@@ -103,6 +106,7 @@ fun Tab(
         selected,
         onClick,
         modifier,
+        enabled,
         interactionState,
         selectedContentColor,
         unselectedContentColor
@@ -123,6 +127,8 @@ fun Tab(
  * @param selected whether this tab is selected or not
  * @param onClick the callback to be invoked when this tab is selected
  * @param modifier optional [Modifier] for this tab
+ * @param enabled controls the enabled state of this tab. When `false`, this tab will not
+ * be clickable and will appear disabled to accessibility services.
  * @param interactionState the [InteractionState] representing the different [Interaction]s
  * present on this Tab. You can create and pass in your own remembered [InteractionState] if
  * you want to read the [InteractionState] and customize the appearance / behavior of this Tab
@@ -137,6 +143,7 @@ fun Tab(
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     interactionState: InteractionState = remember { InteractionState() },
     selectedContentColor: Color = AmbientContentColor.current,
     unselectedContentColor: Color = selectedContentColor.copy(alpha = ContentAlpha.medium),
@@ -153,6 +160,7 @@ fun Tab(
                 .selectable(
                     selected = selected,
                     onClick = onClick,
+                    enabled = enabled,
                     role = Role.Tab,
                     interactionState = interactionState,
                     indication = ripple
