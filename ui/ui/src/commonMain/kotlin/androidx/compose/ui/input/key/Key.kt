@@ -106,52 +106,171 @@ expect inline class Key(val keyCode: Long) {
         /** End Call key. */
         val EndCall: Key
 
+        // TODO(b/177954493): Remove after Alpha 11.
         /**
          * Directional Pad Up key.
          *
          * May also be synthesized from trackball motions.
          */
+        @Deprecated(
+            message = "Use DirectionUp instead.",
+            replaceWith = ReplaceWith(
+                "DirectionUp",
+                "androidx.compose.ui.input.key.Key.Companion.DirectionUp"
+            )
+        )
         val DPadUp: Key
 
+        /**
+         * Up Arrow Key / Directional Pad Up key.
+         *
+         * May also be synthesized from trackball motions.
+         */
+        val DirectionUp: Key
+
+        // TODO(b/177954493): Remove after Alpha 11.
         /**
          * Directional Pad Down key.
          *
          * May also be synthesized from trackball motions.
          */
+        @Deprecated(
+            message = "Use DirectionDown instead.",
+            replaceWith = ReplaceWith(
+                "DirectionDown",
+                "androidx.compose.ui.input.key.Key.Companion.DirectionDown"
+            )
+        )
         val DPadDown: Key
 
+        /**
+         * Down Arrow Key / Directional Pad Down key.
+         *
+         * May also be synthesized from trackball motions.
+         */
+        val DirectionDown: Key
+
+        // TODO(b/177954493): Remove after Alpha 11.
         /**
          * Directional Pad Left key.
          *
          * May also be synthesized from trackball motions.
          */
+        @Deprecated(
+            message = "Use DirectionLeft instead.",
+            replaceWith = ReplaceWith(
+                "DirectionLeft",
+                "androidx.compose.ui.input.key.Key.Companion.DirectionLeft"
+            )
+        )
         val DPadLeft: Key
 
+        /**
+         * Left Arrow Key / Directional Pad Left key.
+         *
+         * May also be synthesized from trackball motions.
+         */
+        val DirectionLeft: Key
+
+        // TODO(b/177954493): Remove after Alpha 11.
         /**
          * Directional Pad Right key.
          *
          * May also be synthesized from trackball motions.
          */
+        @Deprecated(
+            message = "Use DirectionRight instead.",
+            replaceWith = ReplaceWith(
+                "DirectionRight",
+                "androidx.compose.ui.input.key.Key.Companion.DirectionRight"
+            )
+        )
         val DPadRight: Key
 
+        /**
+         * Right Arrow Key / Directional Pad Right key.
+         *
+         * May also be synthesized from trackball motions.
+         */
+        val DirectionRight: Key
+
+        // TODO(b/177954493): Remove after Alpha 11.
         /**
          * Directional Pad Center key.
          *
          * May also be synthesized from trackball motions.
          */
+        @Deprecated(
+            message = "Use DirectionCenter instead.",
+            replaceWith = ReplaceWith(
+                "DirectionCenter",
+                "androidx.compose.ui.input.key.Key.Companion.DirectionCenter"
+            )
+        )
         val DPadCenter: Key
 
+        /**
+         * Center Arrow Key / Directional Pad Center key.
+         *
+         * May also be synthesized from trackball motions.
+         */
+        val DirectionCenter: Key
+
+        // TODO(b/177954493): Remove after Alpha 11.
         /** Directional Pad Up-Left. */
+        @Deprecated(
+            message = "Use DirectionUpLeft instead.",
+            replaceWith = ReplaceWith(
+                "DirectionUpLeft",
+                "androidx.compose.ui.input.key.Key.Companion.DirectionUpLeft"
+            )
+        )
         val DPadUpLeft: Key
 
+        /** Directional Pad Up-Left. */
+        val DirectionUpLeft: Key
+
+        // TODO(b/177954493): Remove after Alpha 11.
         /** Directional Pad Down-Left. */
+        @Deprecated(
+            message = "Use DirectionDownLeft instead.",
+            replaceWith = ReplaceWith(
+                "DirectionDownLeft",
+                "androidx.compose.ui.input.key.Key.Companion.DirectionDownLeft"
+            )
+        )
         val DPadDownLeft: Key
 
+        /** Directional Pad Down-Left. */
+        val DirectionDownLeft: Key
+
+        // TODO(b/177954493): Remove after Alpha 11.
         /** Directional Pad Up-Right. */
+        @Deprecated(
+            message = "Use DirectionUpRight instead.",
+            replaceWith = ReplaceWith(
+                "DirectionUpRight",
+                "androidx.compose.ui.input.key.Key.Companion.DirectionUpRight"
+            )
+        )
         val DPadUpRight: Key
 
+        /** Directional Pad Up-Right. */
+        val DirectionUpRight: Key
+
+        // TODO(b/177954493): Remove after Alpha 11.
         /** Directional Pad Down-Right. */
+        @Deprecated(
+            message = "Use DirectionDownRight instead.",
+            replaceWith = ReplaceWith(
+                "DirectionDownRight",
+                "androidx.compose.ui.input.key.Key.Companion.DirectionDownRight"
+            )
+        )
         val DPadDownRight: Key
+
+        /** Directional Pad Down-Right. */
+        val DirectionDownRight: Key
 
         /**
          * Volume Up key.
@@ -213,7 +332,7 @@ expect inline class Key(val keyCode: Long) {
         /** '+' key. */
         val Plus: Key
 
-        /** '-'. */
+        /** '-' key. */
         val Minus: Key
 
         /** '*' key. */
@@ -845,6 +964,7 @@ expect inline class Key(val keyCode: Long) {
          * Steps media forward, one frame at a time.
          */
         val MediaStepForward: Key
+
         /**
          * Step backward media key.
          *
@@ -1365,19 +1485,19 @@ expect inline class Key(val keyCode: Long) {
         val TvTimerProgramming: Key
 
         /**
-         * Primary stem key for Wear
+         * Primary stem key for Wearables.
          *
-         * Main power/reset button on watch.
+         * Main power/reset button.
          */
         val StemPrimary: Key
 
-        /** Generic stem key 1 for Wear. */
+        /** Generic stem key 1 for Wearables. */
         val Stem1: Key
 
-        /** Generic stem key 2 for Wear. */
+        /** Generic stem key 2 for Wearables. */
         val Stem2: Key
 
-        /** Generic stem key 3 for Wear. */
+        /** Generic stem key 3 for Wearables. */
         val Stem3: Key
 
         /** Show all apps. */
