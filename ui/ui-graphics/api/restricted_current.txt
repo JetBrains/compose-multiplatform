@@ -441,6 +441,21 @@ package androidx.compose.ui.graphics {
     method public static String toString-impl(float[]! $this);
     method public static void translate-impl(float[] $this, optional float x, optional float y, optional float z);
     property public final float[] values;
+    field public static final androidx.compose.ui.graphics.Matrix.Companion Companion;
+    field public static final int Perspective0 = 3; // 0x3
+    field public static final int Perspective1 = 7; // 0x7
+    field public static final int Perspective2 = 15; // 0xf
+    field public static final int ScaleX = 0; // 0x0
+    field public static final int ScaleY = 5; // 0x5
+    field public static final int ScaleZ = 10; // 0xa
+    field public static final int SkewX = 4; // 0x4
+    field public static final int SkewY = 1; // 0x1
+    field public static final int TranslateX = 12; // 0xc
+    field public static final int TranslateY = 13; // 0xd
+    field public static final int TranslateZ = 14; // 0xe
+  }
+
+  public static final class Matrix.Companion {
   }
 
   public final class MatrixKt {
