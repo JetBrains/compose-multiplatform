@@ -18,9 +18,11 @@ package androidx.compose.ui.node
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.ViewConfiguration
@@ -86,6 +88,7 @@ internal interface Owner {
      */
     val focusManager: FocusManager
 
+    // TODO(b/178014889): Remove after Alpha 11.
     /**
      * Provide information about the window that hosts this [Owner].
      */
@@ -176,6 +179,11 @@ internal interface Owner {
      * The position and/or size of the [layoutNode] changed.
      */
     fun onLayoutChange(layoutNode: LayoutNode)
+
+    /**
+     * The [FocusDirection] represented by the specified keyEvent.
+     */
+    fun getFocusDirection(keyEvent: KeyEvent): FocusDirection?
 
     val measureIteration: Long
 
