@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.ui.test.junit4
 
 import androidx.compose.animation.core.FloatPropKey

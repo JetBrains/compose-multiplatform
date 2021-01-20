@@ -28,7 +28,6 @@ val AnimationDemos = DemoCategory(
                 ComposableDemo("Multi-dimensional prop") { MultiDimensionalAnimationDemo() },
                 ComposableDemo("Double tap to like") { DoubleTapToLikeDemo() },
                 ComposableDemo("Repeating rotation") { RepeatedRotationDemo() },
-                ComposableDemo("Manual animation clock") { AnimatableSeekBarDemo() },
                 ComposableDemo("Gesture based animation") { GestureBasedAnimationDemo() },
                 ComposableDemo("Infinite transition") { InfiniteTransitionDemo() },
             )
