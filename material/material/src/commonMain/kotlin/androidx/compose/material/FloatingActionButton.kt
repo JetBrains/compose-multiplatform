@@ -18,7 +18,6 @@ package androidx.compose.material
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.VectorConverter
-import androidx.compose.foundation.AmbientIndication
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.clickable
@@ -31,6 +30,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSizeIn
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Providers
@@ -101,7 +101,7 @@ fun FloatingActionButton(
                 Box(
                     modifier = Modifier
                         .defaultMinSizeConstraints(minWidth = FabSize, minHeight = FabSize)
-                        .indication(interactionState, AmbientIndication.current()),
+                        .indication(interactionState, rememberRipple()),
                     contentAlignment = Alignment.Center
                 ) { content() }
             }
