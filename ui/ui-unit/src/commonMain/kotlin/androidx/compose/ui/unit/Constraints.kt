@@ -21,20 +21,23 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 
 /**
- * Immutable constraints used for measuring child Layouts or [LayoutModifier]s. A parent layout
- * can measure their children using the measure method on the corresponding [Measurable]s,
- * method which takes the [Constraints] the child has to follow. A measured child is then
- * responsible to choose for themselves and return a size which satisfies the set of [Constraints]
- * received from their parent:
+ * Immutable constraints used for measuring layouts, usually as part of parent
+ * [layouts][androidx.compose.ui.layout.Layout] or
+ * [layout modifiers][androidx.compose.ui.layout.LayoutModifier].
+ * Children layouts can be measured using the `measure` method on the corresponding
+ * [Measurables][androidx.compose.ui.layout.Measurable]. This method takes the [Constraints],
+ * in pixels, which the child should respect. A measured child is responsible to choose
+ * and return a size which satisfies the set of [Constraints] received from its parent:
  * - minWidth <= chosenWidth <= maxWidth
  * - minHeight <= chosenHeight <= maxHeight
- * The parent can then access the child chosen size on the resulting [Placeable]. The parent is
- * responsible of defining a valid positioning of the children according to their sizes, so the
- * parent needs to measure the children with appropriate [Constraints], such that whatever valid
- * sizes children choose, they can be laid out in a way that also respects the parent's incoming
- * [Constraints]. Note that different children can be measured with different [Constraints].
+ * The parent can then access the size chosen by the child on the resulting
+ * [Placeable][androidx.compose.ui.layout.Placeable]. Based on the children sizes, the parent
+ * is responsible for defining a valid positioning of the children. This means that children need
+ * to be measured with appropriate [Constraints], such that whatever valid sizes children choose,
+ * they can be laid out correctly according to the parent's layout algorithm. Note that
+ * different children can be measured with different [Constraints].
  * A child is allowed to choose a size that does not satisfy its constraints. However, when this
- * happens, the parent will not read from the [Placeable] the real size of the child, but rather
+ * happens, the parent will not read from the placeable the real size of the child, but rather
  * one that was coerced in the child's constraints; therefore, a parent can assume that its
  * children will always respect the constraints in their layout algorithm. When this does not
  * happen in reality, the position assigned to the child will be automatically offset to be centered
@@ -72,7 +75,7 @@ inline class Constraints(
         get() = (value and FocusMask).toInt()
 
     /**
-     * The minimum width that the measurement can take.
+     * The minimum width that the measurement can take, in pixels.
      */
     val minWidth: Int
         get() {
@@ -81,7 +84,7 @@ inline class Constraints(
         }
 
     /**
-     * The maximum width that the measurement can take. This will either be
+     * The maximum width that the measurement can take, in pixels. This will either be
      * a positive value greater than or equal to [minWidth] or [Constraints.Infinity].
      */
     val maxWidth: Int
@@ -92,7 +95,7 @@ inline class Constraints(
         }
 
     /**
-     * The minimum height that the measurement can take.
+     * The minimum height that the measurement can take, in pixels.
      */
     val minHeight: Int
         get() {
@@ -103,7 +106,7 @@ inline class Constraints(
         }
 
     /**
-     * The maximum height that the measurement can take. This will either be
+     * The maximum height that the measurement can take, in pixels. This will either be
      * a positive value greater than or equal to [minHeight] or [Constraints.Infinity].
      */
     val maxHeight: Int
@@ -136,6 +139,25 @@ inline class Constraints(
             val offset = MinHeightOffsets[focus] + 31
             return ((value shr offset).toInt() and mask) != 0
         }
+
+    /**
+     * Whether there is exactly one width value that satisfies the constraints.
+     */
+    @Stable
+    val hasFixedWidth get() = maxWidth == minWidth
+
+    /**
+     * Whether there is exactly one height value that satisfies the constraints.
+     */
+    @Stable
+    val hasFixedHeight get() = maxHeight == minHeight
+
+    /**
+     * Whether the area of a component respecting these constraints will definitely be 0.
+     * This is true when at least one of maxWidth and maxHeight are 0.
+     */
+    @Stable
+    val isZero get() = maxWidth == 0 || maxHeight == 0
 
     /**
      * Copies the existing [Constraints], replacing some of [minWidth], [minHeight], [maxWidth],
@@ -421,34 +443,33 @@ fun Constraints(
     return Constraints.createConstraints(minWidth, maxWidth, minHeight, maxHeight)
 }
 
-/**
- * Whether there is exactly one width value that satisfies the constraints.
- */
-@Stable
-val Constraints.hasFixedWidth get() = maxWidth == minWidth
-
-/**
- * Whether there is exactly one height value that satisfies the constraints.
- */
-@Stable
-val Constraints.hasFixedHeight get() = maxHeight == minHeight
-
-/**
- * Whether the area of a component respecting these constraints will definitely be 0.
- * This is true when at least one of maxWidth and maxHeight are 0.
- */
-@Stable
-val Constraints.isZero get() = maxWidth == 0 || maxHeight == 0
-
-/**
- * Returns the result of coercing the current constraints in a different set of constraints.
- */
+@Deprecated(
+    "enforce was deprecated. Please use constrain instead.",
+    ReplaceWith("otherConstraints.constrain(this)")
+)
 @Stable
 fun Constraints.enforce(otherConstraints: Constraints) = Constraints(
     minWidth = minWidth.coerceIn(otherConstraints.minWidth, otherConstraints.maxWidth),
     maxWidth = maxWidth.coerceIn(otherConstraints.minWidth, otherConstraints.maxWidth),
     minHeight = minHeight.coerceIn(otherConstraints.minHeight, otherConstraints.maxHeight),
     maxHeight = maxHeight.coerceIn(otherConstraints.minHeight, otherConstraints.maxHeight)
+)
+
+/**
+ * Takes [otherConstraints] and returns the result of coercing them in the current constraints.
+ * Note this means that any size satisfying the resulting constraints will satisfy the current
+ * constraints, but they might not satisfy the [otherConstraints] when the two set of constraints
+ * are disjoint.
+ * Examples (showing only width, height works the same):
+ * (minWidth=2, maxWidth=10).constrain(minWidth=7, maxWidth=12) -> (minWidth = 7, maxWidth = 10)
+ * (minWidth=2, maxWidth=10).constrain(minWidth=11, maxWidth=12) -> (minWidth=10, maxWidth=10)
+ * (minWidth=2, maxWidth=10).constrain(minWidth=5, maxWidth=7) -> (minWidth=5, maxWidth=7)
+ */
+fun Constraints.constrain(otherConstraints: Constraints) = Constraints(
+    minWidth = otherConstraints.minWidth.coerceIn(minWidth, maxWidth),
+    maxWidth = otherConstraints.maxWidth.coerceIn(minWidth, maxWidth),
+    minHeight = otherConstraints.minHeight.coerceIn(minHeight, maxHeight),
+    maxHeight = otherConstraints.maxHeight.coerceIn(minHeight, maxHeight)
 )
 
 /**

@@ -26,7 +26,7 @@ import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.enforce
+import androidx.compose.ui.unit.constrain
 
 /**
  * Declare the preferred width of the content to be the same as the min or max intrinsic width of
@@ -146,10 +146,7 @@ private interface PreferredIntrinsicSizeModifier : LayoutModifier {
         constraints: Constraints
     ): MeasureResult {
         val placeable = measurable.measure(
-            calculateContentConstraints(
-                measurable,
-                constraints
-            ).enforce(constraints)
+            constraints.constrain(calculateContentConstraints(measurable, constraints))
         )
         return layout(placeable.width, placeable.height) {
             placeable.placeRelative(IntOffset.Zero)

@@ -38,10 +38,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.constrain
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.enforce
-import androidx.compose.ui.unit.hasFixedHeight
-import androidx.compose.ui.unit.hasFixedWidth
 import androidx.compose.ui.window.isPopupLayout
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.Root
@@ -271,14 +269,15 @@ internal fun SimpleContainer(
     content: @Composable () -> Unit
 ) {
     Layout(content, modifier) { measurables, incomingConstraints ->
-        val containerConstraints = Constraints()
-            .copy(
-                width?.roundToPx() ?: 0,
-                width?.roundToPx() ?: Constraints.Infinity,
-                height?.roundToPx() ?: 0,
-                height?.roundToPx() ?: Constraints.Infinity
+        val containerConstraints =
+            incomingConstraints.constrain(
+                Constraints().copy(
+                    width?.roundToPx() ?: 0,
+                    width?.roundToPx() ?: Constraints.Infinity,
+                    height?.roundToPx() ?: 0,
+                    height?.roundToPx() ?: Constraints.Infinity
+                )
             )
-            .enforce(incomingConstraints)
         val childConstraints = containerConstraints.copy(minWidth = 0, minHeight = 0)
         var placeable: Placeable? = null
         val containerWidth = if (

@@ -34,9 +34,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.constrain
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
-import androidx.compose.ui.unit.enforce
 import kotlin.math.roundToInt
 
 /**
@@ -684,7 +684,7 @@ private class SizeModifier(
     ): MeasureResult {
         val wrappedConstraints = targetConstraints.let { targetConstraints ->
             if (enforceIncoming) {
-                targetConstraints.enforce(constraints)
+                constraints.constrain(targetConstraints)
             } else {
                 val resolvedMinWidth = if (minWidth != Dp.Unspecified) {
                     targetConstraints.minWidth
