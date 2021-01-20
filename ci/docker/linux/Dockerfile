@@ -32,3 +32,4 @@ RUN JAVA_URL=https://corretto.aws/downloads/latest/amazon-corretto-11-x64-linux-
     find $JAVA_BASE -type d -maxdepth 1 -name "amazon-corretto-11*linux-x64" -exec mv {} $JAVA_HOME \; && \
     rm $JAVA_ARCHIVE
 ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
+ENV JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF
