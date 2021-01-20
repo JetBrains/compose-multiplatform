@@ -52,6 +52,7 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
@@ -242,6 +243,7 @@ class SuspendingPointerInputFilterTest {
     @OptIn(ExperimentalComposeApi::class)
     @Test
     @MediumTest
+    @Ignore // ignored due to a bug b/178013220
     fun testRestartPointerInput() = runBlocking<Unit> {
         var toAdd by mutableStateOf("initial")
         val result = mutableListOf<String>()
