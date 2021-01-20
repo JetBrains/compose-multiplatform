@@ -126,7 +126,7 @@ package androidx.compose.material {
     enum_constant public static final androidx.compose.material.BottomSheetValue Expanded;
   }
 
-  @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public interface ButtonColors {
+  @androidx.compose.runtime.Stable public interface ButtonColors {
     method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> backgroundColor(boolean enabled);
     method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> contentColor(boolean enabled);
   }
@@ -156,7 +156,7 @@ package androidx.compose.material {
     field public static final float OutlinedBorderOpacity = 0.12f;
   }
 
-  @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public interface ButtonElevation {
+  @androidx.compose.runtime.Stable public interface ButtonElevation {
     method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.unit.Dp> elevation(boolean enabled, androidx.compose.foundation.InteractionState interactionState);
   }
 
@@ -170,7 +170,7 @@ package androidx.compose.material {
     method @androidx.compose.runtime.Composable public static void Card-IHU7g64(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.graphics.Shape shape, optional long backgroundColor, optional long contentColor, optional androidx.compose.foundation.BorderStroke? border, optional float elevation, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
-  @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public interface CheckboxColors {
+  @androidx.compose.runtime.Stable public interface CheckboxColors {
     method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> borderColor(boolean enabled, androidx.compose.ui.state.ToggleableState state);
     method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> boxColor(boolean enabled, androidx.compose.ui.state.ToggleableState state);
     method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> checkmarkColor(androidx.compose.ui.state.ToggleableState state);
@@ -343,7 +343,7 @@ package androidx.compose.material {
     field public static final androidx.compose.material.FloatingActionButtonDefaults INSTANCE;
   }
 
-  @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public interface FloatingActionButtonElevation {
+  @androidx.compose.runtime.Stable public interface FloatingActionButtonElevation {
     method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.unit.Dp> elevation(androidx.compose.foundation.InteractionState interactionState);
   }
 
@@ -448,7 +448,7 @@ package androidx.compose.material {
     method @androidx.compose.runtime.Composable public static void LinearProgressIndicator-kLDug40(float progress, optional androidx.compose.ui.Modifier modifier, optional long color, optional long backgroundColor);
   }
 
-  @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public interface RadioButtonColors {
+  @androidx.compose.runtime.Stable public interface RadioButtonColors {
     method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> radioColor(boolean enabled, boolean selected);
   }
 
@@ -627,7 +627,7 @@ package androidx.compose.material {
     method public <T> androidx.compose.runtime.savedinstancestate.Saver<androidx.compose.material.SwipeableState<T>,T> Saver(androidx.compose.animation.core.AnimationClockObservable clock, androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> confirmStateChange);
   }
 
-  @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public interface SwitchColors {
+  @androidx.compose.runtime.Stable public interface SwitchColors {
     method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> thumbColor(boolean enabled, boolean checked);
     method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> trackColor(boolean enabled, boolean checked);
   }

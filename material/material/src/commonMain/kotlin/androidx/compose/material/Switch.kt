@@ -126,7 +126,6 @@ fun Switch(
  * See [SwitchDefaults.colors] for the default implementation that follows Material
  * specifications.
  */
-@ExperimentalMaterialApi
 @Stable
 interface SwitchColors {
 
@@ -149,7 +148,6 @@ interface SwitchColors {
     fun trackColor(enabled: Boolean, checked: Boolean): State<Color>
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun BoxScope.SwitchImpl(
     checked: Boolean,
@@ -234,7 +232,6 @@ object SwitchDefaults {
      * @param disabledUncheckedThumbColor the color used for the thumb when disabled and unchecked
      * @param disabledUncheckedTrackColor the color used for the track when disabled and unchecked
      */
-    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     fun colors(
         checkedThumbColor: Color = MaterialTheme.colors.secondaryVariant,
@@ -270,7 +267,6 @@ object SwitchDefaults {
 /**
  * Default [SwitchColors] implementation.
  */
-@OptIn(ExperimentalMaterialApi::class)
 @Immutable
 private class DefaultSwitchColors(
     private val checkedThumbColor: Color,
