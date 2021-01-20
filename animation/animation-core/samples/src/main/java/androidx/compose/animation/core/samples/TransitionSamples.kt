@@ -18,7 +18,10 @@ package androidx.compose.animation.core.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.animation.animateColor
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.Transition
+import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.snap
@@ -29,12 +32,17 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.Button
+import androidx.compose.material.Card
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,6 +50,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.gesture.doubleTapGestureFilter
 import androidx.compose.ui.gesture.pressIndicatorGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -162,6 +171,147 @@ fun AnimateFloatSample() {
 
         Box(modifier.graphicsLayer(alpha = alpha, scaleX = scale)) {
             // content goes here
+        }
+    }
+}
+
+@Sampled
+fun InitialStateSample() {
+    // This composable enters the composition with a custom enter transition. This is achieved by
+    // defining a different initialState than the first target state using `MutableTransitionState`
+    @Composable
+    fun PoppingInCard() {
+        // Creates a transition state with an initial state where visible = false
+        val visibleState = remember { MutableTransitionState(false) }
+        // Sets the target state of the transition state to true. As it's different than the initial
+        // state, a transition from not visible to visible will be triggered.
+        visibleState.targetState = true
+
+        // Creates a transition with the transition state created above.
+        val transition = updateTransition(visibleState)
+        // Adds a scale animation to the transition to scale the card up when transitioning in.
+        val scale by transition.animateFloat(
+            // Uses a custom spring for the transition.
+            transitionSpec = { spring(dampingRatio = Spring.DampingRatioMediumBouncy) }
+        ) { visible ->
+            if (visible) 1f else 0.8f
+        }
+        // Adds an elevation animation that animates the dp value of the animation.
+        val elevation by transition.animateDp(
+            // Uses a tween animation
+            transitionSpec = {
+                // Uses different animations for when animating from visible to not visible, and
+                // the other way around
+                if (false isTransitioningTo true) {
+                    tween(1000)
+                } else {
+                    spring()
+                }
+            }
+        ) { visible ->
+            if (visible) 10.dp else 0.dp
+        }
+
+        Card(
+            Modifier.graphicsLayer(scaleX = scale, scaleY = scale)
+                .size(200.dp, 100.dp).fillMaxWidth(),
+            elevation = elevation
+        ) {}
+    }
+}
+
+enum class LikedStates {
+    Initial,
+    Liked,
+    Disappeared
+}
+
+@Sampled
+@Composable
+fun DoubleTapToLikeSample() {
+    // enum class LikedStates { Initial, Liked, Disappeared }
+    @Composable
+    fun doubleTapToLike() {
+        // Creates a transition state that starts in [Disappeared] State
+        var transitionState by remember {
+            mutableStateOf(MutableTransitionState(LikedStates.Disappeared))
+        }
+
+        Box(
+            Modifier.fillMaxSize().doubleTapGestureFilter {
+                // This creates a new `MutableTransitionState` object. When a new
+                // `MutableTransitionState` object gets passed to `updateTransition`, a new
+                // transition will be created. All existing values, velocities will be lost as a
+                // result. Hence, in most cases, this is not recommended. The exception is when it's
+                // more important to respond immediately to user interaction than preserving
+                // continuity.
+                transitionState = MutableTransitionState(LikedStates.Initial)
+            }
+        ) {
+            // This ensures sequential states: Initial -> Liked -> Disappeared
+            if (transitionState.currentState == LikedStates.Initial) {
+                transitionState.targetState = LikedStates.Liked
+            } else if (transitionState.currentState == LikedStates.Liked) {
+                // currentState will be updated to targetState when the transition is finished, so
+                // it can be used as a signal to start the next transition.
+                transitionState.targetState = LikedStates.Disappeared
+            }
+
+            // Creates a transition using the TransitionState object that gets recreated at each
+            // double tap.
+            val transition = updateTransition(transitionState)
+            // Creates an alpha animation, as a part of the transition.
+            val alpha by transition.animateFloat(
+                transitionSpec = {
+                    when {
+                        // Uses different animation specs for transitioning from/to different states
+                        LikedStates.Initial isTransitioningTo LikedStates.Liked ->
+                            keyframes {
+                                durationMillis = 500
+                                0f at 0 // optional
+                                0.5f at 100
+                                1f at 225 // optional
+                            }
+                        LikedStates.Liked isTransitioningTo LikedStates.Disappeared ->
+                            tween(durationMillis = 200)
+                        else -> snap()
+                    }
+                }
+            ) {
+                if (it == LikedStates.Liked) 1f else 0f
+            }
+
+            // Creates a scale animation, as a part of the transition
+            val scale by transition.animateFloat(
+                transitionSpec = {
+                    when {
+                        // Uses different animation specs for transitioning from/to different states
+                        LikedStates.Initial isTransitioningTo LikedStates.Liked ->
+                            spring(dampingRatio = Spring.DampingRatioHighBouncy)
+                        LikedStates.Liked isTransitioningTo LikedStates.Disappeared ->
+                            tween(200)
+                        else -> snap()
+                    }
+                }
+            ) {
+                when (it) {
+                    LikedStates.Initial -> 0f
+                    LikedStates.Liked -> 4f
+                    LikedStates.Disappeared -> 2f
+                }
+            }
+
+            Icon(
+                Icons.Filled.Favorite,
+                "Like",
+                Modifier.align(Alignment.Center)
+                    .graphicsLayer(
+                        alpha = alpha,
+                        scaleX = scale,
+                        scaleY = scale
+                    ),
+                tint = Color.Red
+            )
         }
     }
 }

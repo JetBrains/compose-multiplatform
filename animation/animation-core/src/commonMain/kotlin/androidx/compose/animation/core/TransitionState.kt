@@ -16,7 +16,9 @@
 
 package androidx.compose.animation.core
 
-internal open class StateImpl<T>(val name: T) : MutableTransitionState, TransitionState {
+internal open class StateImpl<T>(
+    val name: T
+) : TransitionDefinition.MutableTransitionState, TransitionState {
 
     internal val props: MutableMap<PropKey<Any, AnimationVector>, Any> = mutableMapOf()
 
@@ -43,12 +45,4 @@ internal open class StateImpl<T>(val name: T) : MutableTransitionState, Transiti
  */
 interface TransitionState {
     operator fun <T, V : AnimationVector> get(propKey: PropKey<T, V>): T
-}
-
-/**
- * [MutableTransitionState] is used in [TransitionDefinition] for constructing various
- * [TransitionState]s with corresponding properties and their values.
- */
-interface MutableTransitionState {
-    operator fun <T, V : AnimationVector> set(propKey: PropKey<T, V>, prop: T)
 }

@@ -19,6 +19,7 @@ package androidx.compose.animation.core
 import androidx.compose.animation.VectorConverter
 import androidx.compose.animation.animateColor
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.dispatch.withFrameNanos
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,6 +31,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.delay
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -268,5 +270,73 @@ class TransitionTest {
         }
         rule.waitForIdle()
         assertTrue(playTime > 800)
+    }
+
+    @Test
+    fun initialStateTest() {
+        val target = MutableTransitionState(AnimStates.From)
+        target.targetState = AnimStates.To
+        var playTime by mutableStateOf(0L)
+        var floatAnim: State<Float>? = null
+        rule.setContent {
+            val transition = updateTransition(target)
+            floatAnim = transition.animateFloat(
+                transitionSpec = { tween(800) }
+            ) {
+                if (it == AnimStates.From) 0f else 1000f
+            }
+            // Verify that animation starts right away
+            LaunchedEffect(transition) {
+                val startTime = withFrameNanos { it }
+                val anim = TargetBasedAnimation(tween(800), Float.VectorConverter, 0f, 1000f)
+                while (!anim.isFinished(playTime)) {
+                    playTime = (withFrameNanos { it } - startTime) / 1_000_000L
+                    assertEquals(anim.getValue(playTime), floatAnim?.value)
+                }
+            }
+        }
+        rule.waitForIdle()
+        assertTrue(playTime >= 800)
+        assertEquals(1000f, floatAnim?.value)
+    }
+
+    @Test
+    fun recreatingMutableStatesAmidTransition() {
+        var playTime by mutableStateOf(0L)
+        var targetRecreated by mutableStateOf(false)
+        rule.setContent {
+            var target by remember { mutableStateOf(MutableTransitionState(AnimStates.From)) }
+            target.targetState = AnimStates.To
+            val transition = updateTransition(target)
+            val floatAnim = transition.animateFloat(
+                transitionSpec = { tween(800) }
+            ) {
+                if (it == AnimStates.From) 0f else 1000f
+            }
+            LaunchedEffect(Unit) {
+                delay(100)
+                target = MutableTransitionState(AnimStates.From)
+                target.targetState = AnimStates.To
+                targetRecreated = true
+            }
+
+            if (targetRecreated) {
+                LaunchedEffect(transition) {
+                    // Verify that animation restarted
+                    assertEquals(0f, floatAnim.value)
+
+                    val startTime = withFrameNanos { it }
+                    val anim = TargetBasedAnimation(tween(800), Float.VectorConverter, 0f, 1000f)
+                    while (!anim.isFinished(playTime)) {
+                        playTime = (withFrameNanos { it } - startTime) / 1_000_000L
+                        assertEquals(anim.getValue(playTime), floatAnim.value)
+                    }
+                }
+            }
+        }
+
+        rule.waitForIdle()
+        assertTrue(targetRecreated)
+        assertTrue(playTime >= 800)
     }
 }
