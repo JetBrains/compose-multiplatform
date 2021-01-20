@@ -21,6 +21,9 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.tween
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -77,8 +80,8 @@ internal class RippleAnimation(
     private val animatedCenter = Animatable(startPosition, Offset.VectorConverter)
 
     private var finishContinuation: Continuation<Unit>? = null
-    private var finishedFadingIn = false
-    private var finishRequested = false
+    private var finishedFadingIn by mutableStateOf(false)
+    private var finishRequested by mutableStateOf(false)
 
     init {
         scope.launch {
