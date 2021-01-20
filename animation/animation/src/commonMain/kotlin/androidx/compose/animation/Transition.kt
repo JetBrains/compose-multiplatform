@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.animation
 
 import androidx.compose.animation.core.AnimationClockObservable
@@ -64,8 +66,6 @@ import androidx.compose.ui.platform.AmbientAnimationClock
  * captures all the current values of the animation. Child composables should read the animation
  * values from the [TransitionState] object, and apply the value wherever necessary.
  *
- * @sample androidx.compose.animation.samples.TransitionSample
- *
  * @param definition Transition definition that defines states and transitions
  * @param toState New state to transition to
  * @param clock Optional animation clock that pulses animations when time changes. By default,
@@ -84,6 +84,7 @@ import androidx.compose.ui.platform.AmbientAnimationClock
  * @see [TransitionDefinition]
  */
 // TODO: The list of params is getting a bit long. Consider grouping them.
+@Deprecated("Please use updateTransition or rememberInfiniteTransition instead.")
 @OptIn(InternalAnimationApi::class)
 @Composable
 fun <T> transition(

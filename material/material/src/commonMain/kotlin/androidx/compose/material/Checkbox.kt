@@ -17,13 +17,11 @@
 package androidx.compose.material
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.FloatPropKey
-import androidx.compose.animation.core.TransitionSpec
-import androidx.compose.animation.core.keyframes
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.snap
-import androidx.compose.animation.core.transitionDefinition
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.transition
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
@@ -241,7 +239,38 @@ private fun CheckboxImpl(
     modifier: Modifier,
     colors: CheckboxColors
 ) {
-    val state = transition(definition = TransitionDefinition, toState = value)
+    val transition = updateTransition(value)
+    val checkDrawFraction by transition.animateFloat(
+        transitionSpec = {
+            when {
+                initialState == ToggleableState.Off -> tween(CheckAnimationDuration)
+                targetState == ToggleableState.Off -> snap(BoxOutDuration)
+                else -> spring()
+            }
+        }
+    ) {
+        when (it) {
+            ToggleableState.On -> 1f
+            ToggleableState.Off -> 0f
+            ToggleableState.Indeterminate -> 1f
+        }
+    }
+
+    val checkCenterGravitationShiftFraction by transition.animateFloat(
+        transitionSpec = {
+            when {
+                initialState == ToggleableState.Off -> snap()
+                targetState == ToggleableState.Off -> snap(BoxOutDuration)
+                else -> tween(durationMillis = CheckAnimationDuration)
+            }
+        }
+    ) {
+        when (it) {
+            ToggleableState.On -> 0f
+            ToggleableState.Off -> 0f
+            ToggleableState.Indeterminate -> 1f
+        }
+    }
     val checkCache = remember { CheckDrawingCache() }
     val checkColor by colors.checkmarkColor(value)
     val boxColor by colors.boxColor(enabled, value)
@@ -256,8 +285,8 @@ private fun CheckboxImpl(
         )
         drawCheck(
             checkColor = checkColor,
-            checkFraction = state[CheckDrawFraction],
-            crossCenterGravitation = state[CheckCenterGravitationShiftFraction],
+            checkFraction = checkDrawFraction,
+            crossCenterGravitation = checkCenterGravitationShiftFraction,
             strokeWidthPx = strokeWidthPx,
             drawingCache = checkCache
         )
@@ -412,69 +441,9 @@ private class DefaultCheckboxColors(
     }
 }
 
-// all float props are fraction now [0f .. 1f] as it seems convenient
-private val CheckDrawFraction = FloatPropKey()
-private val CheckCenterGravitationShiftFraction = FloatPropKey()
-
 private const val BoxInDuration = 50
 private const val BoxOutDuration = 100
 private const val CheckAnimationDuration = 100
-
-private val TransitionDefinition = transitionDefinition<ToggleableState> {
-    state(ToggleableState.On) {
-        this[CheckDrawFraction] = 1f
-        this[CheckCenterGravitationShiftFraction] = 0f
-    }
-    state(ToggleableState.Off) {
-        this[CheckDrawFraction] = 0f
-        this[CheckCenterGravitationShiftFraction] = 0f
-    }
-    state(ToggleableState.Indeterminate) {
-        this[CheckDrawFraction] = 1f
-        this[CheckCenterGravitationShiftFraction] = 1f
-    }
-    transition(
-        ToggleableState.Off to ToggleableState.On,
-        ToggleableState.Off to ToggleableState.Indeterminate
-    ) {
-        boxTransitionToChecked()
-    }
-    transition(
-        ToggleableState.On to ToggleableState.Indeterminate,
-        ToggleableState.Indeterminate to ToggleableState.On
-    ) {
-        CheckCenterGravitationShiftFraction using tween(
-            durationMillis = CheckAnimationDuration
-        )
-    }
-    transition(
-        ToggleableState.Indeterminate to ToggleableState.Off,
-        ToggleableState.On to ToggleableState.Off
-    ) {
-        checkboxTransitionToUnchecked()
-    }
-}
-
-private fun TransitionSpec<ToggleableState>.boxTransitionToChecked() {
-    CheckCenterGravitationShiftFraction using snap()
-    CheckDrawFraction using tween(
-        durationMillis = CheckAnimationDuration
-    )
-}
-
-private fun TransitionSpec<ToggleableState>.checkboxTransitionToUnchecked() {
-    // TODO: emulate delayed snap and replace when actual API is available b/158189074
-    CheckDrawFraction using keyframes {
-        durationMillis = BoxOutDuration
-        1f at 0
-        1f at BoxOutDuration - 1
-        0f at BoxOutDuration
-    }
-    CheckCenterGravitationShiftFraction using tween(
-        durationMillis = 1,
-        delayMillis = BoxOutDuration - 1
-    )
-}
 
 private val CheckboxRippleRadius = 24.dp
 private val CheckboxDefaultPadding = 2.dp
