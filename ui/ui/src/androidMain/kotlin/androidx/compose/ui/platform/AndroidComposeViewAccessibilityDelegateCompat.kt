@@ -18,6 +18,7 @@ package androidx.compose.ui.platform
 
 import android.content.Context
 import android.graphics.RectF
+import android.graphics.Region
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -40,15 +41,15 @@ import androidx.collection.ArraySet
 import androidx.collection.SparseArrayCompat
 import androidx.compose.ui.R
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.toAndroidRect
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsActions.CustomActions
 import androidx.compose.ui.semantics.SemanticsNode
+import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.semantics.SemanticsProperties
-import androidx.compose.ui.semantics.findChildById
-import androidx.compose.ui.semantics.getAllSemanticsNodesToMap
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.semantics.outerSemantics
 import androidx.compose.ui.text.AnnotatedString
@@ -160,24 +161,43 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     private var accessibilityCursorPosition = AccessibilityCursorPositionUndefined
     private val subtreeChangedLayoutNodes = ArraySet<LayoutNode>()
     private val boundsUpdateChannel = Channel<Unit>(Channel.CONFLATED)
+    private var currentSemanticsNodesInvalidated = true
+    // Up to date semantics nodes in pruned semantics tree. It always reflects the current
+    // semantics tree.
+    private var currentSemanticsNodes: Map<Int, SemanticsNode> = mapOf()
+        get() {
+            if (currentSemanticsNodesInvalidated) {
+                field = view.semanticsOwner.getAllUncoveredSemanticsNodesToMap()
+                currentSemanticsNodesInvalidated = false
+            }
+            return field
+        }
 
     @VisibleForTesting
     internal class SemanticsNodeCopy(
-        semanticsNode: SemanticsNode
+        semanticsNode: SemanticsNode,
+        currentSemanticsNodes: Map<Int, SemanticsNode>
     ) {
         val config = semanticsNode.config
         val children: MutableSet<Int> = mutableSetOf()
 
         init {
             semanticsNode.children.fastForEach { child ->
-                children.add(child.id)
+                if (currentSemanticsNodes.contains(child.id)) {
+                    children.add(child.id)
+                }
             }
         }
     }
 
+    // previousSemanticsNodes holds the previous pruned semantics tree so that we can compare the
+    // current and previous trees in onSemanticsChange(). We use SemanticsNodeCopy here because
+    // SemanticsNode's children are dynamically generated and always reflect the current children.
+    // We need to keep a copy of its old structure for comparison.
     @VisibleForTesting
-    internal var semanticsNodes: MutableMap<Int, SemanticsNodeCopy> = mutableMapOf()
-    private var semanticsRoot = SemanticsNodeCopy(view.semanticsOwner.rootSemanticsNode)
+    internal var previousSemanticsNodes: MutableMap<Int, SemanticsNodeCopy> = mutableMapOf()
+    private var previousSemanticsRoot =
+        SemanticsNodeCopy(view.semanticsOwner.rootSemanticsNode, mapOf())
     private var checkingForSemanticsChanges = false
 
     init {
@@ -190,7 +210,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         })
     }
 
-    private fun createNodeInfo(virtualViewId: Int): AccessibilityNodeInfo {
+    private fun createNodeInfo(virtualViewId: Int): AccessibilityNodeInfo? {
         val info: AccessibilityNodeInfoCompat = AccessibilityNodeInfoCompat.obtain()
         val semanticsNode: SemanticsNode?
         if (virtualViewId == AccessibilityNodeProviderCompat.HOST_VIEW_ID) {
@@ -198,10 +218,10 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             semanticsNode = view.semanticsOwner.rootSemanticsNode
             info.setParent(ViewCompat.getParentForAccessibility(view) as? View)
         } else {
-            semanticsNode = view.semanticsOwner.rootSemanticsNode.findChildById(virtualViewId)
+            semanticsNode = currentSemanticsNodes[virtualViewId]
             if (semanticsNode == null) {
-                // throw IllegalStateException("Semantics node $virtualViewId is not attached")
-                return info.unwrap()
+                info.recycle()
+                return null
             }
             info.setSource(view, semanticsNode.id)
             if (semanticsNode.parent != null) {
@@ -254,7 +274,9 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         }
 
         for (child in semanticsNode.children) {
-            info.addChild(view, child.id)
+            if (currentSemanticsNodes.contains(child.id)) {
+                info.addChild(view, child.id)
+            }
         }
 
         // Manage internal accessibility focus state.
@@ -752,7 +774,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             if (virtualViewId == AccessibilityNodeProviderCompat.HOST_VIEW_ID) {
                 view.semanticsOwner.rootSemanticsNode
             } else {
-                view.semanticsOwner.rootSemanticsNode.findChildById(virtualViewId) ?: return false
+                currentSemanticsNodes[virtualViewId] ?: return false
             }
 
         // Actions can be performed when disabled.
@@ -998,7 +1020,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             if (virtualViewId == AccessibilityNodeProviderCompat.HOST_VIEW_ID) {
                 view.semanticsOwner.rootSemanticsNode
             } else {
-                view.semanticsOwner.rootSemanticsNode.findChildById(virtualViewId) ?: return
+                currentSemanticsNodes[virtualViewId] ?: return
             }
         // TODO(b/157474582): This only works for single text/text field
         if (node.config.contains(SemanticsProperties.Text) &&
@@ -1216,6 +1238,10 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     }
 
     internal fun onSemanticsChange() {
+        // When accessibility is turned off, we still want to keep
+        // currentSemanticsNodesInvalidated up to date so that when accessibility is turned on
+        // later, we can refresh currentSemanticsNodes if currentSemanticsNodes is stale.
+        currentSemanticsNodesInvalidated = true
         if (isAccessibilityEnabled && !checkingForSemanticsChanges) {
             checkingForSemanticsChanges = true
             handler.post(semanticsChangeChecker)
@@ -1239,6 +1265,24 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                         )
                     }
                     subtreeChangedSemanticsNodesIds.clear()
+                    // When the bounds of layout nodes change, we will not always get semantics
+                    // change notifications because bounds is not part of semantics. And bounds
+                    // change from a layout node without semantics will affect the global bounds
+                    // of it children which has semantics. Bounds change will affect which nodes
+                    // are covered and which nodes are not, so the currentSemanticsNodes is not
+                    // up to date anymore.
+                    // After the subtree events are sent, accessibility services will get the
+                    // current visible/invisible state. We also update our copy here so that our
+                    // incremental changes (represented by accessibility events) are consistent
+                    // with accessibility services. That is: change - notify - new change -
+                    // notify, if we don't update our copy here, we will combine change and new
+                    // change, which is missing finer-grained notification.
+                    // Note that we could update our copy before this delay by posting an update
+                    // copy runnable in onLayoutChange(a code version is in aosp/1553311), similar
+                    // to semanticsChangeChecker, but I think update copy after the subtree
+                    // change events are sent is more accurate because before accessibility
+                    // services receive subtree events, they are not aware of the subtree change.
+                    updateSemanticsNodesCopy()
                 }
                 subtreeChangedLayoutNodes.clear()
                 delay(SendRecurringAccessibilityEventsIntervalMillis)
@@ -1249,10 +1293,13 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     }
 
     internal fun onLayoutChange(layoutNode: LayoutNode) {
+        // When accessibility is turned off, we still want to keep
+        // currentSemanticsNodesInvalidated up to date so that when accessibility is turned on
+        // later, we can refresh currentSemanticsNodes if currentSemanticsNodes is stale.
+        currentSemanticsNodesInvalidated = true
         if (!isAccessibilityEnabled) {
             return
         }
-
         // The layout change of a LayoutNode will also affect its children, so even if it doesn't
         // have semantics attached, we should process it.
         notifySubtreeAccessibilityStateChangedIfNeeded(layoutNode)
@@ -1298,20 +1345,24 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     }
 
     private fun checkForSemanticsChanges() {
-        val newSemanticsNodes = view.semanticsOwner.getAllSemanticsNodesToMap()
-
         // Structural change
-        sendSemanticsStructureChangeEvents(view.semanticsOwner.rootSemanticsNode, semanticsRoot)
-
+        sendSemanticsStructureChangeEvents(
+            view.semanticsOwner.rootSemanticsNode,
+            previousSemanticsRoot
+        )
         // Property change
-        sendSemanticsPropertyChangeEvents(newSemanticsNodes)
+        sendSemanticsPropertyChangeEvents(currentSemanticsNodes)
+        updateSemanticsNodesCopy()
+    }
 
-        // Update the cache
-        semanticsNodes.clear()
-        for (entry in newSemanticsNodes.entries) {
-            semanticsNodes[entry.key] = SemanticsNodeCopy(entry.value)
+    private fun updateSemanticsNodesCopy() {
+        previousSemanticsNodes.clear()
+        for (entry in currentSemanticsNodes.entries) {
+            previousSemanticsNodes[entry.key] =
+                SemanticsNodeCopy(entry.value, currentSemanticsNodes)
         }
-        semanticsRoot = SemanticsNodeCopy(view.semanticsOwner.rootSemanticsNode)
+        previousSemanticsRoot =
+            SemanticsNodeCopy(view.semanticsOwner.rootSemanticsNode, currentSemanticsNodes)
     }
 
     @VisibleForTesting
@@ -1319,7 +1370,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         for (id in newSemanticsNodes.keys) {
             // We do doing this search because the new configuration is set as a whole, so we
             // can't indicate which property is changed when setting the new configuration.
-            val oldNode = semanticsNodes[id] ?: continue
+            val oldNode = previousSemanticsNodes[id] ?: continue
             val newNode = newSemanticsNodes[id]
             var propertyChanged = false
             for (entry in newNode!!.config) {
@@ -1508,11 +1559,13 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
 
         // If any child is added, clear the subtree rooted at this node and return.
         newNode.children.fastForEach { child ->
-            if (!oldNode.children.contains(child.id)) {
-                notifySubtreeAccessibilityStateChangedIfNeeded(newNode.layoutNode)
-                return
+            if (currentSemanticsNodes.contains(child.id)) {
+                if (!oldNode.children.contains(child.id)) {
+                    notifySubtreeAccessibilityStateChangedIfNeeded(newNode.layoutNode)
+                    return
+                }
+                newChildren.add(child.id)
             }
-            newChildren.add(child.id)
         }
 
         // If any child is deleted, clear the subtree rooted at this node and return.
@@ -1524,7 +1577,9 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         }
 
         newNode.children.fastForEach { child ->
-            sendSemanticsStructureChangeEvents(child, semanticsNodes[child.id]!!)
+            if (currentSemanticsNodes.contains(child.id)) {
+                sendSemanticsStructureChangeEvents(child, previousSemanticsNodes[child.id]!!)
+            }
         }
     }
 
@@ -1803,4 +1858,40 @@ private fun SemanticsNode.propertiesDeleted(
         }
     }
     return false
+}
+
+/**
+ * Finds pruned [SemanticsNode]s in the tree owned by this [SemanticsOwner]. A semantics node
+ * completely covered by siblings drawn on top of it will be pruned. Return the results in a
+ * map.
+ */
+internal fun SemanticsOwner.getAllUncoveredSemanticsNodesToMap(
+    useUnmergedTree: Boolean = false
+): Map<Int, SemanticsNode> {
+    val root = if (useUnmergedTree) unmergedRootSemanticsNode else rootSemanticsNode
+    val nodes = mutableMapOf<Int, SemanticsNode>()
+    val unaccountedSpace = Region().also { it.set(root.globalBounds.toAndroidRect()) }
+
+    fun findAllSemanticNodesRecursive(currentNode: SemanticsNode) {
+        if (unaccountedSpace.isEmpty) {
+            return
+        }
+        val rect = currentNode.globalBounds.toAndroidRect()
+
+        if (Region(unaccountedSpace).op(rect, Region.Op.INTERSECT)) {
+            nodes[currentNode.id] = currentNode
+            // Children could be drawn outside of parent, but we are using clipped bounds for
+            // accessibility now, so let's put the children recursion inside of this if. If later
+            // we decide to support children drawn outside of parent, we can move it out of the
+            // if block.
+            val children = currentNode.children
+            for (i in children.size - 1 downTo 0) {
+                findAllSemanticNodesRecursive(children[i])
+            }
+            unaccountedSpace.op(rect, unaccountedSpace, Region.Op.REVERSE_DIFFERENCE)
+        }
+    }
+
+    findAllSemanticNodesRecursive(root)
+    return nodes
 }
