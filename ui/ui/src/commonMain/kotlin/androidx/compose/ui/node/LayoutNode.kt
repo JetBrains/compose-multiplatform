@@ -61,7 +61,6 @@ import androidx.compose.ui.semantics.outerSemantics
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.util.deleteAt
 import kotlin.math.roundToInt
 
 /**
@@ -410,11 +409,13 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
             tree.append(child.debugTreeToString(depth + 1))
         }
 
+        var treeString = tree.toString()
         if (depth == 0) {
             // Delete trailing newline
-            tree.deleteAt(tree.length - 1)
+            treeString = treeString.substring(0, treeString.length - 1)
         }
-        return tree.toString()
+
+        return treeString
     }
 
     internal abstract class NoIntrinsicsMeasureBlocks(private val error: String) : MeasureBlocks {
