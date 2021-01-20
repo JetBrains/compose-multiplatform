@@ -17,6 +17,7 @@
 package androidx.compose.ui
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.preferredSize
@@ -32,7 +33,6 @@ import androidx.compose.testutils.benchmark.toggleStateBenchmarkComposeMeasureLa
 import androidx.compose.testutils.benchmark.toggleStateBenchmarkMeasureLayout
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Placeable
-import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
@@ -45,7 +45,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class WithConstraintsBenchmark {
+class BoxWithConstraintsBenchmark {
 
     @get:Rule
     val benchmarkRule = ComposeBenchmarkRule()
@@ -57,7 +57,7 @@ class WithConstraintsBenchmark {
 
     @Test
     fun withconstraints_inner_recompose() {
-        benchmarkRule.toggleStateBenchmarkComposeMeasureLayout({ WithConstraintsTestCase() })
+        benchmarkRule.toggleStateBenchmarkComposeMeasureLayout({ BoxWithConstraintsTestCase() })
     }
 
     @Test
@@ -84,7 +84,7 @@ private class NoWithConstraintsTestCase : ComposeTestCase, ToggleableTestCase {
     }
 }
 
-private class WithConstraintsTestCase : ComposeTestCase, ToggleableTestCase {
+private class BoxWithConstraintsTestCase : ComposeTestCase, ToggleableTestCase {
 
     private lateinit var state: MutableState<Dp>
 
@@ -92,7 +92,7 @@ private class WithConstraintsTestCase : ComposeTestCase, ToggleableTestCase {
     override fun Content() {
         val size = remember { mutableStateOf(200.dp) }
         this.state = size
-        WithConstraints {
+        BoxWithConstraints {
             Box(Modifier.preferredSize(300.dp), contentAlignment = Alignment.Center) {
                 Spacer(Modifier.preferredSize(width = size.value, height = size.value))
             }
@@ -113,7 +113,7 @@ private class ChangingConstraintsTestCase : ComposeTestCase, ToggleableTestCase 
         val size = remember { mutableStateOf(100) }
         this.state = size
         ChangingConstraintsLayout(state) {
-            WithConstraints {
+            BoxWithConstraints {
                 Box(Modifier.fillMaxSize())
             }
         }

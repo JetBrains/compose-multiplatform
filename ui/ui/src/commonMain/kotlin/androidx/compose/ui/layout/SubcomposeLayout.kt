@@ -46,7 +46,8 @@ import androidx.compose.ui.unit.LayoutDirection
  *
  * Possible use cases:
  * * You need to know the constraints passed by the parent during the composition and can't solve
- * your use case with just custom [Layout] or [LayoutModifier]. See [WithConstraints].
+ * your use case with just custom [Layout] or [LayoutModifier].
+ * See [androidx.compose.foundation.layout.BoxWithConstraints].
  * * You want to use the size of one child during the composition of the second child.
  * * You want to compose your items lazily based on the available size. For example you have a
  * list of 100 items and instead of composing all of them you only compose the ones which are

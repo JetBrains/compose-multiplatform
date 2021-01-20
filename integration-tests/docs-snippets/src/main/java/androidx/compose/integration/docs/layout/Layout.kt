@@ -21,6 +21,7 @@
 package androidx.compose.integration.docs.layout
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ConstraintLayout
 import androidx.compose.foundation.layout.ConstraintSet
@@ -46,7 +47,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.tooling.preview.Preview
@@ -217,7 +217,7 @@ private object LayoutSnippet9 {
 private object LayoutSnippet10 {
     @Composable
     fun DecoupledConstraintLayout() {
-        WithConstraints {
+        BoxWithConstraints {
             val constraints = if (minWidth < 600.dp) {
                 decoupledConstraints(margin = 16.dp) // Portrait constraints
             } else {

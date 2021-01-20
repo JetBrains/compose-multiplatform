@@ -65,7 +65,7 @@ inline fun Box(
     propagateMinConstraints: Boolean = false,
     content: @Composable BoxScope.() -> Unit
 ) {
-    val measureBlocks = rememberMeasureBlocks(contentAlignment, propagateMinConstraints)
+    val measureBlocks = rememberBoxMeasureBlocks(contentAlignment, propagateMinConstraints)
     Layout(
         content = { BoxScope.content() },
         measureBlocks = measureBlocks,
@@ -75,7 +75,7 @@ inline fun Box(
 
 @PublishedApi
 @Composable
-internal fun rememberMeasureBlocks(
+internal fun rememberBoxMeasureBlocks(
     alignment: Alignment,
     propagateMinConstraints: Boolean
 ) = remember(alignment) {
@@ -203,7 +203,7 @@ internal val EmptyBoxMeasureBlocks = MeasuringIntrinsicsMeasureBlocks { _, const
 }
 
 /**
- * A BoxScope provides a scope for the children of a [Box].
+ * A BoxScope provides a scope for the children of [Box] and [BoxWithConstraints].
  */
 @LayoutScopeMarker
 @Immutable
