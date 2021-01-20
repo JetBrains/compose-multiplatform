@@ -25,6 +25,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -65,7 +66,6 @@ import androidx.compose.ui.graphics.SweepGradientShader
 import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.toPixelMap
-import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -90,7 +90,7 @@ fun ColorPickerDemo() {
 
 @Composable
 private fun ColorPicker(onColorChange: (Color) -> Unit) {
-    WithConstraints(
+    BoxWithConstraints(
         Modifier.padding(50.dp)
             .fillMaxSize()
             .aspectRatio(1f)

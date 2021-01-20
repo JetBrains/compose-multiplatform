@@ -18,6 +18,7 @@ package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -25,7 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.constrainHeight
@@ -64,7 +64,7 @@ fun LazyVerticalGrid(
                 scope = scope
             )
         is GridCells.Adaptive ->
-            WithConstraints(
+            BoxWithConstraints(
                 modifier = modifier
             ) {
                 val nColumns = maxOf((maxWidth / cells.minSize).toInt(), 1)

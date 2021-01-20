@@ -19,6 +19,7 @@ package androidx.compose.foundation.layout.demos
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,7 +34,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
@@ -177,7 +177,7 @@ private fun CustomLayout(rtlSupport: Boolean) {
 
 @Composable
 private fun LayoutWithConstraints(text: String) {
-    WithConstraints {
+    BoxWithConstraints {
         val w = maxWidth / 3
         val color = if (AmbientLayoutDirection.current == LayoutDirection.Ltr) {
             Color.Red

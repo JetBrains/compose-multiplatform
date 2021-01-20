@@ -113,8 +113,8 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
         Measuring, NeedsRemeasure -> {
             // requestMeasure has already been called for this node or
             // we're currently measuring it, let's swallow. example when it happens: we compose
-            // DataNode inside WithConstraints, this calls onRequestMeasure on DataNode's
-            // parent, but this parent is WithConstraints which is currently measuring.
+            // DataNode inside BoxWithConstraints, this calls onRequestMeasure on DataNode's
+            // parent, but this parent is BoxWithConstraints which is currently measuring.
             false
         }
         LayingOut -> {

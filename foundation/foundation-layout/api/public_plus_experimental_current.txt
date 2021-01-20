@@ -88,6 +88,23 @@ package androidx.compose.foundation.layout {
   public static final class BoxScope.Companion implements androidx.compose.foundation.layout.BoxScope {
   }
 
+  public final class BoxWithConstraintsKt {
+    method @androidx.compose.runtime.Composable public static void BoxWithConstraints(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.Alignment contentAlignment, optional boolean propagateMinConstraints, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.BoxWithConstraintsScope,kotlin.Unit> content);
+  }
+
+  @androidx.compose.runtime.Stable public interface BoxWithConstraintsScope extends androidx.compose.foundation.layout.BoxScope {
+    method public long getConstraints-msEJaDk();
+    method public float getMaxHeight-D9Ej5fM();
+    method public float getMaxWidth-D9Ej5fM();
+    method public float getMinHeight-D9Ej5fM();
+    method public float getMinWidth-D9Ej5fM();
+    property public abstract long constraints;
+    property public abstract float maxHeight;
+    property public abstract float maxWidth;
+    property public abstract float minHeight;
+    property public abstract float minWidth;
+  }
+
   public final class ChainStyle {
     field public static final androidx.compose.foundation.layout.ChainStyle.Companion Companion;
   }

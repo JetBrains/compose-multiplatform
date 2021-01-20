@@ -17,6 +17,7 @@
 package androidx.compose.ui.tooling
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
@@ -27,7 +28,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.resetSourceInfo
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
@@ -101,7 +101,7 @@ class BoundsTest : ToolingTest() {
         val slotTableRecord = CompositionDataRecord.create()
         show {
             Inspectable(slotTableRecord) {
-                WithConstraints {
+                BoxWithConstraints {
                     Column {
                         Box {
                             Text("Hello")
@@ -137,7 +137,7 @@ class BoundsTest : ToolingTest() {
         show {
             Inspectable(slotTableRecord) {
                 key(value) {
-                    WithConstraints {
+                    BoxWithConstraints {
                         requireNotNull(AmbientDensity.current)
                         Text("Hello")
                     }

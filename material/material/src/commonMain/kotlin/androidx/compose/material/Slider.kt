@@ -32,6 +32,7 @@ import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -54,7 +55,6 @@ import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AmbientLayoutDirection
@@ -129,7 +129,9 @@ fun Slider(
     }
     position.onValueChange = onValueChange
     position.scaledValue = value
-    WithConstraints(modifier.sliderSemantics(value, position, onValueChange, valueRange, steps)) {
+    BoxWithConstraints(
+        modifier.sliderSemantics(value, position, onValueChange, valueRange, steps)
+    ) {
         val isRtl = AmbientLayoutDirection.current == LayoutDirection.Rtl
         val maxPx = constraints.maxWidth.toFloat()
         val minPx = 0f
