@@ -16,6 +16,7 @@
 
 package androidx.build.resources
 
+import androidx.build.getSupportRootFolder
 import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Project
 import java.io.File
@@ -24,7 +25,7 @@ fun Project.configurePublicResourcesStub(extension: LibraryExtension) {
     extension.libraryVariants.all { variant ->
         variant.registerGeneratedResFolders(
             project.files(
-                File(project.rootDir, "/buildSrc/res")
+                File(project.getSupportRootFolder(), "/buildSrc/res")
             )
         )
     }
