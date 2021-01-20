@@ -144,6 +144,8 @@ message Parameter {
 // Request all composables found under a layout tree rooted under the specified view
 message GetComposablesCommand {
    int64 root_view_id = 1;
+  // If true, only show composable nodes created by the user's own app
+  bool skip_system_composables = 2;
 }
 message GetComposablesResponse {
     // A collection of all text referenced by other fields in this message
@@ -152,7 +154,11 @@ message GetComposablesResponse {
 }
 
 message GetParametersCommand {
-  sint64 composable_id = 1;
+  int64 root_view_id = 1; // Used for filtering out composables from unrelated layout trees
+  sint64 composable_id = 2;
+  // As an optimization, we can skip over searching system composables if we know we don't care
+  // about them.
+  bool skip_system_composables = 3;
 }
 
 message GetParametersResponse {

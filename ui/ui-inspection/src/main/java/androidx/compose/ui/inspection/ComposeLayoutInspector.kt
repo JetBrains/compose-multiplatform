@@ -73,16 +73,13 @@ class ComposeLayoutInspector(
     ) {
         ThreadUtils.runOnMainThread {
             val stringTable = StringTable()
-            val composeRoots = getRootViews()
-                .asSequence()
-                // Note: When querying root views, there should only be 0 or 1 match here, but it's
-                // easier to handle this as a general filter, to avoid ? operators all the rest of
-                // the way down
-                .filter { it.uniqueDrawingId == getComposablesCommand.rootViewId }
-                .flatMap { it.flatten() }
-                .mapNotNull { AndroidComposeViewWrapper.tryCreateFor(it) }
-                .map { it.createComposableRoot(stringTable) }
-                .toList()
+            val composeRoots =
+                getComposableRoots(
+                    getComposablesCommand.rootViewId,
+                    getComposablesCommand.skipSystemComposables
+                )
+                    .map { it.createComposableRoot(stringTable) }
+                    .toList()
 
             environment.executors().primary().execute {
                 callback.reply {
@@ -100,10 +97,10 @@ class ComposeLayoutInspector(
         callback: CommandCallback
     ) {
         ThreadUtils.runOnMainThread {
-            val foundComposable = getRootViews()
-                .asSequence()
-                .flatMap { it.flatten() }
-                .mapNotNull { AndroidComposeViewWrapper.tryCreateFor(it) }
+            val foundComposable = getComposableRoots(
+                getParametersCommand.rootViewId,
+                getParametersCommand.skipSystemComposables
+            )
                 .flatMap { it.inspectorNodes }
                 .flatMap { it.flatten() }
                 .firstOrNull { it.id == getParametersCommand.composableId }
@@ -127,11 +124,24 @@ class ComposeLayoutInspector(
     }
 }
 
-private fun getRootViews(): List<View> {
-    val views = WindowInspector.getGlobalWindowViews()
-    return views
+private fun getComposableRoots(
+    rootViewId: Long,
+    skipSystemComposables: Boolean
+): Sequence<AndroidComposeViewWrapper> {
+    return WindowInspector.getGlobalWindowViews()
+        .asSequence()
         .filter { view -> view.visibility == View.VISIBLE && view.isAttachedToWindow }
-        .sortedBy { view -> view.z }
+        // Note: When querying root views, there should only be 0 or 1 match here, but it's
+        // easier to handle this as a general filter, to avoid ? operators all the rest of
+        // the way down
+        .filter { it.uniqueDrawingId == rootViewId }
+        .flatMap { it.flatten() }
+        .mapNotNull {
+            AndroidComposeViewWrapper.tryCreateFor(
+                it,
+                skipSystemComposables
+            )
+        }
 }
 
 private fun Inspector.CommandCallback.reply(initResponse: Response.Builder.() -> Unit) {
