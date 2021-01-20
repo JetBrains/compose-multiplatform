@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.animation.core
 
 @RequiresOptIn(message = "This API is internal to library.")

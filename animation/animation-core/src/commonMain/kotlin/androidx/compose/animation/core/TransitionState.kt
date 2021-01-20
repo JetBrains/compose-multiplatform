@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.animation.core
 
 internal open class StateImpl<T>(
@@ -43,6 +45,7 @@ internal open class StateImpl<T>(
  * [TransitionState] holds a number of property values. The value of a property can be queried via
  * [get], providing its property key.
  */
+@Deprecated("Please use updateTransition or rememberInfiniteTransition instead.")
 interface TransitionState {
     operator fun <T, V : AnimationVector> get(propKey: PropKey<T, V>): T
 }

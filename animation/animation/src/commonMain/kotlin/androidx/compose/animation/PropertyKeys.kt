@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.animation
 
 import androidx.compose.animation.core.AnimationVector1D
@@ -41,6 +43,7 @@ import kotlin.math.roundToInt
  *
  * @param label Label for distinguishing different prop keys in Android Studio.
  */
+@Deprecated("Please use updateTransition or rememberInfiniteTransition instead.")
 class PxPropKey(override val label: String = "PxPropKey") : PropKey<Float, AnimationVector1D> {
     override val typeConverter = Float.VectorConverter
 }
@@ -50,6 +53,7 @@ class PxPropKey(override val label: String = "PxPropKey") : PropKey<Float, Anima
  *
  * @param label Label for distinguishing different prop keys in Android Studio.
  */
+@Deprecated("Please use updateTransition or rememberInfiniteTransition instead.")
 class DpPropKey(override val label: String = "DpPropKey") : PropKey<Dp, AnimationVector1D> {
     override val typeConverter = Dp.VectorConverter
 }
@@ -59,6 +63,7 @@ class DpPropKey(override val label: String = "DpPropKey") : PropKey<Dp, Animatio
  *
  * @param label Label for distinguishing different prop keys in Android Studio.
  */
+@Deprecated("Please use updateTransition or rememberInfiniteTransition instead.")
 class OffsetPropKey(
     override val label: String = "OffsetPropKey"
 ) : PropKey<Offset, AnimationVector2D> {
@@ -70,6 +75,7 @@ class OffsetPropKey(
  *
  * @param label Label for distinguishing different prop keys in Android Studio.
  */
+@Deprecated("Please use updateTransition or rememberInfiniteTransition instead.")
 class ColorPropKey(
     colorSpace: ColorSpace = ColorSpaces.Srgb,
     override val label: String = "ColorPropKey"
@@ -82,6 +88,7 @@ class ColorPropKey(
  *
  * @param label Label for distinguishing different prop keys in Android Studio.
  */
+@Deprecated("Please use updateTransition or rememberInfiniteTransition instead.")
 class RectPropKey(
     override val label: String = "RectPropKey"
 ) : PropKey<Rect, AnimationVector4D> {

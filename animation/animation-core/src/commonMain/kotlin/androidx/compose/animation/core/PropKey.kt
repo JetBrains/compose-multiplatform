@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.animation.core
 
 /**
@@ -68,6 +70,7 @@ private class TwoWayConverterImpl<T, V : AnimationVector>(
  * [typeConverter] needs to be supplied to define how the animated data type can be converted to
  * and from an [AnimationVector], so that animations can support multi-dimensional data types.
  */
+@Deprecated("Please use updateTransition or rememberInfiniteTransition instead.")
 interface PropKey<T, V : AnimationVector> {
     /**
      * A [TwoWayConverter] that converts [T] (the data type to be animated) to and from [V] (any
@@ -93,6 +96,7 @@ internal fun lerp(start: Int, stop: Int, fraction: Float) =
  *
  * @param label Label for distinguishing different prop keys in Android Studio.
  */
+@Deprecated("Please use updateTransition or rememberInfiniteTransition instead.")
 class FloatPropKey(
     override val label: String = "FloatPropKey"
 ) : PropKey<Float, AnimationVector1D> {
@@ -104,6 +108,7 @@ class FloatPropKey(
  *
  * @param label Label for distinguishing different prop keys in Android Studio.
  */
+@Deprecated("Please use updateTransition or rememberInfiniteTransition instead.")
 class IntPropKey(override val label: String = "IntPropKey") : PropKey<Int, AnimationVector1D> {
     override val typeConverter = Int.VectorConverter
 }

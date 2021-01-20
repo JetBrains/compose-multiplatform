@@ -305,7 +305,7 @@ class KeyframesSpec<T>(val config: KeyframesSpecConfig<T>) : DurationBasedAnimat
      * at a particular time. Once the key frames are fully configured, the [KeyframesSpecConfig]
      * can be used to create a [KeyframesSpec].
      *
-     * @sample androidx.compose.animation.core.samples.FloatKeyframesBuilder
+     * @sample androidx.compose.animation.core.samples.KeyframesBuilderForPosition
      * @see keyframes
      */
     class KeyframesSpecConfig<T> {
