@@ -177,6 +177,8 @@ class TransitionModel<T>(
  * [infiniteRepeatable]. By default, [transitionSpec] uses a [spring] animation for all transition
  * destinations.
  *
+ * [label] is used to differentiate from other animations in the same transition in Android Studio.
+ *
  * @return A [State] object, the value of which is updated by animation
  *
  * @see animateValue
@@ -187,15 +189,16 @@ class TransitionModel<T>(
 @Composable
 inline fun <S> Transition<S>.animateColor(
     noinline transitionSpec:
-        @Composable Transition.States<S>.() -> FiniteAnimationSpec<Color> = { spring() },
-    targetValueByState: @Composable (state: S) -> Color
+        @Composable Transition.Segment<S>.() -> FiniteAnimationSpec<Color> = { spring() },
+    label: String = "ColorAnimation",
+    targetValueByState: @Composable() (state: S) -> Color
 ): State<Color> {
     val colorSpace = targetValueByState(targetState).colorSpace
     val typeConverter = remember(colorSpace) {
         Color.VectorConverter(colorSpace)
     }
 
-    return animateValue(typeConverter, transitionSpec, targetValueByState)
+    return animateValue(typeConverter, transitionSpec, label, targetValueByState)
 }
 
 /**

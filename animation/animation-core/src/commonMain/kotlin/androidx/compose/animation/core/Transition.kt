@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:OptIn(InternalAnimationApi::class)
+
 package androidx.compose.animation.core
 
 import androidx.compose.runtime.Composable
@@ -21,22 +23,20 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.State
-import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.dispatch.withFrameNanos
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.Bounds
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.Uptime
+import kotlin.math.max
 
 /**
  * This sets up a [Transition], and updates it with the target provided by [targetState]. When
@@ -45,8 +45,7 @@ import androidx.compose.ui.unit.Uptime
  * using [Transition.animateFloat], [animateColor][ androidx.compose.animation.animateColor],
  * [Transition.animateValue], etc.
  *
- * When all the animations in the transition have finished running, the provided [onFinished] will
- * be invoked.
+ * [label] is used to differentiate different transitions in Android Studio.
  *
  * @sample androidx.compose.animation.core.samples.GestureAnimationSample
  *
@@ -59,25 +58,10 @@ import androidx.compose.ui.unit.Uptime
 @Composable
 fun <T> updateTransition(
     targetState: T,
-    onFinished: (T) -> Unit = {}
+    label: String? = null
 ): Transition<T> {
-    val listener = rememberUpdatedState(onFinished)
-    val transition = remember { Transition(targetState, listener) }
-    // This is needed because child animations rely on this target state and the state pair to
-    // update their animation specs
+    val transition = remember { Transition(targetState, label) }
     transition.updateTarget(targetState)
-    SideEffect {
-        transition.animateTo(targetState)
-    }
-    if (transition.isRunning || transition.startRequested) {
-        LaunchedEffect(transition) {
-            while (true) {
-                withFrameNanos {
-                    transition.onFrame(it)
-                }
-            }
-        }
-    }
     return transition
 }
 
@@ -103,8 +87,9 @@ fun <T> updateTransition(
 // TODO: Support creating Transition outside of composition and support imperative use of Transition
 class Transition<S> internal constructor(
     initialState: S,
-    private val onFinished: State<(S) -> Unit>
+    val label: String? = null
 ) {
+
     /**
      * Current state of the transition. This will always be the initialState of the transition
      * until the transition is finished. Once the transition is finished, [currentState] will be
@@ -121,10 +106,10 @@ class Transition<S> internal constructor(
         internal set
 
     /**
-     * [transitionStates] contains the initial state and the target state of the currently on-going
+     * [segment] contains the initial state and the target state of the currently on-going
      * transition.
      */
-    var transitionStates: States<S> by mutableStateOf(States(initialState, initialState))
+    var segment: Segment<S> by mutableStateOf(Segment(initialState, initialState))
         private set
 
     /**
@@ -137,11 +122,28 @@ class Transition<S> internal constructor(
      * Play time in nano-seconds. [playTimeNanos] is always non-negative. It starts from 0L at the
      * beginning of the transition and increment until all child animations have finished.
      */
-    /*@VisibleForTesting*/
     internal var playTimeNanos by mutableStateOf(0L)
-    internal var startRequested: Boolean by mutableStateOf(false)
+
+    // This gets calculated every time child is updated/added
+    internal var updateChildrenNeeded: Boolean by mutableStateOf(true)
     private var startTime = Uptime.Unspecified
-    private val animations = mutableVectorOf<TransitionAnimationState<*, *>>()
+
+    /** @suppress **/
+    @InternalAnimationApi
+    val animations: List<TransitionAnimationState<*, *>>
+        get() = _animations
+
+    private val _animations = ArrayList<TransitionAnimationState<*, *>>(4)
+
+    // Seeking related
+    @PublishedApi
+    internal var isSeeking: Boolean by mutableStateOf(false)
+    private var lastSeekedTimeNanos: Long = 0L
+
+    /** @suppress **/
+    @InternalAnimationApi
+    var totalDurationNanos: Long by mutableStateOf(0L)
+        private set
 
     // Target state that is currently being animated to
     private var currentTargetState: S = initialState
@@ -150,13 +152,13 @@ class Transition<S> internal constructor(
         if (startTime == Uptime.Unspecified) {
             startTime = Uptime(frameTimeNanos)
         }
-        startRequested = false
+        updateChildrenNeeded = false
 
         // Update play time
         playTimeNanos = frameTimeNanos - startTime.nanoseconds
         var allFinished = true
         // Pulse new playtime
-        animations.forEach {
+        _animations.forEach {
             if (!it.isFinished) {
                 it.onPlayTimeChanged(playTimeNanos)
             }
@@ -169,27 +171,73 @@ class Transition<S> internal constructor(
             startTime = Uptime.Unspecified
             currentState = targetState
             playTimeNanos = 0
-            onFinished.value(targetState)
+        }
+    }
+
+    /**
+     * This allows tools to set the transition (between initial and target state) to any time.
+     * @suppress
+     */
+    @InternalAnimationApi
+    fun seek(initialState: S, targetState: S, playTimeNanos: Long) {
+        // Reset running state
+        startTime = Uptime.Unspecified
+        if (!isSeeking || this.currentState != initialState || this.targetState != targetState) {
+            // Reset all child animations
+            this.currentState = initialState
+            this.targetState = targetState
+            isSeeking = true
+            segment = Segment(initialState, targetState)
+        }
+
+        if (playTimeNanos != lastSeekedTimeNanos) {
+            // Only pulse all children when the play time or any child has changed.
+            _animations.forEach {
+                it.seekTo(playTimeNanos)
+            }
+            lastSeekedTimeNanos = playTimeNanos
         }
     }
 
     @PublishedApi
     internal fun addAnimation(animation: TransitionAnimationState<*, *>) =
-        animations.add(animation)
+        _animations.add(animation)
 
     @PublishedApi
     internal fun removeAnimation(animation: TransitionAnimationState<*, *>) {
-        animations.remove(animation)
+        _animations.remove(animation)
     }
 
     // This target state should only be used to modify "mutableState"s, as it could potentially
     // roll back. The
+    @Suppress("ComposableNaming")
+    @Composable
     internal fun updateTarget(targetState: S) {
-        if (transitionStates.targetState != targetState) {
-            // Starting state should be the "next" state when waypoints are impl'ed
-            transitionStates = States(this.targetState, targetState)
+        if (!isSeeking) {
+            // This is needed because child animations rely on this target state and the state pair to
+            // update their animation specs
+            if (this.targetState != targetState) {
+                // Starting state should be the "next" state when waypoints are impl'ed
+                segment = Segment(this.targetState, targetState)
+                currentState = this.targetState
+                this.targetState = targetState
+            }
+            SideEffect {
+                animateTo(targetState)
+            }
+
+            // target != currentState adds LaunchedEffect into the tree in the same frame as
+            // target change.
+            if (targetState != currentState || isRunning || updateChildrenNeeded) {
+                LaunchedEffect(this) {
+                    while (true) {
+                        withFrameNanos {
+                            onFrame(it)
+                        }
+                    }
+                }
+            }
         }
-        this.targetState = targetState
     }
 
     internal fun animateTo(targetState: S) {
@@ -198,96 +246,139 @@ class Transition<S> internal constructor(
                 startTime = Uptime(startTime.nanoseconds + playTimeNanos)
                 playTimeNanos = 0
             } else {
-                startRequested = true
+                updateChildrenNeeded = true
             }
             currentTargetState = targetState
             // If target state is changed, reset all the animations to be re-created in the
             // next frame w/ their new target value. Child animations target values are updated in
             // the side effect that may not have happened when this function in invoked.
-            animations.forEach { it.resetAnimation() }
+            _animations.forEach { it.resetAnimation() }
         }
     }
 
-    // Called from children to start an animation
-    private fun requestStart() {
-        startRequested = true
+    private fun onChildAnimationUpdated() {
+        updateChildrenNeeded = true
+        if (isSeeking) {
+            // Update total duration
+            var maxDurationNanos = 0L
+            _animations.forEach {
+                maxDurationNanos = max(maxDurationNanos, it.durationNanos)
+                it.seekTo(lastSeekedTimeNanos)
+            }
+            totalDurationNanos = maxDurationNanos
+            // TODO: Is update duration the only thing that needs to be done during seeking to
+            //  accommodate update children?
+            updateChildrenNeeded = false
+        }
     }
 
     // TODO: Consider making this public
-    @PublishedApi
-    internal inner class TransitionAnimationState<T, V : AnimationVector> @PublishedApi internal
+    /** Suppress **/
+    @InternalAnimationApi
+    inner class TransitionAnimationState<T, V : AnimationVector> @PublishedApi internal
     constructor(
         initialValue: T,
         initialVelocityVector: V,
-        val typeConverter: TwoWayConverter<T, V>
+        val typeConverter: TwoWayConverter<T, V>,
+        val label: String
     ) : State<T> {
 
-        override var value by mutableStateOf(initialValue)
+        // Changed during composition, may rollback
+        @PublishedApi
+        internal var targetValue: T by mutableStateOf(initialValue)
             internal set
-
-        var targetValue: T = initialValue
-            internal set
-        var velocityVector: V = initialVelocityVector
-            internal set
-        var isFinished: Boolean by mutableStateOf(true)
-            private set
-        private var animation: Animation<T, V>? = null
 
         @PublishedApi
-        internal var animationSpec: FiniteAnimationSpec<T> = spring()
-        private var offsetTimeNanos = 0L
+        internal var animationSpec: FiniteAnimationSpec<T> by mutableStateOf(spring())
+        private var animation: TargetBasedAnimation<T, V> by mutableStateOf(
+            TargetBasedAnimation(
+                animationSpec, typeConverter, initialValue, targetValue,
+                initialVelocityVector
+            )
+        )
+        internal var isFinished: Boolean by mutableStateOf(true)
+        private var offsetTimeNanos by mutableStateOf(0L)
+
+        // Changed during animation, no concerns of rolling back
+        override var value by mutableStateOf(initialValue)
+            internal set
+        internal var velocityVector: V = initialVelocityVector
+        internal val durationNanos
+            get() = animation.durationMillis.times(1_000_000L)
 
         internal fun onPlayTimeChanged(playTimeNanos: Long) {
-            val anim = animation ?: TargetBasedAnimation<T, V>(
-                animationSpec,
-                typeConverter,
-                value,
-                targetValue,
-                velocityVector
-            ).also { animation = it }
             val playTimeMillis = (playTimeNanos - offsetTimeNanos) / 1_000_000L
-            value = anim.getValue(playTimeMillis)
-            velocityVector = anim.getVelocityVector(playTimeMillis)
-            if (anim.isFinished(playTimeMillis)) {
+            value = animation.getValue(playTimeMillis)
+            velocityVector = animation.getVelocityVector(playTimeMillis)
+            if (animation.isFinished(playTimeMillis)) {
                 isFinished = true
                 offsetTimeNanos = 0
             }
         }
 
+        internal fun seekTo(playTimeNanos: Long) {
+            // TODO: unlikely but need to double check that animation returns the correct values
+            // when play time is way past their durations.
+            val playTimeMillis = playTimeNanos / 1_000_000L
+            value = animation.getValue(playTimeMillis)
+            velocityVector = animation.getVelocityVector(playTimeMillis)
+        }
+
+        private fun updateAnimation(initialValue: T = value) {
+            animation = TargetBasedAnimation(
+                animationSpec,
+                typeConverter,
+                initialValue,
+                targetValue,
+                velocityVector
+            )
+            onChildAnimationUpdated()
+        }
+
         internal fun resetAnimation() {
-            animation = null
             offsetTimeNanos = 0
             isFinished = false
+            updateAnimation()
         }
 
         @PublishedApi
-        // This gets called from a side effect.
+        // This gets called *during* composition
         internal fun updateTargetValue(targetValue: T) {
             if (this.targetValue != targetValue) {
                 this.targetValue = targetValue
                 isFinished = false
-                animation = null
+                updateAnimation()
+                // This is needed because the target change could happen during a transition
                 offsetTimeNanos = playTimeNanos
-                requestStart()
             }
+        }
+
+        @PublishedApi
+        // This gets called *during* composition
+        internal fun updateInitialAndTargetValue(initialValue: T, targetValue: T) {
+            this.targetValue = targetValue
+            if (animation.initialValue == initialValue && animation.targetValue == targetValue) {
+                return
+            }
+            updateAnimation(initialValue)
         }
     }
 
     /**
-     * [States] holds [initialState] and [targetState], which are the beginning and end of a
+     * [Segment] holds [initialState] and [targetState], which are the beginning and end of a
      * transition. These states will be used to obtain the animation spec that will be used for this
      * transition from the child animations.
      */
-    class States<S>(val initialState: S, val targetState: S) {
+    class Segment<S>(val initialState: S, val targetState: S) {
         @Deprecated("transitionSpec no longer takes a parameter", ReplaceWith("this"))
         val it = this
 
         /**
          * Returns whether the provided state matches the [initialState] && the provided
-         * [targetState] matches [States.targetState].
+         * [targetState] matches [Segment.targetState].
          */
         infix fun S.isTransitioningTo(targetState: S): Boolean {
-            return this == initialState && targetState == this@States.targetState
+            return this == initialState && targetState == this@Segment.targetState
         }
     }
 }
@@ -310,6 +401,8 @@ class Transition<S> internal constructor(
  * [infiniteRepeatable]. By default, [transitionSpec] uses a [spring] animation for all transition
  * destinations.
  *
+ * [label] is used to differentiate from other animations in the same transition in Android Studio.
+ *
  * @return A [State] object, the value of which is updated by animation
  * @see updateTransition
  * @see animateFloat
@@ -318,22 +411,41 @@ class Transition<S> internal constructor(
 @Composable
 inline fun <S, T, V : AnimationVector> Transition<S>.animateValue(
     typeConverter: TwoWayConverter<T, V>,
-    noinline transitionSpec: @Composable Transition.States<S>.() -> FiniteAnimationSpec<T> =
+    noinline transitionSpec: @Composable Transition.Segment<S>.() -> FiniteAnimationSpec<T> =
         { spring() },
+    label: String = "ValueAnimation",
     targetValueByState: @Composable (state: S) -> T
 ): State<T> {
+
     val targetValue = targetValueByState(targetState)
-    val transitionAnimation = remember {
+    // TODO: need a better way to store initial value.
+    val initNeeded = remember(this) { mutableStateOf(true) }
+    val initValue = if (initNeeded.value) targetValueByState(currentState) else targetValue
+    val transitionAnimation = remember(this) {
+        // Initialize the animation state to initialState value, so if it's added during a
+        // transition run, it'll participate in the animation.
+        // This is preferred because it's easy to opt out - Simply adding new animation once
+        // currentState == targetState would opt out.
         TransitionAnimationState(
-            targetValue,
+            initValue,
             typeConverter.createZeroVectorFrom(targetValue),
-            typeConverter
+            typeConverter,
+            label
         )
     }
-    val spec = transitionSpec(transitionStates)
+    transitionAnimation.animationSpec = transitionSpec(segment)
 
-    SideEffect {
-        transitionAnimation.animationSpec = spec
+    if (initNeeded.value) {
+        SideEffect {
+            initNeeded.value = false
+        }
+    }
+
+    if (isSeeking) {
+        // In the case of seeking, we also need to update initial value as needed
+        val initialValue = targetValueByState(segment.initialState)
+        transitionAnimation.updateInitialAndTargetValue(initialValue, targetValue)
+    } else {
         transitionAnimation.updateTargetValue(targetValue)
     }
 
@@ -366,6 +478,8 @@ inline fun <S, T, V : AnimationVector> Transition<S>.animateValue(
  *
  * @sample androidx.compose.animation.core.samples.AnimateFloatSample
  *
+ * [label] is used to differentiate from other animations in the same transition in Android Studio.
+ *
  * @return A [State] object, the value of which is updated by animation
  * @see updateTransition
  * @see animateValue
@@ -374,10 +488,11 @@ inline fun <S, T, V : AnimationVector> Transition<S>.animateValue(
 @Composable
 inline fun <S> Transition<S>.animateFloat(
     noinline transitionSpec:
-        @Composable Transition.States<S>.() -> FiniteAnimationSpec<Float> = { spring() },
+        @Composable Transition.Segment<S>.() -> FiniteAnimationSpec<Float> = { spring() },
+    label: String = "FloatAnimation",
     targetValueByState: @Composable (state: S) -> Float
 ): State<Float> =
-    animateValue(Float.VectorConverter, transitionSpec, targetValueByState)
+    animateValue(Float.VectorConverter, transitionSpec, label, targetValueByState)
 
 /**
  * Creates a [Dp] animation as a part of the given [Transition]. This means the states
@@ -396,16 +511,19 @@ inline fun <S> Transition<S>.animateFloat(
  * [infiniteRepeatable]. By default, [transitionSpec] uses a [spring] animation for all transition
  * destinations.
  *
+ * [label] is used to differentiate from other animations in the same transition in Android Studio.
+ *
  * @return A [State] object, the value of which is updated by animation
  */
 @Composable
 inline fun <S> Transition<S>.animateDp(
-    noinline transitionSpec: @Composable Transition.States<S>.() -> FiniteAnimationSpec<Dp> = {
+    noinline transitionSpec: @Composable Transition.Segment<S>.() -> FiniteAnimationSpec<Dp> = {
         spring(visibilityThreshold = Dp.VisibilityThreshold)
     },
+    label: String = "DpAnimation",
     targetValueByState: @Composable (state: S) -> Dp
 ): State<Dp> =
-    animateValue(Dp.VectorConverter, transitionSpec, targetValueByState)
+    animateValue(Dp.VectorConverter, transitionSpec, label, targetValueByState)
 
 /**
  * Creates an [Offset] animation as a part of the given [Transition]. This means the states
@@ -424,43 +542,19 @@ inline fun <S> Transition<S>.animateDp(
  * [infiniteRepeatable]. By default, [transitionSpec] uses a [spring] animation for all transition
  * destinations.
  *
+ * [label] is used to differentiate from other animations in the same transition in Android Studio.
+ *
  * @return A [State] object, the value of which is updated by animation
  */
 @Composable
 inline fun <S> Transition<S>.animateOffset(
-    noinline transitionSpec: @Composable Transition.States<S>.() -> FiniteAnimationSpec<Offset> = {
+    noinline transitionSpec: @Composable Transition.Segment<S>.() -> FiniteAnimationSpec<Offset> = {
         spring(visibilityThreshold = Offset.VisibilityThreshold)
     },
+    label: String = "OffsetAnimation",
     targetValueByState: @Composable (state: S) -> Offset
 ): State<Offset> =
-    animateValue(Offset.VectorConverter, transitionSpec, targetValueByState)
-
-/**
- * Creates a [DpOffset] animation as a part of the given [Transition]. This means the states
- * of this animation will be managed by the [Transition].
- *
- * [targetValueByState] is used as a mapping from a target state to the target value of this
- * animation. [Transition] will be using this mapping to determine what value to target this
- * animation towards. __Note__ that [targetValueByState] is a composable function. This means the
- * mapping function could access states, ambient, themes, etc. If the targetValue changes outside
- * of a [Transition] run (i.e. when the [Transition] already reached its targetState), the
- * [Transition] will start running again to ensure this animation reaches its new target smoothly.
- *
- * An optional [transitionSpec] can be provided to specify (potentially different) animation for
- * each pair of initialState and targetState. [FiniteAnimationSpec] includes any non-infinite
- * animation, such as [tween], [spring], [keyframes] and even [repeatable], but not
- * [infiniteRepeatable]. By default, [transitionSpec] uses a [spring] animation for all transition
- * destinations.
- *
- * @return A [State] object, the value of which is updated by animation
- */
-@Composable
-inline fun <S> Transition<S>.animatePosition(
-    noinline transitionSpec: @Composable Transition.States<S>.() -> FiniteAnimationSpec<DpOffset> =
-        { spring(visibilityThreshold = DpOffset.VisibilityThreshold) },
-    targetValueByState: @Composable (state: S) -> DpOffset
-): State<DpOffset> =
-    animateValue(DpOffset.VectorConverter, transitionSpec, targetValueByState)
+    animateValue(Offset.VectorConverter, transitionSpec, label, targetValueByState)
 
 /**
  * Creates a [Size] animation as a part of the given [Transition]. This means the states
@@ -479,16 +573,19 @@ inline fun <S> Transition<S>.animatePosition(
  * [infiniteRepeatable]. By default, [transitionSpec] uses a [spring] animation for all transition
  * destinations.
  *
+ * [label] is used to differentiate from other animations in the same transition in Android Studio.
+ *
  * @return A [State] object, the value of which is updated by animation
  */
 @Composable
 inline fun <S> Transition<S>.animateSize(
-    noinline transitionSpec: @Composable Transition.States<S>.() -> FiniteAnimationSpec<Size> = {
+    noinline transitionSpec: @Composable Transition.Segment<S>.() -> FiniteAnimationSpec<Size> = {
         spring(visibilityThreshold = Size.VisibilityThreshold)
     },
+    label: String = "SizeAnimation",
     targetValueByState: @Composable (state: S) -> Size
 ): State<Size> =
-    animateValue(Size.VectorConverter, transitionSpec, targetValueByState)
+    animateValue(Size.VectorConverter, transitionSpec, label, targetValueByState)
 
 /**
  * Creates a [IntOffset] animation as a part of the given [Transition]. This means the states
@@ -507,15 +604,19 @@ inline fun <S> Transition<S>.animateSize(
  * [infiniteRepeatable]. By default, [transitionSpec] uses a [spring] animation for all transition
  * destinations.
  *
+ * [label] is used to differentiate from other animations in the same transition in Android Studio.
+ *
  * @return A [State] object, the value of which is updated by animation
  */
 @Composable
 inline fun <S> Transition<S>.animateIntOffset(
-    noinline transitionSpec: @Composable Transition.States<S>.() -> FiniteAnimationSpec<IntOffset> =
-        { spring(visibilityThreshold = IntOffset(1, 1)) },
+    noinline transitionSpec:
+        @Composable Transition.Segment<S>.() -> FiniteAnimationSpec<IntOffset> =
+            { spring(visibilityThreshold = IntOffset(1, 1)) },
+    label: String = "IntOffsetAnimation",
     targetValueByState: @Composable (state: S) -> IntOffset
 ): State<IntOffset> =
-    animateValue(IntOffset.VectorConverter, transitionSpec, targetValueByState)
+    animateValue(IntOffset.VectorConverter, transitionSpec, label, targetValueByState)
 
 /**
  * Creates a [Int] animation as a part of the given [Transition]. This means the states
@@ -534,16 +635,19 @@ inline fun <S> Transition<S>.animateIntOffset(
  * [infiniteRepeatable]. By default, [transitionSpec] uses a [spring] animation for all transition
  * destinations.
  *
+ * [label] is used to differentiate from other animations in the same transition in Android Studio.
+ *
  * @return A [State] object, the value of which is updated by animation
  */
 @Composable
 inline fun <S> Transition<S>.animateInt(
-    noinline transitionSpec: @Composable Transition.States<S>.() -> FiniteAnimationSpec<Int> = {
+    noinline transitionSpec: @Composable Transition.Segment<S>.() -> FiniteAnimationSpec<Int> = {
         spring(visibilityThreshold = 1)
     },
+    label: String = "IntAnimation",
     targetValueByState: @Composable (state: S) -> Int
 ): State<Int> =
-    animateValue(Int.VectorConverter, transitionSpec, targetValueByState)
+    animateValue(Int.VectorConverter, transitionSpec, label, targetValueByState)
 
 /**
  * Creates a [IntSize] animation as a part of the given [Transition]. This means the states
@@ -562,16 +666,18 @@ inline fun <S> Transition<S>.animateInt(
  * [infiniteRepeatable]. By default, [transitionSpec] uses a [spring] animation for all transition
  * destinations.
  *
+ * [label] is used to differentiate from other animations in the same transition in Android Studio.
+ *
  * @return A [State] object, the value of which is updated by animation
  */
 @Composable
 inline fun <S> Transition<S>.animateIntSize(
-    noinline transitionSpec: @Composable Transition.States<S>.() -> FiniteAnimationSpec<IntSize> = {
-        spring(visibilityThreshold = IntSize(1, 1))
-    },
+    noinline transitionSpec: @Composable Transition.Segment<S>.() -> FiniteAnimationSpec<IntSize> =
+        { spring(visibilityThreshold = IntSize(1, 1)) },
+    label: String = "IntSizeAnimation",
     targetValueByState: @Composable (state: S) -> IntSize
 ): State<IntSize> =
-    animateValue(IntSize.VectorConverter, transitionSpec, targetValueByState)
+    animateValue(IntSize.VectorConverter, transitionSpec, label, targetValueByState)
 
 /**
  * Creates a [Bounds] animation as a part of the given [Transition]. This means the states
@@ -590,16 +696,19 @@ inline fun <S> Transition<S>.animateIntSize(
  * [infiniteRepeatable]. By default, [transitionSpec] uses a [spring] animation for all transition
  * destinations.
  *
+ * [label] is used to differentiate from other animations in the same transition in Android Studio.
+ *
  * @return A [State] object, the value of which is updated by animation
  */
 @Composable
 inline fun <S> Transition<S>.animateBounds(
-    noinline transitionSpec: @Composable Transition.States<S>.() -> FiniteAnimationSpec<Bounds> = {
+    noinline transitionSpec: @Composable Transition.Segment<S>.() -> FiniteAnimationSpec<Bounds> = {
         spring(visibilityThreshold = Bounds.VisibilityThreshold)
     },
+    label: String = "BoundsAnimation",
     targetValueByState: @Composable (state: S) -> Bounds
 ): State<Bounds> =
-    animateValue(Bounds.VectorConverter, transitionSpec, targetValueByState)
+    animateValue(Bounds.VectorConverter, transitionSpec, label, targetValueByState)
 
 /**
  * Creates a [Rect] animation as a part of the given [Transition]. This means the states
@@ -618,12 +727,15 @@ inline fun <S> Transition<S>.animateBounds(
  * [infiniteRepeatable]. By default, [transitionSpec] uses a [spring] animation for all transition
  * destinations.
  *
+ * [label] is used to differentiate from other animations in the same transition in Android Studio.
+ *
  * @return A [State] object, the value of which is updated by animation
  */
 @Composable
 inline fun <S> Transition<S>.animateRect(
-    noinline transitionSpec: @Composable Transition.States<S>.() -> FiniteAnimationSpec<Rect> =
+    noinline transitionSpec: @Composable Transition.Segment<S>.() -> FiniteAnimationSpec<Rect> =
         { spring(visibilityThreshold = Rect.VisibilityThreshold) },
+    label: String = "RectAnimation",
     targetValueByState: @Composable (state: S) -> Rect
 ): State<Rect> =
-    animateValue(Rect.VectorConverter, transitionSpec, targetValueByState)
+    animateValue(Rect.VectorConverter, transitionSpec, label, targetValueByState)
