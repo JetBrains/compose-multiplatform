@@ -61,6 +61,7 @@ import androidx.compose.ui.semantics.getTextLayoutResult
 import androidx.compose.ui.semantics.imeAction
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.onLongClick
+import androidx.compose.ui.semantics.password
 import androidx.compose.ui.semantics.pasteText
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.setSelection
@@ -81,6 +82,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.NO_SESSION
 import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.text.input.VisualTransformation
@@ -239,6 +241,7 @@ internal fun CoreTextField(
 
     val manager = remember { TextFieldSelectionManager() }
     manager.offsetMapping = offsetMapping
+    manager.visualTransformation = visualTransformation
     manager.onValueChange = onValueChangeWrapper
     manager.state = state
     manager.value = value
@@ -352,12 +355,14 @@ internal fun CoreTextField(
         state.layoutResult?.innerTextFieldCoordinates = it
     }
 
+    val isPassword = visualTransformation is PasswordVisualTransformation
     val semanticsModifier = Modifier.semantics {
         // focused semantics are handled by Modifier.focusable()
         this.imeAction = imeOptions.imeAction
         this.text = value.annotatedString
         this.textSelectionRange = value.selection
         if (!enabled) this.disabled()
+        if (isPassword) this.password()
         getTextLayoutResult {
             if (state.layoutResult != null) {
                 it.add(state.layoutResult!!.value)
@@ -385,7 +390,12 @@ internal fun CoreTextField(
                 } else {
                     manager.enterSelectionMode()
                 }
-                onValueChangeWrapper(TextFieldValue(value.annotatedString, TextRange(start, end)))
+                onValueChangeWrapper(
+                    TextFieldValue(
+                        value.annotatedString,
+                        TextRange(start, end)
+                    )
+                )
                 true
             } else {
                 manager.exitSelectionMode()
@@ -402,7 +412,7 @@ internal fun CoreTextField(
             manager.enterSelectionMode()
             true
         }
-        if (!value.selection.collapsed) {
+        if (!value.selection.collapsed && !isPassword) {
             copyText {
                 manager.copy()
                 true

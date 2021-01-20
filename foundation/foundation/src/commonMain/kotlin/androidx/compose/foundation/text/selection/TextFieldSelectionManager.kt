@@ -42,7 +42,9 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.input.getSelectedText
 import androidx.compose.ui.text.input.getTextAfterSelection
 import androidx.compose.ui.text.input.getTextBeforeSelection
@@ -76,6 +78,12 @@ internal class TextFieldSelectionManager {
      * The current [TextFieldValue].
      */
     internal var value: TextFieldValue = TextFieldValue()
+
+    /**
+     * Visual transformation of the text field's text. Used to check if certain toolbar options
+     * are permitted. For example, 'cut' will not be available is it is password transformation.
+     */
+    internal var visualTransformation: VisualTransformation = VisualTransformation.None
 
     /**
      * [ClipboardManager] to perform clipboard features.
@@ -433,21 +441,22 @@ internal class TextFieldSelectionManager {
      * the copy, paste and cut method as callbacks when "copy", "cut" or "paste" is clicked.
      */
     internal fun showSelectionToolbar() {
-        val copy: (() -> Unit)? = if (!value.selection.collapsed) {
+        val isPassword = visualTransformation is PasswordVisualTransformation
+        val copy: (() -> Unit)? = if (!value.selection.collapsed && !isPassword) {
             {
                 copy()
                 hideSelectionToolbar()
             }
         } else null
 
-        val cut: (() -> Unit)? = if (!value.selection.collapsed) {
+        val cut: (() -> Unit)? = if (!value.selection.collapsed && editable && !isPassword) {
             {
                 cut()
                 hideSelectionToolbar()
             }
         } else null
 
-        val paste: (() -> Unit)? = if (clipboardManager?.getText() != null) {
+        val paste: (() -> Unit)? = if (editable && clipboardManager?.getText() != null) {
             {
                 paste()
                 hideSelectionToolbar()
@@ -463,8 +472,8 @@ internal class TextFieldSelectionManager {
         textToolbar?.showMenu(
             rect = getContentRect(),
             onCopyRequested = copy,
-            onPasteRequested = if (editable) paste else null,
-            onCutRequested = if (editable) cut else null,
+            onPasteRequested = paste,
+            onCutRequested = cut,
             onSelectAllRequested = selectAll
         )
     }
