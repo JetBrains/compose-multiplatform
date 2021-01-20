@@ -28,6 +28,7 @@ import androidx.compose.material.TabDefaults.tabIndicatorOffset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -41,6 +42,8 @@ import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.util.fastMap
 import androidx.compose.ui.util.fastMaxBy
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 /**
  * A TabRow contains a row of [Tab]s, and displays an indicator underneath the currently
@@ -205,10 +208,12 @@ fun ScrollableTabRow(
 ) {
     Surface(modifier = modifier, color = backgroundColor, contentColor = contentColor) {
         val scrollState = rememberScrollState()
+        val coroutineScope = rememberCoroutineScope()
         val scrollableTabData = remember(scrollState) {
             ScrollableTabData(
                 scrollState = scrollState,
-                selectedTab = selectedTabIndex
+                selectedTab = selectedTabIndex,
+                coroutineScope = coroutineScope
             )
         }
         SubcomposeLayout(
@@ -314,7 +319,8 @@ private enum class TabSlots {
  */
 private class ScrollableTabData(
     private val scrollState: ScrollState,
-    private var selectedTab: Int
+    private var selectedTab: Int,
+    private val coroutineScope: CoroutineScope
 ) {
     fun onLaidOut(
         density: Density,
@@ -328,7 +334,12 @@ private class ScrollableTabData(
                 // Scrolls to the tab with [tabPosition], trying to place it in the center of the
                 // screen or as close to the center as possible.
                 val calculatedOffset = it.calculateTabOffset(density, edgeOffset, tabPositions)
-                scrollState.smoothScrollTo(calculatedOffset, spec = ScrollableTabRowScrollSpec)
+                coroutineScope.launch {
+                    scrollState.smoothScrollTo(
+                        calculatedOffset,
+                        spec = ScrollableTabRowScrollSpec
+                    )
+                }
             }
         }
     }

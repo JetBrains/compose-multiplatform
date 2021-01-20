@@ -104,6 +104,7 @@ class ScrollableController(
      * @param spec [AnimationSpec] to be used for this smooth scrolling
      * @param onEnd lambda to be called when smooth scrolling has ended
      */
+    @Deprecated("Use suspend fun smoothScrollBy instead")
     fun smoothScrollBy(
         value: Float,
         spec: AnimationSpec<Float> = SpringSpec(),

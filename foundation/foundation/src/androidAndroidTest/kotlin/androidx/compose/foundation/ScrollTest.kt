@@ -21,6 +21,8 @@ import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.FloatExponentialDecaySpec
 import androidx.compose.animation.core.ManualAnimationClock
 import androidx.compose.foundation.animation.FlingConfig
+import androidx.compose.foundation.animation.smoothScrollBy
+import androidx.compose.foundation.gestures.Scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,6 +40,7 @@ import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.GestureScope
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertIsDisplayed
@@ -65,6 +68,7 @@ import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -591,8 +595,9 @@ class ScrollTest {
         }
     }
 
+    @OptIn(ExperimentalTestApi::class)
     @Test
-    fun scroller_coerce_whenScrollSmoothTo() {
+    fun scroller_coerce_whenScrollSmoothTo() = runBlocking {
         val clock = ManualAnimationClock(0)
         val scrollState = ScrollState(
             initial = 0f,
@@ -602,30 +607,25 @@ class ScrollTest {
 
         createScrollableContent(isVertical = true, scrollState = scrollState)
 
-        val max = rule.runOnIdle {
-            assertThat(scrollState.value).isEqualTo(0f)
-            assertThat(scrollState.maxValue).isGreaterThan(0f)
-            scrollState.maxValue
-        }
+        rule.awaitIdle()
+        assertThat(scrollState.value).isEqualTo(0f)
+        assertThat(scrollState.maxValue).isGreaterThan(0f)
+        val max = scrollState.maxValue
 
-        performWithAnimationWaitAndAssertPosition(0f, scrollState, clock) {
-            scrollState.smoothScrollTo(-100f)
-        }
+        scrollState.smoothScrollTo(-100f)
+        assertThat(scrollState.value).isEqualTo(0f)
 
-        performWithAnimationWaitAndAssertPosition(0f, scrollState, clock) {
-            scrollState.smoothScrollBy(-100f)
-        }
+        (scrollState as Scrollable).smoothScrollBy(-100f)
+        assertThat(scrollState.value).isEqualTo(0f)
 
-        performWithAnimationWaitAndAssertPosition(max, scrollState, clock) {
-            scrollState.smoothScrollTo(scrollState.maxValue)
-        }
+        scrollState.smoothScrollTo(scrollState.maxValue)
+        assertThat(scrollState.value).isEqualTo(max)
 
-        performWithAnimationWaitAndAssertPosition(max, scrollState, clock) {
-            scrollState.smoothScrollTo(scrollState.maxValue + 1000)
-        }
-        performWithAnimationWaitAndAssertPosition(max, scrollState, clock) {
-            scrollState.smoothScrollBy(100f)
-        }
+        scrollState.smoothScrollTo(scrollState.maxValue + 1000)
+        assertThat(scrollState.value).isEqualTo(max)
+
+        (scrollState as Scrollable).smoothScrollBy(100f)
+        assertThat(scrollState.value).isEqualTo(max)
     }
 
     @Test
