@@ -21,7 +21,6 @@ import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Rect
 import android.os.Build
-import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.util.SparseArray
@@ -94,7 +93,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.util.trace
 import androidx.compose.ui.viewinterop.AndroidViewHolder
 import androidx.compose.ui.viewinterop.InternalInteropApi
-import androidx.core.os.HandlerCompat
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -233,15 +231,6 @@ internal class AndroidComposeView(context: Context) :
     private var wasMeasuredWithMultipleConstraints = false
 
     private val measureAndLayoutDelegate = MeasureAndLayoutDelegate(root)
-
-    private var measureAndLayoutScheduled = false
-
-    private val measureAndLayoutHandler: Handler =
-        HandlerCompat.createAsync(Looper.getMainLooper()) {
-            measureAndLayoutScheduled = false
-            measureAndLayout()
-            true
-        }
 
     override val measureIteration: Long get() = measureAndLayoutDelegate.measureIteration
     override val viewConfiguration: ViewConfiguration =
@@ -427,10 +416,11 @@ internal class AndroidComposeView(context: Context) :
                     return
                 }
             }
-            val handler = handler
-            if (!measureAndLayoutScheduled && handler != null) {
-                measureAndLayoutScheduled = true
-                measureAndLayoutHandler.sendEmptyMessage(0)
+            if (width == 0 || height == 0) {
+                // if the view has no size calling invalidate() will be skipped
+                requestLayout()
+            } else {
+                invalidate()
             }
         }
     }
@@ -657,9 +647,6 @@ internal class AndroidComposeView(context: Context) :
         super.onDetachedFromWindow()
         snapshotObserver.stopObserving()
         ifDebug { if (autofillSupported()) _autofill?.unregisterCallback() }
-        if (measureAndLayoutScheduled) {
-            measureAndLayoutHandler.removeMessages(0)
-        }
         viewTreeObserver.removeOnGlobalLayoutListener(globalLayoutListener)
         viewTreeObserver.removeOnScrollChangedListener(scrollChangedListener)
     }
