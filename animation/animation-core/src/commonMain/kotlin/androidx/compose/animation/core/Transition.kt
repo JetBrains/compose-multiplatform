@@ -21,8 +21,10 @@ package androidx.compose.animation.core
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.dispatch.withFrameNanos
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -60,8 +62,72 @@ fun <T> updateTransition(
     targetState: T,
     label: String? = null
 ): Transition<T> {
-    val transition = remember { Transition(targetState, label) }
+    val transition = remember { Transition(targetState, label = label) }
     transition.updateTarget(targetState)
+    return transition
+}
+
+/**
+ * MutableTransitionState contains two fields: [currentState] and [targetState]. [currentState] is
+ * initialized to the provided initialState, and can only be mutated by a [Transition].
+ * [targetState] is also initialized to initialState. It can be mutated to alter the course of a
+ * transition animation that is created with the [MutableTransitionState] using [updateTransition].
+ * Both [currentState] and [targetState] are backed by a [State] object.
+ *
+ * @sample androidx.compose.animation.core.samples.InitialStateSample
+ * @see updateTransition
+ */
+class MutableTransitionState<S>(initialState: S) {
+    /**
+     * Current state of the transition. [currentState] is initialized to the initialState that the
+     * [MutableTransitionState] is constructed with.
+     *
+     * It will be updated by the Transition that is created with this [MutableTransitionState]
+     * when the transition arrives at a new state.
+     */
+    var currentState: S by mutableStateOf(initialState)
+        internal set
+
+    /**
+     * Target state of the transition. [targetState] is initialized to the initialState that the
+     * [MutableTransitionState] is constructed with.
+     *
+     * It can be updated to a new state at any time. When that happens, the [Transition] that is
+     * created with this [MutableTransitionState] will update its
+     * [Transition.targetState] to the same and subsequently starts a transition animation to
+     * animate from the current values to the new target.
+     */
+    var targetState: S by mutableStateOf(initialState)
+}
+
+/**
+ * Creates a [Transition] and puts it in the [currentState][MutableTransitionState.currentState] of
+ * the provided [transitionState]. Whenever the [targetState][MutableTransitionState.targetState] of
+ * the [transitionState] changes, the [Transition] will animate to the new target state.
+ *
+ * Compared to the [updateTransition] variant that takes a targetState, this function supports a
+ * different initial state than the first targetState. Here is an example:
+ *
+ * @sample androidx.compose.animation.core.samples.InitialStateSample
+ *
+ * __Note__: The provided [transitionState] needs to be [remember]ed.
+ *
+ * In most cases, it is recommended to reuse the same [transitionState] that is [remember]ed, such
+ * that [Transition] preserves continuity when [targetState][MutableTransitionState.targetState] is
+ * changed. However, in some rare cases it is more critical to immediately *snap* to a state
+ * change (e.g. in response to a user interaction). This can be achieved by creating a new
+ * [transitionState]:
+ * @sample androidx.compose.animation.core.samples.DoubleTapToLikeSample
+ */
+@Composable
+fun <T> updateTransition(
+    transitionState: MutableTransitionState<T>,
+    label: String? = null
+): Transition<T> {
+    val transition = remember(transitionState) {
+        Transition(transitionState = transitionState, label)
+    }
+    transition.updateTarget(transitionState.targetState)
     return transition
 }
 
@@ -86,30 +152,37 @@ fun <T> updateTransition(
  */
 // TODO: Support creating Transition outside of composition and support imperative use of Transition
 class Transition<S> internal constructor(
-    initialState: S,
+    private val transitionState: MutableTransitionState<S>,
     val label: String? = null
 ) {
+    internal constructor(
+        initialState: S,
+        label: String?
+    ) : this(MutableTransitionState(initialState), label)
 
     /**
      * Current state of the transition. This will always be the initialState of the transition
      * until the transition is finished. Once the transition is finished, [currentState] will be
-     * set to [targetState].
+     * set to [targetState]. [currentState] is backed by a [MutableState].
      */
-    var currentState: S by mutableStateOf(initialState)
-        internal set
+    var currentState: S
+        get() = transitionState.currentState
+        internal set(value) {
+            transitionState.currentState = value
+        }
 
     /**
      * Target state of the transition. This will be read by all child animations to determine their
      * most up-to-date target values.
      */
-    var targetState: S by mutableStateOf(initialState)
+    var targetState: S by mutableStateOf(currentState)
         internal set
 
     /**
      * [segment] contains the initial state and the target state of the currently on-going
      * transition.
      */
-    var segment: Segment<S> by mutableStateOf(Segment(initialState, initialState))
+    var segment: Segment<S> by mutableStateOf(Segment(currentState, currentState))
         private set
 
     /**
@@ -128,12 +201,11 @@ class Transition<S> internal constructor(
     internal var updateChildrenNeeded: Boolean by mutableStateOf(true)
     private var startTime = Uptime.Unspecified
 
+    private val _animations = mutableVectorOf<TransitionAnimationState<*, *>>()
+
     /** @suppress **/
     @InternalAnimationApi
-    val animations: List<TransitionAnimationState<*, *>>
-        get() = _animations
-
-    private val _animations = ArrayList<TransitionAnimationState<*, *>>(4)
+    val animations: List<TransitionAnimationState<*, *>> = _animations.asMutableList()
 
     // Seeking related
     @PublishedApi
@@ -146,7 +218,7 @@ class Transition<S> internal constructor(
         private set
 
     // Target state that is currently being animated to
-    private var currentTargetState: S = initialState
+    private var currentTargetState: S = currentState
 
     internal fun onFrame(frameTimeNanos: Long) {
         if (startTime == Uptime.Unspecified) {

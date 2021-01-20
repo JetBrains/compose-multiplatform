@@ -16,11 +16,11 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.core.FloatPropKey
 import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.transitionDefinition
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.transition
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.clickable
@@ -42,18 +42,17 @@ import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntBounds
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
 import androidx.compose.ui.unit.width
@@ -100,13 +99,13 @@ fun DropdownMenu(
     dropdownModifier: Modifier = Modifier,
     dropdownContent: @Composable ColumnScope.() -> Unit
 ) {
-    var visibleMenu by remember { mutableStateOf(expanded) }
-    if (expanded) visibleMenu = true
+    val expandedStates = remember { MutableTransitionState(false) }
+    expandedStates.targetState = expanded
 
     Box(toggleModifier) {
         toggle()
 
-        if (visibleMenu) {
+        if (expandedStates.currentState || expandedStates.targetState) {
             val transformOriginState = remember { mutableStateOf(TransformOrigin.Center) }
             val density = AmbientDensity.current
             val popupPositionProvider = DropdownMenuPositionProvider(
@@ -121,20 +120,59 @@ fun DropdownMenu(
                 onDismissRequest = onDismissRequest,
                 popupPositionProvider = popupPositionProvider
             ) {
-                val state = transition(
-                    definition = DropdownMenuOpenCloseTransition,
-                    initState = !expanded,
-                    toState = expanded,
-                    onStateChangeFinished = {
-                        visibleMenu = it
+                // Menu open/close animation.
+                val transition = updateTransition(expandedStates, "DropDownMenu")
+
+                val scale by transition.animateFloat(
+                    transitionSpec = {
+                        if (false isTransitioningTo true) {
+                            // Dismissed to expanded
+                            tween(
+                                durationMillis = InTransitionDuration,
+                                easing = LinearOutSlowInEasing
+                            )
+                        } else {
+                            // Expanded to dismissed.
+                            tween(
+                                durationMillis = 1,
+                                delayMillis = OutTransitionDuration - 1
+                            )
+                        }
                     }
-                )
+                ) {
+                    if (it) {
+                        // Menu is expanded.
+                        1f
+                    } else {
+                        // Menu is dismissed.
+                        0.8f
+                    }
+                }
+
+                val alpha by transition.animateFloat(
+                    transitionSpec = {
+                        if (false isTransitioningTo true) {
+                            // Dismissed to expanded
+                            tween(durationMillis = 30)
+                        } else {
+                            // Expanded to dismissed.
+                            tween(durationMillis = OutTransitionDuration)
+                        }
+                    }
+                ) {
+                    if (it) {
+                        // Menu is expanded.
+                        1f
+                    } else {
+                        // Menu is dismissed.
+                        0f
+                    }
+                }
                 Card(
                     modifier = Modifier.graphicsLayer {
-                        val scale = state[Scale]
                         scaleX = scale
                         scaleY = scale
-                        alpha = state[Alpha]
+                        this.alpha = alpha
                         transformOrigin = transformOriginState.value
                     },
                     elevation = MenuElevation
@@ -213,43 +251,8 @@ private val DropdownMenuItemDefaultMaxWidth = 280.dp
 private val DropdownMenuItemDefaultMinHeight = 48.dp
 
 // Menu open/close animation.
-private val Scale = FloatPropKey()
-private val Alpha = FloatPropKey()
 internal const val InTransitionDuration = 120
 internal const val OutTransitionDuration = 75
-
-private val DropdownMenuOpenCloseTransition = transitionDefinition<Boolean> {
-    state(false) {
-        // Menu is dismissed.
-        this[Scale] = 0.8f
-        this[Alpha] = 0f
-    }
-    state(true) {
-        // Menu is expanded.
-        this[Scale] = 1f
-        this[Alpha] = 1f
-    }
-    transition(false, true) {
-        // Dismissed to expanded.
-        Scale using tween(
-            durationMillis = InTransitionDuration,
-            easing = LinearOutSlowInEasing
-        )
-        Alpha using tween(
-            durationMillis = 30
-        )
-    }
-    transition(true, false) {
-        // Expanded to dismissed.
-        Scale using tween(
-            durationMillis = 1,
-            delayMillis = OutTransitionDuration - 1
-        )
-        Alpha using tween(
-            durationMillis = OutTransitionDuration
-        )
-    }
-}
 
 private fun calculateTransformOrigin(
     parentBounds: IntBounds,
