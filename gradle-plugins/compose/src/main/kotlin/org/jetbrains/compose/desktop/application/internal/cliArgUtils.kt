@@ -1,5 +1,6 @@
 package org.jetbrains.compose.desktop.application.internal
 
+import org.gradle.api.file.FileSystemLocation
 import org.gradle.api.provider.Provider
 import java.io.File
 
@@ -26,7 +27,11 @@ internal fun <T : Any?> MutableCollection<String>.cliArg(
 
 private fun <T : Any?> defaultToString(): (T) -> String =
     {
-        val asString = if (it is File) it.normalizedPath() else it.toString()
+        val asString = when (it) {
+            is FileSystemLocation -> it.asFile.normalizedPath()
+            is File -> it.normalizedPath()
+            else -> it.toString()
+        }
         "\"$asString\""
     }
 

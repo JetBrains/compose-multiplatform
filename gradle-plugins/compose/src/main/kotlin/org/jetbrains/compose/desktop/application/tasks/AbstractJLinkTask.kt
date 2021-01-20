@@ -41,7 +41,7 @@ abstract class AbstractJLinkTask : AbstractJvmToolOperationTask("jlink") {
         cliArg("--no-header-files", noHeaderFiles)
         cliArg("--no-man-pages", noManPages)
         cliArg("--strip-native-commands", stripNativeCommands)
-        cliArg("--compress", compressionLevel.orNull?.id )
+        cliArg("--compress", compressionLevel.orNull?.id)
 
         cliArg("--output", destinationDir)
     }

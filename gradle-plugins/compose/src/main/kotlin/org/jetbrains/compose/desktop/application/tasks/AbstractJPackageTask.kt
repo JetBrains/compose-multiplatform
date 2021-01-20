@@ -163,12 +163,12 @@ abstract class AbstractJPackageTask @Inject constructor(
         cliArg("--input", tmpDir)
         cliArg("--type", targetFormat.id)
 
-        cliArg("--dest", destinationDir.ioFile)
+        cliArg("--dest", destinationDir)
         cliArg("--verbose", verbose)
 
         cliArg("--install-dir", installationPath)
-        cliArg("--license-file", licenseFile.ioFileOrNull)
-        cliArg("--icon", iconFile.ioFileOrNull)
+        cliArg("--license-file", licenseFile)
+        cliArg("--icon", iconFile)
 
         cliArg("--name", packageName)
         cliArg("--description", packageDescription)
@@ -200,7 +200,7 @@ abstract class AbstractJPackageTask @Inject constructor(
                 cliArg("--mac-package-name", macPackageName)
                 cliArg("--mac-bundle-signing-prefix", macBundleSigningPrefix)
                 cliArg("--mac-sign", macSign)
-                cliArg("--mac-signing-keychain", macSigningKeychain.ioFileOrNull)
+                cliArg("--mac-signing-keychain", macSigningKeychain)
                 cliArg("--mac-signing-key-user-name", macSigningKeyUserName)
             }
             OS.Windows -> {
