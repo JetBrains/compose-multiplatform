@@ -235,6 +235,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 Role.Switch -> info.className = "android.widget.Switch"
                 Role.RadioButton -> info.className = "android.widget.RadioButton"
                 Role.Tab -> info.roleDescription = AccessibilityRoleDescriptions.Tab
+                Role.Image -> info.className = "android.widget.ImageView"
             }
         }
         info.packageName = view.context.packageName

@@ -31,7 +31,9 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toolingGraphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 
@@ -117,7 +119,10 @@ fun Icon(
     // TODO: b/149735981 semantics for content description
     val colorFilter = if (tint == Color.Unspecified) null else ColorFilter.tint(tint)
     val semantics = if (contentDescription != null) {
-        Modifier.semantics { this.contentDescription = contentDescription }
+        Modifier.semantics {
+            this.contentDescription = contentDescription
+            this.role = Role.Image
+        }
     } else {
         Modifier
     }

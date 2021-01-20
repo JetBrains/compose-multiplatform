@@ -30,7 +30,10 @@ import androidx.compose.ui.graphics.painter.ImagePainter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.captureToImage
@@ -42,7 +45,6 @@ import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
-import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -193,7 +195,7 @@ class IconTest {
     }
 
     @Test
-    fun contentDescriptionAppliedToIcon() {
+    fun defaultSemanticsWhenContentDescriptionProvided() {
         val testTag = "TestTag"
         rule.setContent {
             Icon(
@@ -203,11 +205,9 @@ class IconTest {
             )
         }
 
-        rule.onNodeWithTag(testTag).fetchSemanticsNode().let {
-            assertThat(it.config.contains(SemanticsProperties.ContentDescription)).isTrue()
-            assertThat(it.config[SemanticsProperties.ContentDescription])
-                .isEqualTo("qwerty")
-        }
+        rule.onNodeWithTag(testTag)
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.ContentDescription, "qwerty"))
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Image))
     }
 
     private fun createBitmapWithColor(

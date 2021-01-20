@@ -2695,6 +2695,7 @@ package androidx.compose.ui.semantics {
   public enum Role {
     enum_constant public static final androidx.compose.ui.semantics.Role Button;
     enum_constant public static final androidx.compose.ui.semantics.Role Checkbox;
+    enum_constant public static final androidx.compose.ui.semantics.Role Image;
     enum_constant public static final androidx.compose.ui.semantics.Role RadioButton;
     enum_constant public static final androidx.compose.ui.semantics.Role Switch;
     enum_constant public static final androidx.compose.ui.semantics.Role Tab;

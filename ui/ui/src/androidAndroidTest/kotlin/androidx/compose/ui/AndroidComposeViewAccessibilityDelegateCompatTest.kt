@@ -254,44 +254,57 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
     }
 
     @Test
-    fun testPopulateAccessibilityNodeInfoProperties_role() {
-        var semanticsNode = createSemanticsNodeWithProperties(1, true) {
+    fun testPopulateAccessibilityNodeInfoProperties_buttonRole() {
+        val semanticsNode = createSemanticsNodeWithProperties(1, true) {
             role = Role.Button
         }
         accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
         assertEquals("android.widget.Button", info.className)
-        info.recycle()
+    }
 
-        info = AccessibilityNodeInfoCompat.obtain()
-        semanticsNode = createSemanticsNodeWithProperties(1, true) {
+    @Test
+    fun testPopulateAccessibilityNodeInfoProperties_switchRole() {
+        val semanticsNode = createSemanticsNodeWithProperties(1, true) {
             role = Role.Switch
         }
         accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
         assertEquals("android.widget.Switch", info.className)
-        info.recycle()
+    }
 
-        info = AccessibilityNodeInfoCompat.obtain()
-        semanticsNode = createSemanticsNodeWithProperties(1, true) {
+    @Test
+    fun testPopulateAccessibilityNodeInfoProperties_checkBoxRole() {
+        val semanticsNode = createSemanticsNodeWithProperties(1, true) {
             role = Role.Checkbox
         }
         accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
         assertEquals("android.widget.CheckBox", info.className)
-        info.recycle()
+    }
 
-        info = AccessibilityNodeInfoCompat.obtain()
-        semanticsNode = createSemanticsNodeWithProperties(1, true) {
+    @Test
+    fun testPopulateAccessibilityNodeInfoProperties_radioButtonRole() {
+        val semanticsNode = createSemanticsNodeWithProperties(1, true) {
             role = Role.RadioButton
         }
         accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
         assertEquals("android.widget.RadioButton", info.className)
-        info.recycle()
+    }
 
-        info = AccessibilityNodeInfoCompat.obtain()
-        semanticsNode = createSemanticsNodeWithProperties(1, true) {
+    @Test
+    fun testPopulateAccessibilityNodeInfoProperties_tabRole() {
+        val semanticsNode = createSemanticsNodeWithProperties(1, true) {
             role = Role.Tab
         }
         accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
         assertEquals("Tab", info.roleDescription)
+    }
+
+    @Test
+    fun testPopulateAccessibilityNodeInfoProperties_imageRole() {
+        val semanticsNode = createSemanticsNodeWithProperties(1, true) {
+            role = Role.Image
+        }
+        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
+        assertEquals("android.widget.ImageView", info.className)
     }
 
     @Test
