@@ -20,9 +20,9 @@ import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.TestOnly
 import androidx.compose.runtime.collection.IdentityScopeMap
+import androidx.compose.runtime.synchronized
 
 @ExperimentalComposeApi
-@Suppress("DEPRECATION_ERROR")
 class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit) -> Unit) {
     private val applyObserver: SnapshotApplyObserver = { applied, _ ->
         var hasValues = false
