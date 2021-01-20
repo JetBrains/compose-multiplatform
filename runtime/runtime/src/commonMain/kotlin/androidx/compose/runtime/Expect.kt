@@ -30,6 +30,7 @@ expect class WeakHashMap<K, V>() : MutableMap<K, V>
 
 internal expect fun identityHashCode(instance: Any?): Int
 
+@PublishedApi
 internal expect inline fun <R> synchronized(lock: Any, block: () -> R): R
 
 expect class AtomicReference<V>(value: V) {
