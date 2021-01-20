@@ -167,6 +167,41 @@ class SemanticsTests {
         rule.onNodeWithTag(tag1).assertLabelEquals("$label1, $label3")
         rule.onNodeWithTag(tag2).assertTextEquals(label1)
     }
+
+    @Test
+    fun clearAndSetSemanticsSameLayoutNode() {
+        val tag1 = "tag1"
+        val tag2 = "tag2"
+        val label1 = "foo"
+        val label2 = "hidden"
+        val label3 = "baz"
+        rule.setContent {
+            SimpleTestLayout(Modifier.semantics(mergeDescendants = true) {}.testTag(tag1)) {
+                SimpleTestLayout(
+                    Modifier
+                        .clearAndSetSemantics { contentDescription = label1 }
+                        .semantics { text = AnnotatedString(label2) }
+                ) {}
+                SimpleTestLayout(
+                    Modifier
+                        .semantics { contentDescription = label3 }
+                        .clearAndSetSemantics { text = AnnotatedString(label3) }
+                ) {}
+            }
+            SimpleTestLayout(
+                Modifier.testTag(tag2)
+                    .semantics { contentDescription = label1 }
+                    .clearAndSetSemantics {}
+                    .semantics { text = AnnotatedString(label1) }
+            ) {}
+        }
+
+        rule.onNodeWithTag(tag1).assertLabelEquals("$label1, $label3")
+        rule.onNodeWithTag(tag1).assertTextEquals(label3)
+        rule.onNodeWithTag(tag2).assertLabelEquals("$label1")
+        rule.onNodeWithTag(tag2).assertDoesNotHaveProperty(SemanticsProperties.Text)
+    }
+
     @Test
     fun removingMergedSubtree_updatesSemantics() {
         val label = "foo"
