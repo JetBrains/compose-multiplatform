@@ -144,7 +144,7 @@ fun Modifier.pointerInput(
     val density = AmbientDensity.current
     val viewConfiguration = AmbientViewConfiguration.current
     remember(density) { SuspendingPointerInputFilter(viewConfiguration, density) }.apply {
-        LaunchedEffect(this, block) {
+        LaunchedEffect(this) {
             block()
         }
     }
