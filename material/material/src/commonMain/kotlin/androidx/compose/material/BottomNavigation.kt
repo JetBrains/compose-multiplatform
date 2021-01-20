@@ -19,7 +19,7 @@ package androidx.compose.material
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.VectorizedAnimationSpec
-import androidx.compose.animation.core.animateAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.layout.Arrangement
@@ -204,7 +204,7 @@ private fun BottomNavigationTransition(
     selected: Boolean,
     content: @Composable (animationProgress: Float) -> Unit
 ) {
-    val animationProgress by animateAsState(
+    val animationProgress by animateFloatAsState(
         targetValue = if (selected) 1f else 0f,
         animationSpec = BottomNavigationAnimationSpec
     )

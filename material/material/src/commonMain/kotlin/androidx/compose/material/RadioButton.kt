@@ -16,8 +16,8 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.animateAsState
-import androidx.compose.animation.core.animateAsState
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Interaction
@@ -77,7 +77,7 @@ fun RadioButton(
     interactionState: InteractionState = remember { InteractionState() },
     colors: RadioButtonColors = RadioButtonDefaults.colors()
 ) {
-    val dotRadius by animateAsState(
+    val dotRadius by animateDpAsState(
         targetValue = if (selected) RadioButtonDotSize / 2 else 0.dp,
         animationSpec = tween(durationMillis = RadioAnimationDuration)
     )
@@ -182,7 +182,7 @@ private class DefaultRadioButtonColors(
         // If not enabled 'snap' to the disabled state, as there should be no animations between
         // enabled / disabled.
         return if (enabled) {
-            animateAsState(target, tween(durationMillis = RadioAnimationDuration))
+            animateColorAsState(target, tween(durationMillis = RadioAnimationDuration))
         } else {
             rememberUpdatedState(target)
         }

@@ -19,7 +19,7 @@ package androidx.compose.material
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.animateAsState
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.transition
@@ -226,7 +226,7 @@ object TabDefaults {
         // TODO: should we animate the width of the indicator as it moves between tabs of different
         // sizes inside a scrollable tab row?
         val currentTabWidth = currentTabPosition.width
-        val indicatorOffset by animateAsState(
+        val indicatorOffset by animateDpAsState(
             targetValue = currentTabPosition.left,
             animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing)
         )

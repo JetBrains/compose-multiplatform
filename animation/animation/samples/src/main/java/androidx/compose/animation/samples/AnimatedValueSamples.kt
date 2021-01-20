@@ -19,7 +19,7 @@ package androidx.compose.animation.samples
 import androidx.annotation.Sampled
 import androidx.compose.animation.Animatable
 import androidx.compose.animation.animate
-import androidx.compose.animation.animateAsState
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.AnimationVector2D
 import androidx.compose.animation.core.TwoWayConverter
@@ -126,7 +126,7 @@ fun ColorAnimationSample() {
         // Animates to primary or secondary color, depending on whether [primary] is true
         // [animateState] returns the current animation value in a State<Color> in this example. We
         // use the State<Color> object as a property delegate here.
-        val color: Color by animateAsState(
+        val color: Color by animateColorAsState(
             if (primary) MaterialTheme.colors.primary else MaterialTheme.colors.secondary
         )
         Box(modifier = Modifier.background(color))

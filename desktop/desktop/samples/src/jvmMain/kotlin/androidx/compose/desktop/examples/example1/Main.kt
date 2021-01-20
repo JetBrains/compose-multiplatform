@@ -15,7 +15,7 @@
  */
 package androidx.compose.desktop.examples.example1
 
-import androidx.compose.animation.animateAsState
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.desktop.AppWindow
 import androidx.compose.desktop.DesktopMaterialTheme
@@ -418,7 +418,7 @@ fun Animations(isCircularEnabled: Boolean) = Row {
     }
 
     val enabled = remember { mutableStateOf(true) }
-    val color by animateAsState(
+    val color by animateColorAsState(
         if (enabled.value) Color.Green else Color.Red,
         animationSpec = TweenSpec(durationMillis = 2000)
     )

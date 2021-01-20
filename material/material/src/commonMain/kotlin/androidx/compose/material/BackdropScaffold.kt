@@ -21,7 +21,7 @@ import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.AnimationEndReason.Interrupted
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.TweenSpec
-import androidx.compose.animation.core.animateAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -378,7 +378,7 @@ private fun Scrim(
     visible: Boolean
 ) {
     if (color != Color.Transparent) {
-        val alpha by animateAsState(
+        val alpha by animateFloatAsState(
             targetValue = if (visible) 1f else 0f,
             animationSpec = TweenSpec()
         )
@@ -407,7 +407,7 @@ private fun BackLayerTransition(
 ) {
     // The progress of the animation between Revealed (0) and Concealed (2).
     // The midpoint (1) is the point where the appBar and backContent are switched.
-    val animationProgress by animateAsState(
+    val animationProgress by animateFloatAsState(
         targetValue = if (target == Revealed) 0f else 2f, animationSpec = TweenSpec()
     )
     val animationSlideOffset = with(AmbientDensity.current) { AnimationSlideOffset.toPx() }
