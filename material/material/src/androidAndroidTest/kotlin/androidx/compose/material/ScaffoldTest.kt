@@ -448,7 +448,8 @@ class ScaffoldTest {
         }
         rule.runOnIdle {
             with(rule.density) {
-                assertThat(innerPadding.bottom).isEqualTo(bottomBarSize.toSize().height.toDp())
+                assertThat(innerPadding.calculateBottomPadding())
+                    .isEqualTo(bottomBarSize.toSize().height.toDp())
             }
         }
     }

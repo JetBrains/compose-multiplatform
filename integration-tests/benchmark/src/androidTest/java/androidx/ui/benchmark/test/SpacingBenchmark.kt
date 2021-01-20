@@ -17,6 +17,8 @@
 package androidx.ui.benchmark.test
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -238,10 +240,10 @@ private fun Padding(
         if (measurable == null) {
             layout(constraints.minWidth, constraints.minHeight) { }
         } else {
-            val paddingLeft = padding.start.roundToPx()
-            val paddingTop = padding.top.roundToPx()
-            val paddingRight = padding.end.roundToPx()
-            val paddingBottom = padding.bottom.roundToPx()
+            val paddingLeft = padding.calculateStartPadding(layoutDirection).roundToPx()
+            val paddingTop = padding.calculateTopPadding().roundToPx()
+            val paddingRight = padding.calculateEndPadding(layoutDirection).roundToPx()
+            val paddingBottom = padding.calculateBottomPadding().roundToPx()
             val horizontalPadding = (paddingLeft + paddingRight)
             val verticalPadding = (paddingTop + paddingBottom)
 

@@ -191,7 +191,7 @@ private fun Scrollbar(
         SliderAdapter(adapter, containerSize, minimalHeight)
     }
 
-    val scrollThickness = style.thickness.toIntPx()
+    val scrollThickness = style.thickness.roundToPx()
     val measureBlocks = if (isVertical) {
         remember(sliderAdapter, scrollThickness) {
             verticalMeasureBlocks(sliderAdapter, { containerSize = it }, scrollThickness)

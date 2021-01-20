@@ -20,6 +20,8 @@ import androidx.compose.foundation.assertNotNestingScrollableContainers
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -73,8 +75,6 @@ internal fun LazyList(
     val cachingItemContentFactory = remember { CachingItemContentFactory(restorableItemContent) }
     cachingItemContentFactory.itemContentFactory = restorableItemContent
 
-    val startContentPadding = if (isVertical) contentPadding.top else contentPadding.start
-    val endContentPadding = if (isVertical) contentPadding.bottom else contentPadding.end
     SubcomposeLayout(
         modifier
             .scrollable(
@@ -91,8 +91,16 @@ internal fun LazyList(
         // this will update the scope object if the constrains have been changed
         cachingItemContentFactory.updateItemScope(this, constraints)
 
-        val startContentPaddingPx = startContentPadding.roundToPx()
-        val endContentPaddingPx = endContentPadding.roundToPx()
+        val startContentPadding = if (isVertical) {
+            contentPadding.calculateTopPadding()
+        } else {
+            contentPadding.calculateStartPadding(layoutDirection)
+        }.roundToPx()
+        val endContentPadding = if (isVertical) {
+            contentPadding.calculateBottomPadding()
+        } else {
+            contentPadding.calculateEndPadding(layoutDirection)
+        }.roundToPx()
         val mainAxisMaxSize = (if (isVertical) constraints.maxHeight else constraints.maxWidth)
         val spaceBetweenItemsDp = if (isVertical) {
             requireNotNull(verticalArrangement).spacing
@@ -117,8 +125,8 @@ internal fun LazyList(
                 horizontalAlignment = horizontalAlignment,
                 verticalAlignment = verticalAlignment,
                 layoutDirection = layoutDirection,
-                startContentPadding = startContentPaddingPx,
-                endContentPadding = endContentPaddingPx,
+                startContentPadding = startContentPadding,
+                endContentPadding = endContentPadding,
                 spacing = spacing,
                 key = key
             )
@@ -128,8 +136,8 @@ internal fun LazyList(
             itemsCount,
             itemProvider,
             mainAxisMaxSize,
-            startContentPaddingPx,
-            endContentPaddingPx,
+            startContentPadding,
+            endContentPadding,
             state.firstVisibleItemIndexNonObservable,
             state.firstVisibleItemScrollOffsetNonObservable,
             state.scrollToBeConsumed
@@ -138,7 +146,7 @@ internal fun LazyList(
         state.applyMeasureResult(measureResult)
 
         val headers = if (headerIndexes.isNotEmpty()) {
-            LazyListHeaders(itemProvider, headerIndexes, measureResult, startContentPaddingPx)
+            LazyListHeaders(itemProvider, headerIndexes, measureResult, startContentPadding)
         } else {
             null
         }

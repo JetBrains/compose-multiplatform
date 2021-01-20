@@ -469,9 +469,11 @@ object ButtonDefaults {
     /**
      * The default content padding used by [TextButton]
      */
-    val TextButtonContentPadding = ContentPadding.copy(
+    val TextButtonContentPadding = PaddingValues(
         start = TextButtonHorizontalPadding,
-        end = TextButtonHorizontalPadding
+        top = ContentPadding.calculateTopPadding(),
+        end = TextButtonHorizontalPadding,
+        bottom = ContentPadding.calculateBottomPadding()
     )
 }
 

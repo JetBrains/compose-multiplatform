@@ -466,7 +466,7 @@ class BottomSheetScaffoldTest {
             }
         }
         rule.runOnIdle {
-            Truth.assertThat(innerPadding.bottom).isEqualTo(peekHeight)
+            Truth.assertThat(innerPadding.calculateBottomPadding()).isEqualTo(peekHeight)
         }
     }
 }
