@@ -41,7 +41,10 @@ fun runMetalavaWithArgs(
     val allArgs = listOf(
         "--no-banner",
         "--hide",
-        "HiddenSuperclass" // We allow having a hidden parent class
+        "HiddenSuperclass", // We allow having a hidden parent class
+
+        "--error",
+        "UnresolvedImport"
     ) + args
     val workQueue = workerExecutor.processIsolation()
     workQueue.submit(MetalavaWorkAction::class.java) { parameters ->

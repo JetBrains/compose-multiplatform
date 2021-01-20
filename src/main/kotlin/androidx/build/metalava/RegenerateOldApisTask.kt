@@ -135,7 +135,7 @@ abstract class RegenerateOldApisTask @Inject constructor(
         return runnerProject.files()
     }
 
-    fun getSources(runnerProject: Project, mavenId: String): Collection<File> {
+    fun getSources(runnerProject: Project, mavenId: String): FileCollection {
         val configuration = runnerProject.configurations.detachedConfiguration(
             runnerProject.dependencies.create(mavenId)
         )
@@ -147,7 +147,7 @@ abstract class RegenerateOldApisTask @Inject constructor(
             copySpec.from(runnerProject.zipTree(configuration.singleFile))
             copySpec.into(unzippedDir)
         })
-        return listOf(unzippedDir)
+        return project.files(unzippedDir)
     }
 
     fun getEmbeddedLibs(runnerProject: Project, mavenId: String): Collection<File> {

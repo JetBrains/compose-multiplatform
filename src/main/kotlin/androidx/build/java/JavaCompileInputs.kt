@@ -60,19 +60,22 @@ data class JavaCompileInputs(
 
         // Constructs a JavaCompileInputs from a sourceset
         fun fromSourceSet(sourceSet: SourceSet, project: Project): JavaCompileInputs {
-            val sourcePaths: Collection<File> = sourceSet.allSource.srcDirs
+            val sourcePaths: FileCollection = project.files(
+                project.provider({
+                    sourceSet.allSource.srcDirs
+                })
+            )
             val dependencyClasspath = sourceSet.compileClasspath
             return fromSourcesAndDeps(sourcePaths, dependencyClasspath, project)
         }
 
         fun fromSourcesAndDeps(
-            sourcePaths: Collection<File>,
+            sourcePaths: FileCollection,
             dependencyClasspath: FileCollection,
             project: Project
         ): JavaCompileInputs {
             val bootClasspath: Collection<File> = androidJarFile(project).files
-            val sourceCollection = project.files(sourcePaths)
-            return JavaCompileInputs(sourceCollection, dependencyClasspath, bootClasspath)
+            return JavaCompileInputs(sourcePaths, dependencyClasspath, bootClasspath)
         }
 
         private fun getSourceCollection(variant: BaseVariant, project: Project): FileCollection {
@@ -88,14 +91,16 @@ data class JavaCompileInputs(
                     .filterNot { it.name == "desktopMain" }
                     .flatMap { it.kotlin.sourceDirectories }
                     .also { require(it.isNotEmpty()) }
-            } ?: variant
-                .getSourceFolders(SourceKind.JAVA)
-                .map { folder ->
-                    for (builtBy in folder.builtBy) {
-                        taskDependencies.add(builtBy)
+            } ?: project.provider({
+                variant
+                    .getSourceFolders(SourceKind.JAVA)
+                    .map { folder ->
+                        for (builtBy in folder.builtBy) {
+                            taskDependencies.add(builtBy)
+                        }
+                        folder.dir
                     }
-                    folder.dir
-                }
+            })
 
             val sourceCollection = project.files(sourceFiles)
             for (dep in taskDependencies) {

@@ -73,7 +73,7 @@ abstract class GenerateApiTask @Inject constructor(
     @TaskAction
     fun exec() {
         check(bootClasspath.isNotEmpty()) { "Android boot classpath not set." }
-        check(sourcePaths.isNotEmpty()) { "Source paths not set." }
+        check(sourcePaths.files.isNotEmpty()) { "Source paths not set." }
 
         val inputs = JavaCompileInputs.fromSourcesAndDeps(
             sourcePaths,
