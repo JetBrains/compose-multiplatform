@@ -9,6 +9,7 @@ package androidx.compose.ui.test.junit4 {
     ctor public AndroidComposeTestRule(R activityRule, kotlin.jvm.functions.Function1<? super R,? extends A> activityProvider);
     method public org.junit.runners.model.Statement apply(org.junit.runners.model.Statement base, org.junit.runner.Description description);
     method @androidx.compose.ui.test.ExperimentalTestApi public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public A getActivity();
     method public R getActivityRule();
     method public androidx.compose.ui.test.junit4.AnimationClockTestRule getClockTestRule();
     method public androidx.compose.ui.unit.Density getDensity();
@@ -23,6 +24,7 @@ package androidx.compose.ui.test.junit4 {
     method public void unregisterIdlingResource(androidx.compose.ui.test.IdlingResource idlingResource);
     method public void waitForIdle();
     method public void waitUntil(long timeoutMillis, kotlin.jvm.functions.Function0<java.lang.Boolean> condition);
+    property public final A activity;
     property public final R activityRule;
     property public androidx.compose.ui.test.junit4.AnimationClockTestRule clockTestRule;
     property public androidx.compose.ui.unit.Density density;

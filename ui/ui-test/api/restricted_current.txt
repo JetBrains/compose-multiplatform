@@ -257,6 +257,7 @@ package androidx.compose.ui.test {
   }
 
   public final class SemanticsNodeInteraction {
+    ctor public SemanticsNodeInteraction(androidx.compose.ui.test.TestContext testContext, boolean useUnmergedTree, androidx.compose.ui.test.SemanticsSelector selector);
     ctor public SemanticsNodeInteraction(androidx.compose.ui.test.TestContext testContext, boolean useUnmergedTree, androidx.compose.ui.test.SemanticsMatcher matcher);
     method public void assertDoesNotExist();
     method public androidx.compose.ui.test.SemanticsNodeInteraction assertExists(optional String? errorMessageOnFail);
@@ -264,6 +265,7 @@ package androidx.compose.ui.test {
   }
 
   public final class SemanticsNodeInteractionCollection {
+    ctor public SemanticsNodeInteractionCollection(androidx.compose.ui.test.TestContext testContext, boolean useUnmergedTree, androidx.compose.ui.test.SemanticsSelector selector);
     ctor public SemanticsNodeInteractionCollection(androidx.compose.ui.test.TestContext testContext, boolean useUnmergedTree, androidx.compose.ui.test.SemanticsMatcher matcher);
     method public java.util.List<androidx.compose.ui.semantics.SemanticsNode> fetchSemanticsNodes(optional String? errorMessageOnFail);
     method public operator androidx.compose.ui.test.SemanticsNodeInteraction get(int index);
