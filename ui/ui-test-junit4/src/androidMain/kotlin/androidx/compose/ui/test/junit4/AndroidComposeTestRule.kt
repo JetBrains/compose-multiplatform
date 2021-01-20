@@ -240,6 +240,13 @@ internal constructor(
         activityProvider: (R) -> A
     ) : this(activityRule, activityProvider, false)
 
+    /**
+     * Provides the current activity.
+     *
+     * Avoid calling often as it can involve synchronization and can be slow.
+     */
+    val activity: A get() = activityProvider(activityRule)
+
     private val idlingResourceRegistry = IdlingResourceRegistry()
     private val espressoLink = EspressoLink(idlingResourceRegistry)
 
@@ -312,8 +319,6 @@ internal constructor(
     private val testOwner = AndroidTestOwner()
     private val testContext = createTestContext(testOwner)
 
-    private var activity: A? = null
-
     override val density: Density by lazy {
         Density(ApplicationProvider.getApplicationContext())
     }
@@ -351,10 +356,10 @@ internal constructor(
         }
 
         // We always make sure we have the latest activity when setting a content
-        activity = activityProvider(activityRule)
+        val currentActivity = activity
 
         runOnUiThread {
-            val composition = activity!!.setContent(
+            val composition = currentActivity.setContent(
                 recomposer ?: Recomposer.current(),
                 composable
             )
@@ -506,7 +511,6 @@ internal constructor(
                         disposeContentHook = null
                     }
                 }
-                activity = null
             }
         }
     }

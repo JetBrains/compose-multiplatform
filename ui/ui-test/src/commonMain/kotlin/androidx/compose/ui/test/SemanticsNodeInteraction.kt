@@ -53,7 +53,7 @@ import androidx.compose.ui.unit.Density
  *     .assertTopPosition(30.dp)
  * ````
  */
-class SemanticsNodeInteraction internal constructor(
+class SemanticsNodeInteraction constructor(
     internal val testContext: TestContext,
     internal val useUnmergedTree: Boolean,
     internal val selector: SemanticsSelector
@@ -194,7 +194,7 @@ class SemanticsNodeInteraction internal constructor(
  *    .assertCountEquals(2)
  * ````
  */
-class SemanticsNodeInteractionCollection internal constructor(
+class SemanticsNodeInteractionCollection constructor(
     internal val testContext: TestContext,
     internal val useUnmergedTree: Boolean,
     internal val selector: SemanticsSelector
