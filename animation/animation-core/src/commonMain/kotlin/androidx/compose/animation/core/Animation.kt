@@ -174,7 +174,7 @@ fun <T, V : AnimationVector> TargetBasedAnimation(
 class TargetBasedAnimation<T, V : AnimationVector> internal constructor(
     internal val animationSpec: VectorizedAnimationSpec<V>,
     override val typeConverter: TwoWayConverter<T, V>,
-    initialValue: T,
+    val initialValue: T,
     override val targetValue: T,
     initialVelocityVector: V? = null
 ) : Animation<T, V> {

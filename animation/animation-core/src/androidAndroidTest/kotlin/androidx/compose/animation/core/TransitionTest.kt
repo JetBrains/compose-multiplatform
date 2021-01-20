@@ -18,12 +18,18 @@ package androidx.compose.animation.core
 
 import androidx.compose.animation.VectorConverter
 import androidx.compose.animation.animateColor
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.dispatch.withFrameNanos
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -102,7 +108,7 @@ class TransitionTest {
         rule.setContent {
             val transition = updateTransition(target.value)
             animFloat.value = transition.animateFloat(
-                {
+                transitionSpec = {
                     if (AnimStates.From isTransitioningTo AnimStates.To) {
                         spring(dampingRatio = Spring.DampingRatioHighBouncy)
                     } else {
@@ -120,7 +126,7 @@ class TransitionTest {
             }.value
 
             animColor.value = transition.animateColor(
-                { tween(durationMillis = 1000) }
+                transitionSpec = { tween(durationMillis = 1000) }
             ) {
                 when (it) {
                     AnimStates.From -> Color.Red
@@ -156,8 +162,8 @@ class TransitionTest {
                         animFloatWithKeyframes.value, 0.00001f
                     )
 
-                    assertEquals(AnimStates.To, transition.transitionStates.targetState)
-                    assertEquals(AnimStates.From, transition.transitionStates.initialState)
+                    assertEquals(AnimStates.To, transition.segment.targetState)
+                    assertEquals(AnimStates.From, transition.segment.initialState)
                 } else {
                     assertEquals(
                         floatAnim2.getValue(transition.playTimeNanos / 1_000_000L),
@@ -171,8 +177,8 @@ class TransitionTest {
                         keyframesAnim2.getValue(transition.playTimeNanos / 1_000_000L),
                         animFloatWithKeyframes.value, 0.00001f
                     )
-                    assertEquals(AnimStates.From, transition.transitionStates.targetState)
-                    assertEquals(AnimStates.To, transition.transitionStates.initialState)
+                    assertEquals(AnimStates.From, transition.segment.targetState)
+                    assertEquals(AnimStates.To, transition.segment.initialState)
                 }
             }
         }
@@ -195,5 +201,72 @@ class TransitionTest {
 
         assertEquals(0f, animFloat.value)
         assertEquals(Color.Red, animColor.value)
+    }
+
+    @Test
+    fun startPulsingNextFrameTest() {
+        val target = mutableStateOf(AnimStates.From)
+        var playTime by mutableStateOf(0L)
+        rule.setContent {
+            val transition = updateTransition(target.value)
+            val actual = transition.animateFloat(
+                transitionSpec = { tween(200) }
+            ) {
+                if (it == AnimStates.From) 0f else 1000f
+            }
+
+            val anim = TargetBasedAnimation(tween(200), Float.VectorConverter, 0f, 1000f)
+
+            if (target.value == AnimStates.To) {
+                LaunchedEffect(transition) {
+                    val startTime = withFrameNanos { it }
+
+                    assertEquals(0f, actual.value)
+                    do {
+                        playTime = (withFrameNanos { it } - startTime) / 1_000_000L
+                        assertEquals(anim.getValue(playTime), actual.value)
+                    } while (playTime <= 200)
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            target.value = AnimStates.To
+        }
+        rule.waitForIdle()
+        assertTrue(playTime > 200)
+    }
+
+    @Test
+    fun addNewAnimationInFlightTest() {
+        val target = mutableStateOf(AnimStates.From)
+        var playTime by mutableStateOf(0L)
+        rule.setContent {
+            val transition = updateTransition(target.value)
+
+            transition.animateFloat(
+                transitionSpec = { tween(1000) }
+            ) {
+                if (it == AnimStates.From) -100f else 0f
+            }
+
+            if (transition.playTimeNanos > 0) {
+                val startTime = remember { transition.playTimeNanos }
+                val laterAdded = transition.animateFloat(
+                    transitionSpec = { tween(800) }
+                ) {
+                    if (it == AnimStates.From) 0f else 1000f
+                }
+                val anim = TargetBasedAnimation(tween(800), Float.VectorConverter, 0f, 1000f)
+                playTime = (transition.playTimeNanos - startTime) / 1_000_000L
+                assertEquals(anim.getValue(playTime), laterAdded.value)
+            }
+        }
+
+        rule.runOnIdle {
+            target.value = AnimStates.To
+        }
+        rule.waitForIdle()
+        assertTrue(playTime > 800)
     }
 }

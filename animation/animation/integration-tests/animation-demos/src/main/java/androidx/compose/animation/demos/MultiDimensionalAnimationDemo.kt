@@ -51,7 +51,7 @@ fun MultiDimensionalAnimationDemo() {
     var width by remember { mutableStateOf(0f) }
     var height by remember { mutableStateOf(0f) }
     val transition = updateTransition(currentState)
-    val rect by transition.animateRect({ spring(stiffness = 100f) }) {
+    val rect by transition.animateRect(transitionSpec = { spring(stiffness = 100f) }) {
         when (it) {
             AnimState.Collapsed -> Rect(600f, 600f, 900f, 900f)
             AnimState.Expanded -> Rect(0f, 400f, width, height - 400f)

@@ -65,7 +65,7 @@ fun RepeatedRotationDemo() {
         Spacer(Modifier.height(10.dp))
         val transition = updateTransition(state.value)
         val rotation by transition.animateFloat(
-            {
+            transitionSpec = {
                 if (initialState == RotationStates.Original) {
                     repeatable(
                         iterations = 10,
