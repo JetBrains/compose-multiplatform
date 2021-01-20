@@ -28,10 +28,10 @@ import androidx.compose.ui.focus.FocusState.Active
 import androidx.compose.ui.focus.FocusState.Inactive
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.Key.Companion.Tab
-import androidx.compose.ui.input.key.Key.Companion.DPadRight
-import androidx.compose.ui.input.key.Key.Companion.DPadLeft
-import androidx.compose.ui.input.key.Key.Companion.DPadUp
-import androidx.compose.ui.input.key.Key.Companion.DPadDown
+import androidx.compose.ui.input.key.Key.Companion.DirectionRight
+import androidx.compose.ui.input.key.Key.Companion.DirectionLeft
+import androidx.compose.ui.input.key.Key.Companion.DirectionUp
+import androidx.compose.ui.input.key.Key.Companion.DirectionDown
 import androidx.compose.ui.focus.FocusDirection.Next
 import androidx.compose.ui.focus.FocusDirection.Previous
 import androidx.compose.ui.focus.FocusDirection.Left
@@ -85,9 +85,9 @@ fun Modifier.focusModifier(): Modifier = composed(debugInspectorInfo { name = "f
 
 private fun getFocusDirection(keyEvent: KeyEvent) = when (keyEvent.key) {
     Tab -> if (keyEvent.isShiftPressed) Previous else Next
-    DPadRight -> Right
-    DPadLeft -> Left
-    DPadUp -> Up
-    DPadDown -> Down
+    DirectionRight -> Right
+    DirectionLeft -> Left
+    DirectionUp -> Up
+    DirectionDown -> Down
     else -> null
 }
