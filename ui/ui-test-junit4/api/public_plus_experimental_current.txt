@@ -5,7 +5,7 @@ package androidx.compose.ui.test.junit4 {
     method @Deprecated @androidx.compose.ui.test.ExperimentalTestApi public static androidx.compose.ui.test.junit4.AnimationClockTestRule createAnimationClockRule();
   }
 
-  public final class AndroidComposeTestRule<R extends org.junit.rules.TestRule, A extends androidx.activity.ComponentActivity> implements androidx.compose.ui.test.junit4.ComposeTestRule {
+  public final class AndroidComposeTestRule<R extends org.junit.rules.TestRule, A extends androidx.activity.ComponentActivity> implements androidx.compose.ui.test.junit4.ComposeContentTestRule {
     ctor public AndroidComposeTestRule(R activityRule, kotlin.jvm.functions.Function1<? super R,? extends A> activityProvider);
     method public org.junit.runners.model.Statement apply(org.junit.runners.model.Statement base, org.junit.runner.Description description);
     method @androidx.compose.ui.test.ExperimentalTestApi public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
@@ -42,8 +42,9 @@ package androidx.compose.ui.test.junit4 {
     method public static inline <reified A extends androidx.activity.ComponentActivity> androidx.compose.ui.test.junit4.AndroidComposeTestRule<androidx.test.ext.junit.rules.ActivityScenarioRule<A>,A>! createAndroidComposeRule();
     method @Deprecated public static <A extends androidx.activity.ComponentActivity> androidx.compose.ui.test.junit4.AndroidComposeTestRule<androidx.test.ext.junit.rules.ActivityScenarioRule<A>,A> createAndroidComposeRuleLegacy(Class<A> activityClass);
     method public static inline <reified A extends androidx.activity.ComponentActivity> androidx.compose.ui.test.junit4.AndroidComposeTestRule<androidx.test.ext.junit.rules.ActivityScenarioRule<A>,A>! createAndroidComposeRuleLegacy();
-    method public static androidx.compose.ui.test.junit4.ComposeTestRule createComposeRule();
-    method @Deprecated public static androidx.compose.ui.test.junit4.ComposeTestRule createComposeRuleLegacy();
+    method public static androidx.compose.ui.test.junit4.ComposeContentTestRule createComposeRule();
+    method @Deprecated public static androidx.compose.ui.test.junit4.ComposeContentTestRule createComposeRuleLegacy();
+    method public static androidx.compose.ui.test.junit4.ComposeTestRule createEmptyComposeRule();
   }
 
   public final class AndroidSynchronizationKt {
@@ -59,6 +60,10 @@ package androidx.compose.ui.test.junit4 {
     property public default boolean isPaused;
   }
 
+  public interface ComposeContentTestRule extends androidx.compose.ui.test.junit4.ComposeTestRule {
+    method public void setContent(kotlin.jvm.functions.Function0<kotlin.Unit> composable);
+  }
+
   public interface ComposeTestRule extends org.junit.rules.TestRule androidx.compose.ui.test.SemanticsNodeInteractionsProvider {
     method @androidx.compose.ui.test.ExperimentalTestApi public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method @Deprecated public androidx.compose.ui.test.junit4.AnimationClockTestRule getClockTestRule();
@@ -68,7 +73,6 @@ package androidx.compose.ui.test.junit4 {
     method public void registerIdlingResource(androidx.compose.ui.test.IdlingResource idlingResource);
     method public <T> T! runOnIdle(kotlin.jvm.functions.Function0<? extends T> action);
     method public <T> T! runOnUiThread(kotlin.jvm.functions.Function0<? extends T> action);
-    method public void setContent(kotlin.jvm.functions.Function0<kotlin.Unit> composable);
     method public void unregisterIdlingResource(androidx.compose.ui.test.IdlingResource idlingResource);
     method public void waitForIdle();
     method public void waitUntil(optional long timeoutMillis, kotlin.jvm.functions.Function0<java.lang.Boolean> condition);
@@ -88,7 +92,7 @@ package androidx.compose.ui.test.junit4 {
   }
 
   public final class StateRestorationTester {
-    ctor public StateRestorationTester(androidx.compose.ui.test.junit4.ComposeTestRule composeTestRule);
+    ctor public StateRestorationTester(androidx.compose.ui.test.junit4.ComposeContentTestRule composeTestRule);
     method public void emulateSavedInstanceStateRestore();
     method public void setContent(kotlin.jvm.functions.Function0<kotlin.Unit> composable);
   }

@@ -27,12 +27,29 @@ import androidx.compose.ui.unit.IntSize
 import org.junit.rules.TestRule
 
 /**
- * Enables to run tests of individual composables without having to do manual setup. For Android
- * tests see [createAndroidComposeRule]. Normally this rule is obtained by using [createComposeRule]
- * factory that provides proper implementation (depending if running host side or Android side).
+ * A [TestRule] that allows you to test and control composables and applications using Compose.
+ * Most of the functionality in this interface provides some form of test synchronization: the
+ * test will block until the app or composable is idle, to ensure the tests are deterministic.
  *
- * However if you really need Android specific dependencies and don't want your test to be abstract
- * you can still create [createAndroidComposeRule] directly and access its underlying Activity.
+ * For example, if you would perform a click on the center of the screen while a button is
+ * animation from left to right over the screen, without synchronization the test would sometimes
+ * click when the button is in the middle of the screen (button is clicked), and sometimes when
+ * the button is past the middle of the screen (button is not clicked). With synchronization, the
+ * app would not be idle until the animation is over, so the test will always click when the
+ * button is past the middle of the screen (and not click it). If you actually do want to click
+ * the button when it's in the middle of the animation, you can do so by controlling the
+ * [clock][mainClock]. You'll have to disable [automatic advancing][MainTestClock.autoAdvance],
+ * and manually advance the clock by the time necessary to position the button in the middle of
+ * the screen.
+ *
+ * An instance of [ComposeTestRule] can be created with [createComposeRule], which will also
+ * create a host for the compose content for you (see [ComposeContentTestRule]). If you need to
+ * specify which particular Activity is started on Android, you can use [createAndroidComposeRule].
+ *
+ * If you don't want any Activity to be started automatically by the test rule on Android, you
+ * can use [createEmptyComposeRule]. In such a case, you will have to set content using one of
+ * Compose UI's setters (like [ComponentActivity.setContent][androidx.compose.ui.platform
+ * .setContent]).
  */
 interface ComposeTestRule : TestRule, SemanticsNodeInteractionsProvider {
     /**
@@ -149,7 +166,21 @@ interface ComposeTestRule : TestRule, SemanticsNodeInteractionsProvider {
      * Unregisters an [IdlingResource] from this test.
      */
     fun unregisterIdlingResource(idlingResource: IdlingResource)
+}
 
+/**
+ * A [ComposeTestRule] that allows you to set content without the necessity to provide a host for
+ * the content. The host, such as an Activity, will be created by the test rule.
+ *
+ * An instance of [ComposeContentTestRule] can be created with [createComposeRule]. If you need to
+ * specify which particular Activity is started on Android, you can use [createAndroidComposeRule].
+ *
+ * If you don't want any host to be started automatically by the test rule on Android, you
+ * can use [createEmptyComposeRule]. In such a case, you will have to create a host in your test
+ * and set the content using one of Compose UI's setters (like [ComponentActivity
+ * .setContent][androidx.compose.ui.platform.setContent]).
+ */
+interface ComposeContentTestRule : ComposeTestRule {
     /**
      * Sets the given composable as a content of the current screen.
      *
@@ -162,7 +193,7 @@ interface ComposeTestRule : TestRule, SemanticsNodeInteractionsProvider {
 }
 
 /**
- * Factory method to provide implementation of [ComposeTestRule].
+ * Factory method to provide an implementation of [ComposeContentTestRule].
  *
  * This method is useful for tests in compose libraries where no custom Activity is usually
  * needed. For app tests or launching custom activities, see [createAndroidComposeRule].
@@ -171,4 +202,4 @@ interface ComposeTestRule : TestRule, SemanticsNodeInteractionsProvider {
  * reference to this activity into the manifest file of the corresponding tests (usually in
  * androidTest/AndroidManifest.xml).
  */
-expect fun createComposeRule(): ComposeTestRule
+expect fun createComposeRule(): ComposeContentTestRule
