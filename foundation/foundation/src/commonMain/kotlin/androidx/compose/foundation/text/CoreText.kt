@@ -20,7 +20,7 @@ package androidx.compose.foundation.text
 import androidx.compose.foundation.text.selection.MultiWidgetSelectionDelegate
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.DisposableEffectDisposable
+import androidx.compose.runtime.DisposableEffectResult
 import androidx.compose.runtime.DisposableEffectScope
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
@@ -328,7 +328,7 @@ private class TextController(val state: TextState) {
         }
     }
 
-    val commit: DisposableEffectScope.() -> DisposableEffectDisposable = {
+    val commit: DisposableEffectScope.() -> DisposableEffectResult = {
         // if no SelectionContainer is added as parent selectionRegistrar will be null
         state.selectable = selectionRegistrar?.let { selectionRegistrar ->
             selectionRegistrar.subscribe(
