@@ -20,9 +20,9 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.fontFamily
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.platform.FontLoader
-import androidx.compose.ui.text.platform.font
+import androidx.compose.ui.text.platform.Font
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.sp
 import com.google.common.truth.Truth
@@ -39,8 +39,8 @@ class DesktopParagraphTest {
     private val fontLoader = FontLoader()
     private val defaultDensity = Density(density = 1f)
     private val fontFamilyMeasureFont =
-        fontFamily(
-            font(
+        FontFamily(
+            Font(
                 "font/sample_font.ttf",
                 weight = FontWeight.Normal,
                 style = FontStyle.Normal

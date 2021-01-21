@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.text.FontTestData.Companion.BASIC_MEASURE_FONT
-import androidx.compose.ui.text.font.asFontFamily
+import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.matchers.assertThat
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
@@ -41,7 +41,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 @SmallTest
 class TextDelegateIntegrationTest {
 
-    private val fontFamily = BASIC_MEASURE_FONT.asFontFamily()
+    private val fontFamily = BASIC_MEASURE_FONT.toFontFamily()
     private val density = Density(density = 1f)
     private val context = InstrumentationRegistry.getInstrumentation().context
     private val resourceLoader = TestFontResourceLoader(context)

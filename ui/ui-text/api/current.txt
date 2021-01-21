@@ -521,9 +521,12 @@ package androidx.compose.ui.text.android.style {
 package androidx.compose.ui.text.font {
 
   public final class AndroidTypefaceKt {
-    method public static androidx.compose.ui.text.font.FontFamily fontFamily(android.graphics.Typeface typeface);
-    method public static androidx.compose.ui.text.font.Typeface typeface(android.content.Context context, androidx.compose.ui.text.font.FontFamily fontFamily, optional java.util.List<? extends kotlin.Pair<androidx.compose.ui.text.font.FontWeight,? extends androidx.compose.ui.text.font.FontStyle>>? necessaryStyles);
-    method public static androidx.compose.ui.text.font.Typeface typeface(android.graphics.Typeface typeface);
+    method public static androidx.compose.ui.text.font.FontFamily FontFamily(android.graphics.Typeface typeface);
+    method public static androidx.compose.ui.text.font.Typeface Typeface(android.content.Context context, androidx.compose.ui.text.font.FontFamily fontFamily, optional java.util.List<? extends kotlin.Pair<androidx.compose.ui.text.font.FontWeight,? extends androidx.compose.ui.text.font.FontStyle>>? styles);
+    method public static androidx.compose.ui.text.font.Typeface Typeface(android.graphics.Typeface typeface);
+    method @Deprecated public static androidx.compose.ui.text.font.FontFamily fontFamily(android.graphics.Typeface typeface);
+    method @Deprecated public static androidx.compose.ui.text.font.Typeface typeface(android.content.Context context, androidx.compose.ui.text.font.FontFamily fontFamily, optional java.util.List<? extends kotlin.Pair<androidx.compose.ui.text.font.FontWeight,? extends androidx.compose.ui.text.font.FontStyle>>? necessaryStyles);
+    method @Deprecated public static androidx.compose.ui.text.font.Typeface typeface(android.graphics.Typeface typeface);
   }
 
   public abstract sealed class FileBasedFontFamily extends androidx.compose.ui.text.font.FontFamily {
@@ -560,18 +563,22 @@ package androidx.compose.ui.text.font {
   }
 
   public final class FontFamilyKt {
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontListFontFamily fontFamily(java.util.List<? extends androidx.compose.ui.text.font.Font> fonts);
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontListFontFamily fontFamily(androidx.compose.ui.text.font.Font... fonts);
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.LoadedFontFamily fontFamily(androidx.compose.ui.text.font.Typeface typeface);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontFamily FontFamily(java.util.List<? extends androidx.compose.ui.text.font.Font> fonts);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontFamily FontFamily(androidx.compose.ui.text.font.Font... fonts);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontFamily FontFamily(androidx.compose.ui.text.font.Typeface typeface);
+    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontListFontFamily fontFamily(java.util.List<? extends androidx.compose.ui.text.font.Font> fonts);
+    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontListFontFamily fontFamily(androidx.compose.ui.text.font.Font... fonts);
+    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.LoadedFontFamily fontFamily(androidx.compose.ui.text.font.Typeface typeface);
   }
 
   public final class FontKt {
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontListFontFamily asFontFamily(androidx.compose.ui.text.font.Font);
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.Font font(int resId, optional androidx.compose.ui.text.font.FontWeight weight, optional androidx.compose.ui.text.font.FontStyle style);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.Font Font(int resId, optional androidx.compose.ui.text.font.FontWeight weight, optional androidx.compose.ui.text.font.FontStyle style);
+    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontFamily asFontFamily(androidx.compose.ui.text.font.Font);
+    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.Font font(int resId, optional androidx.compose.ui.text.font.FontWeight weight, optional androidx.compose.ui.text.font.FontStyle style);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontFamily toFontFamily(androidx.compose.ui.text.font.Font);
   }
 
   @androidx.compose.runtime.Immutable public final class FontListFontFamily extends androidx.compose.ui.text.font.FileBasedFontFamily implements kotlin.jvm.internal.markers.KMappedMarker java.util.List<androidx.compose.ui.text.font.Font> {
-    ctor public FontListFontFamily(java.util.List<? extends androidx.compose.ui.text.font.Font> fonts);
     method public boolean contains(androidx.compose.ui.text.font.Font element);
     method public boolean containsAll(java.util.Collection<?> elements);
     method public androidx.compose.ui.text.font.Font get(int index);
@@ -656,13 +663,11 @@ package androidx.compose.ui.text.font {
   }
 
   public final class LoadedFontFamily extends androidx.compose.ui.text.font.FontFamily {
-    ctor public LoadedFontFamily(androidx.compose.ui.text.font.Typeface typeface);
     method public androidx.compose.ui.text.font.Typeface getTypeface();
     property public final androidx.compose.ui.text.font.Typeface typeface;
   }
 
   public final class ResourceFont implements androidx.compose.ui.text.font.Font {
-    ctor public ResourceFont(int resId, androidx.compose.ui.text.font.FontWeight weight, androidx.compose.ui.text.font.FontStyle style);
     method public androidx.compose.ui.text.font.ResourceFont copy(optional int resId, optional androidx.compose.ui.text.font.FontWeight weight, optional androidx.compose.ui.text.font.FontStyle style);
     method public int getResId();
     method public androidx.compose.ui.text.font.FontStyle getStyle();

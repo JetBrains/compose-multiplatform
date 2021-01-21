@@ -109,12 +109,12 @@ data class LoadedFont(
  *
  * @see FontFamily
  */
-fun font(
+fun Font(
     identity: String,
     data: ByteArray,
     weight: FontWeight = FontWeight.Normal,
     style: FontStyle = FontStyle.Normal
-) = LoadedFont(identity, data, weight, style)
+): DesktopFont = LoadedFont(identity, data, weight, style)
 
 /**
  * Defines a Font using file path.
@@ -147,11 +147,11 @@ data class FileFont(
  *
  * @see FontFamily
  */
-fun font(
+fun Font(
     file: File,
     weight: FontWeight = FontWeight.Normal,
     style: FontStyle = FontStyle.Normal
-) = FileFont(file, weight, style)
+): DesktopFont = FileFont(file, weight, style)
 
 @Deprecated(
     message = "Use resourceFont",
@@ -196,11 +196,11 @@ data class ResourceFont(
  *
  * @see FontFamily
  */
-fun font(
+fun Font(
     resource: String,
     weight: FontWeight = FontWeight.Normal,
     style: FontStyle = FontStyle.Normal
-) = ResourceFont(resource, weight, style)
+): DesktopFont = ResourceFont(resource, weight, style)
 
 internal class DesktopTypeface(
     val alias: String?,
@@ -214,7 +214,7 @@ internal class DesktopTypeface(
  *
  * @param typeface Android Typeface instance
  */
-fun typeface(typeface: Typeface, alias: String? = null): ComposeTypeface {
+fun Typeface(typeface: Typeface, alias: String? = null): ComposeTypeface {
     return DesktopTypeface(alias, typeface)
 }
 

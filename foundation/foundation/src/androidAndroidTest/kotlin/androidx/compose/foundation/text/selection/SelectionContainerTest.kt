@@ -57,11 +57,11 @@ import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.ResourceFont
-import androidx.compose.ui.text.font.asFontFamily
 import androidx.compose.ui.text.font.test.R
+import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -108,11 +108,11 @@ class SelectionContainerTest {
     private lateinit var view: View
 
     private val textContent = "Text Demo Text"
-    private val fontFamily = ResourceFont(
+    private val fontFamily = Font(
         resId = R.font.sample_font,
         weight = FontWeight.Normal,
         style = FontStyle.Normal
-    ).asFontFamily()
+    ).toFontFamily()
 
     private val selection = mutableStateOf<Selection?>(null)
     private val fontSize = 20.sp

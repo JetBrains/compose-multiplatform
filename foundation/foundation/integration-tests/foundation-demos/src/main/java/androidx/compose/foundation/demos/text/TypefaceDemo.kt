@@ -16,15 +16,13 @@
 
 package androidx.compose.foundation.demos.text
 
-import android.graphics.Typeface
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.fontFamily
-import androidx.compose.ui.text.font.typeface
+import androidx.compose.ui.text.font.Typeface
 
 @Composable
 fun TypefaceDemo() {
@@ -46,19 +44,19 @@ fun TypefaceDemo() {
 
 @Composable
 fun TypefaceFromFontFamilyDemo() {
-    val typeface = typeface(AmbientContext.current, FontFamily.Cursive)
-    val fontFamily = fontFamily(typeface)
+    val typeface = Typeface(AmbientContext.current, FontFamily.Cursive)
+    val fontFamily = FontFamily(typeface)
     Text("Hello World", style = TextStyle(fontFamily = fontFamily))
 }
 
 @Composable
 fun AndroidTypefaceDemo() {
-    val fontFamily = fontFamily(typeface(Typeface.DEFAULT_BOLD))
+    val fontFamily = FontFamily(Typeface(android.graphics.Typeface.DEFAULT_BOLD))
     Text("Hello World", style = TextStyle(fontFamily = fontFamily))
 }
 
 @Composable
 fun FontFamilyFromAndroidTypeface() {
-    val fontFamily = fontFamily(Typeface.MONOSPACE)
+    val fontFamily = FontFamily(android.graphics.Typeface.MONOSPACE)
     Text("Hello World", style = TextStyle(fontFamily = fontFamily))
 }

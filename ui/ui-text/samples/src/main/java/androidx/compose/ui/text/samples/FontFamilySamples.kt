@@ -20,12 +20,11 @@ import androidx.annotation.Sampled
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.font
-import androidx.compose.ui.text.font.fontFamily
 
 @Sampled
 @Composable
@@ -66,13 +65,13 @@ fun FontFamilyCursiveSample() {
 @Sampled
 @Composable
 fun CustomFontFamilySample() {
-    val fontFamily = fontFamily(
-        font(
+    val fontFamily = FontFamily(
+        Font(
             resId = R.font.my_font_400_regular,
             weight = FontWeight.W400,
             style = FontStyle.Normal
         ),
-        font(
+        Font(
             resId = R.font.my_font_400_italic,
             weight = FontWeight.W400,
             style = FontStyle.Italic
@@ -85,8 +84,8 @@ fun CustomFontFamilySample() {
 @Composable
 fun FontFamilySynthesisSample() {
     // The font family contains a single font, with normal weight
-    val fontFamily = fontFamily(
-        font(resId = R.font.myfont, weight = FontWeight.Normal)
+    val fontFamily = FontFamily(
+        Font(resId = R.font.myfont, weight = FontWeight.Normal)
     )
     // Configuring the Text composable to be bold
     // Using FontSynthesis.Weight to have the system render the font bold my making the glyphs
