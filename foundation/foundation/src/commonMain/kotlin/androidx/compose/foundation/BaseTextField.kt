@@ -110,7 +110,7 @@ fun BaseTextField(
     onValueChange: (TextFieldValue) -> Unit,
     modifier: Modifier = Modifier,
     textColor: Color = Color.Unspecified,
-    textStyle: TextStyle = AmbientTextStyle.current,
+    textStyle: TextStyle = TextStyle(),
     keyboardType: KeyboardType = KeyboardType.Text,
     imeAction: ImeAction = ImeAction.Default,
     onImeActionPerformed: (ImeAction) -> Unit = {},
