@@ -261,14 +261,25 @@ package androidx.compose.ui.draw {
     method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier drawOpacity(androidx.compose.ui.Modifier, float opacity);
   }
 
+  public interface BuildDrawCacheParams {
+    method public androidx.compose.ui.unit.Density getDensity();
+    method public androidx.compose.ui.unit.LayoutDirection getLayoutDirection();
+    method public long getSize-NH-jbRc();
+    property public abstract androidx.compose.ui.unit.Density density;
+    property public abstract androidx.compose.ui.unit.LayoutDirection layoutDirection;
+    property public abstract long size;
+  }
+
   public final class CacheDrawScope implements androidx.compose.ui.unit.Density {
     method public float getDensity();
     method public float getFontScale();
+    method public androidx.compose.ui.unit.LayoutDirection getLayoutDirection();
     method public long getSize-NH-jbRc();
     method public androidx.compose.ui.draw.DrawResult onDrawBehind(kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
     method public androidx.compose.ui.draw.DrawResult onDrawWithContent(kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.ContentDrawScope,kotlin.Unit> block);
     property public float density;
     property public float fontScale;
+    property public final androidx.compose.ui.unit.LayoutDirection layoutDirection;
     property public final long size;
   }
 
@@ -278,7 +289,7 @@ package androidx.compose.ui.draw {
   }
 
   public interface DrawCacheModifier extends androidx.compose.ui.draw.DrawModifier {
-    method public void onBuildCache-lwCvPpU(long size, androidx.compose.ui.unit.Density density);
+    method public void onBuildCache(androidx.compose.ui.draw.BuildDrawCacheParams params);
   }
 
   public interface DrawModifier extends androidx.compose.ui.Modifier.Element {
