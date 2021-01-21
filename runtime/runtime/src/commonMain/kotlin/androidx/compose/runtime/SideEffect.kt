@@ -57,23 +57,23 @@ class DisposableEffectScope {
      */
     inline fun onDispose(
         crossinline onDisposeEffect: () -> Unit
-    ): DisposableEffectResult = object : DisposableEffectResult {
+    ): DisposableEffectDisposable = object : DisposableEffectDisposable {
         override fun dispose() {
             onDisposeEffect()
         }
     }
 }
 
-interface DisposableEffectResult {
+interface DisposableEffectDisposable {
     fun dispose()
 }
 
 private val InternalDisposableEffectScope = DisposableEffectScope()
 
 private class DisposableEffectImpl(
-    private val effect: DisposableEffectScope.() -> DisposableEffectResult
+    private val effect: DisposableEffectScope.() -> DisposableEffectDisposable
 ) : RememberObserver {
-    private var onDispose: DisposableEffectResult? = null
+    private var onDispose: DisposableEffectDisposable? = null
 
     override fun onRemembered() {
         onDispose = InternalDisposableEffectScope.effect()
@@ -104,7 +104,7 @@ private const val LaunchedEffectNoParamError =
 @Suppress("DeprecatedCallableAddReplaceWith", "UNUSED_PARAMETER")
 @Deprecated(DisposableEffectNoParamError, level = DeprecationLevel.ERROR)
 fun DisposableEffect(
-    effect: DisposableEffectScope.() -> DisposableEffectResult
+    effect: DisposableEffectScope.() -> DisposableEffectDisposable
 ): Unit = error(DisposableEffectNoParamError)
 
 /**
@@ -140,7 +140,7 @@ fun DisposableEffect(
 @ComposableContract(restartable = false)
 fun DisposableEffect(
     key1: Any?,
-    effect: DisposableEffectScope.() -> DisposableEffectResult
+    effect: DisposableEffectScope.() -> DisposableEffectDisposable
 ) {
     remember(key1) { DisposableEffectImpl(effect) }
 }
@@ -180,7 +180,7 @@ fun DisposableEffect(
 fun DisposableEffect(
     key1: Any?,
     key2: Any?,
-    effect: DisposableEffectScope.() -> DisposableEffectResult
+    effect: DisposableEffectScope.() -> DisposableEffectDisposable
 ) {
     remember(key1, key2) { DisposableEffectImpl(effect) }
 }
@@ -221,7 +221,7 @@ fun DisposableEffect(
     key1: Any?,
     key2: Any?,
     key3: Any?,
-    effect: DisposableEffectScope.() -> DisposableEffectResult
+    effect: DisposableEffectScope.() -> DisposableEffectDisposable
 ) {
     remember(key1, key2, key3) { DisposableEffectImpl(effect) }
 }
@@ -261,7 +261,7 @@ fun DisposableEffect(
 @Suppress("ArrayReturn")
 fun DisposableEffect(
     vararg keys: Any?,
-    effect: DisposableEffectScope.() -> DisposableEffectResult
+    effect: DisposableEffectScope.() -> DisposableEffectDisposable
 ) {
     remember(*keys) { DisposableEffectImpl(effect) }
 }
