@@ -28,13 +28,12 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusManagerImpl
-import androidx.compose.ui.input.key.Key.Companion.Tab
+import androidx.compose.ui.focus.FocusDirection.Down
+import androidx.compose.ui.focus.FocusDirection.Left
 import androidx.compose.ui.focus.FocusDirection.Next
 import androidx.compose.ui.focus.FocusDirection.Previous
-import androidx.compose.ui.focus.FocusDirection.Left
 import androidx.compose.ui.focus.FocusDirection.Right
 import androidx.compose.ui.focus.FocusDirection.Up
-import androidx.compose.ui.focus.FocusDirection.Down
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.DesktopCanvas
@@ -42,6 +41,7 @@ import androidx.compose.ui.input.key.Key.Companion.DirectionDown
 import androidx.compose.ui.input.key.Key.Companion.DirectionLeft
 import androidx.compose.ui.input.key.Key.Companion.DirectionRight
 import androidx.compose.ui.input.key.Key.Companion.DirectionUp
+import androidx.compose.ui.input.key.Key.Companion.Tab
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.KeyInputModifier
@@ -224,6 +224,15 @@ class DesktopOwner(
 
     override fun onLayoutChange(layoutNode: LayoutNode) = Unit
 
+    override fun getFocusDirection(keyEvent: KeyEvent): FocusDirection? = when (keyEvent.key) {
+        Tab -> if (keyEvent.isShiftPressed) Previous else Next
+        DirectionRight -> Right
+        DirectionLeft -> Left
+        DirectionUp -> Up
+        DirectionDown -> Down
+        else -> null
+    }
+
     override fun calculatePosition() = IntOffset.Zero
 
     override fun calculatePositionInWindow() = IntOffset.Zero
@@ -314,15 +323,4 @@ class DesktopOwner(
         oldMoveFilters = newMoveFilters.filterIsInstance<PointerMoveEventFilter>()
         newMoveFilters = mutableListOf()
     }
-}
-
-// TODO(b/177930820): Move this logic to Owner so that each platform can specify their own key to
-//  direction translation.
-private fun getFocusDirection(keyEvent: KeyEvent): FocusDirection? = when (keyEvent.key) {
-    Tab -> if (keyEvent.isShiftPressed) Previous else Next
-    DirectionRight -> Right
-    DirectionLeft -> Left
-    DirectionUp -> Up
-    DirectionDown -> Down
-    else -> null
 }

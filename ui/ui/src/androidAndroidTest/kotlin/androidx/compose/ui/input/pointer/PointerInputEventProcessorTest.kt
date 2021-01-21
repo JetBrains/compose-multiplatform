@@ -20,10 +20,12 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
@@ -3092,6 +3094,10 @@ private class MockOwner(
     }
 
     override fun onLayoutChange(layoutNode: LayoutNode) {
+    }
+
+    override fun getFocusDirection(keyEvent: KeyEvent): FocusDirection? {
+        TODO("Not yet implemented")
     }
 
     override val measureIteration: Long

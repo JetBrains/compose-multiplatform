@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
@@ -30,6 +31,7 @@ import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.layout.LayoutModifier
@@ -1826,6 +1828,10 @@ private class MockOwner(
 
     override fun onLayoutChange(layoutNode: LayoutNode) {
         layoutChangeCount++
+    }
+
+    override fun getFocusDirection(keyEvent: KeyEvent): FocusDirection? {
+        TODO("Not yet implemented")
     }
 
     override var measureIteration: Long = 0
