@@ -45,15 +45,14 @@ import androidx.compose.ui.autofill.registerCallback
 import androidx.compose.ui.autofill.unregisterCallback
 import androidx.compose.ui.focus.FOCUS_TAG
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.focus.FocusManager
-import androidx.compose.ui.focus.FocusManagerImpl
-import androidx.compose.ui.input.key.Key.Companion.Tab
+import androidx.compose.ui.focus.FocusDirection.Down
+import androidx.compose.ui.focus.FocusDirection.Left
 import androidx.compose.ui.focus.FocusDirection.Next
 import androidx.compose.ui.focus.FocusDirection.Previous
-import androidx.compose.ui.focus.FocusDirection.Left
 import androidx.compose.ui.focus.FocusDirection.Right
 import androidx.compose.ui.focus.FocusDirection.Up
-import androidx.compose.ui.focus.FocusDirection.Down
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusManagerImpl
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
 import androidx.compose.ui.hapticfeedback.AndroidHapticFeedback
@@ -62,6 +61,7 @@ import androidx.compose.ui.input.key.Key.Companion.DirectionDown
 import androidx.compose.ui.input.key.Key.Companion.DirectionLeft
 import androidx.compose.ui.input.key.Key.Companion.DirectionRight
 import androidx.compose.ui.input.key.Key.Companion.DirectionUp
+import androidx.compose.ui.input.key.Key.Companion.Tab
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.KeyInputModifier
@@ -541,6 +541,15 @@ internal class AndroidComposeView(context: Context) :
         accessibilityDelegate.onLayoutChange(layoutNode)
     }
 
+    override fun getFocusDirection(keyEvent: KeyEvent): FocusDirection? = when (keyEvent.key) {
+        Tab -> if (keyEvent.isShiftPressed) Previous else Next
+        DirectionRight -> Right
+        DirectionLeft -> Left
+        DirectionUp -> Up
+        DirectionDown -> Down
+        else -> null
+    }
+
     override fun dispatchDraw(canvas: android.graphics.Canvas) {
         if (!isAttachedToWindow) {
             invalidateLayers(root)
@@ -778,14 +787,3 @@ internal val Configuration.localeLayoutDirection: LayoutDirection
         // or RTL. Fallback to LTR for unexpected return value.
         else -> LayoutDirection.Ltr
     }
-
-// TODO(b/177930820): Move this logic to Owner so that each platform can specify their own key to
-//  direction translation.
-private fun getFocusDirection(keyEvent: KeyEvent): FocusDirection? = when (keyEvent.key) {
-    Tab -> if (keyEvent.isShiftPressed) Previous else Next
-    DirectionRight -> Right
-    DirectionLeft -> Left
-    DirectionUp -> Up
-    DirectionDown -> Down
-    else -> null
-}
