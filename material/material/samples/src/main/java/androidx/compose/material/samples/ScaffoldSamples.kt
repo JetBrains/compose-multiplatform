@@ -17,7 +17,7 @@
 package androidx.compose.material.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.animation.animatedFloat
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -127,7 +127,9 @@ fun ScaffoldWithBottomBarAndCutout() {
     val sharpEdgePercent = -50f
     val roundEdgePercent = 45f
     // Start with sharp edges
-    val animatedProgress = animatedFloat(sharpEdgePercent)
+    val animatedProgress = remember { Animatable(sharpEdgePercent) }
+    // Create a coroutineScope for the animation
+    val coroutineScope = rememberCoroutineScope()
     // animation value to animate shape
     val progress = animatedProgress.value.roundToInt()
 
@@ -141,13 +143,15 @@ fun ScaffoldWithBottomBarAndCutout() {
         RoundedCornerShape(progress)
     }
     // lambda to call to trigger shape animation
-    val changeShape = {
+    val changeShape: () -> Unit = {
         val target = animatedProgress.targetValue
         val nextTarget = if (target == roundEdgePercent) sharpEdgePercent else roundEdgePercent
-        animatedProgress.animateTo(
-            targetValue = nextTarget,
-            anim = TweenSpec(durationMillis = 600)
-        )
+        coroutineScope.launch {
+            animatedProgress.animateTo(
+                targetValue = nextTarget,
+                animationSpec = TweenSpec(durationMillis = 600)
+            )
+        }
     }
 
     Scaffold(

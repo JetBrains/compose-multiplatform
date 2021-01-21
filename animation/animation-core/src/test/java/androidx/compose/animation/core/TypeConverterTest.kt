@@ -25,31 +25,14 @@ import org.junit.runners.JUnit4
 class TypeConverterTest {
     @Test
     fun testFloatToVectorConverter() {
-        verifyFloatConverter(Float.VectorConverter)
-        verifyFloatConverter(AnimatedFloat(5f, ManualAnimationClock(0L)).typeConverter)
+        val converter = Float.VectorConverter
+        assertEquals(15f, converter.convertToVector(15f).value)
+        assertEquals(5f, converter.convertFromVector(AnimationVector1D(5f)))
     }
 
     @Test
     fun testIntToVectorConverter() {
         assertEquals(100f, Int.VectorConverter.convertToVector(100).value)
         assertEquals(5, Int.VectorConverter.convertFromVector(AnimationVector1D(5f)))
-    }
-
-    @Test
-    fun testAnimatedVectorConverter() {
-        verifyV2VConverter(AnimationVector1D(100f))
-        verifyV2VConverter(AnimationVector2D(40f, 50f))
-        verifyV2VConverter(AnimationVector3D(300f, -20f, 1f))
-        verifyV2VConverter(AnimationVector4D(100f, -20f, 3000f, 4f))
-    }
-
-    private fun <V : AnimationVector> verifyV2VConverter(value: V) {
-        val converter = AnimatedVector(value, ManualAnimationClock(0L)).typeConverter
-        assertEquals(converter.convertFromVector(value), converter.convertToVector(value))
-    }
-
-    private fun verifyFloatConverter(converter: TwoWayConverter<Float, AnimationVector1D>) {
-        assertEquals(15f, converter.convertToVector(15f).value)
-        assertEquals(5f, converter.convertFromVector(AnimationVector1D(5f)))
     }
 }

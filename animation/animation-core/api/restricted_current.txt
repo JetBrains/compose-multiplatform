@@ -58,30 +58,30 @@ package androidx.compose.animation.core {
     method @androidx.compose.runtime.Composable public static <T, V extends androidx.compose.animation.core.AnimationVector> androidx.compose.runtime.State<T> animateValueAsState(T? targetValue, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, optional androidx.compose.animation.core.AnimationSpec<T> animationSpec, optional T? visibilityThreshold, optional kotlin.jvm.functions.Function1<? super T,kotlin.Unit>? finishedListener);
   }
 
-  public abstract class AnimatedFloat extends androidx.compose.animation.core.BaseAnimatedValue<java.lang.Float,androidx.compose.animation.core.AnimationVector1D> {
-    ctor public AnimatedFloat(androidx.compose.animation.core.AnimationClockObservable clock, float visibilityThreshold);
-    method public final float getMax();
-    method public final float getMin();
-    method public final float getVelocity();
-    method public final void setBounds(optional float min, optional float max);
-    method public void snapTo(float targetValue);
+  @Deprecated public abstract class AnimatedFloat extends androidx.compose.animation.core.BaseAnimatedValue<java.lang.Float,androidx.compose.animation.core.AnimationVector1D> {
+    ctor @Deprecated public AnimatedFloat(androidx.compose.animation.core.AnimationClockObservable clock, float visibilityThreshold);
+    method @Deprecated public final float getMax();
+    method @Deprecated public final float getMin();
+    method @Deprecated public final float getVelocity();
+    method @Deprecated public final void setBounds(optional float min, optional float max);
+    method @Deprecated public void snapTo(float targetValue);
     property public final float max;
     property public final float min;
     property public final float velocity;
   }
 
-  public abstract class AnimatedValue<T, V extends androidx.compose.animation.core.AnimationVector> extends androidx.compose.animation.core.BaseAnimatedValue<T,V> {
-    ctor public AnimatedValue(androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, androidx.compose.animation.core.AnimationClockObservable clock, T? visibilityThreshold);
-    method public final V getVelocity();
+  @Deprecated public abstract class AnimatedValue<T, V extends androidx.compose.animation.core.AnimationVector> extends androidx.compose.animation.core.BaseAnimatedValue<T,V> {
+    ctor @Deprecated public AnimatedValue(androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, androidx.compose.animation.core.AnimationClockObservable clock, T? visibilityThreshold);
+    method @Deprecated public final V getVelocity();
     property public final V velocity;
   }
 
   public final class AnimatedValueKt {
-    method public static androidx.compose.animation.core.AnimatedFloat AnimatedFloat(float initVal, androidx.compose.animation.core.AnimationClockObservable clock, optional float visibilityThreshold);
-    method public static <T, V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.AnimatedValue<T,V> AnimatedValue(T? initVal, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, androidx.compose.animation.core.AnimationClockObservable clock, optional T? visibilityThreshold);
-    method public static <V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.AnimatedValue<V,V> AnimatedVector(V initVal, androidx.compose.animation.core.AnimationClockObservable clock, optional V visibilityThreshold);
-    method public static void fling(androidx.compose.animation.core.AnimatedFloat, float startVelocity, optional androidx.compose.animation.core.FloatDecayAnimationSpec decay, optional kotlin.jvm.functions.Function3<? super androidx.compose.animation.core.AnimationEndReason,? super java.lang.Float,? super java.lang.Float,kotlin.Unit>? onEnd);
-    method public static void fling(androidx.compose.animation.core.AnimatedFloat, float startVelocity, optional androidx.compose.animation.core.FloatDecayAnimationSpec decay, kotlin.jvm.functions.Function1<? super java.lang.Float,androidx.compose.animation.core.TargetAnimation> adjustTarget, optional kotlin.jvm.functions.Function3<? super androidx.compose.animation.core.AnimationEndReason,? super java.lang.Float,? super java.lang.Float,kotlin.Unit>? onEnd);
+    method @Deprecated public static androidx.compose.animation.core.AnimatedFloat AnimatedFloat(float initVal, androidx.compose.animation.core.AnimationClockObservable clock, optional float visibilityThreshold);
+    method @Deprecated public static <T, V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.AnimatedValue<T,V> AnimatedValue(T? initVal, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, androidx.compose.animation.core.AnimationClockObservable clock, optional T? visibilityThreshold);
+    method @Deprecated public static <V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.AnimatedValue<V,V> AnimatedVector(V initVal, androidx.compose.animation.core.AnimationClockObservable clock, optional V visibilityThreshold);
+    method @Deprecated public static void fling(androidx.compose.animation.core.AnimatedFloat, float startVelocity, optional androidx.compose.animation.core.FloatDecayAnimationSpec decay, optional kotlin.jvm.functions.Function3<? super androidx.compose.animation.core.AnimationEndReason,? super java.lang.Float,? super java.lang.Float,kotlin.Unit>? onEnd);
+    method @Deprecated public static void fling(androidx.compose.animation.core.AnimatedFloat, float startVelocity, optional androidx.compose.animation.core.FloatDecayAnimationSpec decay, kotlin.jvm.functions.Function1<? super java.lang.Float,androidx.compose.animation.core.TargetAnimation> adjustTarget, optional kotlin.jvm.functions.Function3<? super androidx.compose.animation.core.AnimationEndReason,? super java.lang.Float,? super java.lang.Float,kotlin.Unit>? onEnd);
   }
 
   public interface Animation<T, V extends androidx.compose.animation.core.AnimationVector> {
@@ -117,7 +117,7 @@ package androidx.compose.animation.core {
     enum_constant public static final androidx.compose.animation.core.AnimationEndReason BoundReached;
     enum_constant public static final androidx.compose.animation.core.AnimationEndReason Finished;
     enum_constant public static final androidx.compose.animation.core.AnimationEndReason Interrupted;
-    enum_constant public static final androidx.compose.animation.core.AnimationEndReason TargetReached;
+    enum_constant @Deprecated public static final androidx.compose.animation.core.AnimationEndReason TargetReached;
   }
 
   public final class AnimationKt {
@@ -260,15 +260,15 @@ package androidx.compose.animation.core {
     method public static androidx.compose.animation.core.AnimationVector4D AnimationVector(float v1, float v2, float v3, float v4);
   }
 
-  public abstract sealed class BaseAnimatedValue<T, V extends androidx.compose.animation.core.AnimationVector> {
-    method public final void animateTo(T? targetValue, optional androidx.compose.animation.core.AnimationSpec<T> anim, optional kotlin.jvm.functions.Function2<? super androidx.compose.animation.core.AnimationEndReason,? super T,kotlin.Unit>? onEnd);
-    method protected void checkFinished(long playtime);
-    method public final T! getTargetValue();
-    method public abstract T! getValue();
-    method public final boolean isRunning();
-    method protected abstract void setValue(T! p);
-    method public void snapTo(T? targetValue);
-    method public final void stop();
+  @Deprecated public abstract sealed class BaseAnimatedValue<T, V extends androidx.compose.animation.core.AnimationVector> {
+    method @Deprecated public final void animateTo(T? targetValue, optional androidx.compose.animation.core.AnimationSpec<T> anim, optional kotlin.jvm.functions.Function2<? super androidx.compose.animation.core.AnimationEndReason,? super T,kotlin.Unit>? onEnd);
+    method @Deprecated protected void checkFinished(long playtime);
+    method @Deprecated public final T! getTargetValue();
+    method @Deprecated public abstract T! getValue();
+    method @Deprecated public final boolean isRunning();
+    method @Deprecated protected abstract void setValue(T! p);
+    method @Deprecated public void snapTo(T? targetValue);
+    method @Deprecated public final void stop();
     property public final boolean isRunning;
     property public final T! targetValue;
     property public abstract T! value;

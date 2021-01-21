@@ -1,23 +1,23 @@
 // Signature format: 4.0
 package androidx.compose.animation {
 
-  @androidx.compose.runtime.Stable public final class AnimatedFloatModel extends androidx.compose.animation.core.AnimatedFloat {
-    ctor public AnimatedFloatModel(float initialValue, androidx.compose.animation.core.AnimationClockObservable clock, float visibilityThreshold);
-    method public Float! getValue();
-    method protected void setValue(float p);
+  @Deprecated @androidx.compose.runtime.Stable public final class AnimatedFloatModel extends androidx.compose.animation.core.AnimatedFloat {
+    ctor @Deprecated public AnimatedFloatModel(float initialValue, androidx.compose.animation.core.AnimationClockObservable clock, float visibilityThreshold);
+    method @Deprecated public Float! getValue();
+    method @Deprecated protected void setValue(float p);
     property public Float! value;
   }
 
   public final class AnimatedValueEffectsKt {
-    method @androidx.compose.runtime.Composable public static androidx.compose.animation.core.AnimatedValue<androidx.compose.ui.graphics.Color,androidx.compose.animation.core.AnimationVector4D> animatedColor-IQsfJ5c(long initVal, optional androidx.compose.animation.core.AnimationClockObservable clock);
-    method @androidx.compose.runtime.Composable public static androidx.compose.animation.core.AnimatedFloat animatedFloat(float initVal, optional float visibilityThreshold, optional androidx.compose.animation.core.AnimationClockObservable clock);
-    method @androidx.compose.runtime.Composable public static <T, V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.AnimatedValue<T,V> animatedValue(T? initVal, androidx.compose.animation.core.TwoWayConverter<T,V> converter, optional T? visibilityThreshold, optional androidx.compose.animation.core.AnimationClockObservable clock);
+    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.animation.core.AnimatedValue<androidx.compose.ui.graphics.Color,androidx.compose.animation.core.AnimationVector4D> animatedColor-IQsfJ5c(long initVal, optional androidx.compose.animation.core.AnimationClockObservable clock);
+    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.animation.core.AnimatedFloat animatedFloat(float initVal, optional float visibilityThreshold, optional androidx.compose.animation.core.AnimationClockObservable clock);
+    method @Deprecated @androidx.compose.runtime.Composable public static <T, V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.AnimatedValue<T,V> animatedValue(T? initVal, androidx.compose.animation.core.TwoWayConverter<T,V> converter, optional T? visibilityThreshold, optional androidx.compose.animation.core.AnimationClockObservable clock);
   }
 
-  @androidx.compose.runtime.Stable public final class AnimatedValueModel<T, V extends androidx.compose.animation.core.AnimationVector> extends androidx.compose.animation.core.AnimatedValue<T,V> {
-    ctor public AnimatedValueModel(T? initialValue, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, androidx.compose.animation.core.AnimationClockObservable clock, T? visibilityThreshold);
-    method public T! getValue();
-    method protected void setValue(T! p);
+  @Deprecated @androidx.compose.runtime.Stable public final class AnimatedValueModel<T, V extends androidx.compose.animation.core.AnimationVector> extends androidx.compose.animation.core.AnimatedValue<T,V> {
+    ctor @Deprecated public AnimatedValueModel(T? initialValue, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, androidx.compose.animation.core.AnimationClockObservable clock, T? visibilityThreshold);
+    method @Deprecated public T! getValue();
+    method @Deprecated protected void setValue(T! p);
     property public T! value;
   }
 

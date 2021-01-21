@@ -109,6 +109,7 @@ class BottomSheetState(
         animateTo(
             BottomSheetValue.Expanded,
             onEnd = { endReason, _ ->
+                @Suppress("Deprecation")
                 if (endReason == AnimationEndReason.TargetReached) {
                     onExpanded?.invoke()
                 }
@@ -125,6 +126,7 @@ class BottomSheetState(
         animateTo(
             BottomSheetValue.Collapsed,
             onEnd = { endReason, _ ->
+                @Suppress("Deprecation")
                 if (endReason == AnimationEndReason.TargetReached) {
                     onCollapsed?.invoke()
                 }
