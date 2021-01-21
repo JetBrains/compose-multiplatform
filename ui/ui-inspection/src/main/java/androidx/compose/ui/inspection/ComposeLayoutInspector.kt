@@ -30,10 +30,13 @@ import androidx.inspection.Inspector
 import androidx.inspection.InspectorEnvironment
 import androidx.inspection.InspectorFactory
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Command
+import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetAllParametersCommand
+import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetAllParametersResponse
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetComposablesCommand
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetComposablesResponse
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetParametersCommand
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetParametersResponse
+import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.ParameterGroup
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Response
 
 private const val LAYOUT_INSPECTION_ID = "layoutinspector.compose.inspection"
@@ -62,6 +65,9 @@ class ComposeLayoutInspector(
             }
             Command.SpecializedCase.GET_PARAMETERS_COMMAND -> {
                 handleGetParametersCommand(command.getParametersCommand, callback)
+            }
+            Command.SpecializedCase.GET_ALL_PARAMETERS_COMMAND -> {
+                handleGetAllParametersCommand(command.getAllParametersCommand, callback)
             }
             else -> error("Unexpected compose inspector command case: ${command.specializedCase}")
         }
@@ -111,13 +117,50 @@ class ComposeLayoutInspector(
                         val stringTable = StringTable()
                         val parameters = foundComposable.convertParameters().convertAll(stringTable)
                         GetParametersResponse.newBuilder().apply {
-                            composableId = getParametersCommand.composableId
+                            parameterGroup = ParameterGroup.newBuilder().apply {
+                                composableId = getParametersCommand.composableId
+                                addAllParameter(parameters)
+                            }.build()
                             addAllStrings(stringTable.toStringEntries())
-                            addAllParameters(parameters)
                         }.build()
                     } else {
                         GetParametersResponse.getDefaultInstance()
                     }
+                }
+            }
+        }
+    }
+
+    private fun handleGetAllParametersCommand(
+        getAllParametersCommand: GetAllParametersCommand,
+        callback: CommandCallback
+    ) {
+        ThreadUtils.runOnMainThread {
+
+            val allComposables = getComposableRoots(
+                getAllParametersCommand.rootViewId,
+                getAllParametersCommand.skipSystemComposables
+            )
+                .flatMap { it.inspectorNodes }
+                .flatMap { it.flatten() }
+                .toList()
+
+            environment.executors().primary().execute {
+                callback.reply {
+                    val stringTable = StringTable()
+                    val parameterGroups = allComposables.map { composable ->
+                        val parameters = composable.convertParameters().convertAll(stringTable)
+                        ParameterGroup.newBuilder().apply {
+                            composableId = composable.id
+                            addAllParameter(parameters)
+                        }.build()
+                    }
+
+                    getAllParametersResponse = GetAllParametersResponse.newBuilder().apply {
+                        rootViewId = getAllParametersCommand.rootViewId
+                        addAllParameterGroups(parameterGroups)
+                        addAllStrings(stringTable.toStringEntries())
+                    }.build()
                 }
             }
         }
