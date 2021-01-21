@@ -578,7 +578,7 @@ class AndroidXPlugin : Plugin<Project> {
     private fun Project.createVerifyDependencyVersionsTask():
         TaskProvider<VerifyDependencyVersionsTask>? {
             /**
-             * Ignore -PuseMaxDepVersions when verifying dependency versions because it is a
+             * Ignore -Pandroidx.useMaxDepVersions when verifying dependency versions because it is a
              * hypothetical build which is only intended to check for forward compatibility.
              */
             if (project.usingMaxDepVersions()) {

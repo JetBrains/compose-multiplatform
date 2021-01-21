@@ -67,8 +67,7 @@ const val SUMMARIZE_STANDARD_ERROR = "androidx.summarizeStderr"
  * Setting this property indicates that a build is being performed to check for forward
  * compatibility.
  */
-// TODO(alanv): This property should be prefixed with `androidx.`.
-const val USE_MAX_DEP_VERSIONS = "useMaxDepVersions"
+const val USE_MAX_DEP_VERSIONS = "androidx.useMaxDepVersions"
 
 /**
  * Setting this property enables writing versioned API files
@@ -112,6 +111,7 @@ val ALL_ANDROIDX_PROPERTIES = setOf(
     ENABLE_DOCUMENTATION,
     STUDIO_TYPE,
     SUMMARIZE_STANDARD_ERROR,
+    USE_MAX_DEP_VERSIONS,
     TEST_FAILURES_DO_NOT_FAIL_TEST_TASK,
     VALIDATE_NO_UNRECOGNIZED_MESSAGES,
     WRITE_VERSIONED_API_FILES,
