@@ -3340,6 +3340,7 @@ class AndroidLayoutDrawTest {
     /**
      * invalidateDescendants should invalidate all layout layers.
      */
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun invalidateDescendants() {
         var color = Color.White
