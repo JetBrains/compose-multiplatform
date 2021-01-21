@@ -52,14 +52,14 @@ class ComposeRootRegistryTest {
 
     @Before
     fun setUp() {
-        assertThat(composeRootRegistry.getUnfilteredComposeRoots()).isEmpty()
+        assertThat(composeRootRegistry.getCreatedComposeRoots()).isEmpty()
         composeRootRegistry.addOnRegistrationChangedListener(onRegistrationChangedListener)
     }
 
     @Test
     fun registryIsSetUpAndEmpty() {
         assertThat(composeRootRegistry.isSetUp).isTrue()
-        assertThat(composeRootRegistry.getUnfilteredComposeRoots()).isEmpty()
+        assertThat(composeRootRegistry.getCreatedComposeRoots()).isEmpty()
     }
 
     @Test
@@ -70,9 +70,10 @@ class ComposeRootRegistryTest {
             val composeRoot = activity.findRootForTest()
 
             // Then it is registered
-            assertThat(composeRootRegistry.getUnfilteredComposeRoots())
+            assertThat(composeRootRegistry.getCreatedComposeRoots())
                 .isEqualTo(setOf(composeRoot))
-            assertThat(composeRootRegistry.getComposeRoots()).isEqualTo(setOf(composeRoot))
+            assertThat(composeRootRegistry.getRegisteredComposeRoots())
+                .isEqualTo(setOf(composeRoot))
             // And our listener was notified
             assertThat(onRegistrationChangedListener.recordedChanges).isEqualTo(
                 listOf(Pair(composeRoot, true))
@@ -91,8 +92,7 @@ class ComposeRootRegistryTest {
             activity.setContentView(View(activity))
 
             // Then it is not registered now
-            assertThat(composeRootRegistry.getUnfilteredComposeRoots()).isEmpty()
-            assertThat(composeRootRegistry.getComposeRoots()).isEmpty()
+            assertThat(composeRootRegistry.getRegisteredComposeRoots()).isEmpty()
             // But our listener was notified of addition and removal
             assertThat(onRegistrationChangedListener.recordedChanges).isEqualTo(
                 listOf(
@@ -114,8 +114,8 @@ class ComposeRootRegistryTest {
             composeRootRegistry.tearDownRegistry()
 
             // Then the registry is empty
-            assertThat(composeRootRegistry.getUnfilteredComposeRoots()).isEmpty()
-            assertThat(composeRootRegistry.getComposeRoots()).isEmpty()
+            assertThat(composeRootRegistry.getCreatedComposeRoots()).isEmpty()
+            assertThat(composeRootRegistry.getRegisteredComposeRoots()).isEmpty()
             // And our listener was notified of addition and removal
             assertThat(onRegistrationChangedListener.recordedChanges).isEqualTo(
                 listOf(
