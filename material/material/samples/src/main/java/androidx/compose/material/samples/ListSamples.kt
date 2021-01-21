@@ -19,7 +19,6 @@ package androidx.compose.material.samples
 import androidx.annotation.Sampled
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.AmbientContentColor
@@ -54,12 +53,11 @@ fun ClickableListItems() {
                 // The [clearAndSetSemantics] causes the switch's redundant
                 // toggleable semantics to be cleared in favor of the [ListItem]
                 // toggleable's, to improve usability with screen-readers.
-                Box(Modifier.clearAndSetSemantics {}) {
-                    Switch(
-                        checked = switched,
-                        onCheckedChange = onSwitchedChange
-                    )
-                }
+                Switch(
+                    modifier = Modifier.clearAndSetSemantics {},
+                    checked = switched,
+                    onCheckedChange = onSwitchedChange
+                )
             },
             modifier = Modifier.toggleable(
                 value = switched,
@@ -75,12 +73,11 @@ fun ClickableListItems() {
                 // The [clearAndSetSemantics] causes the checkbox's redundant
                 // toggleable semantics to be cleared in favor of the [ListItem]
                 // toggleable's, to improve usability with screen-readers.
-                Box(Modifier.clearAndSetSemantics {}) {
-                    Checkbox(
-                        checked = checked,
-                        onCheckedChange = onCheckedChange
-                    )
-                }
+                Checkbox(
+                    modifier = Modifier.clearAndSetSemantics {},
+                    checked = checked,
+                    onCheckedChange = onCheckedChange
+                )
             },
             modifier = Modifier.toggleable(
                 value = checked,
