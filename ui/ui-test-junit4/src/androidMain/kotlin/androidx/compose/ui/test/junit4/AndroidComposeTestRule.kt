@@ -18,6 +18,7 @@ package androidx.compose.ui.test.junit4
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.text.blinkingCursorEnabled
@@ -26,7 +27,6 @@ import androidx.compose.runtime.Recomposer
 import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.platform.ViewRootForTest
-import androidx.compose.ui.platform.WindowRecomposerFactory
 import androidx.compose.ui.platform.WindowRecomposerPolicy
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.semantics.SemanticsNode
@@ -377,12 +377,11 @@ internal constructor(
         val currentActivity = activity
 
         runOnUiThread {
-            val composition = currentActivity.setContent(
-                recomposer ?: Recomposer.current(),
-                composable
-            )
+            currentActivity.setContent(recomposer, composable)
             disposeContentHook = {
-                composition.dispose()
+                // Removing a default ComposeView from the view hierarchy will
+                // dispose its composition.
+                activity.setContentView(View(activity))
             }
         }
 
@@ -473,8 +472,19 @@ internal constructor(
     inner class AndroidComposeStatement(
         private val base: Statement
     ) : Statement() {
-        @OptIn(InternalTextApi::class)
+
+        @OptIn(InternalComposeUiApi::class)
         override fun evaluate() {
+            val recomposer = recomposer
+            if (recomposer == null) {
+                evaluateInner()
+            } else WindowRecomposerPolicy.withFactory({ recomposer }) {
+                evaluateInner()
+            }
+        }
+
+        @OptIn(InternalTextApi::class)
+        private fun evaluateInner() {
             @Suppress("DEPRECATION_ERROR")
             val oldTextInputFactory = textInputServiceFactory
             try {
@@ -483,12 +493,6 @@ internal constructor(
                 @Suppress("DEPRECATION_ERROR")
                 textInputServiceFactory = {
                     TextInputServiceForTests(it)
-                }
-                if (recomposer != null) {
-                    @OptIn(InternalComposeUiApi::class)
-                    WindowRecomposerPolicy.setWindowRecomposerFactory {
-                        recomposer
-                    }
                 }
                 base.evaluate()
             } finally {
@@ -500,13 +504,6 @@ internal constructor(
                     frameCoroutineScope!!.cancel()
                     @OptIn(ExperimentalCoroutinesApi::class)
                     testCoroutineDispatcher?.cleanupTestCoroutines()
-                }
-                if (recomposer != null) {
-                    @Suppress("DEPRECATION")
-                    @OptIn(InternalComposeUiApi::class)
-                    WindowRecomposerPolicy.setWindowRecomposerFactory(
-                        WindowRecomposerFactory.Global
-                    )
                 }
                 @Suppress("DEPRECATION_ERROR")
                 blinkingCursorEnabled = true

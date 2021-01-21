@@ -26,16 +26,15 @@ import androidx.compose.runtime.snapshots.SnapshotReadObserver
 import androidx.compose.runtime.snapshots.SnapshotWriteObserver
 import androidx.compose.runtime.snapshots.fastForEach
 import androidx.compose.runtime.snapshots.takeMutableSnapshot
+import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.job
@@ -64,6 +63,30 @@ suspend fun <R> withRunningRecomposer(
 }
 
 /**
+ * Read-only information about a [Recomposer]. Used when code should only monitor the activity of
+ * a [Recomposer], and not attempt to alter its state or create new compositions from it.
+ */
+interface RecomposerInfo {
+    /**
+     * The current [State] of the [Recomposer]. See each [State] value for its meaning.
+     */
+    val state: Flow<Recomposer.State>
+
+    /**
+     * `true` if the [Recomposer] has been assigned work to do and it is currently performing
+     * that work or awaiting an opportunity to do so.
+     */
+    val hasPendingWork: Boolean
+
+    /**
+     * The running count of the number of times the [Recomposer] awoke and applied changes to
+     * one or more [Composer]s. This count is unaffected if the composer awakes and recomposed but
+     * composition did not produce changes to apply.
+     */
+    val changeCount: Long
+}
+
+/**
  * The scheduler for performing recomposition and applying updates to one or more [Composition]s.
  */
 // RedundantVisibilityModifier suppressed because metalava picks up internal function overrides
@@ -81,7 +104,7 @@ class Recomposer(
      * one or more composers. This count is unaffected if the composer awakes and recomposed but
      * composition did not produce changes to apply.
      */
-    var changeCount = 0
+    var changeCount = 0L
         private set
 
     private val broadcastFrameClock = BroadcastFrameClock {
@@ -233,6 +256,24 @@ class Recomposer(
     public val state: Flow<State>
         get() = _state
 
+    // A separate private object to avoid the temptation of casting a RecomposerInfo
+    // to a Recomposer if Recomposer itself were to implement RecomposerInfo.
+    private inner class RecomposerInfoImpl : RecomposerInfo {
+        override val state: Flow<State>
+            get() = this@Recomposer.state
+        override val hasPendingWork: Boolean
+            get() = this@Recomposer.hasPendingWork
+        override val changeCount: Long
+            get() = this@Recomposer.changeCount
+    }
+
+    private val recomposerInfo = RecomposerInfoImpl()
+
+    /**
+     * Obtain a read-only [RecomposerInfo] for this [Recomposer].
+     */
+    fun asRecomposerInfo(): RecomposerInfo = recomposerInfo
+
     private fun recordComposerModificationsLocked() {
         if (snapshotInvalidations.isNotEmpty()) {
             snapshotInvalidations.fastForEach { changes ->
@@ -285,6 +326,8 @@ class Recomposer(
                     } else null
                 }?.resume(Unit)
             }
+
+            addRunning(recomposerInfo)
 
             try {
                 // Invalidate all registered composers when we start since we weren't observing
@@ -371,6 +414,7 @@ class Recomposer(
                     }
                     deriveStateLocked()
                 }
+                removeRunning(recomposerInfo)
             }
         }
     }
@@ -465,9 +509,17 @@ class Recomposer(
     /**
      * Returns true if any pending invalidations have been scheduled.
      */
-    fun hasInvalidations(): Boolean = synchronized(stateLock) {
-        snapshotInvalidations.isNotEmpty() || hasFrameWorkLocked
-    }
+    @Deprecated("Replaced by hasPendingWork", ReplaceWith("hasPendingWork"))
+    fun hasInvalidations(): Boolean = hasPendingWork
+
+    /**
+     * `true` if this [Recomposer] has any pending work scheduled, regardless of whether or not
+     * it is currently [running][runRecomposeAndApplyChanges].
+     */
+    val hasPendingWork: Boolean
+        get() = synchronized(stateLock) {
+            snapshotInvalidations.isNotEmpty() || hasFrameWorkLocked
+        }
 
     private val hasFrameWorkLocked: Boolean
         get() = composerInvalidations.isNotEmpty() || broadcastFrameClock.hasAwaiters
@@ -521,28 +573,31 @@ class Recomposer(
     }
 
     companion object {
-        @OptIn(ExperimentalCoroutinesApi::class)
-        private val mainRecomposer: Recomposer by lazy {
-            val embeddingContext = EmbeddingContext()
-            val mainScope = CoroutineScope(
-                NonCancellable + embeddingContext.mainThreadCompositionContext()
-            )
 
-            Recomposer(mainScope.coroutineContext).also {
-                // NOTE: Launching undispatched so that compositions created with the
-                // Recomposer.current() singleton instance can assume the recomposer is running
-                // when they perform initial composition. The relevant Recomposer code is
-                // appropriately thread-safe for this.
-                mainScope.launch(start = CoroutineStart.UNDISPATCHED) {
-                    it.runRecomposeAndApplyChanges()
-                }
+        private val _runningRecomposers = MutableStateFlow(persistentSetOf<RecomposerInfo>())
+
+        /**
+         * An observable [Set] of [RecomposerInfo]s for currently
+         * [running][runRecomposeAndApplyChanges] [Recomposer]s.
+         * Emitted sets are immutable.
+         */
+        val runningRecomposers: StateFlow<Set<RecomposerInfo>>
+            get() = _runningRecomposers
+
+        private fun addRunning(info: RecomposerInfo) {
+            while (true) {
+                val old = _runningRecomposers.value
+                val new = old.add(info)
+                if (old === new || _runningRecomposers.compareAndSet(old, new)) break
             }
         }
 
-        /**
-         * Retrieves [Recomposer] for the current thread. Needs to be the main thread.
-         */
-        @TestOnly
-        fun current(): Recomposer = mainRecomposer
+        private fun removeRunning(info: RecomposerInfo) {
+            while (true) {
+                val old = _runningRecomposers.value
+                val new = old.remove(info)
+                if (old === new || _runningRecomposers.compareAndSet(old, new)) break
+            }
+        }
     }
 }

@@ -16,11 +16,11 @@
 
 package androidx.compose.runtime.benchmark
 
+import android.view.View
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composer
-import androidx.compose.runtime.Composition
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.Recomposer
@@ -31,8 +31,6 @@ import androidx.compose.runtime.snapshots.SnapshotWriteObserver
 import androidx.compose.runtime.snapshots.takeMutableSnapshot
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.TestMonotonicFrameClock
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -40,9 +38,11 @@ import kotlinx.coroutines.test.DelayController
 import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.withContext
-import org.junit.Assert.assertTrue
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 @OptIn(ExperimentalComposeApi::class, InternalComposeApi::class)
 abstract class ComposeBenchmarkBase {
@@ -55,26 +55,24 @@ abstract class ComposeBenchmarkBase {
 
     @ExperimentalCoroutinesApi
     suspend fun DelayController.measureCompose(block: @Composable () -> Unit) = coroutineScope {
-        var composition: Composition? = null
         val activity = activityRule.activity
         val recomposer = Recomposer(coroutineContext)
+        val emptyView = View(activity)
 
         try {
             benchmarkRule.measureRepeatedSuspendable {
-                composition = activity.setContent(recomposer) {
+                activity.setContent(recomposer) {
                     block()
                 }
 
                 runWithTimingDisabled {
-                    composition?.dispose()
+                    activity.setContentView(emptyView)
                     advanceUntilIdle()
-                    Runtime.getRuntime().let {
-                        it.gc()
-                    }
+                    Runtime.getRuntime().gc()
                 }
             }
         } finally {
-            composition?.dispose()
+            activity.setContentView(emptyView)
             advanceUntilIdle()
             recomposer.shutDown()
         }
@@ -86,8 +84,9 @@ abstract class ComposeBenchmarkBase {
         var activeComposer: Composer<*>? = null
 
         val activity = activityRule.activity
+        val emptyView = View(activity)
 
-        val composition = activity.setContent {
+        activity.setContent {
             activeComposer = currentComposer
             receiver.composeCb()
         }
@@ -115,7 +114,7 @@ abstract class ComposeBenchmarkBase {
             }
         } finally {
             unregisterApplyObserver()
-            composition.dispose()
+            activity.setContentView(emptyView)
         }
     }
 
@@ -127,11 +126,12 @@ abstract class ComposeBenchmarkBase {
         receiver.block()
 
         val activity = activityRule.activity
+        val emptyView = View(activity)
 
         val recomposer = Recomposer(coroutineContext)
         launch { recomposer.runRecomposeAndApplyChanges() }
 
-        val composition = activity.setContent(recomposer) {
+        activity.setContent(recomposer) {
             receiver.composeCb()
         }
 
@@ -143,12 +143,12 @@ abstract class ComposeBenchmarkBase {
             }
             assertTrue(
                 "recomposer does not have invalidations for frame",
-                recomposer.hasInvalidations()
+                recomposer.hasPendingWork
             )
             advanceUntilIdle()
             assertFalse(
                 "recomposer has invalidations for frame",
-                recomposer.hasInvalidations()
+                recomposer.hasPendingWork
             )
             runWithTimingDisabled {
                 receiver.resetCb()
@@ -158,7 +158,7 @@ abstract class ComposeBenchmarkBase {
             iterations++
         }
 
-        composition.dispose()
+        activity.setContentView(emptyView)
         recomposer.shutDown()
     }
 }

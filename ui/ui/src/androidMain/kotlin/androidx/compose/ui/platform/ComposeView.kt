@@ -24,6 +24,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionReference
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.InternalComposeUiApi
+import androidx.compose.ui.node.InternalCoreApi
+import androidx.compose.ui.node.Owner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewTreeLifecycleOwner
 
@@ -110,6 +113,20 @@ abstract class AbstractComposeView @JvmOverloads constructor(
      */
     protected open val shouldCreateCompositionOnAttachedToWindow: Boolean
         get() = true
+
+    /**
+     * Enables the display of visual layout bounds for the Compose UI content of this view.
+     * This is typically managed
+     */
+    @OptIn(InternalCoreApi::class)
+    @InternalComposeUiApi
+    var showLayoutBounds: Boolean = false
+        set(value) {
+            field = value
+            getChildAt(0)?.let {
+                (it as Owner).showLayoutBounds = value
+            }
+        }
 
     /**
      * The Jetpack Compose UI content for this view.

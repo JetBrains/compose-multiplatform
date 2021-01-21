@@ -34,6 +34,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.android.asCoroutineDispatcher
 import kotlinx.coroutines.launch
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.EmptyCoroutineContext
 
 /**
@@ -97,35 +98,58 @@ fun interface WindowRecomposerFactory {
         val LifecycleAware: WindowRecomposerFactory = WindowRecomposerFactory { rootView ->
             rootView.createLifecycleAwareViewTreeRecomposer()
         }
-
-        /**
-         * A [WindowRecomposerFactory] that always returns references to the global,
-         * soon to be deprecated, application main thread-bound [Recomposer.current].
-         * The existence of this API/constant is only temporary while other Compose UI
-         * infrastructure migrates to [LifecycleAware] recomposers.
-         */
-        @Deprecated(
-            "Global Recomposer.current will be removed without replacement; prefer LifecycleScoped"
-        )
-        val Global: WindowRecomposerFactory = WindowRecomposerFactory {
-            Recomposer.current()
-        }
     }
 }
 
 @InternalComposeUiApi
 object WindowRecomposerPolicy {
-    // TODO: Change default to LifecycleScoped when code expecting Recomposer.current() migrates
-    @Suppress("DEPRECATION")
-    @Volatile
-    private var factory: WindowRecomposerFactory = WindowRecomposerFactory.Global
 
-    fun setWindowRecomposerFactory(factory: WindowRecomposerFactory) {
-        this.factory = factory
+    private val factory = AtomicReference<WindowRecomposerFactory>(
+        WindowRecomposerFactory.LifecycleAware
+    )
+
+    // Don't expose the actual AtomicReference as @PublishedApi; we might convert to atomicfu later
+    @PublishedApi
+    internal fun getAndSetFactory(
+        factory: WindowRecomposerFactory
+    ): WindowRecomposerFactory = this.factory.getAndSet(factory)
+
+    @PublishedApi
+    internal fun compareAndSetFactory(
+        expected: WindowRecomposerFactory,
+        factory: WindowRecomposerFactory
+    ): Boolean = this.factory.compareAndSet(expected, factory)
+
+    fun setFactory(factory: WindowRecomposerFactory) {
+        this.factory.set(factory)
+    }
+
+    inline fun <R> withFactory(
+        factory: WindowRecomposerFactory,
+        block: () -> R
+    ): R {
+        var cause: Throwable? = null
+        val oldFactory = getAndSetFactory(factory)
+        return try {
+            block()
+        } catch (t: Throwable) {
+            cause = t
+            throw t
+        } finally {
+            if (!compareAndSetFactory(factory, oldFactory)) {
+                val err = IllegalStateException(
+                    "WindowRecomposerFactory was set to unexpected value; cannot safely restore " +
+                        "old state"
+                )
+                if (cause == null) throw err
+                cause.addSuppressed(err)
+                throw cause
+            }
+        }
     }
 
     internal fun createAndInstallWindowRecomposer(rootView: View): Recomposer {
-        val newRecomposer = factory.createRecomposer(rootView)
+        val newRecomposer = factory.get().createRecomposer(rootView)
         rootView.setTag(R.id.androidx_compose_ui_view_composition_reference, newRecomposer)
 
         // If the Recomposer shuts down, unregister it so that a future request for a window

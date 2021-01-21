@@ -27,14 +27,14 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.layout.AlignmentLine
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.node.Ref
+import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.platform.setContent
@@ -50,6 +50,8 @@ import androidx.compose.ui.unit.hasFixedHeight
 import androidx.compose.ui.unit.hasFixedWidth
 import androidx.compose.ui.unit.isFinite
 import androidx.compose.ui.unit.offset
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
@@ -89,10 +91,16 @@ open class LayoutTest {
     internal fun show(composable: @Composable () -> Unit) {
         val runnable: Runnable = object : Runnable {
             override fun run() {
-                activity.setContent(Recomposer.current(), composable)
+                activity.setContent(content = composable)
             }
         }
         activityTestRule.runOnUiThread(runnable)
+        // Wait for the frame to complete before continuing
+        runBlocking {
+            Recomposer.runningRecomposers.value.forEach { recomposer ->
+                recomposer.state.first { it <= Recomposer.State.Idle }
+            }
+        }
     }
 
     internal fun findComposeView(): View {

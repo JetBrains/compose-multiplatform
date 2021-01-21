@@ -117,7 +117,7 @@ internal class ComposeIdlingResource(
         @OptIn(ExperimentalComposeApi::class)
         get() {
             hadNoSnapshotChanges = !Snapshot.current.hasPendingChanges()
-            hadNoRecomposerChanges = !Recomposer.current().hasInvalidations()
+            hadNoRecomposerChanges = Recomposer.runningRecomposers.value.none { it.hasPendingWork }
             hadAnimationClocksIdle = areAllClocksIdle()
             val composeRoots = composeRootRegistry.getUnfilteredComposeRoots()
             hadNoPendingMeasureLayout = !composeRoots.any { it.hasPendingMeasureOrLayout }

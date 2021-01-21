@@ -17,6 +17,7 @@
 package androidx.compose.ui
 
 import android.util.Log
+import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -97,8 +98,9 @@ class MemoryLeakTest {
     fun disposeContent_assertNoLeak() = runBlocking(AndroidUiDispatcher.Main) {
         // We have to ignore the first run because `dispose` leaves the OwnerView in the
         // View hierarchy to reuse it next time. That is probably not the final desired behavior
-        loopAndVerifyMemory(iterations = 400, gcFrequency = 40, ignoreFirstRun = true) {
-            val composition = activityTestRule.activity.setContent {
+        val emptyView = View(activityTestRule.activity)
+        loopAndVerifyMemory(iterations = 400, gcFrequency = 40) {
+            activityTestRule.activity.setContent {
                 Column {
                     repeat(3) {
                         Box {
@@ -108,8 +110,8 @@ class MemoryLeakTest {
                 }
             }
 
-            // This typically recycles the old view
-            composition.dispose()
+            // This replaces the Compose view, disposing its composition.
+            activityTestRule.activity.setContentView(emptyView)
         }
     }
 

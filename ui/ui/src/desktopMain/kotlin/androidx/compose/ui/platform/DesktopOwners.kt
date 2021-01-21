@@ -101,7 +101,7 @@ class DesktopOwners(
         yield()
 
         // we can't stuck in infinite loop (because of double dispatching in FrameManager.schedule)
-        while (Recomposer.current().hasInvalidations()) {
+        while (Recomposer.runningRecomposers.value.any { it.hasPendingWork }) {
             yield()
         }
     }
