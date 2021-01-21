@@ -21,6 +21,7 @@ package androidx.compose.runtime
  * A CommitScope represents an object that executes some code and has a cleanup in the context of the Composition lifecycle.
  * It has an "onDispose" operation to cleanup anything that it created whenever it leaves the composition.
  */
+@Deprecated("Use DisposableEffect")
 interface CommitScope {
     /**
      * Provide a lambda which will be executed as this CommitScope leaves the composition. It will be executed only once. Use this to
@@ -36,8 +37,10 @@ interface CommitScope {
  * onDispose. Saving this into a constant saves us an allocation on every initialization
  */
 private val emptyDispose: () -> Unit = {}
+@Suppress("DEPRECATION")
 private val emptyCommit: CommitScope.() -> Unit = {}
 
+@Suppress("DEPRECATION")
 @PublishedApi
 internal class PreCommitScopeImpl(
     internal val onCommit: CommitScope.() -> Unit
@@ -77,7 +80,12 @@ internal class PreCommitScopeImpl(
  * @see [onCommit]
  * @see [onDispose]
  */
-@Suppress("ComposableNaming")
+@Suppress("ComposableNaming", "DEPRECATION")
+@Deprecated(
+    "DisposableEffect should be used instead. Calls to onActive without key parameters are" +
+        "usually incorrect, so consider adding key parameter(s) as well.",
+    replaceWith = ReplaceWith("DisposableEffect(Unit, callback)")
+)
 @Composable
 fun onActive(callback: CommitScope.() -> Unit) {
     remember { PreCommitScopeImpl(callback) }
@@ -94,6 +102,11 @@ fun onActive(callback: CommitScope.() -> Unit) {
  * @see [onActive]
  */
 @Suppress("ComposableNaming")
+@Deprecated(
+    "DisposableEffect should be used instead. Calls to onDispose without key parameters are" +
+        "usually incorrect, so consider adding key parameter(s) as well.",
+    replaceWith = ReplaceWith("DisposableEffect(Unit) { onDispose(callback) }")
+)
 @Composable
 fun onDispose(callback: () -> Unit) {
     remember { PreCommitScopeImpl(emptyCommit).also { it.disposeCallback = callback } }
@@ -110,8 +123,14 @@ fun onDispose(callback: () -> Unit) {
  * @see [onDispose]
  * @see [onActive]
  */
-@Suppress("NOTHING_TO_INLINE", "ComposableNaming")
+@Suppress("NOTHING_TO_INLINE", "ComposableNaming", "DEPRECATION")
 @OptIn(ComposeCompilerApi::class)
+@Deprecated(
+    "SideEffect should be used for any effects that don't have set up / tear down. " +
+        "If onDispose is needed, you can use DisposableEffect instead, but a key parameter is " +
+        "required since not having one is usually a bug.",
+    replaceWith = ReplaceWith("SideEffect(callback)")
+)
 @Composable
 inline fun onCommit(noinline callback: CommitScope.() -> Unit) {
     currentComposer.changed(PreCommitScopeImpl(callback))
@@ -129,11 +148,14 @@ inline fun onCommit(noinline callback: CommitScope.() -> Unit) {
  * @see [onDispose]
  * @see [onActive]
  */
-@Suppress("ComposableNaming")
+@Suppress("ComposableNaming", "DEPRECATION")
+@Deprecated(
+    "DisposableEffect should be used instead.",
+    replaceWith = ReplaceWith("DisposableEffect(v1, callback)")
+)
 @Composable
-/*inline*/ fun </*reified*/ V1> onCommit(
+fun <V1> onCommit(
     v1: V1,
-    /*noinline*/
     callback: CommitScope.() -> Unit
 ) {
     remember(v1) { PreCommitScopeImpl(callback) }
@@ -152,12 +174,15 @@ inline fun onCommit(noinline callback: CommitScope.() -> Unit) {
  * @see [onDispose]
  * @see [onActive]
  */
-@Suppress("ComposableNaming")
+@Suppress("ComposableNaming", "DEPRECATION")
+@Deprecated(
+    "DisposableEffect should be used instead.",
+    replaceWith = ReplaceWith("DisposableEffect(v1, v2, callback)")
+)
 @Composable
-/*inline*/ fun </*reified*/ V1, /*reified*/ V2> onCommit(
+fun <V1, V2> onCommit(
     v1: V1,
     v2: V2,
-    /*noinline*/
     callback: CommitScope.() -> Unit
 ) {
     remember(v1, v2) { PreCommitScopeImpl(callback) }
@@ -175,7 +200,11 @@ inline fun onCommit(noinline callback: CommitScope.() -> Unit) {
  * @see [onDispose]
  * @see [onActive]
  */
-@Suppress("ComposableNaming")
+@Suppress("ComposableNaming", "DEPRECATION")
+@Deprecated(
+    "DisposableEffect should be used instead.",
+    replaceWith = ReplaceWith("DisposableEffect(*inputs, callback)")
+)
 @Composable
 fun onCommit(vararg inputs: Any?, callback: CommitScope.() -> Unit) {
     remember(*inputs) { PreCommitScopeImpl(callback) }

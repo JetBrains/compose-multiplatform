@@ -17,7 +17,7 @@
 package androidx.compose.foundation
 
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.runtime.onCommit
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
@@ -152,7 +152,7 @@ fun Modifier.clickable(
             } else {
                 Modifier
             }
-        onCommit(interactionState) {
+        DisposableEffect(interactionState) {
             onDispose {
                 interactionState.removeInteraction(Interaction.Pressed)
             }

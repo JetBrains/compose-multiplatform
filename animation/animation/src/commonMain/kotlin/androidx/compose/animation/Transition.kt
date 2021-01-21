@@ -38,11 +38,11 @@ import androidx.compose.animation.core.repeatable
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
@@ -105,8 +105,9 @@ fun <T> transition(
         // TODO(b/150674848): Should be onCommit, but that posts to the Choreographer. Until that
         //  callback is executed, nothing is aware that the animation is kicked off, so if
         //  Espresso checks for idleness between now and then, it will think all is idle.
-        onCommit(model, toState) {
+        DisposableEffect(model, toState) {
             model.anim.toState(toState)
+            onDispose { }
         }
         return model
     } else {

@@ -83,10 +83,11 @@ class SuspendingEffectsTests : BaseComposeTest() {
                     awaitFrameTime = it
                 }
             }
-            onCommit(true) {
+            DisposableEffect(true) {
                 Choreographer.getInstance().postFrameCallback { frameTimeNanos ->
                     choreographerTime = frameTimeNanos
                 }
+                onDispose { }
             }
         }.then {
             assertNotEquals(choreographerTime, Long.MIN_VALUE, "Choreographer callback never ran")
@@ -104,7 +105,7 @@ class SuspendingEffectsTests : BaseComposeTest() {
         var awaitFrameTime by mutableStateOf(Long.MAX_VALUE)
         compose {
             val scope = rememberCoroutineScope()
-            onCommit(true) {
+            DisposableEffect(true) {
                 scope.launch {
                     withFrameNanos {
                         awaitFrameTime = it
@@ -113,6 +114,7 @@ class SuspendingEffectsTests : BaseComposeTest() {
                 Choreographer.getInstance().postFrameCallback { frameTimeNanos ->
                     choreographerTime = frameTimeNanos
                 }
+                onDispose { }
             }
         }.then {
             assertNotEquals(choreographerTime, Long.MIN_VALUE, "Choreographer callback never ran")
@@ -175,7 +177,7 @@ class SuspendingEffectsTests : BaseComposeTest() {
                 launchedTaskClock = coroutineContext[MonotonicFrameClock]
             }
             val rememberedScope = rememberCoroutineScope()
-            onCommit {
+            SideEffect {
                 rememberCoroutineScopeFrameClock =
                     rememberedScope.coroutineContext[MonotonicFrameClock]
             }
@@ -199,7 +201,7 @@ class SuspendingEffectsTests : BaseComposeTest() {
             LaunchedEffect(Unit) {
                 launchRanAfter = onCommitRan
             }
-            onCommit {
+            SideEffect {
                 onCommitRan = true
             }
         }.then {

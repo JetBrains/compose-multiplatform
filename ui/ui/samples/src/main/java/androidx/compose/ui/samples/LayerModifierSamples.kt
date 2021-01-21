@@ -20,7 +20,7 @@ import androidx.annotation.Sampled
 import androidx.compose.animation.animatedFloat
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.onCommit
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 
@@ -41,7 +41,7 @@ fun AnimateFadeIn() {
             clip = true
         }
     )
-    onCommit {
+    SideEffect {
         animatedAlpha.animateTo(1f)
     }
 }

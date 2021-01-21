@@ -51,8 +51,8 @@ package androidx.compose.runtime {
   public final class BitwiseOperatorsKt {
   }
 
-  public interface CommitScope {
-    method public void onDispose(kotlin.jvm.functions.Function0<kotlin.Unit> callback);
+  @Deprecated public interface CommitScope {
+    method @Deprecated public void onDispose(kotlin.jvm.functions.Function0<kotlin.Unit> callback);
   }
 
   @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface Composable {
@@ -190,12 +190,12 @@ package androidx.compose.runtime {
   public final class EffectsKt {
     method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.runtime.CompositionReference compositionReference();
     method @Deprecated @androidx.compose.runtime.Composable public static kotlin.jvm.functions.Function0<kotlin.Unit> getInvalidate();
-    method @androidx.compose.runtime.Composable public static void onActive(kotlin.jvm.functions.Function1<? super androidx.compose.runtime.CommitScope,kotlin.Unit> callback);
-    method @androidx.compose.runtime.Composable public static inline void onCommit(kotlin.jvm.functions.Function1<? super androidx.compose.runtime.CommitScope,kotlin.Unit> callback);
-    method @androidx.compose.runtime.Composable public static <V1> void onCommit(V1? v1, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.CommitScope,kotlin.Unit> callback);
-    method @androidx.compose.runtime.Composable public static <V1, V2> void onCommit(V1? v1, V2? v2, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.CommitScope,kotlin.Unit> callback);
-    method @androidx.compose.runtime.Composable public static void onCommit(Object![]? inputs, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.CommitScope,kotlin.Unit> callback);
-    method @androidx.compose.runtime.Composable public static void onDispose(kotlin.jvm.functions.Function0<kotlin.Unit> callback);
+    method @Deprecated @androidx.compose.runtime.Composable public static void onActive(kotlin.jvm.functions.Function1<? super androidx.compose.runtime.CommitScope,kotlin.Unit> callback);
+    method @Deprecated @androidx.compose.runtime.Composable public static inline void onCommit(kotlin.jvm.functions.Function1<? super androidx.compose.runtime.CommitScope,kotlin.Unit> callback);
+    method @Deprecated @androidx.compose.runtime.Composable public static <V1> void onCommit(V1? v1, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.CommitScope,kotlin.Unit> callback);
+    method @Deprecated @androidx.compose.runtime.Composable public static <V1, V2> void onCommit(V1? v1, V2? v2, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.CommitScope,kotlin.Unit> callback);
+    method @Deprecated @androidx.compose.runtime.Composable public static void onCommit(Object![]? inputs, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.CommitScope,kotlin.Unit> callback);
+    method @Deprecated @androidx.compose.runtime.Composable public static void onDispose(kotlin.jvm.functions.Function0<kotlin.Unit> callback);
   }
 
   public interface EmbeddingContext {

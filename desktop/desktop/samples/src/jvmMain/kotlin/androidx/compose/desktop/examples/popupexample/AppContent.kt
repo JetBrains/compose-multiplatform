@@ -43,8 +43,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onActive
-import androidx.compose.runtime.onDispose
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,7 +61,7 @@ import java.awt.Toolkit
 
 @Composable
 fun content() {
-    onActive {
+    DisposableEffect(Unit) {
         val tray = Tray().apply {
             icon(AppState.image())
             menu(
@@ -150,8 +149,10 @@ fun content() {
                                         AppManager.focusedWindow?.close()
                                     }
                                 )
-                                onDispose {
-                                    println("Dispose composition")
+                                DisposableEffect(Unit) {
+                                    onDispose {
+                                        println("Dispose composition")
+                                    }
                                 }
                             }
                         },
@@ -272,8 +273,10 @@ fun content() {
             text = {
                 println("Ambient value is ${AmbientTest.current}.")
                 TextBox(text = "Increment amount?")
-                onDispose {
-                    println("onDispose inside AlertDialog is called.")
+                DisposableEffect(Unit) {
+                    onDispose {
+                        println("onDispose inside AlertDialog is called.")
+                    }
                 }
             },
             shape = RoundedCornerShape(0.dp),
@@ -297,8 +300,10 @@ fun PopupSample(displayed: Boolean, onDismiss: () -> Unit) {
             ) {
                 println("Ambient value is ${AmbientTest.current}.")
                 PopupContent(onDismiss)
-                onDispose {
-                    println("onDispose inside Popup is called.")
+                DisposableEffect(Unit) {
+                    onDispose {
+                        println("onDispose inside Popup is called.")
+                    }
                 }
             }
         }

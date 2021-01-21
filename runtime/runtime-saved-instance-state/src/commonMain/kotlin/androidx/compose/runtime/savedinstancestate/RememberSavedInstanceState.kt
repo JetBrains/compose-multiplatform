@@ -17,11 +17,11 @@
 package androidx.compose.runtime.savedinstancestate
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 
 /**
@@ -85,8 +85,8 @@ fun <T : Any> rememberSavedInstanceState(
     saverHolder.value = saver
 
     // re-register if the registry or key has been changed
-    onCommit(registry, finalKey) {
-        if (registry != null) {
+    if (registry != null) {
+        DisposableEffect(registry, finalKey) {
             val valueProvider = {
                 with(saverHolder.value) { SaverScopeImpl(registry::canBeSaved).save(value) }
             }

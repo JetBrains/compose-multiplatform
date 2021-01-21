@@ -33,10 +33,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onCommit
-import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -83,6 +82,12 @@ import java.util.concurrent.CountDownLatch
 @RunWith(AndroidJUnit4::class)
 class LazyColumnTest {
     private val LazyListTag = "LazyListTag"
+
+    private val NeverEqualObject = object {
+        override fun equals(other: Any?): Boolean {
+            return false
+        }
+    }
 
     @get:Rule
     val rule = createComposeRule()
@@ -190,7 +195,7 @@ class LazyColumnTest {
             Box(Modifier.testTag(LazyListTag).preferredHeight(300.dp)) {
                 LazyColumn(Modifier.fillMaxSize()) {
                     items(50) {
-                        onCommit {
+                        DisposableEffect(NeverEqualObject) {
                             composed = true
                             // Signal when everything is done composing
                             latch.countDown()
@@ -242,7 +247,7 @@ class LazyColumnTest {
         rule.setContent {
             LazyColumn(Modifier.testTag(LazyListTag).fillMaxSize()) {
                 items(if (!part2) data1 else data2) {
-                    onCommit {
+                    DisposableEffect(NeverEqualObject) {
                         composed++
                         onDispose {
                             disposals++
@@ -285,11 +290,13 @@ class LazyColumnTest {
                 LazyColumn(Modifier.fillMaxSize()) {
                     items(2) {
                         Box(Modifier.size(100.dp))
-                        onDispose {
-                            if (it == 1) {
-                                disposeCalledOnFirstItem = true
-                            } else {
-                                disposeCalledOnSecondItem = true
+                        DisposableEffect(Unit) {
+                            onDispose {
+                                if (it == 1) {
+                                    disposeCalledOnFirstItem = true
+                                } else {
+                                    disposeCalledOnSecondItem = true
+                                }
                             }
                         }
                     }
