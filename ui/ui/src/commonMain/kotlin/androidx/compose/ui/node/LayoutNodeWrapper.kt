@@ -37,7 +37,7 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.findRoot
-import androidx.compose.ui.layout.positionInWindow
+import androidx.compose.ui.layout.globalPosition
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -596,8 +596,10 @@ internal abstract class LayoutNodeWrapper(
 
     protected fun withinLayerBounds(pointerPositionRelativeToScreen: Offset): Boolean {
         if (layer != null && isClipping) {
-            val l = positionInWindow().x
-            val t = positionInWindow().y
+            @Suppress("DEPRECATION")
+            val l = globalPosition.x
+            @Suppress("DEPRECATION")
+            val t = globalPosition.y
             val r = l + width
             val b = t + height
 
