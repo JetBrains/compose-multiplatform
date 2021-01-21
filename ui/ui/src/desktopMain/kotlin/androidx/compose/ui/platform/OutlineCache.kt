@@ -19,6 +19,7 @@ package androidx.compose.ui.platform
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.toSize
 
@@ -30,7 +31,8 @@ import androidx.compose.ui.unit.toSize
 internal class OutlineCache(
     density: Density,
     size: IntSize,
-    shape: Shape
+    shape: Shape,
+    layoutDirection: LayoutDirection
 ) {
     var density = density
         set(value) {
@@ -56,13 +58,21 @@ internal class OutlineCache(
             }
         }
 
+    var layoutDirection = layoutDirection
+        set(value) {
+            if (value != field) {
+                field = value
+                update()
+            }
+        }
+
     var outline: Outline? = null
         private set
 
     private fun update() {
         outline = if (size != IntSize.Zero) {
             val floatSize = size.toSize()
-            shape.createOutline(floatSize, density)
+            shape.createOutline(floatSize, layoutDirection, density)
         } else {
             null
         }

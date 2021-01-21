@@ -19,6 +19,7 @@ package androidx.compose.ui.graphics
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.test.filters.SmallTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -40,5 +41,5 @@ class RectangleShapeTest {
         assertEquals(outline.rect, size.toRect())
     }
 
-    private fun Shape.toOutline() = createOutline(size, density)
+    private fun Shape.toOutline() = createOutline(size, LayoutDirection.Ltr, density)
 }

@@ -20,6 +20,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
@@ -56,7 +57,7 @@ class CornerBasedShapeTest {
             onOutlineRequested = assertSizes
         )
 
-        assertThat(impl.createOutline(passedSize, density))
+        assertThat(impl.createOutline(passedSize, LayoutDirection.Ltr, density))
             .isEqualTo(Outline.Rectangle(passedSize.toRect()))
 
         assertThat(assertionExecuted).isTrue()
@@ -89,8 +90,8 @@ class CornerBasedShapeTest {
             onOutlineRequested = assertSizes
         )
 
-        impl.createOutline(sizeWithLargerWidth, density)
-        impl.createOutline(sizeWithLargerHeight, density)
+        impl.createOutline(sizeWithLargerWidth, LayoutDirection.Ltr, density)
+        impl.createOutline(sizeWithLargerHeight, LayoutDirection.Ltr, density)
 
         assertThat(sizesList).isEqualTo(mutableListOf(sizeWithLargerWidth, sizeWithLargerHeight))
     }
@@ -122,8 +123,8 @@ class CornerBasedShapeTest {
             onOutlineRequested = assertSizes
         )
 
-        impl.createOutline(sizeWithLargerWidth, density)
-        impl.createOutline(sizeWithLargerHeight, density)
+        impl.createOutline(sizeWithLargerWidth, LayoutDirection.Ltr, density)
+        impl.createOutline(sizeWithLargerHeight, LayoutDirection.Ltr, density)
 
         assertThat(sizesList).isEqualTo(mutableListOf(sizeWithLargerWidth, sizeWithLargerHeight))
     }
@@ -155,8 +156,8 @@ class CornerBasedShapeTest {
             onOutlineRequested = assertSizes
         )
 
-        impl.createOutline(sizeWithLargerWidth, density)
-        impl.createOutline(sizeWithLargerHeight, density)
+        impl.createOutline(sizeWithLargerWidth, LayoutDirection.Ltr, density)
+        impl.createOutline(sizeWithLargerHeight, LayoutDirection.Ltr, density)
 
         assertThat(sizesList).isEqualTo(mutableListOf(sizeWithLargerWidth, sizeWithLargerHeight))
     }

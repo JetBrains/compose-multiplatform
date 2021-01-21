@@ -698,7 +698,7 @@ package androidx.compose.ui.graphics {
   }
 
   @androidx.compose.runtime.Immutable public interface Shape {
-    method public androidx.compose.ui.graphics.Outline createOutline-lwCvPpU(long size, androidx.compose.ui.unit.Density density);
+    method public androidx.compose.ui.graphics.Outline createOutline-9w1PWio(long size, androidx.compose.ui.unit.LayoutDirection layoutDirection, androidx.compose.ui.unit.Density density);
   }
 
   @androidx.compose.runtime.Immutable public final class SolidColor extends androidx.compose.ui.graphics.Brush {

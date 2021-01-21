@@ -40,6 +40,7 @@ import androidx.compose.ui.runOnUiThreadIR
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.waitAndScreenShot
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -69,8 +70,11 @@ class ShadowTest {
     private lateinit var drawLatch: CountDownLatch
 
     private val rectShape = object : Shape {
-        override fun createOutline(size: Size, density: Density): Outline =
-            Outline.Rectangle(size.toRect())
+        override fun createOutline(
+            size: Size,
+            layoutDirection: LayoutDirection,
+            density: Density
+        ) = Outline.Rectangle(size.toRect())
     }
 
     @Before
