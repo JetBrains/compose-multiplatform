@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-@file:Suppress("DEPRECATION")
-
 package androidx.compose.ui.test.junit4
 
 import android.os.Looper
 import androidx.activity.ComponentActivity
-import androidx.compose.animation.core.FloatPropKey
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.snap
-import androidx.compose.animation.core.transitionDefinition
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.transition
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -34,6 +31,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.State
 import androidx.compose.runtime.dispatch.withFrameNanos
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.Snapshot
@@ -188,40 +186,35 @@ class ComposeIdlingResourceTest {
     @Composable
     private fun Ui(animationState: State<AnimationStates>) {
         Box(modifier = Modifier.background(color = Color.Yellow).fillMaxSize()) {
-            val state = transition(
-                definition = animationDefinition,
-                toState = animationState.value,
-                onStateChangeFinished = { animationRunning = false }
-            )
+            val transition = updateTransition(animationState.value)
+            animationRunning = transition.currentState != transition.targetState
+            val x by transition.animateFloat(
+                transitionSpec = {
+                    if (AnimationStates.From isTransitioningTo AnimationStates.To) {
+                        tween(
+                            easing = LinearEasing,
+                            durationMillis = nonIdleDuration.toInt()
+                        )
+                    } else {
+                        snap()
+                    }
+                }
+            ) {
+                if (it == AnimationStates.From) {
+                    animateFromX
+                } else {
+                    animateToX
+                }
+            }
             Canvas(modifier = Modifier.fillMaxSize()) {
-                recordedAnimatedValues.add(state[x])
-                drawRect(Color.Cyan, Offset(state[x], 0f), rectSize)
+                recordedAnimatedValues.add(x)
+                drawRect(Color.Cyan, Offset(x, 0f), rectSize)
             }
         }
     }
+}
 
-    private val x = FloatPropKey()
-
-    private enum class AnimationStates {
-        From,
-        To
-    }
-
-    private val animationDefinition = transitionDefinition<AnimationStates> {
-        state(AnimationStates.From) {
-            this[x] = animateFromX
-        }
-        state(AnimationStates.To) {
-            this[x] = animateToX
-        }
-        transition(AnimationStates.From to AnimationStates.To) {
-            x using tween(
-                easing = LinearEasing,
-                durationMillis = nonIdleDuration.toInt()
-            )
-        }
-        transition(AnimationStates.To to AnimationStates.From) {
-            x using snap()
-        }
-    }
+private enum class AnimationStates {
+    From,
+    To
 }
