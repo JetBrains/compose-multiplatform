@@ -56,7 +56,10 @@ import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -573,7 +576,7 @@ class ImageTest {
     }
 
     @Test
-    fun testImageContentDescription() {
+    fun defaultSemanticsWhenContentDescriptionProvided() {
         val testTag = "TestTag"
         rule.setContent {
             Image(
@@ -582,9 +585,8 @@ class ImageTest {
                 contentDescription = "asdf"
             )
         }
-        rule.onNodeWithTag(testTag).fetchSemanticsNode().let {
-            Assert.assertTrue(it.config.contains(SemanticsProperties.ContentDescription))
-            Assert.assertEquals(it.config[SemanticsProperties.ContentDescription], "asdf")
-        }
+        rule.onNodeWithTag(testTag)
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Image))
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.ContentDescription, "asdf"))
     }
 }

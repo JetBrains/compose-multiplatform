@@ -405,7 +405,12 @@ enum class Role {
      * for accessibility: [SemanticsProperties.Disabled], [SemanticsProperties.StateDescription],
      * [SemanticsActions.OnClick]
      */
-    Tab
+    Tab,
+    /**
+     * This element is an image. Associated semantics properties for accessibility:
+     * [SemanticsProperties.ContentDescription]
+     */
+    Image
 }
 
 /**
