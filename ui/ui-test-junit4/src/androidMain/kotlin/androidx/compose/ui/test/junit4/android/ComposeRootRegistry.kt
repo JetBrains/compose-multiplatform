@@ -21,7 +21,6 @@ import android.os.Looper
 import android.view.View
 import androidx.annotation.VisibleForTesting
 import androidx.compose.ui.platform.ViewRootForTest
-import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
@@ -283,7 +282,6 @@ internal fun ComposeRootRegistry.waitForComposeRoots() {
     }
 }
 
-@ExperimentalTestApi
 @OptIn(ExperimentalTime::class)
 internal suspend fun ComposeRootRegistry.awaitComposeRoots() {
     ensureComposeRootRegistryIsSetUp()

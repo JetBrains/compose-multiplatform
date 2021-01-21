@@ -20,7 +20,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
@@ -130,7 +129,6 @@ class WaitingForOnCommitCallbackTest {
     fun cascadingOnCommits_suspendedWait_mainDispatcher() =
         cascadingOnCommits_suspendedWait(Dispatchers.Main)
 
-    @OptIn(ExperimentalTestApi::class)
     fun cascadingOnCommits_suspendedWait(context: CoroutineContext) = runBlocking(context) {
         // Collect unique values (markers) at each step during the process and
         // at the end verify that they were collected in the right order

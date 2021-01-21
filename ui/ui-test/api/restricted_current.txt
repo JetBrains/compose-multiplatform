@@ -33,12 +33,9 @@ package androidx.compose.ui.test {
     method public static androidx.compose.ui.test.SemanticsNodeInteraction assertIsDisplayed(androidx.compose.ui.test.SemanticsNodeInteraction);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction assertIsEnabled(androidx.compose.ui.test.SemanticsNodeInteraction);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction assertIsFocused(androidx.compose.ui.test.SemanticsNodeInteraction);
-    method @Deprecated public static androidx.compose.ui.test.SemanticsNodeInteraction assertIsHidden(androidx.compose.ui.test.SemanticsNodeInteraction);
-    method @Deprecated public static androidx.compose.ui.test.SemanticsNodeInteraction assertIsInMutuallyExclusiveGroup(androidx.compose.ui.test.SemanticsNodeInteraction);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction assertIsNotDisplayed(androidx.compose.ui.test.SemanticsNodeInteraction);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction assertIsNotEnabled(androidx.compose.ui.test.SemanticsNodeInteraction);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction assertIsNotFocused(androidx.compose.ui.test.SemanticsNodeInteraction);
-    method @Deprecated public static androidx.compose.ui.test.SemanticsNodeInteraction assertIsNotHidden(androidx.compose.ui.test.SemanticsNodeInteraction);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction assertIsNotSelected(androidx.compose.ui.test.SemanticsNodeInteraction);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction assertIsOff(androidx.compose.ui.test.SemanticsNodeInteraction);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction assertIsOn(androidx.compose.ui.test.SemanticsNodeInteraction);
@@ -79,9 +76,6 @@ package androidx.compose.ui.test {
   @kotlin.RequiresOptIn(message="This testing API is experimental and is likely to be changed or removed entirely") public @interface ExperimentalTestApi {
   }
 
-  @Deprecated @kotlin.RequiresOptIn(message="This testing API is experimental and is likely to be changed or removed entirely") public @interface ExperimentalTesting {
-  }
-
   public final class FiltersKt {
     method public static androidx.compose.ui.test.SemanticsMatcher hasAnyAncestor(androidx.compose.ui.test.SemanticsMatcher matcher);
     method public static androidx.compose.ui.test.SemanticsMatcher hasAnyChild(androidx.compose.ui.test.SemanticsMatcher matcher);
@@ -90,7 +84,6 @@ package androidx.compose.ui.test {
     method public static androidx.compose.ui.test.SemanticsMatcher hasClickAction();
     method public static androidx.compose.ui.test.SemanticsMatcher hasContentDescription(String label, optional boolean ignoreCase);
     method public static androidx.compose.ui.test.SemanticsMatcher hasImeAction(androidx.compose.ui.text.input.ImeAction actionType);
-    method @Deprecated public static androidx.compose.ui.test.SemanticsMatcher hasInputMethodsSupport();
     method public static androidx.compose.ui.test.SemanticsMatcher hasNoClickAction();
     method public static androidx.compose.ui.test.SemanticsMatcher hasNoScrollAction();
     method public static androidx.compose.ui.test.SemanticsMatcher hasParent(androidx.compose.ui.test.SemanticsMatcher matcher);
@@ -106,12 +99,9 @@ package androidx.compose.ui.test {
     method public static androidx.compose.ui.test.SemanticsMatcher isFocusable();
     method public static androidx.compose.ui.test.SemanticsMatcher isFocused();
     method public static androidx.compose.ui.test.SemanticsMatcher isHeading();
-    method @Deprecated public static androidx.compose.ui.test.SemanticsMatcher isHidden();
-    method @Deprecated public static androidx.compose.ui.test.SemanticsMatcher isInMutuallyExclusiveGroup();
     method public static androidx.compose.ui.test.SemanticsMatcher isNotEnabled();
     method public static androidx.compose.ui.test.SemanticsMatcher isNotFocusable();
     method public static androidx.compose.ui.test.SemanticsMatcher isNotFocused();
-    method @Deprecated public static androidx.compose.ui.test.SemanticsMatcher isNotHidden();
     method public static androidx.compose.ui.test.SemanticsMatcher isNotSelected();
     method public static androidx.compose.ui.test.SemanticsMatcher isOff();
     method public static androidx.compose.ui.test.SemanticsMatcher isOn();
@@ -189,9 +179,6 @@ package androidx.compose.ui.test {
   }
 
   @kotlin.RequiresOptIn(message="This is internal API for Compose modules that may change frequently and without warning.") public @interface InternalTestApi {
-  }
-
-  @Deprecated @kotlin.RequiresOptIn(message="This is internal API for Compose modules that may change frequently and without warning.") public @interface InternalTestingApi {
   }
 
   public final class KeyInputHelpersKt {
@@ -289,16 +276,6 @@ package androidx.compose.ui.test {
   public final class SemanticsSelectorKt {
   }
 
-  @androidx.compose.ui.test.ExperimentalTestApi public interface TestAnimationClock extends androidx.compose.animation.core.AnimationClockObservable {
-    method public void advanceClock(long milliseconds);
-    method public boolean isIdle();
-    method public boolean isPaused();
-    method public void pauseClock();
-    method public void resumeClock();
-    property public abstract boolean isIdle;
-    property public abstract boolean isPaused;
-  }
-
   public final class TestContext {
   }
 
@@ -317,21 +294,16 @@ package androidx.compose.ui.test {
   }
 
   @androidx.compose.ui.test.InternalTestApi public interface TestOwner {
-    method public void advanceTimeBy(long millis);
+    method public androidx.compose.ui.test.MainTestClock getMainClock();
     method public java.util.Set<androidx.compose.ui.node.RootForTest> getRoots();
     method public <T> T! runOnUiThread(kotlin.jvm.functions.Function0<? extends T> action);
     method public void sendImeAction(androidx.compose.ui.semantics.SemanticsNode node, androidx.compose.ui.text.input.ImeAction actionSpecified);
     method public void sendTextInputCommand(androidx.compose.ui.semantics.SemanticsNode node, java.util.List<? extends androidx.compose.ui.text.input.EditCommand> command);
+    property public abstract androidx.compose.ui.test.MainTestClock mainClock;
   }
 
   public final class TestOwnerKt {
     method @androidx.compose.ui.test.InternalTestApi public static androidx.compose.ui.test.TestContext createTestContext(androidx.compose.ui.test.TestOwner owner);
-  }
-
-  @androidx.compose.ui.test.ExperimentalTestApi public final class TestUiDispatcher {
-    method @Deprecated public kotlin.coroutines.CoroutineContext getMain();
-    property @Deprecated public final kotlin.coroutines.CoroutineContext Main;
-    field public static final androidx.compose.ui.test.TestUiDispatcher INSTANCE;
   }
 
   public final class TextActionsKt {

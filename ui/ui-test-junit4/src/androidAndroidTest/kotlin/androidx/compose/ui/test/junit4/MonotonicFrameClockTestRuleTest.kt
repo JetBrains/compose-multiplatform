@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.test.junit4
 
+import androidx.activity.ComponentActivity
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.snap
@@ -33,14 +34,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 
 @LargeTest
-@OptIn(ExperimentalTestApi::class)
 class MonotonicFrameClockTestRuleTest {
 
     companion object {
@@ -53,7 +52,7 @@ class MonotonicFrameClockTestRuleTest {
     private var hasRecomposed = false
 
     @get:Rule
-    val rule = createAndroidComposeRule(driveClockByMonotonicFrameClock = true)
+    val rule = createAndroidComposeRule<ComponentActivity>()
 
     /**
      * Tests if advancing the clock manually works when the clock is resumed, and that idleness

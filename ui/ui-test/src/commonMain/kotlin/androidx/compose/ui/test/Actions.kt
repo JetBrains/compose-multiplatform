@@ -181,7 +181,6 @@ fun <T : Function<Boolean>> SemanticsNodeInteraction.performSemanticsAction(
         )
     }
 
-    @Suppress("DEPRECATION")
     @OptIn(InternalTestApi::class)
     testContext.testOwner.runOnUiThread {
         invocation(node.config[key].action)
