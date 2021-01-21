@@ -53,6 +53,11 @@ android {
     sourceSets {
         main.resources.srcDirs += "src/main/proto"
     }
+
+    lintOptions {
+        // Restriction not important for inspectors, which only runs at dev-time
+        disable("SyntheticAccessor")
+    }
 }
 
 tasks.withType(KotlinCompile).configureEach {
