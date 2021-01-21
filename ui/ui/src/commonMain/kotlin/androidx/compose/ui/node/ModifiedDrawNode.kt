@@ -16,11 +16,13 @@
 
 package androidx.compose.ui.node
 
+import androidx.compose.ui.draw.BuildDrawCacheParams
 import androidx.compose.ui.draw.DrawCacheModifier
 import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.toSize
 
 internal class ModifiedDrawNode(
@@ -30,19 +32,24 @@ internal class ModifiedDrawNode(
 
     private var cacheDrawModifier: DrawCacheModifier? = updateCacheDrawModifier()
 
-    // b/173669932 we should not cache this here, however, on subsequent modifier updates
-    // the density provided via layoutNode.density becomes 1
-    private val density = layoutNode.density
+    private val buildCacheParams: BuildDrawCacheParams = object : BuildDrawCacheParams {
+        // b/173669932 we should not cache this here, however, on subsequent modifier updates
+        // the density provided via layoutNode.density becomes 1
+        override val density = layoutNode.density
+
+        override val layoutDirection: LayoutDirection get() = layoutNode.layoutDirection
+
+        override val size: Size get() = measuredSize.toSize()
+    }
 
     // Flag to determine if the cache should be re-built
     private var invalidateCache = true
 
     // Callback used to build the drawing cache
     private val updateCache = {
-        val size: Size = measuredSize.toSize()
         // b/173669932 figure out why layoutNode.mDrawScope density is 1 after observation updates
         // and use that here instead of the cached density we get in the constructor
-        cacheDrawModifier?.onBuildCache(size, density)
+        cacheDrawModifier?.onBuildCache(buildCacheParams)
         invalidateCache = false
     }
 
