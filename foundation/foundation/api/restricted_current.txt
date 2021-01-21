@@ -243,15 +243,6 @@ package androidx.compose.foundation.gestures {
     ctor public GestureCancellationException();
   }
 
-  public final class MultitouchGestureDetectorKt {
-    method public static long calculateCentroid(androidx.compose.ui.input.pointer.PointerEvent, optional boolean useCurrent);
-    method public static float calculateCentroidSize(androidx.compose.ui.input.pointer.PointerEvent, optional boolean useCurrent);
-    method public static long calculatePan(androidx.compose.ui.input.pointer.PointerEvent);
-    method public static float calculateRotation(androidx.compose.ui.input.pointer.PointerEvent);
-    method public static float calculateZoom(androidx.compose.ui.input.pointer.PointerEvent);
-    method public static suspend Object? detectMultitouchGestures(androidx.compose.ui.input.pointer.PointerInputScope, optional boolean panZoomLock, kotlin.jvm.functions.Function4<? super androidx.compose.ui.geometry.Offset,? super androidx.compose.ui.geometry.Offset,? super java.lang.Float,? super java.lang.Float,kotlin.Unit> onGesture, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-  }
-
   public interface PressGestureScope extends androidx.compose.ui.unit.Density {
     method public suspend Object? awaitRelease(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public suspend Object? tryAwaitRelease(kotlin.coroutines.Continuation<? super java.lang.Boolean> p);
@@ -283,6 +274,15 @@ package androidx.compose.foundation.gestures {
     method public static suspend Object? awaitFirstDown(androidx.compose.ui.input.pointer.AwaitPointerEventScope, optional boolean requireUnconsumed, optional kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange> p);
     method public static suspend Object? detectTapGestures(androidx.compose.ui.input.pointer.PointerInputScope, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onDoubleTap, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onLongPress, optional kotlin.jvm.functions.Function3<? super androidx.compose.foundation.gestures.PressGestureScope,? super androidx.compose.ui.geometry.Offset,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> onPress, kotlin.jvm.functions.Function0<kotlin.Unit> onTap, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public static suspend Object? waitForUpOrCancellation(androidx.compose.ui.input.pointer.AwaitPointerEventScope, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange> p);
+  }
+
+  public final class TransformGestureDetectorKt {
+    method public static long calculateCentroid(androidx.compose.ui.input.pointer.PointerEvent, optional boolean useCurrent);
+    method public static float calculateCentroidSize(androidx.compose.ui.input.pointer.PointerEvent, optional boolean useCurrent);
+    method public static long calculatePan(androidx.compose.ui.input.pointer.PointerEvent);
+    method public static float calculateRotation(androidx.compose.ui.input.pointer.PointerEvent);
+    method public static float calculateZoom(androidx.compose.ui.input.pointer.PointerEvent);
+    method public static suspend Object? detectTransformGestures(androidx.compose.ui.input.pointer.PointerInputScope, optional boolean panZoomLock, kotlin.jvm.functions.Function4<? super androidx.compose.ui.geometry.Offset,? super androidx.compose.ui.geometry.Offset,? super java.lang.Float,? super java.lang.Float,kotlin.Unit> onGesture, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
   }
 
   public final class ZoomableController {

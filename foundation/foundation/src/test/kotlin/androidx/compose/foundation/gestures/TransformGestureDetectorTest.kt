@@ -28,7 +28,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
 @RunWith(Parameterized::class)
-class MultitouchGestureDetectorTest(val panZoomLock: Boolean) {
+class TransformGestureDetectorTest(val panZoomLock: Boolean) {
     companion object {
         @JvmStatic
         @Parameterized.Parameters
@@ -44,7 +44,7 @@ class MultitouchGestureDetectorTest(val panZoomLock: Boolean) {
     private var zoomAmount = 1f
 
     private val util = SuspendingGestureTestUtil {
-        detectMultitouchGestures(panZoomLock = panZoomLock) { c, pan, gestureZoom, gestureAngle ->
+        detectTransformGestures(panZoomLock = panZoomLock) { c, pan, gestureZoom, gestureAngle ->
             centroid = c
             if (gestureAngle != 0f) {
                 rotated = true
