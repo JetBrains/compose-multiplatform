@@ -26,16 +26,6 @@ object AnimationConstants {
      * The default duration used in [VectorizedAnimationSpec]s and [AnimationSpec].
      */
     const val DefaultDurationMillis: Int = 300
-
-    /**
-     * Used as a iterations count for [VectorizedRepeatableSpec] to create an infinity repeating
-     * animation.
-     */
-    @Deprecated(
-        "Using Infinite to specify repeatable animation iterations has been " +
-            "deprecated. Please use [InfiniteRepeatableSpec] or [infiniteRepeatable] instead."
-    )
-    const val Infinite: Int = Int.MAX_VALUE
 }
 
 /**

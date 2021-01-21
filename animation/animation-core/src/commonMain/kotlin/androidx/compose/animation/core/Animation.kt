@@ -47,10 +47,6 @@ interface Animation<T, V : AnimationVector> {
      */
     val typeConverter: TwoWayConverter<T, V>
 
-    @Deprecated("Renamed to typeConverter", ReplaceWith("typeConverter"))
-    val converter: TwoWayConverter<T, V>
-        get() = typeConverter
-
     /**
      * This is the value that the [Animation] will reach when it finishes uninterrupted.
      */

@@ -512,17 +512,6 @@ fun animateColorAsState(
 
 private val colorDefaultSpring = spring<Color>()
 
-@Deprecated(
-    "animateAsState has been yet again renamed",
-    ReplaceWith("animateColorAsState(targetValue, animationSpec, finishedListener)")
-)
-@Composable
-fun animateAsState(
-    targetValue: Color,
-    animationSpec: AnimationSpec<Color> = colorDefaultSpring,
-    finishedListener: ((Color) -> Unit)? = null
-): State<Color> = animateColorAsState(targetValue, animationSpec, finishedListener)
-
 /**
  * This [Animatable] function creates a Color value holder that automatically
  * animates its value when the value is changed via [animateTo]. [Animatable] supports value
