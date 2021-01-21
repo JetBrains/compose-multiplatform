@@ -122,6 +122,7 @@ message Parameter {
       DIMENSION_SP = 22;
       DIMENSION_EM = 23;
       LAMBDA = 24;
+      FUNCTION_REFERENCE = 25;
     }
 
     Type type = 1;

@@ -81,6 +81,7 @@ fun ParameterType.convert(): Parameter.Type {
         ParameterType.DimensionSp -> Parameter.Type.DIMENSION_SP
         ParameterType.DimensionEm -> Parameter.Type.DIMENSION_EM
         ParameterType.Lambda -> Parameter.Type.LAMBDA
+        ParameterType.FunctionReference -> Parameter.Type.FUNCTION_REFERENCE
     }
 }
 
