@@ -166,8 +166,10 @@ abstract class AbstractJPackageTask @Inject constructor(
         cliArg("--dest", destinationDir)
         cliArg("--verbose", verbose)
 
-        cliArg("--install-dir", installationPath)
-        cliArg("--license-file", licenseFile)
+        if (targetFormat != TargetFormat.AppImage) {
+            cliArg("--install-dir", installationPath)
+            cliArg("--license-file", licenseFile)
+        }
         cliArg("--icon", iconFile)
 
         cliArg("--name", packageName)
@@ -187,13 +189,15 @@ abstract class AbstractJPackageTask @Inject constructor(
 
         when (currentOS) {
             OS.Linux -> {
-                cliArg("--linux-shortcut", linuxShortcut)
-                cliArg("--linux-package-name", linuxPackageName)
-                cliArg("--linux-app-release", linuxAppRelease)
-                cliArg("--linux-app-category", linuxAppCategory)
-                cliArg("--linux-deb-maintainer", linuxDebMaintainer)
-                cliArg("--linux-menu-group", linuxMenuGroup)
-                cliArg("--linux-rpm-license-type", linuxRpmLicenseType)
+                if (targetFormat != TargetFormat.AppImage) {
+                    cliArg("--linux-shortcut", linuxShortcut)
+                    cliArg("--linux-package-name", linuxPackageName)
+                    cliArg("--linux-app-release", linuxAppRelease)
+                    cliArg("--linux-app-category", linuxAppCategory)
+                    cliArg("--linux-deb-maintainer", linuxDebMaintainer)
+                    cliArg("--linux-menu-group", linuxMenuGroup)
+                    cliArg("--linux-rpm-license-type", linuxRpmLicenseType)
+                }
             }
             OS.MacOS -> {
                 cliArg("--mac-package-identifier", macPackageIdentifier)
@@ -205,12 +209,14 @@ abstract class AbstractJPackageTask @Inject constructor(
             }
             OS.Windows -> {
                 cliArg("--win-console", winConsole)
-                cliArg("--win-dir-chooser", winDirChooser)
-                cliArg("--win-per-user-install", winPerUserInstall)
-                cliArg("--win-shortcut", winShortcut)
-                cliArg("--win-menu", winMenu)
-                cliArg("--win-menu-group", winMenuGroup)
-                cliArg("--win-upgrade-uuid", winUpgradeUuid)
+                if (targetFormat != TargetFormat.AppImage) {
+                    cliArg("--win-dir-chooser", winDirChooser)
+                    cliArg("--win-per-user-install", winPerUserInstall)
+                    cliArg("--win-shortcut", winShortcut)
+                    cliArg("--win-menu", winMenu)
+                    cliArg("--win-menu-group", winMenuGroup)
+                    cliArg("--win-upgrade-uuid", winUpgradeUuid)
+                }
             }
         }
 
