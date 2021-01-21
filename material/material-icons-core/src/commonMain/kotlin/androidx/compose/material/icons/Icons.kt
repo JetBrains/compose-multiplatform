@@ -52,6 +52,11 @@ import androidx.compose.ui.unit.dp
  * and provides layout size matching the icon.
  *
  * @sample androidx.compose.material.icons.samples.DrawIcon
+ *
+ * Note that only the most commonly used icons are provided by default. You can add a dependency on
+ * androidx.compose.material:material-icons-extended to access every icon, but note that due to
+ * the very large size of this dependency you should make sure to use R8 / ProGuard to remove
+ * unused icons from your application.
  */
 object Icons {
     /**
