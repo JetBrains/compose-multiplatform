@@ -28,7 +28,7 @@ import androidx.compose.runtime.dispatch.withFrameMillis
  * Cancels the currently running scroll, if any, and suspends until the cancellation is
  * complete.
  *
- * @param value delta to scroll by
+ * @param value number of pixels to scroll by
  * @param spec [AnimationSpec] to be used for this smooth scrolling
  *
  * @return the amount of scroll consumed
@@ -70,4 +70,25 @@ suspend fun Scrollable.smoothScrollBy(
         } while (!finished)
     }
     return previousValue
+}
+
+/**
+ * Jump instantly by [value] pixels.
+ *
+ * Cancels the currently running scroll, if any, and suspends until the cancellation is
+ * complete.
+ *
+ * @see smoothScrollBy for an animated version
+ *
+ * @param value number of pixels to scroll by
+ * @return the amount of scroll consumed
+ */
+suspend fun Scrollable.scrollBy(
+    value: Float
+): Float {
+    var consumed = 0f
+    scroll {
+        consumed = scrollBy(value)
+    }
+    return consumed
 }

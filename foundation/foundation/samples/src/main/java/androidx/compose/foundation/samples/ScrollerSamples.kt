@@ -17,6 +17,7 @@
 package androidx.compose.foundation.samples
 
 import androidx.annotation.Sampled
+import androidx.compose.foundation.animation.scrollBy
 import androidx.compose.foundation.animation.smoothScrollBy
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -97,10 +98,18 @@ fun ControlledScrollableRowSample() {
         // Controls for scrolling
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Scroll")
-            Button(onClick = { scrollState.scrollTo(scrollState.value - 1000) }) {
+            Button(
+                onClick = {
+                    scope.launch { scrollState.scrollTo(scrollState.value - 1000) }
+                }
+            ) {
                 Text("< -")
             }
-            Button(onClick = { scrollState.scrollBy(10000f) }) {
+            Button(
+                onClick = {
+                    scope.launch { (scrollState as Scrollable).scrollBy(10000f) }
+                }
+            ) {
                 Text("--- >")
             }
         }
