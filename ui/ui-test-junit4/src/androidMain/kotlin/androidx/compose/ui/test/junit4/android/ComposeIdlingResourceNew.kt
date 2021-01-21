@@ -47,7 +47,7 @@ internal class ComposeIdlingResourceNew(
             fun shouldPumpTime(): Boolean {
                 hadAwaitersOnMainClock = clock.hasAwaiters
                 hadSnapshotChanges = Snapshot.current.hasPendingChanges()
-                hadRecomposerChanges = mainRecomposer.hasInvalidations()
+                hadRecomposerChanges = mainRecomposer.hasPendingWork
 
                 val needsRecompose = hadAwaitersOnMainClock || hadSnapshotChanges ||
                     hadRecomposerChanges

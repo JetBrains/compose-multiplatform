@@ -57,28 +57,26 @@ class WindowRecomposerTest {
         }
         lateinit var weakActivityRef: WeakReference<Activity>
         try {
-            ActivityScenario.launch(ComponentActivity::class.java).use { scenario ->
-                scenario.onActivity { activity ->
-                    weakActivityRef = WeakReference(activity)
-                    WindowRecomposerPolicy.setWindowRecomposerFactory { localRecomposer }
-                    activity.setContentView(
-                        ComposeView(activity).apply {
-                            setContent {
-                                Box(Modifier.background(Color.Blue).fillMaxSize())
+            WindowRecomposerPolicy.withFactory({ localRecomposer }) {
+                ActivityScenario.launch(ComponentActivity::class.java).use { scenario ->
+                    scenario.onActivity { activity ->
+                        weakActivityRef = WeakReference(activity)
+                        activity.setContentView(
+                            ComposeView(activity).apply {
+                                setContent {
+                                    Box(Modifier.background(Color.Blue).fillMaxSize())
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
+                    assertNotNull(weakActivityRef.get())
                 }
-                assertNotNull(weakActivityRef.get())
+                repeat(10) {
+                    Runtime.getRuntime().gc()
+                }
+                assertNull("expected Activity to have been collected", weakActivityRef.get())
             }
-            repeat(10) {
-                Runtime.getRuntime().gc()
-            }
-            assertNull("expected Activity to have been collected", weakActivityRef.get())
         } finally {
-            // TODO: Change this to the `with` API from a later CL
-            @Suppress("DEPRECATION")
-            WindowRecomposerPolicy.setWindowRecomposerFactory(WindowRecomposerFactory.Global)
             localRecomposer.shutDown()
             runBlocking {
                 recomposerJob.join()

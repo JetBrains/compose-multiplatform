@@ -82,7 +82,6 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
-import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.AmbientDensity
@@ -2329,7 +2328,7 @@ class AndroidLayoutDrawTest {
     // Tests that show layout bounds draws outlines around content and modifiers
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
-    @OptIn(InternalCoreApi::class)
+    @OptIn(InternalComposeUiApi::class)
     fun showLayoutBounds_content() {
         activityTestRule.runOnUiThreadIR {
             activity.setContent {
@@ -2343,8 +2342,8 @@ class AndroidLayoutDrawTest {
                 }
             }
             val content = activity.findViewById<ViewGroup>(android.R.id.content)
-            val owner = content.getChildAt(0) as Owner
-            owner.showLayoutBounds = true
+            val composeView = content.getChildAt(0) as ComposeView
+            composeView.showLayoutBounds = true
         }
         activityTestRule.waitAndScreenShot().apply {
             assertRect(Color.White, size = 8)
@@ -2581,12 +2580,12 @@ class AndroidLayoutDrawTest {
     @Test
     fun detachChildWithLayer() {
         activityTestRule.runOnUiThread {
-            val composition = activity.setContent {
+            activity.setContent {
                 FixedSize(10, Modifier.graphicsLayer()) {
                     FixedSize(8)
                 }
             }
-            composition.dispose()
+            activity.setContentView(View(activity)) // Replace content view with empty
         }
     }
 

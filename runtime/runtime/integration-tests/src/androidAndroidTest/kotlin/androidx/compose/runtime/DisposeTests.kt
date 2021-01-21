@@ -16,6 +16,7 @@
 
 package androidx.compose.runtime
 
+import android.view.View
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import junit.framework.TestCase
@@ -45,8 +46,10 @@ class DisposeTests : BaseComposeTest() {
     fun testDisposeComposition() {
         val log = mutableListOf<String>()
 
+        lateinit var recomposeScope: RecomposeScope
         @OptIn(ExperimentalComposeApi::class)
         val composable = @Composable @ComposableContract(tracked = false) {
+            recomposeScope = currentRecomposeScope
             DisposableEffect(NeverEqualObject) {
                 log.add("onCommit")
                 onDispose {
@@ -67,21 +70,19 @@ class DisposeTests : BaseComposeTest() {
             TestCase.assertEquals(expected, log.joinToString())
         }
 
-        var composition: Composition? = null
-
         assertLog("onCommit, onActive") {
-            composition = activity.show(composable)
+            activity.show(composable)
             activity.waitForAFrame()
         }
 
         assertLog("onCommitDispose, onCommit") {
-            activity.show(composable)
+            recomposeScope.invalidate()
             activity.waitForAFrame()
         }
 
         assertLog("onActiveDispose, onCommitDispose") {
             activity.uiThread {
-                composition?.dispose()
+                activity.setContentView(View(activity))
             }
             activity.waitForAFrame()
         }

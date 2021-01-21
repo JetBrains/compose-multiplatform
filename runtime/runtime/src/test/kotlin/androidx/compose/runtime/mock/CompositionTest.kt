@@ -57,9 +57,9 @@ fun compositionTest(block: suspend CompositionTestScope.() -> Unit) = runBlockin
             override fun advance(): Boolean {
                 val changeCount = recomposer.changeCount
                 Snapshot.sendApplyNotifications()
-                if (recomposer.hasInvalidations()) {
+                if (recomposer.hasPendingWork) {
                     advanceTimeBy(5_000)
-                    check(!recomposer.hasInvalidations()) {
+                    check(!recomposer.hasPendingWork) {
                         "Potentially infinite recomposition, still recomposing after advancing"
                     }
                 }

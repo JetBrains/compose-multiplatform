@@ -248,22 +248,24 @@ class NewCodeGenTests : BaseComposeTest() {
     fun testMoveComponents() {
         var data by mutableStateOf(listOf(1, 2, 3, 4, 5))
         compose {
-            for (item in data) {
-                key(item) {
-                    TextView(text = "$item View")
+            LinearLayout {
+                for (item in data) {
+                    key(item) {
+                        TextView(text = "$item View")
+                    }
                 }
             }
         }.then {
             data = data.toMutableList().also { it.add(it.removeAt(0)) }
         }.then { activity ->
-            val root = activity.root
-            for (index in 0 until data.size) {
-                val textView = root.getChildAt(index) as TextView
-                TestCase.assertEquals(
-                    "${data[index]} View",
-                    textView.text
-                )
-            }
+            activity.root.traversal()
+                .filterIsInstance<TextView>()
+                .forEachIndexed { index, textView ->
+                    TestCase.assertEquals(
+                        "${data[index]} View",
+                        textView.text
+                    )
+                }
         }
     }
 }

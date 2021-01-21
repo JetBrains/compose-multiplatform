@@ -366,20 +366,24 @@ package androidx.compose.runtime {
 
   public final class Recomposer extends androidx.compose.runtime.CompositionReference {
     ctor public Recomposer(kotlin.coroutines.CoroutineContext effectCoroutineContext);
+    method public androidx.compose.runtime.RecomposerInfo asRecomposerInfo();
     method public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public int getChangeCount();
+    method public long getChangeCount();
+    method public boolean getHasPendingWork();
     method public kotlinx.coroutines.flow.Flow<androidx.compose.runtime.Recomposer.State> getState();
-    method public boolean hasInvalidations();
+    method @Deprecated public boolean hasInvalidations();
     method public suspend Object? join(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public suspend Object? runRecomposeAndApplyChanges(kotlin.coroutines.Continuation<?> p);
     method public void shutDown();
-    property public final int changeCount;
+    property public final long changeCount;
+    property public final boolean hasPendingWork;
     property public final kotlinx.coroutines.flow.Flow<androidx.compose.runtime.Recomposer.State> state;
     field public static final androidx.compose.runtime.Recomposer.Companion Companion;
   }
 
   public static final class Recomposer.Companion {
-    method @org.jetbrains.annotations.TestOnly public androidx.compose.runtime.Recomposer current();
+    method public kotlinx.coroutines.flow.StateFlow<java.util.Set<androidx.compose.runtime.RecomposerInfo>> getRunningRecomposers();
+    property public final kotlinx.coroutines.flow.StateFlow<java.util.Set<androidx.compose.runtime.RecomposerInfo>> runningRecomposers;
   }
 
   public enum Recomposer.State {
@@ -389,6 +393,15 @@ package androidx.compose.runtime {
     enum_constant public static final androidx.compose.runtime.Recomposer.State PendingWork;
     enum_constant public static final androidx.compose.runtime.Recomposer.State ShutDown;
     enum_constant public static final androidx.compose.runtime.Recomposer.State ShuttingDown;
+  }
+
+  public interface RecomposerInfo {
+    method public long getChangeCount();
+    method public boolean getHasPendingWork();
+    method public kotlinx.coroutines.flow.Flow<androidx.compose.runtime.Recomposer.State> getState();
+    property public abstract long changeCount;
+    property public abstract boolean hasPendingWork;
+    property public abstract kotlinx.coroutines.flow.Flow<androidx.compose.runtime.Recomposer.State> state;
   }
 
   public final class RecomposerKt {

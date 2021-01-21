@@ -18,12 +18,38 @@ package androidx.compose.ui.platform
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionReference
+import androidx.compose.runtime.EmbeddingContext
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.compositionFor
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.node.LayoutNode
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.launch
+
+// TODO: Replace usages with an appropriately scoped implementation
+// Below is a local copy of the old Recomposer.current() implementation.
+@OptIn(ExperimentalCoroutinesApi::class)
+private val GlobalDefaultRecomposer = run {
+    val embeddingContext = EmbeddingContext()
+    val mainScope = CoroutineScope(
+        NonCancellable + embeddingContext.mainThreadCompositionContext()
+    )
+
+    Recomposer(mainScope.coroutineContext).also {
+        // NOTE: Launching undispatched so that compositions created with the
+        // singleton instance can assume the recomposer is running
+        // when they perform initial composition. The relevant Recomposer code is
+        // appropriately thread-safe for this.
+        mainScope.launch(start = CoroutineStart.UNDISPATCHED) {
+            it.runRecomposeAndApplyChanges()
+        }
+    }
+}
 
 /**
  * Composes the given composable into [DesktopOwner]
@@ -39,7 +65,11 @@ fun DesktopOwner.setContent(
 ): Composition {
     GlobalSnapshotManager.ensureStarted()
 
-    val composition = compositionFor(root, DesktopUiApplier(root), parent ?: Recomposer.current())
+    val composition = compositionFor(
+        root,
+        DesktopUiApplier(root),
+        parent ?: GlobalDefaultRecomposer
+    )
     composition.setContent {
         ProvideDesktopAmbients(this) {
             DesktopSelectionContainer(content)

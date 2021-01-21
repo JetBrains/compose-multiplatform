@@ -20,8 +20,8 @@ import androidx.annotation.Sampled
 import androidx.compose.runtime.AbstractApplier
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
+import androidx.compose.runtime.CompositionReference
 import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.compositionFor
 import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.getValue
@@ -63,8 +63,11 @@ fun CustomTreeComposition() {
     }
 
     // A function like the following could be created to create a composition provided a root Node.
-    fun Node.setContent(content: @Composable () -> Unit): Composition {
-        return compositionFor(this, NodeApplier(this), Recomposer.current()).also {
+    fun Node.setContent(
+        parent: CompositionReference,
+        content: @Composable () -> Unit
+    ): Composition {
+        return compositionFor(this, NodeApplier(this), parent).apply {
             setContent(content)
         }
     }
@@ -89,8 +92,8 @@ fun CustomTreeComposition() {
     }
 
     // and then a sample tree could be composed:
-    fun runApp(root: GroupNode) {
-        root.setContent {
+    fun runApp(root: GroupNode, parent: CompositionReference) {
+        root.setContent(parent) {
             var count by remember { mutableStateOf(0) }
             Group {
                 Text("Count: $count")
