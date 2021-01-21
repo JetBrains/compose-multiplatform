@@ -18,10 +18,9 @@
     package="androidx.compose.ui.test.junit4">
     <application>
         <activity android:name="androidx.activity.ComponentActivity"
-            android:theme="@style/TestTheme"/>
+            android:theme="@style/TestTheme" />
         <activity android:name="androidx.compose.ui.test.junit4.CustomActivity"
-            android:theme="@android:style/Theme.Material.NoActionBar.Fullscreen"/>
-        <activity android:name="androidx.compose.ui.test.junit4.ActivityWithActionBar" />
+            android:theme="@android:style/Theme.Material.NoActionBar.Fullscreen" />
         <activity android:name="androidx.compose.ui.test.junit4.MultipleActivitiesFindTest$Activity1" />
         <activity android:name="androidx.compose.ui.test.junit4.MultipleActivitiesFindTest$Activity2" />
         <activity android:name="androidx.compose.ui.test.junit4.MultipleActivitiesClickTest$Activity1" />
