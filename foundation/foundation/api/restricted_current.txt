@@ -434,8 +434,8 @@ package androidx.compose.foundation.shape {
     ctor public CornerBasedShape(androidx.compose.foundation.shape.CornerSize topLeft, androidx.compose.foundation.shape.CornerSize topRight, androidx.compose.foundation.shape.CornerSize bottomRight, androidx.compose.foundation.shape.CornerSize bottomLeft);
     method public abstract androidx.compose.foundation.shape.CornerBasedShape copy(optional androidx.compose.foundation.shape.CornerSize topLeft, optional androidx.compose.foundation.shape.CornerSize topRight, optional androidx.compose.foundation.shape.CornerSize bottomRight, optional androidx.compose.foundation.shape.CornerSize bottomLeft);
     method public final androidx.compose.foundation.shape.CornerBasedShape copy(androidx.compose.foundation.shape.CornerSize all);
+    method public final androidx.compose.ui.graphics.Outline createOutline-9w1PWio(long size, androidx.compose.ui.unit.LayoutDirection layoutDirection, androidx.compose.ui.unit.Density density);
     method public abstract androidx.compose.ui.graphics.Outline createOutline-hMawgr0(long size, float topLeft, float topRight, float bottomRight, float bottomLeft);
-    method public final androidx.compose.ui.graphics.Outline createOutline-lwCvPpU(long size, androidx.compose.ui.unit.Density density);
     method public final androidx.compose.foundation.shape.CornerSize getBottomLeft();
     method public final androidx.compose.foundation.shape.CornerSize getBottomRight();
     method public final androidx.compose.foundation.shape.CornerSize getTopLeft();
@@ -474,9 +474,8 @@ package androidx.compose.foundation.shape {
   }
 
   public final class GenericShape implements androidx.compose.ui.graphics.Shape {
-    ctor public GenericShape(kotlin.jvm.functions.Function2<? super androidx.compose.ui.graphics.Path,? super androidx.compose.ui.geometry.Size,kotlin.Unit> builder);
-    method public androidx.compose.foundation.shape.GenericShape copy(kotlin.jvm.functions.Function2<? super androidx.compose.ui.graphics.Path,? super androidx.compose.ui.geometry.Size,kotlin.Unit> builder);
-    method public androidx.compose.ui.graphics.Outline createOutline-lwCvPpU(long size, androidx.compose.ui.unit.Density density);
+    ctor public GenericShape(kotlin.jvm.functions.Function3<? super androidx.compose.ui.graphics.Path,? super androidx.compose.ui.geometry.Size,? super androidx.compose.ui.unit.LayoutDirection,kotlin.Unit> builder);
+    method public androidx.compose.ui.graphics.Outline createOutline-9w1PWio(long size, androidx.compose.ui.unit.LayoutDirection layoutDirection, androidx.compose.ui.unit.Density density);
   }
 
   public final class RoundedCornerShape extends androidx.compose.foundation.shape.CornerBasedShape {

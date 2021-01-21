@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.drawOutline
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.unit.LayoutDirection
 
 /**
  * Draws [shape] with a solid [color] behind the content.
@@ -93,6 +94,7 @@ private class Background constructor(
 
     // naive cache outline calculation if size is the same
     private var lastSize: Size? = null
+    private var lastLayoutDirection: LayoutDirection? = null
     private var lastOutline: Outline? = null
 
     override fun ContentDrawScope.draw() {
@@ -112,10 +114,10 @@ private class Background constructor(
 
     private fun ContentDrawScope.drawOutline() {
         val outline =
-            if (size == lastSize) {
+            if (size == lastSize && layoutDirection == lastLayoutDirection) {
                 lastOutline!!
             } else {
-                shape.createOutline(size, this)
+                shape.createOutline(size, layoutDirection, this)
             }
         color?.let { drawOutline(outline, color = color) }
         brush?.let { drawOutline(outline, brush = brush, alpha = alpha) }

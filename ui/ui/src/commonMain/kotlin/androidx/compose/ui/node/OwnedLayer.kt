@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 
 /**
  * A layer returned by [Owner.createLayer] to separate drawn content.
@@ -49,7 +50,8 @@ interface OwnedLayer {
         cameraDistance: Float,
         transformOrigin: TransformOrigin,
         shape: Shape,
-        clip: Boolean
+        clip: Boolean,
+        layoutDirection: LayoutDirection
     )
 
     /**
