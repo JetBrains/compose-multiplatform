@@ -17,10 +17,10 @@
 package androidx.compose.ui.graphics.vector
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onCommit
-import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionReference
 import androidx.compose.runtime.setValue
@@ -79,7 +79,7 @@ fun rememberVectorPainter(
         size = Size(widthPx, heightPx)
         RenderVector(name, vpWidth, vpHeight, content)
     }
-    onCommit {
+    SideEffect {
         // Initialize the intrinsic color filter if a tint color is provided on the
         // vector itself. Note this tint can be overridden by an explicit ColorFilter
         // provided on the Modifier.paint call
@@ -224,8 +224,10 @@ class VectorPainter internal constructor() : Painter() {
             content
         )
 
-        onDispose {
-            composition.dispose()
+        DisposableEffect(composition) {
+            onDispose {
+                composition.dispose()
+            }
         }
     }
 

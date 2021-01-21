@@ -32,9 +32,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -81,8 +81,11 @@ fun SwipeToDismissDemo() {
 private fun Modifier.swipeToDismiss(index: Int): Modifier = composed {
     val animatedOffset = remember { Animatable(0f) }
     val height = remember { mutableStateOf(0) }
-    onCommit(index) {
+    DisposableEffect(index) {
         animatedOffset.snapTo(0f)
+        onDispose {
+            animatedOffset.stop()
+        }
     }
     this.pointerInput {
         coroutineScope {

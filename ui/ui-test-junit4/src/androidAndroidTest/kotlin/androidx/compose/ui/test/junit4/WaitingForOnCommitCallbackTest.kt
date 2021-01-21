@@ -16,9 +16,9 @@
 
 package androidx.compose.ui.test.junit4
 
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -48,8 +48,9 @@ class WaitingForOnCommitCallbackTest {
         val atomicBoolean = AtomicBoolean(false)
         var switch by mutableStateOf(true)
         rule.setContent {
-            onCommit(switch) {
+            DisposableEffect(switch) {
                 atomicBoolean.set(switch)
+                onDispose { }
             }
         }
 
@@ -79,21 +80,25 @@ class WaitingForOnCommitCallbackTest {
         var switch3 by mutableStateOf(true)
         var switch4 by mutableStateOf(true)
         rule.setContent {
-            onCommit(switch1) {
+            DisposableEffect(switch1) {
                 values.add(2)
                 switch2 = switch1
+                onDispose { }
             }
-            onCommit(switch2) {
+            DisposableEffect(switch2) {
                 values.add(3)
                 switch3 = switch2
+                onDispose { }
             }
-            onCommit(switch3) {
+            DisposableEffect(switch3) {
                 values.add(4)
                 switch4 = switch3
+                onDispose { }
             }
-            onCommit(switch4) {
+            DisposableEffect(switch4) {
                 values.add(5)
                 latch.countDown()
+                onDispose { }
             }
         }
 
@@ -142,21 +147,25 @@ class WaitingForOnCommitCallbackTest {
         var switch3 by mutableStateOf(true)
         var switch4 by mutableStateOf(true)
         rule.setContent {
-            onCommit(switch1) {
+            DisposableEffect(switch1) {
                 values.add(2)
                 switch2 = switch1
+                onDispose { }
             }
-            onCommit(switch2) {
+            DisposableEffect(switch2) {
                 values.add(3)
                 switch3 = switch2
+                onDispose { }
             }
-            onCommit(switch3) {
+            DisposableEffect(switch3) {
                 values.add(4)
                 switch4 = switch3
+                onDispose { }
             }
-            onCommit(switch4) {
+            DisposableEffect(switch4) {
                 values.add(5)
                 mutex.unlock()
+                onDispose { }
             }
         }
 

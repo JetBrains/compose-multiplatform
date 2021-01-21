@@ -18,12 +18,13 @@
 package androidx.compose.foundation.text
 
 import androidx.compose.foundation.text.selection.MultiWidgetSelectionDelegate
-import androidx.compose.runtime.CommitScope
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.DisposableEffectDisposable
+import androidx.compose.runtime.DisposableEffectScope
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
@@ -173,7 +174,7 @@ fun CoreText(
         measureBlock = controller.measure
     )
 
-    onCommit(selectionRegistrar, callback = controller.commit)
+    DisposableEffect(selectionRegistrar, effect = controller.commit)
 }
 
 @Composable
@@ -327,7 +328,7 @@ private class TextController(val state: TextState) {
         }
     }
 
-    val commit: CommitScope.() -> Unit = {
+    val commit: DisposableEffectScope.() -> DisposableEffectDisposable = {
         // if no SelectionContainer is added as parent selectionRegistrar will be null
         state.selectable = selectionRegistrar?.let { selectionRegistrar ->
             selectionRegistrar.subscribe(

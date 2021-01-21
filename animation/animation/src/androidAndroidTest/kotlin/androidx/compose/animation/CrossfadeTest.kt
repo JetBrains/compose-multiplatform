@@ -18,9 +18,9 @@ package androidx.compose.animation
 import androidx.compose.animation.core.AnimationConstants.DefaultDurationMillis
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.ExperimentalTestApi
@@ -65,8 +65,10 @@ class CrossfadeTest {
         rule.setContent {
             Crossfade(showFirst) {
                 BasicText(if (it) First else Second)
-                onDispose {
-                    disposed = true
+                DisposableEffect(Unit) {
+                    onDispose {
+                        disposed = true
+                    }
                 }
             }
         }
@@ -98,8 +100,10 @@ class CrossfadeTest {
                 animation = TweenSpec(durationMillis = duration)
             ) {
                 BasicText(if (it) First else Second)
-                onDispose {
-                    disposed = true
+                DisposableEffect(Unit) {
+                    onDispose {
+                        disposed = true
+                    }
                 }
             }
         }

@@ -23,7 +23,7 @@ import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.Strings
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.indication
-import androidx.compose.runtime.onCommit
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
@@ -274,7 +274,7 @@ private fun Modifier.toggleableImpl(
         Modifier
     }
 
-    onCommit(interactionState) {
+    DisposableEffect(interactionState) {
         onDispose {
             interactionState.removeInteraction(Interaction.Pressed)
         }

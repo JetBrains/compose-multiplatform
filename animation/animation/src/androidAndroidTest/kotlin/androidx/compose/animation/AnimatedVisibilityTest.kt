@@ -21,9 +21,9 @@ import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -82,8 +82,10 @@ class AnimatedVisibilityTest {
                         offset = it.localToRoot(Offset.Zero)
                     }.size(100.dp, 100.dp)
                 ) {
-                    onDispose {
-                        disposed = true
+                    DisposableEffect(Unit) {
+                        onDispose {
+                            disposed = true
+                        }
                     }
                 }
             }
@@ -190,8 +192,10 @@ class AnimatedVisibilityTest {
                         offset = it.localToRoot(Offset.Zero)
                     }.size(100.dp, 100.dp)
                 ) {
-                    onDispose {
-                        disposed = true
+                    DisposableEffect(Unit) {
+                        onDispose {
+                            disposed = true
+                        }
                     }
                 }
             }

@@ -17,12 +17,11 @@ package androidx.compose.ui.platform
 
 import android.widget.FrameLayout
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Providers
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.ambientOf
 import androidx.compose.runtime.currentRecomposeScope
-import androidx.compose.runtime.onActive
-import androidx.compose.runtime.onCommit
-import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.rememberCompositionReference
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.viewinterop.AndroidView
@@ -67,13 +66,16 @@ class WrapperTest {
 
         activityScenario.onActivity {
             it.setContent {
-                onCommit { composeWrapperCount++ }
+                SideEffect { composeWrapperCount++ }
                 Recompose { recompose ->
-                    onCommit {
+                    SideEffect {
                         innerCount++
                         commitLatch.countDown()
                     }
-                    onActive { recompose() }
+                    DisposableEffect(Unit) {
+                        recompose()
+                        onDispose { }
+                    }
                 }
             }
         }
@@ -95,8 +97,10 @@ class WrapperTest {
             it.setContentView(view)
             ViewTreeLifecycleOwner.set(view, owner)
             view.setContent {
-                onDispose {
-                    disposeLatch.countDown()
+                DisposableEffect(Unit) {
+                    onDispose {
+                        disposeLatch.countDown()
+                    }
                 }
                 composedLatch.countDown()
             }
@@ -154,7 +158,7 @@ class WrapperTest {
                     val composition = rememberCompositionReference()
 
                     AndroidView({ frameLayout })
-                    onCommit {
+                    SideEffect {
                         frameLayout.setContent(composition) {
                             value = ambient.current
                             composedLatch.countDown()

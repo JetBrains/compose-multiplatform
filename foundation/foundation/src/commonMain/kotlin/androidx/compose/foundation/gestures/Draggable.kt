@@ -19,9 +19,9 @@ package androidx.compose.foundation.gestures
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.runtime.State
-import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
@@ -89,8 +89,10 @@ fun Modifier.draggable(
         properties["onDrag"] = onDrag
     }
 ) {
-    onDispose {
-        interactionState?.removeInteraction(Interaction.Dragged)
+    DisposableEffect(interactionState) {
+        onDispose {
+            interactionState?.removeInteraction(Interaction.Dragged)
+        }
     }
     val orientationState = rememberUpdatedState(orientation)
     val enabledState = rememberUpdatedState(enabled)

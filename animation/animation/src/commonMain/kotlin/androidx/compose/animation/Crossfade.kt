@@ -25,7 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.RecomposeScope
 import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.key
-import androidx.compose.runtime.onCommit
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -109,7 +109,7 @@ private fun animatedAlpha(
     onAnimationFinish: () -> Unit = {}
 ): AnimatedFloat {
     val animatedFloat = animatedFloat(if (!visible) 1f else 0f)
-    onCommit(visible) {
+    DisposableEffect(visible) {
         animatedFloat.animateTo(
             if (visible) 1f else 0f,
             anim = animation,
@@ -119,6 +119,9 @@ private fun animatedAlpha(
                 }
             }
         )
+        onDispose {
+            animatedFloat.stop()
+        }
     }
     return animatedFloat
 }

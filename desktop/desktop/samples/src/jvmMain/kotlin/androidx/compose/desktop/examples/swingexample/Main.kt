@@ -36,7 +36,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onDispose
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -71,8 +71,10 @@ fun SwingComposeWindow() {
     // setting the content
     composePanel.setContent {
         ComposeContent()
-        onDispose {
-            println("Dispose composition")
+        DisposableEffect(Unit) {
+            onDispose {
+                println("Dispose composition")
+            }
         }
     }
 

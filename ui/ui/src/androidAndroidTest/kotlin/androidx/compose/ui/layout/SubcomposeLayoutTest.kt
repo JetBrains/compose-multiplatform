@@ -23,10 +23,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onActive
-import androidx.compose.runtime.onDispose
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.background
 import androidx.compose.ui.draw.assertColor
@@ -300,11 +299,14 @@ class SubcomposeLayoutTest {
             SubcomposeLayout {
                 if (addSlot.value) {
                     subcompose(Unit) {
-                        onActive {
+                        DisposableEffect(Unit) {
                             composed = true
+                            onDispose { }
                         }
-                        onDispose {
-                            disposed = true
+                        DisposableEffect(Unit) {
+                            onDispose {
+                                disposed = true
+                            }
                         }
                     }
                 }
@@ -422,13 +424,17 @@ class SubcomposeLayoutTest {
             if (addLayout.value) {
                 SubcomposeLayout {
                     subcompose(0) {
-                        onDispose {
-                            firstDisposed = true
+                        DisposableEffect(Unit) {
+                            onDispose {
+                                firstDisposed = true
+                            }
                         }
                     }
                     subcompose(1) {
-                        onDispose {
-                            secondDisposed = true
+                        DisposableEffect(Unit) {
+                            onDispose {
+                                secondDisposed = true
+                            }
                         }
                     }
                     layout(10, 10) {}

@@ -22,13 +22,13 @@ import android.view.View
 import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.animation.core.rootAnimationClockFactory
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.ambientOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.neverEqualPolicy
-import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.savedinstancestate.AmbientUiSavedStateRegistry
@@ -167,8 +167,10 @@ internal fun ProvideAndroidAmbients(owner: AndroidComposeView, content: @Composa
     val uiSavedStateRegistry = remember {
         DisposableUiSavedStateRegistry(view, viewTreeOwners.savedStateRegistryOwner)
     }
-    onDispose {
-        uiSavedStateRegistry.dispose()
+    DisposableEffect(Unit) {
+        onDispose {
+            uiSavedStateRegistry.dispose()
+        }
     }
 
     Providers(

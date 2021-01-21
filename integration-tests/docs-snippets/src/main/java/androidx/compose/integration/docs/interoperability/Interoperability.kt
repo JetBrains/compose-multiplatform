@@ -39,12 +39,12 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.listSaver
 import androidx.compose.runtime.savedinstancestate.mapSaver
@@ -292,7 +292,7 @@ private object InteropSnippet13 {
         // Holds our current image, and will be updated by the onCommit lambda below
         var image by remember(url) { mutableStateOf<ImageBitmap?>(null) }
 
-        onCommit(url) {
+        DisposableEffect(url) {
             // This onCommit lambda will be invoked every time url changes
 
             val listener = object : ExampleImageLoader.Listener() {

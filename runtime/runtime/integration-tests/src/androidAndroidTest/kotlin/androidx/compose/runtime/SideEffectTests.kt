@@ -319,10 +319,11 @@ class SideEffectTests : BaseComposeTest() {
                     awaitFrameTime = it
                 }
             }
-            onCommit(true) {
+            DisposableEffect(true) {
                 Choreographer.getInstance().postFrameCallback { frameTimeNanos ->
                     choreographerTime = frameTimeNanos
                 }
+                onDispose { }
             }
         }.then {
             assertNotEquals(choreographerTime, Long.MIN_VALUE, "Choreographer callback never ran")
