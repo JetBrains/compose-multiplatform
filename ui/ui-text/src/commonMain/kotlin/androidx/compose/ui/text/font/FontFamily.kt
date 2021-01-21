@@ -91,7 +91,9 @@ sealed class SystemFontFamily : FontFamily(true)
  * @sample androidx.compose.ui.text.samples.CustomFontFamilySample
  */
 @Immutable
-class FontListFontFamily(val fonts: List<Font>) : FileBasedFontFamily(), List<Font> by fonts {
+class FontListFontFamily internal constructor(
+    val fonts: List<Font>
+) : FileBasedFontFamily(), List<Font> by fonts {
     init {
         check(fonts.isNotEmpty()) { "At least one font should be passed to FontFamily" }
         check(fonts.distinctBy { Pair(it.weight, it.style) }.size == fonts.size) {
@@ -134,14 +136,14 @@ class GenericFontFamily internal constructor(val name: String) : SystemFontFamil
  * Defines a default font family.
  */
 @Immutable
-internal class DefaultFontFamily : SystemFontFamily()
+internal class DefaultFontFamily internal constructor() : SystemFontFamily()
 
 /**
  * Defines a font family that is already loaded Typeface.
  *
  * @param typeface A typeface instance.
  */
-class LoadedFontFamily(val typeface: Typeface) : FontFamily(true) {
+class LoadedFontFamily internal constructor(val typeface: Typeface) : FontFamily(true) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is LoadedFontFamily) return false
@@ -163,6 +165,7 @@ class LoadedFontFamily(val typeface: Typeface) : FontFamily(true) {
  *
  * @param fonts list of font files
  */
+@Deprecated("Use FontFamily() instead", ReplaceWith("FontFamily(fonts)"))
 @Stable
 fun fontFamily(fonts: List<Font>) = FontListFontFamily(fonts)
 
@@ -172,7 +175,33 @@ fun fontFamily(fonts: List<Font>) = FontListFontFamily(fonts)
  * @param fonts list of font files
  */
 @Stable
+fun FontFamily(fonts: List<Font>): FontFamily = FontListFontFamily(fonts)
+
+/**
+ * Construct a font family that contains list of custom font files.
+ *
+ * @param fonts list of font files
+ */
+@Deprecated("Use FontFamily() instead", ReplaceWith("FontFamily(fonts)"))
+@Stable
 fun fontFamily(vararg fonts: Font) = FontListFontFamily(fonts.asList())
+
+/**
+ * Construct a font family that contains list of custom font files.
+ *
+ * @param fonts list of font files
+ */
+@Stable
+fun FontFamily(vararg fonts: Font): FontFamily = FontListFontFamily(fonts.asList())
+
+/**
+ * Construct a font family that contains loaded font family: Typeface.
+ *
+ * @param typeface A typeface instance.
+ */
+@Deprecated("Use FontFamily() instead", ReplaceWith("FontFamily(typeface)"))
+@Stable
+fun fontFamily(typeface: Typeface) = LoadedFontFamily(typeface)
 
 /**
  * Construct a font family that contains loaded font family: Typeface.
@@ -180,4 +209,4 @@ fun fontFamily(vararg fonts: Font) = FontListFontFamily(fonts.asList())
  * @param typeface A typeface instance.
  */
 @Stable
-fun fontFamily(typeface: Typeface) = LoadedFontFamily(typeface)
+fun FontFamily(typeface: Typeface): FontFamily = LoadedFontFamily(typeface)

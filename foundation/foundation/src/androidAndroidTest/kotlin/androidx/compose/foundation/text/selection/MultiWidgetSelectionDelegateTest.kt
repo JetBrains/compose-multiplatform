@@ -35,9 +35,8 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.ResourceFont
-import androidx.compose.ui.text.font.asFontFamily
-import androidx.compose.ui.text.font.font
 import androidx.compose.ui.text.font.test.R
+import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -55,7 +54,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-val BASIC_MEASURE_FONT = font(
+val BASIC_MEASURE_FONT = Font(
     resId = R.font.sample_font,
     weight = FontWeight.Normal,
     style = FontStyle.Normal
@@ -71,7 +70,7 @@ class MultiWidgetSelectionDelegateTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    private val fontFamily = BASIC_MEASURE_FONT.asFontFamily()
+    private val fontFamily = BASIC_MEASURE_FONT.toFontFamily()
     private val context = InstrumentationRegistry.getInstrumentation().context
     private val defaultDensity = Density(density = 1f)
     private val resourceLoader = TestFontResourceLoader(context)

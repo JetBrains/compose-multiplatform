@@ -19,7 +19,7 @@ package androidx.compose.ui.text
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.text.FontTestData.Companion.BASIC_MEASURE_FONT
-import androidx.compose.ui.text.font.asFontFamily
+import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.matchers.isZero
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -38,7 +38,7 @@ import kotlin.math.floor
 @SmallTest
 class TextLayoutResultIntegrationTest {
 
-    private val fontFamily = BASIC_MEASURE_FONT.asFontFamily()
+    private val fontFamily = BASIC_MEASURE_FONT.toFontFamily()
     private val density = Density(density = 1f)
     private val context = InstrumentationRegistry.getInstrumentation().context
     private val resourceLoader = TestFontResourceLoader(context)

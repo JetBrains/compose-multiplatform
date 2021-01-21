@@ -44,9 +44,9 @@ import androidx.compose.runtime.Providers
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.font
-import androidx.compose.ui.text.font.fontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -184,10 +184,10 @@ private object ThemingSnippet11 {
 }
 
 @Composable private fun ThemingSnippet12() {
-    val Rubik = fontFamily(
-        font(R.font.rubik_regular),
-        font(R.font.rubik_medium, FontWeight.W500),
-        font(R.font.rubik_bold, FontWeight.Bold)
+    val Rubik = FontFamily(
+        Font(R.font.rubik_regular),
+        Font(R.font.rubik_medium, FontWeight.W500),
+        Font(R.font.rubik_bold, FontWeight.Bold)
     )
 
     val MyTypography = Typography(
@@ -287,6 +287,6 @@ private object R {
     }
 }
 
-private val Rubik = fontFamily()
+private val Rubik = FontFamily()
 private fun MaterialTheme(typography: Typography) { }
 private fun MaterialTheme(shapes: Shapes) { }

@@ -19,11 +19,10 @@ package androidx.compose.ui.text
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.fontFamily
 import androidx.compose.ui.text.platform.FontLoader
 import androidx.compose.ui.text.platform.GenericFontFamiliesMapping
-import androidx.compose.ui.text.platform.font
-import androidx.compose.ui.text.platform.typeface
+import androidx.compose.ui.text.platform.Font
+import androidx.compose.ui.text.platform.Typeface
 import com.google.common.truth.Truth
 import org.jetbrains.skija.Data
 import org.jetbrains.skija.Typeface
@@ -40,11 +39,11 @@ class DesktopFontTest {
     private val fontLoader = FontLoader()
 
     private val fontListFontFamily by lazy {
-        fontFamily(
-            font(
+        FontFamily(
+            Font(
                 "font/sample_font.ttf"
             ),
-            font(
+            Font(
                 "font/test_400_italic.ttf",
                 style = FontStyle.Italic
             )
@@ -61,7 +60,7 @@ class DesktopFontTest {
     }
 
     private val loadedFontFamily by lazy {
-        fontFamily(typeface(loadedTypeface))
+        FontFamily(Typeface(loadedTypeface))
     }
 
     @Test

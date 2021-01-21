@@ -34,7 +34,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.asFontFamily
+import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.matchers.assertThat
 import androidx.compose.ui.text.style.BaselineShift
@@ -71,7 +71,7 @@ class AndroidParagraphTest {
     // 1. The width of most of visible characters equals to font size.
     // 2. The LTR/RTL characters are rendered as ▶/◀.
     // 3. The fontMetrics passed to TextPaint has descend - ascend equal to 1.2 * fontSize.
-    private val basicFontFamily = BASIC_MEASURE_FONT.asFontFamily()
+    private val basicFontFamily = BASIC_MEASURE_FONT.toFontFamily()
     private val defaultDensity = Density(density = 1f)
     private val context = InstrumentationRegistry.getInstrumentation().context
 

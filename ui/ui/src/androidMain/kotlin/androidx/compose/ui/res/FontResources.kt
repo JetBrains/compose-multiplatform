@@ -27,7 +27,6 @@ import androidx.compose.ui.text.font.FontListFontFamily
 import androidx.compose.ui.text.font.LoadedFontFamily
 import androidx.compose.ui.text.font.ResourceFont
 import androidx.compose.ui.text.font.SystemFontFamily
-import androidx.compose.ui.text.font.typeface
 import androidx.compose.ui.util.fastForEach
 
 private val cacheLock = Object()
@@ -54,11 +53,11 @@ internal fun fontResourceFromContext(context: Context, fontFamily: FontFamily): 
     if (fontFamily is SystemFontFamily || fontFamily is LoadedFontFamily) {
         synchronized(cacheLock) {
             return syncLoadedTypefaces.getOrPut(fontFamily) {
-                typeface(context, fontFamily)
+                Typeface(context, fontFamily)
             }
         }
     } else {
-        return typeface(context, fontFamily)
+        return Typeface(context, fontFamily)
     }
 }
 
@@ -162,7 +161,7 @@ fun loadFontResource(
         }
         val key = fontFamily.cacheKey(context)
         return loadResource(key, pendingTypeface, failedTypeface) {
-            typeface(context, fontFamily)
+            Typeface(context, fontFamily)
         }
     }
 }
