@@ -33,7 +33,9 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 
 /**
@@ -171,7 +173,10 @@ fun Image(
     colorFilter: ColorFilter? = null
 ) {
     val semantics = if (contentDescription != null) {
-        Modifier.semantics { this.contentDescription = contentDescription }
+        Modifier.semantics {
+            this.contentDescription = contentDescription
+            this.role = Role.Image
+        }
     } else {
         Modifier
     }
