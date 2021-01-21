@@ -39,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.AmbientDensity
+import kotlinx.coroutines.runBlocking
 import kotlin.random.Random
 
 /**
@@ -63,7 +64,7 @@ class NestedScrollerTestCase : ComposeTestCase, ToggleableTestCase {
     }
 
     override fun toggleState() {
-        scrollState.scrollTo(if (scrollState.value == 0f) 10f else 0f)
+        runBlocking { scrollState.scrollTo(if (scrollState.value == 0f) 10f else 0f) }
     }
 
     @Composable

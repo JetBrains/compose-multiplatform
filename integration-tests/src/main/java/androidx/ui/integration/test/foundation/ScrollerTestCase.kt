@@ -29,6 +29,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.testutils.ComposeTestCase
 import androidx.compose.testutils.ToggleableTestCase
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.runBlocking
 
 /**
  * Test case that puts a large number of boxes in a column in a vertical scroller to force scrolling.
@@ -64,7 +65,7 @@ class ScrollerTestCase : ComposeTestCase, ToggleableTestCase {
     }
 
     override fun toggleState() {
-        scrollState.scrollTo(if (scrollState.value == 0f) 10f else 0f)
+        runBlocking { scrollState.scrollTo(if (scrollState.value == 0f) 10f else 0f) }
     }
 
     @Composable
