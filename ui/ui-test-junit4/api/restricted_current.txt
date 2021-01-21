@@ -108,6 +108,9 @@ package androidx.compose.ui.test.junit4.android {
     method @Deprecated @androidx.compose.ui.test.ExperimentalTestApi public static void unregisterTestClock(androidx.compose.ui.test.TestAnimationClock clock);
   }
 
+  public final class ComposeIdlingResourceNewKt {
+  }
+
   public final class ComposeNotIdleException extends java.lang.Throwable {
     ctor public ComposeNotIdleException(String? message, Throwable? cause);
   }

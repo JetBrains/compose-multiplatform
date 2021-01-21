@@ -16,10 +16,16 @@
 
 package androidx.compose.ui.test.junit4.android
 
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import androidx.annotation.VisibleForTesting
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewTreeLifecycleOwner
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.junit.runners.model.Statement
 import java.util.Collections
@@ -36,7 +42,10 @@ import kotlin.time.ExperimentalTime
  * state.
  */
 internal class ComposeRootRegistry {
-    private val roots = Collections.newSetFromMap(WeakHashMap<ViewRootForTest, Boolean>())
+
+    private val lock = Any()
+    private val allRoots = Collections.newSetFromMap(WeakHashMap<ViewRootForTest, Boolean>())
+    private val resumedRoots = mutableSetOf<ViewRootForTest>()
     private val registryListeners = mutableSetOf<OnRegistrationChangedListener>()
 
     /**
@@ -57,66 +66,64 @@ internal class ComposeRootRegistry {
      */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     internal fun tearDownRegistry() {
-        ViewRootForTest.onViewCreatedCallback = null
-        synchronized(roots) {
-            getUnfilteredComposeRoots().forEach {
+        synchronized(lock) {
+            // Stop accepting new roots
+            ViewRootForTest.onViewCreatedCallback = null
+            // Unregister the world
+            getCreatedComposeRoots().forEach {
                 unregisterComposeRoot(it)
             }
-            // Remove all listeners as well, now we've unregistered all roots
-            synchronized(registryListeners) { registryListeners.clear() }
+            // Clear all references
+            allRoots.clear()
+            resumedRoots.clear()
+            registryListeners.clear()
         }
     }
 
     private fun onViewRootCreated(root: ViewRootForTest) {
-        root.view.addOnAttachStateChangeListener(ViewAttachedListener(root))
-    }
-
-    /**
-     * Returns a copy of the set of all registered [ViewRootForTest]s, including ones that are
-     * normally not relevant (like those whose lifecycle state is not RESUMED).
-     */
-    fun getUnfilteredComposeRoots(): Set<ViewRootForTest> {
-        return synchronized(roots) { roots.toSet() }
-    }
-
-    /**
-     * Returns a copy of the set of all registered [ViewRootForTest]s that can be interacted with.
-     * This method is almost always preferred over [getUnfilteredComposeRoots].
-     */
-    fun getComposeRoots(): Set<ViewRootForTest> {
-        return synchronized(roots) {
-            roots.filterTo(mutableSetOf()) {
-                it.isLifecycleInResumedState
+        // Need to register immediately to accommodate ViewRoots that have delayed
+        // setContent until they are attached to the window (e.g. popups and dialogs).
+        synchronized(lock) {
+            if (isSetUp) {
+                allRoots.add(root)
+                root.view.addOnAttachStateChangeListener(StateChangeHandler(root))
             }
         }
     }
 
     /**
-     * Adds the given [listener], to be notified when an [ViewRootForTest] registers or unregisters.
+     * Returns a copy of the set of all created [ViewRootForTest]s, including ones that are
+     * normally not relevant (like those whose lifecycle state is not RESUMED). You probably need
+     * [getRegisteredComposeRoots] though. Do not store any of these results, always call this
+     * method again if you need access to anything in this set.
      */
-    fun addOnRegistrationChangedListener(listener: OnRegistrationChangedListener) {
-        synchronized(registryListeners) { registryListeners.add(listener) }
+    fun getCreatedComposeRoots(): Set<ViewRootForTest> {
+        synchronized(lock) {
+            while (true) {
+                try {
+                    return allRoots.toSet()
+                } catch (_: ConcurrentModificationException) {
+                    // A weakly referenced key may have been cleared while copying the set
+                    // Keep trying until we succeed
+                }
+            }
+        }
     }
 
     /**
-     * Removes the given [listener].
+     * Returns a copy of the set of all registered [ViewRootForTest]s that can be interacted with.
+     * This method is almost always preferred over [getCreatedComposeRoots].
      */
-    fun removeOnRegistrationChangedListener(listener: OnRegistrationChangedListener) {
-        synchronized(registryListeners) { registryListeners.remove(listener) }
-    }
-
-    private fun dispatchOnRegistrationChanged(composeRoot: ViewRootForTest, isRegistered: Boolean) {
-        synchronized(registryListeners) { registryListeners.toList() }.forEach {
-            it.onRegistrationChanged(composeRoot, isRegistered)
-        }
+    fun getRegisteredComposeRoots(): Set<ViewRootForTest> {
+        return synchronized(lock) { resumedRoots.toSet() }
     }
 
     /**
      * Registers the [composeRoot] in this registry. Must be called from [View.onAttachedToWindow].
      */
     internal fun registerComposeRoot(composeRoot: ViewRootForTest) {
-        synchronized(roots) {
-            if (roots.add(composeRoot)) {
+        synchronized(lock) {
+            if (isSetUp && resumedRoots.add(composeRoot)) {
                 dispatchOnRegistrationChanged(composeRoot, true)
             }
         }
@@ -127,8 +134,8 @@ internal class ComposeRootRegistry {
      * [View.onDetachedFromWindow].
      */
     internal fun unregisterComposeRoot(composeRoot: ViewRootForTest) {
-        synchronized(roots) {
-            if (roots.remove(composeRoot)) {
+        synchronized(lock) {
+            if (resumedRoots.remove(composeRoot)) {
                 dispatchOnRegistrationChanged(composeRoot, false)
             }
         }
@@ -155,20 +162,96 @@ internal class ComposeRootRegistry {
         fun onRegistrationChanged(composeRoot: ViewRootForTest, registered: Boolean)
     }
 
-    private inner class ViewAttachedListener(
+    /**
+     * Adds the given [listener], to be notified when an [ViewRootForTest] registers or unregisters.
+     */
+    fun addOnRegistrationChangedListener(listener: OnRegistrationChangedListener) {
+        synchronized(lock) { registryListeners.add(listener) }
+    }
+
+    /**
+     * Removes the given [listener].
+     */
+    fun removeOnRegistrationChangedListener(listener: OnRegistrationChangedListener) {
+        synchronized(lock) { registryListeners.remove(listener) }
+    }
+
+    private fun dispatchOnRegistrationChanged(composeRoot: ViewRootForTest, isRegistered: Boolean) {
+        synchronized(lock) { registryListeners.toList() }.forEach {
+            it.onRegistrationChanged(composeRoot, isRegistered)
+        }
+    }
+
+    private inner class StateChangeHandler(
         private val composeRoot: ViewRootForTest
-    ) : View.OnAttachStateChangeListener {
+    ) : View.OnAttachStateChangeListener, LifecycleEventObserver, OnRegistrationChangedListener {
+        private var removeObserver: (() -> Unit)? = null
+
         override fun onViewAttachedToWindow(view: View) {
-            registerComposeRoot(composeRoot)
+            // Only add lifecycle observer. If the root is resumed,
+            // the lifecycle observer will get notified.
+            val lifecycle = checkNotNull(ViewTreeLifecycleOwner.get(view)?.lifecycle)
+            lifecycle.addObserver(this)
+            // Setup a lambda to remove the observer when we're detached from the window. When
+            // that happens, we won't have access to the lifecycle anymore.
+            removeObserver = {
+                lifecycle.removeObserver(this)
+            }
         }
 
         override fun onViewDetachedFromWindow(view: View) {
+            removeLifecycleObserver()
+            // Also unregister the root, as we won't receive lifecycle events anymore
+            unregisterComposeRoot()
+        }
+
+        override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+            if (event == Lifecycle.Event.ON_RESUME) {
+                registerComposeRoot(composeRoot)
+                // Listen to when it is unregistered: it happens
+                // when the registry is torn down prematurely
+                addOnRegistrationChangedListener(this)
+            } else {
+                unregisterComposeRoot()
+            }
+        }
+
+        override fun onRegistrationChanged(composeRoot: ViewRootForTest, registered: Boolean) {
+            if (composeRoot == this.composeRoot && !registered) {
+                // If we are unregistered, stop observing the lifecycle
+                removeLifecycleObserver()
+            }
+        }
+
+        private fun unregisterComposeRoot() {
+            removeOnRegistrationChangedListener(this)
             unregisterComposeRoot(composeRoot)
+        }
+
+        private fun removeLifecycleObserver() {
+            // Lifecycle observers can only be added/removed on the main thread, but
+            // this method can be called from any thread when the registry is torn down.
+            if (Looper.myLooper() != Looper.getMainLooper()) {
+                // Post at front of queue to make sure we remove
+                // the observer before it can receive new events
+                Handler(Looper.getMainLooper()).postAtFrontOfQueue {
+                    removeLifecycleObserverMainThread()
+                }
+            } else {
+                removeLifecycleObserverMainThread()
+            }
+        }
+
+        private fun removeLifecycleObserverMainThread() {
+            removeObserver?.invoke()?.also {
+                removeObserver = null
+            }
         }
     }
 }
 
-private val ComposeRootRegistry.hasComposeRoots: Boolean get() = getComposeRoots().isNotEmpty()
+private val ComposeRootRegistry.hasComposeRoots: Boolean
+    get() = getRegisteredComposeRoots().isNotEmpty()
 
 private fun ComposeRootRegistry.ensureComposeRootRegistryIsSetUp() {
     check(isSetUp) {

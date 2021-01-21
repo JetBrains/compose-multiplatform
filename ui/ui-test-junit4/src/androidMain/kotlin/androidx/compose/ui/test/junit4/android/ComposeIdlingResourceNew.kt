@@ -19,6 +19,7 @@ package androidx.compose.ui.test.junit4.android
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.snapshots.Snapshot
+import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.test.IdlingResource
 import androidx.compose.ui.test.junit4.MainTestClockImpl
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -36,10 +37,11 @@ internal class ComposeIdlingResourceNew(
     private val mainRecomposer: Recomposer
 ) : IdlingResource {
 
-    private var hadAwaitersOnMainClock = true
-    private var hadSnapshotChanges = true
-    private var hadRecomposerChanges = true
-    private var hadPendingMeasureLayout = true
+    private var hadAwaitersOnMainClock = false
+    private var hadSnapshotChanges = false
+    private var hadRecomposerChanges = false
+    private var hadPendingSetContent = false
+    private var hadPendingMeasureLayout = false
 
     override val isIdleNow: Boolean
         @OptIn(ExperimentalComposeApi::class)
@@ -60,24 +62,34 @@ internal class ComposeIdlingResourceNew(
                 ++i
             }
 
-            val composeRoots = composeRootRegistry.getComposeRoots()
+            // pending set content needs all created compose roots,
+            // because by definition they will not be in resumed state
+            hadPendingSetContent =
+                composeRootRegistry.getCreatedComposeRoots().any { it.isBusyAttaching }
+
+            val composeRoots = composeRootRegistry.getRegisteredComposeRoots()
             hadPendingMeasureLayout = composeRoots.any { it.hasPendingMeasureOrLayout }
 
-            return !shouldPumpTime() && !hadPendingMeasureLayout
+            return !shouldPumpTime() &&
+                !hadPendingSetContent &&
+                !hadPendingMeasureLayout
         }
 
     override fun getDiagnosticMessageIfBusy(): String? {
         val wasBusy = hadSnapshotChanges || hadRecomposerChanges || hadAwaitersOnMainClock ||
-            hadPendingMeasureLayout
+            hadPendingSetContent || hadPendingMeasureLayout
 
         if (wasBusy) {
             return null
         }
 
         val busyReasons = mutableListOf<String>()
-        val busyRecomposing = hadSnapshotChanges || hadRecomposerChanges
+        val busyRecomposing = hadSnapshotChanges || hadRecomposerChanges || hadAwaitersOnMainClock
         if (busyRecomposing) {
             busyReasons.add("pending recompositions")
+        }
+        if (hadPendingSetContent) {
+            busyReasons.add("pending setContent")
         }
         if (hadPendingMeasureLayout) {
             busyReasons.add("pending measure/layout")
@@ -94,3 +106,11 @@ internal class ComposeIdlingResourceNew(
         return message
     }
 }
+
+internal val ViewRootForTest.isBusyAttaching: Boolean
+    get() {
+        // If the rootView has a parent, it is the ViewRootImpl, which is set in
+        // windowManager.addView(). If the rootView doesn't have a parent, the view hasn't been
+        // attached to a window yet, or is removed again.
+        return view.rootView.parent != null && !view.isAttachedToWindow
+    }
