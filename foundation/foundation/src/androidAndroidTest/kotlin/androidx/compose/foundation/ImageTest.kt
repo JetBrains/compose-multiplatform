@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredHeightIn
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredSizeIn
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.test.R
 import androidx.compose.runtime.mutableStateOf
@@ -52,6 +53,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.testutils.assertPixels
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.res.imageResource
@@ -588,5 +590,34 @@ class ImageTest {
         rule.onNodeWithTag(testTag)
             .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Image))
             .assert(SemanticsMatcher.expectValue(SemanticsProperties.ContentDescription, "asdf"))
+    }
+
+    @Test
+    fun testImageWithNoIntrinsicSizePainterFillsMaxConstraints() {
+        val testTag = "testTag"
+        rule.setContent {
+            val sizeDp = with(AmbientDensity.current) { 50 / density }
+            Box(modifier = Modifier.size(sizeDp.dp)) {
+                Image(
+                    painter = ColorPainter(Color.Red),
+                    modifier = Modifier.testTag(testTag),
+                    contentDescription = null
+                )
+            }
+        }
+        rule.onNodeWithTag(testTag).captureToImage().assertPixels { Color.Red }
+    }
+
+    @Test
+    fun testImageZeroSizeDoesNotCrash() {
+        rule.setContent {
+            // Intentionally force a size of zero to ensure we do not crash
+            Box(modifier = Modifier.size(0.dp)) {
+                Image(
+                    painter = ColorPainter(Color.Red),
+                    contentDescription = null
+                )
+            }
+        }
     }
 }
