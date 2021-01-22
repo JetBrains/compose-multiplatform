@@ -18,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
@@ -46,21 +47,21 @@ fun Toggles() {
                 modifier = Modifier.padding(16.dp)
             ) {
                 var selected by remember { mutableStateOf("Kotlin") }
-                Row {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     RadioButton(selected = selected == "Kotlin", onClick = { selected = "Kotlin" })
                     Text(
                         text = "Kotlin",
                         modifier = Modifier.clickable(onClick = { selected = "Kotlin" }).padding(start = 4.dp)
                     )
                 }
-                Row {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     RadioButton(selected = selected == "Java", onClick = { selected = "Java" })
                     Text(
                         text = "Java",
                         modifier = Modifier.clickable(onClick = { selected = "Java" }).padding(start = 4.dp)
                     )
                 }
-                Row {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     RadioButton(selected = selected == "Swift", onClick = { selected = "Swift" })
                     Text(
                         text = "Swift",
