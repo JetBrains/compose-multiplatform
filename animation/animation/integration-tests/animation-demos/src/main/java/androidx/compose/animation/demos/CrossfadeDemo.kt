@@ -18,8 +18,9 @@ package androidx.compose.animation.demos
 
 import android.util.Log
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,8 +33,8 @@ import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import kotlin.random.Random
 
@@ -45,12 +46,12 @@ fun CrossfadeDemo() {
         Row {
             tabs.forEachIndexed { index, tab ->
                 Box(
-                    Modifier.tapGestureFilter(
-                        onTap = {
+                    Modifier.pointerInput {
+                        detectTapGestures {
                             Log.e("Crossfade", "Switch to $tab")
                             current = index
                         }
-                    )
+                    }
                         .weight(1f, true)
                         .preferredHeight(48.dp)
                         .background(tab.color)

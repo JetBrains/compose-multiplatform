@@ -15,13 +15,13 @@
  */
 package androidx.compose.foundation
 
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.gesture.pressIndicatorGestureFilter
-import androidx.compose.ui.gesture.tapGestureFilter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
@@ -31,7 +31,7 @@ import androidx.compose.ui.text.style.TextOverflow
 /**
  * A continent version of [BasicText] component to be able to handle click event on the text.
  *
- * This is a shorthand of [BasicText] with [pressIndicatorGestureFilter] to be able to handle click
+ * This is a shorthand of [BasicText] with [pointerInput] to be able to handle click
  * event easily.
  *
  * @sample androidx.compose.foundation.samples.ClickableText
@@ -41,7 +41,8 @@ import androidx.compose.ui.text.style.TextOverflow
  * @sample androidx.compose.foundation.samples.LongClickableText
  *
  * @see BasicText
- * @see androidx.compose.ui.gesture.pressIndicatorGestureFilter
+ * @see androidx.compose.ui.input.pointer.pointerInput
+ * @see androidx.compose.foundation.gestures.detectTapGestures
  *
  * @param text The text to be displayed.
  * @param modifier Modifier to apply to this layout node.
@@ -69,9 +70,11 @@ fun ClickableText(
     onClick: (Int) -> Unit
 ) {
     val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
-    val pressIndicator = Modifier.tapGestureFilter { pos ->
-        layoutResult.value?.let { layoutResult ->
-            onClick(layoutResult.getOffsetForPosition(pos))
+    val pressIndicator = Modifier.pointerInput {
+        detectTapGestures { pos ->
+            layoutResult.value?.let { layoutResult ->
+                onClick(layoutResult.getOffsetForPosition(pos))
+            }
         }
     }
 

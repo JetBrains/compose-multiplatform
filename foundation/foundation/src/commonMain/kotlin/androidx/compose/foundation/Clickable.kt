@@ -138,8 +138,16 @@ fun Modifier.clickable(
                 remember(onDoubleClick, onLongClick) {
                     Modifier.pointerInput {
                         detectTapGestures(
-                            onDoubleTap = onDoubleClick,
-                            onLongPress = onLongClick,
+                            onDoubleTap = if (onDoubleClick != null) {
+                                { onDoubleClick() }
+                            } else {
+                                null
+                            },
+                            onLongPress = if (onLongClick != null) {
+                                { onLongClick() }
+                            } else {
+                                null
+                            },
                             onPress = {
                                 interactionStateState.value.addInteraction(Interaction.Pressed, it)
                                 tryAwaitRelease()

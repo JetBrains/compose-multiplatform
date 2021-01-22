@@ -38,7 +38,6 @@ import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.nestedscroll.nestedScroll
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
-import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
@@ -579,7 +578,7 @@ private fun Scrim(
     color: Color
 ) {
     val dismissDrawer = if (open) {
-        Modifier.tapGestureFilter { onClose() }
+        Modifier.pointerInput { detectTapGestures { onClose() } }
     } else {
         Modifier
     }

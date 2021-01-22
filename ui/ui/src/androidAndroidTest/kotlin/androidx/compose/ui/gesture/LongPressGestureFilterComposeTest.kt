@@ -16,8 +16,10 @@
 
 package androidx.compose.ui.gesture
 
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerInputScope
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
@@ -44,13 +46,15 @@ class LongPressGestureFilterComposeTest {
 
     @Test
     fun testInspectorValue() {
-        val onLongPress: (Offset) -> Unit = {}
+        val block: suspend PointerInputScope.() -> Unit = {
+            detectTapGestures(onLongPress = {})
+        }
         rule.setContent {
-            val modifier = Modifier.longPressGestureFilter(onLongPress) as InspectableValue
-            assertThat(modifier.nameFallback).isEqualTo("longPressGestureFilter")
+            val modifier = Modifier.pointerInput(block) as InspectableValue
+            assertThat(modifier.nameFallback).isEqualTo("pointerInput")
             assertThat(modifier.valueOverride).isNull()
             assertThat(modifier.inspectableElements.asIterable()).containsExactly(
-                ValueElement("onLongPress", onLongPress)
+                ValueElement("block", block)
             )
         }
     }

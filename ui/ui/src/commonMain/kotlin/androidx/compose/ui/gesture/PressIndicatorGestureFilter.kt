@@ -50,6 +50,26 @@ import androidx.compose.ui.util.fastForEach
  * This gesture detector always consumes the down change during the [PointerEventPass.Main] pass.
  */
 // TODO(b/139020678): Probably has shared functionality with other press based detectors.
+@Deprecated(
+    "Gesture filters are deprecated. Use Modifier.clickable or Modifier.pointerInput and " +
+        "detectTapGestures instead",
+    replaceWith = ReplaceWith(
+        """
+            pointerInput {
+                detectTapGestures(onPress = {
+                    onStart?.invoke(it)
+                    val success = tryAwaitRelease()
+                    if (success) {
+                       onStop?.invoke()
+                    } else {
+                       onCancel?.invoke()
+                    }
+                })
+            }""",
+        "androidx.compose.ui.input.pointer.pointerInput",
+        "androidx.compose.foundation.gestures.detectTapGestures"
+    )
+)
 fun Modifier.pressIndicatorGestureFilter(
     onStart: ((Offset) -> Unit)? = null,
     onStop: (() -> Unit)? = null,

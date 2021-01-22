@@ -16,9 +16,10 @@
 
 package androidx.compose.ui.test.gesturescope
 
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.doubleTapGestureFilter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriodMillis
 import androidx.compose.ui.test.doubleClick
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -69,6 +70,7 @@ class SendDoubleClickTest(private val config: TestConfig) {
     private val recordedDoubleClicks = mutableListOf<Offset>()
     private val expectedClickPosition =
         config.position ?: Offset(defaultSize / 2, defaultSize / 2)
+
     // The delay plus 2 clicks
     private val expectedDurationMillis =
         (config.delayMillis ?: 145L) + (2 * eventPeriodMillis)
@@ -84,7 +86,7 @@ class SendDoubleClickTest(private val config: TestConfig) {
         rule.setContent {
             ClickableTestBox(
                 Modifier
-                    .doubleTapGestureFilter(this::recordDoubleClick)
+                    .pointerInput { detectTapGestures(onDoubleTap = ::recordDoubleClick) }
                     .then(recorder)
             )
         }

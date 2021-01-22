@@ -18,6 +18,7 @@ package androidx.compose.ui.demos.gestures
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,20 +28,17 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.drawscope.ContentDrawScope
-import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.Direction
 import androidx.compose.ui.gesture.ScrollCallback
-import androidx.compose.ui.gesture.doubleTapGestureFilter
-import androidx.compose.ui.gesture.longPressGestureFilter
-import androidx.compose.ui.gesture.pressIndicatorGestureFilter
 import androidx.compose.ui.gesture.scrollGestureFilter
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
-import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
@@ -212,10 +210,22 @@ private fun Pressable(
 
     val gestureDetectors =
         Modifier
-            .pressIndicatorGestureFilter(onPress, onRelease, onRelease)
-            .tapGestureFilter(onTap)
-            .doubleTapGestureFilter(onDoubleTap)
-            .longPressGestureFilter(onLongPress)
+            .pointerInput {
+                detectTapGestures(
+                    onPress = {
+                        onPress.invoke(it)
+                        val success = tryAwaitRelease()
+                        if (success) onRelease.invoke() else onRelease.invoke()
+                    }
+                )
+            }
+            .pointerInput {
+                detectTapGestures(
+                    onTap = onTap,
+                    onDoubleTap = onDoubleTap,
+                    onLongPress = onLongPress
+                )
+            }
 
     val pressOverlay =
         if (showPressed.value) Modifier.background(color = pressedColor) else Modifier

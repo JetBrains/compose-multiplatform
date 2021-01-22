@@ -22,6 +22,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.androidview.adapters.setOnClick
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,7 +44,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.tapGestureFilter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -131,7 +132,9 @@ private fun AndroidTapInComposeTap() {
                 .fillMaxSize()
                 .wrapContentSize(Alignment.Center)
                 .preferredSize(240.dp)
-                .tapGestureFilter(onTap)
+                .pointerInput {
+                    detectTapGestures(onTap = onTap)
+                }
         ) {
             AndroidView({ context ->
                 LayoutInflater.from(context)

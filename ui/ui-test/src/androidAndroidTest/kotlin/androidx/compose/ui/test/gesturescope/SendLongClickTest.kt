@@ -16,13 +16,14 @@
 
 package androidx.compose.ui.test.gesturescope
 
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.longPressGestureFilter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.onNodeWithTag
@@ -85,7 +86,13 @@ class SendLongClickTest(private val config: TestConfig) {
         val recorder = SinglePointerInputRecorder()
         rule.setContent {
             Box(Modifier.fillMaxSize().wrapContentSize(Alignment.BottomEnd)) {
-                ClickableTestBox(Modifier.longPressGestureFilter(::recordLongPress).then(recorder))
+                ClickableTestBox(
+                    Modifier
+                        .pointerInput {
+                            detectTapGestures(onLongPress = ::recordLongPress)
+                        }
+                        .then(recorder)
+                )
             }
         }
 

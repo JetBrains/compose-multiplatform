@@ -16,8 +16,10 @@
 
 package androidx.compose.ui.gesture
 
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerInputScope
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
@@ -44,20 +46,15 @@ class PressIndicatorGestureFilterComposeTest {
 
     @Test
     fun testInspectorValue() {
-        val onStart: (Offset) -> Unit = {}
-        val onStop: () -> Unit = {}
-        val onCancel: () -> Unit = {}
-        val enabled = true
+        val block: suspend PointerInputScope.() -> Unit = {
+            detectTapGestures(onPress = {})
+        }
         rule.setContent {
-            val modifier = Modifier.pressIndicatorGestureFilter(onStart, onStop, onCancel, enabled)
-                as InspectableValue
-            assertThat(modifier.nameFallback).isEqualTo("pressIndicatorGestureFilter")
+            val modifier = Modifier.pointerInput(block) as InspectableValue
+            assertThat(modifier.nameFallback).isEqualTo("pointerInput")
             assertThat(modifier.valueOverride).isNull()
             assertThat(modifier.inspectableElements.asIterable()).containsExactly(
-                ValueElement("onStart", onStart),
-                ValueElement("onStop", onStop),
-                ValueElement("onCancel", onCancel),
-                ValueElement("enabled", enabled)
+                ValueElement("block", block)
             )
         }
     }

@@ -172,6 +172,7 @@ class ComposeTapIntegrationBenchmark {
     }
 
     @Composable
+    @Suppress("DEPRECATION")
     fun Email(label: String) {
         Text(
             text = label,
