@@ -51,6 +51,7 @@ class ComposeDemoAction : DumbAwareAction() {
                             ) {
                                 Buttons()
                                 Loaders()
+                                TextInputs()
                                 Toggles()
                             }
                             Box(
