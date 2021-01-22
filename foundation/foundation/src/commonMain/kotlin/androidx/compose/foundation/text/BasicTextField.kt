@@ -25,7 +25,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextLayoutResult
@@ -113,7 +112,6 @@ import androidx.compose.ui.text.input.VisualTransformation
  * parameter "innerTextField" to the decorationBox lambda you provide. You must call
  * innerTextField exactly once.
  */
-@OptIn(ExperimentalTextApi::class)
 @Composable
 fun BasicTextField(
     value: String,
@@ -240,7 +238,7 @@ fun BasicTextField(
  * innerTextField exactly once.
  */
 @Composable
-@OptIn(InternalTextApi::class, ExperimentalTextApi::class)
+@OptIn(InternalTextApi::class)
 fun BasicTextField(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,

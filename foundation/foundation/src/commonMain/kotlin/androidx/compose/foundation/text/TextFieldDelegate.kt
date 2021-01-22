@@ -89,13 +89,8 @@ internal fun computeSizeForDefaultText(
 
 private fun Float.toIntPx(): Int = ceil(this).roundToInt()
 
-/** @suppress **/
-@OptIn(
-    InternalTextApi::class,
-    ExperimentalTextApi::class
-)
-@InternalTextApi
-class TextFieldDelegate {
+@OptIn(ExperimentalTextApi::class, InternalTextApi::class)
+internal class TextFieldDelegate {
     companion object {
         /**
          * Process text layout with given constraint.
@@ -296,7 +291,6 @@ class TextFieldDelegate {
          *
          *  @suppress
          */
-        @InternalTextApi
         fun applyCompositionDecoration(
             compositionRange: TextRange,
             transformed: TransformedText

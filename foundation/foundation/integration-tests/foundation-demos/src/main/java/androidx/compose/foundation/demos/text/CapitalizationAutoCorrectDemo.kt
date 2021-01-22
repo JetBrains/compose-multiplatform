@@ -19,7 +19,8 @@ package androidx.compose.foundation.demos.text
 import androidx.compose.foundation.layout.defaultMinSizeConstraints
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.CoreTextField
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,15 +31,14 @@ import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalTextApi::class)
-private val ImeOptionsList = listOf(
+private val KeyboardOptionsList = listOf(
     ImeOptionsData(
-        imeOptions = ImeOptions(
+        keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Text,
             capitalization = KeyboardCapitalization.Characters
         ),
@@ -46,28 +46,28 @@ private val ImeOptionsList = listOf(
         name = "Capitalize Characters"
     ),
     ImeOptionsData(
-        imeOptions = ImeOptions(
+        keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Text,
             capitalization = KeyboardCapitalization.Words
         ),
         name = "Capitalize Words"
     ),
     ImeOptionsData(
-        imeOptions = ImeOptions(
+        keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Text,
             capitalization = KeyboardCapitalization.Sentences
         ),
         name = "Capitalize Sentences"
     ),
     ImeOptionsData(
-        imeOptions = ImeOptions(
+        keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Text,
             autoCorrect = true
         ),
         name = "AutoCorrect On"
     ),
     ImeOptionsData(
-        imeOptions = ImeOptions(
+        keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Text,
             autoCorrect = false
         ),
@@ -79,7 +79,7 @@ private val ImeOptionsList = listOf(
 @Composable
 fun CapitalizationAutoCorrectDemo() {
     LazyColumn {
-        items(ImeOptionsList) { data ->
+        items(KeyboardOptionsList) { data ->
             TagLine(tag = data.name)
             MyTextField(data)
         }
@@ -94,10 +94,10 @@ fun CapitalizationAutoCorrectDemo() {
 private fun MyTextField(data: ImeOptionsData) {
     val controller = remember { mutableStateOf<SoftwareKeyboardController?>(null) }
     val state = savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
-    CoreTextField(
+    BasicTextField(
         modifier = demoTextFieldModifiers.defaultMinSizeConstraints(100.dp),
         value = state.value,
-        imeOptions = data.imeOptions,
+        keyboardOptions = data.keyboardOptions,
         onValueChange = { state.value = it },
         textStyle = TextStyle(fontSize = fontSize8),
         onTextInputStarted = { controller.value = it },

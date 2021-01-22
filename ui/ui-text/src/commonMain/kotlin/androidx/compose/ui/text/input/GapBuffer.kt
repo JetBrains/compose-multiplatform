@@ -213,7 +213,7 @@ private class GapBuffer(initBuffer: CharArray, initGapStart: Int, initGapEnd: In
  * @param text The initial text
  * @suppress
  */
-@InternalTextApi
+@InternalTextApi // "Used by benchmarks"
 class PartialGapBuffer(var text: String) {
     internal companion object {
         const val BUF_SIZE = 255

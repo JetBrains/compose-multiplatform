@@ -211,7 +211,7 @@ fun TextFieldValue.getSelectedText(): AnnotatedString = annotatedString.subSeque
  *
  * @suppress
  */
-@InternalTextApi
+@InternalTextApi // Used by tests in foundation since constructor is not accessible
 fun buildTextFieldValue(
     text: String,
     selection: TextRange,
