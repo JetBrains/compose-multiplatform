@@ -161,13 +161,9 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
                 lintConfig = project.rootProject.file("buildSrc/lint.xml")
             }
 
-            // Teams shouldn't be able to generate new baseline files or add new violations to
-            // existing files; they should only be able to burn down existing violations. That's
-            // hard to enforce, though, so we'll just prevent them from creating new ones.
-            //
-            // If you are working on enabling a new check -- and ONLY if you are working on a new
-            // check, then you may need to comment out this line  so that you can suppress all
-            // the new failures.
+            // Ideally, teams aren't able to add new violations to a baseline file; they should only
+            // be able to burn down existing violations. That's hard to enforce, though, so we'll
+            // generally allow teams to update their baseline files with a publicly-known flag.
             if (updateLintBaseline) {
                 // Continue generating baselines regardless of errors
                 isAbortOnError = false
@@ -185,9 +181,16 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
                         lintBaseline.delete()
                     }
                 }
+                // Continue running after errors or after creating a new, blank baseline file.
                 System.setProperty(LINT_BASELINE_CONTINUE, "true")
             }
-            baseline(lintBaseline)
+
+            // Lint complains when it generates a new, blank baseline file so we'll just avoid
+            // telling it about the baseline if one doesn't already exist OR we're explicitly
+            // updating (and creating) baseline files.
+            if (updateLintBaseline or lintBaseline.exists()) {
+                baseline(lintBaseline)
+            }
         }
     }
 }
