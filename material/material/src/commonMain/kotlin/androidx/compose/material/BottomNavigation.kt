@@ -47,6 +47,7 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
@@ -123,6 +124,8 @@ fun BottomNavigation(
  * @param selected whether this item is selected
  * @param onClick the callback to be invoked when this item is selected
  * @param modifier optional [Modifier] for this item
+ * @param enabled controls the enabled state of this item. When `false`, this item will not
+ * be clickable and will appear disabled to accessibility services.
  * @param label optional text label for this item
  * @param alwaysShowLabels whether to always show labels for this item. If false, labels will
  * only be shown when this item is selected.
@@ -135,11 +138,12 @@ fun BottomNavigation(
  * @param unselectedContentColor the color of the text label and icon when this item is not selected
  */
 @Composable
-fun BottomNavigationItem(
+fun RowScope.BottomNavigationItem(
     icon: @Composable () -> Unit,
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     label: @Composable () -> Unit = emptyContent(),
     alwaysShowLabels: Boolean = true,
     interactionState: InteractionState = remember { InteractionState() },
@@ -157,16 +161,16 @@ fun BottomNavigationItem(
 
     // TODO This composable has magic behavior within a Row; reconsider this behavior later
     Box(
-        with(RowScope) {
-            modifier
-                .selectable(
-                    selected = selected,
-                    onClick = onClick,
-                    interactionState = interactionState,
-                    indication = ripple
-                )
-                .weight(1f)
-        },
+        modifier
+            .selectable(
+                selected = selected,
+                onClick = onClick,
+                enabled = enabled,
+                role = Role.Tab,
+                interactionState = interactionState,
+                indication = ripple
+            )
+            .weight(1f),
         contentAlignment = Alignment.Center
     ) {
         BottomNavigationTransition(
