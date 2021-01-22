@@ -1,9 +1,11 @@
 package com.jetbrains.compose.widgets
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Checkbox
@@ -47,26 +49,41 @@ fun Toggles() {
                 modifier = Modifier.padding(16.dp)
             ) {
                 var selected by remember { mutableStateOf("Kotlin") }
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row {
                     RadioButton(selected = selected == "Kotlin", onClick = { selected = "Kotlin" })
-                    Text(
-                        text = "Kotlin",
-                        modifier = Modifier.clickable(onClick = { selected = "Kotlin" }).padding(start = 4.dp)
-                    )
+                    Box(
+                        modifier = Modifier.height(30.dp),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        Text(
+                            text = "Kotlin",
+                            modifier = Modifier.clickable(onClick = { selected = "Kotlin" }).padding(start = 4.dp)
+                        )
+                    }
                 }
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row {
                     RadioButton(selected = selected == "Java", onClick = { selected = "Java" })
-                    Text(
-                        text = "Java",
-                        modifier = Modifier.clickable(onClick = { selected = "Java" }).padding(start = 4.dp)
-                    )
+                    Box(
+                        modifier = Modifier.height(30.dp),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        Text(
+                            text = "Java",
+                            modifier = Modifier.clickable(onClick = { selected = "Java" }).padding(start = 4.dp)
+                        )
+                    }
                 }
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row {
                     RadioButton(selected = selected == "Swift", onClick = { selected = "Swift" })
-                    Text(
-                        text = "Swift",
-                        modifier = Modifier.clickable(onClick = { selected = "Swift" }).padding(start = 4.dp)
-                    )
+                    Box(
+                        modifier = Modifier.height(30.dp),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        Text(
+                            text = "Swift",
+                            modifier = Modifier.clickable(onClick = { selected = "Swift" }).padding(start = 4.dp)
+                        )
+                    }
                 }
             }
         }
