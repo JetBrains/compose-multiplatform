@@ -42,10 +42,14 @@ private fun View.isAndroidComposeView(): Boolean {
  * As this class extracts information about the view it's targeting, it must be instantiated on the
  * UI thread.
  */
-class AndroidComposeViewWrapper(private val composeView: View) {
+class AndroidComposeViewWrapper(private val composeView: View, skipSystemComposables: Boolean) {
     companion object {
-        fun tryCreateFor(view: View): AndroidComposeViewWrapper? {
-            return if (view.isAndroidComposeView()) AndroidComposeViewWrapper(view) else null
+        fun tryCreateFor(view: View, skipSystemComposables: Boolean): AndroidComposeViewWrapper? {
+            return if (view.isAndroidComposeView()) {
+                AndroidComposeViewWrapper(view, skipSystemComposables)
+            } else {
+                null
+            }
         }
     }
 
@@ -54,7 +58,9 @@ class AndroidComposeViewWrapper(private val composeView: View) {
         check(composeView.isAndroidComposeView())
     }
 
-    val inspectorNodes = LayoutInspectorTree().convert(composeView)
+    val inspectorNodes = LayoutInspectorTree().apply {
+        this.hideSystemNodes = skipSystemComposables
+    }.convert(composeView)
 
     fun createComposableRoot(stringTable: StringTable): ComposableRoot {
         ThreadUtils.assertOnMainThread()
