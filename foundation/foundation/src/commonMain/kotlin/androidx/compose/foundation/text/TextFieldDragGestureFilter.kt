@@ -19,23 +19,21 @@ package androidx.compose.foundation.text
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.gesture.dragGestureFilter
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.gesture.pressIndicatorGestureFilter
 
 /**
  * Helper composable for tracking drag position.
  */
-@Suppress("ModifierInspectorInfo")
+@Suppress("ModifierInspectorInfo", "DEPRECATION")
 internal fun Modifier.dragPositionGestureFilter(
     onPress: (Offset) -> Unit,
     onRelease: (Offset) -> Unit,
-    onTap: () -> Unit,
     interactionState: InteractionState?,
     enabled: Boolean = true
 ): Modifier = if (enabled) composed {
@@ -48,19 +46,20 @@ internal fun Modifier.dragPositionGestureFilter(
             interactionState?.removeInteraction(Interaction.Pressed)
         }
     }
-    pointerInput {
-        detectTapGestures(
-            onTap = { onTap() },
-            onPress = {
-                interactionState?.addInteraction(Interaction.Pressed, it)
-                tracker.init(it)
-                onPress(it)
-                val success = tryAwaitRelease()
-                interactionState?.removeInteraction(Interaction.Pressed)
-                if (success) onRelease(tracker.getPosition())
-            }
-        )
-    }
+    pressIndicatorGestureFilter(
+        onStart = {
+            interactionState?.addInteraction(Interaction.Pressed, it)
+            tracker.init(it)
+            onPress(it)
+        },
+        onStop = {
+            interactionState?.removeInteraction(Interaction.Pressed)
+            onRelease(tracker.getPosition())
+        },
+        onCancel = {
+            interactionState?.removeInteraction(Interaction.Pressed)
+        }
+    )
         .dragGestureFilter(
             dragObserver = object :
                 DragObserver {
