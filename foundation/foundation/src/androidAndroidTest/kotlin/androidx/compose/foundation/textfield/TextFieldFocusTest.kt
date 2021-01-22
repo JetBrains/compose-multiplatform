@@ -18,6 +18,7 @@ package androidx.compose.foundation.textfield
 
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.CoreTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,7 +27,12 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.text.InternalTextApi
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -36,6 +42,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @LargeTest
+@OptIn(InternalTextApi::class)
 @RunWith(AndroidJUnit4::class)
 class TextFieldFocusTest {
     @get:Rule
@@ -96,6 +103,41 @@ class TextFieldFocusTest {
             assertThat(testDataList[0].focused).isFalse()
             assertThat(testDataList[1].focused).isFalse()
             assertThat(testDataList[2].focused).isTrue()
+        }
+    }
+
+    @Test
+    fun noCrushWhenSwitchingBetweenEnabledFocusedAndDisabledTextField() {
+        val enabled = mutableStateOf(true)
+        var focused = false
+        val tag = "textField"
+        rule.setContent {
+            CoreTextField(
+                value = TextFieldValue(),
+                onValueChange = {},
+                enabled = enabled.value,
+                modifier = Modifier.testTag(tag).onFocusChanged {
+                    focused = it.isFocused
+                }
+            )
+        }
+        // bring enabled text field into focus
+        rule.onNodeWithTag(tag)
+            .performClick()
+        rule.runOnIdle {
+            assertThat(focused).isTrue()
+        }
+
+        // make text field disabled
+        enabled.value = false
+        rule.runOnIdle {
+            assertThat(focused).isFalse()
+        }
+
+        // make text field enabled again, it must not crash
+        enabled.value = true
+        rule.runOnIdle {
+            assertThat(focused).isFalse()
         }
     }
 }
