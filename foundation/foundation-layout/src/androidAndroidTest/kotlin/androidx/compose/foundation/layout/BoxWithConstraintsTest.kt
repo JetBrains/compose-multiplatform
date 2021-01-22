@@ -27,12 +27,12 @@ import android.view.View
 import android.view.ViewTreeObserver
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -615,8 +615,10 @@ class BoxWithConstraintsTest : LayoutTest() {
             if (emit) {
                 BoxWithConstraints {
                     composedLatch.countDown()
-                    onDispose {
-                        disposedLatch.countDown()
+                    DisposableEffect(Unit) {
+                        onDispose {
+                            disposedLatch.countDown()
+                        }
                     }
                 }
             }
