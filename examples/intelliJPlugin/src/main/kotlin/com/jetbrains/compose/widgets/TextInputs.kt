@@ -25,6 +25,8 @@ fun TextInputs() {
     ) {
         var name by remember { mutableStateOf(TextFieldValue("")) }
         var password by remember { mutableStateOf(TextFieldValue("")) }
+
+        // TextInputs() // TODO: causes exceptions on Windows OS
         TextField(
             value = name,
             onValueChange = { newValue -> name = newValue },
@@ -32,6 +34,8 @@ fun TextInputs() {
             label = { Text("Account:") },
             placeholder = { Text("account name") }
         )
+
+        // TextInputs() // TODO: causes exceptions on Windows OS
         OutlinedTextField(
             value = password,
             modifier = Modifier.padding(8.dp).fillMaxWidth(),
