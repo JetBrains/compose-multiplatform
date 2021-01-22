@@ -11,7 +11,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RadioButton
 import androidx.compose.material.Slider
 import androidx.compose.material.Switch
-import androidx.compose.material.SwitchConstants
+import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -37,7 +37,7 @@ fun Toggles() {
                 var switched by remember { mutableStateOf(true) }
                 Switch(
                     checked = switched,
-                    colors = SwitchConstants.defaultColors(checkedThumbColor = MaterialTheme.colors.primary),
+                    colors = SwitchDefaults.colors(checkedThumbColor = MaterialTheme.colors.primary),
                     modifier = Modifier.padding(8.dp),
                     onCheckedChange = { switched = it }
                 )

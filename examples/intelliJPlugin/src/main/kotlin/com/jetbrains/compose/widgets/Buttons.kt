@@ -25,7 +25,11 @@ fun Buttons() {
             modifier = Modifier.padding(8.dp),
             enabled = btnEnabled.value
         ) {
-            Icon(Icons.Default.FavoriteBorder, modifier = Modifier.padding(end = 4.dp))
+            Icon(
+                imageVector = Icons.Default.FavoriteBorder,
+                contentDescription = "FavoriteBorder",
+                modifier = Modifier.padding(end = 4.dp)
+            )
             Text(text = "Button")
         }
         val btnTextEnabled = remember { mutableStateOf(true) }
@@ -43,7 +47,11 @@ fun Buttons() {
             },
             modifier = Modifier.padding(8.dp)
         ) {
-            Icon(Icons.Default.Refresh, modifier = Modifier.padding(0.dp))
+            Icon(
+                imageVector = Icons.Default.Refresh,
+                contentDescription = "Refresh",
+                modifier = Modifier.padding(0.dp)
+            )
         }
     }
 }
