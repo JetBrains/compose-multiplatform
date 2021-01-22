@@ -26,6 +26,7 @@ import androidx.compose.ui.text.platform.Font
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.sp
 import com.google.common.truth.Truth
+import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -70,6 +71,7 @@ class DesktopParagraphTest {
 
     @Test
     fun getBoundingBox_multicodepoints() {
+        assumeLinux()
         with(defaultDensity) {
             val text = "h\uD83E\uDDD1\uD83C\uDFFF\u200D\uD83E\uDDB0"
             val fontSize = 50.sp
@@ -111,5 +113,9 @@ class DesktopParagraphTest {
             density = density ?: defaultDensity,
             resourceLoader = fontLoader
         )
+    }
+
+    private fun assumeLinux() {
+        assumeTrue(System.getProperty("os.name").startsWith("Linux"))
     }
 }
