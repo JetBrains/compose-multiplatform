@@ -25,9 +25,10 @@ import android.view.MotionEvent.ACTION_POINTER_DOWN
 import android.view.MotionEvent.ACTION_POINTER_INDEX_SHIFT
 import android.view.MotionEvent.ACTION_POINTER_UP
 import android.view.MotionEvent.ACTION_UP
-import androidx.compose.ui.platform.AndroidUiDispatcher
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.node.RootForTest
+import androidx.compose.ui.platform.AndroidUiDispatcher
 import androidx.compose.ui.platform.ViewRootForTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -49,7 +50,7 @@ internal actual fun createInputDispatcher(
 
 internal class AndroidInputDispatcher(
     private val testContext: TestContext,
-    root: ViewRootForTest?,
+    private val root: ViewRootForTest?,
     private val sendEvent: (MotionEvent) -> Unit
 ) : InputDispatcher(testContext, root) {
 
@@ -130,6 +131,12 @@ internal class AndroidInputDispatcher(
                 firstEventTime = eventTime
             }
             batchedEvents.add { lateness ->
+                val positionInWindow = if (root != null) {
+                    root.semanticsOwner.rootSemanticsNode.layoutInfo.coordinates.boundsInWindow()
+                        .topLeft
+                } else {
+                    Offset.Zero
+                }
                 MotionEvent.obtain(
                     /* downTime = */ lateness + downTime,
                     /* eventTime = */ lateness + eventTime,
@@ -152,7 +159,9 @@ internal class AndroidInputDispatcher(
                     /* edgeFlags = */ 0,
                     /* source = */ 0,
                     /* flags = */ 0
-                )
+                ).apply {
+                    offsetLocation(-positionInWindow.x, -positionInWindow.y)
+                }
             }
         }
     }

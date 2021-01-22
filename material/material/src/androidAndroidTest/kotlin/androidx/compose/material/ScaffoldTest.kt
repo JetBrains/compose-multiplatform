@@ -92,11 +92,11 @@ class ScaffoldTest {
             Scaffold {
                 Text(
                     "One",
-                    Modifier.onGloballyPositioned { child1 = it.positionInParent }
+                    Modifier.onGloballyPositioned { child1 = it.positionInParent() }
                 )
                 Text(
                     "Two",
-                    Modifier.onGloballyPositioned { child2 = it.positionInParent }
+                    Modifier.onGloballyPositioned { child2 = it.positionInParent() }
                 )
             }
         }
@@ -149,7 +149,7 @@ class ScaffoldTest {
                     Box(
                         Modifier
                             .onGloballyPositioned { positioned: LayoutCoordinates ->
-                                appbarPosition = positioned.positionInParent
+                                appbarPosition = positioned.positionInParent()
                                 appbarSize = positioned.size
                             }
                             .fillMaxWidth()
@@ -161,7 +161,7 @@ class ScaffoldTest {
                 Box(
                     Modifier
                         .onGloballyPositioned { positioned: LayoutCoordinates ->
-                            contentPosition = positioned.positionInParent
+                            contentPosition = positioned.positionInParent()
                             contentSize = positioned.size
                         }
                         .fillMaxSize()
@@ -187,7 +187,7 @@ class ScaffoldTest {
                         Box(
                             Modifier
                                 .onGloballyPositioned { positioned: LayoutCoordinates ->
-                                    drawerChildPosition = positioned.positionInParent
+                                    drawerChildPosition = positioned.positionInParent()
                                 }
                                 .fillMaxWidth()
                                 .height(50.dp)
@@ -243,7 +243,7 @@ class ScaffoldTest {
                         Box(
                             Modifier
                                 .onGloballyPositioned { positioned: LayoutCoordinates ->
-                                    drawerChildPosition = positioned.positionInParent
+                                    drawerChildPosition = positioned.positionInParent()
                                 }
                                 .fillMaxWidth()
                                 .height(50.dp)

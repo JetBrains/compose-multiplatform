@@ -3160,45 +3160,20 @@ class LayoutCoordinatesStub(
         get() = TODO("not implemented")
 
     override val parentLayoutCoordinates: LayoutCoordinates?
-        get() = TODO("not implemented")
+        get() = null
     override val parentCoordinates: LayoutCoordinates?
-        get() = TODO("Not yet implemented")
+        get() = null
 
-    override fun globalToLocal(global: Offset): Offset {
-        TODO("not implemented")
-    }
+    override fun windowToLocal(relativeToWindow: Offset): Offset = relativeToWindow
 
-    override fun windowToLocal(relativeToWindow: Offset): Offset {
-        TODO("Not yet implemented")
-    }
+    override fun localToWindow(relativeToLocal: Offset): Offset = relativeToLocal
 
-    override fun localToGlobal(local: Offset): Offset {
-        assertThat(isAttached).isTrue()
-        return local + additionalOffset
-    }
-
-    override fun localToWindow(relativeToLocal: Offset): Offset {
-        TODO("Not yet implemented")
-    }
-
-    override fun localToRoot(relativeToLocal: Offset): Offset {
-        TODO("not implemented")
-    }
+    override fun localToRoot(relativeToLocal: Offset): Offset = relativeToLocal
 
     override fun localPositionOf(
         sourceCoordinates: LayoutCoordinates,
         relativeToSource: Offset
-    ): Offset {
-        TODO("Not yet implemented")
-    }
-
-    override fun childToLocal(child: LayoutCoordinates, childLocal: Offset): Offset {
-        TODO("not implemented")
-    }
-
-    override fun childBoundingBox(child: LayoutCoordinates): Rect {
-        TODO("not implemented")
-    }
+    ): Offset = relativeToSource
 
     override fun localBoundingBoxOf(
         sourceCoordinates: LayoutCoordinates,

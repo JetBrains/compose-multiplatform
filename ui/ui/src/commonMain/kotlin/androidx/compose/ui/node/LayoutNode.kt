@@ -797,20 +797,21 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
      * Carries out a hit test on the [PointerInputModifier]s associated with this [LayoutNode] and
      * all [PointerInputModifier]s on all descendant [LayoutNode]s.
      *
-     * If [pointerPositionRelativeToScreen] is within the bounds of any tested
+     * If [pointerPosition] is within the bounds of any tested
      * [PointerInputModifier]s, the [PointerInputModifier] is added to [hitPointerInputFilters]
      * and true is returned.
      *
-     * @param pointerPositionRelativeToScreen The tested pointer position, which is relative to
-     * the device screen.
+     * @param pointerPosition The tested pointer position, which is relative to
+     * the LayoutNode.
      * @param hitPointerInputFilters The collection that the hit [PointerInputFilter]s will be
      * added to if hit.
      */
     internal fun hitTest(
-        pointerPositionRelativeToScreen: Offset,
+        pointerPosition: Offset,
         hitPointerInputFilters: MutableList<PointerInputFilter>
     ) {
-        outerLayoutNodeWrapper.hitTest(pointerPositionRelativeToScreen, hitPointerInputFilters)
+        val positionInWrapped = outerLayoutNodeWrapper.fromParentPosition(pointerPosition)
+        outerLayoutNodeWrapper.hitTest(positionInWrapped, hitPointerInputFilters)
     }
 
     /**

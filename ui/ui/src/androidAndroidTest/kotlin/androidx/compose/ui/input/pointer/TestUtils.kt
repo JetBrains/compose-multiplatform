@@ -40,6 +40,7 @@ internal fun PointerInputEventData(
         PointerId(id.toLong()),
         uptime,
         position,
+        position,
         down,
         PointerType.Touch
     )

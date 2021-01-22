@@ -1617,18 +1617,14 @@ package androidx.compose.ui.layout {
   }
 
   public interface LayoutCoordinates {
-    method @Deprecated public androidx.compose.ui.geometry.Rect childBoundingBox(androidx.compose.ui.layout.LayoutCoordinates child);
-    method @Deprecated public long childToLocal-YJiYy8w(androidx.compose.ui.layout.LayoutCoordinates child, long childLocal);
     method public operator int get(androidx.compose.ui.layout.AlignmentLine alignmentLine);
     method public androidx.compose.ui.layout.LayoutCoordinates? getParentCoordinates();
     method public androidx.compose.ui.layout.LayoutCoordinates? getParentLayoutCoordinates();
     method public java.util.Set<androidx.compose.ui.layout.AlignmentLine> getProvidedAlignmentLines();
     method public long getSize-YbymL2g();
-    method @Deprecated public long globalToLocal-k-4lQ0M(long global);
     method public boolean isAttached();
     method public androidx.compose.ui.geometry.Rect localBoundingBoxOf(androidx.compose.ui.layout.LayoutCoordinates sourceCoordinates, optional boolean clipBounds);
     method public long localPositionOf-YJiYy8w(androidx.compose.ui.layout.LayoutCoordinates sourceCoordinates, long relativeToSource);
-    method @Deprecated public long localToGlobal-k-4lQ0M(long local);
     method public long localToRoot-k-4lQ0M(long relativeToLocal);
     method public long localToWindow-k-4lQ0M(long relativeToLocal);
     method public long windowToLocal-k-4lQ0M(long relativeToWindow);
@@ -1640,14 +1636,10 @@ package androidx.compose.ui.layout {
   }
 
   public final class LayoutCoordinatesKt {
+    method public static androidx.compose.ui.geometry.Rect boundsInParent(androidx.compose.ui.layout.LayoutCoordinates);
     method public static androidx.compose.ui.geometry.Rect boundsInRoot(androidx.compose.ui.layout.LayoutCoordinates);
     method public static androidx.compose.ui.geometry.Rect boundsInWindow(androidx.compose.ui.layout.LayoutCoordinates);
-    method public static androidx.compose.ui.geometry.Rect getBoundsInParent(androidx.compose.ui.layout.LayoutCoordinates);
-    method @Deprecated public static androidx.compose.ui.geometry.Rect getBoundsInRoot(androidx.compose.ui.layout.LayoutCoordinates);
-    method @Deprecated public static androidx.compose.ui.geometry.Rect getGlobalBounds(androidx.compose.ui.layout.LayoutCoordinates);
-    method @Deprecated public static inline long getGlobalPosition(androidx.compose.ui.layout.LayoutCoordinates);
-    method public static long getPositionInParent(androidx.compose.ui.layout.LayoutCoordinates);
-    method @Deprecated public static inline long getPositionInRoot(androidx.compose.ui.layout.LayoutCoordinates);
+    method public static long positionInParent(androidx.compose.ui.layout.LayoutCoordinates);
     method public static long positionInRoot(androidx.compose.ui.layout.LayoutCoordinates);
     method public static long positionInWindow(androidx.compose.ui.layout.LayoutCoordinates);
   }
@@ -2356,29 +2348,29 @@ package androidx.compose.ui.semantics {
   public final class SemanticsNode {
     method public int getAlignmentLinePosition(androidx.compose.ui.layout.AlignmentLine alignmentLine);
     method public androidx.compose.ui.geometry.Rect getBoundsInRoot();
+    method public androidx.compose.ui.geometry.Rect getBoundsInWindow();
     method public java.util.List<androidx.compose.ui.semantics.SemanticsNode> getChildren();
     method public androidx.compose.ui.semantics.SemanticsConfiguration getConfig();
-    method public androidx.compose.ui.geometry.Rect getGlobalBounds();
-    method public long getGlobalPosition-F1C5BW0();
     method public int getId();
     method public androidx.compose.ui.layout.LayoutInfo getLayoutInfo();
     method public boolean getMergingEnabled();
     method public androidx.compose.ui.semantics.SemanticsNode? getParent();
     method public long getPositionInRoot-F1C5BW0();
+    method public long getPositionInWindow-F1C5BW0();
     method public androidx.compose.ui.node.RootForTest? getRoot();
     method public long getSize-YbymL2g();
     method public boolean isRoot();
     property public final androidx.compose.ui.geometry.Rect boundsInRoot;
+    property public final androidx.compose.ui.geometry.Rect boundsInWindow;
     property public final java.util.List<androidx.compose.ui.semantics.SemanticsNode> children;
     property public final androidx.compose.ui.semantics.SemanticsConfiguration config;
-    property public final androidx.compose.ui.geometry.Rect globalBounds;
-    property public final long globalPosition;
     property public final int id;
     property public final boolean isRoot;
     property public final androidx.compose.ui.layout.LayoutInfo layoutInfo;
     property public final boolean mergingEnabled;
     property public final androidx.compose.ui.semantics.SemanticsNode? parent;
     property public final long positionInRoot;
+    property public final long positionInWindow;
     property public final androidx.compose.ui.node.RootForTest? root;
     property public final long size;
   }

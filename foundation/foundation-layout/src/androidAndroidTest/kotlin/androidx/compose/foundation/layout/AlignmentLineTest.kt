@@ -343,7 +343,7 @@ class AlignmentLineTest : LayoutTest() {
                     Modifier.width(incomingSize)
                         .paddingFrom(testLine, before = before)
                         .onGloballyPositioned {
-                            Assert.assertEquals(beforePx - linePositionPx, it.positionInParent.x)
+                            Assert.assertEquals(beforePx - linePositionPx, it.positionInParent().x)
                             latch.countDown()
                         }
                 )
@@ -354,7 +354,7 @@ class AlignmentLineTest : LayoutTest() {
                         .onGloballyPositioned {
                             Assert.assertEquals(
                                 incomingSizePx - childSizePx - afterPx + linePositionPx,
-                                it.positionInParent.x
+                                it.positionInParent().x
                             )
                             latch.countDown()
                         }
@@ -386,7 +386,7 @@ class AlignmentLineTest : LayoutTest() {
                     Modifier.height(incomingSize)
                         .paddingFrom(testLine, before = before)
                         .onGloballyPositioned {
-                            Assert.assertEquals(beforePx - linePositionPx, it.positionInParent.y)
+                            Assert.assertEquals(beforePx - linePositionPx, it.positionInParent().y)
                             latch.countDown()
                         }
                 )
@@ -397,7 +397,7 @@ class AlignmentLineTest : LayoutTest() {
                         .onGloballyPositioned {
                             Assert.assertEquals(
                                 incomingSizePx - childSizePx - afterPx + linePositionPx,
-                                it.positionInParent.y
+                                it.positionInParent().y
                             )
                             latch.countDown()
                         }
@@ -492,7 +492,7 @@ class AlignmentLineTest : LayoutTest() {
                     Modifier.height(incomingSize)
                         .paddingFromBaseline(top = before, bottom = after)
                         .onGloballyPositioned {
-                            Assert.assertEquals(beforePx - linePositionPx, it.positionInParent.y)
+                            Assert.assertEquals(beforePx - linePositionPx, it.positionInParent().y)
                             latch.countDown()
                         }
                 ) {

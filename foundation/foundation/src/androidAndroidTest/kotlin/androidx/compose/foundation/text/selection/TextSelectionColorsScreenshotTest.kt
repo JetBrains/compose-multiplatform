@@ -43,6 +43,7 @@ import androidx.compose.ui.test.width
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
@@ -67,6 +68,7 @@ class TextSelectionColorsScreenshotTest {
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_UI)
 
+    @FlakyTest(bugId = 179770443)
     @Test
     fun text_defaultSelectionColors() {
         rule.setContent {
@@ -85,6 +87,7 @@ class TextSelectionColorsScreenshotTest {
             .assertAgainstGolden(screenshotRule, "text_defaultSelectionColors")
     }
 
+    @FlakyTest(bugId = 179770443)
     @Test
     fun text_customSelectionColors() {
         rule.setContent {

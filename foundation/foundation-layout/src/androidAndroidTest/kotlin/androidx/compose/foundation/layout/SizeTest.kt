@@ -38,7 +38,6 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.constrain
 import androidx.compose.ui.unit.dp
-import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -47,11 +46,12 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 
-@SmallTest
+@MediumTest
 @RunWith(AndroidJUnit4::class)
 class SizeTest : LayoutTest() {
 
@@ -1642,7 +1642,7 @@ class SizeTest : LayoutTest() {
                         .onGloballyPositioned {
                             assertEquals(
                                 Offset(outerSize - innerSize, outerSize - innerSize),
-                                it.positionInParent
+                                it.positionInParent()
                             )
                             positionedLatch.countDown()
                         }
@@ -1651,7 +1651,7 @@ class SizeTest : LayoutTest() {
                     Modifier.wrapContentWidth(Alignment.End, unbounded = true)
                         .requiredSize(innerSize.toDp())
                         .onGloballyPositioned {
-                            assertEquals(outerSize - innerSize, it.positionInParent.x)
+                            assertEquals(outerSize - innerSize, it.positionInParent().x)
                             positionedLatch.countDown()
                         }
                 )
@@ -1659,7 +1659,7 @@ class SizeTest : LayoutTest() {
                     Modifier.wrapContentHeight(Alignment.Bottom, unbounded = true)
                         .requiredSize(innerSize.toDp())
                         .onGloballyPositioned {
-                            assertEquals(outerSize - innerSize, it.positionInParent.y)
+                            assertEquals(outerSize - innerSize, it.positionInParent().y)
                             positionedLatch.countDown()
                         }
                 )

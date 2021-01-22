@@ -23,6 +23,7 @@ import android.view.MotionEvent.ACTION_MOVE
 import android.view.MotionEvent.ACTION_POINTER_DOWN
 import android.view.MotionEvent.ACTION_POINTER_UP
 import android.view.MotionEvent.ACTION_UP
+import androidx.compose.ui.geometry.Offset
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
@@ -35,6 +36,11 @@ import org.junit.runner.RunWith
 class MotionEventAdapterTest {
 
     private lateinit var motionEventAdapter: MotionEventAdapter
+    private val positionCalculator = object : PositionCalculator {
+        override fun screenToLocal(positionOnScreen: Offset): Offset = positionOnScreen
+
+        override fun localToScreen(localPosition: Offset): Offset = localPosition
+    }
 
     @Before
     fun setup() {
@@ -1519,6 +1525,9 @@ class MotionEventAdapterTest {
 
         assertThat(pointerInputEvent!!.motionEvent).isSameInstanceAs(motionEvent)
     }
+
+    private fun MotionEventAdapter.convertToPointerInputEvent(motionEvent: MotionEvent) =
+        convertToPointerInputEvent(motionEvent, positionCalculator)
 }
 
 // Private helper functions
@@ -1558,7 +1567,7 @@ private fun assertPointerInputEventData(
 ) {
     assertThat(actual.id).isEqualTo(id)
     assertThat(actual.down).isEqualTo(isDown)
-    assertThat(actual.position.x).isEqualTo(x)
-    assertThat(actual.position.y).isEqualTo(y)
+    assertThat(actual.positionOnScreen.x).isEqualTo(x)
+    assertThat(actual.positionOnScreen.y).isEqualTo(y)
     assertThat(actual.type).isEqualTo(type)
 }

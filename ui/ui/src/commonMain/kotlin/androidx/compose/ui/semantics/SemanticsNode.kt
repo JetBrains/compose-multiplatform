@@ -20,10 +20,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.boundsInRoot
-import androidx.compose.ui.layout.globalBounds
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.layout.LayoutInfo
-import androidx.compose.ui.layout.globalPosition
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNodeWrapper
 import androidx.compose.ui.node.RootForTest
@@ -113,21 +113,19 @@ class SemanticsNode internal constructor(
 
     /**
      * The bounding box for this node relative to the screen, with clipping applied. To get the
-     * bounds with no clipping applied, use PxBounds([globalPosition], [size].toSize())
+     * bounds with no clipping applied, use PxBounds([positionInWindow], [size].toSize())
      */
-    val globalBounds: Rect
+    val boundsInWindow: Rect
         get() {
-            @Suppress("DEPRECATION")
-            return this.layoutNode.coordinates.globalBounds
+            return this.layoutNode.coordinates.boundsInWindow()
         }
 
     /**
      * The position of this node relative to the screen, with no clipping applied
      */
-    val globalPosition: Offset
+    val positionInWindow: Offset
         get() {
-            @Suppress("DEPRECATION")
-            return this.layoutNode.coordinates.globalPosition
+            return this.layoutNode.coordinates.positionInWindow()
         }
 
     /**

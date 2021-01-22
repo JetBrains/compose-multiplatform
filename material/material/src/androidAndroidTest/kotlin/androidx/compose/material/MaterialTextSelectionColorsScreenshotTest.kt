@@ -18,14 +18,14 @@ package androidx.compose.material
 
 import android.os.Build
 import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.runtime.Composable
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
-import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.height
@@ -87,6 +87,7 @@ class MaterialTextSelectionColorsScreenshotTest {
             .isEqualTo(darkPrimary.copy(alpha = 0.375f))
     }
 
+    @FlakyTest(bugId = 179770443)
     @Test
     fun text_lightThemeSelectionColors() {
         rule.setContent {
@@ -105,6 +106,7 @@ class MaterialTextSelectionColorsScreenshotTest {
             .assertAgainstGolden(screenshotRule, "text_lightThemeSelectionColors")
     }
 
+    @FlakyTest(bugId = 179770443)
     @Test
     fun text_darkThemeSelectionColors() {
         rule.setContent {

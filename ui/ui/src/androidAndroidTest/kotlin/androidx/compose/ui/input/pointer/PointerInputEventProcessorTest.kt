@@ -16,6 +16,8 @@
 
 package androidx.compose.ui.input.pointer
 
+import android.view.MotionEvent
+import androidx.compose.foundation.layout.offset
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.Autofill
@@ -49,6 +51,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.minus
+import androidx.compose.ui.unit.toOffset
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
@@ -85,6 +88,11 @@ class PointerInputEventProcessorTest {
 
     private lateinit var pointerInputEventProcessor: PointerInputEventProcessor
     private lateinit var testOwner: TestOwner
+    private val positionCalculator = object : PositionCalculator {
+        override fun screenToLocal(positionOnScreen: Offset): Offset = positionOnScreen
+
+        override fun localToScreen(localPosition: Offset): Offset = localPosition
+    }
 
     @Before
     fun setup() {
@@ -124,6 +132,7 @@ class PointerInputEventProcessorTest {
                 id = PointerId(index.toLong()),
                 uptime = index.toLong(),
                 position = Offset(offset.x + index, offset.y + index),
+                positionOnScreen = Offset(offset.x + index, offset.y + index),
                 down = true,
                 type = pointerType
             )
@@ -590,9 +599,15 @@ class PointerInputEventProcessorTest {
             insertAt(0, middleLayoutNode)
         }
 
-        testOwner.position = IntOffset(aOX, aOY)
+        val outerLayoutNode = LayoutNode(
+            aOX,
+            aOY,
+            aOX + parentLayoutNode.width,
+            aOY + parentLayoutNode.height
+        )
 
-        addToRoot(parentLayoutNode)
+        outerLayoutNode.insertAt(0, parentLayoutNode)
+        addToRoot(outerLayoutNode)
 
         val additionalOffset = IntOffset(aOX, aOY)
 
@@ -1531,7 +1546,9 @@ class PointerInputEventProcessorTest {
                 singlePointerInputFilter
             )
         )
-        addToRoot(layoutNode)
+        val outerLayoutNode = LayoutNode(1, 1, 3, 3)
+        outerLayoutNode.insertAt(0, layoutNode)
+        addToRoot(outerLayoutNode)
         val offsetsThatHit =
             listOf(
                 Offset(2f, 2f),
@@ -1552,7 +1569,6 @@ class PointerInputEventProcessorTest {
                     PointerInputEventData(it, 11, allOffsets[it], true)
                 }
             )
-        testOwner.position = IntOffset(1, 1)
 
         // Act
 
@@ -2960,6 +2976,11 @@ class PointerInputEventProcessorTest {
         assertThat(processResult1.dispatchedToAPointerInputModifier).isFalse()
         assertThat(processResult1.anyMovementConsumed).isFalse()
     }
+
+    private fun MotionEventAdapter.convertToPointerInputEvent(motionEvent: MotionEvent) =
+        convertToPointerInputEvent(motionEvent, positionCalculator)
+    private fun PointerInputEventProcessor.process(event: PointerInputEvent) =
+        process(event, positionCalculator)
 }
 
 private class PointerInputModifierImpl2(override val pointerInputFilter: PointerInputFilter) :
@@ -2996,9 +3017,6 @@ private class TestOwner : Owner {
         root.attach(this)
         delegate.updateRootConstraints(Constraints(maxWidth = 500, maxHeight = 500))
     }
-
-    override fun calculatePosition(): IntOffset = position
-    override fun calculatePositionInWindow(): IntOffset = position
 
     override fun requestFocus(): Boolean = false
     override val rootForTest: RootForTest
@@ -3042,6 +3060,12 @@ private class TestOwner : Owner {
 
     override fun onDetach(node: LayoutNode) {
     }
+
+    override fun calculatePositionInWindow(localPosition: Offset): Offset =
+        localPosition + position.toOffset()
+
+    override fun calculateLocalPosition(positionInWindow: Offset): Offset =
+        positionInWindow - position.toOffset()
 
     override fun measureAndLayout() {
         delegate.measureAndLayout()

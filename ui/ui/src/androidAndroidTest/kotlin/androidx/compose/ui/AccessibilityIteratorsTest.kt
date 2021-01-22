@@ -389,7 +389,7 @@ class AccessibilityIteratorsTest {
         val lineHeight = textLayoutResult.getLineBottom(endLine) -
             textLayoutResult.getLineTop(endLine)
         val iteratorStep = endLineTop - startLineTop
-        val nodeHeight = textFieldNode.globalBounds.bottom - textFieldNode.globalBounds.top
+        val nodeHeight = textFieldNode.boundsInWindow.bottom - textFieldNode.boundsInWindow.top
         Truth.assertThat(abs(iteratorStep - nodeHeight) < lineHeight)
         currentOffset = InputText.length
         range = pageIterator.following(currentOffset)
@@ -412,7 +412,7 @@ class AccessibilityIteratorsTest {
         val lineHeight = textLayoutResult.getLineBottom(endLine) -
             textLayoutResult.getLineTop(endLine)
         val iteratorStep = endLineTop - startLineTop
-        val nodeHeight = textFieldNode.globalBounds.bottom - textFieldNode.globalBounds.top
+        val nodeHeight = textFieldNode.boundsInWindow.bottom - textFieldNode.boundsInWindow.top
         Truth.assertThat(abs(iteratorStep - nodeHeight) < lineHeight)
         currentOffset = 0
         range = pageIterator.preceding(currentOffset)

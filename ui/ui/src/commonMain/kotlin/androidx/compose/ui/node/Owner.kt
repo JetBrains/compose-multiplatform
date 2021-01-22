@@ -20,6 +20,7 @@ import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.input.key.KeyEvent
@@ -30,7 +31,6 @@ import androidx.compose.ui.platform.WindowInfo
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 
 /**
@@ -131,15 +131,18 @@ internal interface Owner {
     fun onDetach(node: LayoutNode)
 
     /**
-     * Returns the most global position of the owner that Compose can access (such as the device
-     * screen).
+     * Returns the position relative to the containing window of the [localPosition],
+     * the position relative to the [Owner]. If the [Owner] is rotated, scaled, or otherwise
+     * transformed relative to the window, this will not be a simple translation.
      */
-    fun calculatePosition(): IntOffset
+    fun calculatePositionInWindow(localPosition: Offset): Offset
 
     /**
-     * Returns the most position of the owner relative to the window.
+     * Returns the position relative to the [Owner] of the [positionInWindow],
+     * the position relative to the window. If the [Owner] is rotated, scaled, or otherwise
+     * transformed relative to the window, this will not be a simple translation.
      */
-    fun calculatePositionInWindow(): IntOffset
+    fun calculateLocalPosition(positionInWindow: Offset): Offset
 
     /**
      * Ask the system to provide focus to this owner.
