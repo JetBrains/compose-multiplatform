@@ -31,7 +31,7 @@ import androidx.compose.ui.node.LayoutNode
  * @param content A `@Composable` function declaring the UI contents
  */
 @OptIn(ExperimentalComposeApi::class)
-fun DesktopOwner.setContent(
+internal fun DesktopOwner.setContent(
     parent: CompositionReference? = null,
     content: @Composable () -> Unit
 ): Composition {

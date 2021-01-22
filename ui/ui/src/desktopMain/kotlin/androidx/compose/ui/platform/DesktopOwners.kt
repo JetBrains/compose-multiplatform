@@ -39,7 +39,7 @@ import androidx.compose.ui.input.key.KeyEvent as ComposeKeyEvent
 internal val DesktopOwnersAmbient = staticAmbientOf<DesktopOwners>()
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DesktopOwners(
+internal class DesktopOwners(
     coroutineScope: CoroutineScope,
     component: DesktopComponent = DummyDesktopComponent,
     invalidate: () -> Unit = {},

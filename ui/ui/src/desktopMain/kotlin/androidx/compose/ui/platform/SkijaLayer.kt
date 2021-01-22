@@ -31,11 +31,11 @@ import androidx.compose.ui.graphics.asDesktopPath
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.toSkijaRect
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toBounds
 import androidx.compose.ui.unit.toRect
@@ -44,7 +44,7 @@ import org.jetbrains.skija.PictureRecorder
 import org.jetbrains.skija.Point3
 import org.jetbrains.skija.ShadowUtils
 
-class SkijaLayer(
+internal class SkijaLayer(
     private val getDensity: () -> Density,
     private val invalidateParentLayer: () -> Unit,
     private val drawBlock: (Canvas) -> Unit

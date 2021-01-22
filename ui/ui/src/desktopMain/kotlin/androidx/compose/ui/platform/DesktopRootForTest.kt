@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,19 @@
 
 package androidx.compose.ui.platform
 
-// TODO(demin): implement UriHandler
-internal class DesktopUriHandler : UriHandler {
-    override fun openUri(uri: String) {
-        println("UriHandler.openUri not implemented yet")
-    }
+import androidx.compose.ui.input.pointer.TestPointerInputEventData
+import androidx.compose.ui.node.RootForTest
+
+/**
+ * The marker interface to be implemented by the desktop root backing the composition.
+ * To be used in tests.
+ */
+interface DesktopRootForTest : RootForTest {
+    /**
+     * Process pointer event
+     *
+     * [nanoTime] time when the pointer event occurred
+     * [pointers] state of all pointers
+     */
+    fun processPointerInput(nanoTime: Long, pointers: List<TestPointerInputEventData>)
 }

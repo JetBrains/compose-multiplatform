@@ -26,14 +26,14 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.focus.FocusManager
-import androidx.compose.ui.focus.FocusManagerImpl
 import androidx.compose.ui.focus.FocusDirection.Down
 import androidx.compose.ui.focus.FocusDirection.Left
 import androidx.compose.ui.focus.FocusDirection.Next
 import androidx.compose.ui.focus.FocusDirection.Previous
 import androidx.compose.ui.focus.FocusDirection.Right
 import androidx.compose.ui.focus.FocusDirection.Up
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusManagerImpl
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.DesktopCanvas
@@ -78,10 +78,10 @@ import androidx.compose.ui.unit.LayoutDirection
     ExperimentalComposeApi::class,
     InternalCoreApi::class
 )
-class DesktopOwner(
+internal class DesktopOwner(
     val container: DesktopOwners,
     density: Density = Density(1f, 1f)
-) : Owner, RootForTest {
+) : Owner, RootForTest, DesktopRootForTest {
     internal var size by mutableStateOf(IntSize(0, 0))
 
     override var density by mutableStateOf(density)
@@ -252,10 +252,10 @@ class DesktopOwner(
         pointerInputEventProcessor.process(event)
     }
 
-    fun processPointerInput(time: Long, pointers: List<TestPointerInputEventData>) {
+    override fun processPointerInput(nanoTime: Long, pointers: List<TestPointerInputEventData>) {
         processPointerInput(
             PointerInputEvent(
-                time,
+                nanoTime,
                 pointers.map { it.toPointerInputEventData() }
             )
         )

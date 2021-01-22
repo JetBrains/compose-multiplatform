@@ -321,7 +321,7 @@ class SkijaLayerTest {
         drawBlock = {}
     )
 
-    fun SkijaLayer.updateProperties(
+    private fun SkijaLayer.updateProperties(
         scaleX: Float = 1f,
         scaleY: Float = 1f,
         alpha: Float = 1f,
