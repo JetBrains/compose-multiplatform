@@ -1,18 +1,22 @@
 package com.jetbrains.compose
 
 import androidx.compose.desktop.ComposePanel
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.Button
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.IntSize
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.ui.layout.panel
+import com.jetbrains.compose.widgets.Buttons
+import com.jetbrains.compose.widgets.LazyScrollable
+import com.jetbrains.compose.widgets.Loaders
+import com.jetbrains.compose.widgets.TextInputs
+import com.jetbrains.compose.widgets.Toggles
 import java.awt.Dimension
 import javax.swing.JComponent
 
@@ -32,18 +36,32 @@ class ComposeDemoAction : DumbAwareAction() {
         }
 
         override fun createCenterPanel(): JComponent {
+            val dialog = this
+            var packed = false
             return ComposePanel().apply {
                 setContent {
-                    Button(onClick = { println("Hi") }) {
-                        //Text("Hello") //todo: crashes IntelliJ
-                        Box(
-                            modifier = Modifier
-                                .background(color = Color.Red)
-                                .size(20.dp, 20.dp)
-                        )
+                    ComposeSizeAdjustmentWrapper(
+                        window = dialog,
+                        panel = this,
+                        preferredSize = IntSize(800, 600)
+                    ) {
+                        Row {
+                            Column(
+                                modifier = Modifier.fillMaxHeight().weight(1f)
+                            ) {
+                                Buttons()
+                                Loaders()
+                                TextInputs()
+                                Toggles()
+                            }
+                            Box(
+                                modifier = Modifier.fillMaxHeight().weight(1f)
+                            ) {
+                                LazyScrollable()
+                            }
+                        }
                     }
                 }
-                size = Dimension(50, 50)
             }
         }
     }
