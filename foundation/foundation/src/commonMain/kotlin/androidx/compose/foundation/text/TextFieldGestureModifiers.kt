@@ -40,14 +40,10 @@ internal fun Modifier.textFieldFocusModifier(
     focusRequester: FocusRequester,
     interactionState: InteractionState?,
     onFocusChanged: (FocusState) -> Unit
-): Modifier {
-    if (!enabled) return this
-
-    return this
-        .focusRequester(focusRequester)
-        .onFocusChanged(onFocusChanged)
-        .focusable(interactionState = interactionState)
-}
+) = this
+    .focusRequester(focusRequester)
+    .onFocusChanged(onFocusChanged)
+    .focusable(interactionState = interactionState, enabled = enabled)
 
 // Mouse
 internal fun Modifier.mouseDragGestureFilter(
