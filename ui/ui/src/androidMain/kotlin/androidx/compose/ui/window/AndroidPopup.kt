@@ -151,7 +151,7 @@ internal actual fun ActualPopup(
     Layout(
         content = emptyContent(),
         modifier = Modifier.onGloballyPositioned { childCoordinates ->
-            val coordinates = childCoordinates.parentCoordinates!!
+            val coordinates = childCoordinates.parentLayoutCoordinates!!
             val layoutSize = coordinates.size
 
             val position = coordinates.positionInWindow()

@@ -3931,8 +3931,10 @@ class LayoutCoordinatesStub(
     override val providedAlignmentLines: Set<AlignmentLine>
         get() = TODO("not implemented")
 
-    override val parentCoordinates: LayoutCoordinates?
+    override val parentLayoutCoordinates: LayoutCoordinates?
         get() = TODO("not implemented")
+    override val parentCoordinates: LayoutCoordinates?
+        get() = TODO("Not yet implemented")
 
     override fun globalToLocal(global: Offset): Offset {
         TODO("not implemented")

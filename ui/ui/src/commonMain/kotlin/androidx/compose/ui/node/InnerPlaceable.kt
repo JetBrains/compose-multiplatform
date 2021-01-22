@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.PaintingStyle
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -149,6 +150,10 @@ internal class InnerPlaceable(
                 hitPointerInputFilters.size > originalSize
             }
         }
+    }
+
+    override fun getWrappedByCoordinates(): LayoutCoordinates {
+        return this
     }
 
     internal companion object {

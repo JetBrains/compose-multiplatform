@@ -39,6 +39,12 @@ interface LayoutCoordinates {
     /**
      * The coordinates of the parent layout. Null if there is no parent.
      */
+    val parentLayoutCoordinates: LayoutCoordinates?
+
+    /**
+     * The coordinates of the parent layout modifier or parent layout if there is no
+     * parent layout modifier, or `null` if there is no parent.
+     */
     val parentCoordinates: LayoutCoordinates?
 
     /**
@@ -173,7 +179,7 @@ fun LayoutCoordinates.boundsInWindow(): Rect {
  * for the root.
  */
 val LayoutCoordinates.positionInParent: Offset
-    get() = parentCoordinates?.localPositionOf(this, Offset.Zero) ?: Offset.Zero
+    get() = parentLayoutCoordinates?.localPositionOf(this, Offset.Zero) ?: Offset.Zero
 
 /**
  * Returns the bounding box of the child in the parent's content area, including any clipping
@@ -181,7 +187,7 @@ val LayoutCoordinates.positionInParent: Offset
  * to the size of the root.
  */
 val LayoutCoordinates.boundsInParent: Rect
-    get() = parentCoordinates?.localBoundingBoxOf(this)
+    get() = parentLayoutCoordinates?.localBoundingBoxOf(this)
         ?: Rect(0f, 0f, size.width.toFloat(), size.height.toFloat())
 
 /**
@@ -208,10 +214,10 @@ val LayoutCoordinates.globalBounds: Rect
  */
 internal fun LayoutCoordinates.findRoot(): LayoutCoordinates {
     var root = this
-    var parent = root.parentCoordinates
+    var parent = root.parentLayoutCoordinates
     while (parent != null) {
         root = parent
-        parent = root.parentCoordinates
+        parent = root.parentLayoutCoordinates
     }
     var rootLayoutNodeWrapper = root as? LayoutNodeWrapper ?: return root
     var parentLayoutNodeWrapper = rootLayoutNodeWrapper.wrappedBy

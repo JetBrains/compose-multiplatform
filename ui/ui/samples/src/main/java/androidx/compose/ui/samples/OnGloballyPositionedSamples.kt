@@ -43,7 +43,7 @@ fun OnGloballyPositioned() {
             // These will be the alignment lines provided to the layout (empty here for Column).
             coordinates.providedAlignmentLines
             // This will a LayoutCoordinates instance corresponding to the parent of Column.
-            coordinates.parentCoordinates
+            coordinates.parentLayoutCoordinates
         }
     ) {
         Box(Modifier.preferredSize(20.dp).background(Color.Green))

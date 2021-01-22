@@ -745,7 +745,7 @@ class LayoutNodeTest {
     }
 
     @Test
-    fun layoutNodeWrapperParentCoordinates() {
+    fun layoutNodeWrapperParentLayoutCoordinates() {
         val layoutNode = LayoutNode()
         val layoutNode2 = LayoutNode()
         val drawModifier = Modifier.drawBehind { }
@@ -755,11 +755,40 @@ class LayoutNodeTest {
 
         assertEquals(
             layoutNode2.innerLayoutNodeWrapper,
+            layoutNode.innerLayoutNodeWrapper.parentLayoutCoordinates
+        )
+        assertEquals(
+            layoutNode2.innerLayoutNodeWrapper,
+            layoutNode.outerLayoutNodeWrapper.parentLayoutCoordinates
+        )
+    }
+
+    @Test
+    fun layoutNodeWrapperParentCoordinates() {
+        val layoutNode = LayoutNode()
+        val layoutNode2 = LayoutNode()
+        val layoutModifier = object : LayoutModifier {
+            override fun MeasureScope.measure(
+                measurable: Measurable,
+                constraints: Constraints
+            ): MeasureResult {
+                TODO("Not yet implemented")
+            }
+        }
+        val drawModifier = Modifier.drawBehind { }
+        layoutNode.modifier = layoutModifier.then(drawModifier)
+        layoutNode2.insertAt(0, layoutNode)
+        layoutNode2.attach(MockOwner())
+
+        val layoutModifierWrapper = layoutNode.outerLayoutNodeWrapper
+
+        assertEquals(
+            layoutModifierWrapper,
             layoutNode.innerLayoutNodeWrapper.parentCoordinates
         )
         assertEquals(
             layoutNode2.innerLayoutNodeWrapper,
-            layoutNode.outerLayoutNodeWrapper.parentCoordinates
+            layoutModifierWrapper.parentCoordinates
         )
     }
 
