@@ -19,6 +19,7 @@ package androidx.compose.ui.demos.gestures
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,12 +32,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.pressIndicatorGestureFilter
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 
 /**
- * Simple [pressIndicatorGestureFilter] demo.
+ * Simple [detectTapGestures] demo for indication.
  */
 @Composable
 fun PressIndicatorGestureFilterDemo() {
@@ -63,7 +64,15 @@ fun PressIndicatorGestureFilterDemo() {
             Modifier.fillMaxSize()
                 .wrapContentSize(Alignment.Center)
                 .preferredSize(192.dp)
-                .pressIndicatorGestureFilter(onStart, onStop, onStop)
+                .pointerInput {
+                    detectTapGestures(
+                        onPress = {
+                            onStart.invoke(it)
+                            val success = tryAwaitRelease()
+                            if (success) onStop.invoke() else onStop.invoke()
+                        }
+                    )
+                }
                 .background(color)
                 .border(BorderStroke(2.dp, BorderColor))
         )

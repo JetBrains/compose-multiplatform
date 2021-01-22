@@ -17,6 +17,7 @@
 package androidx.compose.ui.demos.gestures
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,7 +35,7 @@ import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.gesture.ScaleObserver
 import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.gesture.scaleGestureFilter
-import androidx.compose.ui.gesture.tapGestureFilter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.dp
 
@@ -70,12 +71,12 @@ fun DragAndScaleGestureFilterDemo() {
             Modifier
                 .scaleGestureFilter(scaleObserver)
                 .dragGestureFilter(dragObserver)
-                .tapGestureFilter(onRelease)
+                .pointerInput { detectTapGestures(onTap = onRelease) }
         } else {
             Modifier
                 .dragGestureFilter(dragObserver)
                 .scaleGestureFilter(scaleObserver)
-                .tapGestureFilter(onRelease)
+                .pointerInput { detectTapGestures(onTap = onRelease) }
         }
 
     val color =

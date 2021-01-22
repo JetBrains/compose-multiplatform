@@ -117,6 +117,7 @@ interface LongPressDragObserver {
  * @param longPressDragObserver The callback interface to report all events.
  * @see LongPressDragObserver
  */
+@Suppress("DEPRECATION")
 fun Modifier.longPressDragGestureFilter(
     longPressDragObserver: LongPressDragObserver
 ): Modifier = composed(

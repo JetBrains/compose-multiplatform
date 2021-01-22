@@ -19,6 +19,7 @@ package androidx.compose.ui.demos.focus
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,10 +37,11 @@ import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 
 private const val size = 200f
+
 private enum class CurrentShape { Circle, Square }
 
 @Composable
@@ -60,13 +62,13 @@ fun ReuseFocusRequesterDemo() {
             CurrentShape.Circle -> Circle(
                 modifier = Modifier
                     .focusRequester(focusRequester)
-                    .tapGestureFilter { focusRequester.requestFocus() },
+                    .pointerInput { detectTapGestures { focusRequester.requestFocus() } },
                 nextShape = { shape = CurrentShape.Square }
             )
             CurrentShape.Square -> Square(
                 modifier = Modifier
                     .focusRequester(focusRequester)
-                    .tapGestureFilter { focusRequester.requestFocus() },
+                    .pointerInput { detectTapGestures { focusRequester.requestFocus() } },
                 nextShape = { shape = CurrentShape.Circle }
             )
         }

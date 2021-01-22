@@ -37,7 +37,7 @@ import androidx.compose.ui.demos.gestures.PressIndicatorGestureFilterDemo
 import androidx.compose.ui.demos.gestures.RawDragGestureFilterDemo
 import androidx.compose.ui.demos.gestures.ScaleGestureFilterDemo
 import androidx.compose.ui.demos.gestures.ScrollGestureFilterDemo
-import androidx.compose.ui.demos.gestures.TapGestureFilterDemo
+import androidx.compose.ui.demos.gestures.DetectTapGesturesDemo
 import androidx.compose.ui.demos.gestures.VerticalScrollerInDrawerDemo
 import androidx.compose.ui.demos.keyinput.KeyInputDemo
 import androidx.compose.ui.demos.viewinterop.ViewInteropDemo
@@ -56,7 +56,7 @@ private val GestureDemos = DemoCategory(
             "Common Gestures",
             listOf(
                 ComposableDemo("Press Indication") { PressIndicatorGestureFilterDemo() },
-                ComposableDemo("Tap") { TapGestureFilterDemo() },
+                ComposableDemo("Tap") { DetectTapGesturesDemo() },
                 ComposableDemo("Double Tap") { DoubleTapGestureFilterDemo() },
                 ComposableDemo("Long Press") { LongPressGestureDetectorDemo() },
                 ComposableDemo("Scroll") { ScrollGestureFilterDemo() },

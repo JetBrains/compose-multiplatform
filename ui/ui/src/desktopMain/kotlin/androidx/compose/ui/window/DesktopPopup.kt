@@ -45,6 +45,7 @@ internal actual fun ActualPopup(
 }
 
 @Composable
+@Suppress("DEPRECATION") // tapGestureFilter
 private fun PopupLayout(
     popupPositionProvider: PopupPositionProvider,
     isFocusable: Boolean,

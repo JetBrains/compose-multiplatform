@@ -18,6 +18,7 @@ package androidx.compose.ui.demos.gestures
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,11 +31,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.doubleTapGestureFilter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 
 /**
- * Simple [doubleTapGestureFilter] demo.
+ * Simple [detectTapGestures] demo for double tap.
  */
 @Composable
 fun DoubleTapGestureFilterDemo() {
@@ -50,7 +51,7 @@ fun DoubleTapGestureFilterDemo() {
             Modifier.fillMaxSize()
                 .wrapContentSize(Alignment.Center)
                 .preferredSize(192.dp)
-                .doubleTapGestureFilter(onDoubleTap)
+                .pointerInput { detectTapGestures(onDoubleTap = onDoubleTap) }
                 .border(2.dp, BorderColor)
                 .background(color = color.value)
         )

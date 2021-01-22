@@ -29,6 +29,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -50,10 +51,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.gesture.doubleTapGestureFilter
-import androidx.compose.ui.gesture.pressIndicatorGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 
 @Sampled
@@ -62,14 +62,19 @@ fun GestureAnimationSample() {
     // enum class ComponentState { Pressed, Released }
     var useRed by remember { mutableStateOf(false) }
     var toState by remember { mutableStateOf(ComponentState.Released) }
-    val modifier = Modifier.pressIndicatorGestureFilter(
-        onStart = { toState = ComponentState.Pressed },
-        onStop = { toState = ComponentState.Released },
-        onCancel = { toState = ComponentState.Released }
-    )
+    val modifier = Modifier.pointerInput {
+        detectTapGestures(
+            onPress = {
+                toState = ComponentState.Pressed
+                tryAwaitRelease()
+                toState = ComponentState.Released
+            }
+        )
+    }
 
     // Defines a transition of `ComponentState`, and updates the transition when the provided
-    // [targetState] changes. The transition will run all of the child animations towards the new
+    // [targetState] changes. The tran
+    // sition will run all of the child animations towards the new
     // [targetState] in response to the [targetState] change.
     val transition: Transition<ComponentState> = updateTransition(targetState = toState)
     // Defines a float animation as a child animation the transition. The current animation value
@@ -238,14 +243,18 @@ fun DoubleTapToLikeSample() {
         }
 
         Box(
-            Modifier.fillMaxSize().doubleTapGestureFilter {
-                // This creates a new `MutableTransitionState` object. When a new
-                // `MutableTransitionState` object gets passed to `updateTransition`, a new
-                // transition will be created. All existing values, velocities will be lost as a
-                // result. Hence, in most cases, this is not recommended. The exception is when it's
-                // more important to respond immediately to user interaction than preserving
-                // continuity.
-                transitionState = MutableTransitionState(LikedStates.Initial)
+            Modifier.fillMaxSize().pointerInput {
+                detectTapGestures(
+                    onDoubleTap = {
+                        // This creates a new `MutableTransitionState` object. When a new
+                        // `MutableTransitionState` object gets passed to `updateTransition`, a
+                        // new transition will be created. All existing values, velocities will
+                        // be lost as a result. Hence, in most cases, this is not recommended.
+                        // The exception is when it's more important to respond immediately to
+                        // user interaction than preserving continuity.
+                        transitionState = MutableTransitionState(LikedStates.Initial)
+                    }
+                )
             }
         ) {
             // This ensures sequential states: Initial -> Liked -> Disappeared

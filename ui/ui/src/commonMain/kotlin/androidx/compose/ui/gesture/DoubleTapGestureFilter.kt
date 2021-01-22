@@ -55,6 +55,15 @@ import kotlinx.coroutines.launch
  *
  * Also, given that this gesture detector is so temporary, opting to not write substantial tests.
  */
+@Deprecated(
+    "Gesture filters are deprecated. Use Modifier.clickable or Modifier.pointerInput and " +
+        "detectTapGestures instead",
+    replaceWith = ReplaceWith(
+        """pointerInput { detectTapGestures(onDoubleTap = onDoubleTap) }""",
+        "androidx.compose.ui.input.pointer.pointerInput",
+        "androidx.compose.foundation.gestures.detectTapGestures"
+    )
+)
 fun Modifier.doubleTapGestureFilter(
     onDoubleTap: (Offset) -> Unit
 ): Modifier = composed(
