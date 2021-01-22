@@ -32,7 +32,7 @@ object LibraryVersions {
     val ASYNCLAYOUTINFLATER = Version("1.1.0-alpha01")
     val AUTOFILL = Version("1.2.0-alpha01")
     val BENCHMARK = Version("1.1.0-alpha02")
-    val BIOMETRIC = Version("1.2.0-alpha02")
+    val BIOMETRIC = Version("1.2.0-alpha03")
     val BROWSER = Version("1.3.0-rc01")
     val BUILDSRC_TESTS = Version("1.0.0-alpha01")
     val CAMERA = Version("1.1.0-alpha01")
