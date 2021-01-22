@@ -18,8 +18,8 @@
 
 package androidx.compose.ui.tooling.preview
 
-import android.app.Activity
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.animation.core.TransitionAnimation
 import androidx.compose.ui.tooling.compositionCount
@@ -321,7 +321,7 @@ class ComposeViewAdapterTest {
     }
 
     companion object {
-        class TestActivity : Activity() {
+        class TestActivity : ComponentActivity() {
             override fun onCreate(savedInstanceState: Bundle?) {
                 super.onCreate(savedInstanceState)
                 setContentView(R.layout.compose_adapter_test)
