@@ -23,16 +23,22 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.gesture.LongPressDragObserver
 import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.gesture.longPressDragGestureFilter
+import androidx.compose.ui.gesture.tapGestureFilter
 
 // Touch selection
 internal fun Modifier.longPressDragGestureFilter(
     observer: LongPressDragObserver,
     enabled: Boolean
 ) = if (enabled) this.then(longPressDragGestureFilter(observer)) else this
+
+@Suppress("DEPRECATION")
+internal fun Modifier.focusRequestTapModifier(onTap: (Offset) -> Unit, enabled: Boolean) =
+    if (enabled) this.tapGestureFilter(onTap) else this
 
 // Focus modifiers
 internal fun Modifier.textFieldFocusModifier(

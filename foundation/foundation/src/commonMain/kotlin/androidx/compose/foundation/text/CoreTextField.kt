@@ -276,12 +276,16 @@ fun CoreTextField(
         if (!it.isFocused) manager.deselect()
     }
 
-    val dragPositionGestureModifier = Modifier.dragPositionGestureFilter(
-        interactionState = interactionState,
+    val focusRequestTapModifier = Modifier.focusRequestTapModifier(
         enabled = enabled,
         onTap = {
             tapToFocus(state, focusRequester, textInputService, !readOnly)
-        },
+        }
+    )
+
+    val dragPositionGestureModifier = Modifier.dragPositionGestureFilter(
+        interactionState = interactionState,
+        enabled = enabled,
         onPress = {
             if (state.hasFocus) {
                 state.selectionIsOn = false
@@ -314,6 +318,7 @@ fun CoreTextField(
     } else {
         dragPositionGestureModifier
             .then(selectionModifier)
+            .then(focusRequestTapModifier)
     }
 
     val drawModifier = Modifier.drawBehind {
