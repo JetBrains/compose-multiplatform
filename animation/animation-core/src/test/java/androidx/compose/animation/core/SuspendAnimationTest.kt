@@ -18,7 +18,6 @@ package androidx.compose.animation.core
 
 import androidx.compose.runtime.dispatch.MonotonicFrameClock
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.unit.Uptime
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
@@ -139,7 +138,7 @@ class SuspendAnimationTest {
             val animationState = AnimationState(
                 initialValue = from,
                 typeConverter = offsetToVector,
-                lastFrameTime = Uptime(0)
+                lastFrameTimeNanos = 0
             )
             withContext(clock) {
                 // Put in a bunch of frames 50 milliseconds apart

@@ -26,6 +26,11 @@ object AnimationConstants {
      * The default duration used in [VectorizedAnimationSpec]s and [AnimationSpec].
      */
     const val DefaultDurationMillis: Int = 300
+
+    /**
+     * The value that is used when the animation time is not yet set.
+     */
+    const val UnspecifiedTime: Long = Long.MIN_VALUE
 }
 
 /**

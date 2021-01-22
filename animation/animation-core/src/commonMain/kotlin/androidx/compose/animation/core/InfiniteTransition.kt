@@ -29,7 +29,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.Uptime
 
 /**
  * Creates a [InfiniteTransition] that runs infinite child animations. Child animations can be
@@ -115,7 +114,7 @@ class InfiniteTransition internal constructor() {
 
     internal val animations = mutableVectorOf<TransitionAnimationState<*, *>>()
     private var refreshChildNeeded by mutableStateOf(false)
-    private var startTime = Uptime.Unspecified
+    private var startTimeNanos = AnimationConstants.UnspecifiedTime
     private var isRunning by mutableStateOf(true)
 
     internal fun addAnimation(animation: TransitionAnimationState<*, *>) {
@@ -142,10 +141,10 @@ class InfiniteTransition internal constructor() {
     }
 
     private fun onFrame(frameTimeNanos: Long) {
-        if (startTime == Uptime.Unspecified) {
-            startTime = Uptime(frameTimeNanos)
+        if (startTimeNanos == AnimationConstants.UnspecifiedTime) {
+            startTimeNanos = frameTimeNanos
         }
-        val playTimeNanos = frameTimeNanos - startTime.nanoseconds
+        val playTimeNanos = frameTimeNanos - startTimeNanos
         var allFinished = true
         // Pulse new playtime
         animations.forEach {
