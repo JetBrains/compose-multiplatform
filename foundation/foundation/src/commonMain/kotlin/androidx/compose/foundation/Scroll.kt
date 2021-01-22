@@ -19,7 +19,6 @@ package androidx.compose.foundation
 
 import androidx.compose.animation.asDisposableClock
 import androidx.compose.animation.core.AnimationClockObservable
-import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.foundation.animation.FlingConfig
@@ -204,54 +203,12 @@ class ScrollState(
      * @param value target value in pixels to smooth scroll to, value will be coerced to
      * 0..maxPosition
      * @param spec animation curve for smooth scroll animation
-     * @param onEnd callback to be invoked when smooth scroll has finished
-     */
-    @Suppress("DeprecatedCallableAddReplaceWith") // Methods have the same name
-    @Deprecated(
-        "Use suspend fun smoothScrollTo instead"
-    )
-    fun smoothScrollTo(
-        value: Float,
-        spec: AnimationSpec<Float> = SpringSpec(),
-        onEnd: (endReason: AnimationEndReason, finishValue: Float) -> Unit = { _, _ -> }
-    ) {
-        smoothScrollBy(value - this.value, spec, onEnd)
-    }
-    /**
-     * Smooth scroll to position in pixels
-     *
-     * @param value target value in pixels to smooth scroll to, value will be coerced to
-     * 0..maxPosition
-     * @param spec animation curve for smooth scroll animation
      */
     suspend fun smoothScrollTo(
         value: Float,
         spec: AnimationSpec<Float> = SpringSpec()
     ) {
         (this as Scrollable).smoothScrollBy(value - this.value, spec)
-    }
-
-    /**
-     * Smooth scroll by some amount of pixels
-     *
-     * @param value delta in pixels to scroll by, total value will be coerced to 0..maxPosition
-     * @param spec animation curve for smooth scroll animation
-     * @param onEnd callback to be invoked when smooth scroll has finished
-     */
-    @Deprecated(
-        "Use suspend fun smoothScrollBy instead",
-        ReplaceWith(
-            "(this as Scrollable).smoothScrollBy(value, spec)",
-            "androidx.compose.foundation.animation.smoothScrollBy",
-            "androidx.compose.foundation.gestures.Scrollable"
-        )
-    )
-    fun smoothScrollBy(
-        value: Float,
-        spec: AnimationSpec<Float> = SpringSpec(),
-        onEnd: (endReason: AnimationEndReason, finishValue: Float) -> Unit = { _, _ -> }
-    ) {
-        scrollableController.smoothScrollBy(value, spec, onEnd)
     }
 
     /**
@@ -269,16 +226,6 @@ class ScrollState(
         value: Float
     ): Float {
         return (this as Scrollable).scrollBy(value - this.value)
-    }
-
-    /**
-     * Instantly jump by some amount of pixels
-     *
-     * @param value delta in pixels to jump by, total value will be coerced to 0..maxPosition
-     */
-    @Deprecated("Use suspend version") // TODO(DO NOT MERGE): add ReplaceWith
-    fun scrollBy(value: Float) {
-        this.value = (this.value + value).coerceIn(0f, maxValue)
     }
 
     companion object {
