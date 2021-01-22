@@ -1855,6 +1855,7 @@ package androidx.compose.ui.layout {
     method @Deprecated public long childToLocal-YJiYy8w(androidx.compose.ui.layout.LayoutCoordinates child, long childLocal);
     method public operator int get(androidx.compose.ui.layout.AlignmentLine line);
     method public androidx.compose.ui.layout.LayoutCoordinates? getParentCoordinates();
+    method public androidx.compose.ui.layout.LayoutCoordinates? getParentLayoutCoordinates();
     method public java.util.Set<androidx.compose.ui.layout.AlignmentLine> getProvidedAlignmentLines();
     method public long getSize-YbymL2g();
     method @Deprecated public long globalToLocal-k-4lQ0M(long global);
@@ -1867,6 +1868,7 @@ package androidx.compose.ui.layout {
     method public long windowToLocal-k-4lQ0M(long relativeToWindow);
     property public abstract boolean isAttached;
     property public abstract androidx.compose.ui.layout.LayoutCoordinates? parentCoordinates;
+    property public abstract androidx.compose.ui.layout.LayoutCoordinates? parentLayoutCoordinates;
     property public abstract java.util.Set<androidx.compose.ui.layout.AlignmentLine> providedAlignmentLines;
     property public abstract long size;
   }

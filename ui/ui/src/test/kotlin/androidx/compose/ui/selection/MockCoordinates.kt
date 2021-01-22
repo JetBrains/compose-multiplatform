@@ -41,8 +41,13 @@ class MockCoordinates(
 
     override val providedAlignmentLines: Set<AlignmentLine>
         get() = emptySet()
+
+    override val parentLayoutCoordinates: LayoutCoordinates?
+        get() = null
+
     override val parentCoordinates: LayoutCoordinates?
         get() = null
+
     override fun globalToLocal(global: Offset): Offset {
         globalToLocalParams += global
         return localOffset

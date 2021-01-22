@@ -101,11 +101,21 @@ internal abstract class LayoutNodeWrapper(
     var zIndex: Float = 0f
         protected set
 
-    override val parentCoordinates: LayoutCoordinates?
+    override val parentLayoutCoordinates: LayoutCoordinates?
         get() {
             check(isAttached) { ExpectAttachedLayoutCoordinates }
             return layoutNode.outerLayoutNodeWrapper.wrappedBy
         }
+
+    override val parentCoordinates: LayoutCoordinates?
+        get() {
+            check(isAttached) { ExpectAttachedLayoutCoordinates }
+            return wrappedBy?.getWrappedByCoordinates()
+        }
+
+    protected open fun getWrappedByCoordinates(): LayoutCoordinates? {
+        return wrappedBy?.getWrappedByCoordinates()
+    }
 
     // True when the wrapper is running its own placing block to obtain the position of the
     // wrapped, but is not interested in the position of the wrapped of the wrapped.
@@ -440,7 +450,7 @@ internal abstract class LayoutNodeWrapper(
 
     /**
      * Converts [position] in the local coordinate system to a [Offset] in the
-     * [parentCoordinates] coordinate system.
+     * [parentLayoutCoordinates] coordinate system.
      */
     open fun toParentPosition(position: Offset): Offset {
         val layer = layer
@@ -455,7 +465,7 @@ internal abstract class LayoutNodeWrapper(
     }
 
     /**
-     * Converts [position] in the [parentCoordinates] coordinate system to a [Offset] in the
+     * Converts [position] in the [parentLayoutCoordinates] coordinate system to a [Offset] in the
      * local coordinate system.
      */
     open fun fromParentPosition(position: Offset): Offset {

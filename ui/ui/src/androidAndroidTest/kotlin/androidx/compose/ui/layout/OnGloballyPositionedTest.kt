@@ -265,8 +265,8 @@ class OnGloballyPositionedTest {
             assertEquals(Offset(5f, 5f), coordinates!!.positionInParent)
 
             var root = coordinates!!
-            while (root.parentCoordinates != null) {
-                root = root.parentCoordinates!!
+            while (root.parentLayoutCoordinates != null) {
+                root = root.parentLayoutCoordinates!!
             }
 
             assertEquals(Offset.Zero, root.positionInParent)
@@ -298,8 +298,8 @@ class OnGloballyPositionedTest {
             assertEquals(Rect(5f, 5f, 15f, 15f), coordinates!!.boundsInParent)
 
             var root = coordinates!!
-            while (root.parentCoordinates != null) {
-                root = root.parentCoordinates!!
+            while (root.parentLayoutCoordinates != null) {
+                root = root.parentLayoutCoordinates!!
             }
 
             assertEquals(Rect(0f, 0f, 20f, 20f), root.boundsInParent)
