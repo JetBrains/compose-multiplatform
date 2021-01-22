@@ -16,6 +16,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -26,21 +28,21 @@ fun TextInputs() {
         var name by remember { mutableStateOf(TextFieldValue("")) }
         var password by remember { mutableStateOf(TextFieldValue("")) }
 
-        // TextInputs() // TODO: causes exceptions on Windows OS
         TextField(
             value = name,
             onValueChange = { newValue -> name = newValue },
             modifier = Modifier.padding(8.dp).fillMaxWidth(),
+            textStyle = TextStyle(fontFamily = FontFamily.SansSerif),
             label = { Text("Account:") },
             placeholder = { Text("account name") }
         )
 
-        // TextInputs() // TODO: causes exceptions on Windows OS
         OutlinedTextField(
             value = password,
             modifier = Modifier.padding(8.dp).fillMaxWidth(),
             label = { Text(text = "Password:") },
             placeholder = { Text(text = "your password") },
+            textStyle = TextStyle(fontFamily = FontFamily.SansSerif),
             visualTransformation = PasswordVisualTransformation(),
             onValueChange = {
                 password = it

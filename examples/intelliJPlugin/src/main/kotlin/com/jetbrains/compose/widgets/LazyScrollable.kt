@@ -13,9 +13,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.rememberScrollbarAdapter
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.material.Text
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
@@ -29,7 +31,6 @@ fun LazyScrollable() {
         DesktopTheme {
             Box(
                 modifier = Modifier.fillMaxSize()
-                    .background(color = Color(180, 180, 180))
                     .padding(10.dp)
             ) {
 
@@ -57,13 +58,17 @@ fun LazyScrollable() {
 
 @Composable
 private fun TextBox(text: String = "Item") {
-    Box(
-        modifier = Modifier.height(32.dp)
-            .fillMaxWidth()
-            .background(color = Color(0, 0, 0, 20))
-            .padding(start = 10.dp),
-        contentAlignment = Alignment.CenterStart
+    Surface(
+        color = Color(135, 135, 135, 40),
+        shape = RoundedCornerShape(4.dp)
     ) {
-        Text(text = text)
+        Box(
+            modifier = Modifier.height(32.dp)
+                .fillMaxWidth()
+                .padding(start = 10.dp),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            Text(text = text)
+        }
     }
 }
