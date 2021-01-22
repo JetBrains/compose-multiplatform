@@ -17,7 +17,6 @@
 package androidx.compose.animation.core
 
 import androidx.compose.runtime.dispatch.withFrameNanos
-import androidx.compose.ui.unit.Uptime
 import kotlinx.coroutines.CancellationException
 
 /**
@@ -119,10 +118,10 @@ suspend fun <T, V : AnimationVector> animate(
  * frame time, etc.
  *
  * [sequentialAnimation] indicates whether the animation should use the
- * [AnimationState.lastFrameTime] as the starting time (if true), or start in a new frame. By
+ * [AnimationState.lastFrameTimeNanos] as the starting time (if true), or start in a new frame. By
  * default, [sequentialAnimation] is false, to start the animation in a few frame. In cases where
  * an on-going animation is interrupted and a new animation is started to carry over the
- * momentum, using the interruption time (captured in [AnimationState.lastFrameTime] creates
+ * momentum, using the interruption time (captured in [AnimationState.lastFrameTimeNanos] creates
  * a smoother animation.
  *
  * [block] will be invoked on every frame, and the [AnimationScope] will be checked against
@@ -147,7 +146,11 @@ suspend fun <T, V : AnimationVector> AnimationState<T, V>.animateTo(
         typeConverter = typeConverter,
         initialVelocityVector = velocityVector
     )
-    animate(anim, if (sequentialAnimation) lastFrameTime else Uptime.Unspecified, block)
+    animate(
+        anim,
+        if (sequentialAnimation) lastFrameTimeNanos else AnimationConstants.UnspecifiedTime,
+        block
+    )
 }
 
 /**
@@ -167,10 +170,10 @@ suspend fun <T, V : AnimationVector> AnimationState<T, V>.animateTo(
  * returns. All the animation related info can be accessed via [AnimationScope].
  *
  * [sequentialAnimation] indicates whether the animation should use the
- * [AnimationState.lastFrameTime] as the starting time (if true), or start in a new frame. By
+ * [AnimationState.lastFrameTimeNanos] as the starting time (if true), or start in a new frame. By
  * default, [sequentialAnimation] is false, to start the animation in a few frame. In cases where
  * an on-going animation is interrupted and a new animation is started to carry over the
- * momentum, using the interruption time (captured in [AnimationState.lastFrameTime] creates
+ * momentum, using the interruption time (captured in [AnimationState.lastFrameTimeNanos] creates
  * a smoother animation.
  */
 suspend fun <T, V : AnimationVector> AnimationState<T, V>.animateDecay(
@@ -185,7 +188,11 @@ suspend fun <T, V : AnimationVector> AnimationState<T, V>.animateDecay(
         initialVelocityVector = velocityVector,
         typeConverter = typeConverter
     )
-    animate(anim, if (sequentialAnimation) lastFrameTime else Uptime.Unspecified, block)
+    animate(
+        anim,
+        if (sequentialAnimation) lastFrameTimeNanos else AnimationConstants.UnspecifiedTime,
+        block
+    )
 }
 
 /**
@@ -193,8 +200,8 @@ suspend fun <T, V : AnimationVector> AnimationState<T, V>.animateDecay(
  * finish. During the animation, the [AnimationState] will be updated with the up-to-date
  * value/velocity, frame time, etc.
  *
- * If [startTime] is provided, it will be used as the time that the animation was started. By
- * default, [startTime] is [Uptime.Unspecified], meaning the animation will start in the next frame.
+ * If [startTimeNanos] is provided, it will be used as the time that the animation was started. By
+ * default, [startTimeNanos] is [AnimationConstants.UnspecifiedTime], meaning the animation will start in the next frame.
  *
  * For [Animation]s that use [AnimationSpec], consider using these more convenient APIs:
  * [animate], [AnimationState.animateTo], [animateDecay],
@@ -211,27 +218,31 @@ suspend fun <T, V : AnimationVector> AnimationState<T, V>.animateDecay(
 // some suspend fun differently.
 internal suspend fun <T, V : AnimationVector> AnimationState<T, V>.animate(
     animation: Animation<T, V>,
-    startTime: Uptime = Uptime.Unspecified,
+    startTimeNanos: Long = AnimationConstants.UnspecifiedTime,
     block: AnimationScope<T, V>.() -> Unit = {}
 ) {
     val initialValue = animation.getValue(0)
     val initialVelocityVector = animation.getVelocityVector(0)
     var lateInitScope: AnimationScope<T, V>? = null
     try {
-        val startTimeSpecified =
-            if (startTime == Uptime.Unspecified) Uptime(withFrameNanos { it }) else startTime
+        val startTimeNanosSpecified =
+            if (startTimeNanos == AnimationConstants.UnspecifiedTime) {
+                withFrameNanos { it }
+            } else {
+                startTimeNanos
+            }
         lateInitScope = AnimationScope(
             initialValue = initialValue,
             typeConverter = animation.typeConverter,
             initialVelocityVector = initialVelocityVector,
-            lastFrameTime = startTimeSpecified,
+            lastFrameTimeNanos = startTimeNanosSpecified,
             targetValue = animation.targetValue,
-            startTime = startTimeSpecified,
+            startTimeNanos = startTimeNanosSpecified,
             isRunning = true,
             onCancel = { isRunning = false }
         )
         // First frame
-        lateInitScope.doAnimationFrame(startTimeSpecified.nanoseconds, animation, this, block)
+        lateInitScope.doAnimationFrame(startTimeNanosSpecified, animation, this, block)
         // Subsequent frames
         while (lateInitScope.isRunning) {
             withFrameNanos {
@@ -241,7 +252,7 @@ internal suspend fun <T, V : AnimationVector> AnimationState<T, V>.animate(
         // End of animation
     } catch (e: CancellationException) {
         lateInitScope?.isRunning = false
-        if (lateInitScope?.lastFrameTime == lastFrameTime) {
+        if (lateInitScope?.lastFrameTimeNanos == lastFrameTimeNanos) {
             // There hasn't been another animation.
             isRunning = false
         }
@@ -254,8 +265,8 @@ internal fun <T, V : AnimationVector> AnimationScope<T, V>.updateState(
 ) {
     state.value = value
     state.velocityVector.copyFrom(velocityVector)
-    state.finishedTime = finishedTime
-    state.lastFrameTime = lastFrameTime
+    state.finishedTimeNanos = finishedTimeNanos
+    state.lastFrameTimeNanos = lastFrameTimeNanos
     state.isRunning = isRunning
 }
 
@@ -266,8 +277,8 @@ private fun <T, V : AnimationVector> AnimationScope<T, V>.doAnimationFrame(
     state: AnimationState<T, V>,
     block: AnimationScope<T, V>.() -> Unit
 ) {
-    lastFrameTime = Uptime(frameTimeNanos)
-    val playTimeMillis = (frameTimeNanos - startTime.nanoseconds) / 1_000_000L
+    lastFrameTimeNanos = frameTimeNanos
+    val playTimeMillis = (frameTimeNanos - startTimeNanos) / 1_000_000L
     // TODO: [Animation] should use nanos for all the value/velocity queries
     value = anim.getValue(playTimeMillis)
     velocityVector = anim.getVelocityVector(playTimeMillis)
@@ -275,7 +286,7 @@ private fun <T, V : AnimationVector> AnimationScope<T, V>.doAnimationFrame(
     if (isLastFrame) {
         // TODO: This could probably be a little more granular
         // TODO: end time isn't necessarily last frame time
-        finishedTime = lastFrameTime
+        finishedTimeNanos = lastFrameTimeNanos
         isRunning = false
     }
     updateState(state)

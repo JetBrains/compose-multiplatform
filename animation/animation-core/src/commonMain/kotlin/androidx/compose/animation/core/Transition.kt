@@ -37,7 +37,6 @@ import androidx.compose.ui.unit.Bounds
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.Uptime
 import kotlin.math.max
 
 /**
@@ -189,7 +188,7 @@ class Transition<S> internal constructor(
      * Indicates whether there is any animation running in the transition.
      */
     val isRunning: Boolean
-        get() = startTime != Uptime.Unspecified
+        get() = startTimeNanos != AnimationConstants.UnspecifiedTime
 
     /**
      * Play time in nano-seconds. [playTimeNanos] is always non-negative. It starts from 0L at the
@@ -199,7 +198,7 @@ class Transition<S> internal constructor(
 
     // This gets calculated every time child is updated/added
     internal var updateChildrenNeeded: Boolean by mutableStateOf(true)
-    private var startTime = Uptime.Unspecified
+    private var startTimeNanos = AnimationConstants.UnspecifiedTime
 
     private val _animations = mutableVectorOf<TransitionAnimationState<*, *>>()
 
@@ -221,13 +220,13 @@ class Transition<S> internal constructor(
     private var currentTargetState: S = currentState
 
     internal fun onFrame(frameTimeNanos: Long) {
-        if (startTime == Uptime.Unspecified) {
-            startTime = Uptime(frameTimeNanos)
+        if (startTimeNanos == AnimationConstants.UnspecifiedTime) {
+            startTimeNanos = frameTimeNanos
         }
         updateChildrenNeeded = false
 
         // Update play time
-        playTimeNanos = frameTimeNanos - startTime.nanoseconds
+        playTimeNanos = frameTimeNanos - startTimeNanos
         var allFinished = true
         // Pulse new playtime
         _animations.forEach {
@@ -240,7 +239,7 @@ class Transition<S> internal constructor(
             }
         }
         if (allFinished) {
-            startTime = Uptime.Unspecified
+            startTimeNanos = AnimationConstants.UnspecifiedTime
             currentState = targetState
             playTimeNanos = 0
         }
@@ -253,7 +252,7 @@ class Transition<S> internal constructor(
     @InternalAnimationApi
     fun seek(initialState: S, targetState: S, playTimeNanos: Long) {
         // Reset running state
-        startTime = Uptime.Unspecified
+        startTimeNanos = AnimationConstants.UnspecifiedTime
         if (!isSeeking || this.currentState != initialState || this.targetState != targetState) {
             // Reset all child animations
             this.currentState = initialState
@@ -315,7 +314,7 @@ class Transition<S> internal constructor(
     internal fun animateTo(targetState: S) {
         if (targetState != currentTargetState) {
             if (isRunning) {
-                startTime = Uptime(startTime.nanoseconds + playTimeNanos)
+                startTimeNanos += playTimeNanos
                 playTimeNanos = 0
             } else {
                 updateChildrenNeeded = true

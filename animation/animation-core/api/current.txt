@@ -98,6 +98,7 @@ package androidx.compose.animation.core {
   public final class AnimationConstants {
     field public static final int DefaultDurationMillis = 300; // 0x12c
     field public static final androidx.compose.animation.core.AnimationConstants INSTANCE;
+    field public static final long UnspecifiedTime = -9223372036854775808L; // 0x8000000000000000L
   }
 
   public enum AnimationEndReason {
@@ -123,9 +124,9 @@ package androidx.compose.animation.core {
 
   public final class AnimationScope<T, V extends androidx.compose.animation.core.AnimationVector> {
     method public void cancelAnimation();
-    method public long getFinishedTime-CLVl0cY();
-    method public long getLastFrameTime-CLVl0cY();
-    method public long getStartTime-CLVl0cY();
+    method public long getFinishedTimeNanos();
+    method public long getLastFrameTimeNanos();
+    method public long getStartTimeNanos();
     method public T! getTargetValue();
     method public androidx.compose.animation.core.TwoWayConverter<T,V> getTypeConverter();
     method public T! getValue();
@@ -133,10 +134,10 @@ package androidx.compose.animation.core {
     method public V getVelocityVector();
     method public boolean isRunning();
     method public androidx.compose.animation.core.AnimationState<T,V> toAnimationState();
-    property public final long finishedTime;
+    property public final long finishedTimeNanos;
     property public final boolean isRunning;
-    property public final long lastFrameTime;
-    property public final long startTime;
+    property public final long lastFrameTimeNanos;
+    property public final long startTimeNanos;
     property public final T! targetValue;
     property public final androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter;
     property public final T! value;
@@ -152,16 +153,17 @@ package androidx.compose.animation.core {
   }
 
   public final class AnimationState<T, V extends androidx.compose.animation.core.AnimationVector> implements androidx.compose.runtime.State<T> {
-    method public long getFinishedTime-CLVl0cY();
-    method public long getLastFrameTime-CLVl0cY();
+    ctor public AnimationState(androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, T? initialValue, V? initialVelocityVector, long lastFrameTimeNanos, long finishedTimeNanos, boolean isRunning);
+    method public long getFinishedTimeNanos();
+    method public long getLastFrameTimeNanos();
     method public androidx.compose.animation.core.TwoWayConverter<T,V> getTypeConverter();
     method public T! getValue();
     method public T! getVelocity();
     method public V getVelocityVector();
     method public boolean isRunning();
-    property public final long finishedTime;
+    property public final long finishedTimeNanos;
     property public final boolean isRunning;
-    property public final long lastFrameTime;
+    property public final long lastFrameTimeNanos;
     property public final androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter;
     property public T! value;
     property public final T! velocity;
@@ -169,10 +171,10 @@ package androidx.compose.animation.core {
   }
 
   public final class AnimationStateKt {
-    method public static <T, V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.AnimationState<T,V> AnimationState-NYxC2dI(androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, T? initialValue, T? initialVelocity, optional long lastFrameTime, optional long finishedTime, optional boolean isRunning);
-    method public static androidx.compose.animation.core.AnimationState<java.lang.Float,androidx.compose.animation.core.AnimationVector1D> AnimationState-SZyJPdc(float initialValue, optional float initialVelocity, optional long lastFrameTime, optional long finishedTime, optional boolean isRunning);
-    method public static androidx.compose.animation.core.AnimationState<java.lang.Float,androidx.compose.animation.core.AnimationVector1D> copy-mN48zRs(androidx.compose.animation.core.AnimationState<java.lang.Float,androidx.compose.animation.core.AnimationVector1D>, optional float value, optional float velocity, optional long lastFrameTime, optional long finishedTime, optional boolean isRunning);
-    method public static <T, V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.AnimationState<T,V> copy-upwry94(androidx.compose.animation.core.AnimationState<T,V>, optional T? value, optional V? velocityVector, optional long lastFrameTime, optional long finishedTime, optional boolean isRunning);
+    method public static androidx.compose.animation.core.AnimationState<java.lang.Float,androidx.compose.animation.core.AnimationVector1D> AnimationState(float initialValue, optional float initialVelocity, optional long lastFrameTimeNanos, optional long finishedTimeNanos, optional boolean isRunning);
+    method public static <T, V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.AnimationState<T,V> AnimationState(androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, T? initialValue, T? initialVelocity, optional long lastFrameTimeNanos, optional long finishedTimeNanos, optional boolean isRunning);
+    method public static <T, V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.AnimationState<T,V> copy(androidx.compose.animation.core.AnimationState<T,V>, optional T? value, optional V? velocityVector, optional long lastFrameTimeNanos, optional long finishedTimeNanos, optional boolean isRunning);
+    method public static androidx.compose.animation.core.AnimationState<java.lang.Float,androidx.compose.animation.core.AnimationVector1D> copy(androidx.compose.animation.core.AnimationState<java.lang.Float,androidx.compose.animation.core.AnimationVector1D>, optional float value, optional float velocity, optional long lastFrameTimeNanos, optional long finishedTimeNanos, optional boolean isRunning);
     method public static <T, V extends androidx.compose.animation.core.AnimationVector> V createZeroVectorFrom(androidx.compose.animation.core.TwoWayConverter<T,V>, T? value);
     method public static boolean isFinished(androidx.compose.animation.core.AnimationState<?,?>);
   }
