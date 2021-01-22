@@ -111,6 +111,12 @@ class LayoutInspectorTreeTest : ToolingTest() {
 
         validate(nodes, builder, checkParameters = false) {
             node(
+                name = "Content",
+                fileName = "",
+                left = 0.0.dp, top = 0.0.dp, width = viewWidth, height = viewHeight,
+                children = listOf("Box")
+            )
+            node(
                 name = "Box",
                 isRenderNode = true,
                 fileName = "",
@@ -185,6 +191,12 @@ class LayoutInspectorTreeTest : ToolingTest() {
 
         validate(nodes, builder, checkParameters = false) {
             node(
+                name = "Content",
+                fileName = "",
+                left = 0.0.dp, top = 0.0.dp, width = viewWidth, height = viewHeight,
+                children = listOf("Box")
+            )
+            node(
                 name = "Box",
                 isRenderNode = true,
                 fileName = "",
@@ -195,7 +207,7 @@ class LayoutInspectorTreeTest : ToolingTest() {
                 name = "MaterialTheme",
                 hasTransformations = true,
                 fileName = "LayoutInspectorTreeTest.kt",
-                left = 65.8.dp, top = 48.7.dp, width = 86.2.dp, height = 21.4.dp,
+                left = 68.0.dp, top = 49.7.dp, width = 88.5.dp, height = 21.7.dp,
                 children = listOf("Text")
             )
             node(
@@ -203,7 +215,7 @@ class LayoutInspectorTreeTest : ToolingTest() {
                 isRenderNode = true,
                 hasTransformations = true,
                 fileName = "LayoutInspectorTreeTest.kt",
-                left = 65.8.dp, top = 48.7.dp, width = 86.2.dp, height = 21.4.dp,
+                left = 68.0.dp, top = 49.7.dp, width = 88.5.dp, height = 21.7.dp,
             )
         }
     }
@@ -330,11 +342,13 @@ class LayoutInspectorTreeTest : ToolingTest() {
 
         view.setTag(R.id.inspection_slot_table_set, slotTableRecord.store)
         show {
-            Column {
-                BasicText(
-                    text = "Some text",
-                    style = TextStyle(textDecoration = TextDecoration.Underline)
-                )
+            Inspectable(slotTableRecord) {
+                Column {
+                    BasicText(
+                        text = "Some text",
+                        style = TextStyle(textDecoration = TextDecoration.Underline)
+                    )
+                }
             }
         }
 
