@@ -31,7 +31,7 @@ import android.widget.ImageView
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Recomposer
-import androidx.compose.runtime.dispatch.MonotonicFrameClock
+import androidx.compose.runtime.MonotonicFrameClock
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.platform.setContent

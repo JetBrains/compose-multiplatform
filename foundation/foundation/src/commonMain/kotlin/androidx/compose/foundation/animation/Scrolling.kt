@@ -20,7 +20,7 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.gestures.Scrollable
-import androidx.compose.runtime.dispatch.withFrameMillis
+import androidx.compose.runtime.withFrameMillis
 
 /**
  * Smooth scroll by [value] pixels.

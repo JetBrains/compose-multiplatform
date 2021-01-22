@@ -16,7 +16,7 @@
 
 package androidx.compose.animation.core
 
-import androidx.compose.runtime.dispatch.withFrameNanos
+import androidx.compose.runtime.withFrameNanos
 import kotlinx.coroutines.CancellationException
 
 /**

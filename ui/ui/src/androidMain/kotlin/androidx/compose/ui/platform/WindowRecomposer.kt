@@ -21,8 +21,7 @@ import android.view.ViewParent
 import androidx.compose.runtime.CompositionReference
 import androidx.compose.runtime.PausableMonotonicFrameClock
 import androidx.compose.runtime.Recomposer
-import androidx.compose.runtime.dispatch.AndroidUiDispatcher
-import androidx.compose.runtime.dispatch.MonotonicFrameClock
+import androidx.compose.runtime.MonotonicFrameClock
 import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.R
 import androidx.lifecycle.Lifecycle
