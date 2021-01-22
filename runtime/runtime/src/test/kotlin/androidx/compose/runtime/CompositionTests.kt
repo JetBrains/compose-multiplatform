@@ -2496,11 +2496,11 @@ class CompositionTests {
             }
 
             // Memo to future self:
-            // Without the explicit generic definition of CompositionLifecycleObserver here,
-            // the type of this remember call is inferred to be `Unit` thanks to the call's position
-            // as the last expression in a unit lambda (the argument to `compose {}`). The remember
-            // lambda is in turn interpreted as returning Unit, the object expression is dropped
-            // on the floor for the gc, and Unit is written into the slot table.
+            // Without the explicit generic definition of RememberObserver here, the type of this
+            // remember call is inferred to be `Unit` thanks to the call's position as the last
+            // expression in a unit lambda (the argument to `compose {}`). The remember lambda is in
+            // turn interpreted as returning Unit, the object expression is dropped on the floor for
+            // the gc, and Unit is written into the slot table.
             remember<RememberObserver> {
                 object : RememberObserver {
                     override fun onRemembered() {

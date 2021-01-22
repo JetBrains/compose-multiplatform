@@ -52,10 +52,6 @@ package androidx.compose.runtime {
   public final class BitwiseOperatorsKt {
   }
 
-  @Deprecated public interface CommitScope {
-    method @Deprecated public void onDispose(kotlin.jvm.functions.Function0<kotlin.Unit> callback);
-  }
-
   @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface Composable {
   }
 
@@ -186,11 +182,6 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.ExperimentalComposeApi public static androidx.compose.runtime.Composition compositionFor(Object key, androidx.compose.runtime.Applier<?> applier, androidx.compose.runtime.CompositionReference parent, optional kotlin.jvm.functions.Function0<kotlin.Unit> onCreated);
   }
 
-  @Deprecated public interface CompositionLifecycleObserver {
-    method @Deprecated public default void onEnter();
-    method @Deprecated public default void onLeave();
-  }
-
   public abstract class CompositionReference {
   }
 
@@ -220,26 +211,9 @@ package androidx.compose.runtime {
     method public inline androidx.compose.runtime.DisposableEffectResult onDispose(kotlin.jvm.functions.Function0<kotlin.Unit> onDisposeEffect);
   }
 
-  public final class EffectsKt {
-    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.runtime.CompositionReference compositionReference();
-    method @Deprecated @androidx.compose.runtime.Composable public static kotlin.jvm.functions.Function0<kotlin.Unit> getInvalidate();
-    method @Deprecated @androidx.compose.runtime.Composable public static void onActive(kotlin.jvm.functions.Function1<? super androidx.compose.runtime.CommitScope,kotlin.Unit> callback);
-    method @Deprecated @androidx.compose.runtime.Composable public static inline void onCommit(kotlin.jvm.functions.Function1<? super androidx.compose.runtime.CommitScope,kotlin.Unit> callback);
-    method @Deprecated @androidx.compose.runtime.Composable public static <V1> void onCommit(V1? v1, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.CommitScope,kotlin.Unit> callback);
-    method @Deprecated @androidx.compose.runtime.Composable public static <V1, V2> void onCommit(V1? v1, V2? v2, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.CommitScope,kotlin.Unit> callback);
-    method @Deprecated @androidx.compose.runtime.Composable public static void onCommit(Object![]? inputs, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.CommitScope,kotlin.Unit> callback);
-    method @Deprecated @androidx.compose.runtime.Composable public static void onDispose(kotlin.jvm.functions.Function0<kotlin.Unit> callback);
-  }
-
   public interface EmbeddingContext {
     method public boolean isMainThread();
     method public kotlin.coroutines.CoroutineContext mainThreadCompositionContext();
-  }
-
-  public final class EmitKt {
-    method @androidx.compose.runtime.Composable public static inline <T extends java.lang.Object, reified E extends androidx.compose.runtime.Applier<?>> void emit(kotlin.jvm.functions.Function0<? extends T> factory, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> update);
-    method @androidx.compose.runtime.Composable public static inline <T extends java.lang.Object, reified E extends androidx.compose.runtime.Applier<?>> void emit(kotlin.jvm.functions.Function0<? extends T> factory, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> update, kotlin.jvm.functions.Function0<? extends kotlin.Unit> content);
-    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(readonly=true) public static inline <T, reified E extends androidx.compose.runtime.Applier<?>> void emit(kotlin.jvm.functions.Function0<? extends T> factory, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> update, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.SkippableUpdater<T>,? extends kotlin.Unit> skippableUpdate, kotlin.jvm.functions.Function0<? extends kotlin.Unit> content);
   }
 
   public final class ExpectKt {
@@ -320,14 +294,6 @@ package androidx.compose.runtime {
     method public void resume();
     method public suspend <R> Object? withFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
     property public final boolean isPaused;
-  }
-
-  @kotlin.PublishedApi internal final class PreCommitScopeImpl implements androidx.compose.runtime.CommitScope androidx.compose.runtime.RememberObserver {
-    ctor public PreCommitScopeImpl(kotlin.jvm.functions.Function1<? super androidx.compose.runtime.CommitScope,kotlin.Unit> onCommit);
-    method public void onAbandoned();
-    method public void onDispose(kotlin.jvm.functions.Function0<kotlin.Unit> callback);
-    method public void onForgotten();
-    method public void onRemembered();
   }
 
   public final class ProduceStateKt {

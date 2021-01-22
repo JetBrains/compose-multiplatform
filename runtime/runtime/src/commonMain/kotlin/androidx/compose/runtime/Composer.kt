@@ -51,8 +51,6 @@ private class GroupInfo(
 )
 
 internal interface RememberManager {
-    fun entering(@Suppress("DEPRECATION") instance: CompositionLifecycleObserver)
-    fun leaving(@Suppress("DEPRECATION") instance: CompositionLifecycleObserver)
     fun remembering(instance: RememberObserver)
     fun forgetting(instance: RememberObserver)
     fun sideEffect(effect: () -> Unit)
@@ -288,10 +286,6 @@ class Composer<N>(
 ) {
     private val slotTable: SlotTable = SlotTable()
     private val changes = mutableListOf<Change<N>>()
-    private val lifecycleObservers = HashMap<
-        CompositionLifecycleObserverHolder,
-        CompositionLifecycleObserverHolder
-        >()
     private val abandonSet = HashSet<RememberObserver>()
     private val pendingStack = Stack<Pending?>()
     private var pending: Pending? = null
@@ -654,38 +648,15 @@ class Composer<N>(
     /**
      * Helper for collecting remember observers for later strictly ordered dispatch.
      *
-     * This includes support for the deprecated [CompositionLifecycleObserver] which should be
+     * This includes support for the deprecated [RememberObserver] which should be
      * removed with it.
      */
     private class RememberEventDispatcher(
-        private val lifecycleObservers: MutableMap<CompositionLifecycleObserverHolder,
-            CompositionLifecycleObserverHolder>,
         private val abandoning: MutableSet<RememberObserver>
     ) : RememberManager {
-        private val enters = mutableSetOf<CompositionLifecycleObserverHolder>()
-        private val leaves = mutableSetOf<CompositionLifecycleObserverHolder>()
         private val remembering = mutableListOf<RememberObserver>()
         private val forgetting = mutableListOf<RememberObserver>()
         private val sideEffects = mutableListOf<() -> Unit>()
-
-        override fun entering(@Suppress("DEPRECATION") instance: CompositionLifecycleObserver) {
-            val holder = CompositionLifecycleObserverHolder(instance)
-            lifecycleObservers.getOrPut(holder) {
-                enters.add(holder)
-                holder
-            }.apply { count++ }
-        }
-
-        override fun leaving(@Suppress("DEPRECATION") instance: CompositionLifecycleObserver) {
-            val holder = CompositionLifecycleObserverHolder(instance)
-            val left = lifecycleObservers[holder]?.let {
-                if (--it.count == 0) {
-                    leaves.add(it)
-                    it
-                } else null
-            }
-            if (left != null) lifecycleObservers.remove(left)
-        }
 
         override fun remembering(instance: RememberObserver) {
             forgetting.lastIndexOf(instance).let { index ->
@@ -713,32 +684,12 @@ class Composer<N>(
             sideEffects += effect
         }
 
-        fun dispatchLifecycleObservers() {
-            // Send lifecycle leaves
-            if (leaves.isNotEmpty()) {
-                for (holder in leaves.reversed()) {
-                    // The count of the holder might be greater than 0 here as it might leave one
-                    // part of the composition and reappear in another. Only send a leave if the
-                    // count is still 0 after all changes have been applied.
-                    if (holder.count == 0) {
-                        holder.instance.onLeave()
-                        lifecycleObservers.remove(holder)
-                    }
-                }
-            }
-
+        fun dispatchRememberObservers() {
             // Send forgets
             if (forgetting.isNotEmpty()) {
                 for (instance in forgetting.reversed()) {
                     if (instance !in abandoning)
                         instance.onForgotten()
-                }
-            }
-
-            // Send lifecycle enters
-            if (enters.isNotEmpty()) {
-                for (holder in enters) {
-                    holder.instance.onEnter()
                 }
             }
 
@@ -784,7 +735,7 @@ class Composer<N>(
                 invalidations.map { reader.anchor(it.location) to it }
             }
 
-            val manager = RememberEventDispatcher(lifecycleObservers, abandonSet)
+            val manager = RememberEventDispatcher(abandonSet)
             try {
                 applier.onBeginChanges()
 
@@ -812,9 +763,9 @@ class Composer<N>(
                 }
 
                 // Side effects run after lifecycle observers so that any remembered objects
-                // that implement CompositionLifecycleObserver receive onEnter before a side effect
+                // that implement RememberObserver receive onRemembered before a side effect
                 // that captured it and operates on it can run.
-                manager.dispatchLifecycleObservers()
+                manager.dispatchRememberObservers()
                 manager.dispatchSideEffects()
 
                 if (pendingInvalidScopes) {
@@ -837,13 +788,13 @@ class Composer<N>(
             changes.clear()
             applier.clear()
             if (slotTable.groupsSize > 0) {
-                val manager = RememberEventDispatcher(lifecycleObservers, abandonSet)
+                val manager = RememberEventDispatcher(abandonSet)
                 slotTable.write { writer ->
                     writer.removeCurrentGroup(manager)
                 }
                 providerUpdates.clear()
                 applier.clear()
-                manager.dispatchLifecycleObservers()
+                manager.dispatchRememberObservers()
             } else {
                 applier.clear()
             }
@@ -1103,27 +1054,17 @@ class Composer<N>(
     internal fun updateValue(value: Any?) {
         if (inserting) {
             writer.update(value)
-            @Suppress("DEPRECATION")
-            if (value is CompositionLifecycleObserver) {
-                record { _, _, lifecycleManager -> lifecycleManager.entering(value) }
-            }
             if (value is RememberObserver) {
                 record { _, _, rememberManager -> rememberManager.remembering(value) }
             }
         } else {
             val groupSlotIndex = reader.groupSlotIndex - 1
             recordSlotTableOperation(forParent = true) { _, slots, rememberManager ->
-                @Suppress("DEPRECATION")
-                if (value is CompositionLifecycleObserver)
-                    rememberManager.entering(value)
                 if (value is RememberObserver) {
                     abandonSet.add(value)
                     rememberManager.remembering(value)
                 }
-                @Suppress("DEPRECATION")
                 when (val previous = slots.set(groupSlotIndex, value)) {
-                    is CompositionLifecycleObserver ->
-                        rememberManager.leaving(previous)
                     is RememberObserver ->
                         rememberManager.forgetting(previous)
                     is RecomposeScopeImpl -> {
@@ -1979,8 +1920,8 @@ class Composer<N>(
     /**
      * Start a restart group. A restart group creates a recompose scope and sets it as the current
      * recompose scope of the composition. If the recompose scope is invalidated then this group
-     * will be recomposed. A recompose scope can be invalidated by calling the lambda returned by
-     * [androidx.compose.runtime.invalidate].
+     * will be recomposed. A recompose scope can be invalidated by calling invalidate on the object
+     * returned by [androidx.compose.runtime.currentRecomposeScope].
      */
     @ComposeCompilerApi
     fun startRestartGroup(key: Int) {
@@ -2410,11 +2351,15 @@ class Composer<N>(
      * that will not have its reference made visible to user code.
      */
     // This warning becomes an error if its advice is followed since Composer needs its type param
-    @Suppress("RemoveRedundantQualifierName", "DEPRECATION")
+    @Suppress("RemoveRedundantQualifierName")
     private class CompositionReferenceHolder<T>(
         val ref: Composer<T>.CompositionReferenceImpl
-    ) : CompositionLifecycleObserver {
-        override fun onLeave() {
+    ) : RememberObserver {
+        override fun onRemembered() { }
+        override fun onAbandoned() {
+            ref.dispose()
+        }
+        override fun onForgotten() {
             ref.dispose()
         }
     }
@@ -2680,9 +2625,6 @@ private fun SlotWriter.removeCurrentGroup(rememberManager: RememberManager) {
     for (slot in groupSlots()) {
         @Suppress("DEPRECATION")
         when (slot) {
-            is CompositionLifecycleObserver -> {
-                rememberManager.leaving(slot)
-            }
             is RememberObserver -> {
                 rememberManager.forgetting(slot)
             }
