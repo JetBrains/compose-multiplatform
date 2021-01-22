@@ -110,7 +110,6 @@ fun getApiLintArgs(targetsJavaConsumers: Boolean): List<String> {
             // List of checks that have bugs, but should be enabled once fixed.
             "GetterSetterNames", // b/135498039
             "StaticUtils", // b/135489083
-            "AllUpper", // b/135708486
             "StartWithLower", // b/135710527
 
             // The list of checks that are API lint warnings and are yet to be enabled
@@ -123,6 +122,7 @@ fun getApiLintArgs(targetsJavaConsumers: Boolean): List<String> {
         ).joinToString(),
         "--error",
         listOf(
+            "AllUpper",
             "MinMaxConstant",
             "TopLevelBuilder",
             "BuilderSetStyle",
