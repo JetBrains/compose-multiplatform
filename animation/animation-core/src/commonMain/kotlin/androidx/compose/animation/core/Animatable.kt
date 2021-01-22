@@ -24,7 +24,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.unit.Uptime
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
@@ -278,12 +277,14 @@ class Animatable<T, V : AnimationVector>(
             val oldJob = currentJob.getAndSet(coroutineContext[Job])
             oldJob?.also { it.cancelAnimation() } != null
 
-            val startState = internalState.copy(finishedTime = Uptime.Unspecified)
+            val startState = internalState.copy(
+                finishedTimeNanos = AnimationConstants.UnspecifiedTime
+            )
             val endReason = try {
                 var clampingNeeded = false
                 startState.animate(
                     animation,
-                    internalState.lastFrameTime
+                    internalState.lastFrameTimeNanos
                 ) {
                     if (currentJob.get() == coroutineContext[Job]) {
                         updateState(internalState)
@@ -356,7 +357,7 @@ class Animatable<T, V : AnimationVector>(
         // Reset velocity
         internalState.apply {
             velocityVector.reset()
-            lastFrameTime = Uptime.Unspecified
+            lastFrameTimeNanos = AnimationConstants.UnspecifiedTime
         }
     }
 
