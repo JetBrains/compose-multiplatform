@@ -442,9 +442,6 @@ class Transition<S> internal constructor(
      * transition from the child animations.
      */
     class Segment<S>(val initialState: S, val targetState: S) {
-        @Deprecated("transitionSpec no longer takes a parameter", ReplaceWith("this"))
-        val it = this
-
         /**
          * Returns whether the provided state matches the [initialState] && the provided
          * [targetState] matches [Segment.targetState].
