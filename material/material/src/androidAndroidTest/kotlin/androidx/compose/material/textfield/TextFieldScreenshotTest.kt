@@ -387,7 +387,13 @@ class TextFieldScreenshotTest {
             )
         }
 
+        rule.mainClock.autoAdvance = false
+
         rule.onNodeWithTag(TextFieldTag).performGesture { swipeLeft() }
+
+        // wait for swipe to finish
+        rule.waitForIdle()
+        rule.mainClock.advanceTimeBy(250)
 
         assertAgainstGolden("textField_disabled_notScrolled")
     }
@@ -436,8 +442,13 @@ class TextFieldScreenshotTest {
                 readOnly = true
             )
         }
+        rule.mainClock.autoAdvance = false
 
         rule.onNodeWithTag(TextFieldTag).performGesture { swipeLeft() }
+
+        // wait for swipe to finish
+        rule.waitForIdle()
+        rule.mainClock.advanceTimeBy(250)
 
         assertAgainstGolden("textField_readOnly_scrolled")
     }
