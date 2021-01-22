@@ -39,8 +39,11 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertHeightIsEqualTo
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsEqualTo
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.assertPositionInRootIsEqualTo
@@ -99,6 +102,29 @@ class TabTest {
         rule.onNodeWithTag("tab")
             .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Tab))
             .assertIsSelected()
+            .assertIsEnabled()
+            .assertHasClickAction()
+    }
+
+    @Test
+    fun disabledSemantics() {
+        rule.setMaterialContent {
+            Box {
+                Tab(
+                    enabled = false,
+                    text = { Text("Text") },
+                    modifier = Modifier.testTag("tab"),
+                    selected = true,
+                    onClick = {}
+                )
+            }
+        }
+
+        rule.onNodeWithTag("tab")
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Tab))
+            .assertIsSelected()
+            .assertIsNotEnabled()
+            .assertHasClickAction()
     }
 
     @Test
@@ -472,6 +498,29 @@ class TabTest {
             assertThat(modifier.nameFallback).isEqualTo("tabIndicatorOffset")
             assertThat(modifier.valueOverride).isEqualTo(pos)
             assertThat(modifier.inspectableElements.asIterable()).isEmpty()
+        }
+    }
+
+    @Test
+    fun disabled_noClicks() {
+        var clicks = 0
+        rule.setMaterialContent {
+            Box {
+                Tab(
+                    enabled = false,
+                    text = { Text("Text") },
+                    modifier = Modifier.testTag("tab"),
+                    selected = true,
+                    onClick = { clicks++ }
+                )
+            }
+        }
+
+        rule.onNodeWithTag("tab")
+            .performClick()
+
+        rule.runOnIdle {
+            assertThat(clicks).isEqualTo(0)
         }
     }
 }

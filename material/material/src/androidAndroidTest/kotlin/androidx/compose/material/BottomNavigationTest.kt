@@ -24,10 +24,17 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertHeightIsEqualTo
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsEqualTo
 import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
@@ -57,6 +64,57 @@ import org.junit.runner.RunWith
 class BottomNavigationTest {
     @get:Rule
     val rule = createComposeRule()
+
+    @Test
+    fun defaultSemantics() {
+        rule.setMaterialContent {
+            BottomNavigation {
+                BottomNavigationItem(
+                    modifier = Modifier.testTag("item"),
+                    icon = {
+                        Icon(Icons.Filled.Favorite, null)
+                    },
+                    label = {
+                        Text("ItemText")
+                    },
+                    selected = true,
+                    onClick = {}
+                )
+            }
+        }
+
+        rule.onNodeWithTag("item")
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Tab))
+            .assertIsSelected()
+            .assertIsEnabled()
+            .assertHasClickAction()
+    }
+
+    @Test
+    fun disabledSemantics() {
+        rule.setMaterialContent {
+            BottomNavigation {
+                BottomNavigationItem(
+                    enabled = false,
+                    modifier = Modifier.testTag("item"),
+                    icon = {
+                        Icon(Icons.Filled.Favorite, null)
+                    },
+                    label = {
+                        Text("ItemText")
+                    },
+                    selected = true,
+                    onClick = {}
+                )
+            }
+        }
+
+        rule.onNodeWithTag("item")
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Tab))
+            .assertIsSelected()
+            .assertIsNotEnabled()
+            .assertHasClickAction()
+    }
 
     @Test
     fun bottomNavigation_size() {
@@ -242,5 +300,33 @@ class BottomNavigationTest {
                 get(1).assertIsNotSelected()
                 get(2).assertIsSelected()
             }
+    }
+
+    @Test
+    fun disabled_noClicks() {
+        var clicks = 0
+        rule.setMaterialContent {
+            BottomNavigation {
+                BottomNavigationItem(
+                    enabled = false,
+                    modifier = Modifier.testTag("item"),
+                    icon = {
+                        Icon(Icons.Filled.Favorite, null)
+                    },
+                    label = {
+                        Text("ItemText")
+                    },
+                    selected = true,
+                    onClick = { clicks++ }
+                )
+            }
+        }
+
+        rule.onNodeWithTag("item")
+            .performClick()
+
+        rule.runOnIdle {
+            Truth.assertThat(clicks).isEqualTo(0)
+        }
     }
 }
