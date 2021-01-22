@@ -134,7 +134,12 @@ inline class Size(@PublishedApi internal val packedValue: Long) {
     val maxDimension: Float
         get() = max(width.absoluteValue, height.absoluteValue)
 
-    override fun toString() = "Size(${width.toStringAsFixed(1)}, ${height.toStringAsFixed(1)})"
+    override fun toString() =
+        if (isSpecified) {
+            "Size(${width.toStringAsFixed(1)}, ${height.toStringAsFixed(1)})"
+        } else {
+            "Size(UNSPECIFIED)"
+        }
 }
 
 /**
