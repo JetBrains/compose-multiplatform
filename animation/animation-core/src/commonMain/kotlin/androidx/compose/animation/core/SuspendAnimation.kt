@@ -173,53 +173,6 @@ suspend fun <T, V : AnimationVector> AnimationState<T, V>.animateTo(
  * momentum, using the interruption time (captured in [AnimationState.lastFrameTime] creates
  * a smoother animation.
  */
-@Deprecated(
-    "Please use animateDecay that takes a [DecayAnimationSpec] instead",
-    ReplaceWith(
-        "animateDecay(animationSpec.generateDecayAnimationSpec(), sequentialAnimation, block)"
-    )
-)
-suspend fun AnimationState<Float, AnimationVector1D>.animateDecay(
-    animationSpec: FloatDecayAnimationSpec,
-    // Indicates whether the animation should start from last frame
-    sequentialAnimation: Boolean = false,
-    block: AnimationScope<Float, AnimationVector1D>.() -> Unit = {}
-) {
-    val anim = DecayAnimation(
-        animationSpec = animationSpec,
-        initialValue = value,
-        initialVelocity = velocityVector.value
-    )
-    animate(
-        anim,
-        startTime = if (sequentialAnimation) lastFrameTime else Uptime.Unspecified,
-        block = block
-    )
-}
-
-/**
- * Decay animation that slows down from the current velocity and value captured in [AnimationState]
- * until the velocity reaches 0. During the animation, the given [AnimationState] will be updated
- * with the up-to-date value/velocity, frame time, etc. This is often used to animate the result
- * of a fling gesture.
- *
- * [animationSpec] defines the decay animation that will be used for this animation. Some options
- * for [animationSpec] include: [androidFlingDecay][androidx.compose.foundation.animation
- * .androidFlingDecay] and [exponentialDecay].
- *
- * During the animation, [block] will be invoked on every frame, and the [AnimationScope] will be
- * checked against cancellation before the animation continues. To cancel the animation from the
- * [block], simply call [AnimationScope.cancelAnimation].  After [AnimationScope.cancelAnimation] is
- * called, [block] will not be invoked again. The animation loop will exit after the [block]
- * returns. All the animation related info can be accessed via [AnimationScope].
- *
- * [sequentialAnimation] indicates whether the animation should use the
- * [AnimationState.lastFrameTime] as the starting time (if true), or start in a new frame. By
- * default, [sequentialAnimation] is false, to start the animation in a few frame. In cases where
- * an on-going animation is interrupted and a new animation is started to carry over the
- * momentum, using the interruption time (captured in [AnimationState.lastFrameTime] creates
- * a smoother animation.
- */
 suspend fun <T, V : AnimationVector> AnimationState<T, V>.animateDecay(
     animationSpec: DecayAnimationSpec<T>,
     // Indicates whether the animation should start from last frame

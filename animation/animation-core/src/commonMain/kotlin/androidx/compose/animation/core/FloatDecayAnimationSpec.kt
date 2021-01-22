@@ -85,12 +85,6 @@ interface FloatDecayAnimationSpec {
 
 private const val ExponentialDecayFriction = -4.2f
 
-@Deprecated(
-    "ExponentialDecay has been renamed to FloatExponentialDecaySpec",
-    replaceWith = ReplaceWith("FloatExponentialDecaySpec")
-)
-typealias ExponentialDecay = FloatExponentialDecaySpec
-
 /**
  * This is a decay animation where the friction/deceleration is always proportional to the velocity.
  * As a result, the velocity goes under an exponential decay. The constructor parameter,
