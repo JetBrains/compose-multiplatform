@@ -17,6 +17,7 @@ at https://android.googlesource.com/platform/frameworks/support.
        * [game](examples/falling_balls) - Simple game
        * [todoapp](examples/todoapp) - TODO items tracker with persistence and multiple screens
        * [widgetsgallery](examples/widgetsgallery) - Gallery of standard widgets
+       * [IDEA plugin](examples/intelliJPlugin) - Plugin for IDEA using Compose for Desktop      
    * [gradle-plugins](gradle-plugins) - a plugin, simplifying usage of Compose with Gradle
    * [templates](templates) - new application templates (see `desktop-template/build_and_run_from_cli_example.sh` for using without Gradle)
    * [tutorials](tutorials) - tutorials on using Compose for Desktop
