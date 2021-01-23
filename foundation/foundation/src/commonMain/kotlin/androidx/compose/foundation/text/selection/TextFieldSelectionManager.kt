@@ -308,11 +308,18 @@ internal class TextFieldSelectionManager {
         setSelectionStatus(false)
     }
 
-    internal fun deselect() {
+    internal fun deselect(position: Offset? = null) {
         if (!value.selection.collapsed) {
             // if selection was not collapsed, set a default cursor location, otherwise
             // don't change the location of the cursor.
-            val newCursorOffset = value.selection.max
+            val layoutResult = state?.layoutResult
+            val newCursorOffset = if (position != null && layoutResult != null) {
+                offsetMapping.transformedToOriginal(
+                    layoutResult.getOffsetForPosition(position)
+                )
+            } else {
+                value.selection.max
+            }
             val newValue = value.copy(selection = TextRange(newCursorOffset))
             onValueChange(newValue)
         }

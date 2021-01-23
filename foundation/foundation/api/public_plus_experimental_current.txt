@@ -562,10 +562,10 @@ package androidx.compose.foundation.text {
   public final class TextFieldDelegateKt {
   }
 
-  public final class TextFieldDragGestureFilterKt {
+  public final class TextFieldGestureModifiersKt {
   }
 
-  public final class TextFieldGestureModifiersKt {
+  public final class TextFieldPressGestureFilterKt {
   }
 
   public final class TextFieldScrollKt {
