@@ -76,7 +76,7 @@ class WindowRecomposerTest {
                 assertNull("expected Activity to have been collected", weakActivityRef.get())
             }
         } finally {
-            localRecomposer.shutDown()
+            localRecomposer.cancel()
             runBlocking {
                 recomposerJob.join()
             }

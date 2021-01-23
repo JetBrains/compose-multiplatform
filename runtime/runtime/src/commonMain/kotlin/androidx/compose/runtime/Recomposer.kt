@@ -33,6 +33,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
@@ -47,6 +48,9 @@ private const val RecomposerCompoundHashKey = 1000
 
 /**
  * Runs [block] with a new, active [Recomposer] applying changes in the calling [CoroutineContext].
+ * The [Recomposer] will be [closed][Recomposer.close] after [block] returns.
+ * [withRunningRecomposer] will return once the [Recomposer] is [Recomposer.State.ShutDown]
+ * and all child jobs launched by [block] have [joined][Job.join].
  */
 suspend fun <R> withRunningRecomposer(
     block: suspend CoroutineScope.(recomposer: Recomposer) -> R
@@ -55,7 +59,8 @@ suspend fun <R> withRunningRecomposer(
     // Will be cancelled when recomposerJob cancels
     launch { recomposer.runRecomposeAndApplyChanges() }
     block(recomposer).also {
-        recomposer.shutDown()
+        recomposer.close()
+        recomposer.join()
     }
 }
 
@@ -88,7 +93,8 @@ interface RecomposerInfo {
  */
 // RedundantVisibilityModifier suppressed because metalava picks up internal function overrides
 // if 'internal' is not explicitly specified - b/171342041
-@Suppress("RedundantVisibilityModifier")
+// NotCloseable suppressed because this is Kotlin-only common code; [Auto]Closeable not available.
+@Suppress("RedundantVisibilityModifier", "NotCloseable")
 @OptIn(
     ExperimentalComposeApi::class,
     InternalComposeApi::class
@@ -125,12 +131,20 @@ class Recomposer(
             // kick it out and make sure no new ones start if we have one.
             val cancellation = CancellationException("Recomposer effect job completed", throwable)
 
+            var continuationToResume: CancellableContinuation<Unit>? = null
             synchronized(stateLock) {
                 val runnerJob = runnerJob
                 if (runnerJob != null) {
                     _state.value = State.ShuttingDown
-                    // This will cancel frameContinuation if needed
-                    runnerJob.cancel(cancellation)
+                    // If the recomposer is closed we will let the runnerJob return from
+                    // runRecomposeAndApplyChanges normally and consider ourselves shut down
+                    // immediately.
+                    if (!isClosed) {
+                        // This is the job hosting frameContinuation; no need to resume it otherwise
+                        runnerJob.cancel(cancellation)
+                    } else if (frameContinuation != null) {
+                        continuationToResume = frameContinuation
+                    }
                     frameContinuation = null
                     runnerJob.invokeOnCompletion { runnerJobCause ->
                         synchronized(stateLock) {
@@ -147,6 +161,7 @@ class Recomposer(
                     _state.value = State.ShutDown
                 }
             }
+            continuationToResume?.resume(Unit)
         }
     }
 
@@ -161,13 +176,13 @@ class Recomposer(
      */
     enum class State {
         /**
-         * [shutDown] was called on the [Recomposer] and all cleanup work has completed.
+         * [cancel] was called on the [Recomposer] and all cleanup work has completed.
          * The [Recomposer] is no longer available for use.
          */
         ShutDown,
 
         /**
-         * [shutDown] was called on the [Recomposer] and it is no longer available for use.
+         * [cancel] was called on the [Recomposer] and it is no longer available for use.
          * Cleanup work has not yet been fully completed and composition effect coroutines may
          * still be running.
          */
@@ -205,12 +220,17 @@ class Recomposer(
     }
 
     private val stateLock = Any()
+
+    // Begin properties guarded by stateLock
     private var runnerJob: Job? = null
     private var closeCause: Throwable? = null
     private val knownCompositions = mutableListOf<ControlledComposition>()
     private val snapshotInvalidations = mutableListOf<Set<Any>>()
     private val compositionInvalidations = mutableListOf<ControlledComposition>()
     private var frameContinuation: CancellableContinuation<Unit>? = null
+    private var isClosed: Boolean = false
+    // End properties guarded by stateLock
+
     private val _state = MutableStateFlow(State.Inactive)
 
     /**
@@ -245,6 +265,13 @@ class Recomposer(
             }
         } else null
     }
+
+    /**
+     * `true` if there is still work to do for an active caller of [runRecomposeAndApplyChanges]
+     */
+    private val shouldKeepRecomposing: Boolean
+        get() = synchronized(stateLock) { !isClosed } ||
+            effectJob.children.any { it.isActive }
 
     /**
      * The current [State] of this [Recomposer]. See each [State] value for its meaning.
@@ -301,10 +328,11 @@ class Recomposer(
      * While [runRecomposeAndApplyChanges] is running, [awaitIdle] will suspend until there are no
      * more invalid composers awaiting recomposition.
      *
-     * This method never returns. Cancel the calling [CoroutineScope] to stop.
+     * This method will not return unless the [Recomposer] is [close]d and all effects in managed
+     * compositions complete.
      * Unhandled failure exceptions from child coroutines will be thrown by this method.
      */
-    suspend fun runRecomposeAndApplyChanges(): Nothing {
+    suspend fun runRecomposeAndApplyChanges() {
         val parentFrameClock = coroutineContext[MonotonicFrameClock] ?: DefaultMonotonicFrameClock
         withContext(broadcastFrameClock) {
             // Enforce mutual exclusion of callers; register self as current runner
@@ -335,12 +363,15 @@ class Recomposer(
 
                 val toRecompose = mutableListOf<ControlledComposition>()
                 val toApply = mutableListOf<ControlledComposition>()
-                while (true) {
+                while (shouldKeepRecomposing) {
                     // Await something to do
                     if (_state.value < State.PendingWork) {
                         suspendCancellableCoroutine<Unit> { co ->
                             synchronized(stateLock) {
-                                if (_state.value == State.PendingWork) {
+                                val currentState = _state.value
+                                if (currentState == State.PendingWork ||
+                                    currentState <= State.ShuttingDown
+                                ) {
                                     co.resume(Unit)
                                 } else {
                                     frameContinuation = co
@@ -433,15 +464,32 @@ class Recomposer(
      * [Recomposer] will also be cancelled. See [join] to await the completion of all of these
      * outstanding tasks.
      */
-    fun shutDown() {
+    fun cancel() {
         effectJob.cancel()
     }
 
+    @Deprecated("renamed to cancel(); consider close() for your use case", ReplaceWith("cancel()"))
+    fun shutDown() = cancel()
+
     /**
-     * Await the completion of a [shutDown] operation.
+     * Close this [Recomposer]. Once all effects launched by managed compositions complete,
+     * any active call to [runRecomposeAndApplyChanges] will return normally and this [Recomposer]
+     * will be [State.ShutDown]. See [join] to await the completion of all of these outstanding
+     * tasks.
+     */
+    fun close() {
+        if (effectJob.complete()) {
+            synchronized(stateLock) {
+                isClosed = true
+            }
+        }
+    }
+
+    /**
+     * Await the completion of a [cancel] operation.
      */
     suspend fun join() {
-        effectJob.join()
+        state.first { it == State.ShutDown }
     }
 
     internal override fun composeInitial(
