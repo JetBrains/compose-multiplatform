@@ -117,7 +117,7 @@ internal val DefaultCursorThickness = 2.dp
 
 // TODO(b/151940543): Remove this variable when we have a solution for idling animations
 /** @suppress */
-@InternalTextApi
+@InternalTextApi // Used by Testing infra
 @Deprecated(level = DeprecationLevel.ERROR, message = "This is internal API and should not be used")
 var blinkingCursorEnabled: Boolean = true
     /*@VisibleForTesting

@@ -39,7 +39,6 @@ val TextDemos = DemoCategory(
                 ComposableDemo("Focus transition") { TextFieldFocusTransition() },
                 ComposableDemo("Tail Following Text Field") { TailFollowingTextFieldDemo() },
                 ComposableDemo("Scrollable text fields") { ScrollableTextFieldDemo() },
-                ComposableDemo("Soft Wrap") { SoftWrapDemo() },
                 ComposableDemo("Min/Max Lines") { BasicTextFieldMinMaxDemo() },
                 ComposableDemo("Ime SingleLine") { ImeSingleLineDemo() },
                 ComposableDemo("Capitalization/AutoCorrect") { CapitalizationAutoCorrectDemo() },

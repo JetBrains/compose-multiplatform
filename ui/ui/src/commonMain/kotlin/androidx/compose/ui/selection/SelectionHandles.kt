@@ -55,7 +55,7 @@ internal val HANDLE_HEIGHT = 25.dp
 /**
  * @suppress
  */
-@InternalTextApi
+@InternalTextApi // Used by TextField Selection from foundation
 @Composable
 fun SelectionHandle(
     startHandlePosition: Offset?,
@@ -93,7 +93,7 @@ fun SelectionHandle(
  *
  * @suppress
  */
-@InternalTextApi
+@InternalTextApi // Used by TextField Selection from foundation
 fun getAdjustedCoordinates(position: Offset): Offset {
     return Offset(position.x, position.y - 1f)
 }
@@ -101,7 +101,7 @@ fun getAdjustedCoordinates(position: Offset): Offset {
 /**
  * @suppress
  */
-@InternalTextApi
+@InternalTextApi // Used by TextField Selection from foundation
 @Composable
 /*@VisibleForTesting*/
 internal fun DefaultSelectionHandle(
@@ -195,10 +195,7 @@ private fun HandleDrawLayout(
     }
 }
 
-/**
- * @suppress
- */
-@InternalTextApi
+@OptIn(InternalTextApi::class)
 @Composable
 private fun SelectionHandlePopup(
     startHandlePosition: Offset?,
