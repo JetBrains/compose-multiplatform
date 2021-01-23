@@ -27,7 +27,7 @@ import androidx.compose.runtime.ComposableContract
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.remember
-import androidx.compose.ui.selection.AmbientTextSelectionColors
+import androidx.compose.foundation.text.selection.AmbientTextSelectionColors
 
 /**
  * A MaterialTheme defines the styling principles from the Material design specification.

@@ -45,10 +45,10 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AmbientFontLoader
-import androidx.compose.ui.selection.AmbientSelectionRegistrar
-import androidx.compose.ui.selection.AmbientTextSelectionColors
-import androidx.compose.ui.selection.Selectable
-import androidx.compose.ui.selection.SelectionRegistrar
+import androidx.compose.foundation.text.selection.AmbientSelectionRegistrar
+import androidx.compose.foundation.text.selection.AmbientTextSelectionColors
+import androidx.compose.foundation.text.selection.Selectable
+import androidx.compose.foundation.text.selection.SelectionRegistrar
 import androidx.compose.ui.semantics.getTextLayoutResult
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString

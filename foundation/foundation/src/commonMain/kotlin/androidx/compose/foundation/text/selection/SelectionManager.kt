@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.selection
+package androidx.compose.foundation.text.selection
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -235,8 +235,7 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
     ): Selection? {
 
         val newSelection = selectionRegistrar.sort(requireContainerCoordinates())
-            .fold(null) { mergedSelection: Selection?,
-                handler: Selectable ->
+            .fold(null) { mergedSelection: Selection?, handler: Selectable ->
                 merge(
                     mergedSelection,
                     handler.getSelection(
@@ -559,7 +558,7 @@ internal fun getCurrentSelectedText(
 }
 
 /** Returns the boundary of the visible area in this [LayoutCoordinates]. */
-private fun LayoutCoordinates.visibleBounds(): Rect {
+internal fun LayoutCoordinates.visibleBounds(): Rect {
     // globalBounds is the global boundaries of this LayoutCoordinates after it's clipped by
     // parents. We can think it as the global visible bounds of this Layout. Here globalBounds
     // is convert to local, which is the boundary of the visible area within the LayoutCoordinates.
@@ -570,5 +569,5 @@ private fun LayoutCoordinates.visibleBounds(): Rect {
     )
 }
 
-private fun Rect.containsInclusive(offset: Offset): Boolean =
+internal fun Rect.containsInclusive(offset: Offset): Boolean =
     offset.x in left..right && offset.y in top..bottom

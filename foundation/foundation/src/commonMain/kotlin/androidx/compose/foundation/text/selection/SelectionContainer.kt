@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.selection
+package androidx.compose.foundation.text.selection
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -26,7 +26,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.gesture.dragGestureFilter
-import androidx.compose.ui.gesture.noConsumptionTapGestureFilter
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.AmbientClipboardManager
 import androidx.compose.ui.platform.AmbientHapticFeedback
@@ -36,9 +35,8 @@ import androidx.compose.ui.text.InternalTextApi
 /**
  * Enables text selection for it's direct or indirection children.
  *
- * @sample androidx.compose.ui.samples.SelectionSample
+ * @sample androidx.compose.foundation.samples.SelectionSample
  */
-@Suppress("DEPRECATION")
 @OptIn(InternalTextApi::class)
 @Composable
 fun SelectionContainer(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
@@ -57,7 +55,7 @@ fun SelectionContainer(modifier: Modifier = Modifier, content: @Composable () ->
  * Disables text selection for it's direct or indirection children. To use this, simply add this
  * to wrap one or more text composables.
  *
- * @sample androidx.compose.ui.samples.DisableSelectionSample
+ * @sample androidx.compose.foundation.samples.DisableSelectionSample
  */
 @Composable
 fun DisableSelection(content: @Composable () -> Unit) {
@@ -78,7 +76,7 @@ fun DisableSelection(content: @Composable () -> Unit) {
 @Suppress("ComposableLambdaParameterNaming")
 @InternalTextApi // Used by foundation
 @Composable
-fun SelectionContainer(
+internal fun SelectionContainer(
     /** A [Modifier] for SelectionContainer. */
     modifier: Modifier = Modifier,
     /** Current Selection status.*/
@@ -97,19 +95,13 @@ fun SelectionContainer(
     manager.selection = selection
 
     val selectionContainerModifier = Modifier.composed {
-        val gestureModifiers = Modifier.noConsumptionTapGestureFilter { manager.onRelease() }
-
         val positionedModifier = remember {
             // Get the layout coordinates of the selection container. This is for hit test of
             // cross-composable selection.
             Modifier.onGloballyPositioned { manager.containerLayoutCoordinates = it }
         }
 
-        if (selection != null) {
-            this.then(gestureModifiers).then(positionedModifier)
-        } else {
-            this.then(positionedModifier)
-        }
+        this.then(positionedModifier)
     }
 
     Providers(AmbientSelectionRegistrar provides registrarImpl) {

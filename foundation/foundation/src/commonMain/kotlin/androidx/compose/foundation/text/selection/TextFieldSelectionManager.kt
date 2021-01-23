@@ -31,13 +31,9 @@ import androidx.compose.ui.gesture.LongPressDragObserver
 import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.TextToolbarStatus
-import androidx.compose.ui.selection.SelectionHandle
-import androidx.compose.ui.selection.getAdjustedCoordinates
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextRange
@@ -618,21 +614,3 @@ internal fun TextFieldSelectionManager.isSelectionHandleInVisibleBound(
 ): Boolean = state?.layoutCoordinates?.visibleBounds()?.containsInclusive(
     getHandlePosition(isStartHandle)
 ) ?: false
-
-/** Returns the boundary of the visible area in this [LayoutCoordinates]. */
-internal fun LayoutCoordinates.visibleBounds(): Rect {
-    // globalBounds is the global boundaries of this LayoutCoordinates after it's clipped by
-    // parents. We can think it as the global visible bounds of this Layout. Here globalBounds
-    // is convert to local, which is the boundary of the visible area within the LayoutCoordinates.
-    val boundsInWindow = boundsInWindow()
-    return Rect(
-        windowToLocal(boundsInWindow.topLeft),
-        windowToLocal(boundsInWindow.bottomRight)
-    )
-}
-
-/**
- * Returns true is the [offset] is contained by this [Rect]
- */
-internal fun Rect.containsInclusive(offset: Offset): Boolean =
-    offset.x in left..right && offset.y in top..bottom
