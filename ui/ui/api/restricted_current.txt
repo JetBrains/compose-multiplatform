@@ -2629,7 +2629,6 @@ package androidx.compose.ui.selection {
   public final class SelectionContainerKt {
     method @androidx.compose.runtime.Composable public static void DisableSelection(kotlin.jvm.functions.Function0<kotlin.Unit> content);
     method @androidx.compose.runtime.Composable public static void SelectionContainer(optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method @Deprecated @androidx.compose.runtime.Composable @androidx.compose.ui.text.InternalTextApi public static void SelectionContainer(optional androidx.compose.ui.Modifier modifier, androidx.compose.ui.selection.Selection? selection, kotlin.jvm.functions.Function1<? super androidx.compose.ui.selection.Selection,kotlin.Unit> onSelectionChange, kotlin.jvm.functions.Function0<kotlin.Unit> children);
   }
 
   public final class SelectionHandlesKt {

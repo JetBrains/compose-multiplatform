@@ -107,7 +107,6 @@ import kotlin.math.roundToInt
  *
  * It is crucial that the value provided in the [onValueChange] is fed back into [CoreTextField] in
  * order to have the final state of the text being displayed. Example usage:
- * @sample androidx.compose.foundation.samples.CoreTextFieldSample
  *
  * Please keep in mind that [onValueChange] is useful to be informed about the latest state of the
  * text input by users, however it is generally not recommended to modify the values in the
@@ -154,10 +153,10 @@ import kotlin.math.roundToInt
 @Composable
 @OptIn(
     ExperimentalTextApi::class,
-    MouseTemporaryApi::class
+    MouseTemporaryApi::class,
+    InternalTextApi::class
 )
-@InternalTextApi
-fun CoreTextField(
+internal fun CoreTextField(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     modifier: Modifier = Modifier,

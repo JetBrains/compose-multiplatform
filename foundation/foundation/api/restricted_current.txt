@@ -513,11 +513,9 @@ package androidx.compose.foundation.text {
   }
 
   public final class CoreTextFieldKt {
-    method @androidx.compose.runtime.Composable @androidx.compose.ui.text.InternalTextApi public static void CoreTextField-KzZcjnU(androidx.compose.ui.text.input.TextFieldValue value, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.TextFieldValue,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.text.TextStyle textStyle, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.ImeAction,kotlin.Unit> onImeActionPerformed, optional androidx.compose.ui.text.input.VisualTransformation visualTransformation, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted, optional androidx.compose.foundation.InteractionState? interactionState, optional long cursorColor, optional boolean softWrap, optional int maxLines, optional androidx.compose.ui.text.input.ImeOptions imeOptions, optional boolean enabled, optional boolean readOnly, optional kotlin.jvm.functions.Function1<? super kotlin.jvm.functions.Function0<kotlin.Unit>,kotlin.Unit> decorationBox);
   }
 
   public final class CoreTextKt {
-    method @androidx.compose.runtime.Composable @androidx.compose.ui.text.InternalTextApi public static void CoreText(androidx.compose.ui.text.AnnotatedString text, optional androidx.compose.ui.Modifier modifier, androidx.compose.ui.text.TextStyle style, boolean softWrap, androidx.compose.ui.text.style.TextOverflow overflow, int maxLines, java.util.Map<java.lang.String,androidx.compose.foundation.text.InlineTextContent> inlineContent, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout);
   }
 
   public final class InactiveTextFieldKt {

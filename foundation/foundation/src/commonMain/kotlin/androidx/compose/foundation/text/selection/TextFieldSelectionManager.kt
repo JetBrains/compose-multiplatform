@@ -41,7 +41,6 @@ import androidx.compose.ui.selection.getAdjustedCoordinates
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.constrain
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.getSelectedText
@@ -581,7 +580,7 @@ internal class TextFieldSelectionManager {
     ): TextFieldValue {
         return TextFieldValue(
             annotatedString = annotatedString,
-            selection = selection.constrain(0, annotatedString.length)
+            selection = selection
         )
     }
 }

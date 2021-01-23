@@ -94,9 +94,8 @@ private typealias InlineContentRange = AnnotatedString.Range<@Composable (String
  * @param onTextLayout Callback that is executed when a new text layout is calculated.
  */
 @Composable
-@InternalTextApi
-@OptIn(ExperimentalTextApi::class)
-fun CoreText(
+@OptIn(ExperimentalTextApi::class, InternalTextApi::class)
+internal fun CoreText(
     text: AnnotatedString,
     modifier: Modifier = Modifier,
     style: TextStyle,

@@ -53,7 +53,7 @@ import java.util.concurrent.TimeUnit
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-@InternalTextApi
+@OptIn(InternalTextApi::class)
 class SelectionHandlePopupPositionTest {
     @get:Rule
     val rule = createComposeRule()

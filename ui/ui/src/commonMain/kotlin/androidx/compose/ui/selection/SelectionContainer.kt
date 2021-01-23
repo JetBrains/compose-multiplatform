@@ -72,11 +72,11 @@ fun DisableSelection(content: @Composable () -> Unit) {
  *
  * The selection composable wraps composables and let them to be selectable. It paints the selection
  * area with start and end handles.
+ *
+ * @suppress
  */
 @Suppress("ComposableLambdaParameterNaming")
-@OptIn(InternalTextApi::class)
-@Deprecated("Please use SelectionContainer with no callback")
-@InternalTextApi
+@InternalTextApi // Used by foundation
 @Composable
 fun SelectionContainer(
     /** A [Modifier] for SelectionContainer. */

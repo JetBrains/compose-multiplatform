@@ -39,7 +39,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
-@OptIn(ExperimentalTextApi::class)
+@OptIn(ExperimentalTextApi::class, InternalTextApi::class)
 @RunWith(JUnit4::class)
 class TextInputServiceAndroidOnStateUpdateTest {
 
@@ -74,7 +74,6 @@ class TextInputServiceAndroidOnStateUpdateTest {
         verify(imm, never()).updateSelection(any(), any(), any(), any(), any())
     }
 
-    @OptIn(InternalTextApi::class)
     @Test
     fun onUpdateState_resetInputCalled_whenOnlyCompositionChanged() {
         textInputService.updateState(
@@ -86,7 +85,6 @@ class TextInputServiceAndroidOnStateUpdateTest {
         verify(imm, never()).updateSelection(any(), any(), any(), any(), any())
     }
 
-    @InternalTextApi
     @Test
     fun onUpdateState_updateSelectionCalled_whenOnlySelectionChanged() {
         textInputService.updateState(
@@ -98,7 +96,6 @@ class TextInputServiceAndroidOnStateUpdateTest {
         verify(imm, times(1)).updateSelection(any(), any(), any(), any(), any())
     }
 
-    @OptIn(InternalTextApi::class)
     @Test
     fun onUpdateState_resetInputNotCalled_whenSelectionAndCompositionChanged() {
         textInputService.updateState(

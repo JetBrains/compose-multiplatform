@@ -27,7 +27,7 @@ import kotlin.math.max
  * the children.
  * @suppress
  */
-@InternalTextApi
+@InternalTextApi // Used by TextField Selection from foundation
 @Composable
 fun SimpleLayout(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     Layout(modifier = modifier, content = content) { measurables, constraints ->

@@ -70,7 +70,7 @@ import kotlin.math.ceil
  *
  * @suppress
  */
-@InternalTextApi
+@InternalTextApi // Used by CoreText in foundation
 @Stable
 class TextDelegate(
     val text: AnnotatedString,
