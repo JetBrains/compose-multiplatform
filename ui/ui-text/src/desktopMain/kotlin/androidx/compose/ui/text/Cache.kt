@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.text
 
-import androidx.compose.ui.unit.Duration
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
@@ -28,7 +27,7 @@ internal interface Cache<K, V> {
 
 // expire cache entries after `expireAfter` after last access
 internal class ExpireAfterAccessCache<K, V>(
-    val expireAfter: Duration,
+    val expireAfterNanos: Long,
     val timeProvider: TimeProvider = SystemTimeProvider()
 ) : Cache<K, V> {
     internal interface TimeProvider {
@@ -116,7 +115,7 @@ internal class ExpireAfterAccessCache<K, V>(
     }
 
     private fun checkEvicted(now: Long) {
-        val expireTime = now - expireAfter.nanoseconds
+        val expireTime = now - expireAfterNanos
         var next = accessQueue.tail
         while (next != null && next.accessTime < expireTime) {
             map.remove(next.key)

@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.text
 
-import androidx.compose.ui.unit.Duration
 import com.google.common.truth.Truth
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,11 +26,14 @@ private class MockedTimeProvider : ExpireAfterAccessCache.TimeProvider {
     override fun getTime() = currentTime
 }
 
+private const val twoSecondsInNanos = 2_000_000_000
+private const val tenMillisInNanos = 10_000_000
+
 @RunWith(JUnit4::class)
 class CacheTest {
     private val time = MockedTimeProvider()
     private val cache = ExpireAfterAccessCache<String, String>(
-        expireAfter = Duration(seconds = 1),
+        expireAfterNanos = 1_000_000_000L, // 1 second
         timeProvider = time
     )
     @Test
@@ -45,20 +47,20 @@ class CacheTest {
         var valueFromCache = cache.get("k1") { "v1_2" }
         Truth.assertThat(valueFromCache).isEqualTo("v1")
 
-        time.currentTime += Duration(seconds = 2).nanoseconds
+        time.currentTime += twoSecondsInNanos
 
         valueFromCache = cache.get("k1") { "v1_3" }
         Truth.assertThat(valueFromCache).isEqualTo("v1")
 
         Truth.assertThat(cache.accessQueue.head!!.accessTime)
-            .isEqualTo(Duration(seconds = 2).nanoseconds)
+            .isEqualTo(twoSecondsInNanos)
     }
 
     @Test
     fun two_keys() {
         cache.get("k1") { "v1" }
 
-        time.currentTime += Duration(milliseconds = 10).nanoseconds
+        time.currentTime += tenMillisInNanos
 
         cache.get("k2") { "v2" }
 
@@ -67,7 +69,7 @@ class CacheTest {
         Truth.assertThat(cache.accessQueue.tail!!.key)
             .isEqualTo("k1")
 
-        time.currentTime += Duration(milliseconds = 10).nanoseconds
+        time.currentTime += tenMillisInNanos
 
         var valueFromCache = cache.get("k1") { "v1_2" }
 
@@ -79,7 +81,7 @@ class CacheTest {
             .isEqualTo("k2")
 
         // expiration
-        time.currentTime += Duration(seconds = 2).nanoseconds
+        time.currentTime += twoSecondsInNanos
         cache.get("k1") { "v1_3" }
 
         Truth.assertThat(cache.accessQueue.head!!.key)
@@ -111,7 +113,7 @@ class CacheTest {
         Truth.assertThat(cache.accessQueue.tail!!.nextInAccess!!.key)
             .isEqualTo("k3")
 
-        time.currentTime += Duration(seconds = 2).nanoseconds
+        time.currentTime += twoSecondsInNanos
         cache.get("k3") { "v3_3" }
 
         Truth.assertThat(cache.accessQueue.head!!.key)

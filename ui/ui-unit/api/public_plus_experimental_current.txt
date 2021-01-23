@@ -160,66 +160,6 @@ package androidx.compose.ui.unit {
     property public final long Zero;
   }
 
-  @androidx.compose.runtime.Immutable public final inline class Duration implements java.lang.Comparable<androidx.compose.ui.unit.Duration> {
-    ctor public Duration();
-    method @androidx.compose.runtime.Stable public int compareTo-WUeva1s(long p);
-    method @androidx.compose.runtime.Stable public static int compareTo-WUeva1s(long $this, long other);
-    method public static long constructor-impl(long nanoseconds);
-    method @androidx.compose.runtime.Stable public static operator long div-ojFfpTE(long $this, int quotient);
-    method @androidx.compose.runtime.Stable public static operator long div-ojFfpTE(long $this, double quotient);
-    method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
-    method public static boolean equals-impl0(long p1, long p2);
-    method public long getNanoseconds();
-    method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(long p);
-    method @androidx.compose.runtime.Stable public static operator long minus-WUeva1s(long $this, long other);
-    method @androidx.compose.runtime.Stable public static operator long plus-WUeva1s(long $this, long other);
-    method @androidx.compose.runtime.Stable public static operator long times-ojFfpTE(long $this, int factor);
-    method @androidx.compose.runtime.Stable public static operator long times-ojFfpTE(long $this, double factor);
-    method @androidx.compose.runtime.Stable public static String toString-impl(long $this);
-    property public final long nanoseconds;
-    field public static final androidx.compose.ui.unit.Duration.Companion Companion;
-  }
-
-  public static final class Duration.Companion {
-    method public long getZero-ojFfpTE();
-    property public final long Zero;
-  }
-
-  public final class Durations {
-    method public static long Duration(optional long days, optional long hours, optional long minutes, optional long seconds, optional long milliseconds, optional long microseconds, optional long nanoseconds);
-    method public static inline long getDays(long);
-    method public static inline long getDays(int);
-    method public static inline long getHours(long);
-    method public static inline long getHours(int);
-    method public static inline long getMicroseconds(long);
-    method public static inline long getMicroseconds(int);
-    method public static inline long getMilliseconds(long);
-    method public static inline long getMilliseconds(int);
-    method public static inline long getMinutes(long);
-    method public static inline long getMinutes(int);
-    method public static inline long getNanoseconds(long);
-    method public static inline long getNanoseconds(int);
-    method public static inline long getSeconds(long);
-    method public static inline long getSeconds(int);
-    method public static inline long inDays-WUeva1s(long);
-    method public static inline long inHours-WUeva1s(long);
-    method public static inline long inMicroseconds-WUeva1s(long);
-    method public static inline long inMilliseconds-WUeva1s(long);
-    method public static inline long inMinutes-WUeva1s(long);
-    method public static inline long inSeconds-WUeva1s(long);
-    field public static final long HoursPerDay = 24L; // 0x18L
-    field public static final long MicrosecondsPerMillisecond = 1000L; // 0x3e8L
-    field public static final long MillisecondsPerSecond = 1000L; // 0x3e8L
-    field public static final long MinutesPerHour = 60L; // 0x3cL
-    field public static final long NanosecondsPerDay = 86400000000000L; // 0x4e94914f0000L
-    field public static final long NanosecondsPerHour = 3600000000000L; // 0x34630b8a000L
-    field public static final long NanosecondsPerMicrosecond = 1000L; // 0x3e8L
-    field public static final long NanosecondsPerMillisecond = 1000000L; // 0xf4240L
-    field public static final long NanosecondsPerMinute = 60000000000L; // 0xdf8475800L
-    field public static final long NanosecondsPerSecond = 1000000000L; // 0x3b9aca00L
-    field public static final long SecondsPerMinute = 60L; // 0x3cL
-  }
-
   @androidx.compose.runtime.Immutable public final class IntBounds {
     ctor public IntBounds(int left, int top, int right, int bottom);
     method public int component1();
@@ -380,37 +320,6 @@ package androidx.compose.ui.unit {
     enum_constant public static final androidx.compose.ui.unit.TextUnitType Em;
     enum_constant public static final androidx.compose.ui.unit.TextUnitType Sp;
     enum_constant public static final androidx.compose.ui.unit.TextUnitType Unspecified;
-  }
-
-  @androidx.compose.runtime.Immutable public final inline class Uptime implements java.lang.Comparable<androidx.compose.ui.unit.Uptime> {
-    ctor public Uptime();
-    method public int compareTo-fQUwLeo(long p);
-    method public static int compareTo-fQUwLeo(long $this, long other);
-    method public static long constructor-impl(long nanoseconds);
-    method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
-    method public static boolean equals-impl0(long p1, long p2);
-    method public long getNanoseconds();
-    method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(long p);
-    method public static operator long minus-WUeva1s(long $this, long duration);
-    method public static operator long minus-fQUwLeo(long $this, long other);
-    method public static operator long plus-WUeva1s(long $this, long duration);
-    method @androidx.compose.runtime.Immutable public static inline String! toString-impl(long p);
-    property public final long nanoseconds;
-    field public static final androidx.compose.ui.unit.Uptime.Companion Companion;
-  }
-
-  public static final class Uptime.Companion {
-    method public long getBoot-CLVl0cY();
-    method public long getUnspecified-CLVl0cY();
-    property public final long Boot;
-    property public final long Unspecified;
-  }
-
-  public final class UptimeKt {
-    method public static inline boolean isSpecified-fQUwLeo(long);
-    method public static inline boolean isUnspecified-fQUwLeo(long);
-    method public static operator long plus-I3RPvYE(long, long uptime);
-    method public static inline long takeOrElse-N-58ELw(long, kotlin.jvm.functions.Function0<androidx.compose.ui.unit.Uptime> block);
   }
 
   @androidx.compose.runtime.Immutable public final inline class Velocity {

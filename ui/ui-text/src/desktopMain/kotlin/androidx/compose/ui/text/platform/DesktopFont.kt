@@ -22,7 +22,6 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.GenericFontFamily
 import androidx.compose.ui.text.font.LoadedFontFamily
-import androidx.compose.ui.unit.Duration
 import androidx.compose.ui.util.fastForEach
 import org.jetbrains.skija.Data
 import org.jetbrains.skija.FontMgr
@@ -308,7 +307,9 @@ class FontLoader : ComposeFont.ResourceLoader {
     }
 }
 
-private val typefacesCache = ExpireAfterAccessCache<String, Typeface>(Duration(minutes = 10))
+private val typefacesCache = ExpireAfterAccessCache<String, Typeface>(
+    60_000_000_000 // 1 minute
+)
 
 private fun typefaceResource(resourceName: String): Typeface {
     val resource = Thread
