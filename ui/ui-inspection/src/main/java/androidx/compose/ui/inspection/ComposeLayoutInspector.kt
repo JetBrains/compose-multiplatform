@@ -171,6 +171,8 @@ private fun getComposableRoots(
     rootViewId: Long,
     skipSystemComposables: Boolean
 ): Sequence<AndroidComposeViewWrapper> {
+    ThreadUtils.assertOnMainThread()
+
     return WindowInspector.getGlobalWindowViews()
         .asSequence()
         .filter { view -> view.visibility == View.VISIBLE && view.isAttachedToWindow }
