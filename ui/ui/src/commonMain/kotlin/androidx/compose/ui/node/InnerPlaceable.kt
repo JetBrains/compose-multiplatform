@@ -146,8 +146,12 @@ internal class InnerPlaceable(
             // not add PointerInputFilters on different paths so we should not even go looking.
             val originalSize = hitPointerInputFilters.size
             layoutNode.zSortedChildren.reversedAny { child ->
-                callHitTest(child, pointerPositionRelativeToScreen, hitPointerInputFilters)
-                hitPointerInputFilters.size > originalSize
+                if (child.isPlaced) {
+                    callHitTest(child, pointerPositionRelativeToScreen, hitPointerInputFilters)
+                    hitPointerInputFilters.size > originalSize
+                } else {
+                    false
+                }
             }
         }
     }

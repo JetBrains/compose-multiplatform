@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.input.pointer
 
+import androidx.compose.foundation.layout.offset
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.Autofill
@@ -29,9 +30,10 @@ import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
-import androidx.compose.ui.node.LayoutNodeWrapper
+import androidx.compose.ui.node.MeasureAndLayoutDelegate
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.node.OwnerSnapshotObserver
@@ -51,7 +53,6 @@ import androidx.compose.ui.unit.minus
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockitokotlin2.spy
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -83,15 +84,20 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class PointerInputEventProcessorTest {
 
-    private lateinit var root: LayoutNode
     private lateinit var pointerInputEventProcessor: PointerInputEventProcessor
-    private val testOwner: TestOwner = spy()
+    private lateinit var testOwner: TestOwner
 
     @Before
     fun setup() {
-        root = LayoutNode(0, 0, 500, 500)
-        root.attach(testOwner)
-        pointerInputEventProcessor = PointerInputEventProcessor(root)
+        testOwner = TestOwner()
+        pointerInputEventProcessor = PointerInputEventProcessor(testOwner.root)
+    }
+
+    private fun addToRoot(vararg layoutNodes: LayoutNode) {
+        layoutNodes.forEachIndexed { index, node ->
+            testOwner.root.insertAt(index, node)
+        }
+        testOwner.measureAndLayout()
     }
 
     @Test
@@ -110,7 +116,7 @@ class PointerInputEventProcessorTest {
             )
         )
 
-        root.insertAt(0, layoutNode)
+        addToRoot(layoutNode)
 
         val offset = Offset(100f, 200f)
         val previousEvents = mutableListOf<PointerInputEventData>()
@@ -173,7 +179,7 @@ class PointerInputEventProcessorTest {
             )
         )
 
-        root.insertAt(0, layoutNode)
+        addToRoot(layoutNode)
 
         val offset = Offset(100f, 200f)
         val offset2 = Offset(300f, 400f)
@@ -230,7 +236,7 @@ class PointerInputEventProcessorTest {
             )
         )
 
-        root.insertAt(0, layoutNode)
+        addToRoot(layoutNode)
 
         val offsets = arrayOf(
             Offset(100f, 200f),
@@ -296,7 +302,7 @@ class PointerInputEventProcessorTest {
             )
         )
 
-        root.insertAt(0, layoutNode)
+        addToRoot(layoutNode)
 
         val offsets = arrayOf(
             Offset(99f, 200f),
@@ -372,7 +378,7 @@ class PointerInputEventProcessorTest {
             ).apply {
                 insertAt(0, middleLayoutNode)
             }
-        root.insertAt(0, parentLayoutNode)
+        addToRoot(parentLayoutNode)
 
         val offset = when (numberOfChildrenHit) {
             3 -> Offset(250f, 250f)
@@ -466,7 +472,7 @@ class PointerInputEventProcessorTest {
             )
         )
 
-        root.insertAt(0, layoutNode)
+        addToRoot(layoutNode)
 
         val down = PointerInputEvent(
             0,
@@ -587,7 +593,7 @@ class PointerInputEventProcessorTest {
 
         testOwner.position = IntOffset(aOX, aOY)
 
-        root.insertAt(0, parentLayoutNode)
+        addToRoot(parentLayoutNode)
 
         val additionalOffset = IntOffset(aOX, aOY)
 
@@ -752,10 +758,7 @@ class PointerInputEventProcessorTest {
                     childPointerInputFilter2
                 )
             )
-        root.apply {
-            insertAt(0, childLayoutNode1)
-            insertAt(0, childLayoutNode2)
-        }
+        addToRoot(childLayoutNode1, childLayoutNode2)
 
         val offset1 = Offset(25f, 25f)
         val offset2 = Offset(75f, 75f)
@@ -904,11 +907,7 @@ class PointerInputEventProcessorTest {
             )
         )
 
-        root.apply {
-            insertAt(0, childLayoutNode1)
-            insertAt(1, childLayoutNode2)
-            insertAt(2, childLayoutNode3)
-        }
+        addToRoot(childLayoutNode1, childLayoutNode2, childLayoutNode3)
 
         val offset1 = Offset(25f, 25f)
         val offset2 = Offset(75f, 75f)
@@ -1084,10 +1083,7 @@ class PointerInputEventProcessorTest {
             )
         )
 
-        root.apply {
-            insertAt(0, childLayoutNode1)
-            insertAt(1, childLayoutNode2)
-        }
+        addToRoot(childLayoutNode1, childLayoutNode2)
 
         val offset1 = Offset(50f, 25f)
         val offset2 = Offset(50f, 75f)
@@ -1204,10 +1200,7 @@ class PointerInputEventProcessorTest {
             )
         )
 
-        root.apply {
-            insertAt(0, childLayoutNode1)
-            insertAt(1, childLayoutNode2)
-        }
+        addToRoot(childLayoutNode1, childLayoutNode2)
 
         val offset1 = Offset(25f, 50f)
         val offset2 = Offset(75f, 50f)
@@ -1351,9 +1344,8 @@ class PointerInputEventProcessorTest {
             insertAt(2, layoutNodeBottomLeft)
             insertAt(3, layoutNodeBottomRight)
         }
-        root.apply {
-            insertAt(0, parentLayoutNode)
-        }
+        addToRoot(parentLayoutNode)
+
         val offsetsTopLeft =
             listOf(
                 Offset(0f, 1f),
@@ -1540,9 +1532,7 @@ class PointerInputEventProcessorTest {
                 singlePointerInputFilter
             )
         )
-        root.apply {
-            insertAt(0, layoutNode)
-        }
+        addToRoot(layoutNode)
         val offsetsThatHit =
             listOf(
                 Offset(2f, 2f),
@@ -1616,9 +1606,7 @@ class PointerInputEventProcessorTest {
             modifier
         )
 
-        root.apply {
-            insertAt(0, layoutNode)
-        }
+        addToRoot(layoutNode)
 
         val offset1 = Offset(50f, 75f)
 
@@ -1698,9 +1686,7 @@ class PointerInputEventProcessorTest {
         val layoutNode4: LayoutNode = LayoutNode(4, 8, 500, 500).apply {
             insertAt(0, layoutNode3)
         }
-        root.apply {
-            insertAt(0, layoutNode4)
-        }
+        addToRoot(layoutNode4)
 
         val offset1 = Offset(499f, 499f)
 
@@ -1776,9 +1762,7 @@ class PointerInputEventProcessorTest {
         val layoutNode5: LayoutNode = LayoutNode(5, 10, 500, 500).apply {
             insertAt(0, layoutNode4)
         }
-        root.apply {
-            insertAt(0, layoutNode5)
-        }
+        addToRoot(layoutNode5)
 
         val offset1 = Offset(499f, 499f)
 
@@ -1884,10 +1868,7 @@ class PointerInputEventProcessorTest {
             )
         )
 
-        root.apply {
-            insertAt(0, layoutNode1)
-            insertAt(1, layoutNode2)
-        }
+        addToRoot(layoutNode1, layoutNode2)
 
         val down = PointerInputEvent(
             1, 0, Offset(50f, 50f), true
@@ -1912,9 +1893,7 @@ class PointerInputEventProcessorTest {
             PointerInputModifierImpl2(pointerInputFilter1)
         )
 
-        root.apply {
-            insertAt(0, layoutNode1)
-        }
+        addToRoot(layoutNode1)
 
         val down = PointerInputEvent(
             1, 0, Offset(0f, 0f), true
@@ -1946,7 +1925,7 @@ class PointerInputEventProcessorTest {
             PointerInputModifierImpl2(pointerInputFilter)
         )
 
-        root.insertAt(0, layoutNode)
+        addToRoot(layoutNode)
 
         val pointerInputEvent =
             PointerInputEvent(
@@ -2005,7 +1984,7 @@ class PointerInputEventProcessorTest {
             )
         )
 
-        root.insertAt(0, layoutNode)
+        addToRoot(layoutNode)
 
         val pointerInputEvent1 =
             PointerInputEvent(
@@ -2123,8 +2102,7 @@ class PointerInputEventProcessorTest {
             PointerInputModifierImpl2(pointerInputFilter2)
         )
 
-        root.insertAt(0, layoutNode1)
-        root.insertAt(1, layoutNode2)
+        addToRoot(layoutNode1, layoutNode2)
 
         val pointerInputEventData1 =
             PointerInputEventData(
@@ -2217,7 +2195,7 @@ class PointerInputEventProcessorTest {
             PointerInputModifierImpl2(pointerInputFilter)
         )
 
-        root.insertAt(0, layoutNode)
+        addToRoot(layoutNode)
 
         val down =
             PointerInputEvent(
@@ -2304,7 +2282,7 @@ class PointerInputEventProcessorTest {
             PointerInputModifierImpl2(pointerInputFilter)
         )
 
-        root.insertAt(0, layoutNode)
+        addToRoot(layoutNode)
 
         val down =
             PointerInputEvent(
@@ -2364,7 +2342,7 @@ class PointerInputEventProcessorTest {
             )
         )
 
-        root.insertAt(0, layoutNode)
+        addToRoot(layoutNode)
 
         val down1 =
             PointerInputEvent(
@@ -2460,7 +2438,7 @@ class PointerInputEventProcessorTest {
             insertAt(0, childLayoutNode)
         }
 
-        root.insertAt(0, parentLayoutNode)
+        addToRoot(parentLayoutNode)
 
         val offset = Offset(50f, 50f)
 
@@ -2575,7 +2553,7 @@ class PointerInputEventProcessorTest {
             insertAt(0, childLayoutNode)
         }
 
-        root.insertAt(0, parentLayoutNode)
+        addToRoot(parentLayoutNode)
 
         val down =
             PointerInputEvent(0, 7, Offset(50f, 50f), true)
@@ -2616,7 +2594,7 @@ class PointerInputEventProcessorTest {
             insertAt(0, childLayoutNode)
         }
 
-        root.insertAt(0, parentLayoutNode)
+        addToRoot(parentLayoutNode)
 
         val offset = Offset(50f, 50f)
 
@@ -2731,7 +2709,7 @@ class PointerInputEventProcessorTest {
             insertAt(0, childLayoutNode)
         }
 
-        root.insertAt(0, parentLayoutNode)
+        addToRoot(parentLayoutNode)
 
         val down =
             PointerInputEvent(0, 7, Offset(50f, 50f), true)
@@ -2779,9 +2757,7 @@ class PointerInputEventProcessorTest {
             )
         )
 
-        root.apply {
-            insertAt(0, layoutNode)
-        }
+        addToRoot(layoutNode)
 
         val offsets =
             listOf(
@@ -2824,7 +2800,7 @@ class PointerInputEventProcessorTest {
                 pointerInputFilter
             )
         )
-        root.apply { insertAt(0, layoutNode) }
+        addToRoot(layoutNode)
         val pointerInputEvent =
             PointerInputEvent(0, 11, Offset(0f, 0f), true)
 
@@ -2854,14 +2830,14 @@ class PointerInputEventProcessorTest {
                 pointerInputFilter
             )
         )
-        root.apply { insertAt(0, layoutNode) }
+        addToRoot(layoutNode)
         val down = PointerInputEvent(0, 11, Offset(0f, 0f), true)
         pointerInputEventProcessor.process(down)
         val move = PointerInputEvent(0, 11, Offset(1f, 0f), true)
 
         // Act
 
-        root.removeAt(0, 1)
+        testOwner.root.removeAt(0, 1)
         val result = pointerInputEventProcessor.process(move)
 
         // Assert
@@ -2886,7 +2862,7 @@ class PointerInputEventProcessorTest {
                 pointerInputFilter
             )
         )
-        root.apply { insertAt(0, layoutNode) }
+        addToRoot(layoutNode)
         val down = PointerInputEvent(0, 11, Offset(0f, 0f), true)
         pointerInputEventProcessor.process(down)
         val move = PointerInputEvent(0, 11, Offset(1f, 0f), true)
@@ -2927,7 +2903,7 @@ class PointerInputEventProcessorTest {
                 pointerInputFilter
             )
         )
-        root.apply { insertAt(0, layoutNode) }
+        addToRoot(layoutNode)
         val down = PointerInputEvent(0, 11, Offset(0f, 0f), true)
         pointerInputEventProcessor.process(down)
         val move = PointerInputEvent(0, 11, Offset(1f, 0f), true)
@@ -2987,59 +2963,45 @@ class PointerInputEventProcessorTest {
     }
 }
 
-abstract class TestOwner : Owner {
-    var position: IntOffset? = null
-
-    override val root: LayoutNode
-        get() = LayoutNode()
-
-    override fun calculatePosition(): IntOffset {
-        return position ?: IntOffset.Zero
-    }
-}
-
 private class PointerInputModifierImpl2(override val pointerInputFilter: PointerInputFilter) :
     PointerInputModifier
 
 private fun LayoutNode(x: Int, y: Int, x2: Int, y2: Int, modifier: Modifier = Modifier) =
     LayoutNode().apply {
-        this.modifier = modifier
+        this.modifier = Modifier.layout { measurable, constraints ->
+            val placeable = measurable.measure(constraints)
+            layout(placeable.width, placeable.height) {
+                placeable.place(x, y)
+            }
+        }.then(modifier)
         measureBlocks = object : LayoutNode.NoIntrinsicsMeasureBlocks("not supported") {
             override fun measure(
                 measureScope: MeasureScope,
                 measurables: List<Measurable>,
                 constraints: Constraints
             ): MeasureResult =
-                measureScope.layout(x2 - x, y2 - y) {}
+                measureScope.layout(x2 - x, y2 - y) {
+                    measurables.forEach { it.measure(constraints).place(0, 0) }
+                }
         }
-        attach(mockOwner())
-        layoutState = LayoutNode.LayoutState.NeedsRemeasure
-        remeasure(Constraints())
-        var wrapper: LayoutNodeWrapper? = outerLayoutNodeWrapper
-        while (wrapper != null) {
-            wrapper.measureResult = innerLayoutNodeWrapper.measureResult
-            wrapper = (wrapper as? LayoutNodeWrapper)?.wrapped
-        }
-        place(x, y)
-        detach()
     }
 
-private fun mockOwner(
-    position: IntOffset = IntOffset.Zero,
-    targetRoot: LayoutNode = LayoutNode()
-): Owner = MockOwner(position, targetRoot)
-
 @OptIn(ExperimentalComposeUiApi::class, InternalCoreApi::class)
-private class MockOwner(
-    private val position: IntOffset,
-    private val targetRoot: LayoutNode
-) : Owner {
+private class TestOwner : Owner {
+    var position: IntOffset = IntOffset.Zero
+    override val root = LayoutNode(0, 0, 500, 500)
+
+    private val delegate = MeasureAndLayoutDelegate(root)
+
+    init {
+        root.attach(this)
+        delegate.updateRootConstraints(Constraints(maxWidth = 500, maxHeight = 500))
+    }
+
     override fun calculatePosition(): IntOffset = position
     override fun calculatePositionInWindow(): IntOffset = position
 
     override fun requestFocus(): Boolean = false
-    override val root: LayoutNode
-        get() = targetRoot
     override val rootForTest: RootForTest
         get() = TODO("Not yet implemented")
     override val hapticFeedBack: HapticFeedback
@@ -3069,9 +3031,11 @@ private class MockOwner(
         set(@Suppress("UNUSED_PARAMETER") value) {}
 
     override fun onRequestMeasure(layoutNode: LayoutNode) {
+        delegate.requestRemeasure(layoutNode)
     }
 
     override fun onRequestRelayout(layoutNode: LayoutNode) {
+        delegate.requestRelayout(layoutNode)
     }
 
     override fun onAttach(node: LayoutNode) {
@@ -3081,6 +3045,7 @@ private class MockOwner(
     }
 
     override fun measureAndLayout() {
+        delegate.measureAndLayout()
     }
 
     override fun createLayer(
