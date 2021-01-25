@@ -176,11 +176,11 @@ class TextFieldValue internal constructor(
          */
         val Saver = listSaver<TextFieldValue, Any>(
             save = {
-                listOf(it.annotatedString, it.selection.start, it.selection.end)
+                listOf(it.annotatedString.toString(), it.selection.start, it.selection.end)
             },
             restore = {
                 TextFieldValue(
-                    annotatedString = it[0] as AnnotatedString,
+                    text = it[0] as String,
                     selection = TextRange(it[1] as Int, it[2] as Int)
                 )
             }
