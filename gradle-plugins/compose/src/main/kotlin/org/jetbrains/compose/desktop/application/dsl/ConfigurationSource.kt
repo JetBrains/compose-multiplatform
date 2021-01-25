@@ -9,7 +9,9 @@ import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 
 internal sealed class ConfigurationSource {
     abstract val jarTaskName: String
-    abstract val runtimeClasspath: FileCollection
+
+    abstract fun runtimeClasspath(project: Project): FileCollection
+
     fun jarTask(project: Project): TaskProvider<Jar> =
         project.tasks.named(jarTaskName, Jar::class.java)
 
@@ -17,8 +19,11 @@ internal sealed class ConfigurationSource {
         override val jarTaskName: String
             get() = sourceSet.jarTaskName
 
-        override val runtimeClasspath: FileCollection
-            get() = sourceSet.runtimeClasspath
+        override fun runtimeClasspath(project: Project): FileCollection =
+            project.objects.fileCollection().apply {
+                from(jarTask(project).flatMap { it.archiveFile })
+                from(sourceSet.runtimeClasspath.filter { it.path.endsWith(".jar") })
+            }
 
     }
 
@@ -26,10 +31,10 @@ internal sealed class ConfigurationSource {
         override val jarTaskName: String
             get() = target.artifactsTaskName
 
-        override val runtimeClasspath: FileCollection
-            get() = target.project.objects.fileCollection().apply {
-                from(jarTask(target.project).flatMap { it.archiveFile })
-                from(target.compilations.getByName("main").runtimeDependencyFiles)
+        override fun runtimeClasspath(project: Project): FileCollection =
+            project.objects.fileCollection().apply {
+                from(jarTask(project).flatMap { it.archiveFile })
+                from(target.compilations.getByName("main").runtimeDependencyFiles.filter { it.path.endsWith(".jar") })
             }
     }
 }

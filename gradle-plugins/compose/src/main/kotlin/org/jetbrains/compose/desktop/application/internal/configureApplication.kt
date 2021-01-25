@@ -125,7 +125,7 @@ internal fun AbstractJPackageTask.configurePackagingTask(
 
     app._configurationSource?.let { configSource ->
         dependsOn(configSource.jarTaskName)
-        files.from(configSource.runtimeClasspath)
+        files.from(configSource.runtimeClasspath(project))
         launcherMainJar.set(app.mainJar.orElse(configSource.jarTask(project).flatMap { it.archiveFile }))
     }
 
@@ -188,7 +188,7 @@ private fun JavaExec.configureRunTask(app: Application) {
 
     app._configurationSource?.let { configSource ->
         dependsOn(configSource.jarTaskName)
-        cp.from(configSource.runtimeClasspath)
+        cp.from(configSource.runtimeClasspath(project))
     }
 
     classpath = cp
@@ -207,7 +207,7 @@ private fun Jar.configurePackageUberJarForCurrentOS(app: Application) {
 
         app._configurationSource?.let { configSource ->
             dependsOn(configSource.jarTaskName)
-            from(flattenJars(configSource.runtimeClasspath))
+            from(flattenJars(configSource.runtimeClasspath(project)))
         }
 
         app.mainClass?.let { manifest.attributes["Main-Class"] = it }
