@@ -18,6 +18,7 @@ package androidx.compose.runtime
 
 import androidx.compose.runtime.snapshots.MutableSnapshot
 import androidx.compose.runtime.snapshots.Snapshot
+import androidx.compose.runtime.snapshots.SnapshotMutableState
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.runtime.snapshots.StateObject
@@ -49,7 +50,7 @@ import kotlin.reflect.KProperty
 fun <T> mutableStateOf(
     value: T,
     policy: SnapshotMutationPolicy<T> = structuralEqualityPolicy()
-): MutableState<T> = SnapshotMutableState(value, policy)
+): MutableState<T> = SnapshotMutableStateImpl(value, policy)
 
 /**
  * A value holder where reads to the [value] property during the execution of a [Composable]
@@ -99,11 +100,9 @@ inline operator fun <T> MutableState<T>.setValue(thisObj: Any?, property: KPrope
 }
 
 /**
- * The ModelMutableState class is a single value holder whose reads and writes are observed by
- * Compose.
+ * A single value holder whose reads and writes are observed by Compose.
  *
  * Additionally, writes to it are transacted as part of the [Snapshot] system.
- * `state` and `stateFor` composables.
  *
  * @property value the wrapped value
  * @property policy a policy to control how changes are handled in a mutable snapshot.
@@ -111,11 +110,11 @@ inline operator fun <T> MutableState<T>.setValue(thisObj: Any?, property: KPrope
  * @see mutableStateOf
  * @see SnapshotMutationPolicy
  */
-@OptIn(androidx.compose.runtime.ExperimentalComposeApi::class)
-private class SnapshotMutableState<T>(
+@OptIn(ExperimentalComposeApi::class)
+private class SnapshotMutableStateImpl<T>(
     value: T,
-    val policy: SnapshotMutationPolicy<T>
-) : StateObject, MutableState<T> {
+    override val policy: SnapshotMutationPolicy<T>
+) : StateObject, SnapshotMutableState<T> {
     @Suppress("UNCHECKED_CAST")
     override var value: T
         get() = next.readable(this).value
