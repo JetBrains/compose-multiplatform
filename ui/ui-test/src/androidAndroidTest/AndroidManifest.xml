@@ -20,5 +20,7 @@
         <activity android:name="androidx.activity.ComponentActivity"
             android:theme="@style/TestTheme" />
         <activity android:name="androidx.compose.ui.test.ActivityWithActionBar" />
+        <activity android:name="androidx.compose.ui.test.ClickCounterActivity" />
+        <activity android:name="androidx.compose.ui.test.EmptyActivity" />
     </application>
 </manifest>
