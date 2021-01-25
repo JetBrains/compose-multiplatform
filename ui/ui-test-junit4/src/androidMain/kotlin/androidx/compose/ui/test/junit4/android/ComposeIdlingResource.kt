@@ -19,75 +19,10 @@ package androidx.compose.ui.test.junit4.android
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.snapshots.Snapshot
-import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.test.IdlingResource
-import androidx.compose.ui.test.TestAnimationClock
+import androidx.compose.ui.test.junit4.MainTestClockImpl
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-
-/**
- * Register compose's idling check to Espresso.
- *
- * This makes sure that Espresso is able to wait for any pending changes in Compose. This
- * resource is automatically registered when any compose testing APIs are used including
- * [createAndroidComposeRule]. If you for some reasons want to only use Espresso but still have it
- * wait for Compose being idle you can use this function.
- */
-@Deprecated(
-    message = "Global (un)registration of ComposeIdlingResource is no longer supported. Use " +
-        "createAndroidComposeRule() and registration will happen when needed",
-    level = DeprecationLevel.ERROR,
-    replaceWith = ReplaceWith("")
-)
-@Suppress("DocumentExceptions")
-fun registerComposeWithEspresso(): Unit = throw UnsupportedOperationException(
-    "Global (un)registration of ComposeIdlingResource is no longer supported"
-)
-
-/**
- * Unregisters resource registered as part of [registerComposeWithEspresso].
- */
-@Deprecated(
-    message = "Global (un)registration of ComposeIdlingResource is no longer supported. Use " +
-        "createAndroidComposeRule() and registration will happen when needed",
-    level = DeprecationLevel.ERROR,
-    replaceWith = ReplaceWith("")
-)
-@Suppress("DocumentExceptions")
-fun unregisterComposeFromEspresso(): Unit = throw UnsupportedOperationException(
-    "Global (un)registration of ComposeIdlingResource is no longer supported"
-)
-
-/**
- * Registers the given [clock] so Espresso can await the animations subscribed to that clock.
- */
-@Deprecated(
-    message = "Global (un)registration of TestAnimationClocks is no longer supported. Use the " +
-        "member function ComposeIdlingResource.registerTestClock(clock) instead",
-    level = DeprecationLevel.ERROR,
-    replaceWith = ReplaceWith("composeIdlingResource.registerTestClock(clock)")
-)
-@ExperimentalTestApi
-@Suppress("UNUSED_PARAMETER", "DocumentExceptions")
-fun registerTestClock(clock: TestAnimationClock): Unit = throw UnsupportedOperationException(
-    "Global (un)registration of TestAnimationClocks is no longer supported. Register clocks " +
-        "directly on an instance of ComposeIdlingResource instead"
-)
-
-/**
- * Unregisters the [clock] that was registered with [registerTestClock].
- */
-@Deprecated(
-    message = "Global (un)registration of TestAnimationClocks is no longer supported. Use the " +
-        "member function ComposeIdlingResource.unregisterTestClock(clock) instead",
-    level = DeprecationLevel.ERROR,
-    replaceWith = ReplaceWith("composeIdlingResource.unregisterTestClock(clock)")
-)
-@ExperimentalTestApi
-@Suppress("UNUSED_PARAMETER", "DocumentExceptions")
-fun unregisterTestClock(clock: TestAnimationClock): Unit = throw UnsupportedOperationException(
-    "Global (un)registration of TestAnimationClocks is no longer supported. Register clocks " +
-        "directly on an instance of ComposeIdlingResource instead"
-)
 
 /**
  * Provides an idle check to be registered into Espresso.
@@ -97,95 +32,59 @@ fun unregisterTestClock(clock: TestAnimationClock): Unit = throw UnsupportedOper
  * [createAndroidComposeRule].
  */
 internal class ComposeIdlingResource(
-    private val composeRootRegistry: ComposeRootRegistry
+    private val composeRootRegistry: ComposeRootRegistry,
+    private val clock: MainTestClockImpl,
+    private val mainRecomposer: Recomposer
 ) : IdlingResource {
 
-    @OptIn(ExperimentalTestApi::class)
-    private val clocks = mutableSetOf<TestAnimationClock>()
+    private var hadAwaitersOnMainClock = false
+    private var hadSnapshotChanges = false
+    private var hadRecomposerChanges = false
+    private var hadPendingSetContent = false
+    private var hadPendingMeasureLayout = false
 
-    private var hadAnimationClocksIdle = true
-    private var hadNoSnapshotChanges = true
-    private var hadNoRecomposerChanges = true
-    private var hadNoPendingSetContent = true
-    private var hadNoPendingMeasureLayout = true
-    // TODO(b/174244530): Include hadNoPendingDraw when it is reliable
-//    private var hadNoPendingDraw = true
-
-    /**
-     * Returns whether or not Compose is idle now.
-     */
     override val isIdleNow: Boolean
         @OptIn(ExperimentalComposeApi::class)
         get() {
-            hadNoSnapshotChanges = !Snapshot.current.hasPendingChanges()
-            hadNoRecomposerChanges = Recomposer.runningRecomposers.value.none { it.hasPendingWork }
-            hadAnimationClocksIdle = areAllClocksIdle()
+            fun shouldPumpTime(): Boolean {
+                hadAwaitersOnMainClock = clock.hasAwaiters
+                hadSnapshotChanges = Snapshot.current.hasPendingChanges()
+                hadRecomposerChanges = mainRecomposer.hasPendingWork
+
+                val needsRecompose = hadAwaitersOnMainClock || hadSnapshotChanges ||
+                    hadRecomposerChanges
+                return clock.autoAdvance && needsRecompose
+            }
+
+            var i = 0
+            while (i < 100 && shouldPumpTime()) {
+                clock.advanceTimeByFrame()
+                ++i
+            }
 
             // pending set content needs all created compose roots,
             // because by definition they will not be in resumed state
-            hadNoPendingSetContent =
-                !composeRootRegistry.getCreatedComposeRoots().any { it.isBusyAttaching }
+            hadPendingSetContent =
+                composeRootRegistry.getCreatedComposeRoots().any { it.isBusyAttaching }
 
             val composeRoots = composeRootRegistry.getRegisteredComposeRoots()
-            hadNoPendingMeasureLayout = !composeRoots.any { it.hasPendingMeasureOrLayout }
-            // TODO(b/174244530): Include hadNoPendingDraw when it is reliable
-//            hadNoPendingDraw = !composeRoots.any {
-//                val hasContent = it.view.measuredWidth != 0 && it.view.measuredHeight != 0
-//                it.view.isDirty && (hasContent || it.view.isLayoutRequested)
-//            }
+            hadPendingMeasureLayout = composeRoots.any { it.hasPendingMeasureOrLayout }
 
-            return hadNoSnapshotChanges &&
-                hadNoRecomposerChanges &&
-                hadAnimationClocksIdle &&
-                hadNoPendingSetContent &&
-                // TODO(b/174244530): Include hadNoPendingDraw when it is reliable
-                hadNoPendingMeasureLayout /*&&
-                hadNoPendingDraw*/
+            return !shouldPumpTime() &&
+                !hadPendingSetContent &&
+                !hadPendingMeasureLayout
         }
-
-    @OptIn(ExperimentalTestApi::class)
-    fun registerTestClock(clock: TestAnimationClock) {
-        synchronized(clocks) {
-            clocks.add(clock)
-        }
-    }
-
-    @OptIn(ExperimentalTestApi::class)
-    fun unregisterTestClock(clock: TestAnimationClock) {
-        synchronized(clocks) {
-            clocks.remove(clock)
-        }
-    }
-
-    @OptIn(ExperimentalTestApi::class)
-    private fun areAllClocksIdle(): Boolean {
-        return synchronized(clocks) {
-            clocks.all { it.isIdle }
-        }
-    }
 
     override fun getDiagnosticMessageIfBusy(): String? {
-        val hadSnapshotChanges = !hadNoSnapshotChanges
-        val hadRecomposerChanges = !hadNoRecomposerChanges
-        val hadRunningAnimations = !hadAnimationClocksIdle
-        val hadPendingSetContent = !hadNoPendingSetContent
-        val hadPendingMeasureLayout = !hadNoPendingMeasureLayout
-        // TODO(b/174244530): Include hadNoPendingDraw when it is reliable
-//        val hadPendingDraw = !hadNoPendingDraw
+        val wasBusy = hadSnapshotChanges || hadRecomposerChanges || hadAwaitersOnMainClock ||
+            hadPendingSetContent || hadPendingMeasureLayout
 
-        val wasIdle = !hadSnapshotChanges && !hadRecomposerChanges && !hadRunningAnimations &&
-            // TODO(b/174244530): Include hadNoPendingDraw when it is reliable
-            !hadPendingSetContent && !hadPendingMeasureLayout /*&& !hadPendingDraw*/
-
-        if (wasIdle) {
+        if (wasBusy) {
             return null
         }
 
         val busyReasons = mutableListOf<String>()
-        if (hadRunningAnimations) {
-            busyReasons.add("animations")
-        }
-        val busyRecomposing = hadSnapshotChanges || hadRecomposerChanges
+        val busyRecomposing = hadSnapshotChanges || hadRecomposerChanges || hadAwaitersOnMainClock
         if (busyRecomposing) {
             busyReasons.add("pending recompositions")
         }
@@ -201,8 +100,17 @@ internal class ComposeIdlingResource(
             message += "- Note: Timeout on pending recomposition means that there are most likely" +
                 " infinite re-compositions happening in the tested code.\n"
             message += "- Debug: hadRecomposerChanges = $hadRecomposerChanges, "
-            message += "hadSnapshotChanges = $hadSnapshotChanges"
+            message += "hadSnapshotChanges = $hadSnapshotChanges, "
+            message += "hadAwaitersOnMainClock = $hadAwaitersOnMainClock"
         }
         return message
     }
 }
+
+internal val ViewRootForTest.isBusyAttaching: Boolean
+    get() {
+        // If the rootView has a parent, it is the ViewRootImpl, which is set in
+        // windowManager.addView(). If the rootView doesn't have a parent, the view hasn't been
+        // attached to a window yet, or is removed again.
+        return view.rootView.parent != null && !view.isAttachedToWindow
+    }

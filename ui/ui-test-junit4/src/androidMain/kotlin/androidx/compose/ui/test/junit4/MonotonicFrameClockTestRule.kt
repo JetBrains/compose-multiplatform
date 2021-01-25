@@ -16,54 +16,29 @@
 
 package androidx.compose.ui.test.junit4
 
-import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.animation.core.MonotonicFrameAnimationClock
 import androidx.compose.animation.core.rootAnimationClockFactory
-import androidx.compose.ui.test.ExperimentalTestApi
-import androidx.compose.ui.test.TestAnimationClock
-import kotlinx.coroutines.CoroutineScope
+import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
 
-@ExperimentalTestApi
-internal class MonotonicFrameClockTestRule : AnimationClockTestRule {
-
-    private lateinit var _clock: InternalClock
-    override val clock: TestAnimationClock get() = _clock
+internal class MonotonicFrameClockTestRule : TestRule {
 
     override fun apply(base: Statement, description: Description?): Statement {
         return AnimationClockStatement(base)
-    }
-
-    private fun getOrCreateClock(scope: CoroutineScope): TestAnimationClock {
-        if (!this::_clock.isInitialized) {
-            _clock = InternalClock(MonotonicFrameAnimationClock(scope))
-        }
-        return _clock
     }
 
     @OptIn(InternalAnimationApi::class)
     private inner class AnimationClockStatement(private val base: Statement) : Statement() {
         override fun evaluate() {
             val oldFactory = rootAnimationClockFactory
-            rootAnimationClockFactory = { getOrCreateClock(it) }
+            rootAnimationClockFactory = { MonotonicFrameAnimationClock(it) }
             try {
                 base.evaluate()
             } finally {
                 rootAnimationClockFactory = oldFactory
             }
         }
-    }
-
-    class InternalClock(
-        private val clock: MonotonicFrameAnimationClock
-    ) : TestAnimationClock, AnimationClockObservable by clock {
-        override val isIdle: Boolean get() = !clock.hasObservers
-        override val isPaused: Boolean get() = false
-
-        override fun pauseClock(): Unit = throw UnsupportedOperationException()
-        override fun resumeClock(): Unit = throw UnsupportedOperationException()
-        override fun advanceClock(milliseconds: Long): Unit = throw UnsupportedOperationException()
     }
 }

@@ -189,7 +189,7 @@ internal class AndroidInputDispatcher(
     private fun pumpClock(millis: Long) {
         // Don't bother calling the method if there's nothing to advance
         if (millis > 0) {
-            testContext.testOwner.advanceTimeBy(millis)
+            testContext.testOwner.mainClock.advanceTimeBy(millis)
         }
     }
 
