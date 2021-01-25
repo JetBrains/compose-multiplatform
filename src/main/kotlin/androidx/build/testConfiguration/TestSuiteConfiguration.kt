@@ -64,7 +64,7 @@ fun Project.createTestConfigurationGenerationTask(
         task.minSdk.set(minSdk)
         task.hasBenchmarkPlugin.set(this.hasBenchmarkPlugin())
         task.testRunner.set(testRunner)
-        task.projectPath.set(this.path)
+        task.testProjectPath.set(this.path)
         task.affectedModuleDetectorSubset.set(
             project.provider {
                 AffectedModuleDetector.getProjectSubset(project)
@@ -82,6 +82,14 @@ fun Project.createTestConfigurationGenerationTask(
         .dependsOn(generateTestConfigurationTask)
 }
 
+/**
+ * Further configures the test config generation task for a project. This only gets called when
+ * there is a test app in addition to the instrumentation app, and the only thing it configures is
+ * the location of the testapp.
+ *
+ * @param overrideProject Allows the config task for one project to get registered to an
+ * alternative project. Default is for the project to register the new config task to itself
+ */
 fun Project.addAppApkToTestConfigGeneration(overrideProject: Project = this) {
     extensions.getByType<ApplicationAndroidComponentsExtension>().apply {
         onVariants(selector().withBuildType("debug")) { debugVariant ->
@@ -89,6 +97,7 @@ fun Project.addAppApkToTestConfigGeneration(overrideProject: Project = this) {
                 .configureEach {
                     it.appFolder.set(debugVariant.artifacts.get(ArtifactType.APK))
                     it.appLoader.set(debugVariant.artifacts.getBuiltArtifactsLoader())
+                    it.appProjectPath.set(overrideProject.path)
                 }
         }
     }
@@ -225,7 +234,7 @@ private fun Project.configureMacrobenchmarkConfigTask(
             task.minSdk.set(minSdk)
             task.hasBenchmarkPlugin.set(this.hasBenchmarkPlugin())
             task.testRunner.set(testRunner)
-            task.projectPath.set(this.path)
+            task.testProjectPath.set(this.path)
             task.affectedModuleDetectorSubset.set(
                 project.provider {
                     AffectedModuleDetector.getProjectSubset(project)
@@ -245,6 +254,7 @@ private fun Project.configureMacrobenchmarkConfigTask(
         configTask.configure { task ->
             task.appFolder.set(artifacts.get(ArtifactType.APK))
             task.appLoader.set(artifacts.getBuiltArtifactsLoader())
+            task.appProjectPath.set(path)
         }
     }
 }
