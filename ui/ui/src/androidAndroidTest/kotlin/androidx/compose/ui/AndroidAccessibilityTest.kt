@@ -51,10 +51,10 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.textSelectionRange
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertEditableTextEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
-import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -114,6 +114,7 @@ class AndroidAccessibilityTest {
     private var textFieldSelectionOne = false
     private var isPaneVisible by mutableStateOf(false)
     private var paneTestTitle by mutableStateOf(PaneTitleOne)
+    private var textFieldValue = mutableStateOf(TextFieldValue(InitialText))
 
     companion object {
         private const val TimeOutInitialization: Long = 5000
@@ -150,7 +151,7 @@ class AndroidAccessibilityTest {
             activity.setContentView(container)
             container.setContent {
                 var checked by remember { mutableStateOf(true) }
-                var value by remember { mutableStateOf(TextFieldValue(InitialText)) }
+                var value by remember { textFieldValue }
                 Column(Modifier.testTag(TopColTag)) {
                     Box(
                         Modifier
@@ -203,7 +204,11 @@ class AndroidAccessibilityTest {
                             value = value,
                             onValueChange = { value = it },
                             onTextLayout = { textLayoutResult = it },
-                            visualTransformation = PasswordVisualTransformation()
+                            visualTransformation = PasswordVisualTransformation(),
+                            decorationBox = {
+                                BasicText("Label")
+                                it()
+                            }
                         )
                     }
                 }
@@ -228,7 +233,7 @@ class AndroidAccessibilityTest {
     fun testCreateAccessibilityNodeInfo() {
         val toggleableNode = rule.onNodeWithTag(ToggleableTag)
             .fetchSemanticsNode("couldn't find node with tag $ToggleableTag")
-        var accessibilityNodeInfo = provider.createAccessibilityNodeInfo(toggleableNode.id)
+        val accessibilityNodeInfo = provider.createAccessibilityNodeInfo(toggleableNode.id)
         assertEquals("android.view.View", accessibilityNodeInfo.className)
         val stateDescription = when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
@@ -251,10 +256,15 @@ class AndroidAccessibilityTest {
                 AccessibilityNodeInfo.AccessibilityAction(ACTION_CLICK, null)
             )
         )
+    }
 
+    @Test
+    fun testCreateAccessibilityNodeInfo_forTextField() {
+        textFieldValue.value = TextFieldValue(InitialText)
         val textFieldNode = rule.onNodeWithTag(TextFieldTag)
             .fetchSemanticsNode("couldn't find node with tag $TextFieldTag")
-        accessibilityNodeInfo = provider.createAccessibilityNodeInfo(textFieldNode.id)
+        val accessibilityNodeInfo = provider.createAccessibilityNodeInfo(textFieldNode.id)
+
         assertEquals("android.widget.EditText", accessibilityNodeInfo.className)
         assertEquals(InitialText, accessibilityNodeInfo.text.toString())
         assertTrue(accessibilityNodeInfo.isFocusable)
@@ -297,6 +307,28 @@ class AndroidAccessibilityTest {
                 accessibilityNodeInfo.availableExtraData
             )
         }
+    }
+
+    @Test
+    fun reportedTexts_inTextFieldWithLabel_whenEditableTextNotEmpty() {
+        textFieldValue.value = TextFieldValue(InitialText)
+        val textFieldNode = rule.onNodeWithTag(TextFieldTag)
+            .fetchSemanticsNode("couldn't find node with tag $TextFieldTag")
+        val accessibilityNodeInfo = provider.createAccessibilityNodeInfo(textFieldNode.id)
+
+        assertEquals(InitialText, accessibilityNodeInfo.text.toString())
+        assertEquals("Label", accessibilityNodeInfo.hintText.toString())
+    }
+
+    @Test
+    fun reportedText_inTextFieldWithLabel_whenEditableTextEmpty() {
+        textFieldValue.value = TextFieldValue()
+        val textFieldNode = rule.onNodeWithTag(TextFieldTag)
+            .fetchSemanticsNode("couldn't find node with tag $TextFieldTag")
+        val accessibilityNodeInfo = provider.createAccessibilityNodeInfo(textFieldNode.id)
+
+        assertEquals("Label", accessibilityNodeInfo.text.toString())
+        assertEquals(true, accessibilityNodeInfo.isShowingHintText)
     }
 
     @Test
@@ -417,15 +449,17 @@ class AndroidAccessibilityTest {
 
     @Test
     fun sendTextEvents_whenSetText() {
+        textFieldValue.value = TextFieldValue(InitialText)
+
         rule.onNodeWithTag(TextFieldTag)
             .assertIsDisplayed()
-            .assertTextEquals(InitialText)
+            .assertEditableTextEquals(InitialText)
 
         waitForSubtreeEventToSend()
         rule.onNodeWithTag(TextFieldTag)
             .performSemanticsAction(SemanticsActions.SetText) { it(AnnotatedString(InputText)) }
         rule.onNodeWithTag(TextFieldTag)
-            .assertTextEquals(InputText)
+            .assertEditableTextEquals(InputText)
 
         val textFieldNode = rule.onNodeWithTag(TextFieldTag)
             .fetchSemanticsNode("couldn't find node with tag $TextFieldTag")
