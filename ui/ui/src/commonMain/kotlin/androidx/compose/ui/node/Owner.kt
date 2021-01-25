@@ -88,17 +88,6 @@ internal interface Owner {
      */
     val focusManager: FocusManager
 
-    // TODO(b/178014889): Remove after Alpha 11.
-    /**
-     * Provide information about the window that hosts this [Owner].
-     */
-    @Deprecated(
-        message = "Renamed to windowInfo",
-        replaceWith = ReplaceWith("windowInfo"),
-        level = DeprecationLevel.ERROR
-    )
-    val windowManager get() = windowInfo
-
     /**
      * Provide information about the window that hosts this [Owner].
      */
