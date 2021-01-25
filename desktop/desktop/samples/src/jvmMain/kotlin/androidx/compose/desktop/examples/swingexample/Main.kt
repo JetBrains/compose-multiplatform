@@ -16,8 +16,9 @@
 package androidx.compose.desktop.examples.swingexample
 
 import androidx.compose.desktop.AppManager
-import androidx.compose.desktop.AppWindowAmbient
+import androidx.compose.desktop.LocalAppWindow
 import androidx.compose.desktop.ComposePanel
+import androidx.compose.desktop.SwingPanel
 import androidx.compose.desktop.Window
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -27,6 +28,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,20 +37,24 @@ import androidx.compose.material.Button
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import java.awt.BorderLayout
+import java.awt.Color as awtColor
+import java.awt.Component
+import java.awt.GridLayout
 import java.awt.Dimension
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import javax.swing.JButton
 import javax.swing.JFrame
+import javax.swing.JPanel
 import javax.swing.SwingUtilities
 import javax.swing.WindowConstants
 
@@ -67,11 +74,23 @@ fun main() = SwingUtilities.invokeLater {
 
 fun SwingComposeWindow() {
     // creating ComposePanel
-    val composePanel = ComposePanel()
+    val composePanelTop = ComposePanel()
+    composePanelTop.setBackground(awtColor(55, 155, 55))
+
+    val composePanelBottom = ComposePanel()
+    composePanelBottom.setBackground(awtColor(55, 55, 155))
 
     // setting the content
-    composePanel.setContent {
-        ComposeContent()
+    composePanelTop.setContent {
+        ComposeContent(background = Color(55, 155, 55))
+        DisposableEffect(Unit) {
+            onDispose {
+                println("Dispose composition")
+            }
+        }
+    }
+    composePanelBottom.setContent {
+        ComposeContent(background = Color(55, 55, 155))
         DisposableEffect(Unit) {
             onDispose {
                 println("Dispose composition")
@@ -83,30 +102,38 @@ fun SwingComposeWindow() {
     window.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
     window.title = "SwingComposeWindow"
 
-    window.contentPane.add(actionButton("NORTH", { northClicks.value++ }), BorderLayout.NORTH)
+    val panel = JPanel()
+    panel.setLayout(GridLayout(2, 1))
+    window.contentPane.add(panel, BorderLayout.CENTER)
+
     window.contentPane.add(actionButton("WEST", { westClicks.value++ }), BorderLayout.WEST)
-    window.contentPane.add(actionButton("EAST", { eastClicks.value++ }), BorderLayout.EAST)
     window.contentPane.add(
         actionButton(
             text = "SOUTH/REMOVE COMPOSE",
+            size = IntSize(40, 40),
             action = {
-                window.contentPane.remove(composePanel)
+                panel.remove(composePanelBottom)
             }
         ),
         BorderLayout.SOUTH
     )
 
     // addind ComposePanel on JFrame
-    window.contentPane.add(composePanel, BorderLayout.CENTER)
+    panel.add(composePanelTop)
+    panel.add(composePanelBottom)
 
     window.setSize(800, 600)
     window.setVisible(true)
 }
 
-fun actionButton(text: String, action: (() -> Unit)? = null): JButton {
+fun actionButton(
+    text: String,
+    action: (() -> Unit)? = null,
+    size: IntSize = IntSize(70, 70)
+): JButton {
     val button = JButton(text)
     button.setToolTipText("Tooltip for $text button.")
-    button.setPreferredSize(Dimension(100, 100))
+    button.setPreferredSize(Dimension(size.width, size.height))
     button.addActionListener(object : ActionListener {
         public override fun actionPerformed(e: ActionEvent) {
             action?.invoke()
@@ -117,14 +144,17 @@ fun actionButton(text: String, action: (() -> Unit)? = null): JButton {
 }
 
 @Composable
-fun ComposeContent() {
+fun ComposeContent(background: Color = Color.White) {
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().background(color = background),
         contentAlignment = Alignment.Center
     ) {
         Column {
-            Row {
+            Row(
+                modifier = Modifier.height(40.dp)
+            ) {
                 Button(
+                    modifier = Modifier.height(35.dp).padding(top = 3.dp),
                     onClick = {
                         Window(
                             size = IntSize(400, 250)
@@ -135,6 +165,27 @@ fun ComposeContent() {
                 ) {
                     Text("New window...", color = Color.White)
                 }
+                Spacer(modifier = Modifier.width(20.dp))
+                SwingPanel(
+                    modifier = Modifier.preferredSize(200.dp, 39.dp),
+                    componentBlock = {
+                        actionButton(
+                            text = "JComponent",
+                            action = {
+                                westClicks.value++
+                                northClicks.value++
+                                eastClicks.value++
+                            }
+                        )
+                    },
+                    background = background
+                )
+                Spacer(modifier = Modifier.width(20.dp))
+                SwingPanel(
+                    background = background,
+                    modifier = Modifier.preferredSize(200.dp, 39.dp),
+                    componentBlock = { ComposableColoredPanel(Color.Red) }
+                )
             }
             Spacer(modifier = Modifier.height(50.dp))
             Row {
@@ -146,6 +197,22 @@ fun ComposeContent() {
             }
         }
     }
+}
+
+fun ComposableColoredPanel(color: Color): Component {
+    val composePanel = ComposePanel()
+
+    // setting the content
+    composePanel.setContent {
+        Box(
+            modifier = Modifier.fillMaxSize().background(color = color),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(text = "ColoredPanel")
+        }
+    }
+
+    return composePanel
 }
 
 @Composable
@@ -177,9 +244,9 @@ fun Counter(text: String, counter: MutableState<Int>) {
 
 @Composable
 fun SecondWindowContent() {
-    val window = AppWindowAmbient.current
+    val window = LocalAppWindow.current
     Box(
-        Modifier.fillMaxSize().background(color = Color(55, 55, 55)),
+        Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         Column {
@@ -194,7 +261,7 @@ fun SecondWindowContent() {
                 modifier = Modifier.height(30.dp).fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                Button(onClick = { window?.close() }) {
+                Button(onClick = { window.close() }) {
                     Text("Close", color = Color.White)
                 }
             }

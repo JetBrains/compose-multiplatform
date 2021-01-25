@@ -50,6 +50,7 @@ object AppState {
     val amount = mutableStateOf(0)
 
     val undecorated = mutableStateOf(false)
+    val alertDialog = mutableStateOf(false)
 
     val notify = mutableStateOf(true)
     val warn = mutableStateOf(false)

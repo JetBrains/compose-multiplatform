@@ -17,7 +17,7 @@
 package androidx.compose.ui.window
 
 import androidx.compose.desktop.AppWindow
-import androidx.compose.desktop.AppWindowAmbient
+import androidx.compose.desktop.LocalAppWindow
 import androidx.compose.desktop.WindowEvents
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -78,8 +78,8 @@ fun Dialog(
     properties: DialogProperties = DialogProperties(),
     content: @Composable () -> Unit
 ) {
-    val attached = AppWindowAmbient.current
-    if (attached?.pair != null) {
+    val attached = LocalAppWindow.current
+    if (attached.pair != null) {
         return
     }
 
