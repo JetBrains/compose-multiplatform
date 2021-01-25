@@ -19,7 +19,6 @@
 package androidx.build.dokka
 
 import androidx.build.dependencies.GUAVA_VERSION
-import androidx.build.logging.LogUtils
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.dokka.DokkaConfiguration
@@ -91,8 +90,6 @@ object Dokka {
             task.noStdlibLink = true
             task.noAndroidSdkLink = true
             task.dokkaFatJar = "org.jetbrains.dokka:dokka-fatjar:0.9.17-g013"
-
-            LogUtils.turnWarningsIntoInfos(task)
         }
     }
 
