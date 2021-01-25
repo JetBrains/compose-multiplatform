@@ -1004,15 +1004,6 @@ package androidx.compose.ui.input.key {
     method public long getCtrlRight-EK5gGoQ();
     method public long getCut-EK5gGoQ();
     method public long getD-EK5gGoQ();
-    method @Deprecated public long getDPadCenter-EK5gGoQ();
-    method @Deprecated public long getDPadDown-EK5gGoQ();
-    method @Deprecated public long getDPadDownLeft-EK5gGoQ();
-    method @Deprecated public long getDPadDownRight-EK5gGoQ();
-    method @Deprecated public long getDPadLeft-EK5gGoQ();
-    method @Deprecated public long getDPadRight-EK5gGoQ();
-    method @Deprecated public long getDPadUp-EK5gGoQ();
-    method @Deprecated public long getDPadUpLeft-EK5gGoQ();
-    method @Deprecated public long getDPadUpRight-EK5gGoQ();
     method public long getDelete-EK5gGoQ();
     method public long getDirectionCenter-EK5gGoQ();
     method public long getDirectionDown-EK5gGoQ();
@@ -1300,15 +1291,6 @@ package androidx.compose.ui.input.key {
     property public final long CtrlRight;
     property public final long Cut;
     property public final long D;
-    property @Deprecated public final long DPadCenter;
-    property @Deprecated public final long DPadDown;
-    property @Deprecated public final long DPadDownLeft;
-    property @Deprecated public final long DPadDownRight;
-    property @Deprecated public final long DPadLeft;
-    property @Deprecated public final long DPadRight;
-    property @Deprecated public final long DPadUp;
-    property @Deprecated public final long DPadUpLeft;
-    property @Deprecated public final long DPadUpRight;
     property public final long Delete;
     property public final long DirectionCenter;
     property public final long DirectionDown;
@@ -2255,7 +2237,6 @@ package androidx.compose.ui.platform {
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.UriHandler> getAmbientUriHandler();
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.ViewConfiguration> getAmbientViewConfiguration();
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.WindowInfo> getAmbientWindowInfo();
-    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.WindowInfo>! getAmbientWindowManager();
     method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.animation.core.AnimationClockObservable>! getAnimationClockAmbient();
     method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.ClipboardManager>! getClipboardManagerAmbient();
     method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.unit.Density>! getDensityAmbient();
@@ -2472,12 +2453,6 @@ package androidx.compose.ui.platform {
   }
 
   public final class WindowInfoKt {
-    method @Deprecated @androidx.compose.runtime.Composable public static void WindowFocusObserver(kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onWindowFocusChanged);
-  }
-
-  @Deprecated @androidx.compose.runtime.Stable public interface WindowManager {
-    method @Deprecated public boolean isWindowFocused();
-    property public abstract boolean isWindowFocused;
   }
 
   @androidx.compose.ui.InternalComposeUiApi public fun interface WindowRecomposerFactory {

@@ -40,37 +40,9 @@ interface WindowInfo {
     val isWindowFocused: Boolean
 }
 
-// TODO(b/177085155): Remove after Alpha 11.
-/**
- * Provides information about the Window that is hosting this compose hierarchy.
- */
-@Stable
-@Deprecated(
-    message = "Use WindowInfo instead.",
-    replaceWith = ReplaceWith("WindowInfo", "androidx.compose.ui.platform.WindowInfo"),
-    level = DeprecationLevel.ERROR
-)
-interface WindowManager {
-    val isWindowFocused: Boolean
-}
-
-// TODO(b/177085040):  Remove after Alpha 11.
-/**
- * Provides a callback that is called whenever the window gains or loses focus.
- */
-@Deprecated(
-    message = "Use AmbientWindowInfo.current.isWIndowFocused instead.",
-    level = DeprecationLevel.ERROR
-)
-@Composable
-fun WindowFocusObserver(onWindowFocusChanged: (isWindowFocused: Boolean) -> Unit) {
-    WindowFocusObserver1(onWindowFocusChanged)
-}
-
-// TODO(b/177085040): Rename this to WindowFocusObserver after removing WindowFocusObserver.
 @OptIn(ExperimentalComposeApi::class)
 @Composable
-internal fun WindowFocusObserver1(onWindowFocusChanged: (isWindowFocused: Boolean) -> Unit) {
+internal fun WindowFocusObserver(onWindowFocusChanged: (isWindowFocused: Boolean) -> Unit) {
     val windowInfo = AmbientWindowInfo.current
     val callback = rememberUpdatedState(onWindowFocusChanged)
     LaunchedEffect(windowInfo) {

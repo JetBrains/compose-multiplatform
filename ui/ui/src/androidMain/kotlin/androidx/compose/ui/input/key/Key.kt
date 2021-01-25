@@ -119,42 +119,12 @@ actual inline class Key(val keyCode: Long) {
          */
         actual val DirectionUp = Key(KeyEvent.KEYCODE_DPAD_UP)
 
-        // TODO(b/177954493): Remove after Alpha 11.
-        /**
-         * Directional Pad Up key.
-         *
-         * May also be synthesized from trackball motions.
-         */
-        @Deprecated(
-            message = "Use DirectionUp instead.",
-            replaceWith = ReplaceWith(
-                "DirectionUp",
-                "androidx.compose.ui.input.key.Key.Companion.DirectionUp"
-            )
-        )
-        actual val DPadUp = DirectionUp
-
         /**
          * Down Arrow Key / Directional Pad Down key.
          *
          * May also be synthesized from trackball motions.
          */
         actual val DirectionDown = Key(KeyEvent.KEYCODE_DPAD_DOWN)
-
-        // TODO(b/177954493): Remove after Alpha 11.
-        /**
-         * Directional Pad Down key.
-         *
-         * May also be synthesized from trackball motions.
-         */
-        @Deprecated(
-            message = "Use DirectionDown instead.",
-            replaceWith = ReplaceWith(
-                "DirectionDown",
-                "androidx.compose.ui.input.key.Key.Companion.DirectionDown"
-            )
-        )
-        actual val DPadDown = DirectionDown
 
         /**
          * Left Arrow Key / Directional Pad Left key.
@@ -163,42 +133,12 @@ actual inline class Key(val keyCode: Long) {
          */
         actual val DirectionLeft = Key(KeyEvent.KEYCODE_DPAD_LEFT)
 
-        // TODO(b/177954493): Remove after Alpha 11.
-        /**
-         * Directional Pad Left key.
-         *
-         * May also be synthesized from trackball motions.
-         */
-        @Deprecated(
-            message = "Use DirectionLeft instead.",
-            replaceWith = ReplaceWith(
-                "DirectionLeft",
-                "androidx.compose.ui.input.key.Key.Companion.DirectionLeft"
-            )
-        )
-        actual val DPadLeft = DirectionLeft
-
         /**
          * Right Arrow Key / Directional Pad Right key.
          *
          * May also be synthesized from trackball motions.
          */
         actual val DirectionRight = Key(KeyEvent.KEYCODE_DPAD_RIGHT)
-
-        // TODO(b/177954493): Remove after Alpha 11.
-        /**
-         * Directional Pad Right key.
-         *
-         * May also be synthesized from trackball motions.
-         */
-        @Deprecated(
-            message = "Use DirectionRight instead.",
-            replaceWith = ReplaceWith(
-                "DirectionRight",
-                "androidx.compose.ui.input.key.Key.Companion.DirectionRight"
-            )
-        )
-        actual val DPadRight = DirectionRight
 
         /**
          * Center Arrow Key / Directional Pad Center key.
@@ -207,76 +147,17 @@ actual inline class Key(val keyCode: Long) {
          */
         actual val DirectionCenter = Key(KeyEvent.KEYCODE_DPAD_CENTER)
 
-        // TODO(b/177954493): Remove after Alpha 11.
-        /**
-         * Directional Pad Center key.
-         *
-         * May also be synthesized from trackball motions.
-         */
-        @Deprecated(
-            message = "Use DirectionCenter instead.",
-            replaceWith = ReplaceWith(
-                "DirectionCenter",
-                "androidx.compose.ui.input.key.Key.Companion.DirectionCenter"
-            )
-        )
-        actual val DPadCenter = DirectionCenter
-
         /** Directional Pad Up-Left. */
         actual val DirectionUpLeft = Key(KeyEvent.KEYCODE_DPAD_UP_LEFT)
-
-        // TODO(b/177954493): Remove after Alpha 11.
-        /** Directional Pad Up-Left. */
-        @Deprecated(
-            message = "Use DirectionUpLeft instead.",
-            replaceWith = ReplaceWith(
-                "DirectionUpLeft",
-                "androidx.compose.ui.input.key.Key.Companion.DirectionUpLeft"
-            )
-        )
-        actual val DPadUpLeft = DirectionUpLeft
 
         /** Directional Pad Down-Left. */
         actual val DirectionDownLeft = Key(KeyEvent.KEYCODE_DPAD_DOWN_LEFT)
 
-        // TODO(b/177954493): Remove after Alpha 11.
-        /** Directional Pad Down-Left. */
-        @Deprecated(
-            message = "Use DirectionDownLeft instead.",
-            replaceWith = ReplaceWith(
-                "DirectionDownLeft",
-                "androidx.compose.ui.input.key.Key.Companion.DirectionDownLeft"
-            )
-        )
-        actual val DPadDownLeft = DirectionDownLeft
-
         /** Directional Pad Up-Right. */
         actual val DirectionUpRight = Key(KeyEvent.KEYCODE_DPAD_UP_RIGHT)
 
-        // TODO(b/177954493): Remove after Alpha 11.
-        /** Directional Pad Up-Right. */
-        @Deprecated(
-            message = "Use DirectionUpRight instead.",
-            replaceWith = ReplaceWith(
-                "DirectionUpRight",
-                "androidx.compose.ui.input.key.Key.Companion.DirectionUpRight"
-            )
-        )
-        actual val DPadUpRight = DirectionUpRight
-
         /** Directional Pad Down-Right. */
         actual val DirectionDownRight = Key(KeyEvent.KEYCODE_DPAD_DOWN_RIGHT)
-
-        // TODO(b/177954493): Remove after Alpha 11.
-        /** Directional Pad Down-Right. */
-        @Deprecated(
-            message = "Use DirectionDownRight instead.",
-            replaceWith = ReplaceWith(
-                "DirectionDownRight",
-                "androidx.compose.ui.input.key.Key.Companion.DirectionDownRight"
-            )
-        )
-        actual val DPadDownRight = DirectionDownRight
 
         /**
          * Volume Up key.

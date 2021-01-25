@@ -47,7 +47,7 @@ class WindowInfoAmbientTest {
             BasicText("Main Window")
             windowInfo = AmbientWindowInfo.current
             @Suppress("DEPRECATION")
-            WindowFocusObserver1 { if (it) windowFocusGain.countDown() }
+            WindowFocusObserver { if (it) windowFocusGain.countDown() }
         }
 
         // Act.
@@ -69,12 +69,12 @@ class WindowInfoAmbientTest {
         rule.setContent {
             BasicText("Main Window")
             mainWindowInfo = AmbientWindowInfo.current
-            WindowFocusObserver1 { if (!it) mainWindowFocusLoss.countDown() }
+            WindowFocusObserver { if (!it) mainWindowFocusLoss.countDown() }
             if (showPopup.value) {
                 Popup(isFocusable = true, onDismissRequest = { showPopup.value = false }) {
                     BasicText("Popup Window")
                     popupWindowInfo = AmbientWindowInfo.current
-                    WindowFocusObserver1 { if (it) popupFocusGain.countDown() }
+                    WindowFocusObserver { if (it) popupFocusGain.countDown() }
                 }
             }
         }
@@ -100,11 +100,11 @@ class WindowInfoAmbientTest {
         rule.setContent {
             BasicText(text = "Main Window")
             mainWindowInfo = AmbientWindowInfo.current
-            WindowFocusObserver1 { if (it) mainWindowFocusGain.countDown() }
+            WindowFocusObserver { if (it) mainWindowFocusGain.countDown() }
             if (showPopup.value) {
                 Popup(isFocusable = true, onDismissRequest = { showPopup.value = false }) {
                     BasicText(text = "Popup Window")
-                    WindowFocusObserver1 { if (it) popupFocusGain.countDown() }
+                    WindowFocusObserver { if (it) popupFocusGain.countDown() }
                 }
             }
         }
@@ -133,12 +133,12 @@ class WindowInfoAmbientTest {
         rule.setContent {
             BasicText("Main Window")
             mainWindowInfo = AmbientWindowInfo.current
-            WindowFocusObserver1 { if (!it) mainWindowFocusLoss.countDown() }
+            WindowFocusObserver { if (!it) mainWindowFocusLoss.countDown() }
             if (showDialog.value) {
                 Dialog(onDismissRequest = { showDialog.value = false }) {
                     BasicText("Popup Window")
                     dialogWindowInfo = AmbientWindowInfo.current
-                    WindowFocusObserver1 { if (it) dialogFocusGain.countDown() }
+                    WindowFocusObserver { if (it) dialogFocusGain.countDown() }
                 }
             }
         }
@@ -164,11 +164,11 @@ class WindowInfoAmbientTest {
         rule.setContent {
             BasicText(text = "Main Window")
             mainWindowInfo = AmbientWindowInfo.current
-            WindowFocusObserver1 { if (it) mainWindowFocusGain.countDown() }
+            WindowFocusObserver { if (it) mainWindowFocusGain.countDown() }
             if (showDialog.value) {
                 Dialog(onDismissRequest = { showDialog.value = false }) {
                     BasicText(text = "Popup Window")
-                    WindowFocusObserver1 { if (it) dialogFocusGain.countDown() }
+                    WindowFocusObserver { if (it) dialogFocusGain.countDown() }
                 }
             }
         }
