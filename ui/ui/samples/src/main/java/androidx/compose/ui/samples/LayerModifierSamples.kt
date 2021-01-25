@@ -17,10 +17,11 @@
 package androidx.compose.ui.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.animation.animatedFloat
+import androidx.compose.animation.core.Animatable
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 
@@ -33,7 +34,7 @@ fun ChangeOpacity() {
 @Sampled
 @Composable
 fun AnimateFadeIn() {
-    val animatedAlpha = animatedFloat(initVal = 0f)
+    val animatedAlpha = remember { Animatable(0f) }
     Text(
         "Hello World",
         Modifier.graphicsLayer {
@@ -41,7 +42,7 @@ fun AnimateFadeIn() {
             clip = true
         }
     )
-    SideEffect {
+    LaunchedEffect(animatedAlpha) {
         animatedAlpha.animateTo(1f)
     }
 }

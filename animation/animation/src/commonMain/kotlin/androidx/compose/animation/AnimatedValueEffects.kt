@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.animation
 
 import androidx.compose.animation.core.AnimatedFloat
@@ -45,6 +47,14 @@ import androidx.compose.ui.platform.AmbientAnimationClock
  * finished.
  */
 @Composable
+@Deprecated(
+    "animatedValue has been deprecated. Please use remember { Animatable } instead",
+    replaceWith = ReplaceWith(
+        "remember { Animatable(initVal, converter, visibilityThreshold) }",
+        "androidx.compose.animation.core.Animatable",
+        "androidx.compose.runtime.remember"
+    )
+)
 fun <T, V : AnimationVector> animatedValue(
     initVal: T,
     converter: TwoWayConverter<T, V>,
@@ -64,6 +74,14 @@ fun <T, V : AnimationVector> animatedValue(
  * @param initVal Initial value to set [AnimatedFloat] to.
  */
 @Composable
+@Deprecated(
+    "animatedFloat has been deprecated. Please use remember { Animatable } instead",
+    replaceWith = ReplaceWith(
+        "remember { Animatable(initVal, visibilityThreshold) }",
+        "androidx.compose.animation.core.Animatable",
+        "androidx.compose.runtime.remember"
+    )
+)
 fun animatedFloat(
     initVal: Float,
     visibilityThreshold: Float = Spring.DefaultDisplacementThreshold,
@@ -80,6 +98,14 @@ fun animatedFloat(
  * @param initVal Initial value to set [AnimatedValue] to.
  */
 @Composable
+@Deprecated(
+    "animatedColor has been deprecated. Please use remember { Animatable } instead",
+    replaceWith = ReplaceWith(
+        "remember { Animatable(initVal) }",
+        "androidx.compose.animation.Animatable",
+        "androidx.compose.runtime.remember"
+    )
+)
 fun animatedColor(
     initVal: Color,
     clock: AnimationClockObservable = AmbientAnimationClock.current
@@ -104,6 +130,13 @@ fun animatedColor(
  * @param visibilityThreshold Threshold at which the animation may round off to its target value.
  */
 @Stable
+@Deprecated(
+    "AnimatedValueModel has been deprecated. Please use Animatable instead",
+    replaceWith = ReplaceWith(
+        "Animatable(initialVal, typeConverter, visibilityThreshold)",
+        "androidx.compose.animation.Animatable",
+    )
+)
 class AnimatedValueModel<T, V : AnimationVector>(
     initialValue: T,
     typeConverter: TwoWayConverter<T, V>,
@@ -123,6 +156,13 @@ class AnimatedValueModel<T, V : AnimationVector>(
  *                            enough to the target to terminate
  */
 @Stable
+@Deprecated(
+    "AnimatedFloatModel has been deprecated. Please use Animatable instead",
+    replaceWith = ReplaceWith(
+        "Animatable(initialVal, visibilityThreshold)",
+        "androidx.compose.animation.Animatable",
+    )
+)
 class AnimatedFloatModel(
     initialValue: Float,
     clock: AnimationClockObservable,

@@ -16,19 +16,13 @@
 
 package androidx.compose.foundation.text
 
-import androidx.compose.animation.core.AnimatedFloat
-import androidx.compose.animation.core.AnimationClockObservable
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.keyframes
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.structuralEqualityPolicy
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawWithContent
@@ -36,11 +30,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.isSpecified
-import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 
 @OptIn(InternalTextApi::class)
 @Suppress("ModifierInspectorInfo")
@@ -53,13 +47,15 @@ internal fun Modifier.cursor(
 ) = if (enabled) composed {
     // this should be a disposable clock, but it's not available in this module
     // however, we only launch one animation and guarantee that we stop it (via snap) in dispose
-    val animationClocks = AmbientAnimationClock.current
-    val cursorAlpha = remember(animationClocks) { AnimatedFloatModel(0f, animationClocks) }
+    val cursorAlpha = remember { Animatable(0f) }
+    val coroutineScope = rememberCoroutineScope()
 
     if (state.hasFocus && value.selection.collapsed && cursorColor.isSpecified) {
         DisposableEffect(cursorColor, value.annotatedString) {
             if (@Suppress("DEPRECATION_ERROR") blinkingCursorEnabled) {
-                cursorAlpha.animateTo(0f, anim = cursorAnimationSpec)
+                coroutineScope.launch {
+                    cursorAlpha.animateTo(0f, cursorAnimationSpec)
+                }
             } else {
                 cursorAlpha.snapTo(1f)
             }
@@ -93,15 +89,6 @@ internal fun Modifier.cursor(
     }
 } else this
 
-@Stable
-private class AnimatedFloatModel(
-    initialValue: Float,
-    clock: AnimationClockObservable,
-    visibilityThreshold: Float = Spring.DefaultDisplacementThreshold
-) : AnimatedFloat(clock, visibilityThreshold) {
-    override var value: Float by mutableStateOf(initialValue, structuralEqualityPolicy())
-}
-
 private val cursorAnimationSpec: AnimationSpec<Float>
     get() = infiniteRepeatable(
         animation = keyframes {
@@ -120,5 +107,5 @@ internal val DefaultCursorThickness = 2.dp
 @InternalTextApi // Used by Testing infra
 @Deprecated(level = DeprecationLevel.ERROR, message = "This is internal API and should not be used")
 var blinkingCursorEnabled: Boolean = true
-    /*@VisibleForTesting
-    set*/
+/*@VisibleForTesting
+set*/

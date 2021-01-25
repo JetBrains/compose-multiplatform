@@ -36,6 +36,7 @@ enum class AnimationEndReason {
      * Animation has successfully reached the [BaseAnimatedValue.targetValue] value
      * and come to stop
      */
+    @Deprecated("Renamed to AnimationEndReason.Finished")
     TargetReached,
     /**
      * Animation was interrupted, e.g by another animation
