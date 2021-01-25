@@ -296,7 +296,7 @@ class FontLoader : ComposeFont.ResourceLoader {
         fontFamily: FontFamily,
         fontWeight: FontWeight = FontWeight.Normal,
         fontStyle: FontStyle = FontStyle.Normal
-    ): Typeface {
+    ): Typeface? {
         return when (fontFamily) {
             FontFamily.Default -> fonts.defaultFallback()
             else -> {

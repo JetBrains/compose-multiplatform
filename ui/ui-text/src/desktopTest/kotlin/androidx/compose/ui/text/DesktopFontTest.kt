@@ -82,14 +82,14 @@ class DesktopFontTest {
 
     @Test
     fun findTypeface() {
-        Truth.assertThat(fontLoader.findTypeface(fontListFontFamily).isItalic)
+        Truth.assertThat(fontLoader.findTypeface(fontListFontFamily)!!.isItalic)
             .isEqualTo(false)
 
         Truth.assertThat(
             fontLoader.findTypeface(
                 fontListFontFamily,
                 fontStyle = FontStyle.Italic
-            ).isItalic
+            )!!.isItalic
         )
             .isEqualTo(true)
 
