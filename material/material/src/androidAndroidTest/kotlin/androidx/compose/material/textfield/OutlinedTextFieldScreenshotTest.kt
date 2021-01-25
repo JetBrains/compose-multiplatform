@@ -398,7 +398,13 @@ class OutlinedTextFieldScreenshotTest {
             }
         }
 
+        rule.mainClock.autoAdvance = false
+
         rule.onNodeWithTag(TextFieldTag).performGesture { swipeLeft() }
+
+        // wait for swipe to finish
+        rule.waitForIdle()
+        rule.mainClock.advanceTimeBy(250)
 
         assertAgainstGolden("outlinedTextField_disabled_notScrolled")
     }
@@ -448,7 +454,13 @@ class OutlinedTextFieldScreenshotTest {
             )
         }
 
+        rule.mainClock.autoAdvance = false
+
         rule.onNodeWithTag(TextFieldTag).performGesture { swipeLeft() }
+
+        // wait for swipe to finish
+        rule.waitForIdle()
+        rule.mainClock.advanceTimeBy(250)
 
         assertAgainstGolden("outlinedTextField_readOnly_scrolled")
     }
