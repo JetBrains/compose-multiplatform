@@ -93,10 +93,10 @@ internal fun SimpleContainer(
     Layout(content, modifier) { measurables, incomingConstraints ->
         val containerConstraints = Constraints()
             .copy(
-                width?.toIntPx() ?: 0,
-                width?.toIntPx() ?: Constraints.Infinity,
-                height?.toIntPx() ?: 0,
-                height?.toIntPx() ?: Constraints.Infinity
+                width?.roundToPx() ?: 0,
+                width?.roundToPx() ?: Constraints.Infinity,
+                height?.roundToPx() ?: 0,
+                height?.roundToPx() ?: Constraints.Infinity
             )
             .enforce(incomingConstraints)
         val childConstraints = containerConstraints.copy(minWidth = 0, minHeight = 0)

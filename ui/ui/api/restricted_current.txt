@@ -1762,11 +1762,12 @@ package androidx.compose.ui.layout {
     method public float getDensity();
     method public float getFontScale();
     method public androidx.compose.ui.unit.LayoutDirection getLayoutDirection();
+    method @androidx.compose.runtime.Stable public int roundToPx--R2X_6o(long);
+    method @androidx.compose.runtime.Stable public int roundToPx-0680j_4(float);
     method @androidx.compose.runtime.Stable public float toDp--R2X_6o(long);
     method @androidx.compose.runtime.Stable public float toDp-D9Ej5fM(float);
     method @androidx.compose.runtime.Stable public float toDp-D9Ej5fM(int);
-    method @androidx.compose.runtime.Stable public int toIntPx--R2X_6o(long);
-    method @androidx.compose.runtime.Stable public int toIntPx-0680j_4(float);
+    method @Deprecated @androidx.compose.runtime.Stable public int toIntPx-0680j_4(float);
     method @androidx.compose.runtime.Stable public float toPx--R2X_6o(long);
     method @androidx.compose.runtime.Stable public float toPx-0680j_4(float);
     method @androidx.compose.runtime.Stable public androidx.compose.ui.geometry.Rect toRect(androidx.compose.ui.unit.Bounds);

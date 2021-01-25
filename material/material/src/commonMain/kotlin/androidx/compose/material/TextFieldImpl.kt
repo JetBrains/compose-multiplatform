@@ -290,7 +290,7 @@ internal fun Modifier.iconPadding(start: Dp = 0.dp, end: Dp = 0.dp) =
                 measurable: Measurable,
                 constraints: Constraints
             ): MeasureResult {
-                val horizontal = start.toIntPx() + end.toIntPx()
+                val horizontal = start.roundToPx() + end.roundToPx()
                 val placeable = measurable.measure(constraints.offset(-horizontal))
                 val width = if (placeable.nonZero) {
                     constraints.constrainWidth(placeable.width + horizontal)
@@ -298,7 +298,7 @@ internal fun Modifier.iconPadding(start: Dp = 0.dp, end: Dp = 0.dp) =
                     0
                 }
                 return layout(width, placeable.height) {
-                    placeable.placeRelative(start.toIntPx(), 0)
+                    placeable.placeRelative(start.roundToPx(), 0)
                 }
             }
         }

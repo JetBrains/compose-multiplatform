@@ -73,7 +73,7 @@ class RowColumnTest : LayoutTest() {
     @Test
     fun testRow() = with(density) {
         val sizeDp = 50.toDp()
-        val size = sizeDp.toIntPx()
+        val size = sizeDp.roundToPx()
 
         val drawLatch = CountDownLatch(2)
         val childSize = arrayOf(IntSize(-1, -1), IntSize(-1, -1))
@@ -123,7 +123,7 @@ class RowColumnTest : LayoutTest() {
     fun testRow_withChildrenWithWeight() = with(density) {
         val width = 50.toDp()
         val height = 80.toDp()
-        val childrenHeight = height.toIntPx()
+        val childrenHeight = height.roundToPx()
 
         val drawLatch = CountDownLatch(2)
         val childSize = arrayOfNulls<IntSize>(2)
@@ -178,9 +178,9 @@ class RowColumnTest : LayoutTest() {
     @Test
     fun testRow_withChildrenWithWeightNonFilling() = with(density) {
         val width = 50.toDp()
-        val childrenWidth = width.toIntPx()
+        val childrenWidth = width.roundToPx()
         val height = 80.toDp()
-        val childrenHeight = height.toIntPx()
+        val childrenHeight = height.roundToPx()
 
         val drawLatch = CountDownLatch(2)
         val childSize = arrayOfNulls<IntSize>(2)
@@ -228,7 +228,7 @@ class RowColumnTest : LayoutTest() {
     @Test
     fun testColumn() = with(density) {
         val sizeDp = 50.toDp()
-        val size = sizeDp.toIntPx()
+        val size = sizeDp.roundToPx()
 
         val drawLatch = CountDownLatch(2)
         val childSize = arrayOf(IntSize(-1, -1), IntSize(-1, -1))
@@ -276,7 +276,7 @@ class RowColumnTest : LayoutTest() {
     @Test
     fun testColumn_withChildrenWithWeight() = with(density) {
         val width = 80.toDp()
-        val childrenWidth = width.toIntPx()
+        val childrenWidth = width.roundToPx()
         val height = 50.toDp()
 
         val drawLatch = CountDownLatch(2)
@@ -330,9 +330,9 @@ class RowColumnTest : LayoutTest() {
     @Test
     fun testColumn_withChildrenWithWeightNonFilling() = with(density) {
         val width = 80.toDp()
-        val childrenWidth = width.toIntPx()
+        val childrenWidth = width.roundToPx()
         val height = 50.toDp()
-        val childrenHeight = height.toIntPx()
+        val childrenHeight = height.roundToPx()
 
         val drawLatch = CountDownLatch(2)
         val childSize = arrayOfNulls<IntSize>(2)
@@ -588,7 +588,7 @@ class RowColumnTest : LayoutTest() {
     @Test
     fun testRow_withStretchCrossAxisAlignment() = with(density) {
         val sizeDp = 50.toDp()
-        val size = sizeDp.toIntPx()
+        val size = sizeDp.roundToPx()
 
         val drawLatch = CountDownLatch(2)
         val childSize = arrayOf(IntSize(-1, -1), IntSize(-1, -1))
@@ -637,7 +637,7 @@ class RowColumnTest : LayoutTest() {
     @Test
     fun testRow_withGravityModifier_andGravityParameter() = with(density) {
         val sizeDp = 50.toDp()
-        val size = sizeDp.toIntPx()
+        val size = sizeDp.roundToPx()
 
         val drawLatch = CountDownLatch(3)
         val childSize = arrayOfNulls<IntSize>(3)
@@ -709,7 +709,7 @@ class RowColumnTest : LayoutTest() {
     @Test
     fun testRow_withGravityModifier() = with(density) {
         val sizeDp = 50.toDp()
-        val size = sizeDp.toIntPx()
+        val size = sizeDp.roundToPx()
 
         val drawLatch = CountDownLatch(3)
         val childSize = arrayOfNulls<IntSize>(3)
@@ -779,13 +779,13 @@ class RowColumnTest : LayoutTest() {
     @Test
     fun testRow_withAlignByModifier() = with(density) {
         val baseline1Dp = 30.toDp()
-        val baseline1 = baseline1Dp.toIntPx()
+        val baseline1 = baseline1Dp.roundToPx()
         val baseline2Dp = 25.toDp()
-        val baseline2 = baseline2Dp.toIntPx()
+        val baseline2 = baseline2Dp.roundToPx()
         val baseline3Dp = 20.toDp()
-        val baseline3 = baseline3Dp.toIntPx()
+        val baseline3 = baseline3Dp.roundToPx()
         val sizeDp = 40.toDp()
-        val size = sizeDp.toIntPx()
+        val size = sizeDp.roundToPx()
 
         val drawLatch = CountDownLatch(5)
         val childSize = arrayOfNulls<IntSize>(5)
@@ -889,9 +889,9 @@ class RowColumnTest : LayoutTest() {
     @Test
     fun testRow_withAlignByModifier_andWeight() = with(density) {
         val baselineDp = 30.toDp()
-        val baseline = baselineDp.toIntPx()
+        val baseline = baselineDp.roundToPx()
         val sizeDp = 40.toDp()
-        val size = sizeDp.toIntPx()
+        val size = sizeDp.roundToPx()
 
         val drawLatch = CountDownLatch(2)
         val childSize = arrayOfNulls<IntSize>(2)
@@ -940,7 +940,7 @@ class RowColumnTest : LayoutTest() {
     @Test
     fun testColumn_withStretchCrossAxisAlignment() = with(density) {
         val sizeDp = 50.toDp()
-        val size = sizeDp.toIntPx()
+        val size = sizeDp.roundToPx()
 
         val drawLatch = CountDownLatch(2)
         val childSize = arrayOf(IntSize(-1, -1), IntSize(-1, -1))
@@ -979,7 +979,7 @@ class RowColumnTest : LayoutTest() {
 
         assertEquals(IntSize(root.width, size), childSize[0])
         assertEquals(
-            IntSize(root.width, (sizeDp * 2).toIntPx()),
+            IntSize(root.width, (sizeDp * 2).roundToPx()),
             childSize[1]
         )
         assertEquals(Offset(0f, 0f), childPosition[0])
@@ -989,7 +989,7 @@ class RowColumnTest : LayoutTest() {
     @Test
     fun testColumn_withGravityModifier() = with(density) {
         val sizeDp = 50.toDp()
-        val size = sizeDp.toIntPx()
+        val size = sizeDp.roundToPx()
 
         val drawLatch = CountDownLatch(3)
         val childSize = arrayOfNulls<IntSize>(3)
@@ -1059,7 +1059,7 @@ class RowColumnTest : LayoutTest() {
     @Test
     fun testColumn_withGravityModifier_andGravityParameter() = with(density) {
         val sizeDp = 50.toDp()
-        val size = sizeDp.toIntPx()
+        val size = sizeDp.roundToPx()
 
         val drawLatch = CountDownLatch(3)
         val childSize = arrayOfNulls<IntSize>(3)
@@ -1128,7 +1128,7 @@ class RowColumnTest : LayoutTest() {
     @Test
     fun testColumn_withAlignByModifier() = with(density) {
         val sizeDp = 40.toDp()
-        val size = sizeDp.toIntPx()
+        val size = sizeDp.roundToPx()
         val firstBaseline1Dp = 20.toDp()
         val firstBaseline2Dp = 30.toDp()
 
@@ -1196,7 +1196,7 @@ class RowColumnTest : LayoutTest() {
         assertEquals(IntSize(size, size), childSize[2])
         assertEquals(
             Offset(
-                (size - firstBaseline1Dp.toIntPx()).toFloat(),
+                (size - firstBaseline1Dp.roundToPx()).toFloat(),
                 size.toFloat() * 2
             ),
             childPosition[2]
@@ -1205,7 +1205,7 @@ class RowColumnTest : LayoutTest() {
         assertEquals(IntSize(size, size), childSize[3])
         assertEquals(
             Offset(
-                (size - firstBaseline2Dp.toIntPx()).toFloat(),
+                (size - firstBaseline2Dp.roundToPx()).toFloat(),
                 size.toFloat() * 3
             ),
             childPosition[3]
@@ -1215,9 +1215,9 @@ class RowColumnTest : LayoutTest() {
     @Test
     fun testColumn_withAlignByModifier_andWeight() = with(density) {
         val baselineDp = 30.toDp()
-        val baseline = baselineDp.toIntPx()
+        val baseline = baselineDp.roundToPx()
         val sizeDp = 40.toDp()
-        val size = sizeDp.toIntPx()
+        val size = sizeDp.roundToPx()
 
         val drawLatch = CountDownLatch(2)
         val childSize = arrayOfNulls<IntSize>(2)
@@ -1318,7 +1318,7 @@ class RowColumnTest : LayoutTest() {
         waitForDraw(root)
 
         assertEquals(
-            (sizeDp * 3).toIntPx(),
+            (sizeDp * 3).roundToPx(),
             rowSize.width
         )
     }
@@ -1417,7 +1417,7 @@ class RowColumnTest : LayoutTest() {
         waitForDraw(root)
 
         assertEquals(
-            (sizeDp * 2).toIntPx(),
+            (sizeDp * 2).roundToPx(),
             rowSize.height
         )
     }
@@ -1450,7 +1450,7 @@ class RowColumnTest : LayoutTest() {
         waitForDraw(root)
 
         assertEquals(
-            min(root.width, rowWidthDp.toIntPx()),
+            min(root.width, rowWidthDp.roundToPx()),
             rowSize.width
         )
     }
@@ -1492,7 +1492,7 @@ class RowColumnTest : LayoutTest() {
         waitForDraw(root)
 
         assertEquals(
-            min(root.width, rowWidthDp.toIntPx()),
+            min(root.width, rowWidthDp.roundToPx()),
             rowSize.width
         )
     }
@@ -1525,7 +1525,7 @@ class RowColumnTest : LayoutTest() {
         waitForDraw(root)
 
         assertEquals(
-            rowWidthDp.toIntPx(),
+            rowWidthDp.roundToPx(),
             rowSize.width
         )
     }
@@ -1558,7 +1558,7 @@ class RowColumnTest : LayoutTest() {
         waitForDraw(root)
 
         assertEquals(
-            min(root.height, rowHeightDp.toIntPx()),
+            min(root.height, rowHeightDp.roundToPx()),
             rowSize.height
         )
     }
@@ -1591,7 +1591,7 @@ class RowColumnTest : LayoutTest() {
         waitForDraw(root)
 
         assertEquals(
-            rowHeightDp.toIntPx(),
+            rowHeightDp.roundToPx(),
             rowSize.height
         )
     }
@@ -1603,9 +1603,9 @@ class RowColumnTest : LayoutTest() {
     )
     fun testRow_withMinMainAxisSize() = with(density) {
         val sizeDp = 50.toDp()
-        val size = sizeDp.toIntPx()
+        val size = sizeDp.roundToPx()
         val rowWidthDp = 250.toDp()
-        val rowWidth = rowWidthDp.toIntPx()
+        val rowWidth = rowWidthDp.roundToPx()
 
         val drawLatch = CountDownLatch(2)
         var rowSize: IntSize = IntSize.Zero
@@ -1660,19 +1660,19 @@ class RowColumnTest : LayoutTest() {
                     Row {
                         BoxWithConstraints {
                             assertEquals(Constraints(), constraints)
-                            FixedSizeLayout(noWeightChildWidth.toIntPx(), 0, mapOf())
+                            FixedSizeLayout(noWeightChildWidth.roundToPx(), 0, mapOf())
                         }
                         BoxWithConstraints {
                             assertEquals(Constraints(), constraints)
-                            FixedSizeLayout(noWeightChildWidth.toIntPx(), 0, mapOf())
+                            FixedSizeLayout(noWeightChildWidth.roundToPx(), 0, mapOf())
                         }
                         Layout({}, Modifier.weight(1f)) { _, constraints ->
                             assertEquals(
-                                rowMinWidth.toIntPx() - noWeightChildWidth.toIntPx() * 2,
+                                rowMinWidth.roundToPx() - noWeightChildWidth.roundToPx() * 2,
                                 constraints.minWidth
                             )
                             assertEquals(
-                                rowMinWidth.toIntPx() - noWeightChildWidth.toIntPx() * 2,
+                                rowMinWidth.roundToPx() - noWeightChildWidth.roundToPx() * 2,
                                 constraints.maxWidth
                             )
                             latch.countDown()
@@ -1706,22 +1706,30 @@ class RowColumnTest : LayoutTest() {
                         BoxWithConstraints {
                             assertEquals(
                                 Constraints(
-                                    maxWidth = availableWidth.toIntPx(),
-                                    maxHeight = availableHeight.toIntPx()
+                                    maxWidth = availableWidth.roundToPx(),
+                                    maxHeight = availableHeight.roundToPx()
                                 ),
                                 constraints
                             )
-                            FixedSizeLayout(childWidth.toIntPx(), childHeight.toIntPx(), mapOf())
+                            FixedSizeLayout(
+                                childWidth.roundToPx(),
+                                childHeight.roundToPx(),
+                                mapOf()
+                            )
                         }
                         BoxWithConstraints {
                             assertEquals(
                                 Constraints(
-                                    maxWidth = availableWidth.toIntPx() - childWidth.toIntPx(),
-                                    maxHeight = availableHeight.toIntPx()
+                                    maxWidth = availableWidth.roundToPx() - childWidth.roundToPx(),
+                                    maxHeight = availableHeight.roundToPx()
                                 ),
                                 constraints
                             )
-                            FixedSizeLayout(childWidth.toIntPx(), childHeight.toIntPx(), mapOf())
+                            FixedSizeLayout(
+                                childWidth.roundToPx(),
+                                childHeight.roundToPx(),
+                                mapOf()
+                            )
                             latch.countDown()
                         }
                     }
@@ -1788,7 +1796,7 @@ class RowColumnTest : LayoutTest() {
         waitForDraw(root)
 
         assertEquals(
-            (sizeDp * 3).toIntPx(),
+            (sizeDp * 3).roundToPx(),
             columnSize.height
         )
     }
@@ -1887,7 +1895,7 @@ class RowColumnTest : LayoutTest() {
         waitForDraw(root)
 
         assertEquals(
-            (sizeDp * 2).toIntPx(),
+            (sizeDp * 2).roundToPx(),
             columnSize.width
         )
     }
@@ -1920,7 +1928,7 @@ class RowColumnTest : LayoutTest() {
         waitForDraw(root)
 
         assertEquals(
-            min(root.height, columnHeightDp.toIntPx()),
+            min(root.height, columnHeightDp.roundToPx()),
             columnSize.height
         )
     }
@@ -1962,7 +1970,7 @@ class RowColumnTest : LayoutTest() {
         waitForDraw(root)
 
         assertEquals(
-            min(root.height, columnHeightDp.toIntPx()),
+            min(root.height, columnHeightDp.roundToPx()),
             columnSize.height
         )
     }
@@ -1995,7 +2003,7 @@ class RowColumnTest : LayoutTest() {
         waitForDraw(root)
 
         assertEquals(
-            columnHeightDp.toIntPx(),
+            columnHeightDp.roundToPx(),
             columnSize.height
         )
     }
@@ -2028,7 +2036,7 @@ class RowColumnTest : LayoutTest() {
         waitForDraw(root)
 
         assertEquals(
-            min(root.width, columnWidthDp.toIntPx()),
+            min(root.width, columnWidthDp.roundToPx()),
             columnSize.width
         )
     }
@@ -2061,7 +2069,7 @@ class RowColumnTest : LayoutTest() {
         waitForDraw(root)
 
         assertEquals(
-            columnWidthDp.toIntPx(),
+            columnWidthDp.roundToPx(),
             columnSize.width
         )
     }
@@ -2073,9 +2081,9 @@ class RowColumnTest : LayoutTest() {
     )
     fun testColumn_withMinMainAxisSize() = with(density) {
         val sizeDp = 50.toDp()
-        val size = sizeDp.toIntPx()
+        val size = sizeDp.roundToPx()
         val columnHeightDp = 250.toDp()
-        val columnHeight = columnHeightDp.toIntPx()
+        val columnHeight = columnHeightDp.roundToPx()
 
         val drawLatch = CountDownLatch(2)
         var columnSize: IntSize = IntSize.Zero
@@ -2132,19 +2140,29 @@ class RowColumnTest : LayoutTest() {
                         Column {
                             BoxWithConstraints {
                                 assertEquals(Constraints(), constraints)
-                                FixedSizeLayout(0, noWeightChildHeight.toIntPx(), mapOf())
+                                FixedSizeLayout(
+                                    0,
+                                    noWeightChildHeight.roundToPx(),
+                                    mapOf()
+                                )
                             }
                             BoxWithConstraints {
                                 assertEquals(Constraints(), constraints)
-                                FixedSizeLayout(0, noWeightChildHeight.toIntPx(), mapOf())
+                                FixedSizeLayout(
+                                    0,
+                                    noWeightChildHeight.roundToPx(),
+                                    mapOf()
+                                )
                             }
                             Layout({}, Modifier.weight(1f)) { _, constraints ->
                                 assertEquals(
-                                    columnMinHeight.toIntPx() - noWeightChildHeight.toIntPx() * 2,
+                                    columnMinHeight.roundToPx() -
+                                        noWeightChildHeight.roundToPx() * 2,
                                     constraints.minHeight
                                 )
                                 assertEquals(
-                                    columnMinHeight.toIntPx() - noWeightChildHeight.toIntPx() * 2,
+                                    columnMinHeight.roundToPx() -
+                                        noWeightChildHeight.roundToPx() * 2,
                                     constraints.maxHeight
                                 )
                                 latch.countDown()
@@ -2177,22 +2195,31 @@ class RowColumnTest : LayoutTest() {
                         BoxWithConstraints {
                             assertEquals(
                                 Constraints(
-                                    maxWidth = availableWidth.toIntPx(),
-                                    maxHeight = availableHeight.toIntPx()
+                                    maxWidth = availableWidth.roundToPx(),
+                                    maxHeight = availableHeight.roundToPx()
                                 ),
                                 constraints
                             )
-                            FixedSizeLayout(childWidth.toIntPx(), childHeight.toIntPx(), mapOf())
+                            FixedSizeLayout(
+                                childWidth.roundToPx(),
+                                childHeight.roundToPx(),
+                                mapOf()
+                            )
                         }
                         BoxWithConstraints {
                             assertEquals(
                                 Constraints(
-                                    maxWidth = availableWidth.toIntPx(),
-                                    maxHeight = availableHeight.toIntPx() - childHeight.toIntPx()
+                                    maxWidth = availableWidth.roundToPx(),
+                                    maxHeight = availableHeight.roundToPx() -
+                                        childHeight.roundToPx()
                                 ),
                                 constraints
                             )
-                            FixedSizeLayout(childWidth.toIntPx(), childHeight.toIntPx(), mapOf())
+                            FixedSizeLayout(
+                                childWidth.roundToPx(),
+                                childHeight.roundToPx(),
+                                mapOf()
+                            )
                             latch.countDown()
                         }
                     }
@@ -2207,7 +2234,7 @@ class RowColumnTest : LayoutTest() {
     @Test
     fun testRow_withStartArrangement() = with(density) {
         val sizeDp = 50.toDp()
-        val size = sizeDp.toIntPx()
+        val size = sizeDp.roundToPx()
 
         val drawLatch = CountDownLatch(4)
         val childPosition = arrayOf(
@@ -2253,7 +2280,7 @@ class RowColumnTest : LayoutTest() {
     @Test
     fun testRow_withEndArrangement() = with(density) {
         val sizeDp = 50.toDp()
-        val size = sizeDp.toIntPx()
+        val size = sizeDp.roundToPx()
 
         val drawLatch = CountDownLatch(4)
         val childPosition = arrayOf(
@@ -2299,7 +2326,7 @@ class RowColumnTest : LayoutTest() {
     @Test
     fun testRow_withCenterArrangement() = with(density) {
         val sizeDp = 50.toDp()
-        val size = sizeDp.toIntPx()
+        val size = sizeDp.roundToPx()
 
         val drawLatch = CountDownLatch(4)
         val childPosition = arrayOf(
@@ -2355,7 +2382,7 @@ class RowColumnTest : LayoutTest() {
     @Test
     fun testRow_withSpaceEvenlyArrangement() = with(density) {
         val sizeDp = 50.toDp()
-        val size = sizeDp.toIntPx()
+        val size = sizeDp.roundToPx()
 
         val drawLatch = CountDownLatch(4)
         val childPosition = arrayOf(
@@ -2410,7 +2437,7 @@ class RowColumnTest : LayoutTest() {
     @Test
     fun testRow_withSpaceBetweenArrangement() = with(density) {
         val sizeDp = 50.toDp()
-        val size = sizeDp.toIntPx()
+        val size = sizeDp.roundToPx()
 
         val drawLatch = CountDownLatch(4)
         val childPosition = arrayOf(
@@ -2463,7 +2490,7 @@ class RowColumnTest : LayoutTest() {
     @Test
     fun testRow_withSpaceAroundArrangement() = with(density) {
         val sizeDp = 50.toDp()
-        val size = sizeDp.toIntPx()
+        val size = sizeDp.roundToPx()
 
         val drawLatch = CountDownLatch(4)
         val childPosition = arrayOf(
@@ -2669,7 +2696,7 @@ class RowColumnTest : LayoutTest() {
     @Test
     fun testColumn_withTopArrangement() = with(density) {
         val sizeDp = 50.toDp()
-        val size = sizeDp.toIntPx()
+        val size = sizeDp.roundToPx()
 
         val drawLatch = CountDownLatch(4)
         val childPosition = arrayOf(
@@ -2714,7 +2741,7 @@ class RowColumnTest : LayoutTest() {
     @Test
     fun testColumn_withBottomArrangement() = with(density) {
         val sizeDp = 50.toDp()
-        val size = sizeDp.toIntPx()
+        val size = sizeDp.roundToPx()
 
         val drawLatch = CountDownLatch(4)
         val childPosition = arrayOf(
@@ -2760,7 +2787,7 @@ class RowColumnTest : LayoutTest() {
     @Test
     fun testColumn_withCenterArrangement() = with(density) {
         val sizeDp = 50.toDp()
-        val size = sizeDp.toIntPx()
+        val size = sizeDp.roundToPx()
 
         val drawLatch = CountDownLatch(4)
         val childPosition = arrayOf(
@@ -2819,7 +2846,7 @@ class RowColumnTest : LayoutTest() {
     @Test
     fun testColumn_withSpaceEvenlyArrangement() = with(density) {
         val sizeDp = 50.toDp()
-        val size = sizeDp.toIntPx()
+        val size = sizeDp.roundToPx()
 
         val drawLatch = CountDownLatch(4)
         val childPosition = arrayOf(
@@ -2883,7 +2910,7 @@ class RowColumnTest : LayoutTest() {
     @Test
     fun testColumn_withSpaceBetweenArrangement() = with(density) {
         val sizeDp = 50.toDp()
-        val size = sizeDp.toIntPx()
+        val size = sizeDp.roundToPx()
 
         val drawLatch = CountDownLatch(4)
         val childPosition = arrayOf(
@@ -2936,7 +2963,7 @@ class RowColumnTest : LayoutTest() {
     @Test
     fun testColumn_withSpaceAroundArrangement() = with(density) {
         val sizeDp = 50.toDp()
-        val size = sizeDp.toIntPx()
+        val size = sizeDp.roundToPx()
 
         val drawLatch = CountDownLatch(4)
         val childPosition = arrayOf(
@@ -3141,7 +3168,7 @@ class RowColumnTest : LayoutTest() {
     fun testRow_doesNotUseMinConstraintsOnChildren() = with(density) {
         val sizeDp = 50.toDp()
         val childSizeDp = 30.toDp()
-        val childSize = childSizeDp.toIntPx()
+        val childSize = childSizeDp.roundToPx()
 
         val layoutLatch = CountDownLatch(1)
         val containerSize = Ref<IntSize>()
@@ -3171,7 +3198,7 @@ class RowColumnTest : LayoutTest() {
     fun testColumn_doesNotUseMinConstraintsOnChildren() = with(density) {
         val sizeDp = 50.toDp()
         val childSizeDp = 30.toDp()
-        val childSize = childSizeDp.toIntPx()
+        val childSize = childSizeDp.roundToPx()
 
         val layoutLatch = CountDownLatch(1)
         val containerSize = Ref<IntSize>()
@@ -3313,27 +3340,27 @@ class RowColumnTest : LayoutTest() {
             }
         ) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
             // Min width.
-            assertEquals(50.toDp().toIntPx(), minIntrinsicWidth(0.toDp().toIntPx()))
+            assertEquals(50.toDp().roundToPx(), minIntrinsicWidth(0.toDp().roundToPx()))
             assertEquals(
-                25.toDp().toIntPx() * 2 + 50.toDp().toIntPx(),
-                minIntrinsicWidth(25.toDp().toIntPx())
+                25.toDp().roundToPx() * 2 + 50.toDp().roundToPx(),
+                minIntrinsicWidth(25.toDp().roundToPx())
             )
-            assertEquals(50.toDp().toIntPx(), minIntrinsicWidth(Constraints.Infinity))
+            assertEquals(50.toDp().roundToPx(), minIntrinsicWidth(Constraints.Infinity))
             // Min height.
-            assertEquals(40.toDp().toIntPx(), minIntrinsicHeight(0.toDp().toIntPx()))
-            assertEquals(40.toDp().toIntPx(), minIntrinsicHeight(70.toDp().toIntPx()))
-            assertEquals(40.toDp().toIntPx(), minIntrinsicHeight(Constraints.Infinity))
+            assertEquals(40.toDp().roundToPx(), minIntrinsicHeight(0.toDp().roundToPx()))
+            assertEquals(40.toDp().roundToPx(), minIntrinsicHeight(70.toDp().roundToPx()))
+            assertEquals(40.toDp().roundToPx(), minIntrinsicHeight(Constraints.Infinity))
             // Max width.
-            assertEquals(50.toDp().toIntPx(), maxIntrinsicWidth(0.toDp().toIntPx()))
+            assertEquals(50.toDp().roundToPx(), maxIntrinsicWidth(0.toDp().roundToPx()))
             assertEquals(
-                25.toDp().toIntPx() * 2 + 50.toDp().toIntPx(),
-                maxIntrinsicWidth(25.toDp().toIntPx())
+                25.toDp().roundToPx() * 2 + 50.toDp().roundToPx(),
+                maxIntrinsicWidth(25.toDp().roundToPx())
             )
-            assertEquals(50.toDp().toIntPx(), maxIntrinsicWidth(Constraints.Infinity))
+            assertEquals(50.toDp().roundToPx(), maxIntrinsicWidth(Constraints.Infinity))
             // Max height.
-            assertEquals(40.toDp().toIntPx(), maxIntrinsicHeight(0.toDp().toIntPx()))
-            assertEquals(40.toDp().toIntPx(), maxIntrinsicHeight(70.toDp().toIntPx()))
-            assertEquals(40.toDp().toIntPx(), maxIntrinsicHeight(Constraints.Infinity))
+            assertEquals(40.toDp().roundToPx(), maxIntrinsicHeight(0.toDp().roundToPx()))
+            assertEquals(40.toDp().roundToPx(), maxIntrinsicHeight(70.toDp().roundToPx()))
+            assertEquals(40.toDp().roundToPx(), maxIntrinsicHeight(Constraints.Infinity))
         }
     }
 
@@ -3508,48 +3535,48 @@ class RowColumnTest : LayoutTest() {
         ) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
             // Min width.
             assertEquals(
-                30.toDp().toIntPx() / 2 * 7 + 20.toDp().toIntPx(),
+                30.toDp().roundToPx() / 2 * 7 + 20.toDp().roundToPx(),
                 minIntrinsicWidth(0)
             )
             assertEquals(
-                30.toDp().toIntPx() / 2 * 7 + 20.toDp().toIntPx(),
-                minIntrinsicWidth(10.toDp().toIntPx())
+                30.toDp().roundToPx() / 2 * 7 + 20.toDp().roundToPx(),
+                minIntrinsicWidth(10.toDp().roundToPx())
             )
             assertEquals(
-                25.toDp().toIntPx() * 2 / 2 * 7 + 20.toDp().toIntPx(),
-                minIntrinsicWidth(25.toDp().toIntPx())
+                25.toDp().roundToPx() * 2 / 2 * 7 + 20.toDp().roundToPx(),
+                minIntrinsicWidth(25.toDp().roundToPx())
             )
             assertEquals(
-                30.toDp().toIntPx() / 2 * 7 + 20.toDp().toIntPx(),
+                30.toDp().roundToPx() / 2 * 7 + 20.toDp().roundToPx(),
                 minIntrinsicWidth(Constraints.Infinity)
             )
             // Min height.
-            assertEquals(40.toDp().toIntPx(), minIntrinsicHeight(0.toDp().toIntPx()))
-            assertEquals(40.toDp().toIntPx(), minIntrinsicHeight(125.toDp().toIntPx()))
-            assertEquals(50.toDp().toIntPx(), minIntrinsicHeight(370.toDp().toIntPx()))
-            assertEquals(40.toDp().toIntPx(), minIntrinsicHeight(Constraints.Infinity))
+            assertEquals(40.toDp().roundToPx(), minIntrinsicHeight(0.toDp().roundToPx()))
+            assertEquals(40.toDp().roundToPx(), minIntrinsicHeight(125.toDp().roundToPx()))
+            assertEquals(50.toDp().roundToPx(), minIntrinsicHeight(370.toDp().roundToPx()))
+            assertEquals(40.toDp().roundToPx(), minIntrinsicHeight(Constraints.Infinity))
             // Max width.
             assertEquals(
-                30.toDp().toIntPx() / 2 * 7 + 20.toDp().toIntPx(),
+                30.toDp().roundToPx() / 2 * 7 + 20.toDp().roundToPx(),
                 maxIntrinsicWidth(0)
             )
             assertEquals(
-                30.toDp().toIntPx() / 2 * 7 + 20.toDp().toIntPx(),
-                maxIntrinsicWidth(10.toDp().toIntPx())
+                30.toDp().roundToPx() / 2 * 7 + 20.toDp().roundToPx(),
+                maxIntrinsicWidth(10.toDp().roundToPx())
             )
             assertEquals(
-                25.toDp().toIntPx() * 2 / 2 * 7 + 20.toDp().toIntPx(),
-                maxIntrinsicWidth(25.toDp().toIntPx())
+                25.toDp().roundToPx() * 2 / 2 * 7 + 20.toDp().roundToPx(),
+                maxIntrinsicWidth(25.toDp().roundToPx())
             )
             assertEquals(
-                30.toDp().toIntPx() / 2 * 7 + 20.toDp().toIntPx(),
+                30.toDp().roundToPx() / 2 * 7 + 20.toDp().roundToPx(),
                 maxIntrinsicWidth(Constraints.Infinity)
             )
             // Max height.
-            assertEquals(40.toDp().toIntPx(), maxIntrinsicHeight(0.toDp().toIntPx()))
-            assertEquals(40.toDp().toIntPx(), maxIntrinsicHeight(125.toDp().toIntPx()))
-            assertEquals(50.toDp().toIntPx(), maxIntrinsicHeight(370.toDp().toIntPx()))
-            assertEquals(40.toDp().toIntPx(), maxIntrinsicHeight(Constraints.Infinity))
+            assertEquals(40.toDp().roundToPx(), maxIntrinsicHeight(0.toDp().roundToPx()))
+            assertEquals(40.toDp().roundToPx(), maxIntrinsicHeight(125.toDp().roundToPx()))
+            assertEquals(50.toDp().roundToPx(), maxIntrinsicHeight(370.toDp().roundToPx()))
+            assertEquals(40.toDp().roundToPx(), maxIntrinsicHeight(Constraints.Infinity))
         }
     }
 
@@ -3667,27 +3694,27 @@ class RowColumnTest : LayoutTest() {
             }
         ) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
             // Min width.
-            assertEquals(50.toDp().toIntPx(), minIntrinsicWidth(0.toDp().toIntPx()))
-            assertEquals(50.toDp().toIntPx(), minIntrinsicWidth(25.toDp().toIntPx()))
-            assertEquals(50.toDp().toIntPx(), minIntrinsicWidth(Constraints.Infinity))
+            assertEquals(50.toDp().roundToPx(), minIntrinsicWidth(0.toDp().roundToPx()))
+            assertEquals(50.toDp().roundToPx(), minIntrinsicWidth(25.toDp().roundToPx()))
+            assertEquals(50.toDp().roundToPx(), minIntrinsicWidth(Constraints.Infinity))
             // Min height.
-            assertEquals(40.toDp().toIntPx(), minIntrinsicHeight(0.toDp().toIntPx()))
+            assertEquals(40.toDp().roundToPx(), minIntrinsicHeight(0.toDp().roundToPx()))
             assertEquals(
-                50.toDp().toIntPx() / 2 + 40.toDp().toIntPx(),
-                minIntrinsicHeight(50.toDp().toIntPx())
+                50.toDp().roundToPx() / 2 + 40.toDp().roundToPx(),
+                minIntrinsicHeight(50.toDp().roundToPx())
             )
-            assertEquals(40.toDp().toIntPx(), minIntrinsicHeight(Constraints.Infinity))
+            assertEquals(40.toDp().roundToPx(), minIntrinsicHeight(Constraints.Infinity))
             // Max width.
-            assertEquals(50.toDp().toIntPx(), maxIntrinsicWidth(0.toDp().toIntPx()))
-            assertEquals(50.toDp().toIntPx(), maxIntrinsicWidth(25.toDp().toIntPx()))
-            assertEquals(50.toDp().toIntPx(), maxIntrinsicWidth(Constraints.Infinity))
+            assertEquals(50.toDp().roundToPx(), maxIntrinsicWidth(0.toDp().roundToPx()))
+            assertEquals(50.toDp().roundToPx(), maxIntrinsicWidth(25.toDp().roundToPx()))
+            assertEquals(50.toDp().roundToPx(), maxIntrinsicWidth(Constraints.Infinity))
             // Max height.
-            assertEquals(40.toDp().toIntPx(), maxIntrinsicHeight(0.toDp().toIntPx()))
+            assertEquals(40.toDp().roundToPx(), maxIntrinsicHeight(0.toDp().roundToPx()))
             assertEquals(
-                50.toDp().toIntPx() / 2 + 40.toDp().toIntPx(),
-                maxIntrinsicHeight(50.toDp().toIntPx())
+                50.toDp().roundToPx() / 2 + 40.toDp().roundToPx(),
+                maxIntrinsicHeight(50.toDp().roundToPx())
             )
-            assertEquals(40.toDp().toIntPx(), maxIntrinsicHeight(Constraints.Infinity))
+            assertEquals(40.toDp().roundToPx(), maxIntrinsicHeight(Constraints.Infinity))
         }
     }
 
@@ -3836,47 +3863,47 @@ class RowColumnTest : LayoutTest() {
             }
         ) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
             // Min width.
-            assertEquals(40.toDp().toIntPx(), minIntrinsicWidth(0.toDp().toIntPx()))
-            assertEquals(40.toDp().toIntPx(), minIntrinsicWidth(125.toDp().toIntPx()))
-            assertEquals(50.toDp().toIntPx(), minIntrinsicWidth(370.toDp().toIntPx()))
-            assertEquals(40.toDp().toIntPx(), minIntrinsicWidth(Constraints.Infinity))
+            assertEquals(40.toDp().roundToPx(), minIntrinsicWidth(0.toDp().roundToPx()))
+            assertEquals(40.toDp().roundToPx(), minIntrinsicWidth(125.toDp().roundToPx()))
+            assertEquals(50.toDp().roundToPx(), minIntrinsicWidth(370.toDp().roundToPx()))
+            assertEquals(40.toDp().roundToPx(), minIntrinsicWidth(Constraints.Infinity))
             // Min height.
             assertEquals(
-                30.toDp().toIntPx() / 2 * 7 + 20.toDp().toIntPx(),
+                30.toDp().roundToPx() / 2 * 7 + 20.toDp().roundToPx(),
                 minIntrinsicHeight(0)
             )
             assertEquals(
-                30.toDp().toIntPx() / 2 * 7 + 20.toDp().toIntPx(),
-                minIntrinsicHeight(10.toDp().toIntPx())
+                30.toDp().roundToPx() / 2 * 7 + 20.toDp().roundToPx(),
+                minIntrinsicHeight(10.toDp().roundToPx())
             )
             assertEquals(
-                25.toDp().toIntPx() * 2 / 2 * 7 + 20.toDp().toIntPx(),
-                minIntrinsicHeight(25.toDp().toIntPx())
+                25.toDp().roundToPx() * 2 / 2 * 7 + 20.toDp().roundToPx(),
+                minIntrinsicHeight(25.toDp().roundToPx())
             )
             assertEquals(
-                30.toDp().toIntPx() / 2 * 7 + 20.toDp().toIntPx(),
+                30.toDp().roundToPx() / 2 * 7 + 20.toDp().roundToPx(),
                 minIntrinsicHeight(Constraints.Infinity)
             )
             // Max width.
-            assertEquals(40.toDp().toIntPx(), maxIntrinsicWidth(0.toDp().toIntPx()))
-            assertEquals(40.toDp().toIntPx(), maxIntrinsicWidth(125.toDp().toIntPx()))
-            assertEquals(50.toDp().toIntPx(), maxIntrinsicWidth(370.toDp().toIntPx()))
-            assertEquals(40.toDp().toIntPx(), maxIntrinsicWidth(Constraints.Infinity))
+            assertEquals(40.toDp().roundToPx(), maxIntrinsicWidth(0.toDp().roundToPx()))
+            assertEquals(40.toDp().roundToPx(), maxIntrinsicWidth(125.toDp().roundToPx()))
+            assertEquals(50.toDp().roundToPx(), maxIntrinsicWidth(370.toDp().roundToPx()))
+            assertEquals(40.toDp().roundToPx(), maxIntrinsicWidth(Constraints.Infinity))
             // Max height.
             assertEquals(
-                30.toDp().toIntPx() / 2 * 7 + 20.toDp().toIntPx(),
+                30.toDp().roundToPx() / 2 * 7 + 20.toDp().roundToPx(),
                 maxIntrinsicHeight(0)
             )
             assertEquals(
-                30.toDp().toIntPx() / 2 * 7 + 20.toDp().toIntPx(),
-                maxIntrinsicHeight(10.toDp().toIntPx())
+                30.toDp().roundToPx() / 2 * 7 + 20.toDp().roundToPx(),
+                maxIntrinsicHeight(10.toDp().roundToPx())
             )
             assertEquals(
-                25.toDp().toIntPx() * 2 / 2 * 7 + 20.toDp().toIntPx(),
-                maxIntrinsicHeight(25.toDp().toIntPx())
+                25.toDp().roundToPx() * 2 / 2 * 7 + 20.toDp().roundToPx(),
+                maxIntrinsicHeight(25.toDp().roundToPx())
             )
             assertEquals(
-                30.toDp().toIntPx() / 2 * 7 + 20.toDp().toIntPx(),
+                30.toDp().roundToPx() / 2 * 7 + 20.toDp().roundToPx(),
                 maxIntrinsicHeight(Constraints.Infinity)
             )
         }
@@ -3895,15 +3922,15 @@ class RowColumnTest : LayoutTest() {
                     Modifier.width(dividerWidth).fillMaxHeight().onGloballyPositioned {
                         assertEquals(
                             it.size.height,
-                            (rowWidth.toIntPx() - dividerWidth.toIntPx()) / 2
+                            (rowWidth.roundToPx() - dividerWidth.roundToPx()) / 2
                         )
                         positionedLatch.countDown()
                     }
                 ) {}
                 Layout(
                     content = {},
-                    minIntrinsicWidthMeasureBlock = { _, _ -> rowWidth.toIntPx() / 10 },
-                    maxIntrinsicWidthMeasureBlock = { _, _ -> rowWidth.toIntPx() * 2 },
+                    minIntrinsicWidthMeasureBlock = { _, _ -> rowWidth.roundToPx() / 10 },
+                    maxIntrinsicWidthMeasureBlock = { _, _ -> rowWidth.roundToPx() * 2 },
                     minIntrinsicHeightMeasureBlock = { _, w -> w / 2 },
                     maxIntrinsicHeightMeasureBlock = { _, w -> w / 2 }
                 ) { _, constraints -> layout(constraints.maxWidth, constraints.maxWidth / 2) {} }
@@ -3926,7 +3953,7 @@ class RowColumnTest : LayoutTest() {
                     Modifier.height(dividerHeight).fillMaxWidth().onGloballyPositioned {
                         assertEquals(
                             it.size.width,
-                            (columnHeight.toIntPx() - dividerHeight.toIntPx()) / 2
+                            (columnHeight.roundToPx() - dividerHeight.roundToPx()) / 2
                         )
                         positionedLatch.countDown()
                     }
@@ -3935,8 +3962,8 @@ class RowColumnTest : LayoutTest() {
                     content = {},
                     minIntrinsicWidthMeasureBlock = { _, h -> h / 2 },
                     maxIntrinsicWidthMeasureBlock = { _, h -> h / 2 },
-                    minIntrinsicHeightMeasureBlock = { _, _ -> columnHeight.toIntPx() / 10 },
-                    maxIntrinsicHeightMeasureBlock = { _, _ -> columnHeight.toIntPx() * 2 }
+                    minIntrinsicHeightMeasureBlock = { _, _ -> columnHeight.roundToPx() / 10 },
+                    maxIntrinsicHeightMeasureBlock = { _, _ -> columnHeight.roundToPx() * 2 }
                 ) { _, constraints -> layout(constraints.maxHeight / 2, constraints.maxHeight) {} }
             }
         }
@@ -4017,7 +4044,7 @@ class RowColumnTest : LayoutTest() {
     @Test
     fun testRow_Rtl_arrangementStart() = with(density) {
         val sizeDp = 35.toDp()
-        val size = sizeDp.toIntPx()
+        val size = sizeDp.roundToPx()
 
         val drawLatch = CountDownLatch(2)
         val childPosition = arrayOf(Offset.Zero, Offset.Zero)
@@ -4358,7 +4385,7 @@ class RowColumnTest : LayoutTest() {
     @Test
     fun testColumn_Rtl_gravityStart() = with(density) {
         val sizeDp = 35.toDp()
-        val size = sizeDp.toIntPx()
+        val size = sizeDp.roundToPx()
 
         val drawLatch = CountDownLatch(2)
         val childPosition = arrayOf(Offset.Zero, Offset.Zero)
@@ -4403,7 +4430,7 @@ class RowColumnTest : LayoutTest() {
     @Test
     fun testColumn_Rtl_gravityEnd() = with(density) {
         val sizeDp = 50.toDp()
-        val size = sizeDp.toIntPx()
+        val size = sizeDp.roundToPx()
 
         val drawLatch = CountDownLatch(2)
         val childPosition = arrayOf(Offset.Zero, Offset.Zero)
@@ -4442,7 +4469,7 @@ class RowColumnTest : LayoutTest() {
     @Test
     fun testColumn_Rtl_gravityAlignBy() = with(density) {
         val sizeDp = 50.toDp()
-        val size = sizeDp.toIntPx()
+        val size = sizeDp.roundToPx()
 
         val drawLatch = CountDownLatch(2)
         val childPosition = arrayOf(Offset.Zero, Offset.Zero)
@@ -5375,14 +5402,14 @@ private fun BaselineTestLayout(
         content = content,
         modifier = modifier,
         measureBlock = { _, constraints ->
-            val widthPx = max(width.toIntPx(), constraints.minWidth)
+            val widthPx = max(width.roundToPx(), constraints.minWidth)
             val heightPx =
-                max(height.toIntPx(), constraints.minHeight)
+                max(height.roundToPx(), constraints.minHeight)
             layout(
                 widthPx, heightPx,
                 mapOf(
-                    horizontalLine to baseline.toIntPx(),
-                    TestVerticalLine to baseline.toIntPx()
+                    horizontalLine to baseline.roundToPx(),
+                    TestVerticalLine to baseline.roundToPx()
                 )
             ) {}
         }

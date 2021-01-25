@@ -451,10 +451,10 @@ private fun IconsWithTextFieldLayout(
             Box(Modifier.layoutId(TextFieldId).then(padding)) { textField() }
         }
     ) { measurables, incomingConstraints ->
-        val topBottomPadding = TextFieldPadding.toIntPx()
-        val baseLineOffset = FirstBaselineOffset.toIntPx()
-        val bottomPadding = LastBaselineOffset.toIntPx()
-        val topPadding = TextFieldTopPadding.toIntPx()
+        val topBottomPadding = TextFieldPadding.roundToPx()
+        val baseLineOffset = FirstBaselineOffset.roundToPx()
+        val bottomPadding = LastBaselineOffset.roundToPx()
+        val topPadding = TextFieldTopPadding.roundToPx()
         var occupiedSpaceHorizontally = 0
 
         // measure leading icon

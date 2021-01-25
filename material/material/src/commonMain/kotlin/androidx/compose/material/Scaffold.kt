@@ -251,9 +251,9 @@ private fun ScaffoldLayout(
             val fabLeftOffset = if (fabWidth != 0 && fabHeight != 0) {
                 if (fabPosition == FabPosition.End) {
                     if (layoutDirection == LayoutDirection.Ltr) {
-                        layoutWidth - FabSpacing.toIntPx() - fabWidth
+                        layoutWidth - FabSpacing.roundToPx() - fabWidth
                     } else {
-                        FabSpacing.toIntPx()
+                        FabSpacing.roundToPx()
                     }
                 } else {
                     (layoutWidth - fabWidth) / 2
@@ -284,7 +284,7 @@ private fun ScaffoldLayout(
 
             val fabOffsetFromBottom = if (fabWidth != 0 && fabHeight != 0) {
                 if (bottomBarHeight == 0) {
-                    fabHeight + FabSpacing.toIntPx()
+                    fabHeight + FabSpacing.roundToPx()
                 } else {
                     if (isFabDocked) {
                         // Total height is the bottom bar height + half the FAB height
@@ -292,7 +292,7 @@ private fun ScaffoldLayout(
                     } else {
                         // Total height is the bottom bar height + the FAB height + the padding
                         // between the FAB and bottom bar
-                        bottomBarHeight + fabHeight + FabSpacing.toIntPx()
+                        bottomBarHeight + fabHeight + FabSpacing.roundToPx()
                     }
                 }
             } else {

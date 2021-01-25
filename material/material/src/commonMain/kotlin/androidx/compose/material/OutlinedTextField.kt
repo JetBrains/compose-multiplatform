@@ -430,7 +430,7 @@ private fun IconsWithTextFieldLayout(
     ) { measurables, incomingConstraints ->
         // used to calculate the constraints for measuring elements that will be placed in a row
         var occupiedSpaceHorizontally = 0
-        val bottomPadding = TextFieldPadding.toIntPx()
+        val bottomPadding = TextFieldPadding.roundToPx()
 
         // measure leading icon
         val constraints =

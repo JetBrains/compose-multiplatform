@@ -1113,7 +1113,7 @@ class State(val density: Density) : SolverState() {
 
     override fun convertDimension(value: Any?): Int {
         return if (value is Dp) {
-            with(density) { value.toIntPx() }
+            with(density) { value.roundToPx() }
         } else {
             super.convertDimension(value)
         }

@@ -360,7 +360,7 @@ private fun BaselinesOffsetColumn(
             } else 0
             val topPadding = max(
                 0,
-                offsets[index].toIntPx() - placeable[FirstBaseline] - toPreviousBaseline
+                offsets[index].roundToPx() - placeable[FirstBaseline] - toPreviousBaseline
             )
             y[index] = topPadding + containerHeight
             containerHeight += topPadding + placeable.height
@@ -393,7 +393,7 @@ private fun OffsetToBaselineOrCenter(
         val y: Int
         val containerHeight: Int
         if (baseline != AlignmentLine.Unspecified) {
-            y = offset.toIntPx() - baseline
+            y = offset.roundToPx() - baseline
             containerHeight = max(constraints.minHeight, y + placeable.height)
         } else {
             containerHeight = max(constraints.minHeight, placeable.height)

@@ -208,7 +208,7 @@ class MultiParagraphIntegrationTest {
             val text = createAnnotatedString(List(3) { "a".repeat(lineLength) })
 
             val fontSize = 50.sp
-            val fontSizeInPx = fontSize.toIntPx()
+            val fontSizeInPx = fontSize.roundToPx()
             // each line contains 2 character
             val width = 2 * fontSizeInPx
 

@@ -367,7 +367,7 @@ class TextFieldTest {
         }
 
         with(rule.density) {
-            assertThat(size).isEqualTo(parentSize.toIntPx() - boxSize.toIntPx())
+            assertThat(size).isEqualTo(parentSize.roundToPx() - boxSize.roundToPx())
         }
     }
 

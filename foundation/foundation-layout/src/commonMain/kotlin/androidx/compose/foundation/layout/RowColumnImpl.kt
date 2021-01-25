@@ -61,7 +61,7 @@ internal fun rowColumnMeasureBlocks(
         maxIntrinsicHeightMeasureBlock = MaxIntrinsicHeightMeasureBlock(orientation)
     ) { measurables, outerConstraints ->
         val constraints = OrientationIndependentConstraints(outerConstraints, orientation)
-        val arrangementSpacingPx = arrangementSpacing.toIntPx()
+        val arrangementSpacingPx = arrangementSpacing.roundToPx()
 
         var totalWeight = 0f
         var fixedSpace = 0

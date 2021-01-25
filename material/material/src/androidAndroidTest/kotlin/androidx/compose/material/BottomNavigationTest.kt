@@ -156,7 +156,7 @@ class BottomNavigationTest {
             val totalWidth = parentCoords.size.width
 
             val expectedItemWidth = totalWidth / 4
-            val expectedItemHeight = 56.dp.toIntPx()
+            val expectedItemHeight = 56.dp.roundToPx()
 
             Truth.assertThat(itemCoords.size).isEqualTo(4)
 

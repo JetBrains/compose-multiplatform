@@ -254,7 +254,7 @@ class PopupTest {
         // Click outside the popup
         val outsideX = 0
         val outsideY = with(rule.density) {
-            rule.onAllNodes(isRoot()).onFirst().getUnclippedBoundsInRoot().height.toIntPx() / 2
+            rule.onAllNodes(isRoot()).onFirst().getUnclippedBoundsInRoot().height.roundToPx() / 2
         }
         UiDevice.getInstance(getInstrumentation()).click(outsideX, outsideY)
 
@@ -312,7 +312,7 @@ class PopupTest {
         // Click outside the popup
         val outsideX = 0
         val outsideY = with(rule.density) {
-            rule.onAllNodes(isRoot()).onFirst().getUnclippedBoundsInRoot().height.toIntPx() / 2
+            rule.onAllNodes(isRoot()).onFirst().getUnclippedBoundsInRoot().height.roundToPx() / 2
         }
         UiDevice.getInstance(getInstrumentation()).click(outsideX, outsideY)
 

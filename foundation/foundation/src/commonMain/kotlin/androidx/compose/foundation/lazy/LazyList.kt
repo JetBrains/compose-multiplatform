@@ -86,15 +86,15 @@ internal fun LazyList(
         // this will update the scope object if the constrains have been changed
         cachingItemContentFactory.updateItemScope(this, constraints)
 
-        val startContentPaddingPx = startContentPadding.toIntPx()
-        val endContentPaddingPx = endContentPadding.toIntPx()
+        val startContentPaddingPx = startContentPadding.roundToPx()
+        val endContentPaddingPx = endContentPadding.roundToPx()
         val mainAxisMaxSize = (if (isVertical) constraints.maxHeight else constraints.maxWidth)
         val spaceBetweenItemsDp = if (isVertical) {
             requireNotNull(verticalArrangement).spacing
         } else {
             requireNotNull(horizontalArrangement).spacing
         }
-        val spaceBetweenItems = spaceBetweenItemsDp.toIntPx()
+        val spaceBetweenItems = spaceBetweenItemsDp.roundToPx()
 
         val itemProvider = LazyMeasuredItemProvider(
             constraints,

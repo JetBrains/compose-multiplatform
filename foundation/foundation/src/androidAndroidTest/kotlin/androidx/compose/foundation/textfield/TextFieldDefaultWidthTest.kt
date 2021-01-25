@@ -89,7 +89,7 @@ class BaseTextFieldDefaultWidthTest {
         }
 
         with(density) {
-            assertThat(size).isEqualTo(minWidth.toIntPx())
+            assertThat(size).isEqualTo(minWidth.roundToPx())
         }
     }
 
@@ -111,7 +111,7 @@ class BaseTextFieldDefaultWidthTest {
         }
 
         with(density) {
-            assertThat(size).isEqualTo(width.toIntPx())
+            assertThat(size).isEqualTo(width.roundToPx())
         }
     }
 
@@ -168,7 +168,7 @@ class BaseTextFieldDefaultWidthTest {
         }
 
         with(density) {
-            assertThat(size).isEqualTo(textFieldWidth.toIntPx())
+            assertThat(size).isEqualTo(textFieldWidth.roundToPx())
         }
     }
 

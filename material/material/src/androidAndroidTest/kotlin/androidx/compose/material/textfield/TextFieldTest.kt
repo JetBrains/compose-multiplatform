@@ -311,10 +311,10 @@ class TextFieldTest {
             assertThat(labelSize.value?.width).isGreaterThan(0)
             // centered position
             assertThat(labelPosition.value?.x).isEqualTo(
-                ExpectedPadding.toIntPx().toFloat()
+                ExpectedPadding.roundToPx().toFloat()
             )
             assertThat(labelPosition.value?.y).isEqualTo(
-                ((ExpectedDefaultTextFieldHeight.toIntPx() - labelSize.value!!.height) / 2f)
+                ((ExpectedDefaultTextFieldHeight.roundToPx() - labelSize.value!!.height) / 2f)
                     .roundToInt().toFloat()
             )
         }
@@ -352,10 +352,10 @@ class TextFieldTest {
             assertThat(labelSize.value?.width).isGreaterThan(0)
             // centered position
             assertThat(labelPosition.value?.x).isEqualTo(
-                ExpectedPadding.toIntPx().toFloat()
+                ExpectedPadding.roundToPx().toFloat()
             )
             assertThat(labelPosition.value?.y).isEqualTo(
-                TextFieldPadding.toIntPx()
+                TextFieldPadding.roundToPx()
             )
         }
     }
@@ -391,10 +391,10 @@ class TextFieldTest {
             assertThat(labelSize.value?.width).isGreaterThan(0)
             // centered position
             assertThat(labelPosition.value?.x).isEqualTo(
-                ExpectedPadding.toIntPx().toFloat()
+                ExpectedPadding.roundToPx().toFloat()
             )
             assertThat(labelPosition.value?.y).isEqualTo(
-                TextFieldPadding.toIntPx()
+                TextFieldPadding.roundToPx()
             )
         }
     }
@@ -435,10 +435,10 @@ class TextFieldTest {
             assertThat(labelSize.value?.width).isGreaterThan(0)
             // label's top position
             assertThat(labelPosition.value?.x).isEqualTo(
-                ExpectedPadding.toIntPx().toFloat()
+                ExpectedPadding.roundToPx().toFloat()
             )
             assertThat(baseline.value).isEqualTo(
-                ExpectedBaselineOffset.toIntPx().toFloat()
+                ExpectedBaselineOffset.roundToPx().toFloat()
             )
         }
     }
@@ -475,10 +475,10 @@ class TextFieldTest {
             assertThat(labelSize.value?.width).isGreaterThan(0)
             // label's top position
             assertThat(labelPosition.value?.x).isEqualTo(
-                ExpectedPadding.toIntPx().toFloat()
+                ExpectedPadding.roundToPx().toFloat()
             )
             assertThat(baseline.value).isEqualTo(
-                ExpectedBaselineOffset.toIntPx().toFloat()
+                ExpectedBaselineOffset.roundToPx().toFloat()
             )
         }
     }
@@ -518,11 +518,11 @@ class TextFieldTest {
             assertThat(placeholderSize.value?.width).isGreaterThan(0)
             // placeholder's position
             assertThat(placeholderPosition.value?.x).isEqualTo(
-                ExpectedPadding.toIntPx().toFloat()
+                ExpectedPadding.roundToPx().toFloat()
             )
             assertThat(placeholderPosition.value?.y)
                 .isEqualTo(
-                    (ExpectedBaselineOffset.toIntPx() + TopPaddingFilledTextfield.toIntPx())
+                    (ExpectedBaselineOffset.roundToPx() + TopPaddingFilledTextfield.roundToPx())
                         .toFloat()
                 )
         }
@@ -559,14 +559,14 @@ class TextFieldTest {
         rule.runOnIdleWithDensity {
             // size
             assertThat(placeholderSize.value).isNotNull()
-            assertThat(placeholderSize.value?.height).isEqualTo(20.dp.toIntPx())
+            assertThat(placeholderSize.value?.height).isEqualTo(20.dp.roundToPx())
             assertThat(placeholderSize.value?.width).isGreaterThan(0)
             // centered position
             assertThat(placeholderPosition.value?.x).isEqualTo(
-                ExpectedPadding.toIntPx().toFloat()
+                ExpectedPadding.roundToPx().toFloat()
             )
             assertThat(placeholderPosition.value?.y).isEqualTo(
-                TextFieldPadding.toIntPx()
+                TextFieldPadding.roundToPx()
             )
         }
     }
@@ -671,21 +671,21 @@ class TextFieldTest {
 
         rule.runOnIdleWithDensity {
             // leading
-            assertThat(leadingSize.value).isEqualTo(IntSize(size.toIntPx(), size.toIntPx()))
-            assertThat(leadingPosition.value?.x).isEqualTo(IconPadding.toIntPx().toFloat())
+            assertThat(leadingSize.value).isEqualTo(IntSize(size.roundToPx(), size.roundToPx()))
+            assertThat(leadingPosition.value?.x).isEqualTo(IconPadding.roundToPx().toFloat())
             assertThat(leadingPosition.value?.y).isEqualTo(
-                ((textFieldHeight.toIntPx() - leadingSize.value!!.height) / 2f).roundToInt()
+                ((textFieldHeight.roundToPx() - leadingSize.value!!.height) / 2f).roundToInt()
                     .toFloat()
             )
             // trailing
-            assertThat(trailingSize.value).isEqualTo(IntSize(size.toIntPx(), size.toIntPx()))
+            assertThat(trailingSize.value).isEqualTo(IntSize(size.roundToPx(), size.roundToPx()))
             assertThat(trailingPosition.value?.x).isEqualTo(
-                (textFieldWidth.toIntPx() - IconPadding.toIntPx() - trailingSize.value!!.width)
+                (textFieldWidth.roundToPx() - IconPadding.roundToPx() - trailingSize.value!!.width)
                     .toFloat()
             )
             assertThat(trailingPosition.value?.y)
                 .isEqualTo(
-                    ((textFieldHeight.toIntPx() - trailingSize.value!!.height) / 2f)
+                    ((textFieldHeight.roundToPx() - trailingSize.value!!.height) / 2f)
                         .roundToInt().toFloat()
                 )
         }
@@ -718,7 +718,7 @@ class TextFieldTest {
 
         rule.runOnIdleWithDensity {
             assertThat(labelPosition.value?.x).isEqualTo(
-                (ExpectedPadding.toIntPx() + IconPadding.toIntPx() + iconSize.toIntPx())
+                (ExpectedPadding.roundToPx() + IconPadding.roundToPx() + iconSize.roundToPx())
                     .toFloat()
             )
         }
@@ -750,7 +750,7 @@ class TextFieldTest {
 
         rule.runOnIdleWithDensity {
             assertThat(labelPosition.value?.x).isEqualTo(
-                ExpectedPadding.toIntPx().toFloat()
+                ExpectedPadding.roundToPx().toFloat()
             )
         }
     }

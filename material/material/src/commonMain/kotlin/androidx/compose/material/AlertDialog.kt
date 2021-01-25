@@ -222,7 +222,7 @@ private fun ColumnScope.AlertDialogBaselineLayout(
             if (baseline == AlignmentLine.Unspecified) null else baseline
         } ?: 0
 
-        val titleOffset = TitleBaselineDistanceFromTop.toIntPx()
+        val titleOffset = TitleBaselineDistanceFromTop.roundToPx()
 
         // Place the title so that its first baseline is titleOffset from the top
         val titlePositionY = titleOffset - firstTitleBaseline
@@ -232,9 +232,9 @@ private fun ColumnScope.AlertDialogBaselineLayout(
         } ?: 0
 
         val textOffset = if (titlePlaceable == null) {
-            TextBaselineDistanceFromTop.toIntPx()
+            TextBaselineDistanceFromTop.roundToPx()
         } else {
-            TextBaselineDistanceFromTitle.toIntPx()
+            TextBaselineDistanceFromTitle.roundToPx()
         }
 
         // Combined height of title and spacing above
