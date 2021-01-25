@@ -29,7 +29,9 @@ open class MacOSPlatformSettings @Inject constructor(objects: ObjectFactory): Pl
 open class MacOSSigningSettings {
     var sign: Boolean = false
     var keychain: File? = null
+    @Deprecated("bundlePrefix is Deprecated", ReplaceWith("signingPrefix"))
     var bundlePrefix: String? = null
+    var signingPrefix: String? = null
     var keyUserName: String? = null
 }
 

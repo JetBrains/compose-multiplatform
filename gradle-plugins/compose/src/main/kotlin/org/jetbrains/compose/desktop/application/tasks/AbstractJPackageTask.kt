@@ -113,7 +113,7 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:Input
     @get:Optional
-    val macBundleSigningPrefix: Property<String?> = objects.nullableProperty()
+    val macPackageSigningPrefix: Property<String?> = objects.nullableProperty()
 
     @get:Input
     @get:Optional
@@ -202,7 +202,7 @@ abstract class AbstractJPackageTask @Inject constructor(
             OS.MacOS -> {
                 cliArg("--mac-package-identifier", macPackageIdentifier)
                 cliArg("--mac-package-name", macPackageName)
-                cliArg("--mac-bundle-signing-prefix", macBundleSigningPrefix)
+                cliArg("--mac-package-signing-prefix", macPackageSigningPrefix)
                 cliArg("--mac-sign", macSign)
                 cliArg("--mac-signing-keychain", macSigningKeychain)
                 cliArg("--mac-signing-key-user-name", macSigningKeyUserName)
