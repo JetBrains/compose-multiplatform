@@ -210,21 +210,14 @@ class AndroidXDocsPlugin : Plugin<Project> {
         val docsRuntimeClasspath = project.configurations.create("docs-runtime-classpath") {
             it.setResolveClasspathForUsage(Usage.JAVA_RUNTIME)
         }
-        docsCompileClasspath.resolutionStrategy {
-            val buildVersions = (project.rootProject.property("ext") as ExtraPropertiesExtension)
-                .let { it.get("build_versions") as Map<*, *> }
-            it.eachDependency { details ->
-                if (details.requested.group == "org.jetbrains.kotlin") {
-                    details.useVersion(buildVersions["kotlin"] as String)
-                }
-            }
-        }
-        docsRuntimeClasspath.resolutionStrategy {
-            val buildVersions = (project.rootProject.property("ext") as ExtraPropertiesExtension)
-                .let { it.get("build_versions") as Map<*, *> }
-            it.eachDependency { details ->
-                if (details.requested.group == "org.jetbrains.kotlin") {
-                    details.useVersion(buildVersions["kotlin"] as String)
+        listOf(docsCompileClasspath, docsRuntimeClasspath).forEach { config ->
+            config.resolutionStrategy {
+                val versions = (project.rootProject.property("ext") as ExtraPropertiesExtension)
+                    .let { it.get("build_versions") as Map<*, *> }
+                it.eachDependency { details ->
+                    if (details.requested.group == "org.jetbrains.kotlin") {
+                        details.useVersion(versions["kotlin"] as String)
+                    }
                 }
             }
         }
@@ -345,8 +338,6 @@ class AndroidXDocsPlugin : Plugin<Project> {
             it.apply {
                 dependsOn(unzipDocsTask)
                 dependsOn(generateSdkApiTask)
-                // Doclava does not know how to parse Kotlin files.
-                exclude("**/*.kt")
                 group = JavaBasePlugin.DOCUMENTATION_GROUP
                 description = "Generates Java documentation in the style of d.android.com. To " +
                     "generate offline docs use \'-PofflineDocs=true\' parameter.  Places the " +
@@ -356,7 +347,7 @@ class AndroidXDocsPlugin : Plugin<Project> {
                 destinationDir = destDir
                 classpath = androidJarFile(project) + dependencyClasspath
                 checksConfig = GENERATE_DOCS_CONFIG
-                coreJavadocOptions {
+                extraArgumentsBuilder.apply({
                     addStringOption(
                         "templatedir",
                         "${project.getCheckoutRoot()}/external/doclava/res/assets/templates-sdk"
@@ -366,27 +357,30 @@ class AndroidXDocsPlugin : Plugin<Project> {
                         "samplesdir",
                         "${project.rootDir}/samples"
                     )
-                    addMultilineMultiValueOption("federate").value = listOf(
+                    addStringOption(
+                        "federate",
                         listOf("Android", "https://developer.android.com")
                     )
-                    addMultilineMultiValueOption("federationapi").value = listOf(
-                        listOf("Android", generateSdkApiTask.get().apiFile?.absolutePath)
+                    addStringOption(
+                        "federationapi",
+                        listOf(
+                            "Android",
+                            generateSdkApiTask.get().apiFile?.absolutePath.toString()
+                        )
                     )
-                    addMultilineMultiValueOption("hdf").value = listOf(
-                        listOf("android.whichdoc", "online"),
-                        listOf("android.hasSamples", "true"),
-                        listOf("dac", "true")
-                    )
+                    addStringOption("hdf", listOf("android.whichdoc", "online"))
+                    addStringOption("hdf", listOf("android.hasSamples", "true"))
+                    addStringOption("hdf", listOf("dac", "true"))
 
                     // Specific to reference docs.
                     if (!offline) {
                         addStringOption("toroot", "/")
-                        addBooleanOption("devsite", true)
-                        addBooleanOption("yamlV2", true)
+                        addOption("devsite")
+                        addOption("yamlV2")
                         addStringOption("dac_libraryroot", dacOptions.libraryroot)
                         addStringOption("dac_dataname", dacOptions.dataname)
                     }
-                }
+                })
                 it.source(project.fileTree(unzippedDocsSources))
             }
         }

@@ -192,7 +192,7 @@ object MetalavaTasks {
     }
 
     private fun applyInputs(inputs: JavaCompileInputs, task: MetalavaTask) {
-        task.sourcePaths = inputs.sourcePaths.files
+        task.sourcePaths = inputs.sourcePaths
         task.dependsOn(inputs.sourcePaths)
         task.dependencyClasspath = inputs.dependencyClasspath
         task.bootClasspath = inputs.bootClasspath

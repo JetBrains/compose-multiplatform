@@ -285,13 +285,11 @@ private val BENCHMARK_POSTSUBMIT_OPTIONS = """
 
 private val SMALL_TEST_OPTIONS = """
     <option name="size" value="small" />
-    <option name="test-timeout" value="300" />
 
 """.trimIndent()
 
 private val MEDIUM_TEST_OPTIONS = """
     <option name="size" value="medium" />
-    <option name="test-timeout" value="1500" />
 
 """.trimIndent()
 

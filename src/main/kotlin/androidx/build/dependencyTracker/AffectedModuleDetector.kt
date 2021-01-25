@@ -70,11 +70,25 @@ enum class ProjectSubset { DEPENDENT_PROJECTS, CHANGED_PROJECTS, ALL_AFFECTED_PR
  * Since this needs to check project dependency graph to work, it cannot be accessed before
  * all projects are loaded. Doing so will throw an exception.
  */
-abstract class AffectedModuleDetector {
+abstract class AffectedModuleDetector(
+    protected val logger: Logger?
+) {
     /**
-     * Returns whether this project was affected by current changes..
+     * Returns whether this project was affected by current changes.
      */
     abstract fun shouldInclude(project: Project): Boolean
+
+    /**
+     * Returns whether this task was affected by current changes.
+     */
+    fun shouldInclude(task: Task): Boolean {
+        val include = shouldInclude(task.project)
+        val inclusionVerb = if (include) "Including" else "Excluding"
+        logger?.info(
+            "$inclusionVerb task ${task.path}"
+        )
+        return include
+    }
 
     /**
      * Returns the set that the project belongs to. The set is one of the ProjectSubset above.
@@ -169,7 +183,7 @@ abstract class AffectedModuleDetector {
         @JvmStatic
         internal fun configureTaskGuard(task: Task) {
             task.onlyIf {
-                getOrThrow(task.project).shouldInclude(task.project)
+                getOrThrow(task.project).shouldInclude(task)
             }
         }
 
@@ -193,8 +207,8 @@ abstract class AffectedModuleDetector {
  */
 private class AcceptAll(
     private val wrapped: AffectedModuleDetector? = null,
-    private val logger: Logger? = null
-) : AffectedModuleDetector() {
+    logger: Logger? = null
+) : AffectedModuleDetector(logger) {
     override fun shouldInclude(project: Project): Boolean {
         val wrappedResult = wrapped?.shouldInclude(project)
         logger?.info("[AcceptAll] wrapper returned $wrappedResult but I'll return true")
@@ -216,14 +230,14 @@ private class AcceptAll(
  */
 class AffectedModuleDetectorImpl constructor(
     private val rootProject: Project,
-    private val logger: Logger?,
+    logger: Logger?,
     // used for debugging purposes when we want to ignore non module files
     private val ignoreUnknownProjects: Boolean = false,
     private val projectSubset: ProjectSubset = ProjectSubset.ALL_AFFECTED_PROJECTS,
     private val cobuiltTestPaths: Set<Set<String>> = COBUILT_TEST_PATHS,
     private val injectedGitClient: GitClient? = null,
     private val baseCommitOverride: String? = null
-) : AffectedModuleDetector() {
+) : AffectedModuleDetector(logger) {
     private val git by lazy {
         injectedGitClient ?: GitClientImpl(rootProject.projectDir, logger)
     }
@@ -275,11 +289,7 @@ class AffectedModuleDetectorImpl constructor(
     private var isPresubmit: Boolean = false
 
     override fun shouldInclude(project: Project): Boolean {
-        return (project.isRoot || affectedProjects.contains(project)).also {
-            logger?.info(
-                "checking whether I should include ${project.path} and my answer is $it"
-            )
-        }
+        return (project.isRoot || affectedProjects.contains(project))
     }
 
     override fun getSubset(project: Project): ProjectSubset {

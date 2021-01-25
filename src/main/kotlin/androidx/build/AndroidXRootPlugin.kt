@@ -31,6 +31,7 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.Zip
+import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.kotlin.dsl.KotlinClosure1
 import org.gradle.kotlin.dsl.extra
 import java.io.File
@@ -143,6 +144,8 @@ class AndroidXRootPlugin : Plugin<Project> {
             it.destinationDirectory.set(project.getDistributionDirectory())
             it.archiveFileName.set("androidTest.zip")
             it.from(project.getTestConfigDirectory())
+            // We're mostly zipping a bunch of .apk files that are already compressed
+            it.entryCompression = ZipEntryCompression.STORED
         }
         buildOnServerTask.dependsOn(zipTestConfigsWithApks)
 
@@ -202,6 +205,7 @@ class AndroidXRootPlugin : Plugin<Project> {
 
         androidx.build.dependencies.kotlinVersion = getVersion("kotlin")
         androidx.build.dependencies.kotlinCoroutinesVersion = getVersion("kotlin_coroutines")
+        androidx.build.dependencies.kspVersion = getVersion("ksp")
         androidx.build.dependencies.agpVersion = getVersion("agp")
         androidx.build.dependencies.lintVersion = getVersion("lint")
         androidx.build.dependencies.hiltVersion = getVersion("hilt")

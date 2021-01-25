@@ -20,6 +20,9 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ExternalDependency
+import org.gradle.api.artifacts.component.ModuleComponentIdentifier
+import org.gradle.api.artifacts.repositories.MavenArtifactRepository
+import org.gradle.api.artifacts.result.ResolvedArtifactResult
 import org.gradle.api.attributes.Usage
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.named
@@ -55,7 +58,11 @@ open class CheckExternalDependencyLicensesTask : DefaultTask() {
             .forEach {
                 checkerConfig.dependencies.add(it)
             }
-        val missingLicenses = checkerConfig.resolve().filter {
+        val localArtifactRepositories = findLocalMavenRepositories()
+        val dependencyArtifacts = checkerConfig.incoming.artifacts.artifacts.mapNotNull {
+            validateAndGetArtifactInPrebuilts(it, localArtifactRepositories)
+        }
+        val missingLicenses = dependencyArtifacts.filter {
             findLicenseFile(it.canonicalFile, prebuiltsRoot) == null
         }
         if (missingLicenses.isNotEmpty()) {
@@ -74,15 +81,78 @@ open class CheckExternalDependencyLicensesTask : DefaultTask() {
         }
     }
 
-    private fun findLicenseFile(dependency: File, prebuiltsRoot: File): File? {
-        if (!dependency.absolutePath.startsWith(prebuiltsRoot.absolutePath)) {
-            // IDE plugins use dependencies bundled with the IDE itself, so we can ignore this
-            // warning for such projects
-            if (!project.plugins.hasPlugin("org.jetbrains.intellij")) {
-                throw GradleException(
-                    "prebuilts should come from prebuilts folder. $dependency is not there"
-                )
+    /**
+     * Returns the list of local maven repository File paths declared in this project.
+     */
+    private fun findLocalMavenRepositories(): List<File> {
+        return project.repositories.mapNotNull {
+            if (it is MavenArtifactRepository && it.url.scheme == "file") {
+                it.url
+            } else {
+                null
             }
+        }.map { File(it) }
+    }
+
+    /**
+     * Checks if the given [ResolvedArtifactResult] resolves to an artifact in prebuilts and if
+     * so, returns that File.
+     *
+     * Note that, when artifacts are published with gradle metadata, the actual resolved file may
+     * not reside in prebuilts directory. For those cases, this code re-resolves the artifact
+     * from the [repoPaths] and returns the file in prebuilts instead.
+     *
+     * Returns null if the file does not exist in prebuilts. When it is an error (files outside
+     * prebuitls filder is allowed for IDE plugins), throws a [GradleException].
+     *
+     * @param resolvedArtifact Resolved artifact from the configuration
+     * @param repoPaths List of local maven repositories that can be used to resolve the artifact.
+     *
+     * @return The artifact in prebuilts or null if it does not exist.
+     */
+    private fun validateAndGetArtifactInPrebuilts(
+        resolvedArtifact: ResolvedArtifactResult,
+        repoPaths: List<File>
+    ): File? {
+        val fileInPrebuilts = repoPaths.any { repoPath ->
+            resolvedArtifact.file.absolutePath.startsWith(repoPath.absolutePath)
+        }
+        if (fileInPrebuilts) {
+            return resolvedArtifact.file
+        }
+        // from the artifact coordinates, try to find the actual file in prebuilts.
+        // for gradle metadata publishing, resolved file might be moved into .gradle caches
+        val id = resolvedArtifact.id.componentIdentifier
+        if (id is ModuleComponentIdentifier) {
+            // Construct the local folder structure for the artifact to find it in local
+            // repositories. If it exists, we'll return that folder instead of the final resolved
+            // artifact.
+            // For a module: com.google:artifact:1.2.3; the path would be
+            // <repo-root>/com/google/artifact/1.2.3
+            val subFolder = (id.group.split('.') + id.module + id.version)
+                .joinToString(File.separator)
+            // if it exists in one of the local repositories, return it.
+            repoPaths.forEach {
+                val artifactFolder = it.resolve(subFolder)
+                if (artifactFolder.exists()) {
+                    return artifactFolder
+                }
+            }
+        }
+        // IDE plugins use dependencies bundled with the IDE itself, so we can ignore this
+        // warning for such projects
+        if (!project.plugins.hasPlugin("org.jetbrains.intellij")) {
+            throw GradleException(
+                "prebuilts should come from prebuilts folder. $resolvedArtifact " +
+                    "(${resolvedArtifact.file} is not there"
+            )
+        }
+        return null
+    }
+
+    private fun findLicenseFile(dependency: File, prebuiltsRoot: File): File? {
+        check(dependency.absolutePath.startsWith(prebuiltsRoot.absolutePath)) {
+            "Prebuilt file is not part of the prebuilts folder. ${dependency.absoluteFile}"
         }
         fun recurse(folder: File): File? {
             if (folder == prebuiltsRoot) {
@@ -92,7 +162,7 @@ open class CheckExternalDependencyLicensesTask : DefaultTask() {
                 return recurse(folder.parentFile)
             }
 
-            val found = folder.listFiles().firstOrNull {
+            val found = folder.listFiles()!!.firstOrNull {
                 it.name.startsWith("NOTICE", ignoreCase = true) ||
                     it.name.startsWith("LICENSE", ignoreCase = true)
             }
