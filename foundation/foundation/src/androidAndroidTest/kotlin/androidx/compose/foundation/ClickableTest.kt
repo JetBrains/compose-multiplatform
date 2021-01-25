@@ -20,16 +20,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHasClickAction
-import androidx.compose.ui.test.assertHasNoClickAction
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.center
@@ -53,8 +54,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -85,6 +84,7 @@ class ClickableTest {
         }
 
         rule.onNodeWithTag("myClickable")
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.Role))
             .assertIsEnabled()
             .assertHasClickAction()
     }
@@ -101,8 +101,9 @@ class ClickableTest {
         }
 
         rule.onNodeWithTag("myClickable")
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.Role))
             .assertIsNotEnabled()
-            .assertHasNoClickAction()
+            .assertHasClickAction()
     }
 
     @Test
@@ -276,9 +277,9 @@ class ClickableTest {
 
     @Test
     fun clickableTest_click_withDoubleClick() {
-        val clickLatch = CountDownLatch(1)
+        var clickCounter = 0
         var doubleClickCounter = 0
-        val onClick: () -> Unit = { clickLatch.countDown() }
+        val onClick: () -> Unit = { ++clickCounter }
         val onDoubleClick: () -> Unit = { ++doubleClickCounter }
 
         rule.setContent {
@@ -298,10 +299,10 @@ class ClickableTest {
         rule.onNodeWithTag("myClickable")
             .performClick()
 
-        val res = clickLatch.await(1000, TimeUnit.MILLISECONDS)
+        rule.mainClock.advanceTimeUntil { clickCounter == 1 }
         rule.runOnIdle {
+            assertThat(clickCounter).isEqualTo(1)
             assertThat(doubleClickCounter).isEqualTo(0)
-            assertThat(res).isTrue()
         }
 
         rule.onNodeWithTag("myClickable")
@@ -311,17 +312,17 @@ class ClickableTest {
 
         rule.runOnIdle {
             assertThat(doubleClickCounter).isEqualTo(1)
-            assertThat(clickLatch.await(1000, TimeUnit.MILLISECONDS)).isTrue()
+            assertThat(clickCounter).isEqualTo(1)
         }
     }
 
     @Test
     @LargeTest
     fun clickableTest_click_withDoubleClick_andLongClick() {
-        val clickLatch = CountDownLatch(1)
+        var clickCounter = 0
         var doubleClickCounter = 0
         var longClickCounter = 0
-        val onClick: () -> Unit = { clickLatch.countDown() }
+        val onClick: () -> Unit = { ++clickCounter }
         val onDoubleClick: () -> Unit = { ++doubleClickCounter }
         val onLongClick: () -> Unit = { ++longClickCounter }
 
@@ -343,11 +344,11 @@ class ClickableTest {
         rule.onNodeWithTag("myClickable")
             .performClick()
 
-        val res = clickLatch.await(1000, TimeUnit.MILLISECONDS)
+        rule.mainClock.advanceTimeUntil { clickCounter == 1 }
         rule.runOnIdle {
             assertThat(doubleClickCounter).isEqualTo(0)
             assertThat(longClickCounter).isEqualTo(0)
-            assertThat(res).isTrue()
+            assertThat(clickCounter).isEqualTo(1)
         }
 
         rule.onNodeWithTag("myClickable")
@@ -355,10 +356,11 @@ class ClickableTest {
                 doubleClick()
             }
 
+        rule.mainClock.advanceTimeUntil { doubleClickCounter == 1 }
         rule.runOnIdle {
             assertThat(doubleClickCounter).isEqualTo(1)
             assertThat(longClickCounter).isEqualTo(0)
-            assertThat(clickLatch.await(1000, TimeUnit.MILLISECONDS)).isTrue()
+            assertThat(clickCounter).isEqualTo(1)
         }
 
         rule.onNodeWithTag("myClickable")
@@ -366,10 +368,11 @@ class ClickableTest {
                 longClick()
             }
 
+        rule.mainClock.advanceTimeUntil { longClickCounter == 1 }
         rule.runOnIdle {
             assertThat(doubleClickCounter).isEqualTo(1)
             assertThat(longClickCounter).isEqualTo(1)
-            assertThat(clickLatch.await(1000, TimeUnit.MILLISECONDS)).isTrue()
+            assertThat(clickCounter).isEqualTo(1)
         }
     }
 
@@ -394,18 +397,14 @@ class ClickableTest {
                 doubleClick()
             }
 
-        rule.runOnIdle {
-            assertThat(counter).isEqualTo(1)
-        }
+        rule.mainClock.advanceTimeUntil { counter == 1 }
 
         rule.onNodeWithTag("myClickable")
             .performGesture {
                 doubleClick()
             }
 
-        rule.runOnIdle {
-            assertThat(counter).isEqualTo(2)
-        }
+        rule.mainClock.advanceTimeUntil { counter == 2 }
     }
 
     @Test
@@ -418,7 +417,10 @@ class ClickableTest {
                     "ClickableText",
                     modifier = Modifier
                         .testTag("myClickable")
-                        .clickable(interactionState = interactionState) {}
+                        .clickable(
+                            interactionState = interactionState,
+                            indication = null
+                        ) {}
                 )
             }
         }
@@ -454,7 +456,10 @@ class ClickableTest {
                         "ClickableText",
                         modifier = Modifier
                             .testTag("myClickable")
-                            .clickable(interactionState = interactionState) {}
+                            .clickable(
+                                interactionState = interactionState,
+                                indication = null
+                            ) {}
                     )
                 }
             }
@@ -485,10 +490,10 @@ class ClickableTest {
     @LargeTest
     fun clickableTest_click_withDoubleClick_andLongClick_disabled() {
         val enabled = mutableStateOf(false)
-        val clickLatch = CountDownLatch(1)
+        var clickCounter = 0
         var doubleClickCounter = 0
         var longClickCounter = 0
-        val onClick: () -> Unit = { clickLatch.countDown() }
+        val onClick: () -> Unit = { ++clickCounter }
         val onDoubleClick: () -> Unit = { ++doubleClickCounter }
         val onLongClick: () -> Unit = { ++longClickCounter }
 
@@ -511,10 +516,13 @@ class ClickableTest {
         rule.onNodeWithTag("myClickable")
             .performClick()
 
+        // Process gestures
+        rule.mainClock.advanceTimeBy(1000)
+
         rule.runOnIdle {
             assertThat(doubleClickCounter).isEqualTo(0)
             assertThat(longClickCounter).isEqualTo(0)
-            assertThat(clickLatch.count).isEqualTo(1)
+            assertThat(clickCounter).isEqualTo(0)
         }
 
         rule.onNodeWithTag("myClickable")
@@ -522,10 +530,13 @@ class ClickableTest {
                 doubleClick()
             }
 
+        // Process gestures
+        rule.mainClock.advanceTimeBy(1000)
+
         rule.runOnIdle {
             assertThat(doubleClickCounter).isEqualTo(0)
             assertThat(longClickCounter).isEqualTo(0)
-            assertThat(clickLatch.count).isEqualTo(1)
+            assertThat(clickCounter).isEqualTo(0)
         }
 
         rule.onNodeWithTag("myClickable")
@@ -533,21 +544,25 @@ class ClickableTest {
                 longClick()
             }
 
+        // Process gestures
+        rule.mainClock.advanceTimeBy(1000)
+
         rule.runOnIdle {
             assertThat(doubleClickCounter).isEqualTo(0)
             assertThat(longClickCounter).isEqualTo(0)
-            assertThat(clickLatch.count).isEqualTo(1)
+            assertThat(clickCounter).isEqualTo(0)
             enabled.value = true
         }
 
         rule.onNodeWithTag("myClickable")
             .performClick()
 
-        val res = clickLatch.await(1000, TimeUnit.MILLISECONDS)
+        rule.mainClock.advanceTimeUntil { clickCounter == 1 }
+
         rule.runOnIdle {
             assertThat(doubleClickCounter).isEqualTo(0)
             assertThat(longClickCounter).isEqualTo(0)
-            assertThat(res).isTrue()
+            assertThat(clickCounter).isEqualTo(1)
         }
 
         rule.onNodeWithTag("myClickable")
@@ -555,10 +570,12 @@ class ClickableTest {
                 doubleClick()
             }
 
+        rule.mainClock.advanceTimeUntil { doubleClickCounter == 1 }
+
         rule.runOnIdle {
             assertThat(doubleClickCounter).isEqualTo(1)
             assertThat(longClickCounter).isEqualTo(0)
-            assertThat(clickLatch.await(1000, TimeUnit.MILLISECONDS)).isTrue()
+            assertThat(clickCounter).isEqualTo(1)
         }
 
         rule.onNodeWithTag("myClickable")
@@ -566,15 +583,17 @@ class ClickableTest {
                 longClick()
             }
 
+        rule.mainClock.advanceTimeUntil { longClickCounter == 1 }
+
         rule.runOnIdle {
             assertThat(doubleClickCounter).isEqualTo(1)
             assertThat(longClickCounter).isEqualTo(1)
-            assertThat(clickLatch.await(1000, TimeUnit.MILLISECONDS)).isTrue()
+            assertThat(clickCounter).isEqualTo(1)
         }
     }
 
     @Test
-    fun testInspectorValue() {
+    fun clickable_testInspectorValue_noIndicationOverload() {
         val onClick: () -> Unit = { }
         rule.setContent {
             val modifier = Modifier.clickable(onClick = onClick) as InspectableValue
@@ -583,7 +602,31 @@ class ClickableTest {
             assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
                 "enabled",
                 "onClickLabel",
+                "role",
                 "onClick",
+                "onDoubleClick",
+                "onLongClick",
+                "onLongClickLabel"
+            )
+        }
+    }
+
+    @Test
+    fun clickable_testInspectorValue_fullParamsOverload() {
+        val onClick: () -> Unit = { }
+        rule.setContent {
+            val modifier = Modifier.clickable(
+                onClick = onClick,
+                interactionState = remember { InteractionState() },
+                indication = null
+            ) as InspectableValue
+            assertThat(modifier.nameFallback).isEqualTo("clickable")
+            assertThat(modifier.valueOverride).isNull()
+            assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
+                "enabled",
+                "onClickLabel",
+                "onClick",
+                "role",
                 "onDoubleClick",
                 "onLongClick",
                 "onLongClickLabel",

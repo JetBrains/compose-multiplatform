@@ -27,14 +27,13 @@ import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.TextToolbarStatus
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.InternalTextApi
-import androidx.compose.ui.text.length
-import androidx.compose.ui.text.subSequence
 import kotlin.math.max
 import kotlin.math.min
 
@@ -52,7 +51,9 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
     var selection: Selection? = null
         set(value) {
             field = value
-            updateHandleOffsets()
+            if (value != null) {
+                updateHandleOffsets()
+            }
         }
 
     /**
@@ -144,7 +145,7 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                 updateSelection(
                     startPosition = convertToContainerCoordinates(layoutCoordinates, startPosition),
                     endPosition = convertToContainerCoordinates(layoutCoordinates, endPosition),
-                    isStartHandle = true,
+                    isStartHandle = false,
                     longPress = true
                 )
             }
@@ -152,35 +153,54 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
         selectionRegistrar.onSelectionUpdateEndCallback = {
             showSelectionToolbar()
         }
+
+        selectionRegistrar.onSelectableChangeCallback = { selectable ->
+            if (selectable in selectionRegistrar.selectables) {
+                // clear the selection range of each Selectable.
+                onRelease()
+                selection = null
+            }
+        }
     }
 
     private fun updateHandleOffsets() {
         val selection = selection
         val containerCoordinates = containerLayoutCoordinates
-        if (selection != null && containerCoordinates != null && containerCoordinates.isAttached) {
-            val startLayoutCoordinates = selection.start.selectable.getLayoutCoordinates()
-            val endLayoutCoordinates = selection.end.selectable.getLayoutCoordinates()
+        val startLayoutCoordinates = selection?.start?.selectable?.getLayoutCoordinates()
+        val endLayoutCoordinates = selection?.end?.selectable?.getLayoutCoordinates()
 
-            if (startLayoutCoordinates != null && endLayoutCoordinates != null) {
-                startHandlePosition = containerCoordinates.childToLocal(
-                    startLayoutCoordinates,
-                    selection.start.selectable.getHandlePosition(
-                        selection = selection,
-                        isStartHandle = true
-                    )
-                )
-                endHandlePosition = containerCoordinates.childToLocal(
-                    endLayoutCoordinates,
-                    selection.end.selectable.getHandlePosition(
-                        selection = selection,
-                        isStartHandle = false
-                    )
-                )
-                return
-            }
+        if (
+            selection == null ||
+            containerCoordinates == null ||
+            !containerCoordinates.isAttached ||
+            startLayoutCoordinates == null ||
+            endLayoutCoordinates == null
+        ) {
+            this.startHandlePosition = null
+            this.endHandlePosition = null
+            return
         }
-        startHandlePosition = null
-        endHandlePosition = null
+
+        val startHandlePosition = containerCoordinates.localPositionOf(
+            startLayoutCoordinates,
+            selection.start.selectable.getHandlePosition(
+                selection = selection,
+                isStartHandle = true
+            )
+        )
+        val endHandlePosition = containerCoordinates.localPositionOf(
+            endLayoutCoordinates,
+            selection.end.selectable.getHandlePosition(
+                selection = selection,
+                isStartHandle = false
+            )
+        )
+
+        val visibleBounds = containerCoordinates.visibleBounds()
+        this.startHandlePosition =
+            if (visibleBounds.containsInclusive(startHandlePosition)) startHandlePosition else null
+        this.endHandlePosition =
+            if (visibleBounds.containsInclusive(endHandlePosition)) endHandlePosition else null
     }
 
     /**
@@ -309,14 +329,14 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
 
         val localLayoutCoordinates = containerLayoutCoordinates
         if (localLayoutCoordinates != null && localLayoutCoordinates.isAttached) {
-            var startOffset = localLayoutCoordinates.childToLocal(
+            var startOffset = localLayoutCoordinates.localPositionOf(
                 startLayoutCoordinates,
                 selection.start.selectable.getHandlePosition(
                     selection = selection,
                     isStartHandle = true
                 )
             )
-            var endOffset = localLayoutCoordinates.childToLocal(
+            var endOffset = localLayoutCoordinates.localPositionOf(
                 endLayoutCoordinates,
                 selection.end.selectable.getHandlePosition(
                     selection = selection,
@@ -330,7 +350,7 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
             val left = min(startOffset.x, endOffset.x)
             val right = max(startOffset.x, endOffset.x)
 
-            var startTop = localLayoutCoordinates.childToLocal(
+            var startTop = localLayoutCoordinates.localPositionOf(
                 startLayoutCoordinates,
                 Offset(
                     0f,
@@ -338,7 +358,7 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                 )
             )
 
-            var endTop = localLayoutCoordinates.childToLocal(
+            var endTop = localLayoutCoordinates.localPositionOf(
                 endLayoutCoordinates,
                 Offset(
                     0.0f,
@@ -405,7 +425,7 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
 
                 // Convert the position where drag gesture begins from composable coordinates to
                 // selection container coordinates.
-                dragBeginPosition = requireContainerCoordinates().childToLocal(
+                dragBeginPosition = requireContainerCoordinates().localPositionOf(
                     beginLayoutCoordinates,
                     beginCoordinates
                 )
@@ -421,7 +441,7 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                 val currentStart = if (isStartHandle) {
                     dragBeginPosition + dragTotalDistance
                 } else {
-                    requireContainerCoordinates().childToLocal(
+                    requireContainerCoordinates().localPositionOf(
                         selection.start.selectable.getLayoutCoordinates()!!,
                         getAdjustedCoordinates(
                             selection.start.selectable.getHandlePosition(
@@ -433,7 +453,7 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                 }
 
                 val currentEnd = if (isStartHandle) {
-                    requireContainerCoordinates().childToLocal(
+                    requireContainerCoordinates().localPositionOf(
                         selection.end.selectable.getLayoutCoordinates()!!,
                         getAdjustedCoordinates(
                             selection.end.selectable.getHandlePosition(
@@ -445,7 +465,6 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                 } else {
                     dragBeginPosition + dragTotalDistance
                 }
-
                 updateSelection(
                     startPosition = currentStart,
                     endPosition = currentEnd,
@@ -470,7 +489,7 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
     ): Offset? {
         val coordinates = containerLayoutCoordinates
         if (coordinates == null || !coordinates.isAttached) return null
-        return requireContainerCoordinates().childToLocal(layoutCoordinates, offset)
+        return requireContainerCoordinates().localPositionOf(layoutCoordinates, offset)
     }
 
     private fun updateSelection(
@@ -538,3 +557,18 @@ internal fun getCurrentSelectedText(
         }
     }
 }
+
+/** Returns the boundary of the visible area in this [LayoutCoordinates]. */
+private fun LayoutCoordinates.visibleBounds(): Rect {
+    // globalBounds is the global boundaries of this LayoutCoordinates after it's clipped by
+    // parents. We can think it as the global visible bounds of this Layout. Here globalBounds
+    // is convert to local, which is the boundary of the visible area within the LayoutCoordinates.
+    val boundsInWindow = boundsInWindow()
+    return Rect(
+        windowToLocal(boundsInWindow.topLeft),
+        windowToLocal(boundsInWindow.bottomRight)
+    )
+}
+
+private fun Rect.containsInclusive(offset: Offset): Boolean =
+    offset.x in left..right && offset.y in top..bottom

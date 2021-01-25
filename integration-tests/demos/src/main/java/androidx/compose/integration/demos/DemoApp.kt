@@ -17,12 +17,14 @@
 package androidx.compose.integration.demos
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.integration.demos.common.ActivityDemo
 import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.integration.demos.common.Demo
@@ -123,7 +125,8 @@ private fun DisplayDemo(demo: Demo, onNavigate: (Demo) -> Unit) {
 
 @Composable
 private fun DisplayDemoCategory(category: DemoCategory, onNavigate: (Demo) -> Unit) {
-    ScrollableColumn {
+    // TODO: migrate to LazyColumn after b/175671850
+    Column(Modifier.verticalScroll(rememberScrollState())) {
         category.demos.forEach { demo ->
             ListItem(
                 text = {
@@ -179,21 +182,21 @@ private object AppBarIcons {
             LayoutDirection.Rtl -> Icons.Filled.ArrowForward
         }
         IconButton(onClick = onClick) {
-            Icon(icon)
+            Icon(icon, null)
         }
     }
 
     @Composable
     fun Filter(onClick: () -> Unit) {
         IconButton(modifier = Modifier.testTag(Tags.FilterButton), onClick = onClick) {
-            Icon(Icons.Filled.Search)
+            Icon(Icons.Filled.Search, null)
         }
     }
 
     @Composable
     fun Settings(onClick: () -> Unit) {
         IconButton(onClick = onClick) {
-            Icon(Icons.Filled.Settings)
+            Icon(Icons.Filled.Settings, null)
         }
     }
 }

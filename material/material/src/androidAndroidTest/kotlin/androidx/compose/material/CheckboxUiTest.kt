@@ -15,17 +15,20 @@
  */
 package androidx.compose.material
 
-import androidx.compose.foundation.Strings
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.state.ToggleableState.Indeterminate
 import androidx.compose.ui.state.ToggleableState.Off
 import androidx.compose.ui.state.ToggleableState.On
-import androidx.compose.ui.test.assertHasNoClickAction
+import androidx.compose.ui.test.assertHasClickAction
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
@@ -59,14 +62,16 @@ class CheckboxUiTest {
         }
 
         rule.onNodeWithTag("checkboxUnchecked")
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Checkbox))
             .assertIsEnabled()
             .assertIsOff()
-            .assertValueEquals(Strings.Unchecked)
+            .assertValueEquals("Unchecked")
 
         rule.onNodeWithTag("checkboxChecked")
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Checkbox))
             .assertIsEnabled()
             .assertIsOn()
-            .assertValueEquals(Strings.Checked)
+            .assertValueEquals("Checked")
     }
 
     @Test
@@ -106,7 +111,7 @@ class CheckboxUiTest {
         }
 
         rule.onNodeWithTag(defaultTag)
-            .assertHasNoClickAction()
+            .assertHasClickAction()
     }
 
     @Test

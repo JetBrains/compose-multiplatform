@@ -22,7 +22,7 @@ import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionReference
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.compositionFor
-import androidx.compose.runtime.emit
+import androidx.compose.runtime.ComposeNode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.StrokeCap
@@ -41,8 +41,8 @@ fun Group(
     clipPathData: List<PathNode> = EmptyPath,
     content: @Composable () -> Unit
 ) {
-    emit<GroupComponent, VectorApplier>(
-        ctor = { GroupComponent() },
+    ComposeNode<GroupComponent, VectorApplier>(
+        factory = { GroupComponent() },
         update = {
             set(name) { this.name = it }
             set(rotation) { this.rotation = it }
@@ -76,8 +76,8 @@ fun Path(
     trimPathEnd: Float = DefaultTrimPathEnd,
     trimPathOffset: Float = DefaultTrimPathOffset
 ) {
-    emit<PathComponent, VectorApplier>(
-        ctor = { PathComponent() },
+    ComposeNode<PathComponent, VectorApplier>(
+        factory = { PathComponent() },
         update = {
             set(name) { this.name = it }
             set(pathData) { this.pathData = it }

@@ -42,6 +42,41 @@ class MotionEventAdapterTest {
     }
 
     @Test
+    fun convertToolType() {
+        val types = mapOf(
+            MotionEvent.TOOL_TYPE_FINGER to PointerType.Touch,
+            MotionEvent.TOOL_TYPE_UNKNOWN to PointerType.Unknown,
+            MotionEvent.TOOL_TYPE_ERASER to PointerType.Eraser,
+            MotionEvent.TOOL_TYPE_STYLUS to PointerType.Stylus,
+            MotionEvent.TOOL_TYPE_MOUSE to PointerType.Mouse,
+        )
+        types.forEach { toolType, pointerType ->
+            motionEventAdapter = MotionEventAdapter()
+            val motionEvent = MotionEvent(
+                2894,
+                ACTION_DOWN,
+                1,
+                0,
+                arrayOf(
+                    PointerProperties(1000, toolType),
+                ),
+                arrayOf(
+                    PointerCoords(2967f, 5928f),
+                )
+            )
+            val pointerInputEvent = motionEventAdapter.convertToPointerInputEvent(motionEvent)!!
+            assertPointerInputEventData(
+                pointerInputEvent.pointers[0],
+                PointerId(0),
+                true,
+                2967f,
+                5928f,
+                pointerType
+            )
+        }
+    }
+
+    @Test
     fun convertToPointerInputEvent_1pointerActionDown_convertsCorrectly() {
         val motionEvent = MotionEvent(
             2894,
@@ -58,7 +93,7 @@ class MotionEventAdapterTest {
         val uptime = pointerInputEvent!!.uptime
         val pointers = pointerInputEvent.pointers
         val platformEvent = pointerInputEvent.motionEvent
-        assertThat(uptime.nanoseconds).isEqualTo(2_894_000_000L)
+        assertThat(uptime).isEqualTo(2_894L)
         assertThat(pointers).hasSize(1)
         assertPointerInputEventData(
             pointers[0],
@@ -96,7 +131,7 @@ class MotionEventAdapterTest {
 
         val uptime = pointerInputEvent!!.uptime
         val pointers = pointerInputEvent.pointers
-        assertThat(uptime.nanoseconds).isEqualTo(5_000_000L)
+        assertThat(uptime).isEqualTo(5L)
         assertThat(pointers).hasSize(1)
         assertPointerInputEventData(
             pointers[0],
@@ -133,8 +168,8 @@ class MotionEventAdapterTest {
 
         val uptime = pointerInputEvent!!.uptime
         val pointers = pointerInputEvent.pointers
-        assertThat(uptime.nanoseconds).isEqualTo(34_000_000L)
-        assertThat(uptime.nanoseconds).isEqualTo(34_000_000L)
+        assertThat(uptime).isEqualTo(34L)
+        assertThat(uptime).isEqualTo(34L)
         assertThat(pointers).hasSize(1)
         assertPointerInputEventData(
             pointers[0],
@@ -177,7 +212,7 @@ class MotionEventAdapterTest {
 
         val uptime = pointerInputEvent!!.uptime
         val pointers = pointerInputEvent.pointers
-        assertThat(uptime.nanoseconds).isEqualTo(4_000_000L)
+        assertThat(uptime).isEqualTo(4L)
         assertThat(pointers).hasSize(2)
         assertPointerInputEventData(
             pointers[0],
@@ -227,7 +262,7 @@ class MotionEventAdapterTest {
 
         val uptime = pointerInputEvent!!.uptime
         val pointers = pointerInputEvent.pointers
-        assertThat(uptime.nanoseconds).isEqualTo(4_000_000L)
+        assertThat(uptime).isEqualTo(4L)
         assertThat(pointers).hasSize(2)
         assertPointerInputEventData(
             pointers[0],
@@ -296,7 +331,7 @@ class MotionEventAdapterTest {
 
         val uptime = pointerInputEvent!!.uptime
         val pointers = pointerInputEvent.pointers
-        assertThat(uptime.nanoseconds).isEqualTo(12_000_000L)
+        assertThat(uptime).isEqualTo(12L)
         assertThat(pointers).hasSize(3)
         assertPointerInputEventData(
             pointers[0],
@@ -372,7 +407,7 @@ class MotionEventAdapterTest {
 
         val uptime = pointerInputEvent!!.uptime
         val pointers = pointerInputEvent.pointers
-        assertThat(uptime.nanoseconds).isEqualTo(12_000_000L)
+        assertThat(uptime).isEqualTo(12L)
         assertThat(pointers).hasSize(3)
         assertPointerInputEventData(
             pointers[0],
@@ -448,7 +483,7 @@ class MotionEventAdapterTest {
 
         val uptime = pointerInputEvent!!.uptime
         val pointers = pointerInputEvent.pointers
-        assertThat(uptime.nanoseconds).isEqualTo(12_000_000L)
+        assertThat(uptime).isEqualTo(12L)
         assertThat(pointers).hasSize(3)
         assertPointerInputEventData(
             pointers[0],
@@ -521,7 +556,7 @@ class MotionEventAdapterTest {
 
         val uptime = pointerInputEvent!!.uptime
         val pointers = pointerInputEvent.pointers
-        assertThat(uptime.nanoseconds).isEqualTo(10_000_000L)
+        assertThat(uptime).isEqualTo(10L)
         assertThat(pointers).hasSize(2)
         assertPointerInputEventData(
             pointers[0],
@@ -587,7 +622,7 @@ class MotionEventAdapterTest {
 
         val uptime = pointerInputEvent!!.uptime
         val pointers = pointerInputEvent.pointers
-        assertThat(uptime.nanoseconds).isEqualTo(10_000_000L)
+        assertThat(uptime).isEqualTo(10L)
         assertThat(pointers).hasSize(2)
         assertPointerInputEventData(
             pointers[0],
@@ -653,7 +688,7 @@ class MotionEventAdapterTest {
 
         val uptime = pointerInputEvent!!.uptime
         val pointers = pointerInputEvent.pointers
-        assertThat(uptime.nanoseconds).isEqualTo(10_000_000L)
+        assertThat(uptime).isEqualTo(10L)
         assertThat(pointers).hasSize(2)
         assertPointerInputEventData(
             pointers[0],
@@ -740,7 +775,7 @@ class MotionEventAdapterTest {
 
         val uptime = pointerInputEvent!!.uptime
         val pointers = pointerInputEvent.pointers
-        assertThat(uptime.nanoseconds).isEqualTo(20_000_000L)
+        assertThat(uptime).isEqualTo(20L)
         assertThat(pointers).hasSize(3)
         assertPointerInputEventData(
             pointers[0],
@@ -834,7 +869,7 @@ class MotionEventAdapterTest {
 
         val uptime = pointerInputEvent!!.uptime
         val pointers = pointerInputEvent.pointers
-        assertThat(uptime.nanoseconds).isEqualTo(20_000_000L)
+        assertThat(uptime).isEqualTo(20L)
         assertThat(pointers).hasSize(3)
         assertPointerInputEventData(
             pointers[0],
@@ -928,7 +963,7 @@ class MotionEventAdapterTest {
 
         val uptime = pointerInputEvent!!.uptime
         val pointers = pointerInputEvent.pointers
-        assertThat(uptime.nanoseconds).isEqualTo(20_000_000L)
+        assertThat(uptime).isEqualTo(20L)
         assertThat(pointers).hasSize(3)
         assertPointerInputEventData(
             pointers[0],
@@ -1117,7 +1152,7 @@ class MotionEventAdapterTest {
 
         val uptime = pointerInputEvent!!.uptime
         val pointers = pointerInputEvent.pointers
-        assertThat(uptime.nanoseconds).isEqualTo(0L)
+        assertThat(uptime).isEqualTo(0L)
         assertThat(pointers).hasSize(1)
         assertPointerInputEventData(pointers[0], PointerId(0), true, 1f, 2f)
     }
@@ -1518,11 +1553,12 @@ private fun assertPointerInputEventData(
     id: PointerId,
     isDown: Boolean,
     x: Float,
-    y: Float
+    y: Float,
+    type: PointerType = PointerType.Touch
 ) {
-    val pointerInputData = actual.pointerInputData
     assertThat(actual.id).isEqualTo(id)
-    assertThat(pointerInputData.down).isEqualTo(isDown)
-    assertThat(pointerInputData.position.x).isEqualTo(x)
-    assertThat(pointerInputData.position.y).isEqualTo(y)
+    assertThat(actual.down).isEqualTo(isDown)
+    assertThat(actual.position.x).isEqualTo(x)
+    assertThat(actual.position.y).isEqualTo(y)
+    assertThat(actual.type).isEqualTo(type)
 }

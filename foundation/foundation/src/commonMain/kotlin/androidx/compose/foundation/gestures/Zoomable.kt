@@ -24,7 +24,7 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.onDispose
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -116,8 +116,10 @@ fun Modifier.zoomable(
     onZoomStopped: (() -> Unit)? = null
 ) = composed(
     factory = {
-        onDispose {
-            controller.stopAnimation()
+        DisposableEffect(controller) {
+            onDispose {
+                controller.stopAnimation()
+            }
         }
         scaleGestureFilter(
             scaleObserver = object : ScaleObserver {

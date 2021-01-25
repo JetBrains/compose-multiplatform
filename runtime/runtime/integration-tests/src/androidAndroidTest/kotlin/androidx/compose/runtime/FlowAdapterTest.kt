@@ -26,11 +26,10 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asFlow
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 
 @LargeTest
@@ -209,28 +208,22 @@ class FlowAdapterTest {
         }
     }
 
+    @Ignore("b/177256608")
     @Test
     fun observingOnCustomContext() {
         val stream = FlowChannel<String>()
-        val latch = CountDownLatch(1)
 
         var realValue: String? = null
         rule.setContent {
             realValue = stream.flow.collectAsState(null, Dispatchers.Default).value
-            if (realValue != null) {
-                latch.countDown()
-            }
         }
 
-        rule.runOnIdle {
+        rule.runOnUiThread {
             stream.channel.offer("value")
         }
 
-        assertThat(latch.await(5, TimeUnit.SECONDS)).isTrue()
-
-        rule.runOnIdle {
-            assertThat(realValue).isEqualTo("value")
-        }
+        rule.waitUntil { realValue != null }
+        assertThat(realValue).isEqualTo("value")
     }
 
     @Test

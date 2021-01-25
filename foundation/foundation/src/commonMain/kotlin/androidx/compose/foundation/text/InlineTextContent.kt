@@ -39,7 +39,7 @@ fun AnnotatedString.Builder.appendInlineContent(
     id: String,
     alternateText: String = REPLACEMENT_CHAR
 ) {
-    require(alternateText.length > 0) {
+    require(alternateText.isNotEmpty()) {
         "alternateText can't be an empty string."
     }
     pushStringAnnotation(INLINE_CONTENT_TAG, id)
@@ -61,7 +61,7 @@ fun AnnotatedString.Builder.appendInlineContent(
  * @see Placeholder
  */
 @Immutable
-data class InlineTextContent(
+class InlineTextContent(
     /**
      * The setting object that defines the size and vertical alignment of this composable in the
      * text line. This is different from the measure of Layout

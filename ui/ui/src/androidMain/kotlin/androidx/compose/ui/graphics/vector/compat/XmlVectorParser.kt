@@ -18,6 +18,8 @@ package androidx.compose.ui.graphics.vector.compat
 
 import android.content.res.Resources
 import android.util.AttributeSet
+import android.util.TypedValue
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathFillType
@@ -181,6 +183,42 @@ internal fun XmlPullParser.createVectorImageBuilder(
         AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_HEIGHT, 0.0f
     )
 
+    val tintColor = if (
+        vectorAttrs.hasValue(AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_TINT)
+    ) {
+        // first check if is a simple color
+        val value = TypedValue()
+        vectorAttrs.getValue(AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_TINT, value)
+        if (value.type >= TypedValue.TYPE_FIRST_COLOR_INT &&
+            value.type <= TypedValue.TYPE_LAST_COLOR_INT
+        ) {
+            Color(value.data)
+        } else {
+            Color.Unspecified
+        }
+    } else {
+        Color.Unspecified
+    }
+
+    val blendModeValue = vectorAttrs.getInt(
+        AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_TINT_MODE, -1
+    )
+    val tintBlendMode = if (blendModeValue != -1) {
+        when (blendModeValue) {
+            3 -> BlendMode.SrcOver
+            5 -> BlendMode.SrcIn
+            9 -> BlendMode.SrcAtop
+            // b/73224934 PorterDuff Multiply maps to Skia Modulate so actually
+            // return BlendMode.MODULATE here
+            14 -> BlendMode.Modulate
+            15 -> BlendMode.Screen
+            16 -> BlendMode.Plus
+            else -> BlendMode.SrcIn
+        }
+    } else {
+        BlendMode.SrcIn
+    }
+
     val defaultWidthDp = (defaultWidth / res.displayMetrics.density).dp
     val defaultHeightDp = (defaultHeight / res.displayMetrics.density).dp
 
@@ -190,7 +228,9 @@ internal fun XmlPullParser.createVectorImageBuilder(
         defaultWidth = defaultWidthDp,
         defaultHeight = defaultHeightDp,
         viewportWidth = viewportWidth,
-        viewportHeight = viewportHeight
+        viewportHeight = viewportHeight,
+        tintColor = tintColor,
+        tintBlendMode = tintBlendMode
     )
 }
 

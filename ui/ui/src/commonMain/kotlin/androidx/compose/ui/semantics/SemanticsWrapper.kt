@@ -25,7 +25,7 @@ internal class SemanticsWrapper(
 ) : DelegatingLayoutNodeWrapper<SemanticsModifier>(wrapped, semanticsModifier) {
     fun collapsedSemanticsConfiguration(): SemanticsConfiguration {
         val nextSemantics = wrapped.nearestSemantics
-        if (nextSemantics == null) {
+        if (nextSemantics == null || modifier.semanticsConfiguration.isClearingSemantics) {
             return modifier.semanticsConfiguration
         }
 
@@ -40,6 +40,7 @@ internal class SemanticsWrapper(
     }
 
     override fun onModifierChanged() {
+        super.onModifierChanged()
         layoutNode.owner?.onSemanticsChange()
     }
 

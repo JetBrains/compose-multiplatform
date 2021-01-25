@@ -15,11 +15,11 @@
  */
 package androidx.compose.desktop
 
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.window.MenuBar
 import java.awt.image.BufferedImage
+import javax.swing.JFrame
 
 /**
  * AppFrame is an abstract class that represents a window.
@@ -122,6 +122,54 @@ abstract class AppFrame {
     abstract fun removeMenuBar()
 
     /**
+     * Switches the window to fullscreen mode if the window is resizable. If the window is in
+     * fullscreen mode [minimize] and [maximize] methods are ignored.
+     */
+    abstract fun makeFullscreen()
+
+    /**
+     * Returns true if the window is in fullscreen state, false otherwise.
+     */
+    abstract val isFullscreen: Boolean
+        get
+
+    /**
+     * Minimizes the window to the taskbar.
+     */
+    abstract fun minimize()
+
+    /**
+     * Returns true if the window is minimized, false otherwise.
+     */
+    val isMinimized: Boolean
+        get() = window.extendedState == JFrame.ICONIFIED
+
+    /**
+     * Maximizes the window to fill all available screen space.
+     */
+    abstract fun maximize()
+
+    /**
+     * Returns true if the window is maximized, false otherwise.
+     */
+    val isMaximized: Boolean
+        get() = window.extendedState == JFrame.MAXIMIZED_BOTH
+
+    /**
+     * Restores the previous state and size of the window after
+     * maximizing/minimizing/fullscreen mode.
+     */
+    abstract fun restore()
+
+    /**
+     * Sets the ability to resize the window. True - the window can be resized,
+     * false - the window cannot be resized. If the window is in fullscreen mode
+     * setter of this property is ignored. If this property is true the [makeFullscreen()]
+     * method is ignored.
+     */
+    abstract var resizable: Boolean
+
+    /**
      * Sets the new position of the window on the screen.
      *
      * @param x the new x-coordinate of the window.
@@ -142,12 +190,19 @@ abstract class AppFrame {
      */
     abstract fun setSize(width: Int, height: Int)
 
-    /**
-     * Shows a window with the given Compose content.
-     *
-     * @param content Composable content of the window.
-     */
-    abstract fun show(content: @Composable () -> Unit)
+    // TODO(demin): uncomment this after b/175234629 will be fixed
+//    /**
+//     * Shows a window with the given Compose content.
+//     *
+//     * @param parentComposition The parent composition reference to coordinate
+//     *        scheduling of composition updates.
+//     *        If null then default root composition will be used.
+//     * @param content Composable content of the window.
+//     */
+//    abstract fun show(
+//        parentComposition: CompositionReference? = null,
+//        content: @Composable () -> Unit
+//    )
 
     /**
      * Closes the window.

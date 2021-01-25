@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.ui.tooling
 
 import androidx.compose.animation.DpPropKey
@@ -71,6 +73,6 @@ private fun CheckBox() {
         shape = MaterialTheme.shapes.large.copy(topLeft = CornerSize(state[CheckBoxCorner])),
         modifier = Modifier.toggleable(value = selected, onValueChange = onSelected)
     ) {
-        Icon(imageVector = Icons.Filled.Done)
+        Icon(imageVector = Icons.Filled.Done, contentDescription = null)
     }
 }

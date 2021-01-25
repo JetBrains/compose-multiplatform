@@ -33,13 +33,13 @@ import androidx.compose.ui.text.TextPainter
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.input.EditOperation
+import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.EditProcessor
 import androidx.compose.ui.text.input.INVALID_SESSION
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.InputSessionToken
 import androidx.compose.ui.text.input.ImeOptions
-import androidx.compose.ui.text.input.OffsetMap
+import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.text.input.TransformedText
@@ -120,20 +120,20 @@ class TextFieldDelegate {
          *
          * @param canvas The target canvas.
          * @param value The editor state
-         * @param offsetMap The offset map
+         * @param offsetMapping The offset map
          * @param selectionPaint The selection paint
          */
         @JvmStatic
         internal fun draw(
             canvas: Canvas,
             value: TextFieldValue,
-            offsetMap: OffsetMap,
+            offsetMapping: OffsetMapping,
             textLayoutResult: TextLayoutResult,
             selectionPaint: Paint
         ) {
             if (!value.selection.collapsed) {
-                val start = offsetMap.originalToTransformed(value.selection.min)
-                val end = offsetMap.originalToTransformed(value.selection.max)
+                val start = offsetMapping.originalToTransformed(value.selection.min)
+                val end = offsetMapping.originalToTransformed(value.selection.max)
                 if (start != end) {
                     val selectionPath = textLayoutResult.getPathForRange(start, end)
                     canvas.drawPath(selectionPath, selectionPaint)
@@ -153,7 +153,7 @@ class TextFieldDelegate {
          * @param textInputService The text input service
          * @param token The current input session token.
          * @param hasFocus True if focus is gained.
-         * @param offsetMap The mapper from/to editing buffer to/from visible text.
+         * @param offsetMapping The mapper from/to editing buffer to/from visible text.
          */
         @JvmStatic
         internal fun notifyFocusedRect(
@@ -164,7 +164,7 @@ class TextFieldDelegate {
             textInputService: TextInputService,
             token: InputSessionToken,
             hasFocus: Boolean,
-            offsetMap: OffsetMap
+            offsetMapping: OffsetMapping
         ) {
             if (!hasFocus) {
                 return
@@ -172,11 +172,11 @@ class TextFieldDelegate {
 
             val bbox = if (value.selection.max < value.text.length) {
                 textLayoutResult.getBoundingBox(
-                    offsetMap.originalToTransformed(value.selection.max)
+                    offsetMapping.originalToTransformed(value.selection.max)
                 )
             } else if (value.selection.max != 0) {
                 textLayoutResult.getBoundingBox(
-                    offsetMap.originalToTransformed(value.selection.max) - 1
+                    offsetMapping.originalToTransformed(value.selection.max) - 1
                 )
             } else {
                 val defaultSize = computeSizeForDefaultText(
@@ -203,7 +203,7 @@ class TextFieldDelegate {
          */
         @JvmStatic
         private fun onEditCommand(
-            ops: List<EditOperation>,
+            ops: List<EditCommand>,
             editProcessor: EditProcessor,
             onValueChange: (TextFieldValue) -> Unit
         ) {
@@ -214,20 +214,20 @@ class TextFieldDelegate {
          * Sets the cursor position. Should be called when TextField has focus.
          *
          * @param position The event position in composable coordinate.
-         * @param textLayoutResult The text layout result
+         * @param textLayoutResult The text layout result proxy
          * @param editProcessor The edit processor
-         * @param offsetMap The offset map
+         * @param offsetMapping The offset map
          * @param onValueChange The callback called when the new editor state arrives.
          */
         @JvmStatic
         internal fun setCursorOffset(
             position: Offset,
-            textLayoutResult: TextLayoutResult,
+            textLayoutResult: TextLayoutResultProxy,
             editProcessor: EditProcessor,
-            offsetMap: OffsetMap,
+            offsetMapping: OffsetMapping,
             onValueChange: (TextFieldValue) -> Unit
         ) {
-            val offset = offsetMap.transformedToOriginal(
+            val offset = offsetMapping.transformedToOriginal(
                 textLayoutResult.getOffsetForPosition(position)
             )
             onValueChange(editProcessor.mBufferState.copy(selection = TextRange(offset)))
@@ -302,14 +302,14 @@ class TextFieldDelegate {
             transformed: TransformedText
         ): TransformedText =
             TransformedText(
-                AnnotatedString.Builder(transformed.transformedText).apply {
+                AnnotatedString.Builder(transformed.text).apply {
                     addStyle(
                         SpanStyle(textDecoration = TextDecoration.Underline),
-                        transformed.offsetMap.originalToTransformed(compositionRange.start),
-                        transformed.offsetMap.originalToTransformed(compositionRange.end)
+                        transformed.offsetMapping.originalToTransformed(compositionRange.start),
+                        transformed.offsetMapping.originalToTransformed(compositionRange.end)
                     )
                 }.toAnnotatedString(),
-                transformed.offsetMap
+                transformed.offsetMapping
             )
     }
 }

@@ -36,10 +36,10 @@ inline class Matrix(
         0f, 0f, 0f, 1f
     )
 ) {
-    inline operator fun get(row: Int, column: Int) = values[row + (column * 4)]
+    inline operator fun get(row: Int, column: Int) = values[(row * 4) + column]
 
     inline operator fun set(row: Int, column: Int, v: Float) {
-        values[row + (column * 4)] = v
+        values[(row * 4) + column] = v
     }
 
     /**
@@ -48,9 +48,12 @@ inline class Matrix(
     fun map(point: Offset): Offset {
         val x = point.x
         val y = point.y
+        val z = this[0, 3] * x + this[1, 3] * y + this[3, 3]
+        val pZ = if (z == 0f) 0f else 1f / z
+
         return Offset(
-            x = this[0, 0] * x + this[1, 0] * y + this[3, 0],
-            y = this[0, 1] * x + this[1, 1] * y + this[3, 1]
+            x = pZ * (this[0, 0] * x + this[1, 0] * y + this[3, 0]),
+            y = pZ * (this[0, 1] * x + this[1, 1] * y + this[3, 1])
         )
     }
 
@@ -355,6 +358,63 @@ inline class Matrix(
         this[3, 1] = t2
         this[3, 2] = t3
         this[3, 3] = t4
+    }
+
+    companion object {
+        /**
+         * Index of the flattened array that represents the scale factor along the X axis
+         */
+        const val ScaleX = 0
+
+        /**
+         * Index of the flattened array that represents the skew factor along the Y axis
+         */
+        const val SkewY = 1
+
+        /**
+         * Index of the flattened array that represents the perspective factor along the X axis
+         */
+        const val Perspective0 = 3
+
+        /**
+         * Index of the flattened array that represents the skew factor along the X axis
+         */
+        const val SkewX = 4
+
+        /**
+         * Index of the flattened array that represents the scale factor along the Y axis
+         */
+        const val ScaleY = 5
+
+        /**
+         * Index of the flattened array that represents the perspective factor along the Y axis
+         */
+        const val Perspective1 = 7
+
+        /**
+         * Index of the flattened array that represents the scale factor along the Z axis
+         */
+        const val ScaleZ = 10
+
+        /**
+         * Index of the flattened array that represents the translation along the X axis
+         */
+        const val TranslateX = 12
+
+        /**
+         * Index of the flattened array that represents the translation along the Y axis
+         */
+        const val TranslateY = 13
+
+        /**
+         * Index of the flattened array that represents the translation along the Z axis
+         */
+        const val TranslateZ = 14
+
+        /**
+         * Index of the flattened array that represents the perspective factor along the Z axis
+         */
+        const val Perspective2 = 15
     }
 }
 

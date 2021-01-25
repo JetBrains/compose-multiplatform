@@ -38,6 +38,7 @@ import androidx.compose.ui.text.platform.AndroidTypefaceWrapper
  *                        all fonts in fontFamily.
  * @return A loaded Typeface.
  */
+@Deprecated("Use Typeface() instead", ReplaceWith("Typeface(context, fontFamily, styles)"))
 fun typeface(
     context: Context,
     fontFamily: FontFamily,
@@ -52,11 +53,48 @@ fun typeface(
 }
 
 /**
+ * Build an Android specific Typeface from FontFamily.
+ *
+ * You can pass [styles] for loading only specific styles.
+ *
+ * This function caches the internal native Typeface but always create the new Typeface object.
+ * Caller should cache if necessary.
+ *
+ * @param context the context to be used for loading Typeface.
+ * @param fontFamily the font family to be loaded
+ * @param styles optional style filter for loading subset of fontFamily. null means load
+ *                        all fonts in fontFamily.
+ * @return [androidx.compose.ui.text.font.Typeface] instance
+ */
+fun Typeface(
+    context: Context,
+    fontFamily: FontFamily,
+    styles: List<Pair<FontWeight, FontStyle>>? = null
+): androidx.compose.ui.text.font.Typeface {
+    return when (fontFamily) {
+        is FontListFontFamily -> AndroidFontListTypeface(fontFamily, context, styles)
+        is GenericFontFamily -> AndroidGenericFontFamilyTypeface(fontFamily)
+        is DefaultFontFamily -> AndroidDefaultTypeface()
+        is LoadedFontFamily -> fontFamily.typeface
+    }
+}
+
+/**
  * Returns a Compose [androidx.compose.ui.text.font.Typeface] from Android [Typeface].
  *
  * @param typeface Android Typeface instance
  */
+@Deprecated("Use Typeface() instead", ReplaceWith("Typeface(typeface)"))
 fun typeface(typeface: Typeface): androidx.compose.ui.text.font.Typeface {
+    return AndroidTypefaceWrapper(typeface)
+}
+
+/**
+ * Returns a Compose [androidx.compose.ui.text.font.Typeface] from Android [Typeface].
+ *
+ * @param typeface Android Typeface instance
+ */
+fun Typeface(typeface: Typeface): androidx.compose.ui.text.font.Typeface {
     return AndroidTypefaceWrapper(typeface)
 }
 
@@ -65,6 +103,16 @@ fun typeface(typeface: Typeface): androidx.compose.ui.text.font.Typeface {
  *
  * @param typeface Android Typeface instance
  */
+@Deprecated("Use FontFamily() instead", ReplaceWith("FontFamily(typeface)"))
 fun fontFamily(typeface: Typeface): FontFamily {
-    return fontFamily(typeface(typeface))
+    return FontFamily(Typeface(typeface))
+}
+
+/**
+ * Creates a [FontFamily] from Android [Typeface].
+ *
+ * @param typeface Android Typeface instance
+ */
+fun FontFamily(typeface: Typeface): FontFamily {
+    return FontFamily(Typeface(typeface))
 }

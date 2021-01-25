@@ -15,7 +15,7 @@
  */
 package androidx.compose.desktop.examples.example1
 
-import androidx.compose.animation.animate
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.desktop.AppWindow
 import androidx.compose.desktop.DesktopMaterialTheme
@@ -23,14 +23,16 @@ import androidx.compose.desktop.Window
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
@@ -39,11 +41,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.BottomAppBar
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -83,8 +87,8 @@ import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.fontFamily
-import androidx.compose.ui.text.platform.font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.platform.Font
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextDecoration.Companion.Underline
@@ -96,7 +100,7 @@ import androidx.compose.ui.unit.sp
 
 private const val title = "Desktop Compose Elements"
 
-val italicFont = fontFamily(font("Noto Italic", "NotoSans-Italic.ttf"))
+val italicFont = FontFamily(Font("NotoSans-Italic.ttf"))
 
 fun main() {
     Window(title, IntSize(1024, 850)) {
@@ -112,7 +116,7 @@ private fun App() {
                 TopAppBar(
                     title = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Outlined.Home)
+                            Icon(Icons.Outlined.Home, "Home")
                             Text(title)
                         }
                     }
@@ -132,7 +136,7 @@ private fun App() {
                     IconButton(
                         onClick = {}
                     ) {
-                        Icon(Icons.Filled.Menu, Modifier.size(ButtonDefaults.IconSize))
+                        Icon(Icons.Filled.Menu, "Menu", Modifier.size(ButtonDefaults.IconSize))
                     }
                 }
             },
@@ -164,7 +168,7 @@ private fun ScrollableContent(scrollState: ScrollState) {
     val text = remember {
         mutableStateOf("Hello \uD83E\uDDD1\uD83C\uDFFF\u200D\uD83E\uDDB0\nПривет")
     }
-    ScrollableColumn(Modifier.fillMaxSize(), scrollState) {
+    Column(Modifier.fillMaxSize().verticalScroll(scrollState)) {
         Text(
             text = "Привет! 你好! Desktop Compose ${amount.value}",
             color = Color.Black,
@@ -260,6 +264,35 @@ private fun ScrollableContent(scrollState: ScrollState) {
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Text(
+                "Default",
+            )
+
+            Text(
+                "SansSerif",
+                fontFamily = FontFamily.SansSerif
+            )
+
+            Text(
+                "Serif",
+                fontFamily = FontFamily.Serif
+            )
+
+            Text(
+                "Monospace",
+                fontFamily = FontFamily.Monospace
+            )
+
+            Text(
+                "Cursive",
+                fontFamily = FontFamily.Cursive
+            )
+        }
 
         var overText by remember { mutableStateOf("Move mouse over text:") }
         Text(overText, style = TextStyle(letterSpacing = 10.sp))
@@ -363,11 +396,13 @@ private fun ScrollableContent(scrollState: ScrollState) {
         Row {
             Image(
                 imageResource("androidx/compose/desktop/example/circus.jpg"),
+                "Localized description",
                 Modifier.size(200.dp)
             )
 
             Icon(
                 vectorXmlResource("androidx/compose/desktop/example/ic_baseline_deck_24.xml"),
+                "Localized description",
                 Modifier.size(100.dp).align(Alignment.CenterVertically),
                 tint = Color.Blue.copy(alpha = 0.5f)
             )
@@ -382,9 +417,9 @@ fun Animations(isCircularEnabled: Boolean) = Row {
     }
 
     val enabled = remember { mutableStateOf(true) }
-    val color = animate(
+    val color by animateColorAsState(
         if (enabled.value) Color.Green else Color.Red,
-        animSpec = TweenSpec(durationMillis = 2000)
+        animationSpec = TweenSpec(durationMillis = 2000)
     )
 
     MaterialTheme {

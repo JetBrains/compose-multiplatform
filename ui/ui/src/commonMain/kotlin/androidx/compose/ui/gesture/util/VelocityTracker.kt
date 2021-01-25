@@ -17,11 +17,8 @@
 package androidx.compose.ui.gesture.util
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.unit.Duration
-import androidx.compose.ui.unit.Uptime
 import androidx.compose.ui.unit.Velocity
-import androidx.compose.ui.unit.inMilliseconds
-import kotlin.math.absoluteValue
+import kotlin.math.abs
 
 private const val AssumePointerMoveStoppedMilliseconds: Int = 40
 private const val HistorySize: Int = 20
@@ -56,9 +53,9 @@ class VelocityTracker {
     // TODO(shepshapard): VelocityTracker needs to be updated to be passed vectors instead of
     //   positions. For velocity tracking, the only thing that is important is the change in
     //   position over time.
-    fun addPosition(uptime: Uptime, position: Offset) {
+    fun addPosition(timeMillis: Long, position: Offset) {
         index = (index + 1) % HistorySize
-        samples[index] = PointAtTime(position, uptime)
+        samples[index] = PointAtTime(position, timeMillis)
     }
 
     /**
@@ -66,7 +63,10 @@ class VelocityTracker {
      *
      * This can be expensive. Only call this when you need the velocity.
      */
-    fun calculateVelocity() = Velocity(pixelsPerSecond = getVelocityEstimate().pixelsPerSecond)
+    fun calculateVelocity(): Velocity {
+        val estimate = getVelocityEstimate().pixelsPerSecond
+        return Velocity(estimate.x, estimate.y)
+    }
 
     /**
      * Clears the tracked positions added by [addPosition].
@@ -101,9 +101,9 @@ class VelocityTracker {
         do {
             val sample: PointAtTime = samples[index] ?: break
 
-            val age: Float = (newestSample.time - sample.time).inMilliseconds().toFloat()
+            val age: Float = (newestSample.time - sample.time).toFloat()
             val delta: Float =
-                (sample.time - previousSample.time).inMilliseconds().absoluteValue.toFloat()
+                abs(sample.time - previousSample.time).toFloat()
             previousSample = sample
             if (age > HorizonMilliseconds || delta > AssumePointerMoveStoppedMilliseconds) {
                 break
@@ -136,7 +136,7 @@ class VelocityTracker {
                         (ySlope * 1000)
                     ),
                     confidence = xFit.confidence * yFit.confidence,
-                    duration = newestSample.time - oldestSample.time,
+                    durationMillis = newestSample.time - oldestSample.time,
                     offset = newestSample.point - oldestSample.point
                 )
             } catch (exception: IllegalArgumentException) {
@@ -150,20 +150,20 @@ class VelocityTracker {
         return VelocityEstimate(
             pixelsPerSecond = Offset.Zero,
             confidence = 1.0f,
-            duration = newestSample.time - oldestSample.time,
+            durationMillis = newestSample.time - oldestSample.time,
             offset = newestSample.point - oldestSample.point
         )
     }
 }
 
-private data class PointAtTime(val point: Offset, val time: Uptime)
+private data class PointAtTime(val point: Offset, val time: Long)
 
 /**
  * A two dimensional velocity estimate.
  *
  * VelocityEstimates are computed by [VelocityTracker.getVelocityEstimate]. An
  * estimate's [confidence] measures how well the velocity tracker's position
- * data fit a straight line, [duration] is the time that elapsed between the
+ * data fit a straight line, [durationMillis] is the time that elapsed between the
  * first and last position sample used to compute the velocity, and [offset]
  * is similarly the difference between the first and last positions.
  *
@@ -187,7 +187,7 @@ private data class VelocityEstimate(
      * The time that elapsed between the first and last position sample used
      * to compute [pixelsPerSecond].
      */
-    val duration: Duration,
+    val durationMillis: Long,
     /**
      * The difference between the first and last position sample used
      * to compute [pixelsPerSecond].
@@ -195,6 +195,6 @@ private data class VelocityEstimate(
     val offset: Offset
 ) {
     companion object {
-        val None = VelocityEstimate(Offset.Zero, 1f, Duration(0), Offset.Zero)
+        val None = VelocityEstimate(Offset.Zero, 1f, 0, Offset.Zero)
     }
 }

@@ -20,7 +20,6 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.util.lerp
 import androidx.compose.ui.util.packFloats
-import androidx.compose.ui.util.toStringAsFixed
 import androidx.compose.ui.util.unpackFloat1
 import androidx.compose.ui.util.unpackFloat2
 import kotlin.math.sqrt
@@ -252,3 +251,10 @@ val Offset.isSpecified: Boolean get() = packedValue != Offset.Unspecified.packed
  */
 @Stable
 inline val Offset.isUnspecified: Boolean get() = packedValue == Offset.Unspecified.packedValue
+
+/**
+ * If this [Offset] [isSpecified] then this is returned, otherwise [block] is executed
+ * and its result is returned.
+ */
+inline fun Offset.takeOrElse(block: () -> Offset): Offset =
+    if (isSpecified) this else block()

@@ -27,11 +27,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusModifier
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.focusRequester
 import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Green
@@ -64,7 +64,7 @@ private fun FocusableText(text: String) {
         modifier = Modifier
             .focusRequester(focusRequester)
             .onFocusChanged { color = if (it.isFocused) Green else Black }
-            .focus()
+            .focusModifier()
             .tapGestureFilter { focusRequester.requestFocus() },
         text = text,
         color = color

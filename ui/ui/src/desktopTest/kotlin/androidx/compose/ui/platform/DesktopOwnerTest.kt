@@ -16,9 +16,9 @@
 
 package androidx.compose.ui.platform
 
-import androidx.compose.animation.animate
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.TweenSpec
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -213,9 +214,9 @@ class DesktopOwnerTest {
         var targetValue by mutableStateOf(10f)
 
         setContent {
-            val value = animate(
+            val value by animateFloatAsState(
                 targetValue,
-                animSpec = TweenSpec(durationMillis = 30, easing = LinearEasing)
+                animationSpec = TweenSpec(durationMillis = 30, easing = LinearEasing)
             )
             Box(Modifier.size(value.dp).background(Color.Blue))
         }

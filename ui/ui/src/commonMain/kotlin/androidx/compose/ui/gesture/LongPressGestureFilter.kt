@@ -35,8 +35,6 @@ import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
 import androidx.compose.ui.input.pointer.consumeDownChange
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.inMilliseconds
-import androidx.compose.ui.util.annotation.VisibleForTesting
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
 import kotlinx.coroutines.CoroutineScope
@@ -74,8 +72,8 @@ internal class LongPressGestureFilter(
 ) : PointerInputFilter() {
     lateinit var onLongPress: (Offset) -> Unit
 
-    @VisibleForTesting
-    internal var longPressTimeout = LongPressTimeout
+    /*@VisibleForTesting*/
+    internal var longPressTimeout = LongPressTimeoutMillis
 
     private enum class State {
         Idle, Primed, Fired
@@ -127,8 +125,8 @@ internal class LongPressGestureFilter(
                 // If we are primed, keep track of all down pointer positions so we can pass
                 // pointer position information to the event we will fire.
                 changes.forEach {
-                    if (it.current.down) {
-                        pointerPositions[it.id] = it.current.position
+                    if (it.pressed) {
+                        pointerPositions[it.id] = it.position
                     } else {
                         pointerPositions.remove(it.id)
                     }
@@ -171,7 +169,7 @@ internal class LongPressGestureFilter(
     private fun primeToFire() {
         state = State.Primed
         job = coroutineScope.launch {
-            delay(longPressTimeout.inMilliseconds())
+            delay(longPressTimeout)
             fireLongPress()
         }
     }

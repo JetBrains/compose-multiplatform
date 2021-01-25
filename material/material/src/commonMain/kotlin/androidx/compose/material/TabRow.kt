@@ -28,6 +28,7 @@ import androidx.compose.material.TabDefaults.tabIndicatorOffset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -41,6 +42,8 @@ import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.util.fastMap
 import androidx.compose.ui.util.fastMaxBy
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 /**
  * A TabRow contains a row of [Tab]s, and displays an indicator underneath the currently
@@ -112,12 +115,12 @@ fun TabRow(
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.colors.primarySurface,
     contentColor: Color = contentColorFor(backgroundColor),
-    indicator: @Composable (tabPositions: List<TabPosition>) -> Unit = { tabPositions ->
+    indicator: @Composable (tabPositions: List<TabPosition>) -> Unit = @Composable { tabPositions ->
         TabDefaults.Indicator(
             Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex])
         )
     },
-    divider: @Composable () -> Unit = {
+    divider: @Composable () -> Unit = @Composable {
         TabDefaults.Divider()
     },
     tabs: @Composable () -> Unit
@@ -193,22 +196,24 @@ fun ScrollableTabRow(
     backgroundColor: Color = MaterialTheme.colors.primarySurface,
     contentColor: Color = contentColorFor(backgroundColor),
     edgePadding: Dp = TabDefaults.ScrollableTabRowPadding,
-    indicator: @Composable (tabPositions: List<TabPosition>) -> Unit = { tabPositions ->
+    indicator: @Composable (tabPositions: List<TabPosition>) -> Unit = @Composable { tabPositions ->
         TabDefaults.Indicator(
             Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex])
         )
     },
-    divider: @Composable () -> Unit = {
+    divider: @Composable () -> Unit = @Composable {
         TabDefaults.Divider()
     },
     tabs: @Composable () -> Unit
 ) {
     Surface(modifier = modifier, color = backgroundColor, contentColor = contentColor) {
         val scrollState = rememberScrollState()
+        val coroutineScope = rememberCoroutineScope()
         val scrollableTabData = remember(scrollState) {
             ScrollableTabData(
                 scrollState = scrollState,
-                selectedTab = selectedTabIndex
+                selectedTab = selectedTabIndex,
+                coroutineScope = coroutineScope
             )
         }
         SubcomposeLayout(
@@ -279,8 +284,28 @@ fun ScrollableTabRow(
  * @property width the width of this tab
  */
 @Immutable
-data class TabPosition internal constructor(val left: Dp, val width: Dp) {
+class TabPosition internal constructor(val left: Dp, val width: Dp) {
     val right: Dp get() = left + width
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is TabPosition) return false
+
+        if (left != other.left) return false
+        if (width != other.width) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = left.hashCode()
+        result = 31 * result + width.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "TabPosition(left=$left, right=$right, width=$width)"
+    }
 }
 
 private enum class TabSlots {
@@ -294,7 +319,8 @@ private enum class TabSlots {
  */
 private class ScrollableTabData(
     private val scrollState: ScrollState,
-    private var selectedTab: Int
+    private var selectedTab: Int,
+    private val coroutineScope: CoroutineScope
 ) {
     fun onLaidOut(
         density: Density,
@@ -308,7 +334,12 @@ private class ScrollableTabData(
                 // Scrolls to the tab with [tabPosition], trying to place it in the center of the
                 // screen or as close to the center as possible.
                 val calculatedOffset = it.calculateTabOffset(density, edgeOffset, tabPositions)
-                scrollState.smoothScrollTo(calculatedOffset, spec = ScrollableTabRowScrollSpec)
+                coroutineScope.launch {
+                    scrollState.smoothScrollTo(
+                        calculatedOffset,
+                        spec = ScrollableTabRowScrollSpec
+                    )
+                }
             }
         }
     }

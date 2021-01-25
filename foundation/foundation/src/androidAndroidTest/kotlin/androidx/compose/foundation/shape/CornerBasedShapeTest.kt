@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation.shape
 
-import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.Outline
@@ -163,46 +162,6 @@ class CornerBasedShapeTest {
     }
 
     @Test
-    fun theSameImplsWithTheSameCornersAreEquals() {
-        @Suppress("ReplaceCallWithBinaryOperator")
-        assertThat(
-            Impl2(
-                topLeft = CornerSize(4.0f),
-                topRight = CornerSize(3.0f),
-                bottomRight = CornerSize(3.dp),
-                bottomLeft = CornerSize(50)
-            ).equals(
-                Impl2(
-                    topLeft = CornerSize(4.0f),
-                    topRight = CornerSize(3.0f),
-                    bottomRight = CornerSize(3.dp),
-                    bottomLeft = CornerSize(50)
-                )
-            )
-        ).isTrue()
-    }
-
-    @Test
-    fun differentImplWithTheSameCornersAreNotEquals() {
-        @Suppress("ReplaceCallWithBinaryOperator")
-        assertThat(
-            Impl(
-                topLeft = CornerSize(4.0f),
-                topRight = CornerSize(3.0f),
-                bottomRight = CornerSize(3.dp),
-                bottomLeft = CornerSize(50)
-            ).equals(
-                Impl2(
-                    topLeft = CornerSize(4.0f),
-                    topRight = CornerSize(3.0f),
-                    bottomRight = CornerSize(3.dp),
-                    bottomLeft = CornerSize(50)
-                )
-            )
-        ).isFalse()
-    }
-
-    @Test
     fun copyingUsesCorrectDefaults() {
         val impl = Impl(
             topLeft = CornerSize(4.0f),
@@ -246,29 +205,24 @@ private class Impl(
         bottomRight: CornerSize,
         bottomLeft: CornerSize
     ) = Impl(topLeft, topRight, bottomRight, bottomLeft, onOutlineRequested)
-}
 
-private class Impl2(
-    topLeft: CornerSize,
-    topRight: CornerSize,
-    bottomRight: CornerSize,
-    bottomLeft: CornerSize
-) : CornerBasedShape(topLeft, topRight, bottomRight, bottomLeft) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Impl) return false
 
-    override fun createOutline(
-        size: Size,
-        topLeft: Float,
-        topRight: Float,
-        bottomRight: Float,
-        bottomLeft: Float
-    ): Outline {
-        return Outline.Rounded(RoundRect(size.toRect()))
+        if (topLeft != other.topLeft) return false
+        if (topRight != other.topRight) return false
+        if (bottomRight != other.bottomRight) return false
+        if (bottomLeft != other.bottomLeft) return false
+
+        return true
     }
 
-    override fun copy(
-        topLeft: CornerSize,
-        topRight: CornerSize,
-        bottomRight: CornerSize,
-        bottomLeft: CornerSize
-    ) = Impl2(topLeft, topRight, bottomRight, bottomLeft)
+    override fun hashCode(): Int {
+        var result = topLeft.hashCode()
+        result = 31 * result + topRight.hashCode()
+        result = 31 * result + bottomRight.hashCode()
+        result = 31 * result + bottomLeft.hashCode()
+        return result
+    }
 }

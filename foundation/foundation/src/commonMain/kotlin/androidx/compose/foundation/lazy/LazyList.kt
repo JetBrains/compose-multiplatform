@@ -19,7 +19,6 @@ package androidx.compose.foundation.lazy
 import androidx.compose.foundation.assertNotNestingScrollableContainers
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.InternalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -34,7 +33,6 @@ import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 
-@OptIn(InternalLayoutApi::class)
 @Composable
 internal fun LazyList(
     /** The total size of the list */
@@ -57,6 +55,8 @@ internal fun LazyList(
     verticalAlignment: Alignment.Vertical? = null,
     /** The horizontal arrangement for items. Required when isVertical is false */
     horizontalArrangement: Arrangement.Horizontal? = null,
+    /** The list of indexes of the sticky header items */
+    headerIndexes: List<Int> = emptyList(),
     /** The factory defining the content for an item on the given position in the list */
     itemContent: LazyItemScope.(Int) -> @Composable () -> Unit
 ) {
@@ -132,13 +132,20 @@ internal fun LazyList(
 
         state.applyMeasureResult(measureResult)
 
+        val headers = if (headerIndexes.isNotEmpty()) {
+            LazyListHeaders(itemProvider, headerIndexes, measureResult, startContentPaddingPx)
+        } else {
+            null
+        }
+
         layoutLazyList(
             constraints,
             isVertical,
             verticalArrangement,
             horizontalArrangement,
             measureResult,
-            reverseLayout
+            reverseLayout,
+            headers
         )
     }
 }

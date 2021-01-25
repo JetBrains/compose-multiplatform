@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation.lazy
 
-import androidx.compose.animation.core.ExponentialDecay
+import androidx.compose.animation.core.FloatExponentialDecaySpec
 import androidx.compose.animation.core.ManualAnimationClock
 import androidx.compose.animation.core.snap
 import androidx.compose.foundation.animation.FlingConfig
@@ -33,10 +33,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onCommit
-import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,7 +53,7 @@ import androidx.compose.ui.test.assertPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.center
-import androidx.compose.ui.test.click
+import androidx.compose.ui.test.down
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -83,6 +82,12 @@ import java.util.concurrent.CountDownLatch
 @RunWith(AndroidJUnit4::class)
 class LazyColumnTest {
     private val LazyListTag = "LazyListTag"
+
+    private val NeverEqualObject = object {
+        override fun equals(other: Any?): Boolean {
+            return false
+        }
+    }
 
     @get:Rule
     val rule = createComposeRule()
@@ -184,15 +189,13 @@ class LazyColumnTest {
         var disposed = false
         // Ten 31dp spacers in a 300dp list
         val latch = CountDownLatch(10)
-        // Make it long enough that it's _definitely_ taller than the screen
-        val data = (1..50).toList()
 
         rule.setContent {
             // Fixed height to eliminate device size as a factor
             Box(Modifier.testTag(LazyListTag).preferredHeight(300.dp)) {
                 LazyColumn(Modifier.fillMaxSize()) {
-                    items(data) {
-                        onCommit {
+                    items(50) {
+                        DisposableEffect(NeverEqualObject) {
                             composed = true
                             // Signal when everything is done composing
                             latch.countDown()
@@ -244,7 +247,7 @@ class LazyColumnTest {
         rule.setContent {
             LazyColumn(Modifier.testTag(LazyListTag).fillMaxSize()) {
                 items(if (!part2) data1 else data2) {
-                    onCommit {
+                    DisposableEffect(NeverEqualObject) {
                         composed++
                         onDispose {
                             disposals++
@@ -285,13 +288,15 @@ class LazyColumnTest {
         rule.setContent {
             if (emitAdapterList) {
                 LazyColumn(Modifier.fillMaxSize()) {
-                    items(listOf(0, 1)) {
+                    items(2) {
                         Box(Modifier.size(100.dp))
-                        onDispose {
-                            if (it == 1) {
-                                disposeCalledOnFirstItem = true
-                            } else {
-                                disposeCalledOnSecondItem = true
+                        DisposableEffect(Unit) {
+                            onDispose {
+                                if (it == 1) {
+                                    disposeCalledOnFirstItem = true
+                                } else {
+                                    disposeCalledOnSecondItem = true
+                                }
                             }
                         }
                     }
@@ -892,7 +897,7 @@ class LazyColumnTest {
         val items by mutableStateOf((1..20).toList())
         val clock = ManualAnimationClock(0L)
         val state = LazyListState(
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = clock
         )
         rule.setContent {
@@ -920,9 +925,8 @@ class LazyColumnTest {
             assertThat(state.isAnimationRunning).isEqualTo(true)
         }
 
-        // TODO (jelle): this should be down, and not click to be 100% fair
         rule.onNodeWithTag(LazyListTag)
-            .performGesture { click() }
+            .performGesture { down(center) }
 
         rule.runOnIdle {
             assertThat(state.isAnimationRunning).isEqualTo(false)
@@ -988,7 +992,6 @@ class LazyColumnTest {
     @Test
     fun stateIsRestored() {
         val restorationTester = StateRestorationTester(rule)
-        val items by mutableStateOf((1..20).toList())
         var state: LazyListState? = null
         restorationTester.setContent {
             state = rememberLazyListState()
@@ -996,7 +999,7 @@ class LazyColumnTest {
                 Modifier.size(100.dp).testTag(LazyListTag),
                 state = state!!
             ) {
-                items(items) {
+                items(20) {
                     Spacer(Modifier.size(20.dp).testTag("$it"))
                 }
             }
@@ -1047,7 +1050,6 @@ class LazyColumnTest {
 
     @Test
     fun snapToItemIndex() {
-        val items by mutableStateOf((1..20).toList())
         lateinit var state: LazyListState
         rule.setContent {
             state = rememberLazyListState()
@@ -1055,7 +1057,7 @@ class LazyColumnTest {
                 Modifier.size(100.dp).testTag(LazyListTag),
                 state = state
             ) {
-                items(items) {
+                items(20) {
                     Spacer(Modifier.size(20.dp).testTag("$it"))
                 }
             }
@@ -1098,12 +1100,11 @@ class LazyColumnTest {
 
     @Test
     fun itemInvalidationIsNotCausingAnotherItemToRedraw() {
-        val items = (0..1).toList()
         val redrawCount = Array(2) { 0 }
         var stateUsedInDrawScope by mutableStateOf(false)
         rule.setContent {
             LazyColumn(Modifier.size(100.dp).testTag(LazyListTag)) {
-                items(items) {
+                items(2) {
                     Spacer(
                         Modifier.size(50.dp)
                             .drawBehind {
@@ -1131,7 +1132,6 @@ class LazyColumnTest {
 
     @Test
     fun notVisibleAnymoreItemNotAffectingCrossAxisSize() {
-        val items = (0..1).toList()
         val itemSize = with(rule.density) { 30.toDp() }
         val itemSizeMinusOne = with(rule.density) { 29.toDp() }
         lateinit var state: LazyListState
@@ -1140,7 +1140,7 @@ class LazyColumnTest {
                 Modifier.height(itemSizeMinusOne).testTag(LazyListTag),
                 state = rememberLazyListState().also { state = it }
             ) {
-                items(items) {
+                items(2) {
                     Spacer(
                         if (it == 0) {
                             Modifier.width(30.dp).height(itemSizeMinusOne)
@@ -1186,6 +1186,54 @@ class LazyColumnTest {
 
         rule.onNodeWithTag(LazyListTag)
             .assertWidthIsEqualTo(30.dp)
+    }
+
+    @Test
+    fun usedWithArray() {
+        val items = arrayOf("1", "2", "3")
+
+        val itemSize = with(rule.density) { 15.toDp() }
+
+        rule.setContent {
+            LazyColumn {
+                items(items) {
+                    Spacer(Modifier.size(itemSize).testTag(it))
+                }
+            }
+        }
+
+        rule.onNodeWithTag("1")
+            .assertTopPositionInRootIsEqualTo(0.dp)
+
+        rule.onNodeWithTag("2")
+            .assertTopPositionInRootIsEqualTo(itemSize)
+
+        rule.onNodeWithTag("3")
+            .assertTopPositionInRootIsEqualTo(itemSize * 2)
+    }
+
+    @Test
+    fun usedWithArrayIndexed() {
+        val items = arrayOf("1", "2", "3")
+
+        val itemSize = with(rule.density) { 15.toDp() }
+
+        rule.setContent {
+            LazyColumn {
+                itemsIndexed(items) { index, item ->
+                    Spacer(Modifier.size(itemSize).testTag("$index*$item"))
+                }
+            }
+        }
+
+        rule.onNodeWithTag("0*1")
+            .assertTopPositionInRootIsEqualTo(0.dp)
+
+        rule.onNodeWithTag("1*2")
+            .assertTopPositionInRootIsEqualTo(itemSize)
+
+        rule.onNodeWithTag("2*3")
+            .assertTopPositionInRootIsEqualTo(itemSize * 2)
     }
 
     private fun SemanticsNodeInteraction.assertTopPositionIsAlmost(expected: Dp) {

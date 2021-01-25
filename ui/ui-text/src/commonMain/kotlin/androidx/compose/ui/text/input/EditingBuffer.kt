@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.text.input
 
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextRange
 
@@ -29,8 +30,7 @@ class EditingBuffer(
     /**
      * The initial text of this editing buffer
      */
-    initialText: String,
-
+    text: AnnotatedString,
     /**
      * The initial selection range of this buffer.
      * If you provide collapsed selection, it is treated as the cursor position. The cursor and
@@ -38,24 +38,24 @@ class EditingBuffer(
      * The selection must points the valid index of the initialText, otherwise
      * IndexOutOfBoundsException will be thrown.
      */
-    initialSelection: TextRange // The initial selection range
+    selection: TextRange
 ) {
     internal companion object {
-        const val NOWHERE = -1
+        internal const val NOWHERE = -1
     }
 
-    private val gapBuffer = PartialGapBuffer(initialText)
+    private val gapBuffer = PartialGapBuffer(text.text)
 
     /**
      * The inclusive selection start offset
      */
-    internal var selectionStart = initialSelection.min
+    internal var selectionStart = selection.min
         private set
 
     /**
      * The exclusive selection end offset
      */
-    internal var selectionEnd = initialSelection.max
+    internal var selectionEnd = selection.max
         private set
 
     /**
@@ -107,18 +107,23 @@ class EditingBuffer(
      */
     internal val length: Int get() = gapBuffer.length
 
+    internal constructor(
+        text: String,
+        selection: TextRange
+    ) : this(AnnotatedString(text), selection)
+
     init {
-        val start = initialSelection.min
-        val end = initialSelection.max
-        if (start < 0 || start > initialText.length) {
+        val start = selection.min
+        val end = selection.max
+        if (start < 0 || start > text.length) {
             throw IndexOutOfBoundsException(
-                "start ($start) offset is outside of text region ${initialText.length}"
+                "start ($start) offset is outside of text region ${text.length}"
             )
         }
 
-        if (end < 0 || end > initialText.length) {
+        if (end < 0 || end > text.length) {
             throw IndexOutOfBoundsException(
-                "end ($end) offset is outside of text region ${initialText.length}"
+                "end ($end) offset is outside of text region ${text.length}"
             )
         }
 
@@ -348,4 +353,6 @@ class EditingBuffer(
     }
 
     override fun toString(): String = gapBuffer.toString()
+
+    internal fun toAnnotatedString(): AnnotatedString = AnnotatedString(toString())
 }

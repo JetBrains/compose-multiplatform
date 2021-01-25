@@ -16,9 +16,7 @@
 
 package androidx.compose.material.ripple
 
-import androidx.compose.animation.AnimatedFloatModel
-import androidx.compose.animation.asDisposableClock
-import androidx.compose.animation.core.AnimationClockObservable
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.TweenSpec
@@ -32,6 +30,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.geometry.Offset
@@ -39,65 +38,12 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.clipRect
-import androidx.compose.ui.graphics.useOrElse
-import androidx.compose.ui.platform.AmbientAnimationClock
+import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.isUnspecified
 import androidx.compose.ui.util.fastForEach
-import androidx.compose.ui.util.nativeClass
-
-/**
- * Creates and [remember]s a Ripple using values provided by [RippleTheme].
- *
- * A Ripple is a Material implementation of [Indication] that expresses different [Interaction]s
- * by drawing ripple animations and state layers.
- *
- * A Ripple responds to [Interaction.Pressed] by starting a new [RippleAnimation], and
- * responds to other [Interaction]s by showing a fixed [StateLayer] with varying alpha values
- * depending on the [Interaction].
- *
- * If you are using MaterialTheme in your hierarchy, a Ripple will be used as the default
- * [Indication] inside components such as [androidx.compose.foundation.clickable] and
- * [androidx.compose.foundation.indication]. You can also manually provide Ripples through
- * [androidx.compose.foundation.AmbientIndication] for the same effect if you are not using
- * MaterialTheme.
- *
- * You can also explicitly create a Ripple and provide it to components in order to change the
- * parameters from the default, such as to create an unbounded ripple with a fixed size.
- *
- * @param bounded If true, ripples are clipped by the bounds of the target layout. Unbounded
- * ripples always animate from the target layout center, bounded ripples animate from the touch
- * position.
- * @param radius the radius for the ripple. If `null` is provided then the size will be calculated
- * based on the target layout size.
- * @param color the color of the ripple. This color is usually the same color used by the text or
- * iconography in the component. This color will then have [RippleTheme.rippleAlpha] applied to
- * calculate the final color used to draw the ripple. If [Color.Unspecified] is provided the color
- * used will be [RippleTheme.defaultColor] instead.
- */
-@Deprecated(
-    "Replaced with rememberRipple",
-    ReplaceWith(
-        "rememberRipple(bounded, radius, color)",
-        "androidx.compose.material.ripple.rememberRipple"
-    )
-)
-@Composable
-@OptIn(ExperimentalRippleApi::class)
-public fun rememberRippleIndication(
-    bounded: Boolean = true,
-    radius: Dp? = null,
-    color: Color = Color.Unspecified
-): Indication {
-    val theme = AmbientRippleTheme.current
-    val clock = AmbientAnimationClock.current.asDisposableClock()
-    val resolvedColor = color.useOrElse { theme.defaultColor() }
-    val colorState = remember { mutableStateOf(resolvedColor, structuralEqualityPolicy()) }
-    colorState.value = resolvedColor
-    val rippleAlpha = theme.rippleAlpha()
-    return remember(bounded, radius, theme, clock) {
-        Ripple(bounded, radius ?: Dp.Unspecified, colorState, rippleAlpha, clock)
-    }
-}
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 /**
  * Creates and [remember]s a Ripple using values provided by [RippleTheme].
@@ -136,13 +82,13 @@ public fun rememberRipple(
     color: Color = Color.Unspecified
 ): Indication {
     val theme = AmbientRippleTheme.current
-    val clock = AmbientAnimationClock.current.asDisposableClock()
-    val resolvedColor = color.useOrElse { theme.defaultColor() }
+    val scope = rememberCoroutineScope()
+    val resolvedColor = color.takeOrElse { theme.defaultColor() }
     val colorState = remember { mutableStateOf(resolvedColor, structuralEqualityPolicy()) }
     colorState.value = resolvedColor
     val rippleAlpha = theme.rippleAlpha()
-    return remember(bounded, radius, theme, clock) {
-        Ripple(bounded, radius, colorState, rippleAlpha, clock)
+    return remember(bounded, radius, theme, scope) {
+        Ripple(bounded, radius, colorState, rippleAlpha, scope)
     }
 }
 
@@ -170,25 +116,23 @@ private class Ripple(
     private val radius: Dp,
     private val color: State<Color>,
     private val rippleAlpha: RippleAlpha,
-    private val clock: AnimationClockObservable
+    private val scope: CoroutineScope
 ) : Indication {
     override fun createInstance(): IndicationInstance {
-        return RippleIndicationInstance(bounded, radius, color, rippleAlpha, clock)
+        return RippleIndicationInstance(bounded, radius, color, rippleAlpha, scope)
     }
 
     // to force stability on this indication we need equals and hashcode, there's no value in
     // making this class to be "data class"
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (this.nativeClass() != other?.nativeClass()) return false
-
-        other as Ripple
+        if (other !is Ripple) return false
 
         if (bounded != other.bounded) return false
         if (radius != other.radius) return false
         if (color != other.color) return false
         if (rippleAlpha != other.rippleAlpha) return false
-        if (clock != other.clock) return false
+        if (scope != other.scope) return false
 
         return true
     }
@@ -198,7 +142,7 @@ private class Ripple(
         result = 31 * result + radius.hashCode()
         result = 31 * result + color.hashCode()
         result = 31 * result + rippleAlpha.hashCode()
-        result = 31 * result + clock.hashCode()
+        result = 31 * result + scope.hashCode()
         return result
     }
 }
@@ -209,10 +153,10 @@ private class RippleIndicationInstance constructor(
     private val radius: Dp,
     private val color: State<Color>,
     private val rippleAlpha: RippleAlpha,
-    private val clock: AnimationClockObservable
+    private val scope: CoroutineScope
 ) : IndicationInstance {
 
-    private val stateLayer = StateLayer(clock, bounded, rippleAlpha)
+    private val stateLayer = StateLayer(bounded, rippleAlpha, scope)
 
     private val ripples = mutableStateListOf<RippleAnimation>()
     private var currentPressPosition: Offset? = null
@@ -220,8 +164,7 @@ private class RippleIndicationInstance constructor(
 
     override fun ContentDrawScope.drawIndication(interactionState: InteractionState) {
         val color = color.value
-        // TODO: b/174310811 use library function instead of manual logic here
-        val targetRadius = if (radius == Dp.Unspecified) {
+        val targetRadius = if (radius.isUnspecified) {
             getRippleEndRadius(bounded, size)
         } else {
             radius.toPx()
@@ -246,7 +189,7 @@ private class RippleIndicationInstance constructor(
         val pxSize = Size(size.width, size.height)
         val center = Offset(size.width / 2f, size.height / 2f)
         val position = if (bounded) pressPosition else center
-        val ripple = RippleAnimation(pxSize, position, targetRadius, bounded, clock) { ripple ->
+        val ripple = RippleAnimation(pxSize, position, targetRadius, scope, bounded) { ripple ->
             ripples.remove(ripple)
             if (currentRipple == ripple) {
                 currentRipple = null
@@ -305,11 +248,11 @@ private class RippleIndicationInstance constructor(
  */
 @ExperimentalRippleApi
 private class StateLayer(
-    clock: AnimationClockObservable,
     private val bounded: Boolean,
-    private val rippleAlpha: RippleAlpha
+    private val rippleAlpha: RippleAlpha,
+    private val scope: CoroutineScope
 ) {
-    private val animatedAlpha = AnimatedFloatModel(0f, clock)
+    private val animatedAlpha = Animatable(0f)
     private var previousInteractions: Set<Interaction> = emptySet()
     private var lastDrawnInteraction: Interaction? = null
 
@@ -342,7 +285,9 @@ private class StateLayer(
             val incomingAnimationSpec = IncomingStateLayerAnimationSpecs[interaction]
                 ?: TweenSpec(durationMillis = 15, easing = LinearEasing)
 
-            animatedAlpha.animateTo(targetAlpha, incomingAnimationSpec)
+            scope.launch {
+                animatedAlpha.animateTo(targetAlpha, incomingAnimationSpec)
+            }
 
             lastDrawnInteraction = interaction
             handled = true
@@ -358,7 +303,9 @@ private class StateLayer(
                 val outgoingAnimationSpec = OutgoingStateLayerAnimationSpecs[previousInteraction]
                     ?: TweenSpec(durationMillis = 15, easing = LinearEasing)
 
-                animatedAlpha.animateTo(0f, outgoingAnimationSpec)
+                scope.launch {
+                    animatedAlpha.animateTo(0f, outgoingAnimationSpec)
+                }
 
                 lastDrawnInteraction = null
             }

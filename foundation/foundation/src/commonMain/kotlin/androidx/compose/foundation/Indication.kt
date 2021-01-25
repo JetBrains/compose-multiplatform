@@ -17,7 +17,7 @@
 package androidx.compose.foundation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLifecycleObserver
+import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticAmbientOf
@@ -145,7 +145,7 @@ private object DefaultDebugIndication : Indication {
 private class IndicationModifier(
     val interactionState: InteractionState,
     val indicationInstance: IndicationInstance
-) : CompositionLifecycleObserver, DrawModifier {
+) : RememberObserver, DrawModifier {
 
     override fun ContentDrawScope.draw() {
         with(indicationInstance) {
@@ -153,9 +153,13 @@ private class IndicationModifier(
         }
     }
 
-    override fun onEnter() {}
+    override fun onRemembered() { }
 
-    override fun onLeave() {
+    override fun onForgotten() {
+        indicationInstance.onDispose()
+    }
+
+    override fun onAbandoned() {
         indicationInstance.onDispose()
     }
 }

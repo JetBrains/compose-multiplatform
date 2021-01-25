@@ -20,7 +20,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.graphics.useOrElse
+import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
@@ -34,8 +34,8 @@ import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.isUnspecified
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.util.annotation.VisibleForTesting
 
 /** The default font size if none is specified. */
 private val DefaultFontSize = 14.sp
@@ -81,7 +81,7 @@ private val DefaultColor = Color.Black
  * @see ParagraphStyle
  */
 @Immutable
-data class TextStyle(
+class TextStyle(
     val color: Color = Color.Unspecified,
     val fontSize: TextUnit = TextUnit.Unspecified,
     val fontWeight: FontWeight? = null,
@@ -219,6 +219,118 @@ data class TextStyle(
     @Stable
     operator fun plus(other: SpanStyle): TextStyle = this.merge(other)
 
+    fun copy(
+        color: Color = this.color,
+        fontSize: TextUnit = this.fontSize,
+        fontWeight: FontWeight? = this.fontWeight,
+        fontStyle: FontStyle? = this.fontStyle,
+        fontSynthesis: FontSynthesis? = this.fontSynthesis,
+        fontFamily: FontFamily? = this.fontFamily,
+        fontFeatureSettings: String? = this.fontFeatureSettings,
+        letterSpacing: TextUnit = this.letterSpacing,
+        baselineShift: BaselineShift? = this.baselineShift,
+        textGeometricTransform: TextGeometricTransform? = this.textGeometricTransform,
+        localeList: LocaleList? = this.localeList,
+        background: Color = this.background,
+        textDecoration: TextDecoration? = this.textDecoration,
+        shadow: Shadow? = this.shadow,
+        textAlign: TextAlign? = this.textAlign,
+        textDirection: TextDirection? = this.textDirection,
+        lineHeight: TextUnit = this.lineHeight,
+        textIndent: TextIndent? = this.textIndent
+    ): TextStyle {
+        return TextStyle(
+            color = color,
+            fontSize = fontSize,
+            fontWeight = fontWeight,
+            fontStyle = fontStyle,
+            fontSynthesis = fontSynthesis,
+            fontFamily = fontFamily,
+            fontFeatureSettings = fontFeatureSettings,
+            letterSpacing = letterSpacing,
+            baselineShift = baselineShift,
+            textGeometricTransform = textGeometricTransform,
+            localeList = localeList,
+            background = background,
+            textDecoration = textDecoration,
+            shadow = shadow,
+            textAlign = textAlign,
+            textDirection = textDirection,
+            lineHeight = lineHeight,
+            textIndent = textIndent
+        )
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is TextStyle) return false
+
+        if (color != other.color) return false
+        if (fontSize != other.fontSize) return false
+        if (fontWeight != other.fontWeight) return false
+        if (fontStyle != other.fontStyle) return false
+        if (fontSynthesis != other.fontSynthesis) return false
+        if (fontFamily != other.fontFamily) return false
+        if (fontFeatureSettings != other.fontFeatureSettings) return false
+        if (letterSpacing != other.letterSpacing) return false
+        if (baselineShift != other.baselineShift) return false
+        if (textGeometricTransform != other.textGeometricTransform) return false
+        if (localeList != other.localeList) return false
+        if (background != other.background) return false
+        if (textDecoration != other.textDecoration) return false
+        if (shadow != other.shadow) return false
+        if (textAlign != other.textAlign) return false
+        if (textDirection != other.textDirection) return false
+        if (lineHeight != other.lineHeight) return false
+        if (textIndent != other.textIndent) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = color.hashCode()
+        result = 31 * result + fontSize.hashCode()
+        result = 31 * result + (fontWeight?.hashCode() ?: 0)
+        result = 31 * result + (fontStyle?.hashCode() ?: 0)
+        result = 31 * result + (fontSynthesis?.hashCode() ?: 0)
+        result = 31 * result + (fontFamily?.hashCode() ?: 0)
+        result = 31 * result + (fontFeatureSettings?.hashCode() ?: 0)
+        result = 31 * result + letterSpacing.hashCode()
+        result = 31 * result + (baselineShift?.hashCode() ?: 0)
+        result = 31 * result + (textGeometricTransform?.hashCode() ?: 0)
+        result = 31 * result + (localeList?.hashCode() ?: 0)
+        result = 31 * result + background.hashCode()
+        result = 31 * result + (textDecoration?.hashCode() ?: 0)
+        result = 31 * result + (shadow?.hashCode() ?: 0)
+        result = 31 * result + (textAlign?.hashCode() ?: 0)
+        result = 31 * result + (textDirection?.hashCode() ?: 0)
+        result = 31 * result + lineHeight.hashCode()
+        result = 31 * result + (textIndent?.hashCode() ?: 0)
+        return result
+    }
+
+    override fun toString(): String {
+        return "TextStyle(" +
+            "color=$color, " +
+            "fontSize=$fontSize, " +
+            "fontWeight=$fontWeight, " +
+            "fontStyle=$fontStyle, " +
+            "fontSynthesis=$fontSynthesis, " +
+            "fontFamily=$fontFamily, " +
+            "fontFeatureSettings=$fontFeatureSettings, " +
+            "letterSpacing=$letterSpacing, " +
+            "baselineShift=$baselineShift, " +
+            "textGeometricTransform=$textGeometricTransform, " +
+            "localeList=$localeList, " +
+            "background=$background, " +
+            "textDecoration=$textDecoration, " +
+            "shadow=$shadow, textAlign=$textAlign, " +
+            "textDirection=$textDirection, " +
+            "lineHeight=$lineHeight, " +
+            "textIndent=$textIndent" +
+            ")"
+    }
+
     companion object {
         /**
          * Constant for default text style.
@@ -257,7 +369,7 @@ fun lerp(start: TextStyle, stop: TextStyle, fraction: Float): TextStyle {
  * @return resolved text style.
  */
 fun resolveDefaults(style: TextStyle, direction: LayoutDirection) = TextStyle(
-    color = style.color.useOrElse { DefaultColor },
+    color = style.color.takeOrElse { DefaultColor },
     fontSize = if (style.fontSize.isUnspecified) DefaultFontSize else style.fontSize,
     fontWeight = style.fontWeight ?: FontWeight.Normal,
     fontStyle = style.fontStyle ?: FontStyle.Normal,
@@ -272,7 +384,7 @@ fun resolveDefaults(style: TextStyle, direction: LayoutDirection) = TextStyle(
     baselineShift = style.baselineShift ?: BaselineShift.None,
     textGeometricTransform = style.textGeometricTransform ?: TextGeometricTransform.None,
     localeList = style.localeList ?: LocaleList.current,
-    background = style.background.useOrElse { DefaultBackgroundColor },
+    background = style.background.takeOrElse { DefaultBackgroundColor },
     textDecoration = style.textDecoration ?: TextDecoration.None,
     shadow = style.shadow ?: Shadow.None,
     textAlign = style.textAlign ?: TextAlign.Start,
@@ -285,7 +397,7 @@ fun resolveDefaults(style: TextStyle, direction: LayoutDirection) = TextStyle(
  * If [textDirection] is null returns a [TextDirection] based on
  * [layoutDirection].
  */
-@VisibleForTesting
+/*@VisibleForTesting*/
 internal fun resolveTextDirection(
     layoutDirection: LayoutDirection,
     textDirection: TextDirection?

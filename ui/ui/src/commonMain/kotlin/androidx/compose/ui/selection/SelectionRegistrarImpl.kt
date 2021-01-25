@@ -59,6 +59,11 @@ internal class SelectionRegistrarImpl : SelectionRegistrar {
      */
     internal var onSelectionUpdateEndCallback: (() -> Unit)? = null
 
+    /**
+     * The callback to be invoked when one of the selectable has changed.
+     */
+    internal var onSelectableChangeCallback: ((Selectable) -> Unit)? = null
+
     override fun subscribe(selectable: Selectable): Selectable {
         _selectables.add(selectable)
         sorted = false
@@ -83,13 +88,13 @@ internal class SelectionRegistrarImpl : SelectionRegistrar {
                     val layoutCoordinatesB = b.getLayoutCoordinates()
 
                     val positionA =
-                        if (layoutCoordinatesA != null) containerLayoutCoordinates.childToLocal(
+                        if (layoutCoordinatesA != null) containerLayoutCoordinates.localPositionOf(
                             layoutCoordinatesA,
                             Offset.Zero
                         )
                         else Offset.Zero
                     val positionB =
-                        if (layoutCoordinatesB != null) containerLayoutCoordinates.childToLocal(
+                        if (layoutCoordinatesB != null) containerLayoutCoordinates.localPositionOf(
                             layoutCoordinatesB,
                             Offset.Zero
                         )
@@ -128,5 +133,9 @@ internal class SelectionRegistrarImpl : SelectionRegistrar {
 
     override fun notifySelectionUpdateEnd() {
         onSelectionUpdateEndCallback?.invoke()
+    }
+
+    override fun notifySelectableChange(selectable: Selectable) {
+        onSelectableChangeCallback?.invoke(selectable)
     }
 }

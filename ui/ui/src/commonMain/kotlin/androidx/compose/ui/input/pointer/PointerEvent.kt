@@ -19,7 +19,6 @@
 package androidx.compose.ui.input.pointer
 
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEventPass.Final
@@ -29,7 +28,6 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.Uptime
 import androidx.compose.ui.unit.round
 
 /**
@@ -103,6 +101,7 @@ abstract class PointerInputFilter {
      */
     val size: IntSize
         get() = layoutCoordinates?.size ?: IntSize.Zero
+    @Suppress("DEPRECATION")
     internal val position: IntOffset
         get() = layoutCoordinates?.run { localToGlobal(Offset.Zero).round() } ?: IntOffset.Zero
     internal val isAttached: Boolean
@@ -128,35 +127,105 @@ expect class PointerEvent @OptIn(InternalCoreApi::class) internal constructor(
 }
 
 /**
+ * The device type that produces a [PointerInputChange], such as a mouse or stylus.
+ */
+enum class PointerType {
+    /**
+     * An unknown device type or the device type isn't relevant.
+     */
+    Unknown,
+
+    /**
+     * Touch (finger) input.
+     */
+    Touch,
+
+    /**
+     * A mouse pointer.
+     */
+    Mouse,
+
+    /**
+     * A stylus.
+     */
+    Stylus,
+
+    /**
+     * An eraser or an inverted stylus.
+     */
+    Eraser
+}
+
+/**
  * Describes a change that has occurred for a particular pointer, as well as how much of the change
  * has been consumed (meaning, used by a node in the UI).
  *
- * The [current] data always represents the position of the pointer relative to the element that
+ * The [position] represents the position of the pointer relative to the element that
  * this [PointerInputChange] is being dispatched to.
  *
- * The [previous] data, however, represents the position of the pointer offset to the current
+ * The [previousPosition] represents the position of the pointer offset to the current
  * position of the pointer relative to the screen.
  *
- * This means that [current] and [previous] can always be used to understand how much a pointer
- * has moved relative to an element, even if that element is moving along with the changes to the
- * pointer.  For example, if a pointer touches a 1x1 pixel box in the middle, [current] will
- * report a position of (0, 0) when dispatched to it.  If the next event moves x position 5
- * pixels, [current] will report (5, 0) and [previous] will report (0, 0).  If the box moves all 5
- * pixels, and the next event represents the pointer moving along the x axis for 5 more pixels,
- * [current] will again report (5, 0) and [previous] will report (0, 0).
+ * This means that [position] and [previousPosition] can always be used to understand how
+ * much a pointer has moved relative to an element, even if that element is moving along with the
+ * changes to the pointer.  For example, if a pointer touches a 1x1 pixel box in the middle,
+ * [position] will report a position of (0, 0) when dispatched to it.  If the next event
+ * moves x position 5 pixels, [position] will report (5, 0) and [previousPosition] will
+ * report (0, 0). If the box moves all 5 pixels, and the next event represents the pointer moving
+ * along the x axis for 5 more pixels, [position] will again report (5, 0) and
+ * [previousPosition] will report (0, 0).
  *
  * @param id The unique id of the pointer associated with this [PointerInputChange].
- * @param current The [PointerInputData] that represents the current state of this pointer.
- * @param previous The [PointerInputData] that represents the previous state of this pointer.
+ * @param uptimeMillis The time of the current pointer event, in milliseconds. The start (`0`) time
+ * is platform-dependent
+ * @param position The [Offset] of the current pointer event, relative to the containing
+ * element
+ * @param pressed `true` if the pointer event is considered "pressed." For example, finger
+ * touching the screen or a mouse button is pressed [pressed] would be `true`.
+ * @param previousUptimeMillis The [uptimeMillis] of the previous pointer event
+ * @param previousPosition The [Offset] of the previous pointer event, offset to the
+ * [position] and relative to the containing element.
+ * @param previousPressed `true` if the pointer event was considered "pressed." For example , if
+ * a finter was touching the screen or a mouse button was pressed, [previousPressed] would be
+ * `true`.
  * @param consumed Which aspects of this change have been consumed.
+ * @param type The device type that produced the event, such as [mouse][PointerType.Mouse],
+ * or [touch][PointerType.Touch].git
  */
 @Immutable
-data class PointerInputChange(
+class PointerInputChange(
     val id: PointerId,
-    val current: PointerInputData,
-    val previous: PointerInputData,
-    val consumed: ConsumedData
-)
+    val uptimeMillis: Long,
+    val position: Offset,
+    val pressed: Boolean,
+    val previousUptimeMillis: Long,
+    val previousPosition: Offset,
+    val previousPressed: Boolean,
+    val consumed: ConsumedData,
+    val type: PointerType = PointerType.Touch
+) {
+    fun copy(
+        id: PointerId = this.id,
+        currentTime: Long = this.uptimeMillis,
+        currentPosition: Offset = this.position,
+        currentPressed: Boolean = this.pressed,
+        previousTime: Long = this.previousUptimeMillis,
+        previousPosition: Offset = this.previousPosition,
+        previousPressed: Boolean = this.previousPressed,
+        consumed: ConsumedData = this.consumed,
+        type: PointerType = this.type
+    ): PointerInputChange = PointerInputChange(
+        id,
+        currentTime,
+        currentPosition,
+        currentPressed,
+        previousTime,
+        previousPosition,
+        previousPressed,
+        consumed,
+        type
+    )
+}
 
 /**
  * An ID for a given pointer.
@@ -164,24 +233,6 @@ data class PointerInputChange(
  * @param value The actual value of the id.
  */
 inline class PointerId(val value: Long)
-
-/**
- * Data associated with a pointer.
- *
- * @param uptime The time associated with this particular [PointerInputData]
- * @param position The position of the pointer at [uptime] relative to element that
- * the owning [PointerInputChange] is being dispatched to.
- * @param down True if the at [uptime] the pointer was contacting the screen.
- */
-@Immutable
-data class PointerInputData(
-    @Stable
-    val uptime: Uptime,
-    @Stable
-    val position: Offset,
-    @Stable
-    val down: Boolean
-)
 
 /**
  * Describes what aspects of, and how much of, a change has been consumed.
@@ -270,25 +321,25 @@ interface CustomEventDispatcher {
  * True if this [PointerInputChange] represents a pointer coming in contact with the screen and
  * that change has not been consumed.
  */
-fun PointerInputChange.changedToDown() = !consumed.downChange && !previous.down && current.down
+fun PointerInputChange.changedToDown() = !consumed.downChange && !previousPressed && pressed
 
 /**
  * True if this [PointerInputChange] represents a pointer coming in contact with the screen, whether
  * or not that change has been consumed.
  */
-fun PointerInputChange.changedToDownIgnoreConsumed() = !previous.down && current.down
+fun PointerInputChange.changedToDownIgnoreConsumed() = !previousPressed && pressed
 
 /**
  * True if this [PointerInputChange] represents a pointer breaking contact with the screen and
  * that change has not been consumed.
  */
-fun PointerInputChange.changedToUp() = !consumed.downChange && previous.down && !current.down
+fun PointerInputChange.changedToUp() = !consumed.downChange && previousPressed && !pressed
 
 /**
  * True if this [PointerInputChange] represents a pointer breaking contact with the screen, whether
  * or not that change has been consumed.
  */
-fun PointerInputChange.changedToUpIgnoreConsumed() = previous.down && !current.down
+fun PointerInputChange.changedToUpIgnoreConsumed() = previousPressed && !pressed
 
 /**
  * True if this [PointerInputChange] represents a pointer moving on the screen and some of that
@@ -315,8 +366,8 @@ fun PointerInputChange.positionChange() = this.positionChangeInternal(false)
  */
 fun PointerInputChange.positionChangeIgnoreConsumed() = this.positionChangeInternal(true)
 private fun PointerInputChange.positionChangeInternal(ignoreConsumed: Boolean = false): Offset {
-    val previousPosition = previous.position
-    val currentPosition = current.position
+    val previousPosition = previousPosition
+    val currentPosition = position
 
     val offset = currentPosition - previousPosition
 
@@ -343,7 +394,7 @@ fun PointerInputChange.anyChangeConsumed() = anyPositionChangeConsumed() || cons
  * consume.
  */
 fun PointerInputChange.consumeDownChange() {
-    if (current.down != previous.down) {
+    if (pressed != previousPressed) {
         consumed.downChange = true
     }
 }
@@ -378,7 +429,7 @@ fun PointerInputChange.consumeAllChanges() {
  * given bounds.
  */
 fun PointerInputChange.isOutOfBounds(size: IntSize): Boolean {
-    val position = current.position
+    val position = position
     val x = position.x
     val y = position.y
     val width = size.width

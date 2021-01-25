@@ -20,8 +20,6 @@ import androidx.compose.ui.input.pointer.down
 import androidx.compose.ui.input.pointer.invokeOverAllPasses
 import androidx.compose.ui.input.pointer.moveBy
 import androidx.compose.ui.input.pointer.moveTo
-import androidx.compose.ui.unit.Duration
-import androidx.compose.ui.unit.milliseconds
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Test
@@ -59,7 +57,7 @@ class ScaleSlopExceededGestureFilterTest {
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
 
         pointer = pointer.moveBy(
-            Duration(milliseconds = 10),
+            10,
             TestTouchSlop.toFloat() * 10,
             TestTouchSlop.toFloat() * 10
         )
@@ -455,20 +453,20 @@ class ScaleSlopExceededGestureFilterTest {
     @Test
     fun onPointerEvent_2PointersMoveAroundUnderSlop_onTouchSlopExceededNotCalled() {
         // Arrange
-        var pointer1 = down(0, 0.milliseconds, 0f, 0f)
-        var pointer2 = down(1, 0.milliseconds, 0f, 50f)
+        var pointer1 = down(0, 0, 0f, 0f)
+        var pointer2 = down(1, 0, 0f, 50f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
         // Act
 
         // Translate, rotate and scale up.
         pointer1 = pointer1.moveTo(
-            10.milliseconds,
+            10,
             70f,
             100f
         )
         pointer2 = pointer2.moveTo(
-            10.milliseconds,
+            10,
             10f,
             100f
         )
@@ -476,12 +474,12 @@ class ScaleSlopExceededGestureFilterTest {
 
         // Translate, rotate and scale down.
         pointer1 = pointer1.moveTo(
-            20.milliseconds,
+            20,
             -40f,
             35f
         )
         pointer2 = pointer2.moveTo(
-            20.milliseconds,
+            20,
             -40f,
             75f
         )
@@ -489,12 +487,12 @@ class ScaleSlopExceededGestureFilterTest {
 
         // Translate, rotate and scale up.
         pointer1 = pointer1.moveTo(
-            30.milliseconds,
+            30,
             -20f,
             -20f
         )
         pointer2 = pointer2.moveTo(
-            30.milliseconds,
+            30,
             40f,
             -20f
         )
@@ -502,12 +500,12 @@ class ScaleSlopExceededGestureFilterTest {
 
         // Translate, rotate and scale down.
         pointer1 = pointer1.moveTo(
-            40.milliseconds,
+            40,
             20f,
             -40f
         )
         pointer2 = pointer2.moveTo(
-            40.milliseconds,
+            40,
             20f,
             -80f
         )
@@ -519,20 +517,20 @@ class ScaleSlopExceededGestureFilterTest {
     @Test
     fun onPointerEvent_2PointersMoveOverIntoAndOverSlop_onTouchSlopExceededCalledOnce() {
         // Arrange
-        var pointer1 = down(0, 0.milliseconds, 0f, 0f)
-        var pointer2 = down(1, 0.milliseconds, 0f, 20f)
+        var pointer1 = down(0, 0, 0f, 0f)
+        var pointer2 = down(1, 0, 0f, 20f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
         // Act
 
         // Over
         pointer1 = pointer1.moveTo(
-            10.milliseconds,
+            10,
             0f,
             0f
         )
         pointer2 = pointer2.moveTo(
-            10.milliseconds,
+            10,
             0f,
             30 + TinyNum
         )
@@ -540,12 +538,12 @@ class ScaleSlopExceededGestureFilterTest {
 
         // Under
         pointer1 = pointer1.moveTo(
-            20.milliseconds,
+            20,
             0f,
             0f
         )
         pointer2 = pointer2.moveTo(
-            20.milliseconds,
+            20,
             0f,
             30 - TinyNum
         )
@@ -553,12 +551,12 @@ class ScaleSlopExceededGestureFilterTest {
 
         // Over
         pointer1 = pointer1.moveTo(
-            30.milliseconds,
+            30,
             0f,
             0f
         )
         pointer2 = pointer2.moveTo(
-            30.milliseconds,
+            30,
             0f,
             30 + TinyNum
         )
@@ -571,8 +569,8 @@ class ScaleSlopExceededGestureFilterTest {
     fun onPointerEvent_2PointersStepToSlopThenOverX_onTouchSlopExceededCalledOnceOver() {
 
         // Arrange
-        var pointer1 = down(0, 0.milliseconds, 0f, 0f)
-        var pointer2 = down(1, 0.milliseconds, 1f, 0f)
+        var pointer1 = down(0, 0, 0f, 0f)
+        var pointer2 = down(1, 0, 1f, 0f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
         // Act
@@ -580,12 +578,12 @@ class ScaleSlopExceededGestureFilterTest {
         // Increment to slop, but not over.
         repeat(10) {
             pointer1 = pointer1.moveBy(
-                10.milliseconds,
+                10,
                 0f,
                 0f
             )
             pointer2 = pointer2.moveBy(
-                10.milliseconds,
+                10,
                 1f,
                 0f
             )
@@ -597,12 +595,12 @@ class ScaleSlopExceededGestureFilterTest {
 
         // Go over slop.
         pointer1 = pointer1.moveBy(
-            10.milliseconds,
+            10,
             0f,
             0f
         )
         pointer2 = pointer2.moveBy(
-            10.milliseconds,
+            10,
             TinyNum,
             0f
         )
@@ -615,8 +613,8 @@ class ScaleSlopExceededGestureFilterTest {
     @Test
     fun onPointerEvent_2PointersStepToSlopThenOverY_onTouchSlopExceededCalledOnceOver() {
         // Arrange
-        var pointer1 = down(0, 0.milliseconds, 0f, 0f)
-        var pointer2 = down(1, 0.milliseconds, 0f, 1f)
+        var pointer1 = down(0, 0, 0f, 0f)
+        var pointer2 = down(1, 0, 0f, 1f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
         // Act
@@ -624,12 +622,12 @@ class ScaleSlopExceededGestureFilterTest {
         // Increment to slop, but not over.
         repeat(10) {
             pointer1 = pointer1.moveBy(
-                10.milliseconds,
+                10,
                 0f,
                 0f
             )
             pointer2 = pointer2.moveBy(
-                10.milliseconds,
+                10,
                 0f,
                 1f
             )
@@ -641,12 +639,12 @@ class ScaleSlopExceededGestureFilterTest {
 
         // Go over slop.
         pointer1 = pointer1.moveBy(
-            10.milliseconds,
+            10,
             0f,
             0f
         )
         pointer2 = pointer2.moveBy(
-            10.milliseconds,
+            10,
             0f,
             TinyNum
         )
@@ -663,17 +661,17 @@ class ScaleSlopExceededGestureFilterTest {
 
         // Arrange
 
-        var pointer1 = down(0, 0.milliseconds, 0f, 0f)
-        var pointer2 = down(1, 0L.milliseconds, 1f, 0f)
+        var pointer1 = down(0, 0, 0f, 0f)
+        var pointer2 = down(1, 0, 1f, 0f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
         pointer1 = pointer1.moveTo(
-            10.milliseconds,
+            10,
             0f,
             0f
         )
         pointer2 = pointer2.moveTo(
-            10.milliseconds,
+            10,
             11f,
             0f
         )
@@ -683,17 +681,17 @@ class ScaleSlopExceededGestureFilterTest {
 
         filter.onCancel()
 
-        pointer1 = down(0, 0.milliseconds, 0f, 0f)
-        pointer2 = down(1, 0L.milliseconds, 1f, 0f)
+        pointer1 = down(0, 0, 0f, 0f)
+        pointer2 = down(1, 0, 1f, 0f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
         pointer1 = pointer1.moveTo(
-            10.milliseconds,
+            10,
             0f,
             0f
         )
         pointer2 = pointer2.moveTo(
-            10.milliseconds,
+            10,
             11f,
             0f
         )
@@ -709,17 +707,17 @@ class ScaleSlopExceededGestureFilterTest {
 
         // Arrange
 
-        var pointer1 = down(0, 0.milliseconds, 0f, 0f)
-        var pointer2 = down(1, 0L.milliseconds, 1f, 0f)
+        var pointer1 = down(0, 0, 0f, 0f)
+        var pointer2 = down(1, 0, 1f, 0f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
         pointer1 = pointer1.moveTo(
-            10.milliseconds,
+            10,
             0f,
             0f
         )
         pointer2 = pointer2.moveTo(
-            10.milliseconds,
+            10,
             11 + TinyNum,
             0f
         )
@@ -729,17 +727,17 @@ class ScaleSlopExceededGestureFilterTest {
 
         filter.onCancel()
 
-        pointer1 = down(0, 0.milliseconds, 0f, 0f)
-        pointer2 = down(1, 0L.milliseconds, 1f, 0f)
+        pointer1 = down(0, 0, 0f, 0f)
+        pointer2 = down(1, 0, 1f, 0f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
         pointer1 = pointer1.moveTo(
-            10.milliseconds,
+            10,
             0f,
             0f
         )
         pointer2 = pointer2.moveTo(
-            10.milliseconds,
+            10,
             11 + TinyNum,
             0f
         )
@@ -762,18 +760,18 @@ class ScaleSlopExceededGestureFilterTest {
         expectedCound: Int
     ) {
         // Arrange
-        var pointer1 = down(0, 0.milliseconds, x1s, y1s)
-        var pointer2 = down(1, 0L.milliseconds, x2s, y2s)
+        var pointer1 = down(0, 0, x1s, y1s)
+        var pointer2 = down(1, 0, x2s, y2s)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2))
 
         // Act
         pointer1 = pointer1.moveTo(
-            10.milliseconds,
+            10,
             x1e,
             y1e
         )
         pointer2 = pointer2.moveTo(
-            10.milliseconds,
+            10,
             x2e,
             y2e
         )
@@ -798,24 +796,24 @@ class ScaleSlopExceededGestureFilterTest {
         expectedCound: Int
     ) {
         // Arrange
-        var pointer1 = down(0, 0.milliseconds, x1s, y1s)
-        var pointer2 = down(1, 0.milliseconds, x2s, y2s)
-        var pointer3 = down(2, 0.milliseconds, x3s, y3s)
+        var pointer1 = down(0, 0, x1s, y1s)
+        var pointer2 = down(1, 0, x2s, y2s)
+        var pointer3 = down(2, 0, x3s, y3s)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer1, pointer2, pointer3))
 
         // Act
         pointer1 = pointer1.moveTo(
-            10.milliseconds,
+            10,
             x1e,
             y1e
         )
         pointer2 = pointer2.moveTo(
-            10.milliseconds,
+            10,
             x2e,
             y2e
         )
         pointer3 = pointer3.moveTo(
-            10.milliseconds,
+            10,
             x3e,
             y3e
         )

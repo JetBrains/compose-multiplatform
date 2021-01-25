@@ -21,9 +21,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.luminance
-import androidx.compose.ui.graphics.useOrElse
+import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.selection.TextSelectionColors
-import androidx.compose.ui.util.annotation.VisibleForTesting
 import kotlin.math.max
 import kotlin.math.min
 
@@ -41,7 +40,7 @@ internal fun rememberTextSelectionColors(colors: Colors): TextSelectionColors {
     // 'worst case' scenario. We explicitly don't test with ContentAlpha.disabled, as disabled
     // text shouldn't be selectable / is noted as disabled for accessibility purposes.
     val textColorWithLowestAlpha = colors.contentColorFor(backgroundColor)
-        .useOrElse {
+        .takeOrElse {
             AmbientContentColor.current
         }.copy(
             alpha = ContentAlpha.medium
@@ -75,7 +74,7 @@ internal fun rememberTextSelectionColors(colors: Colors): TextSelectionColors {
  * @return a resulting [selectionColor] with alpha applied that results in acceptable contrast
  * (if possible with the values for [selectionColor], [textColor] and [backgroundColor]).
  */
-@VisibleForTesting
+/*@VisibleForTesting*/
 internal fun calculateSelectionBackgroundColor(
     selectionColor: Color,
     textColor: Color,
@@ -213,7 +212,7 @@ private fun calculateContrastRatio(
  *
  * @return the contrast ratio as a value between 1 and 21. See [calculateContrastRatio]
  */
-@VisibleForTesting
+/*@VisibleForTesting*/
 internal fun calculateContrastRatio(foreground: Color, background: Color): Float {
     val foregroundLuminance = foreground.luminance() + 0.05f
     val backgroundLuminance = background.luminance() + 0.05f

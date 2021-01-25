@@ -22,7 +22,6 @@ import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.annotation.IntRange
 
 /**
  * A shape describing the rectangle with cut corners.
@@ -82,36 +81,56 @@ class CutCornerShape(
         return "CutCornerShape(topLeft = $topLeft, topRight = $topRight, bottomRight = " +
             "$bottomRight, bottomLeft = $bottomLeft)"
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is CutCornerShape) return false
+
+        if (topLeft != other.topLeft) return false
+        if (topRight != other.topRight) return false
+        if (bottomRight != other.bottomRight) return false
+        if (bottomLeft != other.bottomLeft) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = topLeft.hashCode()
+        result = 31 * result + topRight.hashCode()
+        result = 31 * result + bottomRight.hashCode()
+        result = 31 * result + bottomLeft.hashCode()
+        return result
+    }
 }
 
 /**
  * Creates [CutCornerShape] with the same size applied for all four corners.
  * @param corner [CornerSize] to apply.
  */
-/*inline*/ fun CutCornerShape(corner: CornerSize) = CutCornerShape(corner, corner, corner, corner)
+fun CutCornerShape(corner: CornerSize) = CutCornerShape(corner, corner, corner, corner)
 
 /**
  * Creates [CutCornerShape] with the same size applied for all four corners.
  * @param size Size in [Dp] to apply.
  */
-/*inline*/ fun CutCornerShape(size: Dp) = CutCornerShape(CornerSize(size))
+fun CutCornerShape(size: Dp) = CutCornerShape(CornerSize(size))
 
 /**
  * Creates [CutCornerShape] with the same size applied for all four corners.
  * @param size Size in pixels to apply.
  */
-/*inline*/ fun CutCornerShape(size: Float) = CutCornerShape(CornerSize(size))
+fun CutCornerShape(size: Float) = CutCornerShape(CornerSize(size))
 
 /**
  * Creates [CutCornerShape] with the same size applied for all four corners.
  * @param percent Size in percents to apply.
  */
-/*inline*/ fun CutCornerShape(percent: Int) = CutCornerShape(CornerSize(percent))
+fun CutCornerShape(percent: Int) = CutCornerShape(CornerSize(percent))
 
 /**
  * Creates [CutCornerShape] with sizes defined in [Dp].
  */
-/*inline*/ fun CutCornerShape(
+fun CutCornerShape(
     topLeft: Dp = 0.dp,
     topRight: Dp = 0.dp,
     bottomRight: Dp = 0.dp,
@@ -126,7 +145,7 @@ class CutCornerShape(
 /**
  * Creates [CutCornerShape] with sizes defined in float.
  */
-/*inline*/ fun CutCornerShape(
+fun CutCornerShape(
     topLeft: Float = 0.0f,
     topRight: Float = 0.0f,
     bottomRight: Float = 0.0f,
@@ -140,12 +159,25 @@ class CutCornerShape(
 
 /**
  * Creates [CutCornerShape] with sizes defined in percents of the shape's smaller side.
+ *
+ * @param topLeftPercent The top left corner clip size as a percentage of the smaller side, with a
+ * range of 0 - 100.
+ * @param topRightPercent The top right corner clip size as a percentage of the smaller side, with a
+ * range of 0 - 100.
+ * @param bottomRightPercent The bottom right clip size radius as a percentage of the smaller side,
+ * with a range of 0 - 100.
+ * @param bottomLeftPercent The bottom left clip size radius as a percentage of the smaller side,
+ * with a range of 0 - 100.
  */
-/*inline*/ fun CutCornerShape(
-    @IntRange(from = 0, to = 100) topLeftPercent: Int = 0,
-    @IntRange(from = 0, to = 100) topRightPercent: Int = 0,
-    @IntRange(from = 0, to = 100) bottomRightPercent: Int = 0,
-    @IntRange(from = 0, to = 100) bottomLeftPercent: Int = 0
+fun CutCornerShape(
+    /*@IntRange(from = 0, to = 100)*/
+    topLeftPercent: Int = 0,
+    /*@IntRange(from = 0, to = 100)*/
+    topRightPercent: Int = 0,
+    /*@IntRange(from = 0, to = 100)*/
+    bottomRightPercent: Int = 0,
+    /*@IntRange(from = 0, to = 100)*/
+    bottomLeftPercent: Int = 0
 ) = CutCornerShape(
     CornerSize(topLeftPercent),
     CornerSize(topRightPercent),

@@ -18,6 +18,7 @@ package androidx.compose.ui.node
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.hapticfeedback.HapticFeedback
@@ -25,25 +26,26 @@ import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.ViewConfiguration
-import androidx.compose.ui.semantics.SemanticsOwner
+import androidx.compose.ui.platform.WindowInfo
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.platform.WindowManager
 
 /**
  * Owner implements the connection to the underlying view system. On Android, this connects
  * to Android [views][android.view.View] and all layout, draw, input, and accessibility is hooked
  * through them.
  */
-interface Owner {
+internal interface Owner {
 
     /**
      * The root layout node in the component tree.
      */
     val root: LayoutNode
+
+    val rootForTest: RootForTest
 
     /**
      * Provide haptic feedback to the user. Use the Android version of haptic feedback.
@@ -66,18 +68,18 @@ interface Owner {
      *  TODO(ralu): Replace with SemanticsTree. This is a temporary hack until we have a semantics
      *  tree implemented.
      */
+    @get:ExperimentalComposeUiApi
     @ExperimentalComposeUiApi
     val autofillTree: AutofillTree
 
     /**
      * The [Autofill] class can be used to perform autofill operations. It is used as an ambient.
      */
+    @get:ExperimentalComposeUiApi
     @ExperimentalComposeUiApi
     val autofill: Autofill?
 
     val density: Density
-
-    val semanticsOwner: SemanticsOwner
 
     val textInputService: TextInputService
 
@@ -86,10 +88,21 @@ interface Owner {
      */
     val focusManager: FocusManager
 
+    // TODO(b/178014889): Remove after Alpha 11.
     /**
      * Provide information about the window that hosts this [Owner].
      */
-    val windowManager: WindowManager
+    @Deprecated(
+        message = "Renamed to windowInfo",
+        replaceWith = ReplaceWith("windowInfo"),
+        level = DeprecationLevel.ERROR
+    )
+    val windowManager get() = windowInfo
+
+    /**
+     * Provide information about the window that hosts this [Owner].
+     */
+    val windowInfo: WindowInfo
 
     val fontLoader: Font.ResourceLoader
 
@@ -134,18 +147,16 @@ interface Owner {
     fun calculatePosition(): IntOffset
 
     /**
+     * Returns the most position of the owner relative to the window.
+     */
+    fun calculatePositionInWindow(): IntOffset
+
+    /**
      * Ask the system to provide focus to this owner.
      *
      * @return true if the system granted focus to this owner. False otherwise.
      */
     fun requestFocus(): Boolean
-
-    /**
-     * Send this [KeyEvent] to the focused component in this [Owner].
-     *
-     * @return true if the event was consumed. False otherwise.
-     */
-    fun sendKeyEvent(keyEvent: KeyEvent): Boolean
 
     /**
      * Iterates through all LayoutNodes that have requested layout and measures and lays them out
@@ -163,6 +174,16 @@ interface Owner {
      * Semantics tree has some property change.
      */
     fun onSemanticsChange()
+
+    /**
+     * The position and/or size of the [layoutNode] changed.
+     */
+    fun onLayoutChange(layoutNode: LayoutNode)
+
+    /**
+     * The [FocusDirection] represented by the specified keyEvent.
+     */
+    fun getFocusDirection(keyEvent: KeyEvent): FocusDirection?
 
     val measureIteration: Long
 

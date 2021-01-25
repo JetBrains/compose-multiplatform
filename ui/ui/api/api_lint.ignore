@@ -1,14 +1,4 @@
 // Baseline format: 1.0
-AutoBoxing: androidx.compose.ui.node.LayoutNode#getAlignmentLine(androidx.compose.ui.layout.AlignmentLine):
-    Must avoid boxed primitives (`java.lang.Integer`)
-
-
-BuilderSetStyle: androidx.compose.ui.graphics.vector.VectorAssetBuilder#popGroup():
-    Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.graphics.vector.VectorAssetBuilder.popGroup()
-BuilderSetStyle: androidx.compose.ui.graphics.vector.VectorAssetBuilder#pushGroup(String, float, float, float, float, float, float, float, java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode>):
-    Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.graphics.vector.VectorAssetBuilder.pushGroup(String,float,float,float,float,float,float,float,java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode>)
-
-
 CallbackMethodName: androidx.compose.ui.gesture.ScrollCallback#onStart-k-4lQ0M(long):
     Callback method names must follow the on<Something> style: onStart-k-4lQ0M
 
@@ -27,18 +17,6 @@ ExecutorRegistration: androidx.compose.ui.gesture.ScrollGestureFilterKt#scrollGe
     Registration methods should have overload that accepts delivery Executor: `scrollGestureFilter`
 
 
-GetterOnBuilder: androidx.compose.ui.graphics.vector.VectorAssetBuilder#getDefaultHeight-D9Ej5fM():
-    Getter should be on the built object, not the builder: method androidx.compose.ui.graphics.vector.VectorAssetBuilder.getDefaultHeight-D9Ej5fM()
-GetterOnBuilder: androidx.compose.ui.graphics.vector.VectorAssetBuilder#getDefaultWidth-D9Ej5fM():
-    Getter should be on the built object, not the builder: method androidx.compose.ui.graphics.vector.VectorAssetBuilder.getDefaultWidth-D9Ej5fM()
-GetterOnBuilder: androidx.compose.ui.graphics.vector.VectorAssetBuilder#getName():
-    Getter should be on the built object, not the builder: method androidx.compose.ui.graphics.vector.VectorAssetBuilder.getName()
-GetterOnBuilder: androidx.compose.ui.graphics.vector.VectorAssetBuilder#getViewportHeight():
-    Getter should be on the built object, not the builder: method androidx.compose.ui.graphics.vector.VectorAssetBuilder.getViewportHeight()
-GetterOnBuilder: androidx.compose.ui.graphics.vector.VectorAssetBuilder#getViewportWidth():
-    Getter should be on the built object, not the builder: method androidx.compose.ui.graphics.vector.VectorAssetBuilder.getViewportWidth()
-
-
 ListenerLast: androidx.compose.ui.gesture.ScrollGestureFilterKt#scrollGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.ScrollCallback, androidx.compose.ui.gesture.scrollorientationlocking.Orientation, kotlin.jvm.functions.Function1<? super androidx.compose.ui.gesture.Direction,java.lang.Boolean>, boolean) parameter #2:
     Listeners should always be at end of argument list (method `scrollGestureFilter`)
 ListenerLast: androidx.compose.ui.gesture.ScrollGestureFilterKt#scrollGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.ScrollCallback, androidx.compose.ui.gesture.scrollorientationlocking.Orientation, kotlin.jvm.functions.Function1<? super androidx.compose.ui.gesture.Direction,java.lang.Boolean>, boolean) parameter #3:
@@ -47,12 +25,18 @@ ListenerLast: androidx.compose.ui.gesture.ScrollGestureFilterKt#scrollGestureFil
     Listeners should always be at end of argument list (method `scrollGestureFilter`)
 
 
-MissingGetterMatchingBuilder: androidx.compose.ui.graphics.vector.VectorAssetBuilder#addPath(java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode>, androidx.compose.ui.graphics.PathFillType, String, androidx.compose.ui.graphics.Brush, float, androidx.compose.ui.graphics.Brush, float, float, androidx.compose.ui.graphics.StrokeCap, androidx.compose.ui.graphics.StrokeJoin, float, float, float, float):
-    androidx.compose.ui.graphics.vector.VectorAsset does not declare a `getPaths()` method matching method androidx.compose.ui.graphics.vector.VectorAssetBuilder.addPath(java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode>,androidx.compose.ui.graphics.PathFillType,String,androidx.compose.ui.graphics.Brush,float,androidx.compose.ui.graphics.Brush,float,float,androidx.compose.ui.graphics.StrokeCap,androidx.compose.ui.graphics.StrokeJoin,float,float,float,float)
-
-
 MissingNullability: androidx.compose.ui.graphics.TransformOrigin#toString-impl(long):
     Missing nullability on method `toString-impl` return
+MissingNullability: androidx.compose.ui.input.key.KeyEvent#constructor-impl(android.view.KeyEvent):
+    Missing nullability on method `constructor-impl` return
+MissingNullability: androidx.compose.ui.input.key.KeyEvent#equals-impl(android.view.KeyEvent, Object) parameter #0:
+    Missing nullability on parameter `p` in method `equals-impl`
+MissingNullability: androidx.compose.ui.input.key.KeyEvent#hashCode-impl(android.view.KeyEvent) parameter #0:
+    Missing nullability on parameter `p` in method `hashCode-impl`
+MissingNullability: androidx.compose.ui.input.key.KeyEvent#toString-impl(android.view.KeyEvent):
+    Missing nullability on method `toString-impl` return
+MissingNullability: androidx.compose.ui.input.key.KeyEvent#toString-impl(android.view.KeyEvent) parameter #0:
+    Missing nullability on parameter `p` in method `toString-impl`
 MissingNullability: androidx.compose.ui.input.pointer.PointerId#toString-impl(long):
     Missing nullability on method `toString-impl` return
 MissingNullability: androidx.compose.ui.layout.Measured#constructor-impl(androidx.compose.ui.layout.Placeable):
@@ -73,7 +57,3 @@ MissingNullability: androidx.compose.ui.layout.Measured#toString-impl(androidx.c
 
 NotCloseable: androidx.compose.ui.node.OwnedLayer:
     Classes that release resources (destroy()) should implement AutoClosable and CloseGuard: class androidx.compose.ui.node.OwnedLayer
-
-
-TopLevelBuilder: androidx.compose.ui.graphics.vector.VectorAssetBuilder:
-    Builder should be defined as inner class: androidx.compose.ui.graphics.vector.VectorAssetBuilder

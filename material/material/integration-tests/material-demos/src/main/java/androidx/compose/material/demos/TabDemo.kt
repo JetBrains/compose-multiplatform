@@ -16,10 +16,12 @@
 
 package androidx.compose.material.demos
 
-import androidx.compose.foundation.ScrollableColumn
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
@@ -41,7 +43,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun TabDemo() {
-    ScrollableColumn {
+    Column(Modifier.verticalScroll(rememberScrollState())) {
         val showingSimple = remember { mutableStateOf(true) }
         val buttonText = "Show ${if (showingSimple.value) "custom" else "simple"} tabs"
 

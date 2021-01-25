@@ -21,10 +21,8 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus
 import androidx.compose.ui.focus.FocusState.Inactive
 import androidx.compose.ui.focus.FocusState.Active
-import androidx.compose.ui.focusRequester
 import androidx.compose.ui.platform.AmbientFocusManager
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -44,13 +42,13 @@ class FocusEventCountTest {
     fun initially_onFocusEventIsCalledThrice() {
         // Arrange.
         val focusStates = mutableListOf<FocusState>()
-        val focusRequester = FocusRequester()
+        val focusReferece = FocusRequester()
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .onFocusEvent { focusStates.add(it) }
-                    .focusRequester(focusRequester)
-                    .focus()
+                    .focusRequester(focusReferece)
+                    .focusModifier()
             )
         }
 
@@ -86,7 +84,7 @@ class FocusEventCountTest {
                 modifier = Modifier
                     .onFocusEvent { focusStates.add(it) }
                     .focusRequester(focusRequester)
-                    .focus()
+                    .focusModifier()
             )
         }
         rule.runOnIdle { focusStates.clear() }
@@ -108,7 +106,7 @@ class FocusEventCountTest {
                 modifier = Modifier
                     .onFocusEvent { focusStates.add(it) }
                     .focusRequester(focusRequester)
-                    .focus()
+                    .focusModifier()
             )
         }
         rule.runOnIdle {
@@ -135,7 +133,7 @@ class FocusEventCountTest {
                 modifier = Modifier
                     .onFocusEvent { focusStates.add(it) }
                     .focusRequester(focusRequester)
-                    .focus()
+                    .focusModifier()
             )
         }
         rule.runOnIdle {
@@ -162,7 +160,7 @@ class FocusEventCountTest {
                 modifier = Modifier
                     .onFocusEvent { focusStates.add(it) }
                     .focusRequester(focusRequester)
-                    .then(if (addFocusModifier.value) Modifier.focus() else Modifier)
+                    .then(if (addFocusModifier.value) Modifier.focusModifier() else Modifier)
             )
         }
         rule.runOnIdle {
@@ -192,7 +190,7 @@ class FocusEventCountTest {
             Box(
                 modifier = Modifier
                     .onFocusEvent { focusStates.add(it) }
-                    .then(if (addFocusModifier.value) Modifier.focus() else Modifier)
+                    .then(if (addFocusModifier.value) Modifier.focusModifier() else Modifier)
             )
         }
         rule.runOnIdle { focusStates.clear() }
@@ -214,7 +212,7 @@ class FocusEventCountTest {
             Box(
                 modifier = Modifier
                     .onFocusEvent { focusStates.add(it) }
-                    .then(if (addFocusModifier.value) Modifier.focus() else Modifier)
+                    .then(if (addFocusModifier.value) Modifier.focusModifier() else Modifier)
             )
         }
         rule.runOnIdle { focusStates.clear() }

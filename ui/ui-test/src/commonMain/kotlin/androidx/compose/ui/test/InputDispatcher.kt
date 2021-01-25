@@ -17,14 +17,14 @@ package androidx.compose.ui.test
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.lerp
-import androidx.compose.ui.node.Owner
-import androidx.compose.ui.unit.Duration
-import androidx.compose.ui.unit.inMilliseconds
-import androidx.compose.ui.unit.milliseconds
+import androidx.compose.ui.node.RootForTest
 import kotlin.math.max
 import kotlin.math.roundToInt
 
-internal expect fun createInputDispatcher(testContext: TestContext, owner: Owner): InputDispatcher
+internal expect fun createInputDispatcher(
+    testContext: TestContext,
+    root: RootForTest
+): InputDispatcher
 
 /**
  * Dispatcher to inject full and partial gestures. An [InputDispatcher] is created at the
@@ -55,7 +55,7 @@ internal expect fun createInputDispatcher(testContext: TestContext, owner: Owner
  */
 internal abstract class InputDispatcher(
     private val testContext: TestContext,
-    private val owner: Owner?
+    private val root: RootForTest?
 ) {
     companion object {
         /**
@@ -71,7 +71,7 @@ internal abstract class InputDispatcher(
          * depends on too many factors. Instead, the value is chosen comfortably below the
          * targeted frame rate (60 fps, equating to a 16ms period).
          */
-        var eventPeriod = 10.milliseconds.inMilliseconds()
+        var eventPeriodMillis = 10L
             internal set
 
         /**
@@ -125,7 +125,7 @@ internal abstract class InputDispatcher(
     protected abstract val now: Long
 
     init {
-        val state = testContext.states.remove(owner)
+        val state = testContext.states.remove(root)
         if (state?.partialGesture != null) {
             nextDownTime = state.nextDownTime
             gestureLateness = state.gestureLateness
@@ -133,9 +133,9 @@ internal abstract class InputDispatcher(
         }
     }
 
-    protected open fun saveState(owner: Owner?) {
-        if (owner != null) {
-            testContext.states[owner] =
+    protected open fun saveState(root: RootForTest?) {
+        if (root != null) {
+            testContext.states[root] =
                 InputDispatcherState(
                     nextDownTime,
                     gestureLateness,
@@ -145,41 +145,41 @@ internal abstract class InputDispatcher(
     }
 
     /**
-     * Generates the downTime of the next gesture with the given [duration]. The gesture's
-     * [duration] is necessary to facilitate chaining of gestures: if another gesture is made
-     * after the next one, it will start exactly [duration] after the start of the next gesture.
-     * Always use this method to determine the downTime of the [down event][enqueueDown] of a
-     * gesture.
+     * Generates the downTime of the next gesture with the given [durationMillis]. The gesture's
+     * [durationMillis] is necessary to facilitate chaining of gestures: if another gesture is made
+     * after the next one, it will start exactly [durationMillis] after the start of the next
+     * gesture. Always use this method to determine the downTime of the [down event][enqueueDown]
+     * of a gesture.
      *
      * If the duration is unknown when calling this method, use a duration of zero and update
      * with [moveNextDownTime] when the duration is known, or use [moveNextDownTime]
      * incrementally if the gesture unfolds gradually.
      */
-    private fun generateDownTime(duration: Duration): Long {
+    private fun generateDownTime(durationMillis: Long): Long {
         val downTime = if (nextDownTime == DownTimeNotSet) {
             now
         } else {
             nextDownTime
         }
-        nextDownTime = downTime + duration.inMilliseconds()
+        nextDownTime = downTime + durationMillis
         return downTime
     }
 
     /**
-     * Moves the start time of the next gesture ahead by the given [duration]. Does not affect
+     * Moves the start time of the next gesture ahead by the given [durationMillis]. Does not affect
      * any event time from the current gesture. Use this when the expected duration passed to
      * [generateDownTime] has changed.
      */
-    private fun moveNextDownTime(duration: Duration) {
-        generateDownTime(duration)
+    private fun moveNextDownTime(durationMillis: Long) {
+        generateDownTime(durationMillis)
     }
 
     /**
      * Increases the eventTime with the given [time]. Also pushes the downTime for the next
      * chained gesture by the same amount to facilitate chaining.
      */
-    private fun PartialGesture.increaseEventTime(time: Long = eventPeriod) {
-        moveNextDownTime(time.milliseconds)
+    private fun PartialGesture.increaseEventTime(time: Long = eventPeriodMillis) {
+        moveNextDownTime(time)
         lastEventTime += time
     }
 
@@ -209,66 +209,66 @@ internal abstract class InputDispatcher(
     }
 
     /**
-     * Generates a swipe gesture from [start] to [end] with the given [duration]. The generated
-     * events are enqueued in this [InputDispatcher] and will be sent when [sendAllSynchronous]
-     * is called at the end of [performGesture].
+     * Generates a swipe gesture from [start] to [end] with the given [durationMillis]. The
+     * generated events are enqueued in this [InputDispatcher] and will be sent when
+     * [sendAllSynchronous] is called at the end of [performGesture].
      *
      * @param start The start position of the gesture
      * @param end The end position of the gesture
-     * @param duration The duration of the gesture
+     * @param durationMillis The duration of the gesture
      */
-    fun enqueueSwipe(start: Offset, end: Offset, duration: Duration) {
-        val durationFloat = duration.inMilliseconds().toFloat()
+    fun enqueueSwipe(start: Offset, end: Offset, durationMillis: Long) {
+        val durationFloat = durationMillis.toFloat()
         enqueueSwipe(
             curve = { lerp(start, end, it / durationFloat) },
-            duration = duration
+            durationMillis = durationMillis
         )
     }
 
     /**
-     * Generates a swipe gesture from [curve]&#40;0) to [curve]&#40;[duration]), following the
+     * Generates a swipe gesture from [curve]&#40;0) to [curve]&#40;[durationMillis]), following the
      * route defined by [curve]. Will force sampling of an event at all times defined in
      * [keyTimes]. The number of events sampled between the key times is implementation
      * dependent. The generated events are enqueued in this [InputDispatcher] and will be sent
      * when [sendAllSynchronous] is called at the end of [performGesture].
      *
      * @param curve The function that defines the position of the gesture over time
-     * @param duration The duration of the gesture
+     * @param durationMillis The duration of the gesture
      * @param keyTimes An optional list of timestamps in milliseconds at which a move event must
      * be sampled
      */
     fun enqueueSwipe(
         curve: (Long) -> Offset,
-        duration: Duration,
+        durationMillis: Long,
         keyTimes: List<Long> = emptyList()
     ) {
-        enqueueSwipes(listOf(curve), duration, keyTimes)
+        enqueueSwipes(listOf(curve), durationMillis, keyTimes)
     }
 
     /**
      * Generates [curves].size simultaneous swipe gestures, each swipe going from
-     * [curves]&#91;i&#93;(0) to [curves]&#91;i&#93;([duration]), following the route defined by
-     * [curves]&#91;i&#93;. Will force sampling of an event at all times defined in [keyTimes].
+     * [curves]&#91;i&#93;(0) to [curves]&#91;i&#93;([durationMillis]), following the route defined
+     * by [curves]&#91;i&#93;. Will force sampling of an event at all times defined in [keyTimes].
      * The number of events sampled between the key times is implementation dependent. The
      * generated events are enqueued in this [InputDispatcher] and will be sent when
      * [sendAllSynchronous] is called at the end of [performGesture].
      *
      * @param curves The functions that define the position of the gesture over time
-     * @param duration The duration of the gestures
+     * @param durationMillis The duration of the gestures
      * @param keyTimes An optional list of timestamps in milliseconds at which a move event must
      * be sampled
      */
     fun enqueueSwipes(
         curves: List<(Long) -> Offset>,
-        duration: Duration,
+        durationMillis: Long,
         keyTimes: List<Long> = emptyList()
     ) {
         val startTime = 0L
-        val endTime = duration.inMilliseconds()
+        val endTime = durationMillis
 
         // Validate input
-        require(duration >= 1.milliseconds) {
-            "duration must be at least 1 millisecond, not $duration"
+        require(durationMillis >= 1) {
+            "duration must be at least 1 millisecond, not $durationMillis"
         }
         val validRange = startTime..endTime
         require(keyTimes.all { it in validRange }) {
@@ -307,8 +307,8 @@ internal abstract class InputDispatcher(
      * Generates move events between `f([t0])` and `f([tN])` during the time window `(downTime +
      * t0, downTime + tN]`, using [fs] to sample the coordinate of each event. The number of
      * events sent (#numEvents) is such that the time between each event is as close to
-     * [InputDispatcher.eventPeriod] as possible, but at least 1. The first event is sent at time
-     * `downTime + (tN - t0) / #numEvents`, the last event is sent at time tN.
+     * [InputDispatcher.eventPeriodMillis] as possible, but at least 1. The first event is sent at
+     * time `downTime + (tN - t0) / #numEvents`, the last event is sent at time tN.
      *
      * @param fs The functions that define the coordinates of the respective gestures over time
      * @param t0 The start time of this segment of the swipe, in milliseconds relative to downTime
@@ -322,7 +322,7 @@ internal abstract class InputDispatcher(
         var step = 0
         // How many steps will we take between t0 and tN? At least 1, and a number that will
         // bring as as close to eventPeriod as possible
-        val steps = max(1, ((tN - t0) / eventPeriod.toFloat()).roundToInt())
+        val steps = max(1, ((tN - t0) / eventPeriodMillis.toFloat()).roundToInt())
 
         var tPrev = t0
         while (step++ < steps) {
@@ -338,22 +338,22 @@ internal abstract class InputDispatcher(
 
     /**
      * Adds a delay between the end of the last full or current partial gesture of the given
-     * [duration]. Guarantees that the first event time of the next gesture will be exactly
-     * [duration] later then if that gesture would be injected without this delay, provided that
-     * the next gesture is started using the same [InputDispatcher] instance as the one used to
+     * [durationMillis]. Guarantees that the first event time of the next gesture will be exactly
+     * [durationMillis] later then if that gesture would be injected without this delay, provided
+     * that the next gesture is started using the same [InputDispatcher] instance as the one used to
      * end the last gesture.
      *
      * Note: this does not affect the time of the next event for the _current_ partial gesture,
      * using [enqueueMove], [enqueueUp] and [enqueueCancel], but it will affect the time of the
      * _next_ gesture (including partial gestures started with [enqueueDown]).
      *
-     * @param duration The duration of the delay. Must be positive
+     * @param durationMillis The duration of the delay. Must be positive
      */
-    fun enqueueDelay(duration: Duration) {
-        require(duration >= Duration.Zero) {
-            "duration of a delay can only be positive, not $duration"
+    fun enqueueDelay(durationMillis: Long) {
+        require(durationMillis >= 0) {
+            "duration of a delay can only be positive, not $durationMillis"
         }
-        moveNextDownTime(duration)
+        moveNextDownTime(durationMillis)
     }
 
     /**
@@ -403,7 +403,7 @@ internal abstract class InputDispatcher(
 
         // Start a new gesture, or add the pointerId to the existing gesture
         if (gesture == null) {
-            gesture = PartialGesture(generateDownTime(0.milliseconds), position, pointerId)
+            gesture = PartialGesture(generateDownTime(0), position, pointerId)
             partialGesture = gesture
         } else {
             gesture.lastPositions[pointerId] = position
@@ -416,16 +416,16 @@ internal abstract class InputDispatcher(
     /**
      * Generates a move event [delay] milliseconds after the previous injected event of this
      * gesture, without moving any of the pointers. The default [delay] is [10 milliseconds]
-     * [eventPeriod]. Use this to commit all changes in pointer location made
+     * [eventPeriodMillis]. Use this to commit all changes in pointer location made
      * with [movePointer]. The generated event will contain the current position of all pointers.
      * It is enqueued in this [InputDispatcher] and will be sent when [sendAllSynchronous] is
      * called at the end of [performGesture]. See [enqueueDown] for more information on how to
      * make complete gestures from partial gestures.
      *
      * @param delay The time in milliseconds between the previously injected event and the move
-     * event. [10 milliseconds][eventPeriod] by default.
+     * event. [10 milliseconds][eventPeriodMillis] by default.
      */
-    fun enqueueMove(delay: Long = eventPeriod) {
+    fun enqueueMove(delay: Long = eventPeriodMillis) {
         val gesture = checkNotNull(partialGesture) {
             "Cannot send MOVE event, no gesture is in progress"
         }
@@ -515,20 +515,20 @@ internal abstract class InputDispatcher(
 
     /**
      * Generates a cancel event [delay] milliseconds after the previous injected event of this
-     * gesture. The default [delay] is [10 milliseconds][InputDispatcher.eventPeriod]. The
+     * gesture. The default [delay] is [10 milliseconds][InputDispatcher.eventPeriodMillis]. The
      * generated event is enqueued in this [InputDispatcher] and will be sent when
      * [sendAllSynchronous] is called at the end of [performGesture]. See [enqueueDown] for more
      * information on how to make complete gestures from partial gestures.
      *
      * @param delay The time in milliseconds between the previously injected event and the cancel
-     * event. [10 milliseconds][InputDispatcher.eventPeriod] by default.
+     * event. [10 milliseconds][InputDispatcher.eventPeriodMillis] by default.
      *
      * @see enqueueDown
      * @see movePointer
      * @see enqueueMove
      * @see enqueueUp
      */
-    fun enqueueCancel(delay: Long = eventPeriod) {
+    fun enqueueCancel(delay: Long = eventPeriodMillis) {
         val gesture = checkNotNull(partialGesture) {
             "Cannot send CANCEL event, no gesture is in progress"
         }
@@ -554,7 +554,7 @@ internal abstract class InputDispatcher(
      */
     private fun PartialGesture.flushPointerUpdates() {
         if (hasPointerUpdates) {
-            enqueueMove(eventPeriod)
+            enqueueMove(eventPeriodMillis)
         }
     }
 
@@ -570,7 +570,7 @@ internal abstract class InputDispatcher(
      * Called when this [InputDispatcher] is about to be discarded, from [GestureScope.dispose].
      */
     fun dispose() {
-        saveState(owner)
+        saveState(root)
         onDispose()
     }
 

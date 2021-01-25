@@ -22,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.fontResource
 import androidx.compose.ui.res.loadFontResource
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.LoadedFontFamily
 
 @Sampled
 @Composable
@@ -34,7 +33,7 @@ fun FontResourcesFontFamily() {
     ).resource.resource?.let {
         Text(
             text = "Hello, World",
-            fontFamily = LoadedFontFamily(it)
+            fontFamily = FontFamily(it)
         )
     }
 }
@@ -49,7 +48,7 @@ fun FontResourcesTypeface() {
     ).resource.resource?.let {
         Text(
             text = "Hello, World",
-            fontFamily = LoadedFontFamily(it)
+            fontFamily = FontFamily(it)
         )
     }
 }

@@ -25,7 +25,7 @@ import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextLayoutInput
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.OffsetMap
+import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
@@ -46,7 +46,7 @@ import org.junit.runners.JUnit4
 class DesktopTextFieldSelectionManagerTest {
     private val text = "Hello World"
     private val density = Density(density = 1f)
-    private val offsetMap = OffsetMap.identityOffsetMap
+    private val offsetMapping = OffsetMapping.Identity
     private var value = TextFieldValue(text)
     private val lambda: (TextFieldValue) -> Unit = { value = it }
     private val state = TextFieldState(mock())
@@ -65,7 +65,7 @@ class DesktopTextFieldSelectionManagerTest {
 
     @Before
     fun setup() {
-        manager.offsetMap = offsetMap
+        manager.offsetMapping = offsetMapping
         manager.onValueChange = lambda
         manager.state = state
         manager.value = value
@@ -74,8 +74,9 @@ class DesktopTextFieldSelectionManagerTest {
 
         state.layoutResult = mock()
         state.textDelegate = mock()
+        whenever(state.layoutResult!!.value).thenReturn(mock())
         whenever(state.textDelegate.density).thenReturn(density)
-        whenever(state.layoutResult!!.layoutInput).thenReturn(
+        whenever(state.layoutResult!!.value.layoutInput).thenReturn(
             TextLayoutInput(
                 text = AnnotatedString(text),
                 style = TextStyle.Default,

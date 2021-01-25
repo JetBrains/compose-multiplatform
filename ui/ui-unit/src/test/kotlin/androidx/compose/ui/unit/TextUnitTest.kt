@@ -17,15 +17,18 @@
 package androidx.compose.ui.unit
 
 import com.google.common.truth.Truth.assertThat
+import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+
+@Suppress("Deprecation")
 
 @RunWith(JUnit4::class)
 class TextUnitTest {
     @Test
     fun construct_sp_from_float() {
-        TextUnit.Sp(5f).also {
+        5f.sp.also {
             assertThat(it.isSp).isTrue()
             assertThat(it.isUnspecified).isFalse()
             assertThat(it.isEm).isFalse()
@@ -36,7 +39,7 @@ class TextUnitTest {
 
     @Test
     fun construct_sp_from_int() {
-        TextUnit.Sp(5).also {
+        5.sp.also {
             assertThat(it.isSp).isTrue()
             assertThat(it.isUnspecified).isFalse()
             assertThat(it.isEm).isFalse()
@@ -47,7 +50,7 @@ class TextUnitTest {
 
     @Test
     fun construct_sp_from_double() {
-        TextUnit.Sp(5.0).also {
+        5.0.sp.also {
             assertThat(it.isSp).isTrue()
             assertThat(it.isUnspecified).isFalse()
             assertThat(it.isEm).isFalse()
@@ -91,7 +94,7 @@ class TextUnitTest {
 
     @Test
     fun construct_em_from_float() {
-        TextUnit.Em(5f).also {
+        5f.em.also {
             assertThat(it.isSp).isFalse()
             assertThat(it.isUnspecified).isFalse()
             assertThat(it.isEm).isTrue()
@@ -102,7 +105,7 @@ class TextUnitTest {
 
     @Test
     fun construct_em_from_int() {
-        TextUnit.Em(5).also {
+        5.em.also {
             assertThat(it.isSp).isFalse()
             assertThat(it.isUnspecified).isFalse()
             assertThat(it.isEm).isTrue()
@@ -113,7 +116,7 @@ class TextUnitTest {
 
     @Test
     fun construct_em_from_double() {
-        TextUnit.Em(5.0).also {
+        5.0.em.also {
             assertThat(it.isSp).isFalse()
             assertThat(it.isUnspecified).isFalse()
             assertThat(it.isEm).isTrue()
@@ -1052,17 +1055,24 @@ class TextUnitTest {
     }
 
     @Test
-    @Suppress("DEPRECATION")
-    fun inherit_isEqualTo_unspecified() {
-        assertThat(TextUnit.Unspecified).isEqualTo(TextUnit.Inherit)
+    fun testIsSpecified() {
+        Assert.assertFalse(TextUnit.Unspecified.isSpecified)
+        Assert.assertTrue(1.sp.isSpecified)
     }
 
     @Test
-    @Suppress("DEPRECATION")
-    fun isInherit_isEqualTo_isUnspecified() {
-        assertThat(TextUnit.Unspecified.isInherit).isTrue()
-        assertThat(TextUnit.Inherit.isUnspecified).isTrue()
-        assertThat(1.em.isUnspecified).isFalse()
-        assertThat(1.em.isInherit).isFalse()
+    fun testIsUnspecified() {
+        Assert.assertTrue(TextUnit.Unspecified.isUnspecified)
+        Assert.assertFalse(1.sp.isUnspecified)
+    }
+
+    @Test
+    fun testTakeOrElseTrue() {
+        Assert.assertTrue(1.sp.takeOrElse { TextUnit.Unspecified }.isSpecified)
+    }
+
+    @Test
+    fun testTakeOrElseFalse() {
+        Assert.assertTrue(TextUnit.Unspecified.takeOrElse { 1.sp }.isSpecified)
     }
 }

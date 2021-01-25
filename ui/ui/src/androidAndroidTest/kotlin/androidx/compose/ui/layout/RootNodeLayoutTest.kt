@@ -95,7 +95,7 @@ class RootNodeLayoutTest {
         assertNotNull(coordinates)
         assertEquals(
             Rect(left = 0f, top = 0f, right = 10f, bottom = 10f),
-            coordinates!!.boundsInRoot
+            coordinates!!.boundsInRoot()
         )
     }
 

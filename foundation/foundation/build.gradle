@@ -17,7 +17,6 @@
 
 import androidx.build.AndroidXUiPlugin
 import androidx.build.LibraryGroups
-import androidx.build.LibraryVersions
 import androidx.build.Publish
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -155,7 +154,6 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         }
     }
 }
-
 androidx {
     name = "Compose Foundation"
     publish = Publish.SNAPSHOT_AND_RELEASE
@@ -167,7 +165,6 @@ androidx {
 
 tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
-        useIR = true
         freeCompilerArgs += ["-XXLanguage:+InlineClasses"]
     }
 }

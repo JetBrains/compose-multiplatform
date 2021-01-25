@@ -17,15 +17,13 @@
 package androidx.compose.ui.focus
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.ui.FocusModifier
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus
 import androidx.compose.ui.focus.FocusState.Active
 import androidx.compose.ui.focus.FocusState.ActiveParent
 import androidx.compose.ui.focus.FocusState.Captured
 import androidx.compose.ui.focus.FocusState.Disabled
 import androidx.compose.ui.focus.FocusState.Inactive
-import androidx.compose.ui.focusRequester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -63,6 +61,7 @@ class FocusChangedTest {
         }
     }
 
+    @ExperimentalComposeUiApi
     @Test
     fun activeParent_requestFocus() {
         // Arrange.
@@ -73,12 +72,12 @@ class FocusChangedTest {
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .focus()
+                    .focusModifier()
             ) {
                 Box(
                     modifier = Modifier
                         .focusRequester(childFocusRequester)
-                        .focus()
+                        .focusModifier()
                 )
             }
         }
@@ -226,11 +225,11 @@ class FocusChangedTest {
                 modifier = Modifier
                     .onFocusChanged { focusState1 = it }
                     .onFocusChanged { focusState2 = it }
-                    .focus()
+                    .focusModifier()
                     .onFocusChanged { focusState3 = it }
                     .onFocusChanged { focusState4 = it }
                     .focusRequester(focusRequester)
-                    .focus()
+                    .focusModifier()
             )
         }
 

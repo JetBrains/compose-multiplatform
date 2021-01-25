@@ -18,6 +18,7 @@
 
 package androidx.compose.ui.node
 
+import androidx.compose.ui.focus.FocusOrder
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
@@ -35,6 +36,7 @@ import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.layout.findRoot
 import androidx.compose.ui.layout.globalPosition
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
@@ -42,7 +44,6 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.minus
 import androidx.compose.ui.unit.plus
 import androidx.compose.ui.unit.toOffset
-import androidx.compose.ui.util.annotation.CallSuper
 
 /**
  * Measurable and Placeable type that has a position.
@@ -88,6 +89,7 @@ internal abstract class LayoutNodeWrapper(
                 } else {
                     wrappedBy?.invalidateLayer()
                 }
+                layoutNode.owner?.onLayoutChange(layoutNode)
             }
             _measureResult = value
             measuredSize = IntSize(measureResult.width, measureResult.height)
@@ -129,6 +131,7 @@ internal abstract class LayoutNodeWrapper(
     fun isGlobalPointerInBounds(globalPointerPosition: Offset): Boolean {
         // TODO(shepshapard): Right now globalToLocal has to traverse the tree all the way back up
         //  so calling this is expensive.  Would be nice to cache data such that this is cheap.
+        @Suppress("DEPRECATION")
         val localPointerPosition = globalToLocal(globalPointerPosition)
         return localPointerPosition.x >= 0 &&
             localPointerPosition.x < measuredSize.width &&
@@ -154,7 +157,7 @@ internal abstract class LayoutNodeWrapper(
     /**
      * Places the modified child.
      */
-    @CallSuper
+    /*@CallSuper*/
     override fun placeAt(
         position: IntOffset,
         zIndex: Float,
@@ -169,6 +172,7 @@ internal abstract class LayoutNodeWrapper(
             } else {
                 wrappedBy?.invalidateLayer()
             }
+            layoutNode.owner?.onLayoutChange(layoutNode)
         }
         this.zIndex = zIndex
     }
@@ -242,6 +246,7 @@ internal abstract class LayoutNodeWrapper(
         if (layer != null) {
             val layerBlock = requireNotNull(layerBlock)
             graphicsLayerScope.reset()
+            graphicsLayerScope.graphicsDensity = layoutNode.density
             snapshotObserver.observeReads(this, onCommitAffectingLayerParams) {
                 layerBlock.invoke(graphicsLayerScope)
             }
@@ -318,25 +323,118 @@ internal abstract class LayoutNodeWrapper(
 
     override fun globalToLocal(global: Offset): Offset {
         check(isAttached) { ExpectAttachedLayoutCoordinates }
-        val wrapper = wrappedBy ?: return fromParentPosition(
-            global - layoutNode.requireOwner().calculatePosition().toOffset()
-        )
-        return fromParentPosition(wrapper.globalToLocal(global))
+        val positionOnScreen = layoutNode.requireOwner().calculatePosition()
+        val root = findRoot()
+        val rootPosition = (root as LayoutNodeWrapper).position.toOffset()
+        return localPositionOf(root, global - positionOnScreen - rootPosition)
+    }
+
+    override fun windowToLocal(relativeToWindow: Offset): Offset {
+        check(isAttached) { ExpectAttachedLayoutCoordinates }
+        val root = findRoot()
+        val rootPosition = (root as LayoutNodeWrapper).position.toOffset()
+        val positionInRoot =
+            relativeToWindow - layoutNode.requireOwner().calculatePositionInWindow().toOffset() -
+                rootPosition
+        return localPositionOf(root, positionInRoot)
     }
 
     override fun localToGlobal(local: Offset): Offset {
         return localToRoot(local) + layoutNode.requireOwner().calculatePosition()
     }
 
-    override fun localToRoot(local: Offset): Offset {
+    override fun localToWindow(relativeToLocal: Offset): Offset {
+        return localToRoot(relativeToLocal) + layoutNode.requireOwner().calculatePositionInWindow()
+    }
+
+    override fun localPositionOf(
+        sourceCoordinates: LayoutCoordinates,
+        relativeToSource: Offset
+    ): Offset {
+        val layoutNodeWrapper = sourceCoordinates as LayoutNodeWrapper
+        val commonAncestor = findCommonAncestor(sourceCoordinates)
+
+        var position = relativeToSource
+        var wrapper = layoutNodeWrapper
+        while (wrapper !== commonAncestor) {
+            position = wrapper.toParentPosition(position)
+            wrapper = wrapper.wrappedBy!!
+        }
+
+        return ancestorToLocal(commonAncestor, position)
+    }
+
+    override fun localBoundingBoxOf(
+        sourceCoordinates: LayoutCoordinates,
+        clipBounds: Boolean
+    ): Rect {
+        check(isAttached) { ExpectAttachedLayoutCoordinates }
+        check(sourceCoordinates.isAttached) {
+            "LayoutCoordinates $sourceCoordinates is not attached!"
+        }
+        val layoutNodeWrapper = sourceCoordinates as LayoutNodeWrapper
+        val commonAncestor = findCommonAncestor(sourceCoordinates)
+
+        val bounds = rectCache
+        bounds.left = 0f
+        bounds.top = 0f
+        bounds.right = sourceCoordinates.size.width.toFloat()
+        bounds.bottom = sourceCoordinates.size.height.toFloat()
+
+        var wrapper = layoutNodeWrapper
+        while (wrapper !== commonAncestor) {
+            wrapper.rectInParent(bounds, clipBounds)
+            if (bounds.isEmpty) {
+                return Rect.Zero
+            }
+
+            wrapper = wrapper.wrappedBy!!
+        }
+
+        ancestorToLocal(commonAncestor, bounds, clipBounds)
+        return bounds.toRect()
+    }
+
+    private fun ancestorToLocal(ancestor: LayoutNodeWrapper, offset: Offset): Offset {
+        if (ancestor === this) {
+            return offset
+        }
+        val wrappedBy = wrappedBy
+        if (wrappedBy == null || ancestor == wrappedBy) {
+            return fromParentPosition(offset)
+        }
+        return fromParentPosition(wrappedBy.ancestorToLocal(ancestor, offset))
+    }
+
+    private fun ancestorToLocal(
+        ancestor: LayoutNodeWrapper,
+        rect: MutableRect,
+        clipBounds: Boolean
+    ) {
+        if (ancestor === this) {
+            return
+        }
+        wrappedBy?.ancestorToLocal(ancestor, rect, clipBounds)
+        return fromParentRect(rect, clipBounds)
+    }
+
+    override fun localToRoot(relativeToLocal: Offset): Offset {
         check(isAttached) { ExpectAttachedLayoutCoordinates }
         var wrapper: LayoutNodeWrapper? = this
-        var position = local
+        var position = relativeToLocal
         while (wrapper != null) {
             position = wrapper.toParentPosition(position)
             wrapper = wrapper.wrappedBy
         }
         return position
+    }
+
+    protected inline fun withPositionTranslation(canvas: Canvas, block: (Canvas) -> Unit) {
+        val x = position.x.toFloat()
+        val y = position.y.toFloat()
+        canvas.translate(x, y)
+        block(canvas)
+        canvas.translate(-x, -y)
     }
 
     /**
@@ -349,6 +447,7 @@ internal abstract class LayoutNodeWrapper(
             position
         } else {
             val matrix = matrixCache
+            layer.getMatrix(matrix)
             matrix.map(position)
         }
         return targetPosition + this.position
@@ -418,12 +517,12 @@ internal abstract class LayoutNodeWrapper(
 
     /**
      * Modifies bounds to be in the parent LayoutNodeWrapper's coordinates, including clipping,
-     * scaling, etc.
+     * if [clipBounds] is true.
      */
-    protected open fun rectInParent(bounds: MutableRect) {
+    private fun rectInParent(bounds: MutableRect, clipBounds: Boolean) {
         val layer = layer
         if (layer != null) {
-            if (isClipping) {
+            if (isClipping && clipBounds) {
                 bounds.intersect(0f, 0f, size.width.toFloat(), size.height.toFloat())
                 if (bounds.isEmpty) {
                     return
@@ -443,6 +542,34 @@ internal abstract class LayoutNodeWrapper(
         bounds.bottom += y
     }
 
+    /**
+     * Modifies bounds in the parent's coordinates to be in this LayoutNodeWrapper's
+     * coordinates, including clipping, if [clipBounds] is true.
+     */
+    private fun fromParentRect(bounds: MutableRect, clipBounds: Boolean) {
+        val x = position.x
+        bounds.left -= x
+        bounds.right -= x
+
+        val y = position.y
+        bounds.top -= y
+        bounds.bottom -= y
+
+        val layer = layer
+        if (layer != null) {
+            val matrix = matrixCache
+            layer.getMatrix(matrix)
+            matrix.invert()
+            matrix.map(bounds)
+            if (isClipping && clipBounds) {
+                bounds.intersect(0f, 0f, size.width.toFloat(), size.height.toFloat())
+                if (bounds.isEmpty) {
+                    return
+                }
+            }
+        }
+    }
+
     override fun childBoundingBox(child: LayoutCoordinates): Rect {
         check(isAttached) { ExpectAttachedLayoutCoordinates }
         check(child.isAttached) { "Child $child is not attached!" }
@@ -453,7 +580,7 @@ internal abstract class LayoutNodeWrapper(
         bounds.bottom = child.size.height.toFloat()
         var wrapper = child as LayoutNodeWrapper
         while (wrapper !== this) {
-            wrapper.rectInParent(bounds)
+            wrapper.rectInParent(bounds, clipBounds = true)
             if (bounds.isEmpty) {
                 return Rect.Zero
             }
@@ -469,7 +596,9 @@ internal abstract class LayoutNodeWrapper(
 
     protected fun withinLayerBounds(pointerPositionRelativeToScreen: Offset): Boolean {
         if (layer != null && isClipping) {
+            @Suppress("DEPRECATION")
             val l = globalPosition.x
+            @Suppress("DEPRECATION")
             val t = globalPosition.y
             val r = l + width
             val b = t + height
@@ -553,6 +682,15 @@ internal abstract class LayoutNodeWrapper(
     }
 
     /**
+     * Search up the component tree for any parent/parents that have specified a custom focus order.
+     * Allowing parents higher up the hierarchy to overwrite the focus order specified by their
+     * children.
+     */
+    open fun populateFocusOrder(focusOrder: FocusOrder) {
+        wrappedBy?.populateFocusOrder(focusOrder)
+    }
+
+    /**
      * Find the first ancestor that is a [ModifiedFocusNode].
      */
     internal fun findParentFocusNode(): ModifiedFocusNode? {
@@ -629,6 +767,47 @@ internal abstract class LayoutNodeWrapper(
      */
     open fun onModifierChanged() {
         layer?.invalidate()
+    }
+
+    internal fun findCommonAncestor(other: LayoutNodeWrapper): LayoutNodeWrapper {
+        var ancestor1 = other.layoutNode
+        var ancestor2 = layoutNode
+        if (ancestor1 === ancestor2) {
+            // They are on the same node, but we don't know which is the deeper of the two
+            val tooFar = layoutNode.outerLayoutNodeWrapper
+            var tryMe = this
+            while (tryMe !== tooFar && tryMe !== other) {
+                tryMe = tryMe.wrappedBy!!
+            }
+            if (tryMe === other) {
+                return other
+            }
+            return this
+        }
+
+        while (ancestor1.depth > ancestor2.depth) {
+            ancestor1 = ancestor1.parent!!
+        }
+
+        while (ancestor2.depth > ancestor1.depth) {
+            ancestor2 = ancestor2.parent!!
+        }
+
+        while (ancestor1 !== ancestor2) {
+            val parent1 = ancestor1.parent
+            val parent2 = ancestor2.parent
+            if (parent1 == null || parent2 == null) {
+                throw IllegalArgumentException("layouts are not part of the same hierarchy")
+            }
+            ancestor1 = parent1
+            ancestor2 = parent2
+        }
+
+        return when {
+            ancestor2 === layoutNode -> this
+            ancestor1 === other.layoutNode -> other
+            else -> ancestor1.innerLayoutNodeWrapper
+        }
     }
 
     internal companion object {

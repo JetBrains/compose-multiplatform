@@ -22,9 +22,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.unit.Duration
-import androidx.compose.ui.unit.inMilliseconds
-import androidx.test.filters.MediumTest
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performGesture
@@ -37,7 +34,8 @@ import androidx.compose.ui.test.util.assertTimestampsAreIncreasing
 import androidx.compose.ui.test.util.downEvents
 import androidx.compose.ui.test.util.isAlmostEqualTo
 import androidx.compose.ui.test.util.isMonotonicBetween
-import androidx.compose.ui.test.util.recordedDuration
+import androidx.compose.ui.test.util.recordedDurationMillis
+import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -54,7 +52,7 @@ import kotlin.math.max
 class SendSwipeVelocityTest(private val config: TestConfig) {
     data class TestConfig(
         val direction: Direction,
-        val duration: Duration,
+        val durationMillis: Long,
         val velocity: Float,
         val eventPeriod: Long
     )
@@ -78,7 +76,7 @@ class SendSwipeVelocityTest(private val config: TestConfig) {
                                 add(
                                     TestConfig(
                                         direction,
-                                        Duration(milliseconds = duration.toLong()),
+                                        duration.toLong(),
                                         velocity,
                                         period
                                     )
@@ -100,7 +98,7 @@ class SendSwipeVelocityTest(private val config: TestConfig) {
 
     private val start get() = config.direction.from
     private val end get() = config.direction.to
-    private val duration get() = config.duration
+    private val duration get() = config.durationMillis
     private val velocity get() = config.velocity
     private val eventPeriod get() = config.eventPeriod
 
@@ -141,7 +139,7 @@ class SendSwipeVelocityTest(private val config: TestConfig) {
 
         rule.runOnIdle {
             recorder.run {
-                val durationMs = duration.inMilliseconds()
+                val durationMs = duration
                 val minimumEventSize = max(2, (durationMs / eventPeriod).toInt())
                 assertThat(events.size).isAtLeast(minimumEventSize)
                 assertOnlyLastEventIsUp()
@@ -153,13 +151,11 @@ class SendSwipeVelocityTest(private val config: TestConfig) {
 
                 // Check timestamps
                 assertTimestampsAreIncreasing()
-                assertThat(recordedDuration).isEqualTo(duration)
+                assertThat(recordedDurationMillis).isEqualTo(duration)
 
                 // Check velocity
-                val actualVelocity = recordedVelocity.pixelsPerSecond
-                assertThat(actualVelocity.x).isWithin(.1f).of(expectedXVelocity)
-                assertThat(actualVelocity.y).isWithin(.1f).of(expectedYVelocity)
-                assertThat(actualVelocity.getDistance()).isWithin(velocity * 0.001f).of(velocity)
+                assertThat(recordedVelocity.x).isWithin(.1f).of(expectedXVelocity)
+                assertThat(recordedVelocity.y).isWithin(.1f).of(expectedYVelocity)
             }
         }
     }

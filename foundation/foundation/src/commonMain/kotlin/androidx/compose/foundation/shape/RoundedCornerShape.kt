@@ -24,7 +24,6 @@ import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.annotation.IntRange
 
 /**
  * A shape describing the rectangle with rounded corners.
@@ -78,7 +77,27 @@ class RoundedCornerShape(
             "$bottomRight, bottomLeft = $bottomLeft)"
     }
 
-    private /*inline*/ fun Float.toRadius() = CornerRadius(this)
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is RoundedCornerShape) return false
+
+        if (topLeft != other.topLeft) return false
+        if (topRight != other.topRight) return false
+        if (bottomRight != other.bottomRight) return false
+        if (bottomLeft != other.bottomLeft) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = topLeft.hashCode()
+        result = 31 * result + topRight.hashCode()
+        result = 31 * result + bottomRight.hashCode()
+        result = 31 * result + bottomLeft.hashCode()
+        return result
+    }
+
+    private fun Float.toRadius() = CornerRadius(this)
 }
 
 /**
@@ -90,32 +109,32 @@ val CircleShape = RoundedCornerShape(50)
  * Creates [RoundedCornerShape] with the same size applied for all four corners.
  * @param corner [CornerSize] to apply.
  */
-/*inline*/ fun RoundedCornerShape(corner: CornerSize) =
+fun RoundedCornerShape(corner: CornerSize) =
     RoundedCornerShape(corner, corner, corner, corner)
 
 /**
  * Creates [RoundedCornerShape] with the same size applied for all four corners.
  * @param size Size in [Dp] to apply.
  */
-/*inline*/ fun RoundedCornerShape(size: Dp) = RoundedCornerShape(CornerSize(size))
+fun RoundedCornerShape(size: Dp) = RoundedCornerShape(CornerSize(size))
 
 /**
  * Creates [RoundedCornerShape] with the same size applied for all four corners.
  * @param size Size in pixels to apply.
  */
-/*inline*/ fun RoundedCornerShape(size: Float) = RoundedCornerShape(CornerSize(size))
+fun RoundedCornerShape(size: Float) = RoundedCornerShape(CornerSize(size))
 
 /**
  * Creates [RoundedCornerShape] with the same size applied for all four corners.
  * @param percent Size in percents to apply.
  */
-/*inline*/ fun RoundedCornerShape(percent: Int) =
+fun RoundedCornerShape(percent: Int) =
     RoundedCornerShape(CornerSize(percent))
 
 /**
  * Creates [RoundedCornerShape] with sizes defined in [Dp].
  */
-/*inline*/ fun RoundedCornerShape(
+fun RoundedCornerShape(
     topLeft: Dp = 0.dp,
     topRight: Dp = 0.dp,
     bottomRight: Dp = 0.dp,
@@ -130,7 +149,7 @@ val CircleShape = RoundedCornerShape(50)
 /**
  * Creates [RoundedCornerShape] with sizes defined in pixels.
  */
-/*inline*/ fun RoundedCornerShape(
+fun RoundedCornerShape(
     topLeft: Float = 0.0f,
     topRight: Float = 0.0f,
     bottomRight: Float = 0.0f,
@@ -144,12 +163,25 @@ val CircleShape = RoundedCornerShape(50)
 
 /**
  * Creates [RoundedCornerShape] with sizes defined in percents of the shape's smaller side.
+ *
+ * @param topLeftPercent The top left corner radius as a percentage of the smaller side, with a
+ * range of 0 - 100.
+ * @param topRightPercent The top right corner radius as a percentage of the smaller side, with a
+ * range of 0 - 100.
+ * @param bottomRightPercent The bottom right corner radius as a percentage of the smaller side,
+ * with a range of 0 - 100.
+ * @param bottomLeftPercent The bottom left corner radius as a percentage of the smaller side,
+ * with a range of 0 - 100.
  */
-/*inline*/ fun RoundedCornerShape(
-    @IntRange(from = 0, to = 100) topLeftPercent: Int = 0,
-    @IntRange(from = 0, to = 100) topRightPercent: Int = 0,
-    @IntRange(from = 0, to = 100) bottomRightPercent: Int = 0,
-    @IntRange(from = 0, to = 100) bottomLeftPercent: Int = 0
+fun RoundedCornerShape(
+    /*@IntRange(from = 0, to = 100)*/
+    topLeftPercent: Int = 0,
+    /*@IntRange(from = 0, to = 100)*/
+    topRightPercent: Int = 0,
+    /*@IntRange(from = 0, to = 100)*/
+    bottomRightPercent: Int = 0,
+    /*@IntRange(from = 0, to = 100)*/
+    bottomLeftPercent: Int = 0
 ) = RoundedCornerShape(
     CornerSize(topLeftPercent),
     CornerSize(topRightPercent),

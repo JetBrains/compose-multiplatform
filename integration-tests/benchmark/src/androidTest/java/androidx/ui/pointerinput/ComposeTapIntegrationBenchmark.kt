@@ -20,13 +20,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.unit.dp
@@ -176,7 +176,7 @@ class ComposeTapIntegrationBenchmark {
         Text(
             text = label,
             modifier = Modifier
-                .clickable {
+                .tapGestureFilter {
                     assertThat(label).isEqualTo(expectedLabel)
                     actualClickCount++
                 }

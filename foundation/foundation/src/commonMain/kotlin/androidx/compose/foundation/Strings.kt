@@ -18,13 +18,15 @@ package androidx.compose.foundation
 
 // TODO(b/138327849): (STOPSHIP) Move all of these to resources once we have a real resources system,
 //  then delete this class
-@Suppress("MayBeConstant") // The compiler gets unhappy if these are const (b/138328700)
-object Strings {
-    val Checked = "Checked"
-    val Unchecked = "Unchecked"
-    val Indeterminate = "Indeterminate"
-    val Selected = "Selected"
-    val NotSelected = "Not selected"
-    val InProgress = "In progress"
-    val TemplatePercent = "%d percent"
+internal object Strings {
+    const val Checked = "Checked"
+    const val Unchecked = "Unchecked"
+    const val On = "On"
+    const val Off = "Off"
+    const val Indeterminate = "Indeterminate"
+    const val Selected = "Selected"
+    const val NotSelected = "Not selected"
+    const val InProgress = "In progress"
+    const val TemplatePercent = "%d percent"
+    const val Toggle = "Toggle"
 }

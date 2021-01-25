@@ -16,9 +16,11 @@
 
 package androidx.compose.ui.focus
 
-import androidx.compose.ui.FocusModifier
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusState.Active
+import androidx.compose.ui.focus.FocusState.ActiveParent
+import androidx.compose.ui.focus.FocusState.Captured
+import androidx.compose.ui.focus.FocusState.Disabled
 import androidx.compose.ui.focus.FocusState.Inactive
 import androidx.compose.ui.gesture.PointerInputModifierImpl
 import androidx.compose.ui.gesture.TapGestureFilter
@@ -32,6 +34,17 @@ interface FocusManager {
      *  any components that have [Captured][FocusState.Captured] focus.
      */
     fun clearFocus(forcedClear: Boolean = false)
+
+    /**
+     * Moves focus in the specified direction.
+     *
+     * Focus moving is still being implemented. Right now, focus will move only if the user
+     * specified a custom focus traversal order for the item that is currently focused. (Using the
+     * [Modifier.focusOrder()][focusOrder] API).
+     *
+     * @return true if focus was moved successfully. false if the focused item is unchanged.
+     */
+    fun moveFocus(focusDirection: FocusDirection): Boolean
 }
 
 /**
@@ -43,9 +56,18 @@ interface FocusManager {
 internal class FocusManagerImpl(
     private val focusModifier: FocusModifier = FocusModifier(Inactive)
 ) : FocusManager {
+
+    /**
+     * This gesture is fired when the user clicks on a non-clickable / non-focusable part of the
+     * screen. Since no other gesture handled this click, we handle it here.
+     */
     private val passThroughClickModifier = PointerInputModifierImpl(
         TapGestureFilter().apply {
-            onTap = { clearFocus() }
+            onTap = {
+                // The user clicked on a non-clickable part of the screen when something was
+                // focused. This is an indication that the user wants to clear focus.
+                clearFocus()
+            }
             consumeChanges = false
         }
     )
@@ -94,8 +116,29 @@ internal class FocusManagerImpl(
      * component.
      */
     override fun clearFocus(forcedClear: Boolean) {
-        if (focusModifier.focusNode.clearFocus(forcedClear)) {
+        // If this hierarchy had focus before clearing it, it indicates that the host view has
+        // focus. So after clearing focus within the compose hierarchy, we should reset the root
+        // focus modifier to "Active" to maintain consistency with the host view.
+        val rootWasFocused = when (focusModifier.focusState) {
+            Active, ActiveParent, Captured -> true
+            Disabled, Inactive -> false
+        }
+
+        if (focusModifier.focusNode.clearFocus(forcedClear) && rootWasFocused) {
             focusModifier.focusState = Active
         }
+    }
+
+    /**
+     * Moves focus in the specified direction.
+     *
+     * Focus moving is still being implemented. Right now, focus will move only if the user
+     * specified a custom focus traversal order for the item that is currently focused. (Using the
+     * [Modifier.focusOrder()][focusOrder] API).
+     *
+     * @return true if focus was moved successfully. false if the focused item is unchanged.
+     */
+    override fun moveFocus(focusDirection: FocusDirection): Boolean {
+        return focusModifier.focusNode.moveFocus(focusDirection)
     }
 }

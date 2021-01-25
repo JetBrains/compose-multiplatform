@@ -32,10 +32,10 @@ import androidx.compose.runtime.AtomicReference
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.Providers
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onCommit
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.AmbientAnimationClock
@@ -423,7 +423,7 @@ internal class ComposeViewAdapter : FrameLayout {
         this.onDraw = onDraw
 
         previewComposition = @Composable {
-            onCommit {
+            SideEffect {
                 onCommit()
             }
 

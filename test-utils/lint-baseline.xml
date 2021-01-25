@@ -1,15 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="5" by="lint 4.2.0-alpha15" client="gradle" variant="debug" version="4.2.0-alpha15">
+<issues format="5" by="lint 4.2.0-beta02" client="gradle" variant="debug" version="4.2.0-beta02">
 
     <issue
-        id="SuspiciousImport"
-        message="Don&apos;t include `android.R` here; use a fully qualified name for each usage instead"
-        errorLine1="import android.R"
-        errorLine2="~~~~~~~~~~~~~~~~">
+        id="UnknownIssueId"
+        message="Unknown issue id &quot;ComposableLambdaParameterNaming&quot;">
         <location
-            file="src/androidMain/kotlin/androidx/compose/testutils/benchmark/android/AndroidTestCaseRunner.kt"
-            line="19"
-            column="1"/>
+            file="build.gradle"/>
+    </issue>
+
+    <issue
+        id="UnknownIssueId"
+        message="Unknown issue id &quot;ComposableLambdaParameterPosition&quot;">
+        <location
+            file="build.gradle"/>
+    </issue>
+
+    <issue
+        id="UnknownIssueId"
+        message="Unknown issue id &quot;ComposableNaming&quot;">
+        <location
+            file="build.gradle"/>
     </issue>
 
     <issue
@@ -30,7 +40,7 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/testutils/AndroidComposeTestCaseRunner.kt"
-            line="348"
+            line="349"
             column="1"/>
     </issue>
 
@@ -63,7 +73,7 @@
         errorLine2="                            ~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/testutils/AndroidComposeTestCaseRunner.kt"
-            line="277"
+            line="278"
             column="29"/>
     </issue>
 
@@ -74,7 +84,7 @@
         errorLine2="                             ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/testutils/AndroidComposeTestCaseRunner.kt"
-            line="350"
+            line="351"
             column="30"/>
     </issue>
 
@@ -85,7 +95,7 @@
         errorLine2="                   ~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/testutils/AndroidComposeTestCaseRunner.kt"
-            line="353"
+            line="354"
             column="20"/>
     </issue>
 
@@ -96,7 +106,7 @@
         errorLine2="                          ~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/testutils/AndroidComposeTestCaseRunner.kt"
-            line="354"
+            line="355"
             column="27"/>
     </issue>
 
@@ -107,7 +117,7 @@
         errorLine2="                   ~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/testutils/AndroidComposeTestCaseRunner.kt"
-            line="358"
+            line="359"
             column="20"/>
     </issue>
 

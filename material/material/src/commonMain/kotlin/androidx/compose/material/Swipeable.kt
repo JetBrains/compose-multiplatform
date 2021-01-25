@@ -26,16 +26,17 @@ import androidx.compose.animation.core.SpringSpec
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.material.SwipeableDefaults.AnimationSpec
-import androidx.compose.material.SwipeableDefaults.VelocityThreshold
 import androidx.compose.material.SwipeableDefaults.StandardResistanceFactor
+import androidx.compose.material.SwipeableDefaults.VelocityThreshold
 import androidx.compose.material.SwipeableDefaults.resistanceConfig
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.Saver
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
@@ -53,7 +54,6 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.annotation.FloatRange
 import androidx.compose.ui.util.lerp
 import kotlin.math.PI
 import kotlin.math.abs
@@ -265,6 +265,10 @@ open class SwipeableState<T>(
     @ExperimentalMaterialApi
     fun snapTo(targetValue: T) {
         val targetOffset = anchors.getOffset(targetValue)
+        require(anchors.isNotEmpty()) {
+            "State $this is not attached to a component. Have you passed state object to " +
+                "a component?"
+        }
         requireNotNull(targetOffset) {
             "The target value must have an associated anchor."
         }
@@ -286,6 +290,10 @@ open class SwipeableState<T>(
         onEnd: ((AnimationEndReason, T) -> Unit)? = null
     ) {
         val targetOffset = anchors.getOffset(targetValue)
+        require(anchors.isNotEmpty()) {
+            "State $this is not attached to a component. Have you passed state object to " +
+                "a component?"
+        }
         requireNotNull(targetOffset) {
             "The target value must have an associated anchor."
         }
@@ -376,13 +384,15 @@ open class SwipeableState<T>(
  * @param from The state corresponding to the anchor we are moving away from.
  * @param to The state corresponding to the anchor we are moving towards.
  * @param fraction The fraction that the current position represents between [from] and [to].
+ * Must be between `0` and `1`.
  */
 @Immutable
 @ExperimentalMaterialApi
 data class SwipeProgress<T>(
     val from: T,
     val to: T,
-    @FloatRange(from = 0.0, to = 1.0) val fraction: Float
+    /*@FloatRange(from = 0.0, to = 1.0)*/
+    val fraction: Float
 )
 
 /**
@@ -437,16 +447,18 @@ internal fun <T : Any> rememberSwipeableStateFor(
         animationSpec = animationSpec
     )
     val forceAnimationCheck = remember { mutableStateOf(false) }
-    onCommit(value, forceAnimationCheck.value) {
+    DisposableEffect(value, forceAnimationCheck.value) {
         if (value != swipeableState.value) {
             swipeableState.animateTo(value)
         }
+        onDispose { }
     }
-    onCommit(swipeableState.value) {
+    DisposableEffect(swipeableState.value) {
         if (value != swipeableState.value) {
             onValueChange(swipeableState.value)
             forceAnimationCheck.value = !forceAnimationCheck.value
         }
+        onDispose { }
     }
     return swipeableState
 }
@@ -519,7 +531,7 @@ fun <T> Modifier.swipeable(
         "You cannot have two anchors mapped to the same state."
     }
     val density = AmbientDensity.current
-    onCommit(anchors) {
+    DisposableEffect(anchors) {
         state.anchors = anchors
         state.thresholds = { a, b ->
             val from = anchors.getValue(a)
@@ -529,8 +541,9 @@ fun <T> Modifier.swipeable(
         with(density) {
             state.velocityThreshold = velocityThreshold.toPx()
         }
+        onDispose { }
     }
-    onCommit {
+    SideEffect {
         state.resistance = resistance
     }
 
@@ -583,7 +596,8 @@ data class FixedThreshold(private val offset: Dp) : ThresholdConfig {
 @Immutable
 @ExperimentalMaterialApi
 data class FractionalThreshold(
-    @FloatRange(from = 0.0, to = 1.0) private val fraction: Float
+    /*@FloatRange(from = 0.0, to = 1.0)*/
+    private val fraction: Float
 ) : ThresholdConfig {
     override fun Density.computeThreshold(fromValue: Float, toValue: Float): Float {
         return lerp(fromValue, toValue, fraction)
@@ -606,27 +620,19 @@ data class FractionalThreshold(
  * has run out of things to see, and `StiffResistanceFactor` to convey that the user cannot swipe
  * this right now. Also, you can set either factor to 0 to disable resistance at that bound.
  *
- * @param basis Specifies the maximum amount of overflow that will be consumed.
+ * @param basis Specifies the maximum amount of overflow that will be consumed. Must be positive.
  * @param factorAtMin The factor by which to scale the resistance at the minimum bound.
+ * Must not be negative.
  * @param factorAtMax The factor by which to scale the resistance at the maximum bound.
+ * Must not be negative.
  */
 @Immutable
 data class ResistanceConfig(
-    @FloatRange(
-        from = 0.0,
-        to = 3.4e38 /* POSITIVE_INFINITY */,
-        fromInclusive = false
-    )
+    /*@FloatRange(from = 0.0, fromInclusive = false)*/
     val basis: Float,
-    @FloatRange(
-        from = 0.0,
-        to = 3.4e38 /* POSITIVE_INFINITY */
-    )
+    /*@FloatRange(from = 0.0)*/
     val factorAtMin: Float = StandardResistanceFactor,
-    @FloatRange(
-        from = 0.0,
-        to = 3.4e38 /* POSITIVE_INFINITY */
-    )
+    /*@FloatRange(from = 0.0)*/
     val factorAtMax: Float = StandardResistanceFactor
 ) {
     fun computeResistance(overflow: Float): Float {
@@ -722,57 +728,6 @@ private fun <T> Map<Float, T>.getOffset(state: T): Float? {
 }
 
 /**
- * Contains useful constants for [swipeable] and [SwipeableState].
- */
-@Deprecated(
-    "SwipeableConstants has been replaced with SwipeableDefaults",
-    ReplaceWith(
-        "SwipeableDefaults",
-        "androidx.compose.material.SwipeableDefaults"
-    )
-)
-object SwipeableConstants {
-    /**
-     * The default animation used by [SwipeableState].
-     */
-    val DefaultAnimationSpec = SpringSpec<Float>()
-
-    /**
-     * The default velocity threshold (1.8 dp per millisecond) used by [swipeable].
-     */
-    val DefaultVelocityThreshold = 125.dp
-
-    /**
-     * A stiff resistance factor which indicates that swiping isn't available right now.
-     */
-    const val StiffResistanceFactor = 20f
-
-    /**
-     * A standard resistance factor which indicates that the user has run out of things to see.
-     */
-    const val StandardResistanceFactor = 10f
-
-    /**
-     * The default resistance config used by [swipeable].
-     *
-     * This returns `null` if there is one anchor. If there are at least two anchors, it returns
-     * a [ResistanceConfig] with the resistance basis equal to the distance between the two bounds.
-     */
-    fun defaultResistanceConfig(
-        anchors: Set<Float>,
-        factorAtMin: Float = StandardResistanceFactor,
-        factorAtMax: Float = StandardResistanceFactor
-    ): ResistanceConfig? {
-        return if (anchors.size <= 1) {
-            null
-        } else {
-            val basis = anchors.maxOrNull()!! - anchors.minOrNull()!!
-            ResistanceConfig(basis, factorAtMin, factorAtMax)
-        }
-    }
-}
-
-/**
  * Contains useful defaults for [swipeable] and [SwipeableState].
  */
 object SwipeableDefaults {
@@ -843,7 +798,7 @@ internal val <T> SwipeableState<T>.PreUpPostDownNestedScrollConnection: NestedSc
         }
 
         override fun onPreFling(available: Velocity): Velocity {
-            val toFling = available.pixelsPerSecond.toFloat()
+            val toFling = Offset(available.x, available.y).toFloat()
             return if (toFling < 0 && offset.value > minBound) {
                 performFling(velocity = toFling) {}
                 // since we go to the anchor with tween settling, consume all for the best UX
@@ -858,7 +813,7 @@ internal val <T> SwipeableState<T>.PreUpPostDownNestedScrollConnection: NestedSc
             available: Velocity,
             onFinished: (Velocity) -> Unit
         ) {
-            performFling(velocity = available.pixelsPerSecond.toFloat()) {
+            performFling(velocity = Offset(available.x, available.y).toFloat()) {
                 // since we go to the anchor with tween settling, consume all for the best UX
                 onFinished.invoke(available)
             }

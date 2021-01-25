@@ -17,16 +17,15 @@
 package androidx.compose.ui.platform
 
 import android.view.View
-import androidx.compose.ui.node.Owner
-import androidx.compose.ui.util.annotation.VisibleForTesting
+import androidx.annotation.VisibleForTesting
+import androidx.compose.ui.node.RootForTest
 
 /**
  * The marker interface to be implemented by the [View] backing the composition.
  * To be used in tests.
  */
 @VisibleForTesting
-// TODO(b/174747742) Introduce RootForTest and extend it instead of Owner
-interface ViewRootForTest : Owner {
+interface ViewRootForTest : RootForTest {
 
     /**
      * The view backing this Owner.

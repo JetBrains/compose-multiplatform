@@ -18,7 +18,7 @@ package androidx.compose.ui.test.junit4
 
 import androidx.annotation.VisibleForTesting
 import androidx.compose.ui.test.IdlingResource
-import androidx.compose.ui.test.InternalTestingApi
+import androidx.compose.ui.test.InternalTestApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -29,12 +29,12 @@ import org.junit.runners.model.Statement
 
 internal class IdlingResourceRegistry
 @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-@InternalTestingApi
+@InternalTestApi
 internal constructor(
     private val pollScopeOverride: CoroutineScope?
 ) : IdlingResource {
     // Publicly facing constructor, that doesn't override the poll scope
-    @OptIn(InternalTestingApi::class)
+    @OptIn(InternalTestApi::class)
     constructor() : this(null)
 
     private val lock = Any()
@@ -95,9 +95,8 @@ internal constructor(
     }
 
     /**
-     * Starts polling the resources until all resources are idle. Won't start polling if all
-     * resources are already idle when this method is invoked, or if polling has already been
-     * started.
+     * Like [isIdleNow], but starts a poll job if the registry is not idle and no poll job is yet
+     * running.
      */
     internal fun isIdleOrEnsurePolling(): Boolean {
         @Suppress("DEPRECATION_ERROR")
@@ -140,8 +139,8 @@ internal constructor(
                 )
             }
         return "IdlingResourceRegistry has the following idling resources registered:" +
-            busy.map { "\n- [busy] ${it.indentBy("         ")}" } +
-            idle.map { "\n- [idle] $it" } +
+            busy.joinToString { "\n- [busy] ${it.indentBy("         ")}" } +
+            idle.joinToString { "\n- [idle] $it" } +
             if (idle.isEmpty() && busy.isEmpty()) "\n<none>" else ""
     }
 

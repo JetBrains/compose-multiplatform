@@ -27,7 +27,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -42,7 +42,7 @@ import org.junit.runner.RunWith
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-@OptIn(ExperimentalMaterialApi::class, ExperimentalTesting::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalTestApi::class)
 class TabScreenshotTest {
 
     @get:Rule
@@ -276,7 +276,7 @@ class TabScreenshotTest {
         interaction: Interaction? = null,
         goldenIdentifier: String
     ) {
-        composeTestRule.clockTestRule.pauseClock()
+        composeTestRule.mainClock.autoAdvance = false
 
         if (interaction != null) {
             // Start ripple
@@ -290,7 +290,7 @@ class TabScreenshotTest {
 
             // Advance to somewhere in the middle of the animation for the ripple
             composeTestRule.waitForIdle()
-            composeTestRule.clockTestRule.advanceClock(50)
+            composeTestRule.mainClock.advanceTimeBy(milliseconds = 50)
         }
 
         // Capture and compare screenshots

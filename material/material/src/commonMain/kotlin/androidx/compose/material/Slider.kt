@@ -22,23 +22,24 @@ import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.TargetAnimation
 import androidx.compose.animation.core.TweenSpec
+import androidx.compose.animation.core.fling
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
-import androidx.compose.foundation.Strings
 import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.animation.defaultFlingConfig
-import androidx.compose.foundation.animation.fling
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeightIn
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredWidthIn
+import androidx.compose.foundation.progressSemantics
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.SliderDefaults.InactiveTrackColorAlpha
 import androidx.compose.material.SliderDefaults.TickColorAlpha
@@ -54,22 +55,15 @@ import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AmbientLayoutDirection
-import androidx.compose.ui.semantics.AccessibilityRangeInfo
-import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.ui.semantics.stateDescriptionRange
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.setProgress
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.annotation.IntRange
-import androidx.compose.ui.util.format
 import androidx.compose.ui.util.lerp
 import kotlin.math.abs
-import kotlin.math.roundToInt
 
 /**
  * Sliders allow users to make selections from a range of values.
@@ -95,7 +89,7 @@ import kotlin.math.roundToInt
  * this range
  * @param steps if greater than 0, specifies the amounts of discrete values, evenly distributed
  * between across the whole value range. If 0, slider will behave as a continuous slider and allow
- * to choose any value from the range specified
+ * to choose any value from the range specified. Must not be negative.
  * @param onValueChangeEnd lambda to be invoked when value change has ended. This callback
  * shouldn't be used to update the slider value (use [onValueChange] for that), but rather to
  * know when the user has completed selecting a new value by ending a drag or a click.
@@ -119,7 +113,8 @@ fun Slider(
     onValueChange: (Float) -> Unit,
     modifier: Modifier = Modifier,
     valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
-    @IntRange(from = 0) steps: Int = 0,
+    /*@IntRange(from = 0)*/
+    steps: Int = 0,
     onValueChangeEnd: () -> Unit = {},
     interactionState: InteractionState = remember { InteractionState() },
     thumbColor: Color = MaterialTheme.colors.primary,
@@ -134,7 +129,9 @@ fun Slider(
     }
     position.onValueChange = onValueChange
     position.scaledValue = value
-    WithConstraints(modifier.sliderSemantics(value, position, onValueChange, valueRange, steps)) {
+    BoxWithConstraints(
+        modifier.sliderSemantics(value, position, onValueChange, valueRange, steps)
+    ) {
         val isRtl = AmbientLayoutDirection.current == LayoutDirection.Rtl
         val maxPx = constraints.maxWidth.toFloat()
         val minPx = 0f
@@ -143,7 +140,11 @@ fun Slider(
         val flingConfig = sliderFlingConfig(position, position.anchorsPx)
         val gestureEndAction = { velocity: Float ->
             if (flingConfig != null) {
-                position.holder.fling(velocity, flingConfig) { reason, endValue, _ ->
+                position.holder.fling(
+                    velocity,
+                    flingConfig.decayAnimation,
+                    flingConfig.adjustTarget
+                ) { reason, endValue, _ ->
                     if (reason != AnimationEndReason.Interrupted) {
                         position.holder.snapTo(endValue)
                         onValueChangeEnd()
@@ -191,28 +192,6 @@ fun Slider(
             modifier = press.then(drag)
         )
     }
-}
-
-/**
- * Object to hold constants used by the [Slider]
- */
-@Deprecated(
-    "SliderConstants has been replaced with SliderDefaults",
-    ReplaceWith(
-        "SliderDefaults",
-        "androidx.compose.material.SliderDefaults"
-    )
-)
-object SliderConstants {
-    /**
-     * Default alpha of the inactive part of the track
-     */
-    const val InactiveTrackColorAlpha = 0.24f
-
-    /**
-     * Default alpha of the ticks that are drawn on top of the track
-     */
-    const val TickColorAlpha = 0.54f
 }
 
 /**
@@ -372,19 +351,10 @@ private fun Modifier.sliderSemantics(
     position: SliderPosition,
     onValueChange: (Float) -> Unit,
     valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
-    @IntRange(from = 0) steps: Int = 0
+    steps: Int = 0
 ): Modifier {
     val coerced = value.coerceIn(position.startValue, position.endValue)
-    val fraction = calcFraction(position.startValue, position.endValue, coerced)
-    // We only display 0% or 100% when it is exactly 0% or 100%.
-    val percent = when (fraction) {
-        0f -> 0
-        1f -> 100
-        else -> (fraction * 100).roundToInt().coerceIn(1, 99)
-    }
     return semantics(mergeDescendants = true) {
-        stateDescription = Strings.TemplatePercent.format(percent)
-        stateDescriptionRange = AccessibilityRangeInfo(coerced, valueRange, steps)
         setProgress(
             action = { targetValue ->
                 val newValue = targetValue.coerceIn(position.startValue, position.endValue)
@@ -405,7 +375,7 @@ private fun Modifier.sliderSemantics(
                 }
             }
         )
-    }
+    }.progressSemantics(value, valueRange, steps)
 }
 
 /**
@@ -417,12 +387,13 @@ private fun Modifier.sliderSemantics(
  * @param valueRange range of values that Slider value can take
  * @param steps if greater than 0, specifies the amounts of discrete values, evenly distributed
  * between across the whole value range. If 0, slider will behave as a continuous slider and allow
- * to choose any value from the range specified
+ * to choose any value from the range specified. Must not be negative.
  */
 private class SliderPosition(
     initial: Float = 0f,
     val valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
-    @IntRange(from = 0) steps: Int = 0,
+    /*@IntRange(from = 0)*/
+    steps: Int = 0,
     animatedClock: AnimationClockObservable,
     var onValueChange: (Float) -> Unit
 ) {

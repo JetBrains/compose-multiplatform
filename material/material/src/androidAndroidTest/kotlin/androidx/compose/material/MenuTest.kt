@@ -28,7 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.hasAnyDescendant
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.isPopup
@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.IntBounds
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.Position
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -51,7 +51,7 @@ import org.junit.runner.RunWith
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalTesting::class)
+@OptIn(ExperimentalTestApi::class)
 class MenuTest {
     @get:Rule
     val rule = createComposeRule()
@@ -60,7 +60,6 @@ class MenuTest {
     fun menu_canBeTriggered() {
         var expanded by mutableStateOf(false)
 
-        rule.clockTestRule.pauseClock()
         rule.setContent {
             DropdownMenu(
                 expanded = expanded,
@@ -74,21 +73,29 @@ class MenuTest {
                 }
             }
         }
-        rule.onNodeWithTag("MenuContent").assertDoesNotExist()
 
-        rule.runOnIdle { expanded = true }
+        rule.onNodeWithTag("MenuContent").assertDoesNotExist()
+        rule.mainClock.autoAdvance = false
+
+        rule.runOnUiThread { expanded = true }
+        rule.mainClock.advanceTimeByFrame() // Trigger the popup
         rule.waitForIdle()
-        rule.clockTestRule.advanceClock(InTransitionDuration.toLong())
+        rule.mainClock.advanceTimeByFrame() // Kick off the animation
+        rule.mainClock.advanceTimeBy(InTransitionDuration.toLong())
         rule.onNodeWithTag("MenuContent").assertExists()
 
-        rule.runOnIdle { expanded = false }
-        rule.waitForIdle()
-        rule.clockTestRule.advanceClock(OutTransitionDuration.toLong())
+        rule.runOnUiThread { expanded = false }
+        rule.mainClock.advanceTimeByFrame() // Trigger the popup
+        rule.mainClock.advanceTimeByFrame() // Kick off the animation
+        rule.mainClock.advanceTimeBy(OutTransitionDuration.toLong())
+        rule.mainClock.advanceTimeByFrame()
         rule.onNodeWithTag("MenuContent").assertDoesNotExist()
 
-        rule.runOnIdle { expanded = true }
+        rule.runOnUiThread { expanded = true }
+        rule.mainClock.advanceTimeByFrame() // Trigger the popup
         rule.waitForIdle()
-        rule.clockTestRule.advanceClock(InTransitionDuration.toLong())
+        rule.mainClock.advanceTimeByFrame() // Kick off the animation
+        rule.mainClock.advanceTimeBy(InTransitionDuration.toLong())
         rule.onNodeWithTag("MenuContent").assertExists()
     }
 
@@ -126,7 +133,7 @@ class MenuTest {
         val screenWidth = 500
         val screenHeight = 1000
         val density = Density(1f)
-        val windowBounds = IntBounds(0, 0, screenWidth, screenHeight)
+        val windowSize = IntSize(screenWidth, screenHeight)
         val anchorPosition = IntOffset(100, 200)
         val anchorSize = IntSize(10, 20)
         val offsetX = 20
@@ -134,11 +141,11 @@ class MenuTest {
         val popupSize = IntSize(50, 80)
 
         val ltrPosition = DropdownMenuPositionProvider(
-            Position(offsetX.dp, offsetY.dp),
+            DpOffset(offsetX.dp, offsetY.dp),
             density
         ).calculatePosition(
             IntBounds(anchorPosition, anchorSize),
-            windowBounds,
+            windowSize,
             LayoutDirection.Ltr,
             popupSize
         )
@@ -151,11 +158,11 @@ class MenuTest {
         )
 
         val rtlPosition = DropdownMenuPositionProvider(
-            Position(offsetX.dp, offsetY.dp),
+            DpOffset(offsetX.dp, offsetY.dp),
             density
         ).calculatePosition(
             IntBounds(anchorPosition, anchorSize),
-            windowBounds,
+            windowSize,
             LayoutDirection.Rtl,
             popupSize
         )
@@ -173,7 +180,7 @@ class MenuTest {
         val screenWidth = 500
         val screenHeight = 1000
         val density = Density(1f)
-        val windowBounds = IntBounds(0, 0, screenWidth, screenHeight)
+        val windowSize = IntSize(screenWidth, screenHeight)
         val anchorPosition = IntOffset(450, 950)
         val anchorPositionRtl = IntOffset(50, 950)
         val anchorSize = IntSize(10, 20)
@@ -182,11 +189,11 @@ class MenuTest {
         val popupSize = IntSize(150, 80)
 
         val ltrPosition = DropdownMenuPositionProvider(
-            Position(offsetX.dp, offsetY.dp),
+            DpOffset(offsetX.dp, offsetY.dp),
             density
         ).calculatePosition(
             IntBounds(anchorPosition, anchorSize),
-            windowBounds,
+            windowSize,
             LayoutDirection.Ltr,
             popupSize
         )
@@ -199,11 +206,11 @@ class MenuTest {
         )
 
         val rtlPosition = DropdownMenuPositionProvider(
-            Position(offsetX.dp, offsetY.dp),
+            DpOffset(offsetX.dp, offsetY.dp),
             density
         ).calculatePosition(
             IntBounds(anchorPositionRtl, anchorSize),
-            windowBounds,
+            windowSize,
             LayoutDirection.Rtl,
             popupSize
         )
@@ -221,7 +228,7 @@ class MenuTest {
         val screenWidth = 500
         val screenHeight = 1000
         val density = Density(1f)
-        val windowBounds = IntBounds(0, 0, screenWidth, screenHeight)
+        val windowSize = IntSize(screenWidth, screenHeight)
         val anchorPosition = IntOffset(0, 0)
         val anchorSize = IntSize(50, 20)
         val popupSize = IntSize(150, 500)
@@ -231,11 +238,11 @@ class MenuTest {
         val verticalMargin = with(density) { MenuVerticalMargin.toIntPx() }
 
         val position = DropdownMenuPositionProvider(
-            Position(0.dp, 0.dp),
+            DpOffset(0.dp, 0.dp),
             density
         ).calculatePosition(
             IntBounds(anchorPosition, anchorSize),
-            windowBounds,
+            windowSize,
             LayoutDirection.Ltr,
             popupSize
         )
@@ -250,7 +257,7 @@ class MenuTest {
         val screenWidth = 500
         val screenHeight = 1000
         val density = Density(1f)
-        val windowBounds = IntBounds(0, 0, screenWidth, screenHeight)
+        val windowSize = IntSize(screenWidth, screenHeight)
         val anchorPosition = IntOffset(100, 200)
         val anchorSize = IntSize(10, 20)
         val offsetX = 20
@@ -260,14 +267,14 @@ class MenuTest {
         var obtainedParentBounds = IntBounds(0, 0, 0, 0)
         var obtainedMenuBounds = IntBounds(0, 0, 0, 0)
         DropdownMenuPositionProvider(
-            Position(offsetX.dp, offsetY.dp),
+            DpOffset(offsetX.dp, offsetY.dp),
             density
         ) { parentBounds, menuBounds ->
             obtainedParentBounds = parentBounds
             obtainedMenuBounds = menuBounds
         }.calculatePosition(
             IntBounds(anchorPosition, anchorSize),
-            windowBounds,
+            windowSize,
             LayoutDirection.Ltr,
             popupSize
         )

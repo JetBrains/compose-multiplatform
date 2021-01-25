@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation
 
-import androidx.compose.animation.animate
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.lazy.LazyListState
@@ -25,7 +25,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onDispose
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticAmbientOf
@@ -33,7 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.DragObserver
-import androidx.compose.ui.gesture.PressTimeout
+import androidx.compose.ui.gesture.PressTimeoutMillis
 import androidx.compose.ui.gesture.pressIndicatorGestureFilter
 import androidx.compose.ui.gesture.rawDragGestureFilter
 import androidx.compose.ui.graphics.Color
@@ -48,7 +48,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.inMilliseconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlin.math.sign
@@ -176,8 +175,10 @@ private fun Scrollbar(
     interactionState: InteractionState,
     isVertical: Boolean
 ) = with(AmbientDensity.current) {
-    onDispose {
-        interactionState.removeInteraction(Interaction.Dragged)
+    DisposableEffect(interactionState) {
+        onDispose {
+            interactionState.removeInteraction(Interaction.Dragged)
+        }
     }
 
     var containerSize by remember { mutableStateOf(0) }
@@ -218,9 +219,9 @@ private fun Scrollbar(
         }
     }
 
-    val color = animate(
+    val color by animateColorAsState(
         if (isHover) style.hoverColor else style.unhoverColor,
-        animSpec = TweenSpec(durationMillis = style.hoverDurationMillis)
+        animationSpec = TweenSpec(durationMillis = style.hoverDurationMillis)
     )
 
     val isVisible = sliderAdapter.size < containerSize
@@ -255,7 +256,7 @@ private fun Modifier.scrollOnPressOutsideSlider(
         val targetPosition = if (isVertical) targetOffset!!.y else targetOffset!!.x
 
         LaunchedEffect(targetPosition) {
-            var delay = PressTimeout * 3
+            var delay = PressTimeoutMillis * 3
             while (targetPosition !in sliderAdapter.bounds) {
                 val oldSign = sign(targetPosition - sliderAdapter.position)
                 scrollbarAdapter.scrollTo(
@@ -268,8 +269,8 @@ private fun Modifier.scrollOnPressOutsideSlider(
                     break
                 }
 
-                delay(delay.inMilliseconds())
-                delay = PressTimeout
+                delay(delay)
+                delay = PressTimeoutMillis
             }
         }
     }

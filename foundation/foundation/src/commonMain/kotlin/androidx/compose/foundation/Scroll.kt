@@ -24,6 +24,8 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.animation.defaultFlingConfig
+import androidx.compose.foundation.animation.scrollBy
+import androidx.compose.foundation.animation.smoothScrollBy
 import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.Scrollable
 import androidx.compose.foundation.gestures.ScrollableController
@@ -31,7 +33,6 @@ import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.InternalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -41,6 +42,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.savedinstancestate.Saver
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.runtime.setValue
@@ -57,21 +59,22 @@ import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.debugInspectorInfo
-import androidx.compose.ui.semantics.AccessibilityScrollState
-import androidx.compose.ui.semantics.horizontalAccessibilityScrollState
+import androidx.compose.ui.semantics.ScrollAxisRange
+import androidx.compose.ui.semantics.horizontalScrollAxisRange
 import androidx.compose.ui.semantics.scrollBy
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.verticalAccessibilityScrollState
+import androidx.compose.ui.semantics.verticalScrollAxisRange
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 /**
  * Create and [remember] the [ScrollState] based on the currently appropriate scroll
  * configuration to allow changing scroll position or observing scroll behavior.
  *
- * Learn how to control [ScrollableColumn] or [ScrollableRow]:
+ * Learn how to control the state of [Modifier.verticalScroll] or [Modifier.horizontalScroll]:
  * @sample androidx.compose.foundation.samples.ControlledScrollableRowSample
  *
  * @param initial initial scroller position to start with
@@ -101,13 +104,13 @@ fun rememberScrollState(
 
 /**
  * State of the scroll. Allows the developer to change the scroll position or get current state by
- * calling methods on this object. To be hosted and passed to [ScrollableRow], [ScrollableColumn],
- * [Modifier.verticalScroll] or [Modifier.horizontalScroll]
+ * calling methods on this object. To be hosted and passed to [Modifier.verticalScroll] or
+ * [Modifier.horizontalScroll]
  *
  * To create and automatically remember [ScrollState] with default parameters use
  * [rememberScrollState].
  *
- * Learn how to control [ScrollableColumn] or [ScrollableRow]:
+ * Learn how to control the state of [Modifier.verticalScroll] or [Modifier.horizontalScroll]:
  * @sample androidx.compose.foundation.samples.ControlledScrollableRowSample
  *
  * @param initial value of the scroll
@@ -152,10 +155,13 @@ class ScrollState(
             consumeScrollDelta = {
                 val absolute = (value + it)
                 val newValue = absolute.coerceIn(0f, maxValue)
-                if (absolute != newValue) stopAnimation()
+                val changed = absolute != newValue
+                if (changed) stopFlingAnimation()
                 val consumed = newValue - value
                 value += consumed
-                consumed
+
+                // Avoid floating-point rounding error
+                if (changed) consumed else it
             },
             interactionState = interactionState
         )
@@ -182,6 +188,10 @@ class ScrollState(
         scrollableController.stopAnimation()
     }
 
+    private fun stopFlingAnimation() {
+        scrollableController.stopFlingAnimation()
+    }
+
     /**
      * whether this [ScrollState] is currently animating/flinging
      */
@@ -196,12 +206,29 @@ class ScrollState(
      * @param spec animation curve for smooth scroll animation
      * @param onEnd callback to be invoked when smooth scroll has finished
      */
+    @Suppress("DeprecatedCallableAddReplaceWith") // Methods have the same name
+    @Deprecated(
+        "Use suspend fun smoothScrollTo instead"
+    )
     fun smoothScrollTo(
         value: Float,
         spec: AnimationSpec<Float> = SpringSpec(),
         onEnd: (endReason: AnimationEndReason, finishValue: Float) -> Unit = { _, _ -> }
     ) {
         smoothScrollBy(value - this.value, spec, onEnd)
+    }
+    /**
+     * Smooth scroll to position in pixels
+     *
+     * @param value target value in pixels to smooth scroll to, value will be coerced to
+     * 0..maxPosition
+     * @param spec animation curve for smooth scroll animation
+     */
+    suspend fun smoothScrollTo(
+        value: Float,
+        spec: AnimationSpec<Float> = SpringSpec()
+    ) {
+        (this as Scrollable).smoothScrollBy(value - this.value, spec)
     }
 
     /**
@@ -211,6 +238,14 @@ class ScrollState(
      * @param spec animation curve for smooth scroll animation
      * @param onEnd callback to be invoked when smooth scroll has finished
      */
+    @Deprecated(
+        "Use suspend fun smoothScrollBy instead",
+        ReplaceWith(
+            "(this as Scrollable).smoothScrollBy(value, spec)",
+            "androidx.compose.foundation.animation.smoothScrollBy",
+            "androidx.compose.foundation.gestures.Scrollable"
+        )
+    )
     fun smoothScrollBy(
         value: Float,
         spec: AnimationSpec<Float> = SpringSpec(),
@@ -220,12 +255,20 @@ class ScrollState(
     }
 
     /**
-     * Instantly jump to position in pixels
+     * Instantly jump to the given position in pixels.
      *
-     * @param value target value in pixels to jump to, value will be coerced to 0..maxPosition
+     * Cancels the currently running scroll, if any, and suspends until the cancellation is
+     * complete.
+     *
+     * @see smoothScrollTo for an animated version
+     *
+     * @param value number of pixels to scroll by
+     * @return the amount of scroll consumed
      */
-    fun scrollTo(value: Float) {
-        this.value = value.coerceIn(0f, maxValue)
+    suspend fun scrollTo(
+        value: Float
+    ): Float {
+        return (this as Scrollable).scrollBy(value - this.value)
     }
 
     /**
@@ -233,8 +276,9 @@ class ScrollState(
      *
      * @param value delta in pixels to jump by, total value will be coerced to 0..maxPosition
      */
+    @Deprecated("Use suspend version") // TODO(DO NOT MERGE): add ReplaceWith
     fun scrollBy(value: Float) {
-        scrollTo(this.value + value)
+        this.value = (this.value + value).coerceIn(0f, maxValue)
     }
 
     companion object {
@@ -257,8 +301,6 @@ class ScrollState(
  *
  * The content of the [ScrollableColumn] is clipped to its bounds.
  *
- * @sample androidx.compose.foundation.samples.ScrollableColumnSample
- *
  * @param modifier modifier for this [ScrollableColumn]
  * @param scrollState state of the scroll, such as current offset and max offset
  * @param verticalArrangement The vertical arrangement of the layout's children
@@ -271,7 +313,19 @@ class ScrollState(
  * padding for the content after it has been clipped, which is not possible via [modifier] param
  */
 @Composable
-@OptIn(InternalLayoutApi::class)
+@Deprecated(
+    "Prefer to use LazyColumn instead. Or you can use Column(Modifier.verticalScroll" +
+        "(rememberScrollState()) if your scrolling content is small enough.",
+    ReplaceWith(
+        "LazyColumn(modifier = modifier, contentPadding = contentPadding, " +
+            "reverseLayout = reverseScrollDirection, horizontalAlignment = horizontalAlignment) {" +
+            "\n // use `item` for separate elements like headers" +
+            "\n // and `items` for lists of identical elements" +
+            "\n item (content)" +
+            "\n }",
+        "androidx.compose.foundation.lazy.LazyColumn"
+    )
+)
 fun ScrollableColumn(
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(0f),
@@ -301,8 +355,6 @@ fun ScrollableColumn(
  *
  * The content of the [ScrollableRow] is clipped to its bounds.
  *
- * @sample androidx.compose.foundation.samples.ScrollableRowSample
- *
  * @param modifier modifier for this [ScrollableRow]
  * @param scrollState state of the scroll, such as current offset and max offset
  * @param horizontalArrangement The horizontal arrangement of the layout's children
@@ -315,7 +367,19 @@ fun ScrollableColumn(
  * padding for the content after it has been clipped, which is not possible via [modifier] param.
  */
 @Composable
-@OptIn(InternalLayoutApi::class)
+@Deprecated(
+    "Prefer to use LazyRow instead. Or you can use Row(Modifier.horizontalScroll" +
+        "(rememberScrollState()) if your scrolling content is small enough.",
+    ReplaceWith(
+        "LazyRow(modifier = modifier, contentPadding = contentPadding, " +
+            "reverseLayout = reverseScrollDirection, verticalAlignment = verticalAlignment) {" +
+            "\n // use `item` for separate elements like headers" +
+            "\n // and `items` for lists of identical elements" +
+            "\n item (content)" +
+            "\n }",
+        "androidx.compose.foundation.lazy.LazyRow"
+    )
+)
 fun ScrollableRow(
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(0f),
@@ -397,25 +461,28 @@ private fun Modifier.scroll(
     isVertical: Boolean
 ) = composed(
     factory = {
+        val coroutineScope = rememberCoroutineScope()
         val semantics = Modifier.semantics {
             if (isScrollable) {
-                val accessibilityScrollState = AccessibilityScrollState(
+                val accessibilityScrollState = ScrollAxisRange(
                     value = state.value,
                     maxValue = state.maxValue,
                     reverseScrolling = reverseScrolling
                 )
                 if (isVertical) {
-                    this.verticalAccessibilityScrollState = accessibilityScrollState
+                    this.verticalScrollAxisRange = accessibilityScrollState
                 } else {
-                    this.horizontalAccessibilityScrollState = accessibilityScrollState
+                    this.horizontalScrollAxisRange = accessibilityScrollState
                 }
                 // when b/156389287 is fixed, this should be proper scrollTo with reverse handling
                 scrollBy(
                     action = { x: Float, y: Float ->
-                        if (isVertical) {
-                            state.scrollBy(y)
-                        } else {
-                            state.scrollBy(x)
+                        coroutineScope.launch {
+                            if (isVertical) {
+                                (state as Scrollable).scrollBy(y)
+                            } else {
+                                (state as Scrollable).scrollBy(x)
+                            }
                         }
                         return@scrollBy true
                     }

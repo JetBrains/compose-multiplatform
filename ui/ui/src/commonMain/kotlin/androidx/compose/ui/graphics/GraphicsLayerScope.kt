@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.graphics
 
-import androidx.compose.ui.util.annotation.FloatRange
+import androidx.compose.ui.unit.Density
 
 /**
  * Default camera distance for all layers
@@ -28,7 +28,7 @@ const val DefaultCameraDistance = 8.0f
  * ([scaleX], [scaleY]), rotation ([rotationX], [rotationY], [rotationZ]), opacity ([alpha]), shadow
  * ([shadowElevation], [shape]), and clipping ([clip], [shape]).
  */
-interface GraphicsLayerScope {
+interface GraphicsLayerScope : Density {
     /**
      * The horizontal scale of the drawn area. Default value is `1`.
      */
@@ -42,9 +42,10 @@ interface GraphicsLayerScope {
     /**
      * The alpha of the drawn area. Setting this to something other than `1`
      * will cause the drawn contents to be translucent and setting it to `0` will
-     * cause it to be fully invisible. Default value is `1`.
+     * cause it to be fully invisible. Default value is `1` and the range is between
+     * `0` and `1`.
      */
-    @setparam:FloatRange(from = 0.0, to = 1.0)
+    /*@setparam:FloatRange(from = 0.0, to = 1.0)*/
     var alpha: Float
 
     /**
@@ -59,27 +60,28 @@ interface GraphicsLayerScope {
 
     /**
      * Sets the elevation for the shadow in pixels. With the [shadowElevation] > 0f and
-     * [shape] set, a shadow is produced. Default value is `0
+     * [shape] set, a shadow is produced. Default value is `0` and the value must not be
+     * negative.
      */
-    @setparam:FloatRange(from = 0.0, to = 3.4e38 /* POSITIVE_INFINITY */)
+    /*@setparam:FloatRange(from = 0.0)*/
     var shadowElevation: Float
 
     /**
-     * The rotation of the contents around the horizontal axis in degrees. Default value is `0
+     * The rotation, in degrees, of the contents around the horizontal axis in degrees. Default
+     * value is `0`.
      */
-    @setparam:FloatRange(from = 0.0, to = 360.0)
     var rotationX: Float
 
     /**
-     * The rotation of the contents around the vertical axis in degrees. Default value is `0
+     * The rotation, in degrees, of the contents around the vertical axis in degrees. Default
+     * value is `0`.
      */
-    @setparam:FloatRange(from = 0.0, to = 360.0)
     var rotationY: Float
 
     /**
-     * The rotation of the contents around the Z axis in degrees. Default value is `0
+     * The rotation, in degrees, of the contents around the Z axis in degrees. Default value is
+     * `0`.
      */
-    @setparam:FloatRange(from = 0.0, to = 360.0)
     var rotationZ: Float
 
     /**
@@ -103,7 +105,7 @@ interface GraphicsLayerScope {
      * The distance is expressed in pixels and must always be positive.
      * Default value is [DefaultCameraDistance]
      */
-    @setparam:FloatRange(from = 0.0, to = 3.4e38 /* POSITIVE_INFINITY */)
+    /*@setparam:FloatRange(from = 0.0)*/
     var cameraDistance: Float
 
     /**
@@ -148,6 +150,14 @@ internal class ReusableGraphicsLayerScope : GraphicsLayerScope {
     override var transformOrigin: TransformOrigin = TransformOrigin.Center
     override var shape: Shape = RectangleShape
     override var clip: Boolean = false
+
+    internal var graphicsDensity: Density = Density(1.0f)
+
+    override val density: Float
+        get() = graphicsDensity.density
+
+    override val fontScale: Float
+        get() = graphicsDensity.fontScale
 
     fun reset() {
         scaleX = 1f

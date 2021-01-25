@@ -17,14 +17,14 @@
 package androidx.compose.runtime.mock
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.emit
+import androidx.compose.runtime.ComposableContract
+import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.key
 
-@Suppress("ComposableNaming")
 @Composable
-fun <T : Any> MockComposeScope.repeat(
+fun <T : Any> Repeated(
     of: Iterable<T>,
-    block: @Composable MockComposeScope.(value: T) -> Unit
+    block: @Composable (value: T) -> Unit
 ) {
     for (value in of) {
         key(value) {
@@ -33,44 +33,40 @@ fun <T : Any> MockComposeScope.repeat(
     }
 }
 
-@Suppress("ComposableNaming")
 @Composable
-fun MockComposeScope.linear(content: @Composable MockComposeScope.() -> Unit) {
-    emit<View, ViewApplier>(
-        ctor = { View().also { it.name = "linear" } },
+fun Linear(content: @Composable () -> Unit) {
+    ComposeNode<View, ViewApplier>(
+        factory = { View().also { it.name = "linear" } },
         update = { }
     ) {
         content()
     }
 }
 
-@Suppress("ComposableNaming")
-@Composable
-fun MockComposeScope.text(value: String) {
-    emit<View, ViewApplier>(
-        ctor = { View().also { it.name = "text" } },
+@Composable @ComposableContract(restartable = false)
+fun Text(value: String) {
+    ComposeNode<View, ViewApplier>(
+        factory = { View().also { it.name = "text" } },
         update = { set(value) { text = it } }
     )
 }
 
-@Suppress("ComposableNaming")
 @Composable
-fun MockComposeScope.edit(value: String) {
-    emit<View, ViewApplier>(
-        ctor = { View().also { it.name = "edit" } },
+fun Edit(value: String) {
+    ComposeNode<View, ViewApplier>(
+        factory = { View().also { it.name = "edit" } },
         update = { set(value) { this.value = it } }
     )
 }
 
-@Suppress("ComposableNaming")
 @Composable
-fun MockComposeScope.selectBox(
+fun SelectBox(
     selected: Boolean,
-    content: @Composable MockComposeScope.() -> Unit
+    content: @Composable () -> Unit
 ) {
     if (selected) {
-        emit<View, ViewApplier>(
-            ctor = { View().also { it.name = "box" } },
+        ComposeNode<View, ViewApplier>(
+            factory = { View().also { it.name = "box" } },
             update = { },
             content = { content() }
         )

@@ -1,12 +1,10 @@
 // Signature format: 4.0
 package androidx.compose.ui.text {
 
-  @androidx.compose.runtime.Immutable public final class AnnotatedString {
+  @androidx.compose.runtime.Immutable public final class AnnotatedString implements java.lang.CharSequence {
     ctor public AnnotatedString(String text, java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.SpanStyle>> spanStyles, java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.ParagraphStyle>> paragraphStyles);
-    method public String component1();
-    method public java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.SpanStyle>> component2();
-    method public java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.ParagraphStyle>> component3();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.text.AnnotatedString copy(String text, java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.SpanStyle>> spanStyles, java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.ParagraphStyle>> paragraphStyles, java.util.List<? extends androidx.compose.ui.text.AnnotatedString.Range<?>> annotations);
+    method public operator char get(int index);
+    method public int getLength();
     method public java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.ParagraphStyle>> getParagraphStyles();
     method public java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.SpanStyle>> getSpanStyles();
     method public java.util.List<androidx.compose.ui.text.AnnotatedString.Range<java.lang.String>> getStringAnnotations(String tag, int start, int end);
@@ -14,6 +12,9 @@ package androidx.compose.ui.text {
     method public String getText();
     method public java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.TtsAnnotation>> getTtsAnnotations(int start, int end);
     method @androidx.compose.runtime.Stable public operator androidx.compose.ui.text.AnnotatedString plus(androidx.compose.ui.text.AnnotatedString other);
+    method public androidx.compose.ui.text.AnnotatedString subSequence(int startIndex, int endIndex);
+    method public androidx.compose.ui.text.AnnotatedString subSequence-5zc-tL8(long range);
+    property public int length;
     property public final java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.ParagraphStyle>> paragraphStyles;
     property public final java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.SpanStyle>> spanStyles;
     property public final String text;
@@ -66,8 +67,6 @@ package androidx.compose.ui.text {
     method public static inline androidx.compose.ui.text.AnnotatedString buildAnnotatedString(kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.AnnotatedString.Builder,kotlin.Unit> builder);
     method public static androidx.compose.ui.text.AnnotatedString capitalize(androidx.compose.ui.text.AnnotatedString, optional androidx.compose.ui.text.intl.LocaleList localeList);
     method public static androidx.compose.ui.text.AnnotatedString decapitalize(androidx.compose.ui.text.AnnotatedString, optional androidx.compose.ui.text.intl.LocaleList localeList);
-    method public static int getLength(androidx.compose.ui.text.AnnotatedString);
-    method public static androidx.compose.ui.text.AnnotatedString subSequence(androidx.compose.ui.text.AnnotatedString, int start, int end);
     method public static androidx.compose.ui.text.AnnotatedString toLowerCase(androidx.compose.ui.text.AnnotatedString, optional androidx.compose.ui.text.intl.LocaleList localeList);
     method public static androidx.compose.ui.text.AnnotatedString toUpperCase(androidx.compose.ui.text.AnnotatedString, optional androidx.compose.ui.text.intl.LocaleList localeList);
     method public static inline <R> R withStyle(androidx.compose.ui.text.AnnotatedString.Builder, androidx.compose.ui.text.SpanStyle style, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.AnnotatedString.Builder,? extends R> block);
@@ -81,6 +80,11 @@ package androidx.compose.ui.text {
   }
 
   public final class JvmAnnotatedStringKt {
+  }
+
+  public final class JvmCharHelpersKt {
+    method @androidx.compose.ui.text.InternalTextApi public static int findFollowingBreak(String, int index);
+    method @androidx.compose.ui.text.InternalTextApi public static int findPrecedingBreak(String, int index);
   }
 
   public final class MultiParagraph {
@@ -208,11 +212,8 @@ package androidx.compose.ui.text {
   }
 
   @androidx.compose.runtime.Immutable public final class ParagraphStyle {
-    method public androidx.compose.ui.text.style.TextAlign? component1();
-    method public androidx.compose.ui.text.style.TextDirection? component2();
-    method public long component3-XSAIIZE();
-    method public androidx.compose.ui.text.style.TextIndent? component4();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.text.ParagraphStyle copy-QrGfzA0(androidx.compose.ui.text.style.TextAlign? textAlign, androidx.compose.ui.text.style.TextDirection? textDirection, long lineHeight, androidx.compose.ui.text.style.TextIndent? textIndent);
+    method public androidx.compose.ui.text.ParagraphStyle copy-QrGfzA0(optional androidx.compose.ui.text.style.TextAlign? textAlign, optional androidx.compose.ui.text.style.TextDirection? textDirection, optional long lineHeight, optional androidx.compose.ui.text.style.TextIndent? textIndent);
+    method public operator boolean equals(Object? other);
     method public long getLineHeight-XSAIIZE();
     method public androidx.compose.ui.text.style.TextAlign? getTextAlign();
     method public androidx.compose.ui.text.style.TextDirection? getTextDirection();
@@ -230,10 +231,8 @@ package androidx.compose.ui.text {
   }
 
   @androidx.compose.runtime.Immutable public final class Placeholder {
-    method public long component1-XSAIIZE();
-    method public long component2-XSAIIZE();
-    method public androidx.compose.ui.text.PlaceholderVerticalAlign component3();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.text.Placeholder copy-KJSDsNM(long width, long height, androidx.compose.ui.text.PlaceholderVerticalAlign placeholderVerticalAlign);
+    method public androidx.compose.ui.text.Placeholder copy-KJSDsNM(optional long width, optional long height, optional androidx.compose.ui.text.PlaceholderVerticalAlign placeholderVerticalAlign);
+    method public operator boolean equals(Object? other);
     method public long getHeight-XSAIIZE();
     method public androidx.compose.ui.text.PlaceholderVerticalAlign getPlaceholderVerticalAlign();
     method public long getWidth-XSAIIZE();
@@ -260,21 +259,8 @@ package androidx.compose.ui.text {
   }
 
   @androidx.compose.runtime.Immutable public final class SpanStyle {
-    method public long component1-0d7_KjU();
-    method public androidx.compose.ui.text.style.TextGeometricTransform? component10();
-    method public androidx.compose.ui.text.intl.LocaleList? component11();
-    method public long component12-0d7_KjU();
-    method public androidx.compose.ui.text.style.TextDecoration? component13();
-    method public androidx.compose.ui.graphics.Shadow? component14();
-    method public long component2-XSAIIZE();
-    method public androidx.compose.ui.text.font.FontWeight? component3();
-    method public androidx.compose.ui.text.font.FontStyle? component4();
-    method public androidx.compose.ui.text.font.FontSynthesis? component5();
-    method public androidx.compose.ui.text.font.FontFamily? component6();
-    method public String? component7();
-    method public long component8-XSAIIZE();
-    method public androidx.compose.ui.text.style.BaselineShift? component9-5SSeXJ0();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.text.SpanStyle copy-D5kMcog(long color, long fontSize, androidx.compose.ui.text.font.FontWeight? fontWeight, androidx.compose.ui.text.font.FontStyle? fontStyle, androidx.compose.ui.text.font.FontSynthesis? fontSynthesis, androidx.compose.ui.text.font.FontFamily? fontFamily, String? fontFeatureSettings, long letterSpacing, androidx.compose.ui.text.style.BaselineShift? baselineShift, androidx.compose.ui.text.style.TextGeometricTransform? textGeometricTransform, androidx.compose.ui.text.intl.LocaleList? localeList, long background, androidx.compose.ui.text.style.TextDecoration? textDecoration, androidx.compose.ui.graphics.Shadow? shadow);
+    method public androidx.compose.ui.text.SpanStyle copy-D5kMcog(optional long color, optional long fontSize, optional androidx.compose.ui.text.font.FontWeight? fontWeight, optional androidx.compose.ui.text.font.FontStyle? fontStyle, optional androidx.compose.ui.text.font.FontSynthesis? fontSynthesis, optional androidx.compose.ui.text.font.FontFamily? fontFamily, optional String? fontFeatureSettings, optional long letterSpacing, optional androidx.compose.ui.text.style.BaselineShift? baselineShift, optional androidx.compose.ui.text.style.TextGeometricTransform? textGeometricTransform, optional androidx.compose.ui.text.intl.LocaleList? localeList, optional long background, optional androidx.compose.ui.text.style.TextDecoration? textDecoration, optional androidx.compose.ui.graphics.Shadow? shadow);
+    method public operator boolean equals(Object? other);
     method public long getBackground-0d7_KjU();
     method public androidx.compose.ui.text.style.BaselineShift? getBaselineShift-5SSeXJ0();
     method public long getColor-0d7_KjU();
@@ -326,17 +312,8 @@ package androidx.compose.ui.text {
   }
 
   public final class TextLayoutInput {
-    method public androidx.compose.ui.text.AnnotatedString component1();
-    method public long component10-msEJaDk();
-    method public androidx.compose.ui.text.TextStyle component2();
-    method public java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> component3();
-    method public int component4();
-    method public boolean component5();
-    method public androidx.compose.ui.text.style.TextOverflow component6();
-    method public androidx.compose.ui.unit.Density component7();
-    method public androidx.compose.ui.unit.LayoutDirection component8();
-    method public androidx.compose.ui.text.font.Font.ResourceLoader component9();
-    method public androidx.compose.ui.text.TextLayoutInput copy-ih31NyA(androidx.compose.ui.text.AnnotatedString text, androidx.compose.ui.text.TextStyle style, java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, int maxLines, boolean softWrap, androidx.compose.ui.text.style.TextOverflow overflow, androidx.compose.ui.unit.Density density, androidx.compose.ui.unit.LayoutDirection layoutDirection, androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader, long constraints);
+    method public androidx.compose.ui.text.TextLayoutInput copy-ih31NyA(optional androidx.compose.ui.text.AnnotatedString text, optional androidx.compose.ui.text.TextStyle style, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, optional int maxLines, optional boolean softWrap, optional androidx.compose.ui.text.style.TextOverflow overflow, optional androidx.compose.ui.unit.Density density, optional androidx.compose.ui.unit.LayoutDirection layoutDirection, optional androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader, optional long constraints);
+    method public operator boolean equals(Object? other);
     method public long getConstraints-msEJaDk();
     method public androidx.compose.ui.unit.Density getDensity();
     method public androidx.compose.ui.unit.LayoutDirection getLayoutDirection();
@@ -360,9 +337,8 @@ package androidx.compose.ui.text {
   }
 
   public final class TextLayoutResult {
-    method public androidx.compose.ui.text.TextLayoutInput component1();
-    method public long component3-YbymL2g();
-    method public androidx.compose.ui.text.TextLayoutResult copy-2H_Vf2E(androidx.compose.ui.text.TextLayoutInput layoutInput, androidx.compose.ui.text.MultiParagraph multiParagraph, long size);
+    method public androidx.compose.ui.text.TextLayoutResult copy-1moGK-E(optional androidx.compose.ui.text.TextLayoutInput layoutInput, optional long size);
+    method public operator boolean equals(Object? other);
     method public androidx.compose.ui.text.style.ResolvedTextDirection getBidiRunDirection(int offset);
     method public androidx.compose.ui.geometry.Rect getBoundingBox(int offset);
     method public androidx.compose.ui.geometry.Rect getCursorRect(int offset);
@@ -402,7 +378,7 @@ package androidx.compose.ui.text {
   }
 
   public final class TextLayoutResultKt {
-    method @VisibleForTesting public static androidx.compose.ui.text.TextLayoutResult createTextLayoutResult-2H_Vf2E(optional androidx.compose.ui.text.TextLayoutInput layoutInput, optional androidx.compose.ui.text.MultiParagraph multiParagraph, optional long size);
+    method public static androidx.compose.ui.text.TextLayoutResult createTextLayoutResult-2H_Vf2E(optional androidx.compose.ui.text.TextLayoutInput layoutInput, optional androidx.compose.ui.text.MultiParagraph multiParagraph, optional long size);
   }
 
   public final class TextPainter {
@@ -444,25 +420,7 @@ package androidx.compose.ui.text {
   }
 
   @androidx.compose.runtime.Immutable public final class TextStyle {
-    method public long component1-0d7_KjU();
-    method public androidx.compose.ui.text.style.TextGeometricTransform? component10();
-    method public androidx.compose.ui.text.intl.LocaleList? component11();
-    method public long component12-0d7_KjU();
-    method public androidx.compose.ui.text.style.TextDecoration? component13();
-    method public androidx.compose.ui.graphics.Shadow? component14();
-    method public androidx.compose.ui.text.style.TextAlign? component15();
-    method public androidx.compose.ui.text.style.TextDirection? component16();
-    method public long component17-XSAIIZE();
-    method public androidx.compose.ui.text.style.TextIndent? component18();
-    method public long component2-XSAIIZE();
-    method public androidx.compose.ui.text.font.FontWeight? component3();
-    method public androidx.compose.ui.text.font.FontStyle? component4();
-    method public androidx.compose.ui.text.font.FontSynthesis? component5();
-    method public androidx.compose.ui.text.font.FontFamily? component6();
-    method public String? component7();
-    method public long component8-XSAIIZE();
-    method public androidx.compose.ui.text.style.BaselineShift? component9-5SSeXJ0();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.text.TextStyle copy-4skVB9c(long color, long fontSize, androidx.compose.ui.text.font.FontWeight? fontWeight, androidx.compose.ui.text.font.FontStyle? fontStyle, androidx.compose.ui.text.font.FontSynthesis? fontSynthesis, androidx.compose.ui.text.font.FontFamily? fontFamily, String? fontFeatureSettings, long letterSpacing, androidx.compose.ui.text.style.BaselineShift? baselineShift, androidx.compose.ui.text.style.TextGeometricTransform? textGeometricTransform, androidx.compose.ui.text.intl.LocaleList? localeList, long background, androidx.compose.ui.text.style.TextDecoration? textDecoration, androidx.compose.ui.graphics.Shadow? shadow, androidx.compose.ui.text.style.TextAlign? textAlign, androidx.compose.ui.text.style.TextDirection? textDirection, long lineHeight, androidx.compose.ui.text.style.TextIndent? textIndent);
+    method public androidx.compose.ui.text.TextStyle copy-4skVB9c(optional long color, optional long fontSize, optional androidx.compose.ui.text.font.FontWeight? fontWeight, optional androidx.compose.ui.text.font.FontStyle? fontStyle, optional androidx.compose.ui.text.font.FontSynthesis? fontSynthesis, optional androidx.compose.ui.text.font.FontFamily? fontFamily, optional String? fontFeatureSettings, optional long letterSpacing, optional androidx.compose.ui.text.style.BaselineShift? baselineShift, optional androidx.compose.ui.text.style.TextGeometricTransform? textGeometricTransform, optional androidx.compose.ui.text.intl.LocaleList? localeList, optional long background, optional androidx.compose.ui.text.style.TextDecoration? textDecoration, optional androidx.compose.ui.graphics.Shadow? shadow, optional androidx.compose.ui.text.style.TextAlign? textAlign, optional androidx.compose.ui.text.style.TextDirection? textDirection, optional long lineHeight, optional androidx.compose.ui.text.style.TextIndent? textIndent);
     method public long getBackground-0d7_KjU();
     method public androidx.compose.ui.text.style.BaselineShift? getBaselineShift-5SSeXJ0();
     method public long getColor-0d7_KjU();
@@ -563,9 +521,12 @@ package androidx.compose.ui.text.android.style {
 package androidx.compose.ui.text.font {
 
   public final class AndroidTypefaceKt {
-    method public static androidx.compose.ui.text.font.FontFamily fontFamily(android.graphics.Typeface typeface);
-    method public static androidx.compose.ui.text.font.Typeface typeface(android.content.Context context, androidx.compose.ui.text.font.FontFamily fontFamily, optional java.util.List<? extends kotlin.Pair<androidx.compose.ui.text.font.FontWeight,? extends androidx.compose.ui.text.font.FontStyle>>? necessaryStyles);
-    method public static androidx.compose.ui.text.font.Typeface typeface(android.graphics.Typeface typeface);
+    method public static androidx.compose.ui.text.font.FontFamily FontFamily(android.graphics.Typeface typeface);
+    method public static androidx.compose.ui.text.font.Typeface Typeface(android.content.Context context, androidx.compose.ui.text.font.FontFamily fontFamily, optional java.util.List<? extends kotlin.Pair<androidx.compose.ui.text.font.FontWeight,? extends androidx.compose.ui.text.font.FontStyle>>? styles);
+    method public static androidx.compose.ui.text.font.Typeface Typeface(android.graphics.Typeface typeface);
+    method @Deprecated public static androidx.compose.ui.text.font.FontFamily fontFamily(android.graphics.Typeface typeface);
+    method @Deprecated public static androidx.compose.ui.text.font.Typeface typeface(android.content.Context context, androidx.compose.ui.text.font.FontFamily fontFamily, optional java.util.List<? extends kotlin.Pair<androidx.compose.ui.text.font.FontWeight,? extends androidx.compose.ui.text.font.FontStyle>>? necessaryStyles);
+    method @Deprecated public static androidx.compose.ui.text.font.Typeface typeface(android.graphics.Typeface typeface);
   }
 
   public abstract sealed class FileBasedFontFamily extends androidx.compose.ui.text.font.FontFamily {
@@ -602,22 +563,24 @@ package androidx.compose.ui.text.font {
   }
 
   public final class FontFamilyKt {
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontListFontFamily fontFamily(java.util.List<? extends androidx.compose.ui.text.font.Font> fonts);
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontListFontFamily fontFamily(androidx.compose.ui.text.font.Font... fonts);
-    method public static androidx.compose.ui.text.font.LoadedFontFamily fontFamily(androidx.compose.ui.text.font.Typeface typeface);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontFamily FontFamily(java.util.List<? extends androidx.compose.ui.text.font.Font> fonts);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontFamily FontFamily(androidx.compose.ui.text.font.Font... fonts);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontFamily FontFamily(androidx.compose.ui.text.font.Typeface typeface);
+    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontListFontFamily fontFamily(java.util.List<? extends androidx.compose.ui.text.font.Font> fonts);
+    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontListFontFamily fontFamily(androidx.compose.ui.text.font.Font... fonts);
+    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.LoadedFontFamily fontFamily(androidx.compose.ui.text.font.Typeface typeface);
   }
 
   public final class FontKt {
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontListFontFamily asFontFamily(androidx.compose.ui.text.font.Font);
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.Font font(int resId, optional androidx.compose.ui.text.font.FontWeight weight, optional androidx.compose.ui.text.font.FontStyle style);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.Font Font(int resId, optional androidx.compose.ui.text.font.FontWeight weight, optional androidx.compose.ui.text.font.FontStyle style);
+    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontFamily asFontFamily(androidx.compose.ui.text.font.Font);
+    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.Font font(int resId, optional androidx.compose.ui.text.font.FontWeight weight, optional androidx.compose.ui.text.font.FontStyle style);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontFamily toFontFamily(androidx.compose.ui.text.font.Font);
   }
 
   @androidx.compose.runtime.Immutable public final class FontListFontFamily extends androidx.compose.ui.text.font.FileBasedFontFamily implements kotlin.jvm.internal.markers.KMappedMarker java.util.List<androidx.compose.ui.text.font.Font> {
-    ctor public FontListFontFamily(java.util.List<? extends androidx.compose.ui.text.font.Font> fonts);
-    method public java.util.List<androidx.compose.ui.text.font.Font> component1();
     method public boolean contains(androidx.compose.ui.text.font.Font element);
     method public boolean containsAll(java.util.Collection<?> elements);
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.text.font.FontListFontFamily copy(java.util.List<? extends androidx.compose.ui.text.font.Font> fonts);
     method public androidx.compose.ui.text.font.Font get(int index);
     method public java.util.List<androidx.compose.ui.text.font.Font> getFonts();
     method public int getSize();
@@ -645,9 +608,7 @@ package androidx.compose.ui.text.font {
 
   @androidx.compose.runtime.Immutable public final class FontWeight implements java.lang.Comparable<androidx.compose.ui.text.font.FontWeight> {
     ctor public FontWeight(int weight);
-    method public int compareTo(androidx.compose.ui.text.font.FontWeight other);
-    method public int component1();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.text.font.FontWeight copy(int weight);
+    method public operator int compareTo(androidx.compose.ui.text.font.FontWeight other);
     method public int getWeight();
     property public final int weight;
     field public static final androidx.compose.ui.text.font.FontWeight.Companion Companion;
@@ -702,19 +663,12 @@ package androidx.compose.ui.text.font {
   }
 
   public final class LoadedFontFamily extends androidx.compose.ui.text.font.FontFamily {
-    ctor public LoadedFontFamily(androidx.compose.ui.text.font.Typeface typeface);
-    method public androidx.compose.ui.text.font.Typeface component1();
-    method public androidx.compose.ui.text.font.LoadedFontFamily copy(androidx.compose.ui.text.font.Typeface typeface);
     method public androidx.compose.ui.text.font.Typeface getTypeface();
     property public final androidx.compose.ui.text.font.Typeface typeface;
   }
 
   public final class ResourceFont implements androidx.compose.ui.text.font.Font {
-    ctor public ResourceFont(int resId, androidx.compose.ui.text.font.FontWeight weight, androidx.compose.ui.text.font.FontStyle style);
-    method public int component1();
-    method public androidx.compose.ui.text.font.FontWeight component2();
-    method public androidx.compose.ui.text.font.FontStyle component3();
-    method public androidx.compose.ui.text.font.ResourceFont copy(int resId, androidx.compose.ui.text.font.FontWeight weight, androidx.compose.ui.text.font.FontStyle style);
+    method public androidx.compose.ui.text.font.ResourceFont copy(optional int resId, optional androidx.compose.ui.text.font.FontWeight weight, optional androidx.compose.ui.text.font.FontStyle style);
     method public int getResId();
     method public androidx.compose.ui.text.font.FontStyle getStyle();
     method public androidx.compose.ui.text.font.FontWeight getWeight();
@@ -735,104 +689,78 @@ package androidx.compose.ui.text.font {
 
 package androidx.compose.ui.text.input {
 
-  public final class BackspaceKeyEditOp implements androidx.compose.ui.text.input.EditOperation {
-    ctor public BackspaceKeyEditOp();
-    method public void process(androidx.compose.ui.text.input.EditingBuffer buffer);
+  public final class BackspaceCommand implements androidx.compose.ui.text.input.EditCommand {
+    ctor public BackspaceCommand();
+    method public void applyTo(androidx.compose.ui.text.input.EditingBuffer buffer);
   }
 
-  public final class CommitTextEditOp implements androidx.compose.ui.text.input.EditOperation {
-    ctor public CommitTextEditOp(String text, int newCursorPosition);
-    method public String component1();
-    method public int component2();
-    method public androidx.compose.ui.text.input.CommitTextEditOp copy(String text, int newCursorPosition);
+  public final class CommitTextCommand implements androidx.compose.ui.text.input.EditCommand {
+    ctor public CommitTextCommand(String text, int newCursorPosition);
+    method public void applyTo(androidx.compose.ui.text.input.EditingBuffer buffer);
     method public int getNewCursorPosition();
     method public String getText();
-    method public void process(androidx.compose.ui.text.input.EditingBuffer buffer);
     property public final int newCursorPosition;
     property public final String text;
   }
 
-  public final class DeleteAllEditOp implements androidx.compose.ui.text.input.EditOperation {
-    ctor public DeleteAllEditOp();
-    method public void process(androidx.compose.ui.text.input.EditingBuffer buffer);
+  public final class DeleteAllCommand implements androidx.compose.ui.text.input.EditCommand {
+    ctor public DeleteAllCommand();
+    method public void applyTo(androidx.compose.ui.text.input.EditingBuffer buffer);
   }
 
-  public final class DeleteSurroundingTextEditOp implements androidx.compose.ui.text.input.EditOperation {
-    ctor public DeleteSurroundingTextEditOp(int beforeLength, int afterLength);
-    method public int component1();
-    method public int component2();
-    method public androidx.compose.ui.text.input.DeleteSurroundingTextEditOp copy(int beforeLength, int afterLength);
-    method public int getAfterLength();
-    method public int getBeforeLength();
-    method public void process(androidx.compose.ui.text.input.EditingBuffer buffer);
-    property public final int afterLength;
-    property public final int beforeLength;
+  public final class DeleteSurroundingTextCommand implements androidx.compose.ui.text.input.EditCommand {
+    ctor public DeleteSurroundingTextCommand(int lengthBeforeCursor, int lengthAfterCursor);
+    method public void applyTo(androidx.compose.ui.text.input.EditingBuffer buffer);
+    method public int getLengthAfterCursor();
+    method public int getLengthBeforeCursor();
+    property public final int lengthAfterCursor;
+    property public final int lengthBeforeCursor;
   }
 
-  public final class DeleteSurroundingTextInCodePointsEditOp implements androidx.compose.ui.text.input.EditOperation {
-    ctor public DeleteSurroundingTextInCodePointsEditOp(int beforeLength, int afterLength);
-    method public int component1();
-    method public int component2();
-    method public androidx.compose.ui.text.input.DeleteSurroundingTextInCodePointsEditOp copy(int beforeLength, int afterLength);
-    method public int getAfterLength();
-    method public int getBeforeLength();
-    method public void process(androidx.compose.ui.text.input.EditingBuffer buffer);
-    property public final int afterLength;
-    property public final int beforeLength;
+  public final class DeleteSurroundingTextInCodePointsCommand implements androidx.compose.ui.text.input.EditCommand {
+    ctor public DeleteSurroundingTextInCodePointsCommand(int lengthBeforeCursor, int lengthAfterCursor);
+    method public void applyTo(androidx.compose.ui.text.input.EditingBuffer buffer);
+    method public int getLengthAfterCursor();
+    method public int getLengthBeforeCursor();
+    property public final int lengthAfterCursor;
+    property public final int lengthBeforeCursor;
   }
 
-  public interface EditOperation {
-    method public void process(androidx.compose.ui.text.input.EditingBuffer buffer);
+  public interface EditCommand {
+    method public void applyTo(androidx.compose.ui.text.input.EditingBuffer buffer);
+  }
+
+  public final class EditCommandKt {
   }
 
   public final class EditingBuffer {
-    field public static final int NOWHERE = -1; // 0xffffffff
   }
 
-  @Deprecated @androidx.compose.runtime.Immutable public final class EditorValue {
-    method @Deprecated public String component1();
-    method @Deprecated public long component2-d9O1mEE();
-    method @Deprecated public androidx.compose.ui.text.TextRange? component3-MzsxiRA();
-    method @Deprecated @androidx.compose.runtime.Immutable public androidx.compose.ui.text.input.EditorValue copy-Dr2r1M0(String text, long selection, androidx.compose.ui.text.TextRange? composition);
-    method @Deprecated public androidx.compose.ui.text.TextRange? getComposition-MzsxiRA();
-    method @Deprecated public String getSelectedText();
-    method @Deprecated public long getSelection-d9O1mEE();
-    method @Deprecated public String getText();
-    method @Deprecated public String getTextAfterSelection(int maxChars);
-    method @Deprecated public String getTextBeforeSelection(int maxChars);
-    property public final androidx.compose.ui.text.TextRange? composition;
-    property public final long selection;
-    property public final String text;
-  }
-
-  public final class FinishComposingTextEditOp implements androidx.compose.ui.text.input.EditOperation {
-    ctor public FinishComposingTextEditOp();
-    method public void process(androidx.compose.ui.text.input.EditingBuffer buffer);
+  public final class FinishComposingTextCommand implements androidx.compose.ui.text.input.EditCommand {
+    ctor public FinishComposingTextCommand();
+    method public void applyTo(androidx.compose.ui.text.input.EditingBuffer buffer);
   }
 
   public final class GapBufferKt {
   }
 
   public enum ImeAction {
+    enum_constant public static final androidx.compose.ui.text.input.ImeAction Default;
     enum_constant public static final androidx.compose.ui.text.input.ImeAction Done;
     enum_constant public static final androidx.compose.ui.text.input.ImeAction Go;
     enum_constant public static final androidx.compose.ui.text.input.ImeAction Next;
-    enum_constant public static final androidx.compose.ui.text.input.ImeAction NoAction;
+    enum_constant @Deprecated public static final androidx.compose.ui.text.input.ImeAction NoAction;
+    enum_constant public static final androidx.compose.ui.text.input.ImeAction None;
     enum_constant public static final androidx.compose.ui.text.input.ImeAction Previous;
     enum_constant public static final androidx.compose.ui.text.input.ImeAction Search;
     enum_constant public static final androidx.compose.ui.text.input.ImeAction Send;
-    enum_constant public static final androidx.compose.ui.text.input.ImeAction Unspecified;
+    enum_constant @Deprecated public static final androidx.compose.ui.text.input.ImeAction Unspecified;
   }
 
   @androidx.compose.runtime.Immutable public final class ImeOptions {
     ctor public ImeOptions(boolean singleLine, androidx.compose.ui.text.input.KeyboardCapitalization capitalization, boolean autoCorrect, androidx.compose.ui.text.input.KeyboardType keyboardType, androidx.compose.ui.text.input.ImeAction imeAction);
     ctor public ImeOptions();
-    method public boolean component1();
-    method public androidx.compose.ui.text.input.KeyboardCapitalization component2();
-    method public boolean component3();
-    method public androidx.compose.ui.text.input.KeyboardType component4();
-    method public androidx.compose.ui.text.input.ImeAction component5();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.text.input.ImeOptions copy(boolean singleLine, androidx.compose.ui.text.input.KeyboardCapitalization capitalization, boolean autoCorrect, androidx.compose.ui.text.input.KeyboardType keyboardType, androidx.compose.ui.text.input.ImeAction imeAction);
+    method public androidx.compose.ui.text.input.ImeOptions copy(optional boolean singleLine, optional androidx.compose.ui.text.input.KeyboardCapitalization capitalization, optional boolean autoCorrect, optional androidx.compose.ui.text.input.KeyboardType keyboardType, optional androidx.compose.ui.text.input.ImeAction imeAction);
     method public boolean getAutoCorrect();
     method public androidx.compose.ui.text.input.KeyboardCapitalization getCapitalization();
     method public androidx.compose.ui.text.input.ImeAction getImeAction();
@@ -851,8 +779,8 @@ package androidx.compose.ui.text.input {
     property public final androidx.compose.ui.text.input.ImeOptions Default;
   }
 
-  public interface InputEventListener {
-    method public void onEditOperations(java.util.List<? extends androidx.compose.ui.text.input.EditOperation> editOps);
+  public interface InputEventCallback {
+    method public void onEditCommands(java.util.List<? extends androidx.compose.ui.text.input.EditCommand> editCommands);
     method public void onImeAction(androidx.compose.ui.text.input.ImeAction imeAction);
   }
 
@@ -874,31 +802,27 @@ package androidx.compose.ui.text.input {
     enum_constant public static final androidx.compose.ui.text.input.KeyboardType Uri;
   }
 
-  public final class MoveCursorEditOp implements androidx.compose.ui.text.input.EditOperation {
-    ctor public MoveCursorEditOp(int amount);
-    method public int component1();
-    method public androidx.compose.ui.text.input.MoveCursorEditOp copy(int amount);
+  public final class MoveCursorCommand implements androidx.compose.ui.text.input.EditCommand {
+    ctor public MoveCursorCommand(int amount);
+    method public void applyTo(androidx.compose.ui.text.input.EditingBuffer buffer);
     method public int getAmount();
-    method public void process(androidx.compose.ui.text.input.EditingBuffer buffer);
     property public final int amount;
   }
 
-  public interface OffsetMap {
+  public interface OffsetMapping {
     method public int originalToTransformed(int offset);
     method public int transformedToOriginal(int offset);
-    field public static final androidx.compose.ui.text.input.OffsetMap.Companion Companion;
+    field public static final androidx.compose.ui.text.input.OffsetMapping.Companion Companion;
   }
 
-  public static final class OffsetMap.Companion {
-    method public androidx.compose.ui.text.input.OffsetMap getIdentityOffsetMap();
-    property public final androidx.compose.ui.text.input.OffsetMap identityOffsetMap;
+  public static final class OffsetMapping.Companion {
+    method public androidx.compose.ui.text.input.OffsetMapping getIdentity();
+    property public final androidx.compose.ui.text.input.OffsetMapping Identity;
   }
 
   public final class PasswordVisualTransformation implements androidx.compose.ui.text.input.VisualTransformation {
     ctor public PasswordVisualTransformation(char mask);
     ctor public PasswordVisualTransformation();
-    method public char component1();
-    method public androidx.compose.ui.text.input.PasswordVisualTransformation copy(char mask);
     method public androidx.compose.ui.text.input.TransformedText filter(androidx.compose.ui.text.AnnotatedString text);
     method public char getMask();
     property public final char mask;
@@ -907,54 +831,49 @@ package androidx.compose.ui.text.input {
   public interface PlatformTextInputService {
     method public void hideSoftwareKeyboard();
     method public void notifyFocusedRect(androidx.compose.ui.geometry.Rect rect);
-    method public void onStateUpdated(androidx.compose.ui.text.input.TextFieldValue? oldValue, androidx.compose.ui.text.input.TextFieldValue newValue);
     method public void showSoftwareKeyboard();
-    method public void startInput(androidx.compose.ui.text.input.TextFieldValue value, androidx.compose.ui.text.input.ImeOptions imeOptions, kotlin.jvm.functions.Function1<? super java.util.List<? extends androidx.compose.ui.text.input.EditOperation>,kotlin.Unit> onEditCommand, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.ImeAction,kotlin.Unit> onImeActionPerformed);
+    method public void startInput(androidx.compose.ui.text.input.TextFieldValue value, androidx.compose.ui.text.input.ImeOptions imeOptions, kotlin.jvm.functions.Function1<? super java.util.List<? extends androidx.compose.ui.text.input.EditCommand>,kotlin.Unit> onEditCommand, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.ImeAction,kotlin.Unit> onImeActionPerformed);
     method public void stopInput();
+    method public void updateState(androidx.compose.ui.text.input.TextFieldValue? oldValue, androidx.compose.ui.text.input.TextFieldValue newValue);
   }
 
-  public final class SetComposingRegionEditOp implements androidx.compose.ui.text.input.EditOperation {
-    ctor public SetComposingRegionEditOp(int start, int end);
-    method public int component1();
-    method public int component2();
-    method public androidx.compose.ui.text.input.SetComposingRegionEditOp copy(int start, int end);
+  public final class SetComposingRegionCommand implements androidx.compose.ui.text.input.EditCommand {
+    ctor public SetComposingRegionCommand(int start, int end);
+    method public void applyTo(androidx.compose.ui.text.input.EditingBuffer buffer);
     method public int getEnd();
     method public int getStart();
-    method public void process(androidx.compose.ui.text.input.EditingBuffer buffer);
     property public final int end;
     property public final int start;
   }
 
-  public final class SetComposingTextEditOp implements androidx.compose.ui.text.input.EditOperation {
-    ctor public SetComposingTextEditOp(String text, int newCursorPosition);
-    method public String component1();
-    method public int component2();
-    method public androidx.compose.ui.text.input.SetComposingTextEditOp copy(String text, int newCursorPosition);
+  public final class SetComposingTextCommand implements androidx.compose.ui.text.input.EditCommand {
+    ctor public SetComposingTextCommand(String text, int newCursorPosition);
+    method public void applyTo(androidx.compose.ui.text.input.EditingBuffer buffer);
     method public int getNewCursorPosition();
     method public String getText();
-    method public void process(androidx.compose.ui.text.input.EditingBuffer buffer);
     property public final int newCursorPosition;
     property public final String text;
   }
 
-  public final class SetSelectionEditOp implements androidx.compose.ui.text.input.EditOperation {
-    ctor public SetSelectionEditOp(int start, int end);
-    method public int component1();
-    method public int component2();
-    method public androidx.compose.ui.text.input.SetSelectionEditOp copy(int start, int end);
+  public final class SetSelectionCommand implements androidx.compose.ui.text.input.EditCommand {
+    ctor public SetSelectionCommand(int start, int end);
+    method public void applyTo(androidx.compose.ui.text.input.EditingBuffer buffer);
     method public int getEnd();
     method public int getStart();
-    method public void process(androidx.compose.ui.text.input.EditingBuffer buffer);
     property public final int end;
     property public final int start;
   }
 
   @androidx.compose.runtime.Immutable public final class TextFieldValue {
     method public androidx.compose.ui.text.input.TextFieldValue commitComposition();
-    method public androidx.compose.ui.text.input.TextFieldValue copy-rJy5ZHU(optional String text, optional long selection);
+    method public androidx.compose.ui.text.input.TextFieldValue copy-5zc-tL8(optional long selection);
+    method public androidx.compose.ui.text.input.TextFieldValue copy-bLOX0OE(optional androidx.compose.ui.text.AnnotatedString annotatedString, optional long selection);
+    method public androidx.compose.ui.text.input.TextFieldValue copy-rJy5ZHU(String text, optional long selection);
+    method public androidx.compose.ui.text.AnnotatedString getAnnotatedString();
     method public androidx.compose.ui.text.TextRange? getComposition-MzsxiRA();
     method public long getSelection-d9O1mEE();
     method public String getText();
+    property public final androidx.compose.ui.text.AnnotatedString annotatedString;
     property public final androidx.compose.ui.text.TextRange? composition;
     property public final long selection;
     property public final String text;
@@ -967,39 +886,35 @@ package androidx.compose.ui.text.input {
   }
 
   public final class TextFieldValueKt {
-    method public static String getSelectedText(androidx.compose.ui.text.input.TextFieldValue);
-    method public static String getTextAfterSelection(androidx.compose.ui.text.input.TextFieldValue, int maxChars);
-    method public static String getTextBeforeSelection(androidx.compose.ui.text.input.TextFieldValue, int maxChars);
+    method public static androidx.compose.ui.text.AnnotatedString getSelectedText(androidx.compose.ui.text.input.TextFieldValue);
+    method public static androidx.compose.ui.text.AnnotatedString getTextAfterSelection(androidx.compose.ui.text.input.TextFieldValue, int maxChars);
+    method public static androidx.compose.ui.text.AnnotatedString getTextBeforeSelection(androidx.compose.ui.text.input.TextFieldValue, int maxChars);
   }
 
   public class TextInputService {
     ctor public TextInputService(androidx.compose.ui.text.input.PlatformTextInputService platformTextInputService);
     method public void hideSoftwareKeyboard(int token);
     method public void notifyFocusedRect(int token, androidx.compose.ui.geometry.Rect rect);
-    method public void onStateUpdated(int token, androidx.compose.ui.text.input.TextFieldValue? oldValue, androidx.compose.ui.text.input.TextFieldValue newValue);
     method public void showSoftwareKeyboard(int token);
-    method public int startInput(androidx.compose.ui.text.input.TextFieldValue value, androidx.compose.ui.text.input.ImeOptions imeOptions, kotlin.jvm.functions.Function1<? super java.util.List<? extends androidx.compose.ui.text.input.EditOperation>,kotlin.Unit> onEditCommand, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.ImeAction,kotlin.Unit> onImeActionPerformed);
+    method public int startInput(androidx.compose.ui.text.input.TextFieldValue value, androidx.compose.ui.text.input.ImeOptions imeOptions, kotlin.jvm.functions.Function1<? super java.util.List<? extends androidx.compose.ui.text.input.EditCommand>,kotlin.Unit> onEditCommand, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.ImeAction,kotlin.Unit> onImeActionPerformed);
     method public void stopInput(int token);
+    method public void updateState(int token, androidx.compose.ui.text.input.TextFieldValue? oldValue, androidx.compose.ui.text.input.TextFieldValue newValue);
   }
 
   public final class TextInputServiceKt {
-    method @Deprecated @VisibleForTesting public static void setTextInputServiceFactory(kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.PlatformTextInputService,? extends androidx.compose.ui.text.input.TextInputService> p);
     field public static final int INVALID_SESSION = -1; // 0xffffffff
     field public static final int NO_SESSION = 0; // 0x0
   }
 
   public final class TransformedText {
-    ctor public TransformedText(androidx.compose.ui.text.AnnotatedString transformedText, androidx.compose.ui.text.input.OffsetMap offsetMap);
-    method public androidx.compose.ui.text.AnnotatedString component1();
-    method public androidx.compose.ui.text.input.OffsetMap component2();
-    method public androidx.compose.ui.text.input.TransformedText copy(androidx.compose.ui.text.AnnotatedString transformedText, androidx.compose.ui.text.input.OffsetMap offsetMap);
-    method public androidx.compose.ui.text.input.OffsetMap getOffsetMap();
-    method public androidx.compose.ui.text.AnnotatedString getTransformedText();
-    property public final androidx.compose.ui.text.input.OffsetMap offsetMap;
-    property public final androidx.compose.ui.text.AnnotatedString transformedText;
+    ctor public TransformedText(androidx.compose.ui.text.AnnotatedString text, androidx.compose.ui.text.input.OffsetMapping offsetMapping);
+    method public androidx.compose.ui.text.input.OffsetMapping getOffsetMapping();
+    method public androidx.compose.ui.text.AnnotatedString getText();
+    property public final androidx.compose.ui.text.input.OffsetMapping offsetMapping;
+    property public final androidx.compose.ui.text.AnnotatedString text;
   }
 
-  @androidx.compose.runtime.Immutable public interface VisualTransformation {
+  @androidx.compose.runtime.Immutable public fun interface VisualTransformation {
     method public androidx.compose.ui.text.input.TransformedText filter(androidx.compose.ui.text.AnnotatedString text);
     field public static final androidx.compose.ui.text.input.VisualTransformation.Companion Companion;
   }
@@ -1037,10 +952,8 @@ package androidx.compose.ui.text.intl {
     ctor public LocaleList(java.util.List<androidx.compose.ui.text.intl.Locale> localeList);
     ctor public LocaleList(String languageTags);
     ctor public LocaleList(androidx.compose.ui.text.intl.Locale... locales);
-    method public java.util.List<androidx.compose.ui.text.intl.Locale> component1();
     method public operator boolean contains(androidx.compose.ui.text.intl.Locale element);
     method public boolean containsAll(java.util.Collection<?> elements);
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.text.intl.LocaleList copy(java.util.List<androidx.compose.ui.text.intl.Locale> localeList);
     method public operator androidx.compose.ui.text.intl.Locale get(int i);
     method public java.util.List<androidx.compose.ui.text.intl.Locale> getLocaleList();
     method public int getSize();
@@ -1144,9 +1057,8 @@ package androidx.compose.ui.text.style {
   }
 
   @androidx.compose.runtime.Immutable public final class TextDecoration {
-    method public int component1();
     method public operator boolean contains(androidx.compose.ui.text.style.TextDecoration other);
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.text.style.TextDecoration copy(int mask);
+    method public operator boolean equals(Object? other);
     method public int getMask();
     method public operator androidx.compose.ui.text.style.TextDecoration plus(androidx.compose.ui.text.style.TextDecoration decoration);
     property public final int mask;
@@ -1174,9 +1086,8 @@ package androidx.compose.ui.text.style {
   @androidx.compose.runtime.Immutable public final class TextGeometricTransform {
     ctor public TextGeometricTransform(float scaleX, float skewX);
     ctor public TextGeometricTransform();
-    method public float component1();
-    method public float component2();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.text.style.TextGeometricTransform copy(float scaleX, float skewX);
+    method public androidx.compose.ui.text.style.TextGeometricTransform copy(optional float scaleX, optional float skewX);
+    method public operator boolean equals(Object? other);
     method public float getScaleX();
     method public float getSkewX();
     property public final float scaleX;
@@ -1192,9 +1103,8 @@ package androidx.compose.ui.text.style {
   }
 
   @androidx.compose.runtime.Immutable public final class TextIndent {
-    method public long component1-XSAIIZE();
-    method public long component2-XSAIIZE();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.text.style.TextIndent copy-8E83U4Q(long firstLine, long restLine);
+    method public androidx.compose.ui.text.style.TextIndent copy-8E83U4Q(optional long firstLine, optional long restLine);
+    method public operator boolean equals(Object? other);
     method public long getFirstLine-XSAIIZE();
     method public long getRestLine-XSAIIZE();
     property public final long firstLine;

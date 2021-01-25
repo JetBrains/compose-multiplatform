@@ -22,9 +22,9 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.clearRoots
-import androidx.compose.runtime.emit
-import androidx.compose.runtime.onCommit
+import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.simulateHotReload
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.AmbientContext
@@ -67,8 +67,8 @@ class HotReloadTests {
 
         @Composable fun text(text: String, id: Int = -1) {
             val context = AmbientContext.current
-            emit<TextView, UiApplier>(
-                ctor = { TextView(context) },
+            ComposeNode<TextView, UiApplier>(
+                factory = { TextView(context) },
                 update = {
                     set(id) { this.id = it }
                     set(text) { this.text = it }
@@ -78,8 +78,8 @@ class HotReloadTests {
 
         @Composable fun column(content: @Composable () -> Unit) {
             val context = AmbientContext.current
-            emit<LinearLayout, UiApplier>(
-                ctor = { LinearLayout(context) },
+            ComposeNode<LinearLayout, UiApplier>(
+                factory = { LinearLayout(context) },
                 update = {},
                 content = content
             )
@@ -94,7 +94,7 @@ class HotReloadTests {
                     text(text = "World", id = 102)
                     text(text = value, id = 103)
                 }
-                onCommit {
+                SideEffect {
                     composeLatch.countDown()
                 }
             }
@@ -141,7 +141,7 @@ class HotReloadTests {
                 columnNode {
                     semanticsNode(text = value, id = 103)
                 }
-                onCommit {
+                SideEffect {
                     composeLatch.countDown()
                 }
             }

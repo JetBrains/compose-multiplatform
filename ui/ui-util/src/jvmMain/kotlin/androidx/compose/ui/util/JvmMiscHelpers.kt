@@ -16,15 +16,9 @@
 
 package androidx.compose.ui.util
 
-actual fun Any?.identityHashCode(): Int = if (this == null) 0 else System.identityHashCode(this)
-
 actual fun String.format(vararg args: Any?): String = java.lang.String.format(this, *args)
 
 actual fun StringBuilder.deleteAt(index: Int): StringBuilder {
     this.deleteCharAt(index)
     return this
 }
-
-actual fun Any.nativeClass(): Any = this.javaClass
-
-actual typealias TreeSet<T> = java.util.TreeSet<T>

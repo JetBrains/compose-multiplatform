@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.animation.core
 
 import androidx.compose.animation.core.InterruptionHandling.UNINTERRUPTIBLE
@@ -50,6 +52,7 @@ import androidx.compose.animation.core.InterruptionHandling.UNINTERRUPTIBLE
  * @see [androidx.compose.animation.transition]
  */
 @OptIn(InternalAnimationApi::class)
+@Deprecated("Please use updateTransition or rememberInfiniteTransition instead.")
 class TransitionAnimation<T>(
     internal val def: TransitionDefinition<T>,
     private val clock: AnimationClockObservable,
@@ -315,7 +318,7 @@ internal fun <T, V : AnimationVector> PropKey<T, V>.createAnimationWrapper(
     startVelocity: V?,
     end: T
 ): Animation<T, V> =
-    TargetBasedAnimation(anim, start, end, typeConverter, startVelocity)
+    TargetBasedAnimation(anim, typeConverter, start, end, startVelocity)
 
 /**
  * Private class allows mutation on the prop values.

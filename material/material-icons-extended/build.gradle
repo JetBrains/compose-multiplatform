@@ -16,11 +16,9 @@
 
 import androidx.build.AndroidXUiPlugin
 import androidx.build.LibraryGroups
-import androidx.build.LibraryVersions
 import androidx.build.Publish
 import androidx.build.RunApiTasks
 import androidx.compose.material.icons.generator.tasks.IconGenerationTask
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 import static androidx.build.dependencies.DependenciesKt.*
 
@@ -97,6 +95,14 @@ android.buildTypes.all {
     testCoverageEnabled = false
 }
 
+// b/175401659 - disable lint as it takes a long time, and most errors should be caught by lint on
+// material-icons-core anyway
+project.afterEvaluate {
+    tasks.named("lintDebug") {
+        enabled = false
+    }
+}
+
 IconGenerationTask.registerExtendedIconProject(
         project,
         android,
@@ -112,10 +118,4 @@ androidx {
     runApiTasks = new RunApiTasks.No("Five thousand generated source files")
     inceptionYear = "2020"
     description = "Compose Material Design extended icons. This module contains all Material icons. It is a very large dependency and should not be included directly."
-}
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        useIR = true
-    }
 }

@@ -16,10 +16,10 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.animate
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.VectorizedAnimationSpec
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.layout.Arrangement
@@ -34,6 +34,7 @@ import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.emptyContent
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,7 +51,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.annotation.FloatRange
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -204,9 +204,9 @@ private fun BottomNavigationTransition(
     selected: Boolean,
     content: @Composable (animationProgress: Float) -> Unit
 ) {
-    val animationProgress = animate(
-        target = if (selected) 1f else 0f,
-        animSpec = BottomNavigationAnimationSpec
+    val animationProgress by animateFloatAsState(
+        targetValue = if (selected) 1f else 0f,
+        animationSpec = BottomNavigationAnimationSpec
     )
 
     val color = lerp(inactiveColor, activeColor, animationProgress)
@@ -233,7 +233,8 @@ private fun BottomNavigationTransition(
 private fun BottomNavigationItemBaselineLayout(
     icon: @Composable () -> Unit,
     label: @Composable () -> Unit,
-    @FloatRange(from = 0.0, to = 1.0) iconPositionAnimationProgress: Float
+    /*@FloatRange(from = 0.0, to = 1.0)*/
+    iconPositionAnimationProgress: Float
 ) {
     Layout(
         {
@@ -308,7 +309,8 @@ private fun MeasureScope.placeLabelAndIcon(
     labelPlaceable: Placeable,
     iconPlaceable: Placeable,
     constraints: Constraints,
-    @FloatRange(from = 0.0, to = 1.0) iconPositionAnimationProgress: Float
+    /*@FloatRange(from = 0.0, to = 1.0)*/
+    iconPositionAnimationProgress: Float
 ): MeasureResult {
     val height = constraints.maxHeight
 

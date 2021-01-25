@@ -20,7 +20,7 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.emit
+import androidx.compose.runtime.ComposeNode
 import androidx.compose.ui.node.UiApplier
 import androidx.compose.ui.platform.AmbientContext
 
@@ -36,8 +36,8 @@ fun <T : View> emitView(
     update: (T) -> Unit
 ) {
     val context = AmbientContext.current
-    emit<T, UiApplier>(
-        ctor = { ctor(context) },
+    ComposeNode<T, UiApplier>(
+        factory = { ctor(context) },
         update = {
             reconcile(update)
         }
@@ -57,8 +57,8 @@ fun <T : ViewGroup> emitView(
     children: @Composable () -> Unit
 ) {
     val context = AmbientContext.current
-    emit<T, UiApplier>(
-        ctor = { ctor(context) },
+    ComposeNode<T, UiApplier>(
+        factory = { ctor(context) },
         update = {
             reconcile(update)
         },

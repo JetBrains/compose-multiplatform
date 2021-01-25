@@ -29,7 +29,8 @@ import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.annotation.RequiresApi
-import androidx.compose.animation.animate
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
@@ -91,6 +92,7 @@ import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.RenderNodeApi23
 import androidx.compose.ui.platform.RenderNodeApi29
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.ViewLayer
 import androidx.compose.ui.platform.ViewLayerContainer
 import androidx.compose.ui.platform.setContent
@@ -2251,7 +2253,7 @@ class AndroidLayoutDrawTest {
         activity.runOnUiThread {
             assertEquals(size, resultCoordinates?.size?.height)
             assertEquals(size, resultCoordinates?.size?.width)
-            assertEquals(IntOffset(offset, offset).toOffset(), resultCoordinates?.positionInRoot)
+            assertEquals(IntOffset(offset, offset).toOffset(), resultCoordinates?.positionInRoot())
         }
     }
 
@@ -2306,7 +2308,7 @@ class AndroidLayoutDrawTest {
         activity.runOnUiThread {
             assertEquals(coordinates?.size?.height, convenienceCoordinates?.size?.height)
             assertEquals(coordinates?.size?.width, convenienceCoordinates?.size?.width)
-            assertEquals(coordinates?.positionInRoot, convenienceCoordinates?.positionInRoot)
+            assertEquals(coordinates?.positionInRoot(), convenienceCoordinates?.positionInRoot())
         }
     }
 
@@ -3003,7 +3005,7 @@ class AndroidLayoutDrawTest {
             activity.setContent {
                 Box(Modifier.background(Color.Red).drawLatchModifier()) {
                     var animatedSize by remember { mutableStateOf(size) }
-                    animatedSize = animate(size)
+                    animatedSize = animateFloatAsState(size).value
                     if (animatedSize == 10f) {
                         Layout(
                             modifier = Modifier.background(Color.Cyan),
@@ -3039,6 +3041,9 @@ class AndroidLayoutDrawTest {
         lateinit var view: ComposeView
         activityTestRule.runOnUiThread {
             view = ComposeView(activity)
+            view.setViewCompositionStrategy(
+                ViewCompositionStrategy.DisposeOnLifecycleDestroyed(activity)
+            )
             view.setContent {
                 with(AmbientDensity.current) {
                     Box(
@@ -3329,6 +3334,39 @@ class AndroidLayoutDrawTest {
         assertFalse(drawLatch.await(300, TimeUnit.MILLISECONDS))
         assertEquals(1, parentInvalidationCount)
         assertEquals(1, childInvalidationCount)
+    }
+
+    /**
+     * invalidateDescendants should invalidate all layout layers.
+     */
+    @Test
+    fun invalidateDescendants() {
+        var color = Color.White
+        activityTestRule.runOnUiThread {
+            activity.setContent {
+                FixedSize(30, Modifier.background(Color.Blue)) {
+                    FixedSize(30, Modifier.graphicsLayer()) {
+                        with(AmbientDensity.current) {
+                            Canvas(Modifier.size(10.toDp())) {
+                                drawRect(color)
+                                drawLatch.countDown()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        validateSquareColors(outerColor = Color.Blue, innerColor = Color.White, size = 10)
+
+        color = Color.Yellow
+
+        activityTestRule.runOnUiThread {
+            drawLatch = CountDownLatch(1)
+            val view = activityTestRule.findAndroidComposeView() as AndroidComposeView
+            view.invalidateDescendants()
+        }
+        validateSquareColors(outerColor = Color.Blue, innerColor = Color.Yellow, size = 10)
     }
 
     private fun composeSquares(model: SquareModel) {

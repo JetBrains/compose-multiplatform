@@ -18,7 +18,6 @@ package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.InternalLayoutApi
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.Modifier
@@ -37,7 +36,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-@OptIn(InternalLayoutApi::class)
 class LazyArrangementsTest {
 
     private val ContainerTag = "ContainerTag"
@@ -64,7 +62,7 @@ class LazyArrangementsTest {
             LazyColumn(
                 modifier = Modifier.size(containerSize)
             ) {
-                items((0..1).toList()) {
+                items(2) {
                     Box(Modifier.size(itemSize).testTag(it.toString()))
                 }
             }
@@ -98,7 +96,7 @@ class LazyArrangementsTest {
             LazyRow(
                 modifier = Modifier.size(containerSize)
             ) {
-                items((0..1).toList()) {
+                items(2) {
                     Box(Modifier.size(itemSize).testTag(it.toString()))
                 }
             }
@@ -154,7 +152,7 @@ class LazyArrangementsTest {
                 verticalArrangement = Arrangement.spacedBy(itemSize),
                 modifier = Modifier.testTag(ContainerTag)
             ) {
-                items((0..1).toList()) {
+                items(2) {
                     Box(Modifier.size(itemSize))
                 }
             }
@@ -172,7 +170,7 @@ class LazyArrangementsTest {
                 horizontalArrangement = Arrangement.spacedBy(itemSize),
                 modifier = Modifier.testTag(ContainerTag)
             ) {
-                items((0..1).toList()) {
+                items(2) {
                     Box(Modifier.size(itemSize))
                 }
             }
@@ -192,7 +190,7 @@ class LazyArrangementsTest {
                 verticalArrangement = Arrangement.spacedBy(itemSize),
                 modifier = Modifier.size(itemSize * 3.5f)
             ) {
-                items((0..2).toList()) {
+                items(3) {
                     Box(Modifier.size(itemSize).testTag(it.toString()))
                 }
             }
@@ -212,7 +210,7 @@ class LazyArrangementsTest {
                 verticalArrangement = Arrangement.spacedBy(itemSize),
                 modifier = Modifier.size(itemSize * 3.5f).testTag(ContainerTag)
             ) {
-                items((0..2).toList()) {
+                items(3) {
                     Box(Modifier.size(itemSize).testTag(it.toString()))
                 }
             }
@@ -235,7 +233,7 @@ class LazyArrangementsTest {
                 horizontalArrangement = Arrangement.spacedBy(itemSize),
                 modifier = Modifier.size(itemSize * 3.5f)
             ) {
-                items((0..2).toList()) {
+                items(3) {
                     Box(Modifier.size(itemSize).testTag(it.toString()))
                 }
             }
@@ -255,7 +253,7 @@ class LazyArrangementsTest {
                 horizontalArrangement = Arrangement.spacedBy(itemSize),
                 modifier = Modifier.size(itemSize * 3.5f).testTag(ContainerTag)
             ) {
-                items((0..2).toList()) {
+                items(3) {
                     Box(Modifier.size(itemSize).testTag(it.toString()))
                 }
             }
@@ -280,7 +278,7 @@ class LazyArrangementsTest {
                 reverseLayout = true,
                 modifier = Modifier.size(containerSize)
             ) {
-                items((0..1).toList()) {
+                items(2) {
                     Box(Modifier.size(itemSize).testTag(it.toString()))
                 }
             }
@@ -296,7 +294,7 @@ class LazyArrangementsTest {
                 reverseLayout = true,
                 modifier = Modifier.size(containerSize)
             ) {
-                items((0..1).toList()) {
+                items(2) {
                     Box(Modifier.size(itemSize).testTag(it.toString()))
                 }
             }
@@ -313,7 +311,7 @@ class LazyArrangementsTest {
                 verticalArrangement = arrangement,
                 modifier = Modifier.size(containerSize)
             ) {
-                items((0..1).toList()) {
+                items(2) {
                     Box(Modifier.size(itemSize).testTag(it.toString()))
                 }
             }
@@ -327,7 +325,7 @@ class LazyArrangementsTest {
                     horizontalArrangement = arrangement,
                     modifier = Modifier.size(containerSize)
                 ) {
-                    items((0..1).toList()) {
+                    items(2) {
                         Box(Modifier.size(itemSize).testTag(it.toString()))
                     }
                 }
@@ -342,7 +340,7 @@ class LazyArrangementsTest {
         with(rule.density) {
             val sizes = IntArray(2) { itemSize.toIntPx() }
             val outPositions = IntArray(2) { 0 }
-            arrangement.arrange(containerSize.toIntPx(), sizes, this, outPositions)
+            with(arrangement) { arrange(containerSize.toIntPx(), sizes, outPositions) }
 
             outPositions.forEachIndexed { index, position ->
                 val realIndex = if (reversedItemsOrder) if (index == 0) 1 else 0 else index
@@ -360,7 +358,9 @@ class LazyArrangementsTest {
         with(rule.density) {
             val sizes = IntArray(2) { itemSize.toIntPx() }
             val outPositions = IntArray(2) { 0 }
-            arrangement.arrange(containerSize.toIntPx(), sizes, layoutDirection, this, outPositions)
+            with(arrangement) {
+                arrange(containerSize.toIntPx(), sizes, layoutDirection, outPositions)
+            }
 
             outPositions.forEachIndexed { index, position ->
                 val realIndex = if (reversedItemsOrder) if (index == 0) 1 else 0 else index

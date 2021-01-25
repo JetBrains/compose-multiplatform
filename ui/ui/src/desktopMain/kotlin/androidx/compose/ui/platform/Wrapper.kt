@@ -25,11 +25,21 @@ import androidx.compose.runtime.compositionFor
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.node.LayoutNode
 
+/**
+ * Composes the given composable into [DesktopOwner]
+ *
+ * @param parent The parent composition reference to coordinate scheduling of composition updates
+ *        If null then default root composition will be used.
+ * @param content A `@Composable` function declaring the UI contents
+ */
 @OptIn(ExperimentalComposeApi::class)
-fun DesktopOwner.setContent(content: @Composable () -> Unit): Composition {
+fun DesktopOwner.setContent(
+    parent: CompositionReference? = null,
+    content: @Composable () -> Unit
+): Composition {
     GlobalSnapshotManager.ensureStarted()
 
-    val composition = compositionFor(root, DesktopUiApplier(root), Recomposer.current())
+    val composition = compositionFor(root, DesktopUiApplier(root), parent ?: Recomposer.current())
     composition.setContent {
         ProvideDesktopAmbients(this) {
             DesktopSelectionContainer(content)

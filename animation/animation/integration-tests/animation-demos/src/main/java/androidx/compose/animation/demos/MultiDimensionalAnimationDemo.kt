@@ -22,6 +22,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -50,7 +51,7 @@ fun MultiDimensionalAnimationDemo() {
     var width by remember { mutableStateOf(0f) }
     var height by remember { mutableStateOf(0f) }
     val transition = updateTransition(currentState)
-    val rect by transition.animateRect({ spring(stiffness = 100f) }) {
+    val rect by transition.animateRect(transitionSpec = { spring(stiffness = 100f) }) {
         when (it) {
             AnimState.Collapsed -> Rect(600f, 600f, 900f, 900f)
             AnimState.Expanded -> Rect(0f, 400f, width, height - 400f)
@@ -65,7 +66,13 @@ fun MultiDimensionalAnimationDemo() {
             AnimState.PutAway -> Color(0xFFe3ffd9)
         }
     }
-    Canvas(modifier = Modifier.fillMaxSize().clickable(onClick = onClick, indication = null)) {
+    Canvas(
+        modifier = Modifier.fillMaxSize().clickable(
+            onClick = onClick,
+            indication = null,
+            interactionState = remember { InteractionState() }
+        )
+    ) {
         width = size.width
         height = size.height
 

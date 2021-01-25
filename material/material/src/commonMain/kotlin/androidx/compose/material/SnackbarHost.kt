@@ -25,13 +25,14 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.RecomposeScope
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.invalidate
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -52,7 +53,6 @@ import kotlin.coroutines.resume
  * automatically, but can be decoupled from it and live separately when desired.
  */
 @Stable
-@ExperimentalMaterialApi
 class SnackbarHostState {
 
     /**
@@ -106,7 +106,6 @@ class SnackbarHostState {
     }
 
     @Stable
-    @OptIn(ExperimentalMaterialApi::class)
     private class SnackbarDataImpl(
         override val message: String,
         override val actionLabel: String?,
@@ -145,7 +144,6 @@ class SnackbarHostState {
  * appearance based on the [SnackbarData] provided as a param
  */
 @Composable
-@ExperimentalMaterialApi
 fun SnackbarHost(
     hostState: SnackbarHostState,
     modifier: Modifier = Modifier,
@@ -172,7 +170,6 @@ fun SnackbarHost(
  * @property actionLabel optional action label to show as button in the Snackbar
  * @property duration duration of the snackbar
  */
-@ExperimentalMaterialApi
 interface SnackbarData {
     val message: String
     val actionLabel: String?
@@ -234,7 +231,6 @@ private fun SnackbarDuration.toMillis() = when (this) {
 // TODO: to be replaced with the public customizable implementation
 // it's basically tweaked nullable version of Crossfade
 @Composable
-@OptIn(ExperimentalMaterialApi::class)
 private fun FadeInFadeOutWithScale(
     current: SnackbarData?,
     modifier: Modifier = Modifier,
@@ -265,7 +261,7 @@ private fun FadeInFadeOutWithScale(
                         if (key != state.current) {
                             // leave only the current in the list
                             state.items.removeAll { it.key == key }
-                            state.invalidate()
+                            state.scope?.invalidate()
                         }
                     }
                 )
@@ -291,7 +287,7 @@ private fun FadeInFadeOutWithScale(
         }
     }
     Box(modifier) {
-        state.invalidate = invalidate
+        state.scope = currentRecomposeScope
         state.items.fastForEach { (item, opacity) ->
             key(item) {
                 opacity {
@@ -306,7 +302,7 @@ private class FadeInFadeOutState<T> {
     // we use Any here as something which will not be equals to the real initial value
     var current: Any? = Any()
     var items = mutableListOf<FadeInFadeOutAnimationItem<T>>()
-    var invalidate: () -> Unit = { }
+    var scope: RecomposeScope? = null
 }
 
 private data class FadeInFadeOutAnimationItem<T>(
@@ -323,7 +319,7 @@ private fun animatedOpacity(
     onAnimationFinish: () -> Unit = {}
 ): AnimatedFloat {
     val animatedFloat = animatedFloat(if (!visible) 1f else 0f)
-    onCommit(visible) {
+    DisposableEffect(visible) {
         animatedFloat.animateTo(
             if (visible) 1f else 0f,
             anim = animation,
@@ -331,6 +327,9 @@ private fun animatedOpacity(
                 if (reason == AnimationEndReason.TargetReached) onAnimationFinish()
             }
         )
+        onDispose {
+            animatedFloat.stop()
+        }
     }
     return animatedFloat
 }
@@ -338,11 +337,14 @@ private fun animatedOpacity(
 @Composable
 private fun animatedScale(animation: AnimationSpec<Float>, visible: Boolean): AnimatedFloat {
     val animatedFloat = animatedFloat(if (!visible) 1f else 0.8f)
-    onCommit(visible) {
+    DisposableEffect(visible) {
         animatedFloat.animateTo(
             if (visible) 1f else 0.8f,
             anim = animation
         )
+        onDispose {
+            animatedFloat.stop()
+        }
     }
     return animatedFloat
 }

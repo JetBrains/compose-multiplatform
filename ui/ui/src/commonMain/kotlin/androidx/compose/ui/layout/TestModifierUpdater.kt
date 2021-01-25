@@ -18,18 +18,17 @@ package androidx.compose.ui.layout
 
 import androidx.compose.runtime.Applier
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.emit
+import androidx.compose.runtime.ComposeNode
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.node.LayoutEmitHelper
 import androidx.compose.ui.node.LayoutNode
-import androidx.compose.ui.util.annotation.VisibleForTesting
 
 /** @hide */
 @Deprecated(
     "It is a test API, do not use it in the real applications",
     level = DeprecationLevel.ERROR
 )
-@VisibleForTesting
+/*@VisibleForTesting*/
 class TestModifierUpdater internal constructor(private val node: LayoutNode) {
     fun updateModifier(modifier: Modifier) {
         node.modifier = modifier
@@ -41,18 +40,18 @@ class TestModifierUpdater internal constructor(private val node: LayoutNode) {
     "It is a test API, do not use it in the real applications",
     level = DeprecationLevel.ERROR
 )
-@VisibleForTesting
+/*@VisibleForTesting*/
 @Composable
 @Suppress("DEPRECATION_ERROR")
 fun TestModifierUpdaterLayout(onAttached: (TestModifierUpdater) -> Unit) {
     val measureBlocks = MeasuringIntrinsicsMeasureBlocks { _, constraints ->
         layout(constraints.maxWidth, constraints.maxHeight) {}
     }
-    emit<LayoutNode, Applier<Any>>(
-        ctor = LayoutEmitHelper.constructor,
+    ComposeNode<LayoutNode, Applier<Any>>(
+        factory = LayoutEmitHelper.constructor,
         update = {
             set(measureBlocks, LayoutEmitHelper.setMeasureBlocks)
-            set(Unit) { onAttached(TestModifierUpdater(this)) }
+            init { onAttached(TestModifierUpdater(this)) }
         }
     )
 }

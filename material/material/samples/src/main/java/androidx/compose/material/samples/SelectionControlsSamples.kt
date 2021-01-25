@@ -17,7 +17,6 @@
 package androidx.compose.material.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -135,12 +134,11 @@ fun RadioGroupSample() {
                 // The [clearAndSetSemantics] causes the button's redundant
                 // selectable semantics to be cleared in favor of the [Row]
                 // selectable's, to improve usability with screen-readers.
-                Box(Modifier.clearAndSetSemantics {}) {
-                    RadioButton(
-                        selected = (text == selectedOption),
-                        onClick = { onOptionSelected(text) }
-                    )
-                }
+                RadioButton(
+                    modifier = Modifier.clearAndSetSemantics {},
+                    selected = (text == selectedOption),
+                    onClick = { onOptionSelected(text) }
+                )
                 Text(
                     text = text,
                     style = MaterialTheme.typography.body1.merge(),

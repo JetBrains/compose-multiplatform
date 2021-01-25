@@ -22,7 +22,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentComposer
-import androidx.compose.runtime.emit
+import androidx.compose.runtime.ComposeNode
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.materialize
 import androidx.compose.ui.node.UiApplier
@@ -55,12 +55,12 @@ fun <T : ViewBinding> AndroidViewBinding(
 ) {
     val context = AmbientContext.current
     val materialized = currentComposer.materialize(modifier)
-    emit<ViewBindingHolder<T>, UiApplier>(
-        ctor = { ViewBindingHolder(context) },
+    val density = AmbientDensity.current
+    ComposeNode<ViewBindingHolder<T>, UiApplier>(
+        factory = { ViewBindingHolder<T>(context).also { it.bindingBlock = bindingBlock } },
         update = {
-            set(Unit) { this.bindingBlock = bindingBlock }
             set(materialized) { this.modifier = it }
-            set(AmbientDensity.current) { this.density = it }
+            set(density) { this.density = it }
             set(update) { this.updateBlock = it }
         }
     )

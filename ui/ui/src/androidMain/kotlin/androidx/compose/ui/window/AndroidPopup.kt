@@ -26,35 +26,43 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewOutlineProvider
 import android.view.WindowManager
-import android.widget.FrameLayout
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Composition
+import androidx.compose.runtime.CompositionReference
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.compositionReference
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.emptyContent
-import androidx.compose.runtime.onCommit
-import androidx.compose.runtime.onDispose
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.layout.Layout
+import androidx.compose.runtime.rememberCompositionReference
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.layout.positionInWindow
+import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AmbientView
-import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.semantics.popup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntBounds
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.round
+import androidx.compose.ui.unit.height
+import androidx.compose.ui.unit.width
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.ViewTreeViewModelStoreOwner
 import androidx.savedstate.ViewTreeSavedStateRegistryOwner
 import org.jetbrains.annotations.TestOnly
+import kotlin.math.roundToInt
 
 /**
  * Android specific properties to configure a popup.
@@ -90,60 +98,72 @@ internal actual fun ActualPopup(
 ) {
     val view = AmbientView.current
     val density = AmbientDensity.current
+    val testTag = AmbientPopupTestTag.current
+    val parentComposition = rememberCompositionReference()
+    val currentContent by rememberUpdatedState(content)
 
-    val popupLayout = remember { PopupLayout(view, density) }
-
-    // Refresh anything that might have changed
-    popupLayout.onDismissRequest = onDismissRequest
-    popupLayout.testTag = AmbientPopupTestTag.current
-    SideEffect {
-        popupLayout.setPositionProvider(popupPositionProvider)
-        popupLayout.setIsFocusable(isFocusable)
-        popupLayout.setProperties(properties)
+    val popupLayout = remember {
+        PopupLayout(view, density, popupPositionProvider).apply {
+            setContent(parentComposition) {
+                SimpleStack(
+                    Modifier
+                        .semantics { this.popup() }
+                        // Get the size of the content
+                        .onSizeChanged {
+                            popupContentSize = it
+                            updatePosition()
+                        }
+                        // Hide the popup while we can't position it correctly
+                        .alpha(if (canCalculatePosition) 1f else 0f)
+                ) {
+                    currentContent()
+                }
+            }
+        }
     }
 
-    var composition: Composition? = null
+    DisposableEffect(popupLayout) {
+        onDispose {
+            popupLayout.disposeComposition()
+            // Remove the window
+            popupLayout.dismiss()
+        }
+    }
+
+    SideEffect {
+        popupLayout.apply {
+            this.onDismissRequest = onDismissRequest
+            this.testTag = testTag
+            setIsFocusable(isFocusable)
+            setProperties(properties)
+        }
+    }
+
+    DisposableEffect(popupPositionProvider) {
+        popupLayout.positionProvider = popupPositionProvider
+        popupLayout.updatePosition()
+        onDispose {}
+    }
 
     // TODO(soboleva): Look at module arrangement so that Box can be
-    // used instead of this custom Layout
-    // Get the parent's global position, size and layout direction
+    //  used instead of this custom Layout
+    // Get the parent's position, size and layout direction
     Layout(
         content = emptyContent(),
         modifier = Modifier.onGloballyPositioned { childCoordinates ->
             val coordinates = childCoordinates.parentCoordinates!!
-            // Get the global position of the parent
-            val layoutPosition = coordinates.localToGlobal(Offset.Zero).round()
             val layoutSize = coordinates.size
 
-            popupLayout.parentGlobalBounds = IntBounds(layoutPosition, layoutSize)
+            val position = coordinates.positionInWindow()
+            val layoutPosition = IntOffset(position.x.roundToInt(), position.y.roundToInt())
+
+            popupLayout.parentBounds = IntBounds(layoutPosition, layoutSize)
             // Update the popup's position
             popupLayout.updatePosition()
         }
     ) { _, _ ->
         popupLayout.parentLayoutDirection = layoutDirection
         layout(0, 0) {}
-    }
-
-    val parentComposition = compositionReference()
-    onCommit {
-        composition = popupLayout.setContent(parentComposition) {
-            SimpleStack(
-                Modifier.semantics { this.popup() }.onGloballyPositioned {
-                    // Get the size of the content
-                    popupLayout.popupContentSize = it.size
-
-                    // Update the popup's position
-                    popupLayout.updatePosition()
-                },
-                content = content
-            )
-        }
-    }
-
-    onDispose {
-        composition?.dispose()
-        // Remove the window
-        popupLayout.dismiss()
     }
 }
 
@@ -189,12 +209,12 @@ private inline fun SimpleStack(modifier: Modifier, noinline content: @Composable
 @SuppressLint("ViewConstructor")
 private class PopupLayout(
     private val composeView: View,
-    private val density: Density
-) : FrameLayout(composeView.context) {
+    density: Density,
+    initialPositionProvider: PopupPositionProvider
+) : AbstractComposeView(composeView.context) {
     private val windowManager =
         composeView.context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     private val params = createLayoutParams()
-    private var viewAdded: Boolean = false
 
     /** Executed when the popup tries to dismiss itself. */
     var onDismissRequest: (() -> Unit)? = null
@@ -202,12 +222,15 @@ private class PopupLayout(
     var testTag: String = ""
 
     /** The logic of positioning the popup relative to its parent. */
-    private var positionProvider: PopupPositionProvider? = null
+    var positionProvider = initialPositionProvider
 
     // Position params
-    var parentGlobalBounds = IntBounds(0, 0, 0, 0)
-    var popupContentSize = IntSize.Zero
     var parentLayoutDirection: LayoutDirection = LayoutDirection.Ltr
+    var parentBounds: IntBounds? by mutableStateOf(null)
+    var popupContentSize: IntSize? by mutableStateOf(null)
+
+    // Track parent bounds and content size; only show popup once we have both
+    val canCalculatePosition by derivedStateOf { parentBounds != null && popupContentSize != null }
 
     private val maxSupportedElevation = 30.dp
 
@@ -233,16 +256,25 @@ private class PopupLayout(
                 result.alpha = 0f
             }
         }
+
+        windowManager.addView(this, params)
     }
 
-    fun setPositionProvider(positionProvider: PopupPositionProvider) {
-        val wasProviderSetBefore = this.positionProvider != null
-        this.positionProvider = positionProvider
-        // If we already had a provider before, update our position.
-        // Otherwise, the position will be calculated during the first layout.
-        if (wasProviderSetBefore) {
-            updatePosition()
-        }
+    private var content: @Composable () -> Unit by mutableStateOf(emptyContent())
+
+    override var shouldCreateCompositionOnAttachedToWindow: Boolean = false
+        private set
+
+    fun setContent(parent: CompositionReference, content: @Composable () -> Unit) {
+        setParentCompositionReference(parent)
+        this.content = content
+        shouldCreateCompositionOnAttachedToWindow = true
+        createComposition()
+    }
+
+    @Composable
+    override fun Content() {
+        content()
     }
 
     /**
@@ -277,45 +309,33 @@ private class PopupLayout(
 
     private fun applyNewFlags(flags: Int) {
         params.flags = flags
-
-        if (viewAdded) {
-            windowManager.updateViewLayout(this, params)
-        }
+        windowManager.updateViewLayout(this, params)
     }
 
     /**
      * Updates the position of the popup based on current position properties.
      */
     fun updatePosition() {
-        val provider = positionProvider ?: return
+        val parentBounds = parentBounds ?: return
+        val popupContentSize = popupContentSize ?: return
 
-        val windowGlobalBounds = Rect().let {
-            composeView.rootView.getWindowVisibleDisplayFrame(it)
-            it.toIntBounds()
+        val windowSize = Rect().let {
+            composeView.getWindowVisibleDisplayFrame(it)
+            val bounds = it.toIntBounds()
+            IntSize(width = bounds.width, height = bounds.height)
         }
 
-        val popupGlobalPosition = provider.calculatePosition(
-            parentGlobalBounds,
-            windowGlobalBounds,
+        val popupPosition = positionProvider.calculatePosition(
+            parentBounds,
+            windowSize,
             parentLayoutDirection,
             popupContentSize
         )
 
-        // WindowManager treats the given coordinates as relative to our window, not relative to the
-        // screen. Which means that we need to translate them. Other option would be to only work
-        // with window relative coordinates but our layout APIs don't provide this value so it
-        // could be confusing for the implementors of position provider.
-        val rootViewLocation = IntArray(2)
-        composeView.rootView.getLocationOnScreen(rootViewLocation)
-        params.x = popupGlobalPosition.x - rootViewLocation[0]
-        params.y = popupGlobalPosition.y - rootViewLocation[1]
+        params.x = popupPosition.x
+        params.y = popupPosition.y
 
-        if (!viewAdded) {
-            windowManager.addView(this, params)
-            viewAdded = true
-        } else {
-            windowManager.updateViewLayout(this, params)
-        }
+        windowManager.updateViewLayout(this, params)
     }
 
     /**

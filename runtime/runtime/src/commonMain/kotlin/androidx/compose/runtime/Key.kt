@@ -48,13 +48,13 @@ package androidx.compose.runtime
  *
  * @sample androidx.compose.runtime.samples.TwoInputsKeySample
  *
- * @param inputs The set of values to be used to create a compound key. These will be compared to
+ * @param keys The set of values to be used to create a compound key. These will be compared to
  * their previous values using [equals] and [hashCode]
  * @param block The composable children for this group.
  */
 @Composable
 inline fun <T> key(
     @Suppress("UNUSED_PARAMETER")
-    vararg inputs: Any?,
+    vararg keys: Any?,
     block: @Composable () -> T
 ) = block()

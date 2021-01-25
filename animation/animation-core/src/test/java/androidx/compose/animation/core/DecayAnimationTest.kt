@@ -29,7 +29,7 @@ class DecayAnimationTest {
 
     @Test
     fun testExponentialDecay() {
-        val anim = ExponentialDecay(absVelocityThreshold = 2.0f)
+        val anim = FloatExponentialDecaySpec(absVelocityThreshold = 2.0f)
         val startValue = 200f
         val startVelocity = -800f
 
@@ -70,12 +70,12 @@ class DecayAnimationTest {
     fun testDecayThreshold() {
         // TODO: Use parameterized tests
         val threshold = 500f
-        val anim1 = ExponentialDecay(absVelocityThreshold = threshold)
-        val anim2 = ExponentialDecay(absVelocityThreshold = 0f)
+        val anim1 = FloatExponentialDecaySpec(absVelocityThreshold = threshold)
+        val anim2 = FloatExponentialDecaySpec(absVelocityThreshold = 0f)
 
         val startValue = 2000f
         val startVelocity = 800f
-        val fullAnim = ExponentialDecay(absVelocityThreshold = 0f).createAnimation(
+        val fullAnim = FloatExponentialDecaySpec(absVelocityThreshold = 0f).createAnimation(
             startValue,
             startVelocity
         )

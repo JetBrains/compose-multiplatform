@@ -52,13 +52,13 @@ internal class DesktopSelectionRegistrar : SelectionRegistrar {
                     val layoutCoordinatesB = b.getLayoutCoordinates()
 
                     val positionA =
-                        if (layoutCoordinatesA != null) containerLayoutCoordinates.childToLocal(
+                        if (layoutCoordinatesA != null) containerLayoutCoordinates.localPositionOf(
                             layoutCoordinatesA,
                             Offset.Zero
                         )
                         else Offset.Zero
                     val positionB =
-                        if (layoutCoordinatesB != null) containerLayoutCoordinates.childToLocal(
+                        if (layoutCoordinatesB != null) containerLayoutCoordinates.localPositionOf(
                             layoutCoordinatesB,
                             Offset.Zero
                         )
@@ -102,4 +102,6 @@ internal class DesktopSelectionRegistrar : SelectionRegistrar {
     }
 
     override fun notifySelectionUpdateEnd() { /* do nothing */ }
+
+    override fun notifySelectableChange(selectable: Selectable) { /* do nothing */ }
 }

@@ -18,16 +18,22 @@ package androidx.compose.foundation
 import android.os.Handler
 import android.os.Looper
 import androidx.annotation.RequiresApi
-import androidx.compose.animation.core.ExponentialDecay
+import androidx.compose.animation.core.FloatExponentialDecaySpec
 import androidx.compose.animation.core.ManualAnimationClock
 import androidx.compose.foundation.animation.FlingConfig
+import androidx.compose.foundation.animation.scrollBy
+import androidx.compose.foundation.animation.smoothScrollBy
+import androidx.compose.foundation.gestures.Scrollable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.testutils.MockAnimationClock
 import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,12 +41,14 @@ import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.GestureScope
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.captureToImage
-import androidx.compose.ui.test.click
+import androidx.compose.ui.test.center
+import androidx.compose.ui.test.down
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -61,6 +69,7 @@ import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -120,7 +129,7 @@ class ScrollTest {
     fun verticalScroller_SmallContent_Unscrollable() {
         val scrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = ManualAnimationClock(0)
         )
 
@@ -141,12 +150,13 @@ class ScrollTest {
         validateVerticalScroller(height = height)
     }
 
+    @OptIn(ExperimentalTestApi::class)
     @SdkSuppress(minSdkVersion = 26)
     @Test
-    fun verticalScroller_LargeContent_ScrollToEnd() {
+    fun verticalScroller_LargeContent_ScrollToEnd() = runBlocking {
         val scrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = ManualAnimationClock(0)
         )
         val height = 30
@@ -156,10 +166,9 @@ class ScrollTest {
 
         validateVerticalScroller(height = height)
 
-        rule.runOnIdle {
-            assertEquals(scrollDistance.toFloat(), scrollState.maxValue)
-            scrollState.scrollTo(scrollDistance.toFloat())
-        }
+        rule.awaitIdle()
+        assertEquals(scrollDistance.toFloat(), scrollState.maxValue)
+        scrollState.scrollTo(scrollDistance.toFloat())
 
         rule.runOnIdle {} // Just so the block below is correct
         validateVerticalScroller(offset = scrollDistance, height = height)
@@ -170,7 +179,7 @@ class ScrollTest {
     fun verticalScroller_Reversed() {
         val scrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = ManualAnimationClock(0)
         )
         val height = 30
@@ -181,12 +190,13 @@ class ScrollTest {
         validateVerticalScroller(offset = expectedOffset, height = height)
     }
 
+    @OptIn(ExperimentalTestApi::class)
     @SdkSuppress(minSdkVersion = 26)
     @Test
-    fun verticalScroller_LargeContent_Reversed_ScrollToEnd() {
+    fun verticalScroller_LargeContent_Reversed_ScrollToEnd() = runBlocking {
         val scrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = ManualAnimationClock(0)
         )
         val height = 20
@@ -195,11 +205,10 @@ class ScrollTest {
 
         composeVerticalScroller(scrollState, height = height, isReversed = true)
 
-        rule.runOnIdle {
-            scrollState.scrollTo(scrollDistance.toFloat())
-        }
+        rule.awaitIdle()
+        scrollState.scrollTo(scrollDistance.toFloat())
 
-        rule.runOnIdle {} // Just so the block below is correct
+        rule.awaitIdle()
         validateVerticalScroller(offset = expectedOffset, height = height)
     }
 
@@ -243,15 +252,16 @@ class ScrollTest {
         validateHorizontalScroller(width = width, checkInRtl = true)
     }
 
+    @OptIn(ExperimentalTestApi::class)
     @SdkSuppress(minSdkVersion = 26)
     @Test
-    fun horizontalScroller_LargeContent_ScrollToEnd() {
+    fun horizontalScroller_LargeContent_ScrollToEnd() = runBlocking {
         val width = 30
         val scrollDistance = 10
 
         val scrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = ManualAnimationClock(0)
         )
 
@@ -259,24 +269,24 @@ class ScrollTest {
 
         validateHorizontalScroller(width = width)
 
-        rule.runOnIdle {
-            assertEquals(scrollDistance.toFloat(), scrollState.maxValue)
-            scrollState.scrollTo(scrollDistance.toFloat())
-        }
+        rule.awaitIdle()
+        assertEquals(scrollDistance.toFloat(), scrollState.maxValue)
+        scrollState.scrollTo(scrollDistance.toFloat())
 
         rule.runOnIdle {} // Just so the block below is correct
         validateHorizontalScroller(offset = scrollDistance, width = width)
     }
 
+    @OptIn(ExperimentalTestApi::class)
     @SdkSuppress(minSdkVersion = 26)
     @Test
-    fun horizontalScroller_rtl_LargeContent_ScrollToEnd() {
+    fun horizontalScroller_rtl_LargeContent_ScrollToEnd() = runBlocking {
         val width = 30
         val scrollDistance = 10
 
         val scrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = ManualAnimationClock(0)
         )
 
@@ -284,12 +294,11 @@ class ScrollTest {
 
         validateHorizontalScroller(width = width, checkInRtl = true)
 
-        rule.runOnIdle {
-            assertEquals(scrollDistance.toFloat(), scrollState.maxValue)
-            scrollState.scrollTo(scrollDistance.toFloat())
-        }
+        rule.awaitIdle()
+        assertEquals(scrollDistance.toFloat(), scrollState.maxValue)
+        scrollState.scrollTo(scrollDistance.toFloat())
 
-        rule.runOnIdle {} // Just so the block below is correct
+        rule.awaitIdle()
         validateHorizontalScroller(offset = scrollDistance, width = width, checkInRtl = true)
     }
 
@@ -298,7 +307,7 @@ class ScrollTest {
     fun horizontalScroller_reversed() {
         val scrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = ManualAnimationClock(0)
         )
         val width = 30
@@ -314,7 +323,7 @@ class ScrollTest {
     fun horizontalScroller_rtl_reversed() {
         val scrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = ManualAnimationClock(0)
         )
         val width = 30
@@ -325,15 +334,16 @@ class ScrollTest {
         validateHorizontalScroller(offset = expectedOffset, width = width, checkInRtl = true)
     }
 
+    @OptIn(ExperimentalTestApi::class)
     @SdkSuppress(minSdkVersion = 26)
     @Test
-    fun horizontalScroller_LargeContent_Reversed_ScrollToEnd() {
+    fun horizontalScroller_LargeContent_Reversed_ScrollToEnd() = runBlocking {
         val width = 30
         val scrollDistance = 10
 
         val scrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = ManualAnimationClock(0)
         )
 
@@ -341,23 +351,23 @@ class ScrollTest {
 
         composeHorizontalScroller(scrollState, width = width, isReversed = true)
 
-        rule.runOnIdle {
-            scrollState.scrollTo(scrollDistance.toFloat())
-        }
+        rule.awaitIdle()
+        scrollState.scrollTo(scrollDistance.toFloat())
 
         rule.runOnIdle {} // Just so the block below is correct
         validateHorizontalScroller(offset = expectedOffset, width = width)
     }
 
+    @OptIn(ExperimentalTestApi::class)
     @SdkSuppress(minSdkVersion = 26)
     @Test
-    fun horizontalScroller_rtl_LargeContent_Reversed_ScrollToEnd() {
+    fun horizontalScroller_rtl_LargeContent_Reversed_ScrollToEnd() = runBlocking {
         val width = 30
         val scrollDistance = 10
 
         val scrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = ManualAnimationClock(0)
         )
 
@@ -365,9 +375,9 @@ class ScrollTest {
 
         composeHorizontalScroller(scrollState, width = width, isReversed = true, isRtl = true)
 
-        rule.runOnIdle {
-            scrollState.scrollTo(scrollDistance.toFloat())
-        }
+        rule.awaitIdle()
+
+        scrollState.scrollTo(scrollDistance.toFloat())
 
         rule.runOnIdle {} // Just so the block below is correct
         validateHorizontalScroller(offset = expectedOffset, width = width, checkInRtl = true)
@@ -411,7 +421,7 @@ class ScrollTest {
             isVertical = true,
             scrollState = ScrollState(
                 initial = 0f,
-                flingConfig = FlingConfig(ExponentialDecay()),
+                flingConfig = FlingConfig(FloatExponentialDecaySpec()),
                 animationClock = ManualAnimationClock(0)
             ),
             isReversed = true
@@ -430,7 +440,7 @@ class ScrollTest {
             isVertical = false,
             scrollState = ScrollState(
                 initial = 0f,
-                flingConfig = FlingConfig(ExponentialDecay()),
+                flingConfig = FlingConfig(FloatExponentialDecaySpec()),
                 animationClock = ManualAnimationClock(0)
             ),
             isReversed = true
@@ -497,67 +507,56 @@ class ScrollTest {
         )
     }
 
+    @OptIn(ExperimentalTestApi::class)
     @Test
-    fun scroller_coerce_whenScrollTo() {
+    fun scroller_coerce_whenScrollTo() = runBlocking {
         val clock = ManualAnimationClock(0)
         val scrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = clock
         )
 
         createScrollableContent(isVertical = true, scrollState = scrollState)
 
-        rule.runOnIdle {
-            assertThat(scrollState.value).isEqualTo(0f)
-            assertThat(scrollState.maxValue).isGreaterThan(0f)
-        }
-        rule.runOnUiThread {
-            scrollState.scrollTo(-100f)
-        }
-        rule.runOnIdle {
-            assertThat(scrollState.value).isEqualTo(0f)
-        }
-        rule.runOnUiThread {
-            scrollState.scrollBy(-100f)
-        }
-        rule.runOnIdle {
-            assertThat(scrollState.value).isEqualTo(0f)
-        }
-        rule.runOnUiThread {
-            scrollState.scrollTo(scrollState.maxValue)
-        }
-        rule.runOnIdle {
-            assertThat(scrollState.value).isEqualTo(scrollState.maxValue)
-        }
-        rule.runOnUiThread {
-            scrollState.scrollTo(scrollState.maxValue + 1000)
-        }
-        rule.runOnIdle {
-            assertThat(scrollState.value).isEqualTo(scrollState.maxValue)
-        }
-        rule.runOnUiThread {
-            scrollState.scrollBy(100f)
-        }
-        rule.runOnIdle {
-            assertThat(scrollState.value).isEqualTo(scrollState.maxValue)
-        }
+        rule.awaitIdle()
+
+        assertThat(scrollState.value).isEqualTo(0f)
+        assertThat(scrollState.maxValue).isGreaterThan(0f)
+
+        scrollState.scrollTo(-100f)
+        assertThat(scrollState.value).isEqualTo(0f)
+
+        (scrollState as Scrollable).scrollBy(-100f)
+        assertThat(scrollState.value).isEqualTo(0f)
+
+        scrollState.scrollTo(scrollState.maxValue)
+        assertThat(scrollState.value).isEqualTo(scrollState.maxValue)
+
+        scrollState.scrollTo(scrollState.maxValue + 1000)
+        assertThat(scrollState.value).isEqualTo(scrollState.maxValue)
+
+        (scrollState as Scrollable).scrollBy(100f)
+        assertThat(scrollState.value).isEqualTo(scrollState.maxValue)
     }
 
+    @OptIn(ExperimentalTestApi::class)
     @Test
-    fun verticalScroller_LargeContent_coerceWhenMaxChanges() {
+    fun verticalScroller_LargeContent_coerceWhenMaxChanges() = runBlocking {
         val clock = ManualAnimationClock(0)
         val scrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = clock
         )
         val itemCount = mutableStateOf(100)
         rule.setContent {
             Box {
-                ScrollableColumn(
-                    scrollState = scrollState,
-                    modifier = Modifier.preferredSize(100.dp).testTag(scrollerTag)
+                Column(
+                    Modifier
+                        .preferredSize(100.dp)
+                        .testTag(scrollerTag)
+                        .verticalScroll(scrollState)
                 ) {
                     for (i in 0..itemCount.value) {
                         BasicText(i.toString())
@@ -566,60 +565,52 @@ class ScrollTest {
             }
         }
 
-        val max = rule.runOnIdle {
-            assertThat(scrollState.value).isEqualTo(0f)
-            assertThat(scrollState.maxValue).isGreaterThan(0f)
-            scrollState.maxValue
-        }
+        rule.awaitIdle()
 
-        rule.runOnUiThread {
-            scrollState.scrollTo(max)
-        }
-        rule.runOnUiThread {
-            itemCount.value -= 2
-        }
-        rule.runOnIdle {
-            val newMax = scrollState.maxValue
-            assertThat(newMax).isLessThan(max)
-            assertThat(scrollState.value).isEqualTo(newMax)
-        }
+        assertThat(scrollState.value).isEqualTo(0f)
+        assertThat(scrollState.maxValue).isGreaterThan(0f)
+        val max = scrollState.maxValue
+
+        scrollState.scrollTo(max)
+        itemCount.value -= 2
+
+        rule.awaitIdle()
+        val newMax = scrollState.maxValue
+        assertThat(newMax).isLessThan(max)
+        assertThat(scrollState.value).isEqualTo(newMax)
     }
 
+    @OptIn(ExperimentalTestApi::class)
     @Test
-    fun scroller_coerce_whenScrollSmoothTo() {
+    fun scroller_coerce_whenScrollSmoothTo() = runBlocking {
         val clock = ManualAnimationClock(0)
         val scrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = clock
         )
 
         createScrollableContent(isVertical = true, scrollState = scrollState)
 
-        val max = rule.runOnIdle {
-            assertThat(scrollState.value).isEqualTo(0f)
-            assertThat(scrollState.maxValue).isGreaterThan(0f)
-            scrollState.maxValue
-        }
+        rule.awaitIdle()
+        assertThat(scrollState.value).isEqualTo(0f)
+        assertThat(scrollState.maxValue).isGreaterThan(0f)
+        val max = scrollState.maxValue
 
-        performWithAnimationWaitAndAssertPosition(0f, scrollState, clock) {
-            scrollState.smoothScrollTo(-100f)
-        }
+        scrollState.smoothScrollTo(-100f)
+        assertThat(scrollState.value).isEqualTo(0f)
 
-        performWithAnimationWaitAndAssertPosition(0f, scrollState, clock) {
-            scrollState.smoothScrollBy(-100f)
-        }
+        (scrollState as Scrollable).smoothScrollBy(-100f)
+        assertThat(scrollState.value).isEqualTo(0f)
 
-        performWithAnimationWaitAndAssertPosition(max, scrollState, clock) {
-            scrollState.smoothScrollTo(scrollState.maxValue)
-        }
+        scrollState.smoothScrollTo(scrollState.maxValue)
+        assertThat(scrollState.value).isEqualTo(max)
 
-        performWithAnimationWaitAndAssertPosition(max, scrollState, clock) {
-            scrollState.smoothScrollTo(scrollState.maxValue + 1000)
-        }
-        performWithAnimationWaitAndAssertPosition(max, scrollState, clock) {
-            scrollState.smoothScrollBy(100f)
-        }
+        scrollState.smoothScrollTo(scrollState.maxValue + 1000)
+        assertThat(scrollState.value).isEqualTo(max)
+
+        (scrollState as Scrollable).smoothScrollBy(100f)
+        assertThat(scrollState.value).isEqualTo(max)
     }
 
     @Test
@@ -627,7 +618,7 @@ class ScrollTest {
         val clock = ManualAnimationClock(0)
         val scrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = clock
         )
 
@@ -646,57 +637,37 @@ class ScrollTest {
             assertThat(scrollState.isAnimationRunning).isEqualTo(true)
         }
 
-        // TODO (matvei/jelle): this should be down, and not click to be 100% fair
         rule.onNodeWithTag(scrollerTag)
-            .performGesture { click() }
+            .performGesture { down(center) }
 
         rule.runOnIdle {
             assertThat(scrollState.isAnimationRunning).isEqualTo(false)
         }
     }
 
+    @OptIn(ExperimentalTestApi::class)
     @Test
-    fun scroller_restoresScrollerPosition() {
+    fun scroller_restoresScrollerPosition() = runBlocking {
         val restorationTester = StateRestorationTester(rule)
         var scrollState: ScrollState? = null
 
         restorationTester.setContent {
             scrollState = rememberScrollState()
-            ScrollableColumn(scrollState = scrollState!!) {
+            Column(Modifier.verticalScroll(scrollState!!)) {
                 repeat(50) {
                     Box(Modifier.preferredHeight(100.dp))
                 }
             }
         }
 
-        rule.runOnIdle {
-            scrollState!!.scrollTo(70f)
-            scrollState = null
-        }
+        rule.awaitIdle()
+        scrollState!!.scrollTo(70f)
+        scrollState = null
 
         restorationTester.emulateSavedInstanceStateRestore()
 
         rule.runOnIdle {
             assertThat(scrollState!!.value).isEqualTo(70f)
-        }
-    }
-
-    private fun performWithAnimationWaitAndAssertPosition(
-        assertValue: Float,
-        scrollState: ScrollState,
-        clock: ManualAnimationClock,
-        uiAction: () -> Unit
-    ) {
-        rule.runOnUiThread {
-            uiAction.invoke()
-        }
-        rule.runOnIdle {
-            clock.clockTimeMillis += 5000
-        }
-
-        rule.onNodeWithTag(scrollerTag).awaitScrollAnimation(scrollState)
-        rule.runOnIdle {
-            assertThat(scrollState.value).isEqualTo(assertValue)
         }
     }
 
@@ -709,7 +680,7 @@ class ScrollTest {
         val clock = ManualAnimationClock(0)
         val scrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = clock
         )
 
@@ -752,7 +723,7 @@ class ScrollTest {
     private fun composeVerticalScroller(
         scrollState: ScrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = ManualAnimationClock(0)
         ),
         isReversed: Boolean = false,
@@ -764,12 +735,11 @@ class ScrollTest {
         with(rule.density) {
             rule.setContent {
                 Box {
-                    ScrollableColumn(
-                        scrollState = scrollState,
-                        reverseScrollDirection = isReversed,
+                    Column(
                         modifier = Modifier
                             .preferredSize(width.toDp(), height.toDp())
                             .testTag(scrollerTag)
+                            .verticalScroll(scrollState, reverseScrolling = isReversed)
                     ) {
                         colors.forEach { color ->
                             Box(
@@ -787,7 +757,7 @@ class ScrollTest {
     private fun composeHorizontalScroller(
         scrollState: ScrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = ManualAnimationClock(0)
         ),
         isReversed: Boolean = false,
@@ -801,12 +771,11 @@ class ScrollTest {
                 val direction = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
                 Providers(AmbientLayoutDirection provides direction) {
                     Box {
-                        ScrollableRow(
-                            reverseScrollDirection = isReversed,
-                            scrollState = scrollState,
+                        Row(
                             modifier = Modifier
                                 .preferredSize(width.toDp(), height.toDp())
                                 .testTag(scrollerTag)
+                                .horizontalScroll(scrollState, reverseScrolling = isReversed)
                         ) {
                             colors.forEach { color ->
                                 Box(
@@ -862,7 +831,7 @@ class ScrollTest {
         isReversed: Boolean = false,
         scrollState: ScrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = ManualAnimationClock(0)
         ),
         isRtl: Boolean = false
@@ -878,20 +847,19 @@ class ScrollTest {
                     Modifier.preferredSize(width, height).background(Color.White)
                 ) {
                     if (isVertical) {
-                        ScrollableColumn(
-                            Modifier.testTag(scrollerTag),
-                            scrollState = scrollState,
-                            reverseScrollDirection = isReversed
+                        Column(
+                            Modifier
+                                .testTag(scrollerTag)
+                                .verticalScroll(scrollState, reverseScrolling = isReversed)
                         ) {
                             content()
                         }
                     } else {
                         val direction = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
                         Providers(AmbientLayoutDirection provides direction) {
-                            ScrollableRow(
-                                Modifier.testTag(scrollerTag),
-                                scrollState = scrollState,
-                                reverseScrollDirection = isReversed
+                            Row(
+                                Modifier.testTag(scrollerTag)
+                                    .horizontalScroll(scrollState, reverseScrolling = isReversed)
                             ) {
                                 content()
                             }
@@ -926,8 +894,8 @@ class ScrollTest {
     fun testInspectorValue() {
         val state = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
-            animationClock = ManualAnimationClock(0)
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
+            animationClock = MockAnimationClock()
         )
         rule.setContent {
             val modifier = Modifier.verticalScroll(state) as InspectableValue

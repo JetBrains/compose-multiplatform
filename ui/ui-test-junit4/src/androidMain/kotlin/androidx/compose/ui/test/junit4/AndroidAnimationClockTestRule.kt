@@ -18,7 +18,7 @@ package androidx.compose.ui.test.junit4
 
 import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.animation.core.rootAnimationClockFactory
-import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.TestAnimationClock
 import androidx.compose.ui.test.junit4.android.AndroidTestAnimationClock
 import androidx.compose.ui.test.junit4.android.ComposeIdlingResource
@@ -31,7 +31,7 @@ import org.junit.runners.model.Statement
  * the ambient animation clock provided at the root of the composition tree with a
  * [TestAnimationClock].
  */
-@ExperimentalTesting
+@ExperimentalTestApi
 internal class AndroidAnimationClockTestRule(
     private val composeIdlingResource: ComposeIdlingResource
 ) : AnimationClockTestRule {
@@ -70,7 +70,7 @@ internal class AndroidAnimationClockTestRule(
     level = DeprecationLevel.ERROR,
     replaceWith = ReplaceWith("composeTestRule.clockTestRule")
 )
-@ExperimentalTesting
+@ExperimentalTestApi
 @Suppress("DocumentExceptions")
 actual fun createAnimationClockRule(): AnimationClockTestRule =
     throw UnsupportedOperationException()

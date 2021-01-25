@@ -31,8 +31,8 @@ import kotlinx.coroutines.launch
  *
  * [effect] will always be run on the composition's apply dispatcher and appliers are never run
  * concurrent with themselves, one another, applying changes to the composition tree, or running
- * [CompositionLifecycleObserver] event callbacks. [SideEffect]s are always run after
- * [CompositionLifecycleObserver] event callbacks.
+ * [RememberObserver] event callbacks. [SideEffect]s are always run after [RememberObserver]
+ * event callbacks.
  *
  * A [SideEffect] runs after **every** recomposition. To launch an ongoing task spanning
  * potentially many recompositions, see [LaunchedEffect]. To manage an event subscription or other
@@ -53,7 +53,7 @@ fun SideEffect(
 class DisposableEffectScope {
     /**
      * Provide [onDisposeEffect] to the [DisposableEffect] to run when it leaves the composition
-     * or its subject changes.
+     * or its key changes.
      */
     inline fun onDispose(
         crossinline onDisposeEffect: () -> Unit
@@ -72,28 +72,32 @@ private val InternalDisposableEffectScope = DisposableEffectScope()
 
 private class DisposableEffectImpl(
     private val effect: DisposableEffectScope.() -> DisposableEffectDisposable
-) : CompositionLifecycleObserver {
+) : RememberObserver {
     private var onDispose: DisposableEffectDisposable? = null
 
-    override fun onEnter() {
+    override fun onRemembered() {
         onDispose = InternalDisposableEffectScope.effect()
     }
 
-    override fun onLeave() {
+    override fun onForgotten() {
         onDispose?.dispose()
         onDispose = null
+    }
+
+    override fun onAbandoned() {
+        // Nothing to do as [onRemembered] was not called.
     }
 }
 
 private const val DisposableEffectNoParamError =
-    "DisposableEffect must provide one or more 'subject' parameters that define the identity of " +
+    "DisposableEffect must provide one or more 'key' parameters that define the identity of " +
         "the DisposableEffect and determine when its previous effect should be disposed and " +
-        "a new effect started for the new subject."
+        "a new effect started for the new key."
 
 private const val LaunchedEffectNoParamError =
-    "LaunchedEffect must provide one or more 'subject' parameters that define the identity of " +
+    "LaunchedEffect must provide one or more 'key' parameters that define the identity of " +
         "the LaunchedEffect and determine when its previous effect coroutine should be cancelled " +
-        "and a new effect launched for the new subject."
+        "and a new effect launched for the new key."
 
 @Composable
 @ComposableContract(restartable = false)
@@ -104,19 +108,19 @@ fun DisposableEffect(
 ): Unit = error(DisposableEffectNoParamError)
 
 /**
- * A side effect of composition that must run for any new unique value of [subject] and must be
- * reversed or cleaned up if [subject] changes or if the [DisposableEffect] leaves the composition.
+ * A side effect of composition that must run for any new unique value of [key1] and must be
+ * reversed or cleaned up if [key1] changes or if the [DisposableEffect] leaves the composition.
  *
- * A [DisposableEffect]'s _subject_ is a value that defines the identity of the
- * [DisposableEffect]. If a subject changes, the [DisposableEffect] must
+ * A [DisposableEffect]'s _key_ is a value that defines the identity of the
+ * [DisposableEffect]. If a key changes, the [DisposableEffect] must
  * [dispose][DisposableEffectScope.onDispose] its current [effect] and reset by calling [effect]
- * again. Examples of subjects include:
+ * again. Examples of keys include:
  *
  * * Observable objects that the effect subscribes to
  * * Unique request parameters to an operation that must cancel and retry if those parameters change
  *
- * [DisposableEffect] may be used to initialize or subscribe to a subject and reinitialize
- * when a different subject is provided, performing cleanup for the old operation before
+ * [DisposableEffect] may be used to initialize or subscribe to a key and reinitialize
+ * when a different key is provided, performing cleanup for the old operation before
  * initializing the new. For example:
  *
  * @sample androidx.compose.runtime.samples.disposableEffectSample
@@ -129,33 +133,33 @@ fun DisposableEffect(
  * There is guaranteed to be one call to [dispose][DisposableEffectScope.onDispose] for every call
  * to [effect]. Both [effect] and [dispose][DisposableEffectScope.onDispose] will always be run
  * on the composition's apply dispatcher and appliers are never run concurrent with themselves,
- * one another, applying changes to the composition tree, or running [CompositionLifecycleObserver]
- * event callbacks.
+ * one another, applying changes to the composition tree, or running [RememberObserver] event
+ * callbacks.
  */
 @Composable
 @ComposableContract(restartable = false)
 fun DisposableEffect(
-    subject: Any?,
+    key1: Any?,
     effect: DisposableEffectScope.() -> DisposableEffectDisposable
 ) {
-    remember(subject) { DisposableEffectImpl(effect) }
+    remember(key1) { DisposableEffectImpl(effect) }
 }
 
 /**
- * A side effect of composition that must run for any new unique value of [subject1] or [subject2]
- * and must be reversed or cleaned up if [subject1] or [subject2] changes, or if the
+ * A side effect of composition that must run for any new unique value of [key1] or [key2]
+ * and must be reversed or cleaned up if [key1] or [key2] changes, or if the
  * [DisposableEffect] leaves the composition.
  *
- * A [DisposableEffect]'s _subject_ is a value that defines the identity of the
- * [DisposableEffect]. If a subject changes, the [DisposableEffect] must
+ * A [DisposableEffect]'s _key_ is a value that defines the identity of the
+ * [DisposableEffect]. If a key changes, the [DisposableEffect] must
  * [dispose][DisposableEffectScope.onDispose] its current [effect] and reset by calling [effect]
- * again. Examples of subjects include:
+ * again. Examples of keys include:
  *
  * * Observable objects that the effect subscribes to
  * * Unique request parameters to an operation that must cancel and retry if those parameters change
  *
- * [DisposableEffect] may be used to initialize or subscribe to a subject and reinitialize
- * when a different subject is provided, performing cleanup for the old operation before
+ * [DisposableEffect] may be used to initialize or subscribe to a key and reinitialize
+ * when a different key is provided, performing cleanup for the old operation before
  * initializing the new. For example:
  *
  * @sample androidx.compose.runtime.samples.disposableEffectSample
@@ -168,34 +172,34 @@ fun DisposableEffect(
  * There is guaranteed to be one call to [dispose][DisposableEffectScope.onDispose] for every call
  * to [effect]. Both [effect] and [dispose][DisposableEffectScope.onDispose] will always be run
  * on the composition's apply dispatcher and appliers are never run concurrent with themselves,
- * one another, applying changes to the composition tree, or running [CompositionLifecycleObserver]
+ * one another, applying changes to the composition tree, or running [RememberObserver]
  * event callbacks.
  */
 @Composable
 @ComposableContract(restartable = false)
 fun DisposableEffect(
-    subject1: Any?,
-    subject2: Any?,
+    key1: Any?,
+    key2: Any?,
     effect: DisposableEffectScope.() -> DisposableEffectDisposable
 ) {
-    remember(subject1, subject2) { DisposableEffectImpl(effect) }
+    remember(key1, key2) { DisposableEffectImpl(effect) }
 }
 
 /**
- * A side effect of composition that must run for any new unique value of [subject1], [subject2]
- * or [subject3] and must be reversed or cleaned up if [subject1], [subject2] or [subject3]
+ * A side effect of composition that must run for any new unique value of [key1], [key2]
+ * or [key3] and must be reversed or cleaned up if [key1], [key2] or [key3]
  * changes, or if the [DisposableEffect] leaves the composition.
  *
- * A [DisposableEffect]'s _subject_ is a value that defines the identity of the
- * [DisposableEffect]. If a subject changes, the [DisposableEffect] must
+ * A [DisposableEffect]'s _key_ is a value that defines the identity of the
+ * [DisposableEffect]. If a key changes, the [DisposableEffect] must
  * [dispose][DisposableEffectScope.onDispose] its current [effect] and reset by calling [effect]
- * again. Examples of subjects include:
+ * again. Examples of keys include:
  *
  * * Observable objects that the effect subscribes to
  * * Unique request parameters to an operation that must cancel and retry if those parameters change
  *
- * [DisposableEffect] may be used to initialize or subscribe to a subject and reinitialize
- * when a different subject is provided, performing cleanup for the old operation before
+ * [DisposableEffect] may be used to initialize or subscribe to a key and reinitialize
+ * when a different key is provided, performing cleanup for the old operation before
  * initializing the new. For example:
  *
  * @sample androidx.compose.runtime.samples.disposableEffectSample
@@ -208,35 +212,35 @@ fun DisposableEffect(
  * There is guaranteed to be one call to [dispose][DisposableEffectScope.onDispose] for every call
  * to [effect]. Both [effect] and [dispose][DisposableEffectScope.onDispose] will always be run
  * on the composition's apply dispatcher and appliers are never run concurrent with themselves,
- * one another, applying changes to the composition tree, or running [CompositionLifecycleObserver]
- * event callbacks.
+ * one another, applying changes to the composition tree, or running [RememberObserver] event
+ * callbacks.
  */
 @Composable
 @ComposableContract(restartable = false)
 fun DisposableEffect(
-    subject1: Any?,
-    subject2: Any?,
-    subject3: Any?,
+    key1: Any?,
+    key2: Any?,
+    key3: Any?,
     effect: DisposableEffectScope.() -> DisposableEffectDisposable
 ) {
-    remember(subject1, subject2, subject3) { DisposableEffectImpl(effect) }
+    remember(key1, key2, key3) { DisposableEffectImpl(effect) }
 }
 
 /**
- * A side effect of composition that must run for any new unique value of [subjects] and must
- * be reversed or cleaned up if any [subjects] change or if the [DisposableEffect] leaves the
+ * A side effect of composition that must run for any new unique value of [keys] and must
+ * be reversed or cleaned up if any [keys] change or if the [DisposableEffect] leaves the
  * composition.
  *
- * A [DisposableEffect]'s _subject_ is a value that defines the identity of the
- * [DisposableEffect]. If a subject changes, the [DisposableEffect] must
+ * A [DisposableEffect]'s _key_ is a value that defines the identity of the
+ * [DisposableEffect]. If a key changes, the [DisposableEffect] must
  * [dispose][DisposableEffectScope.onDispose] its current [effect] and reset by calling [effect]
- * again. Examples of subjects include:
+ * again. Examples of keys include:
  *
  * * Observable objects that the effect subscribes to
  * * Unique request parameters to an operation that must cancel and retry if those parameters change
  *
- * [DisposableEffect] may be used to initialize or subscribe to a subject and reinitialize
- * when a different subject is provided, performing cleanup for the old operation before
+ * [DisposableEffect] may be used to initialize or subscribe to a key and reinitialize
+ * when a different key is provided, performing cleanup for the old operation before
  * initializing the new. For example:
  *
  * @sample androidx.compose.runtime.samples.disposableEffectSample
@@ -249,33 +253,37 @@ fun DisposableEffect(
  * There is guaranteed to be one call to [dispose][DisposableEffectScope.onDispose] for every call
  * to [effect]. Both [effect] and [dispose][DisposableEffectScope.onDispose] will always be run
  * on the composition's apply dispatcher and appliers are never run concurrent with themselves,
- * one another, applying changes to the composition tree, or running [CompositionLifecycleObserver]
- * event callbacks.
+ * one another, applying changes to the composition tree, or running [RememberObserver] event
+ * callbacks.
  */
 @Composable
 @ComposableContract(restartable = false)
 @Suppress("ArrayReturn")
 fun DisposableEffect(
-    vararg subjects: Any?,
+    vararg keys: Any?,
     effect: DisposableEffectScope.() -> DisposableEffectDisposable
 ) {
-    remember(*subjects) { DisposableEffectImpl(effect) }
+    remember(*keys) { DisposableEffectImpl(effect) }
 }
 
 internal class LaunchedEffectImpl(
     parentCoroutineContext: CoroutineContext,
     private val task: suspend CoroutineScope.() -> Unit
-) : CompositionLifecycleObserver {
-
+) : RememberObserver {
     private val scope = CoroutineScope(parentCoroutineContext)
     private var job: Job? = null
 
-    override fun onEnter() {
+    override fun onRemembered() {
         job?.cancel("Old job was still running!")
         job = scope.launch(block = task)
     }
 
-    override fun onLeave() {
+    override fun onForgotten() {
+        job?.cancel()
+        job = null
+    }
+
+    override fun onAbandoned() {
         job?.cancel()
         job = null
     }
@@ -286,7 +294,7 @@ internal class LaunchedEffectImpl(
  * [CoroutineContext]. The coroutine will be [cancelled][Job.cancel] when the [LaunchedEffect]
  * leaves the composition.
  *
- * It is an error to call [LaunchedEffect] without at least one `subject` parameter.
+ * It is an error to call [LaunchedEffect] without at least one `key` parameter.
  */
 @Deprecated(LaunchedEffectNoParamError, level = DeprecationLevel.ERROR)
 @Suppress("DeprecatedCallableAddReplaceWith", "UNUSED_PARAMETER")
@@ -298,28 +306,28 @@ fun LaunchedEffect(
 /**
  * When [LaunchedEffect] enters the composition it will launch [block] into the composition's
  * [CoroutineContext]. The coroutine will be [cancelled][Job.cancel] and **re-launched** when
- * [LaunchedEffect] is recomposed with a different [subject]. The coroutine will be
+ * [LaunchedEffect] is recomposed with a different [key1]. The coroutine will be
  * [cancelled][Job.cancel] when the [LaunchedEffect] leaves the composition.
  *
  * This function should **not** be used to (re-)launch ongoing tasks in response to callback
- * events by way of storing callback data in [MutableState] passed to [subject]. Instead, see
+ * events by way of storing callback data in [MutableState] passed to [key1]. Instead, see
  * [rememberCoroutineScope] to obtain a [CoroutineScope] that may be used to launch ongoing jobs
  * scoped to the composition in response to event callbacks.
  */
 @Composable
 @ComposableContract(restartable = false)
 fun LaunchedEffect(
-    subject: Any?,
+    key1: Any?,
     block: suspend CoroutineScope.() -> Unit
 ) {
     val applyContext = currentComposer.applyCoroutineContext
-    remember(subject) { LaunchedEffectImpl(applyContext, block) }
+    remember(key1) { LaunchedEffectImpl(applyContext, block) }
 }
 
 /**
  * When [LaunchedEffect] enters the composition it will launch [block] into the composition's
  * [CoroutineContext]. The coroutine will be [cancelled][Job.cancel] and **re-launched** when
- * [LaunchedEffect] is recomposed with a different [subject1] or [subject2]. The coroutine will be
+ * [LaunchedEffect] is recomposed with a different [key1] or [key2]. The coroutine will be
  * [cancelled][Job.cancel] when the [LaunchedEffect] leaves the composition.
  *
  * This function should **not** be used to (re-)launch ongoing tasks in response to callback
@@ -330,18 +338,18 @@ fun LaunchedEffect(
 @Composable
 @ComposableContract(restartable = false)
 fun LaunchedEffect(
-    subject1: Any?,
-    subject2: Any?,
+    key1: Any?,
+    key2: Any?,
     block: suspend CoroutineScope.() -> Unit
 ) {
     val applyContext = currentComposer.applyCoroutineContext
-    remember(subject1, subject2) { LaunchedEffectImpl(applyContext, block) }
+    remember(key1, key2) { LaunchedEffectImpl(applyContext, block) }
 }
 
 /**
  * When [LaunchedEffect] enters the composition it will launch [block] into the composition's
  * [CoroutineContext]. The coroutine will be [cancelled][Job.cancel] and **re-launched** when
- * [LaunchedEffect] is recomposed with a different [subject1], [subject2] or [subject3].
+ * [LaunchedEffect] is recomposed with a different [key1], [key2] or [key3].
  * The coroutine will be [cancelled][Job.cancel] when the [LaunchedEffect] leaves the composition.
  *
  * This function should **not** be used to (re-)launch ongoing tasks in response to callback
@@ -352,19 +360,19 @@ fun LaunchedEffect(
 @Composable
 @ComposableContract(restartable = false)
 fun LaunchedEffect(
-    subject1: Any?,
-    subject2: Any?,
-    subject3: Any?,
+    key1: Any?,
+    key2: Any?,
+    key3: Any?,
     block: suspend CoroutineScope.() -> Unit
 ) {
     val applyContext = currentComposer.applyCoroutineContext
-    remember(subject1, subject2, subject3) { LaunchedEffectImpl(applyContext, block) }
+    remember(key1, key2, key3) { LaunchedEffectImpl(applyContext, block) }
 }
 
 /**
  * When [LaunchedEffect] enters the composition it will launch [block] into the composition's
  * [CoroutineContext]. The coroutine will be [cancelled][Job.cancel] and **re-launched** when
- * [LaunchedEffect] is recomposed with any different [subjects]. The coroutine will be
+ * [LaunchedEffect] is recomposed with any different [keys]. The coroutine will be
  * [cancelled][Job.cancel] when the [LaunchedEffect] leaves the composition.
  *
  * This function should **not** be used to (re-)launch ongoing tasks in response to callback
@@ -376,9 +384,9 @@ fun LaunchedEffect(
 @ComposableContract(restartable = false)
 @Suppress("ArrayReturn")
 fun LaunchedEffect(
-    vararg subjects: Any?,
+    vararg keys: Any?,
     block: suspend CoroutineScope.() -> Unit
 ) {
     val applyContext = currentComposer.applyCoroutineContext
-    remember(*subjects) { LaunchedEffectImpl(applyContext, block) }
+    remember(*keys) { LaunchedEffectImpl(applyContext, block) }
 }

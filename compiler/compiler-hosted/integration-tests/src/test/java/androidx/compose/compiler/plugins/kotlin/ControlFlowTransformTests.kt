@@ -1243,13 +1243,16 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
             @ComposableContract(restartable = false)
             @Composable
             fun Example(items: Iterator<Int>, %composer: Composer<*>?, %changed: Int) {
-              %composer.startReplaceableGroup(<>, "C(Example)*<P(i)>:Test.kt")
+              %composer.startReplaceableGroup(<>, "C(Example):Test.kt")
               while (items.hasNext()) {
+                %composer.startReplaceableGroup(<>, "<P(i)>")
                 val i = items.next()
                 if (i == 0) {
+                  %composer.endReplaceableGroup()
                   continue
                 }
                 P(i, %composer, 0)
+                %composer.endReplaceableGroup()
               }
               %composer.endReplaceableGroup()
             }
@@ -1275,14 +1278,17 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
             @ComposableContract(restartable = false)
             @Composable
             fun Example(items: Iterator<Int>, %composer: Composer<*>?, %changed: Int) {
-              %composer.startReplaceableGroup(<>, "C(Example)*<P(i)>:Test.kt")
+              %composer.startReplaceableGroup(<>, "C(Example):Test.kt")
               while (items.hasNext()) {
+                %composer.startReplaceableGroup(<>, "<P(i)>")
                 val i = items.next()
                 P(i, %composer, 0)
                 if (i == 0) {
+                  %composer.endReplaceableGroup()
                   continue
                 }
                 print(i)
+                %composer.endReplaceableGroup()
               }
               %composer.endReplaceableGroup()
             }
@@ -1308,14 +1314,17 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
             @ComposableContract(restartable = false)
             @Composable
             fun Example(items: Iterator<Int>, %composer: Composer<*>?, %changed: Int) {
-              %composer.startReplaceableGroup(<>, "C(Example)*<P(i)>,<P(i)>:Test.kt")
+              %composer.startReplaceableGroup(<>, "C(Example):Test.kt")
               while (items.hasNext()) {
+                %composer.startReplaceableGroup(<>, "<P(i)>,<P(i)>")
                 val i = items.next()
                 P(i, %composer, 0)
                 if (i == 0) {
+                  %composer.endReplaceableGroup()
                   continue
                 }
                 P(i, %composer, 0)
+                %composer.endReplaceableGroup()
               }
               %composer.endReplaceableGroup()
             }
@@ -2373,22 +2382,18 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
             fun Test(%composer: Composer<*>?, %changed: Int) {
               %composer.startRestartGroup(<>, "C(Test)<Wrap>:Test.kt")
               if (%changed !== 0 || !%composer.skipping) {
-                Wrap(composableLambda(%composer, <>, true, "C<{>,<effect>:Test.kt") { %composer: Composer<*>?, %changed: Int ->
+                Wrap(composableLambda(%composer, <>, true, "C<effect>:Test.kt") { %composer: Composer<*>?, %changed: Int ->
                   if (%changed and 0b1011 xor 0b0010 !== 0 || !%composer.skipping) {
-                    %composer.startReplaceableGroup(<>, "*<{>,<effect>")
+                    %composer.startReplaceableGroup(<>, "*<effect>")
                     repeat(number) { it: Int ->
-                      effects[it] = effect(remember({
-                        {
-                          0
-                        }
-                      }, %composer, 0), %composer, 0b0110)
+                      effects[it] = effect({
+                        0
+                      }, %composer, 0)
                     }
                     %composer.endReplaceableGroup()
-                    outside = effect(remember({
-                      {
-                        "0"
-                      }
-                    }, %composer, 0), %composer, 0b0110)
+                    outside = effect({
+                      "0"
+                    }, %composer, 0)
                   } else {
                     %composer.skipToGroupEnd()
                   }

@@ -46,9 +46,9 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
-import androidx.compose.ui.test.junit4.ComposeTestRule
+import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
@@ -68,7 +68,7 @@ import org.junit.runner.RunWith
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-@OptIn(ExperimentalMaterialApi::class, ExperimentalTesting::class, ExperimentalRippleApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalTestApi::class, ExperimentalRippleApi::class)
 class MaterialRippleThemeTest {
 
     @get:Rule
@@ -576,7 +576,7 @@ class MaterialRippleThemeTest {
         goldenIdentifier: String,
         expectedCenterPixelColor: Color
     ) {
-        rule.clockTestRule.pauseClock()
+        rule.mainClock.autoAdvance = false
 
         // Start ripple
         rule.runOnUiThread {
@@ -590,7 +590,7 @@ class MaterialRippleThemeTest {
         // Advance to somewhere in the middle of the animation for a ripple, or at the end of a
         // state layer transition
         rule.waitForIdle()
-        rule.clockTestRule.advanceClock(50)
+        rule.mainClock.advanceTimeBy(milliseconds = 50)
 
         // Capture and compare screenshots
         rule.onNodeWithTag(Tag)
@@ -599,8 +599,7 @@ class MaterialRippleThemeTest {
 
         // Advance until after the end of the ripple animation, so we have a stable final opacity
         rule.waitForIdle()
-        rule.clockTestRule.advanceClock(50)
-        rule.waitForIdle()
+        rule.mainClock.advanceTimeBy(milliseconds = 50)
 
         // Compare expected and actual pixel color
         val centerPixel = rule.onNodeWithTag(Tag)
@@ -645,7 +644,7 @@ private fun RippleBox(interactionState: InteractionState, ripple: Indication) {
  * @param lightTheme whether the theme is light or dark
  * @param contentColor the contentColor that will be used for the ripple color
  */
-private fun ComposeTestRule.setRippleContent(
+private fun ComposeContentTestRule.setRippleContent(
     interactionState: InteractionState,
     bounded: Boolean,
     lightTheme: Boolean,

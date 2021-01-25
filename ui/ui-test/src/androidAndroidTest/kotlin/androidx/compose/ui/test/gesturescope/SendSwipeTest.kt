@@ -16,29 +16,27 @@
 
 package androidx.compose.ui.test.gesturescope
 
-import androidx.compose.animation.core.AnimationClockObservable
-import androidx.compose.animation.core.AnimationClockObserver
-import androidx.compose.animation.core.ExponentialDecay
+import androidx.compose.animation.core.FloatExponentialDecaySpec
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.testutils.MockAnimationClock
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.TouchSlop
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.unit.milliseconds
-import androidx.test.filters.MediumTest
 import androidx.compose.ui.test.bottomCenter
 import androidx.compose.ui.test.bottomRight
-import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.down
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.moveTo
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performGesture
@@ -59,11 +57,12 @@ import androidx.compose.ui.test.util.assertSame
 import androidx.compose.ui.test.util.assertTimestampsAreIncreasing
 import androidx.compose.ui.test.util.isAlmostEqualTo
 import androidx.compose.ui.test.util.verify
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -139,7 +138,7 @@ class SendSwipeTest {
     @Test
     fun swipeShort() {
         rule.setContent { Ui(Alignment.Center) }
-        rule.onNodeWithTag(tag).performGesture { swipe(topLeft, bottomRight, 1.milliseconds) }
+        rule.onNodeWithTag(tag).performGesture { swipe(topLeft, bottomRight, 1) }
         rule.runOnIdle {
             recorder.run {
                 assertTimestampsAreIncreasing()
@@ -151,7 +150,7 @@ class SendSwipeTest {
                 // DOWN is in top left corner (0, 0)
                 events[0].verify(null, null, true, Offset(0f, 0f))
 
-                val t = events[0].timestamp + 1.milliseconds
+                val t = events[0].timestamp + 1
                 val pointerId = events[0].id
 
                 // MOVE is in bottom right corner (box is 100x100, so corner is (99, 99))
@@ -167,19 +166,17 @@ class SendSwipeTest {
         val touchSlop = with(rule.density) { TouchSlop.toPx() }
         val scrollState = ScrollState(
             initial = 0f,
-            flingConfig = FlingConfig(ExponentialDecay()),
-            animationClock = object : AnimationClockObservable {
-                // Use a "broken" clock, we just want response to input, not to time
-                override fun subscribe(observer: AnimationClockObserver) {}
-                override fun unsubscribe(observer: AnimationClockObserver) {}
-            }
+            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
+            animationClock = MockAnimationClock()
         )
         rule.setContent {
             with(AmbientDensity.current) {
                 // Scrollable with a viewport the size of 10 boxes
-                ScrollableColumn(
-                    Modifier.testTag("scrollable").size(100.toDp(), 1000.toDp()),
-                    scrollState
+                Column(
+                    Modifier
+                        .testTag("scrollable")
+                        .size(100.toDp(), 1000.toDp())
+                        .verticalScroll(scrollState)
                 ) {
                     repeat(100) {
                         ClickableTestBox()

@@ -22,6 +22,7 @@ import com.google.common.truth.Truth.assertWithMessage
 import org.junit.Test
 import org.junit.runner.RunWith
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import org.junit.Assert.assertTrue
 
 private const val delta = 0.01f
 
@@ -41,6 +42,9 @@ class AndroidMatrixTest {
         p.mapPoints(point, floatArrayOf(100f, 100f))
         assertThat(point[0]).isWithin(delta).of(-100f)
         assertThat(point[1]).isWithin(delta).of(100f)
+
+        val composeMatrix = Matrix().apply { setFrom(p) }
+        assertTrue(composeMatrix.values.contentEquals(m.values))
     }
 
     @Test
@@ -55,6 +59,9 @@ class AndroidMatrixTest {
         p.mapPoints(point, floatArrayOf(100f, 0f))
         assertThat(point[0]).isWithin(delta).of(86.602540378f)
         assertThat(point[1]).isWithin(delta).of(50f)
+
+        val composeMatrix = Matrix().apply { setFrom(p) }
+        assertTrue(composeMatrix.values.contentEquals(m.values))
     }
 
     @Test
@@ -69,6 +76,9 @@ class AndroidMatrixTest {
         p.mapPoints(point, floatArrayOf(100f, 100f))
         assertThat(point[0]).isWithin(delta).of(110f)
         assertThat(point[1]).isWithin(delta).of(100f)
+
+        val composeMatrix = Matrix().apply { setFrom(p) }
+        assertTrue(composeMatrix.values.contentEquals(m.values))
     }
 
     @Test
@@ -89,6 +99,9 @@ class AndroidMatrixTest {
         q.mapPoints(point, floatArrayOf(0f, 0f))
         assertThat(point[0]).isWithin(delta).of(0f)
         assertThat(point[1]).isWithin(delta).of(20f)
+
+        val composeMatrix = Matrix().apply { setFrom(q) }
+        assertTrue(composeMatrix.values.contentEquals(m.values))
     }
 
     @Test
@@ -103,6 +116,9 @@ class AndroidMatrixTest {
         p.mapPoints(point, floatArrayOf(100f, 100f))
         assertThat(point[0]).isWithin(delta).of(200f)
         assertThat(point[1]).isWithin(delta).of(300f)
+
+        val composeMatrix = Matrix().apply { setFrom(p) }
+        assertTrue(composeMatrix.values.contentEquals(m.values))
     }
 
     @Test
@@ -118,5 +134,8 @@ class AndroidMatrixTest {
         p.mapPoints(point, floatArrayOf(100f, 100f))
         assertThat(point[0]).isWithin(delta).of(-300f)
         assertThat(point[1]).isWithin(delta).of(200f)
+
+        val composeMatrix = Matrix().apply { setFrom(p) }
+        assertTrue(composeMatrix.values.contentEquals(m.values))
     }
 }

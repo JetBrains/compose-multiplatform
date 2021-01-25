@@ -15,7 +15,6 @@
  */
 
 import androidx.build.Publish
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 import static androidx.build.dependencies.DependenciesKt.*
 
@@ -27,7 +26,7 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin project(":compose:compiler:compiler")
+    kotlinPlugin projectOrArtifact(":compose:compiler:compiler")
 
     // TODO: remove / refactor out reflection dependencies, this is a large dependency to bundle
     // with a library.
@@ -36,9 +35,9 @@ dependencies {
 
     api "androidx.annotation:annotation:1.1.0"
 
-    implementation project(":compose:runtime:runtime")
-    implementation project(":compose:ui:ui")
-    implementation project(":compose:ui:ui-test-junit4")
+    implementation projectOrArtifact(":compose:runtime:runtime")
+    implementation projectOrArtifact(":compose:ui:ui")
+    implementation projectOrArtifact(":compose:ui:ui-test-junit4")
 
     testImplementation(ANDROIDX_TEST_RULES)
     testImplementation(ANDROIDX_TEST_RUNNER)
@@ -48,14 +47,6 @@ dependencies {
     androidTestImplementation(ANDROIDX_TEST_RUNNER)
     androidTestImplementation(JUNIT)
     androidTestImplementation(ESPRESSO_CORE)
-}
-
-android {
-    tasks.withType(KotlinCompile).configureEach {
-        kotlinOptions {
-            useIR = true
-        }
-    }
 }
 
 androidx {

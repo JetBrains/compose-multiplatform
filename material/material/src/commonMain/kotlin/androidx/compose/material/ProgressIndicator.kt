@@ -17,21 +17,22 @@
 package androidx.compose.material
 
 import androidx.compose.animation.core.CubicBezierEasing
-import androidx.compose.animation.core.FloatPropKey
-import androidx.compose.animation.core.IntPropKey
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.SpringSpec
+import androidx.compose.animation.core.VectorConverter
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateValue
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.keyframes
-import androidx.compose.animation.core.transitionDefinition
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.transition
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.progressSemantics
 import androidx.compose.material.ProgressIndicatorDefaults.IndicatorBackgroundOpacity
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -43,7 +44,6 @@ import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.annotation.FloatRange
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.max
@@ -65,7 +65,8 @@ import kotlin.math.max
  */
 @Composable
 fun LinearProgressIndicator(
-    @FloatRange(from = 0.0, to = 1.0) progress: Float,
+    /*@FloatRange(from = 0.0, to = 1.0)*/
+    progress: Float,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colors.primary,
     backgroundColor: Color = color.copy(alpha = IndicatorBackgroundOpacity)
@@ -95,20 +96,59 @@ fun LinearProgressIndicator(
     color: Color = MaterialTheme.colors.primary,
     backgroundColor: Color = color.copy(alpha = IndicatorBackgroundOpacity)
 ) {
-    val state = transition(
-        definition = LinearIndeterminateTransition,
-        initState = 0,
-        toState = 1
+    val infiniteTransition = rememberInfiniteTransition()
+    // Fractional position of the 'head' and 'tail' of the two lines drawn. I.e if the head is 0.8
+    // and the tail is 0.2, there is a line drawn from between 20% along to 80% along the total
+    // width.
+    val firstLineHead by infiniteTransition.animateFloat(
+        0f,
+        1f,
+        infiniteRepeatable(
+            animation = keyframes {
+                durationMillis = LinearAnimationDuration
+                0f at FirstLineHeadDelay with FirstLineHeadEasing
+                1f at FirstLineHeadDuration + FirstLineHeadDelay
+            }
+        )
+    )
+    val firstLineTail by infiniteTransition.animateFloat(
+        0f,
+        1f,
+        infiniteRepeatable(
+            animation = keyframes {
+                durationMillis = LinearAnimationDuration
+                0f at FirstLineTailDelay with FirstLineTailEasing
+                1f at FirstLineTailDuration + FirstLineTailDelay
+            }
+        )
+    )
+    val secondLineHead by infiniteTransition.animateFloat(
+        0f,
+        1f,
+        infiniteRepeatable(
+            animation = keyframes {
+                durationMillis = LinearAnimationDuration
+                0f at SecondLineHeadDelay with SecondLineHeadEasing
+                1f at SecondLineHeadDuration + SecondLineHeadDelay
+            }
+        )
+    )
+    val secondLineTail by infiniteTransition.animateFloat(
+        0f,
+        1f,
+        infiniteRepeatable(
+            animation = keyframes {
+                durationMillis = LinearAnimationDuration
+                0f at SecondLineTailDelay with SecondLineTailEasing
+                1f at SecondLineTailDuration + SecondLineTailDelay
+            }
+        )
     )
     Canvas(
         modifier
             .progressSemantics()
             .preferredSize(LinearIndicatorWidth, LinearIndicatorHeight)
     ) {
-        val firstLineHead = state[FirstLineHeadProp]
-        val firstLineTail = state[FirstLineTailProp]
-        val secondLineHead = state[SecondLineHeadProp]
-        val secondLineTail = state[SecondLineTailProp]
         val strokeWidth = ProgressIndicatorDefaults.StrokeWidth.toPx()
         drawLinearIndicatorBackground(backgroundColor, strokeWidth)
         if (firstLineHead - firstLineTail > 0) {
@@ -171,7 +211,8 @@ private fun DrawScope.drawLinearIndicatorBackground(
  */
 @Composable
 fun CircularProgressIndicator(
-    @FloatRange(from = 0.0, to = 1.0) progress: Float,
+    /*@FloatRange(from = 0.0, to = 1.0)*/
+    progress: Float,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colors.primary,
     strokeWidth: Dp = ProgressIndicatorDefaults.StrokeWidth
@@ -207,30 +248,69 @@ fun CircularProgressIndicator(
     val stroke = with(AmbientDensity.current) {
         Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Square)
     }
-    val state = transition(
-        definition = CircularIndeterminateTransition,
-        initState = 0,
-        toState = 1
+
+    val transition = rememberInfiniteTransition()
+    // The current rotation around the circle, so we know where to start the rotation from
+    val currentRotation by transition.animateValue(
+        0,
+        RotationsPerCycle,
+        Int.VectorConverter,
+        infiniteRepeatable(
+            animation = tween(
+                durationMillis = RotationDuration * RotationsPerCycle,
+                easing = LinearEasing
+            )
+        )
+    )
+    // How far forward (degrees) the base point should be from the start point
+    val baseRotation by transition.animateFloat(
+        0f,
+        BaseRotationAngle,
+        infiniteRepeatable(
+            animation = tween(
+                durationMillis = RotationDuration,
+                easing = LinearEasing
+            )
+        )
+    )
+    // How far forward (degrees) both the head and tail should be from the base point
+    val endAngle by transition.animateFloat(
+        0f,
+        JumpRotationAngle,
+        infiniteRepeatable(
+            animation = keyframes {
+                durationMillis = HeadAndTailAnimationDuration + HeadAndTailDelayDuration
+                0f at 0 with CircularEasing
+                JumpRotationAngle at HeadAndTailAnimationDuration
+            }
+        )
+    )
+
+    val startAngle by transition.animateFloat(
+        0f,
+        JumpRotationAngle,
+        infiniteRepeatable(
+            animation = keyframes {
+                durationMillis = HeadAndTailAnimationDuration + HeadAndTailDelayDuration
+                0f at HeadAndTailDelayDuration with CircularEasing
+                JumpRotationAngle at durationMillis
+            }
+        )
     )
     Canvas(
         modifier
             .progressSemantics()
             .preferredSize(CircularIndicatorDiameter)
     ) {
-        val currentRotation = state[IterationProp]
-        val baseRotation = state[BaseRotationProp]
 
         val currentRotationAngleOffset = (currentRotation * RotationAngleOffset) % 360f
 
-        var startAngle = state[TailRotationProp]
-        val endAngle = state[HeadRotationProp]
         // How long a line to draw using the start angle as a reference point
         val sweep = abs(endAngle - startAngle)
 
         // Offset by the constant offset and the per rotation offset
-        startAngle += StartAngleOffset + currentRotationAngleOffset
-        startAngle += baseRotation
-        drawIndeterminateCircularIndicator(startAngle, strokeWidth, sweep, color, stroke)
+        val offset = StartAngleOffset + currentRotationAngleOffset + baseRotation
+        drawIndeterminateCircularIndicator(startAngle + offset, strokeWidth, sweep, color, stroke)
     }
 }
 
@@ -252,45 +332,6 @@ private fun DrawScope.drawCircularIndicator(
         topLeft = Offset(diameterOffset, diameterOffset),
         size = Size(arcDimen, arcDimen),
         style = stroke
-    )
-}
-
-/**
- * Contains the default values used for [LinearProgressIndicator] and [CircularProgressIndicator].
- */
-@Deprecated(
-    "ProgressIndicatorConstants has been replaced with ProgressIndicatorDefaults",
-    ReplaceWith(
-        "ProgressIndicatorDefaults",
-        "androidx.compose.material.ProgressIndicatorDefaults"
-    )
-)
-object ProgressIndicatorConstants {
-    /**
-     * Default stroke width for [CircularProgressIndicator], and default height for
-     * [LinearProgressIndicator].
-     *
-     * This can be customized with the `strokeWidth` parameter on [CircularProgressIndicator],
-     * and by passing a layout modifier setting the height for [LinearProgressIndicator].
-     */
-    val DefaultStrokeWidth = 4.dp
-
-    /**
-     * The default opacity applied to the indicator color to create the background color in a
-     * [LinearProgressIndicator].
-     */
-    const val DefaultIndicatorBackgroundOpacity = 0.24f
-
-    /**
-     * The default [AnimationSpec] that should be used when animating between progress in a
-     * determinate progress indicator.
-     */
-    val DefaultProgressAnimationSpec = SpringSpec(
-        dampingRatio = Spring.DampingRatioNoBouncy,
-        stiffness = Spring.StiffnessVeryLow,
-        // The default threshold is 0.01, or 1% of the overall progress range, which is quite
-        // large and noticeable.
-        visibilityThreshold = 1 / 1000f
     )
 }
 
@@ -371,13 +412,6 @@ private val CircularIndicatorDiameter = 40.dp
 // Total duration for one cycle
 private const val LinearAnimationDuration = 1800
 
-// Fractional position of the 'head' and 'tail' of the two lines drawn. I.e if the head is 0.8 and
-// the tail is 0.2, there is a line drawn from between 20% along to 80% along the total width
-private val FirstLineHeadProp = FloatPropKey()
-private val FirstLineTailProp = FloatPropKey()
-private val SecondLineHeadProp = FloatPropKey()
-private val SecondLineTailProp = FloatPropKey()
-
 // Duration of the head and tail animations for both lines
 private const val FirstLineHeadDuration = 750
 private const val FirstLineTailDuration = 850
@@ -395,58 +429,12 @@ private val FirstLineTailEasing = CubicBezierEasing(0.4f, 0f, 1f, 1f)
 private val SecondLineHeadEasing = CubicBezierEasing(0f, 0f, 0.65f, 1f)
 private val SecondLineTailEasing = CubicBezierEasing(0.1f, 0f, 0.45f, 1f)
 
-private val LinearIndeterminateTransition = transitionDefinition<Int> {
-    state(0) {
-        this[FirstLineHeadProp] = 0f
-        this[FirstLineTailProp] = 0f
-        this[SecondLineHeadProp] = 0f
-        this[SecondLineTailProp] = 0f
-    }
-
-    state(1) {
-        this[FirstLineHeadProp] = 1f
-        this[FirstLineTailProp] = 1f
-        this[SecondLineHeadProp] = 1f
-        this[SecondLineTailProp] = 1f
-    }
-
-    transition(fromState = 0, toState = 1) {
-        FirstLineHeadProp using infiniteRepeatable(
-            animation = keyframes {
-                durationMillis = LinearAnimationDuration
-                0f at FirstLineHeadDelay with FirstLineHeadEasing
-                1f at FirstLineHeadDuration + FirstLineHeadDelay
-            }
-        )
-        FirstLineTailProp using infiniteRepeatable(
-            animation = keyframes {
-                durationMillis = LinearAnimationDuration
-                0f at FirstLineTailDelay with FirstLineTailEasing
-                1f at FirstLineTailDuration + FirstLineTailDelay
-            }
-        )
-        SecondLineHeadProp using infiniteRepeatable(
-            animation = keyframes {
-                durationMillis = LinearAnimationDuration
-                0f at SecondLineHeadDelay with SecondLineHeadEasing
-                1f at SecondLineHeadDuration + SecondLineHeadDelay
-            }
-        )
-        SecondLineTailProp using infiniteRepeatable(
-            animation = keyframes {
-                durationMillis = LinearAnimationDuration
-                0f at SecondLineTailDelay with SecondLineTailEasing
-                1f at SecondLineTailDuration + SecondLineTailDelay
-            }
-        )
-    }
-}
-
 // Indeterminate circular indicator transition specs
 
 // The animation comprises of 5 rotations around the circle forming a 5 pointed star.
 // After the 5th rotation, we are back at the beginning of the circle.
 private const val RotationsPerCycle = 5
+
 // Each rotation is 1 and 1/3 seconds, but 1332ms divides more evenly
 private const val RotationDuration = 1332
 
@@ -469,58 +457,5 @@ private const val RotationAngleOffset = (BaseRotationAngle + JumpRotationAngle) 
 private const val HeadAndTailAnimationDuration = (RotationDuration * 0.5).toInt()
 private const val HeadAndTailDelayDuration = HeadAndTailAnimationDuration
 
-// The current rotation around the circle, so we know where to start the rotation from
-private val IterationProp = IntPropKey()
-// How far forward (degrees) the base point should be from the start point
-private val BaseRotationProp = FloatPropKey()
-// How far forward (degrees) both the head and tail should be from the base point
-private val HeadRotationProp = FloatPropKey()
-private val TailRotationProp = FloatPropKey()
-
 // The easing for the head and tail jump
 private val CircularEasing = CubicBezierEasing(0.4f, 0f, 0.2f, 1f)
-
-private val CircularIndeterminateTransition = transitionDefinition<Int> {
-    state(0) {
-        this[IterationProp] = 0
-        this[BaseRotationProp] = 0f
-        this[HeadRotationProp] = 0f
-        this[TailRotationProp] = 0f
-    }
-
-    state(1) {
-        this[IterationProp] = RotationsPerCycle
-        this[BaseRotationProp] = BaseRotationAngle
-        this[HeadRotationProp] = JumpRotationAngle
-        this[TailRotationProp] = JumpRotationAngle
-    }
-
-    transition(fromState = 0, toState = 1) {
-        IterationProp using infiniteRepeatable(
-            animation = tween(
-                durationMillis = RotationDuration * RotationsPerCycle,
-                easing = LinearEasing
-            )
-        )
-        BaseRotationProp using infiniteRepeatable(
-            animation = tween(
-                durationMillis = RotationDuration,
-                easing = LinearEasing
-            )
-        )
-        HeadRotationProp using infiniteRepeatable(
-            animation = keyframes {
-                durationMillis = HeadAndTailAnimationDuration + HeadAndTailDelayDuration
-                0f at 0 with CircularEasing
-                JumpRotationAngle at HeadAndTailAnimationDuration
-            }
-        )
-        TailRotationProp using infiniteRepeatable(
-            animation = keyframes {
-                durationMillis = HeadAndTailAnimationDuration + HeadAndTailDelayDuration
-                0f at HeadAndTailDelayDuration with CircularEasing
-                JumpRotationAngle at durationMillis
-            }
-        )
-    }
-}

@@ -25,9 +25,7 @@ import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ExperimentalTextApi
-import androidx.compose.ui.text.length
 import androidx.compose.ui.text.style.ResolvedTextDirection
-import androidx.compose.ui.text.subSequence
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doReturn
@@ -52,7 +50,7 @@ class SelectionManagerTest {
 
     private val containerLayoutCoordinates = mock<LayoutCoordinates> {
         on { isAttached } doReturn true
-        on { childToLocal(any(), Offset(any())) } doAnswer Offset.Zero
+        on { localPositionOf(any(), Offset(any())) } doAnswer Offset.Zero
     }
     private val startSelectable = mock<Selectable>()
     private val endSelectable = mock<Selectable>()
@@ -409,6 +407,45 @@ class SelectionManagerTest {
         selectionManager.selection = fakeSelection
 
         selectionManager.onRelease()
+
+        verify(selectable, times(1))
+            .getSelection(
+                startPosition = Offset(-1f, -1f),
+                endPosition = Offset(-1f, -1f),
+                containerLayoutCoordinates = selectionManager.requireContainerCoordinates(),
+                longPress = false,
+                previousSelection = fakeSelection
+            )
+        assertThat(selection).isNull()
+        verify(spyLambda, times(1)).invoke(null)
+        verify(
+            hapticFeedback,
+            times(1)
+        ).performHapticFeedback(HapticFeedbackType.TextHandleMove)
+    }
+
+    @Test
+    fun notifySelectableChange_clears_selection() {
+        val fakeSelection =
+            Selection(
+                start = Selection.AnchorInfo(
+                    direction = ResolvedTextDirection.Ltr,
+                    offset = 0,
+                    selectable = startSelectable
+                ),
+                end = Selection.AnchorInfo(
+                    direction = ResolvedTextDirection.Ltr,
+                    offset = 5,
+                    selectable = endSelectable
+                )
+            )
+        var selection: Selection? = fakeSelection
+        val lambda: (Selection?) -> Unit = { selection = it }
+        val spyLambda = spy(lambda)
+        selectionManager.onSelectionChange = spyLambda
+        selectionManager.selection = fakeSelection
+
+        selectionRegistrar.notifySelectableChange(selectable)
 
         verify(selectable, times(1))
             .getSelection(

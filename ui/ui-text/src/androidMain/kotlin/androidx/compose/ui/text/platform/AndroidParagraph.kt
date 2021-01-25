@@ -17,6 +17,7 @@ package androidx.compose.ui.text.platform
 
 import android.text.Spanned
 import android.text.TextUtils
+import androidx.annotation.VisibleForTesting
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Canvas
@@ -50,7 +51,6 @@ import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.util.annotation.VisibleForTesting
 import java.util.Locale as JavaLocale
 
 /**

@@ -25,7 +25,6 @@ import androidx.compose.ui.layout.HorizontalAlignmentLine
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.VerticalAlignmentLine
-import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.positionInParent
@@ -88,7 +87,7 @@ class RowColumnTest : LayoutTest() {
                         height = sizeDp,
                         modifier = Modifier.onGloballyPositioned { coordinates ->
                             childSize[0] = coordinates.size
-                            childPosition[0] = coordinates.positionInRoot
+                            childPosition[0] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                     ) {
@@ -99,7 +98,7 @@ class RowColumnTest : LayoutTest() {
                         height = (sizeDp * 2),
                         modifier = Modifier.onGloballyPositioned { coordinates ->
                             childSize[1] = coordinates.size
-                            childPosition[1] = coordinates.positionInRoot
+                            childPosition[1] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                     ) {
@@ -137,7 +136,7 @@ class RowColumnTest : LayoutTest() {
                         Modifier.weight(1f)
                             .onGloballyPositioned { coordinates ->
                                 childSize[0] = coordinates.size
-                                childPosition[0] = coordinates.positionInRoot
+                                childPosition[0] = coordinates.positionInRoot()
                                 drawLatch.countDown()
                             },
                         width = width,
@@ -149,7 +148,7 @@ class RowColumnTest : LayoutTest() {
                         Modifier.weight(2f)
                             .onGloballyPositioned { coordinates ->
                                 childSize[1] = coordinates.size
-                                childPosition[1] = coordinates.positionInRoot
+                                childPosition[1] = coordinates.positionInRoot()
                                 drawLatch.countDown()
                             },
                         width = width,
@@ -194,7 +193,7 @@ class RowColumnTest : LayoutTest() {
                         Modifier.weight(1f, fill = false)
                             .onGloballyPositioned { coordinates ->
                                 childSize[0] = coordinates.size
-                                childPosition[0] = coordinates.positionInRoot
+                                childPosition[0] = coordinates.positionInRoot()
                                 drawLatch.countDown()
                             },
                         width = width,
@@ -206,7 +205,7 @@ class RowColumnTest : LayoutTest() {
                         Modifier.weight(2f, fill = false)
                             .onGloballyPositioned { coordinates ->
                                 childSize[1] = coordinates.size
-                                childPosition[1] = coordinates.positionInRoot
+                                childPosition[1] = coordinates.positionInRoot()
                                 drawLatch.countDown()
                             },
                         width = width,
@@ -243,7 +242,7 @@ class RowColumnTest : LayoutTest() {
                         height = sizeDp,
                         modifier = Modifier.onGloballyPositioned { coordinates ->
                             childSize[0] = coordinates.size
-                            childPosition[0] = coordinates.positionInRoot
+                            childPosition[0] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                     ) {
@@ -253,7 +252,7 @@ class RowColumnTest : LayoutTest() {
                         height = (sizeDp * 2),
                         modifier = Modifier.onGloballyPositioned { coordinates ->
                             childSize[1] = coordinates.size
-                            childPosition[1] = coordinates.positionInRoot
+                            childPosition[1] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                     ) {
@@ -291,7 +290,7 @@ class RowColumnTest : LayoutTest() {
                         Modifier.weight(1f)
                             .onGloballyPositioned { coordinates ->
                                 childSize[0] = coordinates.size
-                                childPosition[0] = coordinates.positionInRoot
+                                childPosition[0] = coordinates.positionInRoot()
                                 drawLatch.countDown()
                             },
                         width = width,
@@ -303,7 +302,7 @@ class RowColumnTest : LayoutTest() {
                         Modifier.weight(2f)
                             .onGloballyPositioned { coordinates ->
                                 childSize[1] = coordinates.size
-                                childPosition[1] = coordinates.positionInRoot
+                                childPosition[1] = coordinates.positionInRoot()
                                 drawLatch.countDown()
                             },
                         width = width,
@@ -346,7 +345,7 @@ class RowColumnTest : LayoutTest() {
                         Modifier.weight(1f, fill = false)
                             .onGloballyPositioned { coordinates ->
                                 childSize[0] = coordinates.size
-                                childPosition[0] = coordinates.positionInRoot
+                                childPosition[0] = coordinates.positionInRoot()
                                 drawLatch.countDown()
                             },
                         width = width,
@@ -357,7 +356,7 @@ class RowColumnTest : LayoutTest() {
                         Modifier.weight(2f, fill = false)
                             .onGloballyPositioned { coordinates ->
                                 childSize[1] = coordinates.size
-                                childPosition[1] = coordinates.positionInRoot
+                                childPosition[1] = coordinates.positionInRoot()
                                 drawLatch.countDown()
                             },
                         width = width,
@@ -401,7 +400,7 @@ class RowColumnTest : LayoutTest() {
                     Modifier.weight(1f)
                         .onGloballyPositioned { coordinates ->
                             width[0] = coordinates.size.width.toFloat()
-                            x[0] = coordinates.positionInRoot.x
+                            x[0] = coordinates.positionInRoot().x
                             latch.countDown()
                         }
                 ) {
@@ -410,7 +409,7 @@ class RowColumnTest : LayoutTest() {
                     Modifier.weight(1f)
                         .onGloballyPositioned { coordinates ->
                             width[1] = coordinates.size.width.toFloat()
-                            x[1] = coordinates.positionInRoot.x
+                            x[1] = coordinates.positionInRoot().x
                             latch.countDown()
                         }
                 ) {
@@ -447,7 +446,7 @@ class RowColumnTest : LayoutTest() {
                     Modifier.weight(2f)
                         .onGloballyPositioned { coordinates ->
                             width[0] = coordinates.size.width.toFloat()
-                            x[0] = coordinates.positionInRoot.x
+                            x[0] = coordinates.positionInRoot().x
                             latch.countDown()
                         }
                 ) {
@@ -456,7 +455,7 @@ class RowColumnTest : LayoutTest() {
                     Modifier.weight(2f)
                         .onGloballyPositioned { coordinates ->
                             width[1] = coordinates.size.width.toFloat()
-                            x[1] = coordinates.positionInRoot.x
+                            x[1] = coordinates.positionInRoot().x
                             latch.countDown()
                         }
                 ) {
@@ -465,7 +464,7 @@ class RowColumnTest : LayoutTest() {
                     Modifier.weight(3f)
                         .onGloballyPositioned { coordinates ->
                             width[2] = coordinates.size.width.toFloat()
-                            x[2] = coordinates.positionInRoot.x
+                            x[2] = coordinates.positionInRoot().x
                             latch.countDown()
                         }
                 ) {
@@ -503,7 +502,7 @@ class RowColumnTest : LayoutTest() {
                     Modifier.weight(1f)
                         .onGloballyPositioned { coordinates ->
                             height[0] = coordinates.size.height.toFloat()
-                            y[0] = coordinates.positionInRoot.y
+                            y[0] = coordinates.positionInRoot().y
                             latch.countDown()
                         }
                 ) {
@@ -512,7 +511,7 @@ class RowColumnTest : LayoutTest() {
                     Modifier.weight(1f)
                         .onGloballyPositioned { coordinates ->
                             height[1] = coordinates.size.height.toFloat()
-                            y[1] = coordinates.positionInRoot.y
+                            y[1] = coordinates.positionInRoot().y
                             latch.countDown()
                         }
                 ) {
@@ -521,7 +520,7 @@ class RowColumnTest : LayoutTest() {
                     Modifier.weight(1f)
                         .onGloballyPositioned { coordinates ->
                             height[2] = coordinates.size.height.toFloat()
-                            y[2] = coordinates.positionInRoot.y
+                            y[2] = coordinates.positionInRoot().y
                             latch.countDown()
                         }
                 ) {
@@ -559,7 +558,7 @@ class RowColumnTest : LayoutTest() {
                     Modifier.weight(1f)
                         .onGloballyPositioned { coordinates ->
                             height[0] = coordinates.size.height.toFloat()
-                            y[0] = coordinates.positionInRoot.y
+                            y[0] = coordinates.positionInRoot().y
                             latch.countDown()
                         }
                 ) {
@@ -568,7 +567,7 @@ class RowColumnTest : LayoutTest() {
                     Modifier.weight(1f)
                         .onGloballyPositioned { coordinates ->
                             height[1] = coordinates.size.height.toFloat()
-                            y[1] = coordinates.positionInRoot.y
+                            y[1] = coordinates.positionInRoot().y
                             latch.countDown()
                         }
                 ) {
@@ -603,7 +602,7 @@ class RowColumnTest : LayoutTest() {
                     modifier = Modifier.fillMaxHeight()
                         .onGloballyPositioned { coordinates ->
                             childSize[0] = coordinates.size
-                            childPosition[0] = coordinates.positionInRoot
+                            childPosition[0] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                 ) {
@@ -615,7 +614,7 @@ class RowColumnTest : LayoutTest() {
                     modifier = Modifier.fillMaxHeight()
                         .onGloballyPositioned { coordinates ->
                             childSize[1] = coordinates.size
-                            childPosition[1] = coordinates.positionInRoot
+                            childPosition[1] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                 ) {
@@ -652,7 +651,7 @@ class RowColumnTest : LayoutTest() {
                     modifier = Modifier.align(Alignment.Top)
                         .onGloballyPositioned { coordinates ->
                             childSize[0] = coordinates.size
-                            childPosition[0] = coordinates.positionInRoot
+                            childPosition[0] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                 ) {
@@ -662,7 +661,7 @@ class RowColumnTest : LayoutTest() {
                     height = sizeDp,
                     modifier = Modifier.onGloballyPositioned { coordinates ->
                         childSize[1] = coordinates.size
-                        childPosition[1] = coordinates.positionInRoot
+                        childPosition[1] = coordinates.positionInRoot()
                         drawLatch.countDown()
                     }
                 ) {
@@ -673,7 +672,7 @@ class RowColumnTest : LayoutTest() {
                     modifier = Modifier.align(Alignment.Bottom)
                         .onGloballyPositioned { coordinates ->
                             childSize[2] = coordinates.size
-                            childPosition[2] = coordinates.positionInRoot
+                            childPosition[2] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                 ) {
@@ -724,7 +723,7 @@ class RowColumnTest : LayoutTest() {
                     modifier = Modifier.align(Alignment.Top)
                         .onGloballyPositioned { coordinates ->
                             childSize[0] = coordinates.size
-                            childPosition[0] = coordinates.positionInRoot
+                            childPosition[0] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                 ) {
@@ -735,7 +734,7 @@ class RowColumnTest : LayoutTest() {
                     modifier = Modifier.align(Alignment.CenterVertically)
                         .onGloballyPositioned { coordinates ->
                             childSize[1] = coordinates.size
-                            childPosition[1] = coordinates.positionInRoot
+                            childPosition[1] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                 ) {
@@ -746,7 +745,7 @@ class RowColumnTest : LayoutTest() {
                     modifier = Modifier.align(Alignment.Bottom)
                         .onGloballyPositioned { coordinates ->
                             childSize[2] = coordinates.size
-                            childPosition[2] = coordinates.positionInRoot
+                            childPosition[2] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                 ) {
@@ -801,7 +800,7 @@ class RowColumnTest : LayoutTest() {
                     modifier = Modifier.alignBy(TestHorizontalLine)
                         .onGloballyPositioned { coordinates ->
                             childSize[0] = coordinates.size
-                            childPosition[0] = coordinates.positionInRoot
+                            childPosition[0] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                 ) {
@@ -812,7 +811,7 @@ class RowColumnTest : LayoutTest() {
                     modifier = Modifier.alignBy { it.height / 2 }
                         .onGloballyPositioned { coordinates ->
                             childSize[1] = coordinates.size
-                            childPosition[1] = coordinates.positionInRoot
+                            childPosition[1] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                 ) {
@@ -824,7 +823,7 @@ class RowColumnTest : LayoutTest() {
                     modifier = Modifier.alignBy(TestHorizontalLine)
                         .onGloballyPositioned { coordinates ->
                             childSize[2] = coordinates.size
-                            childPosition[2] = coordinates.positionInRoot
+                            childPosition[2] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                 ) {
@@ -835,7 +834,7 @@ class RowColumnTest : LayoutTest() {
                     modifier = Modifier.alignBy { it.height * 3 / 4 }
                         .onGloballyPositioned { coordinates ->
                             childSize[3] = coordinates.size
-                            childPosition[3] = coordinates.positionInRoot
+                            childPosition[3] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                 ) {
@@ -848,7 +847,7 @@ class RowColumnTest : LayoutTest() {
                     modifier = Modifier.alignByBaseline()
                         .onGloballyPositioned { coordinates ->
                             childSize[4] = coordinates.size
-                            childPosition[4] = coordinates.positionInRoot
+                            childPosition[4] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                 ) {
@@ -907,7 +906,7 @@ class RowColumnTest : LayoutTest() {
                     modifier = Modifier.alignBy(TestHorizontalLine)
                         .onGloballyPositioned { coordinates ->
                             childSize[0] = coordinates.size
-                            childPosition[0] = coordinates.positionInRoot
+                            childPosition[0] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                 ) {
@@ -918,7 +917,7 @@ class RowColumnTest : LayoutTest() {
                         .weight(1f)
                         .onGloballyPositioned { coordinates ->
                             childSize[1] = coordinates.size
-                            childPosition[1] = coordinates.positionInRoot
+                            childPosition[1] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                 ) {
@@ -955,7 +954,7 @@ class RowColumnTest : LayoutTest() {
                     modifier = Modifier.fillMaxWidth()
                         .onGloballyPositioned { coordinates ->
                             childSize[0] = coordinates.size
-                            childPosition[0] = coordinates.positionInRoot
+                            childPosition[0] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                 ) {
@@ -967,7 +966,7 @@ class RowColumnTest : LayoutTest() {
                     modifier = Modifier.fillMaxWidth()
                         .onGloballyPositioned { coordinates ->
                             childSize[1] = coordinates.size
-                            childPosition[1] = coordinates.positionInRoot
+                            childPosition[1] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                 ) {
@@ -1004,7 +1003,7 @@ class RowColumnTest : LayoutTest() {
                     modifier = Modifier.align(Alignment.Start)
                         .onGloballyPositioned { coordinates ->
                             childSize[0] = coordinates.size
-                            childPosition[0] = coordinates.positionInRoot
+                            childPosition[0] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                 ) {
@@ -1015,7 +1014,7 @@ class RowColumnTest : LayoutTest() {
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                         .onGloballyPositioned { coordinates ->
                             childSize[1] = coordinates.size
-                            childPosition[1] = coordinates.positionInRoot
+                            childPosition[1] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                 ) {
@@ -1026,7 +1025,7 @@ class RowColumnTest : LayoutTest() {
                     modifier = Modifier.align(Alignment.End)
                         .onGloballyPositioned { coordinates ->
                             childSize[2] = coordinates.size
-                            childPosition[2] = coordinates.positionInRoot
+                            childPosition[2] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                 ) {
@@ -1074,7 +1073,7 @@ class RowColumnTest : LayoutTest() {
                     modifier = Modifier.align(Alignment.Start)
                         .onGloballyPositioned { coordinates ->
                             childSize[0] = coordinates.size
-                            childPosition[0] = coordinates.positionInRoot
+                            childPosition[0] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                 ) {
@@ -1084,7 +1083,7 @@ class RowColumnTest : LayoutTest() {
                     height = sizeDp,
                     modifier = Modifier.onGloballyPositioned { coordinates ->
                         childSize[1] = coordinates.size
-                        childPosition[1] = coordinates.positionInRoot
+                        childPosition[1] = coordinates.positionInRoot()
                         drawLatch.countDown()
                     }
                 ) {
@@ -1095,7 +1094,7 @@ class RowColumnTest : LayoutTest() {
                     modifier = Modifier.align(Alignment.End)
                         .onGloballyPositioned { coordinates ->
                             childSize[2] = coordinates.size
-                            childPosition[2] = coordinates.positionInRoot
+                            childPosition[2] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                 ) {
@@ -1145,7 +1144,7 @@ class RowColumnTest : LayoutTest() {
                     modifier = Modifier.alignBy { it.width }
                         .onGloballyPositioned { coordinates ->
                             childSize[0] = coordinates.size
-                            childPosition[0] = coordinates.positionInRoot
+                            childPosition[0] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                 ) {
@@ -1156,7 +1155,7 @@ class RowColumnTest : LayoutTest() {
                     modifier = Modifier.alignBy { 0 }
                         .onGloballyPositioned { coordinates ->
                             childSize[1] = coordinates.size
-                            childPosition[1] = coordinates.positionInRoot
+                            childPosition[1] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                 ) {
@@ -1168,7 +1167,7 @@ class RowColumnTest : LayoutTest() {
                     modifier = Modifier.alignBy(TestVerticalLine)
                         .onGloballyPositioned { coordinates ->
                             childSize[2] = coordinates.size
-                            childPosition[2] = coordinates.positionInRoot
+                            childPosition[2] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                 ) {
@@ -1180,7 +1179,7 @@ class RowColumnTest : LayoutTest() {
                     modifier = Modifier.alignBy(TestVerticalLine)
                         .onGloballyPositioned { coordinates ->
                             childSize[3] = coordinates.size
-                            childPosition[3] = coordinates.positionInRoot
+                            childPosition[3] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                 ) {
@@ -1233,7 +1232,7 @@ class RowColumnTest : LayoutTest() {
                     modifier = Modifier.alignBy(TestVerticalLine)
                         .onGloballyPositioned { coordinates ->
                             childSize[0] = coordinates.size
-                            childPosition[0] = coordinates.positionInRoot
+                            childPosition[0] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                 ) {
@@ -1244,7 +1243,7 @@ class RowColumnTest : LayoutTest() {
                         .weight(1f)
                         .onGloballyPositioned { coordinates ->
                             childSize[1] = coordinates.size
-                            childPosition[1] = coordinates.positionInRoot
+                            childPosition[1] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                 ) {
@@ -1660,11 +1659,11 @@ class RowColumnTest : LayoutTest() {
             WithInfiniteConstraints {
                 ConstrainedBox(DpConstraints(minWidth = rowMinWidth)) {
                     Row {
-                        WithConstraints {
+                        BoxWithConstraints {
                             assertEquals(Constraints(), constraints)
                             FixedSizeLayout(noWeightChildWidth.toIntPx(), 0, mapOf())
                         }
-                        WithConstraints {
+                        BoxWithConstraints {
                             assertEquals(Constraints(), constraints)
                             FixedSizeLayout(noWeightChildWidth.toIntPx(), 0, mapOf())
                         }
@@ -1705,7 +1704,7 @@ class RowColumnTest : LayoutTest() {
                     )
                 ) {
                     Row {
-                        WithConstraints {
+                        BoxWithConstraints {
                             assertEquals(
                                 Constraints(
                                     maxWidth = availableWidth.toIntPx(),
@@ -1715,7 +1714,7 @@ class RowColumnTest : LayoutTest() {
                             )
                             FixedSizeLayout(childWidth.toIntPx(), childHeight.toIntPx(), mapOf())
                         }
-                        WithConstraints {
+                        BoxWithConstraints {
                             assertEquals(
                                 Constraints(
                                     maxWidth = availableWidth.toIntPx() - childWidth.toIntPx(),
@@ -2132,11 +2131,11 @@ class RowColumnTest : LayoutTest() {
                 WithInfiniteConstraints {
                     ConstrainedBox(DpConstraints(minHeight = columnMinHeight)) {
                         Column {
-                            WithConstraints {
+                            BoxWithConstraints {
                                 assertEquals(Constraints(), constraints)
                                 FixedSizeLayout(0, noWeightChildHeight.toIntPx(), mapOf())
                             }
-                            WithConstraints {
+                            BoxWithConstraints {
                                 assertEquals(Constraints(), constraints)
                                 FixedSizeLayout(0, noWeightChildHeight.toIntPx(), mapOf())
                             }
@@ -2176,7 +2175,7 @@ class RowColumnTest : LayoutTest() {
                     )
                 ) {
                     Column {
-                        WithConstraints {
+                        BoxWithConstraints {
                             assertEquals(
                                 Constraints(
                                     maxWidth = availableWidth.toIntPx(),
@@ -2186,7 +2185,7 @@ class RowColumnTest : LayoutTest() {
                             )
                             FixedSizeLayout(childWidth.toIntPx(), childHeight.toIntPx(), mapOf())
                         }
-                        WithConstraints {
+                        BoxWithConstraints {
                             assertEquals(
                                 Constraints(
                                     maxWidth = availableWidth.toIntPx(),
@@ -2878,7 +2877,7 @@ class RowColumnTest : LayoutTest() {
     ) {
         for (i in childPosition.indices) {
             childPosition[i] = parentLayoutCoordinates!!
-                .childToLocal(childLayoutCoordinates[i]!!, Offset(0f, 0f))
+                .localPositionOf(childLayoutCoordinates[i]!!, Offset(0f, 0f))
         }
     }
 
@@ -3998,7 +3997,7 @@ class RowColumnTest : LayoutTest() {
                         .alignBy { it.height / 2 }
                         .onGloballyPositioned { coordinates ->
                             containerSize.value = coordinates.size
-                            containerPosition.value = coordinates.positionInRoot
+                            containerPosition.value = coordinates.positionInRoot()
                             positionedLatch.countDown()
                         },
                     width = size,
@@ -4028,7 +4027,7 @@ class RowColumnTest : LayoutTest() {
                 Row(Modifier.fillMaxWidth()) {
                     Container(
                         Modifier.preferredSize(sizeDp).onGloballyPositioned { coordinates ->
-                            childPosition[0] = coordinates.positionInRoot
+                            childPosition[0] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                     ) {
@@ -4037,7 +4036,7 @@ class RowColumnTest : LayoutTest() {
                     Container(
                         Modifier.preferredSize(sizeDp * 2)
                             .onGloballyPositioned { coordinates ->
-                                childPosition[1] = coordinates.positionInRoot
+                                childPosition[1] = coordinates.positionInRoot()
                                 drawLatch.countDown()
                             }
                     ) {
@@ -4289,7 +4288,7 @@ class RowColumnTest : LayoutTest() {
                 ) {
                     Container(
                         Modifier.preferredSize(sizeDp).onGloballyPositioned { coordinates ->
-                            childPosition[0] = coordinates.positionInRoot
+                            childPosition[0] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                     ) {
@@ -4298,7 +4297,7 @@ class RowColumnTest : LayoutTest() {
                     Container(
                         Modifier.preferredSize(sizeDp * 2)
                             .onGloballyPositioned { coordinates ->
-                                childPosition[1] = coordinates.positionInRoot
+                                childPosition[1] = coordinates.positionInRoot()
                                 drawLatch.countDown()
                             }
                     ) {
@@ -4369,7 +4368,7 @@ class RowColumnTest : LayoutTest() {
                 Column(Modifier.fillMaxWidth()) {
                     Container(
                         Modifier.preferredSize(sizeDp).onGloballyPositioned { coordinates ->
-                            childPosition[0] = coordinates.positionInRoot
+                            childPosition[0] = coordinates.positionInRoot()
                             drawLatch.countDown()
                         }
                     ) {
@@ -4378,7 +4377,7 @@ class RowColumnTest : LayoutTest() {
                     Container(
                         Modifier.preferredSize(sizeDp * 2)
                             .onGloballyPositioned { coordinates ->
-                                childPosition[1] = coordinates.positionInRoot
+                                childPosition[1] = coordinates.positionInRoot()
                                 drawLatch.countDown()
                             }
                     ) {
@@ -4416,7 +4415,7 @@ class RowColumnTest : LayoutTest() {
                         Modifier.preferredSize(sizeDp)
                             .align(Alignment.End)
                             .onGloballyPositioned { coordinates ->
-                                childPosition[0] = coordinates.positionInRoot
+                                childPosition[0] = coordinates.positionInRoot()
                                 drawLatch.countDown()
                             }
                     ) {
@@ -4426,7 +4425,7 @@ class RowColumnTest : LayoutTest() {
                         Modifier.preferredSize(sizeDp * 2)
                             .align(Alignment.End)
                             .onGloballyPositioned { coordinates ->
-                                childPosition[1] = coordinates.positionInRoot
+                                childPosition[1] = coordinates.positionInRoot()
                                 drawLatch.countDown()
                             }
                     ) {
@@ -4455,7 +4454,7 @@ class RowColumnTest : LayoutTest() {
                         Modifier.preferredSize(sizeDp)
                             .alignBy { it.width }
                             .onGloballyPositioned { coordinates ->
-                                childPosition[0] = coordinates.positionInRoot
+                                childPosition[0] = coordinates.positionInRoot()
                                 drawLatch.countDown()
                             }
                     ) {
@@ -4465,7 +4464,7 @@ class RowColumnTest : LayoutTest() {
                         Modifier.preferredSize(sizeDp)
                             .alignBy { it.width / 2 }
                             .onGloballyPositioned { coordinates ->
-                                childPosition[1] = coordinates.positionInRoot
+                                childPosition[1] = coordinates.positionInRoot()
                                 drawLatch.countDown()
                             }
                     ) {

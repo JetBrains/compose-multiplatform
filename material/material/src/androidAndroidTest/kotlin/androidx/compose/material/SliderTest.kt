@@ -21,8 +21,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.AmbientViewConfiguration
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.AccessibilityRangeInfo
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
@@ -103,8 +104,8 @@ class SliderTest {
             .assertValueEquals("0 percent")
             .assert(
                 SemanticsMatcher.expectValue(
-                    SemanticsProperties.AccessibilityRangeInfo,
-                    AccessibilityRangeInfo(0f, 0f..1f, 0)
+                    SemanticsProperties.ProgressBarRangeInfo,
+                    ProgressBarRangeInfo(0f, 0f..1f, 0)
                 )
             )
             .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.SetProgress))
@@ -138,8 +139,8 @@ class SliderTest {
             .assertValueEquals("0 percent")
             .assert(
                 SemanticsMatcher.expectValue(
-                    SemanticsProperties.AccessibilityRangeInfo,
-                    AccessibilityRangeInfo(0f, 0f..1f, 4)
+                    SemanticsProperties.ProgressBarRangeInfo,
+                    ProgressBarRangeInfo(0f, 0f..1f, 4)
                 )
             )
             .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.SetProgress))
@@ -171,8 +172,10 @@ class SliderTest {
     @Test
     fun slider_drag() {
         val state = mutableStateOf(0f)
+        var slop = 0f
 
         rule.setMaterialContent {
+            slop = AmbientViewConfiguration.current.touchSlop
             Slider(
                 modifier = Modifier.testTag(tag),
                 value = state.value,
@@ -191,7 +194,7 @@ class SliderTest {
                 down(center)
                 moveBy(Offset(100f, 0f))
                 up()
-                expected = calculateFraction(left, right, centerX + 100)
+                expected = calculateFraction(left, right, centerX + 100 - slop)
             }
         rule.runOnIdle {
             Truth.assertThat(abs(state.value - expected)).isLessThan(0.001f)
@@ -230,9 +233,11 @@ class SliderTest {
     @Test
     fun slider_drag_rtl() {
         val state = mutableStateOf(0f)
+        var slop = 0f
 
         rule.setMaterialContent {
             Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+                slop = AmbientViewConfiguration.current.touchSlop
                 Slider(
                     modifier = Modifier.testTag(tag),
                     value = state.value,
@@ -253,7 +258,7 @@ class SliderTest {
                 moveBy(Offset(100f, 0f))
                 up()
                 // subtract here as we're in rtl and going in the opposite direction
-                expected = calculateFraction(left, right, centerX - 100)
+                expected = calculateFraction(left, right, centerX - 100 + slop)
             }
         rule.runOnIdle {
             Truth.assertThat(abs(state.value - expected)).isLessThan(0.001f)

@@ -1,0 +1,177 @@
+/*
+ * Copyright 2021 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+syntax = "proto3";
+package layoutinspector.compose.inspection;
+option java_package = "layoutinspector.compose.inspection";
+option java_outer_classname = "LayoutInspectorComposeProtocol";
+
+// ======= MESSAGES =======
+
+// A mapping of |string| to |int32|, so strings can be efficiently reused across nodes
+// Any time a text value in any of these messages has an |int32| type, it means it will do a
+// lookup in a string table on the client.
+message StringEntry {
+    int32 id = 1;
+    string str = 2;
+}
+
+message Point {
+    int32 x = 1;
+    int32 y = 2;
+}
+
+message Rect {
+    int32 x = 1;
+    int32 y = 2;
+    int32 w = 3;
+    int32 h = 4;
+}
+
+// A Quad will be the result of a Rect after applying some affine or perspective transformations.
+// While the transformed points can be skewed in a complex manner, the untransformed Rect source of
+// the coordinates will always be consistent:
+// 0 = top left, 1 = top right, 2 = bot left, 3 = bot right
+message Quad {
+    sint32 x0 = 1;
+    sint32 y0 = 2;
+    sint32 x1 = 3;
+    sint32 y1 = 4;
+    sint32 x2 = 5;
+    sint32 y2 = 6;
+    sint32 x3 = 7;
+    sint32 y3 = 8;
+}
+
+message Bounds {
+    // The bounds of some element in the layout tree
+    Rect layout = 1;
+    // Bounds transformed in preparation for final rendering
+    Quad render = 2;
+}
+
+message ComposableRoot {
+    // The ID of the View this Composable tree is rooted underneath
+    int64 view_id = 1;
+    // All composables owned by this view (usually just one but could be more)
+    repeated ComposableNode nodes = 2;
+}
+
+message ComposableNode {
+    sint64 id = 1;
+    repeated ComposableNode children = 2;
+
+    // The hash of the file's package, for disambiguating same filenames in different folders
+    int32 package_hash = 3;
+    int32 filename = 4; // The file this Composable is defined in
+    int32 line_number = 5;  // The line number within the file
+    int32 offset = 6; // Offset into the file for the exact character position
+
+    int32 name = 7;
+
+    Bounds bounds = 8;
+}
+
+// In Android, a resource id is a simple integer. This class holds the namespace, type, and name
+// of such a resource id.
+// For example, with "@android:id/textView":
+//   type: id
+//   namespace: android
+//   name: textView
+message Resource {
+    int32 type = 1;
+    int32 namespace = 2;
+    int32 name = 3;
+}
+
+// Data that helps us identify a lambda block in code
+message LambdaValue {
+  int32 package_name = 1;       // the package part of the containing class name
+  int32 file_name = 2;          // the file name of the containing class
+  int32 lambda_name = 3;        // the name of the lambda class
+  int32 start_line_number = 4;  // the line number of the start of the lambda
+  int32 end_line_number = 5;    // the line number of the end of the lambda
+}
+
+// Parameters to a @Composable function
+message Parameter {
+    // Note: Enum values kept in sync with tools/adt/idea/layout-inspector's PropertyType as a
+    // convenience, to make it easier to convert between the two
+    enum Type {
+      STRING = 0;
+      BOOLEAN = 1;
+      DOUBLE = 4;
+      FLOAT = 5;
+      INT32 = 7;
+      INT64 = 8;
+      COLOR = 10;
+      RESOURCE = 14;
+      DIMENSION_DP = 21;
+      DIMENSION_SP = 22;
+      DIMENSION_EM = 23;
+      LAMBDA = 24;
+      FUNCTION_REFERENCE = 25;
+    }
+
+    Type type = 1;
+    int32 name = 2;
+    repeated Parameter elements = 3;
+
+    oneof value {
+        int32 int32_value = 11;
+        int64 int64_value = 12;
+        double double_value = 13;
+        float float_value = 14;
+        Resource resource_value = 15;
+        LambdaValue lambda_value = 16;
+    }
+}
+
+// ======= COMMANDS, RESPONSES, AND EVENTS =======
+
+// Request all composables found under a layout tree rooted under the specified view
+message GetComposablesCommand {
+   int64 root_view_id = 1;
+}
+message GetComposablesResponse {
+    // A collection of all text referenced by other fields in this message
+    repeated StringEntry strings = 1;
+    repeated ComposableRoot roots = 2;
+}
+
+message GetParametersCommand {
+  sint64 composable_id = 1;
+}
+
+message GetParametersResponse {
+  sint64 composable_id = 1; // Echoed from GetParametersCommand
+  // A collection of all text referenced by other fields in this message
+  repeated StringEntry strings = 2;
+  repeated Parameter parameters = 3;
+}
+
+message Command {
+  oneof specialized {
+    GetComposablesCommand get_composables_command = 1;
+    GetParametersCommand get_parameters_command = 2;
+  }
+}
+
+message Response {
+  oneof specialized {
+    GetComposablesResponse get_composables_response = 1;
+    GetParametersResponse get_parameters_response = 2;
+  }
+}

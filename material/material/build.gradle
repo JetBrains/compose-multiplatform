@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 import androidx.build.AndroidXUiPlugin
 import androidx.build.LibraryGroups
 import androidx.build.Publish
@@ -137,12 +136,6 @@ androidx {
     inceptionYear = "2018"
     description = "Compose Material Design Components library"
     legacyDisableKotlinStrictApiMode = true
-}
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        useIR = true
-    }
 }
 
 // Screenshot tests related setup

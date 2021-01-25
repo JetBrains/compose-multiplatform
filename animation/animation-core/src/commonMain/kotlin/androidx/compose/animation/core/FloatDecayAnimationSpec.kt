@@ -16,7 +16,6 @@
 
 package androidx.compose.animation.core
 
-import androidx.compose.ui.util.annotation.FloatRange
 import kotlin.math.abs
 import kotlin.math.exp
 import kotlin.math.ln
@@ -27,7 +26,6 @@ import kotlin.math.max
  * Animation<T>, DecayAnimation does not have an end value defined. The end value is a
  * result of the animation rather than an input.
  */
-// TODO: Figure out a better story for non-floats
 interface FloatDecayAnimationSpec {
     /**
      * This is the absolute value of a velocity threshold, below which the animation is considered
@@ -87,26 +85,35 @@ interface FloatDecayAnimationSpec {
 
 private const val ExponentialDecayFriction = -4.2f
 
+@Deprecated(
+    "ExponentialDecay has been renamed to FloatExponentialDecaySpec",
+    replaceWith = ReplaceWith("FloatExponentialDecaySpec")
+)
+typealias ExponentialDecay = FloatExponentialDecaySpec
+
 /**
  * This is a decay animation where the friction/deceleration is always proportional to the velocity.
- * As a result, the velocity goes under an exponential decay. The constructor parameter, friction
- * multiplier, can be tuned to adjust the amount of friction applied in the decay. The higher the
+ * As a result, the velocity goes under an exponential decay. The constructor parameter,
+ * `frictionMultiplier`, can be tuned to adjust the amount of friction applied in the decay. The
+ * higher the
  * multiplier, the higher the friction, the sooner the animation will stop, and the shorter distance
  * the animation will travel with the same starting condition.
+ * @param frictionMultiplier The friction multiplier, indicating how quickly the animation should
+ * stop. This should be greater than `0`, with a default value of `1.0`.
+ * @param absVelocityThreshold The speed at which the animation is considered close enough to
+ * rest for the animation to finish.
  */
-class ExponentialDecay(
-    @FloatRange(
+class FloatExponentialDecaySpec(
+    /*@FloatRange(
         from = 0.0,
-        // TODO(b/158069385): use POSITIVE_INFINITY constant once it's possible to do in MPP code.
-        to = 3.4e38, // POSITIVE_INFINITY,
         fromInclusive = false
-    ) frictionMultiplier: Float = 1f,
-    @FloatRange(
+    )*/
+    frictionMultiplier: Float = 1f,
+    /*@FloatRange(
         from = 0.0,
-        // TODO(b/158069385): use POSITIVE_INFINITY constant once it's possible to do in MPP code.
-        to = 3.4e38, // POSITIVE_INFINITY,
         fromInclusive = false
-    ) absVelocityThreshold: Float = 0.1f
+    )*/
+    absVelocityThreshold: Float = 0.1f
 ) : FloatDecayAnimationSpec {
 
     override val absVelocityThreshold: Float = max(0.0000001f, abs(absVelocityThreshold))

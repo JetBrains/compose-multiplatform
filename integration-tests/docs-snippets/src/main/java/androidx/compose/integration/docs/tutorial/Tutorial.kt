@@ -43,6 +43,8 @@ import androidx.compose.ui.unit.dp
  * https://developer.android.com/jetpack/compose/tutorial
  *
  * No action required if it's modified.
+ *
+ * Tech writers: on DAC, these snippets contain html formatting that is omitted here.
  */
 
 private object TutorialSnippet1 {
@@ -157,7 +159,7 @@ private object TutorialSnippet7 {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            Image(image)
+            Image(image, contentDescription = null)
 
             Text("A day in Shark Fin Cove")
             Text("Davenport, California")
@@ -177,8 +179,12 @@ private object TutorialSnippet8 {
                 .preferredHeight(180.dp)
                 .fillMaxWidth()
 
-            Image(image, modifier = imageModifier,
-                contentScale = ContentScale.Crop)
+            Image(
+                image,
+                contentDescription = null,
+                modifier = imageModifier,
+                contentScale = ContentScale.Crop
+            )
 
             Text("A day in Shark Fin Cove")
             Text("Davenport, California")
@@ -202,8 +208,12 @@ private object TutorialSnippet9 {
                 .fillMaxWidth()
                 .clip(shape = RoundedCornerShape(4.dp))
 
-            Image(image, modifier = imageModifier,
-                contentScale = ContentScale.Crop)
+            Image(
+                image,
+                contentDescription = null,
+                modifier = imageModifier,
+                contentScale = ContentScale.Crop
+            )
             Spacer(Modifier.preferredHeight(16.dp))
 
             Text("A day in Shark Fin Cove")
@@ -226,8 +236,12 @@ private object TutorialSnippet10 {
                     .fillMaxWidth()
                     .clip(shape = RoundedCornerShape(4.dp))
 
-                Image(image, modifier = imageModifier,
-                    contentScale = ContentScale.Crop)
+                Image(
+                    image,
+                    contentDescription = null,
+                    modifier = imageModifier,
+                    contentScale = ContentScale.Crop
+                )
                 Spacer(Modifier.preferredHeight(16.dp))
 
                 Text("A day in Shark Fin Cove")
@@ -252,8 +266,12 @@ private object TutorialSnippet11 {
                     .fillMaxWidth()
                     .clip(shape = RoundedCornerShape(4.dp))
 
-                Image(image, modifier = imageModifier,
-                    contentScale = ContentScale.Crop)
+                Image(
+                    image,
+                    contentDescription = null,
+                    modifier = imageModifier,
+                    contentScale = ContentScale.Crop
+                )
                 Spacer(Modifier.preferredHeight(16.dp))
 
                 Text("A day in Shark Fin Cove",
@@ -281,8 +299,12 @@ private object TutorialSnippet12 {
                     .fillMaxWidth()
                     .clip(shape = RoundedCornerShape(4.dp))
 
-                Image(image, modifier = imageModifier,
-                    contentScale = ContentScale.Crop)
+                Image(
+                    image,
+                    contentDescription = null,
+                    modifier = imageModifier,
+                    contentScale = ContentScale.Crop
+                )
                 Spacer(Modifier.preferredHeight(16.dp))
 
                 Text(
@@ -314,8 +336,11 @@ private object TutorialSnippet13 {
                     .fillMaxWidth()
                     .clip(shape = RoundedCornerShape(4.dp))
 
-                Image(image, modifier = imageModifier,
-                    contentScale = ContentScale.Crop)
+                Image(
+                    image, null,
+                    modifier = imageModifier,
+                    contentScale = ContentScale.Crop
+                )
                 Spacer(Modifier.preferredHeight(16.dp))
 
                 Text(

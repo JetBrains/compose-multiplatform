@@ -47,7 +47,6 @@ import androidx.compose.ui.util.fastMaxBy
  * inside of the [Scaffold]
  */
 @Stable
-@OptIn(ExperimentalMaterialApi::class)
 class ScaffoldState(
     val drawerState: DrawerState,
     val snackbarHostState: SnackbarHostState
@@ -61,7 +60,6 @@ class ScaffoldState(
  * inside of the [Scaffold]
  */
 @Composable
-@OptIn(ExperimentalMaterialApi::class)
 fun rememberScaffoldState(
     drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
@@ -147,7 +145,6 @@ enum class FabPosition {
  * the scroller itself.
  */
 @Composable
-@OptIn(ExperimentalMaterialApi::class)
 fun Scaffold(
     modifier: Modifier = Modifier,
     scaffoldState: ScaffoldState = rememberScaffoldState(),

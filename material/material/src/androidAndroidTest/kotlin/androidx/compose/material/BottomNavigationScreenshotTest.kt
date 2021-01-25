@@ -29,7 +29,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -44,7 +44,7 @@ import org.junit.runner.RunWith
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-@OptIn(ExperimentalMaterialApi::class, ExperimentalTesting::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalTestApi::class)
 class BottomNavigationScreenshotTest {
 
     @get:Rule
@@ -278,7 +278,7 @@ class BottomNavigationScreenshotTest {
         interaction: Interaction? = null,
         goldenIdentifier: String
     ) {
-        composeTestRule.clockTestRule.pauseClock()
+        composeTestRule.mainClock.autoAdvance = false
 
         if (interaction != null) {
             // Start ripple
@@ -292,7 +292,7 @@ class BottomNavigationScreenshotTest {
 
             // Advance to somewhere in the middle of the animation for the ripple
             composeTestRule.waitForIdle()
-            composeTestRule.clockTestRule.advanceClock(50)
+            composeTestRule.mainClock.advanceTimeBy(milliseconds = 80)
         }
 
         // Capture and compare screenshots
@@ -316,18 +316,18 @@ private fun DefaultBottomNavigation(
     Box(Modifier.semantics(mergeDescendants = true) {}.testTag(Tag)) {
         BottomNavigation {
             BottomNavigationItem(
-                icon = { Icon(Icons.Filled.Favorite) },
+                icon = { Icon(Icons.Filled.Favorite, null) },
                 selected = true,
                 onClick = {},
                 interactionState = interactionState
             )
             BottomNavigationItem(
-                icon = { Icon(Icons.Filled.Favorite) },
+                icon = { Icon(Icons.Filled.Favorite, null) },
                 selected = false,
                 onClick = {}
             )
             BottomNavigationItem(
-                icon = { Icon(Icons.Filled.Favorite) },
+                icon = { Icon(Icons.Filled.Favorite, null) },
                 selected = false,
                 onClick = {}
             )
@@ -359,7 +359,7 @@ private fun CustomBottomNavigation(
     Box(Modifier.semantics(mergeDescendants = true) {}.testTag(Tag)) {
         BottomNavigation(backgroundColor = backgroundColor) {
             BottomNavigationItem(
-                icon = { Icon(Icons.Filled.Favorite) },
+                icon = { Icon(Icons.Filled.Favorite, null) },
                 selected = true,
                 onClick = {},
                 interactionState = interactionState,
@@ -367,14 +367,14 @@ private fun CustomBottomNavigation(
                 unselectedContentColor = unselectedContentColor
             )
             BottomNavigationItem(
-                icon = { Icon(Icons.Filled.Favorite) },
+                icon = { Icon(Icons.Filled.Favorite, null) },
                 selected = false,
                 onClick = {},
                 selectedContentColor = selectedContentColor,
                 unselectedContentColor = unselectedContentColor
             )
             BottomNavigationItem(
-                icon = { Icon(Icons.Filled.Favorite) },
+                icon = { Icon(Icons.Filled.Favorite, null) },
                 selected = false,
                 onClick = {},
                 selectedContentColor = selectedContentColor,

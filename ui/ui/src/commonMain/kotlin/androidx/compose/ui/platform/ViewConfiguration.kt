@@ -16,8 +16,6 @@
 
 package androidx.compose.ui.platform
 
-import androidx.compose.ui.unit.Duration
-
 /**
  * Contains methods to standard constants used in the UI for timeouts, sizes, and distances.
  */
@@ -25,19 +23,19 @@ interface ViewConfiguration {
     /**
      * The duration before a press turns into a long press.
      */
-    val longPressTimeout: Duration
+    val longPressTimeoutMillis: Long
 
     /**
      * The duration between the first tap's up event and the second tap's down
      * event for an interaction to be considered a double-tap.
      */
-    val doubleTapTimeout: Duration
+    val doubleTapTimeoutMillis: Long
 
     /**
      * The minimum duration between the first tap's up event and the second tap's down event for
      * an interaction to be considered a double-tap.
      */
-    val doubleTapMinTime: Duration
+    val doubleTapMinTimeMillis: Long
 
     /**
      * Distance in pixels a touch can wander before we think the user is scrolling.

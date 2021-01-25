@@ -80,4 +80,32 @@ internal open class FontMatcher {
 
         return result ?: throw IllegalStateException("Cannot match any font")
     }
+
+    /**
+     * @see matchFont
+     */
+    open fun matchFont(
+        fontFamily: FontFamily,
+        fontWeight: FontWeight,
+        fontStyle: FontStyle
+    ): Font {
+        if (fontFamily !is FontListFontFamily) throw IllegalArgumentException(
+            "Only FontFamily instances that presents a list of Fonts can be used"
+        )
+
+        return matchFont(fontFamily, fontWeight, fontStyle)
+    }
+
+    /**
+     * Required to disambiguate matchFont(fontListFontFamilyInstance).
+     *
+     * @see matchFont
+     */
+    open fun matchFont(
+        fontFamily: FontListFontFamily,
+        fontWeight: FontWeight,
+        fontStyle: FontStyle
+    ): Font {
+        return matchFont(fontFamily.fonts, fontWeight, fontStyle)
+    }
 }

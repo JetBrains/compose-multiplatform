@@ -17,7 +17,6 @@
 package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.InternalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.runtime.Composable
@@ -51,14 +50,14 @@ import androidx.compose.ui.unit.dp
  * content asynchronously please reserve some space for the item, for example using [Spacer].
  * Use [LazyColumnForIndexed] if you need to have both index and item params.
  */
-@OptIn(InternalLayoutApi::class)
 @Composable
 @Deprecated(
     "Use LazyColumn instead",
     ReplaceWith(
         "LazyColumn(modifier, state, contentPadding, horizontalAlignment = " +
             "horizontalAlignment) { \n items(items, itemContent) \n }",
-        "androidx.compose.foundation.lazy.LazyColumn"
+        "androidx.compose.foundation.lazy.LazyColumn",
+        "androidx.compose.foundation.lazy.items"
     )
 )
 fun <T> LazyColumnFor(
@@ -113,14 +112,14 @@ fun <T> LazyColumnFor(
  * recompose with the real content, so even if you load the content asynchronously please reserve
  * some space for the item, for example using [Spacer].
  */
-@OptIn(InternalLayoutApi::class)
 @Composable
 @Deprecated(
     "Use LazyColumn instead",
     ReplaceWith(
         "LazyColumn(modifier, state, contentPadding, horizontalAlignment = " +
             "horizontalAlignment) { \n itemsIndexed(items, itemContent) \n }",
-        "androidx.compose.foundation.lazy.LazyColumn"
+        "androidx.compose.foundation.lazy.LazyColumn",
+        "androidx.compose.foundation.lazy.itemsIndexed"
     )
 )
 fun <T> LazyColumnForIndexed(
@@ -172,14 +171,14 @@ fun <T> LazyColumnForIndexed(
  * content asynchronously please reserve some space for the item, for example using [Spacer].
  * Use [LazyRowForIndexed] if you need to have both index and item params.
  */
-@OptIn(InternalLayoutApi::class)
 @Composable
 @Deprecated(
     "Use LazyRow instead",
     ReplaceWith(
         "LazyRow(modifier, state, contentPadding, verticalAlignment = " +
             "verticalAlignment) { \n items(items, itemContent) \n }",
-        "androidx.compose.foundation.lazy.LazyColumn"
+        "androidx.compose.foundation.lazy.LazyRow",
+        "androidx.compose.foundation.lazy.items"
     )
 )
 fun <T> LazyRowFor(
@@ -233,14 +232,14 @@ fun <T> LazyRowFor(
  * recompose with the real content, so even if you load the content asynchronously please reserve
  * some space for the item, for example using [Spacer].
  */
-@OptIn(InternalLayoutApi::class)
 @Composable
 @Deprecated(
     "Use LazyRow instead",
     ReplaceWith(
         "LazyRow(modifier, state, contentPadding, verticalAlignment = " +
             "verticalAlignment) { \n itemsIndexed(items, itemContent) \n }",
-        "androidx.compose.foundation.lazy.LazyColumn"
+        "androidx.compose.foundation.lazy.LazyRow",
+        "androidx.compose.foundation.lazy.itemsIndexed"
     )
 )
 fun <T> LazyRowForIndexed(

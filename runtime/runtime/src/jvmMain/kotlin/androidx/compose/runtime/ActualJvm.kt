@@ -39,10 +39,9 @@ internal actual typealias WeakHashMap<K, V> = java.util.WeakHashMap<K, V>
 
 internal actual fun identityHashCode(instance: Any?): Int = System.identityHashCode(instance)
 
+@PublishedApi
 internal actual inline fun <R> synchronized(lock: Any, block: () -> R): R {
-    kotlin.synchronized(lock) {
-        return block()
-    }
+    return kotlin.synchronized(lock, block)
 }
 
 internal actual typealias TestOnly = org.jetbrains.annotations.TestOnly

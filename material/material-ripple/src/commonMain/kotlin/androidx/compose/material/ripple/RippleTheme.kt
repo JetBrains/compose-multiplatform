@@ -119,6 +119,7 @@ public fun interface RippleAlpha {
  * See [RippleTheme.defaultRippleColor] and [RippleTheme.defaultRippleAlpha] functions for the
  * default implementations for color and alpha.
  */
+@get:ExperimentalRippleApi
 @ExperimentalRippleApi
 public val AmbientRippleTheme: ProvidableAmbient<RippleTheme> = staticAmbientOf { DebugRippleTheme }
 

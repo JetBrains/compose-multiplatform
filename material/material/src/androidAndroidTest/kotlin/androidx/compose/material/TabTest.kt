@@ -34,6 +34,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsEqualTo
@@ -80,6 +84,24 @@ class TabTest {
     }
 
     @Test
+    fun defaultSemantics() {
+        rule.setMaterialContent {
+            Box {
+                Tab(
+                    text = { Text("Text") },
+                    modifier = Modifier.testTag("tab"),
+                    selected = true,
+                    onClick = {}
+                )
+            }
+        }
+
+        rule.onNodeWithTag("tab")
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Tab))
+            .assertIsSelected()
+    }
+
+    @Test
     fun textTab_height() {
         rule
             .setMaterialContentForSizeAssertions {
@@ -92,7 +114,7 @@ class TabTest {
     fun iconTab_height() {
         rule
             .setMaterialContentForSizeAssertions {
-                Tab(icon = { Icon(icon) }, selected = true, onClick = {})
+                Tab(icon = { Icon(icon, null) }, selected = true, onClick = {})
             }
             .assertHeightIsEqualTo(ExpectedSmallTabHeight)
     }
@@ -104,7 +126,7 @@ class TabTest {
                 Surface {
                     Tab(
                         text = { Text("Text and Icon") },
-                        icon = { Icon(icon) },
+                        icon = { Icon(icon, null) },
                         selected = true,
                         onClick = {}
                     )
@@ -223,7 +245,7 @@ class TabTest {
                             text = {
                                 Text(title, Modifier.testTag("text"))
                             },
-                            icon = { Icon(Icons.Filled.Favorite) },
+                            icon = { Icon(Icons.Filled.Favorite, null) },
                             selected = state == index,
                             onClick = { state = index }
                         )

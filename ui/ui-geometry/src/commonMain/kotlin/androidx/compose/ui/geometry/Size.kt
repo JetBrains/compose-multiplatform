@@ -20,7 +20,6 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.util.lerp
 import androidx.compose.ui.util.packFloats
-import androidx.compose.ui.util.toStringAsFixed
 import androidx.compose.ui.util.unpackFloat1
 import androidx.compose.ui.util.unpackFloat2
 import kotlin.math.absoluteValue
@@ -139,6 +138,27 @@ inline class Size(@PublishedApi internal val packedValue: Long) {
 }
 
 /**
+ * `false` when this is [Size.Unspecified].
+ */
+@Stable
+inline val Size.isSpecified: Boolean
+    get() = packedValue != Size.Unspecified.packedValue
+
+/**
+ * `true` when this is [Size.Unspecified].
+ */
+@Stable
+inline val Size.isUnspecified: Boolean
+    get() = packedValue == Size.Unspecified.packedValue
+
+/**
+ * If this [Size] [isSpecified] then this is returned, otherwise [block] is executed
+ * and its result is returned.
+ */
+inline fun Size.takeOrElse(block: () -> Size): Size =
+    if (isSpecified) this else block()
+
+/**
  * Linearly interpolate between two sizes
  *
  * The [fraction] argument represents position on the timeline, with 0.0 meaning
@@ -189,3 +209,10 @@ fun Size.toRect(): Rect {
 @Suppress("NOTHING_TO_INLINE")
 @Stable
 inline operator fun Float.times(size: Size) = size * this
+
+/**
+ * Returns the [Offset] of the center of the rect from the point of [0, 0]
+ * with this [Size].
+ */
+@Stable
+val Size.center: Offset get() = Offset(width / 2f, height / 2f)

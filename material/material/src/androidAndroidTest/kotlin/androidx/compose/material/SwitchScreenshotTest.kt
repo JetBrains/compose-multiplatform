@@ -29,7 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.center
 import androidx.compose.ui.test.down
@@ -52,7 +52,7 @@ import org.junit.runner.RunWith
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-@OptIn(ExperimentalTesting::class)
+@OptIn(ExperimentalTestApi::class)
 class SwitchScreenshotTest {
 
     @get:Rule
@@ -183,7 +183,7 @@ class SwitchScreenshotTest {
             }
         }
 
-        rule.clockTestRule.pauseClock()
+        rule.mainClock.autoAdvance = false
 
         rule.onNode(isToggleable())
             // split click into (down) and (move, up) to enforce a composition in between
@@ -191,13 +191,13 @@ class SwitchScreenshotTest {
             .performGesture { move(); up() }
 
         rule.waitForIdle()
-
-        rule.clockTestRule.advanceClock(60)
+        rule.mainClock.advanceTimeBy(milliseconds = 96)
 
         assertToggeableAgainstGolden("switch_animateToChecked")
     }
 
     @Test
+    @Suppress("DEPRECATION") // Due to clockTestRule
     fun switchTest_checked_animateToUnchecked() {
         rule.setMaterialContent {
             val isChecked = remember { mutableStateOf(true) }
@@ -209,7 +209,7 @@ class SwitchScreenshotTest {
             }
         }
 
-        rule.clockTestRule.pauseClock()
+        rule.mainClock.autoAdvance = false
 
         rule.onNode(isToggleable())
             // split click into (down) and (move, up) to enforce a composition in between
@@ -217,8 +217,7 @@ class SwitchScreenshotTest {
             .performGesture { move(); up() }
 
         rule.waitForIdle()
-
-        rule.clockTestRule.advanceClock(60)
+        rule.mainClock.advanceTimeBy(milliseconds = 96)
 
         assertToggeableAgainstGolden("switch_animateToUnchecked")
     }

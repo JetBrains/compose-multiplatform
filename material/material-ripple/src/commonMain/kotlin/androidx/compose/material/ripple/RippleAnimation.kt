@@ -16,15 +16,10 @@
 
 package androidx.compose.material.ripple
 
-import androidx.compose.animation.OffsetPropKey
-import androidx.compose.animation.core.AnimationClockObservable
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.FloatPropKey
-import androidx.compose.animation.core.InterruptionHandling
 import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.TransitionAnimation
-import androidx.compose.animation.core.createAnimation
-import androidx.compose.animation.core.transitionDefinition
+import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,8 +31,12 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.inMilliseconds
-import androidx.compose.ui.unit.milliseconds
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 import kotlin.math.max
 
 /**
@@ -58,66 +57,94 @@ import kotlin.math.max
  * @param startPosition The position the animation will start from.
  * @param radius Effects grow up to this size.
  * @param clipped If true the effect should be clipped by the target layout bounds.
- * @param clock The animation clock observable that will drive this ripple effect
+ * @param scope The coroutine scope used for suspending animations
  * @param onAnimationFinished Call when the effect animation has been finished.
  */
 internal class RippleAnimation(
     size: Size,
     startPosition: Offset,
     radius: Float,
+    scope: CoroutineScope,
     private val clipped: Boolean,
-    clock: AnimationClockObservable,
     private val onAnimationFinished: (RippleAnimation) -> Unit
 ) {
+    private val startAlpha = 0f
+    private val startRadius = getRippleStartRadius(size)
 
-    private val animation: TransitionAnimation<RippleTransition.State>
-    private var transitionState = RippleTransition.State.Initial
-    private var finishRequested = false
-    private var animationPulse by mutableStateOf(0L)
+    private val targetAlpha = 1f
+    private val targetRadius = radius
+    private val targetCenter = Offset(size.width / 2.0f, size.height / 2.0f)
+
+    private val animatedAlpha = Animatable(startAlpha)
+    private val animatedRadius = Animatable(startRadius)
+    private val animatedCenter = Animatable(startPosition, Offset.VectorConverter)
+
+    private var finishContinuation: Continuation<Unit>? = null
+    private var finishedFadingIn by mutableStateOf(false)
+    private var finishRequested by mutableStateOf(false)
 
     init {
-        val surfaceSize = size
-        val startRadius = getRippleStartRadius(surfaceSize)
-        val targetRadius = radius
-
-        val center = Offset(size.width / 2.0f, size.height / 2.0f)
-        animation = RippleTransition.definition(
-            startRadius = startRadius,
-            endRadius = targetRadius,
-            startCenter = startPosition,
-            endCenter = center
-        ).createAnimation(clock)
-        animation.onUpdate = {
-            // TODO We shouldn't need this animationPulse hack b/152631516
-            animationPulse++
+        scope.launch {
+            fadeIn()
+            finishedFadingIn = true
+            // If we haven't been told to finish, wait until we have been
+            if (!finishRequested) {
+                suspendCoroutine<Unit> { finishContinuation = it }
+            }
+            fadeOut()
+            onAnimationFinished(this@RippleAnimation)
         }
-        animation.onStateChangeFinished = { stage ->
-            transitionState = stage
-            if (transitionState == RippleTransition.State.Finished) {
-                onAnimationFinished(this)
+    }
+
+    private suspend fun fadeIn() {
+        coroutineScope {
+            launch {
+                animatedAlpha.animateTo(
+                    targetAlpha,
+                    tween(durationMillis = FadeInDuration, easing = LinearEasing)
+                )
+            }
+            launch {
+                animatedRadius.animateTo(
+                    targetRadius,
+                    tween(durationMillis = RadiusDuration, easing = FastOutSlowInEasing)
+                )
+            }
+            launch {
+                animatedCenter.animateTo(
+                    targetCenter,
+                    tween(durationMillis = RadiusDuration, easing = LinearEasing)
+                )
             }
         }
-        // currently we are in Initial state, now we start the animation:
-        animation.toState(RippleTransition.State.Revealed)
+    }
+
+    private suspend fun fadeOut() {
+        coroutineScope {
+            launch {
+                animatedAlpha.animateTo(
+                    0f,
+                    tween(durationMillis = FadeOutDuration, easing = LinearEasing)
+                )
+            }
+        }
     }
 
     fun finish() {
         finishRequested = true
-        animation.toState(RippleTransition.State.Finished)
+        finishContinuation?.resume(Unit)
     }
 
     fun DrawScope.draw(color: Color) {
-        animationPulse // model read so we will be redrawn with the next animation values
-
-        val alpha = if (transitionState == RippleTransition.State.Initial && finishRequested) {
-            // if we still fading-in we should immediately switch to the final alpha.
+        val alpha = if (finishRequested && !finishedFadingIn) {
+            // If we are still fading-in we should immediately switch to the final alpha.
             1f
         } else {
-            animation[RippleTransition.Alpha]
+            animatedAlpha.value
         }
 
-        val centerOffset = animation[RippleTransition.Center]
-        val radius = animation[RippleTransition.Radius]
+        val radius = animatedRadius.value
+        val centerOffset = animatedCenter.value
 
         val modulatedColor = color.copy(alpha = color.alpha * alpha)
         if (clipped) {
@@ -126,80 +153,6 @@ internal class RippleAnimation(
             }
         } else {
             drawCircle(modulatedColor, radius, centerOffset)
-        }
-    }
-}
-
-/**
- * The Ripple transition specification.
- */
-private object RippleTransition {
-
-    enum class State {
-        /** The starting state.  */
-        Initial,
-        /** User is still touching the surface.  */
-        Revealed,
-        /** User stopped touching the surface.  */
-        Finished
-    }
-
-    private val FadeInDuration = 75.milliseconds
-    private val RadiusDuration = 225.milliseconds
-    private val FadeOutDuration = 150.milliseconds
-
-    val Alpha = FloatPropKey()
-    val Radius = FloatPropKey()
-    val Center = OffsetPropKey()
-
-    fun definition(
-        startRadius: Float,
-        endRadius: Float,
-        startCenter: Offset,
-        endCenter: Offset
-    ) = transitionDefinition<State> {
-        state(State.Initial) {
-            this[Alpha] = 0f
-            this[Radius] = startRadius
-            this[Center] = startCenter
-        }
-        state(State.Revealed) {
-            this[Alpha] = 1f
-            this[Radius] = endRadius
-            this[Center] = endCenter
-        }
-        state(State.Finished) {
-            this[Alpha] = 0f
-            // the rest are the same as for Revealed
-            this[Radius] = endRadius
-            this[Center] = endCenter
-        }
-        transition(State.Initial to State.Revealed) {
-            Alpha using tween(
-                durationMillis = FadeInDuration.inMilliseconds().toInt(),
-                easing = LinearEasing
-            )
-            Radius using tween(
-                durationMillis = RadiusDuration.inMilliseconds().toInt(),
-                easing = FastOutSlowInEasing
-            )
-            Center using tween(
-                durationMillis = RadiusDuration.inMilliseconds().toInt(),
-                easing = LinearEasing
-            )
-            // we need to always finish the radius animation before starting fading out
-            interruptionHandling = InterruptionHandling.UNINTERRUPTIBLE
-        }
-        transition(State.Revealed to State.Finished) {
-            fun <T> toFinished() =
-                tween<T>(
-                    durationMillis = FadeOutDuration.inMilliseconds().toInt(),
-                    easing = LinearEasing
-                )
-
-            Alpha using toFinished()
-            Radius using toFinished()
-            Center using toFinished()
         }
     }
 }
@@ -227,3 +180,7 @@ internal fun Density.getRippleEndRadius(bounded: Boolean, size: Size): Float {
 }
 
 private val BoundedRippleExtraRadius = 10.dp
+
+private const val FadeInDuration = 75
+private const val RadiusDuration = 225
+private const val FadeOutDuration = 150

@@ -16,12 +16,12 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.animate
 import androidx.compose.animation.asDisposableClock
 import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.TweenSpec
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.Saver
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
@@ -286,7 +287,10 @@ private fun Scrim(
     visible: Boolean
 ) {
     if (color != Color.Transparent) {
-        val alpha = animate(target = if (visible) 1f else 0f, animSpec = TweenSpec())
+        val alpha by animateFloatAsState(
+            targetValue = if (visible) 1f else 0f,
+            animationSpec = TweenSpec()
+        )
         val dismissModifier = if (visible) Modifier.tapGestureFilter { onDismiss() } else Modifier
 
         Canvas(
@@ -324,31 +328,6 @@ private fun BottomSheetStack(
 }
 
 private enum class BottomSheetStackSlot { SheetContent, Content }
-
-/**
- * Contains useful constants for [ModalBottomSheetLayout].
- */
-@Deprecated(
-    "ModalBottomSheetConstants has been replaced with ModalBottomSheetDefaults",
-    ReplaceWith(
-        "ModalBottomSheetDefaults",
-        "androidx.compose.material.ModalBottomSheetDefaults"
-    )
-)
-object ModalBottomSheetConstants {
-
-    /**
-     * The default elevation used by [ModalBottomSheetLayout].
-     */
-    val DefaultElevation = 16.dp
-
-    /**
-     * The default scrim color used by [ModalBottomSheetLayout].
-     */
-    val DefaultScrimColor: Color
-        @Composable
-        get() = MaterialTheme.colors.onSurface.copy(alpha = 0.32f)
-}
 
 /**
  * Contains useful Defaults for [ModalBottomSheetLayout].

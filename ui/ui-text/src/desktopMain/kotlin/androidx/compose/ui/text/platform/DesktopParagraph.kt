@@ -47,6 +47,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.isUnspecified
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import org.jetbrains.skija.Paint
@@ -734,7 +735,11 @@ internal class ParagraphBuilder(
 
     internal val defaultFont by lazy {
         val typeface = textStyle.fontFamily?.let {
-            fontLoader.defaultTypeface(it)
+            fontLoader.findTypeface(
+                fontFamily = it,
+                textStyle.fontWeight ?: FontWeight.Normal,
+                textStyle.fontStyle ?: FontStyle.Normal
+            )
         } ?: Typeface.makeDefault()
         SkFont(typeface, defaultStyle.fontSize)
     }

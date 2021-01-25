@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.unit
 
+import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -63,5 +64,27 @@ class UptimeTest {
     @Test
     fun minus_uptime_isCorrect() {
         assertEquals(Duration(3), Uptime(5) - Uptime(2))
+    }
+
+    @Test
+    fun testIsSpecified() {
+        Assert.assertFalse(Uptime.Unspecified.isSpecified)
+        assertTrue(Uptime(1).isSpecified)
+    }
+
+    @Test
+    fun testIsUnspecified() {
+        assertTrue(Uptime.Unspecified.isUnspecified)
+        Assert.assertFalse(Uptime(1).isUnspecified)
+    }
+
+    @Test
+    fun testTakeOrElseTrue() {
+        assertTrue(Uptime(1).takeOrElse { Uptime.Unspecified }.isSpecified)
+    }
+
+    @Test
+    fun testTakeOrElseFalse() {
+        assertTrue(Uptime.Unspecified.takeOrElse { Uptime(1) }.isSpecified)
     }
 }

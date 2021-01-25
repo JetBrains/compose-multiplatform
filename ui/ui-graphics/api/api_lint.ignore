@@ -1,14 +1,4 @@
 // Baseline format: 1.0
-ArrayReturn: androidx.compose.ui.graphics.BrushKt#HorizontalGradient(kotlin.Pair<java.lang.Float,androidx.compose.ui.graphics.Color>[], float, float, androidx.compose.ui.graphics.TileMode) parameter #0:
-    Method parameter should be Collection<Pair> (or subclass) instead of raw array; was `kotlin.Pair<java.lang.Float,androidx.compose.ui.graphics.Color>[]`
-ArrayReturn: androidx.compose.ui.graphics.BrushKt#LinearGradient(kotlin.Pair<java.lang.Float,androidx.compose.ui.graphics.Color>[], float, float, float, float, androidx.compose.ui.graphics.TileMode) parameter #0:
-    Method parameter should be Collection<Pair> (or subclass) instead of raw array; was `kotlin.Pair<java.lang.Float,androidx.compose.ui.graphics.Color>[]`
-ArrayReturn: androidx.compose.ui.graphics.BrushKt#RadialGradient(kotlin.Pair<java.lang.Float,androidx.compose.ui.graphics.Color>[], float, float, float, androidx.compose.ui.graphics.TileMode) parameter #0:
-    Method parameter should be Collection<Pair> (or subclass) instead of raw array; was `kotlin.Pair<java.lang.Float,androidx.compose.ui.graphics.Color>[]`
-ArrayReturn: androidx.compose.ui.graphics.BrushKt#VerticalGradient(kotlin.Pair<java.lang.Float,androidx.compose.ui.graphics.Color>[], float, float, androidx.compose.ui.graphics.TileMode) parameter #0:
-    Method parameter should be Collection<Pair> (or subclass) instead of raw array; was `kotlin.Pair<java.lang.Float,androidx.compose.ui.graphics.Color>[]`
-
-
 BuilderSetStyle: androidx.compose.ui.graphics.vector.PathBuilder#arcTo(float, float, float, boolean, boolean, float, float):
     Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.graphics.vector.PathBuilder.arcTo(float,float,float,boolean,boolean,float,float)
 BuilderSetStyle: androidx.compose.ui.graphics.vector.PathBuilder#arcToRelative(float, float, float, boolean, boolean, float, float):

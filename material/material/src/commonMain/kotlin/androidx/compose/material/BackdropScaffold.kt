@@ -16,12 +16,12 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.animate
 import androidx.compose.animation.asDisposableClock
 import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.AnimationEndReason.Interrupted
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.TweenSpec
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,6 +33,7 @@ import androidx.compose.material.BackdropValue.Concealed
 import androidx.compose.material.BackdropValue.Revealed
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.Saver
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
@@ -377,7 +378,10 @@ private fun Scrim(
     visible: Boolean
 ) {
     if (color != Color.Transparent) {
-        val alpha = animate(target = if (visible) 1f else 0f, animSpec = TweenSpec())
+        val alpha by animateFloatAsState(
+            targetValue = if (visible) 1f else 0f,
+            animationSpec = TweenSpec()
+        )
         val dismissModifier = if (visible) Modifier.tapGestureFilter { onDismiss() } else Modifier
 
         Canvas(
@@ -403,8 +407,8 @@ private fun BackLayerTransition(
 ) {
     // The progress of the animation between Revealed (0) and Concealed (2).
     // The midpoint (1) is the point where the appBar and backContent are switched.
-    val animationProgress = animate(
-        target = if (target == Revealed) 0f else 2f, animSpec = TweenSpec()
+    val animationProgress by animateFloatAsState(
+        targetValue = if (target == Revealed) 0f else 2f, animationSpec = TweenSpec()
     )
     val animationSlideOffset = with(AmbientDensity.current) { AnimationSlideOffset.toPx() }
 
@@ -465,48 +469,6 @@ private fun BackdropStack(
 }
 
 private enum class BackdropLayers { Back, Front }
-
-/**
- * Contains useful constants for [BackdropScaffold].
- */
-@Deprecated(
-    "BackdropScaffoldConstants has been replaced with BackdropScaffoldDefaults",
-    ReplaceWith(
-        "BackdropScaffoldDefaults",
-        "androidx.compose.material.BackdropScaffoldDefaults"
-    )
-)
-object BackdropScaffoldConstants {
-
-    /**
-     * The default peek height of the back layer.
-     */
-    val DefaultPeekHeight = 56.dp
-
-    /**
-     * The default header height of the front layer.
-     */
-    val DefaultHeaderHeight = 48.dp
-
-    /**
-     * The default shape of the front layer.
-     */
-    val DefaultFrontLayerShape: Shape
-        @Composable
-        get() = MaterialTheme.shapes.large
-            .copy(topLeft = CornerSize(16.dp), topRight = CornerSize(16.dp))
-
-    /**
-     * The default elevation of the front layer.
-     */
-    val DefaultFrontLayerElevation = 1.dp
-
-    /**
-     * The default color of the scrim applied to the front layer.
-     */
-    val DefaultFrontLayerScrimColor: Color
-        @Composable get() = MaterialTheme.colors.surface.copy(alpha = 0.60f)
-}
 
 /**
  * Contains useful defaults for [BackdropScaffold].

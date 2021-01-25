@@ -18,11 +18,9 @@ package androidx.compose.ui.focus
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus
 import androidx.compose.ui.focus.FocusState.Active
 import androidx.compose.ui.focus.FocusState.ActiveParent
 import androidx.compose.ui.focus.FocusState.Inactive
-import androidx.compose.ui.focusRequester
 import androidx.compose.ui.platform.AmbientFocusManager
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -51,7 +49,7 @@ class FocusManagerAmbientTest {
                 modifier = Modifier
                     .focusRequester(focusRequester)
                     .onFocusChanged { focusState = it }
-                    .focus()
+                    .focusModifier()
             )
         }
         rule.runOnIdle {
@@ -80,18 +78,18 @@ class FocusManagerAmbientTest {
             Box(
                 modifier = Modifier
                     .onFocusChanged { grandparentFocusState = it }
-                    .focus()
+                    .focusModifier()
             ) {
                 Box(
                     modifier = Modifier
                         .onFocusChanged { parentFocusState = it }
-                        .focus()
+                        .focusModifier()
                 ) {
                     Box(
                         modifier = Modifier
                             .focusRequester(focusRequester)
                             .onFocusChanged { focusState = it }
-                            .focus()
+                            .focusModifier()
                     )
                 }
             }

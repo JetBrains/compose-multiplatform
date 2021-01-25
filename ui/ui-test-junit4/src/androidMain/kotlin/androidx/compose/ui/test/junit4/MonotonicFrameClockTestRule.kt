@@ -20,17 +20,14 @@ import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.animation.core.MonotonicFrameAnimationClock
 import androidx.compose.animation.core.rootAnimationClockFactory
-import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.TestAnimationClock
-import androidx.compose.ui.test.junit4.android.ComposeIdlingResource
 import kotlinx.coroutines.CoroutineScope
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
 
-@ExperimentalTesting
-internal class MonotonicFrameClockTestRule(
-    private val composeIdlingResource: ComposeIdlingResource
-) : AnimationClockTestRule {
+@ExperimentalTestApi
+internal class MonotonicFrameClockTestRule : AnimationClockTestRule {
 
     private lateinit var _clock: InternalClock
     override val clock: TestAnimationClock get() = _clock
@@ -42,7 +39,6 @@ internal class MonotonicFrameClockTestRule(
     private fun getOrCreateClock(scope: CoroutineScope): TestAnimationClock {
         if (!this::_clock.isInitialized) {
             _clock = InternalClock(MonotonicFrameAnimationClock(scope))
-            composeIdlingResource.registerTestClock(_clock)
         }
         return _clock
     }
@@ -56,7 +52,6 @@ internal class MonotonicFrameClockTestRule(
                 base.evaluate()
             } finally {
                 rootAnimationClockFactory = oldFactory
-                composeIdlingResource.unregisterTestClock(clock)
             }
         }
     }

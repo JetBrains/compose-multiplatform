@@ -29,7 +29,7 @@ import androidx.compose.ui.text.FontTestData.Companion.BASIC_KERN_FONT
 import androidx.compose.ui.text.FontTestData.Companion.BASIC_MEASURE_FONT
 import androidx.compose.ui.text.FontTestData.Companion.FONT_100_REGULAR
 import androidx.compose.ui.text.FontTestData.Companion.FONT_200_REGULAR
-import androidx.compose.ui.text.font.asFontFamily
+import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.matchers.assertThat
 import androidx.compose.ui.text.matchers.isZero
@@ -54,10 +54,10 @@ import kotlin.math.roundToInt
 @RunWith(AndroidJUnit4::class)
 @SmallTest
 class ParagraphIntegrationTest {
-    private val fontFamilyMeasureFont = BASIC_MEASURE_FONT.asFontFamily()
-    private val fontFamilyKernFont = BASIC_KERN_FONT.asFontFamily()
-    private val fontFamilyCustom100 = FONT_100_REGULAR.asFontFamily()
-    private val fontFamilyCustom200 = FONT_200_REGULAR.asFontFamily()
+    private val fontFamilyMeasureFont = BASIC_MEASURE_FONT.toFontFamily()
+    private val fontFamilyKernFont = BASIC_KERN_FONT.toFontFamily()
+    private val fontFamilyCustom100 = FONT_100_REGULAR.toFontFamily()
+    private val fontFamilyCustom200 = FONT_200_REGULAR.toFontFamily()
 
     private val context = InstrumentationRegistry.getInstrumentation().context
     private val defaultDensity = Density(density = 1f)

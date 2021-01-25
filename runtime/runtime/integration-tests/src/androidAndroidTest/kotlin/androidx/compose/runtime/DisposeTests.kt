@@ -35,19 +35,25 @@ class DisposeTests : BaseComposeTest() {
     @get:Rule
     override val activityRule = makeTestActivityRule()
 
+    private val NeverEqualObject = object {
+        override fun equals(other: Any?): Boolean {
+            return false
+        }
+    }
+
     @Test
     fun testDisposeComposition() {
         val log = mutableListOf<String>()
 
         @OptIn(ExperimentalComposeApi::class)
         val composable = @Composable @ComposableContract(tracked = false) {
-            onCommit {
+            DisposableEffect(NeverEqualObject) {
                 log.add("onCommit")
                 onDispose {
                     log.add("onCommitDispose")
                 }
             }
-            onActive {
+            DisposableEffect(Unit) {
                 log.add("onActive")
                 onDispose {
                     log.add("onActiveDispose")

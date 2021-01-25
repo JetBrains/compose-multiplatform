@@ -25,6 +25,7 @@ import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.unit.Constraints
 
 /**
@@ -131,6 +132,14 @@ fun Modifier.graphicsLayer(block: GraphicsLayerScope.() -> Unit): Modifier =
             }
         )
     )
+
+/**
+ * A [Modifier.Element] that adds a draw layer such that tooling can identify an element
+ * in the drawn image.
+ */
+@Stable
+fun Modifier.toolingGraphicsLayer() =
+    if (isDebugInspectorInfoEnabled) this.then(Modifier.graphicsLayer()) else this
 
 private class BlockGraphicsLayerModifier(
     private val layerBlock: GraphicsLayerScope.() -> Unit,

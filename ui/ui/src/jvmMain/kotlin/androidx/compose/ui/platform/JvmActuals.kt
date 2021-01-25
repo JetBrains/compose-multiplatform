@@ -27,3 +27,5 @@ internal actual fun simpleIdentityToString(obj: Any, name: String?): String {
 
     return className + "@" + String.format("%07x", System.identityHashCode(obj))
 }
+
+internal actual fun Any.nativeClass(): Any = this.javaClass

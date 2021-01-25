@@ -18,18 +18,16 @@ package androidx.compose.ui.platform
 
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.Duration
-import androidx.compose.ui.unit.milliseconds
 
 class DesktopViewConfiguration(private val density: Density) : ViewConfiguration {
-    override val longPressTimeout: Duration
-        get() = 500.milliseconds
+    override val longPressTimeoutMillis: Long
+        get() = 500
 
-    override val doubleTapTimeout: Duration
-        get() = 300.milliseconds
+    override val doubleTapTimeoutMillis: Long
+        get() = 300
 
-    override val doubleTapMinTime: Duration
-        get() = 40.milliseconds
+    override val doubleTapMinTimeMillis: Long
+        get() = 40
 
     override val touchSlop: Float
         get() = with(density) { 18.dp.toPx() }

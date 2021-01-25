@@ -17,7 +17,6 @@
 package androidx.compose.material.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +24,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.BottomSheetScaffold
 import androidx.compose.material.Button
 import androidx.compose.material.ExperimentalMaterialApi
@@ -89,7 +89,7 @@ fun BottomSheetScaffoldSample() {
                 title = { Text("Bottom sheet scaffold") },
                 navigationIcon = {
                     IconButton(onClick = { scaffoldState.drawerState.open() }) {
-                        Icon(Icons.Default.Menu)
+                        Icon(Icons.Default.Menu, contentDescription = "Localized description")
                     }
                 }
             )
@@ -104,7 +104,7 @@ fun BottomSheetScaffoldSample() {
                     }
                 }
             ) {
-                Icon(Icons.Default.Favorite)
+                Icon(Icons.Default.Favorite, contentDescription = "Localized description")
             }
         },
         floatingActionButtonPosition = FabPosition.End,
@@ -122,8 +122,8 @@ fun BottomSheetScaffoldSample() {
             }
         }
     ) { innerPadding ->
-        ScrollableColumn(contentPadding = innerPadding) {
-            repeat(100) {
+        LazyColumn(contentPadding = innerPadding) {
+            items(100) {
                 Box(
                     Modifier
                         .fillMaxWidth()

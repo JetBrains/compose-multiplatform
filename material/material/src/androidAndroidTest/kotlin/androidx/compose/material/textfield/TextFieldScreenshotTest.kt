@@ -18,6 +18,8 @@ package androidx.compose.material.textfield
 
 import android.os.Build
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.GOLDEN_MATERIAL
 import androidx.compose.material.Text
@@ -30,6 +32,7 @@ import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.center
 import androidx.compose.ui.test.down
@@ -37,8 +40,11 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.move
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.up
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
@@ -52,6 +58,13 @@ import org.junit.runner.RunWith
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
 class TextFieldScreenshotTest {
     private val TextFieldTag = "TextField"
+    private val longText = TextFieldValue(
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do " +
+            "eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam," +
+            " quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. " +
+            "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu " +
+            "fugiat nulla pariatur."
+    )
 
     @get:Rule
     val rule = createComposeRule()
@@ -66,7 +79,8 @@ class TextFieldScreenshotTest {
                 TextField(
                     value = "Text",
                     onValueChange = {},
-                    label = { Text("Label") }
+                    label = { Text("Label") },
+                    modifier = Modifier.width(280.dp)
                 )
             }
         }
@@ -81,7 +95,8 @@ class TextFieldScreenshotTest {
                 TextField(
                     value = "",
                     onValueChange = {},
-                    label = { Text("Label") }
+                    label = { Text("Label") },
+                    modifier = Modifier.width(280.dp)
                 )
             }
         }
@@ -96,15 +111,13 @@ class TextFieldScreenshotTest {
                 TextField(
                     value = "",
                     onValueChange = {},
-                    label = { Text("Label") }
+                    label = { Text("Label") },
+                    modifier = Modifier.width(280.dp)
                 )
             }
         }
 
-        rule.onNodeWithTag(TextFieldTag)
-            // split click into (down) and (move, up) to enforce a composition in between
-            .performGesture { down(center) }
-            .performGesture { move(); up() }
+        rule.onNodeWithTag(TextFieldTag).focus()
 
         assertAgainstGolden("filled_textField_focused")
     }
@@ -117,16 +130,14 @@ class TextFieldScreenshotTest {
                     TextField(
                         value = "",
                         onValueChange = {},
-                        label = { Text("Label") }
+                        label = { Text("Label") },
+                        modifier = Modifier.width(280.dp)
                     )
                 }
             }
         }
 
-        rule.onNodeWithTag(TextFieldTag)
-            // split click into (down) and (move, up) to enforce a composition in between
-            .performGesture { down(center) }
-            .performGesture { move(); up() }
+        rule.onNodeWithTag(TextFieldTag).focus()
 
         assertAgainstGolden("filled_textField_focused_rtl")
     }
@@ -139,14 +150,11 @@ class TextFieldScreenshotTest {
                 onValueChange = {},
                 label = { Text("Label") },
                 isErrorValue = true,
-                modifier = Modifier.testTag(TextFieldTag)
+                modifier = Modifier.width(280.dp).testTag(TextFieldTag)
             )
         }
 
-        rule.onNodeWithTag(TextFieldTag)
-            // split click into (down) and (move, up) to enforce a composition in between
-            .performGesture { down(center) }
-            .performGesture { move(); up() }
+        rule.onNodeWithTag(TextFieldTag).focus()
 
         assertAgainstGolden("filled_textField_focused_errorState")
     }
@@ -159,7 +167,7 @@ class TextFieldScreenshotTest {
                 onValueChange = {},
                 label = { Text("Label") },
                 isErrorValue = true,
-                modifier = Modifier.testTag(TextFieldTag)
+                modifier = Modifier.width(280.dp).testTag(TextFieldTag)
             )
         }
 
@@ -173,12 +181,270 @@ class TextFieldScreenshotTest {
                 TextField(
                     value = "Hello, world!",
                     onValueChange = {},
-                    modifier = Modifier.testTag(TextFieldTag)
+                    modifier = Modifier.width(280.dp).testTag(TextFieldTag)
                 )
             }
         }
 
         assertAgainstGolden("filled_textField_textColor_defaultContentColor")
+    }
+
+    @Test
+    fun textField_multiLine_withLabel_textAlignedToTop() {
+        rule.setMaterialContent {
+            TextField(
+                value = "Text",
+                onValueChange = {},
+                label = { Text("Label") },
+                modifier = Modifier.height(300.dp).width(280.dp).testTag(TextFieldTag)
+            )
+        }
+
+        assertAgainstGolden("filled_textField_multiLine_withLabel_textAlignedToTop")
+    }
+
+    @Test
+    fun textField_multiLine_withoutLabel_textAlignedToTop() {
+        rule.setMaterialContent {
+            TextField(
+                value = "Text",
+                onValueChange = {},
+                modifier = Modifier.height(300.dp).width(280.dp).testTag(TextFieldTag)
+            )
+        }
+
+        assertAgainstGolden("filled_textField_multiLine_withoutLabel_textAlignedToTop")
+    }
+
+    @Test
+    fun textField_multiLine_withLabel_placeholderAlignedToTop() {
+        rule.setMaterialContent {
+            TextField(
+                value = "",
+                onValueChange = {},
+                label = { Text("Label") },
+                placeholder = { Text("placeholder") },
+                modifier = Modifier.height(300.dp).width(280.dp).testTag(TextFieldTag)
+            )
+        }
+
+        rule.onNodeWithTag(TextFieldTag).focus()
+
+        assertAgainstGolden("filled_textField_multiLine_withLabel_placeholderAlignedToTop")
+    }
+
+    @Test
+    fun textField_multiLine_withoutLabel_placeholderAlignedToTop() {
+        rule.setMaterialContent {
+            TextField(
+                value = "",
+                onValueChange = {},
+                placeholder = { Text("placeholder") },
+                modifier = Modifier.height(300.dp).width(280.dp).testTag(TextFieldTag)
+            )
+        }
+
+        rule.onNodeWithTag(TextFieldTag).focus()
+
+        assertAgainstGolden("filled_textField_multiLine_withoutLabel_placeholderAlignedToTop")
+    }
+
+    @Test
+    fun textField_multiLine_labelAlignedToTop() {
+        rule.setMaterialContent {
+            TextField(
+                value = "",
+                onValueChange = {},
+                label = { Text("Label") },
+                modifier = Modifier.height(300.dp).width(280.dp).testTag(TextFieldTag)
+            )
+        }
+
+        assertAgainstGolden("filled_textField_multiLine_labelAlignedToTop")
+    }
+
+    @Test
+    fun textField_singleLine_withLabel_textAlignedToTop() {
+        rule.setMaterialContent {
+            TextField(
+                value = "Text",
+                onValueChange = {},
+                singleLine = true,
+                label = { Text("Label") },
+                modifier = Modifier.width(280.dp).testTag(TextFieldTag)
+            )
+        }
+
+        assertAgainstGolden("filled_textField_singleLine_withLabel_textAlignedToTop")
+    }
+
+    @Test
+    fun textField_singleLine_withoutLabel_textCenteredVertically() {
+        rule.setMaterialContent {
+            TextField(
+                value = "Text",
+                onValueChange = {},
+                singleLine = true,
+                modifier = Modifier.width(280.dp).testTag(TextFieldTag)
+            )
+        }
+
+        assertAgainstGolden("filled_textField_singleLine_withoutLabel_textCenteredVertically")
+    }
+
+    @Test
+    fun textField_singleLine_withLabel_placeholderAlignedToTop() {
+        rule.setMaterialContent {
+            TextField(
+                value = "",
+                onValueChange = {},
+                placeholder = { Text("placeholder") },
+                label = { Text("Label") },
+                singleLine = true,
+                modifier = Modifier.width(280.dp).testTag(TextFieldTag)
+            )
+        }
+
+        rule.onNodeWithTag(TextFieldTag).focus()
+
+        assertAgainstGolden("filled_textField_singleLine_withLabel_placeholderAlignedToTop")
+    }
+
+    @Test
+    fun textField_singleLine_withoutLabel_placeholderCenteredVertically() {
+        rule.setMaterialContent {
+            TextField(
+                value = "",
+                onValueChange = {},
+                placeholder = { Text("placeholder") },
+                singleLine = true,
+                modifier = Modifier.width(280.dp).testTag(TextFieldTag)
+            )
+        }
+
+        rule.onNodeWithTag(TextFieldTag).focus()
+
+        assertAgainstGolden(
+            "filled_textField_singleLine_withoutLabel_placeholderCenteredVertically"
+        )
+    }
+
+    @Test
+    fun textField_singleLine_labelCenteredVetically() {
+        rule.setMaterialContent {
+            TextField(
+                value = "",
+                onValueChange = {},
+                label = { Text("Label") },
+                modifier = Modifier.width(280.dp).testTag(TextFieldTag)
+            )
+        }
+
+        assertAgainstGolden("filled_textField_singleLine_labelCenteredVetically")
+    }
+
+    @Test
+    fun textField_disabled() {
+        rule.setContent {
+            TextField(
+                value = TextFieldValue("Text"),
+                onValueChange = {},
+                modifier = Modifier.width(280.dp).testTag(TextFieldTag),
+                singleLine = true,
+                enabled = false
+            )
+        }
+
+        assertAgainstGolden("textField_disabled")
+    }
+
+    @Test
+    fun textField_disabled_notFocusable() {
+        rule.setContent {
+            TextField(
+                value = TextFieldValue("Text"),
+                onValueChange = {},
+                singleLine = true,
+                modifier = Modifier.width(280.dp).testTag(TextFieldTag),
+                enabled = false
+            )
+        }
+
+        rule.onNodeWithTag(TextFieldTag).focus()
+
+        assertAgainstGolden("textField_disabled_notFocusable")
+    }
+
+    @Test
+    fun textField_disabled_notScrolled() {
+        rule.setContent {
+            TextField(
+                value = longText,
+                onValueChange = { },
+                singleLine = true,
+                modifier = Modifier.testTag(TextFieldTag).width(300.dp),
+                enabled = false
+            )
+        }
+
+        rule.onNodeWithTag(TextFieldTag).performGesture { swipeLeft() }
+
+        assertAgainstGolden("textField_disabled_notScrolled")
+    }
+
+    @Test
+    fun textField_readOnly() {
+        rule.setContent {
+            TextField(
+                value = TextFieldValue("Text"),
+                onValueChange = {},
+                modifier = Modifier.width(280.dp).testTag(TextFieldTag),
+                enabled = true,
+                readOnly = true
+            )
+        }
+
+        assertAgainstGolden("textField_readOnly")
+    }
+
+    @Test
+    fun textField_readOnly_focused() {
+        rule.setContent {
+            TextField(
+                value = TextFieldValue("Text"),
+                onValueChange = {},
+                modifier = Modifier.width(280.dp).testTag(TextFieldTag),
+                enabled = true,
+                readOnly = true
+            )
+        }
+
+        rule.onNodeWithTag(TextFieldTag).focus()
+
+        assertAgainstGolden("textField_readOnly_focused")
+    }
+
+    @Test
+    fun textField_readOnly_scrolled() {
+        rule.setContent {
+            TextField(
+                value = longText,
+                onValueChange = { },
+                modifier = Modifier.testTag(TextFieldTag).width(300.dp),
+                singleLine = true,
+                enabled = true,
+                readOnly = true
+            )
+        }
+
+        rule.onNodeWithTag(TextFieldTag).performGesture { swipeLeft() }
+
+        assertAgainstGolden("textField_readOnly_scrolled")
+    }
+
+    private fun SemanticsNodeInteraction.focus() {
+        // split click into (down) and (move, up) to enforce a composition in between
+        this.performGesture { down(center) }.performGesture { move(); up() }
     }
 
     private fun assertAgainstGolden(goldenIdentifier: String) {

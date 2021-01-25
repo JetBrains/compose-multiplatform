@@ -73,7 +73,7 @@ fun ExplicitAutofillTypesDemo() {
                 value = nameState.value,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Unspecified
+                    imeAction = ImeAction.Default
                 ),
                 onValueChange = { nameState.value = it },
                 textStyle = textStyle
@@ -100,7 +100,7 @@ fun ExplicitAutofillTypesDemo() {
                 value = emailState.value,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Unspecified
+                    imeAction = ImeAction.Default
                 ),
                 onValueChange = { emailState.value = it },
                 textStyle = textStyle
@@ -130,6 +130,7 @@ private fun Autofill(
     }
 }
 
+@Suppress("DEPRECATION")
 private fun LayoutCoordinates.boundingBox() = localToGlobal(Offset.Zero).run {
     Rect(
         x.toInt(),

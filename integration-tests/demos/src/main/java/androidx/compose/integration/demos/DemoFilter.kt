@@ -17,12 +17,14 @@
 package androidx.compose.integration.demos
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.integration.demos.common.Demo
 import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.AmbientTextStyle
@@ -35,16 +37,16 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.key
-import androidx.compose.runtime.onCommit
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 
 /**
@@ -55,7 +57,8 @@ fun DemoFilter(launchableDemos: List<Demo>, filterText: String, onNavigate: (Dem
     val filteredDemos = launchableDemos
         .filter { it.title.contains(filterText, ignoreCase = true) }
         .sortedBy { it.title }
-    ScrollableColumn {
+    // TODO: migrate to LazyColumn after b/175671850
+    Column(Modifier.verticalScroll(rememberScrollState())) {
         filteredDemos.forEach { demo ->
             FilteredDemoListItem(
                 demo,
@@ -85,7 +88,7 @@ fun FilterAppBar(
         }
         TopAppBar(backgroundColor = appBarColor, contentColor = onSurface) {
             IconButton(modifier = Modifier.align(Alignment.CenterVertically), onClick = onClose) {
-                Icon(Icons.Filled.Close)
+                Icon(Icons.Filled.Close, null)
             }
             FilterField(
                 filterText,
@@ -115,7 +118,10 @@ private fun FilterField(
         textStyle = AmbientTextStyle.current,
         cursorColor = AmbientContentColor.current
     )
-    onCommit { focusRequester.requestFocus() }
+    DisposableEffect(focusRequester) {
+        focusRequester.requestFocus()
+        onDispose { }
+    }
 }
 
 /**

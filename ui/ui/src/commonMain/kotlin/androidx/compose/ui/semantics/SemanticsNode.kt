@@ -21,12 +21,12 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.globalBounds
-import androidx.compose.ui.layout.globalPosition
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.layout.LayoutInfo
+import androidx.compose.ui.layout.globalPosition
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNodeWrapper
-import androidx.compose.ui.node.Owner
+import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastForEach
 
@@ -73,10 +73,9 @@ class SemanticsNode internal constructor(
     val layoutInfo: LayoutInfo = layoutNodeWrapper.layoutNode
 
     /**
-     * The [Owner] this node is attached to.
+     * The [root][RootForTest] this node is attached to.
      */
-    // TODO(b/174747742) Stop using Owner in tests and use RootForTest instead
-    val owner: Owner? get() = layoutNode.owner
+    val root: RootForTest? get() = layoutNode.owner?.rootForTest
 
     /**
      * The [LayoutNode] that this is associated with.
@@ -100,7 +99,7 @@ class SemanticsNode internal constructor(
      */
     val boundsInRoot: Rect
         get() {
-            return this.layoutNode.coordinates.boundsInRoot
+            return this.layoutNode.coordinates.boundsInRoot()
         }
 
     /**
@@ -109,7 +108,7 @@ class SemanticsNode internal constructor(
      */
     val positionInRoot: Offset
         get() {
-            return this.layoutNode.coordinates.positionInRoot
+            return this.layoutNode.coordinates.positionInRoot()
         }
 
     /**
@@ -118,6 +117,7 @@ class SemanticsNode internal constructor(
      */
     val globalBounds: Rect
         get() {
+            @Suppress("DEPRECATION")
             return this.layoutNode.coordinates.globalBounds
         }
 
@@ -126,6 +126,7 @@ class SemanticsNode internal constructor(
      */
     val globalPosition: Offset
         get() {
+            @Suppress("DEPRECATION")
             return this.layoutNode.coordinates.globalPosition
         }
 
@@ -318,7 +319,7 @@ internal fun SemanticsNode.findChildById(id: Int): SemanticsNode? {
 private fun LayoutNode.findOneLayerOfSemanticsWrappers(
     list: MutableList<SemanticsWrapper> = mutableListOf<SemanticsWrapper>()
 ): List<SemanticsWrapper> {
-    children.fastForEach { child ->
+    zSortedChildren.forEach { child ->
         val outerSemantics = child.outerSemantics
         if (outerSemantics != null) {
             list.add(outerSemantics)

@@ -24,10 +24,6 @@ import androidx.compose.ui.graphics.colorspace.ColorSpace
 import androidx.compose.ui.graphics.colorspace.ColorSpaces
 import androidx.compose.ui.graphics.colorspace.Rgb
 import androidx.compose.ui.graphics.colorspace.connect
-import androidx.compose.ui.util.annotation.ColorInt
-import androidx.compose.ui.util.annotation.FloatRange
-import androidx.compose.ui.util.annotation.IntRange
-import androidx.compose.ui.util.annotation.Size
 import androidx.compose.ui.util.lerp
 import kotlin.math.max
 import kotlin.math.min
@@ -363,8 +359,7 @@ fun Color(
     }
 
     val id = colorSpace.id
-    // TODO(mount): restore MinId when const vals work in IR module
-    require(id != -1 /*ColorSpace.MinId*/) {
+    require(id != ColorSpace.MinId) {
         "Unknown color space, please use a color space in ColorSpaces"
     }
 
@@ -399,7 +394,7 @@ fun Color(
  * @return A non-null instance of {@link Color}
  */
 @Stable
-fun Color(@ColorInt color: Int): Color {
+fun Color(/*@ColorInt*/ color: Int): Color {
     return Color(value = color.toULong() shl 32)
 }
 
@@ -425,16 +420,25 @@ fun Color(color: Long): Color {
  * The resulting color is in the [sRGB][ColorSpaces.Srgb]
  * color space. The default alpha value is `0xFF` (opaque).
  *
+ * @param red The red component of the color, between 0 and 255.
+ * @param green The green component of the color, between 0 and 255.
+ * @param blue The blue component of the color, between 0 and 255.
+ * @param alpha The alpha component of the color, between 0 and 255.
+ *
  * @return A non-null instance of {@link Color}
  */
 @Stable
 fun Color(
-    @IntRange(from = 0, to = 0xFF) red: Int,
-    @IntRange(from = 0, to = 0xFF) green: Int,
-    @IntRange(from = 0, to = 0xFF) blue: Int,
-    @IntRange(from = 0, to = 0xFF) alpha: Int = 0xFF
+    /*@IntRange(from = 0, to = 0xFF)*/
+    red: Int,
+    /*@IntRange(from = 0, to = 0xFF)*/
+    green: Int,
+    /*@IntRange(from = 0, to = 0xFF)*/
+    blue: Int,
+    /*@IntRange(from = 0, to = 0xFF)*/
+    alpha: Int = 0xFF
 ): Color {
-    @ColorInt val color = ((alpha and 0xFF) shl 24) or
+    val color = ((alpha and 0xFF) shl 24) or
         ((red and 0xFF) shl 16) or
         ((green and 0xFF) shl 8) or
         (blue and 0xFF)
@@ -444,10 +448,10 @@ fun Color(
 /**
  * Linear interpolate between two [Colors][Color], [start] and [stop] with [fraction] fraction
  * between the two. The [ColorSpace] of the result is always the [ColorSpace][Color.colorSpace]
- * of [stop].
+ * of [stop]. [fraction] should be between 0 and 1, inclusive.
  */
 @Stable
-fun lerp(start: Color, stop: Color, @FloatRange(from = 0.0, to = 1.0) fraction: Float): Color {
+fun lerp(start: Color, stop: Color, /*@FloatRange(from = 0.0, to = 1.0)*/ fraction: Float): Color {
     val linearColorSpace = ColorSpaces.LinearExtendedSrgb
     val startColor = start.convert(linearColorSpace)
     val endColor = stop.convert(linearColorSpace)
@@ -519,7 +523,7 @@ private inline fun compositeComponent(
  *
  * @return A new, non-null array whose size is 4
  */
-@Size(value = 4)
+/*@Size(value = 4)*/
 private fun Color.getComponents(): FloatArray = floatArrayOf(red, green, blue, alpha)
 
 /**
@@ -561,7 +565,7 @@ private fun saturate(v: Float): Float {
  * @return An ARGB color in the sRGB color space
  */
 @Stable
-@ColorInt
+/*@ColorInt*/
 fun Color.toArgb(): Int {
     val colorSpace = colorSpace
     if (colorSpace.isSrgb) {
@@ -594,4 +598,11 @@ inline val Color.isUnspecified: Boolean get() = value == Color.Unspecified.value
  * If this [Color] [isSpecified] then this is returned, otherwise [block] is executed and its result
  * is returned.
  */
+@Deprecated("Use takeOrElse", ReplaceWith("takeOrElse(block)"))
 inline fun Color.useOrElse(block: () -> Color): Color = if (isSpecified) this else block()
+
+/**
+ * If this [Color] [isSpecified] then this is returned, otherwise [block] is executed and its result
+ * is returned.
+ */
+inline fun Color.takeOrElse(block: () -> Color): Color = if (isSpecified) this else block()

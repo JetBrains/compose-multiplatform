@@ -16,8 +16,8 @@
 
 package androidx.compose.foundation.lazy
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.InternalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -29,39 +29,89 @@ import androidx.compose.ui.unit.dp
  */
 interface LazyListScope {
     /**
-     * Adds a list of items and their content to the scope.
-     *
-     * @param items the data list
-     * @param itemContent the content displayed by a single item
-     */
-    fun <T> items(
-        items: List<T>,
-        itemContent: @Composable LazyItemScope.(item: T) -> Unit
-    )
-
-    /**
-     * Adds a single item to the scope.
+     * Adds a single item.
      *
      * @param content the content of the item
      */
     fun item(content: @Composable LazyItemScope.() -> Unit)
 
     /**
-     * Adds a list of items to the scope where the content of an item is aware of its index.
+     * Adds a [count] of items.
      *
-     * @param items the data list
+     * @param count the items count
      * @param itemContent the content displayed by a single item
      */
-    fun <T> itemsIndexed(
-        items: List<T>,
-        itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
-    )
+    fun items(count: Int, itemContent: @Composable LazyItemScope.(index: Int) -> Unit)
+
+    /**
+     * Adds a sticky header item, which will remain pinned even when scrolling after it.
+     * The header will remain pinned until the next header will take its place.
+     *
+     * @sample androidx.compose.foundation.samples.StickyHeaderSample
+     *
+     * @param content the content of the header
+     */
+    @ExperimentalFoundationApi
+    fun stickyHeader(content: @Composable LazyItemScope.() -> Unit)
+}
+
+/**
+ * Adds a list of items.
+ *
+ * @param items the data list
+ * @param itemContent the content displayed by a single item
+ */
+inline fun <T> LazyListScope.items(
+    items: List<T>,
+    crossinline itemContent: @Composable LazyItemScope.(item: T) -> Unit
+) = items(items.size) {
+    itemContent(items[it])
+}
+
+/**
+ * Adds a list of items where the content of an item is aware of its index.
+ *
+ * @param items the data list
+ * @param itemContent the content displayed by a single item
+ */
+inline fun <T> LazyListScope.itemsIndexed(
+    items: List<T>,
+    crossinline itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
+) = items(items.size) {
+    itemContent(it, items[it])
+}
+
+/**
+ * Adds an array of items.
+ *
+ * @param items the data array
+ * @param itemContent the content displayed by a single item
+ */
+inline fun <T> LazyListScope.items(
+    items: Array<T>,
+    crossinline itemContent: @Composable LazyItemScope.(item: T) -> Unit
+) = items(items.size) {
+    itemContent(items[it])
+}
+
+/**
+ * Adds an array of items where the content of an item is aware of its index.
+ *
+ * @param items the data array
+ * @param itemContent the content displayed by a single item
+ */
+inline fun <T> LazyListScope.itemsIndexed(
+    items: Array<T>,
+    crossinline itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
+) = items(items.size) {
+    itemContent(it, items[it])
 }
 
 internal class LazyListScopeImpl : LazyListScope {
     private val intervals = IntervalList<LazyItemScope.(Int) -> (@Composable () -> Unit)>()
-
     val totalSize get() = intervals.totalSize
+    var headersIndexes: MutableList<Int>? = null
+        private set
 
     fun contentFor(index: Int, scope: LazyItemScope): @Composable () -> Unit {
         val interval = intervals.intervalForIndex(index)
@@ -70,13 +120,9 @@ internal class LazyListScopeImpl : LazyListScope {
         return interval.content(scope, localIntervalIndex)
     }
 
-    override fun <T> items(
-        items: List<T>,
-        itemContent: @Composable LazyItemScope.(item: T) -> Unit
-    ) {
-        intervals.add(items.size) { index ->
-            val item = items[index]
-            @Composable { itemContent(item) }
+    override fun items(count: Int, itemContent: @Composable LazyItemScope.(index: Int) -> Unit) {
+        intervals.add(count) { index ->
+            @Composable { itemContent(index) }
         }
     }
 
@@ -84,14 +130,14 @@ internal class LazyListScopeImpl : LazyListScope {
         intervals.add(1) { @Composable { content() } }
     }
 
-    override fun <T> itemsIndexed(
-        items: List<T>,
-        itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
-    ) {
-        intervals.add(items.size) { index ->
-            val item = items[index]
-            @Composable { itemContent(index, item) }
+    @ExperimentalFoundationApi
+    override fun stickyHeader(content: @Composable LazyItemScope.() -> Unit) {
+        val headersIndexes = headersIndexes ?: mutableListOf<Int>().also {
+            headersIndexes = it
         }
+        headersIndexes.add(totalSize)
+
+        item(content)
     }
 }
 
@@ -119,7 +165,6 @@ internal class LazyListScopeImpl : LazyListScope {
  * @param content a block which describes the content. Inside this block you can use methods like
  * [LazyListScope.item] to add a single item or [LazyListScope.items] to add a list of items.
  */
-@OptIn(InternalLayoutApi::class)
 @Composable
 fun LazyRow(
     modifier: Modifier = Modifier,
@@ -142,7 +187,8 @@ fun LazyRow(
         verticalAlignment = verticalAlignment,
         horizontalArrangement = horizontalArrangement,
         isVertical = false,
-        reverseLayout = reverseLayout
+        reverseLayout = reverseLayout,
+        headerIndexes = scope.headersIndexes ?: emptyList()
     ) { index ->
         scope.contentFor(index, this)
     }
@@ -172,7 +218,6 @@ fun LazyRow(
  * @param content a block which describes the content. Inside this block you can use methods like
  * [LazyListScope.item] to add a single item or [LazyListScope.items] to add a list of items.
  */
-@OptIn(InternalLayoutApi::class)
 @Composable
 fun LazyColumn(
     modifier: Modifier = Modifier,
@@ -195,7 +240,8 @@ fun LazyColumn(
         horizontalAlignment = horizontalAlignment,
         verticalArrangement = verticalArrangement,
         isVertical = true,
-        reverseLayout = reverseLayout
+        reverseLayout = reverseLayout,
+        headerIndexes = scope.headersIndexes ?: emptyList()
     ) { index ->
         scope.contentFor(index, this)
     }

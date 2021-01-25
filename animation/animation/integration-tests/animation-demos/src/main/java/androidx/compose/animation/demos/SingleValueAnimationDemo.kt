@@ -16,22 +16,60 @@
 
 package androidx.compose.animation.demos
 
-import androidx.compose.animation.animate
+import androidx.compose.animation.Animatable
+import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 
 @Composable
 fun SingleValueAnimationDemo() {
     val enabled = remember { mutableStateOf(true) }
-    val color = animate(if (enabled.value) Color.Green else Color.Red)
+    val alpha: Float by animateFloatAsState(if (enabled.value) 1f else 0.5f)
+    val color = myAnimate(
+        if (enabled.value) Color.Green else Color.Magenta,
+        spring()
+    ) {
+        println("Finished at color $it")
+    }
     Box(
-        Modifier.fillMaxSize().clickable { enabled.value = !enabled.value }.background(color)
+        Modifier.fillMaxSize().clickable(
+            indication = null,
+            interactionState = remember { InteractionState() }
+        ) {
+            enabled
+                .value = !enabled
+                .value
+        }
+            .graphicsLayer(alpha = alpha)
+            .background(color)
     )
+}
+
+@Composable
+private fun myAnimate(
+    targetValue: Color,
+    animationSpec: AnimationSpec<Color>,
+    onFinished: (Color) -> Unit
+): Color {
+    val color = remember { Animatable(targetValue) }
+    val finishedListener = rememberUpdatedState(onFinished)
+    LaunchedEffect(targetValue, animationSpec) {
+        color.animateTo(targetValue, animationSpec)
+        finishedListener.value(targetValue)
+    }
+    return color.value
 }

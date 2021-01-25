@@ -23,7 +23,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.useOrElse
+import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
@@ -110,16 +110,16 @@ fun BaseTextField(
     onValueChange: (TextFieldValue) -> Unit,
     modifier: Modifier = Modifier,
     textColor: Color = Color.Unspecified,
-    textStyle: TextStyle = AmbientTextStyle.current,
+    textStyle: TextStyle = TextStyle(),
     keyboardType: KeyboardType = KeyboardType.Text,
-    imeAction: ImeAction = ImeAction.Unspecified,
+    imeAction: ImeAction = ImeAction.Default,
     onImeActionPerformed: (ImeAction) -> Unit = {},
     visualTransformation: VisualTransformation = VisualTransformation.None,
     onTextLayout: (TextLayoutResult) -> Unit = {},
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
     cursorColor: Color = AmbientContentColor.current
 ) {
-    val color = textColor.useOrElse { textStyle.color.useOrElse { AmbientContentColor.current } }
+    val color = textColor.takeOrElse { textStyle.color.takeOrElse { AmbientContentColor.current } }
     val mergedStyle = textStyle.merge(TextStyle(color = color))
 
     BasicTextField(

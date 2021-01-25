@@ -26,17 +26,10 @@ val AnimationDemos = DemoCategory(
             "State Transition Demos",
             listOf(
                 ComposableDemo("Multi-dimensional prop") { MultiDimensionalAnimationDemo() },
-                ComposableDemo("State based ripple") { StateBasedRippleDemo() },
+                ComposableDemo("Double tap to like") { DoubleTapToLikeDemo() },
                 ComposableDemo("Repeating rotation") { RepeatedRotationDemo() },
-                ComposableDemo("Manual animation clock") { AnimatableSeekBarDemo() },
                 ComposableDemo("Gesture based animation") { GestureBasedAnimationDemo() },
-            )
-        ),
-        DemoCategory(
-            "Single Value Animation Demos",
-            listOf(
-                ComposableDemo("Animated scrolling") { FancyScrollingDemo() },
-                ComposableDemo("animate()") { SingleValueAnimationDemo() },
+                ComposableDemo("Infinite transition") { InfiniteTransitionDemo() },
             )
         ),
         DemoCategory(
@@ -54,7 +47,10 @@ val AnimationDemos = DemoCategory(
         DemoCategory(
             "Suspend Animation Demos",
             listOf(
+                ComposableDemo("Animated scrolling") { FancyScrollingDemo() },
+                ComposableDemo("animateAsState()") { SingleValueAnimationDemo() },
                 ComposableDemo("Follow the tap") { SuspendAnimationDemo() },
+                ComposableDemo("Game of fling") { FlingGame() },
                 ComposableDemo("Infinitely Animating") { InfiniteAnimationDemo() },
                 ComposableDemo("Spring back scrolling") { SpringBackScrollingDemo() },
                 ComposableDemo("Swipe to dismiss") { SwipeToDismissDemo() },

@@ -44,7 +44,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
 import androidx.compose.ui.unit.width
-import androidx.compose.ui.util.annotation.VisibleForTesting
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import kotlin.math.max
@@ -104,7 +103,7 @@ fun getAdjustedCoordinates(position: Offset): Offset {
  */
 @InternalTextApi
 @Composable
-@VisibleForTesting
+/*@VisibleForTesting*/
 internal fun DefaultSelectionHandle(
     modifier: Modifier,
     isStartHandle: Boolean,
@@ -260,24 +259,24 @@ private object AllowZeroSize : LayoutModifier {
  *
  * This is for [SelectionHandlePopup] only.
  */
-@VisibleForTesting
+/*@VisibleForTesting*/
 internal class SelectionHandlePositionProvider(
     val alignment: Alignment,
     val offset: IntOffset
 ) : PopupPositionProvider {
     override fun calculatePosition(
-        parentGlobalBounds: IntBounds,
-        windowGlobalBounds: IntBounds,
+        anchorBounds: IntBounds,
+        windowSize: IntSize,
         layoutDirection: LayoutDirection,
         popupContentSize: IntSize
     ): IntOffset {
         // TODO: Decide which is the best way to round to result without reimplementing Alignment.align
-        var popupGlobalPosition = IntOffset(0, 0)
+        var popupPosition = IntOffset(0, 0)
 
         // Get the aligned point inside the parent
         val parentAlignmentPoint = alignment.align(
             IntSize.Zero,
-            IntSize(parentGlobalBounds.width, parentGlobalBounds.height),
+            IntSize(anchorBounds.width, anchorBounds.height),
             layoutDirection
         )
         // Get the aligned point inside the child
@@ -287,20 +286,20 @@ internal class SelectionHandlePositionProvider(
             layoutDirection
         )
 
-        // Add the global position of the parent
-        popupGlobalPosition += IntOffset(parentGlobalBounds.left, parentGlobalBounds.top)
+        // Add the position of the parent
+        popupPosition += IntOffset(anchorBounds.left, anchorBounds.top)
 
         // Add the distance between the parent's top left corner and the alignment point
-        popupGlobalPosition += parentAlignmentPoint
+        popupPosition += parentAlignmentPoint
 
         // Subtract the distance between the children's top left corner and the alignment point
-        popupGlobalPosition -= IntOffset(relativePopupPos.x, relativePopupPos.y)
+        popupPosition -= IntOffset(relativePopupPos.x, relativePopupPos.y)
 
         // Add the user offset
         val resolvedOffset = IntOffset(offset.x, offset.y)
-        popupGlobalPosition += resolvedOffset
+        popupPosition += resolvedOffset
 
-        return popupGlobalPosition
+        return popupPosition
     }
 }
 
@@ -329,7 +328,7 @@ private fun isLeft(
  * the right. However, in Rtl context or when handles are crossed, the start handle should point to
  * the right, and the end handle should point to left.
  */
-@VisibleForTesting
+/*@VisibleForTesting*/
 internal fun isHandleLtrDirection(
     direction: ResolvedTextDirection,
     areHandlesCrossed: Boolean

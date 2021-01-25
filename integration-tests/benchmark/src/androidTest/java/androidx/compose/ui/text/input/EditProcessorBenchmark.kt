@@ -47,7 +47,7 @@ class EditProcessorBenchmark(val initText: InitialText, val scenario: TestScenar
         /**
          * Helper class for describing the parameter in test result
          */
-        data class TestScenario(val ops: List<EditOperation>, val name: String) {
+        data class TestScenario(val ops: List<EditCommand>, val name: String) {
             override fun toString(): String = name
         }
 
@@ -59,17 +59,17 @@ class EditProcessorBenchmark(val initText: InitialText, val scenario: TestScenar
                 InitialText(shortText, "Short Text")
             ),
             arrayOf(
-                TestScenario(listOf(CommitTextEditOp("Android", 1)), "Insert a text"),
-                TestScenario(listOf(SetComposingTextEditOp("Android", 1)), "Insert composition"),
-                TestScenario(listOf(SetComposingRegionEditOp(0, 1)), "Set composition"),
-                TestScenario(listOf(DeleteSurroundingTextEditOp(0, 1)), "Delete text"),
+                TestScenario(listOf(CommitTextCommand("Android", 1)), "Insert a text"),
+                TestScenario(listOf(SetComposingTextCommand("Android", 1)), "Insert composition"),
+                TestScenario(listOf(SetComposingRegionCommand(0, 1)), "Set composition"),
+                TestScenario(listOf(DeleteSurroundingTextCommand(0, 1)), "Delete text"),
                 TestScenario(
-                    listOf(DeleteSurroundingTextInCodePointsEditOp(0, 1)),
+                    listOf(DeleteSurroundingTextInCodePointsCommand(0, 1)),
                     "Delete text in code points"
                 ),
-                TestScenario(listOf(SetSelectionEditOp(0, 1)), "Set selection"),
-                TestScenario(listOf(BackspaceKeyEditOp()), "Backspace"),
-                TestScenario(listOf(MoveCursorEditOp(1)), "Cursor movement")
+                TestScenario(listOf(SetSelectionCommand(0, 1)), "Set selection"),
+                TestScenario(listOf(BackspaceCommand()), "Backspace"),
+                TestScenario(listOf(MoveCursorCommand(1)), "Cursor movement")
             )
         )
     }

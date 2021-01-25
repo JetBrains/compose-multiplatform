@@ -27,7 +27,6 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Measured
 import androidx.compose.ui.platform.debugInspectorInfo
-import androidx.compose.ui.util.annotation.FloatRange
 
 /**
  * A layout composable that places its children in a horizontal sequence. For a layout composable
@@ -62,11 +61,9 @@ import androidx.compose.ui.util.annotation.FloatRange
  * @param verticalAlignment The vertical alignment of the layout's children.
  *
  * @see Column
- * @see [androidx.compose.foundation.ScrollableRow]
  * @see [androidx.compose.foundation.lazy.LazyRow]
  */
 @Composable
-@OptIn(InternalLayoutApi::class)
 inline fun Row(
     modifier: Modifier = Modifier,
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
@@ -88,11 +85,10 @@ inline fun Row(
  * MeasureBlocks to use when horizontalArrangement and verticalAlignment are not provided.
  */
 @PublishedApi
-@OptIn(InternalLayoutApi::class)
 internal val DefaultRowMeasureBlocks = rowColumnMeasureBlocks(
     orientation = LayoutOrientation.Horizontal,
     arrangement = { totalSize, size, layoutDirection, density, outPosition ->
-        Arrangement.Start.arrange(totalSize, size, layoutDirection, density, outPosition)
+        with(Arrangement.Start) { density.arrange(totalSize, size, layoutDirection, outPosition) }
     },
     arrangementSpacing = Arrangement.Start.spacing,
     crossAxisAlignment = CrossAxisAlignment.vertical(Alignment.Top),
@@ -101,7 +97,6 @@ internal val DefaultRowMeasureBlocks = rowColumnMeasureBlocks(
 
 @PublishedApi
 @Composable
-@OptIn(InternalLayoutApi::class)
 internal fun rowMeasureBlocks(
     horizontalArrangement: Arrangement.Horizontal,
     verticalAlignment: Alignment.Vertical
@@ -112,8 +107,9 @@ internal fun rowMeasureBlocks(
         rowColumnMeasureBlocks(
             orientation = LayoutOrientation.Horizontal,
             arrangement = { totalSize, size, layoutDirection, density, outPosition ->
-                horizontalArrangement
-                    .arrange(totalSize, size, layoutDirection, density, outPosition)
+                with(horizontalArrangement) {
+                    density.arrange(totalSize, size, layoutDirection, outPosition)
+                }
             },
             arrangementSpacing = horizontalArrangement.spacing,
             crossAxisAlignment = CrossAxisAlignment.vertical(verticalAlignment),
@@ -205,10 +201,14 @@ interface RowScope {
      * When [fill] is true, the element will be forced to occupy the whole width allocated to it.
      * Otherwise, the element is allowed to be smaller - this will result in [Row] being smaller,
      * as the unused allocated width will not be redistributed to other siblings.
+     *
+     * @param weight The proportional width to give to this element, as related to the total of
+     * all weighted siblings. Must be positive.
+     * @param fill When `true`, the element will occupy the whole width allocated.
      */
     @Stable
     fun Modifier.weight(
-        @FloatRange(from = 0.0, to = 3.4e38 /* POSITIVE_INFINITY */, fromInclusive = false)
+        /*@FloatRange(from = 0.0, fromInclusive = false)*/
         weight: Float,
         fill: Boolean = true
     ): Modifier {

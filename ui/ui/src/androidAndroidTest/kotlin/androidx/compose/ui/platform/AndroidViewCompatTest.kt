@@ -36,7 +36,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Applier
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.emit
+import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -48,8 +48,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.background
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LayoutCoordinates
@@ -57,8 +57,8 @@ import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
-import androidx.compose.ui.layout.globalPosition
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.node.LayoutEmitHelper
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.Owner
@@ -419,10 +419,12 @@ class AndroidViewCompatTest {
             .assertPixels(IntSize(size, size)) { Color.Blue }
 
         rule.runOnIdle { size += 20 }
+        rule.runOnIdle { } // just wait for composition to finish
         rule.onNodeWithTag("view").captureToImage()
             .assertPixels(IntSize(size, size)) { Color.Blue }
 
         rule.runOnIdle { size += 20 }
+        rule.runOnIdle { } // just wait for composition to finish
         rule.onNodeWithTag("view").captureToImage()
             .assertPixels(IntSize(size, size)) { Color.Blue }
     }
@@ -435,14 +437,14 @@ class AndroidViewCompatTest {
         var inner: Offset = Offset.Zero
 
         rule.setContent {
-            Box(Modifier.onGloballyPositioned { outer = it.globalPosition }) {
+            Box(Modifier.onGloballyPositioned { outer = it.positionInWindow() }) {
                 val paddingDp = with(AmbientDensity.current) { padding.toDp() }
                 Box(Modifier.padding(paddingDp)) {
                     AndroidView(::ComposeView) {
                         it.setContent {
                             Box(
                                 Modifier.padding(paddingDp)
-                                    .onGloballyPositioned { inner = it.globalPosition }
+                                    .onGloballyPositioned { inner = it.positionInWindow() }
                             )
                         }
                     }
@@ -490,12 +492,12 @@ class AndroidViewCompatTest {
                 }
             }
         }
-        rule.runOnIdle { startX = coordinates.globalPosition.x.roundToInt() }
+        rule.runOnIdle { startX = coordinates.positionInWindow().x.roundToInt() }
 
         rule.runOnIdle { topView.visibility = View.GONE }
 
         rule.runOnIdle {
-            assertEquals(100, startX - coordinates.globalPosition.x.roundToInt())
+            assertEquals(100, startX - coordinates.positionInWindow().x.roundToInt())
         }
     }
 
@@ -511,17 +513,17 @@ class AndroidViewCompatTest {
         var inner1: Offset = Offset.Zero
         var inner2: Offset = Offset.Zero
         rule.setContent {
-            Box(Modifier.onGloballyPositioned { outer = it.globalPosition }) {
+            Box(Modifier.onGloballyPositioned { outer = it.positionInWindow() }) {
                 Box(Modifier.padding(start = paddingDp, top = paddingDp)) {
                     emitView(::LinearLayout, {}) {
                         Box(
                             Modifier.size(sizeDp).background(Color.Blue).onGloballyPositioned {
-                                inner1 = it.globalPosition
+                                inner1 = it.positionInWindow()
                             }
                         )
                         Box(
                             Modifier.size(sizeDp).background(Color.Gray).onGloballyPositioned {
-                                inner2 = it.globalPosition
+                                inner2 = it.positionInWindow()
                             }
                         )
                     }
@@ -578,12 +580,20 @@ class AndroidViewCompatTest {
         rule.setContent {
             if (composeContent) {
                 Box {
-                    AndroidView(::ComposeView) {
+                    AndroidView(
+                        {
+                            ComposeView(it).apply {
+                                setViewCompositionStrategy(
+                                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                                )
+                            }
+                        }
+                    ) {
                         it.setContent {
-                            emit<LayoutNode, Applier<Any>>(
-                                ctor = LayoutEmitHelper.constructor,
+                            ComposeNode<LayoutNode, Applier<Any>>(
+                                factory = LayoutEmitHelper.constructor,
                                 update = {
-                                    set(Unit) { node = this }
+                                    init { node = this }
                                     set(noOpMeasureBlocks, LayoutEmitHelper.setMeasureBlocks)
                                 }
                             )

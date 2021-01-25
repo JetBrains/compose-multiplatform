@@ -16,16 +16,16 @@
 
 package androidx.compose.ui.input.key
 
-import android.view.KeyEvent.ACTION_DOWN
-import android.view.KeyEvent.ACTION_UP
-import android.view.KeyEvent.KEYCODE_A
+import android.view.KeyEvent.ACTION_DOWN as ActionDown
+import android.view.KeyEvent.ACTION_UP as ActionUp
+import android.view.KeyEvent.KEYCODE_A as KeyCodeA
 import android.view.View
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusModifier
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.setFocusableContent
-import androidx.compose.ui.focusRequester
 import androidx.compose.ui.input.key.Key.Companion.A
 import androidx.compose.ui.input.key.KeyEventType.KeyDown
 import androidx.compose.ui.input.key.KeyEventType.KeyUp
@@ -45,28 +45,28 @@ import android.view.KeyEvent as AndroidKeyEvent
  */
 @SmallTest
 @RunWith(Parameterized::class)
-class AndroidProcessKeyInputTest(val keyEventAction: Int) {
+class AndroidProcessKeyInputTest(private val keyEventAction: Int) {
     @get:Rule
     val rule = createComposeRule()
 
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "keyEventAction = {0}")
-        fun initParameters() = listOf(ACTION_UP, ACTION_DOWN)
+        fun initParameters() = listOf(ActionUp, ActionDown)
     }
 
     @Test
     fun onKeyEvent_triggered() {
         // Arrange.
         lateinit var ownerView: View
-        lateinit var receivedKeyEvent: KeyEvent
+        var receivedKeyEvent: KeyEvent? = null
         val focusRequester = FocusRequester()
         rule.setFocusableContent {
             ownerView = AmbientView.current
             Box(
                 modifier = Modifier
                     .focusRequester(focusRequester)
-                    .focus()
+                    .focusModifier()
                     .onKeyEvent {
                         receivedKeyEvent = it
                         true
@@ -79,17 +79,20 @@ class AndroidProcessKeyInputTest(val keyEventAction: Int) {
 
         // Act.
         val keyConsumed = rule.runOnIdle {
-            ownerView.dispatchKeyEvent(AndroidKeyEvent(keyEventAction, KEYCODE_A))
+            ownerView.dispatchKeyEvent(AndroidKeyEvent(keyEventAction, KeyCodeA))
         }
 
         // Assert.
         rule.runOnIdle {
-            val keyEventType = when (keyEventAction) {
-                ACTION_UP -> KeyUp
-                ACTION_DOWN -> KeyDown
-                else -> error("No tests for this key action.")
-            }
-            receivedKeyEvent.assertEqualTo(keyEvent(A, keyEventType))
+            val keyEvent = checkNotNull(receivedKeyEvent)
+            assertThat(keyEvent.type).isEqualTo(
+                when (keyEventAction) {
+                    ActionUp -> KeyUp
+                    ActionDown -> KeyDown
+                    else -> error("No tests for this key action.")
+                }
+            )
+            assertThat(keyEvent.key).isEqualTo(A)
             assertThat(keyConsumed).isTrue()
         }
     }

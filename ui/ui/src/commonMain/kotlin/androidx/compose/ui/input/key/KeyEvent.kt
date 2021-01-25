@@ -17,58 +17,64 @@
 package androidx.compose.ui.input.key
 
 /**
+ * The native platform-specific keyboard key event.
+ */
+expect class NativeKeyEvent
+
+/**
  * When a user presses a key on a hardware keyboard, a [KeyEvent] is sent to the
  * [KeyInputModifier] that is currently active.
  */
-interface KeyEvent {
-    /**
-     * The key that was pressed.
-     */
-    val key: Key
+@Suppress("EXPERIMENTAL_FEATURE_WARNING")
+inline class KeyEvent(val nativeKeyEvent: NativeKeyEvent)
 
-    /**
-     * The UTF16 value corresponding to the key event that was pressed. The unicode character
-     * takes into account any meta keys that are pressed (eg. Pressing shift results in capital
-     * alphabets). The UTF16 value uses the
-     * [U+n notation][http://www.unicode.org/reports/tr27/#notation] of the Unicode Standard.
-     *
-     * An [Int] is used instead of a [Char] so that we can support supplementary characters. The
-     * Unicode Standard allows for characters whose representation requires more than 16 bits.
-     * The range of legal code points is U+0000 to U+10FFFF, known as Unicode scalar value.
-     *
-     * The set of characters from U+0000 to U+FFFF is sometimes referred to as the Basic
-     * Multilingual Plane (BMP). Characters whose code points are greater than U+FFFF are called
-     * supplementary characters. In this representation, supplementary characters are represented
-     * as a pair of char values, the first from the high-surrogates range, (\uD800-\uDBFF), the
-     * second from the low-surrogates range (\uDC00-\uDFFF).
-     */
-    val utf16CodePoint: Int
+/**
+ * The key that was pressed.
+ */
+expect val KeyEvent.key: Key
 
-    /**
-     * The [type][KeyEventType] of key event.
-     */
-    val type: KeyEventType
+/**
+ * The UTF16 value corresponding to the key event that was pressed. The unicode character
+ * takes into account any meta keys that are pressed (eg. Pressing shift results in capital
+ * alphabets). The UTF16 value uses the
+ * [U+n notation][http://www.unicode.org/reports/tr27/#notation] of the Unicode Standard.
+ *
+ * An [Int] is used instead of a [Char] so that we can support supplementary characters. The
+ * Unicode Standard allows for characters whose representation requires more than 16 bits.
+ * The range of legal code points is U+0000 to U+10FFFF, known as Unicode scalar value.
+ *
+ * The set of characters from U+0000 to U+FFFF is sometimes referred to as the Basic
+ * Multilingual Plane (BMP). Characters whose code points are greater than U+FFFF are called
+ * supplementary characters. In this representation, supplementary characters are represented
+ * as a pair of char values, the first from the high-surrogates range, (\uD800-\uDBFF), the
+ * second from the low-surrogates range (\uDC00-\uDFFF).
+ */
+expect val KeyEvent.utf16CodePoint: Int
 
-    /**
-     * Indicates whether the Alt key is pressed.
-     */
-    val isAltPressed: Boolean
+/**
+ * The [type][KeyEventType] of key event.
+ */
+expect val KeyEvent.type: KeyEventType
 
-    /**
-     * Indicates whether the Ctrl key is pressed.
-     */
-    val isCtrlPressed: Boolean
+/**
+ * Indicates whether the Alt key is pressed.
+ */
+expect val KeyEvent.isAltPressed: Boolean
 
-    /**
-     * Indicates whether the Meta key is pressed.
-     */
-    val isMetaPressed: Boolean
+/**
+ * Indicates whether the Ctrl key is pressed.
+ */
+expect val KeyEvent.isCtrlPressed: Boolean
 
-    /**
-     * Indicates whether the Shift key is pressed.
-     */
-    val isShiftPressed: Boolean
-}
+/**
+ * Indicates whether the Meta key is pressed.
+ */
+expect val KeyEvent.isMetaPressed: Boolean
+
+/**
+ * Indicates whether the Shift key is pressed.
+ */
+expect val KeyEvent.isShiftPressed: Boolean
 
 /**
  * The type of Key Event.

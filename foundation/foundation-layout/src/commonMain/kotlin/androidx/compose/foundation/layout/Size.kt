@@ -37,7 +37,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.enforce
-import androidx.compose.ui.util.annotation.FloatRange
 import kotlin.math.roundToInt
 
 /**
@@ -421,12 +420,14 @@ fun Modifier.sizeIn(
  * make the content fill the whole available width. If the incoming maximum width is
  * [Constraints.Infinity] this modifier will have no effect.
  *
+ * @param fraction The fraction of the maximum width to use, between `0` and `1`, inclusive.
+ *
  * Example usage:
  * @sample androidx.compose.foundation.layout.samples.SimpleFillWidthModifier
  * @sample androidx.compose.foundation.layout.samples.FillHalfWidthModifier
  */
 @Stable
-fun Modifier.fillMaxWidth(@FloatRange(from = 0.0, to = 1.0) fraction: Float = 1f) =
+fun Modifier.fillMaxWidth(/*@FloatRange(from = 0.0, to = 1.0)*/ fraction: Float = 1f) =
     this.then(
         FillModifier(
             direction = Direction.Horizontal,
@@ -446,12 +447,14 @@ fun Modifier.fillMaxWidth(@FloatRange(from = 0.0, to = 1.0) fraction: Float = 1f
  * the [fraction] is 1, so the modifier will make the content fill the whole available height.
  * If the incoming maximum height is [Constraints.Infinity] this modifier will have no effect.
  *
+ * @param fraction The fraction of the maximum height to use, between `0` and `1`, inclusive.
+ *
  * Example usage:
  * @sample androidx.compose.foundation.layout.samples.SimpleFillHeightModifier
  * @sample androidx.compose.foundation.layout.samples.FillHalfHeightModifier
  */
 @Stable
-fun Modifier.fillMaxHeight(@FloatRange(from = 0.0, to = 1.0) fraction: Float = 1f) =
+fun Modifier.fillMaxHeight(/*@FloatRange(from = 0.0, to = 1.0)*/ fraction: Float = 1f) =
     this.then(
         FillModifier(
             direction = Direction.Vertical,
@@ -475,12 +478,14 @@ fun Modifier.fillMaxHeight(@FloatRange(from = 0.0, to = 1.0) fraction: Float = 1
  * If the incoming maximum width or height is [Constraints.Infinity] this modifier will have no
  * effect in that dimension.
  *
+ * @param fraction The fraction of the maximum size to use, between `0` and `1`, inclusive.
+ *
  * Example usage:
  * @sample androidx.compose.foundation.layout.samples.SimpleFillModifier
  * @sample androidx.compose.foundation.layout.samples.FillHalfSizeModifier
  */
 @Stable
-fun Modifier.fillMaxSize(@FloatRange(from = 0.0, to = 1.0) fraction: Float = 1f) =
+fun Modifier.fillMaxSize(/*@FloatRange(from = 0.0, to = 1.0)*/ fraction: Float = 1f) =
     this.then(
         FillModifier(
             direction = Direction.Both,

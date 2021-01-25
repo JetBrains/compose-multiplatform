@@ -16,10 +16,10 @@
 
 package androidx.compose.ui.test
 
-import androidx.compose.ui.node.Owner
+import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.getAllSemanticsNodes
-import androidx.compose.ui.text.input.EditOperation
+import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.ImeAction
 
 /**
@@ -27,13 +27,12 @@ import androidx.compose.ui.text.input.ImeAction
  *
  * This is typically implemented by entities like test rule.
  */
-@InternalTestingApi
+@InternalTestApi
 interface TestOwner {
-
     /**
      * Sends the given list of text commands to the given semantics node.
      */
-    fun sendTextInputCommand(node: SemanticsNode, command: List<EditOperation>)
+    fun sendTextInputCommand(node: SemanticsNode, command: List<EditCommand>)
 
     /**
      * Sends the given IME action to the given semantics node.
@@ -49,14 +48,20 @@ interface TestOwner {
     fun <T> runOnUiThread(action: () -> T): T
 
     /**
-     * Collects all [Owner]s from all compose hierarchies.
+     * Collects all [RootForTest]s from all compose hierarchies.
      *
      * This is a blocking call. Returns only after compose is idle.
      *
      * Can crash in case it hits time out. This is not supposed to be handled as it
      * surfaces only in incorrect tests.
      */
-    fun getOwners(): Set<Owner>
+    fun getRoots(): Set<RootForTest>
+
+    /**
+     * Advances time if and only if this [TestOwner] uses a [MainTestClock]
+     */
+    // TODO(b/176898053): Once mainClock become the standard provide them here and remove this method.
+    fun advanceTimeBy(millis: Long)
 }
 
 /**
@@ -67,24 +72,24 @@ interface TestOwner {
  * Can crash in case it hits time out. This is not supposed to be handled as it
  * surfaces only in incorrect tests.
  */
-@OptIn(InternalTestingApi::class)
+@OptIn(InternalTestApi::class)
 internal fun TestOwner.getAllSemanticsNodes(useUnmergedTree: Boolean): List<SemanticsNode> {
-    return getOwners().flatMap { it.semanticsOwner.getAllSemanticsNodes(useUnmergedTree) }
+    return getRoots().flatMap { it.semanticsOwner.getAllSemanticsNodes(useUnmergedTree) }
 }
 
-@InternalTestingApi
+@InternalTestApi
 fun createTestContext(owner: TestOwner): TestContext {
     return TestContext(owner)
 }
 
-@OptIn(InternalTestingApi::class)
+@OptIn(InternalTestApi::class)
 class TestContext internal constructor(internal val testOwner: TestOwner) {
 
     /**
-     * Stores the [InputDispatcherState] of each [Owner]. The state will be restored in an
+     * Stores the [InputDispatcherState] of each [RootForTest]. The state will be restored in an
      * [InputDispatcher] when it is created for an owner that has a state stored.
      */
-    internal val states = mutableMapOf<Owner, InputDispatcherState>()
+    internal val states = mutableMapOf<RootForTest, InputDispatcherState>()
 
     internal fun getAllSemanticsNodes(mergingEnabled: Boolean) =
         testOwner.getAllSemanticsNodes(mergingEnabled)

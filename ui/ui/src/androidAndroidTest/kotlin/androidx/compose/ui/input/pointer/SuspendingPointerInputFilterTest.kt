@@ -16,17 +16,25 @@
 
 package androidx.compose.ui.input.pointer
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.runtime.ExperimentalComposeApi
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.withMutableSnapshot
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
-import androidx.compose.ui.unit.Duration
+import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.Uptime
-import androidx.compose.ui.unit.milliseconds
+import androidx.lifecycle.Lifecycle
+import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CompletableDeferred
@@ -37,13 +45,18 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.withTimeout
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 @SmallTest
 @RunWith(AndroidJUnit4::class)
@@ -158,16 +171,12 @@ class SuspendingPointerInputFilterTest {
                 listOf(
                     PointerInputChange(
                         PointerId(0),
-                        current = PointerInputData(
-                            uptime = Uptime.Boot,
-                            position = Offset(6f, 6f),
-                            down = false
-                        ),
-                        previous = PointerInputData(
-                            uptime = Uptime.Boot,
-                            position = Offset(6f, 6f),
-                            down = true
-                        ),
+                        0,
+                        Offset(6f, 6f),
+                        false,
+                        0,
+                        Offset(6f, 6f),
+                        true,
                         consumed = ConsumedData(downChange = true)
                     )
                 )
@@ -230,6 +239,41 @@ class SuspendingPointerInputFilterTest {
             ValueElement("block", block)
         )
     }
+
+    @OptIn(ExperimentalComposeApi::class)
+    @Test
+    @MediumTest
+    @Ignore // ignored due to a bug b/178013220
+    fun testRestartPointerInput() = runBlocking<Unit> {
+        var toAdd by mutableStateOf("initial")
+        val result = mutableListOf<String>()
+        val latch = CountDownLatch(2)
+        ActivityScenario.launch(TestActivity::class.java).use { scenario ->
+            scenario.moveToState(Lifecycle.State.CREATED)
+            scenario.onActivity {
+                it.setContent {
+                    // Read the value in composition to change the lambda capture below
+                    val toCapture = toAdd
+                    Box(
+                        Modifier.pointerInput {
+                            result += toCapture
+                            latch.countDown()
+                            suspendCancellableCoroutine<Unit> {}
+                        }
+                    )
+                }
+            }
+            scenario.moveToState(Lifecycle.State.STARTED)
+            withMutableSnapshot {
+                toAdd = "secondary"
+            }
+            assertTrue("waiting for relaunch timed out", latch.await(1, TimeUnit.SECONDS))
+            assertEquals(
+                listOf("initial", "secondary"),
+                result
+            )
+        }
+    }
 }
 
 private fun PointerInputChange.toPointerEvent() = PointerEvent(listOf(this))
@@ -238,39 +282,39 @@ private val PointerEvent.firstChange get() = changes.first()
 
 private class PointerInputChangeEmitter(id: Int = 0) {
     val pointerId = PointerId(id.toLong())
-    var previousData = PointerInputData(
-        uptime = Uptime.Boot,
-        position = Offset.Zero,
-        down = false
-    )
+    var previousTime = 0L
+    var previousPosition = Offset.Zero
+    var previousPressed = false
 
     fun nextChange(
         position: Offset = Offset.Zero,
         down: Boolean = true,
-        time: Uptime = Uptime.Boot
+        time: Long = 0
     ): PointerInputChange {
-        val current = PointerInputData(
-            position = position,
-            down = down,
-            uptime = time
-        )
-
         return PointerInputChange(
             id = pointerId,
-            current = current,
-            previous = previousData,
+            time,
+            position,
+            down,
+            previousTime,
+            previousPosition,
+            previousPressed,
             consumed = ConsumedData()
-        ).also { previousData = current }
+        ).also {
+            previousTime = time
+            previousPosition = position
+            previousPressed = down
+        }
     }
 }
 
 private class FakeViewConfiguration : ViewConfiguration {
-    override val longPressTimeout: Duration
-        get() = 500.milliseconds
-    override val doubleTapTimeout: Duration
-        get() = 300.milliseconds
-    override val doubleTapMinTime: Duration
-        get() = 40.milliseconds
+    override val longPressTimeoutMillis: Long
+        get() = 500
+    override val doubleTapTimeoutMillis: Long
+        get() = 300
+    override val doubleTapMinTimeMillis: Long
+        get() = 40
     override val touchSlop: Float
         get() = 18f
 }

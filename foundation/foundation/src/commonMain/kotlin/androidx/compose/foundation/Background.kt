@@ -29,7 +29,6 @@ import androidx.compose.ui.graphics.drawOutline
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.debugInspectorInfo
-import androidx.compose.ui.util.annotation.FloatRange
 
 /**
  * Draws [shape] with a solid [color] behind the content.
@@ -62,12 +61,14 @@ fun Modifier.background(
  *
  * @param brush brush to paint background with
  * @param shape desired shape of the background
- * @param alpha Opacity to be applied to the [brush]
+ * @param alpha Opacity to be applied to the [brush], with `0` being completely transparent and
+ * `1` being completely opaque. The value must be between `0` and `1`.
  */
 fun Modifier.background(
     brush: Brush,
     shape: Shape = RectangleShape,
-    @FloatRange(from = 0.0, to = 1.0) alpha: Float = 1.0f
+    /*@FloatRange(from = 0.0, to = 1.0)*/
+    alpha: Float = 1.0f
 ) = this.then(
     Background(
         brush = brush,

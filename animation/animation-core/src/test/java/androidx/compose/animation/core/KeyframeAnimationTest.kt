@@ -82,7 +82,7 @@ class KeyframeAnimationTest {
             1f at durationMillis
         }.vectorize(Float.VectorConverter)
 
-        assertThat(animation.at(31)).isEqualTo(easing(0.31f))
+        assertThat(animation.at(31)).isEqualTo(easing.transform(0.31f))
     }
 
     @Test
@@ -94,7 +94,7 @@ class KeyframeAnimationTest {
             2f at durationMillis
         }.vectorize(Float.VectorConverter)
 
-        assertThat(animation.at(140)).isEqualTo(1f + easing(0.4f))
+        assertThat(animation.at(140)).isEqualTo(1f + easing.transform(0.4f))
     }
 
     @Test
@@ -127,7 +127,7 @@ class KeyframeAnimationTest {
                 v2 = lerp(0f, 300f, time / 200f)
             } else {
                 v1 = 200f
-                v2 = lerp(300f, 400f, easing((time - 200) / 200f))
+                v2 = lerp(300f, 400f, easing.transform((time - 200) / 200f))
             }
             assertEquals(
                 AnimationVector(v1, v2),

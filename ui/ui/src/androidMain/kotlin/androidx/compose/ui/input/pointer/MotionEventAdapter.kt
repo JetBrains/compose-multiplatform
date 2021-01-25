@@ -24,8 +24,6 @@ import android.view.MotionEvent.ACTION_POINTER_UP
 import android.view.MotionEvent.ACTION_UP
 import androidx.annotation.VisibleForTesting
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.unit.NanosecondsPerMillisecond
-import androidx.compose.ui.unit.Uptime
 
 /**
  * Converts Android framework [MotionEvent]s into Compose [PointerInputEvent]s.
@@ -84,7 +82,7 @@ internal class MotionEventAdapter {
         }
 
         return PointerInputEvent(
-            Uptime(motionEvent.eventTime * NanosecondsPerMillisecond),
+            motionEvent.eventTime,
             pointers,
             motionEvent
         )
@@ -118,14 +116,12 @@ internal class MotionEventAdapter {
                     "to have been the case"
             )
 
-        return PointerInputEventData(
+        return createPointerInputEventData(
             pointerId,
-            createPointerInputData(
-                Uptime(motionEvent.eventTime * NanosecondsPerMillisecond),
-                motionEvent,
-                index,
-                upIndex
-            )
+            motionEvent.eventTime,
+            motionEvent,
+            index,
+            upIndex
         )
     }
 }
@@ -133,20 +129,31 @@ internal class MotionEventAdapter {
 /**
  * Creates a new PointerInputData.
  */
-private fun createPointerInputData(
-    timestamp: Uptime,
+private fun createPointerInputEventData(
+    pointerId: PointerId,
+    timestamp: Long,
     motionEvent: MotionEvent,
     index: Int,
     upIndex: Int?
-): PointerInputData {
+): PointerInputEventData {
     val pointerCoords = MotionEvent.PointerCoords()
     motionEvent.getPointerCoords(index, pointerCoords)
     val offset = Offset(pointerCoords.x, pointerCoords.y)
+    val toolType = when (motionEvent.getToolType(index)) {
+        MotionEvent.TOOL_TYPE_UNKNOWN -> PointerType.Unknown
+        MotionEvent.TOOL_TYPE_FINGER -> PointerType.Touch
+        MotionEvent.TOOL_TYPE_STYLUS -> PointerType.Stylus
+        MotionEvent.TOOL_TYPE_MOUSE -> PointerType.Mouse
+        MotionEvent.TOOL_TYPE_ERASER -> PointerType.Eraser
+        else -> PointerType.Unknown
+    }
 
-    return PointerInputData(
+    return PointerInputEventData(
+        pointerId,
         timestamp,
         offset,
-        index != upIndex
+        index != upIndex,
+        toolType
     )
 }
 

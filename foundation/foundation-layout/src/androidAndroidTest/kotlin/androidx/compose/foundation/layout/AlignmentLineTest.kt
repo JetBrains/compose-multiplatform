@@ -25,7 +25,6 @@ import androidx.compose.ui.layout.HorizontalAlignmentLine
 import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.VerticalAlignmentLine
-import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.positionInParent
@@ -86,7 +85,7 @@ class AlignmentLineTest : LayoutTest() {
                     childDp, 0.dp, testLine, lineDp,
                     Modifier.onGloballyPositioned {
                         childSize.value = it.size
-                        childPosition.value = it.positionInRoot
+                        childPosition.value = it.positionInRoot()
                         layoutLatch.countDown()
                     }.paddingFrom(testLine, beforeDp, afterDp)
                 )
@@ -132,7 +131,7 @@ class AlignmentLineTest : LayoutTest() {
                     0.dp, childDp, testLine, lineDp,
                     Modifier.onGloballyPositioned {
                         childSize.value = it.size
-                        childPosition.value = it.positionInRoot
+                        childPosition.value = it.positionInRoot()
                         layoutLatch.countDown()
                     }.paddingFrom(testLine, beforeDp, afterDp)
                 )
@@ -289,7 +288,7 @@ class AlignmentLineTest : LayoutTest() {
         val minHeight = 10.dp
         show {
             Box {
-                WithConstraints(
+                BoxWithConstraints(
                     Modifier
                         .preferredSizeIn(minHeight = minHeight)
                         .paddingFrom(testLine, 0.dp)
@@ -309,7 +308,7 @@ class AlignmentLineTest : LayoutTest() {
         val minWidth = 10.dp
         show {
             Box {
-                WithConstraints(
+                BoxWithConstraints(
                     Modifier
                         .preferredSizeIn(minWidth = minWidth)
                         .paddingFrom(testLine, 0.dp)

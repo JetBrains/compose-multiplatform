@@ -24,12 +24,11 @@ import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
-import androidx.compose.ui.test.ExperimentalTesting
-import androidx.compose.ui.test.TestUiDispatcher
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.junit.Before
@@ -37,13 +36,11 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
+import kotlin.math.roundToInt
 
 @MediumTest
-@OptIn(ExperimentalTesting::class)
 @RunWith(Parameterized::class)
 class LazyScrollTest(private val orientation: Orientation) {
-    private val LazyListTag = "LazyListTag"
-
     @get:Rule
     val rule = createComposeRule()
 
@@ -69,7 +66,7 @@ class LazyScrollTest(private val orientation: Orientation) {
 
     @Test
     fun snapToItemTest() = runBlocking {
-        withContext(TestUiDispatcher.Main) {
+        withContext(Dispatchers.Main) {
             state.snapToItemIndex(3)
         }
         assertThat(state.firstVisibleItemIndex).isEqualTo(3)
@@ -79,14 +76,18 @@ class LazyScrollTest(private val orientation: Orientation) {
     @ExperimentalFoundationApi
     @Test
     fun smoothScrollByTest() = runBlocking {
-        withContext(TestUiDispatcher.Main) {
-            state.smoothScrollBy(with(rule.density) { 320.dp.toPx() })
+        fun Int.dpToPx(): Int = with(rule.density) { dp.toPx().roundToInt() }
+        val scrollDistance = 320.dpToPx()
+        val itemSize = 101.dpToPx()
+
+        val expectedIndex = scrollDistance / itemSize // resolves to 3
+        val expectedOffset = scrollDistance % itemSize // resolves to ~17.dp.toIntPx()
+
+        withContext(Dispatchers.Main) {
+            state.smoothScrollBy(scrollDistance.toFloat())
         }
-        assertThat(state.firstVisibleItemIndex).isEqualTo(3)
-        assertThat(state.firstVisibleItemScrollOffset)
-            .isEqualTo(
-                with(rule.density) { 320.dp.toIntPx() - 101.dp.toIntPx() * 3 }
-            )
+        assertThat(state.firstVisibleItemIndex).isEqualTo(expectedIndex)
+        assertThat(state.firstVisibleItemScrollOffset).isEqualTo(expectedOffset)
     }
 
     @Composable
@@ -107,7 +108,7 @@ class LazyScrollTest(private val orientation: Orientation) {
     }
 
     @Composable
-    private fun LazyItemScope.ItemContent() {
+    private fun ItemContent() {
         val modifier = if (vertical) {
             Modifier.preferredHeight(101.dp)
         } else {

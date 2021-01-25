@@ -22,9 +22,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performKeyPress
@@ -49,7 +49,7 @@ class ShortcutsTest {
                 modifier = Modifier
                     .size(10.dp, 10.dp)
                     .focusRequester(focusRequester)
-                    .focus()
+                    .focusModifier()
                     .shortcuts {
                         on(Key.MetaLeft + Key.Enter) {
                             triggered += 1
@@ -100,7 +100,7 @@ class ShortcutsTest {
                 modifier = Modifier
                     .size(10.dp, 10.dp)
                     .focusRequester(focusRequester)
-                    .focus()
+                    .focusModifier()
                     .shortcuts {
                         if (setShortcuts) {
                             on(Key.Enter) {
@@ -157,7 +157,7 @@ class ShortcutsTest {
                 modifier = Modifier
                     .size(10.dp, 10.dp)
                     .focusRequester(focusRequester)
-                    .focus()
+                    .focusModifier()
                     .shortcuts {
                         on(Key.Enter) {
                             enterTriggered += 1
@@ -225,7 +225,7 @@ class ShortcutsTest {
                 modifier = Modifier
                     .size(10.dp, 10.dp)
                     .focusRequester(focusRequester)
-                    .focus()
+                    .focusModifier()
                     .shortcuts {
                         on(Key.MetaLeft + Key.A) {
                             aTriggered += 1

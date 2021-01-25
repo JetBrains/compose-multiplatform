@@ -22,10 +22,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.boundingRect
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.graphics.drawscope.Fill
-import androidx.compose.ui.util.annotation.FloatRange
 
 /**
  * Defines a simple shape, used for bounding graphical regions.
@@ -38,7 +38,11 @@ sealed class Outline {
      * Rectangular area.
      */
     @Immutable
-    data class Rectangle(val rect: Rect) : Outline()
+    data class Rectangle(val rect: Rect) : Outline() {
+
+        override val bounds: Rect
+            get() = rect
+    }
     /**
      * Rectangular area with rounded corners.
      */
@@ -60,13 +64,24 @@ sealed class Outline {
                 null
             }
         }
+
+        override val bounds: Rect
+            get() = roundRect.boundingRect
     }
     /**
      * An area defined as a path.
      *
      * Note that only convex paths can be used for drawing the shadow. See [Path.isConvex].
      */
-    data class Generic(val path: Path) : Outline()
+    data class Generic(val path: Path) : Outline() {
+        override val bounds: Rect
+            get() = path.getBounds()
+    }
+
+    /**
+     * Return the bounds of the outline
+     */
+    abstract val bounds: Rect
 }
 
 /**
@@ -92,7 +107,8 @@ fun Path.addOutline(outline: Outline) = when (outline) {
 fun DrawScope.drawOutline(
     outline: Outline,
     color: Color,
-    @FloatRange(from = 0.0, to = 1.0) alpha: Float = 1.0f,
+    /*@FloatRange(from = 0.0, to = 1.0)*/
+    alpha: Float = 1.0f,
     style: DrawStyle = Fill,
     colorFilter: ColorFilter? = null,
     blendMode: BlendMode = DrawScope.DefaultBlendMode
@@ -131,7 +147,8 @@ fun DrawScope.drawOutline(
 fun DrawScope.drawOutline(
     outline: Outline,
     brush: Brush,
-    @FloatRange(from = 0.0, to = 1.0) alpha: Float = 1.0f,
+    /*@FloatRange(from = 0.0, to = 1.0)*/
+    alpha: Float = 1.0f,
     style: DrawStyle = Fill,
     colorFilter: ColorFilter? = null,
     blendMode: BlendMode = DrawScope.DefaultBlendMode

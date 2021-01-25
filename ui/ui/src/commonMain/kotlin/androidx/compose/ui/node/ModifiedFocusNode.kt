@@ -16,7 +16,8 @@
 
 package androidx.compose.ui.node
 
-import androidx.compose.ui.FocusModifier
+import androidx.compose.ui.focus.FocusModifier
+import androidx.compose.ui.focus.FocusOrder
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.FocusState.Active
 import androidx.compose.ui.focus.FocusState.ActiveParent
@@ -25,6 +26,8 @@ import androidx.compose.ui.focus.FocusState.Disabled
 import androidx.compose.ui.focus.FocusState.Inactive
 import androidx.compose.ui.focus.focusableChildren2
 import androidx.compose.ui.focus.searchChildrenForFocusNode
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.util.fastForEach
 
 internal class ModifiedFocusNode(
@@ -303,6 +306,15 @@ internal class ModifiedFocusNode(
     override fun propagateFocusEvent(focusState: FocusState) {
         // Do nothing. Stop propagating the focus change (since we hit another focus node).
     }
+
+    override fun populateFocusOrder(focusOrder: FocusOrder) {
+        // Do nothing. Stop propagating the fetchFocusOrder (since we hit another focus node).
+    }
+
+    // TODO(b/175900268): Add API to allow a parent to extends the bounds of the focus Modifier.
+    //  For now we just use the bounds of this node.
+    internal val focusRect: Rect
+        get() = boundsInRoot()
 
     // TODO(b/152051577): Measure the performance of focusableChildren.
     //  Consider caching the children.

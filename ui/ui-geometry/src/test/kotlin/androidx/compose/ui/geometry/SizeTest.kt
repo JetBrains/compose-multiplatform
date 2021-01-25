@@ -139,4 +139,26 @@ class SizeTest {
         val size2 = Size(300f, 500f)
         Assert.assertEquals(Size(200f, 350f), lerp(size1, size2, 0.5f))
     }
+
+    @Test
+    fun testIsSpecified() {
+        Assert.assertFalse(Size.Unspecified.isSpecified)
+        Assert.assertTrue(Size(1f, 1f).isSpecified)
+    }
+
+    @Test
+    fun testIsUnspecified() {
+        Assert.assertTrue(Size.Unspecified.isUnspecified)
+        Assert.assertFalse(Size(1f, 1f).isUnspecified)
+    }
+
+    @Test
+    fun testTakeOrElseTrue() {
+        Assert.assertTrue(Size(1f, 1f).takeOrElse { Size.Unspecified }.isSpecified)
+    }
+
+    @Test
+    fun testTakeOrElseFalse() {
+        Assert.assertTrue(Size.Unspecified.takeOrElse { Size(1f, 1f) }.isSpecified)
+    }
 }

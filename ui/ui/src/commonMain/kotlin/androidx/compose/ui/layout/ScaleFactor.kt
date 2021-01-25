@@ -19,8 +19,9 @@ package androidx.compose.ui.layout
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.isSpecified
+import androidx.compose.ui.util.format
 import androidx.compose.ui.util.packFloats
-import androidx.compose.ui.util.toStringAsFixed
 import androidx.compose.ui.util.unpackFloat1
 import androidx.compose.ui.util.unpackFloat2
 
@@ -95,8 +96,7 @@ inline class ScaleFactor(@PublishedApi internal val packedValue: Long) {
     @Stable
     operator fun div(operand: Float) = ScaleFactor(scaleX / operand, scaleY / operand)
 
-    override fun toString() = "ScaleFactor(${scaleX.toStringAsFixed(1)}, " +
-        "${scaleY.toStringAsFixed(1)})"
+    override fun toString() = "ScaleFactor(${"%.1f".format(scaleX)}, ${"%.1f".format(scaleY)})"
 
     companion object {
 
@@ -109,6 +109,27 @@ inline class ScaleFactor(@PublishedApi internal val packedValue: Long) {
         val Unspecified = ScaleFactor(Float.NaN, Float.NaN)
     }
 }
+
+/**
+ * `false` when this is [ScaleFactor.Unspecified].
+ */
+@Stable
+inline val ScaleFactor.isSpecified: Boolean
+    get() = packedValue != ScaleFactor.Unspecified.packedValue
+
+/**
+ * `true` when this is [ScaleFactor.Unspecified].
+ */
+@Stable
+inline val ScaleFactor.isUnspecified: Boolean
+    get() = packedValue == ScaleFactor.Unspecified.packedValue
+
+/**
+ * If this [ScaleFactor] [isSpecified] then this is returned, otherwise [block] is executed
+ * and its result is returned.
+ */
+inline fun ScaleFactor.takeOrElse(block: () -> ScaleFactor): ScaleFactor =
+    if (isSpecified) this else block()
 
 /**
  * Multiplication operator with [Size].

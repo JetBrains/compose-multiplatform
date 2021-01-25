@@ -17,64 +17,72 @@
 package androidx.compose.ui.text.input
 
 /**
- * Enums used for indicating IME action.
- *
- * @see <https://developer.android.com/reference/android/view/inputmethod/EditorInfo.html#IME_MASK_ACTION>
+ * Signals the keyboard what type of action should be displayed. It is not guaranteed if
+ * the keyboard will show the requested action. Apart from the visuals on the keyboard, when the
+ * user performs the action onImeActionPerformed callback will be triggered with the action.
  */
 enum class ImeAction {
     /**
-     * An IME action used to represent that any IME action is associated.
-     *
-     * @see <https://developer.android.com/reference/android/view/inputmethod/EditorInfo.html#IME_ACTION_UNSPECIFIED>
+     * Use the platform and keyboard defaults and let the keyboard to decide the action. The
+     * keyboards will mostly show one of [Done] or [None] actions based on the single/multi
+     * line configuration.
      */
+    @Deprecated("Use Default instead", ReplaceWith("Default"))
     Unspecified,
 
     /**
-     * An IME action used to represent that no IME action is available in editor.
-     *
-     * @see <https://developer.android.com/reference/android/view/inputmethod/EditorInfo.html#IME_ACTION_NONE>
+     * Use the platform and keyboard defaults and let the keyboard to decide the action. The
+     * keyboards will mostly show one of [Done] or [None] actions based on the single/multi
+     * line configuration.
      */
+    Default,
+
+    /**
+     * Represents that no IME action is available in editor. The keyboards will mostly show new line
+     * action.
+     */
+    @Deprecated("Use None instead", ReplaceWith("None"))
     NoAction,
 
     /**
-     * An IME action used to represent that the "enter" key works as "go" action.
-     *
-     * @see <https://developer.android.com/reference/android/view/inputmethod/EditorInfo.html#IME_ACTION_GO>
+     * Represents that no action is expected from the keyboard. Keyboard might choose to show an
+     * action which mostly will be newline, however this action is not carried into the app via
+     * onImeActionPerformed.
+     */
+    None,
+
+    /**
+     * Represents that the user would like to go to the target of the text in the input i.e.
+     * visiting a URL.
      */
     Go,
 
     /**
-     * An IME action used to represent that the "enter" key works as "search" action.
-     *
-     * @see <https://developer.android.com/reference/android/view/inputmethod/EditorInfo.html#IME_ACTION_SEARCH>
+     * Represents that the user wants to execute a search, i.e web search query.
      */
     Search,
 
     /**
-     * An IME action used to represent that the "enter" key works as "send" action.
-     *
-     * @see <https://developer.android.com/reference/android/view/inputmethod/EditorInfo.html#IME_ACTION_SEND>
+     * Represents that the user wants to send the text in the input, i.e an SMS.
      */
     Send,
 
     /**
-     * An IME action used to represent that the "enter" key works as "previous" action.
-     *
-     * @see <https://developer.android.com/reference/android/view/inputmethod/EditorInfo.html#IME_ACTION_PREVIOUS>
+     * Represents that the user wants to return to the previous input i.e. going back to the
+     * previous field in a form.
      */
     Previous,
 
     /**
-     * An IME action used to represent that the "enter" key works as "next" action.
-     *
-     * https://developer.android.com/reference/android/view/inputmethod/EditorInfo.html#IME_ACTION_NEXT
+     * Represents that the user is done with the current input, and wants to move to the next
+     * one i.e. moving to the next field in a form.
      */
     Next,
 
     /**
-     * An IME action used to represent that the "enter" key works as "done" action.
-     *
-     * @see <https://developer.android.com/reference/android/view/inputmethod/EditorInfo.html#IME_ACTION_DONE>
+     * Represents that the user is done providing input to a group of inputs. Some
+     * kind of finalization behavior should now take place i.e. the field was the last element in
+     * a group and the data input is finalized.
      */
     Done
 }

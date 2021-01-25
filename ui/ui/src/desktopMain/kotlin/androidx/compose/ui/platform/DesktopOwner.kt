@@ -25,15 +25,32 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusManagerImpl
+import androidx.compose.ui.focus.FocusDirection.Down
+import androidx.compose.ui.focus.FocusDirection.Left
+import androidx.compose.ui.focus.FocusDirection.Next
+import androidx.compose.ui.focus.FocusDirection.Previous
+import androidx.compose.ui.focus.FocusDirection.Right
+import androidx.compose.ui.focus.FocusDirection.Up
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.DesktopCanvas
+import androidx.compose.ui.input.key.Key.Companion.DirectionDown
+import androidx.compose.ui.input.key.Key.Companion.DirectionLeft
+import androidx.compose.ui.input.key.Key.Companion.DirectionRight
+import androidx.compose.ui.input.key.Key.Companion.DirectionUp
+import androidx.compose.ui.input.key.Key.Companion.Tab
 import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.KeyInputModifier
+import androidx.compose.ui.input.key.isShiftPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.mouse.MouseScrollEvent
 import androidx.compose.ui.input.mouse.MouseScrollEventFilter
+import androidx.compose.ui.input.pointer.TestPointerInputEventData
 import androidx.compose.ui.input.pointer.PointerInputEvent
 import androidx.compose.ui.input.pointer.PointerInputEventProcessor
 import androidx.compose.ui.input.pointer.PointerInputFilter
@@ -45,6 +62,7 @@ import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.MeasureAndLayoutDelegate
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.node.OwnerSnapshotObserver
+import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.semantics.SemanticsModifierCore
 import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.text.input.TextInputService
@@ -63,7 +81,7 @@ import androidx.compose.ui.unit.LayoutDirection
 class DesktopOwner(
     val container: DesktopOwners,
     density: Density = Density(1f, 1f)
-) : Owner {
+) : Owner, RootForTest {
     internal var size by mutableStateOf(IntSize(0, 0))
 
     override var density by mutableStateOf(density)
@@ -82,12 +100,25 @@ class DesktopOwner(
     override val focusManager: FocusManager
         get() = _focusManager
 
-    // TODO: set/clear _windowManager.isWindowFocused when the window gains/loses focus.
-    private val _windowManager: WindowManagerImpl = WindowManagerImpl()
-    override val windowManager: WindowManager
-        get() = _windowManager
+    // TODO: set/clear _windowInfo.isWindowFocused when the window gains/loses focus.
+    private val _windowInfo: WindowInfoImpl = WindowInfoImpl()
+    override val windowInfo: WindowInfo
+        get() = _windowInfo
 
-    private val keyInputModifier = KeyInputModifier(null, null)
+    // TODO(b/177931787) : Consider creating a KeyInputManager like we have for FocusManager so
+    //  that this common logic can be used by all owners.
+    private val keyInputModifier: KeyInputModifier = KeyInputModifier(
+        onKeyEvent = {
+            if (it.type == KeyEventType.KeyDown) {
+                getFocusDirection(it)?.let { direction ->
+                    focusManager.moveFocus(direction)
+                    return@KeyInputModifier true
+                }
+            }
+            false
+        },
+        onPreviewKeyEvent = null
+    )
 
     override val root = LayoutNode().also {
         it.measureBlocks = RootMeasureBlocks
@@ -95,6 +126,8 @@ class DesktopOwner(
             .then(_focusManager.modifier)
             .then(keyInputModifier)
     }
+
+    override val rootForTest = this
 
     override val snapshotObserver = OwnerSnapshotObserver { command ->
         command()
@@ -189,7 +222,20 @@ class DesktopOwner(
 
     override fun onSemanticsChange() = Unit
 
+    override fun onLayoutChange(layoutNode: LayoutNode) = Unit
+
+    override fun getFocusDirection(keyEvent: KeyEvent): FocusDirection? = when (keyEvent.key) {
+        Tab -> if (keyEvent.isShiftPressed) Previous else Next
+        DirectionRight -> Right
+        DirectionLeft -> Left
+        DirectionUp -> Up
+        DirectionDown -> Down
+        else -> null
+    }
+
     override fun calculatePosition() = IntOffset.Zero
+
+    override fun calculatePositionInWindow() = IntOffset.Zero
 
     fun setSize(width: Int, height: Int) {
         val constraints = Constraints(0, width, 0, height)
@@ -201,9 +247,18 @@ class DesktopOwner(
         root.draw(DesktopCanvas(canvas))
     }
 
-    fun processPointerInput(event: PointerInputEvent) {
+    internal fun processPointerInput(event: PointerInputEvent) {
         measureAndLayout()
         pointerInputEventProcessor.process(event)
+    }
+
+    fun processPointerInput(time: Long, pointers: List<TestPointerInputEventData>) {
+        processPointerInput(
+            PointerInputEvent(
+                time,
+                pointers.map { it.toPointerInputEventData() }
+            )
+        )
     }
 
     // TODO(demin): This is likely temporary. After PointerInputEvent can handle mouse events

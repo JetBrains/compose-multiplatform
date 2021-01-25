@@ -25,7 +25,6 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.Uptime
 import com.google.common.truth.FailureMetadata
 import com.google.common.truth.Subject
 import com.google.common.truth.Subject.Factory
@@ -33,21 +32,22 @@ import com.google.common.truth.Truth
 
 internal fun PointerInputEventData(
     id: Int,
-    uptime: Uptime,
+    uptime: Long,
     position: Offset,
     down: Boolean
 ): PointerInputEventData {
-    val pointerInputData = PointerInputData(
+    return PointerInputEventData(
+        PointerId(id.toLong()),
         uptime,
         position,
-        down
+        down,
+        PointerType.Touch
     )
-    return PointerInputEventData(PointerId(id.toLong()), pointerInputData)
 }
 
 internal fun PointerInputEvent(
     id: Int,
-    uptime: Uptime,
+    uptime: Long,
     position: Offset,
     down: Boolean
 ): PointerInputEvent {
@@ -59,7 +59,7 @@ internal fun PointerInputEvent(
 }
 
 internal fun PointerInputEvent(
-    uptime: Uptime,
+    uptime: Long,
     pointers: List<PointerInputEventData>
 ) = PointerInputEvent(
     uptime,
@@ -179,8 +179,11 @@ internal fun MotionEvent(
 }
 
 @Suppress("TestFunctionName")
-internal fun PointerProperties(id: Int) =
-    MotionEvent.PointerProperties().apply { this.id = id }
+internal fun PointerProperties(id: Int, toolType: Int = MotionEvent.TOOL_TYPE_FINGER) =
+    MotionEvent.PointerProperties().apply {
+        this.id = id
+        this.toolType = toolType
+    }
 
 @Suppress("TestFunctionName")
 internal fun PointerCoords(x: Float, y: Float) =
@@ -306,8 +309,24 @@ internal class PointerEventSubject(
         check("changes.size").that(actualChanges.size).isEqualTo(expectedChanges.size)
         actualChanges.forEachIndexed { i, _ ->
             check("id").that(actualChanges[i].id).isEqualTo(expectedChanges[i].id)
-            check("current").that(actualChanges[i].current).isEqualTo(expectedChanges[i].current)
-            check("previous").that(actualChanges[i].previous).isEqualTo(expectedChanges[i].previous)
+            check("currentPosition")
+                .that(actualChanges[i].position)
+                .isEqualTo(expectedChanges[i].position)
+            check("currentTime")
+                .that(actualChanges[i].uptimeMillis)
+                .isEqualTo(expectedChanges[i].uptimeMillis)
+            check("currentPressed")
+                .that(actualChanges[i].pressed)
+                .isEqualTo(expectedChanges[i].pressed)
+            check("previousTime")
+                .that(actualChanges[i].previousUptimeMillis)
+                .isEqualTo(expectedChanges[i].previousUptimeMillis)
+            check("previousPosition")
+                .that(actualChanges[i].previousPosition)
+                .isEqualTo(expectedChanges[i].previousPosition)
+            check("previousPressed")
+                .that(actualChanges[i].previousPressed)
+                .isEqualTo(expectedChanges[i].previousPressed)
             check("consumed.downChange")
                 .that(actualChanges[i].consumed.downChange)
                 .isEqualTo(expectedChanges[i].consumed.downChange)
@@ -359,8 +378,24 @@ internal class PointerInputChangeSubject(
 
     fun isStructurallyEqualTo(expected: PointerInputChange) {
         check("id").that(actual.id).isEqualTo(expected.id)
-        check("current").that(actual.current).isEqualTo(expected.current)
-        check("previous").that(actual.previous).isEqualTo(expected.previous)
+        check("currentPosition")
+            .that(actual.position)
+            .isEqualTo(expected.position)
+        check("previousPosition")
+            .that(actual.previousPosition)
+            .isEqualTo(expected.previousPosition)
+        check("currentTime")
+            .that(actual.uptimeMillis)
+            .isEqualTo(expected.uptimeMillis)
+        check("previousTime")
+            .that(actual.previousUptimeMillis)
+            .isEqualTo(expected.previousUptimeMillis)
+        check("currentPressed")
+            .that(actual.pressed)
+            .isEqualTo(expected.pressed)
+        check("previousPressed")
+            .that(actual.previousPressed)
+            .isEqualTo(expected.previousPressed)
         check("consumed.downChange")
             .that(actual.consumed.downChange)
             .isEqualTo(expected.consumed.downChange)
@@ -370,10 +405,6 @@ internal class PointerInputChangeSubject(
     }
 }
 
-internal fun PointerInputChange.deepCopy() =
-    PointerInputChange(
-        id,
-        current.copy(),
-        previous.copy(),
-        ConsumedData(consumed.positionChange, consumed.downChange)
-    )
+internal fun PointerInputChange.deepCopy() = copy(
+    consumed = ConsumedData(consumed.positionChange, consumed.downChange)
+)

@@ -17,11 +17,11 @@
 
 import androidx.build.AndroidXUiPlugin
 import androidx.build.LibraryGroups
-import androidx.build.LibraryVersions
 import androidx.build.Publish
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 import static androidx.build.dependencies.DependenciesKt.*
+import static androidx.inspection.gradle.InspectionPluginKt.packageInspector
 
 plugins {
     id("AndroidXPlugin")
@@ -109,6 +109,8 @@ dependencies {
         lintPublish project(":compose:ui:ui-lint")
     }
 }
+
+packageInspector(project, project(":compose:ui:ui-inspection"))
 
 if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
     kotlin {
@@ -236,7 +238,6 @@ tasks.withType(KotlinCompile).configureEach {
             "-Xuse-experimental=kotlin.Experimental",
             "-XXLanguage:+InlineClasses"
         ]
-        useIR = true
     }
 }
 

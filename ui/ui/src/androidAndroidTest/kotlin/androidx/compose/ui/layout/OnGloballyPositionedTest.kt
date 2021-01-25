@@ -18,7 +18,6 @@ package androidx.compose.ui.layout
 
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import androidx.compose.foundation.layout.Box
@@ -26,7 +25,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.State
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
@@ -92,7 +90,7 @@ class OnGloballyPositionedTest {
                                 minWidth = size,
                                 minHeight = size,
                                 modifier = Modifier.onGloballyPositioned { coordinates ->
-                                    wrap1Position = coordinates.globalPosition.x
+                                    wrap1Position = coordinates.positionInWindow().x
                                     latch.countDown()
                                 }
                             )
@@ -101,7 +99,7 @@ class OnGloballyPositionedTest {
                                 minWidth = size,
                                 minHeight = size,
                                 modifier = Modifier.onGloballyPositioned { coordinates ->
-                                    wrap2Position = coordinates.globalPosition.x
+                                    wrap2Position = coordinates.positionInWindow().x
                                     latch.countDown()
                                 }
                             )
@@ -175,7 +173,7 @@ class OnGloballyPositionedTest {
                                 minWidth = 10,
                                 minHeight = 10,
                                 modifier = Modifier.onGloballyPositioned { coordinates ->
-                                    childGlobalPosition = coordinates.positionInRoot
+                                    childGlobalPosition = coordinates.positionInRoot()
                                     latch.countDown()
                                 }
                             )
@@ -349,7 +347,7 @@ class OnGloballyPositionedTest {
         rule.runOnUiThread {
             view?.getLocationOnScreen(position)
         }
-        assertEquals(position[1].toFloat(), coordinates!!.globalPosition.y)
+        assertEquals(position[1].toFloat(), coordinates!!.positionInWindow().y)
     }
 
     @Test
@@ -379,7 +377,7 @@ class OnGloballyPositionedTest {
             }
         }
         assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
-        val startY = coordinates!!.globalPosition.y
+        val startY = coordinates!!.positionInWindow().y
         positionedLatch = CountDownLatch(1)
 
         rule.runOnUiThread {
@@ -390,7 +388,7 @@ class OnGloballyPositionedTest {
             "OnPositioned is not called when the container moved",
             positionedLatch.await(1, TimeUnit.SECONDS)
         )
-        assertEquals(startY - 100f, coordinates!!.globalPosition.y)
+        assertEquals(startY - 100f, coordinates!!.positionInWindow().y)
     }
 
     @Test
@@ -503,10 +501,10 @@ class OnGloballyPositionedTest {
         assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
 
         // global position
-        val gPos = childCoordinates!!.localToGlobal(Offset.Zero).x
+        val gPos = childCoordinates!!.localToWindow(Offset.Zero).x
         assertThat(gPos).isEqualTo((firstPaddingPx + secondPaddingPx + thirdPaddingPx))
         // Position in grandparent Px(value=50.0)
-        val gpPos = gpCoordinates!!.childToLocal(childCoordinates!!, Offset.Zero).x
+        val gpPos = gpCoordinates!!.localPositionOf(childCoordinates!!, Offset.Zero).x
         assertThat(gpPos).isEqualTo((secondPaddingPx + thirdPaddingPx))
         // local position
         assertThat(childCoordinates!!.positionInParent.x).isEqualTo(thirdPaddingPx)
@@ -523,19 +521,19 @@ class OnGloballyPositionedTest {
 
         val positionedLatch = CountDownLatch(1)
         rule.runOnUiThread {
-            val frameLayout = FrameLayout(activity)
-            frameLayout.setPadding(padding, padding, padding, padding)
-            activity.setContentView(frameLayout)
+            val composeView = ComposeView(activity)
+            composeView.setPadding(padding, padding, padding, padding)
+            activity.setContentView(composeView)
 
             val position = IntArray(2)
-            frameLayout.getLocationOnScreen(position)
+            composeView.getLocationOnScreen(position)
             frameGlobalPosition = Offset(position[0].toFloat(), position[1].toFloat())
 
-            frameLayout.setContent(Recomposer.current()) {
+            composeView.setContent {
                 Box(
                     Modifier.fillMaxSize().onGloballyPositioned {
-                        realGlobalPosition = it.localToGlobal(localPosition)
-                        realLocalPosition = it.globalToLocal(
+                        realGlobalPosition = it.localToWindow(localPosition)
+                        realLocalPosition = it.windowToLocal(
                             framePadding + frameGlobalPosition!!
                         )
                         positionedLatch.countDown()
@@ -618,7 +616,7 @@ class OnGloballyPositionedTest {
                                 Box(Modifier.size(10.toDp())) {
                                     Box(
                                         Modifier.onGloballyPositioned {
-                                            realLeft = it.positionInRoot.x
+                                            realLeft = it.positionInRoot().x
                                             positionedLatch.countDown()
                                         }.size(10.toDp())
                                     )

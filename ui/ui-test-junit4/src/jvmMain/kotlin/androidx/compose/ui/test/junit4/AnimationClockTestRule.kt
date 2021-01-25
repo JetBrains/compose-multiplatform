@@ -16,11 +16,11 @@
 
 package androidx.compose.ui.test.junit4
 
-import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.TestAnimationClock
 import org.junit.rules.TestRule
 
-@ExperimentalTesting
+@ExperimentalTestApi
 interface AnimationClockTestRule : TestRule {
     /**
      * The ambient animation clock that is provided at the root of the composition tree.
@@ -54,5 +54,5 @@ interface AnimationClockTestRule : TestRule {
     level = DeprecationLevel.ERROR,
     replaceWith = ReplaceWith("composeTestRule.clockTestRule")
 )
-@ExperimentalTesting
+@ExperimentalTestApi
 expect fun createAnimationClockRule(): AnimationClockTestRule

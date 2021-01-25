@@ -18,6 +18,8 @@ package androidx.compose.ui.tooling.inspector
 
 import androidx.compose.ui.layout.LayoutInfo
 
+private val EmptyIntArray = IntArray(0)
+
 /**
  * Node representing a Composable for the Layout Inspector.
  */
@@ -86,6 +88,14 @@ class InspectorNode internal constructor(
     val height: Int,
 
     /**
+     * The 4 corners of the node after modifier transformations.
+     * If there are no coordinate transforms the array will be empty.
+     * Otherwise the content will be 8 integers representing 4 (x,y) corners
+     * in clockwise order of the original, untransformed coordinates.
+     */
+    val bounds: IntArray,
+
+    /**
      * The parameters of this Composable.
      */
     val parameters: List<RawParameter>,
@@ -117,27 +127,29 @@ internal class MutableInspectorNode {
     var top = 0
     var width = 0
     var height = 0
+    var bounds = EmptyIntArray
     val parameters = mutableListOf<RawParameter>()
     val children = mutableListOf<InspectorNode>()
 
     fun reset() {
-        resetExceptIdLayoutNodesAndChildren()
+        markUnwanted()
         id = 0L
+        left = 0
+        top = 0
+        width = 0
+        height = 0
         layoutNodes.clear()
+        bounds = EmptyIntArray
         children.clear()
     }
 
-    fun resetExceptIdLayoutNodesAndChildren() {
+    fun markUnwanted() {
         name = ""
         fileName = ""
         packageHash = -1
         lineNumber = 0
         offset = 0
         length = 0
-        left = 0
-        top = 0
-        width = 0
-        height = 0
         parameters.clear()
     }
 
@@ -153,6 +165,7 @@ internal class MutableInspectorNode {
         top = node.top
         width = node.width
         height = node.height
+        bounds = node.bounds
         parameters.addAll(node.parameters)
         children.addAll(node.children)
     }
@@ -160,6 +173,6 @@ internal class MutableInspectorNode {
     fun build(): InspectorNode =
         InspectorNode(
             id, name, fileName, packageHash, lineNumber, offset, length, left, top, width, height,
-            parameters.toList(), children.toList()
+            bounds, parameters.toList(), children.toList()
         )
 }

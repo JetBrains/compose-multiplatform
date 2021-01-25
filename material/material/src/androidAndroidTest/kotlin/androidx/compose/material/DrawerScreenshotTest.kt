@@ -26,7 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.captureToImage
-import androidx.compose.ui.test.junit4.ComposeTestRule
+import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
@@ -43,13 +43,14 @@ import org.junit.runner.RunWith
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
 class DrawerScreenshotTest {
 
+    @Suppress("DEPRECATION")
     @get:Rule
     val rule = createComposeRule()
 
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL)
 
-    private fun ComposeTestRule.setBottomDrawer(drawerValue: BottomDrawerValue) {
+    private fun ComposeContentTestRule.setBottomDrawer(drawerValue: BottomDrawerValue) {
         setMaterialContent {
             Box(Modifier.size(10.dp, 100.dp).testTag("container")) {
                 BottomDrawerLayout(
@@ -61,7 +62,7 @@ class DrawerScreenshotTest {
         }
     }
 
-    private fun ComposeTestRule.setModalDrawer(drawerValue: DrawerValue) {
+    private fun ComposeContentTestRule.setModalDrawer(drawerValue: DrawerValue) {
         setMaterialContent {
             Box(Modifier.size(100.dp, 10.dp).testTag("container")) {
                 ModalDrawerLayout(

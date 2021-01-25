@@ -26,7 +26,7 @@ import androidx.compose.integration.demos.common.Demo
 import androidx.compose.integration.demos.common.DemoCategory
 import androidx.compose.integration.demos.common.allDemos
 import androidx.compose.integration.demos.common.allLaunchableDemos
-import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsNodeInteractionCollection
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasClickAction
@@ -51,12 +51,14 @@ private val demosWithInifinateAnimations = listOf("Material > Progress Indicator
 private val ignoredDemos = listOf(
     // TODO(b/168695905, fresen): We don't have a way to pause suspend animations yet.
     "Animation > Suspend Animation Demos > Infinitely Animating",
+    "Animation > State Transition Demos > Infinite transition",
 )
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalTesting::class)
+@OptIn(ExperimentalTestApi::class)
 class DemoTest {
+    // We need to provide the recompose factory first to use new clock.
     @get:Rule
     val rule = createAndroidComposeRule<DemoActivity>()
 
@@ -114,7 +116,7 @@ class DemoTest {
     @Test
     fun navigateThroughAllDemos_withInfiniteAnimations() {
         // Pause the clock in these tests and forward it manually
-        rule.clockTestRule.pauseClock()
+        rule.mainClock.autoAdvance = false
         navigateThroughAllDemos(AllDemosWithInfiniteAnimations, fastForwardClock = true)
     }
 
@@ -191,6 +193,7 @@ class DemoTest {
             ?.activityClass != ComposeInAndroidDialogDismissDialogDuringDispatch::class
 
         if (hasComposeView) {
+            rule.waitForIdle()
             while (rule.onAllNodes(isDialog()).isNotEmpty()) {
                 rule.waitForIdle()
                 Espresso.pressBack()
@@ -200,12 +203,17 @@ class DemoTest {
         rule.waitForIdle()
         Espresso.pressBack()
 
+        if (fastForwardClock) {
+            // Pump press back
+            fastForwardClock(2000)
+        }
+
         assertAppBarHasTitle(navigationTitle)
     }
 
-    private fun fastForwardClock() {
+    private fun fastForwardClock(millis: Long = 5000) {
         rule.waitForIdle()
-        rule.clockTestRule.advanceClock(5000)
+        rule.mainClock.advanceTimeBy(millis)
     }
 
     /**

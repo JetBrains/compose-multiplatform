@@ -17,7 +17,6 @@
 package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.InternalLayoutApi
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.unit.Constraints
@@ -55,6 +54,7 @@ internal fun measureLazyList(
             firstVisibleItemScrollOffset = 0,
             canScrollForward = false,
             consumedScroll = 0f,
+            notUsedButComposedItems = null,
             viewportStartOffset = -startContentPadding,
             viewportEndOffset = endContentPadding,
             totalItemsCount = 0
@@ -223,6 +223,7 @@ internal fun measureLazyList(
             firstVisibleItemScrollOffset = currentFirstItemScrollOffset,
             canScrollForward = mainAxisUsed > maxOffset,
             consumedScroll = consumedScroll,
+            notUsedButComposedItems = notUsedButComposedItems,
             viewportStartOffset = -startContentPadding,
             viewportEndOffset = maximumVisibleOffset,
             totalItemsCount = itemsCount
@@ -233,14 +234,14 @@ internal fun measureLazyList(
 /**
  * Lays out [LazyMeasuredItem]s based on the [LazyListMeasureResult] and the passed arrangement.
  */
-@OptIn(InternalLayoutApi::class)
 internal fun MeasureScope.layoutLazyList(
     constraints: Constraints,
     isVertical: Boolean,
     verticalArrangement: Arrangement.Vertical?,
     horizontalArrangement: Arrangement.Horizontal?,
     measureResult: LazyListMeasureResult,
-    reverseLayout: Boolean
+    reverseLayout: Boolean,
+    headers: LazyListHeaders?
 ): MeasureResult {
     val layoutWidth = constraints.constrainWidth(
         if (isVertical) measureResult.crossAxisSize else measureResult.mainAxisSize
@@ -264,25 +265,35 @@ internal fun MeasureScope.layoutLazyList(
             }
             val positions = IntArray(items.size) { 0 }
             if (isVertical) {
-                requireNotNull(verticalArrangement)
-                    .arrange(mainAxisLayoutSize, sizes, density, positions)
+                with(requireNotNull(verticalArrangement)) {
+                    density.arrange(mainAxisLayoutSize, sizes, positions)
+                }
             } else {
-                requireNotNull(horizontalArrangement)
-                    .arrange(mainAxisLayoutSize, sizes, layoutDirection, density, positions)
+                with(requireNotNull(horizontalArrangement)) {
+                    density.arrange(mainAxisLayoutSize, sizes, layoutDirection, positions)
+                }
             }
             positions.forEachIndexed { index, position ->
                 items[index].place(this, layoutWidth, layoutHeight, position, reverseLayout)
             }
         } else {
+            headers?.onBeforeItemsPlacing()
             measureResult.items.fastForEach {
                 val offset = if (reverseLayout) {
                     mainAxisLayoutSize - currentMainAxis - (it.size)
                 } else {
                     currentMainAxis
                 }
-                it.place(this, layoutWidth, layoutHeight, offset, reverseLayout)
+                if (headers != null) {
+                    headers.place(it, this, layoutWidth, layoutHeight, offset, reverseLayout)
+                } else {
+                    it.place(this, layoutWidth, layoutHeight, offset, reverseLayout)
+                }
                 currentMainAxis += it.sizeWithSpacings
             }
+            headers?.onAfterItemsPlacing(
+                this, mainAxisLayoutSize, layoutWidth, layoutHeight, reverseLayout
+            )
         }
     }
 }

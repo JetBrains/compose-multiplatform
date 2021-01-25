@@ -16,8 +16,6 @@
 
 import androidx.build.LibraryGroups
 import androidx.build.LibraryType
-import androidx.build.LibraryVersions
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 import static androidx.build.dependencies.DependenciesKt.*
 
@@ -40,14 +38,6 @@ dependencies {
     implementation project(":compose:material:material")
     implementation project(":compose:runtime:runtime")
     implementation project(":compose:ui:ui-text")
-}
-
-android {
-    tasks.withType(KotlinCompile).configureEach {
-        kotlinOptions {
-            useIR = true
-        }
-    }
 }
 
 androidx {

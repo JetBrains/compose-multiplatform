@@ -18,7 +18,7 @@ package androidx.compose.ui.demos
 
 import androidx.compose.ui.demos.autofill.ExplicitAutofillTypesDemo
 import androidx.compose.ui.demos.focus.FocusableDemo
-import androidx.compose.ui.demos.focus.ReuseFocusRequester
+import androidx.compose.ui.demos.focus.ReuseFocusRequesterDemo
 import androidx.compose.ui.demos.gestures.DoubleTapGestureFilterDemo
 import androidx.compose.ui.demos.gestures.DoubleTapInTapDemo
 import androidx.compose.ui.demos.gestures.DragAndScaleGestureFilterDemo
@@ -43,8 +43,10 @@ import androidx.compose.ui.demos.keyinput.KeyInputDemo
 import androidx.compose.ui.demos.viewinterop.ViewInteropDemo
 import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.integration.demos.common.DemoCategory
-import androidx.compose.ui.demos.focus.FocusInDialog
-import androidx.compose.ui.demos.focus.FocusInPopup
+import androidx.compose.ui.demos.focus.CustomFocusOrderDemo
+import androidx.compose.ui.demos.focus.FocusInDialogDemo
+import androidx.compose.ui.demos.focus.FocusInPopupDemo
+import androidx.compose.ui.demos.focus.FocusManagerMoveFocusDemo
 import androidx.compose.ui.samples.NestedScrollSample
 
 private val GestureDemos = DemoCategory(
@@ -97,9 +99,11 @@ private val FocusDemos = DemoCategory(
     "Focus",
     listOf(
         ComposableDemo("Focusable Siblings") { FocusableDemo() },
-        ComposableDemo("Focus Within Dialog") { FocusInDialog() },
-        ComposableDemo("Focus Within Popup") { FocusInPopup() },
-        ComposableDemo("Reuse Focus Requester") { ReuseFocusRequester() }
+        ComposableDemo("Focus Within Dialog") { FocusInDialogDemo() },
+        ComposableDemo("Focus Within Popup") { FocusInPopupDemo() },
+        ComposableDemo("Reuse Focus Requester") { ReuseFocusRequesterDemo() },
+        ComposableDemo("Custom Focus Order") { CustomFocusOrderDemo() },
+        ComposableDemo("FocusManager.moveFocus()") { FocusManagerMoveFocusDemo() }
     )
 )
 

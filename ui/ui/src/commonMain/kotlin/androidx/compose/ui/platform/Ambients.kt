@@ -52,6 +52,7 @@ val AmbientAnimationClock = staticAmbientOf<AnimationClockObservable>()
 /**
  * The ambient that can be used to trigger autofill actions. Eg. [Autofill.requestAutofillForNode].
  */
+@get:ExperimentalComposeUiApi
 @ExperimentalComposeUiApi
 val AmbientAutofill = staticAmbientOf<Autofill?>()
 
@@ -61,6 +62,7 @@ val AmbientAutofill = staticAmbientOf<Autofill?>()
  * [AutofillTree] is a temporary data structure that will be replaced by Autofill Semantics
  * (b/138604305).
  */
+@get:ExperimentalComposeUiApi
 @ExperimentalComposeUiApi
 val AmbientAutofillTree = staticAmbientOf<AutofillTree>()
 
@@ -258,10 +260,24 @@ val ViewConfigurationAmbient get() = AmbientViewConfiguration
  */
 val AmbientViewConfiguration = staticAmbientOf<ViewConfiguration>()
 
+// TODO(b/177085155): Remove after Alpha 11.
 /**
  * The ambient that provides information about the window that hosts the current [Owner].
  */
-val AmbientWindowManager = staticAmbientOf<WindowManager>()
+@Deprecated(
+    message = "Renamed to AmbientWindowInfo",
+    replaceWith = ReplaceWith(
+        "AmbientWindowInfo",
+        "androidx.compose.ui.platform.AmbientWindowInfo"
+    ),
+    level = DeprecationLevel.ERROR
+)
+val AmbientWindowManager get() = AmbientWindowInfo
+
+/**
+ * The ambient that provides information about the window that hosts the current [Owner].
+ */
+val AmbientWindowInfo = staticAmbientOf<WindowInfo>()
 
 @ExperimentalComposeUiApi
 @Composable
@@ -285,7 +301,7 @@ internal fun ProvideCommonAmbients(
         AmbientTextToolbar provides owner.textToolbar,
         AmbientUriHandler provides uriHandler,
         AmbientViewConfiguration provides owner.viewConfiguration,
-        AmbientWindowManager provides owner.windowManager,
+        AmbientWindowInfo provides owner.windowInfo,
         content = content
     )
 }

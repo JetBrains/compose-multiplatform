@@ -71,7 +71,8 @@ import androidx.compose.ui.unit.dp
 
 @Composable private fun KotlinSnippet4() {
     Column(
-        modifier = Modifier.padding(16.dp), content = {
+        modifier = Modifier.padding(16.dp),
+        content = {
             Text("Some text")
             Text("Some more text")
             Text("Last text")
@@ -114,7 +115,7 @@ import androidx.compose.ui.unit.dp
             // This method accepts a lambda of type DrawScope.() -> Unit
             // therefore in this lambda we can access properties and functions
             // available from DrawScope, such as the `drawRectangle` function.
-            drawRect( /*...*/)
+            drawRect(/*...*/)
         }
     )
 }

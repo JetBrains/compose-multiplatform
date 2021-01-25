@@ -53,7 +53,7 @@ fun SemanticsNodeInteraction.captureToImage(): ImageBitmap {
         )
     }
 
-    val view = (node.owner as ViewRootForTest).view
+    val view = (node.root as ViewRootForTest).view
 
     // If we are in dialog use its window to capture the bitmap
     val dialogParentNodeMaybe = node.findClosestParentNode(includeSelf = true) {

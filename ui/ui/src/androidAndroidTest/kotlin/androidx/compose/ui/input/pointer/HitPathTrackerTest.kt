@@ -22,7 +22,6 @@ import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.milliseconds
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
@@ -304,7 +303,7 @@ class HitPathTrackerTest {
         hitPathTracker.addHitPath(PointerId(3), listOf(pif1, pif2))
         hitPathTracker.addHitPath(PointerId(5), listOf(pif3, pif4))
         val event1 = down(3)
-        val event2 = down(5).moveTo(10.milliseconds, 7f, 9f)
+        val event2 = down(5).moveTo(10, 7f, 9f)
 
         hitPathTracker.dispatchChanges(
             internalPointerEventOf(event1, event2)
@@ -356,7 +355,7 @@ class HitPathTrackerTest {
         hitPathTracker.addHitPath(PointerId(3), listOf(parent, child1))
         hitPathTracker.addHitPath(PointerId(5), listOf(parent, child2))
         val event1 = down(3)
-        val event2 = down(5).moveTo(10.milliseconds, 7f, 9f)
+        val event2 = down(5).moveTo(10, 7f, 9f)
 
         hitPathTracker.dispatchChanges(
             internalPointerEventOf(event1, event2)
@@ -433,7 +432,7 @@ class HitPathTrackerTest {
         hitPathTracker.addHitPath(PointerId(3), listOf(child1, child2))
         hitPathTracker.addHitPath(PointerId(5), listOf(child1, child2))
         val event1 = down(3)
-        val event2 = down(5).moveTo(10.milliseconds, 7f, 9f)
+        val event2 = down(5).moveTo(10, 7f, 9f)
 
         hitPathTracker.dispatchChanges(
             internalPointerEventOf(event1, event2)
@@ -545,7 +544,7 @@ class HitPathTrackerTest {
         )
 
         hitPathTracker.addHitPath(PointerId(13), listOf(pif1, pif2, pif3))
-        val actualChange = down(13).moveTo(10.milliseconds, 0f, 0f)
+        val actualChange = down(13).moveTo(10, 0f, 0f)
         val expectedChange = actualChange.deepCopy()
 
         val (result, _) = hitPathTracker.dispatchChanges(internalPointerEventOf(actualChange))
@@ -685,8 +684,8 @@ class HitPathTrackerTest {
         )
         hitPathTracker.addHitPath(PointerId(3), listOf(pif1, pif2))
         hitPathTracker.addHitPath(PointerId(5), listOf(pif3, pif4))
-        val actualEvent1 = down(3).moveTo(10.milliseconds, 0f, 0f)
-        val actualEvent2 = down(5).moveTo(10.milliseconds, 0f, 0f)
+        val actualEvent1 = down(3).moveTo(10, 0f, 0f)
+        val actualEvent2 = down(5).moveTo(10, 0f, 0f)
         val expectedEvent1 = actualEvent1.deepCopy()
         val expectedEvent2 = actualEvent2.deepCopy()
 
@@ -852,8 +851,8 @@ class HitPathTrackerTest {
 
         hitPathTracker.addHitPath(PointerId(3), listOf(parent, child1))
         hitPathTracker.addHitPath(PointerId(5), listOf(parent, child2))
-        val actualEvent1 = down(3).moveTo(10.milliseconds, 0f, 0f)
-        val actualEvent2 = down(5).moveTo(10.milliseconds, 0f, 0f)
+        val actualEvent1 = down(3).moveTo(10, 0f, 0f)
+        val actualEvent2 = down(5).moveTo(10, 0f, 0f)
         val expectedEvent1 = actualEvent1.deepCopy()
         val expectedEvent2 = actualEvent2.deepCopy()
 
@@ -978,8 +977,8 @@ class HitPathTrackerTest {
 
         hitPathTracker.addHitPath(PointerId(3), listOf(child1, child2))
         hitPathTracker.addHitPath(PointerId(5), listOf(child1, child2))
-        val actualEvent1 = down(3).moveTo(10.milliseconds, 0f, 0f)
-        val actualEvent2 = down(5).moveTo(10.milliseconds, 0f, 0f)
+        val actualEvent1 = down(3).moveTo(10, 0f, 0f)
+        val actualEvent2 = down(5).moveTo(10, 0f, 0f)
         val expectedEvent1 = actualEvent1.deepCopy()
         val expectedEvent2 = actualEvent2.deepCopy()
 
@@ -3660,8 +3659,8 @@ class HitPathTrackerTest {
         val child = PointerInputFilterMock(log)
         hitPathTracker.addHitPath(PointerId(13), listOf(parent, pif, child))
 
-        val actual = internalPointerEventOf(down(13, 120.milliseconds, 1.0f, 1.0f))
-        val expected = pointerEventOf(down(13, 120.milliseconds, 1.0f, 1.0f))
+        val actual = internalPointerEventOf(down(13, 120, 1.0f, 1.0f))
+        val expected = pointerEventOf(down(13, 120, 1.0f, 1.0f))
 
         hitPathTracker.dispatchChanges(actual)
 
@@ -3939,13 +3938,28 @@ class LayoutCoordinatesStub(
         TODO("not implemented")
     }
 
+    override fun windowToLocal(relativeToWindow: Offset): Offset {
+        TODO("Not yet implemented")
+    }
+
     override fun localToGlobal(local: Offset): Offset {
         assertThat(isAttached).isTrue()
         return local + additionalOffset
     }
 
-    override fun localToRoot(local: Offset): Offset {
+    override fun localToWindow(relativeToLocal: Offset): Offset {
+        TODO("Not yet implemented")
+    }
+
+    override fun localToRoot(relativeToLocal: Offset): Offset {
         TODO("not implemented")
+    }
+
+    override fun localPositionOf(
+        sourceCoordinates: LayoutCoordinates,
+        relativeToSource: Offset
+    ): Offset {
+        TODO("Not yet implemented")
     }
 
     override fun childToLocal(child: LayoutCoordinates, childLocal: Offset): Offset {
@@ -3954,6 +3968,13 @@ class LayoutCoordinatesStub(
 
     override fun childBoundingBox(child: LayoutCoordinates): Rect {
         TODO("not implemented")
+    }
+
+    override fun localBoundingBoxOf(
+        sourceCoordinates: LayoutCoordinates,
+        clipBounds: Boolean
+    ): Rect {
+        TODO("Not yet implemented")
     }
 
     override fun get(line: AlignmentLine): Int {

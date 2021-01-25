@@ -19,14 +19,14 @@ package androidx.compose.ui.layout
 import androidx.compose.runtime.Applier
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
-import androidx.compose.runtime.CompositionLifecycleObserver
 import androidx.compose.runtime.CompositionReference
 import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.compositionReference
+import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.currentComposer
-import androidx.compose.runtime.emit
+import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCompositionReference
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.materialize
 import androidx.compose.ui.node.LayoutEmitHelper
@@ -46,7 +46,8 @@ import androidx.compose.ui.unit.LayoutDirection
  *
  * Possible use cases:
  * * You need to know the constraints passed by the parent during the composition and can't solve
- * your use case with just custom [Layout] or [LayoutModifier]. See [WithConstraints].
+ * your use case with just custom [Layout] or [LayoutModifier].
+ * See [androidx.compose.foundation.layout.BoxWithConstraints].
  * * You want to use the size of one child during the composition of the second child.
  * * You want to compose your items lazily based on the available size. For example you have a
  * list of 100 items and instead of composing all of them you only compose the ones which are
@@ -64,17 +65,19 @@ fun SubcomposeLayout(
     measureBlock: SubcomposeMeasureScope.(Constraints) -> MeasureResult
 ) {
     val state = remember { SubcomposeLayoutState() }
-    state.compositionRef = compositionReference()
+    state.compositionRef = rememberCompositionReference()
 
     val materialized = currentComposer.materialize(modifier)
-    emit<LayoutNode, Applier<Any>>(
-        ctor = LayoutEmitHelper.constructor,
+    val density = AmbientDensity.current
+    val layoutDirection = AmbientLayoutDirection.current
+    ComposeNode<LayoutNode, Applier<Any>>(
+        factory = LayoutEmitHelper.constructor,
         update = {
-            set(Unit, state.setRoot)
+            init(state.setRoot)
             set(materialized, LayoutEmitHelper.setModifier)
             set(measureBlock, state.setMeasureBlock)
-            set(AmbientDensity.current, LayoutEmitHelper.setDensity)
-            set(AmbientLayoutDirection.current, LayoutEmitHelper.setLayoutDirection)
+            set(density, LayoutEmitHelper.setDensity)
+            set(layoutDirection, LayoutEmitHelper.setLayoutDirection)
         }
     )
 }
@@ -100,7 +103,7 @@ interface SubcomposeMeasureScope : MeasureScope {
 
 private class SubcomposeLayoutState :
     SubcomposeMeasureScope,
-    CompositionLifecycleObserver {
+    RememberObserver {
     var compositionRef: CompositionReference? = null
 
     // MeasureScope delegation
@@ -109,7 +112,7 @@ private class SubcomposeLayoutState :
     override var fontScale: Float = 0f
 
     // Pre-allocated lambdas to update LayoutNode
-    val setRoot: LayoutNode.(Unit) -> Unit = { root = this }
+    val setRoot: LayoutNode.() -> Unit = { root = this }
     val setMeasureBlock:
         LayoutNode.(SubcomposeMeasureScope.(Constraints) -> MeasureResult) -> Unit =
             { measureBlocks = createMeasureBlocks(it) }
@@ -213,17 +216,19 @@ private class SubcomposeLayoutState :
         }
     }
 
-    override fun onEnter() {
+    override fun onRemembered() {
         // do nothing
     }
 
-    override fun onLeave() {
+    override fun onForgotten() {
         nodeToNodeState.values.forEach {
             it.composition!!.dispose()
         }
         nodeToNodeState.clear()
         slodIdToNode.clear()
     }
+
+    override fun onAbandoned() = onForgotten()
 
     private class NodeState(
         val slotId: Any?,

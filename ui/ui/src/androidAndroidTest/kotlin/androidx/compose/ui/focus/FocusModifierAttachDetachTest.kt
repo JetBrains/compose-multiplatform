@@ -21,12 +21,10 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus
 import androidx.compose.ui.focus.FocusState.Active
 import androidx.compose.ui.focus.FocusState.ActiveParent
 import androidx.compose.ui.focus.FocusState.Captured
 import androidx.compose.ui.focus.FocusState.Inactive
-import androidx.compose.ui.focusRequester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -50,8 +48,8 @@ class FocusModifierAttachDetachTest {
         rule.setFocusableContent {
             val focusRequesterModifier = Modifier.focusRequester(focusRequester)
             val onFocusChanged = Modifier.onFocusChanged { focusState = it }
-            val focusModifier1 = Modifier.focus()
-            val focusModifier2 = Modifier.focus()
+            val focusModifier1 = Modifier.focusModifier()
+            val focusModifier2 = Modifier.focusModifier()
             Box {
                 observingFocusModifier1 = remember { mutableStateOf(true) }
                 Box(
@@ -90,7 +88,7 @@ class FocusModifierAttachDetachTest {
         rule.setFocusableContent {
             val focusRequesterModifier = Modifier.focusRequester(focusRequester)
             val onFocusChanged = Modifier.onFocusChanged { focusState = it }
-            val focusModifier = Modifier.focus()
+            val focusModifier = Modifier.focusModifier()
             Box {
                 onFocusChangedHasFocusModifier = remember { mutableStateOf(true) }
                 Box(
@@ -129,7 +127,7 @@ class FocusModifierAttachDetachTest {
             Box(
                 modifier = Modifier.onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .then(if (optionalFocusModifier.value) Modifier.focus() else Modifier)
+                    .then(if (optionalFocusModifier.value) Modifier.focusModifier() else Modifier)
             )
         }
         rule.runOnIdle {
@@ -155,9 +153,9 @@ class FocusModifierAttachDetachTest {
             Box(
                 modifier = Modifier.onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .then(if (optionalFocusModifier.value) Modifier.focus() else Modifier)
+                    .then(if (optionalFocusModifier.value) Modifier.focusModifier() else Modifier)
             ) {
-                Box(modifier = Modifier.focus())
+                Box(modifier = Modifier.focusModifier())
             }
         }
         rule.runOnIdle {
@@ -183,9 +181,9 @@ class FocusModifierAttachDetachTest {
             Box(
                 modifier = Modifier.onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .then(if (optionalFocusModifier.value) Modifier.focus() else Modifier)
+                    .then(if (optionalFocusModifier.value) Modifier.focusModifier() else Modifier)
             ) {
-                Box(modifier = Modifier.focus())
+                Box(modifier = Modifier.focusModifier())
             }
         }
         rule.runOnIdle {
@@ -211,10 +209,10 @@ class FocusModifierAttachDetachTest {
             optionalFocusModifier = remember { mutableStateOf(true) }
             Box(
                 modifier = Modifier.onFocusChanged { focusState = it }
-                    .then(if (optionalFocusModifier.value) Modifier.focus() else Modifier)
+                    .then(if (optionalFocusModifier.value) Modifier.focusModifier() else Modifier)
                     .focusRequester(focusRequester)
             ) {
-                Box(modifier = Modifier.focus())
+                Box(modifier = Modifier.focusModifier())
             }
         }
         rule.runOnIdle {
@@ -242,9 +240,9 @@ class FocusModifierAttachDetachTest {
                     .then(
                         if (optionalFocusModifier.value) {
                             Modifier
-                                .focus()
+                                .focusModifier()
                                 .focusRequester(focusRequester)
-                                .focus()
+                                .focusModifier()
                         } else {
                             Modifier
                         }
@@ -275,14 +273,14 @@ class FocusModifierAttachDetachTest {
             Box(
                 modifier = Modifier
                     .onFocusChanged { parentFocusState = it }
-                    .focus()
+                    .focusModifier()
             ) {
                 Box(
                     modifier = Modifier.onFocusChanged { focusState = it }.then(
                         if (optionalFocusModifiers.value) {
-                            Modifier.focus()
+                            Modifier.focusModifier()
                                 .focusRequester(focusRequester)
-                                .focus()
+                                .focusModifier()
                         } else {
                             Modifier
                         }
@@ -316,9 +314,9 @@ class FocusModifierAttachDetachTest {
             optionalFocusModifier = remember { mutableStateOf(true) }
             Box(
                 modifier = Modifier.onFocusChanged { focusState = it }
-                    .then(if (optionalFocusModifier.value) Modifier.focus() else Modifier)
+                    .then(if (optionalFocusModifier.value) Modifier.focusModifier() else Modifier)
                     .focusRequester(focusRequester)
-                    .focus()
+                    .focusModifier()
             )
         }
 
@@ -340,9 +338,9 @@ class FocusModifierAttachDetachTest {
             Box(
                 modifier = Modifier.onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .then(if (addFocusModifier.value) Modifier.focus() else Modifier)
+                    .then(if (addFocusModifier.value) Modifier.focusModifier() else Modifier)
             ) {
-                Box(modifier = Modifier.focus())
+                Box(modifier = Modifier.focusModifier())
             }
         }
         rule.runOnIdle {
@@ -368,7 +366,7 @@ class FocusModifierAttachDetachTest {
             Box(
                 modifier = Modifier.onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .then(if (addFocusModifier.value) Modifier.focus() else Modifier)
+                    .then(if (addFocusModifier.value) Modifier.focusModifier() else Modifier)
             )
         }
         rule.runOnIdle {

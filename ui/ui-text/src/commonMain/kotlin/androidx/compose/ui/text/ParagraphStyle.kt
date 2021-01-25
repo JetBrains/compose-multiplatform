@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.text.style.lerp
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.isUnspecified
 
 /**
  * Paragraph styling configuration for a paragraph. The difference between [SpanStyle] and
@@ -46,7 +47,7 @@ import androidx.compose.ui.unit.TextUnit
  * @see TextStyle
  */
 @Immutable
-data class ParagraphStyle constructor(
+class ParagraphStyle constructor(
     val textAlign: TextAlign? = null,
     val textDirection: TextDirection? = null,
     val lineHeight: TextUnit = TextUnit.Unspecified,
@@ -88,6 +89,49 @@ data class ParagraphStyle constructor(
      */
     @Stable
     operator fun plus(other: ParagraphStyle): ParagraphStyle = this.merge(other)
+
+    fun copy(
+        textAlign: TextAlign? = this.textAlign,
+        textDirection: TextDirection? = this.textDirection,
+        lineHeight: TextUnit = this.lineHeight,
+        textIndent: TextIndent? = this.textIndent
+    ): ParagraphStyle {
+        return ParagraphStyle(
+            textAlign = textAlign,
+            textDirection = textDirection,
+            lineHeight = lineHeight,
+            textIndent = textIndent
+        )
+    }
+
+    override operator fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ParagraphStyle) return false
+
+        if (textAlign != other.textAlign) return false
+        if (textDirection != other.textDirection) return false
+        if (lineHeight != other.lineHeight) return false
+        if (textIndent != other.textIndent) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = textAlign?.hashCode() ?: 0
+        result = 31 * result + (textDirection?.hashCode() ?: 0)
+        result = 31 * result + lineHeight.hashCode()
+        result = 31 * result + (textIndent?.hashCode() ?: 0)
+        return result
+    }
+
+    override fun toString(): String {
+        return "ParagraphStyle(" +
+            "textAlign=$textAlign, " +
+            "textDirection=$textDirection, " +
+            "lineHeight=$lineHeight, " +
+            "textIndent=$textIndent" +
+            ")"
+    }
 }
 
 /**

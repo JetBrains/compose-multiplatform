@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.animation.core
 
 import androidx.compose.animation.core.AnimationConstants.DefaultDurationMillis
@@ -28,8 +30,8 @@ import androidx.compose.ui.util.fastFirstOrNull
  * instead of the default [FloatSpringSpec] animation to animate the value change for that
  * property.
  *
- * @sample androidx.compose.animation.core.samples.TransitionSpecWith3Properties
  **/
+@Deprecated("Please use updateTransition or rememberInfiniteTransition instead.")
 class TransitionSpec<S> internal constructor(private val fromToPairs: Array<out Pair<S?, S?>>) {
 
     /**
@@ -131,8 +133,6 @@ fun <T> spring(
 /**
  * Creates a [KeyframesSpec] animation, initialized with [init]. For example:
  *
- * @sample androidx.compose.animation.core.samples.KeyframesBuilderForPosition
- *
  * @param init Initialization function for the [KeyframesSpec] animation
  * @See KeyframesSpec.KeyframesSpecConfig
  */
@@ -181,7 +181,7 @@ fun <T> repeatable(
 fun <T> infiniteRepeatable(
     animation: DurationBasedAnimationSpec<T>,
     repeatMode: RepeatMode = RepeatMode.Restart
-): AnimationSpec<T> =
+): InfiniteRepeatableSpec<T> =
     InfiniteRepeatableSpec(animation, repeatMode)
 
 /**
@@ -243,13 +243,12 @@ fun <T> snap(delayMillis: Int = 0) = SnapSpec<T>(delayMillis)
  * PropKey.
  * 2) Optional transitions, for how to animate from one state to another.
  *
- * @sample androidx.compose.animation.core.samples.TransitionDefSample
- *
  * Once a [TransitionDefinition] is created, [androidx.compose.animation.transition] composable can take
  * it as an input and create a state-based transition in compose.
  *
  * @see [androidx.compose.animation.transition]
  */
+@Deprecated("Please use updateTransition or rememberInfiniteTransition instead.")
 class TransitionDefinition<T> {
     internal val states: MutableMap<T, StateImpl<T>> = mutableMapOf()
     internal lateinit var defaultState: StateImpl<T>
@@ -261,6 +260,15 @@ class TransitionDefinition<T> {
     // re-created at least for each state type T. Consider dropping this T beyond initial sanity
     // check.
     private val defaultTransitionSpec = TransitionSpec<T>(arrayOf(null to null))
+
+    /**
+     * [MutableTransitionState] is used in [TransitionDefinition] for constructing various
+     * [TransitionState]s with corresponding properties and their values.
+     */
+    @Deprecated("Please use updateTransition or rememberInfiniteTransition instead.")
+    interface MutableTransitionState {
+        operator fun <T, V : AnimationVector> set(propKey: PropKey<T, V>, prop: T)
+    }
 
     /**
      * Defines all the properties and their values associated with the state with the name: [name]
@@ -303,7 +311,6 @@ class TransitionDefinition<T> {
      * from/to any state.
      *
      * Sample of usage with [Pair]s infix extension [to]:
-     * @sample androidx.compose.animation.core.samples.TransitionSpecWithPairs
      *
      * @param fromToPairs The pairs of from and to states for this transition
      * @param init Lambda to initialize the transition
@@ -349,6 +356,7 @@ class TransitionDefinition<T> {
  *
  * @param clock The clock source for animation to get frame time from.
  */
+@Deprecated("Please use updateTransition or rememberInfiniteTransition instead.")
 fun <T> TransitionDefinition<T>.createAnimation(
     clock: AnimationClockObservable,
     initState: T? = null
@@ -359,9 +367,11 @@ fun <T> TransitionDefinition<T>.createAnimation(
  *
  * @param init Initialization function for the [TransitionDefinition]
  */
+@Deprecated("Please use updateTransition or rememberInfiniteTransition instead.")
 fun <T> transitionDefinition(init: TransitionDefinition<T>.() -> Unit) =
     TransitionDefinition<T>().apply(init)
 
+@Deprecated("Please use updateTransition or rememberInfiniteTransition instead.")
 enum class InterruptionHandling {
     PHYSICS,
     SNAP_TO_END, // Not yet supported

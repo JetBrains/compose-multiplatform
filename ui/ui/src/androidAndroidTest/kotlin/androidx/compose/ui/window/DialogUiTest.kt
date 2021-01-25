@@ -23,9 +23,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.test.isRoot
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.unit.height
 import androidx.test.espresso.Espresso
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.FlakyTest
@@ -117,7 +121,9 @@ class DialogUiTest {
 
         // Click outside the dialog to dismiss it
         val outsideX = 0
-        val outsideY = rule.displaySize.height / 2
+        val outsideY = with(rule.density) {
+            rule.onAllNodes(isRoot()).onFirst().getUnclippedBoundsInRoot().height.toIntPx() / 2
+        }
         UiDevice.getInstance(getInstrumentation()).click(outsideX, outsideY)
 
         rule.onNodeWithText(defaultText).assertDoesNotExist()
@@ -139,7 +145,9 @@ class DialogUiTest {
 
         // Click outside the dialog to try to dismiss it
         val outsideX = 0
-        val outsideY = rule.displaySize.height / 2
+        val outsideY = with(rule.density) {
+            rule.onAllNodes(isRoot()).onFirst().getUnclippedBoundsInRoot().height.toIntPx() / 2
+        }
         UiDevice.getInstance(getInstrumentation()).click(outsideX, outsideY)
 
         // The Dialog should still be visible
@@ -167,14 +175,16 @@ class DialogUiTest {
 
         // Click outside the dialog to try to dismiss it
         val outsideX = 0
-        val outsideY = rule.displaySize.height / 2
+        val outsideY = with(rule.density) {
+            rule.onAllNodes(isRoot()).onFirst().getUnclippedBoundsInRoot().height.toIntPx() / 2
+        }
         UiDevice.getInstance(getInstrumentation()).click(outsideX, outsideY)
 
         // The Dialog should still be visible
         rule.onNodeWithText(defaultText).assertIsDisplayed()
     }
 
-    @Test
+    @FlakyTest(bugId = 159364185)
     fun dialogTest_isDismissed_whenSpecified_backButtonPressed() {
         rule.setContent {
             val showDialog = remember { mutableStateOf(true) }
@@ -198,7 +208,7 @@ class DialogUiTest {
         rule.onNodeWithText(defaultText).assertDoesNotExist()
     }
 
-    @Test
+    @FlakyTest(bugId = 159364185)
     fun dialogTest_isNotDismissed_whenNotSpecified_backButtonPressed() {
         rule.setContent {
             val showDialog = remember { mutableStateOf(true) }
@@ -219,7 +229,7 @@ class DialogUiTest {
         rule.onNodeWithText(defaultText).assertIsDisplayed()
     }
 
-    @Test
+    @FlakyTest(bugId = 159364185)
     fun dialogTest_isNotDismissed_whenDismissOnBackPressIsFalse() {
         rule.setContent {
             val showDialog = remember { mutableStateOf(true) }

@@ -16,15 +16,14 @@
 
 package androidx.compose.foundation
 
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onCommit
-import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.focus
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.debugInspectorInfo
@@ -53,13 +52,16 @@ fun Modifier.focusable(
     }
 ) {
     var isFocused by remember { mutableStateOf(false) }
-    onDispose {
-        interactionState?.removeInteraction(Interaction.Focused)
+    DisposableEffect(Unit) {
+        onDispose {
+            interactionState?.removeInteraction(Interaction.Focused)
+        }
     }
-    onCommit(enabled) {
+    DisposableEffect(enabled) {
         if (!enabled) {
             interactionState?.removeInteraction(Interaction.Focused)
         }
+        onDispose { }
     }
 
     if (enabled) {
@@ -75,7 +77,7 @@ fun Modifier.focusable(
                     interactionState?.removeInteraction(Interaction.Focused)
                 }
             }
-            .focus()
+            .focusModifier()
     } else {
         Modifier
     }

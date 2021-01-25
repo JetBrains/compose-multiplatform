@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.ThreadLocal
+import androidx.compose.runtime.synchronized
 
 /**
  * Take a snapshot of the current value of all state objects. The values are preserved until
@@ -124,7 +125,6 @@ fun takeSnapshot(
  * @see Snapshot
  * @see MutableSnapshot
  */
-@ExperimentalComposeApi
 fun takeMutableSnapshot(
     readObserver: SnapshotReadObserver? = null,
     writeObserver: SnapshotWriteObserver? = null
@@ -150,7 +150,6 @@ fun takeMutableSnapshot(
  * @see androidx.compose.runtime.mutableStateListOf
  * @see androidx.compose.runtime.mutableStateMapOf
  */
-@ExperimentalComposeApi
 sealed class Snapshot(
     id: Int,
     invalid: SnapshotIdSet
@@ -389,7 +388,6 @@ sealed class Snapshot(
          *
          * @return a lambda that, when called, unregisters [observer].
          */
-        @ExperimentalComposeApi
         fun registerGlobalWriteObserver(observer: SnapshotWriteObserver): () -> Unit {
             sync {
                 globalWriteObservers.add(observer)
@@ -416,7 +414,6 @@ sealed class Snapshot(
          * Compose uses this between phases of composition to allow observing changes to state
          * objects create in a previous phase.
          */
-        @ExperimentalComposeApi
         fun notifyObjectsInitialized() = currentSnapshot().notifyObjectsInitialized()
 
         /**
@@ -429,7 +426,6 @@ sealed class Snapshot(
          * Composition schedules this to be called after changes to state objects are
          * detected an observer registered with [registerGlobalWriteObserver].
          */
-        @ExperimentalComposeApi
         fun sendApplyNotifications() {
             val changes = sync {
                 currentGlobalSnapshot.modified?.isNotEmpty() == true
@@ -477,7 +473,6 @@ sealed class Snapshot(
  * @see androidx.compose.runtime.mutableStateListOf
  * @see androidx.compose.runtime.mutableStateMapOf
  */
-@ExperimentalComposeApi
 open class MutableSnapshot internal constructor(
     id: Int,
     invalid: SnapshotIdSet,
@@ -920,7 +915,6 @@ internal fun currentSnapshot(): Snapshot =
  * An exception that is thrown when [SnapshotApplyResult.check] is called on a result of a
  * [MutableSnapshot.apply] that fails to apply.
  */
-@ExperimentalComposeApi
 class SnapshotApplyConflictException(
     @Suppress("unused") val snapshot: Snapshot
 ) : Exception()
@@ -928,7 +922,6 @@ class SnapshotApplyConflictException(
 /**
  * Snapshot local value of a state object.
  */
-@ExperimentalComposeApi
 abstract class StateRecord {
     /**
      * The snapshot id of the snapshot in which the record was created.
@@ -966,7 +959,6 @@ abstract class StateRecord {
  * Interface implemented by all snapshot aware state objects. Used by this module to maintain the
  * state records of a state object.
  */
-@ExperimentalComposeApi
 interface StateObject {
     /**
      * The first state record in a linked list of state records.
@@ -1371,7 +1363,6 @@ private val threadSnapshot = ThreadLocal<Snapshot>()
 internal val lock = Any()
 
 @PublishedApi
-@Suppress("DEPRECATION_ERROR")
 internal inline fun <T> sync(block: () -> T): T = synchronized(lock, block)
 
 // The following variables should only be written when sync is taken
@@ -1585,7 +1576,6 @@ internal fun <T : StateRecord> T.writableRecord(state: StateObject, snapshot: Sn
     return newData
 }
 
-@ExperimentalComposeApi
 internal fun <T : StateRecord> T.newWritableRecord(state: StateObject, snapshot: Snapshot): T {
     // Calling used() on a state object might return the same record for each thread calling
     // used() therefore selecting the record to reuse should be guarded.
@@ -1711,6 +1701,5 @@ internal fun <T : StateRecord> current(r: T, snapshot: Snapshot) =
  *
  * @see readable
  */
-@ExperimentalComposeApi
 inline fun <T : StateRecord, R> T.withCurrent(block: (r: T) -> R): R =
     block(current(this, Snapshot.current))

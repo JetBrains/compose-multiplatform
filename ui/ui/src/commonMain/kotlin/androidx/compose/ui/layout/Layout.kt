@@ -20,11 +20,12 @@ package androidx.compose.ui.layout
 
 import androidx.compose.runtime.Applier
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.SkippableUpdater
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.currentComposer
-import androidx.compose.runtime.emit
+import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.GraphicsLayerScope
@@ -230,12 +231,14 @@ fun measureBlocksOf(
     modifier: Modifier = Modifier
 ) {
     @OptIn(ExperimentalComposeApi::class)
-    emit<LayoutNode, Applier<Any>>(
-        ctor = LayoutEmitHelper.constructor,
+    val density = AmbientDensity.current
+    val layoutDirection = AmbientLayoutDirection.current
+    ComposeNode<LayoutNode, Applier<Any>>(
+        factory = LayoutEmitHelper.constructor,
         update = {
             set(measureBlocks, LayoutEmitHelper.setMeasureBlocks)
-            set(AmbientDensity.current, LayoutEmitHelper.setDensity)
-            set(AmbientLayoutDirection.current, LayoutEmitHelper.setLayoutDirection)
+            set(density, LayoutEmitHelper.setDensity)
+            set(layoutDirection, LayoutEmitHelper.setLayoutDirection)
         },
         skippableUpdate = materializerOf(modifier),
         content = content
@@ -265,17 +268,19 @@ fun MultiMeasureLayout(
 ) {
     val measureBlocks = remember(measureBlock) { MeasuringIntrinsicsMeasureBlocks(measureBlock) }
     val materialized = currentComposer.materialize(modifier)
+    val density = AmbientDensity.current
+    val layoutDirection = AmbientLayoutDirection.current
 
     @OptIn(ExperimentalComposeApi::class)
-    emit<LayoutNode, Applier<Any>>(
-        ctor = LayoutEmitHelper.constructor,
+    ComposeNode<LayoutNode, Applier<Any>>(
+        factory = LayoutEmitHelper.constructor,
         update = {
             set(materialized, LayoutEmitHelper.setModifier)
             set(measureBlocks, LayoutEmitHelper.setMeasureBlocks)
-            set(AmbientDensity.current, LayoutEmitHelper.setDensity)
-            set(AmbientLayoutDirection.current, LayoutEmitHelper.setLayoutDirection)
+            set(density, LayoutEmitHelper.setDensity)
+            set(layoutDirection, LayoutEmitHelper.setLayoutDirection)
             @Suppress("DEPRECATION")
-            set(Unit) { this.canMultiMeasure = true }
+            init { this.canMultiMeasure = true }
         },
         content = children
     )
@@ -315,7 +320,7 @@ internal enum class IntrinsicWidthHeight {
 }
 
 /**
- * A wrapper around a [Measurable] for intrinsic measurments in [Layout]. Consumers of
+ * A wrapper around a [Measurable] for intrinsic measurements in [Layout]. Consumers of
  * [Layout] don't identify intrinsic methods, but we can give a reasonable implementation
  * by using their [measure], substituting the intrinsics gathering method
  * for the [Measurable.measure] call.
@@ -440,7 +445,7 @@ fun MeasuringIntrinsicsMeasureBlocks(measureBlock: MeasureBlock) =
  * measure block with measure calls replaced with intrinsic measurement calls.
  */
 private inline fun Density.MeasuringMinIntrinsicWidth(
-    measureBlock: MeasureBlock /*TODO: crossinline*/,
+    measureBlock: MeasureBlock,
     measurables: List<IntrinsicMeasurable>,
     h: Int,
     layoutDirection: LayoutDirection
@@ -511,19 +516,13 @@ private inline fun Density.MeasuringMaxIntrinsicHeight(
     return layoutResult.height
 }
 
-/**
- * A composable that defines its own content according to the available space, based on the incoming
- * constraints or the current [LayoutDirection]. Example usage:
- * @sample androidx.compose.ui.samples.WithConstraintsSample
- *
- * The composable will compose the given children, and will position the resulting layout composables
- * in a parent [Layout]. This layout will be as small as possible such that it can fit its
- * children. If the composition yields multiple layout children, these will be all placed at the
- * top left of the WithConstraints, so consider wrapping them in an additional common
- * parent if different positioning is preferred.
- *
- * @param modifier Modifier to be applied to the introduced layout.
- */
+@Deprecated(
+    "WithConstraints was reworked as BoxWithConstraints.",
+    ReplaceWith(
+        "BoxWithConstraints(modifier, content)",
+        "androidx.compose.foundation.layout.BoxWithConstraints"
+    )
+)
 @Composable
 fun WithConstraints(
     modifier: Modifier = Modifier,
@@ -547,9 +546,13 @@ fun WithConstraints(
     }
 }
 
-/**
- * Receiver scope being used by the children parameter of [WithConstraints]
- */
+@Deprecated(
+    "WithConstraints was reworked as BoxWithConstraints.",
+    ReplaceWith(
+        "BoxWithConstraintsScope",
+        "androidx.compose.foundation.layout.BoxWithConstraintsScope"
+    )
+)
 @Stable
 interface WithConstraintsScope {
     /**

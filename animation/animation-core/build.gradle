@@ -124,14 +124,3 @@ tasks.withType(KotlinCompile).configureEach {
         ]
     }
 }
-
-android {
-    defaultConfig {
-        minSdkVersion 21
-    }
-    tasks.withType(KotlinCompile).configureEach {
-        kotlinOptions {
-            useIR = true
-        }
-    }
-}

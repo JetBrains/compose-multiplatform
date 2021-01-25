@@ -32,8 +32,6 @@ import androidx.compose.ui.input.pointer.invokeOverPasses
 import androidx.compose.ui.input.pointer.moveBy
 import androidx.compose.ui.input.pointer.moveTo
 import androidx.compose.ui.input.pointer.up
-import androidx.compose.ui.unit.Duration
-import androidx.compose.ui.unit.milliseconds
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.mock
 import org.junit.Before
@@ -88,9 +86,9 @@ class DragSlopExceededGestureFilterTest {
 
     @Test
     fun onPointerEvent_downUp_canDragNotCalled() {
-        val down = down(0, duration = 0.milliseconds)
+        val down = down(0, durationMillis = 0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
-        val up = down.up(10.milliseconds)
+        val up = down.up(10)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up))
 
         assertThat(canDragDirections).isEmpty()
@@ -101,7 +99,7 @@ class DragSlopExceededGestureFilterTest {
         val down = down(0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
         val move =
-            down.moveBy(Duration(milliseconds = 10), 3f, 5f)
+            down.moveBy(10, 3f, 5f)
                 .apply { consumePositionChange(3f, 5f) }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
 
@@ -114,7 +112,7 @@ class DragSlopExceededGestureFilterTest {
     fun onPointerEvent_downMove1Dimension_canDragCalledOnce() {
         val down = down(0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
-        val move = down.moveBy(Duration(milliseconds = 10), 3f, 0f)
+        val move = down.moveBy(10, 3f, 0f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
 
         // Twice because while under touch slop, TouchSlopExceededGestureDetector checks during Main and Final
@@ -125,7 +123,7 @@ class DragSlopExceededGestureFilterTest {
     fun onPointerEvent_downMove2Dimensions_canDragCalledTwice() {
         val down = down(0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
-        val move = down.moveBy(Duration(milliseconds = 10), 3f, 5f)
+        val move = down.moveBy(10, 3f, 5f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
 
         // 4 times because while under touch slop, TouchSlopExceededGestureDetector checks during Main and
@@ -138,7 +136,7 @@ class DragSlopExceededGestureFilterTest {
         val down = down(0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
         val move =
-            down.moveBy(Duration(milliseconds = 10), 0f, 5f)
+            down.moveBy(10, 0f, 5f)
                 .apply { consumePositionChange(0f, 4f) }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
 
@@ -152,7 +150,7 @@ class DragSlopExceededGestureFilterTest {
         val down = down(0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
         val move =
-            down.moveBy(Duration(milliseconds = 10), 3f, 5f)
+            down.moveBy(10, 3f, 5f)
                 .apply { consumePositionChange(2f, 4f) }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
 
@@ -167,10 +165,10 @@ class DragSlopExceededGestureFilterTest {
 
         val down = down(0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
-        var move = down.moveTo(10.milliseconds, 0f, beyondSlop)
+        var move = down.moveTo(10, 0f, beyondSlop)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
         repeat(3) {
-            move = move.moveBy(Duration(milliseconds = 10), 0f, 1f)
+            move = move.moveBy(10, 0f, 1f)
             filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
         }
 
@@ -187,7 +185,7 @@ class DragSlopExceededGestureFilterTest {
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
         var move = down
         repeat(3) {
-            move = move.moveBy(Duration(milliseconds = 10), 0f, thirdSlop.toFloat())
+            move = move.moveBy(10, 0f, thirdSlop.toFloat())
             filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
         }
 
@@ -203,13 +201,13 @@ class DragSlopExceededGestureFilterTest {
         var event = down(0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(event))
         // Out of touch slop region
-        event = event.moveBy(Duration(milliseconds = 10), 0f, beyondSlop)
+        event = event.moveBy(10, 0f, beyondSlop)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(event))
         // Back into touch slop region
-        event = event.moveBy(Duration(milliseconds = 10), 0f, -beyondSlop)
+        event = event.moveBy(10, 0f, -beyondSlop)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(event))
         // Out of touch slop region again
-        event = event.moveBy(Duration(milliseconds = 10), 0f, beyondSlop)
+        event = event.moveBy(10, 0f, beyondSlop)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(event))
 
         // Once because although DragGestureDetector checks during Main and Final, slop is
@@ -255,7 +253,7 @@ class DragSlopExceededGestureFilterTest {
         canDragDirections.clear()
         val down = down(0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
-        val move = down.moveBy(Duration(milliseconds = 10), dx, dy)
+        val move = down.moveBy(10, dx, dy)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
 
         // Everything here is twice because DragGestureDetector checks during Main and Final.
@@ -276,7 +274,7 @@ class DragSlopExceededGestureFilterTest {
         val down = down(0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
         val move = down.moveBy(
-            Duration(milliseconds = 10),
+            10,
             TestTouchSlop.toFloat(),
             TestTouchSlop.toFloat()
         )
@@ -293,7 +291,7 @@ class DragSlopExceededGestureFilterTest {
         val down = down(0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
         val move = down.moveBy(
-            Duration(milliseconds = 10),
+            10,
             beyondSlop,
             beyondSlop
         )
@@ -309,7 +307,7 @@ class DragSlopExceededGestureFilterTest {
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
 
         val move =
-            down.moveBy(10.milliseconds, TestTouchSlop + TinyNum, 0f)
+            down.moveBy(10, TestTouchSlop + TinyNum, 0f)
                 .apply { consumePositionChange(1f, 0f) }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
 
@@ -324,7 +322,7 @@ class DragSlopExceededGestureFilterTest {
         val down = down(0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
 
-        val move = down.moveBy(10.milliseconds, TestTouchSlop.toFloat(), 0f)
+        val move = down.moveBy(10, TestTouchSlop.toFloat(), 0f)
         filter::onPointerEvent.invokeOverPasses(
             pointerEventOf(move),
             listOf(
@@ -357,40 +355,40 @@ class DragSlopExceededGestureFilterTest {
         // Go around the border of the touch slop area
 
         // To top left
-        change = change.moveTo(10.milliseconds, -slop, -slop)
+        change = change.moveTo(10, -slop, -slop)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
         // To bottom left
-        change = change.moveTo(20.milliseconds, -slop, slop)
+        change = change.moveTo(20, -slop, slop)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
         // To bottom right
-        change = change.moveTo(30.milliseconds, slop, slop)
+        change = change.moveTo(30, slop, slop)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
         // To top right
-        change = change.moveTo(40.milliseconds, slop, -slop)
+        change = change.moveTo(40, slop, -slop)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
 
         // Jump from corner to opposite corner and back
 
         // To bottom left
-        change = change.moveTo(50.milliseconds, -slop, slop)
+        change = change.moveTo(50, -slop, slop)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
         // To top right
-        change = change.moveTo(60.milliseconds, slop, -slop)
+        change = change.moveTo(60, slop, -slop)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
 
         // Move the other diagonal
 
         // To top left
-        change = change.moveTo(70.milliseconds, -slop, -slop)
+        change = change.moveTo(70, -slop, -slop)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
 
         // Jump from corner to opposite corner and back
 
         // To bottom right
-        change = change.moveTo(80.milliseconds, slop, slop)
+        change = change.moveTo(80, slop, slop)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
         // To top left
-        change = change.moveTo(90.milliseconds, -slop, -slop)
+        change = change.moveTo(90, -slop, -slop)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
 
         assertThat(onDragSlopExceededCallCount).isEqualTo(0)
@@ -405,7 +403,7 @@ class DragSlopExceededGestureFilterTest {
         val down = down(0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
         val move = down.moveBy(
-            Duration(milliseconds = 100),
+            100,
             beyondSlop,
             0f
         )
@@ -420,13 +418,13 @@ class DragSlopExceededGestureFilterTest {
         val down = down(0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
         val move = down.moveBy(
-            Duration(milliseconds = 100),
+            100,
             TestTouchSlop.toFloat(),
             0f
         )
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
         val move2 = down.moveBy(
-            Duration(milliseconds = 100),
+            100,
             1f,
             0f
         )
@@ -442,13 +440,13 @@ class DragSlopExceededGestureFilterTest {
         var event = down(0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(event))
         // Out of touch slop region
-        event = event.moveBy(Duration(milliseconds = 10), 0f, beyondSlop)
+        event = event.moveBy(10, 0f, beyondSlop)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(event))
         // Back into touch slop region
-        event = event.moveBy(Duration(milliseconds = 10), 0f, -beyondSlop)
+        event = event.moveBy(10, 0f, -beyondSlop)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(event))
         // Out of touch slop region again
-        event = event.moveBy(Duration(milliseconds = 10), 0f, beyondSlop)
+        event = event.moveBy(10, 0f, beyondSlop)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(event))
 
         assertThat(onDragSlopExceededCallCount).isEqualTo(1)
@@ -460,7 +458,7 @@ class DragSlopExceededGestureFilterTest {
 
         val down = down(0).apply { consumeDownChange() }
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
-        val move = down.moveBy(Duration(milliseconds = 100), beyondSlop, 0f)
+        val move = down.moveBy(100, beyondSlop, 0f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
 
         assertThat(onDragSlopExceededCallCount).isEqualTo(1)
@@ -474,7 +472,7 @@ class DragSlopExceededGestureFilterTest {
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
         canDragReturn = false
         change = change.moveBy(
-            Duration(milliseconds = 10),
+            10,
             0f,
             beyondSlop
         )
@@ -484,7 +482,7 @@ class DragSlopExceededGestureFilterTest {
         canDragReturn = true
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(change))
         change = change.moveBy(
-            Duration(milliseconds = 10),
+            10,
             0f,
             -beyondSlop
         )
@@ -507,12 +505,12 @@ class DragSlopExceededGestureFilterTest {
         // Act
 
         pointer1 = pointer1.moveBy(
-            Duration(milliseconds = 100),
+            100,
             beyondSlop,
             0f
         )
         pointer2 = pointer2.moveBy(
-            Duration(milliseconds = 100),
+            100,
             -beyondSlop,
             0f
         )
@@ -538,19 +536,19 @@ class DragSlopExceededGestureFilterTest {
         // These movements average to no movement.
         pointers[0] =
             pointers[0].moveBy(
-                Duration(milliseconds = 100),
+                100,
                 beyondSlop * -1,
                 beyondSlop * -1
             )
         pointers[1] =
             pointers[1].moveBy(
-                Duration(milliseconds = 100),
+                100,
                 beyondSlop * 1,
                 beyondSlop * -1
             )
         pointers[2] =
             pointers[2].moveBy(
-                Duration(milliseconds = 100),
+                100,
                 0f,
                 beyondSlop * 2
             )
@@ -578,13 +576,13 @@ class DragSlopExceededGestureFilterTest {
 
         pointer1 =
             pointer1.moveBy(
-                Duration(milliseconds = 100),
+                100,
                 0f,
                 0f
             )
         pointer2 =
             pointer2.moveBy(
-                Duration(milliseconds = 100),
+                100,
                 beyondSlop * -1,
                 0f
             )
@@ -612,13 +610,13 @@ class DragSlopExceededGestureFilterTest {
 
         pointer1 =
             pointer1.moveBy(
-                Duration(milliseconds = 100),
+                100,
                 0f,
                 0f
             )
         pointer2 =
             pointer2.moveBy(
-                Duration(milliseconds = 100),
+                100,
                 beyondSlop * 2 - 1,
                 0f
             )
@@ -646,13 +644,13 @@ class DragSlopExceededGestureFilterTest {
 
         pointer1 =
             pointer1.moveBy(
-                Duration(milliseconds = 100),
+                100,
                 0f,
                 0f
             )
         pointer2 =
             pointer2.moveBy(
-                Duration(milliseconds = 100),
+                100,
                 beyondSlop * 2,
                 0f
             )
@@ -676,7 +674,7 @@ class DragSlopExceededGestureFilterTest {
         // Act
 
         repeat(5) {
-            pointer = pointer.moveBy(100.milliseconds, beyondSlop, beyondSlop)
+            pointer = pointer.moveBy(100, beyondSlop, beyondSlop)
             filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
         }
 
@@ -693,7 +691,7 @@ class DragSlopExceededGestureFilterTest {
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
 
         val move =
-            down.moveBy(10.milliseconds, 0f, 0f).apply { consumePositionChange(beyondSlop, 0f) }
+            down.moveBy(10, 0f, 0f).apply { consumePositionChange(beyondSlop, 0f) }
         filter::onPointerEvent.invokeOverPasses(
             pointerEventOf(move),
             listOf(
@@ -714,7 +712,7 @@ class DragSlopExceededGestureFilterTest {
         val down = down(0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
 
-        val move = down.moveBy(10.milliseconds, 0f, 0f)
+        val move = down.moveBy(10, 0f, 0f)
         filter::onPointerEvent.invokeOverPasses(
             pointerEventOf(move),
             listOf(
@@ -742,7 +740,7 @@ class DragSlopExceededGestureFilterTest {
         val down = down(0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
 
-        val move = down.moveBy(10.milliseconds, halfSlop.toFloat(), 0f)
+        val move = down.moveBy(10, halfSlop.toFloat(), 0f)
         filter::onPointerEvent.invokeOverPasses(
             pointerEventOf(move),
             listOf(
@@ -769,7 +767,7 @@ class DragSlopExceededGestureFilterTest {
         val down = down(0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
 
-        val move = down.moveBy(10.milliseconds, beyondSlop, 0f)
+        val move = down.moveBy(10, beyondSlop, 0f)
         filter::onPointerEvent.invokeOverPasses(
             pointerEventOf(move),
             listOf(
@@ -803,7 +801,7 @@ class DragSlopExceededGestureFilterTest {
         val down = down(0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
 
-        val move = down.moveBy(10.milliseconds, TestTouchSlop.toFloat(), TestTouchSlop.toFloat())
+        val move = down.moveBy(10, TestTouchSlop.toFloat(), TestTouchSlop.toFloat())
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
 
         // Assert
@@ -819,10 +817,10 @@ class DragSlopExceededGestureFilterTest {
         val down = down(0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
 
-        val move = down.moveBy(10.milliseconds, TestTouchSlop.toFloat(), TestTouchSlop.toFloat())
+        val move = down.moveBy(10, TestTouchSlop.toFloat(), TestTouchSlop.toFloat())
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
 
-        val up = move.up(20.milliseconds)
+        val up = move.up(20)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up))
 
         // Assert
@@ -839,7 +837,7 @@ class DragSlopExceededGestureFilterTest {
         val down = down(0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
 
-        val move = down.moveBy(10.milliseconds, beyondSlop, beyondSlop)
+        val move = down.moveBy(10, beyondSlop, beyondSlop)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
 
         // Assert
@@ -856,10 +854,10 @@ class DragSlopExceededGestureFilterTest {
         val down = down(0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
 
-        val move = down.moveBy(10.milliseconds, beyondSlop, beyondSlop)
+        val move = down.moveBy(10, beyondSlop, beyondSlop)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
 
-        val up = move.up(20.milliseconds)
+        val up = move.up(20)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up))
 
         // Assert
@@ -879,10 +877,10 @@ class DragSlopExceededGestureFilterTest {
             val down = down(0)
             filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
 
-            val move = down.moveBy(10.milliseconds, beyondSlop, 0f)
+            val move = down.moveBy(10, beyondSlop, 0f)
             filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move))
 
-            val up = move.up(20.milliseconds)
+            val up = move.up(20)
             filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(up))
         }
 
@@ -899,9 +897,9 @@ class DragSlopExceededGestureFilterTest {
 
         val down = down(0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
-        val move1 = down.moveBy(Duration(milliseconds = 10), 0f, 1f)
+        val move1 = down.moveBy(10, 0f, 1f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move1))
-        val move2 = down.moveBy(Duration(milliseconds = 10), 0f, -1f)
+        val move2 = down.moveBy(10, 0f, -1f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move2))
 
         assertThat(canDragDirections).isEmpty()
@@ -913,9 +911,9 @@ class DragSlopExceededGestureFilterTest {
 
         val down = down(0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
-        val move1 = down.moveBy(Duration(milliseconds = 10), 1f, 0f)
+        val move1 = down.moveBy(10, 1f, 0f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move1))
-        val move2 = down.moveBy(Duration(milliseconds = 10), -1f, 0f)
+        val move2 = down.moveBy(10, -1f, 0f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move2))
 
         assertThat(canDragDirections).isEmpty()
@@ -927,9 +925,9 @@ class DragSlopExceededGestureFilterTest {
 
         val down = down(0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
-        val move1 = down.moveBy(Duration(milliseconds = 10), 1f, 0f)
+        val move1 = down.moveBy(10, 1f, 0f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move1))
-        val move2 = down.moveBy(Duration(milliseconds = 10), -1f, 0f)
+        val move2 = down.moveBy(10, -1f, 0f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move2))
 
         // 2 for each because canDrag is currently checked on both main and final
@@ -943,9 +941,9 @@ class DragSlopExceededGestureFilterTest {
 
         val down = down(0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
-        val move1 = down.moveBy(Duration(milliseconds = 10), 0f, 1f)
+        val move1 = down.moveBy(10, 0f, 1f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move1))
-        val move2 = down.moveBy(Duration(milliseconds = 10), 0f, -1f)
+        val move2 = down.moveBy(10, 0f, -1f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(move2))
 
         // 2 for each because canDrag is currently checked on both main and final
@@ -1006,7 +1004,7 @@ class DragSlopExceededGestureFilterTest {
         val down = down(0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
         val move = down.moveBy(
-            Duration(milliseconds = 100),
+            100,
             horizontalDirection * beyondSlop,
             verticalDirection * beyondSlop
         )
@@ -1091,7 +1089,7 @@ class DragSlopExceededGestureFilterTest {
         val down = down(0)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(down))
         val move = down.moveBy(
-            Duration(milliseconds = 100),
+            100,
             horizontalDirection * beyondSlop,
             verticalDirection * beyondSlop
         )
@@ -1110,11 +1108,11 @@ class DragSlopExceededGestureFilterTest {
 
         // Arrange
 
-        var pointer = down(0, 0.milliseconds, 0f, 0f)
+        var pointer = down(0, 0, 0f, 0f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
 
         pointer = pointer.moveTo(
-            10.milliseconds,
+            10,
             underSlop,
             0f
         )
@@ -1124,11 +1122,11 @@ class DragSlopExceededGestureFilterTest {
 
         filter.onCancel()
 
-        pointer = down(0, 0.milliseconds, 0f, 0f)
+        pointer = down(0, 0, 0f, 0f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
 
         pointer = pointer.moveTo(
-            10.milliseconds,
+            10,
             underSlop,
             0f
         )
@@ -1145,11 +1143,11 @@ class DragSlopExceededGestureFilterTest {
 
         // Arrange
 
-        var pointer = down(0, 0.milliseconds, 0f, 0f)
+        var pointer = down(0, 0, 0f, 0f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
 
         pointer = pointer.moveTo(
-            10.milliseconds,
+            10,
             overSlop,
             0f
         )
@@ -1159,11 +1157,11 @@ class DragSlopExceededGestureFilterTest {
 
         filter.onCancel()
 
-        pointer = down(0, 0.milliseconds, 0f, 0f)
+        pointer = down(0, 0, 0f, 0f)
         filter::onPointerEvent.invokeOverAllPasses(pointerEventOf(pointer))
 
         pointer = pointer.moveTo(
-            10.milliseconds,
+            10,
             overSlop,
             0f
         )

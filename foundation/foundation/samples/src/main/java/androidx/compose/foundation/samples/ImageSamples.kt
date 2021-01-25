@@ -43,7 +43,7 @@ import androidx.compose.ui.unit.dp
 fun ImageSample() {
     val ImageBitmap = createTestImage()
     // Lays out and draws an image sized to the dimensions of the ImageBitmap
-    Image(bitmap = ImageBitmap)
+    Image(bitmap = ImageBitmap, contentDescription = "Localized description")
 }
 
 @Sampled
@@ -56,7 +56,8 @@ fun ImagePainterSubsectionSample() {
             ImageBitmap,
             IntOffset(10, 12),
             IntSize(50, 60)
-        )
+        ),
+        contentDescription = "Localized description"
     )
 }
 
@@ -67,6 +68,7 @@ fun ImageVectorSample() {
     imageVector.resource.resource?.let {
         Image(
             imageVector = it,
+            contentDescription = null,
             modifier = Modifier.preferredSize(200.dp, 200.dp),
             contentScale = ContentScale.Fit,
             colorFilter = ColorFilter.tint(Color.Cyan)
@@ -89,7 +91,11 @@ fun ImagePainterSample() {
         }
     }
 
-    Image(painter = customPainter, modifier = Modifier.preferredSize(100.dp, 100.dp))
+    Image(
+        painter = customPainter,
+        contentDescription = "Localized description",
+        modifier = Modifier.preferredSize(100.dp, 100.dp)
+    )
 }
 
 /**

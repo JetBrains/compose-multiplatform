@@ -27,27 +27,31 @@ import android.view.MotionEvent.ACTION_POINTER_UP
 import android.view.MotionEvent.ACTION_UP
 import androidx.compose.runtime.dispatch.AndroidUiDispatcher
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.node.Owner
+import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.platform.ViewRootForTest
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlin.math.max
 
-internal actual fun createInputDispatcher(testContext: TestContext, owner: Owner): InputDispatcher {
-    require(owner is ViewRootForTest) {
+internal actual fun createInputDispatcher(
+    testContext: TestContext,
+    root: RootForTest
+): InputDispatcher {
+    require(root is ViewRootForTest) {
         "InputDispatcher currently only supports dispatching to ViewRootForTest, not to " +
-            owner::class.java.simpleName
+            root::class.java.simpleName
     }
-    val view = owner.view
-    return AndroidInputDispatcher(testContext, owner) { view.dispatchTouchEvent(it) }
+    val view = root.view
+    return AndroidInputDispatcher(testContext, root) { view.dispatchTouchEvent(it) }
 }
 
 internal class AndroidInputDispatcher(
-    testContext: TestContext,
-    owner: Owner?,
+    private val testContext: TestContext,
+    root: ViewRootForTest?,
     private val sendEvent: (MotionEvent) -> Unit
-) : InputDispatcher(testContext, owner) {
+) : InputDispatcher(testContext, root) {
 
     private val batchLock = Any()
     // Batched events are generated just-in-time, given the "lateness" of the dispatching (see
@@ -55,6 +59,7 @@ internal class AndroidInputDispatcher(
     private var batchedEvents = mutableListOf<(Long) -> MotionEvent>()
     private var acceptEvents = true
     private var firstEventTime = Long.MAX_VALUE
+    private val previousLastEventTime = partialGesture?.lastEventTime
 
     override val now: Long get() = SystemClock.uptimeMillis()
 
@@ -154,6 +159,7 @@ internal class AndroidInputDispatcher(
 
     override fun sendAllSynchronous() {
         runBlocking {
+            // Must inject on the main thread, because it might modify View properties
             withContext(AndroidUiDispatcher.Main) {
                 checkAndStopAcceptingEvents()
 
@@ -162,13 +168,29 @@ internal class AndroidInputDispatcher(
                     gestureLateness = it
                 }
 
+                // Add lateness so we're on the same timeline as the event times
+                var lastEventTime = (previousLastEventTime ?: firstEventTime) + lateness
                 batchedEvents.forEach {
-                    sendAndRecycleEvent(it(lateness))
+                    // Before injecting the next event, pump the clock
+                    // by the difference between this and the last event
+                    val event = it(lateness)
+                    pumpClock(
+                        event.eventTime - lastEventTime.also { lastEventTime = event.eventTime }
+                    )
+                    sendAndRecycleEvent(event)
                 }
             }
         }
         // Each invocation of performGesture (Actions.kt) uses a new instance of an input
         // dispatcher, so we don't have to reset firstEventTime after use
+    }
+
+    @OptIn(InternalTestApi::class, ExperimentalCoroutinesApi::class)
+    private fun pumpClock(millis: Long) {
+        // Don't bother calling the method if there's nothing to advance
+        if (millis > 0) {
+            testContext.testOwner.advanceTimeBy(millis)
+        }
     }
 
     override fun onDispose() {

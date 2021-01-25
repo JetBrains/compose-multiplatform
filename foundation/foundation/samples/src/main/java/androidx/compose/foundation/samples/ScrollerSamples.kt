@@ -17,10 +17,11 @@
 package androidx.compose.foundation.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.ScrollableColumn
-import androidx.compose.foundation.ScrollableRow
+import androidx.compose.foundation.animation.scrollBy
+import androidx.compose.foundation.animation.smoothScrollBy
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Scrollable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,13 +35,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 
 private val colors = listOf(
     Color(0xFFffd7d7.toInt()),
@@ -48,39 +50,6 @@ private val colors = listOf(
     Color(0xFFfffbd0.toInt()),
     Color(0xFFe3ffd9.toInt()),
     Color(0xFFd0fff8.toInt())
-)
-
-private val phrases = listOf(
-    "Easy As Pie",
-    "Wouldn't Harm a Fly",
-    "No-Brainer",
-    "Keep On Truckin'",
-    "An Arm and a Leg",
-    "Down To Earth",
-    "Under the Weather",
-    "Up In Arms",
-    "Cup Of Joe",
-    "Not the Sharpest Tool in the Shed",
-    "Ring Any Bells?",
-    "Son of a Gun",
-    "Hard Pill to Swallow",
-    "Close But No Cigar",
-    "Beating a Dead Horse",
-    "If You Can't Stand the Heat, Get Out of the Kitchen",
-    "Cut To The Chase",
-    "Heads Up",
-    "Goody Two-Shoes",
-    "Fish Out Of Water",
-    "Cry Over Spilt Milk",
-    "Elephant in the Room",
-    "There's No I in Team",
-    "Poke Fun At",
-    "Talk the Talk",
-    "Know the Ropes",
-    "Fool's Gold",
-    "It's Not Brain Surgery",
-    "Fight Fire With Fire",
-    "Go For Broke"
 )
 
 @Sampled
@@ -116,31 +85,12 @@ fun VerticalScrollExample() {
 
 @Sampled
 @Composable
-fun ScrollableColumnSample() {
-    ScrollableColumn {
-        phrases.forEach { phrase ->
-            Text(phrase, fontSize = 30.sp)
-        }
-    }
-}
-
-@Sampled
-@Composable
-fun ScrollableRowSample() {
-    ScrollableRow {
-        repeat(100) { index ->
-            Square(index)
-        }
-    }
-}
-
-@Sampled
-@Composable
 fun ControlledScrollableRowSample() {
-    // Create ScrollState to own it and be able to control scroll behaviour of ScrollableRow below
+    // Create ScrollState to own it and be able to control scroll behaviour of scrollable Row below
     val scrollState = rememberScrollState()
+    val scope = rememberCoroutineScope()
     Column {
-        ScrollableRow(scrollState = scrollState) {
+        Row(Modifier.horizontalScroll(scrollState)) {
             repeat(1000) { index ->
                 Square(index)
             }
@@ -148,19 +98,35 @@ fun ControlledScrollableRowSample() {
         // Controls for scrolling
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Scroll")
-            Button(onClick = { scrollState.scrollTo(scrollState.value - 1000) }) {
+            Button(
+                onClick = {
+                    scope.launch { scrollState.scrollTo(scrollState.value - 1000) }
+                }
+            ) {
                 Text("< -")
             }
-            Button(onClick = { scrollState.scrollBy(10000f) }) {
+            Button(
+                onClick = {
+                    scope.launch { (scrollState as Scrollable).scrollBy(10000f) }
+                }
+            ) {
                 Text("--- >")
             }
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Smooth Scroll")
-            Button(onClick = { scrollState.smoothScrollTo(scrollState.value - 1000) }) {
+            Button(
+                onClick = {
+                    scope.launch { scrollState.smoothScrollTo(scrollState.value - 1000) }
+                }
+            ) {
                 Text("< -")
             }
-            Button(onClick = { scrollState.smoothScrollBy(10000f) }) {
+            Button(
+                onClick = {
+                    scope.launch { (scrollState as Scrollable).smoothScrollBy(10000f) }
+                }
+            ) {
                 Text("--- >")
             }
         }

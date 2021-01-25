@@ -47,7 +47,7 @@ class EditProcessorTest {
 
         assertEquals(model, proc.mBufferState)
         val captor = argumentCaptor<TextFieldValue>()
-        verify(tis, times(1)).onStateUpdated(
+        verify(tis, times(1)).updateState(
             eq(inputSessionToken),
             eq(TextFieldValue("", TextRange.Zero)),
             captor.capture()
@@ -61,7 +61,7 @@ class EditProcessorTest {
 
         val newState = proc.onEditCommands(
             listOf(
-                CommitTextEditOp("X", 1)
+                CommitTextCommand("X", 1)
             )
         )
 
@@ -69,7 +69,7 @@ class EditProcessorTest {
         assertEquals(1, newState.selection.min)
         assertEquals(1, newState.selection.max)
         // onEditCommands should not fire onStateUpdated since need to pass it to developer first.
-        verify(tis, never()).onStateUpdated(any(), any(), any())
+        verify(tis, never()).updateState(any(), any(), any())
     }
 
     @Test

@@ -48,13 +48,9 @@ internal class AndroidFontListTypeface(
     private val loadedTypefaces: Map<Font, Typeface>
 
     init {
-        val targetFonts = if (necessaryStyles == null) {
-            fontFamily.fonts
-        } else {
-            necessaryStyles.map { (weight, style) ->
-                fontMatcher.matchFont(fontFamily, weight, style)
-            }.distinct()
-        }
+        val targetFonts = necessaryStyles?.map { (weight, style) ->
+            fontMatcher.matchFont(fontFamily, weight, style)
+        }?.distinct() ?: fontFamily.fonts
         val typefaces = mutableMapOf<Font, Typeface>()
 
         targetFonts.fastForEach {

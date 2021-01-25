@@ -19,6 +19,7 @@ package androidx.compose.foundation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -92,7 +93,10 @@ class IndicationTest {
                 Modifier
                     .testTag(testTag)
                     .preferredSize(100.dp)
-                    .clickable(indication = indication) {}
+                    .clickable(
+                        interactionState = remember { InteractionState() },
+                        indication = indication,
+                    ) {}
             )
         }
         assertThat(countDownLatch.count).isEqualTo(2)
@@ -148,7 +152,10 @@ class IndicationTest {
                 Modifier
                     .testTag(testTag)
                     .preferredSize(100.dp)
-                    .clickable(indication = indication) { }
+                    .clickable(
+                        interactionState = remember { InteractionState() },
+                        indication = indication
+                    ) { }
             )
         }
         assertThat(lastPosition).isNull()

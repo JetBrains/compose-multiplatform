@@ -26,6 +26,7 @@ import androidx.compose.ui.tooling.ToolingTest
 import androidx.compose.ui.tooling.asTree
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.sp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
@@ -42,7 +43,7 @@ class InlineClassConverterTest : ToolingTest() {
         show {
             Inspectable(slotTableRecord) {
                 Surface {
-                    Text(text = "OK", fontSize = TextUnit.Sp(12))
+                    Text(text = "OK", fontSize = 12.sp)
                 }
             }
         }

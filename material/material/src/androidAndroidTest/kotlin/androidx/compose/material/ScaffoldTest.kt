@@ -114,7 +114,7 @@ class ScaffoldTest {
                     Box(
                         Modifier
                             .onGloballyPositioned { positioned: LayoutCoordinates ->
-                                appbarPosition = positioned.localToGlobal(Offset.Zero)
+                                appbarPosition = positioned.localToWindow(Offset.Zero)
                                 appbarSize = positioned.size
                             }
                             .fillMaxWidth()
@@ -125,7 +125,7 @@ class ScaffoldTest {
             ) {
                 Box(
                     Modifier
-                        .onGloballyPositioned { contentPosition = it.localToGlobal(Offset.Zero) }
+                        .onGloballyPositioned { contentPosition = it.localToWindow(Offset.Zero) }
                         .fillMaxWidth()
                         .preferredHeight(50.dp)
                         .background(Color.Blue)
@@ -281,11 +281,11 @@ class ScaffoldTest {
                     FloatingActionButton(
                         modifier = Modifier.onGloballyPositioned { positioned ->
                             fabSize = positioned.size
-                            fabPosition = positioned.positionInRoot
+                            fabPosition = positioned.positionInRoot()
                         },
                         onClick = {}
                     ) {
-                        Icon(Icons.Filled.Favorite)
+                        Icon(Icons.Filled.Favorite, null)
                     }
                 },
                 floatingActionButtonPosition = FabPosition.Center,
@@ -294,7 +294,7 @@ class ScaffoldTest {
                     BottomAppBar(
                         Modifier
                             .onGloballyPositioned { positioned: LayoutCoordinates ->
-                                bottomBarPosition = positioned.positionInRoot
+                                bottomBarPosition = positioned.positionInRoot()
                             }
                     ) {}
                 }
@@ -317,11 +317,11 @@ class ScaffoldTest {
                     FloatingActionButton(
                         modifier = Modifier.onGloballyPositioned { positioned ->
                             fabSize = positioned.size
-                            fabPosition = positioned.positionInRoot
+                            fabPosition = positioned.positionInRoot()
                         },
                         onClick = {}
                     ) {
-                        Icon(Icons.Filled.Favorite)
+                        Icon(Icons.Filled.Favorite, null)
                     }
                 },
                 floatingActionButtonPosition = FabPosition.End,
@@ -330,7 +330,7 @@ class ScaffoldTest {
                     BottomAppBar(
                         Modifier
                             .onGloballyPositioned { positioned: LayoutCoordinates ->
-                                bottomBarPosition = positioned.positionInRoot
+                                bottomBarPosition = positioned.positionInRoot()
                             }
                     ) {}
                 }
@@ -394,7 +394,7 @@ class ScaffoldTest {
                         },
                         onClick = {}
                     ) {
-                        Icon(Icons.Filled.Favorite)
+                        Icon(Icons.Filled.Favorite, null)
                     }
                 }
             }

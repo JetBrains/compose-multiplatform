@@ -17,12 +17,12 @@
 package androidx.compose.ui.window
 
 import androidx.compose.desktop.AppWindow
-import androidx.compose.desktop.WindowEvents
 import androidx.compose.desktop.AppWindowAmbient
+import androidx.compose.desktop.WindowEvents
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.onActive
-import androidx.compose.runtime.onDispose
+import androidx.compose.runtime.rememberCompositionReference
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -42,6 +42,8 @@ import java.awt.image.BufferedImage
  * @param menuBar Window menu bar. The menu bar can be displayed inside a window (Windows,
  * Linux) or at the top of the screen (Mac OS).
  * @param undecorated Removes the native window border if set to true. The default value is false.
+ * @param resizable Makes the window resizable if is set to true and unresizable if is set to
+ * false. The default value is true.
  * @param events Allows to describe events of the window.
  * Supported events: onOpen, onClose, onMinimize, onMaximize, onRestore, onFocusGet, onFocusLost,
  * onResize, onRelocate.
@@ -55,6 +57,7 @@ data class DesktopDialogProperties(
     val icon: BufferedImage? = null,
     val menuBar: MenuBar? = null,
     val undecorated: Boolean = false,
+    val resizable: Boolean = true,
     val events: WindowEvents = WindowEvents()
 ) : DialogProperties
 
@@ -74,6 +77,7 @@ internal actual fun ActualDialog(
         return
     }
 
+    val parentComposition = rememberCompositionReference()
     val dialog = remember {
         AppWindow(
             attached = attached,
@@ -84,32 +88,32 @@ internal actual fun ActualDialog(
             icon = desktopProperties.icon,
             menuBar = desktopProperties.menuBar,
             undecorated = desktopProperties.undecorated,
+            resizable = desktopProperties.resizable,
             events = desktopProperties.events,
             onDismissRequest = onDismissRequest
         )
     }
 
-    onActive {
-        dialog.show {
+    DisposableEffect(Unit) {
+        dialog.show(parentComposition) {
             content()
         }
-    }
+        onDispose {
+            if (!dialog.isClosed) {
+                // There are two closing situations of dialog windows:
+                // 1. by [onDismissRequest]
+                // 2. directly closing the dialog by clicking the close button or calling
+                // the [close ()] JFrame method.
+                // In the first case [onDismissRequest] is called first, then [onDismissRequest]
+                // calls [onDispose], [onDispose] invokes [dialog.close()], [dialog.close()]
+                // calls [onDismissRequest] again.
+                // To prevent double invocation of [onDismissRequest] we should clear
+                // the [onDismiss (originally - onDismissRequest)] event of the dialog window.
+                dialog.onDismiss = null
 
-    onDispose {
-        if (!dialog.isClosed) {
-            // There are two closing situations of dialog windows:
-            // 1. by [onDismissRequest]
-            // 2. directly closing the dialog by clicking the close button or calling
-            // the [close ()] JFrame method.
-            // In the first case [onDismissRequest] is called first, then [onDismissRequest]
-            // calls [onDispose], [onDispose] invokes [dialog.close()], [dialog.close()]
-            // calls [onDismissRequest] again.
-            // To prevent double invocation of [onDismissRequest] we should clear
-            // the [onDismiss (originally - onDismissRequest)] event of the dialog window.
-            dialog.onDismiss = null
-
-            // directly closes the Swing window
-            dialog.close()
+                // directly closes the Swing window
+                dialog.close()
+            }
         }
     }
 }

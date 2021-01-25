@@ -17,20 +17,39 @@
 package androidx.compose.ui.test.junit4
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.ComposeTimeoutException
 import androidx.compose.ui.test.IdlingResource
+import androidx.compose.ui.test.MainTestClock
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import org.junit.rules.TestRule
 
 /**
- * Enables to run tests of individual composables without having to do manual setup. For Android
- * tests see [createAndroidComposeRule]. Normally this rule is obtained by using [createComposeRule]
- * factory that provides proper implementation (depending if running host side or Android side).
+ * A [TestRule] that allows you to test and control composables and applications using Compose.
+ * Most of the functionality in this interface provides some form of test synchronization: the
+ * test will block until the app or composable is idle, to ensure the tests are deterministic.
  *
- * However if you really need Android specific dependencies and don't want your test to be abstract
- * you can still create [createAndroidComposeRule] directly and access its underlying Activity.
+ * For example, if you would perform a click on the center of the screen while a button is
+ * animation from left to right over the screen, without synchronization the test would sometimes
+ * click when the button is in the middle of the screen (button is clicked), and sometimes when
+ * the button is past the middle of the screen (button is not clicked). With synchronization, the
+ * app would not be idle until the animation is over, so the test will always click when the
+ * button is past the middle of the screen (and not click it). If you actually do want to click
+ * the button when it's in the middle of the animation, you can do so by controlling the
+ * [clock][mainClock]. You'll have to disable [automatic advancing][MainTestClock.autoAdvance],
+ * and manually advance the clock by the time necessary to position the button in the middle of
+ * the screen.
+ *
+ * An instance of [ComposeTestRule] can be created with [createComposeRule], which will also
+ * create a host for the compose content for you (see [ComposeContentTestRule]). If you need to
+ * specify which particular Activity is started on Android, you can use [createAndroidComposeRule].
+ *
+ * If you don't want any Activity to be started automatically by the test rule on Android, you
+ * can use [createEmptyComposeRule]. In such a case, you will have to set content using one of
+ * Compose UI's setters (like [ComponentActivity.setContent][androidx.compose.ui.platform
+ * .setContent]).
  */
 interface ComposeTestRule : TestRule, SemanticsNodeInteractionsProvider {
     /**
@@ -41,13 +60,34 @@ interface ComposeTestRule : TestRule, SemanticsNodeInteractionsProvider {
     /**
      * Current device display's size.
      */
+    @Deprecated(
+        "This utility was deprecated without replacement. It is recommend to use " +
+            "the root size for any assertions."
+    )
     val displaySize: IntSize get
 
     /**
-     * A test rule that allows you to control the animation clock
+     * A test rule that allows you to control the animation clock.
+     *
+     * Important: this clock is now deprecated and should not be used. Please migrate to
+     * [mainClock]. If this need to be used the rule needs to be created via
+     * createComposeRuleLegacy method that enables it.
      */
-    @OptIn(ExperimentalTesting::class)
+    @Deprecated(
+        "clockTestRule was replaced with mainClock. As a temporary remedy, there are " +
+            "createComposeRuleLegacy methods and via those this property is still usable.",
+        ReplaceWith("mainClock", "androidx.compose.ui.test.junit4.ComposeTestRule")
+    )
+    @OptIn(ExperimentalTestApi::class)
     val clockTestRule: AnimationClockTestRule
+
+    /**
+     * Clock that drives frames and recompositions in compose tests.
+     *
+     * This is replacement for [clockTestRule]. When using this clock the original [clockTestRule]
+     * is no longer available.
+     */
+    val mainClock: MainTestClock
 
     /**
      * Runs the given action on the UI thread.
@@ -62,6 +102,10 @@ interface ComposeTestRule : TestRule, SemanticsNodeInteractionsProvider {
      * variables.
      *
      * This method is blocking until the action is complete.
+     *
+     * In case the main clock auto advancement is enabled (by default is) this will also keep
+     * advancing the clock until it is idle (meaning there are no recompositions, animations, etc.
+     * pending). If not, this will wait only for other idling resources.
      */
     fun <T> runOnIdle(action: () -> T): T
 
@@ -69,6 +113,10 @@ interface ComposeTestRule : TestRule, SemanticsNodeInteractionsProvider {
      * Waits for compose to be idle.
      *
      * This is a blocking call. Returns only after compose is idle.
+     *
+     * In case the main clock auto advancement is enabled (by default is) this will also keep
+     * advancing the clock until it is idle (meaning there are no recompositions, animations, etc.
+     * pending). If not, this will wait only for other idling resources.
      *
      * Can crash in case there is a time out. This is not supposed to be handled as it
      * surfaces only in incorrect tests.
@@ -78,9 +126,36 @@ interface ComposeTestRule : TestRule, SemanticsNodeInteractionsProvider {
     /**
      * Suspends until compose is idle. Compose is idle if there are no pending compositions, no
      * pending changes that could lead to another composition, and no pending draw calls.
+     *
+     * In case the main clock auto advancement is enabled (by default is) this will also keep
+     * advancing the clock until it is idle (meaning there are no recompositions, animations, etc.
+     * pending). If not, this will wait only for other idling resources.
      */
-    @ExperimentalTesting
+    @ExperimentalTestApi
     suspend fun awaitIdle()
+
+    /**
+     * Blocks until the given condition is satisfied.
+     *
+     * In case the main clock auto advancement is enabled (by default is), this will also keep
+     * advancing the clock on a frame by frame basis and yield for other async work at the end of
+     * each frame. If the advancement of the main clock is not enabled this will work as a
+     * countdown latch without any other advancements.
+     *
+     * There is also [MainTestClock.advanceTimeUntil] which is faster as it does not yield back
+     * the UI thread.
+     *
+     * This method should be used in cases where [MainTestClock.advanceTimeUntil]
+     * is not enough.
+     *
+     * @param timeoutMillis The time after which this method throws an exception if the given
+     * condition is not satisfied. This is the wall clock time not the main clock one.
+     * @param condition Condition that must be satisfied in order for this method to successfully
+     * finish.
+     *
+     * @throws ComposeTimeoutException If the condition is not satisfied after [timeoutMillis].
+     */
+    fun waitUntil(timeoutMillis: Long = 1_000, condition: () -> Boolean)
 
     /**
      * Registers an [IdlingResource] in this test.
@@ -91,7 +166,21 @@ interface ComposeTestRule : TestRule, SemanticsNodeInteractionsProvider {
      * Unregisters an [IdlingResource] from this test.
      */
     fun unregisterIdlingResource(idlingResource: IdlingResource)
+}
 
+/**
+ * A [ComposeTestRule] that allows you to set content without the necessity to provide a host for
+ * the content. The host, such as an Activity, will be created by the test rule.
+ *
+ * An instance of [ComposeContentTestRule] can be created with [createComposeRule]. If you need to
+ * specify which particular Activity is started on Android, you can use [createAndroidComposeRule].
+ *
+ * If you don't want any host to be started automatically by the test rule on Android, you
+ * can use [createEmptyComposeRule]. In such a case, you will have to create a host in your test
+ * and set the content using one of Compose UI's setters (like [ComponentActivity
+ * .setContent][androidx.compose.ui.platform.setContent]).
+ */
+interface ComposeContentTestRule : ComposeTestRule {
     /**
      * Sets the given composable as a content of the current screen.
      *
@@ -104,7 +193,7 @@ interface ComposeTestRule : TestRule, SemanticsNodeInteractionsProvider {
 }
 
 /**
- * Factory method to provide implementation of [ComposeTestRule].
+ * Factory method to provide an implementation of [ComposeContentTestRule].
  *
  * This method is useful for tests in compose libraries where no custom Activity is usually
  * needed. For app tests or launching custom activities, see [createAndroidComposeRule].
@@ -113,4 +202,4 @@ interface ComposeTestRule : TestRule, SemanticsNodeInteractionsProvider {
  * reference to this activity into the manifest file of the corresponding tests (usually in
  * androidTest/AndroidManifest.xml).
  */
-expect fun createComposeRule(): ComposeTestRule
+expect fun createComposeRule(): ComposeContentTestRule

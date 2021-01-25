@@ -50,4 +50,5 @@
     <item name="accessibility_custom_action_31" type="id"/>
     <item name="wrapped_composition_tag" type="id" />
     <item name="inspection_slot_table_set" type="id" />
+    <item name="androidx_compose_ui_view_composition_reference" type="id" />
 </resources>

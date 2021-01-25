@@ -47,6 +47,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.viewModel
 import androidx.lifecycle.LiveData
@@ -209,10 +210,10 @@ private object StateSnippet10 {
         override var value: T
     }
      */
-    interface DummyState<T> : State<T> {
+    interface FakeState<T> : State<T> {
         override var value: T
     }
-    interface DummMutableState<T> : MutableState<String>
+    interface FakeMutableState<T> : MutableState<String>
 }
 
 private object StateSnippet11 {
@@ -235,12 +236,18 @@ private object StateSnippet11 {
                     Text(text = body, Modifier.padding(top = 8.dp))
                     // change expanded in response to click events
                     IconButton(onClick = { expanded = false }, modifier = Modifier.fillMaxWidth()) {
-                        Icon(Icons.Default.ExpandLess)
+                        Icon(
+                            Icons.Default.ExpandLess,
+                            contentDescription = stringResource(R.string.expand_less)
+                        )
                     }
                 } else {
                     // change expanded in response to click events
                     IconButton(onClick = { expanded = true }, modifier = Modifier.fillMaxWidth()) {
-                        Icon(Icons.Default.ExpandMore)
+                        Icon(
+                            Icons.Default.ExpandMore,
+                            contentDescription = stringResource(R.string.expand_more)
+                        )
                     }
                 }
             }
@@ -250,7 +257,7 @@ private object StateSnippet11 {
 
 private object StateSnippet12 {
     // this stateful composable is only responsible for holding internal state
-// and defers the UI to the stateless composable
+    // and defers the UI to the stateless composable
     @Composable
     fun ExpandingCard(title: String, body: String) {
         var expanded by remember { mutableStateOf(false) }
@@ -264,7 +271,7 @@ private object StateSnippet12 {
     }
 
     // this stateless composable is responsible for describing the UI based on the state
-// passed to it and firing events in response to the buttons being pressed
+    // passed to it and firing events in response to the buttons being pressed
     @Composable
     fun ExpandingCard(
         title: String,
@@ -284,12 +291,18 @@ private object StateSnippet12 {
                 if (expanded) {
                     Spacer(Modifier.height(8.dp))
                     Text(body)
-                    IconButton(onClick = onCollapse, Modifier.fillMaxWidth()) {
-                        Icon(Icons.Default.ExpandLess)
+                    IconButton(onClick = onCollapse, modifier = Modifier.fillMaxWidth()) {
+                        Icon(
+                            Icons.Default.ExpandLess,
+                            contentDescription = stringResource(R.string.expand_less)
+                        )
                     }
                 } else {
-                    IconButton(onClick = onExpand, Modifier.fillMaxWidth()) {
-                        Icon(Icons.Default.ExpandMore)
+                    IconButton(onClick = onExpand, modifier = Modifier.fillMaxWidth()) {
+                        Icon(
+                            Icons.Default.ExpandMore,
+                            contentDescription = stringResource(R.string.expand_more)
+                        )
                     }
                 }
             }
@@ -322,6 +335,13 @@ private object binding {
 
     object textInput {
         fun doAfterTextChanged(function: () -> Unit) { }
+    }
+}
+
+private object R {
+    object string {
+        const val expand_less = 0
+        const val expand_more = 1
     }
 }
 

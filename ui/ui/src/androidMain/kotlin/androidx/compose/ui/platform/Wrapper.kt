@@ -17,6 +17,7 @@ package androidx.compose.ui.platform
 
 import android.app.Activity
 import android.os.Build
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -43,6 +44,8 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import java.util.Collections
 import java.util.WeakHashMap
+
+private val TAG = "Wrapper"
 
 /**
  * Composes the children of the view with the passed in [composable].
@@ -162,6 +165,7 @@ fun ComponentActivity.setContent(
  * @param parent The [Recomposer] or parent composition reference.
  * @param content Composable that will be the content of the view.
  */
+@Deprecated("Use ComposeView or AbstractComposeView instead.")
 fun ViewGroup.setContent(
     parent: CompositionReference = Recomposer.current(),
     content: @Composable () -> Unit
@@ -205,10 +209,14 @@ private fun enableDebugInspectorInfo() {
     // assignment. This allows the InspectorInfo lambdas to be stripped from release builds.
     @OptIn(InternalComposeApi::class)
     if (!isDebugInspectorInfoEnabled) {
-        val packageClass = Class.forName("androidx.compose.ui.platform.InspectableValueKt")
-        val field = packageClass.getDeclaredField("isDebugInspectorInfoEnabled")
-        field.isAccessible = true
-        field.setBoolean(null, true)
+        try {
+            val packageClass = Class.forName("androidx.compose.ui.platform.InspectableValueKt")
+            val field = packageClass.getDeclaredField("isDebugInspectorInfoEnabled")
+            field.isAccessible = true
+            field.setBoolean(null, true)
+        } catch (ignored: Exception) {
+            Log.w(TAG, "Could not access isDebugInspectorInfoEnabled. Please set explicitly.")
+        }
     }
 }
 
@@ -233,6 +241,7 @@ private class WrappedComposition(
                     lifecycle.addObserver(this)
                 } else if (lifecycle.currentState.isAtLeast(Lifecycle.State.CREATED)) {
                     original.setContent {
+
                         @Suppress("UNCHECKED_CAST")
                         val inspectionTable =
                             owner.getTag(R.id.inspection_slot_table_set) as?
@@ -246,6 +255,7 @@ private class WrappedComposition(
                         }
 
                         LaunchedEffect(owner) { owner.keyboardVisibilityEventLoop() }
+                        LaunchedEffect(owner) { owner.boundsUpdatesEventLoop() }
 
                         Providers(InspectionTables provides inspectionTable) {
                             ProvideAndroidAmbients(owner, content)

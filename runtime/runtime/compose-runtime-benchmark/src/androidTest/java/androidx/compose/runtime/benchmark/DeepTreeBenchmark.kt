@@ -20,6 +20,7 @@ import androidx.compose.runtime.benchmark.deeptree.DeepTree
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.FixMethodOrder
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -33,11 +34,12 @@ import org.junit.runners.MethodSorters
  */
 @LargeTest
 @RunWith(AndroidJUnit4::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class DeepTreeBenchmark : ComposeBenchmarkBase() {
     @UiThreadTest
     @Test
-    fun benchmark_deep_tree_01_depth1_breadth100_wrap2() {
+    fun benchmark_deep_tree_01_depth1_breadth100_wrap2() = runBlockingTestWithFrameClock {
         measureCompose {
             DeepTree(depth = 1, breadth = 100, wrap = 2)
         }
@@ -45,7 +47,7 @@ class DeepTreeBenchmark : ComposeBenchmarkBase() {
 
     @UiThreadTest
     @Test
-    fun benchmark_deep_tree_02_depth7_breadth3_wrap2() {
+    fun benchmark_deep_tree_02_depth7_breadth3_wrap2() = runBlockingTestWithFrameClock {
         measureCompose {
             DeepTree(depth = 7, breadth = 3, wrap = 2)
         }
@@ -53,7 +55,7 @@ class DeepTreeBenchmark : ComposeBenchmarkBase() {
 
     @UiThreadTest
     @Test
-    fun benchmark_deep_tree_03_depth2_breadth10_wrap2() {
+    fun benchmark_deep_tree_03_depth2_breadth10_wrap2() = runBlockingTestWithFrameClock {
         measureCompose {
             DeepTree(depth = 2, breadth = 10, wrap = 2)
         }
@@ -61,7 +63,7 @@ class DeepTreeBenchmark : ComposeBenchmarkBase() {
 
     @UiThreadTest
     @Test
-    fun benchmark_deep_tree_04_depth2_breadth10_wrap6() {
+    fun benchmark_deep_tree_04_depth2_breadth10_wrap6() = runBlockingTestWithFrameClock {
         measureCompose {
             DeepTree(depth = 2, breadth = 10, wrap = 6)
         }

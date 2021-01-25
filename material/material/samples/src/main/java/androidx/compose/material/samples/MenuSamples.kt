@@ -42,7 +42,7 @@ fun MenuSample() {
 
     val iconButton = @Composable {
         IconButton(onClick = { expanded = true }) {
-            Icon(Icons.Default.MoreVert)
+            Icon(Icons.Default.MoreVert, contentDescription = "Localized description")
         }
     }
     DropdownMenu(

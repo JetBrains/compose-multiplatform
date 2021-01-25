@@ -16,16 +16,19 @@
 
 package androidx.compose.foundation.demos
 
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -36,9 +39,12 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun NestedScrollDemo() {
-    ScrollableColumn(
-        Modifier.fillMaxSize().background(Color.Red),
-        contentPadding = PaddingValues(30.dp)
+    Column(
+        Modifier
+            .fillMaxSize()
+            .background(Color.Red)
+            .verticalScroll(rememberScrollState())
+            .padding(PaddingValues(30.dp))
     ) {
         repeat(6) { outerOuterIndex ->
             LazyColumn(
@@ -48,10 +54,14 @@ fun NestedScrollDemo() {
             ) {
                 repeat(3) { outerIndex ->
                     item {
-                        ScrollableColumn(
-                            Modifier.fillMaxSize().border(3.dp, Color.Blue).height(150.dp)
-                                .background(Color.White),
-                            contentPadding = PaddingValues(30.dp)
+                        Column(
+                            Modifier
+                                .fillMaxSize()
+                                .border(3.dp, Color.Blue)
+                                .height(150.dp)
+                                .background(Color.White)
+                                .verticalScroll(rememberScrollState())
+                                .padding(PaddingValues(30.dp))
                         ) {
                             repeat(6) { innerIndex ->
                                 Box(

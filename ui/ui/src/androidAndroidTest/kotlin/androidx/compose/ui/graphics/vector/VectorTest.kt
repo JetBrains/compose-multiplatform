@@ -55,7 +55,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.CountDownLatch
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -78,6 +77,22 @@ class VectorTest {
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
+    fun testVectorIntrinsicTint() {
+        rule.setContent {
+            val background = Modifier.paint(
+                createTestVectorPainter(200, Color.Magenta),
+                alignment = Alignment.Center
+            )
+            AtLeastSize(size = 200, modifier = background) {
+            }
+        }
+        takeScreenShot(200).apply {
+            assertEquals(getPixel(100, 100), Color.Magenta.toArgb())
+        }
+    }
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
     fun testVectorAlignment() {
         rule.setContent {
             VectorTint(minimumSize = 500, alignment = Alignment.BottomEnd)
@@ -91,26 +106,24 @@ class VectorTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun testVectorInvalidation() {
-        val latch1 = CountDownLatch(1)
-        val latch2 = CountDownLatch(1)
-        val testCase = VectorInvalidationTestCase(latch1)
+        val testCase = VectorInvalidationTestCase()
         rule.setContent {
             testCase.TestVector()
         }
 
-        latch1.await()
+        rule.waitUntil { testCase.measured }
         val size = testCase.vectorSize
         takeScreenShot(size).apply {
             assertEquals(Color.Blue.toArgb(), getPixel(5, size - 5))
             assertEquals(Color.White.toArgb(), getPixel(size - 5, 5))
         }
 
-        testCase.latch = latch2
+        testCase.measured = false
         rule.runOnUiThread {
             testCase.toggle()
         }
 
-        rule.waitForIdle()
+        rule.waitUntil { testCase.measured }
 
         takeScreenShot(size).apply {
             assertEquals(Color.White.toArgb(), getPixel(5, size - 5))
@@ -220,13 +233,14 @@ class VectorTest {
             val clickState = remember { mutableStateOf(false) }
             Image(
                 imageVector = if (clickState.value) icon1 else icon2,
+                contentDescription = null,
                 modifier = Modifier
                     .testTag(testTag)
                     .preferredSize(icon1.defaultWidth, icon1.defaultHeight)
                     .background(Color.Red)
                     .clickable { clickState.value = !clickState.value },
-                contentScale = ContentScale.FillHeight,
-                alignment = Alignment.TopStart
+                alignment = Alignment.TopStart,
+                contentScale = ContentScale.FillHeight
             )
         }
 
@@ -279,6 +293,7 @@ class VectorTest {
             }
             Image(
                 painter = vectorPainter,
+                contentDescription = null,
                 modifier = Modifier
                     .testTag(testTag)
                     .preferredSize(defaultWidth * 7, defaultHeight * 3)
@@ -296,7 +311,6 @@ class VectorTest {
         minimumSize: Int = size,
         alignment: Alignment = Alignment.Center
     ) {
-
         val background = Modifier.paint(
             createTestVectorPainter(size),
             colorFilter = ColorFilter.tint(Color.Cyan),
@@ -307,7 +321,10 @@ class VectorTest {
     }
 
     @Composable
-    private fun createTestVectorPainter(size: Int = 200): VectorPainter {
+    private fun createTestVectorPainter(
+        size: Int = 200,
+        tintColor: Color = Color.Unspecified
+    ): VectorPainter {
         val sizePx = size.toFloat()
         val sizeDp = (size / AmbientDensity.current.density).dp
         return rememberVectorPainter(
@@ -323,7 +340,8 @@ class VectorTest {
                     },
                     fill = SolidColor(Color.Black)
                 )
-            }
+            },
+            tintColor = tintColor
         )
     }
 

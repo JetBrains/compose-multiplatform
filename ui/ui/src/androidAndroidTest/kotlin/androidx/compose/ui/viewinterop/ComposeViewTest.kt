@@ -27,19 +27,17 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.layout.globalBounds
+import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.IntSize
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LifecycleRegistry
-import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
@@ -48,7 +46,9 @@ import androidx.test.filters.MediumTest
 import androidx.test.filters.SmallTest
 import org.hamcrest.CoreMatchers.instanceOf
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -102,26 +102,49 @@ class ComposeViewTest {
         }
 
         rule.onNodeWithTag("text").assertTextEquals("World")
-
-        rule.activityRule.scenario.onActivity { activity ->
-            val composeView: ComposeView = activity.findViewById(id)
-            composeView.disposeComposition()
-        }
-
-        rule.onNodeWithTag("text").assertDoesNotExist()
     }
 
     @Test
-    fun disposeOnLifecycleDestroyed() {
-        val lco = rule.runOnUiThread {
-            TestLifecycleOwner().apply {
-                registry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    fun compositionStrategyDisposed() {
+        rule.activityRule.scenario.onActivity { activity ->
+            var installed = false
+            var disposed = false
+            val testView = TestComposeView(activity)
+            val strategy = object : ViewCompositionStrategy {
+                override fun installFor(view: AbstractComposeView): () -> Unit {
+                    installed = true
+                    assertSame("correct view provided", testView, view)
+                    return { disposed = true }
+                }
             }
+            testView.setViewCompositionStrategy(strategy)
+            assertTrue("strategy should be installed", installed)
+            assertFalse("strategy should not be disposed", disposed)
+            testView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
+            assertTrue("strategy should be disposed", disposed)
         }
+    }
+
+    @Test
+    fun disposeOnDetachedDefaultStrategy() {
+        rule.activityRule.scenario.onActivity { activity ->
+            val testView = TestComposeView(activity)
+            assertFalse("should not have composition yet", testView.hasComposition)
+            activity.setContentView(testView)
+            assertTrue("composition should be created", testView.hasComposition)
+            activity.setContentView(View(activity))
+            assertFalse("composition should have been disposed on detach", testView.hasComposition)
+        }
+    }
+
+    @Test
+    fun disposeOnLifecycleDestroyedStrategy() {
         var composeViewCapture: ComposeView? = null
         rule.activityRule.scenario.onActivity { activity ->
             val composeView = ComposeView(activity).also {
-                ViewTreeLifecycleOwner.set(it, lco)
+                it.setViewCompositionStrategy(
+                    ViewCompositionStrategy.DisposeOnLifecycleDestroyed(activity)
+                )
                 composeViewCapture = it
             }
             activity.setContentView(composeView)
@@ -132,12 +155,64 @@ class ComposeViewTest {
 
         rule.onNodeWithTag("text").assertTextEquals("Hello")
 
-        rule.activityRule.scenario.onActivity {
-            lco.registry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+        rule.activityRule.scenario.moveToState(Lifecycle.State.DESTROYED)
+        assertNotNull("composeViewCapture should not be null", composeViewCapture)
+        assertTrue(
+            "ComposeView should not have a composition",
+            composeViewCapture?.hasComposition == false
+        )
+    }
+
+    @Test
+    fun disposeOnViewTreeLifecycleDestroyedStrategy_setBeforeAttached() {
+        var composeViewCapture: ComposeView? = null
+        rule.activityRule.scenario.onActivity { activity ->
+            val composeView = ComposeView(activity).also {
+                it.setViewCompositionStrategy(
+                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                )
+                composeViewCapture = it
+            }
+            activity.setContentView(composeView)
+            composeView.setContent {
+                BasicText("Hello", Modifier.testTag("text"))
+            }
         }
 
-        assertNotNull("composeViewCapture", composeViewCapture)
-        assertTrue("ComposeView.isDisposed", composeViewCapture?.isDisposed == true)
+        rule.onNodeWithTag("text").assertTextEquals("Hello")
+
+        rule.activityRule.scenario.moveToState(Lifecycle.State.DESTROYED)
+        assertNotNull("composeViewCapture should not be null", composeViewCapture)
+        assertTrue(
+            "ComposeView should not have a composition",
+            composeViewCapture?.hasComposition == false
+        )
+    }
+
+    @Test
+    fun disposeOnViewTreeLifecycleDestroyedStrategy_setAfterAttached() {
+        var composeViewCapture: ComposeView? = null
+        rule.activityRule.scenario.onActivity { activity ->
+            val composeView = ComposeView(activity)
+            composeViewCapture = composeView
+
+            activity.setContentView(composeView)
+            composeView.setViewCompositionStrategy(
+                ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+            )
+            composeView.setContent {
+                BasicText("Hello", Modifier.testTag("text"))
+            }
+        }
+
+        rule.onNodeWithTag("text").assertTextEquals("Hello")
+
+        rule.activityRule.scenario.moveToState(Lifecycle.State.DESTROYED)
+        assertNotNull("composeViewCapture should not be null", composeViewCapture)
+        assertTrue(
+            "ComposeView should not have a composition",
+            composeViewCapture?.hasComposition == false
+        )
     }
 
     @Test
@@ -153,7 +228,7 @@ class ComposeViewTest {
                     Modifier.testTag("box").fillMaxSize().onGloballyPositioned {
                         val position = IntArray(2)
                         composeView.getLocationOnScreen(position)
-                        globalBounds = it.globalBounds.translate(
+                        globalBounds = it.boundsInWindow().translate(
                             -position[0].toFloat(), -position[1].toFloat()
                         )
                         latch.countDown()
@@ -241,12 +316,6 @@ private inline fun ViewGroup.assertUnsupported(
         "$testName throws UnsupportedOperationException",
         exception is UnsupportedOperationException
     )
-}
-
-private class TestLifecycleOwner : LifecycleOwner {
-    val registry = LifecycleRegistry(this)
-
-    override fun getLifecycle(): Lifecycle = registry
 }
 
 private class TestComposeView(

@@ -16,6 +16,7 @@
 package androidx.compose.desktop
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionReference
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.ambientOf
 import androidx.compose.runtime.emptyContent
@@ -23,14 +24,13 @@ import androidx.compose.ui.platform.Keyboard
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.window.MenuBar
-import java.awt.Dimension
 import java.awt.Frame
-import java.awt.Toolkit
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import java.awt.image.BufferedImage
+import javax.swing.JFrame
 import javax.swing.JMenuBar
 import javax.swing.SwingUtilities
 import javax.swing.WindowConstants
@@ -51,6 +51,8 @@ val AppWindowAmbient = ambientOf<AppWindow?>()
  * @param menuBar Window menu bar. The menu bar can be displayed inside a window (Windows,
  * Linux) or at the top of the screen (Mac OS).
  * @param undecorated Removes the native window border if set to true. The default value is false.
+ * @param resizable Makes the window resizable if is set to true and unresizable if is set to
+ * false. The default value is true.
  * @param events Allows to describe events of the window.
  * Supported events: onOpen, onClose, onMinimize, onMaximize, onRestore, onFocusGet, onFocusLost,
  * onResize, onRelocate.
@@ -64,6 +66,7 @@ fun Window(
     icon: BufferedImage? = null,
     menuBar: MenuBar? = null,
     undecorated: Boolean = false,
+    resizable: Boolean = true,
     events: WindowEvents = WindowEvents(),
     onDismissRequest: (() -> Unit)? = null,
     content: @Composable () -> Unit = emptyContent()
@@ -76,6 +79,7 @@ fun Window(
         icon = icon,
         menuBar = menuBar,
         undecorated = undecorated,
+        resizable = resizable,
         events = events,
         onDismissRequest = onDismissRequest
     ).show {
@@ -120,7 +124,10 @@ class AppWindow : AppFrame {
             })
             addWindowFocusListener(object : WindowAdapter() {
                 override fun windowGainedFocus(event: WindowEvent) {
-                    window.setJMenuBar(parent.menuBar?.menuBar)
+                    // Dialogs should not receive a common application menu bar
+                    if (invoker == null) {
+                        window.setJMenuBar(parent.menuBar?.menuBar)
+                    }
                     events.invokeOnFocusGet()
                 }
                 override fun windowLostFocus(event: WindowEvent) {
@@ -157,6 +164,7 @@ class AppWindow : AppFrame {
         icon: BufferedImage? = null,
         menuBar: MenuBar? = null,
         undecorated: Boolean = false,
+        resizable: Boolean = true,
         events: WindowEvents = WindowEvents(),
         onDismissRequest: (() -> Unit)? = null
     ) : this(
@@ -167,6 +175,7 @@ class AppWindow : AppFrame {
         icon = icon,
         menuBar = menuBar,
         undecorated = undecorated,
+        resizable = resizable,
         events = events,
         onDismissRequest = onDismissRequest
     ) {
@@ -187,6 +196,8 @@ class AppWindow : AppFrame {
      * @param menuBar Window menu bar. The menu bar can be displayed inside a window (Windows,
      * Linux) or at the top of the screen (Mac OS).
      * @param undecorated Removes the native window border if set to true. The default value is false.
+     * @param resizable Makes the window resizable if is set to true and unresizable if is set to
+     * false. The default value is true.
      * @param events Allows to describe events of the window.
      * Supported events: onOpen, onClose, onMinimize, onMaximize, onRestore, onFocusGet, onFocusLost,
      * onResize, onRelocate.
@@ -200,6 +211,7 @@ class AppWindow : AppFrame {
         icon: BufferedImage? = null,
         menuBar: MenuBar? = null,
         undecorated: Boolean = false,
+        resizable: Boolean = true,
         events: WindowEvents = WindowEvents(),
         onDismissRequest: (() -> Unit)? = null
     ) {
@@ -208,6 +220,7 @@ class AppWindow : AppFrame {
         setTitle(title)
         setIcon(icon)
         setSize(size.width, size.height)
+        this.resizable = resizable
         if (centered) {
             setWindowCentered()
         } else {
@@ -281,6 +294,72 @@ class AppWindow : AppFrame {
     }
 
     /**
+     * Returns true if the window is in fullscreen mode, false otherwise.
+     */
+    override val isFullscreen: Boolean
+        get() = window.layer.wrapped.fullscreen
+
+    /**
+     * Switches the window to fullscreen mode if the window is resizable. If the window is in
+     * fullscreen mode [minimize] and [maximize] methods are ignored.
+     */
+    override fun makeFullscreen() {
+        if (!isFullscreen && resizable) {
+            window.layer.wrapped.fullscreen = true
+        }
+    }
+
+    /**
+     * Minimizes the window to the taskbar. If the window is in fullscreen mode this method
+     * is ignored.
+     */
+    override fun minimize() {
+        if (!isFullscreen) {
+            window.setExtendedState(JFrame.ICONIFIED)
+        }
+    }
+
+    /**
+     * Maximizes the window to fill all available screen space. If the window is in fullscreen mode
+     * this method is ignored.
+     */
+    override fun maximize() {
+        if (!isFullscreen) {
+            window.setExtendedState(JFrame.MAXIMIZED_BOTH)
+        }
+    }
+
+    /**
+     * Restores the previous state and size of the window after
+     * maximizing/minimizing/fullscreen mode.
+     */
+    override fun restore() {
+        if (isFullscreen) {
+            window.layer.wrapped.fullscreen = false
+        }
+        window.setExtendedState(JFrame.NORMAL)
+    }
+
+    private var _resizable: Boolean = true
+
+    /**
+     * Sets the ability to resize the window. True - the window can be resized,
+     * false - the window cannot be resized. If the window is in fullscreen mode
+     * setter of this property is ignored. If this property is true the [makeFullscreen()]
+     * method is ignored.
+     */
+    override var resizable: Boolean
+        get() {
+            return window.isResizable()
+        }
+        set(value) {
+            if (!isFullscreen) {
+                _resizable = value
+                window.setResizable(value)
+            }
+        }
+
+    /**
      * Sets the new size of the window.
      *
      * @param width the new width of the window.
@@ -311,17 +390,20 @@ class AppWindow : AppFrame {
     }
 
     /**
-     * Sets the window to the center of the screen.
+     * Sets the window to the center of the current screen.
      */
     override fun setWindowCentered() {
-        val dim: Dimension = Toolkit.getDefaultToolkit().getScreenSize()
-        val x = dim.width / 2 - width / 2
-        val y = dim.height / 2 - height / 2
+        val screenBounds = window.graphicsConfiguration.getBounds()
+        val x = (screenBounds.width - width) / 2 + screenBounds.x
+        val y = (screenBounds.height - height) / 2 + screenBounds.y
         window.setLocation(x, y)
     }
 
-    private fun onCreate(content: @Composable () -> Unit) {
-        window.setContent {
+    private fun onCreate(
+        parentComposition: CompositionReference? = null,
+        content: @Composable () -> Unit
+    ) {
+        window.setContent(parentComposition) {
             Providers(
                 AppWindowAmbient provides this,
                 content = content
@@ -332,15 +414,21 @@ class AppWindow : AppFrame {
     /**
      * Shows a window with the given Compose content.
      *
+     * @param parentComposition The parent composition reference to coordinate
+     *        scheduling of composition updates.
+     *        If null then default root composition will be used.
      * @param content Composable content of the window.
      */
-    override fun show(content: @Composable () -> Unit) {
+    fun show(
+        parentComposition: CompositionReference? = null,
+        content: @Composable () -> Unit
+    ) {
         if (invoker != null) {
             invoker!!.lockWindow()
             window.setAlwaysOnTop(true)
         }
 
-        onCreate {
+        onCreate(parentComposition) {
             window.layer.owners?.keyboard = keyboard
             content()
         }
@@ -374,11 +462,11 @@ class AppWindow : AppFrame {
         window.apply {
             defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
             setFocusableWindowState(true)
-            setResizable(true)
             setEnabled(true)
             toFront()
             requestFocus()
         }
+        resizable = _resizable
         disconnectPair()
     }
 

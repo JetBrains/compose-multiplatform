@@ -16,15 +16,16 @@
 
 package androidx.compose.material.demos
 
-import androidx.compose.animation.DpPropKey
-import androidx.compose.animation.core.FloatPropKey
-import androidx.compose.animation.core.transitionDefinition
+import androidx.compose.animation.core.Transition
+import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.transition
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -65,7 +66,6 @@ import androidx.compose.ui.graphics.SweepGradientShader
 import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.toPixelMap
-import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -90,7 +90,7 @@ fun ColorPickerDemo() {
 
 @Composable
 private fun ColorPicker(onColorChange: (Color) -> Unit) {
-    WithConstraints(
+    BoxWithConstraints(
         Modifier.padding(50.dp)
             .fillMaxSize()
             .aspectRatio(1f)
@@ -115,7 +115,7 @@ private fun ColorPicker(onColorChange: (Color) -> Unit) {
         )
 
         Box(Modifier.fillMaxSize()) {
-            Image(modifier = inputModifier, bitmap = colorWheel.image)
+            Image(modifier = inputModifier, contentDescription = null, bitmap = colorWheel.image)
             val color = colorWheel.colorForPosition(position)
             if (color.isSpecified) {
                 Magnifier(visible = isDragging, position = position, color = color)
@@ -203,7 +203,7 @@ private val MagnifierLabelHeight = 50.dp
 private val SelectionCircleDiameter = 30.dp
 
 /**
- * [transition] that animates between [visible] states of the magnifier by animating the width of
+ * [Transition] that animates between [visible] states of the magnifier by animating the width of
  * the label, diameter of the selection circle, and alpha of the overall magnifier
  */
 @Composable
@@ -213,40 +213,26 @@ private fun MagnifierTransition(
     maxDiameter: Dp,
     content: @Composable (labelWidth: Dp, selectionDiameter: Dp, alpha: Float) -> Unit
 ) {
-    val transitionDefinition = remember {
-        transitionDefinition<Boolean> {
-            state(false) {
-                this[LabelWidthPropKey] = 0.dp
-                this[MagnifierDiameterPropKey] = 0.dp
-                this[AlphaPropKey] = 0f
-            }
-            state(true) {
-                this[LabelWidthPropKey] = maxWidth
-                this[MagnifierDiameterPropKey] = maxDiameter
-                this[AlphaPropKey] = 1f
-            }
-            transition(false to true) {
-                LabelWidthPropKey using tween()
-                MagnifierDiameterPropKey using tween()
-                AlphaPropKey using tween()
-            }
-            transition(true to false) {
-                LabelWidthPropKey using tween()
-                MagnifierDiameterPropKey using tween()
-                AlphaPropKey using tween(
-                    delayMillis = 100,
-                    durationMillis = 200
-                )
+    val transition = updateTransition(visible)
+    val labelWidth by transition.animateDp(transitionSpec = { tween() }) {
+        if (it) maxWidth else 0.dp
+    }
+    val magnifierDiameter by transition.animateDp(transitionSpec = { tween() }) {
+        if (it) maxDiameter else 0.dp
+    }
+    val alpha by transition.animateFloat(
+        transitionSpec = {
+            if (true isTransitioningTo false) {
+                tween(delayMillis = 100, durationMillis = 200)
+            } else {
+                tween()
             }
         }
+    ) {
+        if (it) 1f else 0f
     }
-    val state = transition(transitionDefinition, visible)
-    content(state[LabelWidthPropKey], state[MagnifierDiameterPropKey], state[AlphaPropKey])
+    content(labelWidth, magnifierDiameter, alpha)
 }
-
-private val LabelWidthPropKey = DpPropKey()
-private val MagnifierDiameterPropKey = DpPropKey()
-private val AlphaPropKey = FloatPropKey()
 
 /**
  * Label representing the currently selected [color], with [Text] representing the hex code and a

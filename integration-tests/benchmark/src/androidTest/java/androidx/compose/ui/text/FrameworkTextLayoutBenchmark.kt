@@ -19,6 +19,7 @@ package androidx.compose.ui.text
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
+import android.os.Build
 import android.text.BoringLayout
 import android.text.Layout
 import android.text.StaticLayout
@@ -85,7 +86,20 @@ class FrameworkTextLayoutBenchmark(private val textLength: Int) {
                     }
                     Pair(text, paint)
                 }
-                StaticLayout.Builder.obtain(text, 0, text.length, paint, width).build()
+                if (Build.VERSION.SDK_INT >= 23) {
+                    StaticLayout.Builder.obtain(text, 0, text.length, paint, width).build()
+                } else {
+                    @Suppress("DEPRECATION")
+                    StaticLayout(
+                        text,
+                        paint,
+                        text.length,
+                        Layout.Alignment.ALIGN_NORMAL,
+                        1.0f,
+                        0f,
+                        true
+                    )
+                }
             }
         }
     }

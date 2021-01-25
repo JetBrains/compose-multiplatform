@@ -19,9 +19,6 @@ package androidx.compose.ui.test.inputdispatcher
 import android.view.MotionEvent.ACTION_DOWN
 import android.view.MotionEvent.ACTION_UP
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.unit.Duration
-import androidx.compose.ui.unit.inMilliseconds
-import androidx.test.filters.SmallTest
 import androidx.compose.ui.test.AndroidInputDispatcher
 import androidx.compose.ui.test.util.assertHasValidEventTimes
 import androidx.compose.ui.test.util.between
@@ -30,6 +27,7 @@ import androidx.compose.ui.test.util.relativeEventTimes
 import androidx.compose.ui.test.util.relativeTime
 import androidx.compose.ui.test.util.splitsDurationEquallyInto
 import androidx.compose.ui.test.util.verify
+import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Test
@@ -56,7 +54,7 @@ class SendSwipeWithKeyTimesAndEventPeriodTest(
     private val config: TestConfig
 ) : InputDispatcherTest(config.eventPeriod) {
     data class TestConfig(
-        val duration: Duration,
+        val durationMillis: Long,
         val keyTimes: List<Long>,
         val eventPeriod: Long
     )
@@ -79,7 +77,7 @@ class SendSwipeWithKeyTimesAndEventPeriodTest(
                 (firstKeyTime..lastKeyTime step eventPeriod).flatMap { keyTime1 ->
                     (keyTime1..lastKeyTime).map { keyTime2 ->
                         TestConfig(
-                            Duration(milliseconds = durationMs),
+                            durationMs,
                             listOf(keyTime1, keyTime2),
                             eventPeriod
                         )
@@ -89,7 +87,7 @@ class SendSwipeWithKeyTimesAndEventPeriodTest(
         }
     }
 
-    private val duration get() = config.duration
+    private val duration get() = config.durationMillis
     private val keyTimes get() = config.keyTimes
     private val eventPeriod = config.eventPeriod
 
@@ -103,7 +101,7 @@ class SendSwipeWithKeyTimesAndEventPeriodTest(
     @Test
     fun swipeWithKeyTimesAndEventPeriod() {
         // Given a specific eventPeriod and a swipe with a given duration and set of keyTimes
-        subject.enqueueSwipe(curve = curve, duration = duration, keyTimes = keyTimes)
+        subject.enqueueSwipe(curve = curve, durationMillis = duration, keyTimes = keyTimes)
         subject.sendAllSynchronous()
 
         // then
@@ -113,7 +111,7 @@ class SendSwipeWithKeyTimesAndEventPeriodTest(
             assertThat(size).isAtLeast(2 + keyTimes.size)
 
             // Check down and up events
-            val durationMs = duration.inMilliseconds()
+            val durationMs = duration
             first().verify(curve, ACTION_DOWN, 0)
             last().verify(curve, ACTION_UP, durationMs)
 

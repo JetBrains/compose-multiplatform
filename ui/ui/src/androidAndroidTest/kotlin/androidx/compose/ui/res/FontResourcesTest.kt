@@ -19,13 +19,13 @@ package androidx.compose.ui.res
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.text.font.Typeface
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontListFontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.asFontFamily
-import androidx.compose.ui.text.font.font
-import androidx.compose.ui.text.font.fontFamily
+import androidx.compose.ui.text.font.Typeface
 import androidx.compose.ui.text.font.test.R
+import androidx.compose.ui.text.font.toFontFamily
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -79,8 +79,8 @@ class FontResourcesTest {
         rule.setContent {
             Providers(AmbientContext provides context) {
                 loadFontResource(
-                    fontFamily = font(R.font.sample_font).asFontFamily(),
-                    pendingFontFamily = font(R.font.sample_font).asFontFamily(),
+                    fontFamily = Font(R.font.sample_font).toFontFamily(),
+                    pendingFontFamily = Font(R.font.sample_font).toFontFamily(),
                     failedFontFamily = FontFamily.SansSerif
                 )
             }
@@ -94,9 +94,9 @@ class FontResourcesTest {
         rule.setContent {
             Providers(AmbientContext provides context) {
                 loadFontResource(
-                    fontFamily = font(R.font.sample_font).asFontFamily(),
+                    fontFamily = Font(R.font.sample_font).toFontFamily(),
                     pendingFontFamily = FontFamily.Serif,
-                    failedFontFamily = font(R.font.sample_font).asFontFamily()
+                    failedFontFamily = Font(R.font.sample_font).toFontFamily()
                 )
             }
         }
@@ -107,24 +107,23 @@ class FontResourcesTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
 
         assertThat(
-            font(R.font.sample_font).asFontFamily().cacheKey(context)
+            (Font(R.font.sample_font).toFontFamily() as FontListFontFamily).cacheKey(context)
         ).isEqualTo(
-            font(R.font.sample_font).asFontFamily().cacheKey(context)
+            (Font(R.font.sample_font).toFontFamily() as FontListFontFamily).cacheKey(context)
         )
 
         assertThat(
-            font(R.font.sample_font).asFontFamily().cacheKey(context)
+            (Font(R.font.sample_font).toFontFamily() as FontListFontFamily).cacheKey(context)
         ).isNotEqualTo(
-            font(R.font.sample_font2).asFontFamily().cacheKey(context)
+            (Font(R.font.sample_font2).toFontFamily() as FontListFontFamily).cacheKey(context)
         )
 
-        assertThat(
-            fontFamily(
-                font(R.font.sample_font, FontWeight.Normal),
-                font(R.font.sample_font2, FontWeight.Bold)
-            ).cacheKey(context)
-        ).isNotEqualTo(
-            font(R.font.sample_font).asFontFamily().cacheKey(context)
+        val fontFamily = FontFamily(
+            Font(R.font.sample_font, FontWeight.Normal),
+            Font(R.font.sample_font2, FontWeight.Bold)
+        ) as FontListFontFamily
+        assertThat(fontFamily.cacheKey(context)).isNotEqualTo(
+            (Font(R.font.sample_font).toFontFamily() as FontListFontFamily).cacheKey(context)
         )
     }
 }

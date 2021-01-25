@@ -21,7 +21,6 @@ import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Rect
 import android.os.Build
-import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.util.SparseArray
@@ -45,15 +44,30 @@ import androidx.compose.ui.autofill.populateViewStructure
 import androidx.compose.ui.autofill.registerCallback
 import androidx.compose.ui.autofill.unregisterCallback
 import androidx.compose.ui.focus.FOCUS_TAG
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusDirection.Down
+import androidx.compose.ui.focus.FocusDirection.Left
+import androidx.compose.ui.focus.FocusDirection.Next
+import androidx.compose.ui.focus.FocusDirection.Previous
+import androidx.compose.ui.focus.FocusDirection.Right
+import androidx.compose.ui.focus.FocusDirection.Up
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusManagerImpl
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
 import androidx.compose.ui.hapticfeedback.AndroidHapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.input.key.Key.Companion.DirectionDown
+import androidx.compose.ui.input.key.Key.Companion.DirectionLeft
+import androidx.compose.ui.input.key.Key.Companion.DirectionRight
+import androidx.compose.ui.input.key.Key.Companion.DirectionUp
+import androidx.compose.ui.input.key.Key.Companion.Tab
 import androidx.compose.ui.input.key.KeyEvent
-import androidx.compose.ui.input.key.KeyEventAndroid
+import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.KeyInputModifier
+import androidx.compose.ui.input.key.isShiftPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.MotionEventAdapter
 import androidx.compose.ui.input.pointer.PointerInputEventProcessor
 import androidx.compose.ui.input.pointer.ProcessResult
@@ -65,6 +79,7 @@ import androidx.compose.ui.node.MeasureAndLayoutDelegate
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.node.OwnerSnapshotObserver
+import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.semantics.SemanticsModifierCore
 import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.text.InternalTextApi
@@ -78,7 +93,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.util.trace
 import androidx.compose.ui.viewinterop.AndroidViewHolder
 import androidx.compose.ui.viewinterop.InternalInteropApi
-import androidx.core.os.HandlerCompat
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -115,11 +129,24 @@ internal class AndroidComposeView(context: Context) :
     override val focusManager: FocusManager
         get() = _focusManager
 
-    private val _windowManager: WindowManagerImpl = WindowManagerImpl()
-    override val windowManager: WindowManager
-        get() = _windowManager
+    private val _windowInfo: WindowInfoImpl = WindowInfoImpl()
+    override val windowInfo: WindowInfo
+        get() = _windowInfo
 
-    private val keyInputModifier = KeyInputModifier(null, null)
+    // TODO(b/177931787) : Consider creating a KeyInputManager like we have for FocusManager so
+    //  that this common logic can be used by all owners.
+    private val keyInputModifier: KeyInputModifier = KeyInputModifier(
+        onKeyEvent = {
+            if (it.type == KeyEventType.KeyDown) {
+                getFocusDirection(it)?.let { direction ->
+                    focusManager.moveFocus(direction)
+                    return@KeyInputModifier true
+                }
+            }
+            false
+        },
+        onPreviewKeyEvent = null
+    )
 
     private val canvasHolder = CanvasHolder()
 
@@ -130,6 +157,8 @@ internal class AndroidComposeView(context: Context) :
             .then(_focusManager.modifier)
             .then(keyInputModifier)
     }
+
+    override val rootForTest: RootForTest = this
 
     override val semanticsOwner: SemanticsOwner = SemanticsOwner(root)
     private val accessibilityDelegate = AndroidComposeViewAccessibilityDelegateCompat(this)
@@ -202,15 +231,6 @@ internal class AndroidComposeView(context: Context) :
     private var wasMeasuredWithMultipleConstraints = false
 
     private val measureAndLayoutDelegate = MeasureAndLayoutDelegate(root)
-
-    private var measureAndLayoutScheduled = false
-
-    private val measureAndLayoutHandler: Handler =
-        HandlerCompat.createAsync(Looper.getMainLooper()) {
-            measureAndLayoutScheduled = false
-            measureAndLayout()
-            true
-        }
 
     override val measureIteration: Long get() = measureAndLayoutDelegate.measureIteration
     override val viewConfiguration: ViewConfiguration =
@@ -298,7 +318,7 @@ internal class AndroidComposeView(context: Context) :
     }
 
     override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
-        _windowManager.isWindowFocused = hasWindowFocus
+        _windowInfo.isWindowFocused = hasWindowFocus
         super.onWindowFocusChanged(hasWindowFocus)
     }
 
@@ -310,7 +330,7 @@ internal class AndroidComposeView(context: Context) :
         if (isFocused) {
             // Focus lies within the Compose hierarchy, so we dispatch the key event to the
             // appropriate place.
-            sendKeyEvent(KeyEventAndroid(event))
+            sendKeyEvent(KeyEvent(event))
         } else {
             // This Owner has a focused child view, which is a view interop use case,
             // so we use the default ViewGroup behavior which will route tke key event to the
@@ -396,10 +416,11 @@ internal class AndroidComposeView(context: Context) :
                     return
                 }
             }
-            val handler = handler
-            if (!measureAndLayoutScheduled && handler != null) {
-                measureAndLayoutScheduled = true
-                measureAndLayoutHandler.sendEmptyMessage(0)
+            if (width == 0 || height == 0) {
+                // if the view has no size calling invalidate() will be skipped
+                requestLayout()
+            } else {
+                invalidate()
             }
         }
     }
@@ -516,6 +537,19 @@ internal class AndroidComposeView(context: Context) :
         accessibilityDelegate.onSemanticsChange()
     }
 
+    override fun onLayoutChange(layoutNode: LayoutNode) {
+        accessibilityDelegate.onLayoutChange(layoutNode)
+    }
+
+    override fun getFocusDirection(keyEvent: KeyEvent): FocusDirection? = when (keyEvent.key) {
+        Tab -> if (keyEvent.isShiftPressed) Previous else Next
+        DirectionRight -> Right
+        DirectionLeft -> Left
+        DirectionUp -> Up
+        DirectionDown -> Down
+        else -> null
+    }
+
     override fun dispatchDraw(canvas: android.graphics.Canvas) {
         if (!isAttachedToWindow) {
             invalidateLayers(root)
@@ -546,6 +580,10 @@ internal class AndroidComposeView(context: Context) :
         } else {
             onViewTreeOwnersAvailable = callback
         }
+    }
+
+    suspend fun boundsUpdatesEventLoop() {
+        accessibilityDelegate.boundsUpdatesEventLoop()
     }
 
     /**
@@ -618,9 +656,6 @@ internal class AndroidComposeView(context: Context) :
         super.onDetachedFromWindow()
         snapshotObserver.stopObserving()
         ifDebug { if (autofillSupported()) _autofill?.unregisterCallback() }
-        if (measureAndLayoutScheduled) {
-            measureAndLayoutHandler.removeMessages(0)
-        }
         viewTreeObserver.removeOnGlobalLayoutListener(globalLayoutListener)
         viewTreeObserver.removeOnScrollChangedListener(scrollChangedListener)
     }
@@ -671,6 +706,11 @@ internal class AndroidComposeView(context: Context) :
         textInputServiceAndroid.createInputConnection(outAttrs)
 
     override fun calculatePosition(): IntOffset = globalPosition
+
+    override fun calculatePositionInWindow(): IntOffset {
+        getLocationInWindow(tmpPositionArray)
+        return IntOffset(tmpPositionArray[0], tmpPositionArray[1])
+    }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)

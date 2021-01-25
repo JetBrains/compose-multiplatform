@@ -16,12 +16,12 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.ColorPropKey
-import androidx.compose.animation.animate
+import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.transitionDefinition
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.transition
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
@@ -41,6 +41,7 @@ import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.emptyContent
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,6 +53,7 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
@@ -93,7 +95,7 @@ fun Tab(
     selectedContentColor: Color = AmbientContentColor.current,
     unselectedContentColor: Color = selectedContentColor.copy(alpha = ContentAlpha.medium)
 ) {
-    val styledText = @Composable {
+    val styledText: @Composable () -> Unit = @Composable {
         val style = MaterialTheme.typography.button.copy(textAlign = TextAlign.Center)
         ProvideTextStyle(style, content = text)
     }
@@ -151,6 +153,7 @@ fun Tab(
                 .selectable(
                     selected = selected,
                     onClick = onClick,
+                    role = Role.Tab,
                     interactionState = interactionState,
                     indication = ripple
                 )
@@ -160,105 +163,6 @@ fun Tab(
             content = content
         )
     }
-}
-
-/**
- * Contains default values used by tabs from the Material specification.
- */
-@Deprecated(
-    "TabConstants has been replaced with TabDefaults",
-    ReplaceWith(
-        "TabDefaults",
-        "androidx.compose.material.TabDefaults"
-    )
-)
-object TabConstants {
-    /**
-     * Default [Divider], which will be positioned at the bottom of the [TabRow], underneath the
-     * indicator.
-     *
-     * @param modifier modifier for the divider's layout
-     * @param thickness thickness of the divider
-     * @param color color of the divider
-     */
-    @Composable
-    fun DefaultDivider(
-        modifier: Modifier = Modifier,
-        thickness: Dp = DefaultDividerThickness,
-        color: Color = AmbientContentColor.current.copy(alpha = DefaultDividerOpacity)
-    ) {
-        Divider(modifier = modifier, thickness = thickness, color = color)
-    }
-
-    /**
-     * Default indicator, which will be positioned at the bottom of the [TabRow], on top of the
-     * divider.
-     *
-     * @param modifier modifier for the indicator's layout
-     * @param height height of the indicator
-     * @param color color of the indicator
-     */
-    @Composable
-    fun DefaultIndicator(
-        modifier: Modifier = Modifier,
-        height: Dp = DefaultIndicatorHeight,
-        color: Color = AmbientContentColor.current
-    ) {
-        Box(
-            modifier
-                .fillMaxWidth()
-                .preferredHeight(height)
-                .background(color = color)
-        )
-    }
-
-    /**
-     * [Modifier] that takes up all the available width inside the [TabRow], and then animates
-     * the offset of the indicator it is applied to, depending on the [currentTabPosition].
-     *
-     * @param currentTabPosition [TabPosition] of the currently selected tab. This is used to
-     * calculate the offset of the indicator this modifier is applied to, as well as its width.
-     */
-    fun Modifier.defaultTabIndicatorOffset(
-        currentTabPosition: TabPosition
-    ): Modifier = composed(
-        inspectorInfo = debugInspectorInfo {
-            name = "defaultTabIndicatorOffset"
-            value = currentTabPosition
-        }
-    ) {
-        // TODO: should we animate the width of the indicator as it moves between tabs of different
-        // sizes inside a scrollable tab row?
-        val currentTabWidth = currentTabPosition.width
-        val indicatorOffset = animate(
-            target = currentTabPosition.left,
-            animSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing)
-        )
-        fillMaxWidth()
-            .wrapContentSize(Alignment.BottomStart)
-            .offset(x = indicatorOffset)
-            .preferredWidth(currentTabWidth)
-    }
-
-    /**
-     * Default opacity for the color of [DefaultDivider]
-     */
-    const val DefaultDividerOpacity = 0.12f
-
-    /**
-     * Default thickness for [DefaultDivider]
-     */
-    val DefaultDividerThickness = 1.dp
-
-    /**
-     * Default height for [DefaultIndicator]
-     */
-    val DefaultIndicatorHeight = 2.dp
-
-    /**
-     * The default padding from the starting edge before a tab in a [ScrollableTabRow].
-     */
-    val DefaultScrollableTabRowPadding = 52.dp
 }
 
 /**
@@ -322,9 +226,9 @@ object TabDefaults {
         // TODO: should we animate the width of the indicator as it moves between tabs of different
         // sizes inside a scrollable tab row?
         val currentTabWidth = currentTabPosition.width
-        val indicatorOffset = animate(
-            target = currentTabPosition.left,
-            animSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing)
+        val indicatorOffset by animateDpAsState(
+            targetValue = currentTabPosition.left,
+            animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing)
         )
         fillMaxWidth()
             .wrapContentSize(Alignment.BottomStart)
@@ -353,8 +257,6 @@ object TabDefaults {
     val ScrollableTabRowPadding = 52.dp
 }
 
-private val TabTintColor = ColorPropKey()
-
 /**
  * [transition] defining how the tint color for a tab animates, when a new tab is selected. This
  * component uses [AmbientContentColor] to provide an interpolated value between [activeColor]
@@ -367,34 +269,25 @@ private fun TabTransition(
     selected: Boolean,
     content: @Composable () -> Unit
 ) {
-    val transitionDefinition = remember(activeColor, inactiveColor) {
-        transitionDefinition<Boolean> {
-            state(true) {
-                this[TabTintColor] = activeColor
-            }
-
-            state(false) {
-                this[TabTintColor] = inactiveColor
-            }
-
-            transition(toState = false, fromState = true) {
-                TabTintColor using tween(
+    val transition = updateTransition(selected)
+    val color by transition.animateColor(
+        transitionSpec = {
+            if (false isTransitioningTo true) {
+                tween(
                     durationMillis = TabFadeInAnimationDuration,
                     delayMillis = TabFadeInAnimationDelay,
                     easing = LinearEasing
                 )
-            }
-
-            transition(fromState = true, toState = false) {
-                TabTintColor using tween(
+            } else {
+                tween(
                     durationMillis = TabFadeOutAnimationDuration,
                     easing = LinearEasing
                 )
             }
         }
+    ) {
+        if (it) activeColor else inactiveColor
     }
-    val state = transition(transitionDefinition, selected)
-    val color = state[TabTintColor]
     Providers(
         AmbientContentColor provides color.copy(alpha = 1f),
         AmbientContentAlpha provides color.alpha,

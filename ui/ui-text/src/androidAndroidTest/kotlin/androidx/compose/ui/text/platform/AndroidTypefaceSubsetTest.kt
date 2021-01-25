@@ -22,8 +22,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.fontFamily
-import androidx.compose.ui.text.font.typeface
+import androidx.compose.ui.text.font.Typeface
 import androidx.compose.ui.text.matchers.assertThat
 import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -37,7 +36,7 @@ class AndroidTypefaceSubsetTest {
 
     val context = InstrumentationRegistry.getInstrumentation().targetContext
 
-    val fontFamily = fontFamily(
+    val fontFamily = FontFamily(
         FontTestData.FONT_100_REGULAR,
         FontTestData.FONT_100_ITALIC,
         FontTestData.FONT_200_REGULAR,
@@ -63,7 +62,7 @@ class AndroidTypefaceSubsetTest {
         fontFamily: FontFamily,
         necessaryStyles: List<Pair<FontWeight, FontStyle>>? = null
     ): AndroidTypeface {
-        return typeface(context, fontFamily, necessaryStyles) as AndroidTypeface
+        return Typeface(context, fontFamily, necessaryStyles) as AndroidTypeface
     }
 
     @Test

@@ -17,13 +17,16 @@
 package androidx.compose.ui.graphics.vector
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.compositionReference
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCompositionReference
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.Painter
@@ -48,6 +51,8 @@ const val RootGroupName = "VectorRootGroup"
  * paths are drawn on.
  *  This parameter is optional. Not providing it will use the [defaultHeight] converted to pixels
  * @param [name] optional identifier used to identify the root of this vector graphic
+ * @param [tintColor] optional color used to tint the root group of this vector graphic
+ * @param [tintBlendMode] BlendMode used in combination with [tintColor]
  * @param [content] Composable used to define the structure and contents of the vector graphic
  */
 @Composable
@@ -57,6 +62,8 @@ fun rememberVectorPainter(
     viewportWidth: Float = Float.NaN,
     viewportHeight: Float = Float.NaN,
     name: String = RootGroupName,
+    tintColor: Color = Color.Unspecified,
+    tintBlendMode: BlendMode = BlendMode.SrcIn,
     content: @Composable (viewportWidth: Float, viewportHeight: Float) -> Unit
 ): VectorPainter {
     val density = AmbientDensity.current
@@ -66,12 +73,23 @@ fun rememberVectorPainter(
     val vpWidth = if (viewportWidth.isNaN()) widthPx else viewportWidth
     val vpHeight = if (viewportHeight.isNaN()) heightPx else viewportHeight
 
-    return remember { VectorPainter() }.apply {
+    val painter = remember { VectorPainter() }.apply {
         // This assignment is thread safe as the internal Size parameter is
         // backed by a mutableState object
         size = Size(widthPx, heightPx)
         RenderVector(name, vpWidth, vpHeight, content)
     }
+    SideEffect {
+        // Initialize the intrinsic color filter if a tint color is provided on the
+        // vector itself. Note this tint can be overridden by an explicit ColorFilter
+        // provided on the Modifier.paint call
+        painter.intrinsicColorFilter = if (tintColor != Color.Unspecified) {
+            ColorFilter(tintColor, tintBlendMode)
+        } else {
+            null
+        }
+    }
+    return painter
 }
 
 /**
@@ -109,12 +127,12 @@ fun VectorPainter(
     children: @Composable (viewportWidth: Float, viewportHeight: Float) -> Unit
 ): VectorPainter =
     rememberVectorPainter(
-        defaultWidth,
-        defaultHeight,
-        viewportWidth,
-        viewportHeight,
-        name,
-        children
+        defaultWidth = defaultWidth,
+        defaultHeight = defaultHeight,
+        viewportWidth = viewportWidth,
+        viewportHeight = viewportHeight,
+        name = name,
+        content = children
     )
 
 /**
@@ -157,6 +175,8 @@ fun rememberVectorPainter(image: ImageVector) =
         viewportWidth = image.viewportWidth,
         viewportHeight = image.viewportHeight,
         name = image.name,
+        tintColor = image.tintColor,
+        tintBlendMode = image.tintBlendMode,
         content = { _, _ -> RenderVectorGroup(group = image.root) }
     )
 
@@ -168,6 +188,15 @@ fun rememberVectorPainter(image: ImageVector) =
 class VectorPainter internal constructor() : Painter() {
 
     internal var size by mutableStateOf(Size.Zero)
+
+    /**
+     * configures the intrinsic tint that may be defined on a VectorPainter
+     */
+    internal var intrinsicColorFilter: ColorFilter?
+        get() = vector.intrinsicColorFilter
+        set(value) {
+            vector.intrinsicColorFilter = value
+        }
 
     private val vector = VectorComponent().apply {
         invalidateCallback = {
@@ -191,12 +220,14 @@ class VectorPainter internal constructor() : Painter() {
         }
         val composition = composeVector(
             vector,
-            compositionReference(),
+            rememberCompositionReference(),
             content
         )
 
-        onDispose {
-            composition.dispose()
+        DisposableEffect(composition) {
+            onDispose {
+                composition.dispose()
+            }
         }
     }
 
@@ -207,7 +238,9 @@ class VectorPainter internal constructor() : Painter() {
         get() = size
 
     override fun DrawScope.onDraw() {
-        with(vector) { draw(currentAlpha, currentColorFilter) }
+        with(vector) {
+            draw(currentAlpha, currentColorFilter ?: intrinsicColorFilter)
+        }
         // This conditional is necessary to obtain invalidation callbacks as the state is
         // being read here which adds this callback to the snapshot observation
         if (isDirty) {

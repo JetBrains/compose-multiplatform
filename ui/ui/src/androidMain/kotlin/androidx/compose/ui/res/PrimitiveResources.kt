@@ -62,7 +62,7 @@ fun booleanResource(@BoolRes id: Int): Boolean {
 }
 
 /**
- * Load a boolean resource.
+ * Load a dimension resource.
  *
  * @param id the resource identifier
  * @return the dimension value associated with the resource

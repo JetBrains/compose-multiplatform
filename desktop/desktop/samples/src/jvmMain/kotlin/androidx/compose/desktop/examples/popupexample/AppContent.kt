@@ -21,36 +21,35 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Text
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Checkbox
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.RadioButton
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onActive
-import androidx.compose.runtime.onDispose
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerMoveFilter
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -62,7 +61,7 @@ import java.awt.Toolkit
 
 @Composable
 fun content() {
-    onActive {
+    DisposableEffect(Unit) {
         val tray = Tray().apply {
             icon(AppState.image())
             menu(
@@ -96,9 +95,29 @@ fun content() {
                     TextBox(text = AppState.wndTitle.value)
                 }
                 Row {
-                    Button(color = Color(232, 182, 109), size = IntSize(16, 16))
+                    Button(
+                        color = Color(210, 210, 210),
+                        size = IntSize(16, 16),
+                        onClick = {
+                            AppManager.focusedWindow?.makeFullscreen()
+                        }
+                    )
+                    Spacer(modifier = Modifier.width(30.dp))
+                    Button(
+                        color = Color(232, 182, 109),
+                        size = IntSize(16, 16),
+                        onClick = {
+                            AppManager.focusedWindow?.minimize()
+                        }
+                    )
                     Spacer(modifier = Modifier.width(3.dp))
-                    Button(color = Color(150, 232, 150), size = IntSize(16, 16))
+                    Button(
+                        color = Color(150, 232, 150),
+                        size = IntSize(16, 16),
+                        onClick = {
+                            AppManager.focusedWindow?.maximize()
+                        }
+                    )
                     Spacer(modifier = Modifier.width(3.dp))
                     Button(
                         onClick = { AppManager.exit() },
@@ -130,6 +149,11 @@ fun content() {
                                         AppManager.focusedWindow?.close()
                                     }
                                 )
+                                DisposableEffect(Unit) {
+                                    onDispose {
+                                        println("Dispose composition")
+                                    }
+                                }
                             }
                         },
                         color = Color(26, 198, 188)
@@ -160,15 +184,14 @@ fun content() {
                         .fillMaxWidth()
                 ) {
                     ContextMenu()
-                    Spacer(modifier = Modifier.height(30.dp))
-                    Spacer(modifier = Modifier.height(60.dp))
+                    Spacer(modifier = Modifier.height(100.dp))
                     Row {
                         Checkbox(
                             checked = AppState.undecorated.value,
                             onCheckedChange = {
                                 AppState.undecorated.value = !AppState.undecorated.value
                             },
-                            modifier = Modifier.height(30.dp).padding(start = 20.dp)
+                            modifier = Modifier.height(35.dp).padding(start = 20.dp)
                         )
                         Spacer(modifier = Modifier.width(5.dp))
                         TextBox(text = "- undecorated")
@@ -248,7 +271,13 @@ fun content() {
                 TextBox(text = "Alert Dialog")
             },
             text = {
+                println("Ambient value is ${AmbientTest.current}.")
                 TextBox(text = "Increment amount?")
+                DisposableEffect(Unit) {
+                    onDispose {
+                        println("onDispose inside AlertDialog is called.")
+                    }
+                }
             },
             shape = RoundedCornerShape(0.dp),
             backgroundColor = Color(70, 70, 70),
@@ -269,7 +298,13 @@ fun PopupSample(displayed: Boolean, onDismiss: () -> Unit) {
                 isFocusable = true,
                 onDismissRequest = onDismiss
             ) {
+                println("Ambient value is ${AmbientTest.current}.")
                 PopupContent(onDismiss)
+                DisposableEffect(Unit) {
+                    onDispose {
+                        println("onDispose inside Popup is called.")
+                    }
+                }
             }
         }
     }
@@ -312,7 +347,7 @@ fun Button(
     text: String = "",
     onClick: () -> Unit = {},
     color: Color = Color(10, 162, 232),
-    size: IntSize = IntSize(150, 30)
+    size: IntSize = IntSize(200, 35)
 ) {
     val buttonHover = remember { mutableStateOf(false) }
     Button(
@@ -363,7 +398,8 @@ fun ContextMenu() {
 
     Surface(
         modifier = Modifier
-            .padding(start = 4.dp, top = 2.dp),
+            .padding(start = 4.dp, top = 2.dp)
+            .clickable(onClick = { showMenu.value = true }),
         color = Color(255, 255, 255, 40),
         shape = RoundedCornerShape(4.dp)
     ) {
@@ -372,9 +408,8 @@ fun ContextMenu() {
                 TextBox(
                     text = "Selected: ${items[selectedIndex.value]}",
                     modifier = Modifier
-                        .height(26.dp)
+                        .height(35.dp)
                         .padding(start = 4.dp, end = 4.dp)
-                        .clickable(onClick = { showMenu.value = true })
                 )
             },
             expanded = showMenu.value,
@@ -397,7 +432,7 @@ fun ContextMenu() {
 @Composable
 fun RadioButton(text: String, state: MutableState<Boolean>) {
     Box(
-        modifier = Modifier.height(30.dp),
+        modifier = Modifier.height(35.dp),
         contentAlignment = Alignment.Center
     ) {
         RadioButton(

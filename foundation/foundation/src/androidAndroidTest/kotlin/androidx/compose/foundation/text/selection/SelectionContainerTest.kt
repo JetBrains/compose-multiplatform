@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation.text.selection
 
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.ComponentActivity
@@ -28,6 +27,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.PointerEvent
@@ -40,21 +40,28 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.AmbientHapticFeedback
 import androidx.compose.ui.platform.AmbientLayoutDirection
-import androidx.compose.ui.platform.AmbientView
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.selection.Selection
 import androidx.compose.ui.selection.SelectionContainer
+import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
+import androidx.compose.ui.test.click
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.test.hasAnyChild
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.isRoot
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.ResourceFont
-import androidx.compose.ui.text.font.asFontFamily
 import androidx.compose.ui.text.font.test.R
+import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -76,7 +83,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.roundToInt
@@ -89,18 +95,24 @@ class SelectionContainerTest {
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>()
 
-    private var composeViewAbsolutePos = IntOffset(0, 0)
+    private val composeViewAbsolutePos: IntOffset get() {
+        // Get the view position on screen
+        val positionArray = IntArray(2)
+        view.getLocationOnScreen(positionArray)
+        return IntOffset(
+            positionArray[0],
+            positionArray[1]
+        )
+    }
 
     private lateinit var view: View
 
     private val textContent = "Text Demo Text"
-    private val fontFamily = ResourceFont(
+    private val fontFamily = Font(
         resId = R.font.sample_font,
         weight = FontWeight.Normal,
         style = FontStyle.Normal
-    ).asFontFamily()
-
-    private lateinit var gestureCountDownLatch: CountDownLatch
+    ).toFontFamily()
 
     private val selection = mutableStateOf<Selection?>(null)
     private val fontSize = 20.sp
@@ -115,13 +127,15 @@ class SelectionContainerTest {
         // A reasonable number.
         createSelectionContainer()
         val position = 50f
-        longPress(x = position, y = position)
+        rule.onSelectionContainer()
+            .performGesture { longClick(Offset(x = position, y = position)) }
         rule.runOnIdle {
             assertThat(selection.value).isNotNull()
         }
 
         // Act.
-        press(x = position, y = position)
+        rule.onSelectionContainer()
+            .performGesture { click(Offset(x = position, y = position)) }
 
         // Assert.
         rule.runOnIdle {
@@ -140,21 +154,21 @@ class SelectionContainerTest {
         // A reasonable number.
         createSelectionContainer()
         val position = 50f
-        longPress(x = position, y = position)
+        rule.onSelectionContainer()
+            .performGesture { longClick(Offset(x = position, y = position)) }
 
         log.entries.clear()
 
         // Act.
-        press(x = position, y = position)
+        rule.onSelectionContainer()
+            .performGesture { click(Offset(x = position, y = position)) }
 
         // Assert.
         rule.runOnIdle {
-            // Press has a down event over 3 passes and then an up event over 3 passes.  We are
-            // interested in looking at the final up event.
-            assertThat(log.entries).hasSize(6)
-            assertThat(log.entries[5].pass).isEqualTo(PointerEventPass.Final)
-            assertThat(log.entries[5].changes).hasSize(1)
-            assertThat(log.entries[5].changes[0].changedToUp()).isTrue()
+            // We are interested in looking at the final up event.
+            assertThat(log.entries.last().pass).isEqualTo(PointerEventPass.Final)
+            assertThat(log.entries.last().changes).hasSize(1)
+            assertThat(log.entries.last().changes[0].changedToUp()).isTrue()
         }
     }
 
@@ -171,10 +185,12 @@ class SelectionContainerTest {
             val expectedRightY = fontSize.toDp()
 
             // Act.
-            longPress(
-                x = textContent.indexOf('m') * characterSize,
-                y = 0.5f * characterSize
-            )
+            rule.onSelectionContainer()
+                .performGesture {
+                    longClick(
+                        Offset(textContent.indexOf('m') * characterSize, 0.5f * characterSize)
+                    )
+                }
 
             // Assert. Should select "Demo".
             rule.runOnIdle {
@@ -216,10 +232,16 @@ class SelectionContainerTest {
             val expectedRightY = fontSize.toDp()
 
             // Act.
-            longPress(
-                x = rule.rootWidth().toSp().toPx() - "xt Demo Text".length * characterSize,
-                y = 0.5f * characterSize
-            )
+            rule.onSelectionContainer()
+                .performGesture {
+                    longClick(
+                        Offset(
+                            rule.rootWidth().toSp().toPx() - ("xt Demo Text").length *
+                                characterSize,
+                            0.5f * characterSize
+                        )
+                    )
+                }
 
             // Assert. Should select "Demo".
             rule.runOnIdle {
@@ -251,42 +273,31 @@ class SelectionContainerTest {
         val measureLatch = CountDownLatch(1)
 
         val layoutDirection = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
-        with(rule.density) {
-            rule.setContent {
-                // Get the compose view position on screen
-                val composeView = AmbientView.current
-                val positionArray = IntArray(2)
-                composeView.getLocationOnScreen(positionArray)
-                composeViewAbsolutePos = IntOffset(
-                    positionArray[0],
-                    positionArray[1]
-                )
-                Providers(
-                    AmbientHapticFeedback provides hapticFeedback,
-                    AmbientLayoutDirection provides layoutDirection
-                ) {
-                    TestParent(Modifier.gestureSpy(log)) {
-                        SelectionContainer(
-                            modifier = Modifier.onGloballyPositioned {
-                                measureLatch.countDown()
-                            },
-                            selection = selection.value,
-                            onSelectionChange = {
-                                selection.value = it
-                                gestureCountDownLatch.countDown()
-                            }
-                        ) {
-                            CoreText(
-                                AnnotatedString(textContent),
-                                Modifier.fillMaxSize(),
-                                style = TextStyle(fontFamily = fontFamily, fontSize = fontSize),
-                                softWrap = true,
-                                overflow = TextOverflow.Clip,
-                                maxLines = Int.MAX_VALUE,
-                                inlineContent = mapOf(),
-                                onTextLayout = {}
-                            )
+        rule.setContent {
+            Providers(
+                AmbientHapticFeedback provides hapticFeedback,
+                AmbientLayoutDirection provides layoutDirection
+            ) {
+                TestParent(Modifier.testTag("selectionContainer").gestureSpy(log)) {
+                    SelectionContainer(
+                        modifier = Modifier.onGloballyPositioned {
+                            measureLatch.countDown()
+                        },
+                        selection = selection.value,
+                        onSelectionChange = {
+                            selection.value = it
                         }
+                    ) {
+                        CoreText(
+                            AnnotatedString(textContent),
+                            Modifier.fillMaxSize(),
+                            style = TextStyle(fontFamily = fontFamily, fontSize = fontSize),
+                            softWrap = true,
+                            overflow = TextOverflow.Clip,
+                            maxLines = Int.MAX_VALUE,
+                            inlineContent = mapOf(),
+                            onTextLayout = {}
+                        )
                     }
                 }
             }
@@ -328,77 +339,10 @@ class SelectionContainerTest {
             }
         }
     }
-
-    private fun longPress(x: Float, y: Float) {
-        waitForLongPress {
-            view.dispatchTouchEvent(getDownEvent(x, y))
-        }
-        waitForOtherGesture {
-            view.dispatchTouchEvent(getUpEvent(x, y))
-        }
-    }
-
-    private fun longPressAndDrag(startX: Float, startY: Float, endX: Float, endY: Float) {
-        waitForLongPress {
-            view.dispatchTouchEvent(getDownEvent(startX, startY))
-        }
-        waitForOtherGesture {
-            view.dispatchTouchEvent(getMoveEvent(endX, endY))
-        }
-    }
-
-    private fun press(x: Float, y: Float) {
-        waitForOtherGesture {
-            view.dispatchTouchEvent(getDownEvent(x, y))
-        }
-        waitForOtherGesture {
-            view.dispatchTouchEvent(getUpEvent(x, y))
-        }
-    }
-
-    private fun getDownEvent(x: Float, y: Float): MotionEvent {
-        return MotionEvent(
-            0,
-            MotionEvent.ACTION_DOWN,
-            1,
-            0,
-            arrayOf(PointerProperties(0)),
-            arrayOf(PointerCoords(x, y))
-        )
-    }
-
-    private fun getUpEvent(x: Float, y: Float): MotionEvent {
-        return MotionEvent(
-            0,
-            MotionEvent.ACTION_UP,
-            1,
-            0,
-            arrayOf(PointerProperties(0)),
-            arrayOf(PointerCoords(x, y))
-        )
-    }
-
-    private fun getMoveEvent(x: Float, y: Float): MotionEvent {
-        return MotionEvent(
-            0,
-            MotionEvent.ACTION_MOVE,
-            1,
-            0,
-            arrayOf(PointerProperties(0)),
-            arrayOf(PointerCoords(x, y))
-        )
-    }
-
-    private fun waitForLongPress(block: () -> Unit) {
-        gestureCountDownLatch = CountDownLatch(1)
-        rule.runOnIdle(block)
-        gestureCountDownLatch.await(750, TimeUnit.MILLISECONDS)
-    }
-
-    private fun waitForOtherGesture(block: () -> Unit) {
-        rule.runOnIdle(block)
-    }
 }
+
+private fun SemanticsNodeInteractionsProvider.onSelectionContainer() =
+    onNode(isRoot() and hasAnyChild(hasTestTag("selectionContainer")))
 
 private fun ComposeTestRule.rootWidth(): Dp = onRoot().getUnclippedBoundsInRoot().width
 

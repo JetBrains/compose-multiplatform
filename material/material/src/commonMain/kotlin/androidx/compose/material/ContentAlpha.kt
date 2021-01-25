@@ -19,7 +19,6 @@ package androidx.compose.material
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ambientOf
 import androidx.compose.ui.graphics.luminance
-import androidx.compose.ui.util.annotation.FloatRange
 
 /**
  * Default alpha levels used by Material components.
@@ -70,8 +69,10 @@ object ContentAlpha {
      */
     @Composable
     private fun contentAlpha(
-        @FloatRange(from = 0.0, to = 1.0) highContrastAlpha: Float,
-        @FloatRange(from = 0.0, to = 1.0) lowContrastAlpha: Float
+        /*@FloatRange(from = 0.0, to = 1.0)*/
+        highContrastAlpha: Float,
+        /*@FloatRange(from = 0.0, to = 1.0)*/
+        lowContrastAlpha: Float
     ): Float {
         val contentColor = AmbientContentColor.current
         val lightTheme = MaterialTheme.colors.isLight

@@ -39,12 +39,12 @@ internal val TAG = "RecordingIC"
  * [InputConnection] implementation that binds Android IME to Compose.
  *
  * @param initState The initial input state.
- * @param eventListener An input event listener.
+ * @param eventCallback An input event listener.
  * @param autoCorrect Whether autoCorrect is enabled.
  */
 internal class RecordingInputConnection(
     initState: TextFieldValue,
-    val eventListener: InputEventListener,
+    val eventCallback: InputEventCallback,
     val autoCorrect: Boolean
 ) : InputConnection {
 
@@ -109,13 +109,13 @@ internal class RecordingInputConnection(
     }
 
     // The recoding editing ops.
-    private val editOps = mutableListOf<EditOperation>()
+    private val editCommands = mutableListOf<EditCommand>()
 
     // Add edit op to internal list with wrapping batch edit.
-    private fun addEditOpWithBatch(editOp: EditOperation) {
+    private fun addEditCommandWithBatch(editCommand: EditCommand) {
         beginBatchEdit()
         try {
-            editOps.add(editOp)
+            editCommands.add(editCommand)
         } finally {
             endBatchEdit()
         }
@@ -134,16 +134,16 @@ internal class RecordingInputConnection(
     override fun endBatchEdit(): Boolean {
         if (DEBUG) { Log.d(TAG, "endBatchEdit()") }
         batchDepth--
-        if (batchDepth == 0 && editOps.isNotEmpty()) {
-            eventListener.onEditOperations(editOps.toList())
-            editOps.clear()
+        if (batchDepth == 0 && editCommands.isNotEmpty()) {
+            eventCallback.onEditCommands(editCommands.toList())
+            editCommands.clear()
         }
         return batchDepth > 0
     }
 
     override fun closeConnection() {
         if (DEBUG) { Log.d(TAG, "closeConnection()") }
-        editOps.clear()
+        editCommands.clear()
         batchDepth = 0
     }
 
@@ -153,43 +153,43 @@ internal class RecordingInputConnection(
 
     override fun commitText(text: CharSequence?, newCursorPosition: Int): Boolean {
         if (DEBUG) { Log.d(TAG, "commitText(\"$text\", $newCursorPosition)") }
-        addEditOpWithBatch(CommitTextEditOp(text.toString(), newCursorPosition))
+        addEditCommandWithBatch(CommitTextCommand(text.toString(), newCursorPosition))
         return true
     }
 
     override fun setComposingRegion(start: Int, end: Int): Boolean {
         if (DEBUG) { Log.d(TAG, "setComposingRegion($start, $end)") }
-        addEditOpWithBatch(SetComposingRegionEditOp(start, end))
+        addEditCommandWithBatch(SetComposingRegionCommand(start, end))
         return true
     }
 
     override fun setComposingText(text: CharSequence?, newCursorPosition: Int): Boolean {
         if (DEBUG) { Log.d(TAG, "setComposingText(\"$text\", $newCursorPosition)") }
-        addEditOpWithBatch(SetComposingTextEditOp(text.toString(), newCursorPosition))
+        addEditCommandWithBatch(SetComposingTextCommand(text.toString(), newCursorPosition))
         return true
     }
 
     override fun deleteSurroundingTextInCodePoints(beforeLength: Int, afterLength: Int): Boolean {
         if (DEBUG) { Log.d(TAG, "deleteSurroundingTextInCodePoints($beforeLength, $afterLength)") }
-        addEditOpWithBatch(DeleteSurroundingTextInCodePointsEditOp(beforeLength, afterLength))
+        addEditCommandWithBatch(DeleteSurroundingTextInCodePointsCommand(beforeLength, afterLength))
         return true
     }
 
     override fun deleteSurroundingText(beforeLength: Int, afterLength: Int): Boolean {
         if (DEBUG) { Log.d(TAG, "deleteSurroundingText($beforeLength, $afterLength)") }
-        addEditOpWithBatch(DeleteSurroundingTextEditOp(beforeLength, afterLength))
+        addEditCommandWithBatch(DeleteSurroundingTextCommand(beforeLength, afterLength))
         return true
     }
 
     override fun setSelection(start: Int, end: Int): Boolean {
         if (DEBUG) { Log.d(TAG, "setSelection($start, $end)") }
-        addEditOpWithBatch(SetSelectionEditOp(start, end))
+        addEditCommandWithBatch(SetSelectionCommand(start, end))
         return true
     }
 
     override fun finishComposingText(): Boolean {
         if (DEBUG) { Log.d(TAG, "finishComposingText()") }
-        addEditOpWithBatch(FinishComposingTextEditOp())
+        addEditCommandWithBatch(FinishComposingTextCommand())
         return true
     }
 
@@ -205,13 +205,13 @@ internal class RecordingInputConnection(
         //  we probably need key event modifiers at the textfield layer to handle
         //  the events.
         val op = when (event.keyCode) {
-            KeyEvent.KEYCODE_DEL -> BackspaceKeyEditOp()
-            KeyEvent.KEYCODE_DPAD_LEFT -> MoveCursorEditOp(-1)
-            KeyEvent.KEYCODE_DPAD_RIGHT -> MoveCursorEditOp(1)
+            KeyEvent.KEYCODE_DEL -> BackspaceCommand()
+            KeyEvent.KEYCODE_DPAD_LEFT -> MoveCursorCommand(-1)
+            KeyEvent.KEYCODE_DPAD_RIGHT -> MoveCursorCommand(1)
             else -> {
                 val unicodeChar = event.unicodeChar
                 if (unicodeChar != 0) {
-                    CommitTextEditOp(String(Character.toChars(unicodeChar)), 1)
+                    CommitTextCommand(String(Character.toChars(unicodeChar)), 1)
                 } else {
                     // do nothing
                     // Android BaseInputConnection calls
@@ -222,7 +222,7 @@ internal class RecordingInputConnection(
             }
         }
 
-        if (op != null) addEditOpWithBatch(op)
+        if (op != null) addEditCommandWithBatch(op)
         return true
     }
 
@@ -232,17 +232,17 @@ internal class RecordingInputConnection(
 
     override fun getTextBeforeCursor(maxChars: Int, flags: Int): CharSequence {
         if (DEBUG) { Log.d(TAG, "getTextBeforeCursor($maxChars, $flags)") }
-        return mTextFieldValue.getTextBeforeSelection(maxChars)
+        return mTextFieldValue.getTextBeforeSelection(maxChars).toString()
     }
 
     override fun getTextAfterCursor(maxChars: Int, flags: Int): CharSequence {
         if (DEBUG) { Log.d(TAG, "getTextAfterCursor($maxChars, $flags)") }
-        return mTextFieldValue.getTextAfterSelection(maxChars)
+        return mTextFieldValue.getTextAfterSelection(maxChars).toString()
     }
 
     override fun getSelectedText(flags: Int): CharSequence {
         if (DEBUG) { Log.d(TAG, "getSelectedText($flags)") }
-        return mTextFieldValue.getSelectedText()
+        return mTextFieldValue.getSelectedText().toString()
     }
 
     override fun requestCursorUpdates(cursorUpdateMode: Int): Boolean {
@@ -273,7 +273,7 @@ internal class RecordingInputConnection(
     override fun performEditorAction(editorAction: Int): Boolean {
         if (DEBUG) { Log.d(TAG, "performEditorAction($editorAction)") }
         val imeAction = when (editorAction) {
-            EditorInfo.IME_ACTION_UNSPECIFIED -> ImeAction.Unspecified
+            EditorInfo.IME_ACTION_UNSPECIFIED -> ImeAction.Default
             EditorInfo.IME_ACTION_DONE -> ImeAction.Done
             EditorInfo.IME_ACTION_SEND -> ImeAction.Send
             EditorInfo.IME_ACTION_SEARCH -> ImeAction.Search
@@ -282,10 +282,10 @@ internal class RecordingInputConnection(
             EditorInfo.IME_ACTION_GO -> ImeAction.Go
             else -> {
                 Log.w(TAG, "IME sends unsupported Editor Action: $editorAction")
-                ImeAction.Unspecified
+                ImeAction.Default
             }
         }
-        eventListener.onImeAction(imeAction)
+        eventCallback.onImeAction(imeAction)
         return true
     }
 

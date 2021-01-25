@@ -27,7 +27,7 @@ import androidx.compose.ui.text.TextStyle
  * @see SpanStyle
  */
 @Immutable
-data class LocaleList constructor(val localeList: List<Locale>) : Collection<Locale> {
+class LocaleList constructor(val localeList: List<Locale>) : Collection<Locale> {
     companion object {
         /**
          * Returns Locale object which represents current locale
@@ -54,9 +54,28 @@ data class LocaleList constructor(val localeList: List<Locale>) : Collection<Loc
 
     // Collection overrides for easy iterations.
     override val size: Int = localeList.size
+
     override operator fun contains(element: Locale): Boolean = localeList.contains(element)
+
     override fun containsAll(elements: Collection<Locale>): Boolean =
         localeList.containsAll(elements)
+
     override fun isEmpty(): Boolean = localeList.isEmpty()
+
     override fun iterator(): Iterator<Locale> = localeList.iterator()
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is LocaleList) return false
+        if (localeList != other.localeList) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return localeList.hashCode()
+    }
+
+    override fun toString(): String {
+        return "LocaleList(localeList=$localeList)"
+    }
 }

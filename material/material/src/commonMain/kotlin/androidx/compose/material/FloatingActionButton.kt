@@ -16,12 +16,8 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.AnimatedValueModel
-import androidx.compose.animation.asDisposableClock
-import androidx.compose.animation.core.AnimationClockObservable
-import androidx.compose.animation.core.AnimationVector1D
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.VectorConverter
-import androidx.compose.foundation.AmbientIndication
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.clickable
@@ -34,15 +30,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSizeIn
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.platform.AmbientAnimationClock
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -70,7 +69,6 @@ import androidx.compose.ui.unit.dp
  * in different states. This controls the size of the shadow below the FAB.
  * @param content the content of this FAB - this is typically an [Icon].
  */
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun FloatingActionButton(
     onClick: () -> Unit,
@@ -88,20 +86,21 @@ fun FloatingActionButton(
     Surface(
         modifier = modifier.clickable(
             onClick = onClick,
+            role = Role.Button,
             interactionState = interactionState,
             indication = null
         ),
         shape = shape,
         color = backgroundColor,
         contentColor = contentColor,
-        elevation = elevation.elevation(interactionState)
+        elevation = elevation.elevation(interactionState).value
     ) {
         Providers(AmbientContentAlpha provides contentColor.alpha) {
             ProvideTextStyle(MaterialTheme.typography.button) {
                 Box(
                     modifier = Modifier
                         .defaultMinSizeConstraints(minWidth = FabSize, minHeight = FabSize)
-                        .indication(interactionState, AmbientIndication.current()),
+                        .indication(interactionState, rememberRipple()),
                     contentAlignment = Alignment.Center
                 ) { content() }
             }
@@ -191,7 +190,6 @@ fun ExtendedFloatingActionButton(
  * See [FloatingActionButtonDefaults.elevation] for the default elevation used in a
  * [FloatingActionButton] and [ExtendedFloatingActionButton].
  */
-@ExperimentalMaterialApi
 @Stable
 interface FloatingActionButtonElevation {
     /**
@@ -199,56 +197,8 @@ interface FloatingActionButtonElevation {
      *
      * @param interactionState the [InteractionState] for this floating action button
      */
-    fun elevation(interactionState: InteractionState): Dp
-}
-
-/**
- * Contains the default values used by [FloatingActionButton]
- */
-@Deprecated(
-    "FloatingActionButtonConstants has been replaced with FloatingActionButtonDefaults",
-    ReplaceWith(
-        "FloatingActionButtonDefaults",
-        "androidx.compose.material.FloatingActionButtonDefaults"
-    )
-)
-object FloatingActionButtonConstants {
-    // TODO: b/152525426 add support for focused and hovered states
-    /**
-     * Creates a [FloatingActionButtonElevation] that will animate between the provided values
-     * according to the Material specification.
-     *
-     * @param defaultElevation the elevation to use when the [FloatingActionButton] has no
-     * [Interaction]s
-     * @param pressedElevation the elevation to use when the [FloatingActionButton] is
-     * [Interaction.Pressed].
-     */
-    @OptIn(ExperimentalMaterialApi::class)
     @Composable
-    @Deprecated(
-        "FloatingActionButtonConstants has been replaced with " +
-            "FloatingActionButtonDefaults",
-        ReplaceWith(
-            "FloatingActionButtonDefaults.elevation(elevation, pressedElevation, " +
-                "disabledElevation)",
-            "androidx.compose.material.FloatingActionButtonDefaults"
-        )
-    )
-    fun defaultElevation(
-        defaultElevation: Dp = 6.dp,
-        pressedElevation: Dp = 12.dp
-        // focused: Dp = 8.dp,
-        // hovered: Dp = 8.dp,
-    ): FloatingActionButtonElevation {
-        val clock = AmbientAnimationClock.current.asDisposableClock()
-        return remember(defaultElevation, pressedElevation, clock) {
-            DefaultFloatingActionButtonElevation(
-                defaultElevation = defaultElevation,
-                pressedElevation = pressedElevation,
-                clock = clock
-            )
-        }
-    }
+    fun elevation(interactionState: InteractionState): State<Dp>
 }
 
 /**
@@ -265,7 +215,6 @@ object FloatingActionButtonDefaults {
      * @param pressedElevation the elevation to use when the [FloatingActionButton] is
      * [Interaction.Pressed].
      */
-    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     fun elevation(
         defaultElevation: Dp = 6.dp,
@@ -273,12 +222,10 @@ object FloatingActionButtonDefaults {
         // focused: Dp = 8.dp,
         // hovered: Dp = 8.dp,
     ): FloatingActionButtonElevation {
-        val clock = AmbientAnimationClock.current.asDisposableClock()
-        return remember(defaultElevation, pressedElevation, clock) {
+        return remember(defaultElevation, pressedElevation) {
             DefaultFloatingActionButtonElevation(
                 defaultElevation = defaultElevation,
-                pressedElevation = pressedElevation,
-                clock = clock
+                pressedElevation = pressedElevation
             )
         }
     }
@@ -287,18 +234,13 @@ object FloatingActionButtonDefaults {
 /**
  * Default [FloatingActionButtonElevation] implementation.
  */
-@OptIn(ExperimentalMaterialApi::class)
 @Stable
 private class DefaultFloatingActionButtonElevation(
     private val defaultElevation: Dp,
     private val pressedElevation: Dp,
-    private val clock: AnimationClockObservable
 ) : FloatingActionButtonElevation {
-    private val lazyAnimatedElevation = LazyAnimatedValue<Dp, AnimationVector1D> { target ->
-        AnimatedValueModel(initialValue = target, typeConverter = Dp.VectorConverter, clock = clock)
-    }
-
-    override fun elevation(interactionState: InteractionState): Dp {
+    @Composable
+    override fun elevation(interactionState: InteractionState): State<Dp> {
         val interaction = interactionState.value.lastOrNull {
             it is Interaction.Pressed
         }
@@ -308,21 +250,21 @@ private class DefaultFloatingActionButtonElevation(
             else -> defaultElevation
         }
 
-        val animatedElevation = lazyAnimatedElevation.animatedValueForTarget(target)
+        val animatable = remember { Animatable(target, Dp.VectorConverter) }
 
-        if (animatedElevation.targetValue != target) {
-            val lastInteraction = when (animatedElevation.targetValue) {
+        LaunchedEffect(target) {
+            val lastInteraction = when (animatable.targetValue) {
                 pressedElevation -> Interaction.Pressed
                 else -> null
             }
-            animatedElevation.animateElevation(
+            animatable.animateElevation(
                 from = lastInteraction,
                 to = interaction,
                 target = target
             )
         }
 
-        return animatedElevation.value
+        return animatable.asState()
     }
 }
 

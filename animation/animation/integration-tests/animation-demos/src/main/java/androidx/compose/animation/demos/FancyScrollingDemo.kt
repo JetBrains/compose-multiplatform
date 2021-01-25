@@ -17,11 +17,12 @@
 package androidx.compose.animation.demos
 
 import android.util.Log
-import androidx.compose.animation.animatedFloat
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.SpringSpec
-import androidx.compose.animation.core.TargetAnimation
-import androidx.compose.animation.core.fling
+import androidx.compose.animation.core.calculateTargetValue
+import androidx.compose.animation.core.exponentialDecay
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -30,15 +31,16 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.gesture.DragObserver
-import androidx.compose.ui.gesture.rawDragGestureFilter
+import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 const val DEBUG = false
@@ -51,40 +53,39 @@ fun FancyScrollingDemo() {
             fontSize = 20.sp,
             modifier = Modifier.padding(40.dp)
         )
-        val animScroll = animatedFloat(0f)
+        val animScroll = remember { Animatable(0f) }
         val itemWidth = remember { mutableStateOf(0f) }
-        val gesture = Modifier.rawDragGestureFilter(
-            dragObserver = object : DragObserver {
-                override fun onDrag(dragDistance: Offset): Offset {
-                    // Snap to new drag position
-                    animScroll.snapTo(animScroll.value + dragDistance.x)
-                    return dragDistance
-                }
+        val scope = rememberCoroutineScope()
+        val modifier = Modifier.draggable(
+            orientation = Orientation.Horizontal,
+            onDrag = { delta: Float ->
+                // Snap to new drag position
+                animScroll.snapTo(animScroll.value + delta)
+            },
 
-                override fun onStop(velocity: Offset) {
+            onDragStopped = { velocity: Float ->
 
-                    // Uses default decay animation to calculate where the fling will settle,
-                    // and adjust that position as needed. The target animation will be used for
-                    // animating to the adjusted target.
-                    animScroll.fling(
-                        velocity.x,
-                        adjustTarget = { target ->
-                            // Adjust the target position to center align the item
-                            var rem = target % itemWidth.value
-                            if (rem < 0) {
-                                rem += itemWidth.value
-                            }
-                            TargetAnimation(
-                                (target - rem),
-                                SpringSpec(dampingRatio = 2.0f, stiffness = 100f)
-                            )
-                        }
+                // Uses default decay animation to calculate where the fling will settle,
+                // and adjust that position as needed. The target animation will be used for
+                // animating to the adjusted target.
+                scope.launch {
+                    val decay = exponentialDecay<Float>()
+                    val target = decay.calculateTargetValue(animScroll.value, velocity)
+                    // Adjust the target position to center align the item
+                    var rem = target % itemWidth.value
+                    if (rem < 0) {
+                        rem += itemWidth.value
+                    }
+                    animScroll.animateTo(
+                        targetValue = target - rem,
+                        initialVelocity = velocity,
+                        animationSpec = SpringSpec(dampingRatio = 2.0f, stiffness = 100f)
                     )
                 }
             }
         )
 
-        Canvas(gesture.fillMaxWidth().preferredHeight(400.dp)) {
+        Canvas(modifier.fillMaxWidth().preferredHeight(400.dp)) {
             val width = size.width / 2f
             val scroll = animScroll.value + width / 2
             itemWidth.value = width
@@ -92,7 +93,7 @@ fun FancyScrollingDemo() {
                 Log.w(
                     "Anim",
                     "Drawing items with updated" +
-                        " AnimatedFloat: ${animScroll.value}"
+                        " Scroll: ${animScroll.value}"
                 )
             }
             drawItems(scroll, width, size.height)

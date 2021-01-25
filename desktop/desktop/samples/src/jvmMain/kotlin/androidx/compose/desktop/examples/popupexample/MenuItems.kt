@@ -60,4 +60,12 @@ object MenuItems {
         },
         shortcut = KeyStroke(Key.U)
     )
+
+    val IsFullscreen = MenuItem(
+        name = "Is fullscreen mode",
+        onClick = {
+            println("Fullscreen mode: ${AppManager.focusedWindow?.isFullscreen}")
+        },
+        shortcut = KeyStroke(Key.F)
+    )
 }

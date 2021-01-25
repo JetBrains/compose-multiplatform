@@ -17,11 +17,10 @@
 package androidx.compose.material.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.animation.ColorPropKey
-import androidx.compose.animation.DpPropKey
+import androidx.compose.animation.animateColor
+import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.transitionDefinition
-import androidx.compose.animation.transition
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -88,7 +87,7 @@ fun IconTabs() {
         TabRow(selectedTabIndex = state) {
             icons.forEachIndexed { index, icon ->
                 Tab(
-                    icon = { Icon(icon) },
+                    icon = { Icon(icon, contentDescription = "Favorite") },
                     selected = state == index,
                     onClick = { state = index }
                 )
@@ -115,7 +114,7 @@ fun TextAndIconTabs() {
             titlesAndIcons.forEachIndexed { index, (title, icon) ->
                 Tab(
                     text = { Text(title) },
-                    icon = { Icon(icon) },
+                    icon = { Icon(icon, contentDescription = null) },
                     selected = state == index,
                     onClick = { state = index }
                 )
@@ -322,58 +321,52 @@ fun FancyIndicator(color: Color, modifier: Modifier = Modifier) {
 @Sampled
 @Composable
 fun FancyAnimatedIndicator(tabPositions: List<TabPosition>, selectedTabIndex: Int) {
-    val indicatorStart = remember { DpPropKey() }
-    val indicatorEnd = remember { DpPropKey() }
-    val indicatorColor = remember { ColorPropKey() }
-
     val colors = listOf(Color.Yellow, Color.Red, Color.Green)
-    val transitionDefinition = remember(tabPositions) {
-        transitionDefinition<Int> {
-            tabPositions.forEachIndexed { index, position ->
-                state(index) {
-                    this[indicatorStart] = position.left
-                    this[indicatorEnd] = position.right
-                    this[indicatorColor] = colors[index % colors.size]
-                }
-            }
-            repeat(tabPositions.size) { from ->
-                repeat(tabPositions.size) { to ->
-                    if (from != to) {
-                        transition(fromState = from, toState = to) {
-                            // Handle directionality here, if we are moving to the right, we
-                            // want the right side of the indicator to move faster, if we are
-                            // moving to the left, we want the left side to move faster.
-                            val startStiffness = if (from < to) 50f else 1000f
-                            val endStiffness = if (from < to) 1000f else 50f
-                            indicatorStart using spring(
-                                dampingRatio = 1f,
-                                stiffness = startStiffness
-                            )
-                            indicatorEnd using spring(
-                                dampingRatio = 1f,
-                                stiffness = endStiffness
-                            )
-                        }
-                    }
-                }
+    val transition = updateTransition(selectedTabIndex)
+    val indicatorStart by transition.animateDp(
+        transitionSpec = {
+            // Handle directionality here, if we are moving to the right, we
+            // want the right side of the indicator to move faster, if we are
+            // moving to the left, we want the left side to move faster.
+            if (initialState < targetState) {
+                spring(dampingRatio = 1f, stiffness = 50f)
+            } else {
+                spring(dampingRatio = 1f, stiffness = 1000f)
             }
         }
+    ) {
+        tabPositions[it].left
     }
 
-    val state = transition(transitionDefinition, selectedTabIndex)
-    val offset = state[indicatorStart]
-    val width = state[indicatorEnd] - state[indicatorStart]
+    val indicatorEnd by transition.animateDp(
+        transitionSpec = {
+            // Handle directionality here, if we are moving to the right, we
+            // want the right side of the indicator to move faster, if we are
+            // moving to the left, we want the left side to move faster.
+            if (initialState < targetState) {
+                spring(dampingRatio = 1f, stiffness = 1000f)
+            } else {
+                spring(dampingRatio = 1f, stiffness = 50f)
+            }
+        }
+    ) {
+        tabPositions[it].right
+    }
+
+    val indicatorColor by transition.animateColor {
+        colors[it % colors.size]
+    }
 
     FancyIndicator(
         // Pass the current color to the indicator
-        state[indicatorColor],
+        indicatorColor,
         modifier = Modifier
             // Fill up the entire TabRow, and place the indicator at the start
             .fillMaxSize()
             .wrapContentSize(align = Alignment.BottomStart)
             // Apply an offset from the start to correctly position the indicator around the tab
-            .offset(x = offset)
+            .offset(x = indicatorStart)
             // Make the width of the indicator follow the animated width as we move between tabs
-            .preferredWidth(width)
+            .preferredWidth(indicatorEnd - indicatorStart)
     )
 }

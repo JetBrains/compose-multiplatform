@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import java.lang.reflect.Field
+import kotlin.jvm.internal.FunctionReference
 import kotlin.jvm.internal.Lambda
 import kotlin.math.abs
 import kotlin.reflect.KClass
@@ -277,6 +278,9 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
                     is Dp -> NodeParameter(name, DimensionDp, value.value)
                     is Enum<*> -> NodeParameter(name, ParameterType.String, value.toString())
                     is Float -> NodeParameter(name, ParameterType.Float, value)
+                    is FunctionReference -> NodeParameter(
+                        name, ParameterType.FunctionReference, arrayOf<Any>(value, value.name)
+                    )
                     is FontListFontFamily -> createFromFontListFamily(name, value)
                     is FontWeight -> NodeParameter(name, ParameterType.Int32, value.weight)
                     is Modifier -> createFromModifier(name, value)
@@ -316,7 +320,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
             val lambda = value.javaClass.getDeclaredField("_block")
                 .apply { isAccessible = true }
                 .get(value)
-            NodeParameter(name, ParameterType.Lambda, lambda)
+            NodeParameter(name, ParameterType.Lambda, arrayOf<Any?>(lambda))
         } catch (_: Throwable) {
             null
         }
@@ -400,7 +404,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
             return parameter
         }
 
-        private fun createFromIterable(name: String, value: Iterable<*>): NodeParameter? {
+        private fun createFromIterable(name: String, value: Iterable<*>): NodeParameter {
             val parameter = NodeParameter(name, ParameterType.String, "")
             val elements = parameter.elements
             value.asSequence()
@@ -411,7 +415,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
         }
 
         private fun createFromLambda(name: String, value: Lambda<*>): NodeParameter =
-            NodeParameter(name, ParameterType.Lambda, value)
+            NodeParameter(name, ParameterType.Lambda, arrayOf<Any>(value))
 
         private fun createFromModifier(name: String, value: Modifier): NodeParameter? =
             when {
@@ -448,15 +452,15 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
         }
 
         @Suppress("DEPRECATION")
-        private fun createFromTextUnit(name: String, value: TextUnit): NodeParameter? =
+        private fun createFromTextUnit(name: String, value: TextUnit): NodeParameter =
             when (value.type) {
                 TextUnitType.Sp -> NodeParameter(name, ParameterType.DimensionSp, value.value)
                 TextUnitType.Em -> NodeParameter(name, ParameterType.DimensionEm, value.value)
-                TextUnitType.Inherit, TextUnitType.Unspecified ->
+                TextUnitType.Unspecified ->
                     NodeParameter(name, ParameterType.String, "Unspecified")
             }
 
-        private fun createFromImageVector(name: String, value: ImageVector): NodeParameter? =
+        private fun createFromImageVector(name: String, value: ImageVector): NodeParameter =
             NodeParameter(name, ParameterType.String, value.name)
 
         /**

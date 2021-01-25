@@ -21,7 +21,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.lerp
-import androidx.compose.ui.graphics.useOrElse
+import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.text.style.lerp
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.isUnspecified
 import androidx.compose.ui.unit.lerp
 
 /**
@@ -68,7 +69,7 @@ import androidx.compose.ui.unit.lerp
  * @see ParagraphStyle
  */
 @Immutable
-data class SpanStyle(
+class SpanStyle(
     val color: Color = Color.Unspecified,
     val fontSize: TextUnit = TextUnit.Unspecified,
     val fontWeight: FontWeight? = null,
@@ -98,7 +99,7 @@ data class SpanStyle(
         if (other == null) return this
 
         return SpanStyle(
-            color = other.color.useOrElse { this.color },
+            color = other.color.takeOrElse { this.color },
             fontFamily = other.fontFamily ?: this.fontFamily,
             fontSize = if (!other.fontSize.isUnspecified) other.fontSize else this.fontSize,
             fontWeight = other.fontWeight ?: this.fontWeight,
@@ -113,7 +114,7 @@ data class SpanStyle(
             baselineShift = other.baselineShift ?: this.baselineShift,
             textGeometricTransform = other.textGeometricTransform ?: this.textGeometricTransform,
             localeList = other.localeList ?: this.localeList,
-            background = other.background.useOrElse { this.background },
+            background = other.background.takeOrElse { this.background },
             textDecoration = other.textDecoration ?: this.textDecoration,
             shadow = other.shadow ?: this.shadow
         )
@@ -124,6 +125,99 @@ data class SpanStyle(
      */
     @Stable
     operator fun plus(other: SpanStyle): SpanStyle = this.merge(other)
+
+    fun copy(
+        color: Color = this.color,
+        fontSize: TextUnit = this.fontSize,
+        fontWeight: FontWeight? = this.fontWeight,
+        fontStyle: FontStyle? = this.fontStyle,
+        fontSynthesis: FontSynthesis? = this.fontSynthesis,
+        fontFamily: FontFamily? = this.fontFamily,
+        fontFeatureSettings: String? = this.fontFeatureSettings,
+        letterSpacing: TextUnit = this.letterSpacing,
+        baselineShift: BaselineShift? = this.baselineShift,
+        textGeometricTransform: TextGeometricTransform? = this.textGeometricTransform,
+        localeList: LocaleList? = this.localeList,
+        background: Color = this.background,
+        textDecoration: TextDecoration? = this.textDecoration,
+        shadow: Shadow? = this.shadow
+    ): SpanStyle {
+        return SpanStyle(
+            color = color,
+            fontSize = fontSize,
+            fontWeight = fontWeight,
+            fontStyle = fontStyle,
+            fontSynthesis = fontSynthesis,
+            fontFamily = fontFamily,
+            fontFeatureSettings = fontFeatureSettings,
+            letterSpacing = letterSpacing,
+            baselineShift = baselineShift,
+            textGeometricTransform = textGeometricTransform,
+            localeList = localeList,
+            background = background,
+            textDecoration = textDecoration,
+            shadow = shadow
+        )
+    }
+
+    override operator fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is SpanStyle) return false
+
+        if (color != other.color) return false
+        if (fontSize != other.fontSize) return false
+        if (fontWeight != other.fontWeight) return false
+        if (fontStyle != other.fontStyle) return false
+        if (fontSynthesis != other.fontSynthesis) return false
+        if (fontFamily != other.fontFamily) return false
+        if (fontFeatureSettings != other.fontFeatureSettings) return false
+        if (letterSpacing != other.letterSpacing) return false
+        if (baselineShift != other.baselineShift) return false
+        if (textGeometricTransform != other.textGeometricTransform) return false
+        if (localeList != other.localeList) return false
+        if (background != other.background) return false
+        if (textDecoration != other.textDecoration) return false
+        if (shadow != other.shadow) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = color.hashCode()
+        result = 31 * result + fontSize.hashCode()
+        result = 31 * result + (fontWeight?.hashCode() ?: 0)
+        result = 31 * result + (fontStyle?.hashCode() ?: 0)
+        result = 31 * result + (fontSynthesis?.hashCode() ?: 0)
+        result = 31 * result + (fontFamily?.hashCode() ?: 0)
+        result = 31 * result + (fontFeatureSettings?.hashCode() ?: 0)
+        result = 31 * result + letterSpacing.hashCode()
+        result = 31 * result + (baselineShift?.hashCode() ?: 0)
+        result = 31 * result + (textGeometricTransform?.hashCode() ?: 0)
+        result = 31 * result + (localeList?.hashCode() ?: 0)
+        result = 31 * result + background.hashCode()
+        result = 31 * result + (textDecoration?.hashCode() ?: 0)
+        result = 31 * result + (shadow?.hashCode() ?: 0)
+        return result
+    }
+
+    override fun toString(): String {
+        return "SpanStyle(" +
+            "color=$color, " +
+            "fontSize=$fontSize, " +
+            "fontWeight=$fontWeight, " +
+            "fontStyle=$fontStyle, " +
+            "fontSynthesis=$fontSynthesis, " +
+            "fontFamily=$fontFamily, " +
+            "fontFeatureSettings=$fontFeatureSettings, " +
+            "letterSpacing=$letterSpacing, " +
+            "baselineShift=$baselineShift, " +
+            "textGeometricTransform=$textGeometricTransform, " +
+            "localeList=$localeList, " +
+            "background=$background, " +
+            "textDecoration=$textDecoration, " +
+            "shadow=$shadow" +
+            ")"
+    }
 }
 
 /**

@@ -16,10 +16,8 @@
 
 package androidx.compose.foundation
 
-import androidx.compose.animation.core.ExponentialDecay
-import androidx.compose.animation.core.ManualAnimationClock
+import androidx.compose.animation.core.FloatExponentialDecaySpec
 import androidx.compose.animation.core.ManualFrameClock
-import androidx.compose.animation.core.advanceClockMillis
 import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.animation.smoothScrollBy
 import androidx.compose.foundation.gestures.Scrollable
@@ -31,6 +29,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.testutils.MockAnimationClock
+import androidx.compose.testutils.advanceClockOnMainThreadMillis
+import androidx.compose.testutils.monotonicFrameAnimationClockOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -42,11 +43,10 @@ import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.center
 import androidx.compose.ui.test.down
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.monotonicFrameAnimationClockOf
 import androidx.compose.ui.test.moveBy
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performGesture
@@ -56,7 +56,6 @@ import androidx.compose.ui.test.swipeWithVelocity
 import androidx.compose.ui.test.up
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.milliseconds
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
@@ -90,7 +89,7 @@ class ScrollableTest {
     }
 
     @Test
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_horizontalScroll() = runBlockingWithManualClock { clock ->
         var total = 0f
         val controller = ScrollableController(
@@ -98,8 +97,8 @@ class ScrollableTest {
                 total += it
                 it
             },
-            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
-            animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
+            flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
+            animationClock = monotonicFrameAnimationClockOf(coroutineContext)
         )
         setScrollableContent {
             Modifier.scrollable(
@@ -111,7 +110,7 @@ class ScrollableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         advanceClockWhileAwaitersExist(clock)
@@ -124,7 +123,7 @@ class ScrollableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x, this.center.y + 100f),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         advanceClockWhileAwaitersExist(clock)
@@ -136,7 +135,7 @@ class ScrollableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x - 100f, this.center.y),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         advanceClockWhileAwaitersExist(clock)
@@ -146,7 +145,7 @@ class ScrollableTest {
     }
 
     @Test
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_verticalScroll() = runBlockingWithManualClock { clock ->
         var total = 0f
         val controller = ScrollableController(
@@ -154,8 +153,8 @@ class ScrollableTest {
                 total += it
                 it
             },
-            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
-            animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
+            flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
+            animationClock = monotonicFrameAnimationClockOf(coroutineContext)
         )
         setScrollableContent {
             Modifier.scrollable(
@@ -167,7 +166,7 @@ class ScrollableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x, this.center.y + 100f),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         advanceClockWhileAwaitersExist(clock)
@@ -180,7 +179,7 @@ class ScrollableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         advanceClockWhileAwaitersExist(clock)
@@ -192,7 +191,7 @@ class ScrollableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x, this.center.y - 100f),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         advanceClockWhileAwaitersExist(clock)
@@ -202,7 +201,7 @@ class ScrollableTest {
     }
 
     @Test
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_startStop_notify() = runBlockingWithManualClock(true) { clock ->
         var startTrigger = 0f
         var stopTrigger = 0f
@@ -212,8 +211,8 @@ class ScrollableTest {
                 total += it
                 it
             },
-            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
-            animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
+            flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
+            animationClock = monotonicFrameAnimationClockOf(coroutineContext)
         )
         setScrollableContent {
             Modifier.scrollable(
@@ -231,7 +230,7 @@ class ScrollableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         // don't wait for animation so stop is 0, as we flinging still
@@ -248,7 +247,7 @@ class ScrollableTest {
     }
 
     @Test
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_disabledWontCallLambda() = runBlockingWithManualClock(true) { clock ->
         val enabled = mutableStateOf(true)
         var total = 0f
@@ -257,8 +256,8 @@ class ScrollableTest {
                 total += it
                 it
             },
-            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
-            animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
+            flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
+            animationClock = monotonicFrameAnimationClockOf(coroutineContext)
         )
         setScrollableContent {
             Modifier.scrollable(
@@ -271,7 +270,7 @@ class ScrollableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         advanceClockWhileAwaitersExist(clock)
@@ -284,7 +283,7 @@ class ScrollableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         advanceClockWhileAwaitersExist(clock)
@@ -294,8 +293,8 @@ class ScrollableTest {
     }
 
     @Test
-    @OptIn(ExperimentalTesting::class)
-    fun scrollable_velocityProxy() = runBlockingWithManualClock { clock ->
+    @OptIn(ExperimentalTestApi::class)
+    fun scrollable_velocityProxy() = runBlockingWithManualClock {
         var velocityTriggered = 0f
         var total = 0f
         val controller = ScrollableController(
@@ -303,8 +302,8 @@ class ScrollableTest {
                 total += it
                 it
             },
-            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
-            animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
+            flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
+            animationClock = monotonicFrameAnimationClockOf(coroutineContext)
         )
         setScrollableContent {
             Modifier.scrollable(
@@ -320,7 +319,7 @@ class ScrollableTest {
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
                 endVelocity = 112f,
-                duration = 100.milliseconds
+                durationMillis = 100
 
             )
         }
@@ -331,7 +330,7 @@ class ScrollableTest {
                 start = this.center,
                 end = Offset(this.center.x - 100f, this.center.y),
                 endVelocity = 312f,
-                duration = 100.milliseconds
+                durationMillis = 100
 
             )
         }
@@ -342,16 +341,16 @@ class ScrollableTest {
     }
 
     @Test
-    @OptIn(ExperimentalTesting::class)
-    fun scrollable_startWithoutSlop_ifFlinging() = runBlockingWithManualClock { clock ->
+    @OptIn(ExperimentalTestApi::class)
+    fun scrollable_startWithoutSlop_ifFlinging() = runBlockingWithManualClock {
         var total = 0f
         val controller = ScrollableController(
             consumeScrollDelta = {
                 total += it
                 it
             },
-            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
-            animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
+            flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
+            animationClock = monotonicFrameAnimationClockOf(coroutineContext)
         )
         setScrollableContent {
             Modifier.scrollable(
@@ -363,7 +362,7 @@ class ScrollableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         // don't advance clocks
@@ -375,7 +374,7 @@ class ScrollableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 114f, this.center.y),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         rule.runOnIdle {
@@ -386,7 +385,7 @@ class ScrollableTest {
     }
 
     @Test
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_cancel_callsDragStop() = runBlocking {
         var total by mutableStateOf(0f)
         var dragStopped = 0f
@@ -395,7 +394,7 @@ class ScrollableTest {
                 total += it
                 it
             },
-            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+            flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
             animationClock = monotonicFrameAnimationClockOf(coroutineContext)
         )
         setScrollableContent {
@@ -415,7 +414,7 @@ class ScrollableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100, this.center.y),
-                duration = 100.milliseconds
+                durationMillis = 100
             )
         }
         rule.runOnIdle {
@@ -425,7 +424,7 @@ class ScrollableTest {
     }
 
     @Test
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_snappingScrolling() = runBlocking {
         var total = 0f
         val controller = ScrollableController(
@@ -433,7 +432,7 @@ class ScrollableTest {
                 total += it
                 it
             },
-            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+            flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
             animationClock = monotonicFrameAnimationClockOf(coroutineContext)
         )
         setScrollableContent {
@@ -450,7 +449,7 @@ class ScrollableTest {
     }
 
     @Test
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_explicitDisposal() = runBlockingWithManualClock { clock ->
         val disposed = mutableStateOf(false)
         var total = 0f
@@ -460,8 +459,8 @@ class ScrollableTest {
                 total += it
                 it
             },
-            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
-            animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
+            flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
+            animationClock = monotonicFrameAnimationClockOf(coroutineContext)
         )
         setScrollableContent {
             if (!disposed.value) {
@@ -471,13 +470,13 @@ class ScrollableTest {
             }
         }
         launch {
-            controller.smoothScrollBy(300f)
+            (controller as Scrollable).smoothScrollBy(300f)
         }
         advanceClockWhileAwaitersExist(clock)
         assertThat(total).isEqualTo(300f)
 
         launch {
-            controller.smoothScrollBy(200f)
+            (controller as Scrollable).smoothScrollBy(200f)
         }
         // don't advance clocks yet, toggle disposed value
         disposed.value = true
@@ -491,17 +490,17 @@ class ScrollableTest {
     }
 
     @Test
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_nestedDrag() = runBlockingWithManualClock { clock ->
         var innerDrag = 0f
         var outerDrag = 0f
-        val animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
+        val animationClock = monotonicFrameAnimationClockOf(coroutineContext)
         val outerState = ScrollableController(
             consumeScrollDelta = {
                 outerDrag += it
                 it
             },
-            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+            flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
             animationClock = animationClock
         )
         val innerState = ScrollableController(
@@ -509,7 +508,7 @@ class ScrollableTest {
                 innerDrag += it / 2
                 it / 2
             },
-            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+            flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
             animationClock = animationClock
         )
 
@@ -539,7 +538,7 @@ class ScrollableTest {
             this.swipeWithVelocity(
                 start = this.center,
                 end = Offset(this.center.x + 200f, this.center.y),
-                duration = 300.milliseconds,
+                durationMillis = 300,
                 endVelocity = 0f
             )
         }
@@ -560,17 +559,17 @@ class ScrollableTest {
     }
 
     @Test
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_nestedFling() = runBlockingWithManualClock { clock ->
         var innerDrag = 0f
         var outerDrag = 0f
-        val animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
+        val animationClock = monotonicFrameAnimationClockOf(coroutineContext)
         val outerState = ScrollableController(
             consumeScrollDelta = {
                 outerDrag += it
                 it
             },
-            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+            flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
             animationClock = animationClock
         )
         val innerState = ScrollableController(
@@ -578,7 +577,7 @@ class ScrollableTest {
                 innerDrag += it / 2
                 it / 2
             },
-            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+            flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
             animationClock = animationClock
         )
 
@@ -611,7 +610,7 @@ class ScrollableTest {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 200f, this.center.y),
-                duration = 300.milliseconds
+                durationMillis = 300
             )
         }
         val lastEqualDrag = rule.runOnIdle {
@@ -631,13 +630,13 @@ class ScrollableTest {
     }
 
     @Test
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_nestedScrollAbove_respectsPreConsumption() =
         runBlockingWithManualClock { clock ->
             var value = 0f
             var lastReceivedPreScrollAvailable = 0f
             val preConsumeFraction = 0.7f
-            val animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
+            val animationClock = monotonicFrameAnimationClockOf(coroutineContext)
             val controller = ScrollableController(
                 consumeScrollDelta = {
                     val expected = lastReceivedPreScrollAvailable * (1 - preConsumeFraction)
@@ -645,7 +644,7 @@ class ScrollableTest {
                     value += it
                     it
                 },
-                flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+                flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
                 animationClock = animationClock
             )
             val preConsumingParent = object : NestedScrollConnection {
@@ -684,7 +683,7 @@ class ScrollableTest {
                 this.swipe(
                     start = this.center,
                     end = Offset(this.center.x + 200f, this.center.y),
-                    duration = 300.milliseconds
+                    durationMillis = 300
                 )
             }
 
@@ -699,13 +698,13 @@ class ScrollableTest {
         }
 
     @Test
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_nestedScrollAbove_proxiesPostCycles() =
         runBlockingWithManualClock { clock ->
             var value = 0f
             var expectedLeft = 0f
             val velocityFlung = 5000f
-            val animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
+            val animationClock = monotonicFrameAnimationClockOf(coroutineContext)
             val controller = ScrollableController(
                 consumeScrollDelta = {
                     val toConsume = it * 0.345f
@@ -713,7 +712,7 @@ class ScrollableTest {
                     expectedLeft = it - toConsume
                     toConsume
                 },
-                flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+                flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
                 animationClock = animationClock
             )
             val parent = object : NestedScrollConnection {
@@ -732,9 +731,9 @@ class ScrollableTest {
                     available: Velocity,
                     onFinished: (Velocity) -> Unit
                 ) {
-                    assertThat(available.pixelsPerSecond)
+                    assertThat(available)
                         .isEqualTo(
-                            Offset(x = velocityFlung, y = 0f) - consumed.pixelsPerSecond
+                            Velocity(x = velocityFlung, y = 0f) - consumed
                         )
                     onFinished.invoke(available)
                 }
@@ -764,7 +763,7 @@ class ScrollableTest {
                 this.swipeWithVelocity(
                     start = this.center,
                     end = Offset(this.center.x + 500f, this.center.y),
-                    duration = 300.milliseconds,
+                    durationMillis = 300,
                     endVelocity = velocityFlung
                 )
             }
@@ -776,19 +775,19 @@ class ScrollableTest {
         }
 
     @Test
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_nestedScrollBelow_listensDispatches() =
         runBlockingWithManualClock { clock ->
             var value = 0f
             var expectedConsumed = 0f
-            val animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
+            val animationClock = monotonicFrameAnimationClockOf(coroutineContext)
             val controller = ScrollableController(
                 consumeScrollDelta = {
                     expectedConsumed = it * 0.3f
                     value += expectedConsumed
                     expectedConsumed
                 },
-                flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+                flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
                 animationClock = animationClock
             )
             val child = object : NestedScrollConnection {}
@@ -827,13 +826,13 @@ class ScrollableTest {
                 assertThat(consumed.x - expectedConsumed).isWithin(0.001f)
 
                 val preFlingConsumed = dispatcher
-                    .dispatchPreFling(Velocity(Offset(50f, 50f)))
+                    .dispatchPreFling(Velocity(50f, 50f))
                 // scrollable won't participate in the pre fling
                 assertThat(preFlingConsumed).isEqualTo(Velocity.Zero)
 
                 dispatcher.dispatchPostFling(
-                    Velocity(Offset(1000f, 1000f)),
-                    Velocity(Offset(2000f, 2000f))
+                    Velocity(1000f, 1000f),
+                    Velocity(2000f, 2000f)
                 )
                 value
             }
@@ -848,7 +847,7 @@ class ScrollableTest {
         }
 
     @Test
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_interactionState() = runBlocking {
         val interactionState = InteractionState()
         var total = 0f
@@ -857,7 +856,7 @@ class ScrollableTest {
                 total += it
                 it
             },
-            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+            flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
             animationClock = monotonicFrameAnimationClockOf(coroutineContext),
             interactionState = interactionState
         )
@@ -894,7 +893,7 @@ class ScrollableTest {
     }
 
     @Test
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_interactionState_resetWhenDisposed() = runBlocking {
         val interactionState = InteractionState()
         var emitScrollableBox by mutableStateOf(true)
@@ -904,7 +903,7 @@ class ScrollableTest {
                 total += it
                 it
             },
-            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
+            flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
             animationClock = monotonicFrameAnimationClockOf(coroutineContext),
             interactionState = interactionState
         )
@@ -953,8 +952,8 @@ class ScrollableTest {
     fun testInspectorValue() {
         val controller = ScrollableController(
             consumeScrollDelta = { it },
-            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
-            animationClock = ManualAnimationClock(0)
+            flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
+            animationClock = MockAnimationClock()
         )
         rule.setContent {
             val modifier = Modifier.scrollable(Orientation.Vertical, controller) as InspectableValue
@@ -985,14 +984,12 @@ class ScrollableTest {
         }
     }
 
-    @ExperimentalTesting
+    @ExperimentalTestApi
     private suspend fun advanceClockWhileAwaitersExist(clock: ManualFrameClock) {
         rule.awaitIdle()
         yield()
         while (clock.hasAwaiters) {
-            clock.advanceClockMillis(5000L)
-            // Give awaiters the chance to await again
-            yield()
+            clock.advanceClockOnMainThreadMillis(5000L)
         }
     }
 }

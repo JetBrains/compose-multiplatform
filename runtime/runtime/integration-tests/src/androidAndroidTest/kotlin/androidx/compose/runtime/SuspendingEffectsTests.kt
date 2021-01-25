@@ -36,7 +36,6 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
-@Suppress("DEPRECATION")
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class SuspendingEffectsTests : BaseComposeTest() {
@@ -56,7 +55,7 @@ class SuspendingEffectsTests : BaseComposeTest() {
         // Used as a signal that LaunchedTask will await
         val ch = Channel<Unit>(Channel.CONFLATED)
         compose {
-            LaunchedTask {
+            LaunchedEffect(Unit) {
                 counter++
                 ch.receive()
                 counter++
@@ -79,15 +78,16 @@ class SuspendingEffectsTests : BaseComposeTest() {
         var choreographerTime by mutableStateOf(Long.MIN_VALUE)
         var awaitFrameTime by mutableStateOf(Long.MAX_VALUE)
         compose {
-            LaunchedTask {
+            LaunchedEffect(Unit) {
                 withFrameNanos {
                     awaitFrameTime = it
                 }
             }
-            onCommit(true) {
+            DisposableEffect(true) {
                 Choreographer.getInstance().postFrameCallback { frameTimeNanos ->
                     choreographerTime = frameTimeNanos
                 }
+                onDispose { }
             }
         }.then {
             assertNotEquals(choreographerTime, Long.MIN_VALUE, "Choreographer callback never ran")
@@ -105,7 +105,7 @@ class SuspendingEffectsTests : BaseComposeTest() {
         var awaitFrameTime by mutableStateOf(Long.MAX_VALUE)
         compose {
             val scope = rememberCoroutineScope()
-            onCommit(true) {
+            DisposableEffect(true) {
                 scope.launch {
                     withFrameNanos {
                         awaitFrameTime = it
@@ -114,6 +114,7 @@ class SuspendingEffectsTests : BaseComposeTest() {
                 Choreographer.getInstance().postFrameCallback { frameTimeNanos ->
                     choreographerTime = frameTimeNanos
                 }
+                onDispose { }
             }
         }.then {
             assertNotEquals(choreographerTime, Long.MIN_VALUE, "Choreographer callback never ran")
@@ -172,11 +173,11 @@ class SuspendingEffectsTests : BaseComposeTest() {
 
         compose {
             recomposerClock = currentComposer.applyCoroutineContext[MonotonicFrameClock]
-            LaunchedTask {
+            LaunchedEffect(Unit) {
                 launchedTaskClock = coroutineContext[MonotonicFrameClock]
             }
             val rememberedScope = rememberCoroutineScope()
-            onCommit {
+            SideEffect {
                 rememberCoroutineScopeFrameClock =
                     rememberedScope.coroutineContext[MonotonicFrameClock]
             }
@@ -197,10 +198,10 @@ class SuspendingEffectsTests : BaseComposeTest() {
         compose {
             // Confirms that these run "out of order" with respect to one another because
             // the launch runs dispatched.
-            LaunchedTask {
+            LaunchedEffect(Unit) {
                 launchRanAfter = onCommitRan
             }
-            onCommit {
+            SideEffect {
                 onCommitRan = true
             }
         }.then {

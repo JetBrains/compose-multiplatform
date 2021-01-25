@@ -25,11 +25,11 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.ResourceFont
-import androidx.compose.ui.text.font.asFontFamily
 import androidx.compose.ui.text.font.test.R
+import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
@@ -46,11 +46,11 @@ import org.junit.runner.RunWith
 @OptIn(InternalTextApi::class)
 class CoreTextFieldSoftWrapTest {
 
-    private val fontFamily = ResourceFont(
+    private val fontFamily = Font(
         resId = R.font.sample_font,
         weight = FontWeight.Normal,
         style = FontStyle.Normal
-    ).asFontFamily()
+    ).toFontFamily()
 
     @get:Rule
     val rule = createComposeRule()
@@ -81,6 +81,8 @@ class CoreTextFieldSoftWrapTest {
                 )
             }
         }
+
+        rule.waitUntil { width != null }
 
         with(density) {
             assertThat(textLayout).isNotNull()
@@ -116,6 +118,8 @@ class CoreTextFieldSoftWrapTest {
                 )
             }
         }
+
+        rule.waitUntil { width != null }
 
         with(density) {
             assertThat(textLayout).isNotNull()

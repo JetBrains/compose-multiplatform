@@ -65,11 +65,63 @@ interface Font {
  *
  * @see FontFamily
  */
-data class ResourceFont(
+class ResourceFont internal constructor(
     val resId: Int,
     override val weight: FontWeight = FontWeight.Normal,
     override val style: FontStyle = FontStyle.Normal
-) : Font
+) : Font {
+
+    fun copy(
+        resId: Int = this.resId,
+        weight: FontWeight = this.weight,
+        style: FontStyle = this.style
+    ): ResourceFont {
+        return ResourceFont(
+            resId = resId,
+            weight = weight,
+            style = style
+        )
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ResourceFont) return false
+        if (resId != other.resId) return false
+        if (weight != other.weight) return false
+        if (style != other.style) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = resId
+        result = 31 * result + weight.hashCode()
+        result = 31 * result + style.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "ResourceFont(resId=$resId, weight=$weight, style=$style)"
+    }
+}
+
+/**
+ * Creates a Font with using resource ID.
+ *
+ * @param resId The resource ID of the font file in font resources. i.e. "R.font.myfont".
+ * @param weight The weight of the font. The system uses this to match a font to a font request
+ * that is given in a [androidx.compose.ui.text.SpanStyle].
+ * @param style The style of the font, normal or italic. The system uses this to match a font to a
+ * font request that is given in a [androidx.compose.ui.text.SpanStyle].
+ *
+ * @see FontFamily
+ */
+@Deprecated("Use Font() instead", ReplaceWith("Font(resId, weight, style)"))
+@Stable
+fun font(
+    resId: Int,
+    weight: FontWeight = FontWeight.Normal,
+    style: FontStyle = FontStyle.Normal
+): Font = ResourceFont(resId, weight, style)
 
 /**
  * Creates a Font with using resource ID.
@@ -83,7 +135,7 @@ data class ResourceFont(
  * @see FontFamily
  */
 @Stable
-fun font(
+fun Font(
     resId: Int,
     weight: FontWeight = FontWeight.Normal,
     style: FontStyle = FontStyle.Normal
@@ -92,5 +144,12 @@ fun font(
 /**
  * Create a [FontFamily] from this single [font].
  */
+@Deprecated("Use toFontFamily() instead", ReplaceWith("toFontFamily()"))
 @Stable
-fun Font.asFontFamily() = fontFamily(this)
+fun Font.asFontFamily() = FontFamily(this)
+
+/**
+ * Create a [FontFamily] from this single [font].
+ */
+@Stable
+fun Font.toFontFamily() = FontFamily(this)

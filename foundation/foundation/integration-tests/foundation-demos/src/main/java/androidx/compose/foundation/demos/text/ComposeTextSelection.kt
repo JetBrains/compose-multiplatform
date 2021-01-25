@@ -16,11 +16,11 @@
 
 package androidx.compose.foundation.demos.text
 
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -37,15 +37,23 @@ import androidx.compose.ui.text.withStyle
 
 @Composable
 fun TextSelectionDemo() {
-    ScrollableColumn {
-        TagLine(tag = "selection")
-        TextDemoSelection()
-        TagLine(tag = "selection with string input")
-        TextDemoSelectionWithStringInput()
-        TagLine(tag = "selection in 2D Array Vertical")
-        TextDemoSelection2DArrayVertical()
-        TagLine(tag = "enable and disable selection")
-        TextDemoSelectionEnableAndDisable()
+    LazyColumn {
+        item {
+            TagLine(tag = "selection")
+            TextDemoSelection()
+        }
+        item {
+            TagLine(tag = "selection with string input")
+            TextDemoSelectionWithStringInput()
+        }
+        item {
+            TagLine(tag = "selection in 2D Array Vertical")
+            TextDemoSelection2DArrayVertical()
+        }
+        item {
+            TagLine(tag = "enable and disable selection")
+            TextDemoSelectionEnableAndDisable()
+        }
     }
 }
 
@@ -77,7 +85,7 @@ fun TextDemoSelection() {
                     append(displayTextHindi)
                 }
 
-                append(text = "$arabicSentence")
+                append(text = arabicSentence)
 
                 withStyle(SpanStyle(localeList = LocaleList("zh-CN"))) {
                     append("\n先帝创业未半而中道崩殂，今天下三分，益州疲弊，此诚危急存亡之秋也。")

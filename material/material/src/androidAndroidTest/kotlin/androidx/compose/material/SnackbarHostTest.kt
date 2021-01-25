@@ -30,7 +30,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -38,7 +37,6 @@ import org.junit.runner.RunWith
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-@OptIn(ExperimentalMaterialApi::class)
 class SnackbarHostTest {
 
     @get:Rule
@@ -66,9 +64,8 @@ class SnackbarHostTest {
             hostState.showSnackbar("3")
             Truth.assertThat(resultedInvocation).isEqualTo("123")
         }
-        runBlocking {
-            job.join()
-        }
+
+        rule.waitUntil { job.isCompleted }
     }
 
     @Test
@@ -95,9 +92,8 @@ class SnackbarHostTest {
                 hostState.showSnackbar(it.toString())
             }
         }
-        runBlocking {
-            parent.children.forEach { it.join() }
-        }
+
+        rule.waitUntil { parent.children.all { it.isCompleted } }
         Truth.assertThat(resultedInvocation).isEqualTo("0123456789")
     }
 
@@ -118,9 +114,9 @@ class SnackbarHostTest {
         }
         rule.onNodeWithText("press")
             .performClick()
-        runBlocking {
-            job1.join()
-        }
+
+        rule.waitUntil { job1.isCompleted }
+
         val job2 = scope.launch {
             val result = hostState.showSnackbar(
                 message = "1",
@@ -128,9 +124,8 @@ class SnackbarHostTest {
             )
             Truth.assertThat(result).isEqualTo(SnackbarResult.Dismissed)
         }
-        runBlocking {
-            job2.join()
-        }
+
+        rule.waitUntil(timeoutMillis = 5_000) { job2.isCompleted }
     }
 
     @Test
@@ -154,9 +149,7 @@ class SnackbarHostTest {
             delay(10)
             switchState.value = false
         }
-        runBlocking {
-            job2.join()
-            job1.join()
-        }
+
+        rule.waitUntil { job1.isCompleted && job2.isCompleted }
     }
 }

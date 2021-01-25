@@ -16,19 +16,13 @@
 
 package androidx.compose.ui.test.junit4.android
 
-import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.snapshots.Snapshot
-import androidx.compose.ui.node.Owner
-import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.IdlingResource
 import androidx.compose.ui.test.TestAnimationClock
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.junit4.isOnUiThread
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import org.junit.runners.model.Statement
 
 /**
  * Register compose's idling check to Espresso.
@@ -72,7 +66,7 @@ fun unregisterComposeFromEspresso(): Unit = throw UnsupportedOperationException(
     level = DeprecationLevel.ERROR,
     replaceWith = ReplaceWith("composeIdlingResource.registerTestClock(clock)")
 )
-@ExperimentalTesting
+@ExperimentalTestApi
 @Suppress("UNUSED_PARAMETER", "DocumentExceptions")
 fun registerTestClock(clock: TestAnimationClock): Unit = throw UnsupportedOperationException(
     "Global (un)registration of TestAnimationClocks is no longer supported. Register clocks " +
@@ -88,7 +82,7 @@ fun registerTestClock(clock: TestAnimationClock): Unit = throw UnsupportedOperat
     level = DeprecationLevel.ERROR,
     replaceWith = ReplaceWith("composeIdlingResource.unregisterTestClock(clock)")
 )
-@ExperimentalTesting
+@ExperimentalTestApi
 @Suppress("UNUSED_PARAMETER", "DocumentExceptions")
 fun unregisterTestClock(clock: TestAnimationClock): Unit = throw UnsupportedOperationException(
     "Global (un)registration of TestAnimationClocks is no longer supported. Register clocks " +
@@ -102,12 +96,11 @@ fun unregisterTestClock(clock: TestAnimationClock): Unit = throw UnsupportedOper
  * resource is automatically registered when any compose testing APIs are used including
  * [createAndroidComposeRule].
  */
-internal class ComposeIdlingResource : IdlingResource {
+internal class ComposeIdlingResource(
+    private val composeRootRegistry: ComposeRootRegistry
+) : IdlingResource {
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    internal val androidOwnerRegistry = AndroidOwnerRegistry()
-
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     private val clocks = mutableSetOf<TestAnimationClock>()
 
     private var hadAnimationClocksIdle = true
@@ -126,10 +119,10 @@ internal class ComposeIdlingResource : IdlingResource {
             hadNoSnapshotChanges = !Snapshot.current.hasPendingChanges()
             hadNoRecomposerChanges = !Recomposer.current().hasInvalidations()
             hadAnimationClocksIdle = areAllClocksIdle()
-            val owners = androidOwnerRegistry.getUnfilteredOwners()
-            hadNoPendingMeasureLayout = !owners.any { it.hasPendingMeasureOrLayout }
+            val composeRoots = composeRootRegistry.getUnfilteredComposeRoots()
+            hadNoPendingMeasureLayout = !composeRoots.any { it.hasPendingMeasureOrLayout }
             // TODO(b/174244530): Include hadNoPendingDraw when it is reliable
-//            hadNoPendingDraw = !owners.any {
+//            hadNoPendingDraw = !composeRoots.any {
 //                val hasContent = it.view.measuredWidth != 0 && it.view.measuredHeight != 0
 //                it.view.isDirty && (hasContent || it.view.isLayoutRequested)
 //            }
@@ -142,21 +135,21 @@ internal class ComposeIdlingResource : IdlingResource {
                 hadNoPendingDraw*/
         }
 
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun registerTestClock(clock: TestAnimationClock) {
         synchronized(clocks) {
             clocks.add(clock)
         }
     }
 
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     fun unregisterTestClock(clock: TestAnimationClock) {
         synchronized(clocks) {
             clocks.remove(clock)
         }
     }
 
-    @OptIn(ExperimentalTesting::class)
+    @OptIn(ExperimentalTestApi::class)
     private fun areAllClocksIdle(): Boolean {
         return synchronized(clocks) {
             clocks.all { it.isIdle }
@@ -171,7 +164,9 @@ internal class ComposeIdlingResource : IdlingResource {
         // TODO(b/174244530): Include hadNoPendingDraw when it is reliable
 //        val hadPendingDraw = !hadNoPendingDraw
 
-        val wasIdle = !hadSnapshotChanges && !hadRecomposerChanges && !hadRunningAnimations
+        val wasIdle = !hadSnapshotChanges && !hadRecomposerChanges && !hadRunningAnimations &&
+            // TODO(b/174244530): Include hadNoPendingDraw when it is reliable
+            !hadPendingMeasureLayout /*&& !hadPendingDraw*/
 
         if (wasIdle) {
             return null
@@ -185,70 +180,17 @@ internal class ComposeIdlingResource : IdlingResource {
         if (busyRecomposing) {
             busyReasons.add("pending recompositions")
         }
+        if (hadPendingMeasureLayout) {
+            busyReasons.add("pending measure/layout")
+        }
 
         var message = "${javaClass.simpleName} is busy due to ${busyReasons.joinToString(", ")}.\n"
         if (busyRecomposing) {
             message += "- Note: Timeout on pending recomposition means that there are most likely" +
                 " infinite re-compositions happening in the tested code.\n"
             message += "- Debug: hadRecomposerChanges = $hadRecomposerChanges, "
-            message += "hadSnapshotChanges = $hadSnapshotChanges, "
-            message += "hadPendingMeasureLayout = $hadPendingMeasureLayout"
-            // TODO(b/174244530): Include hadNoPendingDraw when it is reliable
-//            message += ", hadPendingDraw = $hadPendingDraw"
+            message += "hadSnapshotChanges = $hadSnapshotChanges"
         }
         return message
-    }
-
-    fun waitForIdle() {
-        check(!isOnUiThread()) {
-            "Functions that involve synchronization (Assertions, Actions, Synchronization; " +
-                "e.g. assertIsSelected(), doClick(), runOnIdle()) cannot be run " +
-                "from the main thread. Did you nest such a function inside " +
-                "runOnIdle {}, runOnUiThread {} or setContent {}?"
-        }
-
-        // First wait until we have an AndroidOwner (in case an Activity is being started)
-        androidOwnerRegistry.waitForAndroidOwners()
-        // Then await composition(s)
-        runEspressoOnIdle()
-
-        // TODO(b/155774664): waitForAndroidOwners() may be satisfied by an AndroidOwner from an
-        //  Activity that is about to be paused, in cases where a new Activity is being started.
-        //  That means that AndroidOwnerRegistry.getOwners() may still return an empty list
-        //  between now and when the new Activity has created its AndroidOwner, even though
-        //  waitForAndroidOwners() suggests that we are now guaranteed one.
-    }
-
-    @ExperimentalTesting
-    suspend fun awaitIdle() {
-        // TODO(b/169038516): when we can query AndroidOwners for measure or layout, remove
-        //  runEspressoOnIdle() and replace it with a suspend fun that loops while the
-        //  snapshot or the recomposer has pending changes, clocks are busy or owners have
-        //  pending measures or layouts; and do the await on AndroidUiDispatcher.Main
-        // We use Espresso to wait for composition, measure, layout and draw,
-        // and Espresso needs to be called from a non-ui thread; so use Dispatchers.IO
-        withContext(Dispatchers.IO) {
-            // First wait until we have an AndroidOwner (in case an Activity is being started)
-            androidOwnerRegistry.awaitAndroidOwners()
-            // Then await composition(s)
-            runEspressoOnIdle()
-        }
-    }
-
-    fun getOwners(): Set<Owner> {
-        // TODO(pavlis): Instead of returning a flatMap, let all consumers handle a tree
-        //  structure. In case of multiple AndroidOwners, add a fake root
-        waitForIdle()
-
-        return androidOwnerRegistry.getOwners().also {
-            // TODO(b/153632210): This check should be done by callers of collectOwners
-            check(it.isNotEmpty()) {
-                "No compose views found in the app. Is your Activity resumed?"
-            }
-        }
-    }
-
-    fun getStatementFor(base: Statement): Statement {
-        return androidOwnerRegistry.getStatementFor(base)
     }
 }

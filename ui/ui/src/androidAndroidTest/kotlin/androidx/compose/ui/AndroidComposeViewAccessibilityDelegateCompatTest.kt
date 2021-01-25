@@ -28,25 +28,33 @@ import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.platform.AmbientClipboardManager
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat
-import androidx.compose.ui.semantics.AccessibilityRangeInfo
-import androidx.compose.ui.semantics.AccessibilityScrollState
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
+import androidx.compose.ui.semantics.ScrollAxisRange
 import androidx.compose.ui.semantics.SemanticsModifierCore
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsWrapper
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.copyText
+import androidx.compose.ui.semantics.cutText
+import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.ui.semantics.stateDescriptionRange
+import androidx.compose.ui.semantics.progressBarRangeInfo
 import androidx.compose.ui.semantics.dismiss
 import androidx.compose.ui.semantics.focused
 import androidx.compose.ui.semantics.getTextLayoutResult
+import androidx.compose.ui.semantics.horizontalScrollAxisRange
 import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.onLongClick
 import androidx.compose.ui.semantics.pasteText
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.setProgress
 import androidx.compose.ui.semantics.setSelection
 import androidx.compose.ui.semantics.setText
 import androidx.compose.ui.semantics.text
 import androidx.compose.ui.semantics.textSelectionRange
-import androidx.compose.ui.semantics.verticalAccessibilityScrollState
+import androidx.compose.ui.semantics.verticalScrollAxisRange
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextRange
@@ -61,6 +69,7 @@ import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -80,6 +89,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
     private lateinit var accessibilityDelegate: AndroidComposeViewAccessibilityDelegateCompat
     private lateinit var container: ViewGroup
     private lateinit var androidComposeView: AndroidComposeView
+    private lateinit var info: AccessibilityNodeInfoCompat
 
     @Before
     fun setup() {
@@ -99,27 +109,30 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
             accessibilityDelegate = AndroidComposeViewAccessibilityDelegateCompat(
                 androidComposeView
             )
+            accessibilityDelegate.accessibilityForceEnabledForTesting = true
         }
         rule.setContent {
             AmbientClipboardManager.current.setText(AnnotatedString("test"))
         }
+        info = AccessibilityNodeInfoCompat.obtain()
+    }
+
+    @After
+    fun cleanup() {
+        info.recycle()
     }
 
     @Test
     fun testPopulateAccessibilityNodeInfoProperties_general() {
-        val info = AccessibilityNodeInfoCompat.obtain()
         val clickActionLabel = "click"
         val dismissActionLabel = "dismiss"
         val stateDescription = "checked"
-        val semanticsModifier = SemanticsModifierCore(1, true, false) {
+        val semanticsNode = createSemanticsNodeWithProperties(1, true) {
             this.stateDescription = stateDescription
+            heading()
             onClick(clickActionLabel) { true }
             dismiss(dismissActionLabel) { true }
         }
-        val semanticsNode = SemanticsNode(
-            SemanticsWrapper(InnerPlaceable(LayoutNode()), semanticsModifier),
-            true
-        )
         accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
         assertEquals("android.view.View", info.className)
         assertTrue(
@@ -154,22 +167,140 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
             }
         }
         assertEquals(stateDescription, stateDescriptionResult)
+        assertTrue(info.isHeading)
         assertTrue(info.isClickable)
         assertTrue(info.isVisibleToUser)
     }
 
     @Test
+    fun testPopulateAccessibilityNodeInfoProperties_disabled() {
+        val semanticsNode = createSemanticsNodeWithProperties(1, true) {
+            disabled()
+            text = AnnotatedString("text")
+            horizontalScrollAxisRange = ScrollAxisRange(0f, 5f)
+            onClick { true }
+            onLongClick { true }
+            copyText { true }
+            pasteText { true }
+            cutText { true }
+            setText { true }
+            setSelection { _, _, _ -> true }
+            dismiss { true }
+        }
+        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
+        assertTrue(info.isClickable)
+        assertFalse(
+            containsAction(
+                info,
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_CLICK
+            )
+        )
+        assertTrue(info.isLongClickable)
+        assertFalse(
+            containsAction(
+                info,
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_LONG_CLICK
+            )
+        )
+        assertTrue(
+            containsAction(
+                info,
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_COPY
+            )
+        )
+        assertFalse(
+            containsAction(
+                info,
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_PASTE
+            )
+        )
+        assertFalse(
+            containsAction(
+                info,
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_CUT
+            )
+        )
+        assertFalse(
+            containsAction(
+                info,
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SET_TEXT
+            )
+        )
+        // This is the default ACTION_SET_SELECTION.
+        assertTrue(
+            containsAction(
+                info,
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SET_SELECTION
+            )
+        )
+        assertFalse(
+            containsAction(
+                info,
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_DISMISS
+            )
+        )
+        assertFalse(
+            containsAction(
+                info,
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_FORWARD
+            )
+        )
+        assertFalse(
+            containsAction(
+                info,
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_RIGHT
+            )
+        )
+    }
+
+    @Test
+    fun testPopulateAccessibilityNodeInfoProperties_role() {
+        var semanticsNode = createSemanticsNodeWithProperties(1, true) {
+            role = Role.Button
+        }
+        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
+        assertEquals("android.widget.Button", info.className)
+        info.recycle()
+
+        info = AccessibilityNodeInfoCompat.obtain()
+        semanticsNode = createSemanticsNodeWithProperties(1, true) {
+            role = Role.Switch
+        }
+        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
+        assertEquals("android.widget.Switch", info.className)
+        info.recycle()
+
+        info = AccessibilityNodeInfoCompat.obtain()
+        semanticsNode = createSemanticsNodeWithProperties(1, true) {
+            role = Role.Checkbox
+        }
+        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
+        assertEquals("android.widget.CheckBox", info.className)
+        info.recycle()
+
+        info = AccessibilityNodeInfoCompat.obtain()
+        semanticsNode = createSemanticsNodeWithProperties(1, true) {
+            role = Role.RadioButton
+        }
+        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
+        assertEquals("android.widget.RadioButton", info.className)
+        info.recycle()
+
+        info = AccessibilityNodeInfoCompat.obtain()
+        semanticsNode = createSemanticsNodeWithProperties(1, true) {
+            role = Role.Tab
+        }
+        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
+        assertEquals("Tab", info.roleDescription)
+    }
+
+    @Test
     fun testPopulateAccessibilityNodeInfoProperties_SeekBar() {
-        val info = AccessibilityNodeInfoCompat.obtain()
         val setProgressActionLabel = "setProgress"
-        val semanticsModifier = SemanticsModifierCore(1, true, false) {
-            stateDescriptionRange = AccessibilityRangeInfo(0.5f, 0f..1f, 6)
+        val semanticsNode = createSemanticsNodeWithProperties(1, true) {
+            progressBarRangeInfo = ProgressBarRangeInfo(0.5f, 0f..1f, 6)
             setProgress(setProgressActionLabel) { true }
         }
-        val semanticsNode = SemanticsNode(
-            SemanticsWrapper(InnerPlaceable(LayoutNode()), semanticsModifier),
-            true
-        )
         accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
         assertEquals("android.widget.SeekBar", info.className)
         assertEquals(
@@ -194,11 +325,10 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
 
     @Test
     fun testPopulateAccessibilityNodeInfoProperties_EditText() {
-        val info = AccessibilityNodeInfoCompat.obtain()
         val setSelectionActionLabel = "setSelection"
         val setTextActionLabel = "setText"
         val text = "hello"
-        val semanticsModifier = SemanticsModifierCore(1, true, false) {
+        val semanticsNode = createSemanticsNodeWithProperties(1, true) {
             this.text = AnnotatedString(text)
             this.textSelectionRange = TextRange(1)
             this.focused = true
@@ -206,10 +336,6 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
             setText(setTextActionLabel) { true }
             setSelection(setSelectionActionLabel) { _, _, _ -> true }
         }
-        val semanticsNode = SemanticsNode(
-            SemanticsWrapper(InnerPlaceable(LayoutNode()), semanticsModifier),
-            true
-        )
         accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
         assertEquals("android.widget.EditText", info.className)
         assertEquals(SpannableString(text), info.text)
@@ -266,7 +392,6 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
 
     @Test
     fun test_PasteAction_ifFocused() {
-        val info = AccessibilityNodeInfoCompat.obtain()
         val semanticsNode = createSemanticsNodeWithProperties(1, true) {
             focused = true
             pasteText {
@@ -289,7 +414,6 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
 
     @Test
     fun test_noPasteAction_ifUnfocused() {
-        val info = AccessibilityNodeInfoCompat.obtain()
         val semanticsNode = createSemanticsNodeWithProperties(1, true) {
             pasteText {
                 true
@@ -310,14 +434,17 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
     }
 
     @Test
-    fun notSendScrollEvent_whenOnlyAccessibilityScrollStateMaxValueChanges() {
+    fun notSendScrollEvent_whenOnlyScrollAxisRangeMaxValueChanges() {
         val oldSemanticsNode = createSemanticsNodeWithProperties(1, true) {
-            this.verticalAccessibilityScrollState = AccessibilityScrollState(0f, 0f, false)
+            this.verticalScrollAxisRange = ScrollAxisRange(0f, 0f, false)
         }
-        accessibilityDelegate.semanticsNodes[1] =
-            AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(oldSemanticsNode)
+        accessibilityDelegate.previousSemanticsNodes[1] =
+            AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(
+                oldSemanticsNode,
+                mapOf()
+            )
         val newSemanticsNode = createSemanticsNodeWithProperties(1, true) {
-            this.verticalAccessibilityScrollState = AccessibilityScrollState(0f, 5f, false)
+            this.verticalScrollAxisRange = ScrollAxisRange(0f, 5f, false)
         }
         val newNodes = mutableMapOf<Int, SemanticsNode>()
         newNodes[1] = newSemanticsNode
@@ -331,40 +458,25 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
                 }
             )
         )
-        verify(container, times(1)).requestSendAccessibilityEvent(
-            eq(androidComposeView),
-            argThat(
-                ArgumentMatcher {
-                    it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
-                        it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_SUBTREE
-                }
-            )
-        )
     }
 
     @Test
-    fun sendScrollEvent_whenAccessibilityScrollStateValueChanges() {
+    fun sendScrollEvent_whenScrollAxisRangeValueChanges() {
         val oldSemanticsNode = createSemanticsNodeWithProperties(2, false) {
-            this.verticalAccessibilityScrollState = AccessibilityScrollState(0f, 5f, false)
+            this.verticalScrollAxisRange = ScrollAxisRange(0f, 5f, false)
         }
-        accessibilityDelegate.semanticsNodes[1] =
-            AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(oldSemanticsNode)
+        accessibilityDelegate.previousSemanticsNodes[2] =
+            AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(
+                oldSemanticsNode,
+                mapOf()
+            )
         val newSemanticsNode = createSemanticsNodeWithProperties(2, false) {
-            this.verticalAccessibilityScrollState = AccessibilityScrollState(2f, 5f, false)
+            this.verticalScrollAxisRange = ScrollAxisRange(2f, 5f, false)
         }
         val newNodes = mutableMapOf<Int, SemanticsNode>()
-        newNodes[1] = newSemanticsNode
+        newNodes[2] = newSemanticsNode
         accessibilityDelegate.sendSemanticsPropertyChangeEvents(newNodes)
 
-        verify(container, times(1)).requestSendAccessibilityEvent(
-            eq(androidComposeView),
-            argThat(
-                ArgumentMatcher {
-                    it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
-                        it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_SUBTREE
-                }
-            )
-        )
         verify(container, times(1)).requestSendAccessibilityEvent(
             eq(androidComposeView),
             argThat(
@@ -376,6 +488,86 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
                         } else {
                             true
                         }
+                }
+            )
+        )
+    }
+
+    @Test
+    fun sendWindowContentChangeUndefinedEventByDefault_whenPropertyAdded() {
+        val oldSemanticsNode = createSemanticsNodeWithProperties(1, false) {}
+        accessibilityDelegate.previousSemanticsNodes[1] =
+            AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(
+                oldSemanticsNode,
+                mapOf()
+            )
+        val newSemanticsNode = createSemanticsNodeWithProperties(1, false) {
+            disabled()
+        }
+        val newNodes = mutableMapOf<Int, SemanticsNode>()
+        newNodes[1] = newSemanticsNode
+        accessibilityDelegate.sendSemanticsPropertyChangeEvents(newNodes)
+
+        verify(container, times(1)).requestSendAccessibilityEvent(
+            eq(androidComposeView),
+            argThat(
+                ArgumentMatcher {
+                    it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
+                        it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_UNDEFINED
+                }
+            )
+        )
+    }
+
+    @Test
+    fun sendWindowContentChangeUndefinedEventByDefault_whenPropertyRemoved() {
+        val oldSemanticsNode = createSemanticsNodeWithProperties(1, false) {
+            disabled()
+        }
+        accessibilityDelegate.previousSemanticsNodes[1] =
+            AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(
+                oldSemanticsNode,
+                mapOf()
+            )
+        val newSemanticsNode = createSemanticsNodeWithProperties(1, false) {}
+        val newNodes = mutableMapOf<Int, SemanticsNode>()
+        newNodes[1] = newSemanticsNode
+        accessibilityDelegate.sendSemanticsPropertyChangeEvents(newNodes)
+
+        verify(container, times(1)).requestSendAccessibilityEvent(
+            eq(androidComposeView),
+            argThat(
+                ArgumentMatcher {
+                    it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
+                        it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_UNDEFINED
+                }
+            )
+        )
+    }
+
+    @Test
+    fun sendWindowContentChangeUndefinedEventByDefault_onlyOnce_whenMultiplePropertiesChange() {
+        val oldSemanticsNode = createSemanticsNodeWithProperties(1, false) {
+            disabled()
+        }
+        accessibilityDelegate.previousSemanticsNodes[1] =
+            AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(
+                oldSemanticsNode,
+                mapOf()
+            )
+        val newSemanticsNode = createSemanticsNodeWithProperties(1, false) {
+            onClick { true }
+        }
+        val newNodes = mutableMapOf<Int, SemanticsNode>()
+        newNodes[1] = newSemanticsNode
+        accessibilityDelegate.sendSemanticsPropertyChangeEvents(newNodes)
+
+        verify(container, times(1)).requestSendAccessibilityEvent(
+            eq(androidComposeView),
+            argThat(
+                ArgumentMatcher {
+                    it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
+                        it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_UNDEFINED
                 }
             )
         )

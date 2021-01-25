@@ -22,13 +22,13 @@ import android.view.View
 import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.animation.core.rootAnimationClockFactory
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.ambientOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.neverEqualPolicy
-import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.savedinstancestate.AmbientUiSavedStateRegistry
@@ -37,6 +37,7 @@ import androidx.compose.runtime.staticAmbientOf
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelStoreOwner
+import androidx.savedstate.SavedStateRegistryOwner
 
 /**
  * The Android [Configuration]. The [Configuration] is useful for determining how to organize the
@@ -96,6 +97,11 @@ val LifecycleOwnerAmbient get() = AmbientLifecycleOwner
  * The ambient containing the current [LifecycleOwner].
  */
 val AmbientLifecycleOwner = staticAmbientOf<LifecycleOwner>()
+
+/**
+ * The ambient containing the current [SavedStateRegistryOwner].
+ */
+val AmbientSavedStateRegistryOwner = staticAmbientOf<SavedStateRegistryOwner>()
 
 /**
  * The ambient containing the current Compose [View].
@@ -161,14 +167,17 @@ internal fun ProvideAndroidAmbients(owner: AndroidComposeView, content: @Composa
     val uiSavedStateRegistry = remember {
         DisposableUiSavedStateRegistry(view, viewTreeOwners.savedStateRegistryOwner)
     }
-    onDispose {
-        uiSavedStateRegistry.dispose()
+    DisposableEffect(Unit) {
+        onDispose {
+            uiSavedStateRegistry.dispose()
+        }
     }
 
     Providers(
         AmbientConfiguration provides configuration,
         AmbientContext provides context,
         AmbientLifecycleOwner provides viewTreeOwners.lifecycleOwner,
+        AmbientSavedStateRegistryOwner provides viewTreeOwners.savedStateRegistryOwner,
         AmbientUiSavedStateRegistry provides uiSavedStateRegistry,
         AmbientView provides owner.view,
         AmbientViewModelStoreOwner provides viewTreeOwners.viewModelStoreOwner

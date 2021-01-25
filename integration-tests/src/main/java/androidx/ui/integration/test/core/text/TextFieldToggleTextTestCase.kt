@@ -34,7 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.EditOperation
+import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.PlatformTextInputService
@@ -103,13 +103,13 @@ class TextFieldToggleTextTestCase(
         override fun startInput(
             value: TextFieldValue,
             imeOptions: ImeOptions,
-            onEditCommand: (List<EditOperation>) -> Unit,
+            onEditCommand: (List<EditCommand>) -> Unit,
             onImeActionPerformed: (ImeAction) -> Unit
         ) { /*do nothing*/ }
         override fun stopInput() { /*do nothing*/ }
         override fun showSoftwareKeyboard() { /*do nothing*/ }
         override fun hideSoftwareKeyboard() { /*do nothing*/ }
-        override fun onStateUpdated(oldValue: TextFieldValue?, newValue: TextFieldValue) {
+        override fun updateState(oldValue: TextFieldValue?, newValue: TextFieldValue) {
             /*do nothing*/
         }
         override fun notifyFocusedRect(rect: Rect) { /*do nothing*/ }

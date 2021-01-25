@@ -96,7 +96,7 @@ class ImageVectorTest {
             }
             val imageVector =
                 vectorResource(R.drawable.ic_pathfill_sample)
-            Image(imageVector, modifier = Modifier.testTag(testTag))
+            Image(imageVector, null, modifier = Modifier.testTag(testTag))
         }
 
         rule.onNodeWithTag(testTag).captureToImage().asAndroidBitmap().apply {

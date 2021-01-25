@@ -16,8 +16,8 @@
 
 package androidx.compose.ui.node
 
-import androidx.compose.ui.FocusRequesterModifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.FocusRequesterModifier
 import androidx.compose.ui.focus.searchChildrenForFocusNode
 
 internal class ModifiedFocusRequesterNode(

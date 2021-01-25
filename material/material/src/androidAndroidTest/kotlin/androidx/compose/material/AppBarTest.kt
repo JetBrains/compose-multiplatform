@@ -198,7 +198,7 @@ class AppBarTest {
      */
     private val FakeIcon = @Composable { modifier: Modifier ->
         IconButton(onClick = {}, modifier = modifier) {
-            Icon(ColorPainter(Color.Red))
+            Icon(ColorPainter(Color.Red), null)
         }
     }
 

@@ -33,6 +33,12 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class EffectsTests : BaseComposeTest() {
 
+    private val NeverEqualObject = object {
+        override fun equals(other: Any?): Boolean {
+            return false
+        }
+    }
+
     @After
     fun teardown() {
         clearRoots()
@@ -186,7 +192,7 @@ class EffectsTests : BaseComposeTest() {
         @Composable
         fun Unmountable() {
             log("Unmountable:start")
-            onCommit {
+            DisposableEffect(NeverEqualObject) {
                 log("onCommit")
                 onDispose {
                     log("onDispose")
@@ -239,13 +245,13 @@ class EffectsTests : BaseComposeTest() {
 
         @Composable
         fun Unmountable() {
-            onCommit {
+            DisposableEffect(NeverEqualObject) {
                 log("onCommit:a2")
                 onDispose {
                     log("onDispose:a2")
                 }
             }
-            onCommit {
+            DisposableEffect(NeverEqualObject) {
                 log("onCommit:b2")
                 onDispose {
                     log("onDispose:b2")
@@ -254,7 +260,7 @@ class EffectsTests : BaseComposeTest() {
         }
 
         compose {
-            onCommit {
+            DisposableEffect(NeverEqualObject) {
                 log("onCommit:a1")
                 onDispose {
                     log("onDispose:a1")
@@ -263,7 +269,7 @@ class EffectsTests : BaseComposeTest() {
             if (mount) {
                 Unmountable()
             }
-            onCommit {
+            DisposableEffect(NeverEqualObject) {
                 log("onCommit:b1")
                 onDispose {
                     log("onDispose:b1")
@@ -311,7 +317,7 @@ class EffectsTests : BaseComposeTest() {
 
         compose {
             trigger.subscribe()
-            onCommit {
+            DisposableEffect(NeverEqualObject) {
                 val y = x++
                 log("onCommit:$y")
                 onDispose {
@@ -345,14 +351,14 @@ class EffectsTests : BaseComposeTest() {
 
         compose {
             trigger.subscribe()
-            onCommit {
+            DisposableEffect(NeverEqualObject) {
                 val y = a++
                 log("onCommit a:$y")
                 onDispose {
                     log("dispose a:$y")
                 }
             }
-            onCommit {
+            DisposableEffect(NeverEqualObject) {
                 val y = b++
                 log("onCommit b:$y")
                 onDispose {
@@ -389,7 +395,7 @@ class EffectsTests : BaseComposeTest() {
 
         compose {
             trigger.subscribe()
-            onCommit(key) {
+            DisposableEffect(key) {
                 val y = x++
                 log("onCommit:$y")
                 onDispose {
@@ -437,7 +443,7 @@ class EffectsTests : BaseComposeTest() {
         @Composable
         fun Sub() {
             trigger.subscribe()
-            onCommit {
+            DisposableEffect(NeverEqualObject) {
                 val y = c++
                 log("onCommit c:$y")
                 onDispose {
@@ -448,7 +454,7 @@ class EffectsTests : BaseComposeTest() {
 
         compose {
             trigger.subscribe()
-            onCommit {
+            DisposableEffect(NeverEqualObject) {
                 val y = a++
                 log("onCommit a:$y")
                 onDispose {
@@ -456,7 +462,7 @@ class EffectsTests : BaseComposeTest() {
                 }
             }
 
-            onCommit {
+            DisposableEffect(NeverEqualObject) {
                 val y = b++
                 log("onCommit b:$y")
                 onDispose {
@@ -495,7 +501,7 @@ class EffectsTests : BaseComposeTest() {
         fun UpdateStateInCommit() {
             var value by remember { mutableStateOf(1) }
             readValue = value
-            onCommit {
+            SideEffect {
                 value = 2
             }
         }
@@ -516,7 +522,9 @@ class EffectsTests : BaseComposeTest() {
 
         @Composable
         fun DisposeLogger(msg: String) {
-            onDispose { log(msg) }
+            DisposableEffect(Unit) {
+                onDispose { log(msg) }
+            }
         }
 
         compose {
@@ -570,7 +578,7 @@ class EffectsTests : BaseComposeTest() {
     fun testAmbient2() {
         val MyAmbient = ambientOf<Int> { throw Exception("not set") }
 
-        var requestRecompose: (() -> Unit)? = null
+        var scope: RecomposeScope? = null
         var ambientValue = 1
 
         @Composable fun SimpleComposable2() {
@@ -579,7 +587,7 @@ class EffectsTests : BaseComposeTest() {
         }
 
         @Composable fun SimpleComposable() {
-            requestRecompose = invalidate
+            scope = currentRecomposeScope
             Providers(MyAmbient provides ambientValue++) {
                 SimpleComposable2()
                 Button(id = 123)
@@ -597,7 +605,7 @@ class EffectsTests : BaseComposeTest() {
         }.then {
             firstButton = it.findViewById<Button>(123)
             assertTrue("Expected button to be created", firstButton != null)
-            requestRecompose?.invoke()
+            scope?.invalidate()
         }.then {
             assertEquals(
                 "Expected button to not be recreated",
@@ -611,7 +619,7 @@ class EffectsTests : BaseComposeTest() {
     fun testAmbient_RecomposeScope() {
         val MyAmbient = ambientOf<Int> { throw Exception("not set") }
 
-        var requestRecompose: (() -> Unit)? = null
+        var scope: RecomposeScope? = null
         var componentComposed = false
         var ambientValue = 1
 
@@ -622,7 +630,7 @@ class EffectsTests : BaseComposeTest() {
         }
 
         @Composable fun SimpleComposable() {
-            requestRecompose = invalidate
+            scope = currentRecomposeScope
             Providers(MyAmbient provides ambientValue++) {
                 SimpleComposable2()
                 Button(id = 123)
@@ -642,7 +650,7 @@ class EffectsTests : BaseComposeTest() {
             firstButton = it.findViewById<Button>(123)
             assertTrue("Expected button to be created", firstButton != null)
             componentComposed = false
-            requestRecompose?.invoke()
+            scope?.invalidate()
         }.then {
             assertTrue("Expected component to be composed", componentComposed)
 
@@ -680,8 +688,9 @@ class EffectsTests : BaseComposeTest() {
             // rather than initial composition
             if (enabler) {
                 var state by remember { mutableStateOf(0) }
-                onCommit(Unit) {
+                DisposableEffect(Unit) {
                     state = 1
+                    onDispose { }
                 }
                 TextView(id = id, text = "$state")
                 Button(

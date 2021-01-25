@@ -29,8 +29,7 @@ import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.satisfiedBy
-import androidx.compose.ui.util.annotation.FloatRange
+import androidx.compose.ui.unit.isSatisfiedBy
 import kotlin.math.roundToInt
 
 /**
@@ -53,7 +52,7 @@ import kotlin.math.roundToInt
  */
 @Stable
 fun Modifier.aspectRatio(
-    @FloatRange(from = 0.0, to = 3.4e38 /* POSITIVE_INFINITY */, fromInclusive = false)
+    /*@FloatRange(from = 0.0, fromInclusive = false)*/
     ratio: Float,
     matchHeightConstraintsFirst: Boolean = false
 ) = this.then(
@@ -158,7 +157,7 @@ private class AspectRatioModifier(
             val height = (maxWidth / aspectRatio).roundToInt()
             if (height > 0) {
                 val size = IntSize(maxWidth, height)
-                if (!enforceConstraints || satisfiedBy(size)) {
+                if (!enforceConstraints || isSatisfiedBy(size)) {
                     return size
                 }
             }
@@ -172,7 +171,7 @@ private class AspectRatioModifier(
             val width = (maxHeight * aspectRatio).roundToInt()
             if (width > 0) {
                 val size = IntSize(width, maxHeight)
-                if (!enforceConstraints || satisfiedBy(size)) {
+                if (!enforceConstraints || isSatisfiedBy(size)) {
                     return size
                 }
             }
@@ -185,7 +184,7 @@ private class AspectRatioModifier(
         val height = (minWidth / aspectRatio).roundToInt()
         if (height > 0) {
             val size = IntSize(minWidth, height)
-            if (!enforceConstraints || satisfiedBy(size)) {
+            if (!enforceConstraints || isSatisfiedBy(size)) {
                 return size
             }
         }
@@ -197,7 +196,7 @@ private class AspectRatioModifier(
         val width = (minHeight * aspectRatio).roundToInt()
         if (width > 0) {
             val size = IntSize(width, minHeight)
-            if (!enforceConstraints || satisfiedBy(size)) {
+            if (!enforceConstraints || isSatisfiedBy(size)) {
                 return size
             }
         }

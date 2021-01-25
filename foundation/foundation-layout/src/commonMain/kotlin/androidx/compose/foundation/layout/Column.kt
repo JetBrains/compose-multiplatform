@@ -26,7 +26,6 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measured
 import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.platform.debugInspectorInfo
-import androidx.compose.ui.util.annotation.FloatRange
 
 /**
  * A layout composable that places its children in a vertical sequence. For a layout composable
@@ -61,11 +60,9 @@ import androidx.compose.ui.util.annotation.FloatRange
  * @param horizontalAlignment The horizontal alignment of the layout's children.
  *
  * @see Row
- * @see [androidx.compose.foundation.ScrollableColumn]
  * @see [androidx.compose.foundation.lazy.LazyColumn]
  */
 @Composable
-@OptIn(InternalLayoutApi::class)
 inline fun Column(
     modifier: Modifier = Modifier,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
@@ -81,11 +78,10 @@ inline fun Column(
 }
 
 @PublishedApi
-@OptIn(InternalLayoutApi::class)
 internal val DefaultColumnMeasureBlocks = rowColumnMeasureBlocks(
     orientation = LayoutOrientation.Vertical,
     arrangement = { totalSize, size, _, density, outPosition ->
-        Arrangement.Top.arrange(totalSize, size, density, outPosition)
+        with(Arrangement.Top) { density.arrange(totalSize, size, outPosition) }
     },
     arrangementSpacing = Arrangement.Top.spacing,
     crossAxisAlignment = CrossAxisAlignment.horizontal(Alignment.Start),
@@ -94,7 +90,6 @@ internal val DefaultColumnMeasureBlocks = rowColumnMeasureBlocks(
 
 @PublishedApi
 @Composable
-@OptIn(InternalLayoutApi::class)
 internal fun columnMeasureBlocks(
     verticalArrangement: Arrangement.Vertical,
     horizontalAlignment: Alignment.Horizontal
@@ -105,7 +100,7 @@ internal fun columnMeasureBlocks(
         rowColumnMeasureBlocks(
             orientation = LayoutOrientation.Vertical,
             arrangement = { totalSize, size, _, density, outPosition ->
-                verticalArrangement.arrange(totalSize, size, density, outPosition)
+                with(verticalArrangement) { density.arrange(totalSize, size, outPosition) }
             },
             arrangementSpacing = verticalArrangement.spacing,
             crossAxisAlignment = CrossAxisAlignment.horizontal(horizontalAlignment),
@@ -179,11 +174,15 @@ interface ColumnScope {
      * Otherwise, the element is allowed to be smaller - this will result in [Column] being smaller,
      * as the unused allocated height will not be redistributed to other siblings.
      *
+     * @param weight The proportional height to give to this element, as related to the total of
+     * all weighted siblings. Must be positive.
+     * @param fill When `true`, the element will occupy the whole height allocated.
+     *
      * @sample androidx.compose.foundation.layout.samples.SimpleColumn
      */
     @Stable
     fun Modifier.weight(
-        @FloatRange(from = 0.0, to = 3.4e38 /* POSITIVE_INFINITY */, fromInclusive = false)
+        /*@FloatRange(from = 0.0, fromInclusive = false)*/
         weight: Float,
         fill: Boolean = true
     ): Modifier {

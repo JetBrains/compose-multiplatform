@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.animation
 
 import androidx.compose.animation.core.AnimationVector1D
@@ -32,7 +34,7 @@ import androidx.compose.ui.unit.Bounds
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.Position
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 
@@ -41,6 +43,7 @@ import kotlin.math.roundToInt
  *
  * @param label Label for distinguishing different prop keys in Android Studio.
  */
+@Deprecated("Please use updateTransition or rememberInfiniteTransition instead.")
 class PxPropKey(override val label: String = "PxPropKey") : PropKey<Float, AnimationVector1D> {
     override val typeConverter = Float.VectorConverter
 }
@@ -50,6 +53,7 @@ class PxPropKey(override val label: String = "PxPropKey") : PropKey<Float, Anima
  *
  * @param label Label for distinguishing different prop keys in Android Studio.
  */
+@Deprecated("Please use updateTransition or rememberInfiniteTransition instead.")
 class DpPropKey(override val label: String = "DpPropKey") : PropKey<Dp, AnimationVector1D> {
     override val typeConverter = Dp.VectorConverter
 }
@@ -59,6 +63,7 @@ class DpPropKey(override val label: String = "DpPropKey") : PropKey<Dp, Animatio
  *
  * @param label Label for distinguishing different prop keys in Android Studio.
  */
+@Deprecated("Please use updateTransition or rememberInfiniteTransition instead.")
 class OffsetPropKey(
     override val label: String = "OffsetPropKey"
 ) : PropKey<Offset, AnimationVector2D> {
@@ -70,6 +75,7 @@ class OffsetPropKey(
  *
  * @param label Label for distinguishing different prop keys in Android Studio.
  */
+@Deprecated("Please use updateTransition or rememberInfiniteTransition instead.")
 class ColorPropKey(
     colorSpace: ColorSpace = ColorSpaces.Srgb,
     override val label: String = "ColorPropKey"
@@ -82,6 +88,7 @@ class ColorPropKey(
  *
  * @param label Label for distinguishing different prop keys in Android Studio.
  */
+@Deprecated("Please use updateTransition or rememberInfiniteTransition instead.")
 class RectPropKey(
     override val label: String = "RectPropKey"
 ) : PropKey<Rect, AnimationVector4D> {
@@ -137,12 +144,12 @@ private val DpToVector: TwoWayConverter<Dp, AnimationVector1D> = TwoWayConverter
 )
 
 /**
- * A type converter that converts a [Position] to a [AnimationVector2D], and vice versa.
+ * A type converter that converts a [DpOffset] to a [AnimationVector2D], and vice versa.
  */
-private val PositionToVector: TwoWayConverter<Position, AnimationVector2D> =
+private val DpOffsetToVector: TwoWayConverter<DpOffset, AnimationVector2D> =
     TwoWayConverter(
         convertToVector = { AnimationVector2D(it.x.value, it.y.value) },
-        convertFromVector = { Position(it.v1.dp, it.v2.dp) }
+        convertFromVector = { DpOffset(it.v1.dp, it.v2.dp) }
     )
 
 /**
@@ -216,11 +223,11 @@ val Dp.Companion.VectorConverter: TwoWayConverter<Dp, AnimationVector1D>
     get() = DpToVector
 
 /**
- * A type converter that converts a [Position] to a [AnimationVector2D], and vice versa.
+ * A type converter that converts a [DpOffset] to a [AnimationVector2D], and vice versa.
  */
 @Deprecated("Position.VectorConverter has been moved to animation-core library")
-val Position.Companion.VectorConverter: TwoWayConverter<Position, AnimationVector2D>
-    get() = PositionToVector
+val DpOffset.Companion.VectorConverter: TwoWayConverter<DpOffset, AnimationVector2D>
+    get() = DpOffsetToVector
 
 /**
  * A type converter that converts a [Size] to a [AnimationVector2D], and vice versa.

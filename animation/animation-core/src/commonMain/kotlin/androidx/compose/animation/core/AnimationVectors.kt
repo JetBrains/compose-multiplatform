@@ -16,8 +16,6 @@
 
 package androidx.compose.animation.core
 
-import androidx.compose.ui.util.identityHashCode
-
 /**
  * [AnimationVector] class that is the base class of [AnimationVector1D], [AnimationVector2D],
  * [AnimationVector3D] and [AnimationVector4D]. In order to animate any arbitrary type, it is
@@ -80,6 +78,20 @@ internal fun <T : AnimationVector> T.newInstance(): T {
     return this.newVector() as T
 }
 
+internal fun <T : AnimationVector> T.copy(): T {
+    val newVector = newInstance()
+    for (i in 0 until newVector.size) {
+        newVector[i] = this[i]
+    }
+    return newVector
+}
+
+internal fun <T : AnimationVector> T.copyFrom(source: T) {
+    for (i in 0 until size) {
+        this[i] = source[i]
+    }
+}
+
 /**
  * This class defines a 1D vector. It contains only one Float value that is initialized in the
  * constructor.
@@ -122,7 +134,7 @@ class AnimationVector1D(initVal: Float) : AnimationVector() {
     override fun equals(other: Any?): Boolean =
         other is AnimationVector1D && other.value == value
 
-    override fun hashCode(): Int = identityHashCode()
+    override fun hashCode(): Int = value.hashCode()
 }
 
 /**
@@ -137,6 +149,7 @@ class AnimationVector2D(v1: Float, v2: Float) : AnimationVector() {
      */
     var v1: Float = v1
         internal set
+
     /**
      * Float value field for the second dimension of the 2D vector.
      */
@@ -174,7 +187,7 @@ class AnimationVector2D(v1: Float, v2: Float) : AnimationVector() {
     override fun equals(other: Any?): Boolean =
         other is AnimationVector2D && other.v1 == v1 && other.v2 == v2
 
-    override fun hashCode(): Int = identityHashCode()
+    override fun hashCode(): Int = v1.hashCode() * 31 + v2.hashCode()
 }
 
 /**
@@ -191,11 +204,13 @@ class AnimationVector3D(v1: Float, v2: Float, v3: Float) : AnimationVector() {
      */
     var v1: Float = v1
         internal set
+
     /**
      * Float value field for the second dimension of the 3D vector.
      */
     var v2: Float = v2
         internal set
+
     /**
      * Float value field for the third dimension of the 3D vector.
      */
@@ -237,7 +252,7 @@ class AnimationVector3D(v1: Float, v2: Float, v3: Float) : AnimationVector() {
     override fun equals(other: Any?): Boolean =
         other is AnimationVector3D && other.v1 == v1 && other.v2 == v2 && other.v3 == v3
 
-    override fun hashCode(): Int = identityHashCode()
+    override fun hashCode(): Int = (v1.hashCode() * 31 + v2.hashCode()) * 31 + v3.hashCode()
 }
 
 /**
@@ -255,16 +270,19 @@ class AnimationVector4D(v1: Float, v2: Float, v3: Float, v4: Float) : AnimationV
      */
     var v1: Float = v1
         internal set
+
     /**
      * Float value field for the second dimension of the 4D vector.
      */
     var v2: Float = v2
         internal set
+
     /**
      * Float value field for the third dimension of the 4D vector.
      */
     var v3: Float = v3
         internal set
+
     /**
      * Float value field for the fourth dimension of the 4D vector.
      */
@@ -312,5 +330,6 @@ class AnimationVector4D(v1: Float, v2: Float, v3: Float, v4: Float) : AnimationV
             other.v3 == v3 &&
             other.v4 == v4
 
-    override fun hashCode(): Int = identityHashCode()
+    override fun hashCode(): Int =
+        ((v1.hashCode() * 31 + v2.hashCode()) * 31 + v3.hashCode()) * 31 + v4.hashCode()
 }

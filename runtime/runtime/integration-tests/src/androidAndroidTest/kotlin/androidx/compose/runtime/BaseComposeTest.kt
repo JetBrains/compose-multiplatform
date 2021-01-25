@@ -117,7 +117,7 @@ abstract class BaseComposeTest {
     @Composable
     fun subCompose(block: @Composable () -> Unit) {
         val container = remember { View(activity) }
-        val reference = compositionReference()
+        val reference = rememberCompositionReference()
         // TODO(b/150390669): Review use of @ComposableContract(tracked = false)
         @OptIn(ExperimentalComposeApi::class)
         compositionFor(

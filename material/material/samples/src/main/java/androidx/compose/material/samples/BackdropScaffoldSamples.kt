@@ -58,11 +58,11 @@ fun BackdropScaffoldSample() {
                 navigationIcon = {
                     if (scaffoldState.isConcealed) {
                         IconButton(onClick = { scaffoldState.reveal() }) {
-                            Icon(Icons.Default.Menu)
+                            Icon(Icons.Default.Menu, contentDescription = "Localized description")
                         }
                     } else {
                         IconButton(onClick = { scaffoldState.conceal() }) {
-                            Icon(Icons.Default.Close)
+                            Icon(Icons.Default.Close, contentDescription = "Localized description")
                         }
                     }
                 },
@@ -77,7 +77,7 @@ fun BackdropScaffoldSample() {
                             }
                         }
                     ) {
-                        Icon(Icons.Default.Favorite)
+                        Icon(Icons.Default.Favorite, contentDescription = "Localized description")
                     }
                 },
                 elevation = 0.dp,
@@ -86,13 +86,13 @@ fun BackdropScaffoldSample() {
         },
         backLayerContent = {
             LazyColumn {
-                for (i in 1..5) item {
+                items(5) {
                     ListItem(
                         Modifier.clickable {
-                            selection.value = i
+                            selection.value = it
                             scaffoldState.conceal()
                         },
-                        text = { Text("Select $i") }
+                        text = { Text("Select $it") }
                     )
                 }
             }
@@ -100,10 +100,15 @@ fun BackdropScaffoldSample() {
         frontLayerContent = {
             Text("Selection: ${selection.value}")
             LazyColumn {
-                for (i in 1..50) item {
+                items(50) {
                     ListItem(
-                        text = { Text("Item $i") },
-                        icon = { Icon(Icons.Default.Favorite) }
+                        text = { Text("Item $it") },
+                        icon = {
+                            Icon(
+                                Icons.Default.Favorite,
+                                contentDescription = "Localized description"
+                            )
+                        }
                     )
                 }
             }

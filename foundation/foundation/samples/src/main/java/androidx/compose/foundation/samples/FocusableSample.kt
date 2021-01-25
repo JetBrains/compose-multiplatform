@@ -27,13 +27,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focusRequester
+import androidx.compose.ui.focus.focusRequester
 
 @Sampled
 @Composable
 fun FocusableSample() {
-    // initialize focus requester to be able to request focus programmatically
-    val requester = FocusRequester()
+    // initialize focus reference to be able to request focus programmatically
+    val focusRequester = FocusRequester()
     // interaction state to track changes of the component's interactions (like "focused")
     val interactionState = remember { InteractionState() }
 
@@ -50,10 +50,10 @@ fun FocusableSample() {
             text = text,
             modifier = Modifier
                 // add focusRequester modifier before the focusable (or even in the parent)
-                .focusRequester(requester)
+                .focusRequester(focusRequester)
                 .focusable(interactionState = interactionState)
         )
-        Button(onClick = { requester.requestFocus() }) {
+        Button(onClick = { focusRequester.requestFocus() }) {
             Text("Bring focus to the text above")
         }
     }

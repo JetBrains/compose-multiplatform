@@ -20,9 +20,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.style.ResolvedTextDirection
+import androidx.compose.ui.unit.IntSize
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.times
@@ -40,13 +40,20 @@ class SelectionManagerDragTest {
     private val selectable = mock<Selectable>()
     private val selectionManager = SelectionManager(selectionRegistrar)
 
-    private val childToLocal_result = Offset(300f, 400f)
+    private val size = IntSize(500, 600)
+    private val globalOffset = Offset(100f, 200f)
+    private val windowOffset = Offset(100f, 200f)
+    private val childToLocalOffset = Offset(300f, 400f)
 
-    private val containerLayoutCoordinates = mock<LayoutCoordinates> {
-        on { isAttached } doReturn true
-        on { childToLocal(child = any(), childLocal = Offset(any())) } doAnswer
-            childToLocal_result
-    }
+    private val containerLayoutCoordinates = spy(
+        MockCoordinates(
+            size = size,
+            globalOffset = globalOffset,
+            windowOffset = windowOffset,
+            childToLocalOffset = childToLocalOffset,
+            isAttached = true
+        )
+    )
 
     private val startSelectable = mock<Selectable> {
         on { getHandlePosition(any(), any()) } doAnswer Offset.Zero
@@ -113,9 +120,9 @@ class SelectionManagerDragTest {
         selectionManager.handleDragObserver(isStartHandle = true).onStart(Offset.Zero)
 
         verify(containerLayoutCoordinates, times(1))
-            .childToLocal(
-                child = startLayoutCoordinates,
-                childLocal = getAdjustedCoordinates(Offset.Zero)
+            .localPositionOf(
+                sourceCoordinates = startLayoutCoordinates,
+                relativeToSource = getAdjustedCoordinates(Offset.Zero)
             )
         verify(spyLambda, times(0)).invoke(fakeResultSelection)
     }
@@ -125,9 +132,9 @@ class SelectionManagerDragTest {
         selectionManager.handleDragObserver(isStartHandle = false).onStart(Offset.Zero)
 
         verify(containerLayoutCoordinates, times(1))
-            .childToLocal(
-                child = endLayoutCoordinates,
-                childLocal = getAdjustedCoordinates(Offset.Zero)
+            .localPositionOf(
+                sourceCoordinates = endLayoutCoordinates,
+                relativeToSource = getAdjustedCoordinates(Offset.Zero)
             )
         verify(spyLambda, times(0)).invoke(fakeResultSelection)
     }
@@ -135,20 +142,21 @@ class SelectionManagerDragTest {
     @Test
     fun handleDragObserver_onDrag_startHandle_reuse_endHandle_calls_getSelection_change_selection
     () {
+        val startOffset = Offset(30f, 50f)
         val dragDistance = Offset(100f, 100f)
-        selectionManager.handleDragObserver(isStartHandle = true).onStart(Offset.Zero)
+        selectionManager.handleDragObserver(isStartHandle = true).onStart(startOffset)
 
         val result = selectionManager.handleDragObserver(isStartHandle = true).onDrag(dragDistance)
 
         verify(containerLayoutCoordinates, times(1))
-            .childToLocal(
-                child = endLayoutCoordinates,
-                childLocal = getAdjustedCoordinates(Offset.Zero)
+            .localPositionOf(
+                sourceCoordinates = endLayoutCoordinates,
+                relativeToSource = getAdjustedCoordinates(Offset.Zero)
             )
         verify(selectable, times(1))
             .getSelection(
-                startPosition = childToLocal_result + dragDistance,
-                endPosition = childToLocal_result,
+                startPosition = childToLocalOffset + dragDistance,
+                endPosition = childToLocalOffset,
                 containerLayoutCoordinates = selectionManager.requireContainerCoordinates(),
                 longPress = false,
                 isStartHandle = true,
@@ -160,22 +168,23 @@ class SelectionManagerDragTest {
     }
 
     @Test
-    fun handleDragObserver_onDrag_endHandle_resue_startHandle_calls_getSelection_change_selection
+    fun handleDragObserver_onDrag_endHandle_reuse_startHandle_calls_getSelection_change_selection
     () {
+        val startOffset = Offset(30f, 50f)
         val dragDistance = Offset(100f, 100f)
-        selectionManager.handleDragObserver(isStartHandle = false).onStart(Offset.Zero)
+        selectionManager.handleDragObserver(isStartHandle = false).onStart(startOffset)
 
         val result = selectionManager.handleDragObserver(isStartHandle = false).onDrag(dragDistance)
 
         verify(containerLayoutCoordinates, times(1))
-            .childToLocal(
-                child = startLayoutCoordinates,
-                childLocal = getAdjustedCoordinates(Offset.Zero)
+            .localPositionOf(
+                sourceCoordinates = startLayoutCoordinates,
+                relativeToSource = getAdjustedCoordinates(Offset.Zero)
             )
         verify(selectable, times(1))
             .getSelection(
-                startPosition = childToLocal_result,
-                endPosition = childToLocal_result + dragDistance,
+                startPosition = childToLocalOffset,
+                endPosition = childToLocalOffset + dragDistance,
                 containerLayoutCoordinates = selectionManager.requireContainerCoordinates(),
                 longPress = false,
                 isStartHandle = false,

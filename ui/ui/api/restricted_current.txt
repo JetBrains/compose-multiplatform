@@ -136,25 +136,10 @@ package androidx.compose.ui {
   }
 
   public final class FocusModifierKt {
-    method public static androidx.compose.ui.Modifier focus(androidx.compose.ui.Modifier);
+    method @Deprecated public static androidx.compose.ui.Modifier focus(androidx.compose.ui.Modifier);
   }
 
-  @Deprecated public interface FocusObserverModifier extends androidx.compose.ui.Modifier.Element {
-    method @Deprecated public kotlin.jvm.functions.Function1<androidx.compose.ui.focus.FocusState,kotlin.Unit> getOnFocusChange();
-    property public abstract kotlin.jvm.functions.Function1<androidx.compose.ui.focus.FocusState,kotlin.Unit> onFocusChange;
-  }
-
-  public final class FocusObserverModifierKt {
-    method @Deprecated public static androidx.compose.ui.Modifier focusObserver(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.focus.FocusState,kotlin.Unit> onFocusChange);
-  }
-
-  public interface FocusRequesterModifier extends androidx.compose.ui.Modifier.Element {
-    method public androidx.compose.ui.focus.FocusRequester getFocusRequester();
-    property public abstract androidx.compose.ui.focus.FocusRequester focusRequester;
-  }
-
-  public final class FocusRequesterModifierKt {
-    method public static androidx.compose.ui.Modifier focusRequester(androidx.compose.ui.Modifier, androidx.compose.ui.focus.FocusRequester focusRequester);
+  @kotlin.RequiresOptIn(message="Unstable API for use only between compose-ui modules sharing the same exact version, " + "subject to change without notice in major, minor, or patch releases.") public @interface InternalComposeUiApi {
   }
 
   @androidx.compose.runtime.Stable public interface Modifier {
@@ -272,8 +257,8 @@ package androidx.compose.ui.autofill {
 package androidx.compose.ui.draw {
 
   public final class AlphaKt {
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier alpha(androidx.compose.ui.Modifier, @FloatRange(from=0.0, to=1.0) float alpha);
-    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier drawOpacity(androidx.compose.ui.Modifier, @FloatRange(from=0.0, to=1.0) float opacity);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier alpha(androidx.compose.ui.Modifier, float alpha);
+    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier drawOpacity(androidx.compose.ui.Modifier, float opacity);
   }
 
   public final class CacheDrawScope implements androidx.compose.ui.unit.Density {
@@ -335,6 +320,15 @@ package androidx.compose.ui.focus {
     method public static androidx.compose.ui.Modifier onFocusChanged(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.focus.FocusState,kotlin.Unit> onFocusChanged);
   }
 
+  public enum FocusDirection {
+    enum_constant public static final androidx.compose.ui.focus.FocusDirection Down;
+    enum_constant public static final androidx.compose.ui.focus.FocusDirection Left;
+    enum_constant public static final androidx.compose.ui.focus.FocusDirection Next;
+    enum_constant public static final androidx.compose.ui.focus.FocusDirection Previous;
+    enum_constant public static final androidx.compose.ui.focus.FocusDirection Right;
+    enum_constant public static final androidx.compose.ui.focus.FocusDirection Up;
+  }
+
   public interface FocusEventModifier extends androidx.compose.ui.Modifier.Element {
     method public void onFocusEvent(androidx.compose.ui.focus.FocusState focusState);
   }
@@ -345,9 +339,51 @@ package androidx.compose.ui.focus {
 
   public interface FocusManager {
     method public void clearFocus(optional boolean forcedClear);
+    method public boolean moveFocus(androidx.compose.ui.focus.FocusDirection focusDirection);
+  }
+
+  public final class FocusModifierKt {
+    method public static androidx.compose.ui.Modifier focusModifier(androidx.compose.ui.Modifier);
   }
 
   public final class FocusNodeUtilsKt {
+  }
+
+  public final class FocusOrder {
+    ctor public FocusOrder();
+    method public androidx.compose.ui.focus.FocusRequester getDown();
+    method public androidx.compose.ui.focus.FocusRequester getEnd();
+    method public androidx.compose.ui.focus.FocusRequester getLeft();
+    method public androidx.compose.ui.focus.FocusRequester getNext();
+    method public androidx.compose.ui.focus.FocusRequester getPrevious();
+    method public androidx.compose.ui.focus.FocusRequester getRight();
+    method public androidx.compose.ui.focus.FocusRequester getStart();
+    method public androidx.compose.ui.focus.FocusRequester getUp();
+    method public void setDown(androidx.compose.ui.focus.FocusRequester p);
+    method public void setEnd(androidx.compose.ui.focus.FocusRequester p);
+    method public void setLeft(androidx.compose.ui.focus.FocusRequester p);
+    method public void setNext(androidx.compose.ui.focus.FocusRequester p);
+    method public void setPrevious(androidx.compose.ui.focus.FocusRequester p);
+    method public void setRight(androidx.compose.ui.focus.FocusRequester p);
+    method public void setStart(androidx.compose.ui.focus.FocusRequester p);
+    method public void setUp(androidx.compose.ui.focus.FocusRequester p);
+    property public final androidx.compose.ui.focus.FocusRequester down;
+    property public final androidx.compose.ui.focus.FocusRequester end;
+    property public final androidx.compose.ui.focus.FocusRequester left;
+    property public final androidx.compose.ui.focus.FocusRequester next;
+    property public final androidx.compose.ui.focus.FocusRequester previous;
+    property public final androidx.compose.ui.focus.FocusRequester right;
+    property public final androidx.compose.ui.focus.FocusRequester start;
+    property public final androidx.compose.ui.focus.FocusRequester up;
+  }
+
+  public interface FocusOrderModifier extends androidx.compose.ui.Modifier.Element {
+    method public void populateFocusOrder(androidx.compose.ui.focus.FocusOrder focusOrder);
+  }
+
+  public final class FocusOrderModifierKt {
+    method public static androidx.compose.ui.Modifier focusOrder(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.focus.FocusOrder,kotlin.Unit> focusOrderReceiver);
+    method public static androidx.compose.ui.Modifier focusOrder(androidx.compose.ui.Modifier, androidx.compose.ui.focus.FocusRequester focusRequester, kotlin.jvm.functions.Function1<? super androidx.compose.ui.focus.FocusOrder,kotlin.Unit> focusOrderReceiver);
   }
 
   public final class FocusRequester {
@@ -359,10 +395,12 @@ package androidx.compose.ui.focus {
   }
 
   public static final class FocusRequester.Companion {
-    method public androidx.compose.ui.focus.FocusRequester.Companion.FocusRequesterFactory createRefs();
+    method @androidx.compose.ui.ExperimentalComposeUiApi public androidx.compose.ui.focus.FocusRequester.Companion.FocusRequesterFactory createRefs();
+    method public androidx.compose.ui.focus.FocusRequester getDefault();
+    property public final androidx.compose.ui.focus.FocusRequester Default;
   }
 
-  public static final class FocusRequester.Companion.FocusRequesterFactory {
+  @androidx.compose.ui.ExperimentalComposeUiApi public static final class FocusRequester.Companion.FocusRequesterFactory {
     method public operator androidx.compose.ui.focus.FocusRequester component1();
     method public operator androidx.compose.ui.focus.FocusRequester component10();
     method public operator androidx.compose.ui.focus.FocusRequester component11();
@@ -385,6 +423,15 @@ package androidx.compose.ui.focus {
   public final class FocusRequesterKt {
   }
 
+  public interface FocusRequesterModifier extends androidx.compose.ui.Modifier.Element {
+    method public androidx.compose.ui.focus.FocusRequester getFocusRequester();
+    property public abstract androidx.compose.ui.focus.FocusRequester focusRequester;
+  }
+
+  public final class FocusRequesterModifierKt {
+    method public static androidx.compose.ui.Modifier focusRequester(androidx.compose.ui.Modifier, androidx.compose.ui.focus.FocusRequester focusRequester);
+  }
+
   public enum FocusState {
     enum_constant public static final androidx.compose.ui.focus.FocusState Active;
     enum_constant public static final androidx.compose.ui.focus.FocusState ActiveParent;
@@ -397,28 +444,19 @@ package androidx.compose.ui.focus {
     method public static boolean isFocused(androidx.compose.ui.focus.FocusState);
   }
 
+  public final class FocusTraversalKt {
+  }
+
 }
 
 package androidx.compose.ui.gesture {
 
   public final class ConstantsKt {
-    method public static long getDoubleTapMinTime();
-    method public static float getDoubleTapSlop();
-    method public static long getDoubleTapTimeout();
-    method public static float getDoubleTapTouchSlop();
-    method public static float getHoverTapSlop();
-    method public static long getHoverTapTimeout();
-    method public static long getJumpTapTimeout();
-    method public static long getLongPressTimeout();
-    method public static float getMaxFlingVelocity();
-    method public static float getMinFlingVelocity();
-    method public static float getPagingTouchSlop();
-    method public static float getPanSlop();
-    method public static long getPressTimeout();
     method public static float getScaleSlop();
     method public static float getTouchSlop();
-    method public static float getWindowTouchSlop();
-    method public static long getZoomControlsTimeout();
+    field public static final long DoubleTapTimeoutMillis = 300L; // 0x12cL
+    field public static final long LongPressTimeoutMillis = 500L; // 0x1f4L
+    field public static final long PressTimeoutMillis = 100L; // 0x64L
   }
 
   public enum Direction {
@@ -608,7 +646,7 @@ package androidx.compose.ui.gesture.util {
 
   public final class VelocityTracker {
     ctor public VelocityTracker();
-    method public void addPosition-cJzGd7g(long uptime, long position);
+    method public void addPosition-OX7LsLU(long timeMillis, long position);
     method public long calculateVelocity-9UxMQ8M();
     method public void resetTracking();
   }
@@ -623,9 +661,10 @@ package androidx.compose.ui.graphics {
   public final class GraphicsLayerModifierKt {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier graphicsLayer(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.GraphicsLayerScope,kotlin.Unit> block);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier graphicsLayer-i_P0lGk(androidx.compose.ui.Modifier, optional float scaleX, optional float scaleY, optional float alpha, optional float translationX, optional float translationY, optional float shadowElevation, optional float rotationX, optional float rotationY, optional float rotationZ, optional float cameraDistance, optional long transformOrigin, optional androidx.compose.ui.graphics.Shape shape, optional boolean clip);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier toolingGraphicsLayer(androidx.compose.ui.Modifier);
   }
 
-  public interface GraphicsLayerScope {
+  public interface GraphicsLayerScope extends androidx.compose.ui.unit.Density {
     method public float getAlpha();
     method public float getCameraDistance();
     method public boolean getClip();
@@ -701,23 +740,20 @@ package androidx.compose.ui.graphics {
 package androidx.compose.ui.graphics.vector {
 
   @androidx.compose.runtime.Immutable public final class ImageVector {
-    method public String component1();
-    method public float component2-D9Ej5fM();
-    method public float component3-D9Ej5fM();
-    method public float component4();
-    method public float component5();
-    method public androidx.compose.ui.graphics.vector.VectorGroup component6();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.graphics.vector.ImageVector copy-pRTh4Qo(String name, float defaultWidth, float defaultHeight, float viewportWidth, float viewportHeight, androidx.compose.ui.graphics.vector.VectorGroup root);
     method public float getDefaultHeight-D9Ej5fM();
     method public float getDefaultWidth-D9Ej5fM();
     method public String getName();
     method public androidx.compose.ui.graphics.vector.VectorGroup getRoot();
+    method public androidx.compose.ui.graphics.BlendMode getTintBlendMode();
+    method public long getTintColor-0d7_KjU();
     method public float getViewportHeight();
     method public float getViewportWidth();
     property public final float defaultHeight;
     property public final float defaultWidth;
     property public final String name;
     property public final androidx.compose.ui.graphics.vector.VectorGroup root;
+    property public final androidx.compose.ui.graphics.BlendMode tintBlendMode;
+    property public final long tintColor;
     property public final float viewportHeight;
     property public final float viewportWidth;
   }
@@ -818,7 +854,7 @@ package androidx.compose.ui.graphics.vector {
     method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.VectorPainter VectorPainter(androidx.compose.ui.graphics.vector.ImageVector image);
     method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.VectorPainter VectorPainter-RKTc9UI(float defaultWidth, float defaultHeight, optional float viewportWidth, optional float viewportHeight, optional String name, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,kotlin.Unit> children);
     method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.VectorPainter rememberVectorPainter(androidx.compose.ui.graphics.vector.ImageVector image);
-    method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.VectorPainter rememberVectorPainter-RKTc9UI(float defaultWidth, float defaultHeight, optional float viewportWidth, optional float viewportHeight, optional String name, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.VectorPainter rememberVectorPainter-u_AqRoo(float defaultWidth, float defaultHeight, optional float viewportWidth, optional float viewportHeight, optional String name, optional long tintColor, optional androidx.compose.ui.graphics.BlendMode tintBlendMode, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,kotlin.Unit> content);
     field public static final String RootGroupName = "VectorRootGroup";
   }
 
@@ -879,612 +915,630 @@ package androidx.compose.ui.input.key {
 
   public final inline class Key {
     ctor public Key();
-    method public static int constructor-impl(int keyCode);
-    method public static inline boolean equals-impl(int p, Object? p1);
-    method public static boolean equals-impl0(int p1, int p2);
-    method public int getKeyCode();
-    method public static inline int hashCode-impl(int p);
-    method public static String toString-impl(int $this);
-    property public final int keyCode;
+    method public static long constructor-impl(long keyCode);
+    method public static inline boolean equals-impl(long p, Object? p1);
+    method public static boolean equals-impl0(long p1, long p2);
+    method public long getKeyCode();
+    method public static inline int hashCode-impl(long p);
+    method public static String toString-impl(long $this);
+    property public final long keyCode;
     field public static final androidx.compose.ui.input.key.Key.Companion Companion;
   }
 
   public static final class Key.Companion {
-    method public int getA-EK5gGoQ();
-    method public int getAllApps-EK5gGoQ();
-    method public int getAltLeft-EK5gGoQ();
-    method public int getAltRight-EK5gGoQ();
-    method public int getApostrophe-EK5gGoQ();
-    method public int getAppSwitch-EK5gGoQ();
-    method public int getAssist-EK5gGoQ();
-    method public int getAt-EK5gGoQ();
-    method public int getAvReceiverInput-EK5gGoQ();
-    method public int getAvReceiverPower-EK5gGoQ();
-    method public int getB-EK5gGoQ();
-    method public int getBack-EK5gGoQ();
-    method public int getBackslash-EK5gGoQ();
-    method public int getBackspace-EK5gGoQ();
-    method public int getBookmark-EK5gGoQ();
-    method public int getBreak-EK5gGoQ();
-    method public int getBrightnessDown-EK5gGoQ();
-    method public int getBrightnessUp-EK5gGoQ();
-    method public int getBrowser-EK5gGoQ();
-    method public int getButton1-EK5gGoQ();
-    method public int getButton10-EK5gGoQ();
-    method public int getButton11-EK5gGoQ();
-    method public int getButton12-EK5gGoQ();
-    method public int getButton13-EK5gGoQ();
-    method public int getButton14-EK5gGoQ();
-    method public int getButton15-EK5gGoQ();
-    method public int getButton16-EK5gGoQ();
-    method public int getButton2-EK5gGoQ();
-    method public int getButton3-EK5gGoQ();
-    method public int getButton4-EK5gGoQ();
-    method public int getButton5-EK5gGoQ();
-    method public int getButton6-EK5gGoQ();
-    method public int getButton7-EK5gGoQ();
-    method public int getButton8-EK5gGoQ();
-    method public int getButton9-EK5gGoQ();
-    method public int getButtonA-EK5gGoQ();
-    method public int getButtonB-EK5gGoQ();
-    method public int getButtonC-EK5gGoQ();
-    method public int getButtonL1-EK5gGoQ();
-    method public int getButtonL2-EK5gGoQ();
-    method public int getButtonMode-EK5gGoQ();
-    method public int getButtonR1-EK5gGoQ();
-    method public int getButtonR2-EK5gGoQ();
-    method public int getButtonSelect-EK5gGoQ();
-    method public int getButtonStart-EK5gGoQ();
-    method public int getButtonThumbLeft-EK5gGoQ();
-    method public int getButtonThumbRight-EK5gGoQ();
-    method public int getButtonX-EK5gGoQ();
-    method public int getButtonY-EK5gGoQ();
-    method public int getButtonZ-EK5gGoQ();
-    method public int getC-EK5gGoQ();
-    method public int getCalculator-EK5gGoQ();
-    method public int getCalendar-EK5gGoQ();
-    method public int getCall-EK5gGoQ();
-    method public int getCamera-EK5gGoQ();
-    method public int getCapsLock-EK5gGoQ();
-    method public int getCaptions-EK5gGoQ();
-    method public int getChannelDown-EK5gGoQ();
-    method public int getChannelUp-EK5gGoQ();
-    method public int getClear-EK5gGoQ();
-    method public int getComma-EK5gGoQ();
-    method public int getContacts-EK5gGoQ();
-    method public int getCopy-EK5gGoQ();
-    method public int getCtrlLeft-EK5gGoQ();
-    method public int getCtrlRight-EK5gGoQ();
-    method public int getCut-EK5gGoQ();
-    method public int getD-EK5gGoQ();
-    method public int getDPadCenter-EK5gGoQ();
-    method public int getDPadDown-EK5gGoQ();
-    method public int getDPadDownLeft-EK5gGoQ();
-    method public int getDPadDownRight-EK5gGoQ();
-    method public int getDPadLeft-EK5gGoQ();
-    method public int getDPadRight-EK5gGoQ();
-    method public int getDPadUp-EK5gGoQ();
-    method public int getDPadUpLeft-EK5gGoQ();
-    method public int getDPadUpRight-EK5gGoQ();
-    method public int getDelete-EK5gGoQ();
-    method public int getDvr-EK5gGoQ();
-    method public int getE-EK5gGoQ();
-    method public int getEisu-EK5gGoQ();
-    method public int getEndCall-EK5gGoQ();
-    method public int getEnter-EK5gGoQ();
-    method public int getEnvelope-EK5gGoQ();
-    method public int getEquals-EK5gGoQ();
-    method public int getEscape-EK5gGoQ();
-    method public int getF-EK5gGoQ();
-    method public int getF1-EK5gGoQ();
-    method public int getF10-EK5gGoQ();
-    method public int getF11-EK5gGoQ();
-    method public int getF12-EK5gGoQ();
-    method public int getF2-EK5gGoQ();
-    method public int getF3-EK5gGoQ();
-    method public int getF4-EK5gGoQ();
-    method public int getF5-EK5gGoQ();
-    method public int getF6-EK5gGoQ();
-    method public int getF7-EK5gGoQ();
-    method public int getF8-EK5gGoQ();
-    method public int getF9-EK5gGoQ();
-    method public int getFocus-EK5gGoQ();
-    method public int getForward-EK5gGoQ();
-    method public int getFunction-EK5gGoQ();
-    method public int getG-EK5gGoQ();
-    method public int getGrave-EK5gGoQ();
-    method public int getGuide-EK5gGoQ();
-    method public int getH-EK5gGoQ();
-    method public int getHeadsetHook-EK5gGoQ();
-    method public int getHelp-EK5gGoQ();
-    method public int getHenkan-EK5gGoQ();
-    method public int getHome-EK5gGoQ();
-    method public int getI-EK5gGoQ();
-    method public int getInfo-EK5gGoQ();
-    method public int getInsert-EK5gGoQ();
-    method public int getJ-EK5gGoQ();
-    method public int getK-EK5gGoQ();
-    method public int getKana-EK5gGoQ();
-    method public int getKatakanaHiragana-EK5gGoQ();
-    method public int getL-EK5gGoQ();
-    method public int getLanguageSwitch-EK5gGoQ();
-    method public int getLastChannel-EK5gGoQ();
-    method public int getLeftBracket-EK5gGoQ();
-    method public int getM-EK5gGoQ();
-    method public int getMannerMode-EK5gGoQ();
-    method public int getMediaAudioTrack-EK5gGoQ();
-    method public int getMediaClose-EK5gGoQ();
-    method public int getMediaEject-EK5gGoQ();
-    method public int getMediaFastForward-EK5gGoQ();
-    method public int getMediaNext-EK5gGoQ();
-    method public int getMediaPause-EK5gGoQ();
-    method public int getMediaPlay-EK5gGoQ();
-    method public int getMediaPlayPause-EK5gGoQ();
-    method public int getMediaPrevious-EK5gGoQ();
-    method public int getMediaRecord-EK5gGoQ();
-    method public int getMediaRewind-EK5gGoQ();
-    method public int getMediaSkipBackward-EK5gGoQ();
-    method public int getMediaSkipForward-EK5gGoQ();
-    method public int getMediaStepBackward-EK5gGoQ();
-    method public int getMediaStepForward-EK5gGoQ();
-    method public int getMediaStop-EK5gGoQ();
-    method public int getMediaTopMenu-EK5gGoQ();
-    method public int getMenu-EK5gGoQ();
-    method public int getMetaLeft-EK5gGoQ();
-    method public int getMetaRight-EK5gGoQ();
-    method public int getMicrophoneMute-EK5gGoQ();
-    method public int getMinus-EK5gGoQ();
-    method public int getMoveEnd-EK5gGoQ();
-    method public int getMoveHome-EK5gGoQ();
-    method public int getMuhenkan-EK5gGoQ();
-    method public int getMultiply-EK5gGoQ();
-    method public int getMusic-EK5gGoQ();
-    method public int getN-EK5gGoQ();
-    method public int getNavigateIn-EK5gGoQ();
-    method public int getNavigateNext-EK5gGoQ();
-    method public int getNavigateOut-EK5gGoQ();
-    method public int getNavigatePrevious-EK5gGoQ();
-    method public int getNotification-EK5gGoQ();
-    method public int getNumLock-EK5gGoQ();
-    method public int getNumPad0-EK5gGoQ();
-    method public int getNumPad1-EK5gGoQ();
-    method public int getNumPad2-EK5gGoQ();
-    method public int getNumPad3-EK5gGoQ();
-    method public int getNumPad4-EK5gGoQ();
-    method public int getNumPad5-EK5gGoQ();
-    method public int getNumPad6-EK5gGoQ();
-    method public int getNumPad7-EK5gGoQ();
-    method public int getNumPad8-EK5gGoQ();
-    method public int getNumPad9-EK5gGoQ();
-    method public int getNumPadAdd-EK5gGoQ();
-    method public int getNumPadComma-EK5gGoQ();
-    method public int getNumPadDivide-EK5gGoQ();
-    method public int getNumPadDot-EK5gGoQ();
-    method public int getNumPadEnter-EK5gGoQ();
-    method public int getNumPadEquals-EK5gGoQ();
-    method public int getNumPadLeftParenthesis-EK5gGoQ();
-    method public int getNumPadMultiply-EK5gGoQ();
-    method public int getNumPadRightParenthesis-EK5gGoQ();
-    method public int getNumPadSubtract-EK5gGoQ();
-    method public int getNumber-EK5gGoQ();
-    method public int getNumber0-EK5gGoQ();
-    method public int getNumber1-EK5gGoQ();
-    method public int getNumber11-EK5gGoQ();
-    method public int getNumber12-EK5gGoQ();
-    method public int getNumber2-EK5gGoQ();
-    method public int getNumber3-EK5gGoQ();
-    method public int getNumber4-EK5gGoQ();
-    method public int getNumber5-EK5gGoQ();
-    method public int getNumber6-EK5gGoQ();
-    method public int getNumber7-EK5gGoQ();
-    method public int getNumber8-EK5gGoQ();
-    method public int getNumber9-EK5gGoQ();
-    method public int getO-EK5gGoQ();
-    method public int getP-EK5gGoQ();
-    method public int getPageDown-EK5gGoQ();
-    method public int getPageUp-EK5gGoQ();
-    method public int getPairing-EK5gGoQ();
-    method public int getPaste-EK5gGoQ();
-    method public int getPeriod-EK5gGoQ();
-    method public int getPictureSymbols-EK5gGoQ();
-    method public int getPlus-EK5gGoQ();
-    method public int getPound-EK5gGoQ();
-    method public int getPower-EK5gGoQ();
-    method public int getPrintScreen-EK5gGoQ();
-    method public int getProfileSwitch-EK5gGoQ();
-    method public int getProgramBlue-EK5gGoQ();
-    method public int getProgramGreen-EK5gGoQ();
-    method public int getProgramRed-EK5gGoQ();
-    method public int getProgramYellow-EK5gGoQ();
-    method public int getQ-EK5gGoQ();
-    method public int getR-EK5gGoQ();
-    method public int getRefresh-EK5gGoQ();
-    method public int getRightBracket-EK5gGoQ();
-    method public int getRo-EK5gGoQ();
-    method public int getS-EK5gGoQ();
-    method public int getScrollLock-EK5gGoQ();
-    method public int getSearch-EK5gGoQ();
-    method public int getSemicolon-EK5gGoQ();
-    method public int getSetTopBoxInput-EK5gGoQ();
-    method public int getSetTopBoxPower-EK5gGoQ();
-    method public int getSettings-EK5gGoQ();
-    method public int getShiftLeft-EK5gGoQ();
-    method public int getShiftRight-EK5gGoQ();
-    method public int getSlash-EK5gGoQ();
-    method public int getSleep-EK5gGoQ();
-    method public int getSoftLeft-EK5gGoQ();
-    method public int getSoftRight-EK5gGoQ();
-    method public int getSoftSleep-EK5gGoQ();
-    method public int getSpacebar-EK5gGoQ();
-    method public int getStem1-EK5gGoQ();
-    method public int getStem2-EK5gGoQ();
-    method public int getStem3-EK5gGoQ();
-    method public int getStemPrimary-EK5gGoQ();
-    method public int getSwitchCharset-EK5gGoQ();
-    method public int getSymbol-EK5gGoQ();
-    method public int getSystemNavigationDown-EK5gGoQ();
-    method public int getSystemNavigationLeft-EK5gGoQ();
-    method public int getSystemNavigationRight-EK5gGoQ();
-    method public int getSystemNavigationUp-EK5gGoQ();
-    method public int getT-EK5gGoQ();
-    method public int getTab-EK5gGoQ();
-    method public int getThumbsDown-EK5gGoQ();
-    method public int getThumbsUp-EK5gGoQ();
-    method public int getToggle2D3D-EK5gGoQ();
-    method public int getTv-EK5gGoQ();
-    method public int getTvAntennaCable-EK5gGoQ();
-    method public int getTvAudioDescription-EK5gGoQ();
-    method public int getTvAudioDescriptionMixingVolumeDown-EK5gGoQ();
-    method public int getTvAudioDescriptionMixingVolumeUp-EK5gGoQ();
-    method public int getTvContentsMenu-EK5gGoQ();
-    method public int getTvDataService-EK5gGoQ();
-    method public int getTvInput-EK5gGoQ();
-    method public int getTvInputComponent1-EK5gGoQ();
-    method public int getTvInputComponent2-EK5gGoQ();
-    method public int getTvInputComposite1-EK5gGoQ();
-    method public int getTvInputComposite2-EK5gGoQ();
-    method public int getTvInputHdmi1-EK5gGoQ();
-    method public int getTvInputHdmi2-EK5gGoQ();
-    method public int getTvInputHdmi3-EK5gGoQ();
-    method public int getTvInputHdmi4-EK5gGoQ();
-    method public int getTvInputVga1-EK5gGoQ();
-    method public int getTvMediaContextMenu-EK5gGoQ();
-    method public int getTvNetwork-EK5gGoQ();
-    method public int getTvNumberEntry-EK5gGoQ();
-    method public int getTvPower-EK5gGoQ();
-    method public int getTvRadioService-EK5gGoQ();
-    method public int getTvSatellite-EK5gGoQ();
-    method public int getTvSatelliteBs-EK5gGoQ();
-    method public int getTvSatelliteCs-EK5gGoQ();
-    method public int getTvSatelliteService-EK5gGoQ();
-    method public int getTvTeletext-EK5gGoQ();
-    method public int getTvTerrestrialAnalog-EK5gGoQ();
-    method public int getTvTerrestrialDigital-EK5gGoQ();
-    method public int getTvTimerProgramming-EK5gGoQ();
-    method public int getTvZoomMode-EK5gGoQ();
-    method public int getU-EK5gGoQ();
-    method public int getUnknown-EK5gGoQ();
-    method public int getV-EK5gGoQ();
-    method public int getVoiceAssist-EK5gGoQ();
-    method public int getVolumeDown-EK5gGoQ();
-    method public int getVolumeMute-EK5gGoQ();
-    method public int getVolumeUp-EK5gGoQ();
-    method public int getW-EK5gGoQ();
-    method public int getWakeUp-EK5gGoQ();
-    method public int getWindow-EK5gGoQ();
-    method public int getX-EK5gGoQ();
-    method public int getY-EK5gGoQ();
-    method public int getYen-EK5gGoQ();
-    method public int getZ-EK5gGoQ();
-    method public int getZenkakuHankaru-EK5gGoQ();
-    method public int getZoomIn-EK5gGoQ();
-    method public int getZoomOut-EK5gGoQ();
-    property public final int A;
-    property public final int AllApps;
-    property public final int AltLeft;
-    property public final int AltRight;
-    property public final int Apostrophe;
-    property public final int AppSwitch;
-    property public final int Assist;
-    property public final int At;
-    property public final int AvReceiverInput;
-    property public final int AvReceiverPower;
-    property public final int B;
-    property public final int Back;
-    property public final int Backslash;
-    property public final int Backspace;
-    property public final int Bookmark;
-    property public final int Break;
-    property public final int BrightnessDown;
-    property public final int BrightnessUp;
-    property public final int Browser;
-    property public final int Button1;
-    property public final int Button10;
-    property public final int Button11;
-    property public final int Button12;
-    property public final int Button13;
-    property public final int Button14;
-    property public final int Button15;
-    property public final int Button16;
-    property public final int Button2;
-    property public final int Button3;
-    property public final int Button4;
-    property public final int Button5;
-    property public final int Button6;
-    property public final int Button7;
-    property public final int Button8;
-    property public final int Button9;
-    property public final int ButtonA;
-    property public final int ButtonB;
-    property public final int ButtonC;
-    property public final int ButtonL1;
-    property public final int ButtonL2;
-    property public final int ButtonMode;
-    property public final int ButtonR1;
-    property public final int ButtonR2;
-    property public final int ButtonSelect;
-    property public final int ButtonStart;
-    property public final int ButtonThumbLeft;
-    property public final int ButtonThumbRight;
-    property public final int ButtonX;
-    property public final int ButtonY;
-    property public final int ButtonZ;
-    property public final int C;
-    property public final int Calculator;
-    property public final int Calendar;
-    property public final int Call;
-    property public final int Camera;
-    property public final int CapsLock;
-    property public final int Captions;
-    property public final int ChannelDown;
-    property public final int ChannelUp;
-    property public final int Clear;
-    property public final int Comma;
-    property public final int Contacts;
-    property public final int Copy;
-    property public final int CtrlLeft;
-    property public final int CtrlRight;
-    property public final int Cut;
-    property public final int D;
-    property public final int DPadCenter;
-    property public final int DPadDown;
-    property public final int DPadDownLeft;
-    property public final int DPadDownRight;
-    property public final int DPadLeft;
-    property public final int DPadRight;
-    property public final int DPadUp;
-    property public final int DPadUpLeft;
-    property public final int DPadUpRight;
-    property public final int Delete;
-    property public final int Dvr;
-    property public final int E;
-    property public final int Eisu;
-    property public final int EndCall;
-    property public final int Enter;
-    property public final int Envelope;
-    property public final int Equals;
-    property public final int Escape;
-    property public final int F;
-    property public final int F1;
-    property public final int F10;
-    property public final int F11;
-    property public final int F12;
-    property public final int F2;
-    property public final int F3;
-    property public final int F4;
-    property public final int F5;
-    property public final int F6;
-    property public final int F7;
-    property public final int F8;
-    property public final int F9;
-    property public final int Focus;
-    property public final int Forward;
-    property public final int Function;
-    property public final int G;
-    property public final int Grave;
-    property public final int Guide;
-    property public final int H;
-    property public final int HeadsetHook;
-    property public final int Help;
-    property public final int Henkan;
-    property public final int Home;
-    property public final int I;
-    property public final int Info;
-    property public final int Insert;
-    property public final int J;
-    property public final int K;
-    property public final int Kana;
-    property public final int KatakanaHiragana;
-    property public final int L;
-    property public final int LanguageSwitch;
-    property public final int LastChannel;
-    property public final int LeftBracket;
-    property public final int M;
-    property public final int MannerMode;
-    property public final int MediaAudioTrack;
-    property public final int MediaClose;
-    property public final int MediaEject;
-    property public final int MediaFastForward;
-    property public final int MediaNext;
-    property public final int MediaPause;
-    property public final int MediaPlay;
-    property public final int MediaPlayPause;
-    property public final int MediaPrevious;
-    property public final int MediaRecord;
-    property public final int MediaRewind;
-    property public final int MediaSkipBackward;
-    property public final int MediaSkipForward;
-    property public final int MediaStepBackward;
-    property public final int MediaStepForward;
-    property public final int MediaStop;
-    property public final int MediaTopMenu;
-    property public final int Menu;
-    property public final int MetaLeft;
-    property public final int MetaRight;
-    property public final int MicrophoneMute;
-    property public final int Minus;
-    property public final int MoveEnd;
-    property public final int MoveHome;
-    property public final int Muhenkan;
-    property public final int Multiply;
-    property public final int Music;
-    property public final int N;
-    property public final int NavigateIn;
-    property public final int NavigateNext;
-    property public final int NavigateOut;
-    property public final int NavigatePrevious;
-    property public final int Notification;
-    property public final int NumLock;
-    property public final int NumPad0;
-    property public final int NumPad1;
-    property public final int NumPad2;
-    property public final int NumPad3;
-    property public final int NumPad4;
-    property public final int NumPad5;
-    property public final int NumPad6;
-    property public final int NumPad7;
-    property public final int NumPad8;
-    property public final int NumPad9;
-    property public final int NumPadAdd;
-    property public final int NumPadComma;
-    property public final int NumPadDivide;
-    property public final int NumPadDot;
-    property public final int NumPadEnter;
-    property public final int NumPadEquals;
-    property public final int NumPadLeftParenthesis;
-    property public final int NumPadMultiply;
-    property public final int NumPadRightParenthesis;
-    property public final int NumPadSubtract;
-    property public final int Number;
-    property public final int Number0;
-    property public final int Number1;
-    property public final int Number11;
-    property public final int Number12;
-    property public final int Number2;
-    property public final int Number3;
-    property public final int Number4;
-    property public final int Number5;
-    property public final int Number6;
-    property public final int Number7;
-    property public final int Number8;
-    property public final int Number9;
-    property public final int O;
-    property public final int P;
-    property public final int PageDown;
-    property public final int PageUp;
-    property public final int Pairing;
-    property public final int Paste;
-    property public final int Period;
-    property public final int PictureSymbols;
-    property public final int Plus;
-    property public final int Pound;
-    property public final int Power;
-    property public final int PrintScreen;
-    property public final int ProfileSwitch;
-    property public final int ProgramBlue;
-    property public final int ProgramGreen;
-    property public final int ProgramRed;
-    property public final int ProgramYellow;
-    property public final int Q;
-    property public final int R;
-    property public final int Refresh;
-    property public final int RightBracket;
-    property public final int Ro;
-    property public final int S;
-    property public final int ScrollLock;
-    property public final int Search;
-    property public final int Semicolon;
-    property public final int SetTopBoxInput;
-    property public final int SetTopBoxPower;
-    property public final int Settings;
-    property public final int ShiftLeft;
-    property public final int ShiftRight;
-    property public final int Slash;
-    property public final int Sleep;
-    property public final int SoftLeft;
-    property public final int SoftRight;
-    property public final int SoftSleep;
-    property public final int Spacebar;
-    property public final int Stem1;
-    property public final int Stem2;
-    property public final int Stem3;
-    property public final int StemPrimary;
-    property public final int SwitchCharset;
-    property public final int Symbol;
-    property public final int SystemNavigationDown;
-    property public final int SystemNavigationLeft;
-    property public final int SystemNavigationRight;
-    property public final int SystemNavigationUp;
-    property public final int T;
-    property public final int Tab;
-    property public final int ThumbsDown;
-    property public final int ThumbsUp;
-    property public final int Toggle2D3D;
-    property public final int Tv;
-    property public final int TvAntennaCable;
-    property public final int TvAudioDescription;
-    property public final int TvAudioDescriptionMixingVolumeDown;
-    property public final int TvAudioDescriptionMixingVolumeUp;
-    property public final int TvContentsMenu;
-    property public final int TvDataService;
-    property public final int TvInput;
-    property public final int TvInputComponent1;
-    property public final int TvInputComponent2;
-    property public final int TvInputComposite1;
-    property public final int TvInputComposite2;
-    property public final int TvInputHdmi1;
-    property public final int TvInputHdmi2;
-    property public final int TvInputHdmi3;
-    property public final int TvInputHdmi4;
-    property public final int TvInputVga1;
-    property public final int TvMediaContextMenu;
-    property public final int TvNetwork;
-    property public final int TvNumberEntry;
-    property public final int TvPower;
-    property public final int TvRadioService;
-    property public final int TvSatellite;
-    property public final int TvSatelliteBs;
-    property public final int TvSatelliteCs;
-    property public final int TvSatelliteService;
-    property public final int TvTeletext;
-    property public final int TvTerrestrialAnalog;
-    property public final int TvTerrestrialDigital;
-    property public final int TvTimerProgramming;
-    property public final int TvZoomMode;
-    property public final int U;
-    property public final int Unknown;
-    property public final int V;
-    property public final int VoiceAssist;
-    property public final int VolumeDown;
-    property public final int VolumeMute;
-    property public final int VolumeUp;
-    property public final int W;
-    property public final int WakeUp;
-    property public final int Window;
-    property public final int X;
-    property public final int Y;
-    property public final int Yen;
-    property public final int Z;
-    property public final int ZenkakuHankaru;
-    property public final int ZoomIn;
-    property public final int ZoomOut;
+    method public long getA-EK5gGoQ();
+    method public long getAllApps-EK5gGoQ();
+    method public long getAltLeft-EK5gGoQ();
+    method public long getAltRight-EK5gGoQ();
+    method public long getApostrophe-EK5gGoQ();
+    method public long getAppSwitch-EK5gGoQ();
+    method public long getAssist-EK5gGoQ();
+    method public long getAt-EK5gGoQ();
+    method public long getAvReceiverInput-EK5gGoQ();
+    method public long getAvReceiverPower-EK5gGoQ();
+    method public long getB-EK5gGoQ();
+    method public long getBack-EK5gGoQ();
+    method public long getBackslash-EK5gGoQ();
+    method public long getBackspace-EK5gGoQ();
+    method public long getBookmark-EK5gGoQ();
+    method public long getBreak-EK5gGoQ();
+    method public long getBrightnessDown-EK5gGoQ();
+    method public long getBrightnessUp-EK5gGoQ();
+    method public long getBrowser-EK5gGoQ();
+    method public long getButton1-EK5gGoQ();
+    method public long getButton10-EK5gGoQ();
+    method public long getButton11-EK5gGoQ();
+    method public long getButton12-EK5gGoQ();
+    method public long getButton13-EK5gGoQ();
+    method public long getButton14-EK5gGoQ();
+    method public long getButton15-EK5gGoQ();
+    method public long getButton16-EK5gGoQ();
+    method public long getButton2-EK5gGoQ();
+    method public long getButton3-EK5gGoQ();
+    method public long getButton4-EK5gGoQ();
+    method public long getButton5-EK5gGoQ();
+    method public long getButton6-EK5gGoQ();
+    method public long getButton7-EK5gGoQ();
+    method public long getButton8-EK5gGoQ();
+    method public long getButton9-EK5gGoQ();
+    method public long getButtonA-EK5gGoQ();
+    method public long getButtonB-EK5gGoQ();
+    method public long getButtonC-EK5gGoQ();
+    method public long getButtonL1-EK5gGoQ();
+    method public long getButtonL2-EK5gGoQ();
+    method public long getButtonMode-EK5gGoQ();
+    method public long getButtonR1-EK5gGoQ();
+    method public long getButtonR2-EK5gGoQ();
+    method public long getButtonSelect-EK5gGoQ();
+    method public long getButtonStart-EK5gGoQ();
+    method public long getButtonThumbLeft-EK5gGoQ();
+    method public long getButtonThumbRight-EK5gGoQ();
+    method public long getButtonX-EK5gGoQ();
+    method public long getButtonY-EK5gGoQ();
+    method public long getButtonZ-EK5gGoQ();
+    method public long getC-EK5gGoQ();
+    method public long getCalculator-EK5gGoQ();
+    method public long getCalendar-EK5gGoQ();
+    method public long getCall-EK5gGoQ();
+    method public long getCamera-EK5gGoQ();
+    method public long getCapsLock-EK5gGoQ();
+    method public long getCaptions-EK5gGoQ();
+    method public long getChannelDown-EK5gGoQ();
+    method public long getChannelUp-EK5gGoQ();
+    method public long getClear-EK5gGoQ();
+    method public long getComma-EK5gGoQ();
+    method public long getContacts-EK5gGoQ();
+    method public long getCopy-EK5gGoQ();
+    method public long getCtrlLeft-EK5gGoQ();
+    method public long getCtrlRight-EK5gGoQ();
+    method public long getCut-EK5gGoQ();
+    method public long getD-EK5gGoQ();
+    method @Deprecated public long getDPadCenter-EK5gGoQ();
+    method @Deprecated public long getDPadDown-EK5gGoQ();
+    method @Deprecated public long getDPadDownLeft-EK5gGoQ();
+    method @Deprecated public long getDPadDownRight-EK5gGoQ();
+    method @Deprecated public long getDPadLeft-EK5gGoQ();
+    method @Deprecated public long getDPadRight-EK5gGoQ();
+    method @Deprecated public long getDPadUp-EK5gGoQ();
+    method @Deprecated public long getDPadUpLeft-EK5gGoQ();
+    method @Deprecated public long getDPadUpRight-EK5gGoQ();
+    method public long getDelete-EK5gGoQ();
+    method public long getDirectionCenter-EK5gGoQ();
+    method public long getDirectionDown-EK5gGoQ();
+    method public long getDirectionDownLeft-EK5gGoQ();
+    method public long getDirectionDownRight-EK5gGoQ();
+    method public long getDirectionLeft-EK5gGoQ();
+    method public long getDirectionRight-EK5gGoQ();
+    method public long getDirectionUp-EK5gGoQ();
+    method public long getDirectionUpLeft-EK5gGoQ();
+    method public long getDirectionUpRight-EK5gGoQ();
+    method public long getDvr-EK5gGoQ();
+    method public long getE-EK5gGoQ();
+    method public long getEight-EK5gGoQ();
+    method public long getEisu-EK5gGoQ();
+    method public long getEndCall-EK5gGoQ();
+    method public long getEnter-EK5gGoQ();
+    method public long getEnvelope-EK5gGoQ();
+    method public long getEquals-EK5gGoQ();
+    method public long getEscape-EK5gGoQ();
+    method public long getF-EK5gGoQ();
+    method public long getF1-EK5gGoQ();
+    method public long getF10-EK5gGoQ();
+    method public long getF11-EK5gGoQ();
+    method public long getF12-EK5gGoQ();
+    method public long getF2-EK5gGoQ();
+    method public long getF3-EK5gGoQ();
+    method public long getF4-EK5gGoQ();
+    method public long getF5-EK5gGoQ();
+    method public long getF6-EK5gGoQ();
+    method public long getF7-EK5gGoQ();
+    method public long getF8-EK5gGoQ();
+    method public long getF9-EK5gGoQ();
+    method public long getFive-EK5gGoQ();
+    method public long getFocus-EK5gGoQ();
+    method public long getForward-EK5gGoQ();
+    method public long getFour-EK5gGoQ();
+    method public long getFunction-EK5gGoQ();
+    method public long getG-EK5gGoQ();
+    method public long getGrave-EK5gGoQ();
+    method public long getGuide-EK5gGoQ();
+    method public long getH-EK5gGoQ();
+    method public long getHeadsetHook-EK5gGoQ();
+    method public long getHelp-EK5gGoQ();
+    method public long getHenkan-EK5gGoQ();
+    method public long getHome-EK5gGoQ();
+    method public long getI-EK5gGoQ();
+    method public long getInfo-EK5gGoQ();
+    method public long getInsert-EK5gGoQ();
+    method public long getJ-EK5gGoQ();
+    method public long getK-EK5gGoQ();
+    method public long getKana-EK5gGoQ();
+    method public long getKatakanaHiragana-EK5gGoQ();
+    method public long getL-EK5gGoQ();
+    method public long getLanguageSwitch-EK5gGoQ();
+    method public long getLastChannel-EK5gGoQ();
+    method public long getLeftBracket-EK5gGoQ();
+    method public long getM-EK5gGoQ();
+    method public long getMannerMode-EK5gGoQ();
+    method public long getMediaAudioTrack-EK5gGoQ();
+    method public long getMediaClose-EK5gGoQ();
+    method public long getMediaEject-EK5gGoQ();
+    method public long getMediaFastForward-EK5gGoQ();
+    method public long getMediaNext-EK5gGoQ();
+    method public long getMediaPause-EK5gGoQ();
+    method public long getMediaPlay-EK5gGoQ();
+    method public long getMediaPlayPause-EK5gGoQ();
+    method public long getMediaPrevious-EK5gGoQ();
+    method public long getMediaRecord-EK5gGoQ();
+    method public long getMediaRewind-EK5gGoQ();
+    method public long getMediaSkipBackward-EK5gGoQ();
+    method public long getMediaSkipForward-EK5gGoQ();
+    method public long getMediaStepBackward-EK5gGoQ();
+    method public long getMediaStepForward-EK5gGoQ();
+    method public long getMediaStop-EK5gGoQ();
+    method public long getMediaTopMenu-EK5gGoQ();
+    method public long getMenu-EK5gGoQ();
+    method public long getMetaLeft-EK5gGoQ();
+    method public long getMetaRight-EK5gGoQ();
+    method public long getMicrophoneMute-EK5gGoQ();
+    method public long getMinus-EK5gGoQ();
+    method public long getMoveEnd-EK5gGoQ();
+    method public long getMoveHome-EK5gGoQ();
+    method public long getMuhenkan-EK5gGoQ();
+    method public long getMultiply-EK5gGoQ();
+    method public long getMusic-EK5gGoQ();
+    method public long getN-EK5gGoQ();
+    method public long getNavigateIn-EK5gGoQ();
+    method public long getNavigateNext-EK5gGoQ();
+    method public long getNavigateOut-EK5gGoQ();
+    method public long getNavigatePrevious-EK5gGoQ();
+    method public long getNine-EK5gGoQ();
+    method public long getNotification-EK5gGoQ();
+    method public long getNumLock-EK5gGoQ();
+    method public long getNumPad0-EK5gGoQ();
+    method public long getNumPad1-EK5gGoQ();
+    method public long getNumPad2-EK5gGoQ();
+    method public long getNumPad3-EK5gGoQ();
+    method public long getNumPad4-EK5gGoQ();
+    method public long getNumPad5-EK5gGoQ();
+    method public long getNumPad6-EK5gGoQ();
+    method public long getNumPad7-EK5gGoQ();
+    method public long getNumPad8-EK5gGoQ();
+    method public long getNumPad9-EK5gGoQ();
+    method public long getNumPadAdd-EK5gGoQ();
+    method public long getNumPadComma-EK5gGoQ();
+    method public long getNumPadDivide-EK5gGoQ();
+    method public long getNumPadDot-EK5gGoQ();
+    method public long getNumPadEnter-EK5gGoQ();
+    method public long getNumPadEquals-EK5gGoQ();
+    method public long getNumPadLeftParenthesis-EK5gGoQ();
+    method public long getNumPadMultiply-EK5gGoQ();
+    method public long getNumPadRightParenthesis-EK5gGoQ();
+    method public long getNumPadSubtract-EK5gGoQ();
+    method public long getNumber-EK5gGoQ();
+    method public long getO-EK5gGoQ();
+    method public long getOne-EK5gGoQ();
+    method public long getP-EK5gGoQ();
+    method public long getPageDown-EK5gGoQ();
+    method public long getPageUp-EK5gGoQ();
+    method public long getPairing-EK5gGoQ();
+    method public long getPaste-EK5gGoQ();
+    method public long getPeriod-EK5gGoQ();
+    method public long getPictureSymbols-EK5gGoQ();
+    method public long getPlus-EK5gGoQ();
+    method public long getPound-EK5gGoQ();
+    method public long getPower-EK5gGoQ();
+    method public long getPrintScreen-EK5gGoQ();
+    method public long getProfileSwitch-EK5gGoQ();
+    method public long getProgramBlue-EK5gGoQ();
+    method public long getProgramGreen-EK5gGoQ();
+    method public long getProgramRed-EK5gGoQ();
+    method public long getProgramYellow-EK5gGoQ();
+    method public long getQ-EK5gGoQ();
+    method public long getR-EK5gGoQ();
+    method public long getRefresh-EK5gGoQ();
+    method public long getRightBracket-EK5gGoQ();
+    method public long getRo-EK5gGoQ();
+    method public long getS-EK5gGoQ();
+    method public long getScrollLock-EK5gGoQ();
+    method public long getSearch-EK5gGoQ();
+    method public long getSemicolon-EK5gGoQ();
+    method public long getSetTopBoxInput-EK5gGoQ();
+    method public long getSetTopBoxPower-EK5gGoQ();
+    method public long getSettings-EK5gGoQ();
+    method public long getSeven-EK5gGoQ();
+    method public long getShiftLeft-EK5gGoQ();
+    method public long getShiftRight-EK5gGoQ();
+    method public long getSix-EK5gGoQ();
+    method public long getSlash-EK5gGoQ();
+    method public long getSleep-EK5gGoQ();
+    method public long getSoftLeft-EK5gGoQ();
+    method public long getSoftRight-EK5gGoQ();
+    method public long getSoftSleep-EK5gGoQ();
+    method public long getSpacebar-EK5gGoQ();
+    method public long getStem1-EK5gGoQ();
+    method public long getStem2-EK5gGoQ();
+    method public long getStem3-EK5gGoQ();
+    method public long getStemPrimary-EK5gGoQ();
+    method public long getSwitchCharset-EK5gGoQ();
+    method public long getSymbol-EK5gGoQ();
+    method public long getSystemNavigationDown-EK5gGoQ();
+    method public long getSystemNavigationLeft-EK5gGoQ();
+    method public long getSystemNavigationRight-EK5gGoQ();
+    method public long getSystemNavigationUp-EK5gGoQ();
+    method public long getT-EK5gGoQ();
+    method public long getTab-EK5gGoQ();
+    method public long getThree-EK5gGoQ();
+    method public long getThumbsDown-EK5gGoQ();
+    method public long getThumbsUp-EK5gGoQ();
+    method public long getToggle2D3D-EK5gGoQ();
+    method public long getTv-EK5gGoQ();
+    method public long getTvAntennaCable-EK5gGoQ();
+    method public long getTvAudioDescription-EK5gGoQ();
+    method public long getTvAudioDescriptionMixingVolumeDown-EK5gGoQ();
+    method public long getTvAudioDescriptionMixingVolumeUp-EK5gGoQ();
+    method public long getTvContentsMenu-EK5gGoQ();
+    method public long getTvDataService-EK5gGoQ();
+    method public long getTvInput-EK5gGoQ();
+    method public long getTvInputComponent1-EK5gGoQ();
+    method public long getTvInputComponent2-EK5gGoQ();
+    method public long getTvInputComposite1-EK5gGoQ();
+    method public long getTvInputComposite2-EK5gGoQ();
+    method public long getTvInputHdmi1-EK5gGoQ();
+    method public long getTvInputHdmi2-EK5gGoQ();
+    method public long getTvInputHdmi3-EK5gGoQ();
+    method public long getTvInputHdmi4-EK5gGoQ();
+    method public long getTvInputVga1-EK5gGoQ();
+    method public long getTvMediaContextMenu-EK5gGoQ();
+    method public long getTvNetwork-EK5gGoQ();
+    method public long getTvNumberEntry-EK5gGoQ();
+    method public long getTvPower-EK5gGoQ();
+    method public long getTvRadioService-EK5gGoQ();
+    method public long getTvSatellite-EK5gGoQ();
+    method public long getTvSatelliteBs-EK5gGoQ();
+    method public long getTvSatelliteCs-EK5gGoQ();
+    method public long getTvSatelliteService-EK5gGoQ();
+    method public long getTvTeletext-EK5gGoQ();
+    method public long getTvTerrestrialAnalog-EK5gGoQ();
+    method public long getTvTerrestrialDigital-EK5gGoQ();
+    method public long getTvTimerProgramming-EK5gGoQ();
+    method public long getTvZoomMode-EK5gGoQ();
+    method public long getTwo-EK5gGoQ();
+    method public long getU-EK5gGoQ();
+    method public long getUnknown-EK5gGoQ();
+    method public long getV-EK5gGoQ();
+    method public long getVoiceAssist-EK5gGoQ();
+    method public long getVolumeDown-EK5gGoQ();
+    method public long getVolumeMute-EK5gGoQ();
+    method public long getVolumeUp-EK5gGoQ();
+    method public long getW-EK5gGoQ();
+    method public long getWakeUp-EK5gGoQ();
+    method public long getWindow-EK5gGoQ();
+    method public long getX-EK5gGoQ();
+    method public long getY-EK5gGoQ();
+    method public long getYen-EK5gGoQ();
+    method public long getZ-EK5gGoQ();
+    method public long getZenkakuHankaru-EK5gGoQ();
+    method public long getZero-EK5gGoQ();
+    method public long getZoomIn-EK5gGoQ();
+    method public long getZoomOut-EK5gGoQ();
+    property public final long A;
+    property public final long AllApps;
+    property public final long AltLeft;
+    property public final long AltRight;
+    property public final long Apostrophe;
+    property public final long AppSwitch;
+    property public final long Assist;
+    property public final long At;
+    property public final long AvReceiverInput;
+    property public final long AvReceiverPower;
+    property public final long B;
+    property public final long Back;
+    property public final long Backslash;
+    property public final long Backspace;
+    property public final long Bookmark;
+    property public final long Break;
+    property public final long BrightnessDown;
+    property public final long BrightnessUp;
+    property public final long Browser;
+    property public final long Button1;
+    property public final long Button10;
+    property public final long Button11;
+    property public final long Button12;
+    property public final long Button13;
+    property public final long Button14;
+    property public final long Button15;
+    property public final long Button16;
+    property public final long Button2;
+    property public final long Button3;
+    property public final long Button4;
+    property public final long Button5;
+    property public final long Button6;
+    property public final long Button7;
+    property public final long Button8;
+    property public final long Button9;
+    property public final long ButtonA;
+    property public final long ButtonB;
+    property public final long ButtonC;
+    property public final long ButtonL1;
+    property public final long ButtonL2;
+    property public final long ButtonMode;
+    property public final long ButtonR1;
+    property public final long ButtonR2;
+    property public final long ButtonSelect;
+    property public final long ButtonStart;
+    property public final long ButtonThumbLeft;
+    property public final long ButtonThumbRight;
+    property public final long ButtonX;
+    property public final long ButtonY;
+    property public final long ButtonZ;
+    property public final long C;
+    property public final long Calculator;
+    property public final long Calendar;
+    property public final long Call;
+    property public final long Camera;
+    property public final long CapsLock;
+    property public final long Captions;
+    property public final long ChannelDown;
+    property public final long ChannelUp;
+    property public final long Clear;
+    property public final long Comma;
+    property public final long Contacts;
+    property public final long Copy;
+    property public final long CtrlLeft;
+    property public final long CtrlRight;
+    property public final long Cut;
+    property public final long D;
+    property @Deprecated public final long DPadCenter;
+    property @Deprecated public final long DPadDown;
+    property @Deprecated public final long DPadDownLeft;
+    property @Deprecated public final long DPadDownRight;
+    property @Deprecated public final long DPadLeft;
+    property @Deprecated public final long DPadRight;
+    property @Deprecated public final long DPadUp;
+    property @Deprecated public final long DPadUpLeft;
+    property @Deprecated public final long DPadUpRight;
+    property public final long Delete;
+    property public final long DirectionCenter;
+    property public final long DirectionDown;
+    property public final long DirectionDownLeft;
+    property public final long DirectionDownRight;
+    property public final long DirectionLeft;
+    property public final long DirectionRight;
+    property public final long DirectionUp;
+    property public final long DirectionUpLeft;
+    property public final long DirectionUpRight;
+    property public final long Dvr;
+    property public final long E;
+    property public final long Eight;
+    property public final long Eisu;
+    property public final long EndCall;
+    property public final long Enter;
+    property public final long Envelope;
+    property public final long Equals;
+    property public final long Escape;
+    property public final long F;
+    property public final long F1;
+    property public final long F10;
+    property public final long F11;
+    property public final long F12;
+    property public final long F2;
+    property public final long F3;
+    property public final long F4;
+    property public final long F5;
+    property public final long F6;
+    property public final long F7;
+    property public final long F8;
+    property public final long F9;
+    property public final long Five;
+    property public final long Focus;
+    property public final long Forward;
+    property public final long Four;
+    property public final long Function;
+    property public final long G;
+    property public final long Grave;
+    property public final long Guide;
+    property public final long H;
+    property public final long HeadsetHook;
+    property public final long Help;
+    property public final long Henkan;
+    property public final long Home;
+    property public final long I;
+    property public final long Info;
+    property public final long Insert;
+    property public final long J;
+    property public final long K;
+    property public final long Kana;
+    property public final long KatakanaHiragana;
+    property public final long L;
+    property public final long LanguageSwitch;
+    property public final long LastChannel;
+    property public final long LeftBracket;
+    property public final long M;
+    property public final long MannerMode;
+    property public final long MediaAudioTrack;
+    property public final long MediaClose;
+    property public final long MediaEject;
+    property public final long MediaFastForward;
+    property public final long MediaNext;
+    property public final long MediaPause;
+    property public final long MediaPlay;
+    property public final long MediaPlayPause;
+    property public final long MediaPrevious;
+    property public final long MediaRecord;
+    property public final long MediaRewind;
+    property public final long MediaSkipBackward;
+    property public final long MediaSkipForward;
+    property public final long MediaStepBackward;
+    property public final long MediaStepForward;
+    property public final long MediaStop;
+    property public final long MediaTopMenu;
+    property public final long Menu;
+    property public final long MetaLeft;
+    property public final long MetaRight;
+    property public final long MicrophoneMute;
+    property public final long Minus;
+    property public final long MoveEnd;
+    property public final long MoveHome;
+    property public final long Muhenkan;
+    property public final long Multiply;
+    property public final long Music;
+    property public final long N;
+    property public final long NavigateIn;
+    property public final long NavigateNext;
+    property public final long NavigateOut;
+    property public final long NavigatePrevious;
+    property public final long Nine;
+    property public final long Notification;
+    property public final long NumLock;
+    property public final long NumPad0;
+    property public final long NumPad1;
+    property public final long NumPad2;
+    property public final long NumPad3;
+    property public final long NumPad4;
+    property public final long NumPad5;
+    property public final long NumPad6;
+    property public final long NumPad7;
+    property public final long NumPad8;
+    property public final long NumPad9;
+    property public final long NumPadAdd;
+    property public final long NumPadComma;
+    property public final long NumPadDivide;
+    property public final long NumPadDot;
+    property public final long NumPadEnter;
+    property public final long NumPadEquals;
+    property public final long NumPadLeftParenthesis;
+    property public final long NumPadMultiply;
+    property public final long NumPadRightParenthesis;
+    property public final long NumPadSubtract;
+    property public final long Number;
+    property public final long O;
+    property public final long One;
+    property public final long P;
+    property public final long PageDown;
+    property public final long PageUp;
+    property public final long Pairing;
+    property public final long Paste;
+    property public final long Period;
+    property public final long PictureSymbols;
+    property public final long Plus;
+    property public final long Pound;
+    property public final long Power;
+    property public final long PrintScreen;
+    property public final long ProfileSwitch;
+    property public final long ProgramBlue;
+    property public final long ProgramGreen;
+    property public final long ProgramRed;
+    property public final long ProgramYellow;
+    property public final long Q;
+    property public final long R;
+    property public final long Refresh;
+    property public final long RightBracket;
+    property public final long Ro;
+    property public final long S;
+    property public final long ScrollLock;
+    property public final long Search;
+    property public final long Semicolon;
+    property public final long SetTopBoxInput;
+    property public final long SetTopBoxPower;
+    property public final long Settings;
+    property public final long Seven;
+    property public final long ShiftLeft;
+    property public final long ShiftRight;
+    property public final long Six;
+    property public final long Slash;
+    property public final long Sleep;
+    property public final long SoftLeft;
+    property public final long SoftRight;
+    property public final long SoftSleep;
+    property public final long Spacebar;
+    property public final long Stem1;
+    property public final long Stem2;
+    property public final long Stem3;
+    property public final long StemPrimary;
+    property public final long SwitchCharset;
+    property public final long Symbol;
+    property public final long SystemNavigationDown;
+    property public final long SystemNavigationLeft;
+    property public final long SystemNavigationRight;
+    property public final long SystemNavigationUp;
+    property public final long T;
+    property public final long Tab;
+    property public final long Three;
+    property public final long ThumbsDown;
+    property public final long ThumbsUp;
+    property public final long Toggle2D3D;
+    property public final long Tv;
+    property public final long TvAntennaCable;
+    property public final long TvAudioDescription;
+    property public final long TvAudioDescriptionMixingVolumeDown;
+    property public final long TvAudioDescriptionMixingVolumeUp;
+    property public final long TvContentsMenu;
+    property public final long TvDataService;
+    property public final long TvInput;
+    property public final long TvInputComponent1;
+    property public final long TvInputComponent2;
+    property public final long TvInputComposite1;
+    property public final long TvInputComposite2;
+    property public final long TvInputHdmi1;
+    property public final long TvInputHdmi2;
+    property public final long TvInputHdmi3;
+    property public final long TvInputHdmi4;
+    property public final long TvInputVga1;
+    property public final long TvMediaContextMenu;
+    property public final long TvNetwork;
+    property public final long TvNumberEntry;
+    property public final long TvPower;
+    property public final long TvRadioService;
+    property public final long TvSatellite;
+    property public final long TvSatelliteBs;
+    property public final long TvSatelliteCs;
+    property public final long TvSatelliteService;
+    property public final long TvTeletext;
+    property public final long TvTerrestrialAnalog;
+    property public final long TvTerrestrialDigital;
+    property public final long TvTimerProgramming;
+    property public final long TvZoomMode;
+    property public final long Two;
+    property public final long U;
+    property public final long Unknown;
+    property public final long V;
+    property public final long VoiceAssist;
+    property public final long VolumeDown;
+    property public final long VolumeMute;
+    property public final long VolumeUp;
+    property public final long W;
+    property public final long WakeUp;
+    property public final long Window;
+    property public final long X;
+    property public final long Y;
+    property public final long Yen;
+    property public final long Z;
+    property public final long ZenkakuHankaru;
+    property public final long Zero;
+    property public final long ZoomIn;
+    property public final long ZoomOut;
   }
 
-  public interface KeyEvent {
-    method public int getKey-EK5gGoQ();
-    method public androidx.compose.ui.input.key.KeyEventType getType();
-    method public int getUtf16CodePoint();
-    method public boolean isAltPressed();
-    method public boolean isCtrlPressed();
-    method public boolean isMetaPressed();
-    method public boolean isShiftPressed();
-    property public abstract boolean isAltPressed;
-    property public abstract boolean isCtrlPressed;
-    property public abstract boolean isMetaPressed;
-    property public abstract boolean isShiftPressed;
-    property public abstract int key;
-    property public abstract androidx.compose.ui.input.key.KeyEventType type;
-    property public abstract int utf16CodePoint;
+  public final inline class KeyEvent {
+    ctor public KeyEvent();
+    method public static android.view.KeyEvent! constructor-impl(android.view.KeyEvent nativeKeyEvent);
+    method public static inline boolean equals-impl(android.view.KeyEvent! p, Object? p1);
+    method public static boolean equals-impl0(android.view.KeyEvent p1, android.view.KeyEvent p2);
+    method public android.view.KeyEvent getNativeKeyEvent();
+    method public static inline int hashCode-impl(android.view.KeyEvent! p);
+    method public static inline String! toString-impl(android.view.KeyEvent! p);
+    property public final android.view.KeyEvent nativeKeyEvent;
+  }
+
+  public final class KeyEventKt {
+    method public static long getKey-ZmokQxo(android.view.KeyEvent);
+    method public static androidx.compose.ui.input.key.KeyEventType getType-ZmokQxo(android.view.KeyEvent);
+    method public static int getUtf16CodePoint-ZmokQxo(android.view.KeyEvent);
+    method public static boolean isAltPressed-ZmokQxo(android.view.KeyEvent);
+    method public static boolean isCtrlPressed-ZmokQxo(android.view.KeyEvent);
+    method public static boolean isMetaPressed-ZmokQxo(android.view.KeyEvent);
+    method public static boolean isShiftPressed-ZmokQxo(android.view.KeyEvent);
   }
 
   public enum KeyEventType {
@@ -1494,10 +1548,13 @@ package androidx.compose.ui.input.key {
   }
 
   public final class KeyInputModifierKt {
-    method @Deprecated public static androidx.compose.ui.Modifier keyInputFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.key.KeyEvent,java.lang.Boolean> onKeyEvent);
     method public static androidx.compose.ui.Modifier onKeyEvent(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.key.KeyEvent,java.lang.Boolean> onKeyEvent);
     method public static androidx.compose.ui.Modifier onPreviewKeyEvent(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.key.KeyEvent,java.lang.Boolean> onPreviewKeyEvent);
-    method @Deprecated public static androidx.compose.ui.Modifier previewKeyInputFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.key.KeyEvent,java.lang.Boolean> onPreviewKeyEvent);
+  }
+
+  public final class KeyKt {
+    method public static long Key(int nativeKeyCode);
+    method public static int getNativeKeyCode-YVgTNJs(long);
   }
 
 }
@@ -1588,51 +1645,25 @@ package androidx.compose.ui.input.pointer {
   }
 
   @androidx.compose.runtime.Immutable public final class PointerInputChange {
-    method public long component1-J3iCeTQ();
-    method public androidx.compose.ui.input.pointer.PointerInputData component2();
-    method public androidx.compose.ui.input.pointer.PointerInputData component3();
-    method public androidx.compose.ui.input.pointer.ConsumedData component4();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.input.pointer.PointerInputChange copy-FzBznnU(long id, androidx.compose.ui.input.pointer.PointerInputData current, androidx.compose.ui.input.pointer.PointerInputData previous, androidx.compose.ui.input.pointer.ConsumedData consumed);
+    method public androidx.compose.ui.input.pointer.PointerInputChange copy-aJ2ieLA(optional long id, optional long currentTime, optional long currentPosition, optional boolean currentPressed, optional long previousTime, optional long previousPosition, optional boolean previousPressed, optional androidx.compose.ui.input.pointer.ConsumedData consumed, optional androidx.compose.ui.input.pointer.PointerType type);
     method public androidx.compose.ui.input.pointer.ConsumedData getConsumed();
-    method public androidx.compose.ui.input.pointer.PointerInputData getCurrent();
     method public long getId-J3iCeTQ();
-    method public androidx.compose.ui.input.pointer.PointerInputData getPrevious();
-    property public final androidx.compose.ui.input.pointer.ConsumedData consumed;
-    property public final androidx.compose.ui.input.pointer.PointerInputData current;
-    property public final long id;
-    property public final androidx.compose.ui.input.pointer.PointerInputData previous;
-  }
-
-  @androidx.compose.runtime.Immutable public final class PointerInputData {
-    method public long component1-CLVl0cY();
-    method public long component2-F1C5BW0();
-    method public boolean component3();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.input.pointer.PointerInputData copy-JMrSy48(long uptime, long position, boolean down);
-    method public boolean getDown();
     method public long getPosition-F1C5BW0();
-    method public long getUptime-CLVl0cY();
-    property public final boolean down;
-    property public final long position;
-    property public final long uptime;
-  }
-
-  public final class PointerInputEvent {
-    method public android.view.MotionEvent getMotionEvent();
-    method public java.util.List<androidx.compose.ui.input.pointer.PointerInputEventData> getPointers();
-    method public long getUptime-CLVl0cY();
-    property public final android.view.MotionEvent motionEvent;
-    property public final java.util.List<androidx.compose.ui.input.pointer.PointerInputEventData> pointers;
-    property public final long uptime;
-  }
-
-  public final class PointerInputEventData {
-    method public long component1-J3iCeTQ();
-    method public androidx.compose.ui.input.pointer.PointerInputData component2();
-    method public androidx.compose.ui.input.pointer.PointerInputEventData copy-pdufZyI(long id, androidx.compose.ui.input.pointer.PointerInputData pointerInputData);
-    method public long getId-J3iCeTQ();
-    method public androidx.compose.ui.input.pointer.PointerInputData getPointerInputData();
+    method public boolean getPressed();
+    method public long getPreviousPosition-F1C5BW0();
+    method public boolean getPreviousPressed();
+    method public long getPreviousUptimeMillis();
+    method public androidx.compose.ui.input.pointer.PointerType getType();
+    method public long getUptimeMillis();
+    property public final androidx.compose.ui.input.pointer.ConsumedData consumed;
     property public final long id;
-    property public final androidx.compose.ui.input.pointer.PointerInputData pointerInputData;
+    property public final long position;
+    property public final boolean pressed;
+    property public final long previousPosition;
+    property public final boolean previousPressed;
+    property public final long previousUptimeMillis;
+    property public final androidx.compose.ui.input.pointer.PointerType type;
+    property public final long uptimeMillis;
   }
 
   public final class PointerInputEventProcessorKt {
@@ -1670,6 +1701,14 @@ package androidx.compose.ui.input.pointer {
   }
 
   public final class PointerInteropUtilsKt {
+  }
+
+  public enum PointerType {
+    enum_constant public static final androidx.compose.ui.input.pointer.PointerType Eraser;
+    enum_constant public static final androidx.compose.ui.input.pointer.PointerType Mouse;
+    enum_constant public static final androidx.compose.ui.input.pointer.PointerType Stylus;
+    enum_constant public static final androidx.compose.ui.input.pointer.PointerType Touch;
+    enum_constant public static final androidx.compose.ui.input.pointer.PointerType Unknown;
   }
 
   public final class RequestDisallowInterceptTouchEvent implements kotlin.jvm.functions.Function1<java.lang.Boolean,kotlin.Unit> {
@@ -1801,16 +1840,20 @@ package androidx.compose.ui.layout {
   }
 
   public interface LayoutCoordinates {
-    method public androidx.compose.ui.geometry.Rect childBoundingBox(androidx.compose.ui.layout.LayoutCoordinates child);
-    method public long childToLocal-YJiYy8w(androidx.compose.ui.layout.LayoutCoordinates child, long childLocal);
+    method @Deprecated public androidx.compose.ui.geometry.Rect childBoundingBox(androidx.compose.ui.layout.LayoutCoordinates child);
+    method @Deprecated public long childToLocal-YJiYy8w(androidx.compose.ui.layout.LayoutCoordinates child, long childLocal);
     method public operator int get(androidx.compose.ui.layout.AlignmentLine line);
     method public androidx.compose.ui.layout.LayoutCoordinates? getParentCoordinates();
     method public java.util.Set<androidx.compose.ui.layout.AlignmentLine> getProvidedAlignmentLines();
     method public long getSize-YbymL2g();
-    method public long globalToLocal-k-4lQ0M(long global);
+    method @Deprecated public long globalToLocal-k-4lQ0M(long global);
     method public boolean isAttached();
-    method public long localToGlobal-k-4lQ0M(long local);
-    method public long localToRoot-k-4lQ0M(long local);
+    method public androidx.compose.ui.geometry.Rect localBoundingBoxOf(androidx.compose.ui.layout.LayoutCoordinates sourceCoordinates, optional boolean clipBounds);
+    method public long localPositionOf-YJiYy8w(androidx.compose.ui.layout.LayoutCoordinates sourceCoordinates, long relativeToSource);
+    method @Deprecated public long localToGlobal-k-4lQ0M(long local);
+    method public long localToRoot-k-4lQ0M(long relativeToLocal);
+    method public long localToWindow-k-4lQ0M(long relativeToLocal);
+    method public long windowToLocal-k-4lQ0M(long relativeToWindow);
     property public abstract boolean isAttached;
     property public abstract androidx.compose.ui.layout.LayoutCoordinates? parentCoordinates;
     property public abstract java.util.Set<androidx.compose.ui.layout.AlignmentLine> providedAlignmentLines;
@@ -1818,12 +1861,16 @@ package androidx.compose.ui.layout {
   }
 
   public final class LayoutCoordinatesKt {
+    method public static androidx.compose.ui.geometry.Rect boundsInRoot(androidx.compose.ui.layout.LayoutCoordinates);
+    method public static androidx.compose.ui.geometry.Rect boundsInWindow(androidx.compose.ui.layout.LayoutCoordinates);
     method public static androidx.compose.ui.geometry.Rect getBoundsInParent(androidx.compose.ui.layout.LayoutCoordinates);
-    method public static androidx.compose.ui.geometry.Rect getBoundsInRoot(androidx.compose.ui.layout.LayoutCoordinates);
-    method public static androidx.compose.ui.geometry.Rect getGlobalBounds(androidx.compose.ui.layout.LayoutCoordinates);
-    method public static inline long getGlobalPosition(androidx.compose.ui.layout.LayoutCoordinates);
+    method @Deprecated public static androidx.compose.ui.geometry.Rect getBoundsInRoot(androidx.compose.ui.layout.LayoutCoordinates);
+    method @Deprecated public static androidx.compose.ui.geometry.Rect getGlobalBounds(androidx.compose.ui.layout.LayoutCoordinates);
+    method @Deprecated public static inline long getGlobalPosition(androidx.compose.ui.layout.LayoutCoordinates);
     method public static long getPositionInParent(androidx.compose.ui.layout.LayoutCoordinates);
-    method public static inline long getPositionInRoot(androidx.compose.ui.layout.LayoutCoordinates);
+    method @Deprecated public static inline long getPositionInRoot(androidx.compose.ui.layout.LayoutCoordinates);
+    method public static long positionInRoot(androidx.compose.ui.layout.LayoutCoordinates);
+    method public static long positionInWindow(androidx.compose.ui.layout.LayoutCoordinates);
   }
 
   public final class LayoutIdKt {
@@ -1859,7 +1906,7 @@ package androidx.compose.ui.layout {
     method @androidx.compose.runtime.Composable public static inline void Layout(kotlin.jvm.functions.Function0<kotlin.Unit> content, androidx.compose.ui.node.MeasureBlocks measureBlocks, optional androidx.compose.ui.Modifier modifier);
     method public static androidx.compose.ui.node.MeasureBlocks MeasuringIntrinsicsMeasureBlocks(kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.MeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.Measurable>,? super androidx.compose.ui.unit.Constraints,? extends androidx.compose.ui.layout.MeasureResult> measureBlock);
     method @Deprecated @androidx.compose.runtime.Composable public static void MultiMeasureLayout(optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function0<kotlin.Unit> children, kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.MeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.Measurable>,? super androidx.compose.ui.unit.Constraints,? extends androidx.compose.ui.layout.MeasureResult> measureBlock);
-    method @androidx.compose.runtime.Composable public static void WithConstraints(optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.WithConstraintsScope,kotlin.Unit> content);
+    method @Deprecated @androidx.compose.runtime.Composable public static void WithConstraints(optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.WithConstraintsScope,kotlin.Unit> content);
     method @kotlin.PublishedApi internal static kotlin.jvm.functions.Function1<androidx.compose.runtime.SkippableUpdater<androidx.compose.ui.node.LayoutNode>,kotlin.Unit> materializerOf(androidx.compose.ui.Modifier modifier);
     method public static androidx.compose.ui.node.MeasureBlocks measureBlocksOf(kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.IntrinsicMeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.IntrinsicMeasurable>,? super java.lang.Integer,java.lang.Integer> minIntrinsicWidthMeasureBlock, kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.IntrinsicMeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.IntrinsicMeasurable>,? super java.lang.Integer,java.lang.Integer> minIntrinsicHeightMeasureBlock, kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.IntrinsicMeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.IntrinsicMeasurable>,? super java.lang.Integer,java.lang.Integer> maxIntrinsicWidthMeasureBlock, kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.IntrinsicMeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.IntrinsicMeasurable>,? super java.lang.Integer,java.lang.Integer> maxIntrinsicHeightMeasureBlock, kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.MeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.Measurable>,? super androidx.compose.ui.unit.Constraints,? extends androidx.compose.ui.layout.MeasureResult> measureBlock);
   }
@@ -2011,7 +2058,10 @@ package androidx.compose.ui.layout {
   public final class ScaleFactorKt {
     method @androidx.compose.runtime.Stable public static long ScaleFactor(float scaleX, float scaleY);
     method @androidx.compose.runtime.Stable public static operator long div-ngKnWWw(long, long scaleFactor);
+    method public static inline boolean isSpecified-FK8aYYs(long);
+    method public static inline boolean isUnspecified-FK8aYYs(long);
     method @androidx.compose.runtime.Stable public static long lerp-bKVCie4(long start, long stop, float fraction);
+    method public static inline long takeOrElse-L-byAFk(long, kotlin.jvm.functions.Function0<androidx.compose.ui.layout.ScaleFactor> block);
     method @androidx.compose.runtime.Stable public static operator long times-Sp6zcS4(long, long size);
     method @androidx.compose.runtime.Stable public static operator long times-ngKnWWw(long, long scaleFactor);
   }
@@ -2031,12 +2081,12 @@ package androidx.compose.ui.layout {
     ctor public VerticalAlignmentLine(kotlin.jvm.functions.Function2<? super java.lang.Integer,? super java.lang.Integer,java.lang.Integer> merger);
   }
 
-  @androidx.compose.runtime.Stable public interface WithConstraintsScope {
-    method public long getConstraints-msEJaDk();
-    method public float getMaxHeight-D9Ej5fM();
-    method public float getMaxWidth-D9Ej5fM();
-    method public float getMinHeight-D9Ej5fM();
-    method public float getMinWidth-D9Ej5fM();
+  @Deprecated @androidx.compose.runtime.Stable public interface WithConstraintsScope {
+    method @Deprecated public long getConstraints-msEJaDk();
+    method @Deprecated public float getMaxHeight-D9Ej5fM();
+    method @Deprecated public float getMaxWidth-D9Ej5fM();
+    method @Deprecated public float getMinHeight-D9Ej5fM();
+    method @Deprecated public float getMinWidth-D9Ej5fM();
     property public abstract long constraints;
     property public abstract float maxHeight;
     property public abstract float maxWidth;
@@ -2116,60 +2166,6 @@ package androidx.compose.ui.node {
     property public abstract long layerId;
   }
 
-  public interface Owner {
-    method public long calculatePosition-nOcc-ac();
-    method public androidx.compose.ui.node.OwnedLayer createLayer(kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.Canvas,kotlin.Unit> drawBlock, kotlin.jvm.functions.Function0<kotlin.Unit> invalidateParentLayer);
-    method public androidx.compose.ui.autofill.Autofill? getAutofill();
-    method public androidx.compose.ui.autofill.AutofillTree getAutofillTree();
-    method public androidx.compose.ui.platform.ClipboardManager getClipboardManager();
-    method public androidx.compose.ui.unit.Density getDensity();
-    method public androidx.compose.ui.focus.FocusManager getFocusManager();
-    method public androidx.compose.ui.text.font.Font.ResourceLoader getFontLoader();
-    method public androidx.compose.ui.hapticfeedback.HapticFeedback getHapticFeedBack();
-    method public androidx.compose.ui.unit.LayoutDirection getLayoutDirection();
-    method public long getMeasureIteration();
-    method public androidx.compose.ui.node.LayoutNode getRoot();
-    method public androidx.compose.ui.semantics.SemanticsOwner getSemanticsOwner();
-    method public boolean getShowLayoutBounds();
-    method public androidx.compose.ui.node.OwnerSnapshotObserver getSnapshotObserver();
-    method public androidx.compose.ui.text.input.TextInputService getTextInputService();
-    method public androidx.compose.ui.platform.TextToolbar getTextToolbar();
-    method public androidx.compose.ui.platform.ViewConfiguration getViewConfiguration();
-    method public androidx.compose.ui.platform.WindowManager getWindowManager();
-    method public void measureAndLayout();
-    method public void onAttach(androidx.compose.ui.node.LayoutNode node);
-    method public void onDetach(androidx.compose.ui.node.LayoutNode node);
-    method public void onRequestMeasure(androidx.compose.ui.node.LayoutNode layoutNode);
-    method public void onRequestRelayout(androidx.compose.ui.node.LayoutNode layoutNode);
-    method public void onSemanticsChange();
-    method public boolean requestFocus();
-    method public boolean sendKeyEvent(androidx.compose.ui.input.key.KeyEvent keyEvent);
-    property public abstract androidx.compose.ui.autofill.Autofill? autofill;
-    property public abstract androidx.compose.ui.autofill.AutofillTree autofillTree;
-    property public abstract androidx.compose.ui.platform.ClipboardManager clipboardManager;
-    property public abstract androidx.compose.ui.unit.Density density;
-    property public abstract androidx.compose.ui.focus.FocusManager focusManager;
-    property public abstract androidx.compose.ui.text.font.Font.ResourceLoader fontLoader;
-    property public abstract androidx.compose.ui.hapticfeedback.HapticFeedback hapticFeedBack;
-    property public abstract androidx.compose.ui.unit.LayoutDirection layoutDirection;
-    property public abstract long measureIteration;
-    property public abstract androidx.compose.ui.node.LayoutNode root;
-    property public abstract androidx.compose.ui.semantics.SemanticsOwner semanticsOwner;
-    property public abstract boolean showLayoutBounds;
-    property public abstract androidx.compose.ui.node.OwnerSnapshotObserver snapshotObserver;
-    property public abstract androidx.compose.ui.text.input.TextInputService textInputService;
-    property public abstract androidx.compose.ui.platform.TextToolbar textToolbar;
-    property public abstract androidx.compose.ui.platform.ViewConfiguration viewConfiguration;
-    property public abstract androidx.compose.ui.platform.WindowManager windowManager;
-    field public static final androidx.compose.ui.node.Owner.Companion Companion;
-  }
-
-  public static final class Owner.Companion {
-    method public boolean getEnableExtraAssertions();
-    method public void setEnableExtraAssertions(boolean p);
-    property public final boolean enableExtraAssertions;
-  }
-
   public interface OwnerScope {
     method public boolean isValid();
     property public abstract boolean isValid;
@@ -2184,6 +2180,16 @@ package androidx.compose.ui.node {
     method public T? getValue();
     method public void setValue(T? p);
     property public final T? value;
+  }
+
+  public interface RootForTest {
+    method public androidx.compose.ui.unit.Density getDensity();
+    method public androidx.compose.ui.semantics.SemanticsOwner getSemanticsOwner();
+    method public androidx.compose.ui.text.input.TextInputService getTextInputService();
+    method public boolean sendKeyEvent-ZmokQxo(android.view.KeyEvent keyEvent);
+    property public abstract androidx.compose.ui.unit.Density density;
+    property public abstract androidx.compose.ui.semantics.SemanticsOwner semanticsOwner;
+    property public abstract androidx.compose.ui.text.input.TextInputService textInputService;
   }
 
   public final class UiApplier extends androidx.compose.runtime.AbstractApplier<java.lang.Object> {
@@ -2209,16 +2215,20 @@ package androidx.compose.ui.platform {
     method @androidx.compose.runtime.Composable public abstract void Content();
     method public final void createComposition();
     method public final void disposeComposition();
-    method public final boolean isDisposed();
+    method public final boolean getHasComposition();
+    method protected boolean getShouldCreateCompositionOnAttachedToWindow();
     method protected final void onLayout(boolean changed, int left, int top, int right, int bottom);
     method protected final void onMeasure(int widthMeasureSpec, int heightMeasureSpec);
-    property public final boolean isDisposed;
+    method public final void setParentCompositionReference(androidx.compose.runtime.CompositionReference? parent);
+    method public final void setViewCompositionStrategy(androidx.compose.ui.platform.ViewCompositionStrategy strategy);
+    property public final boolean hasComposition;
+    property protected boolean shouldCreateCompositionOnAttachedToWindow;
   }
 
   public final class AmbientsKt {
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.animation.core.AnimationClockObservable> getAmbientAnimationClock();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.autofill.Autofill> getAmbientAutofill();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.autofill.AutofillTree> getAmbientAutofillTree();
+    method @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.autofill.Autofill> getAmbientAutofill();
+    method @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.autofill.AutofillTree> getAmbientAutofillTree();
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.ClipboardManager> getAmbientClipboardManager();
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.unit.Density> getAmbientDensity();
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.focus.FocusManager> getAmbientFocusManager();
@@ -2228,7 +2238,8 @@ package androidx.compose.ui.platform {
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.TextToolbar> getAmbientTextToolbar();
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.UriHandler> getAmbientUriHandler();
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.ViewConfiguration> getAmbientViewConfiguration();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.WindowManager> getAmbientWindowManager();
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.WindowInfo> getAmbientWindowInfo();
+    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.WindowInfo>! getAmbientWindowManager();
     method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.animation.core.AnimationClockObservable>! getAnimationClockAmbient();
     method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.ClipboardManager>! getClipboardManagerAmbient();
     method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.unit.Density>! getDensityAmbient();
@@ -2246,6 +2257,7 @@ package androidx.compose.ui.platform {
     method public static androidx.compose.runtime.ProvidableAmbient<android.content.res.Configuration> getAmbientConfiguration();
     method public static androidx.compose.runtime.ProvidableAmbient<android.content.Context> getAmbientContext();
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.lifecycle.LifecycleOwner> getAmbientLifecycleOwner();
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.savedstate.SavedStateRegistryOwner> getAmbientSavedStateRegistryOwner();
     method public static androidx.compose.runtime.ProvidableAmbient<android.view.View> getAmbientView();
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.lifecycle.ViewModelStoreOwner> getAmbientViewModelStoreOwner();
     method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<android.content.res.Configuration>! getConfigurationAmbient();
@@ -2258,6 +2270,9 @@ package androidx.compose.ui.platform {
   public final class AndroidClipboardManagerKt {
   }
 
+  public final class AndroidComposeViewAccessibilityDelegateCompatKt {
+  }
+
   public final class AndroidComposeViewKt {
   }
 
@@ -2268,13 +2283,13 @@ package androidx.compose.ui.platform {
 
   public final class AndroidViewConfiguration implements androidx.compose.ui.platform.ViewConfiguration {
     ctor public AndroidViewConfiguration(android.view.ViewConfiguration viewConfiguration);
-    method public long getDoubleTapMinTime-ojFfpTE();
-    method public long getDoubleTapTimeout-ojFfpTE();
-    method public long getLongPressTimeout-ojFfpTE();
+    method public long getDoubleTapMinTimeMillis();
+    method public long getDoubleTapTimeoutMillis();
+    method public long getLongPressTimeoutMillis();
     method public float getTouchSlop();
-    property public long doubleTapMinTime;
-    property public long doubleTapTimeout;
-    property public long longPressTimeout;
+    property public long doubleTapMinTimeMillis;
+    property public long doubleTapTimeoutMillis;
+    property public long longPressTimeoutMillis;
     property public float touchSlop;
   }
 
@@ -2289,6 +2304,7 @@ package androidx.compose.ui.platform {
     ctor public ComposeView(android.content.Context context);
     method @androidx.compose.runtime.Composable public void Content();
     method public void setContent(kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    property protected boolean shouldCreateCompositionOnAttachedToWindow;
   }
 
   public final class DebugUtilsKt {
@@ -2379,18 +2395,45 @@ package androidx.compose.ui.platform {
     method public operator void set(String name, Object? value);
   }
 
+  public interface ViewCompositionStrategy {
+    method public kotlin.jvm.functions.Function0<kotlin.Unit> installFor(androidx.compose.ui.platform.AbstractComposeView view);
+    field public static final androidx.compose.ui.platform.ViewCompositionStrategy.Companion Companion;
+  }
+
+  public static final class ViewCompositionStrategy.Companion {
+  }
+
+  public static final class ViewCompositionStrategy.DisposeOnDetachedFromWindow implements androidx.compose.ui.platform.ViewCompositionStrategy {
+    method public kotlin.jvm.functions.Function0<kotlin.Unit> installFor(androidx.compose.ui.platform.AbstractComposeView view);
+    field public static final androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnDetachedFromWindow INSTANCE;
+  }
+
+  public static final class ViewCompositionStrategy.DisposeOnLifecycleDestroyed implements androidx.compose.ui.platform.ViewCompositionStrategy {
+    ctor public ViewCompositionStrategy.DisposeOnLifecycleDestroyed(androidx.lifecycle.Lifecycle lifecycle);
+    ctor public ViewCompositionStrategy.DisposeOnLifecycleDestroyed(androidx.lifecycle.LifecycleOwner lifecycleOwner);
+    method public kotlin.jvm.functions.Function0<kotlin.Unit> installFor(androidx.compose.ui.platform.AbstractComposeView view);
+  }
+
+  public static final class ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed implements androidx.compose.ui.platform.ViewCompositionStrategy {
+    method public kotlin.jvm.functions.Function0<kotlin.Unit> installFor(androidx.compose.ui.platform.AbstractComposeView view);
+    field public static final androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed INSTANCE;
+  }
+
+  public final class ViewCompositionStrategyKt {
+  }
+
   public interface ViewConfiguration {
-    method public long getDoubleTapMinTime-ojFfpTE();
-    method public long getDoubleTapTimeout-ojFfpTE();
-    method public long getLongPressTimeout-ojFfpTE();
+    method public long getDoubleTapMinTimeMillis();
+    method public long getDoubleTapTimeoutMillis();
+    method public long getLongPressTimeoutMillis();
     method public float getTouchSlop();
-    property public abstract long doubleTapMinTime;
-    property public abstract long doubleTapTimeout;
-    property public abstract long longPressTimeout;
+    property public abstract long doubleTapMinTimeMillis;
+    property public abstract long doubleTapTimeoutMillis;
+    property public abstract long longPressTimeoutMillis;
     property public abstract float touchSlop;
   }
 
-  @VisibleForTesting public interface ViewRootForTest extends androidx.compose.ui.node.Owner {
+  @VisibleForTesting public interface ViewRootForTest extends androidx.compose.ui.node.RootForTest {
     method public boolean getHasPendingMeasureOrLayout();
     method public android.view.View getView();
     method public void invalidateDescendants();
@@ -2407,18 +2450,46 @@ package androidx.compose.ui.platform {
     property public final kotlin.jvm.functions.Function1<androidx.compose.ui.platform.ViewRootForTest,kotlin.Unit>? onViewCreatedCallback;
   }
 
-  @androidx.compose.runtime.Stable public interface WindowManager {
+  @androidx.compose.runtime.Stable public interface WindowInfo {
     method public boolean isWindowFocused();
     property public abstract boolean isWindowFocused;
   }
 
-  public final class WindowManagerKt {
-    method @androidx.compose.runtime.Composable public static void WindowFocusObserver(kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onWindowFocusChanged);
+  public final class WindowInfoKt {
+    method @Deprecated @androidx.compose.runtime.Composable public static void WindowFocusObserver(kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onWindowFocusChanged);
+  }
+
+  @Deprecated @androidx.compose.runtime.Stable public interface WindowManager {
+    method @Deprecated public boolean isWindowFocused();
+    property public abstract boolean isWindowFocused;
+  }
+
+  @androidx.compose.ui.InternalComposeUiApi public fun interface WindowRecomposerFactory {
+    method public androidx.compose.runtime.Recomposer createRecomposer(android.view.View windowRootView);
+    field public static final androidx.compose.ui.platform.WindowRecomposerFactory.Companion Companion;
+  }
+
+  public static final class WindowRecomposerFactory.Companion {
+    method @Deprecated public androidx.compose.ui.platform.WindowRecomposerFactory getGlobal();
+    method public androidx.compose.ui.platform.WindowRecomposerFactory getLifecycleAware();
+    property @Deprecated public final androidx.compose.ui.platform.WindowRecomposerFactory Global;
+    property public final androidx.compose.ui.platform.WindowRecomposerFactory LifecycleAware;
+  }
+
+  public final class WindowRecomposerKt {
+    method public static androidx.compose.runtime.CompositionReference? findViewTreeCompositionReference(android.view.View);
+    method public static androidx.compose.runtime.CompositionReference? getCompositionReference(android.view.View);
+    method public static void setCompositionReference(android.view.View, androidx.compose.runtime.CompositionReference? value);
+  }
+
+  @androidx.compose.ui.InternalComposeUiApi public final class WindowRecomposerPolicy {
+    method public void setWindowRecomposerFactory(androidx.compose.ui.platform.WindowRecomposerFactory factory);
+    field public static final androidx.compose.ui.platform.WindowRecomposerPolicy INSTANCE;
   }
 
   public final class WrapperKt {
     method public static androidx.compose.runtime.Composition setContent(androidx.activity.ComponentActivity, optional androidx.compose.runtime.CompositionReference parent, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method public static androidx.compose.runtime.Composition setContent(android.view.ViewGroup, optional androidx.compose.runtime.CompositionReference parent, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @Deprecated public static androidx.compose.runtime.Composition setContent(android.view.ViewGroup, optional androidx.compose.runtime.CompositionReference parent, kotlin.jvm.functions.Function0<kotlin.Unit> content);
     method @Deprecated public static androidx.compose.runtime.Composition setViewContent(android.view.ViewGroup, optional androidx.compose.runtime.CompositionReference parent, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
     method @Deprecated public static androidx.compose.runtime.Composition setViewContent(android.app.Activity, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
   }
@@ -2554,6 +2625,7 @@ package androidx.compose.ui.selection {
 
   @androidx.compose.ui.text.ExperimentalTextApi public interface SelectionRegistrar {
     method public void notifyPositionChange();
+    method public void notifySelectableChange(androidx.compose.ui.selection.Selectable selectable);
     method public void notifySelectionUpdate-rULFVbc(androidx.compose.ui.layout.LayoutCoordinates layoutCoordinates, long startPosition, long endPosition);
     method public void notifySelectionUpdateEnd();
     method public void notifySelectionUpdateStart-YJiYy8w(androidx.compose.ui.layout.LayoutCoordinates layoutCoordinates, long startPosition);
@@ -2595,35 +2667,6 @@ package androidx.compose.ui.semantics {
     property public final CharSequence? label;
   }
 
-  public final class AccessibilityRangeInfo {
-    ctor public AccessibilityRangeInfo(float current, kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> range, @IntRange(from=0) int steps);
-    method public float component1();
-    method public kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> component2();
-    method public int component3();
-    method public androidx.compose.ui.semantics.AccessibilityRangeInfo copy(float current, kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> range, int steps);
-    method public float getCurrent();
-    method public kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> getRange();
-    method public int getSteps();
-    property public final float current;
-    property public final kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> range;
-    property public final int steps;
-  }
-
-  public final class AccessibilityScrollState {
-    ctor public AccessibilityScrollState(float value, float maxValue, boolean reverseScrolling);
-    ctor public AccessibilityScrollState();
-    method public float component1();
-    method public float component2();
-    method public boolean component3();
-    method public androidx.compose.ui.semantics.AccessibilityScrollState copy(float value, float maxValue, boolean reverseScrolling);
-    method public float getMaxValue();
-    method public boolean getReverseScrolling();
-    method public float getValue();
-    property public final float maxValue;
-    property public final boolean reverseScrolling;
-    property public final float value;
-  }
-
   public final class CustomAccessibilityAction {
     ctor public CustomAccessibilityAction(CharSequence label, kotlin.jvm.functions.Function0<java.lang.Boolean> action);
     method public CharSequence component1();
@@ -2633,6 +2676,43 @@ package androidx.compose.ui.semantics {
     method public CharSequence getLabel();
     property public final kotlin.jvm.functions.Function0<java.lang.Boolean> action;
     property public final CharSequence label;
+  }
+
+  public final class ProgressBarRangeInfo {
+    ctor public ProgressBarRangeInfo(float current, kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> range, int steps);
+    method public float component1();
+    method public kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> component2();
+    method public int component3();
+    method public androidx.compose.ui.semantics.ProgressBarRangeInfo copy(float current, kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> range, int steps);
+    method public float getCurrent();
+    method public kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> getRange();
+    method public int getSteps();
+    property public final float current;
+    property public final kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> range;
+    property public final int steps;
+  }
+
+  public enum Role {
+    enum_constant public static final androidx.compose.ui.semantics.Role Button;
+    enum_constant public static final androidx.compose.ui.semantics.Role Checkbox;
+    enum_constant public static final androidx.compose.ui.semantics.Role RadioButton;
+    enum_constant public static final androidx.compose.ui.semantics.Role Switch;
+    enum_constant public static final androidx.compose.ui.semantics.Role Tab;
+  }
+
+  public final class ScrollAxisRange {
+    ctor public ScrollAxisRange(float value, float maxValue, boolean reverseScrolling);
+    ctor public ScrollAxisRange();
+    method public float component1();
+    method public float component2();
+    method public boolean component3();
+    method public androidx.compose.ui.semantics.ScrollAxisRange copy(float value, float maxValue, boolean reverseScrolling);
+    method public float getMaxValue();
+    method public boolean getReverseScrolling();
+    method public float getValue();
+    property public final float maxValue;
+    property public final boolean reverseScrolling;
+    property public final float value;
   }
 
   public final class SemanticsActions {
@@ -2706,9 +2786,9 @@ package androidx.compose.ui.semantics {
     method public int getId();
     method public androidx.compose.ui.layout.LayoutInfo getLayoutInfo();
     method public boolean getMergingEnabled();
-    method public androidx.compose.ui.node.Owner? getOwner();
     method public androidx.compose.ui.semantics.SemanticsNode? getParent();
     method public long getPositionInRoot-F1C5BW0();
+    method public androidx.compose.ui.node.RootForTest? getRoot();
     method public long getSize-YbymL2g();
     method public boolean isRoot();
     property public final androidx.compose.ui.geometry.Rect boundsInRoot;
@@ -2720,9 +2800,9 @@ package androidx.compose.ui.semantics {
     property public final boolean isRoot;
     property public final androidx.compose.ui.layout.LayoutInfo layoutInfo;
     property public final boolean mergingEnabled;
-    property public final androidx.compose.ui.node.Owner? owner;
     property public final androidx.compose.ui.semantics.SemanticsNode? parent;
     property public final long positionInRoot;
+    property public final androidx.compose.ui.node.RootForTest? root;
     property public final long size;
   }
 
@@ -2743,38 +2823,42 @@ package androidx.compose.ui.semantics {
   }
 
   public final class SemanticsProperties {
-    method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityRangeInfo> getAccessibilityRangeInfo();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> getContentDescription();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> getDisabled();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> getFocused();
-    method public androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> getHidden();
-    method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityScrollState> getHorizontalAccessibilityScrollState();
+    method public androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> getHeading();
+    method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.ScrollAxisRange> getHorizontalScrollAxisRange();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.text.input.ImeAction> getImeAction();
+    method public androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> getInvisibleToUser();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> getIsDialog();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> getIsPopup();
+    method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.ProgressBarRangeInfo> getProgressBarRangeInfo();
+    method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.Role> getRole();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> getSelected();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> getStateDescription();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> getTestTag();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.text.AnnotatedString> getText();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.text.TextRange> getTextSelectionRange();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.state.ToggleableState> getToggleableState();
-    method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityScrollState> getVerticalAccessibilityScrollState();
-    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityRangeInfo> AccessibilityRangeInfo;
+    method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.ScrollAxisRange> getVerticalScrollAxisRange();
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> ContentDescription;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> Disabled;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> Focused;
-    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> Hidden;
-    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityScrollState> HorizontalAccessibilityScrollState;
+    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> Heading;
+    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.ScrollAxisRange> HorizontalScrollAxisRange;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.text.input.ImeAction> ImeAction;
+    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> InvisibleToUser;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> IsDialog;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> IsPopup;
+    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.ProgressBarRangeInfo> ProgressBarRangeInfo;
+    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.Role> Role;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> Selected;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> StateDescription;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> TestTag;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.text.AnnotatedString> Text;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.text.TextRange> TextSelectionRange;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.state.ToggleableState> ToggleableState;
-    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityScrollState> VerticalAccessibilityScrollState;
+    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.ScrollAxisRange> VerticalScrollAxisRange;
     field public static final androidx.compose.ui.semantics.SemanticsProperties INSTANCE;
   }
 
@@ -2784,46 +2868,52 @@ package androidx.compose.ui.semantics {
     method public static void dialog(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static void disabled(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static void dismiss(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean> action);
-    method @Deprecated public static String getAccessibilityLabel(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
-    method @Deprecated public static String getAccessibilityValue(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static String getContentDescription(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static java.util.List<androidx.compose.ui.semantics.CustomAccessibilityAction> getCustomActions(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static boolean getFocused(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
-    method public static androidx.compose.ui.semantics.AccessibilityScrollState getHorizontalAccessibilityScrollState(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
+    method @Deprecated public static androidx.compose.ui.semantics.ScrollAxisRange getHorizontalAccessibilityScrollState(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
+    method public static androidx.compose.ui.semantics.ScrollAxisRange getHorizontalScrollAxisRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static androidx.compose.ui.text.input.ImeAction getImeAction(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
+    method public static androidx.compose.ui.semantics.ProgressBarRangeInfo getProgressBarRangeInfo(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
+    method public static androidx.compose.ui.semantics.Role getRole(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static boolean getSelected(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static String getStateDescription(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
-    method public static androidx.compose.ui.semantics.AccessibilityRangeInfo getStateDescriptionRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
+    method @Deprecated public static androidx.compose.ui.semantics.ProgressBarRangeInfo getStateDescriptionRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static String getTestTag(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static androidx.compose.ui.text.AnnotatedString getText(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static void getTextLayoutResult(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function1<? super java.util.List<androidx.compose.ui.text.TextLayoutResult>,java.lang.Boolean> action);
     method public static long getTextSelectionRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static androidx.compose.ui.state.ToggleableState getToggleableState(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
-    method public static androidx.compose.ui.semantics.AccessibilityScrollState getVerticalAccessibilityScrollState(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
-    method public static void hidden(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
+    method @Deprecated public static androidx.compose.ui.semantics.ScrollAxisRange getVerticalAccessibilityScrollState(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
+    method public static androidx.compose.ui.semantics.ScrollAxisRange getVerticalScrollAxisRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
+    method public static void heading(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
+    method @Deprecated public static void hidden(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
+    method @androidx.compose.ui.ExperimentalComposeUiApi public static void invisibleToUser(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static void onClick(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean> action);
     method public static void onLongClick(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean> action);
     method public static void pasteText(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean> action);
     method public static void popup(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static void scrollBy(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,java.lang.Boolean> action);
-    method @Deprecated public static void setAccessibilityLabel(androidx.compose.ui.semantics.SemanticsPropertyReceiver, String p);
-    method @Deprecated public static void setAccessibilityValue(androidx.compose.ui.semantics.SemanticsPropertyReceiver, String p);
     method public static void setContentDescription(androidx.compose.ui.semantics.SemanticsPropertyReceiver, String p);
     method public static void setCustomActions(androidx.compose.ui.semantics.SemanticsPropertyReceiver, java.util.List<androidx.compose.ui.semantics.CustomAccessibilityAction> p);
     method public static void setFocused(androidx.compose.ui.semantics.SemanticsPropertyReceiver, boolean p);
-    method public static void setHorizontalAccessibilityScrollState(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.AccessibilityScrollState p);
+    method @Deprecated public static void setHorizontalAccessibilityScrollState(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.ScrollAxisRange p);
+    method public static void setHorizontalScrollAxisRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.ScrollAxisRange p);
     method public static void setImeAction(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.text.input.ImeAction p);
     method public static void setProgress(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Boolean> action);
+    method public static void setProgressBarRangeInfo(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.ProgressBarRangeInfo p);
+    method public static void setRole(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.Role p);
     method public static void setSelected(androidx.compose.ui.semantics.SemanticsPropertyReceiver, boolean p);
     method public static void setSelection(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function3<? super java.lang.Integer,? super java.lang.Integer,? super java.lang.Boolean,java.lang.Boolean> action);
     method public static void setStateDescription(androidx.compose.ui.semantics.SemanticsPropertyReceiver, String p);
-    method public static void setStateDescriptionRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.AccessibilityRangeInfo p);
+    method @Deprecated public static void setStateDescriptionRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.ProgressBarRangeInfo p);
     method public static void setTestTag(androidx.compose.ui.semantics.SemanticsPropertyReceiver, String p);
     method public static void setText(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.text.AnnotatedString p);
     method public static void setText(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.AnnotatedString,java.lang.Boolean> action);
     method public static void setTextSelectionRange-Hy0MoUY(androidx.compose.ui.semantics.SemanticsPropertyReceiver, long p);
     method public static void setToggleableState(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.state.ToggleableState p);
-    method public static void setVerticalAccessibilityScrollState(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.AccessibilityScrollState p);
+    method @Deprecated public static void setVerticalAccessibilityScrollState(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.ScrollAxisRange p);
+    method public static void setVerticalScrollAxisRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.ScrollAxisRange p);
   }
 
   public final class SemanticsPropertyKey<T> {
@@ -2896,8 +2986,8 @@ package androidx.compose.ui.viewinterop {
   }
 
   public final class ViewModelKt {
-    method @androidx.compose.runtime.Composable public static <VM extends androidx.lifecycle.ViewModel> VM viewModel(Class<VM> modelClass, optional String? key, optional androidx.lifecycle.ViewModelProvider.Factory? factory);
-    method @androidx.compose.runtime.Composable public static inline <reified VM extends androidx.lifecycle.ViewModel> VM! viewModel(optional String key, optional androidx.lifecycle.ViewModelProvider.Factory? factory);
+    method @androidx.compose.runtime.Composable public static <T extends androidx.lifecycle.ViewModel> T viewModel(Class<T> modelClass, optional String? key, optional androidx.lifecycle.ViewModelProvider.Factory? factory);
+    method @androidx.compose.runtime.Composable public static inline <reified T extends androidx.lifecycle.ViewModel> T! viewModel(optional String key, optional androidx.lifecycle.ViewModelProvider.Factory? factory);
   }
 
 }
@@ -2953,7 +3043,7 @@ package androidx.compose.ui.window {
   }
 
   @androidx.compose.runtime.Immutable public interface PopupPositionProvider {
-    method public long calculatePosition-pcJl1fs(androidx.compose.ui.unit.IntBounds parentGlobalBounds, androidx.compose.ui.unit.IntBounds windowGlobalBounds, androidx.compose.ui.unit.LayoutDirection layoutDirection, long popupContentSize);
+    method public long calculatePosition-igXpx9M(androidx.compose.ui.unit.IntBounds anchorBounds, long windowSize, androidx.compose.ui.unit.LayoutDirection layoutDirection, long popupContentSize);
   }
 
   @androidx.compose.runtime.Immutable public interface PopupProperties {

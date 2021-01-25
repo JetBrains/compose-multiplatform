@@ -20,12 +20,15 @@ import android.content.Context
 import android.os.Build
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.compose.foundation.Interaction
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.AmbientContentAlpha
 import androidx.compose.material.AmbientContentColor
@@ -33,6 +36,7 @@ import androidx.compose.material.AmbientTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldPadding
 import androidx.compose.material.runOnIdleWithDensity
 import androidx.compose.material.setMaterialContent
 import androidx.compose.material.setMaterialContentForSizeAssertions
@@ -40,12 +44,11 @@ import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.testutils.assertShape
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.isFocused
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.focusRequester
+import androidx.compose.ui.focus.focusModifier
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -56,8 +59,9 @@ import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.AmbientTextInputService
 import androidx.compose.ui.platform.AmbientView
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertHeightIsEqualTo
+import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -88,16 +92,15 @@ import com.nhaarman.mockitokotlin2.verify
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalTesting::class)
+@OptIn(ExperimentalTestApi::class)
 class TextFieldTest {
 
-    private val ExpectedMinimumTextFieldHeight = 56.dp
+    private val ExpectedDefaultTextFieldHeight = 56.dp
+    private val ExpectedDefaultTextFieldWidth = 280.dp
     private val ExpectedPadding = 16.dp
     private val IconPadding = 12.dp
     private val ExpectedBaselineOffset = 20.dp
@@ -118,34 +121,56 @@ class TextFieldTest {
                 modifier = Modifier.preferredHeight(20.dp)
             )
         }
-            .assertHeightIsEqualTo(ExpectedMinimumTextFieldHeight)
+            .assertHeightIsEqualTo(20.dp)
+    }
+
+    @Test
+    fun testTextField_setSmallWidth() {
+        rule.setMaterialContentForSizeAssertions {
+            TextField(
+                value = "input",
+                onValueChange = {},
+                label = {},
+                modifier = Modifier.width(40.dp)
+            )
+        }
+            .assertWidthIsEqualTo(40.dp)
+    }
+
+    @Test
+    fun testTextField_defaultWidth() {
+        rule.setMaterialContentForSizeAssertions {
+            TextField(
+                value = "input",
+                onValueChange = {},
+                label = {}
+            )
+        }
+            .assertWidthIsEqualTo(ExpectedDefaultTextFieldWidth)
     }
 
     @Test
     fun testTextFields_singleFocus() {
-        var textField1Focused = false
         val textField1Tag = "TextField1"
-
-        var textField2Focused = false
         val textField2Tag = "TextField2"
+        val interactionState1 = InteractionState()
+        val interactionState2 = InteractionState()
 
         rule.setMaterialContent {
             Column {
                 TextField(
-                    modifier = Modifier
-                        .onFocusChanged { textField1Focused = it.isFocused }
-                        .testTag(textField1Tag),
+                    modifier = Modifier.testTag(textField1Tag),
                     value = "input1",
                     onValueChange = {},
-                    label = {}
+                    label = {},
+                    interactionState = interactionState1
                 )
                 TextField(
-                    modifier = Modifier
-                        .onFocusChanged { textField2Focused = it.isFocused }
-                        .testTag(textField2Tag),
+                    modifier = Modifier.testTag(textField2Tag),
                     value = "input2",
                     onValueChange = {},
-                    label = {}
+                    label = {},
+                    interactionState = interactionState2
                 )
             }
         }
@@ -153,32 +178,29 @@ class TextFieldTest {
         rule.onNodeWithTag(textField1Tag).performClick()
 
         rule.runOnIdle {
-            assertThat(textField1Focused).isTrue()
-            assertThat(textField2Focused).isFalse()
+            assertThat(interactionState1.contains(Interaction.Focused)).isTrue()
+            assertThat(interactionState2.contains(Interaction.Focused)).isFalse()
         }
 
         rule.onNodeWithTag(textField2Tag).performClick()
 
         rule.runOnIdle {
-            assertThat(textField1Focused).isFalse()
-            assertThat(textField2Focused).isTrue()
+            assertThat(interactionState1.contains(Interaction.Focused)).isFalse()
+            assertThat(interactionState2.contains(Interaction.Focused)).isTrue()
         }
     }
 
     @Test
     fun testTextField_getFocus_whenClickedOnSurfaceArea() {
-        var focused = false
+        val interactionState = InteractionState()
         rule.setMaterialContent {
-            Box {
-                TextField(
-                    modifier = Modifier
-                        .onFocusChanged { focused = it.isFocused }
-                        .testTag(TextfieldTag),
-                    value = "input",
-                    onValueChange = {},
-                    label = {}
-                )
-            }
+            TextField(
+                modifier = Modifier.testTag(TextfieldTag),
+                value = "input",
+                onValueChange = {},
+                label = {},
+                interactionState = interactionState
+            )
         }
 
         // Click on (2, 2) which is Surface area and outside input area
@@ -187,10 +209,11 @@ class TextFieldTest {
         }
 
         rule.runOnIdleWithDensity {
-            assertThat(focused).isTrue()
+            assertThat(interactionState.contains(Interaction.Focused)).isTrue()
         }
     }
 
+    @ExperimentalComposeUiApi
     @Test
     fun testTextField_showHideKeyboardBasedOnFocus() {
         val (focusRequester, parentFocusRequester) = FocusRequester.createRefs()
@@ -201,7 +224,7 @@ class TextFieldTest {
                 TextField(
                     modifier = Modifier
                         .focusRequester(parentFocusRequester)
-                        .focus()
+                        .focusModifier()
                         .focusRequester(focusRequester)
                         .testTag(TextfieldTag),
                     value = "input",
@@ -220,6 +243,7 @@ class TextFieldTest {
         rule.runOnIdle { assertThat(hostView.isSoftwareKeyboardShown).isFalse() }
     }
 
+    @ExperimentalComposeUiApi
     @Test
     fun testTextField_clickingOnTextAfterDismissingKeyboard_showsKeyboard() {
         val (focusRequester, parentFocusRequester) = FocusRequester.createRefs()
@@ -231,7 +255,7 @@ class TextFieldTest {
                 TextField(
                     modifier = Modifier
                         .focusRequester(parentFocusRequester)
-                        .focus()
+                        .focusModifier()
                         .focusRequester(focusRequester)
                         .testTag(TextfieldTag),
                     value = "input",
@@ -255,7 +279,7 @@ class TextFieldTest {
     }
 
     @Test
-    fun testTextField_labelPosition_initial_withDefaultHeight() {
+    fun testTextField_labelPosition_initial_singleLine() {
         val labelSize = Ref<IntSize>()
         val labelPosition = Ref<Offset>()
         rule.setMaterialContent {
@@ -263,13 +287,14 @@ class TextFieldTest {
                 TextField(
                     value = "",
                     onValueChange = {},
+                    singleLine = true,
                     label = {
                         Text(
                             text = "label",
                             fontSize = 10.sp,
                             modifier = Modifier
                                 .onGloballyPositioned {
-                                    labelPosition.value = it.positionInRoot
+                                    labelPosition.value = it.positionInRoot()
                                     labelSize.value = it.size
                                 }
                         )
@@ -289,8 +314,48 @@ class TextFieldTest {
                 ExpectedPadding.toIntPx().toFloat()
             )
             assertThat(labelPosition.value?.y).isEqualTo(
-                ((ExpectedMinimumTextFieldHeight.toIntPx() - labelSize.value!!.height) / 2f)
+                ((ExpectedDefaultTextFieldHeight.toIntPx() - labelSize.value!!.height) / 2f)
                     .roundToInt().toFloat()
+            )
+        }
+    }
+
+    @Test
+    fun testTextField_labelPosition_initial_withDefaultHeight() {
+        val labelSize = Ref<IntSize>()
+        val labelPosition = Ref<Offset>()
+        rule.setMaterialContent {
+            Box {
+                TextField(
+                    value = "",
+                    onValueChange = {},
+                    label = {
+                        Text(
+                            text = "label",
+                            fontSize = 10.sp,
+                            modifier = Modifier
+                                .onGloballyPositioned {
+                                    labelPosition.value = it.positionInRoot()
+                                    labelSize.value = it.size
+                                }
+                        )
+                    },
+                    modifier = Modifier.preferredHeight(56.dp)
+                )
+            }
+        }
+
+        rule.runOnIdleWithDensity {
+            // size
+            assertThat(labelSize.value).isNotNull()
+            assertThat(labelSize.value?.height).isGreaterThan(0)
+            assertThat(labelSize.value?.width).isGreaterThan(0)
+            // centered position
+            assertThat(labelPosition.value?.x).isEqualTo(
+                ExpectedPadding.toIntPx().toFloat()
+            )
+            assertThat(labelPosition.value?.y).isEqualTo(
+                TextFieldPadding.toIntPx()
             )
         }
     }
@@ -310,7 +375,7 @@ class TextFieldTest {
                         Text(
                             text = "label",
                             modifier = Modifier.onGloballyPositioned {
-                                labelPosition.value = it.positionInRoot
+                                labelPosition.value = it.positionInRoot()
                                 labelSize.value = it.size
                             }
                         )
@@ -329,7 +394,7 @@ class TextFieldTest {
                 ExpectedPadding.toIntPx().toFloat()
             )
             assertThat(labelPosition.value?.y).isEqualTo(
-                ((height.toIntPx() - labelSize.value!!.height) / 2f).roundToInt().toFloat()
+                TextFieldPadding.toIntPx()
             )
         }
     }
@@ -349,7 +414,7 @@ class TextFieldTest {
                         Text(
                             text = "label",
                             modifier = Modifier.onGloballyPositioned {
-                                labelPosition.value = it.positionInRoot
+                                labelPosition.value = it.positionInRoot()
                                 labelSize.value = it.size
                                 baseline.value = it[FirstBaseline].toFloat() +
                                     labelPosition.value!!.y
@@ -361,7 +426,7 @@ class TextFieldTest {
         }
 
         // click to focus
-        clickAndAdvanceClock()
+        rule.onNodeWithTag(TextfieldTag).performClick()
 
         rule.runOnIdleWithDensity {
             // size
@@ -392,7 +457,7 @@ class TextFieldTest {
                         Text(
                             text = "label",
                             modifier = Modifier.onGloballyPositioned {
-                                labelPosition.value = it.positionInRoot
+                                labelPosition.value = it.positionInRoot()
                                 labelSize.value = it.size
                                 baseline.value =
                                     it[FirstBaseline].toFloat() + labelPosition.value!!.y
@@ -435,7 +500,7 @@ class TextFieldTest {
                         Text(
                             text = "placeholder",
                             modifier = Modifier.onGloballyPositioned {
-                                placeholderPosition.value = it.positionInRoot
+                                placeholderPosition.value = it.positionInRoot()
                                 placeholderSize.value = it.size
                             }
                         )
@@ -444,7 +509,7 @@ class TextFieldTest {
             }
         }
         // click to focus
-        clickAndAdvanceClock()
+        rule.onNodeWithTag(TextfieldTag).performClick()
 
         rule.runOnIdleWithDensity {
             // size
@@ -480,7 +545,7 @@ class TextFieldTest {
                             text = "placeholder",
                             modifier = Modifier.height(20.dp)
                                 .onGloballyPositioned {
-                                    placeholderPosition.value = it.positionInRoot
+                                    placeholderPosition.value = it.positionInRoot()
                                     placeholderSize.value = it.size
                                 }
                         )
@@ -489,7 +554,7 @@ class TextFieldTest {
             }
         }
         // click to focus
-        clickAndAdvanceClock()
+        rule.onNodeWithTag(TextfieldTag).performClick()
 
         rule.runOnIdleWithDensity {
             // size
@@ -501,9 +566,7 @@ class TextFieldTest {
                 ExpectedPadding.toIntPx().toFloat()
             )
             assertThat(placeholderPosition.value?.y).isEqualTo(
-                ((height.toIntPx().toFloat() - placeholderSize.value!!.height) / 2f)
-                    .roundToInt()
-                    .toFloat()
+                TextFieldPadding.toIntPx()
             )
         }
     }
@@ -523,7 +586,7 @@ class TextFieldTest {
                         Text(
                             text = "placeholder",
                             modifier = Modifier.onGloballyPositioned {
-                                placeholderPosition.value = it.positionInRoot
+                                placeholderPosition.value = it.positionInRoot()
                                 placeholderSize.value = it.size
                             }
                         )
@@ -533,7 +596,7 @@ class TextFieldTest {
         }
 
         // click to focus
-        clickAndAdvanceClock()
+        rule.onNodeWithTag(TextfieldTag).performClick()
 
         rule.runOnIdleWithDensity {
             assertThat(placeholderSize.value).isNull()
@@ -590,7 +653,7 @@ class TextFieldTest {
                 leadingIcon = {
                     Box(
                         Modifier.preferredSize(size).onGloballyPositioned {
-                            leadingPosition.value = it.positionInRoot
+                            leadingPosition.value = it.positionInRoot()
                             leadingSize.value = it.size
                         }
                     )
@@ -598,7 +661,7 @@ class TextFieldTest {
                 trailingIcon = {
                     Box(
                         Modifier.preferredSize(size).onGloballyPositioned {
-                            trailingPosition.value = it.positionInRoot
+                            trailingPosition.value = it.positionInRoot()
                             trailingSize.value = it.size
                         }
                     )
@@ -643,7 +706,7 @@ class TextFieldTest {
                         Text(
                             text = "label",
                             modifier = Modifier.onGloballyPositioned {
-                                labelPosition.value = it.positionInRoot
+                                labelPosition.value = it.positionInRoot()
                             }
                         )
                     },
@@ -675,7 +738,7 @@ class TextFieldTest {
                         Text(
                             text = "label",
                             modifier = Modifier.onGloballyPositioned {
-                                labelPosition.value = it.positionInRoot
+                                labelPosition.value = it.positionInRoot()
                             }
                         )
                     },
@@ -765,7 +828,7 @@ class TextFieldTest {
             }
         }
 
-        clickAndAdvanceClock()
+        rule.onNodeWithTag(TextfieldTag).performClick()
 
         rule.runOnIdle {
             verify(textInputService, atLeastOnce()).startInput(
@@ -814,21 +877,20 @@ class TextFieldTest {
     @LargeTest
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun testTextField_alphaNotApplied_toCustomBackgroundColorAndTransparentColors() {
-        val latch = CountDownLatch(1)
+        val interactionState = InteractionState()
 
         rule.setMaterialContent {
             Box(Modifier.background(color = Color.White)) {
                 TextField(
-                    modifier = Modifier
-                        .onFocusChanged { if (it.isFocused) latch.countDown() }
-                        .testTag(TextfieldTag),
+                    modifier = Modifier.testTag(TextfieldTag),
                     value = "",
                     onValueChange = {},
                     label = {},
                     shape = RectangleShape,
                     backgroundColor = Color.Blue,
                     activeColor = Color.Transparent,
-                    inactiveColor = Color.Transparent
+                    inactiveColor = Color.Transparent,
+                    interactionState = interactionState
                 )
             }
         }
@@ -845,7 +907,9 @@ class TextFieldTest {
             )
 
         rule.onNodeWithTag(TextfieldTag).performClick()
-        assert(latch.await(1, TimeUnit.SECONDS))
+        rule.runOnIdle {
+            assertThat(interactionState.contains(Interaction.Focused)).isTrue()
+        }
 
         rule.onNodeWithTag(TextfieldTag)
             .captureToImage()
@@ -910,16 +974,12 @@ class TextFieldTest {
         }
     }
 
-    private fun clickAndAdvanceClock() {
-        rule.onNodeWithTag(TextfieldTag).performClick()
-        rule.clockTestRule.advanceClock(200L)
-    }
-
-    private val View.isSoftwareKeyboardShown: Boolean get() {
-        val inputMethodManager =
-            context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        // TODO(b/163742556): This is just a proxy for software keyboard visibility. Find a better
-        //  way to check if the software keyboard is shown.
-        return inputMethodManager.isAcceptingText()
-    }
+    private val View.isSoftwareKeyboardShown: Boolean
+        get() {
+            val inputMethodManager =
+                context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            // TODO(b/163742556): This is just a proxy for software keyboard visibility. Find a better
+            //  way to check if the software keyboard is shown.
+            return inputMethodManager.isAcceptingText()
+        }
 }

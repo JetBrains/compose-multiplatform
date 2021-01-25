@@ -21,69 +21,47 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.text.AnnotatedString
 
 /**
- * The map interface used for bidirectional offset mapping from original to transformed text.
- */
-interface OffsetMap {
-    /**
-     * Convert offset in original text into the offset in transformed text.
-     *
-     * This function must be a monotonically non-decreasing function. In other words, if a cursor
-     * advances in the original text, the cursor in the transformed text must advance or stay there.
-     *
-     * @param offset offset in original text.
-     * @return offset in transformed text
-     * @see VisualTransformation
-     */
-    fun originalToTransformed(offset: Int): Int
-
-    /**
-     * Convert offset in transformed text into the offset in original text.
-     *
-     * This function must be a monotonically non-decreasing function. In other words, if a cursor
-     * advances in the transformed text, the cusrsor in the original text must advance or stay
-     * there.
-     *
-     * @param offset offset in transformed text
-     * @return offset in original text
-     * @see VisualTransformation
-     */
-    fun transformedToOriginal(offset: Int): Int
-
-    companion object {
-        /**
-         * The offset map used for identity mapping.
-         */
-        val identityOffsetMap = object : OffsetMap {
-            override fun originalToTransformed(offset: Int): Int = offset
-            override fun transformedToOriginal(offset: Int): Int = offset
-        }
-    }
-}
-
-/**
  * The transformed text with offset offset mapping
  */
-data class TransformedText(
+class TransformedText(
     /**
      * The transformed text
      */
-    val transformedText: AnnotatedString,
+    val text: AnnotatedString,
 
     /**
      * The map used for bidirectional offset mapping from original to transformed text.
      */
-    val offsetMap: OffsetMap
-)
+    val offsetMapping: OffsetMapping
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is TransformedText) return false
+        if (text != other.text) return false
+        if (offsetMapping != other.offsetMapping) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = text.hashCode()
+        result = 31 * result + offsetMapping.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "TransformedText(text=$text, offsetMapping=$offsetMapping)"
+    }
+}
 
 /**
  * Interface used for changing visual output of the input field.
  *
  * This interface can be used for changing visual output of the text in the input field.
  * For example, you can mask characters in password filed with asterisk with
- * PasswordVisualTransformation.
+ * [PasswordVisualTransformation].
  */
 @Immutable
-interface VisualTransformation {
+fun interface VisualTransformation {
     /**
      * Change the visual output of given text.
      *
@@ -113,9 +91,8 @@ interface VisualTransformation {
          * A special visual transformation object indicating that no transformation is applied.
          */
         @Stable
-        val None: VisualTransformation = object : VisualTransformation {
-            override fun filter(text: AnnotatedString) =
-                TransformedText(text, OffsetMap.identityOffsetMap)
+        val None: VisualTransformation = VisualTransformation { text ->
+            TransformedText(text, OffsetMapping.Identity)
         }
     }
 }
@@ -127,11 +104,22 @@ interface VisualTransformation {
  *
  * @param mask The mask character used instead of original text.
  */
-data class PasswordVisualTransformation(val mask: Char = '\u2022') : VisualTransformation {
+class PasswordVisualTransformation(val mask: Char = '\u2022') : VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {
         return TransformedText(
             AnnotatedString(mask.toString().repeat(text.text.length)),
-            OffsetMap.identityOffsetMap
+            OffsetMapping.Identity
         )
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is PasswordVisualTransformation) return false
+        if (mask != other.mask) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return mask.hashCode()
     }
 }

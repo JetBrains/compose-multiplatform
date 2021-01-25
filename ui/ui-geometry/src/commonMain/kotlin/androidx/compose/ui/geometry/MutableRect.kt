@@ -17,7 +17,6 @@
 package androidx.compose.ui.geometry
 
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.util.toStringAsFixed
 import kotlin.math.max
 import kotlin.math.min
 

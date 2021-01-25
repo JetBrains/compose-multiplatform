@@ -18,6 +18,8 @@ package androidx.compose.ui.layout
 
 import androidx.compose.ui.geometry.Size
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -108,5 +110,27 @@ class ScaleFactorTest {
     @Test
     fun testSizeDivision() {
         assertEquals(Size(1f, 2f), Size(100f, 300f) / ScaleFactor(100f, 150f))
+    }
+
+    @Test
+    fun testIsSpecified() {
+        assertFalse(ScaleFactor.Unspecified.isSpecified)
+        assertTrue(ScaleFactor(1f, 1f).isSpecified)
+    }
+
+    @Test
+    fun testIsUnspecified() {
+        assertTrue(ScaleFactor.Unspecified.isUnspecified)
+        assertFalse(ScaleFactor(1f, 1f).isUnspecified)
+    }
+
+    @Test
+    fun testTakeOrElseTrue() {
+        assertTrue(ScaleFactor(1f, 1f).takeOrElse { ScaleFactor.Unspecified }.isSpecified)
+    }
+
+    @Test
+    fun testTakeOrElseFalse() {
+        assertTrue(ScaleFactor.Unspecified.takeOrElse { ScaleFactor(1f, 1f) }.isSpecified)
     }
 }

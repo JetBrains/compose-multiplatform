@@ -18,12 +18,13 @@
 package androidx.compose.foundation.text
 
 import androidx.compose.foundation.text.selection.MultiWidgetSelectionDelegate
-import androidx.compose.runtime.CommitScope
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.DisposableEffectDisposable
+import androidx.compose.runtime.DisposableEffectScope
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
@@ -41,8 +42,8 @@ import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.MeasureBlock
-import androidx.compose.ui.layout.globalPosition
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AmbientFontLoader
 import androidx.compose.ui.selection.AmbientSelectionRegistrar
@@ -60,14 +61,11 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.length
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.subSequence
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.util.annotation.VisibleForTesting
 import androidx.compose.ui.util.fastForEach
 import kotlin.math.floor
 import kotlin.math.roundToInt
@@ -176,7 +174,7 @@ fun CoreText(
         measureBlock = controller.measure
     )
 
-    onCommit(selectionRegistrar, callback = controller.commit)
+    DisposableEffect(selectionRegistrar, effect = controller.commit)
 }
 
 @Composable
@@ -228,7 +226,7 @@ private class TextController(val state: TextState) {
         state.layoutCoordinates = it
         selectionRegistrar?.let { selectionRegistrar ->
             if (state.selectionRange != null) {
-                val newGlobalPosition = it.globalPosition
+                val newGlobalPosition = it.positionInWindow()
                 if (newGlobalPosition != state.previousGlobalPosition) {
                     selectionRegistrar.notifyPositionChange()
                 }
@@ -277,6 +275,15 @@ private class TextController(val state: TextState) {
         )
         if (state.layoutResult != layoutResult) {
             state.onTextLayout(layoutResult)
+
+            state.layoutResult?.let { prevLayoutResult ->
+                // If the input text of this CoreText has changed, notify the SelectionContainer.
+                if (prevLayoutResult.layoutInput.text != layoutResult.layoutInput.text) {
+                    state.selectable?.let { selectable ->
+                        selectionRegistrar?.notifySelectableChange(selectable)
+                    }
+                }
+            }
         }
         state.layoutResult = layoutResult
 
@@ -321,33 +328,37 @@ private class TextController(val state: TextState) {
         }
     }
 
-    val commit: CommitScope.() -> Unit = {
+    val commit: DisposableEffectScope.() -> DisposableEffectDisposable = {
         // if no SelectionContainer is added as parent selectionRegistrar will be null
-        val id: Selectable? =
-            selectionRegistrar?.let { selectionRegistrar ->
-                selectionRegistrar.subscribe(
-                    MultiWidgetSelectionDelegate(
-                        selectionRangeUpdate = { state.selectionRange = it },
-                        coordinatesCallback = { state.layoutCoordinates },
-                        layoutResultCallback = { state.layoutResult }
-                    )
+        state.selectable = selectionRegistrar?.let { selectionRegistrar ->
+            selectionRegistrar.subscribe(
+                MultiWidgetSelectionDelegate(
+                    selectionRangeUpdate = { state.selectionRange = it },
+                    coordinatesCallback = { state.layoutCoordinates },
+                    layoutResultCallback = { state.layoutResult }
                 )
-            }
+            )
+        }
 
         onDispose {
             // unregister only if any id was provided by SelectionRegistrar
-            id?.let { selectionRegistrar?.unsubscribe(id) }
+            state.selectable?.let { selectionRegistrar?.unsubscribe(it) }
         }
     }
 }
 
-@OptIn(InternalTextApi::class)
-@VisibleForTesting
+@OptIn(
+    InternalTextApi::class,
+    ExperimentalTextApi::class
+)
+/*@VisibleForTesting*/
 internal class TextState(
     var textDelegate: TextDelegate
 ) {
     var onTextLayout: (TextLayoutResult) -> Unit = {}
 
+    /** The [Selectable] associated with this [CoreText]. */
+    var selectable: Selectable? = null
     /**
      * The current selection range, used by selection.
      * This should be a state as every time we update the value during the selection we
@@ -442,7 +453,7 @@ private fun resolveInlineContent(
     InternalTextApi::class,
     ExperimentalTextApi::class
 )
-@VisibleForTesting
+/*@VisibleForTesting*/
 internal fun longPressDragObserver(
     state: TextState,
     selectionRegistrar: SelectionRegistrar?

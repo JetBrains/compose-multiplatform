@@ -31,9 +31,9 @@ import androidx.compose.foundation.animation.defaultFlingConfig
 import androidx.compose.foundation.animation.fling
 import androidx.compose.runtime.AtomicReference
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -104,6 +104,7 @@ class ScrollableController(
      * @param spec [AnimationSpec] to be used for this smooth scrolling
      * @param onEnd lambda to be called when smooth scrolling has ended
      */
+    @Deprecated("Use suspend fun smoothScrollBy instead")
     fun smoothScrollBy(
         value: Float,
         spec: AnimationSpec<Float> = SpringSpec(),
@@ -226,8 +227,8 @@ class ScrollableController(
             available: Velocity,
             onFinished: (Velocity) -> Unit
         ) {
-            performFlingInternal(available.pixelsPerSecond) { leftAfterUs ->
-                onFinished.invoke(available - Velocity(leftAfterUs))
+            performFlingInternal(Offset(available.x, available.y)) { leftAfterUs ->
+                onFinished.invoke(available - Velocity(leftAfterUs.x, leftAfterUs.y))
             }
         }
     }
@@ -249,14 +250,15 @@ class ScrollableController(
 
     internal fun dispatchFling(velocity: Float, onScrollEnd: (Float) -> Unit) {
         val consumedByParent =
-            nestedScrollDispatcher.dispatchPreFling(Velocity(velocity.toOffset()))
-        val available = velocity.toOffset() - consumedByParent.pixelsPerSecond
-        performFlingInternal(available) { velocityLeft ->
+            nestedScrollDispatcher.dispatchPreFling(velocity.toVelocity())
+        val available = velocity.toVelocity() - consumedByParent
+        performFlingInternal(Offset(available.x, available.y)) { velocityLeft ->
             // when notifying users code -- reverse if needed to obey their setting
+            val velocityLeftAsVelocity = Velocity(velocityLeft.x, velocityLeft.y)
             onScrollEnd(velocityLeft.toFloat().reverseIfNeeded())
             nestedScrollDispatcher.dispatchPostFling(
-                Velocity(available - velocityLeft),
-                Velocity(velocityLeft)
+                available - velocityLeftAsVelocity,
+                velocityLeftAsVelocity
             )
         }
     }
@@ -274,7 +276,13 @@ class ScrollableController(
     private fun Float.toOffset(): Offset =
         if (orientation == Orientation.Horizontal) Offset(this, 0f) else Offset(0f, this)
 
+    private fun Float.toVelocity(): Velocity =
+        if (orientation == Orientation.Horizontal) Velocity(this, 0f) else Velocity(0f, this)
+
     private fun Offset.toFloat(): Float =
+        if (orientation == Orientation.Horizontal) this.x else this.y
+
+    private fun Velocity.toFloat(): Float =
         if (orientation == Orientation.Horizontal) this.x else this.y
 
     private fun Float.reverseIfNeeded(): Float = if (reverseDirection) this * -1 else this
@@ -318,9 +326,11 @@ fun Modifier.scrollable(
 ): Modifier = composed(
     factory = {
         controller.update(orientation, reverseDirection)
-        onDispose {
-            controller.stopAnimation()
-            controller.interactionState?.removeInteraction(Interaction.Dragged)
+        DisposableEffect(controller) {
+            onDispose {
+                controller.stopAnimation()
+                controller.interactionState?.removeInteraction(Interaction.Dragged)
+            }
         }
 
         val scrollCallback = object : ScrollCallback {

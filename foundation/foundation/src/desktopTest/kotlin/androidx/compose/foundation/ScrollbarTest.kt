@@ -17,6 +17,7 @@
 package androidx.compose.foundation
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,6 +25,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
@@ -38,7 +40,7 @@ import androidx.compose.ui.input.mouse.MouseScrollUnit
 import androidx.compose.ui.platform.DesktopPlatform
 import androidx.compose.ui.platform.DesktopPlatformAmbient
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.down
 import androidx.compose.ui.test.junit4.ComposeTestRule
@@ -49,7 +51,6 @@ import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.swipe
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.milliseconds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -61,13 +62,13 @@ import org.junit.Rule
 import org.junit.Test
 
 @Suppress("WrapUnaryOperator")
-@OptIn(ExperimentalTesting::class)
+@OptIn(ExperimentalTestApi::class)
 class ScrollbarTest {
     @get:Rule
     val rule = createComposeRule()
 
     // don't inline, surface controls canvas life time
-    private val surface = Surface.makeRasterN32Premul(100, 100)
+    private val surface = Surface.makeRasterN32Premul(100, 100)!!
     private val canvas = surface.canvas
 
     @Test
@@ -275,7 +276,7 @@ class ScrollbarTest {
             rule.awaitIdle()
 
             rule.onNodeWithTag("scrollbar").performGesture {
-                swipe(start = Offset(0f, 0f), end = Offset(0f, 11f), duration = 1.milliseconds)
+                swipe(start = Offset(0f, 0f), end = Offset(0f, 11f), durationMillis = 1)
             }
             onFrame()
             assertEquals(2, state.firstVisibleItemIndex)
@@ -303,7 +304,7 @@ class ScrollbarTest {
             rule.awaitIdle()
 
             rule.onNodeWithTag("scrollbar").performGesture {
-                swipe(start = Offset(0f, 0f), end = Offset(0f, 26f), duration = 1.milliseconds)
+                swipe(start = Offset(0f, 0f), end = Offset(0f, 26f), durationMillis = 1)
             }
             onFrame()
             assertEquals(5, state.firstVisibleItemIndex)
@@ -331,14 +332,14 @@ class ScrollbarTest {
             rule.awaitIdle()
 
             rule.onNodeWithTag("scrollbar").performGesture {
-                swipe(start = Offset(0f, 0f), end = Offset(0f, 10000f), duration = 1.milliseconds)
+                swipe(start = Offset(0f, 0f), end = Offset(0f, 10000f), durationMillis = 1)
             }
             onFrame()
             assertEquals(15, state.firstVisibleItemIndex)
             assertEquals(0, state.firstVisibleItemScrollOffset)
 
             rule.onNodeWithTag("scrollbar").performGesture {
-                swipe(start = Offset(0f, 99f), end = Offset(0f, -10000f), duration = 1.milliseconds)
+                swipe(start = Offset(0f, 99f), end = Offset(0f, -10000f), durationMillis = 1)
             }
             onFrame()
             assertEquals(0, state.firstVisibleItemIndex)
@@ -381,9 +382,8 @@ class ScrollbarTest {
         Box(Modifier.size(size)) {
             val state = rememberScrollState()
 
-            ScrollableColumn(
-                Modifier.fillMaxSize().testTag("column"),
-                state
+            Column(
+                Modifier.fillMaxSize().testTag("column").verticalScroll(state)
             ) {
                 repeat(childCount) {
                     Box(Modifier.size(childSize).testTag("box$it"))
@@ -409,9 +409,8 @@ class ScrollbarTest {
         Box(Modifier.size(size)) {
             val state = rememberScrollState()
 
-            ScrollableColumn(
-                Modifier.fillMaxSize().testTag("column"),
-                state,
+            Column(
+                Modifier.fillMaxSize().testTag("column").verticalScroll(state),
                 content = scrollableContent
             )
 

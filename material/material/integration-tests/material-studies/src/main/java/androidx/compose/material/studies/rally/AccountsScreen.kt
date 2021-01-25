@@ -37,37 +37,39 @@ import androidx.compose.ui.unit.dp
  */
 @Composable
 fun AccountsBody(accounts: List<Account>) {
-    Box(Modifier.verticalScroll(rememberScrollState(0f)).padding(16.dp)) {
-        val accountsProportion = accounts.extractProportions { it.balance }
-        val colors = accounts.map { it.color }
-        AnimatedCircle(
-            Modifier.preferredHeight(300.dp).align(Alignment.Center).fillMaxWidth(),
-            accountsProportion,
-            colors
-        )
-        Column(modifier = Modifier.align(Alignment.Center)) {
-            Text(
-                text = "Total",
-                style = MaterialTheme.typography.body1,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+    Column {
+        Box(Modifier.verticalScroll(rememberScrollState(0f)).padding(16.dp)) {
+            val accountsProportion = accounts.extractProportions { it.balance }
+            val colors = accounts.map { it.color }
+            AnimatedCircle(
+                Modifier.preferredHeight(300.dp).align(Alignment.Center).fillMaxWidth(),
+                accountsProportion,
+                colors
             )
-            Text(
-                text = "$12,132.49",
-                style = MaterialTheme.typography.h2,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
-        }
-    }
-    Spacer(Modifier.preferredHeight(10.dp))
-    Card {
-        Column(modifier = Modifier.padding(12.dp)) {
-            accounts.forEach { account ->
-                AccountRow(
-                    name = account.name,
-                    number = account.number,
-                    amount = account.balance,
-                    color = account.color
+            Column(modifier = Modifier.align(Alignment.Center)) {
+                Text(
+                    text = "Total",
+                    style = MaterialTheme.typography.body1,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
+                Text(
+                    text = "$12,132.49",
+                    style = MaterialTheme.typography.h2,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+            }
+        }
+        Spacer(Modifier.preferredHeight(10.dp))
+        Card {
+            Column(modifier = Modifier.padding(12.dp)) {
+                accounts.forEach { account ->
+                    AccountRow(
+                        name = account.name,
+                        number = account.number,
+                        amount = account.balance,
+                        color = account.color
+                    )
+                }
             }
         }
     }

@@ -36,6 +36,8 @@ internal class LazyListMeasureResult(
     val canScrollForward: Boolean,
     /** The amount of scroll consumed during the measure pass.*/
     val consumedScroll: Float,
+    /** The composed MeasuredItem which we are not going to place as they are out of screen.*/
+    val notUsedButComposedItems: MutableList<LazyMeasuredItem>?,
     override val viewportStartOffset: Int,
     override val viewportEndOffset: Int,
     override val totalItemsCount: Int

@@ -18,10 +18,8 @@ package androidx.compose.ui.focus
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus
 import androidx.compose.ui.focus.FocusState.Active
 import androidx.compose.ui.focus.FocusState.Inactive
-import androidx.compose.ui.focusRequester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -46,7 +44,7 @@ class ReusedFocusRequesterTest {
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .focus()
+                    .focusModifier()
             )
         }
 
@@ -70,13 +68,13 @@ class ReusedFocusRequesterTest {
                 modifier = Modifier
                     .onFocusChanged { focusState1 = it }
                     .focusRequester(focusRequester)
-                    .focus()
+                    .focusModifier()
             )
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState2 = it }
                     .focusRequester(focusRequester)
-                    .focus()
+                    .focusModifier()
             )
         }
 
@@ -102,19 +100,19 @@ class ReusedFocusRequesterTest {
                 modifier = Modifier
                     .onFocusChanged { focusState1 = it }
                     .focusRequester(focusRequester)
-                    .focus()
+                    .focusModifier()
             )
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState2 = it }
                     .focusRequester(focusRequester)
-                    .focus()
+                    .focusModifier()
             )
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState3 = it }
                     .focusRequester(focusRequester)
-                    .focus()
+                    .focusModifier()
             )
         }
 

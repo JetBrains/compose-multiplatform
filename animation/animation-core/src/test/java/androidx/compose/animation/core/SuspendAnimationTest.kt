@@ -37,8 +37,8 @@ class SuspendAnimationTest {
     fun animateFloatVariantTest() =
         runBlocking {
             val anim = TargetBasedAnimation(
-                spring(dampingRatio = Spring.DampingRatioMediumBouncy),
-                initialValue = 0f, targetValue = 1f, Float.VectorConverter
+                spring(dampingRatio = Spring.DampingRatioMediumBouncy), Float.VectorConverter,
+                initialValue = 0f, targetValue = 1f
             )
             val clock = TestFrameClock()
             val interval = 50
@@ -70,8 +70,7 @@ class SuspendAnimationTest {
                     convertFromVector = { Offset(it.v1, it.v2) }
                 )
             val anim = TargetBasedAnimation(
-                tween(500),
-                initialValue = from, targetValue = to, offsetToVector
+                tween(500), offsetToVector, initialValue = from, targetValue = to
             )
             val clock = TestFrameClock()
             val interval = 50
@@ -82,8 +81,8 @@ class SuspendAnimationTest {
                 }
                 var playTimeMillis = 0L
                 animate(
+                    offsetToVector,
                     from, to,
-                    typeConverter = offsetToVector,
                     animationSpec = tween(500)
                 ) { value, _ ->
                     val expectedValue = anim.getValue(playTimeMillis)
@@ -100,7 +99,7 @@ class SuspendAnimationTest {
             val from = 666f
             val velocity = 999f
             val anim = DecayAnimation(
-                ExponentialDecay(),
+                FloatExponentialDecaySpec(),
                 initialValue = from, initialVelocity = velocity
             )
             val clock = TestFrameClock()
@@ -113,7 +112,7 @@ class SuspendAnimationTest {
                 var playTimeMillis = 0L
                 animateDecay(
                     from, velocity,
-                    animationSpec = ExponentialDecay()
+                    animationSpec = FloatExponentialDecaySpec()
                 ) { value, velocity ->
                     assertEquals(anim.getValue(playTimeMillis), value, 0.001f)
                     assertEquals(anim.getVelocity(playTimeMillis), velocity, 0.001f)
@@ -133,8 +132,7 @@ class SuspendAnimationTest {
                     convertFromVector = { Offset(it.v1, it.v2) }
                 )
             val anim = TargetBasedAnimation(
-                tween(500),
-                initialValue = from, targetValue = to, offsetToVector
+                tween(500), offsetToVector, initialValue = from, targetValue = to
             )
             val clock = TestFrameClock()
             val interval = 50
@@ -189,7 +187,7 @@ class SuspendAnimationTest {
             val from = 9f
             val initialVelocity = 20f
             val anim = DecayAnimation(
-                ExponentialDecay(),
+                FloatExponentialDecaySpec(),
                 initialValue = from, initialVelocity = initialVelocity
             )
             val clock = TestFrameClock()
@@ -201,7 +199,9 @@ class SuspendAnimationTest {
                 }
                 var playTimeMillis = 0L
                 val state = AnimationState(9f, 20f)
-                state.animateDecay(animationSpec = ExponentialDecay()) {
+                state.animateDecay(
+                    FloatExponentialDecaySpec().generateDecayAnimationSpec()
+                ) {
                     assertEquals(anim.getValue(playTimeMillis), value, 0.001f)
                     assertEquals(anim.getVelocity(playTimeMillis), velocity, 0.001f)
                     playTimeMillis += interval
@@ -211,7 +211,7 @@ class SuspendAnimationTest {
             }
         }
 
-    private class TestFrameClock : MonotonicFrameClock {
+    internal class TestFrameClock : MonotonicFrameClock {
         // Make the send non-blocking
         private val frameCh = Channel<Long>(Channel.UNLIMITED)
 

@@ -46,8 +46,11 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHasClickAction
-import androidx.compose.ui.test.assertHasNoClickAction
 import androidx.compose.ui.test.assertHeightIsAtLeast
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsEnabled
@@ -63,7 +66,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
@@ -91,6 +93,7 @@ class ButtonTest {
         }
 
         rule.onNodeWithTag("myButton")
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button))
             .assertIsEnabled()
     }
 
@@ -105,6 +108,7 @@ class ButtonTest {
         }
 
         rule.onNodeWithTag("myButton")
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button))
             .assertIsNotEnabled()
     }
 
@@ -133,7 +137,6 @@ class ButtonTest {
     }
 
     @Test
-    @FlakyTest // TODO: b/158341686
     fun canBeDisabled() {
         val tag = "myButton"
 
@@ -151,8 +154,8 @@ class ButtonTest {
             .assertHasClickAction()
             .assertIsEnabled()
             .performClick()
-            // Then confirm it's disabled with no click action after clicking it
-            .assertHasNoClickAction()
+            // Then confirm it's disabled with click action after clicking it
+            .assertHasClickAction()
             .assertIsNotEnabled()
     }
 
@@ -537,8 +540,8 @@ class ButtonTest {
         }
 
         rule.runOnIdle {
-            val buttonBounds = buttonCoordinates!!.boundsInRoot
-            val contentBounds = contentCoordinates!!.boundsInRoot
+            val buttonBounds = buttonCoordinates!!.boundsInRoot()
+            val contentBounds = contentCoordinates!!.boundsInRoot()
             assertThat(contentBounds.width).isLessThan(buttonBounds.width)
             assertThat(contentBounds.height).isLessThan(buttonBounds.height)
             with(rule.density) {
@@ -574,14 +577,14 @@ class ButtonTest {
             Column {
                 Spacer(
                     Modifier.size(10.dp).weight(1f).onGloballyPositioned {
-                        item1Bounds = it.boundsInRoot
+                        item1Bounds = it.boundsInRoot()
                     }
                 )
 
                 Button(
                     onClick = {},
                     modifier = Modifier.weight(1f).onGloballyPositioned {
-                        buttonBounds = it.boundsInRoot
+                        buttonBounds = it.boundsInRoot()
                     }
                 ) {
                     Text("Button")
@@ -604,17 +607,17 @@ class ButtonTest {
             Button(
                 onClick = {},
                 modifier = Modifier.onGloballyPositioned {
-                    buttonBounds = it.boundsInRoot
+                    buttonBounds = it.boundsInRoot()
                 }
             ) {
                 Spacer(
                     Modifier.size(10.dp).onGloballyPositioned {
-                        item1Bounds = it.boundsInRoot
+                        item1Bounds = it.boundsInRoot()
                     }
                 )
                 Spacer(
                     Modifier.width(10.dp).height(5.dp).onGloballyPositioned {
-                        item2Bounds = it.boundsInRoot
+                        item2Bounds = it.boundsInRoot()
                     }
                 )
             }
@@ -644,8 +647,8 @@ class ButtonTest {
         }
 
         rule.runOnIdle {
-            val topLeft = childCoordinates!!.localToGlobal(Offset.Zero).x -
-                parentCoordinates!!.localToGlobal(Offset.Zero).x
+            val topLeft = childCoordinates!!.localToWindow(Offset.Zero).x -
+                parentCoordinates!!.localToWindow(Offset.Zero).x
             val currentPadding = with(rule.density) {
                 padding.toIntPx().toFloat()
             }

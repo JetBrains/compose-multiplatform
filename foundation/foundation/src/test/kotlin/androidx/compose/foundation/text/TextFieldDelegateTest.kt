@@ -35,7 +35,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.OffsetMap
+import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.text.input.TransformedText
@@ -72,12 +72,13 @@ class TextFieldDelegateTest {
     private lateinit var textInputService: TextInputService
     private lateinit var layoutCoordinates: LayoutCoordinates
     private lateinit var multiParagraphIntrinsics: MultiParagraphIntrinsics
+    private lateinit var textLayoutResultProxy: TextLayoutResultProxy
     private lateinit var textLayoutResult: TextLayoutResult
 
     /**
      * Test implementation of offset map which doubles the offset in transformed text.
      */
-    private val skippingOffsetMap = object : OffsetMap {
+    private val skippingOffsetMap = object : OffsetMapping {
         override fun originalToTransformed(offset: Int): Int = offset * 2
         override fun transformedToOriginal(offset: Int): Int = offset / 2
     }
@@ -93,6 +94,8 @@ class TextFieldDelegateTest {
         layoutCoordinates = mock()
         multiParagraphIntrinsics = mock()
         textLayoutResult = mock()
+        textLayoutResultProxy = mock()
+        whenever(textLayoutResultProxy.value).thenReturn(textLayoutResult)
     }
 
     @Test
@@ -101,13 +104,13 @@ class TextFieldDelegateTest {
         val offset = 10
         val editorState = TextFieldValue(text = "Hello, World", selection = TextRange(1))
         whenever(processor.mBufferState).thenReturn(editorState)
-        whenever(textLayoutResult.getOffsetForPosition(position)).thenReturn(offset)
+        whenever(textLayoutResultProxy.getOffsetForPosition(position)).thenReturn(offset)
 
         TextFieldDelegate.setCursorOffset(
             position,
-            textLayoutResult,
+            textLayoutResultProxy,
             processor,
-            OffsetMap.identityOffsetMap,
+            OffsetMapping.Identity,
             onValueChange
         )
 
@@ -219,7 +222,7 @@ class TextFieldDelegateTest {
             textInputService,
             inputSessionToken,
             true /* hasFocus */,
-            OffsetMap.identityOffsetMap
+            OffsetMapping.Identity
         )
         verify(textInputService).notifyFocusedRect(eq(inputSessionToken), any())
     }
@@ -236,7 +239,7 @@ class TextFieldDelegateTest {
             textInputService,
             inputSessionToken,
             false /* hasFocus */,
-            OffsetMap.identityOffsetMap
+            OffsetMapping.Identity
         )
         verify(textInputService, never()).notifyFocusedRect(any(), any())
     }
@@ -259,7 +262,7 @@ class TextFieldDelegateTest {
             textInputService,
             inputSessionToken,
             true /* hasFocus */,
-            OffsetMap.identityOffsetMap
+            OffsetMapping.Identity
         )
         verify(textInputService).notifyFocusedRect(eq(inputSessionToken), any())
     }
@@ -295,11 +298,11 @@ class TextFieldDelegateTest {
         val offset = 10
         val editorState = TextFieldValue(text = "Hello, World", selection = TextRange(1))
         whenever(processor.mBufferState).thenReturn(editorState)
-        whenever(textLayoutResult.getOffsetForPosition(position)).thenReturn(offset)
+        whenever(textLayoutResultProxy.getOffsetForPosition(position)).thenReturn(offset)
 
         TextFieldDelegate.setCursorOffset(
             position,
-            textLayoutResult,
+            textLayoutResultProxy,
             processor,
             skippingOffsetMap,
             onValueChange
@@ -312,30 +315,33 @@ class TextFieldDelegateTest {
 
     @Test
     fun use_identity_mapping_if_none_visual_transformation() {
-        val (visualText, offsetMap) =
-            VisualTransformation.None.filter(AnnotatedString(text = "Hello, World"))
+        val transformedText = VisualTransformation.None.filter(
+            AnnotatedString(text = "Hello, World")
+        )
+        val visualText = transformedText.text
+        val offsetMapping = transformedText.offsetMapping
 
         assertEquals("Hello, World", visualText.text)
         for (i in 0..visualText.text.length) {
             // Identity mapping returns if no visual filter is provided.
-            assertThat(offsetMap.originalToTransformed(i)).isEqualTo(i)
-            assertThat(offsetMap.transformedToOriginal(i)).isEqualTo(i)
+            assertThat(offsetMapping.originalToTransformed(i)).isEqualTo(i)
+            assertThat(offsetMapping.transformedToOriginal(i)).isEqualTo(i)
         }
     }
 
     @Test
     fun apply_composition_decoration() {
-        val identityOffsetMap = object : OffsetMap {
+        val identityOffsetMapping = object : OffsetMapping {
             override fun originalToTransformed(offset: Int): Int = offset
             override fun transformedToOriginal(offset: Int): Int = offset
         }
 
         val input = TransformedText(
-            transformedText = AnnotatedString.Builder().apply {
+            text = AnnotatedString.Builder().apply {
                 pushStyle(SpanStyle(color = Color.Red))
                 append("Hello, World")
             }.toAnnotatedString(),
-            offsetMap = identityOffsetMap
+            offsetMapping = identityOffsetMapping
         )
 
         val result = TextFieldDelegate.applyCompositionDecoration(
@@ -343,9 +349,9 @@ class TextFieldDelegateTest {
             transformed = input
         )
 
-        assertThat(result.transformedText.text).isEqualTo(input.transformedText.text)
-        assertThat(result.transformedText.spanStyles.size).isEqualTo(2)
-        assertThat(result.transformedText.spanStyles).contains(
+        assertThat(result.text.text).isEqualTo(input.text.text)
+        assertThat(result.text.spanStyles.size).isEqualTo(2)
+        assertThat(result.text.spanStyles).contains(
             AnnotatedString.Range(SpanStyle(textDecoration = TextDecoration.Underline), 3, 6)
         )
     }
@@ -353,17 +359,17 @@ class TextFieldDelegateTest {
     @Test
     fun apply_composition_decoration_with_offsetmap() {
         val offsetAmount = 5
-        val offsetMap = object : OffsetMap {
+        val offsetMapping = object : OffsetMapping {
             override fun originalToTransformed(offset: Int): Int = offsetAmount + offset
             override fun transformedToOriginal(offset: Int): Int = offset - offsetAmount
         }
 
         val input = TransformedText(
-            transformedText = AnnotatedString.Builder().apply {
+            text = AnnotatedString.Builder().apply {
                 append(" ".repeat(offsetAmount))
                 append("Hello World")
             }.toAnnotatedString(),
-            offsetMap = offsetMap
+            offsetMapping = offsetMapping
         )
 
         val range = TextRange(0, 2)
@@ -372,8 +378,8 @@ class TextFieldDelegateTest {
             transformed = input
         )
 
-        assertThat(result.transformedText.spanStyles.size).isEqualTo(1)
-        assertThat(result.transformedText.spanStyles).contains(
+        assertThat(result.text.spanStyles.size).isEqualTo(1)
+        assertThat(result.text.spanStyles).contains(
             AnnotatedString.Range(
                 SpanStyle(textDecoration = TextDecoration.Underline),
                 range.start + offsetAmount,
@@ -395,15 +401,25 @@ class TextFieldDelegateTest {
         override val isAttached: Boolean
             get() = true
         override fun globalToLocal(global: Offset): Offset = localOffset
+        override fun windowToLocal(relativeToWindow: Offset): Offset = localOffset
 
         override fun localToGlobal(local: Offset): Offset = globalOffset
+        override fun localToWindow(relativeToLocal: Offset): Offset = globalOffset
 
-        override fun localToRoot(local: Offset): Offset = rootOffset
+        override fun localToRoot(relativeToLocal: Offset): Offset = rootOffset
+        override fun localPositionOf(
+            sourceCoordinates: LayoutCoordinates,
+            relativeToSource: Offset
+        ): Offset = Offset.Zero
 
         override fun childToLocal(child: LayoutCoordinates, childLocal: Offset): Offset =
             Offset.Zero
 
         override fun childBoundingBox(child: LayoutCoordinates): Rect = Rect.Zero
+        override fun localBoundingBoxOf(
+            sourceCoordinates: LayoutCoordinates,
+            clipBounds: Boolean
+        ): Rect = Rect.Zero
 
         override fun get(line: AlignmentLine): Int = 0
     }

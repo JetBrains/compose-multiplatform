@@ -22,6 +22,16 @@ import kotlin.coroutines.CoroutineContext
 private val EmptyAmbientMap: AmbientMap = persistentHashMapOf()
 
 /**
+ * An Effect to construct a CompositionReference at the current point of composition. This can be used
+ * to run a separate composition in the context of the current one, preserving ambients and propagating
+ * invalidations. When this call leaves the composition, the reference is invalidated.
+ */
+@OptIn(ComposeCompilerApi::class)
+@Composable fun rememberCompositionReference(): CompositionReference {
+    return currentComposer.buildReference()
+}
+
+/**
  * A [CompositionReference] is an opaque type that is used to logically "link" two compositions
  * together. The [CompositionReference] instance represents a reference to the "parent" composition
  * in a specific position of that composition's tree, and the instance can then be given to a new
@@ -30,7 +40,7 @@ private val EmptyAmbientMap: AmbientMap = persistentHashMapOf()
  *
  * The "parent" of a root composition is a [Recomposer].
  *
- * @see compositionReference
+ * @see rememberCompositionReference
  */
 @OptIn(InternalComposeApi::class)
 abstract class CompositionReference internal constructor() {

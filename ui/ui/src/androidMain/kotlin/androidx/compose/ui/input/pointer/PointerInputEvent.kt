@@ -17,10 +17,9 @@
 package androidx.compose.ui.input.pointer
 
 import android.view.MotionEvent
-import androidx.compose.ui.unit.Uptime
 
-actual class PointerInputEvent(
-    actual val uptime: Uptime,
+internal actual class PointerInputEvent(
+    actual val uptime: Long,
     actual val pointers: List<PointerInputEventData>,
     val motionEvent: MotionEvent
 )

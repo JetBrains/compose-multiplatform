@@ -23,9 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.longPressGestureFilter
-import androidx.compose.ui.unit.Duration
-import androidx.compose.ui.unit.milliseconds
-import androidx.test.filters.MediumTest
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.onNodeWithTag
@@ -35,7 +32,8 @@ import androidx.compose.ui.test.util.ClickableTestBox.defaultSize
 import androidx.compose.ui.test.util.ClickableTestBox.defaultTag
 import androidx.compose.ui.test.util.SinglePointerInputRecorder
 import androidx.compose.ui.test.util.isAlmostEqualTo
-import androidx.compose.ui.test.util.recordedDuration
+import androidx.compose.ui.test.util.recordedDurationMillis
+import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -50,14 +48,14 @@ import org.junit.runners.Parameterized
 @MediumTest
 @RunWith(Parameterized::class)
 class SendLongClickTest(private val config: TestConfig) {
-    data class TestConfig(val position: Offset?, val duration: Duration?)
+    data class TestConfig(val position: Offset?, val durationMillis: Long?)
 
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
         fun createTestSet(): List<TestConfig> {
             return mutableListOf<TestConfig>().apply {
-                for (duration in listOf(null, 700.milliseconds)) {
+                for (duration in listOf(null, 700L)) {
                     for (x in listOf(1.0f, defaultSize / 4)) {
                         for (y in listOf(1.0f, defaultSize / 3)) {
                             add(TestConfig(Offset(x, y), duration))
@@ -75,7 +73,7 @@ class SendLongClickTest(private val config: TestConfig) {
     private val recordedLongClicks = mutableListOf<Offset>()
     private val expectedClickPosition =
         config.position ?: Offset(defaultSize / 2, defaultSize / 2)
-    private val expectedDuration = config.duration ?: 600.milliseconds
+    private val expectedDuration = config.durationMillis ?: 600L
 
     private fun recordLongPress(position: Offset) {
         recordedLongClicks.add(position)
@@ -93,12 +91,12 @@ class SendLongClickTest(private val config: TestConfig) {
 
         // When we inject a long click
         rule.onNodeWithTag(defaultTag).performGesture {
-            if (config.position != null && config.duration != null) {
-                longClick(config.position, config.duration)
+            if (config.position != null && config.durationMillis != null) {
+                longClick(config.position, config.durationMillis)
             } else if (config.position != null) {
                 longClick(config.position)
-            } else if (config.duration != null) {
-                longClick(duration = config.duration)
+            } else if (config.durationMillis != null) {
+                longClick(durationMillis = config.durationMillis)
             } else {
                 longClick()
             }
@@ -111,6 +109,6 @@ class SendLongClickTest(private val config: TestConfig) {
         recordedLongClicks[0].isAlmostEqualTo(expectedClickPosition)
 
         // And that the duration was as expected
-        assertThat(recorder.recordedDuration).isEqualTo(expectedDuration)
+        assertThat(recorder.recordedDurationMillis).isEqualTo(expectedDuration)
     }
 }

@@ -31,11 +31,11 @@ package androidx.compose.animation {
     method public static androidx.compose.ui.Modifier animateContentSize(androidx.compose.ui.Modifier, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.unit.IntSize> animSpec, optional boolean clip, optional kotlin.jvm.functions.Function2<? super androidx.compose.ui.unit.IntSize,? super androidx.compose.ui.unit.IntSize,kotlin.Unit>? endListener);
   }
 
-  public final class ColorPropKey implements androidx.compose.animation.core.PropKey<androidx.compose.ui.graphics.Color,androidx.compose.animation.core.AnimationVector4D> {
-    ctor public ColorPropKey(androidx.compose.ui.graphics.colorspace.ColorSpace colorSpace, String label);
-    ctor public ColorPropKey();
-    method public String getLabel();
-    method public androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.graphics.Color,androidx.compose.animation.core.AnimationVector4D> getTypeConverter();
+  @Deprecated public final class ColorPropKey implements androidx.compose.animation.core.PropKey<androidx.compose.ui.graphics.Color,androidx.compose.animation.core.AnimationVector4D> {
+    ctor @Deprecated public ColorPropKey(androidx.compose.ui.graphics.colorspace.ColorSpace colorSpace, String label);
+    ctor @Deprecated public ColorPropKey();
+    method @Deprecated public String getLabel();
+    method @Deprecated public androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.graphics.Color,androidx.compose.animation.core.AnimationVector4D> getTypeConverter();
     property public String label;
     property public androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.graphics.Color,androidx.compose.animation.core.AnimationVector4D> typeConverter;
   }
@@ -57,11 +57,11 @@ package androidx.compose.animation {
     method @androidx.compose.runtime.Composable public static androidx.compose.animation.DisposableAnimationClock asDisposableClock(androidx.compose.animation.core.AnimationClockObservable);
   }
 
-  public final class DpPropKey implements androidx.compose.animation.core.PropKey<androidx.compose.ui.unit.Dp,androidx.compose.animation.core.AnimationVector1D> {
-    ctor public DpPropKey(String label);
-    ctor public DpPropKey();
-    method public String getLabel();
-    method public androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.Dp,androidx.compose.animation.core.AnimationVector1D> getTypeConverter();
+  @Deprecated public final class DpPropKey implements androidx.compose.animation.core.PropKey<androidx.compose.ui.unit.Dp,androidx.compose.animation.core.AnimationVector1D> {
+    ctor @Deprecated public DpPropKey(String label);
+    ctor @Deprecated public DpPropKey();
+    method @Deprecated public String getLabel();
+    method @Deprecated public androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.Dp,androidx.compose.animation.core.AnimationVector1D> getTypeConverter();
     property public String label;
     property public androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.Dp,androidx.compose.animation.core.AnimationVector1D> typeConverter;
   }
@@ -94,11 +94,11 @@ package androidx.compose.animation {
   @kotlin.RequiresOptIn(message="This is an experimental animation API.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface ExperimentalAnimationApi {
   }
 
-  public final class OffsetPropKey implements androidx.compose.animation.core.PropKey<androidx.compose.ui.geometry.Offset,androidx.compose.animation.core.AnimationVector2D> {
-    ctor public OffsetPropKey(String label);
-    ctor public OffsetPropKey();
-    method public String getLabel();
-    method public androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.geometry.Offset,androidx.compose.animation.core.AnimationVector2D> getTypeConverter();
+  @Deprecated public final class OffsetPropKey implements androidx.compose.animation.core.PropKey<androidx.compose.ui.geometry.Offset,androidx.compose.animation.core.AnimationVector2D> {
+    ctor @Deprecated public OffsetPropKey(String label);
+    ctor @Deprecated public OffsetPropKey();
+    method @Deprecated public String getLabel();
+    method @Deprecated public androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.geometry.Offset,androidx.compose.animation.core.AnimationVector2D> getTypeConverter();
     property public String label;
     property public androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.geometry.Offset,androidx.compose.animation.core.AnimationVector2D> typeConverter;
   }
@@ -107,7 +107,7 @@ package androidx.compose.animation {
     method public static kotlin.jvm.functions.Function1<androidx.compose.ui.graphics.colorspace.ColorSpace,androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.graphics.Color,androidx.compose.animation.core.AnimationVector4D>> getVectorConverter(androidx.compose.ui.graphics.Color.Companion);
     method @Deprecated public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.geometry.Rect,androidx.compose.animation.core.AnimationVector4D> getVectorConverter(androidx.compose.ui.geometry.Rect.Companion);
     method @Deprecated public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.Dp,androidx.compose.animation.core.AnimationVector1D> getVectorConverter(androidx.compose.ui.unit.Dp.Companion);
-    method @Deprecated public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.Position,androidx.compose.animation.core.AnimationVector2D> getVectorConverter(androidx.compose.ui.unit.Position.Companion);
+    method @Deprecated public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.DpOffset,androidx.compose.animation.core.AnimationVector2D> getVectorConverter(androidx.compose.ui.unit.DpOffset.Companion);
     method @Deprecated public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.geometry.Size,androidx.compose.animation.core.AnimationVector2D> getVectorConverter(androidx.compose.ui.geometry.Size.Companion);
     method @Deprecated public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.Bounds,androidx.compose.animation.core.AnimationVector4D> getVectorConverter(androidx.compose.ui.unit.Bounds.Companion);
     method @Deprecated public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.geometry.Offset,androidx.compose.animation.core.AnimationVector2D> getVectorConverter(androidx.compose.ui.geometry.Offset.Companion);
@@ -115,44 +115,45 @@ package androidx.compose.animation {
     method @Deprecated public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.IntSize,androidx.compose.animation.core.AnimationVector2D> getVectorConverter(androidx.compose.ui.unit.IntSize.Companion);
   }
 
-  public final class PxPropKey implements androidx.compose.animation.core.PropKey<java.lang.Float,androidx.compose.animation.core.AnimationVector1D> {
-    ctor public PxPropKey(String label);
-    ctor public PxPropKey();
-    method public String getLabel();
-    method public androidx.compose.animation.core.TwoWayConverter<java.lang.Float,androidx.compose.animation.core.AnimationVector1D> getTypeConverter();
+  @Deprecated public final class PxPropKey implements androidx.compose.animation.core.PropKey<java.lang.Float,androidx.compose.animation.core.AnimationVector1D> {
+    ctor @Deprecated public PxPropKey(String label);
+    ctor @Deprecated public PxPropKey();
+    method @Deprecated public String getLabel();
+    method @Deprecated public androidx.compose.animation.core.TwoWayConverter<java.lang.Float,androidx.compose.animation.core.AnimationVector1D> getTypeConverter();
     property public String label;
     property public androidx.compose.animation.core.TwoWayConverter<java.lang.Float,androidx.compose.animation.core.AnimationVector1D> typeConverter;
   }
 
-  public final class RectPropKey implements androidx.compose.animation.core.PropKey<androidx.compose.ui.geometry.Rect,androidx.compose.animation.core.AnimationVector4D> {
-    ctor public RectPropKey(String label);
-    ctor public RectPropKey();
-    method public String getLabel();
-    method public androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.geometry.Rect,androidx.compose.animation.core.AnimationVector4D> getTypeConverter();
+  @Deprecated public final class RectPropKey implements androidx.compose.animation.core.PropKey<androidx.compose.ui.geometry.Rect,androidx.compose.animation.core.AnimationVector4D> {
+    ctor @Deprecated public RectPropKey(String label);
+    ctor @Deprecated public RectPropKey();
+    method @Deprecated public String getLabel();
+    method @Deprecated public androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.geometry.Rect,androidx.compose.animation.core.AnimationVector4D> getTypeConverter();
     property public String label;
     property public androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.geometry.Rect,androidx.compose.animation.core.AnimationVector4D> typeConverter;
   }
 
   public final class SingleValueAnimationKt {
-    method @androidx.compose.runtime.Composable public static float animate(float target, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animSpec, optional float visibilityThreshold, optional kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit>? endListener);
-    method @androidx.compose.runtime.Composable public static androidx.compose.ui.unit.Bounds animate(androidx.compose.ui.unit.Bounds target, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.unit.Bounds> animSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.Bounds,kotlin.Unit>? endListener);
-    method @androidx.compose.runtime.Composable public static androidx.compose.ui.geometry.Rect animate(androidx.compose.ui.geometry.Rect target, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.geometry.Rect> animSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Rect,kotlin.Unit>? endListener);
-    method @androidx.compose.runtime.Composable public static int animate(int target, optional androidx.compose.animation.core.AnimationSpec<java.lang.Integer> animSpec, optional kotlin.jvm.functions.Function1<? super java.lang.Integer,kotlin.Unit>? endListener);
-    method @androidx.compose.runtime.Composable public static <T extends androidx.compose.animation.core.AnimationVector> T animate(T target, optional androidx.compose.animation.core.AnimationSpec<T> animSpec, optional T? visibilityThreshold, optional kotlin.jvm.functions.Function1<? super T,kotlin.Unit>? endListener);
-    method @androidx.compose.runtime.Composable public static <T, V extends androidx.compose.animation.core.AnimationVector> T! animate(T? target, androidx.compose.animation.core.TwoWayConverter<T,V> converter, optional androidx.compose.animation.core.AnimationSpec<T> animSpec, optional T? visibilityThreshold, optional kotlin.jvm.functions.Function1<? super T,kotlin.Unit>? endListener);
-    method @androidx.compose.runtime.Composable public static long animate-2AXSKHY(long target, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.unit.IntOffset> animSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.IntOffset,kotlin.Unit>? endListener);
-    method @androidx.compose.runtime.Composable public static long animate-Cmzki-s(long target, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.unit.IntSize> animSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.IntSize,kotlin.Unit>? endListener);
-    method @androidx.compose.runtime.Composable public static float animate-Lz7ev7o(float target, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.unit.Dp> animSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.Dp,kotlin.Unit>? endListener);
-    method @androidx.compose.runtime.Composable public static long animate-TEItX5s(long target, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.unit.Position> animSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.Position,kotlin.Unit>? endListener);
-    method @androidx.compose.runtime.Composable public static long animate-m3E411Q(long target, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.graphics.Color> animSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.Color,kotlin.Unit>? endListener);
-    method @androidx.compose.runtime.Composable public static long animate-rlPqr8Y(long target, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.geometry.Size> animSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Size,kotlin.Unit>? endListener);
-    method @androidx.compose.runtime.Composable public static long animate-t81mtYE(long target, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.geometry.Offset> animSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit>? endListener);
+    method public static androidx.compose.animation.core.Animatable<androidx.compose.ui.graphics.Color,androidx.compose.animation.core.AnimationVector4D> Animatable-8_81llA(long initialValue);
+    method @Deprecated @androidx.compose.runtime.Composable public static float animate(float target, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animSpec, optional float visibilityThreshold, optional kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit>? endListener);
+    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.ui.unit.Bounds animate(androidx.compose.ui.unit.Bounds target, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.unit.Bounds> animSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.Bounds,kotlin.Unit>? endListener);
+    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.ui.geometry.Rect animate(androidx.compose.ui.geometry.Rect target, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.geometry.Rect> animSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Rect,kotlin.Unit>? endListener);
+    method @Deprecated @androidx.compose.runtime.Composable public static int animate(int target, optional androidx.compose.animation.core.AnimationSpec<java.lang.Integer> animSpec, optional kotlin.jvm.functions.Function1<? super java.lang.Integer,kotlin.Unit>? endListener);
+    method @Deprecated @androidx.compose.runtime.Composable public static <T, V extends androidx.compose.animation.core.AnimationVector> T! animate(T? target, androidx.compose.animation.core.TwoWayConverter<T,V> converter, optional androidx.compose.animation.core.AnimationSpec<T> animSpec, optional T? visibilityThreshold, optional kotlin.jvm.functions.Function1<? super T,kotlin.Unit>? endListener);
+    method @Deprecated @androidx.compose.runtime.Composable public static long animate-2AXSKHY(long target, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.unit.IntOffset> animSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.IntOffset,kotlin.Unit>? endListener);
+    method @Deprecated @androidx.compose.runtime.Composable public static long animate-Cmzki-s(long target, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.unit.IntSize> animSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.IntSize,kotlin.Unit>? endListener);
+    method @Deprecated @androidx.compose.runtime.Composable public static float animate-Lz7ev7o(float target, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.unit.Dp> animSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.Dp,kotlin.Unit>? endListener);
+    method @Deprecated @androidx.compose.runtime.Composable public static long animate-m3E411Q(long target, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.graphics.Color> animSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.Color,kotlin.Unit>? endListener);
+    method @Deprecated @androidx.compose.runtime.Composable public static long animate-rlPqr8Y(long target, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.geometry.Size> animSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Size,kotlin.Unit>? endListener);
+    method @Deprecated @androidx.compose.runtime.Composable public static long animate-t81mtYE(long target, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.geometry.Offset> animSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit>? endListener);
+    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> animateAsState-m3E411Q(long targetValue, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.graphics.Color> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.Color,kotlin.Unit>? finishedListener);
+    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> animateColorAsState-m3E411Q(long targetValue, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.graphics.Color> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.Color,kotlin.Unit>? finishedListener);
   }
 
   public final class TransitionKt {
-    method @androidx.compose.runtime.Composable public static inline <S> androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> animateColor(androidx.compose.animation.core.Transition<S>, optional kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.Transition.States<S>,? extends androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.graphics.Color>> transitionSpec, kotlin.jvm.functions.Function1<? super S,androidx.compose.ui.graphics.Color> targetValueByState);
-    method @Deprecated @VisibleForTesting public static void setTransitionsEnabled(boolean p);
-    method @androidx.compose.runtime.Composable public static <T> androidx.compose.animation.core.TransitionState transition(androidx.compose.animation.core.TransitionDefinition<T> definition, T? toState, optional androidx.compose.animation.core.AnimationClockObservable clock, optional T? initState, optional String? label, optional kotlin.jvm.functions.Function1<? super T,kotlin.Unit>? onStateChangeFinished);
+    method @androidx.compose.runtime.Composable public static inline <S> androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> animateColor(androidx.compose.animation.core.Transition<S>, optional kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.Transition.Segment<S>,? extends androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.graphics.Color>> transitionSpec, optional String label, kotlin.jvm.functions.Function1<? super S,androidx.compose.ui.graphics.Color> targetValueByState);
+    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> animateColor-Baa6hxQ(androidx.compose.animation.core.InfiniteTransition, long initialValue, long targetValue, androidx.compose.animation.core.InfiniteRepeatableSpec<androidx.compose.ui.graphics.Color> animationSpec);
+    method @Deprecated @androidx.compose.runtime.Composable public static <T> androidx.compose.animation.core.TransitionState transition(androidx.compose.animation.core.TransitionDefinition<T> definition, T? toState, optional androidx.compose.animation.core.AnimationClockObservable clock, optional T? initState, optional String? label, optional kotlin.jvm.functions.Function1<? super T,kotlin.Unit>? onStateChangeFinished);
   }
 
 }

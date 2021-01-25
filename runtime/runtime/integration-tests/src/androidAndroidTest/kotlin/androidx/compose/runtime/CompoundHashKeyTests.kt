@@ -35,17 +35,17 @@ class CompoundHashKeyTests : BaseComposeTest() {
     fun testWithSubCompose() {
         val outerKeys = mutableListOf<Int>()
         val innerKeys = mutableListOf<Int>()
-        val invalidates = mutableListOf<() -> Unit>()
+        val invalidates = mutableListOf<RecomposeScope>()
         fun invalidateComposition() {
-            invalidates.forEach { it() }
+            invalidates.forEach { it.invalidate() }
             invalidates.clear()
         }
         @Composable
         fun recordHashKeys() {
-            invalidates.add(invalidate)
+            invalidates.add(currentRecomposeScope)
             outerKeys.add(currentComposer.currentCompoundKeyHash)
             subCompose {
-                invalidates.add(invalidate)
+                invalidates.add(currentRecomposeScope)
                 innerKeys.add(currentComposer.currentCompoundKeyHash)
             }
         }

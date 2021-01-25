@@ -18,7 +18,7 @@ package androidx.compose.ui.text.input
 
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.util.annotation.VisibleForTesting
+import androidx.compose.ui.text.emptyAnnotatedString
 
 /**
  * The core editing implementation
@@ -32,15 +32,15 @@ import androidx.compose.ui.util.annotation.VisibleForTesting
 class EditProcessor {
 
     // The last known state of the EditingBuffer
-    @VisibleForTesting
-    var mBufferState: TextFieldValue = TextFieldValue("", TextRange.Zero, null)
+    /*@VisibleForTesting*/
+    var mBufferState: TextFieldValue = TextFieldValue(emptyAnnotatedString(), TextRange.Zero, null)
         private set
 
     // The editing buffer used for applying editor commands from IME.
-    @VisibleForTesting
+    /*@VisibleForTesting*/
     internal var mBuffer: EditingBuffer = EditingBuffer(
-        initialText = "",
-        initialSelection = TextRange.Zero
+        text = mBufferState.annotatedString,
+        selection = mBufferState.selection
     )
 
     /**
@@ -54,10 +54,10 @@ class EditProcessor {
         textInputService: TextInputService?,
         token: InputSessionToken
     ) {
-        if (mBufferState.text != value.text) {
+        if (mBufferState.annotatedString != value.annotatedString) {
             mBuffer = EditingBuffer(
-                initialText = value.text,
-                initialSelection = value.selection
+                text = value.annotatedString,
+                selection = value.selection
             )
         } else if (mBufferState.selection != value.selection) {
             mBuffer.setSelection(value.selection.min, value.selection.max)
@@ -71,7 +71,7 @@ class EditProcessor {
 
         val oldValue = mBufferState
         mBufferState = value
-        textInputService?.onStateUpdated(token, oldValue, value)
+        textInputService?.updateState(token, oldValue, value)
     }
 
     /**
@@ -80,11 +80,11 @@ class EditProcessor {
      * This method updates internal editing buffer with the given edit operations and returns the
      * latest editor state representation of the editing buffer.
      */
-    fun onEditCommands(ops: List<EditOperation>): TextFieldValue {
-        ops.forEach { it.process(mBuffer) }
+    fun onEditCommands(ops: List<EditCommand>): TextFieldValue {
+        ops.forEach { it.applyTo(mBuffer) }
 
         val newState = TextFieldValue(
-            text = mBuffer.toString(),
+            annotatedString = mBuffer.toAnnotatedString(),
             selection = TextRange(mBuffer.selectionStart, mBuffer.selectionEnd),
             composition = if (mBuffer.hasComposition()) {
                 TextRange(mBuffer.compositionStart, mBuffer.compositionEnd)

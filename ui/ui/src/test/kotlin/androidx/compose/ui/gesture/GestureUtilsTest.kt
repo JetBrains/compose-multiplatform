@@ -19,7 +19,6 @@ package androidx.compose.ui.gesture
 import androidx.compose.ui.input.pointer.down
 import androidx.compose.ui.input.pointer.up
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.milliseconds
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -32,7 +31,7 @@ class GestureUtilsTest {
     fun anyPointersInBounds_1Up_returnsFalse() {
         assertThat(
             listOf(
-                down(0, x = 0f, y = 0f).up(100.milliseconds)
+                down(0, x = 0f, y = 0f).up(100)
             )
                 .anyPointersInBounds(IntSize(1, 1))
         ).isFalse()

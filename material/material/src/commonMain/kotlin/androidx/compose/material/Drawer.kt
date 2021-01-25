@@ -19,9 +19,11 @@ package androidx.compose.material
 import androidx.compose.animation.asDisposableClock
 import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.AnimationEndReason
-import androidx.compose.animation.core.SpringSpec
+import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
@@ -39,7 +41,7 @@ import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.layout.WithConstraints
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AmbientLayoutDirection
@@ -353,17 +355,23 @@ fun ModalDrawerLayout(
     scrimColor: Color = DrawerDefaults.scrimColor,
     bodyContent: @Composable () -> Unit
 ) {
-    WithConstraints(modifier.fillMaxSize()) {
+    BoxWithConstraints(modifier.fillMaxSize()) {
+        val modalDrawerConstraints = constraints
         // TODO : think about Infinite max bounds case
-        if (!constraints.hasBoundedWidth) {
+        if (!modalDrawerConstraints.hasBoundedWidth) {
             throw IllegalStateException("Drawer shouldn't have infinite width")
         }
 
-        val minValue = -constraints.maxWidth.toFloat()
+        val minValue = -modalDrawerConstraints.maxWidth.toFloat()
         val maxValue = 0f
 
         val anchors = mapOf(minValue to DrawerValue.Closed, maxValue to DrawerValue.Open)
         val isRtl = AmbientLayoutDirection.current == LayoutDirection.Rtl
+        val blockClicks = if (drawerState.isOpen) {
+            Modifier.pointerInput { detectTapGestures {} }
+        } else {
+            Modifier
+        }
         Box(
             Modifier.swipeable(
                 state = drawerState,
@@ -387,12 +395,13 @@ fun ModalDrawerLayout(
             )
             Surface(
                 modifier = with(AmbientDensity.current) {
-                    Modifier.preferredSizeIn(
-                        minWidth = constraints.minWidth.toDp(),
-                        minHeight = constraints.minHeight.toDp(),
-                        maxWidth = constraints.maxWidth.toDp(),
-                        maxHeight = constraints.maxHeight.toDp()
-                    )
+                    Modifier
+                        .preferredSizeIn(
+                            minWidth = modalDrawerConstraints.minWidth.toDp(),
+                            minHeight = modalDrawerConstraints.minHeight.toDp(),
+                            maxWidth = modalDrawerConstraints.maxWidth.toDp(),
+                            maxHeight = modalDrawerConstraints.maxHeight.toDp()
+                        )
                 }
                     .semantics {
                         if (drawerState.isOpen) {
@@ -400,13 +409,13 @@ fun ModalDrawerLayout(
                         }
                     }
                     .offset { IntOffset(drawerState.offset.value.roundToInt(), 0) }
-                    .padding(end = VerticalDrawerPadding),
+                    .padding(end = EndDrawerPadding),
                 shape = drawerShape,
                 color = drawerBackgroundColor,
                 contentColor = drawerContentColor,
                 elevation = drawerElevation
             ) {
-                Column(Modifier.fillMaxSize(), content = drawerContent)
+                Column(Modifier.fillMaxSize().then(blockClicks), content = drawerContent)
             }
         }
     }
@@ -456,17 +465,18 @@ fun BottomDrawerLayout(
     scrimColor: Color = DrawerDefaults.scrimColor,
     bodyContent: @Composable () -> Unit
 ) {
-    WithConstraints(modifier.fillMaxSize()) {
+    BoxWithConstraints(modifier.fillMaxSize()) {
+        val modalDrawerConstraints = constraints
         // TODO : think about Infinite max bounds case
-        if (!constraints.hasBoundedHeight) {
+        if (!modalDrawerConstraints.hasBoundedHeight) {
             throw IllegalStateException("Drawer shouldn't have infinite height")
         }
 
         val minValue = 0f
-        val maxValue = constraints.maxHeight.toFloat()
+        val maxValue = modalDrawerConstraints.maxHeight.toFloat()
 
         // TODO: add proper landscape support
-        val isLandscape = constraints.maxWidth > constraints.maxHeight
+        val isLandscape = modalDrawerConstraints.maxWidth > modalDrawerConstraints.maxHeight
         val openValue = if (isLandscape) minValue else lerp(
             minValue,
             maxValue,
@@ -485,6 +495,11 @@ fun BottomDrawerLayout(
                     minValue to BottomDrawerValue.Expanded
                 )
             }
+        val blockClicks = if (drawerState.isClosed) {
+            Modifier
+        } else {
+            Modifier.pointerInput { detectTapGestures {} }
+        }
         Box(
             Modifier
                 .nestedScroll(drawerState.nestedScrollConnection)
@@ -511,10 +526,10 @@ fun BottomDrawerLayout(
             Surface(
                 modifier = with(AmbientDensity.current) {
                     Modifier.preferredSizeIn(
-                        minWidth = constraints.minWidth.toDp(),
-                        minHeight = constraints.minHeight.toDp(),
-                        maxWidth = constraints.maxWidth.toDp(),
-                        maxHeight = constraints.maxHeight.toDp()
+                        minWidth = modalDrawerConstraints.minWidth.toDp(),
+                        minHeight = modalDrawerConstraints.minHeight.toDp(),
+                        maxWidth = modalDrawerConstraints.maxWidth.toDp(),
+                        maxHeight = modalDrawerConstraints.maxHeight.toDp()
                     )
                 }
                     .semantics {
@@ -527,37 +542,10 @@ fun BottomDrawerLayout(
                 contentColor = drawerContentColor,
                 elevation = drawerElevation
             ) {
-                Column(Modifier.fillMaxSize(), content = drawerContent)
+                Column(Modifier.fillMaxSize().then(blockClicks), content = drawerContent)
             }
         }
     }
-}
-
-/**
- * Object to hold default values for [ModalDrawerLayout] and [BottomDrawerLayout]
- */
-@Deprecated(
-    "DrawerConstants has been replaced with DrawerDefaults",
-    ReplaceWith(
-        "DrawerDefaults",
-        "androidx.compose.material.DrawerDefaults"
-    )
-)
-object DrawerConstants {
-
-    /**
-     * Default Elevation for drawer sheet as specified in material specs
-     */
-    val DefaultElevation = 16.dp
-
-    val defaultScrimColor: Color
-        @Composable
-        get() = MaterialTheme.colors.onSurface.copy(alpha = ScrimDefaultOpacity)
-
-    /**
-     * Default alpha for scrim color
-     */
-    const val ScrimDefaultOpacity = 0.32f
 }
 
 /**
@@ -605,11 +593,11 @@ private fun Scrim(
     }
 }
 
-private val VerticalDrawerPadding = 56.dp
+private val EndDrawerPadding = 56.dp
 private val DrawerVelocityThreshold = 400.dp
 
-private const val DrawerStiffness = 1000f
-
-private val AnimationSpec = SpringSpec<Float>(stiffness = DrawerStiffness)
+// TODO: b/177571613 this should be a proper decay settling
+// this is taken from the DrawerLayout's DragViewHelper as a min duration.
+private val AnimationSpec = TweenSpec<Float>(durationMillis = 256)
 
 internal const val BottomDrawerOpenFraction = 0.5f

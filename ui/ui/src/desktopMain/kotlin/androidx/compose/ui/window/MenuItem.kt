@@ -16,6 +16,7 @@
 package androidx.compose.ui.window
 
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.nativeKeyCode
 import java.awt.Toolkit
 import javax.swing.KeyStroke
 
@@ -68,7 +69,7 @@ class MenuItem {
  */
 fun KeyStroke(key: Key): KeyStroke {
     return KeyStroke.getKeyStroke(
-        key.keyCode,
+        key.nativeKeyCode,
         Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()
     )
 }

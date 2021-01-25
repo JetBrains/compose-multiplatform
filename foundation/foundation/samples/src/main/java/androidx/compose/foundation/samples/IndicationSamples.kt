@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -39,16 +40,18 @@ fun IndicationSample() {
         Text(
             text = "Click me and my neighbour will indicate as well!",
             modifier = Modifier
-                // clickable will update interaction state and show indication for this element
-                .clickable(interactionState = interactionState) { /** do something */ }
+                // clickable will update interaction state and show ripple
+                .clickable(interactionState = interactionState, indication = rememberRipple()) {
+                    /**do something */
+                }
                 .padding(10.dp)
         )
         Spacer(Modifier.height(10.dp))
         Text(
             text = "I'm neighbour and I indicate when you click the other one",
             modifier = Modifier
-                // this element doesn't have a click, but will indicate as it accepts same
-                // interaction state
+                // this element doesn't have a click, but will show default indication from the
+                // ambient as it accepts same interaction state
                 .indication(interactionState, AmbientIndication.current())
                 .padding(10.dp)
         )

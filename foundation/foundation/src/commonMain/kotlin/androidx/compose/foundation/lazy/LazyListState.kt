@@ -36,8 +36,6 @@ import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.ui.layout.Remeasurement
 import androidx.compose.ui.layout.RemeasurementModifier
 import androidx.compose.ui.platform.AmbientAnimationClock
-import androidx.compose.ui.util.annotation.IntRange
-import androidx.compose.ui.util.annotation.VisibleForTesting
 import kotlin.math.abs
 
 /**
@@ -85,6 +83,7 @@ fun rememberLazyListState(
  *
  * @param firstVisibleItemIndex the initial value for [LazyListState.firstVisibleItemIndex]
  * @param firstVisibleItemScrollOffset the initial value for
+ * [LazyListState.firstVisibleItemScrollOffset]
  * @param interactionState [InteractionState] that will be updated when the element with this
  * state is being scrolled by dragging, using [Interaction.Dragged]. If you want to know whether
  * the fling (or smooth scroll) is in progress, use [LazyListState.isAnimationRunning].
@@ -173,7 +172,7 @@ class LazyListState constructor(
     /**
      * Only used for testing to confirm that we're not making too many measure passes
      */
-    @VisibleForTesting
+    /*@VisibleForTesting*/
     internal var numMeasurePasses: Int = 0
         private set
 
@@ -193,14 +192,15 @@ class LazyListState constructor(
      * Cancels the currently running scroll, if any, and suspends until the cancellation is
      * complete.
      *
-     * @param index the data index to snap to
-     * @param scrollOffset the number of pixels past the start of the item to snap to
+     * @param index the data index to snap to. Must be between 0 and the number of elements.
+     * @param scrollOffset the number of pixels past the start of the item to snap to. Must
+     * not be negative.
      */
     @OptIn(ExperimentalFoundationApi::class)
     suspend fun snapToItemIndex(
-        @IntRange(from = 0)
+        /*@IntRange(from = 0)*/
         index: Int,
-        @IntRange(from = 0)
+        /*@IntRange(from = 0)*/
         scrollOffset: Int = 0
     ) = scrollableController.scroll {
         scrollPosition.update(
@@ -230,7 +230,7 @@ class LazyListState constructor(
 
     // TODO: Coroutine scrolling APIs will allow this to be private again once we have more
     //  fine-grained control over scrolling
-    @VisibleForTesting
+    /*@VisibleForTesting*/
     internal fun onScroll(distance: Float): Float {
         if (distance < 0 && !scrollPosition.canScrollForward ||
             distance > 0 && !scrollPosition.canScrollBackward

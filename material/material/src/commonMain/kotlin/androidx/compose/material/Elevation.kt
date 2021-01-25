@@ -16,7 +16,7 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.core.AnimatedValue
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.dp
  * @param target the [Dp] target elevation for this component, corresponding to the elevation
  * desired for the [to] state.
  */
-fun AnimatedValue<Dp, *>.animateElevation(
+suspend fun Animatable<Dp, *>.animateElevation(
     from: Interaction? = null,
     to: Interaction? = null,
     target: Dp
@@ -55,55 +55,6 @@ fun AnimatedValue<Dp, *>.animateElevation(
         else -> null
     }
     if (spec != null) animateTo(target, spec) else snapTo(target)
-}
-
-/**
- * Contains default [AnimationSpec]s used for animating elevation between different [Interaction]s.
- *
- * Typically you should use [animateElevation] instead, which uses these [AnimationSpec]s
- * internally. [animateElevation] in turn is used by the defaults for [Button] and
- * [FloatingActionButton] - inside [ButtonDefaults.elevation] and
- * [FloatingActionButtonDefaults.elevation] respectively.
- *
- * @see animateElevation
- */
-@Deprecated(
-    "ElevationConstants has been replaced with ElevationDefaults",
-    ReplaceWith(
-        "ElevationDefaults",
-        "androidx.compose.material.ElevationDefaults"
-    )
-)
-object ElevationConstants {
-    /**
-     * Returns the [AnimationSpec]s used when animating elevation to [interaction], either from a
-     * previous [Interaction], or from the default state. If [interaction] is unknown, then
-     * returns `null`.
-     *
-     * @param interaction the [Interaction] that is being animated to
-     */
-    fun incomingAnimationSpecForInteraction(interaction: Interaction): AnimationSpec<Dp>? {
-        return when (interaction) {
-            is Interaction.Pressed -> DefaultIncomingSpec
-            is Interaction.Dragged -> DefaultIncomingSpec
-            else -> null
-        }
-    }
-
-    /**
-     * Returns the [AnimationSpec]s used when animating elevation away from [interaction], to the
-     * default state. If [interaction] is unknown, then returns `null`.
-     *
-     * @param interaction the [Interaction] that is being animated away from
-     */
-    fun outgoingAnimationSpecForInteraction(interaction: Interaction): AnimationSpec<Dp>? {
-        return when (interaction) {
-            is Interaction.Pressed -> DefaultOutgoingSpec
-            is Interaction.Dragged -> DefaultOutgoingSpec
-            // TODO: use [HoveredOutgoingSpec] when hovered
-            else -> null
-        }
-    }
 }
 
 /**

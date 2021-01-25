@@ -14,17 +14,23 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.animation
 
 import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.AnimationVector
 import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.core.InfiniteRepeatableSpec
+import androidx.compose.animation.core.InfiniteTransition
 import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.animation.core.PropKey
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.TransitionAnimation
 import androidx.compose.animation.core.TransitionDefinition
 import androidx.compose.animation.core.TransitionState
+import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.animateValue
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.keyframes
@@ -32,16 +38,15 @@ import androidx.compose.animation.core.repeatable
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.AmbientAnimationClock
-import androidx.compose.ui.util.annotation.VisibleForTesting
 
 /**
  * [transition] composable creates a state-based transition using the animation configuration
@@ -61,8 +66,6 @@ import androidx.compose.ui.util.annotation.VisibleForTesting
  * captures all the current values of the animation. Child composables should read the animation
  * values from the [TransitionState] object, and apply the value wherever necessary.
  *
- * @sample androidx.compose.animation.samples.TransitionSample
- *
  * @param definition Transition definition that defines states and transitions
  * @param toState New state to transition to
  * @param clock Optional animation clock that pulses animations when time changes. By default,
@@ -81,6 +84,7 @@ import androidx.compose.ui.util.annotation.VisibleForTesting
  * @see [TransitionDefinition]
  */
 // TODO: The list of params is getting a bit long. Consider grouping them.
+@Deprecated("Please use updateTransition or rememberInfiniteTransition instead.")
 @OptIn(InternalAnimationApi::class)
 @Composable
 fun <T> transition(
@@ -101,8 +105,9 @@ fun <T> transition(
         // TODO(b/150674848): Should be onCommit, but that posts to the Choreographer. Until that
         //  callback is executed, nothing is aware that the animation is kicked off, so if
         //  Espresso checks for idleness between now and then, it will think all is idle.
-        onCommit(model, toState) {
+        DisposableEffect(model, toState) {
             model.anim.toState(toState)
+            onDispose { }
         }
         return model
     } else {
@@ -122,8 +127,8 @@ fun <T> transition(
         "pause the animation clock and advance it manually"
 )
 var transitionsEnabled = true
-    @VisibleForTesting
-    set
+    /*@VisibleForTesting
+    set*/
 
 // TODO(Doris): Use Clock idea instead of TransitionModel with pulse
 /**
@@ -174,6 +179,8 @@ class TransitionModel<T>(
  * [infiniteRepeatable]. By default, [transitionSpec] uses a [spring] animation for all transition
  * destinations.
  *
+ * [label] is used to differentiate from other animations in the same transition in Android Studio.
+ *
  * @return A [State] object, the value of which is updated by animation
  *
  * @see animateValue
@@ -184,13 +191,41 @@ class TransitionModel<T>(
 @Composable
 inline fun <S> Transition<S>.animateColor(
     noinline transitionSpec:
-        @Composable (states: Transition.States<S>) -> FiniteAnimationSpec<Color> = { spring() },
-    targetValueByState: @Composable (state: S) -> Color
+        @Composable Transition.Segment<S>.() -> FiniteAnimationSpec<Color> = { spring() },
+    label: String = "ColorAnimation",
+    targetValueByState: @Composable() (state: S) -> Color
 ): State<Color> {
     val colorSpace = targetValueByState(targetState).colorSpace
     val typeConverter = remember(colorSpace) {
         Color.VectorConverter(colorSpace)
     }
 
-    return animateValue(typeConverter, transitionSpec, targetValueByState)
+    return animateValue(typeConverter, transitionSpec, label, targetValueByState)
+}
+
+/**
+ * Creates a Color animation that runs infinitely as a part of the given [InfiniteTransition].
+ *
+ * Once the animation is created, it will run from [initialValue] to [targetValue] and repeat.
+ * Depending on the [RepeatMode] of the provided [animationSpec], the animation could either
+ * restart after each iteration (i.e. [RepeatMode.Restart]), or reverse after each iteration (i.e
+ * . [RepeatMode.Reverse]).
+ *
+ * If [initialValue] or [targetValue] is changed at any point during the animation, the animation
+ * will be restarted with the new [initialValue] and [targetValue]. __Note__: this means
+ * continuity will *not* be preserved.
+ *
+ * @see InfiniteTransition.animateValue
+ * @see androidx.compose.animation.core.animateFloat
+ */
+@Composable
+fun InfiniteTransition.animateColor(
+    initialValue: Color,
+    targetValue: Color,
+    animationSpec: InfiniteRepeatableSpec<Color>
+): State<Color> {
+    val converter = remember {
+        (Color.VectorConverter)(targetValue.colorSpace)
+    }
+    return animateValue(initialValue, targetValue, converter, animationSpec)
 }

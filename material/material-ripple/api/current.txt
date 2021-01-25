@@ -13,7 +13,6 @@ package androidx.compose.material.ripple {
 
   public final class RippleKt {
     method @androidx.compose.runtime.Composable public static androidx.compose.foundation.Indication rememberRipple-aOO63xs(optional boolean bounded, optional float radius, optional long color);
-    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.foundation.Indication rememberRippleIndication-DudYJDg(optional boolean bounded, optional androidx.compose.ui.unit.Dp? radius, optional long color);
   }
 
   @androidx.compose.material.ripple.ExperimentalRippleApi public interface RippleTheme {
@@ -28,7 +27,7 @@ package androidx.compose.material.ripple {
   }
 
   public final class RippleThemeKt {
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.material.ripple.RippleTheme> getAmbientRippleTheme();
+    method @androidx.compose.material.ripple.ExperimentalRippleApi public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.material.ripple.RippleTheme> getAmbientRippleTheme();
   }
 
 }

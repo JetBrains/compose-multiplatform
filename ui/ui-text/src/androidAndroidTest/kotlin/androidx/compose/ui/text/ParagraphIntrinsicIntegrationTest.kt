@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.text
 
-import androidx.compose.ui.text.font.asFontFamily
+import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
@@ -30,7 +30,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 @RunWith(AndroidJUnit4::class)
 @SmallTest
 class ParagraphIntrinsicIntegrationTest {
-    private val fontFamilyMeasureFont = FontTestData.BASIC_MEASURE_FONT.asFontFamily()
+    private val fontFamilyMeasureFont = FontTestData.BASIC_MEASURE_FONT.toFontFamily()
     private val context = InstrumentationRegistry.getInstrumentation().context
     private val defaultDensity = Density(density = 1f)
 

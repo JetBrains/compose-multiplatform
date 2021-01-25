@@ -17,6 +17,7 @@
 package androidx.compose.material
 
 import android.os.Build
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Modifier
@@ -34,6 +35,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.width
+import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
@@ -248,7 +250,7 @@ private fun TextTestContent(colors: Colors) {
 private fun FilledTextFieldTestContent(colors: Colors) {
     MaterialTheme(colors) {
         Surface(Modifier.testTag(Tag)) {
-            TextField(value = Text, onValueChange = {})
+            TextField(value = Text, onValueChange = {}, modifier = Modifier.width(280.dp))
         }
     }
 }
@@ -257,7 +259,7 @@ private fun FilledTextFieldTestContent(colors: Colors) {
 private fun OutlinedTextFieldTestContent(colors: Colors) {
     MaterialTheme(colors) {
         Surface(Modifier.testTag(Tag)) {
-            OutlinedTextField(value = Text, onValueChange = {})
+            OutlinedTextField(value = Text, onValueChange = {}, modifier = Modifier.width(280.dp))
         }
     }
 }

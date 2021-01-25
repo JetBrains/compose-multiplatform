@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.offset
  * Padding is applied before content measurement and takes precedence; content may only be as large
  * as the remaining space.
  *
- * Negative padding is not permitted. See [offset].
+ * Negative padding is not permitted. See [Modifier.offset].
  *
  * Example usage:
  * @sample androidx.compose.foundation.layout.samples.PaddingModifier
@@ -74,7 +74,7 @@ fun Modifier.padding(
  * Padding is applied before content measurement and takes precedence; content may only be as large
  * as the remaining space.
  *
- * Negative padding is not permitted. See [offset].
+ * Negative padding is not permitted. See [Modifier.offset].
  *
  * Example usage:
  * @sample androidx.compose.foundation.layout.samples.SymmetricPaddingModifier
@@ -103,7 +103,7 @@ fun Modifier.padding(
  * Padding is applied before content measurement and takes precedence; content may only be as large
  * as the remaining space.
  *
- * Negative padding is not permitted. See [offset].
+ * Negative padding is not permitted. See [Modifier.offset].
  *
  * Example usage:
  * @sample androidx.compose.foundation.layout.samples.PaddingAllModifier
@@ -129,7 +129,7 @@ fun Modifier.padding(all: Dp) =
  * top, right and bottom. Padding is applied before content measurement and takes precedence;
  * content may only be as large as the remaining space.
  *
- * Negative padding is not permitted. See [offset].
+ * Negative padding is not permitted. See [Modifier.offset].
  *
  * Example usage:
  * @sample androidx.compose.foundation.layout.samples.PaddingValuesModifier
@@ -158,7 +158,7 @@ fun Modifier.padding(padding: PaddingValues) =
  * [padding] to apply relative paddings. Padding is applied before content measurement and takes
  * precedence; content may only be as large as the remaining space.
  *
- * Negative padding is not permitted. See [offset].
+ * Negative padding is not permitted. See [Modifier.offset].
  *
  * Example usage:
  * @sample androidx.compose.foundation.layout.samples.AbsolutePaddingModifier
@@ -195,7 +195,12 @@ private class PaddingModifier(
     inspectorInfo: InspectorInfo.() -> Unit
 ) : LayoutModifier, InspectorValueInfo(inspectorInfo) {
     init {
-        require(start.value >= 0f && top.value >= 0f && end.value >= 0f && bottom.value >= 0f) {
+        require(
+            (start.value >= 0f || start == Dp.Unspecified) &&
+                (top.value >= 0f || top == Dp.Unspecified) &&
+                (end.value >= 0f || end == Dp.Unspecified) &&
+                (bottom.value >= 0f || bottom == Dp.Unspecified)
+        ) {
             "Padding must be non-negative"
         }
     }
@@ -253,5 +258,14 @@ data class PaddingValues(
     @Stable
     val bottom: Dp = 0.dp
 ) {
+    /**
+     * Describes a padding of [all] dp along all 4 edges.
+     */
     constructor(all: Dp) : this(all, all, all, all)
+
+    /**
+     * Describes a padding of [horizontal] dp along the left and right edges, and of [vertical]
+     * dp along the top and bottom edges.
+     */
+    constructor(horizontal: Dp, vertical: Dp) : this(horizontal, vertical, horizontal, vertical)
 }

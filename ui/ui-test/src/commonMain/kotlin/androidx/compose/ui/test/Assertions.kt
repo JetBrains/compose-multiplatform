@@ -17,7 +17,7 @@
 package androidx.compose.ui.test
 
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.semantics.AccessibilityRangeInfo
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsProperties
 
@@ -32,6 +32,8 @@ import androidx.compose.ui.semantics.SemanticsProperties
  *
  * Throws [AssertionError] if the node is not hidden.
  */
+@Deprecated("SemanticsMatcher.assertIsHidden is deprecated without a replacement.")
+@Suppress("DEPRECATION")
 fun SemanticsNodeInteraction.assertIsHidden(): SemanticsNodeInteraction = assert(isHidden())
 
 /**
@@ -43,6 +45,8 @@ fun SemanticsNodeInteraction.assertIsHidden(): SemanticsNodeInteraction = assert
  *
  * Throws [AssertionError] if the node is hidden.
  */
+@Deprecated("SemanticsMatcher.assertIsNotHidden is deprecated without a replacement.")
+@Suppress("DEPRECATION")
 fun SemanticsNodeInteraction.assertIsNotHidden(): SemanticsNodeInteraction = assert(isNotHidden())
 
 /**
@@ -188,16 +192,16 @@ fun SemanticsNodeInteraction.assertTextEquals(value: String): SemanticsNodeInter
  * Throws [AssertionError] if the node's value is not equal to `value`, or if the node has no value
  */
 fun SemanticsNodeInteraction.assertValueEquals(value: String): SemanticsNodeInteraction =
-    assert(hasValue(value))
+    assert(hasStateDescription(value))
 
 /**
  * Asserts the node's range info equals the given value.
  *
- * For further details please check [SemanticsProperties.AccessibilityRangeInfo].
+ * For further details please check [SemanticsProperties.ProgressBarRangeInfo].
  * Throws [AssertionError] if the node's value is not equal to `value`, or if the node has no value
  */
-fun SemanticsNodeInteraction.assertRangeInfoEquals(value: AccessibilityRangeInfo):
-    SemanticsNodeInteraction = assert(hasRangeInfo(value))
+fun SemanticsNodeInteraction.assertRangeInfoEquals(value: ProgressBarRangeInfo):
+    SemanticsNodeInteraction = assert(hasProgressBarRangeInfo(value))
 
 /**
  * Asserts that the current semantics node has a click action.

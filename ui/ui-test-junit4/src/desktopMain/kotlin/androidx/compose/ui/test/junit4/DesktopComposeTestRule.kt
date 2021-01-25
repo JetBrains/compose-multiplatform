@@ -20,20 +20,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.snapshots.Snapshot
-import androidx.compose.ui.node.Owner
+import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.platform.DesktopOwner
 import androidx.compose.ui.platform.DesktopOwners
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.semantics.SemanticsNode
-import androidx.compose.ui.test.ExperimentalTesting
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.IdlingResource
-import androidx.compose.ui.test.InternalTestingApi
+import androidx.compose.ui.test.InternalTestApi
+import androidx.compose.ui.test.MainTestClock
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.SemanticsNodeInteractionCollection
 import androidx.compose.ui.test.TestOwner
 import androidx.compose.ui.test.createTestContext
-import androidx.compose.ui.text.input.EditOperation
+import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
@@ -47,10 +48,10 @@ import java.util.concurrent.FutureTask
 import javax.swing.SwingUtilities.invokeAndWait
 import javax.swing.SwingUtilities.isEventDispatchThread
 
-actual fun createComposeRule(): ComposeTestRule = DesktopComposeTestRule()
+actual fun createComposeRule(): ComposeContentTestRule = DesktopComposeTestRule()
 
-@OptIn(InternalTestingApi::class)
-class DesktopComposeTestRule : ComposeTestRule {
+@OptIn(InternalTestApi::class)
+class DesktopComposeTestRule : ComposeContentTestRule {
 
     companion object {
         var current: DesktopComposeTestRule? = null
@@ -59,13 +60,21 @@ class DesktopComposeTestRule : ComposeTestRule {
     var owners: DesktopOwners? = null
     private var owner: DesktopOwner? = null
 
-    @ExperimentalTesting
+    @ExperimentalTestApi
     override val clockTestRule: AnimationClockTestRule = DesktopAnimationClockTestRule()
 
     override val density: Density
         get() = TODO()
 
-    override val displaySize: IntSize get() = IntSize(1024, 768)
+    override val mainClock: MainTestClock
+        get() = TODO()
+
+    @Deprecated(
+        "This utility was deprecated without replacement. It is recommend to use " +
+            "the root size for any assertions."
+    )
+    override val displaySize: IntSize get() = testDisplaySize
+    internal val testDisplaySize: IntSize get() = IntSize(1024, 768)
 
     val executionQueue = LinkedList<() -> Unit>()
 
@@ -104,7 +113,7 @@ class DesktopComposeTestRule : ComposeTestRule {
         }
     }
 
-    @ExperimentalTesting
+    @ExperimentalTestApi
     override suspend fun awaitIdle() {
         while (!isIdle()) {
             runExecutionQueue()
@@ -129,6 +138,10 @@ class DesktopComposeTestRule : ComposeTestRule {
         // stabilization of the new rendering/dispatching model
         waitForIdle()
         return action().also { waitForIdle() }
+    }
+
+    override fun waitUntil(timeoutMillis: Long, condition: () -> Boolean) {
+        // TODO: implement
     }
 
     override fun registerIdlingResource(idlingResource: IdlingResource) {
@@ -159,14 +172,14 @@ class DesktopComposeTestRule : ComposeTestRule {
     }
 
     private fun performSetContent(composable: @Composable() () -> Unit) {
-        val surface = Surface.makeRasterN32Premul(displaySize.width, displaySize.height)
+        val surface = Surface.makeRasterN32Premul(testDisplaySize.width, testDisplaySize.height)!!
         val canvas = surface.canvas
         val owners = DesktopOwners(invalidate = {}).also {
             owners = it
         }
         val owner = DesktopOwner(owners)
-        owner.setContent(composable)
-        owner.setSize(displaySize.width, displaySize.height)
+        owner.setContent(content = composable)
+        owner.setSize(testDisplaySize.width, testDisplaySize.height)
         owner.measureAndLayout()
         owner.draw(canvas)
         this.owner = owner
@@ -187,7 +200,7 @@ class DesktopComposeTestRule : ComposeTestRule {
     }
 
     private class DesktopTestOwner(val rule: DesktopComposeTestRule) : TestOwner {
-        override fun sendTextInputCommand(node: SemanticsNode, command: List<EditOperation>) {
+        override fun sendTextInputCommand(node: SemanticsNode, command: List<EditCommand>) {
             TODO()
         }
 
@@ -199,8 +212,12 @@ class DesktopComposeTestRule : ComposeTestRule {
             return rule.runOnUiThread(action)
         }
 
-        override fun getOwners(): Set<Owner> {
+        override fun getRoots(): Set<RootForTest> {
             return rule.owners!!.list
+        }
+
+        override fun advanceTimeBy(millis: Long) {
+            TODO()
         }
     }
 }

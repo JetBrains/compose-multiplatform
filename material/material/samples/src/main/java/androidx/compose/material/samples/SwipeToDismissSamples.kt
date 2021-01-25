@@ -17,12 +17,15 @@
 package androidx.compose.material.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.animation.animate
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Card
 import androidx.compose.material.DismissDirection.EndToStart
 import androidx.compose.material.DismissDirection.StartToEnd
@@ -96,7 +99,7 @@ fun SwipeToDismissListItems() {
                 },
                 background = {
                     val direction = dismissState.dismissDirection ?: return@SwipeToDismiss
-                    val color = animate(
+                    val color by animateColorAsState(
                         when (dismissState.targetValue) {
                             Default -> Color.LightGray
                             DismissedToEnd -> Color.Green
@@ -111,20 +114,26 @@ fun SwipeToDismissListItems() {
                         StartToEnd -> Icons.Default.Done
                         EndToStart -> Icons.Default.Delete
                     }
-                    val scale = animate(if (dismissState.targetValue == Default) 0.75f else 1f)
+                    val scale by animateFloatAsState(
+                        if (dismissState.targetValue == Default) 0.75f else 1f
+                    )
 
                     Box(
                         Modifier.fillMaxSize().background(color).padding(horizontal = 20.dp),
                         contentAlignment = alignment
                     ) {
-                        Icon(icon, Modifier.scale(scale))
+                        Icon(
+                            icon,
+                            contentDescription = "Localized description",
+                            modifier = Modifier.scale(scale)
+                        )
                     }
                 },
                 dismissContent = {
                     Card(
-                        elevation = animate(
+                        elevation = animateDpAsState(
                             if (dismissState.dismissDirection != null) 4.dp else 0.dp
-                        )
+                        ).value
                     ) {
                         ListItem(
                             text = {

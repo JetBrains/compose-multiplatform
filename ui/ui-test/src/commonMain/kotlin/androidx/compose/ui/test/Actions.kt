@@ -66,7 +66,7 @@ fun SemanticsNodeInteraction.performScrollTo(): SemanticsNodeInteraction {
     // from any other ancestors.
     val viewPortInParent = scrollableNode.layoutInfo.coordinates.boundsInParent
     val parentInRoot = scrollableNode.layoutInfo.coordinates.parentCoordinates
-        ?.positionInRoot ?: Offset.Zero
+        ?.positionInRoot() ?: Offset.Zero
 
     val viewPort = viewPortInParent.translate(parentInRoot)
     val target = Rect(node.positionInRoot, node.size.toSize())
@@ -98,7 +98,7 @@ fun SemanticsNodeInteraction.performScrollTo(): SemanticsNodeInteraction {
         0f
     }
 
-    @OptIn(InternalTestingApi::class)
+    @OptIn(InternalTestApi::class)
     testContext.testOwner.runOnUiThread {
         scrollableNode.config[SemanticsActions.ScrollBy].action(dx, dy)
     }
@@ -182,7 +182,7 @@ fun <T : Function<Boolean>> SemanticsNodeInteraction.performSemanticsAction(
     }
 
     @Suppress("DEPRECATION")
-    @OptIn(InternalTestingApi::class)
+    @OptIn(InternalTestApi::class)
     testContext.testOwner.runOnUiThread {
         invocation(node.config[key].action)
     }

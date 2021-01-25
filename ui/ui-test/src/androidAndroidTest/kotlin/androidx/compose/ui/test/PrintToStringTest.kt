@@ -123,6 +123,7 @@ class PrintToStringTest {
                 "    .-Node #X at \\(X, X, X, X\\)px, Tag: 'box'\n" +
                 "    . Disabled = 'kotlin.Unit'\n" +
                 "    .  .-Node #X at \\(X, X, X, X\\)px\n" +
+                "    .    Role = 'Button'\n" +
                 "    .    OnClick = 'AccessibilityAction\\(label=null, action=.*\\)'\n" +
                 "    .    Text = 'Button'\n" +
                 "    .    GetTextLayoutResult = 'AccessibilityAction\\(label=null, " +

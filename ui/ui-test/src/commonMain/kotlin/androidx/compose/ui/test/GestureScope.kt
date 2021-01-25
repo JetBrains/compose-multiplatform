@@ -18,17 +18,13 @@ package androidx.compose.ui.test
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.lerp
-import androidx.compose.ui.gesture.DoubleTapTimeout
-import androidx.compose.ui.gesture.LongPressTimeout
+import androidx.compose.ui.gesture.DoubleTapTimeoutMillis
+import androidx.compose.ui.gesture.LongPressTimeoutMillis
 import androidx.compose.ui.layout.globalBounds
 import androidx.compose.ui.semantics.SemanticsNode
-import androidx.compose.ui.unit.Duration
+import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriodMillis
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.inMilliseconds
-import androidx.compose.ui.unit.milliseconds
-import androidx.compose.ui.util.annotation.FloatRange
 import androidx.compose.ui.util.lerp
-import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriod
 import kotlin.math.atan2
 import kotlin.math.ceil
 import kotlin.math.cos
@@ -47,7 +43,7 @@ private const val edgeFuzzFactor = 0.083f
  * The time between the last event of the first click and the first event of the second click in
  * a double click gesture. 145 milliseconds: both median and average of empirical data (33 samples)
  */
-private val doubleClickDelay = 145.milliseconds
+private const val doubleClickDelayMillis = 145L
 
 /**
  * The receiver scope for injecting gestures on the [semanticsNode] identified by the
@@ -105,12 +101,9 @@ class GestureScope(node: SemanticsNode, testContext: TestContext) {
             "Can't query SemanticsNode, (Partial)GestureScope has already been disposed"
         }
 
-    // Convenience property
-    private val owner get() = semanticsNode.owner
-
     // TODO(b/133217292): Better error: explain which gesture couldn't be performed
     private var _inputDispatcher: InputDispatcher? =
-        createInputDispatcher(testContext, checkNotNull(owner))
+        createInputDispatcher(testContext, checkNotNull(semanticsNode.root))
     internal val inputDispatcher
         get() = checkNotNull(_inputDispatcher) {
             "Can't send gesture, (Partial)GestureScope has already been disposed"
@@ -263,8 +256,8 @@ val GestureScope.bottomRight: Offset
 
 /**
  * Creates an [Offset] relative to the size of the node we're interacting with. [x] and [y]
- * are fractions of the [width] and [height]. Note that `percentOffset(1f, 1f) != bottomRight`,
- * see [right] and [bottom].
+ * are fractions of the [width] and [height], between `-1` and `1`.
+ * Note that `percentOffset(1f, 1f) != bottomRight`, see [right] and [bottom].
  *
  * For example: `percentOffset(.5f, .5f)` is the same as the [center]; `centerLeft +
  * percentOffset(.1f, 0f)` is a point 10% inward from the middle of the left edge; and
@@ -272,8 +265,10 @@ val GestureScope.bottomRight: Offset
  * bottom right corner.
  */
 fun GestureScope.percentOffset(
-    @FloatRange(from = -1.0, to = 1.0) x: Float = 0f,
-    @FloatRange(from = -1.0, to = 1.0) y: Float = 0f
+    /*@FloatRange(from = -1.0, to = 1.0)*/
+    x: Float = 0f,
+    /*@FloatRange(from = -1.0, to = 1.0)*/
+    y: Float = 0f
 ): Offset {
     return Offset(x * width, y * height)
 }
@@ -285,6 +280,7 @@ fun GestureScope.percentOffset(
  * @param position A position in local coordinates
  */
 private fun GestureScope.localToGlobal(position: Offset): Offset {
+    @Suppress("DEPRECATION")
     return position + semanticsNode.layoutInfo.coordinates.globalBounds.topLeft
 }
 
@@ -303,45 +299,45 @@ fun GestureScope.click(position: Offset = center) {
 
 /**
  * Performs a long click gesture at the given [position] on the associated node, or in the
- * center if the [position] is omitted. By default, the [duration] of the press is
- * [LongPressTimeout] + 100 milliseconds. The [position] is in the node's local coordinate
+ * center if the [position] is omitted. By default, the [durationMillis] of the press is
+ * [LongPressTimeoutMillis] + 100 milliseconds. The [position] is in the node's local coordinate
  * system, where (0, 0) is the top left corner of the node.
  *
  * @param position The position of the long click, in the node's local coordinate system. If
  * omitted, the center position will be used.
- * @param duration The time between the down and the up event
+ * @param durationMillis The time between the down and the up event
  */
 fun GestureScope.longClick(
     position: Offset = center,
-    duration: Duration = LongPressTimeout + 100.milliseconds
+    durationMillis: Long = LongPressTimeoutMillis + 100
 ) {
-    require(duration >= LongPressTimeout) {
-        "Long click must have a duration of at least ${LongPressTimeout.inMilliseconds()}ms"
+    require(durationMillis >= LongPressTimeoutMillis) {
+        "Long click must have a duration of at least ${LongPressTimeoutMillis}ms"
     }
-    swipe(position, position, duration)
+    swipe(position, position, durationMillis)
 }
 
 /**
  * Performs a double click gesture at the given [position] on the associated node, or in the
- * center if the [position] is omitted. By default, the [delay] between the first and the second
- * click is 145 milliseconds (empirically established). The [position] is in the node's
+ * center if the [position] is omitted. By default, the [delayMillis] between the first and the
+ * second click is 145 milliseconds (empirically established). The [position] is in the node's
  * local coordinate system, where (0, 0) is the top left corner of the node.
  *
  * @param position The position of the double click, in the node's local coordinate system.
  * If omitted, the center position will be used.
- * @param delay The time between the up event of the first click and the down event of the second
- * click
+ * @param delayMillis The time between the up event of the first click and the down event of the
+ * second click
  */
 fun GestureScope.doubleClick(
     position: Offset = center,
-    delay: Duration = doubleClickDelay
+    delayMillis: Long = doubleClickDelayMillis
 ) {
-    require(delay <= DoubleTapTimeout - 10.milliseconds) {
-        "Time between clicks in double click can be at most ${DoubleTapTimeout - 10.milliseconds}ms"
+    require(delayMillis <= DoubleTapTimeoutMillis - 10) {
+        "Time between clicks in double click can be at most ${DoubleTapTimeoutMillis - 10}ms"
     }
     val globalPosition = localToGlobal(position)
     inputDispatcher.enqueueClick(globalPosition)
-    inputDispatcher.enqueueDelay(delay)
+    inputDispatcher.enqueueDelay(delayMillis)
     inputDispatcher.enqueueClick(globalPosition)
 }
 
@@ -353,16 +349,16 @@ fun GestureScope.doubleClick(
  *
  * @param start The start position of the gesture, in the node's local coordinate system
  * @param end The end position of the gesture, in the node's local coordinate system
- * @param duration The duration of the gesture
+ * @param durationMillis The duration of the gesture
  */
 fun GestureScope.swipe(
     start: Offset,
     end: Offset,
-    duration: Duration = 200.milliseconds
+    durationMillis: Long = 200
 ) {
     val globalStart = localToGlobal(start)
     val globalEnd = localToGlobal(end)
-    inputDispatcher.enqueueSwipe(globalStart, globalEnd, duration)
+    inputDispatcher.enqueueSwipe(globalStart, globalEnd, durationMillis)
 }
 
 /**
@@ -376,27 +372,27 @@ fun GestureScope.swipe(
  * @param end0 The end position of the first gesture in the node's local coordinate system
  * @param start1 The start position of the second gesture in the node's local coordinate system
  * @param end1 The end position of the second gesture in the node's local coordinate system
- * @param duration the duration of the gesture
+ * @param durationMillis the duration of the gesture
  */
 fun GestureScope.pinch(
     start0: Offset,
     end0: Offset,
     start1: Offset,
     end1: Offset,
-    duration: Duration = 400.milliseconds
+    durationMillis: Long = 400
 ) {
     val globalStart0 = localToGlobal(start0)
     val globalEnd0 = localToGlobal(end0)
     val globalStart1 = localToGlobal(start1)
     val globalEnd1 = localToGlobal(end1)
-    val durationFloat = duration.inMilliseconds().toFloat()
+    val durationFloat = durationMillis.toFloat()
 
     inputDispatcher.enqueueSwipes(
         listOf<(Long) -> Offset>(
             { lerp(globalStart0, globalEnd0, it / durationFloat) },
             { lerp(globalStart1, globalEnd1, it / durationFloat) }
         ),
-        duration
+        durationMillis
     )
 }
 
@@ -413,23 +409,24 @@ fun GestureScope.pinch(
  * @param start The start position of the gesture, in the node's local coordinate system
  * @param end The end position of the gesture, in the node's local coordinate system
  * @param endVelocity The velocity of the gesture at the moment it ends. Must be positive.
- * @param duration The duration of the gesture. Must be long enough that at least 3 input events
- * are generated, which happens with a duration of 25ms or more.
+ * @param durationMillis The duration of the gesture in milliseconds. Must be long enough that at
+ * least 3 input events are generated, which happens with a duration of 25ms or more.
  */
 fun GestureScope.swipeWithVelocity(
     start: Offset,
     end: Offset,
-    @FloatRange(from = 0.0, to = 3.4e38 /* POSITIVE_INFINITY */) endVelocity: Float,
-    duration: Duration = 200.milliseconds
+    /*@FloatRange(from = 0.0)*/
+    endVelocity: Float,
+    durationMillis: Long = 200
 ) {
     require(endVelocity >= 0f) {
         "Velocity cannot be $endVelocity, it must be positive"
     }
-    require(eventPeriod < 40.milliseconds.inMilliseconds()) {
+    require(eventPeriodMillis < 40) {
         "InputDispatcher.eventPeriod must be smaller than 40ms in order to generate velocities"
     }
-    val minimumDuration = ceil(2.5f * eventPeriod).roundToInt()
-    require(duration >= minimumDuration.milliseconds) {
+    val minimumDuration = ceil(2.5f * eventPeriodMillis).roundToInt()
+    require(durationMillis >= minimumDuration) {
         "Duration must be at least ${minimumDuration}ms because " +
             "velocity requires at least 3 input events"
     }
@@ -453,11 +450,10 @@ fun GestureScope.swipeWithVelocity(
     // the right velocity. VelocityTracker makes a polynomial fit through the points
     // (-age, x) and (-age, y) for vx and vy respectively, which is accounted for in
     // f(Long, Long, Float, Float, Float).
-    val durationMs = duration.inMilliseconds()
-    val fx = createFunctionForVelocity(durationMs, globalStart.x, globalEnd.x, vx)
-    val fy = createFunctionForVelocity(durationMs, globalStart.y, globalEnd.y, vy)
+    val fx = createFunctionForVelocity(durationMillis, globalStart.x, globalEnd.x, vx)
+    val fy = createFunctionForVelocity(durationMillis, globalStart.y, globalEnd.y, vy)
 
-    inputDispatcher.enqueueSwipe({ t -> Offset(fx(t), fy(t)) }, duration)
+    inputDispatcher.enqueueSwipe({ t -> Offset(fx(t), fy(t)) }, durationMillis)
 }
 
 /**
@@ -470,7 +466,7 @@ fun GestureScope.swipeUp() {
     val y1 = 0.0f
     val start = Offset(x, y0)
     val end = Offset(x, y1)
-    swipe(start, end, 200.milliseconds)
+    swipe(start, end, 200)
 }
 
 /**
@@ -483,7 +479,7 @@ fun GestureScope.swipeDown() {
     val y1 = visibleSize.height.toFloat()
     val start = Offset(x, y0)
     val end = Offset(x, y1)
-    swipe(start, end, 200.milliseconds)
+    swipe(start, end, 200)
 }
 
 /**
@@ -496,7 +492,7 @@ fun GestureScope.swipeLeft() {
     val y = center.y
     val start = Offset(x0, y)
     val end = Offset(x1, y)
-    swipe(start, end, 200.milliseconds)
+    swipe(start, end, 200)
 }
 
 /**
@@ -509,7 +505,7 @@ fun GestureScope.swipeRight() {
     val y = center.y
     val start = Offset(x0, y)
     val end = Offset(x1, y)
-    swipe(start, end, 200.milliseconds)
+    swipe(start, end, 200)
 }
 
 /**

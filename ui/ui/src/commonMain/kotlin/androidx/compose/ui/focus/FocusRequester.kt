@@ -18,18 +18,19 @@ package androidx.compose.ui.focus
 
 import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.node.ModifiedFocusRequesterNode
 
-private val focusRequesterNotInitialized = "FocusRequester is not initialized. One reason for " +
-    "this is that you requesting focus changes during composition. Focus requests should " +
+private const val focusRequesterNotInitialized = "FocusRequester is not initialized. One reason " +
+    "for this is that you requesting focus changes during composition. Focus requesters should " +
     "not be made during composition, but should be made in response to some event."
 
 /**
  * The [FocusRequester] is used in conjunction with
- * [Modifier.focusRequester][androidx.compose.ui.focusRequester] to send requests for focus state
- * change.
+ * [Modifier.focusRequester][androidx.compose.ui.focus.focusRequester] to send requests for focus
+ * state change.
  *
- * @see androidx.compose.ui.focusRequester
+ * @see androidx.compose.ui.focus.focusRequester
  */
 class FocusRequester {
 
@@ -75,15 +76,16 @@ class FocusRequester {
      * Use this function to send a request to release focus when one of the components associated
      * with this [FocusRequester] is in a [Captured][FocusState.Captured] state.
      *
-     * When the node is in the [Captured][FocusState.Captured] state, it rejects all requests to clear focus. Calling
+     * When the node is in the [Captured][FocusState.Captured] state, it rejects all requests to
+     * clear focus. Calling
      * [freeFocus] puts the node in the [Active][FocusState.Active] state, where it is no longer
      * preventing other
      * nodes from requesting focus.
      *
      * @return true if the focus was successfully released. i.e. At the end of this operation,
      * one of the components associated with this
-     * [focusRequester][androidx.compose.ui.focusRequester] is in the [Active][FocusState.Active]
-     * state. false otherwise.
+     * [focusRequester][androidx.compose.ui.focus.focusRequester] is in the
+     * [Active][FocusState.Active] state. false otherwise.
      */
     fun freeFocus(): Boolean {
         check(focusRequesterNodes.isNotEmpty()) { focusRequesterNotInitialized }
@@ -100,8 +102,16 @@ class FocusRequester {
 
     companion object {
         /**
+         * Default [focusRequester], which when used in [Modifier.focusOrder][focusOrder] implies
+         * that we want to use the default system focus order, that is based on the location on
+         * items on the screen.
+         */
+        val Default = FocusRequester()
+
+        /**
          * Convenient way to create multiple [FocusRequester] instances.
          */
+        @ExperimentalComposeUiApi
         object FocusRequesterFactory {
             operator fun component1() = FocusRequester()
             operator fun component2() = FocusRequester()
@@ -125,6 +135,7 @@ class FocusRequester {
          * Convenient way to create multiple [FocusRequester]s, which can to be used to request
          * focus, or to specify a focus traversal order.
          */
+        @ExperimentalComposeUiApi
         fun createRefs() = FocusRequesterFactory
     }
 }

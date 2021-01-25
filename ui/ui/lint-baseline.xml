@@ -1,367 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="5" by="lint 4.2.0-alpha15" client="gradle" variant="debug" version="4.2.0-alpha15">
+<issues format="5" by="lint 4.2.0-beta02" client="gradle" variant="debug" version="4.2.0-beta02">
 
     <issue
-        id="DiscouragedPrivateApi"
-        message="Reflective access to updateDisplayListIfDirty, which is not part of the public SDK and therefore likely to change in future Android releases"
-        errorLine1="                        View::class.java.getDeclaredMethod(&quot;updateDisplayListIfDirty&quot;)"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        id="UnknownIssueId"
+        message="Unknown issue id &quot;ComposableLambdaParameterNaming&quot;">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/platform/ViewLayer.kt"
-            line="261"
-            column="25"/>
+            file="build.gradle"/>
     </issue>
 
     <issue
-        id="InlinedApi"
-        message="Field requires API level 26 (current min is 21): `android.view.accessibility.AccessibilityNodeInfo#EXTRA_DATA_TEXT_CHARACTER_LOCATION_ARG_START_INDEX`"
-        errorLine1="                EXTRA_DATA_TEXT_CHARACTER_LOCATION_ARG_START_INDEX, -1"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        id="UnknownIssueId"
+        message="Unknown issue id &quot;ComposableLambdaParameterPosition&quot;">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeViewAccessibilityDelegateCompat.kt"
-            line="928"
-            column="17"/>
+            file="build.gradle"/>
     </issue>
 
     <issue
-        id="InlinedApi"
-        message="Field requires API level 26 (current min is 21): `android.view.accessibility.AccessibilityNodeInfo#EXTRA_DATA_TEXT_CHARACTER_LOCATION_ARG_LENGTH`"
-        errorLine1="                EXTRA_DATA_TEXT_CHARACTER_LOCATION_ARG_LENGTH, -1"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        id="UnknownIssueId"
+        message="Unknown issue id &quot;ComposableNaming&quot;">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeViewAccessibilityDelegateCompat.kt"
-            line="931"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 27 (current min is 21): `android.view.HapticFeedbackConstants#TEXT_HANDLE_MOVE`"
-        errorLine1="                view.performHapticFeedback(HapticFeedbackConstants.TEXT_HANDLE_MOVE)"
-        errorLine2="                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/hapticfeedback/AndroidHapticFeedback.kt"
-            line="35"
-            column="44"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 23 (current min is 21): `android.view.KeyEvent#KEYCODE_NAVIGATE_PREVIOUS`"
-        errorLine1="        actual val NavigatePrevious = Key(KeyEvent.KEYCODE_NAVIGATE_PREVIOUS)"
-        errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/input/key/Key.kt"
-            line="34"
-            column="43"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 23 (current min is 21): `android.view.KeyEvent#KEYCODE_NAVIGATE_NEXT`"
-        errorLine1="        actual val NavigateNext = Key(KeyEvent.KEYCODE_NAVIGATE_NEXT)"
-        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/input/key/Key.kt"
-            line="35"
-            column="39"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 23 (current min is 21): `android.view.KeyEvent#KEYCODE_NAVIGATE_IN`"
-        errorLine1="        actual val NavigateIn = Key(KeyEvent.KEYCODE_NAVIGATE_IN)"
-        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/input/key/Key.kt"
-            line="36"
-            column="37"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 23 (current min is 21): `android.view.KeyEvent#KEYCODE_NAVIGATE_OUT`"
-        errorLine1="        actual val NavigateOut = Key(KeyEvent.KEYCODE_NAVIGATE_OUT)"
-        errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/input/key/Key.kt"
-            line="37"
-            column="38"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 25 (current min is 21): `android.view.KeyEvent#KEYCODE_SYSTEM_NAVIGATION_UP`"
-        errorLine1="        actual val SystemNavigationUp = Key(KeyEvent.KEYCODE_SYSTEM_NAVIGATION_UP)"
-        errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/input/key/Key.kt"
-            line="38"
-            column="45"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 25 (current min is 21): `android.view.KeyEvent#KEYCODE_SYSTEM_NAVIGATION_DOWN`"
-        errorLine1="        actual val SystemNavigationDown = Key(KeyEvent.KEYCODE_SYSTEM_NAVIGATION_DOWN)"
-        errorLine2="                                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/input/key/Key.kt"
-            line="39"
-            column="47"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 25 (current min is 21): `android.view.KeyEvent#KEYCODE_SYSTEM_NAVIGATION_LEFT`"
-        errorLine1="        actual val SystemNavigationLeft = Key(KeyEvent.KEYCODE_SYSTEM_NAVIGATION_LEFT)"
-        errorLine2="                                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/input/key/Key.kt"
-            line="40"
-            column="47"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 25 (current min is 21): `android.view.KeyEvent#KEYCODE_SYSTEM_NAVIGATION_RIGHT`"
-        errorLine1="        actual val SystemNavigationRight = Key(KeyEvent.KEYCODE_SYSTEM_NAVIGATION_RIGHT)"
-        errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/input/key/Key.kt"
-            line="41"
-            column="48"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 24 (current min is 21): `android.view.KeyEvent#KEYCODE_DPAD_UP_LEFT`"
-        errorLine1="        actual val DPadUpLeft = Key(KeyEvent.KEYCODE_DPAD_UP_LEFT)"
-        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/input/key/Key.kt"
-            line="49"
-            column="37"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 24 (current min is 21): `android.view.KeyEvent#KEYCODE_DPAD_DOWN_LEFT`"
-        errorLine1="        actual val DPadDownLeft = Key(KeyEvent.KEYCODE_DPAD_DOWN_LEFT)"
-        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/input/key/Key.kt"
-            line="50"
-            column="39"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 24 (current min is 21): `android.view.KeyEvent#KEYCODE_DPAD_UP_RIGHT`"
-        errorLine1="        actual val DPadUpRight = Key(KeyEvent.KEYCODE_DPAD_UP_RIGHT)"
-        errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/input/key/Key.kt"
-            line="51"
-            column="38"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 24 (current min is 21): `android.view.KeyEvent#KEYCODE_DPAD_DOWN_RIGHT`"
-        errorLine1="        actual val DPadDownRight = Key(KeyEvent.KEYCODE_DPAD_DOWN_RIGHT)"
-        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/input/key/Key.kt"
-            line="52"
-            column="40"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 24 (current min is 21): `android.view.KeyEvent#KEYCODE_CUT`"
-        errorLine1="        actual val Cut = Key(KeyEvent.KEYCODE_CUT)"
-        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/input/key/Key.kt"
-            line="128"
-            column="30"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 24 (current min is 21): `android.view.KeyEvent#KEYCODE_COPY`"
-        errorLine1="        actual val Copy = Key(KeyEvent.KEYCODE_COPY)"
-        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/input/key/Key.kt"
-            line="129"
-            column="31"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 24 (current min is 21): `android.view.KeyEvent#KEYCODE_PASTE`"
-        errorLine1="        actual val Paste = Key(KeyEvent.KEYCODE_PASTE)"
-        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/input/key/Key.kt"
-            line="130"
-            column="32"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 23 (current min is 21): `android.view.KeyEvent#KEYCODE_MEDIA_SKIP_FORWARD`"
-        errorLine1="        actual val MediaSkipForward = Key(KeyEvent.KEYCODE_MEDIA_SKIP_FORWARD)"
-        errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/input/key/Key.kt"
-            line="227"
-            column="43"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 23 (current min is 21): `android.view.KeyEvent#KEYCODE_MEDIA_SKIP_BACKWARD`"
-        errorLine1="        actual val MediaSkipBackward = Key(KeyEvent.KEYCODE_MEDIA_SKIP_BACKWARD)"
-        errorLine2="                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/input/key/Key.kt"
-            line="228"
-            column="44"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 23 (current min is 21): `android.view.KeyEvent#KEYCODE_MEDIA_STEP_FORWARD`"
-        errorLine1="        actual val MediaStepForward = Key(KeyEvent.KEYCODE_MEDIA_STEP_FORWARD)"
-        errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/input/key/Key.kt"
-            line="229"
-            column="43"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 23 (current min is 21): `android.view.KeyEvent#KEYCODE_MEDIA_STEP_BACKWARD`"
-        errorLine1="        actual val MediaStepBackward = Key(KeyEvent.KEYCODE_MEDIA_STEP_BACKWARD)"
-        errorLine2="                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/input/key/Key.kt"
-            line="230"
-            column="44"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 24 (current min is 21): `android.view.KeyEvent#KEYCODE_SOFT_SLEEP`"
-        errorLine1="        actual val SoftSleep = Key(KeyEvent.KEYCODE_SOFT_SLEEP)"
-        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/input/key/Key.kt"
-            line="276"
-            column="36"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 24 (current min is 21): `android.view.KeyEvent#KEYCODE_STEM_PRIMARY`"
-        errorLine1="        actual val StemPrimary = Key(KeyEvent.KEYCODE_STEM_PRIMARY)"
-        errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/input/key/Key.kt"
-            line="310"
-            column="38"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 24 (current min is 21): `android.view.KeyEvent#KEYCODE_STEM_1`"
-        errorLine1="        actual val Stem1 = Key(KeyEvent.KEYCODE_STEM_1)"
-        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/input/key/Key.kt"
-            line="311"
-            column="32"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 24 (current min is 21): `android.view.KeyEvent#KEYCODE_STEM_2`"
-        errorLine1="        actual val Stem2 = Key(KeyEvent.KEYCODE_STEM_2)"
-        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/input/key/Key.kt"
-            line="312"
-            column="32"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 24 (current min is 21): `android.view.KeyEvent#KEYCODE_STEM_3`"
-        errorLine1="        actual val Stem3 = Key(KeyEvent.KEYCODE_STEM_3)"
-        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/input/key/Key.kt"
-            line="313"
-            column="32"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 28 (current min is 21): `android.view.KeyEvent#KEYCODE_ALL_APPS`"
-        errorLine1="        actual val AllApps = Key(KeyEvent.KEYCODE_ALL_APPS)"
-        errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/input/key/Key.kt"
-            line="314"
-            column="34"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 28 (current min is 21): `android.view.KeyEvent#KEYCODE_REFRESH`"
-        errorLine1="        actual val Refresh = Key(KeyEvent.KEYCODE_REFRESH)"
-        errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/input/key/Key.kt"
-            line="315"
-            column="34"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 29 (current min is 21): `android.view.KeyEvent#KEYCODE_THUMBS_UP`"
-        errorLine1="        actual val ThumbsUp = Key(KeyEvent.KEYCODE_THUMBS_UP)"
-        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/input/key/Key.kt"
-            line="316"
-            column="35"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 29 (current min is 21): `android.view.KeyEvent#KEYCODE_THUMBS_DOWN`"
-        errorLine1="        actual val ThumbsDown = Key(KeyEvent.KEYCODE_THUMBS_DOWN)"
-        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/input/key/Key.kt"
-            line="317"
-            column="37"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 29 (current min is 21): `android.view.KeyEvent#KEYCODE_PROFILE_SWITCH`"
-        errorLine1="        actual val ProfileSwitch = Key(KeyEvent.KEYCODE_PROFILE_SWITCH)"
-        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/input/key/Key.kt"
-            line="318"
-            column="40"/>
+            file="build.gradle"/>
     </issue>
 
     <issue
@@ -382,7 +40,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeView.kt"
-            line="731"
+            line="719"
             column="13"/>
     </issue>
 
@@ -393,7 +51,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/ViewLayer.kt"
-            line="287"
+            line="285"
             column="13"/>
     </issue>
 
@@ -404,7 +62,7 @@
         errorLine2="                     ~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
-            line="70"
+            line="73"
             column="22"/>
     </issue>
 
@@ -415,7 +73,7 @@
         errorLine2="             ~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
-            line="73"
+            line="76"
             column="14"/>
     </issue>
 
@@ -426,7 +84,7 @@
         errorLine2="            ~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
-            line="74"
+            line="77"
             column="13"/>
     </issue>
 
@@ -437,7 +95,7 @@
         errorLine2="                               ~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
-            line="74"
+            line="77"
             column="32"/>
     </issue>
 
@@ -448,7 +106,7 @@
         errorLine2="            ~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
-            line="75"
+            line="78"
             column="13"/>
     </issue>
 
@@ -459,7 +117,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
-            line="76"
+            line="79"
             column="13"/>
     </issue>
 
@@ -470,7 +128,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
-            line="77"
+            line="80"
             column="13"/>
     </issue>
 
@@ -481,7 +139,7 @@
         errorLine2="                ~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
-            line="89"
+            line="92"
             column="17"/>
     </issue>
 
@@ -492,7 +150,7 @@
         errorLine2="                  ~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
-            line="105"
+            line="109"
             column="19"/>
     </issue>
 
@@ -503,7 +161,7 @@
         errorLine2="                                                                       ~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
-            line="105"
+            line="109"
             column="72"/>
     </issue>
 
@@ -514,7 +172,7 @@
         errorLine2="                  ~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
-            line="106"
+            line="110"
             column="19"/>
     </issue>
 
@@ -525,7 +183,7 @@
         errorLine2="                  ~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
-            line="107"
+            line="111"
             column="19"/>
     </issue>
 
@@ -536,7 +194,7 @@
         errorLine2="                  ~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
-            line="108"
+            line="112"
             column="19"/>
     </issue>
 
@@ -547,7 +205,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofillDebugUtils.kt"
-            line="63"
+            line="65"
             column="21"/>
     </issue>
 
@@ -558,7 +216,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofillDebugUtils.kt"
-            line="71"
+            line="74"
             column="21"/>
     </issue>
 
@@ -569,7 +227,7 @@
         errorLine2="            ~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeView.kt"
-            line="306"
+            line="280"
             column="13"/>
     </issue>
 
@@ -580,7 +238,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeView.kt"
-            line="308"
+            line="282"
             column="13"/>
     </issue>
 
@@ -591,7 +249,7 @@
         errorLine2="                          ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeViewAccessibilityDelegateCompat.kt"
-            line="351"
+            line="407"
             column="27"/>
     </issue>
 
@@ -635,85 +293,19 @@
         errorLine2="                              ~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
-            line="164"
+            line="165"
             column="31"/>
     </issue>
 
     <issue
         id="UnsafeNewApiCall"
         message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.WrapperKt is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
-        errorLine1="        owner.view.attributeSourceResourceMap.isNotEmpty()"
-        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        owner.attributeSourceResourceMap.isNotEmpty()"
+        errorLine2="              ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/Wrapper.kt"
-            line="291"
-            column="20"/>
-    </issue>
-
-    <issue
-        id="Recycle"
-        message="This `TypedArray` should be recycled after use with `#recycle()`"
-        errorLine1="    ) ?: res.obtainAttributes(attrs, AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_CLIP_PATH)"
-        errorLine2="             ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/graphics/vector/compat/XmlVectorParser.kt"
-            line="349"
-            column="14"/>
-    </issue>
-
-    <issue
-        id="ViewConstructor"
-        message="Custom view `DialogLayout` is missing constructor used by tools: `(Context)` or `(Context,AttributeSet)` or `(Context,AttributeSet,int)`"
-        errorLine1="private class DialogLayout("
-        errorLine2="              ~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/window/AndroidDialog.kt"
-            line="116"
+            line="308"
             column="15"/>
-    </issue>
-
-    <issue
-        id="ViewConstructor"
-        message="Custom view `ViewLayer` is missing constructor used by tools: `(Context)` or `(Context,AttributeSet)` or `(Context,AttributeSet,int)`"
-        errorLine1="internal class ViewLayer("
-        errorLine2="               ~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/platform/ViewLayer.kt"
-            line="40"
-            column="16"/>
-    </issue>
-
-    <issue
-        id="ClickableViewAccessibility"
-        message="Custom view `PopupLayout` overrides `onTouchEvent` but not `performClick`"
-        errorLine1="    override fun onTouchEvent(event: MotionEvent?): Boolean {"
-        errorLine2="                 ~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/window/AndroidPopup.kt"
-            line="330"
-            column="18"/>
-    </issue>
-
-    <issue
-        id="IgnoreWithoutReason"
-        message="Test is ignored without giving any explanation"
-        errorLine1="    @Ignore"
-        errorLine2="    ~~~~~~~">
-        <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/input/pointer/AndroidPointerInputTest.kt"
-            line="240"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="IgnoreWithoutReason"
-        message="Test is ignored without giving any explanation"
-        errorLine1="    @Ignore"
-        errorLine2="    ~~~~~~~">
-        <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/window/DialogUiTest.kt"
-            line="176"
-            column="5"/>
     </issue>
 
 </issues>

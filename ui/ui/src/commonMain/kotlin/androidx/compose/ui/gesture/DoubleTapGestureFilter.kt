@@ -35,8 +35,6 @@ import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.consumeDownChange
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.inMilliseconds
-import androidx.compose.ui.util.annotation.VisibleForTesting
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
 import kotlinx.coroutines.CoroutineScope
@@ -81,8 +79,8 @@ internal class DoubleTapGestureFilter(
         Idle, Down, Up, SecondDown
     }
 
-    @VisibleForTesting
-    internal var doubleTapTimeout = DoubleTapTimeout
+    /*@VisibleForTesting*/
+    internal var doubleTapTimeout = DoubleTapTimeoutMillis
 
     private var state = State.Idle
     private var job: Job? = null
@@ -111,7 +109,7 @@ internal class DoubleTapGestureFilter(
                 delayUpDispatcher.delayUp(changes)
 
                 job = coroutineScope.launch {
-                    delay(doubleTapTimeout.inMilliseconds())
+                    delay(doubleTapTimeout)
                     state = State.Idle
                     delayUpDispatcher.allowUp()
                 }
@@ -128,7 +126,7 @@ internal class DoubleTapGestureFilter(
 
             if (state == State.SecondDown && changes.all { it.changedToUp() }) {
                 state = State.Idle
-                onDoubleTap.invoke(changes[0].previous.position)
+                onDoubleTap.invoke(changes[0].previousPosition)
                 changes.fastForEach {
                     it.consumeDownChange()
                 }
