@@ -60,20 +60,12 @@ class DesktopComposeTestRule : ComposeContentTestRule {
     var owners: DesktopOwners? = null
     private var owner: DesktopOwner? = null
 
-    @ExperimentalTestApi
-    override val clockTestRule: AnimationClockTestRule = DesktopAnimationClockTestRule()
-
     override val density: Density
         get() = TODO()
 
     override val mainClock: MainTestClock
         get() = TODO()
 
-    @Deprecated(
-        "This utility was deprecated without replacement. It is recommend to use " +
-            "the root size for any assertions."
-    )
-    override val displaySize: IntSize get() = testDisplaySize
     internal val testDisplaySize: IntSize get() = IntSize(1024, 768)
 
     val executionQueue = LinkedList<() -> Unit>()
@@ -216,8 +208,7 @@ class DesktopComposeTestRule : ComposeContentTestRule {
             return rule.owners!!.list
         }
 
-        override fun advanceTimeBy(millis: Long) {
-            TODO()
-        }
+        override val mainClock: MainTestClock
+            get() = TODO()
     }
 }

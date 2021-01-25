@@ -24,7 +24,6 @@ import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.util.fastAny
-import androidx.compose.ui.ExperimentalComposeUiApi
 
 /**
  * Returns whether the node is enabled.
@@ -248,43 +247,6 @@ fun hasTestTag(testTag: String): SemanticsMatcher =
     SemanticsMatcher.expectValue(SemanticsProperties.TestTag, testTag)
 
 /**
- * Verifies that the node is in a mutually exclusive group.
- *
- * @Deprecated Replaced with androidx.compose.ui.test.isSelectable
- */
-@Deprecated(
-    "Replaced with androidx.compose.ui.test.isSelectable",
-    ReplaceWith("isSelectable()", "androidx.compose.ui.test")
-)
-fun isInMutuallyExclusiveGroup(): SemanticsMatcher = isSelectable()
-
-/**
- * Returns whether the node is hidden. A hidden node is a node that is not visible for
- * accessibility. It will still be shown, but it will be skipped by accessibility services.
- *
- * This checks only the property of the node itself. Ignoring parents visibility.
- *
- * @see SemanticsProperties.Hidden
- */
-@Deprecated("SemanticsMatcher.isHidden is deprecated without a replacement.")
-@OptIn(ExperimentalComposeUiApi::class)
-fun isHidden(): SemanticsMatcher =
-    SemanticsMatcher.keyIsDefined(SemanticsProperties.InvisibleToUser)
-
-/**
- * Returns whether the node is not hidden. A hidden node is a node that is not visible for
- * accessibility. It will still be shown, but it will be skipped by accessibility services.
- *
- * This checks only the property of the node itself. Ignoring parents visibility.
- *
- * @see SemanticsProperties.Hidden
- */
-@Deprecated("SemanticsMatcher.isNotHidden is deprecated without a replacement.")
-@OptIn(ExperimentalComposeUiApi::class)
-fun isNotHidden(): SemanticsMatcher =
-    !SemanticsMatcher.keyIsDefined(SemanticsProperties.InvisibleToUser)
-
-/**
  * Returns whether the node is a dialog.
  *
  * This only checks if the node itself is a dialog, not if it is _part of_ a dialog. Use
@@ -312,22 +274,6 @@ fun isPopup(): SemanticsMatcher =
  */
 fun hasImeAction(actionType: ImeAction) =
     SemanticsMatcher.expectValue(SemanticsProperties.ImeAction, actionType)
-
-/**
- * Return whether the node supports input methods.
- *
- * Supporting input methods means that the node provides a connection to IME (keyboard) and is
- * able to accept input from it. This is however not enforced and relies on the nodes to
- * properly add this to semantics when they provide input. Note that this is not related to
- * gestures input but only to IME. This can be used to for instance filter out all text fields.
- *
- * @Deprecated Replaced with androidx.compose.ui.test.hasSetTextAction
- */
-@Deprecated(
-    "Replaced with androidx.compose.ui.test.hasSetTextAction",
-    ReplaceWith("hasSetTextAction()", "androidx.compose.ui.test")
-)
-fun hasInputMethodsSupport() = hasSetTextAction()
 
 /**
  * Returns whether the node defines semantics action to set text to it.

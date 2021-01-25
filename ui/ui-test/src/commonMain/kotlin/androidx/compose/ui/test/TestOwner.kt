@@ -30,6 +30,11 @@ import androidx.compose.ui.text.input.ImeAction
 @InternalTestApi
 interface TestOwner {
     /**
+     * Clock that drives frames and recompositions in compose tests.
+     */
+    val mainClock: MainTestClock
+
+    /**
      * Sends the given list of text commands to the given semantics node.
      */
     fun sendTextInputCommand(node: SemanticsNode, command: List<EditCommand>)
@@ -56,12 +61,6 @@ interface TestOwner {
      * surfaces only in incorrect tests.
      */
     fun getRoots(): Set<RootForTest>
-
-    /**
-     * Advances time if and only if this [TestOwner] uses a [MainTestClock]
-     */
-    // TODO(b/176898053): Once mainClock become the standard provide them here and remove this method.
-    fun advanceTimeBy(millis: Long)
 }
 
 /**

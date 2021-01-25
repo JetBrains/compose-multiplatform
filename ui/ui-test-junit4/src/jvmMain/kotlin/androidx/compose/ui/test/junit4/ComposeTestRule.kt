@@ -17,13 +17,11 @@
 package androidx.compose.ui.test.junit4
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.ComposeTimeoutException
 import androidx.compose.ui.test.IdlingResource
 import androidx.compose.ui.test.MainTestClock
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.IntSize
 import org.junit.rules.TestRule
 
 /**
@@ -58,34 +56,7 @@ interface ComposeTestRule : TestRule, SemanticsNodeInteractionsProvider {
     val density: Density
 
     /**
-     * Current device display's size.
-     */
-    @Deprecated(
-        "This utility was deprecated without replacement. It is recommend to use " +
-            "the root size for any assertions."
-    )
-    val displaySize: IntSize get
-
-    /**
-     * A test rule that allows you to control the animation clock.
-     *
-     * Important: this clock is now deprecated and should not be used. Please migrate to
-     * [mainClock]. If this need to be used the rule needs to be created via
-     * createComposeRuleLegacy method that enables it.
-     */
-    @Deprecated(
-        "clockTestRule was replaced with mainClock. As a temporary remedy, there are " +
-            "createComposeRuleLegacy methods and via those this property is still usable.",
-        ReplaceWith("mainClock", "androidx.compose.ui.test.junit4.ComposeTestRule")
-    )
-    @OptIn(ExperimentalTestApi::class)
-    val clockTestRule: AnimationClockTestRule
-
-    /**
      * Clock that drives frames and recompositions in compose tests.
-     *
-     * This is replacement for [clockTestRule]. When using this clock the original [clockTestRule]
-     * is no longer available.
      */
     val mainClock: MainTestClock
 
@@ -131,7 +102,6 @@ interface ComposeTestRule : TestRule, SemanticsNodeInteractionsProvider {
      * advancing the clock until it is idle (meaning there are no recompositions, animations, etc.
      * pending). If not, this will wait only for other idling resources.
      */
-    @ExperimentalTestApi
     suspend fun awaitIdle()
 
     /**
