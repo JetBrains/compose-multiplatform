@@ -22,6 +22,7 @@ import android.graphics.Outline
 import android.graphics.PixelFormat
 import android.graphics.Rect
 import android.view.Gravity
+import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewOutlineProvider
@@ -67,13 +68,39 @@ import kotlin.math.roundToInt
 /**
  * Android specific properties to configure a popup.
  *
+ * @property dismissOnBackPress Whether the popup can be dismissed by pressing the back button.
+ * If true, pressing the back button will call onDismissRequest. Note that the popup must be
+ * focusable in order to receive key events such as the back button - if the popup is not
+ * focusable then this property does nothing.
+ * @property dismissOnClickOutside Whether the popup can be dismissed by clicking outside the
+ * popup's bounds. If true, clicking outside the popup will call onDismissRequest.
  * @param securePolicy Policy for setting [WindowManager.LayoutParams.FLAG_SECURE] on the popup's
  * window.
  */
 @Immutable
-data class AndroidPopupProperties(
+class AndroidPopupProperties(
+    val dismissOnBackPress: Boolean = true,
+    val dismissOnClickOutside: Boolean = true,
     val securePolicy: SecureFlagPolicy = SecureFlagPolicy.Inherit
-) : PopupProperties
+) : PopupProperties {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is AndroidPopupProperties) return false
+
+        if (dismissOnBackPress != other.dismissOnBackPress) return false
+        if (dismissOnClickOutside != other.dismissOnClickOutside) return false
+        if (securePolicy != other.securePolicy) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = dismissOnBackPress.hashCode()
+        result = 31 * result + dismissOnClickOutside.hashCode()
+        result = 31 * result + securePolicy.hashCode()
+        return result
+    }
+}
 
 /**
  * Opens a popup with the given content.
@@ -229,6 +256,8 @@ private class PopupLayout(
     var parentBounds: IntBounds? by mutableStateOf(null)
     var popupContentSize: IntSize? by mutableStateOf(null)
 
+    var properties: AndroidPopupProperties = AndroidPopupProperties()
+
     // Track parent bounds and content size; only show popup once we have both
     val canCalculatePosition by derivedStateOf { parentBounds != null && popupContentSize != null }
 
@@ -278,6 +307,29 @@ private class PopupLayout(
     }
 
     /**
+     * Taken from PopupWindow
+     */
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (event.keyCode == KeyEvent.KEYCODE_BACK && properties.dismissOnBackPress) {
+            if (keyDispatcherState == null) {
+                return super.dispatchKeyEvent(event)
+            }
+            if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0) {
+                val state = keyDispatcherState
+                state?.startTracking(event, this)
+                return true
+            } else if (event.action == KeyEvent.ACTION_UP) {
+                val state = keyDispatcherState
+                if (state != null && state.isTracking(event) && !event.isCanceled) {
+                    onDismissRequest?.invoke()
+                    return true
+                }
+            }
+        }
+        return super.dispatchKeyEvent(event)
+    }
+
+    /**
      * Set whether the popup can grab a focus and support dismissal.
      */
     fun setIsFocusable(isFocusable: Boolean) = applyNewFlags(
@@ -296,15 +348,13 @@ private class PopupLayout(
         }
     )
 
-    fun setProperties(properties: PopupProperties?) {
-        if (properties != null && properties is AndroidPopupProperties) {
-            setSecureFlagEnabled(
-                properties.securePolicy
-                    .shouldApplySecureFlag(composeView.isFlagSecureEnabled())
-            )
-        } else {
-            setSecureFlagEnabled(composeView.isFlagSecureEnabled())
+    fun setProperties(newProperties: PopupProperties?) {
+        if (newProperties is AndroidPopupProperties) {
+            properties = newProperties
         }
+        setSecureFlagEnabled(
+            properties.securePolicy.shouldApplySecureFlag(composeView.isFlagSecureEnabled())
+        )
     }
 
     private fun applyNewFlags(flags: Int) {
@@ -351,6 +401,9 @@ private class PopupLayout(
      * users clicks outside the popup.
      */
     override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if (!properties.dismissOnClickOutside) {
+            return super.onTouchEvent(event)
+        }
         // Note that this implementation is taken from PopupWindow. It actually does not seem to
         // matter whether we return true or false as some upper layer decides on whether the
         // event is propagated to other windows or not. So for focusable the event is consumed but
