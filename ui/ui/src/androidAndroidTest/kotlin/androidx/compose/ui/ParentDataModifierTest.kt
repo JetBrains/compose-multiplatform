@@ -64,7 +64,7 @@ class ParentDataModifierTest {
                     content = {
                         SimpleDrawChild(drawLatch = drawLatch)
                     },
-                    measureBlock = { measurables, constraints ->
+                    measurePolicy = { measurables, constraints ->
                         assertEquals(1, measurables.size)
                         parentData.value = measurables[0].parentData
 
@@ -92,7 +92,7 @@ class ParentDataModifierTest {
                     content = {
                         SimpleDrawChild(drawLatch = drawLatch)
                     },
-                    measureBlock = { measurables, constraints ->
+                    measurePolicy = { measurables, constraints ->
                         assertEquals(1, measurables.size)
                         parentData.value = measurables[0].parentData
 

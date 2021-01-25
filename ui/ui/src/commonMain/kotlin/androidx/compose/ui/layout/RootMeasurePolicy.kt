@@ -22,21 +22,20 @@ import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.util.fastForEach
 
-internal object RootMeasureBlocks : LayoutNode.NoIntrinsicsMeasureBlocks(
+internal object RootMeasurePolicy : LayoutNode.NoIntrinsicsMeasurePolicy(
     "Undefined intrinsics block and it is required"
 ) {
-    override fun measure(
-        measureScope: MeasureScope,
+    override fun MeasureScope.measure(
         measurables: List<Measurable>,
         constraints: Constraints
     ): MeasureResult {
         return when {
             measurables.isEmpty() -> {
-                measureScope.layout(constraints.minWidth, constraints.minHeight) {}
+                layout(constraints.minWidth, constraints.minHeight) {}
             }
             measurables.size == 1 -> {
                 val placeable = measurables[0].measure(constraints)
-                measureScope.layout(
+                layout(
                     constraints.constrainWidth(placeable.width),
                     constraints.constrainHeight(placeable.height)
                 ) {
@@ -53,7 +52,7 @@ internal object RootMeasureBlocks : LayoutNode.NoIntrinsicsMeasureBlocks(
                     maxWidth = maxOf(placeable.width, maxWidth)
                     maxHeight = maxOf(placeable.height, maxHeight)
                 }
-                measureScope.layout(
+                layout(
                     constraints.constrainWidth(maxWidth),
                     constraints.constrainHeight(maxHeight)
                 ) {

@@ -37,11 +37,15 @@ import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.FirstBaseline
-import androidx.compose.ui.layout.IntrinsicMeasureBlock
+import androidx.compose.ui.layout.IntrinsicMeasurable
+import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.layout.MeasureBlock
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasurePolicy
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalDensity
@@ -174,11 +178,7 @@ internal fun CoreText(
                     Modifier
                 }
             ),
-        minIntrinsicWidthMeasureBlock = controller.minIntrinsicWidth,
-        minIntrinsicHeightMeasureBlock = controller.minIntrinsicHeight,
-        maxIntrinsicWidthMeasureBlock = controller.maxIntrinsicWidth,
-        maxIntrinsicHeightMeasureBlock = controller.maxIntrinsicHeight,
-        measureBlock = controller.measure
+        measurePolicy = controller.measurePolicy
     )
 
     DisposableEffect(selectionRegistrar, effect = controller.commit)
@@ -248,87 +248,103 @@ private class TextController(val state: TextState) {
         }
     }
 
-    val minIntrinsicWidth: IntrinsicMeasureBlock = { _, _ ->
-        state.textDelegate.layoutIntrinsics(layoutDirection)
-        state.textDelegate.minIntrinsicWidth
-    }
+    val measurePolicy = object : MeasurePolicy {
+        override fun MeasureScope.measure(
+            measurables: List<Measurable>,
+            constraints: Constraints
+        ): MeasureResult {
+            val layoutResult = state.textDelegate.layout(
+                constraints,
+                layoutDirection,
+                state.layoutResult
+            )
+            if (state.layoutResult != layoutResult) {
+                state.onTextLayout(layoutResult)
 
-    val minIntrinsicHeight: IntrinsicMeasureBlock = { _, width ->
-        // given the width constraint, determine the min height
-        state.textDelegate
-            .layout(Constraints(0, width, 0, Constraints.Infinity), layoutDirection)
-            .size.height
-    }
-
-    val maxIntrinsicWidth: IntrinsicMeasureBlock = { _, _ ->
-        state.textDelegate.layoutIntrinsics(layoutDirection)
-        state.textDelegate.maxIntrinsicWidth
-    }
-
-    val maxIntrinsicHeight: IntrinsicMeasureBlock = { _, width ->
-        state.textDelegate
-            .layout(Constraints(0, width, 0, Constraints.Infinity), layoutDirection)
-            .size.height
-    }
-
-    val measure: MeasureBlock = { measurables, constraints ->
-        val layoutResult = state.textDelegate.layout(
-            constraints,
-            layoutDirection,
-            state.layoutResult
-        )
-        if (state.layoutResult != layoutResult) {
-            state.onTextLayout(layoutResult)
-
-            state.layoutResult?.let { prevLayoutResult ->
-                // If the input text of this CoreText has changed, notify the SelectionContainer.
-                if (prevLayoutResult.layoutInput.text != layoutResult.layoutInput.text) {
-                    state.selectable?.let { selectable ->
-                        selectionRegistrar?.notifySelectableChange(selectable)
+                state.layoutResult?.let { prevLayoutResult ->
+                    // If the input text of this CoreText has changed, notify the SelectionContainer.
+                    if (prevLayoutResult.layoutInput.text != layoutResult.layoutInput.text) {
+                        state.selectable?.let { selectable ->
+                            selectionRegistrar?.notifySelectableChange(selectable)
+                        }
                     }
                 }
             }
-        }
-        state.layoutResult = layoutResult
+            state.layoutResult = layoutResult
 
-        check(measurables.size >= layoutResult.placeholderRects.size)
-        val placeables = layoutResult.placeholderRects.mapIndexedNotNull { index, rect ->
-            // PlaceholderRect will be null if it's ellipsized. In that case, the corresponding
-            // inline children won't be measured or placed.
-            rect?.let {
-                Pair(
-                    measurables[index].measure(
-                        Constraints(
-                            maxWidth = floor(it.width).toInt(),
-                            maxHeight = floor(it.height).toInt()
-                        )
-                    ),
-                    IntOffset(it.left.roundToInt(), it.top.roundToInt())
+            check(measurables.size >= layoutResult.placeholderRects.size)
+            val placeables = layoutResult.placeholderRects.mapIndexedNotNull { index, rect ->
+                // PlaceholderRect will be null if it's ellipsized. In that case, the corresponding
+                // inline children won't be measured or placed.
+                rect?.let {
+                    Pair(
+                        measurables[index].measure(
+                            Constraints(
+                                maxWidth = floor(it.width).toInt(),
+                                maxHeight = floor(it.height).toInt()
+                            )
+                        ),
+                        IntOffset(it.left.roundToInt(), it.top.roundToInt())
+                    )
+                }
+            }
+
+            return layout(
+                layoutResult.size.width,
+                layoutResult.size.height,
+                // Provide values for the alignment lines defined by text - the first
+                // and last baselines of the text. These can be used by parent layouts
+                // to position this text or align this and other texts by baseline.
+                //
+                // Note: we use round to make Int but any rounding doesn't work well here since
+                // the layout system works with integer pixels but baseline can be in a middle of
+                // the pixel. So any rounding doesn't offer the pixel perfect baseline. We use
+                // round just because the Android framework is doing float-to-int conversion with
+                // round.
+                // https://cs.android.com/android/platform/superproject/+/master:frameworks/base/core/jni/android/graphics/Paint.cpp;l=635?q=Paint.cpp
+                mapOf(
+                    FirstBaseline to layoutResult.firstBaseline.roundToInt(),
+                    LastBaseline to layoutResult.lastBaseline.roundToInt()
                 )
+            ) {
+                placeables.fastForEach { placeable ->
+                    placeable.first.placeRelative(placeable.second)
+                }
             }
         }
 
-        layout(
-            layoutResult.size.width,
-            layoutResult.size.height,
-            // Provide values for the alignment lines defined by text - the first
-            // and last baselines of the text. These can be used by parent layouts
-            // to position this text or align this and other texts by baseline.
-            //
-            // Note: we use round to make Int but any rounding doesn't work well here since
-            // the layout system works with integer pixels but baseline can be in a middle of
-            // the pixel. So any rounding doesn't offer the pixel perfect baseline. We use
-            // round just because the Android framework is doing float-to-int conversion with
-            // round.
-            // https://cs.android.com/android/platform/superproject/+/master:frameworks/base/core/jni/android/graphics/Paint.cpp;l=635?q=Paint.cpp
-            mapOf(
-                FirstBaseline to layoutResult.firstBaseline.roundToInt(),
-                LastBaseline to layoutResult.lastBaseline.roundToInt()
-            )
-        ) {
-            placeables.fastForEach { placeable ->
-                placeable.first.placeRelative(placeable.second)
-            }
+        override fun IntrinsicMeasureScope.minIntrinsicWidth(
+            measurables: List<IntrinsicMeasurable>,
+            height: Int
+        ): Int {
+            state.textDelegate.layoutIntrinsics(layoutDirection)
+            return state.textDelegate.minIntrinsicWidth
+        }
+
+        override fun IntrinsicMeasureScope.minIntrinsicHeight(
+            measurables: List<IntrinsicMeasurable>,
+            width: Int
+        ): Int {
+            return state.textDelegate
+                .layout(Constraints(0, width, 0, Constraints.Infinity), layoutDirection)
+                .size.height
+        }
+
+        override fun IntrinsicMeasureScope.maxIntrinsicWidth(
+            measurables: List<IntrinsicMeasurable>,
+            height: Int
+        ): Int {
+            state.textDelegate.layoutIntrinsics(layoutDirection)
+            return state.textDelegate.maxIntrinsicWidth
+        }
+
+        override fun IntrinsicMeasureScope.maxIntrinsicHeight(
+            measurables: List<IntrinsicMeasurable>,
+            width: Int
+        ): Int {
+            return state.textDelegate
+                .layout(Constraints(0, width, 0, Constraints.Infinity), layoutDirection)
+                .size.height
         }
     }
 

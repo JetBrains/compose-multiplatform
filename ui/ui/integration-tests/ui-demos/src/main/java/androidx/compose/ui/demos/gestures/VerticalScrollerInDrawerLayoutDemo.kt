@@ -149,7 +149,7 @@ private fun Scrollable(orientation: Orientation, content: @Composable () -> Unit
                 toConsume
             }
         ).then(ClipModifier),
-        measureBlock = { measurables, constraints ->
+        measurePolicy = { measurables, constraints ->
             val placeable =
                 when (orientation) {
                     Orientation.Horizontal -> measurables.first().measure(

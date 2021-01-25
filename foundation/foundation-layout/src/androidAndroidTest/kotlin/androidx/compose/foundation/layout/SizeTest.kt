@@ -1548,7 +1548,7 @@ class SizeTest : LayoutTest() {
                         }
                     }
                 },
-                measureBlock = { measurables, constraints ->
+                measurePolicy = { measurables, constraints ->
                     val placeable = measurables.first().measure(Constraints())
                     layout(constraints.maxWidth, constraints.maxHeight) {
                         placeable.placeRelative(0, 0)
@@ -1593,7 +1593,7 @@ class SizeTest : LayoutTest() {
                         ) {
                         }
                     },
-                    measureBlock = { measurables, incomingConstraints ->
+                    measurePolicy = { measurables, incomingConstraints ->
                         val measurable = measurables.first()
                         val constraints = incomingConstraints.constrain(
                             Constraints(
@@ -1773,7 +1773,7 @@ class SizeTest : LayoutTest() {
                         }
                     }
                 },
-                measureBlock = { measurables, constraints ->
+                measurePolicy = { measurables, constraints ->
                     val placeable = measurables.first().measure(Constraints())
                     layout(constraints.maxWidth, constraints.maxHeight) {
                         placeable.placeRelative(0, 0)
