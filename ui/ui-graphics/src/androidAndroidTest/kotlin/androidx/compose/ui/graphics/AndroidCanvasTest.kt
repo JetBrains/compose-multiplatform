@@ -19,6 +19,10 @@ package androidx.compose.ui.graphics
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.ColorMatrixColorFilter
+import android.graphics.LightingColorFilter
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.os.Build
 import android.util.AttributeSet
 import android.view.Gravity
@@ -460,6 +464,143 @@ class AndroidCanvasTest {
                         2f,
                         android.graphics.PathDashPathEffect.Style.ROTATE
                     )
+            }
+        )
+
+        val composePixels = imageBitmap.toPixelMap()
+        for (i in 0 until 80) {
+            for (j in 0 until 80) {
+                assertEquals(
+                    "invalid color at i: " + i + ", " + j,
+                    composePixels[i, j].toArgb(),
+                    androidBitmap.getPixel(i, j)
+                )
+            }
+        }
+    }
+
+    @Test
+    fun testColorFilterTint() {
+        val width = 80
+        val height = 80
+        val imageBitmap = ImageBitmap(width, height)
+        imageBitmap.asAndroidBitmap().eraseColor(android.graphics.Color.WHITE)
+        val canvas = Canvas(imageBitmap)
+        canvas.drawRect(
+            0f,
+            0f,
+            width.toFloat(),
+            height.toFloat(),
+            Paint().apply {
+                color = Color.Blue
+                colorFilter = ColorFilter.tint(Color.Magenta, BlendMode.SrcIn)
+            }
+        )
+
+        val androidBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        androidBitmap.eraseColor(android.graphics.Color.WHITE)
+        val androidCanvas = android.graphics.Canvas(androidBitmap)
+        androidCanvas.drawRect(
+            0f,
+            0f,
+            width.toFloat(),
+            height.toFloat(),
+            android.graphics.Paint().apply {
+                isAntiAlias = true
+                color = android.graphics.Color.BLUE
+                colorFilter = PorterDuffColorFilter(Color.Magenta.toArgb(), PorterDuff.Mode.SRC_IN)
+            }
+        )
+
+        val composePixels = imageBitmap.toPixelMap()
+        for (i in 0 until 80) {
+            for (j in 0 until 80) {
+                assertEquals(
+                    "invalid color at i: " + i + ", " + j,
+                    composePixels[i, j].toArgb(),
+                    androidBitmap.getPixel(i, j)
+                )
+            }
+        }
+    }
+
+    @Test
+    fun testColorFilterLighting() {
+        val width = 80
+        val height = 80
+        val imageBitmap = ImageBitmap(width, height)
+        imageBitmap.asAndroidBitmap().eraseColor(android.graphics.Color.WHITE)
+        val canvas = Canvas(imageBitmap)
+        canvas.drawRect(
+            0f,
+            0f,
+            width.toFloat(),
+            height.toFloat(),
+            Paint().apply {
+                color = Color.Blue
+                colorFilter = ColorFilter.lighting(Color.Red, Color.Blue)
+            }
+        )
+
+        val androidBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        androidBitmap.eraseColor(android.graphics.Color.WHITE)
+        val androidCanvas = android.graphics.Canvas(androidBitmap)
+        androidCanvas.drawRect(
+            0f,
+            0f,
+            width.toFloat(),
+            height.toFloat(),
+            android.graphics.Paint().apply {
+                isAntiAlias = true
+                color = android.graphics.Color.BLUE
+                colorFilter = LightingColorFilter(Color.Red.toArgb(), Color.Blue.toArgb())
+            }
+        )
+
+        val composePixels = imageBitmap.toPixelMap()
+        for (i in 0 until 80) {
+            for (j in 0 until 80) {
+                assertEquals(
+                    "invalid color at i: " + i + ", " + j,
+                    composePixels[i, j].toArgb(),
+                    androidBitmap.getPixel(i, j)
+                )
+            }
+        }
+    }
+
+    @Test
+    fun testColorFilterColorMatrix() {
+        val width = 80
+        val height = 80
+        val imageBitmap = ImageBitmap(width, height)
+        imageBitmap.asAndroidBitmap().eraseColor(android.graphics.Color.WHITE)
+        val canvas = Canvas(imageBitmap)
+
+        val colorMatrix = ColorMatrix().apply { setToSaturation(0f) }
+        canvas.drawRect(
+            0f,
+            0f,
+            width.toFloat(),
+            height.toFloat(),
+            Paint().apply {
+                color = Color.Blue
+                colorFilter = ColorFilter.colorMatrix(colorMatrix)
+            }
+        )
+
+        val androidBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        androidBitmap.eraseColor(android.graphics.Color.WHITE)
+        val androidCanvas = android.graphics.Canvas(androidBitmap)
+        androidCanvas.drawRect(
+            0f,
+            0f,
+            width.toFloat(),
+            height.toFloat(),
+            android.graphics.Paint().apply {
+                isAntiAlias = true
+                color = android.graphics.Color.BLUE
+                colorFilter = ColorMatrixColorFilter(colorMatrix.values)
             }
         )
 
