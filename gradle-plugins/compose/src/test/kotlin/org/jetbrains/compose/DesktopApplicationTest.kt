@@ -57,7 +57,7 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             OS.Windows -> "msi"
             OS.MacOS -> "dmg"
         }
-        file("build/compose/binaries/main/$ext/simple-1.0.$ext")
+        file("build/compose/binaries/main/$ext/TestPackage-1.0.$ext")
             .checkExists()
         assertEquals(TaskOutcome.SUCCESS, result.task(":package${ext.capitalize()}")?.outcome)
         assertEquals(TaskOutcome.SUCCESS, result.task(":package")?.outcome)
