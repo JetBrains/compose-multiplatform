@@ -65,19 +65,19 @@ class DesktopApplicationTest : GradlePluginTestBase() {
 
     @Test
     fun packageUberJarForCurrentOSJvm() = with(testProject(TestProjects.jvm)) {
-        testPackageNativeExecutables()
+        testPackageUberJarForCurrentOS()
     }
 
     @Test
     fun packageUberJarForCurrentOSMpp() = with(testProject(TestProjects.mpp)) {
-        testPackageNativeExecutables()
+        testPackageUberJarForCurrentOS()
     }
 
     private fun TestProject.testPackageUberJarForCurrentOS() {
         gradle(":packageUberJarForCurrentOS").build().let { result ->
             assertEquals(TaskOutcome.SUCCESS, result.task(":packageUberJarForCurrentOS")?.outcome)
 
-            val resultJarFile = file("build/compose/jars/simple-${currentTarget.id}-1.0.jar")
+            val resultJarFile = file("build/compose/jars/TestPackage-${currentTarget.id}-1.0.jar")
             resultJarFile.checkExists()
 
             JarFile(resultJarFile).use { jar ->
