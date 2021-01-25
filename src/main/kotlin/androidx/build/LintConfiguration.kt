@@ -123,6 +123,9 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
             // Disable the TODO check until we have a policy that requires it.
             disable("StopShip")
 
+            // Disable a check that conflicts with our workaround for b/177359055
+            disable("LintBaseline")
+
             // Provide stricter enforcement for project types intended to run on a device.
             if (extension.type.compilationTarget == CompilationTarget.DEVICE) {
                 fatal("Assert")
