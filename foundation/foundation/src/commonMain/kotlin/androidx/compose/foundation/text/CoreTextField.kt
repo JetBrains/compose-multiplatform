@@ -24,11 +24,11 @@ import androidx.compose.foundation.text.selection.TextFieldSelectionHandle
 import androidx.compose.foundation.text.selection.TextFieldSelectionManager
 import androidx.compose.foundation.text.selection.isSelectionHandleInVisibleBound
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.runtime.setValue
@@ -277,30 +277,21 @@ internal fun CoreTextField(
 
     val focusRequestTapModifier = Modifier.focusRequestTapModifier(
         enabled = enabled,
-        onTap = {
+        onTap = { offset ->
             tapToFocus(state, focusRequester, textInputService, !readOnly)
-        }
-    )
-
-    val dragPositionGestureModifier = Modifier.dragPositionGestureFilter(
-        interactionState = interactionState,
-        enabled = enabled,
-        onPress = {
             if (state.hasFocus) {
-                state.selectionIsOn = false
-                manager.hideSelectionToolbar()
-            }
-        },
-        onRelease = {
-            if (state.hasFocus && !state.selectionIsOn) {
-                state.layoutResult?.let { layoutResult ->
-                    TextFieldDelegate.setCursorOffset(
-                        it,
-                        layoutResult,
-                        state.processor,
-                        offsetMapping,
-                        onValueChangeWrapper
-                    )
+                if (!state.selectionIsOn) {
+                    state.layoutResult?.let { layoutResult ->
+                        TextFieldDelegate.setCursorOffset(
+                            offset,
+                            layoutResult,
+                            state.processor,
+                            offsetMapping,
+                            onValueChangeWrapper
+                        )
+                    }
+                } else {
+                    manager.deselect(offset)
                 }
             }
         }
@@ -315,7 +306,7 @@ internal fun CoreTextField(
             enabled = enabled
         )
     } else {
-        dragPositionGestureModifier
+        Modifier.pressGestureFilter(interactionState = interactionState, enabled = enabled)
             .then(selectionModifier)
             .then(focusRequestTapModifier)
     }
