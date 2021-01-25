@@ -25,13 +25,13 @@ import androidx.compose.ui.text.font.LoadedFontFamily
 import androidx.compose.ui.util.fastForEach
 import org.jetbrains.skija.Data
 import org.jetbrains.skija.FontMgr
-import org.jetbrains.skija.Typeface
+import org.jetbrains.skija.Typeface as SkTypeface
 import org.jetbrains.skija.paragraph.FontCollection
 import org.jetbrains.skija.paragraph.TypefaceFontProvider
 import java.io.File
 import java.security.MessageDigest
-import androidx.compose.ui.text.font.Font as ComposeFont
-import androidx.compose.ui.text.font.Typeface as ComposeTypeface
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.Typeface
 
 internal val GenericFontFamiliesMapping by lazy {
     when (Platform.Current) {
@@ -70,7 +70,7 @@ internal val GenericFontFamiliesMapping by lazy {
     }
 }
 
-sealed class DesktopFont : ComposeFont {
+sealed class DesktopFont : Font {
     abstract val identity: String
 
     internal val cacheKey: String
@@ -89,12 +89,38 @@ sealed class DesktopFont : ComposeFont {
  *
  * @see FontFamily
  */
-data class LoadedFont(
+class LoadedFont internal constructor(
     override val identity: String,
     val data: ByteArray,
     override val weight: FontWeight,
     override val style: FontStyle
-) : DesktopFont()
+) : DesktopFont() {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as LoadedFont
+
+        if (identity != other.identity) return false
+        if (!data.contentEquals(other.data)) return false
+        if (weight != other.weight) return false
+        if (style != other.style) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = identity.hashCode()
+        result = 31 * result + data.contentHashCode()
+        result = 31 * result + weight.hashCode()
+        result = 31 * result + style.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "LoadedFont(identity='$identity', weight=$weight, style=$style)"
+    }
+}
 
 /**
  * Creates a Font using byte array with loaded font data.
@@ -113,7 +139,7 @@ fun Font(
     data: ByteArray,
     weight: FontWeight = FontWeight.Normal,
     style: FontStyle = FontStyle.Normal
-): DesktopFont = LoadedFont(identity, data, weight, style)
+): Font = LoadedFont(identity, data, weight, style)
 
 /**
  * Defines a Font using file path.
@@ -126,13 +152,37 @@ fun Font(
  *
  * @see FontFamily
  */
-data class FileFont(
+class FileFont internal constructor(
     val file: File,
     override val weight: FontWeight = FontWeight.Normal,
     override val style: FontStyle = FontStyle.Normal
 ) : DesktopFont() {
     override val identity
         get() = file.toString()
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as FileFont
+
+        if (file != other.file) return false
+        if (weight != other.weight) return false
+        if (style != other.style) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = file.hashCode()
+        result = 31 * result + weight.hashCode()
+        result = 31 * result + style.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "FileFont(file=$file, weight=$weight, style=$style)"
+    }
 }
 
 /**
@@ -150,7 +200,7 @@ fun Font(
     file: File,
     weight: FontWeight = FontWeight.Normal,
     style: FontStyle = FontStyle.Normal
-): DesktopFont = FileFont(file, weight, style)
+): Font = FileFont(file, weight, style)
 
 /**
  * Defines a Font using resource name.
@@ -164,13 +214,37 @@ fun Font(
  * @see FontFamily
  */
 
-data class ResourceFont(
+class ResourceFont internal constructor(
     val name: String,
     override val weight: FontWeight = FontWeight.Normal,
     override val style: FontStyle = FontStyle.Normal
 ) : DesktopFont() {
     override val identity
         get() = name
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as ResourceFont
+
+        if (name != other.name) return false
+        if (weight != other.weight) return false
+        if (style != other.style) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + weight.hashCode()
+        result = 31 * result + style.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "ResourceFont(name='$name', weight=$weight, style=$style)"
+    }
 }
 
 /**
@@ -188,21 +262,21 @@ fun Font(
     resource: String,
     weight: FontWeight = FontWeight.Normal,
     style: FontStyle = FontStyle.Normal
-): DesktopFont = ResourceFont(resource, weight, style)
+): Font = ResourceFont(resource, weight, style)
 
 internal class DesktopTypeface(
     val alias: String?,
-    val nativeTypeface: Typeface
-) : ComposeTypeface {
+    val nativeTypeface: SkTypeface
+) : Typeface {
     override val fontFamily: FontFamily? = null
 }
 
 /**
- * Returns a Compose [ComposeTypeface] from Skija [Typeface].
+ * Returns a Compose [Typeface] from Skija [SkTypeface].
  *
  * @param typeface Android Typeface instance
  */
-fun Typeface(typeface: Typeface, alias: String? = null): ComposeTypeface {
+fun Typeface(typeface: SkTypeface, alias: String? = null): Typeface {
     return DesktopTypeface(alias, typeface)
 }
 
@@ -220,7 +294,7 @@ internal fun FontListFontFamily.makeAlias(): String {
 
 private fun ByteArray.toHexString() = joinToString("") { "%02x".format(it) }
 
-class FontLoader : ComposeFont.ResourceLoader {
+class FontLoader : Font.ResourceLoader {
     val fonts = FontCollection()
     private val fontProvider = TypefaceFontProvider()
 
@@ -267,15 +341,15 @@ class FontLoader : ComposeFont.ResourceLoader {
     //  proper interfaces or they are broken (.makeFromFile(*, 1) always fails)
     //  2. variable fonts. for them we also need to extend definition interfaces to support
     //  custom variation settings
-    override fun load(font: ComposeFont): Typeface {
+    override fun load(font: Font): SkTypeface {
         if (font !is DesktopFont) {
             throw IllegalArgumentException("Unsupported font type: $font")
         }
         return typefacesCache.get(font.cacheKey) {
             when (font) {
                 is ResourceFont -> typefaceResource(font.name)
-                is FileFont -> Typeface.makeFromFile(font.file.toString())
-                is LoadedFont -> Typeface.makeFromData(Data.makeFromBytes(font.data))
+                is FileFont -> SkTypeface.makeFromFile(font.file.toString())
+                is LoadedFont -> SkTypeface.makeFromData(Data.makeFromBytes(font.data))
             }
         }
     }
@@ -284,7 +358,7 @@ class FontLoader : ComposeFont.ResourceLoader {
         fontFamily: FontFamily,
         fontWeight: FontWeight = FontWeight.Normal,
         fontStyle: FontStyle = FontStyle.Normal
-    ): Typeface? {
+    ): SkTypeface? {
         return when (fontFamily) {
             FontFamily.Default -> fonts.defaultFallback()
             else -> {
@@ -296,17 +370,17 @@ class FontLoader : ComposeFont.ResourceLoader {
     }
 }
 
-private val typefacesCache = ExpireAfterAccessCache<String, Typeface>(
+private val typefacesCache = ExpireAfterAccessCache<String, SkTypeface>(
     60_000_000_000 // 1 minute
 )
 
-private fun typefaceResource(resourceName: String): Typeface {
+private fun typefaceResource(resourceName: String): SkTypeface {
     val resource = Thread
         .currentThread()
         .contextClassLoader
         .getResourceAsStream(resourceName) ?: error("Can't load font from $resourceName")
     val bytes = resource.readAllBytes()
-    return Typeface.makeFromData(Data.makeFromBytes(bytes))
+    return SkTypeface.makeFromData(Data.makeFromBytes(bytes))
 }
 
 private enum class Platform {
