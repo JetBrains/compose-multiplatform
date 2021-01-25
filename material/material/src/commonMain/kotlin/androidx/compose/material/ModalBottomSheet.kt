@@ -113,6 +113,7 @@ class ModalBottomSheetState(
         animateTo(
             targetValue = targetValue,
             onEnd = { endReason, _ ->
+                @Suppress("Deprecation")
                 if (endReason == AnimationEndReason.TargetReached) {
                     onShown?.invoke()
                 }
@@ -129,6 +130,7 @@ class ModalBottomSheetState(
         animateTo(
             targetValue = ModalBottomSheetValue.Hidden,
             onEnd = { endReason, _ ->
+                @Suppress("Deprecation")
                 if (endReason == AnimationEndReason.TargetReached) {
                     onHidden?.invoke()
                 }
