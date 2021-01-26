@@ -217,8 +217,8 @@ package androidx.compose.material {
   }
 
   public final class ColorsKt {
-    method @androidx.compose.runtime.Composable public static long contentColorFor-8_81llA(long color);
-    method public static long contentColorFor-pz-ABmo(androidx.compose.material.Colors, long color);
+    method @androidx.compose.runtime.Composable public static long contentColorFor-8_81llA(long backgroundColor);
+    method public static long contentColorFor-pz-ABmo(androidx.compose.material.Colors, long backgroundColor);
     method public static androidx.compose.material.Colors darkColors-T8B3sC8(optional long primary, optional long primaryVariant, optional long secondary, optional long background, optional long surface, optional long error, optional long onPrimary, optional long onSecondary, optional long onBackground, optional long onSurface, optional long onError);
     method public static androidx.compose.material.Colors lightColors-hW7iGhc(optional long primary, optional long primaryVariant, optional long secondary, optional long secondaryVariant, optional long background, optional long surface, optional long error, optional long onPrimary, optional long onSecondary, optional long onBackground, optional long onSurface, optional long onError);
   }
