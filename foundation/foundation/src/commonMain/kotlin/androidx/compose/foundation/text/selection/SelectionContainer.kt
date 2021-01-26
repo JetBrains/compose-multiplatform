@@ -72,7 +72,7 @@ fun DisableSelection(content: @Composable () -> Unit) {
  *
  * @suppress
  */
-@Suppress("ComposableLambdaParameterNaming")
+@Suppress("ComposableLambdaParameterNaming", "DEPRECATION")
 @InternalTextApi // Used by foundation
 @Composable
 internal fun SelectionContainer(

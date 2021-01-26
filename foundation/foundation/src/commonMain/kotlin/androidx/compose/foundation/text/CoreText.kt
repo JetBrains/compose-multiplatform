@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:Suppress("DEPRECATION_ERROR")
+@file:Suppress("DEPRECATION_ERROR", "DEPRECATION")
 
 package androidx.compose.foundation.text
 
@@ -94,6 +94,7 @@ private typealias InlineContentRange = AnnotatedString.Range<@Composable (String
  */
 @Composable
 @OptIn(ExperimentalTextApi::class, InternalTextApi::class)
+@Suppress("DEPRECATION") // longPressDragGestureFilter
 internal fun CoreText(
     text: AnnotatedString,
     modifier: Modifier = Modifier,
@@ -452,6 +453,7 @@ private fun resolveInlineContent(
     ExperimentalTextApi::class
 )
 /*@VisibleForTesting*/
+@Suppress("DEPRECATION") // LongPressDragObserver
 internal fun longPressDragObserver(
     state: TextState,
     selectionRegistrar: SelectionRegistrar?

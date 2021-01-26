@@ -17,6 +17,9 @@
 package androidx.compose.ui.demos.gestures
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.drag
+import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,24 +33,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.DragObserver
-import androidx.compose.ui.gesture.rawDragGestureFilter
+import androidx.compose.ui.input.pointer.consumeAllChanges
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 
 /**
- * Simple [rawDragGestureFilter] demo.
+ * Simple [drag] demo.
  */
 @Composable
 fun RawDragGestureFilterDemo() {
     val offset = remember { mutableStateOf(Offset.Zero) }
-
-    val dragObserver = object : DragObserver {
-        override fun onDrag(dragDistance: Offset): Offset {
-            offset.value += dragDistance
-            return dragDistance
-        }
-    }
 
     val (offsetX, offsetY) =
         with(LocalDensity.current) { offset.value.x.toDp() to offset.value.y.toDp() }
@@ -60,7 +57,17 @@ fun RawDragGestureFilterDemo() {
                 .wrapContentSize(Alignment.Center)
                 .offset(offsetX, offsetY)
                 .preferredSize(192.dp)
-                .rawDragGestureFilter(dragObserver)
+                .pointerInput {
+                    forEachGesture {
+                        awaitPointerEventScope {
+                            val down = awaitFirstDown(requireUnconsumed = false)
+                            drag(down.id) { change ->
+                                offset.value += change.positionChange()
+                                change.consumeAllChanges()
+                            }
+                        }
+                    }
+                }
                 .background(Grey)
         )
     }

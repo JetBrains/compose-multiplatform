@@ -20,6 +20,8 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.rememberScrollableController
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,9 +34,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.Direction
-import androidx.compose.ui.gesture.ScrollCallback
-import androidx.compose.ui.gesture.scrollGestureFilter
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
@@ -81,38 +80,29 @@ private fun Scrollable(content: @Composable () -> Unit) {
     val offset = remember { mutableStateOf(0f) }
     val maxOffset = remember { mutableStateOf(0f) }
 
-    val scrollObserver = object : ScrollCallback {
-        override fun onScroll(scrollDistance: Float): Float {
-            val resultingOffset = offset.value + scrollDistance
-            val dyToConsume =
-                when {
-                    resultingOffset > 0f -> {
-                        0f - offset.value
-                    }
-                    resultingOffset < maxOffset.value -> {
-                        maxOffset.value - offset.value
-                    }
-                    else -> {
-                        scrollDistance
-                    }
-                }
-            offset.value += dyToConsume
-            return dyToConsume
-        }
-    }
-
-    val canDrag = { direction: Direction ->
-        when (direction) {
-            Direction.UP -> true
-            Direction.DOWN -> true
-            else -> false
-        }
-    }
-
     Layout(
         content = content,
         modifier = Modifier
-            .scrollGestureFilter(scrollObserver, Orientation.Vertical, canDrag)
+            .scrollable(
+                orientation = Orientation.Vertical,
+                controller = rememberScrollableController { scrollDistance ->
+                    val resultingOffset = offset.value + scrollDistance
+                    val dyToConsume =
+                        when {
+                            resultingOffset > 0f -> {
+                                0f - offset.value
+                            }
+                            resultingOffset < maxOffset.value -> {
+                                maxOffset.value - offset.value
+                            }
+                            else -> {
+                                scrollDistance
+                            }
+                        }
+                    offset.value += dyToConsume
+                    dyToConsume
+                }
+            )
             .clipToBounds(),
         measureBlock = { measurables, constraints ->
             val placeable =

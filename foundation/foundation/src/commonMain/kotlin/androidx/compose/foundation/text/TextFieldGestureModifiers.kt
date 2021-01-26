@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION") // gestures
+
 package androidx.compose.foundation.text
 
 import androidx.compose.foundation.InteractionState
@@ -36,7 +38,6 @@ internal fun Modifier.longPressDragGestureFilter(
     enabled: Boolean
 ) = if (enabled) this.then(longPressDragGestureFilter(observer)) else this
 
-@Suppress("DEPRECATION")
 internal fun Modifier.focusRequestTapModifier(onTap: (Offset) -> Unit, enabled: Boolean) =
     if (enabled) this.tapGestureFilter(onTap) else this
 

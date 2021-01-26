@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file: Suppress("DEPRECATION")
+
 package androidx.compose.ui.gesture
 
 import androidx.compose.runtime.remember
@@ -55,6 +57,7 @@ import androidx.compose.ui.platform.debugInspectorInfo
  * should be set to true when the child of the GestureDetector is animating, such that when a finger
  * touches it, dragging is immediately started so the animation stops and dragging can occur.
  */
+@Deprecated("Use Modifier.pointerInput{ detectDragGestures(... )} instead")
 fun Modifier.dragGestureFilter(
     dragObserver: DragObserver,
     canDrag: ((Direction) -> Boolean)? = null,

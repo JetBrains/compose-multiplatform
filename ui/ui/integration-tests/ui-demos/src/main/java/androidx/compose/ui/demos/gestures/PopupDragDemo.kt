@@ -17,6 +17,7 @@
 package androidx.compose.ui.demos.gestures
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.preferredSize
@@ -28,9 +29,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.DragObserver
-import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.consumeAllChanges
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.round
@@ -41,15 +42,6 @@ fun PopupDragDemo() {
     // TODO fix this demo in RTL (check when draggable handles RTL)
     val offset = remember { mutableStateOf(Offset.Zero) }
 
-    val observer = remember {
-        object : DragObserver {
-            override fun onDrag(dragDistance: Offset): Offset {
-                offset.value = offset.value + dragDistance
-                return dragDistance
-            }
-        }
-    }
-
     Column {
         Text("That is a pop up with a dragGestureFilter on it.  You can drag it around!")
         Popup(
@@ -59,7 +51,12 @@ fun PopupDragDemo() {
             Box {
                 Box(
                     Modifier
-                        .dragGestureFilter(observer)
+                        .pointerInput {
+                            detectDragGestures { change, dragAmount ->
+                                offset.value = offset.value + dragAmount
+                                change.consumeAllChanges()
+                            }
+                        }
                         .preferredSize(70.dp)
                         .background(Color.Green, CircleShape),
                     contentAlignment = Alignment.Center

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION") // gestures
+
 package androidx.compose.foundation.text.selection
 
 import androidx.compose.foundation.text.TextFieldDelegate
