@@ -757,6 +757,11 @@ package androidx.compose.runtime.snapshots {
     field @kotlin.PublishedApi internal static final androidx.compose.runtime.snapshots.Snapshot snapshotInitializer;
   }
 
+  public interface SnapshotMutableState<T> extends androidx.compose.runtime.MutableState<T> {
+    method public androidx.compose.runtime.SnapshotMutationPolicy<T> getPolicy();
+    property public abstract androidx.compose.runtime.SnapshotMutationPolicy<T> policy;
+  }
+
   @androidx.compose.runtime.Stable public final class SnapshotStateList<T> implements kotlin.jvm.internal.markers.KMutableList java.util.List<T> androidx.compose.runtime.snapshots.StateObject {
     ctor public SnapshotStateList();
     method public boolean add(T? element);
