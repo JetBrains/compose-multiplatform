@@ -172,6 +172,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             }
             return field
         }
+    private var paneDisplayed = ArraySet<Int>()
 
     @VisibleForTesting
     internal class SemanticsNodeCopy(
@@ -188,6 +189,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 }
             }
         }
+
+        fun hasPaneTitle() = config.contains(SemanticsProperties.PaneTitle)
     }
 
     // previousSemanticsNodes holds the previous pruned semantics tree so that we can compare the
@@ -541,6 +544,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 }
             }
         }
+
+        info.paneTitle = semanticsNode.config.getOrNull(SemanticsProperties.PaneTitle)
 
         if (semanticsNode.enabled()) {
             semanticsNode.config.getOrNull(SemanticsActions.Dismiss)?.let {
@@ -1283,7 +1288,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     // to semanticsChangeChecker, but I think update copy after the subtree
                     // change events are sent is more accurate because before accessibility
                     // services receive subtree events, they are not aware of the subtree change.
-                    updateSemanticsNodesCopy()
+                    updateSemanticsNodesCopyAndPanes()
                 }
                 subtreeChangedLayoutNodes.clear()
                 delay(SendRecurringAccessibilityEventsIntervalMillis)
@@ -1353,12 +1358,31 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         )
         // Property change
         sendSemanticsPropertyChangeEvents(currentSemanticsNodes)
-        updateSemanticsNodesCopy()
+        updateSemanticsNodesCopyAndPanes()
     }
 
-    private fun updateSemanticsNodesCopy() {
+    private fun updateSemanticsNodesCopyAndPanes() {
+        // TODO(b/172606324): removed this compose specific fix when talkback has a proper solution.
+        for (id in paneDisplayed) {
+            val currentNode = currentSemanticsNodes[id]
+            if (currentNode == null || !currentNode.hasPaneTitle()) {
+                paneDisplayed.remove(id)
+                sendPaneChangeEvents(
+                    id,
+                    AccessibilityEventCompat.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED,
+                    previousSemanticsNodes[id]?.config?.getOrNull(SemanticsProperties.PaneTitle)
+                )
+            }
+        }
         previousSemanticsNodes.clear()
         for (entry in currentSemanticsNodes.entries) {
+            if (entry.value.hasPaneTitle() && paneDisplayed.add(entry.key)) {
+                sendPaneChangeEvents(
+                    entry.key,
+                    AccessibilityEventCompat.CONTENT_CHANGE_TYPE_PANE_APPEARED,
+                    entry.value.config[SemanticsProperties.PaneTitle]
+                )
+            }
             previousSemanticsNodes[entry.key] =
                 SemanticsNodeCopy(entry.value, currentSemanticsNodes)
         }
@@ -1379,6 +1403,18 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     continue
                 }
                 when (entry.key) {
+                    SemanticsProperties.PaneTitle -> {
+                        val paneTitle = entry.value as String
+                        // If oldNode doesn't have pane title, it will be handled in
+                        // updateSemanticsNodesCopyAndPanes().
+                        if (oldNode.hasPaneTitle()) {
+                            sendPaneChangeEvents(
+                                id,
+                                AccessibilityEventCompat.CONTENT_CHANGE_TYPE_PANE_TITLE,
+                                paneTitle
+                            )
+                        }
+                    }
                     SemanticsProperties.StateDescription ->
                         sendEventForVirtualView(
                             semanticsNodeIdToAccessibilityVirtualNodeId(id),
@@ -1529,8 +1565,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                             AccessibilityEvent.CONTENT_CHANGE_TYPE_UNDEFINED
                         )
                     }
-                    // TODO(b/151840490) send the correct events for certain properties, like pane
-                    //  title, view selected.
+                    // TODO(b/151840490) send the correct events for certain properties, like view
+                    //  selected.
                     else -> {
                         propertyChanged = true
                     }
@@ -1550,6 +1586,22 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 )
             }
         }
+    }
+
+    private fun sendPaneChangeEvents(
+        semanticsNodeId: Int,
+        contentChangeType: Int,
+        title: String?
+    ) {
+        val event = createEvent(
+            semanticsNodeIdToAccessibilityVirtualNodeId(semanticsNodeId),
+            AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
+        )
+        event.contentChangeTypes = contentChangeType
+        if (title != null) {
+            event.text.add(title)
+        }
+        sendEvent(event)
     }
 
     private fun sendSemanticsStructureChangeEvents(
@@ -1860,6 +1912,8 @@ private fun SemanticsNode.propertiesDeleted(
     }
     return false
 }
+
+private fun SemanticsNode.hasPaneTitle() = config.contains(SemanticsProperties.PaneTitle)
 
 /**
  * Finds pruned [SemanticsNode]s in the tree owned by this [SemanticsOwner]. A semantics node
