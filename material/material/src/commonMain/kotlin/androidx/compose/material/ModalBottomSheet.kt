@@ -43,6 +43,10 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.platform.LocalAnimationClock
+import androidx.compose.ui.semantics.collapse
+import androidx.compose.ui.semantics.dismiss
+import androidx.compose.ui.semantics.expand
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -98,13 +102,15 @@ class ModalBottomSheetState(
     val isVisible: Boolean
         get() = value != ModalBottomSheetValue.Hidden
 
-    private val isHalfExpandedEnabled: Boolean
+    internal val isHalfExpandedEnabled: Boolean
         get() = anchors.values.contains(ModalBottomSheetValue.HalfExpanded)
 
     /**
-     * Show the bottom sheet, with an animation.
+     * Show the bottom sheet, with an animation. If half expand is enabled, the bottom sheet will
+     * be half expanded. Otherwise it will be fully expanded.
      *
      * @param onShown Optional callback invoked when the bottom sheet has been shown.
+     * @see expand
      */
     fun show(onShown: (() -> Unit)? = null) {
         val targetValue =
@@ -116,6 +122,44 @@ class ModalBottomSheetState(
                 @Suppress("Deprecation")
                 if (endReason == AnimationEndReason.TargetReached) {
                     onShown?.invoke()
+                }
+            }
+        )
+    }
+
+    /**
+     * Half expand the bottom sheet if half expand is enabled, with an animation.
+     *
+     * @param onHalfExpand Optional callback invoked when the bottom sheet has been half-expanded.
+     */
+    fun halfExpand(onHalfExpand: (() -> Unit)? = null) {
+        if (!isHalfExpandedEnabled) {
+            return
+        }
+        animateTo(
+            targetValue = ModalBottomSheetValue.HalfExpanded,
+            onEnd = { endReason, _ ->
+                @Suppress("Deprecation")
+                if (endReason == AnimationEndReason.TargetReached) {
+                    onHalfExpand?.invoke()
+                }
+            }
+        )
+    }
+
+    /**
+     * Fully expand the bottom sheet, with an animation.
+     *
+     * @param onExpand Optional callback invoked when the bottom sheet has been expanded.
+     * @see show
+     */
+    fun expand(onExpand: (() -> Unit)? = null) {
+        animateTo(
+            targetValue = ModalBottomSheetValue.Expanded,
+            onEnd = { endReason, _ ->
+                @Suppress("Deprecation")
+                if (endReason == AnimationEndReason.TargetReached) {
+                    onExpand?.invoke()
                 }
             }
         )
@@ -240,7 +284,17 @@ fun ModalBottomSheetLayout(
             Modifier
                 .fillMaxWidth()
                 .nestedScroll(sheetState.nestedScrollConnection)
-                .offset { IntOffset(0, sheetState.offset.value.roundToInt()) },
+                .offset { IntOffset(0, sheetState.offset.value.roundToInt()) }
+                .semantics {
+                    if (sheetState.isVisible) {
+                        dismiss { sheetState.hide(); true }
+                        if (sheetState.value == ModalBottomSheetValue.HalfExpanded) {
+                            expand { sheetState.expand(); true }
+                        } else if (sheetState.isHalfExpandedEnabled) {
+                            collapse { sheetState.halfExpand(); true }
+                        }
+                    }
+                },
             shape = sheetShape,
             elevation = sheetElevation,
             color = sheetBackgroundColor,

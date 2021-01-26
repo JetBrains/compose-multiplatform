@@ -23,10 +23,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onParent
 import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.unit.dp
@@ -105,6 +110,37 @@ class ModalBottomSheetTest {
     }
 
     @Test
+    fun modalBottomSheet_testDismissAction_whenExpanded() {
+        val sheetState = ModalBottomSheetState(ModalBottomSheetValue.Expanded, clock)
+        rule.setMaterialContent {
+            ModalBottomSheetLayout(
+                sheetState = sheetState,
+                content = {},
+                sheetContent = {
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .preferredHeight(sheetHeight)
+                            .testTag(sheetTag)
+                    )
+                }
+            )
+        }
+
+        val height = rule.rootHeight()
+        rule.onNodeWithTag(sheetTag).onParent()
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.Collapse))
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.Expand))
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.Dismiss))
+            .performSemanticsAction(SemanticsActions.Dismiss)
+
+        advanceClock()
+
+        rule.onNodeWithTag(sheetTag)
+            .assertTopPositionInRootIsEqualTo(height)
+    }
+
+    @Test
     fun modalBottomSheet_testOffset_tallBottomSheet_whenHidden() {
         rule.setMaterialContent {
             ModalBottomSheetLayout(
@@ -146,6 +182,66 @@ class ModalBottomSheetTest {
     }
 
     @Test
+    fun modalBottomSheet_testCollapseAction_tallBottomSheet_whenExpanded() {
+        val sheetState = ModalBottomSheetState(ModalBottomSheetValue.Expanded, clock)
+        rule.setMaterialContent {
+            ModalBottomSheetLayout(
+                sheetState = sheetState,
+                content = {},
+                sheetContent = {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .testTag(sheetTag)
+                    )
+                }
+            )
+        }
+
+        val height = rule.rootHeight()
+        rule.onNodeWithTag(sheetTag).onParent()
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.Expand))
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.Collapse))
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.Dismiss))
+            .performSemanticsAction(SemanticsActions.Collapse)
+
+        advanceClock()
+
+        rule.onNodeWithTag(sheetTag)
+            .assertTopPositionInRootIsEqualTo(height / 2)
+    }
+
+    @Test
+    fun modalBottomSheet_testDismissAction_tallBottomSheet_whenExpanded() {
+        val sheetState = ModalBottomSheetState(ModalBottomSheetValue.Expanded, clock)
+        rule.setMaterialContent {
+            ModalBottomSheetLayout(
+                sheetState = sheetState,
+                content = {},
+                sheetContent = {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .testTag(sheetTag)
+                    )
+                }
+            )
+        }
+
+        val height = rule.rootHeight()
+        rule.onNodeWithTag(sheetTag).onParent()
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.Expand))
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.Collapse))
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.Dismiss))
+            .performSemanticsAction(SemanticsActions.Dismiss)
+
+        advanceClock()
+
+        rule.onNodeWithTag(sheetTag)
+            .assertTopPositionInRootIsEqualTo(height)
+    }
+
+    @Test
     fun modalBottomSheet_testOffset_tallBottomSheet_whenHalfExpanded() {
         rule.setMaterialContent {
             ModalBottomSheetLayout(
@@ -164,6 +260,65 @@ class ModalBottomSheetTest {
         val height = rule.rootHeight()
         rule.onNodeWithTag(sheetTag)
             .assertTopPositionInRootIsEqualTo(height / 2)
+    }
+
+    @Test
+    fun modalBottomSheet_testExpandAction_tallBottomSheet_whenHalfExpanded() {
+        val sheetState = ModalBottomSheetState(ModalBottomSheetValue.HalfExpanded, clock)
+        rule.setMaterialContent {
+            ModalBottomSheetLayout(
+                sheetState = sheetState,
+                content = {},
+                sheetContent = {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .testTag(sheetTag)
+                    )
+                }
+            )
+        }
+
+        rule.onNodeWithTag(sheetTag).onParent()
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.Collapse))
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.Expand))
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.Dismiss))
+            .performSemanticsAction(SemanticsActions.Expand)
+
+        advanceClock()
+
+        rule.onNodeWithTag(sheetTag)
+            .assertTopPositionInRootIsEqualTo(0.dp)
+    }
+
+    @Test
+    fun modalBottomSheet_testDismissAction_tallBottomSheet_whenHalfExpanded() {
+        val sheetState = ModalBottomSheetState(ModalBottomSheetValue.HalfExpanded, clock)
+        rule.setMaterialContent {
+            ModalBottomSheetLayout(
+                sheetState = sheetState,
+                content = {},
+                sheetContent = {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .testTag(sheetTag)
+                    )
+                }
+            )
+        }
+
+        val height = rule.rootHeight()
+        rule.onNodeWithTag(sheetTag).onParent()
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.Collapse))
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.Expand))
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.Dismiss))
+            .performSemanticsAction(SemanticsActions.Dismiss)
+
+        advanceClock()
+
+        rule.onNodeWithTag(sheetTag)
+            .assertTopPositionInRootIsEqualTo(height)
     }
 
     @Test

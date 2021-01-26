@@ -35,6 +35,7 @@ import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsWrapper
+import androidx.compose.ui.semantics.collapse
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.copyText
 import androidx.compose.ui.semantics.cutText
@@ -42,6 +43,7 @@ import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.progressBarRangeInfo
 import androidx.compose.ui.semantics.dismiss
+import androidx.compose.ui.semantics.expand
 import androidx.compose.ui.semantics.focused
 import androidx.compose.ui.semantics.getTextLayoutResult
 import androidx.compose.ui.semantics.horizontalScrollAxisRange
@@ -126,12 +128,16 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
     fun testPopulateAccessibilityNodeInfoProperties_general() {
         val clickActionLabel = "click"
         val dismissActionLabel = "dismiss"
+        val expandActionLabel = "expand"
+        val collapseActionLabel = "collapse"
         val stateDescription = "checked"
         val semanticsNode = createSemanticsNodeWithProperties(1, true) {
             this.stateDescription = stateDescription
             heading()
             onClick(clickActionLabel) { true }
             dismiss(dismissActionLabel) { true }
+            expand(expandActionLabel) { true }
+            collapse(collapseActionLabel) { true }
         }
         accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
         assertEquals("android.view.View", info.className)
@@ -150,6 +156,24 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
                 AccessibilityNodeInfoCompat.AccessibilityActionCompat(
                     AccessibilityNodeInfoCompat.ACTION_DISMISS,
                     dismissActionLabel
+                )
+            )
+        )
+        assertTrue(
+            containsAction(
+                info,
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+                    AccessibilityNodeInfoCompat.ACTION_EXPAND,
+                    expandActionLabel
+                )
+            )
+        )
+        assertTrue(
+            containsAction(
+                info,
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+                    AccessibilityNodeInfoCompat.ACTION_COLLAPSE,
+                    collapseActionLabel
                 )
             )
         )
@@ -186,6 +210,8 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
             setText { true }
             setSelection { _, _, _ -> true }
             dismiss { true }
+            expand { true }
+            collapse { true }
         }
         accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
         assertTrue(info.isClickable)
@@ -237,6 +263,18 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
             containsAction(
                 info,
                 AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_DISMISS
+            )
+        )
+        assertFalse(
+            containsAction(
+                info,
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_EXPAND
+            )
+        )
+        assertFalse(
+            containsAction(
+                info,
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_COLLAPSE
             )
         )
         assertFalse(

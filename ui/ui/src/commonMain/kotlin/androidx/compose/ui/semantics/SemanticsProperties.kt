@@ -267,6 +267,16 @@ object SemanticsActions {
     val PasteText = SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>("PasteText")
 
     /**
+     * @see SemanticsPropertyReceiver.expand
+     */
+    val Expand = SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>("Expand")
+
+    /**
+     * @see SemanticsPropertyReceiver.collapse
+     */
+    val Collapse = SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>("Collapse")
+
+    /**
      * @see SemanticsPropertyReceiver.dismiss
      */
     val Dismiss = SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>("Dismiss")
@@ -747,6 +757,32 @@ fun SemanticsPropertyReceiver.pasteText(
     action: () -> Boolean
 ) {
     this[SemanticsActions.PasteText] = AccessibilityAction(label, action)
+}
+
+/**
+ * Action to expand an expandable node.
+ *
+ * @param label Optional label for this action.
+ * @param action Action to be performed when the [SemanticsActions.Expand] is called.
+ */
+fun SemanticsPropertyReceiver.expand(
+    label: String? = null,
+    action: () -> Boolean
+) {
+    this[SemanticsActions.Expand] = AccessibilityAction(label, action)
+}
+
+/**
+ * Action to collapse an expandable node.
+ *
+ * @param label Optional label for this action.
+ * @param action Action to be performed when the [SemanticsActions.Collapse] is called.
+ */
+fun SemanticsPropertyReceiver.collapse(
+    label: String? = null,
+    action: () -> Boolean
+) {
+    this[SemanticsActions.Collapse] = AccessibilityAction(label, action)
 }
 
 /**
