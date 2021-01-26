@@ -79,6 +79,10 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.plus
 import androidx.compose.ui.input.key.shortcuts
+import androidx.compose.ui.input.pointer.PointerEvent
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerInputFilter
+import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.vectorXmlResource
@@ -97,6 +101,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import java.awt.event.MouseEvent
 
 private const val title = "Desktop Compose Elements"
 
@@ -323,13 +328,34 @@ private fun ScrollableContent(scrollState: ScrollState) {
             )
         )
 
-        Button(
-            modifier = Modifier.padding(4.dp),
-            onClick = {
-                amount.value++
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            var lastEvent by remember { mutableStateOf<MouseEvent?>(null) }
+            Button(
+                modifier = Modifier.padding(4.dp),
+                onClick = {
+                    amount.value++
+                }
+            ) {
+                Text("Base")
             }
-        ) {
-            Text("Base")
+
+            Text(
+                modifier = object : PointerInputModifier {
+                    override val pointerInputFilter = object : PointerInputFilter() {
+                        override fun onPointerEvent(
+                            pointerEvent: PointerEvent,
+                            pass: PointerEventPass,
+                            bounds: IntSize
+                        ) {
+                            lastEvent = pointerEvent.mouseEvent
+                        }
+
+                        override fun onCancel() {
+                        }
+                    }
+                },
+                text = "Custom mouse event button: ${lastEvent?.button}"
+            )
         }
 
         Row(

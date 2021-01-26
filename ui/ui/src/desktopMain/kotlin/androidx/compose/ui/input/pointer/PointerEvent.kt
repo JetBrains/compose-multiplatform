@@ -16,14 +16,29 @@
 
 package androidx.compose.ui.input.pointer
 
+import java.awt.event.MouseEvent
+
 /**
  * Describes a pointer input change event that has occurred at a particular point in time.
  */
-actual data class PointerEvent actual constructor(
-    actual val changes: List<PointerInputChange>
+actual data class PointerEvent internal constructor(
+    /**
+     * The changes.
+     */
+    actual val changes: List<PointerInputChange>,
+
+    /**
+     * Original raw native event from AWT
+     */
+    val mouseEvent: MouseEvent?
 ) {
     internal actual constructor(
         changes: List<PointerInputChange>,
         internalPointerEvent: InternalPointerEvent?
-    ) : this(changes)
+    ) : this(changes, internalPointerEvent?.mouseEvent)
+
+    /**
+     * @param changes The changes.
+     */
+    actual constructor(changes: List<PointerInputChange>) : this(changes, mouseEvent = null)
 }
