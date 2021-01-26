@@ -60,7 +60,7 @@ suspend fun PointerInputScope.detectTransformGestures(
             val touchSlop = viewConfiguration.touchSlop
             var lockedToPanZoom = false
 
-            awaitFirstDown()
+            awaitFirstDown(requireUnconsumed = false)
             do {
                 val event = awaitPointerEvent()
                 val canceled = event.changes.fastAny { it.anyPositionChangeConsumed() }

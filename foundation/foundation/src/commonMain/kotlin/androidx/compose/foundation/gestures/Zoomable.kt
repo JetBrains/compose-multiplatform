@@ -27,13 +27,22 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.gesture.ScaleObserver
-import androidx.compose.ui.gesture.scaleGestureFilter
+import androidx.compose.ui.input.pointer.PointerEvent
+import androidx.compose.ui.input.pointer.PointerInputScope
+import androidx.compose.ui.input.pointer.anyPositionChangeConsumed
+import androidx.compose.ui.input.pointer.consumeAllChanges
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChanged
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.util.fastAny
+import androidx.compose.ui.util.fastForEach
+import kotlin.math.abs
 
 /**
  * Create and remember [ZoomableController] with default [AnimationClockObservable].
@@ -52,7 +61,7 @@ fun rememberZoomableController(onZoomDelta: (Float) -> Unit): ZoomableController
  * Controller to control [zoomable] modifier with. Provides smooth scaling capabilities.
  *
  * @param animationClock clock observable to run animation on. Consider querying
- * [AnimationClockAmbient] to get current composition value
+ * [AnimationClockObservable] to get current composition value
  * @param onZoomDelta callback to be invoked when pinch/smooth zooming occurs. The callback
  * receives the delta as the ratio of the new size compared to the old. Callers should update
  * their state and UI in this callback.
@@ -123,35 +132,17 @@ fun Modifier.zoomable(
                 controller.stopAnimation()
             }
         }
-        scaleGestureFilter(
-            scaleObserver = object : ScaleObserver {
-                override fun onScale(scaleFactor: Float) {
-                    if (enabled) {
-                        controller.stopAnimation()
-                        controller.onScale(scaleFactor)
-                    }
-                }
-
-                override fun onStop() {
-                    if (enabled) {
-                        onZoomStopped?.invoke()
-                    }
-                }
-
-                override fun onCancel() {
-                    if (enabled) {
-                        onZoomStopped?.invoke()
-                    }
-                }
-
-                override fun onStart() {
-                    if (enabled) {
-                        controller.stopAnimation()
-                        onZoomStarted?.invoke()
-                    }
+        val onZoomStartedState = rememberUpdatedState(onZoomStarted)
+        val onZoomStoppedState = rememberUpdatedState(onZoomStopped)
+        val controllerState = rememberUpdatedState(controller)
+        val block: suspend PointerInputScope.() -> Unit = remember {
+            {
+                forEachGesture {
+                    detectZoom(onZoomStartedState, controllerState, onZoomStoppedState)
                 }
             }
-        )
+        }
+        if (enabled) Modifier.pointerInput(block) else Modifier
     },
     inspectorInfo = debugInspectorInfo {
         name = "zoomable"
@@ -161,6 +152,55 @@ fun Modifier.zoomable(
         properties["onZoomStopped"] = onZoomStopped
     }
 )
+
+// TODO: to be replaced with detectMultitouchGestures when it will support panning and rotation
+private suspend fun PointerInputScope.detectZoom(
+    onZoomStartedState: State<(() -> Unit)?>,
+    controllerState: State<ZoomableController>,
+    onZoomStoppedState: State<(() -> Unit)?>
+) {
+    awaitPointerEventScope {
+        var zoom = 1f
+        var pastTouchSlop = false
+        val touchSlop = viewConfiguration.touchSlop
+
+        awaitFirstDown(requireUnconsumed = false)
+        do {
+            val event = awaitPointerEvent()
+            val canceled = event.changes.fastAny { it.anyPositionChangeConsumed() }
+            if (!canceled) {
+                val zoomChange = event.calculateZoom()
+                if (!pastTouchSlop) {
+                    zoom *= zoomChange
+                    val centroidSize = event.calculateCentroidSize(useCurrent = false)
+                    val zoomMotion = abs(1 - zoom) * centroidSize
+                    if (zoomMotion > touchSlop) {
+                        onZoomStartedState.value?.invoke()
+                        pastTouchSlop = true
+                    }
+                }
+
+                if (pastTouchSlop) {
+                    dispatchZoom(zoomChange, controllerState, event)
+                }
+            }
+        } while (!canceled && event.changes.fastAny { it.pressed })
+        onZoomStoppedState.value?.invoke()
+    }
+}
+
+private fun dispatchZoom(
+    zoomChange: Float,
+    controllerState: State<ZoomableController>,
+    event: PointerEvent
+) {
+    if (zoomChange != 1f) controllerState.value.onZoomDelta(zoomChange)
+    event.changes.fastForEach {
+        if (it.positionChanged()) {
+            it.consumeAllChanges()
+        }
+    }
+}
 
 /**
  * Enable zooming of the modified UI element.

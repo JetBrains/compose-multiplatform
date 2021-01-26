@@ -528,32 +528,6 @@ package androidx.compose.ui.gesture {
     method public static androidx.compose.ui.Modifier rawPressStartGestureFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onPressStart, optional boolean enabled, optional androidx.compose.ui.input.pointer.PointerEventPass executionPass);
   }
 
-  public final class RawScaleGestureFilterKt {
-    method public static androidx.compose.ui.Modifier rawScaleGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.RawScaleObserver scaleObserver, optional kotlin.jvm.functions.Function0<java.lang.Boolean>? canStartScaling);
-  }
-
-  public interface RawScaleObserver {
-    method public default void onCancel();
-    method public default float onScale(float scaleFactor);
-    method public default void onStart();
-    method public default void onStop();
-  }
-
-  public final class ScaleGestureFilterKt {
-    method public static androidx.compose.ui.Modifier scaleGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.ScaleObserver scaleObserver);
-  }
-
-  public interface ScaleObserver {
-    method public default void onCancel();
-    method public void onScale(float scaleFactor);
-    method public default void onStart();
-    method public default void onStop();
-  }
-
-  public final class ScaleSlopExceededGestureFilterKt {
-    method public static androidx.compose.ui.Modifier scaleSlopExceededGestureFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function0<kotlin.Unit> onScaleSlopExceeded);
-  }
-
   public final class ScaleUtilKt {
   }
 
