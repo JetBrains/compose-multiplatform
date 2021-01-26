@@ -19,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionReference
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.ambientOf
-import androidx.compose.runtime.emptyContent
 import androidx.compose.ui.platform.Keyboard
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -69,7 +68,7 @@ fun Window(
     resizable: Boolean = true,
     events: WindowEvents = WindowEvents(),
     onDismissRequest: (() -> Unit)? = null,
-    content: @Composable () -> Unit = emptyContent()
+    content: @Composable () -> Unit = { }
 ) = SwingUtilities.invokeLater {
     AppWindow(
         title = title,

@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -661,7 +660,7 @@ class OnGloballyPositionedTest {
 fun DelayedMeasure(
     size: Int,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit = emptyContent()
+    content: @Composable () -> Unit = {}
 ) {
     Layout(content = content, modifier = modifier) { measurables, _ ->
         layout(size, size) {

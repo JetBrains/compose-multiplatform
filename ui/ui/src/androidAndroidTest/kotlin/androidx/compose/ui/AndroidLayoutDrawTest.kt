@@ -41,7 +41,6 @@ import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -534,7 +533,7 @@ class AndroidLayoutDrawTest {
                             assertEquals(childConstraints[0], constraints)
                             layout(0, 0) {}
                         },
-                        content = emptyContent(), modifier = Modifier.layoutId("header")
+                        content = {}, modifier = Modifier.layoutId("header")
                     )
                 }
                 val footer = @Composable {
@@ -543,14 +542,14 @@ class AndroidLayoutDrawTest {
                             assertEquals(childConstraints[1], constraints)
                             layout(0, 0) {}
                         },
-                        content = emptyContent(), modifier = Modifier.layoutId("footer")
+                        content = {}, modifier = Modifier.layoutId("footer")
                     )
                     Layout(
                         measureBlock = { _, constraints ->
                             assertEquals(childConstraints[2], constraints)
                             layout(0, 0) {}
                         },
-                        content = emptyContent(), modifier = Modifier.layoutId("footer")
+                        content = {}, modifier = Modifier.layoutId("footer")
                     )
                 }
 
@@ -1812,7 +1811,7 @@ class AndroidLayoutDrawTest {
             activity.setContent {
                 Layout(
                     content = {
-                        Layout(content = emptyContent()) { _, _ ->
+                        Layout(content = {}) { _, _ ->
                             latch.countDown()
                             layout(model.size, model.size) {}
                         }
@@ -1844,7 +1843,7 @@ class AndroidLayoutDrawTest {
                     content = {
                         Layout(
                             modifier = Modifier.graphicsLayer(),
-                            content = emptyContent()
+                            content = {}
                         ) { _, _ ->
                             latch.countDown()
                             layout(model.size, model.size) {}
@@ -2379,7 +2378,7 @@ class AndroidLayoutDrawTest {
                             }
                             layout(100, 100) {}
                         }
-                        FixedSize(30, content = emptyContent())
+                        FixedSize(30, content = {})
                     }
                 ) { measurables, constraints ->
                     val (first, second) = measurables
@@ -3599,7 +3598,7 @@ fun assertColorsEqual(
 fun AtLeastSize(
     size: Int,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit = emptyContent()
+    content: @Composable () -> Unit = {}
 ) {
     Layout(
         measureBlock = { measurables, constraints ->
@@ -3641,7 +3640,7 @@ fun AtLeastSize(
 fun FixedSize(
     size: Int,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit = emptyContent()
+    content: @Composable () -> Unit = {}
 ) {
     Layout(content = content, modifier = modifier) { measurables, _ ->
         val newConstraints = Constraints.fixed(size, size)

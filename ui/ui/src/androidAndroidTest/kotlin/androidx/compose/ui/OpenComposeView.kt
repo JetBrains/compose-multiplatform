@@ -19,7 +19,6 @@ package androidx.compose.ui
 import android.content.Context
 import android.util.AttributeSet
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.AbstractComposeView
 
@@ -31,7 +30,7 @@ open class OpenComposeView @JvmOverloads constructor(
 ) : AbstractComposeView(context, attrs, defStyleAttr) {
 
     @Suppress("RemoveExplicitTypeArguments")
-    private val content = mutableStateOf<@Composable () -> Unit>(emptyContent())
+    private val content = mutableStateOf<@Composable () -> Unit>({})
 
     @Composable
     override fun Content() {

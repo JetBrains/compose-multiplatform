@@ -31,7 +31,6 @@ import androidx.compose.runtime.CompositionReference
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -161,7 +160,7 @@ private class DialogLayout(
     override val window: Window
 ) : AbstractComposeView(context), DialogWindowProvider {
 
-    private var content: @Composable () -> Unit by mutableStateOf(emptyContent())
+    private var content: @Composable () -> Unit by mutableStateOf({})
 
     protected override var shouldCreateCompositionOnAttachedToWindow: Boolean = false
         private set

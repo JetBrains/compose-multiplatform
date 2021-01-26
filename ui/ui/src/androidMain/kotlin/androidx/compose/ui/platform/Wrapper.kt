@@ -31,7 +31,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.currentComposer
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.tooling.InspectionTables
 import androidx.compose.ui.R
 import androidx.compose.ui.node.LayoutNode
@@ -166,7 +165,7 @@ private class WrappedComposition(
 
     private var disposed = false
     private var addedToLifecycle: Lifecycle? = null
-    private var lastContent: @Composable () -> Unit = emptyContent()
+    private var lastContent: @Composable () -> Unit = {}
 
     @OptIn(InternalComposeApi::class)
     override fun setContent(content: @Composable () -> Unit) {
