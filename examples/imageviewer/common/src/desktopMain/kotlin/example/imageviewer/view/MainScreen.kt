@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
@@ -21,6 +22,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -56,10 +58,36 @@ import example.imageviewer.utils.toByteArray
 
 @Composable
 fun setMainScreen(content: ContentState) {
-    check(content.isContentReady())
-    Column {
-        setTopContent(content)
-        setScrollableArea(content)
+    if (content.isContentReady()) {
+        Column {
+            setTopContent(content)
+            setScrollableArea(content)
+        }
+    } else {
+        setLoadingScreen(content)
+    }
+}
+
+@Composable
+private fun setLoadingScreen(content: ContentState) {
+    Box {
+        Column {
+            setTopContent(content)
+        }
+        Box(modifier = Modifier.align(Alignment.Center)) {
+            Surface(color = DarkGray, elevation = 4.dp, shape = CircleShape) {
+                CircularProgressIndicator(
+                    modifier = Modifier.preferredSize(50.dp).padding(3.dp, 3.dp, 4.dp, 4.dp),
+                    color = DarkGreen
+                )
+            }
+        }
+        Text(
+            text = ResString.loading,
+            modifier = Modifier.align(Alignment.Center).offset(0.dp, 70.dp),
+            style = MaterialTheme.typography.body1,
+            color = Foreground
+        )
     }
 }
 

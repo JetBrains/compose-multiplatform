@@ -27,7 +27,7 @@ object ContentState {
         }
         this.uriRepository = uriRepository
         repository = ImageRepository(uriRepository)
-        isAppUIReady.value = false
+        isContentReady.value = false
 
         initData()
 
@@ -36,9 +36,14 @@ object ContentState {
 
     private val executor: ExecutorService by lazy { Executors.newFixedThreadPool(2) }
 
-    private val isAppUIReady = mutableStateOf(false)
+    private val isAppReady = mutableStateOf(false)
+    fun isAppReady(): Boolean {
+        return isAppReady.value
+    }
+
+    private val isContentReady = mutableStateOf(false)
     fun isContentReady(): Boolean {
-        return isAppUIReady.value
+        return isContentReady.value
     }
 
     // drawable content
@@ -124,7 +129,7 @@ object ContentState {
 
     // application content initialization
     private fun initData() {
-        if (isAppUIReady.value)
+        if (isContentReady.value)
             return
 
         val directory = File(cacheImagePath)
@@ -142,7 +147,7 @@ object ContentState {
                             showPopUpMessage(
                                 ResString.repoInvalid
                             )
-                            isAppUIReady.value = true
+                            onContentReady()
                         }
                         return@execute
                     }
@@ -154,7 +159,7 @@ object ContentState {
                             showPopUpMessage(
                                 ResString.repoEmpty
                             )
-                            isAppUIReady.value = true
+                            onContentReady()
                         }
                     } else {
                         val picture = loadFullImage(imageList[0])
@@ -168,7 +173,7 @@ object ContentState {
                                 appliedFilters.add(mainImageWrapper.getFilters())
                                 currentImageIndex.value = mainImageWrapper.getId()
                             }
-                            isAppUIReady.value = true
+                            onContentReady()
                         }
                     }
                 } else {
@@ -176,7 +181,7 @@ object ContentState {
                         showPopUpMessage(
                             ResString.noInternet
                         )
-                        isAppUIReady.value = true
+                        onContentReady()
                     }
                 }
             } catch (e: Exception) {
@@ -191,7 +196,7 @@ object ContentState {
     }
 
     fun fullscreen(picture: Picture) {
-        isAppUIReady.value = false
+        isContentReady.value = false
         AppState.screenState(ScreenType.FullscreenImage)
         setMainImage(picture)
     }
@@ -199,7 +204,7 @@ object ContentState {
     fun setMainImage(picture: Picture) {
         if (mainImageWrapper.getId() == picture.id) {
             if (!isContentReady()) {
-                isAppUIReady.value = true
+                onContentReady()
             }
             return
         }
@@ -211,7 +216,7 @@ object ContentState {
                     val fullSizePicture = loadFullImage(picture.source)
                     fullSizePicture.id = picture.id
                     wrapPictureIntoMainImage(fullSizePicture)
-                    isAppUIReady.value = true
+                    onContentReady()
                 }
             } else {
                 invokeLater {
@@ -219,10 +224,15 @@ object ContentState {
                         "${ResString.noInternet}\n${ResString.loadImageUnavailable}"
                     )
                     wrapPictureIntoMainImage(picture)
-                    isAppUIReady.value = true
+                    onContentReady()
                 }
             }
         }
+    }
+
+    private fun onContentReady() {
+        isContentReady.value = true
+        isAppReady.value = true
     }
 
     private fun wrapPictureIntoMainImage(picture: Picture) {
@@ -258,7 +268,7 @@ object ContentState {
                 invokeLater {
                     clearCache()
                     miniatures.clear()
-                    isAppUIReady.value = false
+                    isContentReady.value = false
                     initData()
                 }
             } else {
