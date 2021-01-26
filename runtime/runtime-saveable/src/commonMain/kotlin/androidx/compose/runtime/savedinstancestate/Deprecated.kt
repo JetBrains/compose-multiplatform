@@ -14,9 +14,13 @@
  * limitations under the License.
  */
 
-@file:Suppress("DeprecatedCallableAddReplaceWith", "UNUSED_PARAMETER", "DEPRECATION_ERROR")
+@file:Suppress(
+    "DeprecatedCallableAddReplaceWith", "UNUSED_PARAMETER", "DEPRECATION_ERROR", "DEPRECATION"
+)
 
 package androidx.compose.runtime.savedinstancestate
+
+import androidx.compose.runtime.Composable
 
 @Deprecated(
     "It was moved to androidx.compose.runtime.saveable package",
@@ -75,3 +79,32 @@ interface SaverScope : androidx.compose.runtime.saveable.SaverScope
 fun <T> autoSaver(): Saver<T, Any> = throw IllegalStateException(
     "This method was moved to androidx.compose.runtime.saveable package"
 )
+
+@Deprecated("This annotation is going to be removed")
+annotation class ExperimentalRestorableStateHolder
+
+@Deprecated(
+    "It was renamed to SaveableStateHolder and moved to androidx.compose.runtime.saveable package",
+    ReplaceWith(
+        "SaveableStateHolder",
+        "androidx.compose.runtime.saveable.SaveableStateHolder"
+    ),
+    level = DeprecationLevel.ERROR
+)
+interface RestorableStateHolder<T : Any> :
+    androidx.compose.runtime.saveable.SaveableStateHolder
+
+@Deprecated(
+    "It was renamed to moved to androidx.compose.runtime.saveable package",
+    ReplaceWith(
+        "rememberSaveableStateHolder()",
+        "androidx.compose.runtime.saveable.rememberSaveableStateHolder"
+    ),
+    level = DeprecationLevel.ERROR
+)
+@Suppress("DocumentExceptions")
+@Composable
+fun <T : Any> rememberRestorableStateHolder(): RestorableStateHolder<T> =
+    throw IllegalStateException(
+        "This method is deprecated and moved to androidx.compose.runtime.saveable package"
+    )

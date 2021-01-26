@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.runtime.savedinstancestate
+package androidx.compose.runtime.saveable
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -22,13 +22,9 @@ import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.Saver
-
-@RequiresOptIn(
-    "This is an experimental API. This means that the API is not yet stable and can be" +
-        "changed before being promoted to stable."
-)
-annotation class ExperimentalRestorableStateHolder
+import androidx.compose.runtime.savedinstancestate.AmbientUiSavedStateRegistry
+import androidx.compose.runtime.savedinstancestate.UiSavedStateRegistry
+import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 
 /**
  * Allows to save the state defined with [savedInstanceState] and [rememberSavedInstanceState]
@@ -36,17 +32,13 @@ annotation class ExperimentalRestorableStateHolder
  * restored state. It allows different navigation patterns to keep the ui state like scroll
  * position for the currently not composed screens from the backstack.
  *
- * @sample androidx.compose.runtime.savedinstancestate.samples.SimpleNavigationWithRestorableStateSample
+ * @sample androidx.compose.runtime.saveable.samples.SimpleNavigationWithSaveableStateSample
  *
- * The content should be composed using [RestorableStateProvider] while providing a key representing
- * this content. Next time [RestorableStateProvider] will be used with the same key its state will be
+ * The content should be composed using [SaveableStateProvider] while providing a key representing
+ * this content. Next time [SaveableStateProvider] will be used with the same key its state will be
  * restored.
- *
- * @param T type of the keys. Note that on Android you can only use types which can be stored
- * inside the Bundle.
  */
-@ExperimentalRestorableStateHolder
-interface RestorableStateHolder<T : Any> {
+interface SaveableStateHolder {
     /**
      * Put your content associated with a [key] inside the [content]. This will automatically
      * save all the states defined with [savedInstanceState] and [rememberSavedInstanceState]
@@ -57,41 +49,36 @@ interface RestorableStateHolder<T : Any> {
      * Android you can only use types which can be stored inside the Bundle.
      */
     @Composable
-    fun RestorableStateProvider(key: T, content: @Composable () -> Unit)
+    fun SaveableStateProvider(key: Any, content: @Composable () -> Unit)
 
     /**
      * Removes the saved state associated with the passed [key].
      */
-    fun removeState(key: T)
+    fun removeState(key: Any)
 }
 
 /**
- * Creates and remembers the instance of [RestorableStateHolder].
- *
- * @param T type of the keys. Note that on Android you can only use types which can be stored
- * inside the Bundle.
+ * Creates and remembers the instance of [SaveableStateHolder].
  */
-@ExperimentalRestorableStateHolder
 @Composable
-fun <T : Any> rememberRestorableStateHolder(): RestorableStateHolder<T> =
+fun rememberSaveableStateHolder(): SaveableStateHolder =
     rememberSavedInstanceState(
-        saver = RestorableStateHolderImpl.Saver()
+        saver = SaveableStateHolderImpl.Saver
     ) {
-        RestorableStateHolderImpl<T>()
+        SaveableStateHolderImpl()
     }.apply {
         parentSavedStateRegistry = AmbientUiSavedStateRegistry.current
     }
 
-@ExperimentalRestorableStateHolder
-private class RestorableStateHolderImpl<T : Any>(
-    private val savedStates: MutableMap<T, Map<String, List<Any?>>> = mutableMapOf()
-) : RestorableStateHolder<T> {
-    private val registryHolders = mutableMapOf<T, RegistryHolder>()
+private class SaveableStateHolderImpl(
+    private val savedStates: MutableMap<Any, Map<String, List<Any?>>> = mutableMapOf()
+) : SaveableStateHolder {
+    private val registryHolders = mutableMapOf<Any, RegistryHolder>()
     var parentSavedStateRegistry: UiSavedStateRegistry? = null
 
     @OptIn(ExperimentalComposeApi::class)
     @Composable
-    override fun RestorableStateProvider(key: T, content: @Composable () -> Unit) {
+    override fun SaveableStateProvider(key: Any, content: @Composable () -> Unit) {
         key(key) {
             val registryHolder = remember {
                 require(parentSavedStateRegistry?.canBeSaved(key) ?: true) {
@@ -116,13 +103,13 @@ private class RestorableStateHolderImpl<T : Any>(
         }
     }
 
-    private fun saveAll(): MutableMap<T, Map<String, List<Any?>>> {
+    private fun saveAll(): MutableMap<Any, Map<String, List<Any?>>> {
         val map = savedStates.toMutableMap()
         registryHolders.values.forEach { it.saveTo(map) }
         return map
     }
 
-    override fun removeState(key: T) {
+    override fun removeState(key: Any) {
         val registryHolder = registryHolders[key]
         if (registryHolder != null) {
             registryHolder.shouldSave = false
@@ -132,14 +119,14 @@ private class RestorableStateHolderImpl<T : Any>(
     }
 
     inner class RegistryHolder constructor(
-        val key: T
+        val key: Any
     ) {
         var shouldSave = true
         val registry: UiSavedStateRegistry = UiSavedStateRegistry(savedStates[key]) {
             parentSavedStateRegistry?.canBeSaved(it) ?: true
         }
 
-        fun saveTo(map: MutableMap<T, Map<String, List<Any?>>>) {
+        fun saveTo(map: MutableMap<Any, Map<String, List<Any?>>>) {
             if (shouldSave) {
                 map[key] = registry.performSave()
             }
@@ -147,12 +134,9 @@ private class RestorableStateHolderImpl<T : Any>(
     }
 
     companion object {
-        private val Saver: Saver<RestorableStateHolderImpl<Any>, *> = Saver(
+        val Saver: Saver<SaveableStateHolderImpl, *> = Saver(
             save = { it.saveAll() },
-            restore = { RestorableStateHolderImpl(it) }
+            restore = { SaveableStateHolderImpl(it) }
         )
-
-        @Suppress("UNCHECKED_CAST")
-        fun <T : Any> Saver() = Saver as Saver<RestorableStateHolderImpl<T>, *>
     }
 }

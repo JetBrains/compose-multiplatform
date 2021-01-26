@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package androidx.compose.runtime.savedinstancestate
+package androidx.compose.runtime.saveable
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -29,10 +30,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@OptIn(ExperimentalRestorableStateHolder::class)
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-class RestorableStateHolderTest {
+class SaveableStateHolderTest {
 
     @get:Rule
     val rule = createComposeRule()
@@ -46,8 +46,8 @@ class RestorableStateHolderTest {
         var numberOnScreen1 = -1
         var restorableNumberOnScreen1 = -1
         restorationTester.setContent {
-            val holder = rememberRestorableStateHolder<Screens>()
-            holder.RestorableStateProvider(screen) {
+            val holder = rememberSaveableStateHolder()
+            holder.SaveableStateProvider(screen) {
                 if (screen == Screens.Screen1) {
                     numberOnScreen1 = remember { increment++ }
                     restorableNumberOnScreen1 = rememberSavedInstanceState { increment++ }
@@ -84,8 +84,8 @@ class RestorableStateHolderTest {
         var number = -1
         var restorableNumber = -1
         restorationTester.setContent {
-            val holder = rememberRestorableStateHolder<Screens>()
-            holder.RestorableStateProvider(Screens.Screen1) {
+            val holder = rememberSaveableStateHolder()
+            holder.SaveableStateProvider(Screens.Screen1) {
                 number = remember { increment++ }
                 restorableNumber = rememberSavedInstanceState { increment++ }
             }
@@ -113,8 +113,8 @@ class RestorableStateHolderTest {
         var numberOnScreen2 = -1
         var restorableNumberOnScreen2 = -1
         restorationTester.setContent {
-            val holder = rememberRestorableStateHolder<Screens>()
-            holder.RestorableStateProvider(screen) {
+            val holder = rememberSaveableStateHolder()
+            holder.SaveableStateProvider(screen) {
                 if (screen == Screens.Screen2) {
                     numberOnScreen2 = remember { increment++ }
                     restorableNumberOnScreen2 = rememberSavedInstanceState { increment++ }
@@ -149,8 +149,8 @@ class RestorableStateHolderTest {
         var numberOnScreen1 = -1
         var restorableNumberOnScreen1 = -1
         restorationTester.setContent {
-            val holder = rememberRestorableStateHolder<Screens>()
-            holder.RestorableStateProvider(screen) {
+            val holder = rememberSaveableStateHolder()
+            holder.SaveableStateProvider(screen) {
                 if (screen == Screens.Screen1) {
                     numberOnScreen1 = remember { increment++ }
                     restorableNumberOnScreen1 = rememberSavedInstanceState { increment++ }
@@ -190,12 +190,12 @@ class RestorableStateHolderTest {
     fun weCanSkipSavingForCurrentScreen() {
         var increment = 0
         var screen by mutableStateOf(Screens.Screen1)
-        var restorableStateHolder: RestorableStateHolder<Screens>? = null
+        var restorableStateHolder: SaveableStateHolder? = null
         var restorableNumberOnScreen1 = -1
         restorationTester.setContent {
-            val holder = rememberRestorableStateHolder<Screens>()
+            val holder = rememberSaveableStateHolder()
             restorableStateHolder = holder
-            holder.RestorableStateProvider(screen) {
+            holder.SaveableStateProvider(screen) {
                 if (screen == Screens.Screen1) {
                     restorableNumberOnScreen1 = rememberSavedInstanceState { increment++ }
                 } else {
@@ -226,12 +226,12 @@ class RestorableStateHolderTest {
     fun weCanRemoveAlreadySavedState() {
         var increment = 0
         var screen by mutableStateOf(Screens.Screen1)
-        var restorableStateHolder: RestorableStateHolder<Screens>? = null
+        var restorableStateHolder: SaveableStateHolder? = null
         var restorableNumberOnScreen1 = -1
         restorationTester.setContent {
-            val holder = rememberRestorableStateHolder<Screens>()
+            val holder = rememberSaveableStateHolder()
             restorableStateHolder = holder
-            holder.RestorableStateProvider(screen) {
+            holder.SaveableStateProvider(screen) {
                 if (screen == Screens.Screen1) {
                     restorableNumberOnScreen1 = rememberSavedInstanceState { increment++ }
                 } else {
