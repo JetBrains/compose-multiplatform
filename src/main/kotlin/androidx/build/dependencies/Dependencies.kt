@@ -76,8 +76,8 @@ const val KOTLINPOET_METADATA = "com.squareup:kotlinpoet-metadata:1.4.0"
 const val KOTLINPOET_METADATA_SPECS = "com.squareup:kotlinpoet-metadata-specs:1.4.0"
 const val KOTLINPOET_CLASSINSPECTOR_ELEMENTS =
     "com.squareup:kotlinpoet-classinspector-elements:1.4.0"
-const val KOTLIN_COMPILE_TESTING = "com.github.tschuchortdev:kotlin-compile-testing:1.3.4"
-const val KOTLIN_COMPILE_TESTING_KSP = "com.github.tschuchortdev:kotlin-compile-testing-ksp:1.3.4"
+const val KOTLIN_COMPILE_TESTING = "com.github.tschuchortdev:kotlin-compile-testing:1.3.5"
+const val KOTLIN_COMPILE_TESTING_KSP = "com.github.tschuchortdev:kotlin-compile-testing-ksp:1.3.5"
 
 /**
  * KSP is used both as a plugin and runtime dependency, hence its version is declared in the
