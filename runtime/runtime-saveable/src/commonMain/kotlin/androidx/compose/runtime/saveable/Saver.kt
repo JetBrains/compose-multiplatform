@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.runtime.savedinstancestate
+package androidx.compose.runtime.saveable
 
 /**
  * The [Saver] describes how the object of [Original] class can be simplified and converted into
@@ -27,7 +27,7 @@ package androidx.compose.runtime.savedinstancestate
  * You can pass the implementations of this class as a parameter for [savedInstanceState] or
  * [rememberSavedInstanceState].
  *
- * @sample androidx.compose.runtime.savedinstancestate.samples.CustomSaverSample
+ * @sample androidx.compose.runtime.saveable.samples.CustomSaverSample
  */
 interface Saver<Original, Saveable : Any> {
     /**
@@ -53,7 +53,7 @@ interface Saver<Original, Saveable : Any> {
  * You can pass the implementations of this class as a parameter for [savedInstanceState] or
  * [rememberSavedInstanceState].
  *
- * @sample androidx.compose.runtime.savedinstancestate.samples.CustomSaverSample
+ * @sample androidx.compose.runtime.saveable.samples.CustomSaverSample
  *
  * @param save Defines how to convert the value into a saveable one. If null is returned the
  * value will not be saved.
@@ -76,7 +76,7 @@ fun <Original, Saveable : Any> Saver(
  *
  * @see Saver
  */
-interface SaverScope {
+fun interface SaverScope {
     /**
      * What types can be saved is defined by [UiSavedStateRegistry], by default everything which can
      * be stored in the Bundle class can be saved.

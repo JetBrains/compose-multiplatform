@@ -42,8 +42,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.savedinstancestate.Saver
-import androidx.compose.runtime.savedinstancestate.listSaver
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView

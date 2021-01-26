@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.runtime.savedinstancestate
+package androidx.compose.runtime.saveable
 
 /**
  * The [Saver] implementation which allows to represent your [Original] class as a list of
@@ -25,7 +25,7 @@ package androidx.compose.runtime.savedinstancestate
  *
  * You can use it as a parameter for [savedInstanceState] or [rememberSavedInstanceState].
  *
- * @sample androidx.compose.runtime.savedinstancestate.samples.ListSaverSample
+ * @sample androidx.compose.runtime.saveable.samples.ListSaverSample
  */
 fun <Original : Any, Saveable : Any> listSaver(
     save: SaverScope.(value: Original) -> List<Saveable>,

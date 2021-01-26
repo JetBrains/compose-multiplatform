@@ -16,6 +16,8 @@
 
 package androidx.compose.runtime.savedinstancestate
 
+import androidx.compose.runtime.saveable.Saver
+
 internal data class Holder(var value: Int)
 
 internal val HolderSaver = Saver<Holder, Int>(

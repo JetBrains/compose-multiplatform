@@ -22,6 +22,9 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.currentCompositeKeyHash
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.SaverScope
+import androidx.compose.runtime.saveable.autoSaver
 
 /**
  * Remember the value produced by [init].
@@ -40,7 +43,7 @@ import androidx.compose.runtime.remember
  * restored automatically using [autoSaver], otherwise you will need to provide a custom [Saver]
  * implementation via the [saver] param.
  *
- * @sample androidx.compose.runtime.savedinstancestate.samples.CustomSaverSample
+ * @sample androidx.compose.runtime.saveable.samples.CustomSaverSample
  *
  * @param inputs A set of inputs such that, when any of them have changed, will cause the state to
  * reset and [init] to be rerun

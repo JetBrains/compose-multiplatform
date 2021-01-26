@@ -33,7 +33,7 @@ import androidx.compose.material.SwipeableDefaults.StandardResistanceFactor
 import androidx.compose.material.SwipeableDefaults.StiffResistanceFactor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.Saver
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation

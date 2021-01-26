@@ -21,6 +21,8 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.SnapshotMutationPolicy
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.structuralEqualityPolicy
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.autoSaver
 
 /**
  * Used to introduce a state value of type [T] into a composition.
@@ -39,7 +41,7 @@ import androidx.compose.runtime.structuralEqualityPolicy
  * restored automatically using [autoSaver], otherwise you will need to provide a custom [Saver]
  * implementation via the [saver] param.
  *
- * @sample androidx.compose.runtime.savedinstancestate.samples.CustomSaverSample
+ * @sample androidx.compose.runtime.saveable.samples.CustomSaverSample
  *
  * @param inputs A set of inputs such that, when any of them have changed, will cause the state to
  * reset and [init] to be rerun

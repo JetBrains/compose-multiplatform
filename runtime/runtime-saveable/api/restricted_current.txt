@@ -1,19 +1,44 @@
 // Signature format: 4.0
+package androidx.compose.runtime.saveable {
+
+  public final class ListSaverKt {
+    method public static <Original, Saveable> androidx.compose.runtime.saveable.Saver<Original,java.lang.Object> listSaver(kotlin.jvm.functions.Function2<? super androidx.compose.runtime.saveable.SaverScope,? super Original,? extends java.util.List<? extends Saveable>> save, kotlin.jvm.functions.Function1<? super java.util.List<? extends Saveable>,? extends Original> restore);
+  }
+
+  public final class MapSaverKt {
+    method public static <T> androidx.compose.runtime.saveable.Saver<T,java.lang.Object> mapSaver(kotlin.jvm.functions.Function2<? super androidx.compose.runtime.saveable.SaverScope,? super T,? extends java.util.Map<java.lang.String,?>> save, kotlin.jvm.functions.Function1<? super java.util.Map<java.lang.String,?>,? extends T> restore);
+  }
+
+  public interface Saver<Original, Saveable> {
+    method public Original? restore(Saveable value);
+    method public Saveable? save(androidx.compose.runtime.saveable.SaverScope, Original? value);
+  }
+
+  public final class SaverKt {
+    method public static <Original, Saveable> androidx.compose.runtime.saveable.Saver<Original,Saveable> Saver(kotlin.jvm.functions.Function2<? super androidx.compose.runtime.saveable.SaverScope,? super Original,? extends Saveable> save, kotlin.jvm.functions.Function1<? super Saveable,? extends Original> restore);
+    method public static <T> androidx.compose.runtime.saveable.Saver<T,java.lang.Object> autoSaver();
+  }
+
+  public fun interface SaverScope {
+    method public boolean canBeSaved(Object value);
+  }
+
+}
+
 package androidx.compose.runtime.savedinstancestate {
+
+  public final class DeprecatedKt {
+    method @Deprecated public static <Original, Saveable> androidx.compose.runtime.savedinstancestate.Saver<Original,Saveable> Saver(kotlin.jvm.functions.Function2<? super androidx.compose.runtime.savedinstancestate.SaverScope,? super Original,? extends Saveable> save, kotlin.jvm.functions.Function1<? super Saveable,? extends Original> restore);
+    method @Deprecated public static <T> androidx.compose.runtime.savedinstancestate.Saver<T,java.lang.Object> autoSaver();
+    method @Deprecated public static <Original, Saveable> androidx.compose.runtime.savedinstancestate.Saver<Original,?> listSaver(kotlin.jvm.functions.Function2<? super androidx.compose.runtime.savedinstancestate.SaverScope,? super Original,? extends java.util.List<? extends Saveable>> save, kotlin.jvm.functions.Function1<? super java.util.List<? extends Saveable>,? extends Original> restore);
+    method @Deprecated public static <T> androidx.compose.runtime.savedinstancestate.Saver<T,?> mapSaver(kotlin.jvm.functions.Function2<? super androidx.compose.runtime.savedinstancestate.SaverScope,? super T,? extends java.util.Map<java.lang.String,?>> save, kotlin.jvm.functions.Function1<? super java.util.Map<java.lang.String,?>,? extends T> restore);
+  }
 
   @kotlin.RequiresOptIn(message="This is an experimental API. This means that the API is not yet stable and can be" + "changed before being promoted to stable.") public @interface ExperimentalRestorableStateHolder {
   }
 
-  public final class ListSaverKt {
-    method public static <Original, Saveable> androidx.compose.runtime.savedinstancestate.Saver<Original,java.lang.Object> listSaver(kotlin.jvm.functions.Function2<? super androidx.compose.runtime.savedinstancestate.SaverScope,? super Original,? extends java.util.List<? extends Saveable>> save, kotlin.jvm.functions.Function1<? super java.util.List<? extends Saveable>,? extends Original> restore);
-  }
-
-  public final class MapSaverKt {
-    method public static <T> androidx.compose.runtime.savedinstancestate.Saver<T,java.lang.Object> mapSaver(kotlin.jvm.functions.Function2<? super androidx.compose.runtime.savedinstancestate.SaverScope,? super T,? extends java.util.Map<java.lang.String,?>> save, kotlin.jvm.functions.Function1<? super java.util.Map<java.lang.String,?>,? extends T> restore);
-  }
-
   public final class RememberSavedInstanceStateKt {
-    method @androidx.compose.runtime.Composable public static <T> T rememberSavedInstanceState(Object![]? inputs, optional androidx.compose.runtime.savedinstancestate.Saver<T,?> saver, optional String? key, kotlin.jvm.functions.Function0<? extends T> init);
+    method @androidx.compose.runtime.Composable public static <T> T rememberSavedInstanceState(Object![]? inputs, optional androidx.compose.runtime.saveable.Saver<T,?> saver, optional String? key, kotlin.jvm.functions.Function0<? extends T> init);
   }
 
   @androidx.compose.runtime.savedinstancestate.ExperimentalRestorableStateHolder public interface RestorableStateHolder<T> {
@@ -26,21 +51,13 @@ package androidx.compose.runtime.savedinstancestate {
   }
 
   public final class SavedInstanceStateKt {
-    method @androidx.compose.runtime.Composable public static <T> androidx.compose.runtime.MutableState<T> savedInstanceState(Object![]? inputs, optional androidx.compose.runtime.savedinstancestate.Saver<T,?> saver, optional String? key, optional androidx.compose.runtime.SnapshotMutationPolicy<T> policy, kotlin.jvm.functions.Function0<? extends T> init);
+    method @androidx.compose.runtime.Composable public static <T> androidx.compose.runtime.MutableState<T> savedInstanceState(Object![]? inputs, optional androidx.compose.runtime.saveable.Saver<T,?> saver, optional String? key, optional androidx.compose.runtime.SnapshotMutationPolicy<T> policy, kotlin.jvm.functions.Function0<? extends T> init);
   }
 
-  public interface Saver<Original, Saveable> {
-    method public Original? restore(Saveable value);
-    method public Saveable? save(androidx.compose.runtime.savedinstancestate.SaverScope, Original? value);
+  @Deprecated public interface Saver<Original, Saveable> extends androidx.compose.runtime.saveable.Saver<Original,Saveable> {
   }
 
-  public final class SaverKt {
-    method public static <Original, Saveable> androidx.compose.runtime.savedinstancestate.Saver<Original,Saveable> Saver(kotlin.jvm.functions.Function2<? super androidx.compose.runtime.savedinstancestate.SaverScope,? super Original,? extends Saveable> save, kotlin.jvm.functions.Function1<? super Saveable,? extends Original> restore);
-    method public static <T> androidx.compose.runtime.savedinstancestate.Saver<T,java.lang.Object> autoSaver();
-  }
-
-  public interface SaverScope {
-    method public boolean canBeSaved(Object value);
+  @Deprecated public interface SaverScope extends androidx.compose.runtime.saveable.SaverScope {
   }
 
   public interface UiSavedStateRegistry {

@@ -33,7 +33,7 @@ import androidx.compose.foundation.layout.preferredSizeIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.Saver
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.nestedscroll.nestedScroll

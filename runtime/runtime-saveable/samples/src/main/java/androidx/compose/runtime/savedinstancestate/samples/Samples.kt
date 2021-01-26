@@ -21,9 +21,6 @@ package androidx.compose.runtime.savedinstancestate.samples
 import androidx.annotation.Sampled
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.savedinstancestate.Saver
-import androidx.compose.runtime.savedinstancestate.listSaver
-import androidx.compose.runtime.savedinstancestate.mapSaver
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.runtime.setValue
@@ -38,43 +35,4 @@ fun SavedInstanceStateSample() {
 @Composable
 fun RememberSavedInstanceStateSample() {
     val list = rememberSavedInstanceState { mutableListOf<Int>() }
-}
-
-@Sampled
-@Composable
-fun CustomSaverSample() {
-    data class Holder(var value: Int)
-
-    // this Saver implementation converts Holder object which we don't know how to save
-    // to Int which we can save
-    val HolderSaver = Saver<Holder, Int>(
-        save = { it.value },
-        restore = { Holder(it) }
-    )
-}
-
-@Sampled
-@Composable
-fun ListSaverSample() {
-    data class Size(val x: Int, val y: Int)
-
-    val sizeSaver = listSaver<Size, Int>(
-        save = { listOf(it.x, it.y) },
-        restore = { Size(it[0], it[1]) }
-    )
-}
-
-@Sampled
-@Composable
-fun MapSaverSample() {
-    data class User(val name: String, val age: Int)
-
-    val userSaver = run {
-        val nameKey = "Name"
-        val ageKey = "Age"
-        mapSaver(
-            save = { mapOf(nameKey to it.name, ageKey to it.age) },
-            restore = { User(it[nameKey] as String, it[ageKey] as Int) }
-        )
-    }
 }
