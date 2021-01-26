@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.text.input
 
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.findFollowingBreak
 import androidx.compose.ui.text.findPrecedingBreak
@@ -40,15 +41,28 @@ interface EditCommand {
  */
 class CommitTextCommand(
     /**
-     * The text to commit. We ignore any styles in the original API.
+     * The text to commit.
      */
-    val text: String,
+    val annotatedString: AnnotatedString,
 
     /**
      * The cursor position after inserted text.
      */
     val newCursorPosition: Int
 ) : EditCommand {
+
+    constructor(
+        /**
+         * The text to commit. We ignore any styles in the original API.
+         */
+        text: String,
+        /**
+         * The cursor position after setting composing text.
+         */
+        newCursorPosition: Int
+    ) : this(AnnotatedString(text), newCursorPosition)
+
+    val text: String get() = annotatedString.text
 
     override fun applyTo(buffer: EditingBuffer) {
         // API description says replace ongoing composition text if there. Then, if there is no
@@ -162,12 +176,25 @@ class SetComposingTextCommand(
     /**
      * The composing text.
      */
-    val text: String,
+    val annotatedString: AnnotatedString,
     /**
      * The cursor position after setting composing text.
      */
     val newCursorPosition: Int
 ) : EditCommand {
+
+    constructor(
+        /**
+         * The composing text.
+         */
+        text: String,
+        /**
+         * The cursor position after setting composing text.
+         */
+        newCursorPosition: Int
+    ) : this(AnnotatedString(text), newCursorPosition)
+
+    val text: String get() = annotatedString.text
 
     override fun applyTo(buffer: EditingBuffer) {
         if (buffer.hasComposition()) {
