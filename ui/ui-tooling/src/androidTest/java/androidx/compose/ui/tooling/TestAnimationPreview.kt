@@ -73,7 +73,7 @@ private fun CheckBox() {
     }
 
     Surface(
-        shape = MaterialTheme.shapes.large.copy(topLeft = CornerSize(checkBoxCorner)),
+        shape = MaterialTheme.shapes.large.copy(topStart = CornerSize(checkBoxCorner)),
         modifier = Modifier.toggleable(value = selected, onValueChange = onSelected)
     ) {
         Icon(imageVector = Icons.Filled.Done, contentDescription = null)
