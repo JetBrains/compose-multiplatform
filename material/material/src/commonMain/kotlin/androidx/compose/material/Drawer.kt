@@ -333,7 +333,7 @@ fun rememberBottomDrawerState(
  * drawer sheet
  * @param drawerBackgroundColor background color to be used for the drawer sheet
  * @param drawerContentColor color of the content to use inside the drawer sheet. Defaults to
- * either the matching `onFoo` color for [drawerBackgroundColor], or, if it is not a color from
+ * either the matching content color for [drawerBackgroundColor], or, if it is not a color from
  * the theme, this will keep the same value set above this Surface.
  * @param scrimColor color of the scrim that obscures content when the drawer is open
  * @param bodyContent content of the rest of the UI
@@ -443,7 +443,7 @@ fun ModalDrawerLayout(
  * @param drawerContent composable that represents content inside the drawer
  * @param drawerBackgroundColor background color to be used for the drawer sheet
  * @param drawerContentColor color of the content to use inside the drawer sheet. Defaults to
- * either the matching `onFoo` color for [drawerBackgroundColor], or, if it is not a color from
+ * either the matching content color for [drawerBackgroundColor], or, if it is not a color from
  * the theme, this will keep the same value set above this Surface.
  * @param scrimColor color of the scrim that obscures content when the drawer is open
  * @param bodyContent content of the rest of the UI

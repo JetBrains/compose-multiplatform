@@ -76,7 +76,7 @@ import kotlin.math.roundToInt
  * @param modifier optional [Modifier] for this BottomNavigation
  * @param backgroundColor The background color for this BottomNavigation
  * @param contentColor The preferred content color provided by this BottomNavigation to its
- * children. Defaults to either the matching `onFoo` color for [backgroundColor], or if
+ * children. Defaults to either the matching content color for [backgroundColor], or if
  * [backgroundColor] is not a color from the theme, this will keep the same value set above this
  * BottomNavigation.
  * @param elevation elevation for this BottomNavigation

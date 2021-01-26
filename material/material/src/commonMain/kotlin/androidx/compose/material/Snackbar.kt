@@ -66,7 +66,7 @@ import kotlin.math.max
  * @param shape Defines the Snackbar's shape as well as its shadow
  * @param backgroundColor background color of the Snackbar
  * @param contentColor color of the content to use inside the snackbar. Defaults to
- * either the matching `onFoo` color for [backgroundColor], or, if it is not a color from
+ * either the matching content color for [backgroundColor], or, if it is not a color from
  * the theme, this will keep the same value set above this Surface.
  * @param elevation The z-coordinate at which to place the SnackBar. This controls the size
  * of the shadow below the SnackBar
@@ -134,7 +134,7 @@ fun Snackbar(
  * @param shape Defines the Snackbar's shape as well as its shadow
  * @param backgroundColor background color of the Snackbar
  * @param contentColor color of the content to use inside the snackbar. Defaults to
- * either the matching `onFoo` color for [backgroundColor], or, if it is not a color from
+ * either the matching content color for [backgroundColor], or, if it is not a color from
  * the theme, this will keep the same value set above this Surface.
  * @param actionColor color of the action
  * @param elevation The z-coordinate at which to place the SnackBar. This controls the size

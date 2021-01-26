@@ -58,6 +58,7 @@ import kotlin.math.sqrt
  * @sample androidx.compose.material.samples.SimpleTopAppBar
  *
  * @param title The title to be displayed in the center of the TopAppBar
+ * @param modifier The [Modifier] to be applied to this TopAppBar
  * @param navigationIcon The navigation icon displayed at the start of the TopAppBar. This should
  * typically be an [IconButton] or [IconToggleButton].
  * @param actions The actions displayed at the end of the TopAppBar. This should typically be
@@ -65,7 +66,7 @@ import kotlin.math.sqrt
  * @param backgroundColor The background color for the TopAppBar. Use [Color.Transparent] to have
  * no color.
  * @param contentColor The preferred content color provided by this TopAppBar to its children.
- * Defaults to either the matching `onFoo` color for [backgroundColor], or if [backgroundColor]
+ * Defaults to either the matching content color for [backgroundColor], or if [backgroundColor]
  * is not a color from the theme, this will keep the same value set above this TopAppBar.
  * @param elevation the elevation of this TopAppBar.
  */
@@ -118,10 +119,11 @@ fun TopAppBar(
  * This TopAppBar has no pre-defined slots for content, allowing you to customize the layout of
  * content inside.
  *
+ * @param modifier The [Modifier] to be applied to this TopAppBar
  * @param backgroundColor The background color for the TopAppBar. Use [Color.Transparent] to have
  * no color.
  * @param contentColor The preferred content color provided by this TopAppBar to its children.
- * Defaults to either the matching `onFoo` color for [backgroundColor], or if [backgroundColor] is
+ * Defaults to either the matching content color for [backgroundColor], or if [backgroundColor] is
  * not a color from the theme, this will keep the same value set above this TopAppBar.
  * @param elevation the elevation of this TopAppBar.
  * @param content the content of this TopAppBar.The default layout here is a [Row],
@@ -155,10 +157,11 @@ fun TopAppBar(
  *
  * @sample androidx.compose.material.samples.SimpleBottomAppBar
  *
+ * @param modifier The [Modifier] to be applied to this BottomAppBar
  * @param backgroundColor The background color for the BottomAppBar. Use [Color.Transparent] to
  * have no color.
  * @param contentColor The preferred content color provided by this BottomAppBar to its children.
- * Defaults to either the matching `onFoo` color for [backgroundColor], or if [backgroundColor] is
+ * Defaults to either the matching content color for [backgroundColor], or if [backgroundColor] is
  * not a color from the theme, this will keep the same value set above this BottomAppBar.
  * @param cutoutShape the shape of the cutout that will be added to the BottomAppBar - this
  * should typically be the same shape used inside the [FloatingActionButton], when [BottomAppBar]

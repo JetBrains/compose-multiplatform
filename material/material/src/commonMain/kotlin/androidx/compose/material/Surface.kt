@@ -58,7 +58,7 @@ import androidx.compose.ui.unit.dp
  * this surface - this is used by the [Text] and [Icon] components as a default color.
  *
  * If no [contentColor] is set, this surface will try and match its background color to a color
- * defined in the theme [Colors], and return the corresponding `onFoo` color. For example,
+ * defined in the theme [Colors], and return the corresponding content color. For example,
  * if the [color] of this surface is [Colors.surface], [contentColor] will be set to
  * [Colors.onSurface]. If [color] is not part of the theme palette, [contentColor] will keep
  * the same value set above this Surface.
@@ -75,7 +75,7 @@ import androidx.compose.ui.unit.dp
  *  displayed if the [elevation] is greater than zero.
  * @param color The background color. Use [Color.Transparent] to have no color.
  * @param contentColor The preferred content color provided by this Surface to its children.
- * Defaults to either the matching `onFoo` color for [color], or if [color] is not a color from
+ * Defaults to either the matching content color for [color], or if [color] is not a color from
  * the theme, this will keep the same value set above this Surface.
  * @param border Optional border to draw on top of the surface
  * @param elevation The size of the shadow below the surface. Note that It will not affect z index

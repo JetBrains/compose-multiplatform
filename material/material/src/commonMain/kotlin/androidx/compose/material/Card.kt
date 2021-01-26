@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
  *  displayed if the [elevation] is greater than zero.
  * @param backgroundColor The background color.
  * @param contentColor The preferred content color provided by this Surface to its children.
- * Defaults to either the matching `onFoo` color for [backgroundColor], or if [backgroundColor]
+ * Defaults to either the matching content color for [backgroundColor], or if [backgroundColor]
  * is not a color from the theme, this will keep the same value set above this Surface.
  * @param border Optional border to draw on top of the card
  * @param elevation The z-coordinate at which to place this surface. This controls

@@ -213,7 +213,7 @@ fun rememberModalBottomSheetState(
  * @param sheetElevation The elevation of the bottom sheet.
  * @param sheetBackgroundColor The background color of the bottom sheet.
  * @param sheetContentColor The preferred content color provided by the bottom sheet to its
- * children. Defaults to the matching `onFoo` color for [sheetBackgroundColor], or if that is not
+ * children. Defaults to the matching content color for [sheetBackgroundColor], or if that is not
  * a color from the theme, this will keep the same content color set above the bottom sheet.
  * @param scrimColor The color of the scrim that is applied to the rest of the screen when the
  * bottom sheet is visible. If you set this to `Color.Transparent`, then a scrim will no longer be

@@ -256,7 +256,7 @@ fun rememberBottomSheetScaffoldState(
  * @param sheetElevation The elevation of the bottom sheet.
  * @param sheetBackgroundColor The background color of the bottom sheet.
  * @param sheetContentColor The preferred content color provided by the bottom sheet to its
- * children. Defaults to the matching `onFoo` color for [sheetBackgroundColor], or if that is
+ * children. Defaults to the matching content color for [sheetBackgroundColor], or if that is
  * not a color from the theme, this will keep the same content color set above the bottom sheet.
  * @param sheetPeekHeight The height of the bottom sheet when it is collapsed.
  * @param drawerContent The content of the drawer sheet.
@@ -265,7 +265,7 @@ fun rememberBottomSheetScaffoldState(
  * @param drawerElevation The elevation of the drawer sheet.
  * @param drawerBackgroundColor The background color of the drawer sheet.
  * @param drawerContentColor The preferred content color provided by the drawer sheet to its
- * children. Defaults to the matching `onFoo` color for [drawerBackgroundColor], or if that is
+ * children. Defaults to the matching content color for [drawerBackgroundColor], or if that is
  * not a color from the theme, this will keep the same content color set above the drawer sheet.
  * @param drawerScrimColor The color of the scrim that is applied when the drawer is open.
  * @param bodyContent The main content of the screen. You should use the provided [PaddingValues]
