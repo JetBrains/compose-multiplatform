@@ -22,7 +22,6 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
-import androidx.compose.animation.transition
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.background
@@ -266,7 +265,7 @@ object TabDefaults {
 }
 
 /**
- * [transition] defining how the tint color for a tab animates, when a new tab is selected. This
+ * Transition defining how the tint color for a tab animates, when a new tab is selected. This
  * component uses [AmbientContentColor] to provide an interpolated value between [activeColor]
  * and [inactiveColor] depending on the animation status.
  */

@@ -28,6 +28,66 @@ import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 
 /**
+ * [TwoWayConverter] class contains the definition on how to convert from an arbitrary type [T]
+ * to a [AnimationVector], and convert the [AnimationVector] back to the type [T]. This allows
+ * animations to run on any type of objects, e.g. position, rectangle, color, etc.
+ */
+interface TwoWayConverter<T, V : AnimationVector> {
+    /**
+     * Defines how a type [T] should be converted to a Vector type (i.e. [AnimationVector1D],
+     * [AnimationVector2D], [AnimationVector3D] or [AnimationVector4D], depends on the dimensions of
+     * type T).
+     */
+    val convertToVector: (T) -> V
+    /**
+     * Defines how to convert a Vector type (i.e. [AnimationVector1D], [AnimationVector2D],
+     * [AnimationVector3D] or [AnimationVector4D], depends on the dimensions of type T) back to type
+     * [T].
+     */
+    val convertFromVector: (V) -> T
+}
+
+/**
+ * Factory method to create a [TwoWayConverter] that converts a type [T] from and to an
+ * [AnimationVector] type.
+ *
+ * @param convertToVector converts from type [T] to [AnimationVector]
+ * @param convertFromVector converts from [AnimationVector] to type [T]
+ */
+fun <T, V : AnimationVector> TwoWayConverter(
+    convertToVector: (T) -> V,
+    convertFromVector: (V) -> T
+): TwoWayConverter<T, V> = TwoWayConverterImpl(convertToVector, convertFromVector)
+
+/**
+ * Type converter to convert type [T] to and from a [AnimationVector1D].
+ */
+private class TwoWayConverterImpl<T, V : AnimationVector>(
+    override val convertToVector: (T) -> V,
+    override val convertFromVector: (V) -> T
+) : TwoWayConverter<T, V>
+
+internal fun lerp(start: Float, stop: Float, fraction: Float) =
+    (start * (1 - fraction) + stop * fraction)
+
+/**
+ * A [TwoWayConverter] that converts [Float] from and to [AnimationVector1D]
+ */
+val Float.Companion.VectorConverter: TwoWayConverter<Float, AnimationVector1D>
+    get() = FloatToVector
+
+/**
+ * A [TwoWayConverter] that converts [Int] from and to [AnimationVector1D]
+ */
+val Int.Companion.VectorConverter: TwoWayConverter<Int, AnimationVector1D>
+    get() = IntToVector
+
+private val FloatToVector: TwoWayConverter<Float, AnimationVector1D> =
+    TwoWayConverter({ AnimationVector1D(it) }, { it.value })
+
+private val IntToVector: TwoWayConverter<Int, AnimationVector1D> =
+    TwoWayConverter({ AnimationVector1D(it.toFloat()) }, { it.value.toInt() })
+/**
  * A type converter that converts a [Rect] to a [AnimationVector4D], and vice versa.
  */
 val Rect.Companion.VectorConverter: TwoWayConverter<Rect, AnimationVector4D>
