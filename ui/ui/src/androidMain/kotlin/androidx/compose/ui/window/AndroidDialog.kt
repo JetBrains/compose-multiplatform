@@ -66,11 +66,29 @@ import androidx.savedstate.ViewTreeSavedStateRegistryOwner
  * dialog's window.
  */
 @Immutable
-data class AndroidDialogProperties(
+class AndroidDialogProperties(
     val dismissOnBackPress: Boolean = true,
     val dismissOnClickOutside: Boolean = true,
     val securePolicy: SecureFlagPolicy = SecureFlagPolicy.Inherit
-) : DialogProperties
+) : DialogProperties {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is AndroidDialogProperties) return false
+
+        if (dismissOnBackPress != other.dismissOnBackPress) return false
+        if (dismissOnClickOutside != other.dismissOnClickOutside) return false
+        if (securePolicy != other.securePolicy) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = dismissOnBackPress.hashCode()
+        result = 31 * result + dismissOnClickOutside.hashCode()
+        result = 31 * result + securePolicy.hashCode()
+        return result
+    }
+}
 
 /**
  * Opens a dialog with the given content.
