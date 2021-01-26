@@ -495,7 +495,7 @@ object BackdropScaffoldDefaults {
     val frontLayerShape: Shape
         @Composable
         get() = MaterialTheme.shapes.large
-            .copy(topLeft = CornerSize(16.dp), topRight = CornerSize(16.dp))
+            .copy(topStart = CornerSize(16.dp), topEnd = CornerSize(16.dp))
 
     /**
      * The default elevation of the front layer.
