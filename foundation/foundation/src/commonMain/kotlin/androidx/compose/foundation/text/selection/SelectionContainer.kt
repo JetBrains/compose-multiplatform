@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.text.selection
 
+import androidx.compose.foundation.Interaction
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Providers
@@ -24,9 +25,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.gesture.dragGestureFilter
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.AmbientClipboardManager
 import androidx.compose.ui.platform.AmbientHapticFeedback
 import androidx.compose.ui.platform.AmbientTextToolbar
@@ -94,38 +93,28 @@ internal fun SelectionContainer(
     manager.onSelectionChange = onSelectionChange
     manager.selection = selection
 
-    val selectionContainerModifier = Modifier.composed {
-        val positionedModifier = remember {
-            // Get the layout coordinates of the selection container. This is for hit test of
-            // cross-composable selection.
-            Modifier.onGloballyPositioned { manager.containerLayoutCoordinates = it }
-        }
-
-        this.then(positionedModifier)
-    }
-
     Providers(AmbientSelectionRegistrar provides registrarImpl) {
         // Get the layout coordinates of the selection container. This is for hit test of
         // cross-composable selection.
-        SimpleLayout(
-            modifier = modifier.then(selectionContainerModifier)
-        ) {
+        SimpleLayout(modifier = modifier.then(manager.modifier)) {
             children()
-            manager.selection?.let {
-                for (isStartHandle in listOf(true, false)) {
-                    SelectionHandle(
-                        startHandlePosition = manager.startHandlePosition,
-                        endHandlePosition = manager.endHandlePosition,
-                        isStartHandle = isStartHandle,
-                        directions = Pair(it.start.direction, it.end.direction),
-                        handlesCrossed = it.handlesCrossed,
-                        modifier = Modifier.dragGestureFilter(
-                            manager.handleDragObserver(
-                                isStartHandle
-                            )
-                        ),
-                        handle = null
-                    )
+            if (manager.interactionState.contains(Interaction.Focused)) {
+                manager.selection?.let {
+                    for (isStartHandle in listOf(true, false)) {
+                        SelectionHandle(
+                            startHandlePosition = manager.startHandlePosition,
+                            endHandlePosition = manager.endHandlePosition,
+                            isStartHandle = isStartHandle,
+                            directions = Pair(it.start.direction, it.end.direction),
+                            handlesCrossed = it.handlesCrossed,
+                            modifier = Modifier.dragGestureFilter(
+                                manager.handleDragObserver(
+                                    isStartHandle
+                                )
+                            ),
+                            handle = null
+                        )
+                    }
                 }
             }
         }
@@ -133,7 +122,6 @@ internal fun SelectionContainer(
 
     DisposableEffect(manager) {
         onDispose {
-            manager.selection = null
             manager.hideSelectionToolbar()
         }
     }

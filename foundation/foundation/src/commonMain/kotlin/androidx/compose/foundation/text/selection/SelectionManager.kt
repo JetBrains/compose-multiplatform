@@ -16,11 +16,18 @@
 
 package androidx.compose.foundation.text.selection
 
+import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.focusable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.isFocused
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.gesture.DragObserver
@@ -28,6 +35,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.TextToolbarStatus
@@ -77,6 +85,29 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
      * [TextToolbar] to show floating toolbar(post-M) or primary toolbar(pre-M).
      */
     var textToolbar: TextToolbar? = null
+
+    /**
+     * Focus requester used to request focus when selection becomes active.
+     */
+    var focusRequester: FocusRequester = FocusRequester()
+
+    /**
+     * InteractionState corresponds to the focusRequester, it will return trun.
+     */
+    val interactionState: InteractionState = InteractionState()
+
+    /**
+     * Modifier for selection container.
+     */
+    val modifier get() = Modifier
+        .onGloballyPositioned { containerLayoutCoordinates = it }
+        .focusRequester(focusRequester)
+        .onFocusChanged { focusState ->
+            if (!focusState.isFocused) {
+                onRelease()
+            }
+        }
+        .focusable(interactionState = interactionState)
 
     /**
      * Layout Coordinates of the selection container.
@@ -138,6 +169,7 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                 longPress = true
             )
             hideSelectionToolbar()
+            focusRequester.requestFocus()
         }
 
         selectionRegistrar.onSelectionUpdateCallback =
@@ -383,13 +415,15 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
 
     // This is for PressGestureDetector to cancel the selection.
     fun onRelease() {
-        // Call mergeSelections with an out of boundary input to inform all text widgets to
-        // cancel their individual selection.
-        mergeSelections(
-            startPosition = Offset(-1f, -1f),
-            endPosition = Offset(-1f, -1f),
-            previousSelection = selection
-        )
+        if (containerLayoutCoordinates?.isAttached == true) {
+            // Call mergeSelections with an out of boundary input to inform all text widgets to
+            // cancel their individual selection.
+            mergeSelections(
+                startPosition = Offset(-1f, -1f),
+                endPosition = Offset(-1f, -1f),
+                previousSelection = selection
+            )
+        }
         hideSelectionToolbar()
         if (selection != null) onSelectionChange(null)
     }
