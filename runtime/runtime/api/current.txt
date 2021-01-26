@@ -720,6 +720,11 @@ package androidx.compose.runtime.snapshots {
     method public static inline <T extends androidx.compose.runtime.snapshots.StateRecord, R> R! writable(T, androidx.compose.runtime.snapshots.StateObject state, kotlin.jvm.functions.Function1<? super T,? extends R> block);
   }
 
+  public interface SnapshotMutableState<T> extends androidx.compose.runtime.MutableState<T> {
+    method public androidx.compose.runtime.SnapshotMutationPolicy<T> getPolicy();
+    property public abstract androidx.compose.runtime.SnapshotMutationPolicy<T> policy;
+  }
+
   @androidx.compose.runtime.Stable public final class SnapshotStateList<T> implements kotlin.jvm.internal.markers.KMutableList java.util.List<T> androidx.compose.runtime.snapshots.StateObject {
     ctor public SnapshotStateList();
     method public boolean add(T? element);
