@@ -19,7 +19,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.material.TabDefaults.tabIndicatorOffset
+import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.samples.ScrollingTextTabs
@@ -378,7 +378,7 @@ class TabTest {
         rule.onNodeWithTag("indicator")
             .assertPositionInRootIsEqualTo(
                 // Tabs in a scrollable tab row are offset 52.dp from each end
-                expectedLeft = TabDefaults.ScrollableTabRowPadding,
+                expectedLeft = TabRowDefaults.ScrollableTabRowPadding,
                 expectedTop = tabRowBounds.height - indicatorHeight
             )
 
@@ -389,7 +389,7 @@ class TabTest {
         // should be in the middle of the TabRow
         rule.onNodeWithTag("indicator")
             .assertPositionInRootIsEqualTo(
-                expectedLeft = TabDefaults.ScrollableTabRowPadding + minimumTabWidth,
+                expectedLeft = TabRowDefaults.ScrollableTabRowPadding + minimumTabWidth,
                 expectedTop = tabRowBounds.height - indicatorHeight
             )
     }
