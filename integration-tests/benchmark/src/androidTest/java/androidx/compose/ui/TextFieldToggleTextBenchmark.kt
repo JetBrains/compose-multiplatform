@@ -146,7 +146,7 @@ class TextFieldToggleTextBenchmark(
      */
     @Test
     fun toggleText_measure() {
-        benchmarkRule.toggleStateBenchmarkMeasure(caseFactory)
+        benchmarkRule.toggleStateBenchmarkMeasure(caseFactory, assertOneRecomposition = false)
     }
 
     /**
@@ -154,7 +154,7 @@ class TextFieldToggleTextBenchmark(
      */
     @Test
     fun toggleText_layout() {
-        benchmarkRule.toggleStateBenchmarkLayout(caseFactory)
+        benchmarkRule.toggleStateBenchmarkLayout(caseFactory, assertOneRecomposition = false)
     }
 
     /**

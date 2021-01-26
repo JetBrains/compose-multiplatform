@@ -186,7 +186,7 @@ suspend fun PointerInputScope.detectDragGestures(
 ) {
     forEachGesture {
         awaitPointerEventScope {
-            val down = awaitFirstDown()
+            val down = awaitFirstDown(requireUnconsumed = false)
             var drag: PointerInputChange?
             do {
                 drag = awaitTouchSlopOrCancellation(down.id, onDrag)
@@ -316,7 +316,7 @@ suspend fun PointerInputScope.detectVerticalDragGestures(
 ) {
     forEachGesture {
         awaitPointerEventScope {
-            val down = awaitFirstDown()
+            val down = awaitFirstDown(requireUnconsumed = false)
             val drag = awaitVerticalTouchSlopOrCancellation(down.id, onVerticalDrag)
             if (drag != null) {
                 if (
@@ -439,7 +439,7 @@ suspend fun PointerInputScope.detectHorizontalDragGestures(
 ) {
     forEachGesture {
         awaitPointerEventScope {
-            val down = awaitFirstDown()
+            val down = awaitFirstDown(requireUnconsumed = false)
             val drag = awaitHorizontalTouchSlopOrCancellation(down.id, onHorizontalDrag)
             if (drag != null) {
                 if (

@@ -18,7 +18,6 @@ package androidx.compose.foundation.gestures
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.gesture.Direction
 import androidx.compose.ui.gesture.ScrollCallback
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.input.mouse.MouseScrollUnit
@@ -33,7 +32,7 @@ import kotlin.math.sqrt
 internal actual fun Modifier.touchScrollable(
     scrollCallback: ScrollCallback,
     orientation: Orientation,
-    canScroll: ((Direction) -> Boolean)?,
+    enabled: Boolean,
     startScrollImmediately: Boolean
 ): Modifier = this
 

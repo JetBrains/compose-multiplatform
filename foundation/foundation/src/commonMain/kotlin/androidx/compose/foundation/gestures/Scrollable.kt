@@ -41,7 +41,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.Direction
 import androidx.compose.ui.gesture.ScrollCallback
 import androidx.compose.ui.gesture.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.gesture.nestedscroll.NestedScrollDispatcher
@@ -51,7 +50,6 @@ import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Velocity
-import androidx.compose.ui.unit.minus
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.sync.Mutex
@@ -311,7 +309,6 @@ class ScrollableController(
  * @param enabled whether or not scrolling in enabled
  * @param reverseDirection reverse the direction of the scroll, so top to bottom scroll will
  * behave like bottom to top and left to right will behave like right to left.
- * @param canScroll callback to indicate whether or not scroll is allowed for given [Direction]
  * @param onScrollStarted callback to be invoked when scroll has started from the certain
  * position on the screen
  * @param onScrollStopped callback to be invoked when scroll stops with amount of velocity
@@ -322,7 +319,6 @@ fun Modifier.scrollable(
     controller: ScrollableController,
     enabled: Boolean = true,
     reverseDirection: Boolean = false,
-    canScroll: (Direction) -> Boolean = { enabled },
     onScrollStarted: (startedPosition: Offset) -> Unit = {},
     onScrollStopped: (velocity: Float) -> Unit = {}
 ): Modifier = composed(
@@ -374,7 +370,7 @@ fun Modifier.scrollable(
         touchScrollable(
             scrollCallback = scrollCallback,
             orientation = orientation,
-            canScroll = canScroll,
+            enabled = enabled,
             startScrollImmediately = controller.isAnimationRunning
         ).mouseScrollable(
             scrollCallback,
@@ -387,7 +383,6 @@ fun Modifier.scrollable(
         properties["controller"] = controller
         properties["enabled"] = enabled
         properties["reverseDirection"] = reverseDirection
-        properties["canScroll"] = canScroll
         properties["onScrollStarted"] = onScrollStarted
         properties["onScrollStopped"] = onScrollStopped
     }
@@ -396,7 +391,7 @@ fun Modifier.scrollable(
 internal expect fun Modifier.touchScrollable(
     scrollCallback: ScrollCallback,
     orientation: Orientation,
-    canScroll: ((Direction) -> Boolean)?,
+    enabled: Boolean,
     startScrollImmediately: Boolean
 ): Modifier
 

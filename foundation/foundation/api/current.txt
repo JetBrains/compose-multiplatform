@@ -267,7 +267,7 @@ package androidx.compose.foundation.gestures {
 
   public final class ScrollableKt {
     method @androidx.compose.runtime.Composable public static androidx.compose.foundation.gestures.ScrollableController rememberScrollableController(optional androidx.compose.foundation.InteractionState? interactionState, kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> consumeScrollDelta);
-    method public static androidx.compose.ui.Modifier scrollable(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.scrollorientationlocking.Orientation orientation, androidx.compose.foundation.gestures.ScrollableController controller, optional boolean enabled, optional boolean reverseDirection, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.gesture.Direction,java.lang.Boolean> canScroll, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onScrollStarted, optional kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit> onScrollStopped);
+    method public static androidx.compose.ui.Modifier scrollable(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.scrollorientationlocking.Orientation orientation, androidx.compose.foundation.gestures.ScrollableController controller, optional boolean enabled, optional boolean reverseDirection, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onScrollStarted, optional kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit> onScrollStopped);
   }
 
   public final class TapGestureDetectorKt {

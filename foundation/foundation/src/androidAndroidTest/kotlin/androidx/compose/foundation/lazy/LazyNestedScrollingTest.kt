@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.TouchSlop
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.down
@@ -36,7 +35,6 @@ import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -49,20 +47,14 @@ class LazyNestedScrollingTest {
     @get:Rule
     val rule = createComposeRule()
 
-    var expectedDragOffset = Float.MAX_VALUE
-
-    @Before
-    fun test() {
-        expectedDragOffset = with(rule.density) {
-            TouchSlop.toPx() + 20
-        }
-    }
+    private val expectedDragOffset = 20f
+    private val dragOffsetWithTouchSlop = expectedDragOffset + TestTouchSlop
 
     @Test
     fun column_nestedScrollingBackwardInitially() {
         val items = (1..3).toList()
         var draggedOffset = 0f
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             Box(
                 Modifier.scrollable(
                     orientation = Orientation.Vertical,
@@ -83,7 +75,7 @@ class LazyNestedScrollingTest {
         rule.onNodeWithTag(LazyTag)
             .performGesture {
                 down(Offset(x = 10f, y = 10f))
-                moveBy(Offset(x = 0f, y = 100f))
+                moveBy(Offset(x = 0f, y = 100f + TestTouchSlop))
                 up()
             }
 
@@ -96,7 +88,7 @@ class LazyNestedScrollingTest {
     fun column_nestedScrollingBackwardOnceWeScrolledForwardPreviously() {
         val items = (1..3).toList()
         var draggedOffset = 0f
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             Box(
                 Modifier.scrollable(
                     orientation = Orientation.Vertical,
@@ -127,7 +119,7 @@ class LazyNestedScrollingTest {
             .performGesture {
                 draggedOffset = 0f
                 down(Offset(x = 10f, y = 10f))
-                moveBy(Offset(x = 0f, y = expectedDragOffset))
+                moveBy(Offset(x = 0f, y = dragOffsetWithTouchSlop))
                 up()
             }
 
@@ -140,7 +132,7 @@ class LazyNestedScrollingTest {
     fun column_nestedScrollingForwardWhenTheFullContentIsInitiallyVisible() {
         val items = (1..2).toList()
         var draggedOffset = 0f
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             Box(
                 Modifier.scrollable(
                     orientation = Orientation.Vertical,
@@ -161,7 +153,7 @@ class LazyNestedScrollingTest {
         rule.onNodeWithTag(LazyTag)
             .performGesture {
                 down(Offset(x = 10f, y = 10f))
-                moveBy(Offset(x = 0f, y = -expectedDragOffset))
+                moveBy(Offset(x = 0f, y = -dragOffsetWithTouchSlop))
                 up()
             }
 
@@ -174,7 +166,7 @@ class LazyNestedScrollingTest {
     fun column_nestedScrollingForwardWhenScrolledToTheEnd() {
         val items = (1..3).toList()
         var draggedOffset = 0f
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             Box(
                 Modifier.scrollable(
                     orientation = Orientation.Vertical,
@@ -200,7 +192,7 @@ class LazyNestedScrollingTest {
             .performGesture {
                 draggedOffset = 0f
                 down(Offset(x = 10f, y = 10f))
-                moveBy(Offset(x = 0f, y = -expectedDragOffset))
+                moveBy(Offset(x = 0f, y = -dragOffsetWithTouchSlop))
                 up()
             }
 
@@ -213,7 +205,7 @@ class LazyNestedScrollingTest {
     fun row_nestedScrollingBackwardInitially() {
         val items = (1..3).toList()
         var draggedOffset = 0f
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             Box(
                 Modifier.scrollable(
                     orientation = Orientation.Horizontal,
@@ -236,7 +228,7 @@ class LazyNestedScrollingTest {
         rule.onNodeWithTag(LazyTag)
             .performGesture {
                 down(Offset(x = 10f, y = 10f))
-                moveBy(Offset(x = expectedDragOffset, y = 0f))
+                moveBy(Offset(x = dragOffsetWithTouchSlop, y = 0f))
                 up()
             }
 
@@ -249,7 +241,7 @@ class LazyNestedScrollingTest {
     fun row_nestedScrollingBackwardOnceWeScrolledForwardPreviously() {
         val items = (1..3).toList()
         var draggedOffset = 0f
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             Box(
                 Modifier.scrollable(
                     orientation = Orientation.Horizontal,
@@ -282,7 +274,7 @@ class LazyNestedScrollingTest {
             .performGesture {
                 draggedOffset = 0f
                 down(Offset(x = 10f, y = 10f))
-                moveBy(Offset(x = expectedDragOffset, y = 0f))
+                moveBy(Offset(x = dragOffsetWithTouchSlop, y = 0f))
                 up()
             }
 
@@ -295,7 +287,7 @@ class LazyNestedScrollingTest {
     fun row_nestedScrollingForwardWhenTheFullContentIsInitiallyVisible() {
         val items = (1..2).toList()
         var draggedOffset = 0f
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             Box(
                 Modifier.scrollable(
                     orientation = Orientation.Horizontal,
@@ -318,7 +310,7 @@ class LazyNestedScrollingTest {
         rule.onNodeWithTag(LazyTag)
             .performGesture {
                 down(Offset(x = 10f, y = 10f))
-                moveBy(Offset(x = -expectedDragOffset, y = 0f))
+                moveBy(Offset(x = -dragOffsetWithTouchSlop, y = 0f))
                 up()
             }
 
@@ -331,7 +323,7 @@ class LazyNestedScrollingTest {
     fun row_nestedScrollingForwardWhenScrolledToTheEnd() {
         val items = (1..3).toList()
         var draggedOffset = 0f
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             Box(
                 Modifier.scrollable(
                     orientation = Orientation.Horizontal,
@@ -359,7 +351,7 @@ class LazyNestedScrollingTest {
             .performGesture {
                 draggedOffset = 0f
                 down(Offset(x = 10f, y = 10f))
-                moveBy(Offset(x = -expectedDragOffset, y = 0f))
+                moveBy(Offset(x = -dragOffsetWithTouchSlop, y = 0f))
                 up()
             }
 
