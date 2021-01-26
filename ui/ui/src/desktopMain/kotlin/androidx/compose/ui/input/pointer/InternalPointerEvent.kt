@@ -16,7 +16,14 @@
 
 package androidx.compose.ui.input.pointer
 
-internal actual class InternalPointerEvent actual constructor(
+import java.awt.event.MouseEvent
+
+internal actual class InternalPointerEvent constructor(
     actual var changes: MutableMap<PointerId, PointerInputChange>,
-    pointerInputEvent: PointerInputEvent
-)
+    val mouseEvent: MouseEvent?
+) {
+    actual constructor(
+        changes: MutableMap<PointerId, PointerInputChange>,
+        pointerInputEvent: PointerInputEvent
+    ) : this(changes, pointerInputEvent.mouseEvent)
+}

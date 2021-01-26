@@ -17,10 +17,12 @@
 package androidx.compose.ui.input.pointer
 
 import androidx.compose.ui.geometry.Offset
+import java.awt.event.MouseEvent
 
 internal actual class PointerInputEvent(
     actual val uptime: Long,
-    actual val pointers: List<PointerInputEventData>
+    actual val pointers: List<PointerInputEventData>,
+    val mouseEvent: MouseEvent? = null
 )
 
 /**

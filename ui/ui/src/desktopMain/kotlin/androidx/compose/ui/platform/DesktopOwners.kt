@@ -29,6 +29,7 @@ import kotlinx.coroutines.yield
 import org.jetbrains.skija.Canvas
 import java.awt.event.InputMethodEvent
 import java.awt.event.KeyEvent
+import java.awt.event.MouseEvent
 
 val DesktopOwnersAmbient = staticAmbientOf<DesktopOwners>()
 
@@ -109,19 +110,19 @@ class DesktopOwners(
     val lastOwner: DesktopOwner?
         get() = list.lastOrNull()
 
-    fun onMousePressed(x: Int, y: Int) {
+    fun onMousePressed(x: Int, y: Int, nativeEvent: MouseEvent? = null) {
         isMousePressed = true
-        lastOwner?.processPointerInput(pointerInputEvent(x, y, isMousePressed))
+        lastOwner?.processPointerInput(pointerInputEvent(nativeEvent, x, y, isMousePressed))
     }
 
-    fun onMouseReleased(x: Int, y: Int) {
+    fun onMouseReleased(x: Int, y: Int, nativeEvent: MouseEvent? = null) {
         isMousePressed = false
-        lastOwner?.processPointerInput(pointerInputEvent(x, y, isMousePressed))
+        lastOwner?.processPointerInput(pointerInputEvent(nativeEvent, x, y, isMousePressed))
         pointerId += 1
     }
 
-    fun onMouseDragged(x: Int, y: Int) {
-        lastOwner?.processPointerInput(pointerInputEvent(x, y, isMousePressed))
+    fun onMouseDragged(x: Int, y: Int, nativeEvent: MouseEvent? = null) {
+        lastOwner?.processPointerInput(pointerInputEvent(nativeEvent, x, y, isMousePressed))
     }
 
     fun onMouseScroll(x: Int, y: Int, event: MouseScrollEvent) {
@@ -168,7 +169,12 @@ class DesktopOwners(
         }
     }
 
-    private fun pointerInputEvent(x: Int, y: Int, down: Boolean): PointerInputEvent {
+    private fun pointerInputEvent(
+        nativeEvent: MouseEvent?,
+        x: Int,
+        y: Int,
+        down: Boolean
+    ): PointerInputEvent {
         val time = System.nanoTime() / 1_000_000L
         return PointerInputEvent(
             time,
@@ -180,7 +186,8 @@ class DesktopOwners(
                     down,
                     PointerType.Mouse
                 )
-            )
+            ),
+            nativeEvent
         )
     }
 }
