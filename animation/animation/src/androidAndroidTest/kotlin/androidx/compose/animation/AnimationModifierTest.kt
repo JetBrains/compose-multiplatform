@@ -150,7 +150,7 @@ class AnimationModifierTest {
             assertThat(modifier.valueOverride, nullValue())
             assertThat(
                 modifier.inspectableElements.map { it.name }.toList(),
-                `is`(listOf("animSpec", "clip", "endListener"))
+                `is`(listOf("animationSpec", "finishedListener"))
             )
         }
     }

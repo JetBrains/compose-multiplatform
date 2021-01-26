@@ -28,7 +28,7 @@ package androidx.compose.animation {
   }
 
   public final class AnimationModifierKt {
-    method public static androidx.compose.ui.Modifier animateContentSize(androidx.compose.ui.Modifier, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.unit.IntSize> animSpec, optional boolean clip, optional kotlin.jvm.functions.Function2<? super androidx.compose.ui.unit.IntSize,? super androidx.compose.ui.unit.IntSize,kotlin.Unit>? endListener);
+    method public static androidx.compose.ui.Modifier animateContentSize(androidx.compose.ui.Modifier, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntSize> animationSpec, optional kotlin.jvm.functions.Function2<? super androidx.compose.ui.unit.IntSize,? super androidx.compose.ui.unit.IntSize,kotlin.Unit>? finishedListener);
   }
 
   @Deprecated public final class ColorPropKey implements androidx.compose.animation.core.PropKey<androidx.compose.ui.graphics.Color,androidx.compose.animation.core.AnimationVector4D> {
