@@ -35,22 +35,6 @@ interface ContentScale {
     fun computeScaleFactor(srcSize: Size, dstSize: Size): ScaleFactor
 
     /**
-     * Computes the scale factor to apply to both dimensions in order to fit the source
-     * appropriately with the given destination size
-     */
-    @Deprecated(
-        "use computeScaleFactor instead",
-        ReplaceWith(
-            "computeScaleFactor(srcSize, dstSize)",
-            "androidx.compose.ui.layout"
-        )
-    )
-    fun scale(srcSize: Size, dstSize: Size): Float =
-        // Returning scaleX here as previous implementations of ContentScale all provided
-        // uniform scale values which were identical for both scaleX and scaleY
-        computeScaleFactor(srcSize, dstSize).scaleX
-
-    /**
      * Companion object containing commonly used [ContentScale] implementations
      */
     companion object {

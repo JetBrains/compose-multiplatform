@@ -251,23 +251,6 @@ class TextLayoutResult internal constructor(
         multiParagraph.getLineEnd(lineIndex, visibleEnd)
 
     /**
-     * Returns the end of visible offset of the given line.
-     *
-     * If no ellipsis happens on the given line, this returns the line end offset with excluding
-     * trailing whitespaces.
-     * If ellipsis happens on the given line, this returns the offset that ellipsis started, i.e.
-     * the exclusive not ellipsized last character.
-     * @param lineIndex a 0 based line index
-     * @return an exclusive line end offset that is visible on the display
-     * @see getLineEnd
-     */
-    @Deprecated(
-        "This function will be removed.",
-        replaceWith = ReplaceWith("getLineEnd(lineIndex, true)", "androidx.compose.ui.text")
-    )
-    fun getLineVisibleEnd(lineIndex: Int): Int = multiParagraph.getLineEnd(lineIndex, true)
-
-    /**
      * Returns true if ellipsis happens on the given line, otherwise returns false
      *
      * @param lineIndex a 0 based line index

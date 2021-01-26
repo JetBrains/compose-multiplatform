@@ -44,17 +44,6 @@ fun imageFromResource(res: Resources, resId: Int): ImageBitmap {
  */
 fun Bitmap.asImageBitmap(): ImageBitmap = AndroidImageBitmap(this)
 
-/**
- * Create an [ImageBitmap] from the given [Bitmap]. Note this does
- * not create a copy of the original [Bitmap] and changes to it
- * will modify the returned [ImageBitmap]
- */
-@Deprecated(
-    "Use asImageBitmap instead",
-    ReplaceWith("asImageBitmap()", "androidx.compose.ui.graphics")
-)
-fun Bitmap.asImageAsset(): ImageBitmap = asImageBitmap()
-
 internal actual fun ActualImageBitmap(
     width: Int,
     height: Int,

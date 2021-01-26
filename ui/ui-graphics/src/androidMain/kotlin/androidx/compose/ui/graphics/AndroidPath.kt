@@ -22,8 +22,6 @@ import androidx.compose.ui.geometry.RoundRect
 
 actual fun Path(): Path = AndroidPath()
 
-actual typealias NativePathEffect = android.graphics.PathEffect
-
 /**
  * Convert the [android.graphics.Path] instance into a compose compatible Path
  */

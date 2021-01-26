@@ -139,13 +139,6 @@ interface Paint {
      */
     var colorFilter: ColorFilter?
 
-    @Suppress("DEPRECATION")
-    @Deprecated(
-        "Use pathEffect instead",
-        ReplaceWith("pathEffect", "androidx.compose.ui.graphics.Paint")
-    )
-    var nativePathEffect: NativePathEffect?
-
     /**
      * Specifies the [PathEffect] applied to the geometry of the shape that is drawn
      */

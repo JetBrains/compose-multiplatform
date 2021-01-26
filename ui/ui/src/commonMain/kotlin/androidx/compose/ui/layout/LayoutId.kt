@@ -87,9 +87,3 @@ interface LayoutIdParentData {
  */
 val Measurable.layoutId: Any?
     get() = (parentData as? LayoutIdParentData)?.layoutId
-
-@Deprecated(
-    "id was renamed to layoutId",
-    ReplaceWith("layoutId", "androidx.compose.ui.layout.layoutId")
-)
-val Measurable.id get() = layoutId

@@ -480,15 +480,6 @@ fun Constraints.isSatisfiedBy(size: IntSize): Boolean {
     return size.width in minWidth..maxWidth && size.height in minHeight..maxHeight
 }
 
-@Deprecated(
-    "satisfiedBy was renamed to isSatisfiedBy.",
-    ReplaceWith("isSatifiedBy(size)", "androidx.compose.ui.unit.isSatisfiedBy")
-)
-@Stable
-fun Constraints.satisfiedBy(size: IntSize): Boolean {
-    return size.width in minWidth..maxWidth && size.height in minHeight..maxHeight
-}
-
 /**
  * Returns the Constraints obtained by offsetting the current instance with the given values.
  */

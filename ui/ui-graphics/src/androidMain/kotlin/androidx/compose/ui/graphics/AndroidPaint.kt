@@ -108,16 +108,6 @@ class AndroidPaint : Paint {
             internalPaint.setNativeColorFilter(value)
         }
 
-    override var nativePathEffect: NativePathEffect?
-        get() = pathEffect?.asAndroidPathEffect()
-        set(value) {
-            pathEffect = if (value == null) {
-                null
-            } else {
-                AndroidPathEffect(value)
-            }
-        }
-
     override var pathEffect: PathEffect? = null
         set(value) {
             internalPaint.setNativePathEffect(value)

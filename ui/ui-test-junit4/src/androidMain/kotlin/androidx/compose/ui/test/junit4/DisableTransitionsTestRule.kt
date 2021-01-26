@@ -48,14 +48,3 @@ class DisableTransitionsTestRule(private val disableTransitions: Boolean = false
         }
     }
 }
-
-@Deprecated(
-    message = "Renamed to DisableTransitionsTestRule",
-    replaceWith = ReplaceWith(
-        "DisableTransitionsTestRule",
-        "androidx.ui.test.DisableTransitionsTestRule"
-    )
-)
-@Suppress("unused")
-@OptIn(InternalTestApi::class)
-typealias DisableTransitions = DisableTransitionsTestRule

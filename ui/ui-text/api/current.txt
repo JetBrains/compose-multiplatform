@@ -63,7 +63,6 @@ package androidx.compose.ui.text {
   public final class AnnotatedStringKt {
     method public static androidx.compose.ui.text.AnnotatedString AnnotatedString(String text, androidx.compose.ui.text.SpanStyle spanStyle, optional androidx.compose.ui.text.ParagraphStyle? paragraphStyle);
     method public static androidx.compose.ui.text.AnnotatedString AnnotatedString(String text, androidx.compose.ui.text.ParagraphStyle paragraphStyle);
-    method @Deprecated public static inline androidx.compose.ui.text.AnnotatedString annotatedString(kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.AnnotatedString.Builder,kotlin.Unit> builder);
     method public static inline androidx.compose.ui.text.AnnotatedString buildAnnotatedString(kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.AnnotatedString.Builder,kotlin.Unit> builder);
     method public static androidx.compose.ui.text.AnnotatedString capitalize(androidx.compose.ui.text.AnnotatedString, optional androidx.compose.ui.text.intl.LocaleList localeList);
     method public static androidx.compose.ui.text.AnnotatedString decapitalize(androidx.compose.ui.text.AnnotatedString, optional androidx.compose.ui.text.intl.LocaleList localeList);
@@ -109,7 +108,6 @@ package androidx.compose.ui.text {
     method public float getLineRight(int lineIndex);
     method public int getLineStart(int lineIndex);
     method public float getLineTop(int lineIndex);
-    method @Deprecated public int getLineVisibleEnd(int lineIndex);
     method public float getLineWidth(int lineIndex);
     method public float getMaxIntrinsicWidth();
     method public int getMaxLines();
@@ -172,7 +170,6 @@ package androidx.compose.ui.text {
     method public float getLineRight(int lineIndex);
     method public int getLineStart(int lineIndex);
     method public float getLineTop(int lineIndex);
-    method @Deprecated public int getLineVisibleEnd(int lineIndex);
     method public float getLineWidth(int lineIndex);
     method public float getMaxIntrinsicWidth();
     method public float getMinIntrinsicWidth();
@@ -358,7 +355,6 @@ package androidx.compose.ui.text {
     method public float getLineRight(int lineIndex);
     method public int getLineStart(int lineIndex);
     method public float getLineTop(int lineIndex);
-    method @Deprecated public int getLineVisibleEnd(int lineIndex);
     method public int getOffsetForPosition-k-4lQ0M(long position);
     method public androidx.compose.ui.text.style.ResolvedTextDirection getParagraphDirection(int offset);
     method public androidx.compose.ui.graphics.Path getPathForRange(int start, int end);
@@ -524,9 +520,6 @@ package androidx.compose.ui.text.font {
     method public static androidx.compose.ui.text.font.FontFamily FontFamily(android.graphics.Typeface typeface);
     method public static androidx.compose.ui.text.font.Typeface Typeface(android.content.Context context, androidx.compose.ui.text.font.FontFamily fontFamily, optional java.util.List<? extends kotlin.Pair<androidx.compose.ui.text.font.FontWeight,? extends androidx.compose.ui.text.font.FontStyle>>? styles);
     method public static androidx.compose.ui.text.font.Typeface Typeface(android.graphics.Typeface typeface);
-    method @Deprecated public static androidx.compose.ui.text.font.FontFamily fontFamily(android.graphics.Typeface typeface);
-    method @Deprecated public static androidx.compose.ui.text.font.Typeface typeface(android.content.Context context, androidx.compose.ui.text.font.FontFamily fontFamily, optional java.util.List<? extends kotlin.Pair<androidx.compose.ui.text.font.FontWeight,? extends androidx.compose.ui.text.font.FontStyle>>? necessaryStyles);
-    method @Deprecated public static androidx.compose.ui.text.font.Typeface typeface(android.graphics.Typeface typeface);
   }
 
   public abstract sealed class FileBasedFontFamily extends androidx.compose.ui.text.font.FontFamily {
@@ -566,15 +559,10 @@ package androidx.compose.ui.text.font {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontFamily FontFamily(java.util.List<? extends androidx.compose.ui.text.font.Font> fonts);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontFamily FontFamily(androidx.compose.ui.text.font.Font... fonts);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontFamily FontFamily(androidx.compose.ui.text.font.Typeface typeface);
-    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontListFontFamily fontFamily(java.util.List<? extends androidx.compose.ui.text.font.Font> fonts);
-    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontListFontFamily fontFamily(androidx.compose.ui.text.font.Font... fonts);
-    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.LoadedFontFamily fontFamily(androidx.compose.ui.text.font.Typeface typeface);
   }
 
   public final class FontKt {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.Font Font(int resId, optional androidx.compose.ui.text.font.FontWeight weight, optional androidx.compose.ui.text.font.FontStyle style);
-    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontFamily asFontFamily(androidx.compose.ui.text.font.Font);
-    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.Font font(int resId, optional androidx.compose.ui.text.font.FontWeight weight, optional androidx.compose.ui.text.font.FontStyle style);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontFamily toFontFamily(androidx.compose.ui.text.font.Font);
   }
 
@@ -752,12 +740,10 @@ package androidx.compose.ui.text.input {
     enum_constant public static final androidx.compose.ui.text.input.ImeAction Done;
     enum_constant public static final androidx.compose.ui.text.input.ImeAction Go;
     enum_constant public static final androidx.compose.ui.text.input.ImeAction Next;
-    enum_constant @Deprecated public static final androidx.compose.ui.text.input.ImeAction NoAction;
     enum_constant public static final androidx.compose.ui.text.input.ImeAction None;
     enum_constant public static final androidx.compose.ui.text.input.ImeAction Previous;
     enum_constant public static final androidx.compose.ui.text.input.ImeAction Search;
     enum_constant public static final androidx.compose.ui.text.input.ImeAction Send;
-    enum_constant @Deprecated public static final androidx.compose.ui.text.input.ImeAction Unspecified;
   }
 
   @androidx.compose.runtime.Immutable public final class ImeOptions {

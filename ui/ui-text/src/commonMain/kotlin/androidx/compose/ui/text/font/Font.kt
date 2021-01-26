@@ -115,38 +115,12 @@ class ResourceFont internal constructor(
  *
  * @see FontFamily
  */
-@Deprecated("Use Font() instead", ReplaceWith("Font(resId, weight, style)"))
-@Stable
-fun font(
-    resId: Int,
-    weight: FontWeight = FontWeight.Normal,
-    style: FontStyle = FontStyle.Normal
-): Font = ResourceFont(resId, weight, style)
-
-/**
- * Creates a Font with using resource ID.
- *
- * @param resId The resource ID of the font file in font resources. i.e. "R.font.myfont".
- * @param weight The weight of the font. The system uses this to match a font to a font request
- * that is given in a [androidx.compose.ui.text.SpanStyle].
- * @param style The style of the font, normal or italic. The system uses this to match a font to a
- * font request that is given in a [androidx.compose.ui.text.SpanStyle].
- *
- * @see FontFamily
- */
 @Stable
 fun Font(
     resId: Int,
     weight: FontWeight = FontWeight.Normal,
     style: FontStyle = FontStyle.Normal
 ): Font = ResourceFont(resId, weight, style)
-
-/**
- * Create a [FontFamily] from this single [font].
- */
-@Deprecated("Use toFontFamily() instead", ReplaceWith("toFontFamily()"))
-@Stable
-fun Font.asFontFamily() = FontFamily(this)
 
 /**
  * Create a [FontFamily] from this single [font].

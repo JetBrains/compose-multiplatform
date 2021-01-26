@@ -132,19 +132,6 @@ enum class AutofillType {
     PostalCodeExtended,
 
     /**
-     * Indicates that the associated component can be aufofilled with a name.
-     *
-     * TODO(b/153400666): Remove this deprecated value.
-     */
-    @Deprecated(
-        "It was is too generic since it did not indicate which part of the name it represents. " +
-            "Replace with PersonFullName or PersonFirstName, PersonLastName etc.",
-        ReplaceWith("PersonFullName", "androidx.compose.ui.autofill.AutofillType.PersonFullName"),
-        DeprecationLevel.ERROR
-    )
-    Name,
-
-    /**
      * Indicates that the associated component can be aufofilled with a person's full name.
      *
      */
