@@ -45,6 +45,7 @@ import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.semantics.dismiss
+import androidx.compose.ui.semantics.paneTitle
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -403,6 +404,7 @@ fun ModalDrawerLayout(
                         )
                 }
                     .semantics {
+                        paneTitle = Strings.NavigationMenu
                         if (drawerState.isOpen) {
                             dismiss(action = { drawerState.close(); true })
                         }
@@ -532,6 +534,7 @@ fun BottomDrawerLayout(
                     )
                 }
                     .semantics {
+                        paneTitle = Strings.NavigationMenu
                         if (drawerState.isOpen) {
                             dismiss(action = { drawerState.close(); true })
                         }
