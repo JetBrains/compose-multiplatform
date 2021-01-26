@@ -57,7 +57,7 @@ fun CrossfadeDemo() {
             }
         }
         val saveableStateHolder = rememberSaveableStateHolder()
-        Crossfade(current = current) { current ->
+        Crossfade(targetState = current) { current ->
             saveableStateHolder.SaveableStateProvider(current) {
                 val tab = tabs[current]
                 arrayOf<Any?>()

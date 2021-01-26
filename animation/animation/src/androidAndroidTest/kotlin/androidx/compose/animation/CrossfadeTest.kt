@@ -97,7 +97,7 @@ class CrossfadeTest {
         rule.setContent {
             Crossfade(
                 showFirst,
-                animation = TweenSpec(durationMillis = duration)
+                animationSpec = TweenSpec(durationMillis = duration)
             ) {
                 BasicText(if (it) First else Second)
                 DisposableEffect(Unit) {
