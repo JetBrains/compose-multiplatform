@@ -337,6 +337,7 @@ class Recomposer(
                 }
 
                 val toRecompose = mutableListOf<ControlledComposition>()
+                val toApply = mutableListOf<ControlledComposition>()
                 while (true) {
                     // Await something to do
                     if (_state.value < State.PendingWork) {
@@ -391,14 +392,23 @@ class Recomposer(
 
                             // Perform recomposition for any invalidated composers
                             try {
-                                var changes = false
                                 toRecompose.fastForEach { composer ->
-                                    changes = performRecompose(composer) || changes
+                                    performRecompose(composer)?.let { toApply += it }
                                 }
-                                if (changes) changeCount++
+                                if (toApply.isNotEmpty()) changeCount++
                             } finally {
                                 toRecompose.clear()
                             }
+
+                            // Perform apply changes
+                            try {
+                                toApply.fastForEach { composition ->
+                                    composition.applyChanges()
+                                }
+                            } finally {
+                                toApply.clear()
+                            }
+
                             synchronized(stateLock) {
                                 deriveStateLocked()
                             }
@@ -466,13 +476,13 @@ class Recomposer(
         }
     }
 
-    private fun performRecompose(composition: ControlledComposition): Boolean {
-        if (composition.isComposing || composition.isDisposed) return false
-        return composing(composition) {
-            composition.recompose()
-        }.also {
-            composition.applyChanges()
-        }
+    private fun performRecompose(composition: ControlledComposition): ControlledComposition? {
+        if (composition.isComposing || composition.isDisposed) return null
+        return if (
+            composing(composition) {
+                composition.recompose()
+            }
+        ) composition else null
     }
 
     private fun readObserverOf(composition: ControlledComposition): SnapshotReadObserver {
