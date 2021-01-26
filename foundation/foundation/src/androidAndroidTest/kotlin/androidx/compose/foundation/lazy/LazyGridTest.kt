@@ -101,7 +101,7 @@ class LazyGridTest {
     fun lazyGridShowsSecondRowOnScroll() {
         val items = (1..9).map { it.toString() }
 
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyVerticalGrid(
                 cells = GridCells.Fixed(3),
                 modifier = Modifier.preferredHeight(100.dp).testTag(LazyGridTag)
@@ -138,7 +138,7 @@ class LazyGridTest {
     fun lazyGridScrollHidesFirstRow() {
         val items = (1..9).map { it.toString() }
 
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyVerticalGrid(
                 cells = GridCells.Fixed(3),
                 modifier = Modifier.preferredHeight(200.dp).testTag(LazyGridTag)
