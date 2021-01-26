@@ -40,7 +40,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ScrollableTabRow
 import androidx.compose.material.Tab
-import androidx.compose.material.TabDefaults.tabIndicatorOffset
+import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.TabPosition
 import androidx.compose.material.TabRow
 import androidx.compose.material.Text

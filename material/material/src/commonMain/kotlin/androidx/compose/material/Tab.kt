@@ -175,6 +175,13 @@ fun Tab(
 /**
  * Contains default values used by tabs from the Material specification.
  */
+@Deprecated(
+    "TabDefaults has been replaced with TabRowDefaults",
+    ReplaceWith(
+        "TabRowDefaults",
+        "androidx.compose.material.TabRowDefaults"
+    )
+)
 object TabDefaults {
     /**
      * Default [Divider], which will be positioned at the bottom of the [TabRow], underneath the
@@ -395,7 +402,7 @@ private fun Placeable.PlacementScope.placeText(
 
     // Total offset between the last text baseline and the bottom of the Tab layout
     val totalOffset = with(density) {
-        baselineOffset.toIntPx() + TabDefaults.IndicatorHeight.toIntPx()
+        baselineOffset.toIntPx() + TabRowDefaults.IndicatorHeight.toIntPx()
     }
 
     val textPlaceableY = tabHeight - lastBaseline - totalOffset
@@ -424,7 +431,7 @@ private fun Placeable.PlacementScope.placeTextAndIcon(
 
     // Total offset between the last text baseline and the bottom of the Tab layout
     val textOffset = with(density) {
-        baselineOffset.toIntPx() + TabDefaults.IndicatorHeight.toIntPx()
+        baselineOffset.toIntPx() + TabRowDefaults.IndicatorHeight.toIntPx()
     }
 
     // How much space there is between the top of the icon (essentially the top of this layout)
