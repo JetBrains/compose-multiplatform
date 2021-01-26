@@ -108,3 +108,22 @@ fun <T : Any> rememberRestorableStateHolder(): RestorableStateHolder<T> =
     throw IllegalStateException(
         "This method is deprecated and moved to androidx.compose.runtime.saveable package"
     )
+
+@Deprecated(
+    "It was renamed to rememberSaveable() and moved to androidx.compose.runtime.saveable package",
+    ReplaceWith(
+        "rememberSaveable(key = key, init)",
+        "androidx.compose.runtime.saveable.rememberSaveable"
+    ),
+    level = DeprecationLevel.ERROR
+)
+@Suppress("DocumentExceptions")
+@Composable
+fun <T : Any> rememberSavedInstanceState(
+    vararg inputs: Any?,
+    saver: Saver<T, out Any>? = null,
+    key: String? = null,
+    init: () -> T
+): T = throw IllegalStateException(
+    "This method is deprecated and moved to androidx.compose.runtime.saveable package"
+)

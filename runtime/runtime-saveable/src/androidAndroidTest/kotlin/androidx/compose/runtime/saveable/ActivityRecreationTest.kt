@@ -23,6 +23,7 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.test.R
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.setContent
@@ -153,7 +154,8 @@ class RecreationTest2Activity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            array = rememberSavedInstanceState { intArrayOf(0) }
+            arrayOf<Any?>()
+            array = rememberSaveable { intArrayOf(0) }
         }
     }
 }
@@ -183,10 +185,12 @@ class RecreationTest3Activity : ComponentActivity() {
         setContentView(linear)
 
         child1.setContent {
-            array1 = rememberSavedInstanceState(key = "key") { intArrayOf(0) }
+            arrayOf<Any?>()
+            array1 = rememberSaveable(key = "key") { intArrayOf(0) }
         }
         child2.setContent {
-            array2 = rememberSavedInstanceState(key = "key") { intArrayOf(0) }
+            arrayOf<Any?>()
+            array2 = rememberSaveable(key = "key") { intArrayOf(0) }
         }
     }
 }
@@ -231,7 +235,8 @@ class TestFragment : Fragment() {
         savedInstanceState: Bundle?
     ) = ComposeView(requireContext()).apply {
         setContent {
-            array = rememberSavedInstanceState(key = "key") { intArrayOf(0) }
+            arrayOf<Any?>()
+            array = rememberSaveable(key = "key") { intArrayOf(0) }
         }
     }
 }

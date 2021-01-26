@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package androidx.compose.runtime.savedinstancestate
+package androidx.compose.runtime.saveable
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.savedinstancestate.AmbientUiSavedStateRegistry
+import androidx.compose.runtime.savedinstancestate.UiSavedStateRegistry
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.saveable.Saver
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -37,7 +38,7 @@ import java.util.concurrent.TimeUnit
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-class RememberSavedInstanceStateTest {
+class RememberSaveableTest {
 
     @get:Rule
     val rule = createComposeRule()
@@ -48,7 +49,7 @@ class RememberSavedInstanceStateTest {
     fun simpleRestore() {
         var array: IntArray? = null
         restorationTester.setContent {
-            array = rememberSavedInstanceState {
+            array = rememberSaveable {
                 intArrayOf(0)
             }
         }
@@ -70,7 +71,7 @@ class RememberSavedInstanceStateTest {
     fun restoreWithSaver() {
         var holder: Holder? = null
         restorationTester.setContent {
-            holder = rememberSavedInstanceState(saver = HolderSaver) {
+            holder = rememberSaveable(saver = HolderSaver) {
                 Holder(0)
             }
         }
@@ -103,7 +104,7 @@ class RememberSavedInstanceStateTest {
                     }
                 }
             ) {
-                val v = rememberSavedInstanceState { 1 }
+                val v = rememberSaveable { 1 }
                 assertEquals(1, v)
             }
         }
@@ -128,7 +129,7 @@ class RememberSavedInstanceStateTest {
                     }
                 }
             ) {
-                val v = rememberSavedInstanceState { 2 }
+                val v = rememberSaveable { 2 }
                 assertEquals(2, v)
             }
         }
@@ -153,7 +154,7 @@ class RememberSavedInstanceStateTest {
                     }
                 }
             ) {
-                rememberSavedInstanceState(saver = HolderSaver) { Holder(4) }
+                rememberSaveable(saver = HolderSaver) { Holder(4) }
             }
         }
 
@@ -182,7 +183,7 @@ class RememberSavedInstanceStateTest {
                     registryFactory(it)
                 }
             ) {
-                val v = rememberSavedInstanceState { 1 }
+                val v = rememberSaveable { 1 }
                 assertEquals(1, v)
             }
         }
@@ -229,7 +230,7 @@ class RememberSavedInstanceStateTest {
                     }
                 }
             ) {
-                val v = rememberSavedInstanceState(key = key) { 1 }
+                val v = rememberSaveable(key = key) { 1 }
                 assertEquals(1, v)
             }
         }
@@ -253,7 +254,7 @@ class RememberSavedInstanceStateTest {
         )
 
         restorationTester.setContent {
-            rememberSavedInstanceState(saver = saver) { 1 }
+            rememberSaveable(saver = saver) { 1 }
         }
 
         val latch = CountDownLatch(1)
@@ -289,7 +290,7 @@ class RememberSavedInstanceStateTest {
                 }
             ) {
                 if (doEmit) {
-                    rememberSavedInstanceState { 1 }
+                    rememberSaveable { 1 }
                 }
             }
         }
@@ -318,7 +319,7 @@ class RememberSavedInstanceStateTest {
                     }
                 }
             ) {
-                val v = rememberSavedInstanceState(key = passedKey) { 2 }
+                val v = rememberSaveable(key = passedKey) { 2 }
                 assertEquals(2, v)
             }
         }
@@ -340,7 +341,7 @@ class RememberSavedInstanceStateTest {
                     }
                 }
             ) {
-                val v = rememberSavedInstanceState(key = "") { 2 }
+                val v = rememberSaveable(key = "") { 2 }
                 assertEquals(2, v)
             }
         }

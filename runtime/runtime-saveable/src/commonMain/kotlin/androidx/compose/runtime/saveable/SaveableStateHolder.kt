@@ -24,10 +24,9 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.AmbientUiSavedStateRegistry
 import androidx.compose.runtime.savedinstancestate.UiSavedStateRegistry
-import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 
 /**
- * Allows to save the state defined with [savedInstanceState] and [rememberSavedInstanceState]
+ * Allows to save the state defined with [savedInstanceState] and [rememberSaveable]
  * for the subtree before disposing it to make it possible to compose it back next time with the
  * restored state. It allows different navigation patterns to keep the ui state like scroll
  * position for the currently not composed screens from the backstack.
@@ -41,7 +40,7 @@ import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 interface SaveableStateHolder {
     /**
      * Put your content associated with a [key] inside the [content]. This will automatically
-     * save all the states defined with [savedInstanceState] and [rememberSavedInstanceState]
+     * save all the states defined with [savedInstanceState] and [rememberSaveable]
      * before disposing the content and will restore the states when you compose with this key
      * again.
      *
@@ -62,7 +61,7 @@ interface SaveableStateHolder {
  */
 @Composable
 fun rememberSaveableStateHolder(): SaveableStateHolder =
-    rememberSavedInstanceState(
+    rememberSaveable(
         saver = SaveableStateHolderImpl.Saver
     ) {
         SaveableStateHolderImpl()

@@ -44,7 +44,7 @@ import androidx.compose.material.lightColors
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
-import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 
@@ -62,7 +62,7 @@ class DemoActivity : ComponentActivity() {
             val activityStarter = fun(demo: ActivityDemo<*>) {
                 startActivity(Intent(this, demo.activityClass.java))
             }
-            val navigator = rememberSavedInstanceState(
+            val navigator = rememberSaveable(
                 saver = Navigator.Saver(AllDemosCategory, onBackPressedDispatcher, activityStarter)
             ) {
                 Navigator(AllDemosCategory, onBackPressedDispatcher, activityStarter)
@@ -79,7 +79,7 @@ class DemoActivity : ComponentActivity() {
                 }
             }
             DemoTheme(demoColors, window) {
-                val filteringMode = rememberSavedInstanceState(
+                val filteringMode = rememberSaveable(
                     saver = FilterMode.Saver(onBackPressedDispatcher)
                 ) {
                     FilterMode(onBackPressedDispatcher)

@@ -17,6 +17,8 @@
 package androidx.compose.runtime.savedinstancestate
 
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.saveable.Holder
+import androidx.compose.runtime.saveable.HolderSaver
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4

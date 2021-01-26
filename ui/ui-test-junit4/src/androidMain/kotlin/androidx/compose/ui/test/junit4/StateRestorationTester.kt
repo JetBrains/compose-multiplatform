@@ -33,7 +33,7 @@ import androidx.compose.runtime.savedinstancestate.UiSavedStateRegistry
  * [emulateSavedInstanceStateRestore] and assert your state is restored properly.
  *
  * Note that this tests only the restoration of the local state of the composable you passed to
- * [setContent] and useful for testing [savedInstanceState] or [rememberSavedInstanceState]
+ * [setContent] and useful for testing [savedInstanceState] or [rememberSaveable]
  * integration. It is not testing the integration with any other life cycles or Activity callbacks.
  */
 class StateRestorationTester(private val composeTestRule: ComposeContentTestRule) {
@@ -56,7 +56,7 @@ class StateRestorationTester(private val composeTestRule: ComposeContentTestRule
     }
 
     /**
-     * Saves all the state stored via [savedInstanceState] or [rememberSavedInstanceState],
+     * Saves all the state stored via [savedInstanceState] or [rememberSaveable],
      * disposes current composition, and composes again the content passed to [setContent].
      * Allows to test how your component behaves when the state restoration is happening.
      * Note that the state stored via regular state() or remember() will be lost.

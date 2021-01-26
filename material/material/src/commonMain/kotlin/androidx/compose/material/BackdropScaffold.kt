@@ -37,7 +37,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.nestedscroll.nestedScroll
@@ -188,7 +188,7 @@ fun rememberBackdropScaffoldState(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ): BackdropScaffoldState {
     val disposableClock = clock.asDisposableClock()
-    return rememberSavedInstanceState(
+    return rememberSaveable(
         disposableClock,
         animationSpec,
         confirmStateChange,

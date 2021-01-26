@@ -32,7 +32,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
-import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.layout.Remeasurement
 import androidx.compose.ui.layout.RemeasurementModifier
 import androidx.compose.ui.platform.AmbientAnimationClock
@@ -65,7 +65,7 @@ fun rememberLazyListState(
         LazyListState.Saver(config, clock, interactionState)
     }
 
-    return rememberSavedInstanceState(config, clock, interactionState, saver = saver) {
+    return rememberSaveable(config, clock, interactionState, saver = saver) {
         LazyListState(
             initialFirstVisibleItemIndex,
             initialFirstVisibleItemScrollOffset,

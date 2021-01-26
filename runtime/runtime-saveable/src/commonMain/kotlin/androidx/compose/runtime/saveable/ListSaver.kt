@@ -23,7 +23,7 @@ package androidx.compose.runtime.saveable
  * What types can be saved is defined by [UiSavedStateRegistry], by default everything which can
  * be stored in the Bundle class can be saved.
  *
- * You can use it as a parameter for [savedInstanceState] or [rememberSavedInstanceState].
+ * You can use it as a parameter for [savedInstanceState] or [rememberSaveable].
  *
  * @sample androidx.compose.runtime.saveable.samples.ListSaverSample
  */

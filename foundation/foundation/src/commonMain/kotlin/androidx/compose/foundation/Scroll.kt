@@ -43,7 +43,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Alignment
@@ -88,7 +88,7 @@ fun rememberScrollState(
 ): ScrollState {
     val clock = AmbientAnimationClock.current.asDisposableClock()
     val config = defaultFlingConfig()
-    return rememberSavedInstanceState(
+    return rememberSaveable(
         clock, config, interactionState,
         saver = ScrollState.Saver(config, clock, interactionState)
     ) {

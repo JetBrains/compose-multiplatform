@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.runtime.savedinstancestate
+package androidx.compose.runtime.saveable
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -22,9 +22,8 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.currentCompositeKeyHash
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.SaverScope
-import androidx.compose.runtime.saveable.autoSaver
+import androidx.compose.runtime.savedinstancestate.AmbientUiSavedStateRegistry
+import androidx.compose.runtime.savedinstancestate.UiSavedStateRegistry
 
 /**
  * Remember the value produced by [init].
@@ -33,7 +32,7 @@ import androidx.compose.runtime.saveable.autoSaver
  * recreation using the saved instance state mechanism (for example it happens when the screen is
  * rotated in the Android application).
  *
- * @sample androidx.compose.runtime.savedinstancestate.samples.RememberSavedInstanceStateSample
+ * @sample androidx.compose.runtime.saveable.samples.RememberSaveable
  *
  * This function works nicely with mutable objects, when you update the state of this object
  * instead of recreating it. If you work with immutable objects [savedInstanceState] can suit you
@@ -54,7 +53,7 @@ import androidx.compose.runtime.saveable.autoSaver
  * @param init A factory function to create the initial value of this state
  */
 @Composable
-fun <T : Any> rememberSavedInstanceState(
+fun <T : Any> rememberSaveable(
     vararg inputs: Any?,
     saver: Saver<T, out Any> = autoSaver(),
     key: String? = null,
@@ -89,7 +88,7 @@ fun <T : Any> rememberSavedInstanceState(
     if (registry != null) {
         DisposableEffect(registry, finalKey) {
             val valueProvider = {
-                with(saverHolder.value) { SaverScopeImpl(registry::canBeSaved).save(value) }
+                with(saverHolder.value) { SaverScope { registry.canBeSaved(it) }.save(value) }
             }
             registry.requireCanBeSaved(valueProvider())
             registry.registerProvider(finalKey, valueProvider)
@@ -110,13 +109,8 @@ private fun UiSavedStateRegistry.requireCanBeSaved(value: Any?) {
                 "$value cannot be saved using the current UiSavedStateRegistry. The default " +
                     "implementation only supports types which can be stored inside the Bundle" +
                     ". Please consider implementing a custom Saver for this class and pass it" +
-                    " to savedInstanceState() or rememberSavedInstanceState()."
+                    " to savedInstanceState() or rememberSaveable()."
             }
         )
     }
-}
-
-// TODO this will not be needed when we make SaverScope "fun interface"
-private class SaverScopeImpl(val canBeSaved: (Any) -> Boolean) : SaverScope {
-    override fun canBeSaved(value: Any) = canBeSaved.invoke(value)
 }

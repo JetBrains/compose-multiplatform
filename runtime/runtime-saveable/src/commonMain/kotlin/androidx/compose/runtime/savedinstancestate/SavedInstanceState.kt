@@ -23,6 +23,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.autoSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 
 /**
  * Used to introduce a state value of type [T] into a composition.
@@ -35,7 +36,7 @@ import androidx.compose.runtime.saveable.autoSaver
  *
  * This function works nicely with immutable values as we wrap them into [MutableState] and
  * update the values in this state. If you work with a mutable object and going to update the
- * state of this object instead of recreating it [rememberSavedInstanceState] can suit you more.
+ * state of this object instead of recreating it [rememberSaveable] can suit you more.
  *
  * If you use it with types which can be stored inside the Bundle then it will be saved and
  * restored automatically using [autoSaver], otherwise you will need to provide a custom [Saver]
@@ -61,7 +62,7 @@ fun <T> savedInstanceState(
     key: String? = null,
     policy: SnapshotMutationPolicy<T> = structuralEqualityPolicy(),
     init: () -> T
-): MutableState<T> = rememberSavedInstanceState(
+): MutableState<T> = rememberSaveable(
     *inputs,
     saver = mutableStateSaver(saver, policy),
     key = key,

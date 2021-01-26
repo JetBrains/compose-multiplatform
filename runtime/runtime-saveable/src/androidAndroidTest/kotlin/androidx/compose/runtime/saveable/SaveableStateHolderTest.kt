@@ -19,7 +19,6 @@ package androidx.compose.runtime.saveable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -50,7 +49,7 @@ class SaveableStateHolderTest {
             holder.SaveableStateProvider(screen) {
                 if (screen == Screens.Screen1) {
                     numberOnScreen1 = remember { increment++ }
-                    restorableNumberOnScreen1 = rememberSavedInstanceState { increment++ }
+                    restorableNumberOnScreen1 = rememberSaveable { increment++ }
                 } else {
                     // screen 2
                     remember { 100 }
@@ -87,7 +86,7 @@ class SaveableStateHolderTest {
             val holder = rememberSaveableStateHolder()
             holder.SaveableStateProvider(Screens.Screen1) {
                 number = remember { increment++ }
-                restorableNumber = rememberSavedInstanceState { increment++ }
+                restorableNumber = rememberSaveable { increment++ }
             }
         }
 
@@ -117,7 +116,7 @@ class SaveableStateHolderTest {
             holder.SaveableStateProvider(screen) {
                 if (screen == Screens.Screen2) {
                     numberOnScreen2 = remember { increment++ }
-                    restorableNumberOnScreen2 = rememberSavedInstanceState { increment++ }
+                    restorableNumberOnScreen2 = rememberSaveable { increment++ }
                 }
             }
         }
@@ -153,7 +152,7 @@ class SaveableStateHolderTest {
             holder.SaveableStateProvider(screen) {
                 if (screen == Screens.Screen1) {
                     numberOnScreen1 = remember { increment++ }
-                    restorableNumberOnScreen1 = rememberSavedInstanceState { increment++ }
+                    restorableNumberOnScreen1 = rememberSaveable { increment++ }
                 } else {
                     // screen 2
                     remember { 100 }
@@ -197,7 +196,7 @@ class SaveableStateHolderTest {
             restorableStateHolder = holder
             holder.SaveableStateProvider(screen) {
                 if (screen == Screens.Screen1) {
-                    restorableNumberOnScreen1 = rememberSavedInstanceState { increment++ }
+                    restorableNumberOnScreen1 = rememberSaveable { increment++ }
                 } else {
                     // screen 2
                     remember { 100 }
@@ -233,7 +232,7 @@ class SaveableStateHolderTest {
             restorableStateHolder = holder
             holder.SaveableStateProvider(screen) {
                 if (screen == Screens.Screen1) {
-                    restorableNumberOnScreen1 = rememberSavedInstanceState { increment++ }
+                    restorableNumberOnScreen1 = rememberSaveable { increment++ }
                 } else {
                     // screen 2
                     remember { 100 }

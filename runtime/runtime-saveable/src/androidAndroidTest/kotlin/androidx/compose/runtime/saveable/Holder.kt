@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,11 @@
  * limitations under the License.
  */
 
-@file:Suppress("UNUSED_VARIABLE")
+package androidx.compose.runtime.saveable
 
-package androidx.compose.runtime.savedinstancestate.samples
+internal data class Holder(var value: Int)
 
-import androidx.annotation.Sampled
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.savedinstancestate.savedInstanceState
-import androidx.compose.runtime.setValue
-
-@Sampled
-@Composable
-fun SavedInstanceStateSample() {
-    var value by savedInstanceState { "value" }
-}
+internal val HolderSaver = Saver<Holder, Int>(
+    save = { it.value },
+    restore = { Holder(it) }
+)
