@@ -39,7 +39,6 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -91,15 +90,17 @@ fun Tab(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    text: @Composable () -> Unit = emptyContent(),
-    icon: @Composable () -> Unit = emptyContent(),
+    text: @Composable (() -> Unit)? = null,
+    icon: @Composable (() -> Unit)? = null,
     interactionState: InteractionState = remember { InteractionState() },
     selectedContentColor: Color = AmbientContentColor.current,
     unselectedContentColor: Color = selectedContentColor.copy(alpha = ContentAlpha.medium)
 ) {
-    val styledText: @Composable () -> Unit = @Composable {
-        val style = MaterialTheme.typography.button.copy(textAlign = TextAlign.Center)
-        ProvideTextStyle(style, content = text)
+    val styledText: @Composable (() -> Unit)? = text?.let {
+        @Composable {
+            val style = MaterialTheme.typography.button.copy(textAlign = TextAlign.Center)
+            ProvideTextStyle(style, content = text)
+        }
     }
     Tab(
         selected,
@@ -309,56 +310,63 @@ private fun TabTransition(
  */
 @Composable
 private fun TabBaselineLayout(
-    text: @Composable () -> Unit,
-    icon: @Composable () -> Unit
+    text: @Composable (() -> Unit)?,
+    icon: @Composable (() -> Unit)?
 ) {
     Layout(
         {
-            Box(Modifier.layoutId("text").padding(horizontal = HorizontalTextPadding)) { text() }
-            Box(Modifier.layoutId("icon")) { icon() }
+            if (text != null) {
+                Box(
+                    Modifier.layoutId("text").padding(horizontal = HorizontalTextPadding)
+                ) { text() }
+            }
+            if (icon != null) {
+                Box(Modifier.layoutId("icon")) { icon() }
+            }
         }
     ) { measurables, constraints ->
-        val textPlaceable = measurables.first { it.layoutId == "text" }.measure(
-            // Measure with loose constraints for height as we don't want the text to take up more
-            // space than it needs
-            constraints.copy(minHeight = 0)
-        )
+        val textPlaceable = text?.let {
+            measurables.first { it.layoutId == "text" }.measure(
+                // Measure with loose constraints for height as we don't want the text to take up more
+                // space than it needs
+                constraints.copy(minHeight = 0)
+            )
+        }
 
-        val iconPlaceable = measurables.first { it.layoutId == "icon" }.measure(constraints)
+        val iconPlaceable = icon?.let {
+            measurables.first { it.layoutId == "icon" }.measure(constraints)
+        }
 
-        val hasTextPlaceable =
-            textPlaceable.width != 0 && textPlaceable.height != 0
+        val tabWidth = max(textPlaceable?.width ?: 0, iconPlaceable?.width ?: 0)
 
-        val hasIconPlaceable =
-            iconPlaceable.width != 0 && iconPlaceable.height != 0
+        val tabHeight = if (textPlaceable != null && iconPlaceable != null) {
+            LargeTabHeight
+        } else {
+            SmallTabHeight
+        }.toIntPx()
 
-        val tabWidth = max(textPlaceable.width, iconPlaceable.width)
-
-        val tabHeight =
-            (if (hasTextPlaceable && hasIconPlaceable) LargeTabHeight else SmallTabHeight).toIntPx()
-
-        val firstBaseline = textPlaceable[FirstBaseline]
-        val lastBaseline = textPlaceable[LastBaseline]
+        val firstBaseline = textPlaceable?.get(FirstBaseline)
+        val lastBaseline = textPlaceable?.get(LastBaseline)
 
         layout(tabWidth, tabHeight) {
             when {
-                hasTextPlaceable && hasIconPlaceable -> placeTextAndIcon(
+                textPlaceable != null && iconPlaceable != null -> placeTextAndIcon(
                     density = this@Layout,
                     textPlaceable = textPlaceable,
                     iconPlaceable = iconPlaceable,
                     tabWidth = tabWidth,
                     tabHeight = tabHeight,
-                    firstBaseline = firstBaseline,
-                    lastBaseline = lastBaseline
+                    firstBaseline = firstBaseline!!,
+                    lastBaseline = lastBaseline!!
                 )
-                hasTextPlaceable -> placeText(
+                textPlaceable != null -> placeText(
                     density = this@Layout,
                     textPlaceable = textPlaceable,
                     tabHeight = tabHeight,
-                    firstBaseline = firstBaseline,
-                    lastBaseline = lastBaseline
+                    firstBaseline = firstBaseline!!,
+                    lastBaseline = lastBaseline!!
                 )
-                hasIconPlaceable -> placeIcon(iconPlaceable, tabHeight)
+                iconPlaceable != null -> placeIcon(iconPlaceable, tabHeight)
                 else -> {}
             }
         }
