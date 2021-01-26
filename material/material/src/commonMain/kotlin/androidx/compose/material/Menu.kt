@@ -49,7 +49,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpOffset
-import androidx.compose.ui.unit.IntBounds
+import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
@@ -255,8 +255,8 @@ internal const val InTransitionDuration = 120
 internal const val OutTransitionDuration = 75
 
 private fun calculateTransformOrigin(
-    parentBounds: IntBounds,
-    menuBounds: IntBounds
+    parentBounds: IntRect,
+    menuBounds: IntRect
 ): TransformOrigin {
     val pivotX = when {
         menuBounds.left >= parentBounds.right -> 0f
@@ -297,10 +297,10 @@ private fun calculateTransformOrigin(
 internal data class DropdownMenuPositionProvider(
     val contentOffset: DpOffset,
     val density: Density,
-    val onPositionCalculated: (IntBounds, IntBounds) -> Unit = { _, _ -> }
+    val onPositionCalculated: (IntRect, IntRect) -> Unit = { _, _ -> }
 ) : PopupPositionProvider {
     override fun calculatePosition(
-        anchorBounds: IntBounds,
+        anchorBounds: IntRect,
         windowSize: IntSize,
         layoutDirection: LayoutDirection,
         popupContentSize: IntSize
@@ -336,7 +336,7 @@ internal data class DropdownMenuPositionProvider(
 
         onPositionCalculated(
             anchorBounds,
-            IntBounds(x, y, x + popupContentSize.width, y + popupContentSize.height)
+            IntRect(x, y, x + popupContentSize.width, y + popupContentSize.height)
         )
         return IntOffset(x, y)
     }

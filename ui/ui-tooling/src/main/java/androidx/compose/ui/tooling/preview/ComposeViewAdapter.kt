@@ -46,7 +46,7 @@ import androidx.compose.ui.tooling.Inspectable
 import androidx.compose.ui.tooling.SourceLocation
 import androidx.compose.ui.tooling.asTree
 import androidx.compose.ui.tooling.preview.animation.PreviewAnimationClock
-import androidx.compose.ui.unit.IntBounds
+import androidx.compose.ui.unit.IntRect
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.ViewModelStoreOwner
@@ -70,7 +70,7 @@ private val emptyContent: @Composable () -> Unit = @Composable {}
 data class ViewInfo(
     val fileName: String,
     val lineNumber: Int,
-    val bounds: IntBounds,
+    val bounds: IntRect,
     val location: SourceLocation?,
     val children: List<ViewInfo>
 ) {

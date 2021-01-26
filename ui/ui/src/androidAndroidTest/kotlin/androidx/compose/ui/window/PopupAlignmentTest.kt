@@ -26,7 +26,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.unit.IntBounds
+import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
@@ -52,7 +52,7 @@ class PopupAlignmentTest {
     private val testTag = "testedPopup"
     private val offset = IntOffset(10, 10)
     private val popupSize = IntSize(40, 20)
-    private val parentBounds = IntBounds(50, 50, 150, 150)
+    private val parentBounds = IntRect(50, 50, 150, 150)
     private val parentSize = IntSize(parentBounds.width, parentBounds.height)
 
     private var composeViewAbsolutePos = IntOffset(0, 0)

@@ -29,7 +29,7 @@ import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.DesktopOwner
 import androidx.compose.ui.platform.DesktopOwnersAmbient
 import androidx.compose.ui.platform.setContent
-import androidx.compose.ui.unit.IntBounds
+import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.round
 
@@ -55,14 +55,14 @@ private fun PopupLayout(
     val owners = DesktopOwnersAmbient.current
     val density = AmbientDensity.current
 
-    val parentBounds = remember { mutableStateOf(IntBounds(0, 0, 0, 0)) }
+    val parentBounds = remember { mutableStateOf(IntRect.Zero) }
 
     // getting parent bounds
     Layout(
         content = {},
         modifier = Modifier.onGloballyPositioned { childCoordinates ->
             val coordinates = childCoordinates.parentCoordinates!!
-            parentBounds.value = IntBounds(
+            parentBounds.value = IntRect(
                 coordinates.localToWindow(Offset.Zero).round(),
                 coordinates.size
             )

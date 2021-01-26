@@ -22,7 +22,7 @@ import androidx.compose.runtime.Providers
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.unit.IntBounds
+import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
@@ -180,7 +180,7 @@ interface PopupPositionProvider {
      * @return The window relative position where the popup should be positioned.
      */
     fun calculatePosition(
-        anchorBounds: IntBounds,
+        anchorBounds: IntRect,
         windowSize: IntSize,
         layoutDirection: LayoutDirection,
         popupContentSize: IntSize
@@ -201,7 +201,7 @@ internal class AlignmentOffsetPositionProvider(
     val offset: IntOffset
 ) : PopupPositionProvider {
     override fun calculatePosition(
-        anchorBounds: IntBounds,
+        anchorBounds: IntRect,
         windowSize: IntSize,
         layoutDirection: LayoutDirection,
         popupContentSize: IntSize
@@ -247,7 +247,7 @@ internal class DropdownPositionProvider(
     val offset: IntOffset
 ) : PopupPositionProvider {
     override fun calculatePosition(
-        anchorBounds: IntBounds,
+        anchorBounds: IntRect,
         windowSize: IntSize,
         layoutDirection: LayoutDirection,
         popupContentSize: IntSize

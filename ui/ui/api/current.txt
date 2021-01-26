@@ -2855,7 +2855,7 @@ package androidx.compose.ui.window {
   }
 
   @androidx.compose.runtime.Immutable public interface PopupPositionProvider {
-    method public long calculatePosition-igXpx9M(androidx.compose.ui.unit.IntBounds anchorBounds, long windowSize, androidx.compose.ui.unit.LayoutDirection layoutDirection, long popupContentSize);
+    method public long calculatePosition-aa5Bd6I(androidx.compose.ui.unit.IntRect anchorBounds, long windowSize, androidx.compose.ui.unit.LayoutDirection layoutDirection, long popupContentSize);
   }
 
   @androidx.compose.runtime.Immutable public interface PopupProperties {

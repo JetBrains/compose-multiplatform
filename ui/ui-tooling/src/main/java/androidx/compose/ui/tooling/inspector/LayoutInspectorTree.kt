@@ -345,7 +345,7 @@ class LayoutInspectorTree {
         val layoutInfo = (group as? NodeGroup)?.node as? LayoutInfo ?: return
         node.layoutNodes.add(layoutInfo)
         val box = group.box
-        val size = box.toSize().toSize()
+        val size = box.size.toSize()
         val coordinates = layoutInfo.coordinates
         val topLeft = toIntOffset(coordinates.localToWindow(Offset.Zero))
         val topRight = toIntOffset(coordinates.localToWindow(Offset(size.width, 0f)))

@@ -83,6 +83,14 @@ inline class IntSize(@PublishedApi internal val packedValue: Long) {
 operator fun Int.times(size: IntSize) = size * this
 
 /**
+ * Convert a [IntSize] to a [IntRect].
+ */
+@Stable
+fun IntSize.toIntRect(): IntRect {
+    return IntRect(IntOffset.Zero, this)
+}
+
+/**
  * Constructs an [IntSize] from width and height [Int] values.
  */
 @Stable
