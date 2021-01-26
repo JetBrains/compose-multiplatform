@@ -51,7 +51,7 @@ class ComposeIntoTests : BaseComposeTest() {
 
         var initializationCount = 0
         @OptIn(ExperimentalComposeApi::class)
-        val composable = @Composable @ComposableContract(tracked = false) {
+        val composable = @Composable {
             DisposableEffect(Unit) {
                 initializationCount++
                 onDispose { }

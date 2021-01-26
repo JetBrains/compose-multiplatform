@@ -18,7 +18,7 @@ package androidx.compose.foundation
 
 import android.content.res.Configuration
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ComposableContract
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.platform.AmbientConfiguration
 
 /**
@@ -43,7 +43,7 @@ import androidx.compose.ui.platform.AmbientConfiguration
  * @return `true` if the system is considered to be in 'dark theme'.
  */
 @Composable
-@ComposableContract(readonly = true)
+@ReadOnlyComposable
 fun isSystemInDarkTheme(): Boolean {
     val uiMode = AmbientConfiguration.current.uiMode
     return (uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES

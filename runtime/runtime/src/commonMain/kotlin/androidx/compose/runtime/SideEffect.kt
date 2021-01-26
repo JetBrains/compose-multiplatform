@@ -39,7 +39,7 @@ import kotlinx.coroutines.launch
  * object lifecycle, see [DisposableEffect].
  */
 @Composable
-@ComposableContract(restartable = false)
+@NonRestartableComposable
 @OptIn(InternalComposeApi::class)
 fun SideEffect(
     effect: () -> Unit
@@ -101,7 +101,7 @@ private const val LaunchedEffectNoParamError =
         "and a new effect launched for the new key."
 
 @Composable
-@ComposableContract(restartable = false)
+@NonRestartableComposable
 @Suppress("DeprecatedCallableAddReplaceWith", "UNUSED_PARAMETER")
 @Deprecated(DisposableEffectNoParamError, level = DeprecationLevel.ERROR)
 fun DisposableEffect(
@@ -138,7 +138,7 @@ fun DisposableEffect(
  * callbacks.
  */
 @Composable
-@ComposableContract(restartable = false)
+@NonRestartableComposable
 fun DisposableEffect(
     key1: Any?,
     effect: DisposableEffectScope.() -> DisposableEffectResult
@@ -177,7 +177,7 @@ fun DisposableEffect(
  * event callbacks.
  */
 @Composable
-@ComposableContract(restartable = false)
+@NonRestartableComposable
 fun DisposableEffect(
     key1: Any?,
     key2: Any?,
@@ -217,7 +217,7 @@ fun DisposableEffect(
  * callbacks.
  */
 @Composable
-@ComposableContract(restartable = false)
+@NonRestartableComposable
 fun DisposableEffect(
     key1: Any?,
     key2: Any?,
@@ -258,7 +258,7 @@ fun DisposableEffect(
  * callbacks.
  */
 @Composable
-@ComposableContract(restartable = false)
+@NonRestartableComposable
 @Suppress("ArrayReturn")
 fun DisposableEffect(
     vararg keys: Any?,
@@ -316,7 +316,7 @@ fun LaunchedEffect(
  * scoped to the composition in response to event callbacks.
  */
 @Composable
-@ComposableContract(restartable = false)
+@NonRestartableComposable
 @OptIn(InternalComposeApi::class)
 fun LaunchedEffect(
     key1: Any?,
@@ -338,7 +338,7 @@ fun LaunchedEffect(
  * scoped to the composition in response to event callbacks.
  */
 @Composable
-@ComposableContract(restartable = false)
+@NonRestartableComposable
 @OptIn(InternalComposeApi::class)
 fun LaunchedEffect(
     key1: Any?,
@@ -361,7 +361,7 @@ fun LaunchedEffect(
  * scoped to the composition in response to event callbacks.
  */
 @Composable
-@ComposableContract(restartable = false)
+@NonRestartableComposable
 @OptIn(InternalComposeApi::class)
 fun LaunchedEffect(
     key1: Any?,
@@ -385,7 +385,7 @@ fun LaunchedEffect(
  * scoped to the composition in response to event callbacks.
  */
 @Composable
-@ComposableContract(restartable = false)
+@NonRestartableComposable
 @Suppress("ArrayReturn")
 @OptIn(InternalComposeApi::class)
 fun LaunchedEffect(

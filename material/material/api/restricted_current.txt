@@ -377,12 +377,12 @@ package androidx.compose.material {
   }
 
   public final class MaterialTheme {
-    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(readonly=true) public androidx.compose.material.Colors getColors();
-    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(readonly=true) public androidx.compose.material.Shapes getShapes();
-    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(readonly=true) public androidx.compose.material.Typography getTypography();
-    property @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(readonly=true) public final androidx.compose.material.Colors colors;
-    property @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(readonly=true) public final androidx.compose.material.Shapes shapes;
-    property @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(readonly=true) public final androidx.compose.material.Typography typography;
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public androidx.compose.material.Colors getColors();
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public androidx.compose.material.Shapes getShapes();
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public androidx.compose.material.Typography getTypography();
+    property @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public final androidx.compose.material.Colors colors;
+    property @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public final androidx.compose.material.Shapes shapes;
+    property @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public final androidx.compose.material.Typography typography;
     field public static final androidx.compose.material.MaterialTheme INSTANCE;
   }
 

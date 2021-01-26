@@ -501,13 +501,12 @@ class AmbientTests : BaseComposeTest() {
         narrowInvalidateForReference(ref = ref)
         return {
             @OptIn(ExperimentalComposeApi::class)
-            // TODO(b/150390669): Review use of @ComposableContract(tracked = false)
             Composition(
                 container,
                 UiApplier(container),
                 ref.value
             ).apply {
-                setContent @ComposableContract(tracked = false) {
+                setContent {
                     block()
                 }
             }

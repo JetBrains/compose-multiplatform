@@ -24,8 +24,8 @@ package androidx.compose.runtime {
   }
 
   @androidx.compose.runtime.Stable public abstract sealed class Ambient<T> {
-    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(readonly=true) public final inline T! getCurrent();
-    property @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(readonly=true) public final inline T! current;
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public final inline T! getCurrent();
+    property @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public final inline T! current;
   }
 
   public final class AmbientKt {
@@ -64,11 +64,11 @@ package androidx.compose.runtime {
   @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface Composable {
   }
 
-  @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface ComposableContract {
-    method public abstract boolean preventCapture() default false;
-    method public abstract boolean readonly() default false;
-    method public abstract boolean restartable() default true;
-    method public abstract boolean tracked() default true;
+  @Deprecated @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface ComposableContract {
+    method @Deprecated public abstract boolean preventCapture() default false;
+    method @Deprecated public abstract boolean readonly() default false;
+    method @Deprecated public abstract boolean restartable() default true;
+    method @Deprecated public abstract boolean tracked() default true;
     property public abstract boolean preventCapture;
     property public abstract boolean readonly;
     property public abstract boolean restartable;
@@ -86,7 +86,7 @@ package androidx.compose.runtime {
   public final class ComposeNodeKt {
     method @androidx.compose.runtime.Composable public static inline <T extends java.lang.Object, reified E extends androidx.compose.runtime.Applier<?>> void ComposeNode(kotlin.jvm.functions.Function0<? extends T> factory, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> update);
     method @androidx.compose.runtime.Composable public static inline <T extends java.lang.Object, reified E extends androidx.compose.runtime.Applier<?>> void ComposeNode(kotlin.jvm.functions.Function0<? extends T> factory, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> update, kotlin.jvm.functions.Function0<? extends kotlin.Unit> content);
-    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(readonly=true) public static inline <T, reified E extends androidx.compose.runtime.Applier<?>> void ComposeNode(kotlin.jvm.functions.Function0<? extends T> factory, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> update, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.SkippableUpdater<T>,? extends kotlin.Unit> skippableUpdate, kotlin.jvm.functions.Function0<? extends kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public static inline <T, reified E extends androidx.compose.runtime.Applier<?>> void ComposeNode(kotlin.jvm.functions.Function0<? extends T> factory, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> update, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.SkippableUpdater<T>,? extends kotlin.Unit> skippableUpdate, kotlin.jvm.functions.Function0<? extends kotlin.Unit> content);
   }
 
   public interface Composer {
@@ -220,6 +220,9 @@ package androidx.compose.runtime {
     method public static <T> androidx.compose.runtime.State<T> derivedStateOf(kotlin.jvm.functions.Function0<? extends T> calculation);
   }
 
+  @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets=kotlin.annotation.AnnotationTarget) public @interface DisallowComposableCalls {
+  }
+
   public interface DisposableEffectResult {
     method public void dispose();
   }
@@ -315,6 +318,9 @@ package androidx.compose.runtime {
   @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface NoLiveLiterals {
   }
 
+  @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface NonRestartableComposable {
+  }
+
   public final class PausableMonotonicFrameClock implements androidx.compose.runtime.MonotonicFrameClock {
     ctor public PausableMonotonicFrameClock(androidx.compose.runtime.MonotonicFrameClock frameClock);
     method public boolean isPaused();
@@ -350,12 +356,15 @@ package androidx.compose.runtime {
     property public final T! value;
   }
 
+  @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface ReadOnlyComposable {
+  }
+
   public interface RecomposeScope {
     method public void invalidate();
   }
 
   public final class RecomposeScopeImplKt {
-    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(readonly=true) public static androidx.compose.runtime.RecomposeScope getCurrentRecomposeScope();
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public static androidx.compose.runtime.RecomposeScope getCurrentRecomposeScope();
   }
 
   public final class Recomposer extends androidx.compose.runtime.CompositionReference {
@@ -422,17 +431,17 @@ package androidx.compose.runtime {
   }
 
   public final class SideEffectKt {
-    method @Deprecated @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void DisposableEffect(kotlin.jvm.functions.Function1<? super androidx.compose.runtime.DisposableEffectScope,? extends androidx.compose.runtime.DisposableEffectResult> effect);
-    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void DisposableEffect(Object? key1, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.DisposableEffectScope,? extends androidx.compose.runtime.DisposableEffectResult> effect);
-    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void DisposableEffect(Object? key1, Object? key2, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.DisposableEffectScope,? extends androidx.compose.runtime.DisposableEffectResult> effect);
-    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void DisposableEffect(Object? key1, Object? key2, Object? key3, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.DisposableEffectScope,? extends androidx.compose.runtime.DisposableEffectResult> effect);
-    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void DisposableEffect(Object![]? keys, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.DisposableEffectScope,? extends androidx.compose.runtime.DisposableEffectResult> effect);
+    method @Deprecated @androidx.compose.runtime.Composable @androidx.compose.runtime.NonRestartableComposable public static void DisposableEffect(kotlin.jvm.functions.Function1<? super androidx.compose.runtime.DisposableEffectScope,? extends androidx.compose.runtime.DisposableEffectResult> effect);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.NonRestartableComposable public static void DisposableEffect(Object? key1, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.DisposableEffectScope,? extends androidx.compose.runtime.DisposableEffectResult> effect);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.NonRestartableComposable public static void DisposableEffect(Object? key1, Object? key2, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.DisposableEffectScope,? extends androidx.compose.runtime.DisposableEffectResult> effect);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.NonRestartableComposable public static void DisposableEffect(Object? key1, Object? key2, Object? key3, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.DisposableEffectScope,? extends androidx.compose.runtime.DisposableEffectResult> effect);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.NonRestartableComposable public static void DisposableEffect(Object![]? keys, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.DisposableEffectScope,? extends androidx.compose.runtime.DisposableEffectResult> effect);
     method @Deprecated @androidx.compose.runtime.Composable public static void LaunchedEffect(kotlin.jvm.functions.Function2<? super kotlinx.coroutines.CoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
-    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void LaunchedEffect(Object? key1, kotlin.jvm.functions.Function2<? super kotlinx.coroutines.CoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
-    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void LaunchedEffect(Object? key1, Object? key2, kotlin.jvm.functions.Function2<? super kotlinx.coroutines.CoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
-    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void LaunchedEffect(Object? key1, Object? key2, Object? key3, kotlin.jvm.functions.Function2<? super kotlinx.coroutines.CoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
-    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void LaunchedEffect(Object![]? keys, kotlin.jvm.functions.Function2<? super kotlinx.coroutines.CoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
-    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(restartable=false) public static void SideEffect(kotlin.jvm.functions.Function0<kotlin.Unit> effect);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.NonRestartableComposable public static void LaunchedEffect(Object? key1, kotlin.jvm.functions.Function2<? super kotlinx.coroutines.CoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.NonRestartableComposable public static void LaunchedEffect(Object? key1, Object? key2, kotlin.jvm.functions.Function2<? super kotlinx.coroutines.CoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.NonRestartableComposable public static void LaunchedEffect(Object? key1, Object? key2, Object? key3, kotlin.jvm.functions.Function2<? super kotlinx.coroutines.CoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.NonRestartableComposable public static void LaunchedEffect(Object![]? keys, kotlin.jvm.functions.Function2<? super kotlinx.coroutines.CoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.NonRestartableComposable public static void SideEffect(kotlin.jvm.functions.Function0<kotlin.Unit> effect);
   }
 
   public final inline class SkippableUpdater<T> {
