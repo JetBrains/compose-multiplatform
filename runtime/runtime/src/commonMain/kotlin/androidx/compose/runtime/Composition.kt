@@ -26,11 +26,14 @@ package androidx.compose.runtime
  */
 interface Composition {
     /**
-     * Update the composition with the content described by the [content] composable
-     *
-     * @param content A composable function that describes the UI
+     * Returns true if any pending invalidations have been scheduled.
      */
-    fun setContent(content: @Composable () -> Unit)
+    val hasInvalidations: Boolean
+
+    /**
+     * True if [dispose] has been called.
+     */
+    val isDisposed: Boolean
 
     /**
      * Clear the hierarchy that was created from the composition.
@@ -38,15 +41,112 @@ interface Composition {
     fun dispose()
 
     /**
-     * Returns true if any pending invalidations have been scheduled.
+     * Update the composition with the content described by the [content] composable. After this
+     * has been called the changes to produce the initial composition has been calculated and
+     * applied to the composition.
+     *
+     * Will throw an [IllegalStateException] if the composition has been disposed.
+     *
+     * @param content A composable function that describes the tree.
+     * @exception IllegalStateException thrown in the composition has been [dispose]d.
      */
-    fun hasInvalidations(): Boolean
+    fun setContent(content: @Composable () -> Unit)
+}
+
+/**
+ * A controlled composition is a [Composition] that can be directly controlled by the caller.
+ *
+ * This is the interface used by the [Recomposer] to control how and when a composition is
+ * invalidated and subsequently recomposed.
+ *
+ * Normally a composition is controlled by the [Recomposer] but it is often more efficient for
+ * tests to take direct control over a composition by calling [ControlledComposition] instead of
+ * [Composition].
+ *
+ * @see ControlledComposition
+ */
+interface ControlledComposition : Composition {
+    /**
+     * True if the composition is actively compositing such as when actively in a call to
+     * [composeContent] or [recompose].
+     */
+    val isComposing: Boolean
+
+    /**
+     * True after [composeContent] or [recompose] has been called and [applyChanges] is expected
+     * as the next call. An exception will be throw in [composeContent] or [recompose] is called
+     * while there are pending from the previous composition pending to be applied.
+     */
+    val hasPendingChanges: Boolean
+
+    /**
+     * Called by the parent composition in response to calling [setContent]. After this method
+     * the changes should be calculated but not yet applied. DO NOT call this method directly if
+     * this is interface is controlled by a [Recomposer], either use [setContent] or
+     * [Recomposer.composeInitial] instead.
+     *
+     * @param content A composable function that describes the tree.
+     */
+    fun composeContent(content: @Composable () -> Unit)
+
+    /**
+     * Record the values that were modified after the last call to [recompose] or from the
+     * initial call to [composeContent]. This should be called before [recompose] is called to
+     * record which parts of the composition need to be recomposed.
+     *
+     * @param values the set of values that have changed since the last composition.
+     */
+    fun recordModificationsOf(values: Set<Any>)
+
+    /**
+     * Record that [value] has been read. This is used primarily by the [Recomposer] to inform the
+     * composer when the a [MutableState] instance has been read implying it should be observed
+     * for changes.
+     *
+     * @param value the instance from which a property was read
+     */
+    fun recordReadOf(value: Any)
+
+    /**
+     * Record that [value] has been modified. This is used primarily by the [Recomposer] to inform
+     * the composer when the a [MutableState] instance been change by a composable function.
+     */
+    fun recordWriteOf(value: Any)
+
+    /**
+     * Recompose the composition to calculate any changes necessary to the composition state and
+     * the tree maintained by the applier. No changes have been made yet. Changes calculated will
+     * be applied when [applyChanges] is called.
+     *
+     * @return returns `true` if any changes are pending and [applyChanges] should be called.
+     */
+    fun recompose(): Boolean
+
+    /**
+     * Apply the changes calculated during [setContent] or [recompose]. If an exception is thrown
+     * by [applyChanges] the composition is irreparably damaged and should be [dispose]d.
+     */
+    fun applyChanges()
+
+    /**
+     * Invalidate all invalidation scopes. This is called, for example, by [Recomposer] when the
+     * Recomposer becomes active after a previous period of inactivity, potentially missing more
+     * granular invalidations.
+     */
+    fun invalidateAll()
+
+    /**
+     * Throws an exception if the internal state of the composer has been corrupted and is no
+     * longer consistent. Used in testing the composer itself.
+     */
+    @InternalComposeApi
+    fun verifyConsistent()
 }
 
 /**
  * This method is the way to initiate a composition. Optionally, a [parent]
  * [CompositionReference] can be provided to make the composition behave as a sub-composition of
- * the parent.
+ * the parent or a [Recomposer] can be provided.
  *
  * It is important to call [Composition.dispose] whenever this [key] is no longer needed in
  * order to release resources.
@@ -65,7 +165,7 @@ interface Composition {
  * @see Recomposer
  */
 @ExperimentalComposeApi
-fun compositionFor(
+fun Composition(
     key: Any,
     applier: Applier<*>,
     parent: CompositionReference,
@@ -73,7 +173,7 @@ fun compositionFor(
 ): Composition = Compositions.findOrCreate(key) {
     CompositionImpl(
         parent,
-        composerFactory = { parent -> Composer(applier, parent) },
+        applier,
         onDispose = { Compositions.onDisposed(key) }
     ).also {
         onCreated()
@@ -81,16 +181,73 @@ fun compositionFor(
 }
 
 /**
+ * This method is the way to initiate a composition. Optionally, a [parent]
+ * [CompositionReference] can be provided to make the composition behave as a sub-composition of
+ * the parent or a [Recomposer] can be provided.
+ *
+ * It is important to call [Composition.dispose] this composer is no longer needed in order to
+ * release resources.
+ *
+ * @sample androidx.compose.runtime.samples.CustomTreeComposition
+ *
+ * @param applier The [Applier] instance to be used in the composition.
+ * @param parent The parent composition reference, if applicable. Default is null.
+ *
+ * @see Applier
+ * @see Composition
+ * @see Recomposer
+ */
+@ExperimentalComposeApi
+fun Composition(
+    applier: Applier<*>,
+    parent: CompositionReference
+): Composition =
+    CompositionImpl(
+        parent,
+        applier
+    )
+
+/**
+ * This method is the way to initiate a composition. Optionally, a [parent]
+ * [CompositionReference] can be provided to make the composition behave as a sub-composition of
+ * the parent or a [Recomposer] can be provided.
+ *
+ * A controlled composition allows direct control of the composition instead of it being
+ * controlled by the [Recomposer] passed ot the root composition.
+ *
+ * It is important to call [Composition.dispose] this composer is no longer needed in order to
+ * release resources.
+ *
+ * @sample androidx.compose.runtime.samples.CustomTreeComposition
+ *
+ * @param applier The [Applier] instance to be used in the composition.
+ * @param parent The parent composition reference, if applicable. Default is null.
+ *
+ * @see Applier
+ * @see Composition
+ * @see Recomposer
+ */
+@TestOnly
+fun ControlledComposition(
+    applier: Applier<*>,
+    parent: CompositionReference
+): ControlledComposition =
+    CompositionImpl(
+        parent,
+        applier
+    )
+
+/**
  * @param parent An optional reference to the parent composition.
- * @param composerFactory A function to create a composer object, for use during composition
+ * @param applier The applier to use to manage the tree built by the composer.
  * @param onDispose A callback to be triggered when [dispose] is called.
  */
 private class CompositionImpl(
     private val parent: CompositionReference,
-    composerFactory: (CompositionReference) -> Composer<*>,
-    private val onDispose: () -> Unit
-) : Composition {
-    private val composer: Composer<*> = composerFactory(parent).also {
+    applier: Applier<*>,
+    private val onDispose: (() -> Unit)? = null
+) : ControlledComposition {
+    private val composer: ComposerImpl = ComposerImpl(applier, parent, this).also {
         parent.registerComposer(it)
     }
 
@@ -103,10 +260,22 @@ private class CompositionImpl(
 
     var composable: @Composable () -> Unit = emptyContent()
 
+    override val isComposing: Boolean
+        get() = composer.isComposing
+
+    override val isDisposed: Boolean = disposed
+
+    override val hasPendingChanges: Boolean
+        get() = composer.hasPendingChanges
+
     override fun setContent(content: @Composable () -> Unit) {
         check(!disposed) { "The composition is disposed" }
         this.composable = content
-        parent.composeInitial(composer, composable)
+        parent.composeInitial(this, composable)
+    }
+
+    override fun composeContent(content: @Composable () -> Unit) {
+        composer.composeContent(content)
     }
 
     @OptIn(ExperimentalComposeApi::class)
@@ -115,11 +284,38 @@ private class CompositionImpl(
             disposed = true
             composable = emptyContent()
             composer.dispose()
-            onDispose()
+            parent.unregisterComposition(this)
+            onDispose?.invoke()
         }
     }
 
-    override fun hasInvalidations() = composer.hasInvalidations()
+    override val hasInvalidations get() = composer.hasInvalidations
+
+    override fun recordModificationsOf(values: Set<Any>) {
+        composer.recordModificationsOf(values)
+    }
+
+    override fun recordReadOf(value: Any) {
+        composer.recordReadOf(value)
+    }
+
+    override fun recordWriteOf(value: Any) {
+        composer.recordWriteOf(value)
+    }
+
+    override fun recompose(): Boolean = composer.recompose()
+
+    override fun applyChanges() {
+        composer.applyChanges()
+    }
+
+    override fun invalidateAll() {
+        composer.invalidateAll()
+    }
+
+    override fun verifyConsistent() {
+        composer.verifyConsistent()
+    }
 }
 
 /**

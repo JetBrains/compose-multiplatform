@@ -106,7 +106,7 @@ abstract class BaseComposeTest {
         val reference = rememberCompositionReference()
         // TODO(b/150390669): Review use of @ComposableContract(tracked = false)
         @OptIn(ExperimentalComposeApi::class)
-        compositionFor(
+        Composition(
             container,
             UiApplier(container),
             reference

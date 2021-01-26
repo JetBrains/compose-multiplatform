@@ -21,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionReference
 import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.compositionFor
 import androidx.compose.runtime.ComposeNode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.PathFillType
@@ -102,7 +101,7 @@ internal fun composeVector(
     container: VectorComponent,
     parent: CompositionReference,
     composable: @Composable (viewportWidth: Float, viewportHeight: Float) -> Unit
-): Composition = compositionFor(
+): Composition = Composition(
     container,
     VectorApplier(container.root),
     parent

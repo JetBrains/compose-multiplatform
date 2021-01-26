@@ -210,11 +210,10 @@ class Recomposer(
     private val stateLock = Any()
     private var runnerJob: Job? = null
     private var closeCause: Throwable? = null
-    private val knownComposers = mutableListOf<Composer<*>>()
+    private val knownCompositions = mutableListOf<ControlledComposition>()
     private val snapshotInvalidations = mutableListOf<Set<Any>>()
-    private val composerInvalidations = mutableListOf<Composer<*>>()
+    private val compositionInvalidations = mutableListOf<ControlledComposition>()
     private var frameContinuation: CancellableContinuation<Unit>? = null
-
     private val _state = MutableStateFlow(State.Inactive)
 
     /**
@@ -223,9 +222,9 @@ class Recomposer(
      */
     private fun deriveStateLocked(): CancellableContinuation<Unit>? {
         if (_state.value <= State.ShuttingDown) {
-            knownComposers.clear()
+            knownCompositions.clear()
             snapshotInvalidations.clear()
-            composerInvalidations.clear()
+            compositionInvalidations.clear()
             frameContinuation?.cancel()
             frameContinuation = null
             return null
@@ -234,10 +233,10 @@ class Recomposer(
         val newState = when {
             runnerJob == null -> {
                 snapshotInvalidations.clear()
-                composerInvalidations.clear()
+                compositionInvalidations.clear()
                 if (broadcastFrameClock.hasAwaiters) State.InactivePendingWork else State.Inactive
             }
-            composerInvalidations.isNotEmpty() || snapshotInvalidations.isNotEmpty() ||
+            compositionInvalidations.isNotEmpty() || snapshotInvalidations.isNotEmpty() ||
                 broadcastFrameClock.hasAwaiters -> State.PendingWork
             else -> State.Idle
         }
@@ -277,8 +276,8 @@ class Recomposer(
     private fun recordComposerModificationsLocked() {
         if (snapshotInvalidations.isNotEmpty()) {
             snapshotInvalidations.fastForEach { changes ->
-                knownComposers.fastForEach { composer ->
-                    composer.recordModificationsOf(changes)
+                knownCompositions.fastForEach { composition ->
+                    composition.recordModificationsOf(changes)
                 }
             }
             snapshotInvalidations.clear()
@@ -333,11 +332,11 @@ class Recomposer(
                 // Invalidate all registered composers when we start since we weren't observing
                 // snapshot changes on their behalf. Assume anything could have changed.
                 synchronized(stateLock) {
-                    knownComposers.fastForEach { it.invalidateAll() }
+                    knownCompositions.fastForEach { it.invalidateAll() }
                     // Don't need to deriveStateLocked here; invalidate will do it if needed.
                 }
 
-                val toRecompose = mutableListOf<Composer<*>>()
+                val toRecompose = mutableListOf<ControlledComposition>()
                 while (true) {
                     // Await something to do
                     if (_state.value < State.PendingWork) {
@@ -386,8 +385,8 @@ class Recomposer(
                             synchronized(stateLock) {
                                 recordComposerModificationsLocked()
 
-                                composerInvalidations.fastForEach { toRecompose += it }
-                                composerInvalidations.clear()
+                                compositionInvalidations.fastForEach { toRecompose += it }
+                                compositionInvalidations.clear()
                             }
 
                             // Perform recomposition for any invalidated composers
@@ -439,23 +438,23 @@ class Recomposer(
     }
 
     internal override fun composeInitial(
-        composer: Composer<*>,
-        composable: @Composable () -> Unit
+        composition: ControlledComposition,
+        content: @Composable () -> Unit
     ) {
-        val composerWasComposing = composer.isComposing
-        composing(composer) {
-            composer.composeInitial(composable)
+        val composerWasComposing = composition.isComposing
+        composing(composition) {
+            composition.composeContent(content)
         }
         // TODO(b/143755743)
         if (!composerWasComposing) {
             Snapshot.notifyObjectsInitialized()
         }
-        composer.applyChanges()
+        composition.applyChanges()
 
         synchronized(stateLock) {
             if (_state.value > State.ShuttingDown) {
-                if (composer !in knownComposers) {
-                    knownComposers += composer
+                if (composition !in knownCompositions) {
+                    knownCompositions += composition
                 }
             }
         }
@@ -467,26 +466,26 @@ class Recomposer(
         }
     }
 
-    private fun performRecompose(composer: Composer<*>): Boolean {
-        if (composer.isComposing || composer.isDisposed) return false
-        return composing(composer) {
-            composer.recompose()
+    private fun performRecompose(composition: ControlledComposition): Boolean {
+        if (composition.isComposing || composition.isDisposed) return false
+        return composing(composition) {
+            composition.recompose()
         }.also {
-            composer.applyChanges()
+            composition.applyChanges()
         }
     }
 
-    private fun readObserverOf(composer: Composer<*>): SnapshotReadObserver {
-        return { value -> composer.recordReadOf(value) }
+    private fun readObserverOf(composition: ControlledComposition): SnapshotReadObserver {
+        return { value -> composition.recordReadOf(value) }
     }
 
-    private fun writeObserverOf(composer: Composer<*>): SnapshotWriteObserver {
-        return { value -> composer.recordWriteOf(value) }
+    private fun writeObserverOf(composition: ControlledComposition): SnapshotWriteObserver {
+        return { value -> composition.recordWriteOf(value) }
     }
 
-    private inline fun <T> composing(composer: Composer<*>, block: () -> T): T {
+    private inline fun <T> composing(composition: ControlledComposition, block: () -> T): T {
         val snapshot = takeMutableSnapshot(
-            readObserverOf(composer), writeObserverOf(composer)
+            readObserverOf(composition), writeObserverOf(composition)
         )
         try {
             return snapshot.enter(block)
@@ -522,7 +521,7 @@ class Recomposer(
         }
 
     private val hasFrameWorkLocked: Boolean
-        get() = composerInvalidations.isNotEmpty() || broadcastFrameClock.hasAwaiters
+        get() = compositionInvalidations.isNotEmpty() || broadcastFrameClock.hasAwaiters
 
     /**
      * Suspends until the currently pending recomposition frame is complete.
@@ -553,20 +552,20 @@ class Recomposer(
         // than the current configuration with an ambient
     }
 
-    internal override fun registerComposerWithRoot(composer: Composer<*>) {
+    internal override fun registerComposition(composition: ControlledComposition) {
         // Do nothing.
     }
 
-    internal override fun unregisterComposerWithRoot(composer: Composer<*>) {
+    internal override fun unregisterComposition(composition: ControlledComposition) {
         synchronized(stateLock) {
-            knownComposers -= composer
+            knownCompositions -= composition
         }
     }
 
-    internal override fun invalidate(composer: Composer<*>) {
+    internal override fun invalidate(composition: ControlledComposition) {
         synchronized(stateLock) {
-            if (composer !in composerInvalidations) {
-                composerInvalidations += composer
+            if (composition !in compositionInvalidations) {
+                compositionInvalidations += composition
                 deriveStateLocked()
             } else null
         }?.resume(Unit)

@@ -26,7 +26,7 @@ private val EmptyAmbientMap: AmbientMap = persistentHashMapOf()
  * to run a separate composition in the context of the current one, preserving ambients and propagating
  * invalidations. When this call leaves the composition, the reference is invalidated.
  */
-@OptIn(ComposeCompilerApi::class)
+@OptIn(InternalComposeApi::class)
 @Composable fun rememberCompositionReference(): CompositionReference {
     return currentComposer.buildReference()
 }
@@ -48,18 +48,17 @@ abstract class CompositionReference internal constructor() {
     internal abstract val collectingKeySources: Boolean
     internal abstract val collectingParameterInformation: Boolean
     internal abstract val effectCoroutineContext: CoroutineContext
-    internal abstract fun composeInitial(composer: Composer<*>, composable: @Composable () -> Unit)
-    internal abstract fun invalidate(composer: Composer<*>)
+    internal abstract fun composeInitial(
+        composition: ControlledComposition,
+        content: @Composable () -> Unit
+    )
+    internal abstract fun invalidate(composition: ControlledComposition)
 
     internal open fun recordInspectionTable(table: MutableSet<CompositionData>) {}
-    internal open fun registerComposer(composer: Composer<*>) {
-        registerComposerWithRoot(composer)
-    }
-    internal open fun unregisterComposer(composer: Composer<*>) {
-        unregisterComposerWithRoot(composer)
-    }
-    internal abstract fun registerComposerWithRoot(composer: Composer<*>)
-    internal abstract fun unregisterComposerWithRoot(composer: Composer<*>)
+    internal open fun registerComposer(composer: Composer) { }
+    internal open fun unregisterComposer(composer: Composer) { }
+    internal abstract fun registerComposition(composition: ControlledComposition)
+    internal abstract fun unregisterComposition(composition: ControlledComposition)
 
     internal open fun <T> getAmbient(key: Ambient<T>): T = key.defaultValueHolder.value
     internal open fun getAmbientScope(): AmbientMap = EmptyAmbientMap

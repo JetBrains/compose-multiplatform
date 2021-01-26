@@ -32,7 +32,7 @@ package androidx.compose.runtime
  *
  * @see Updater
  * @see Applier
- * @see compositionFor
+ * @see Composition
  */
 @OptIn(ComposeCompilerApi::class)
 @Composable inline fun <T : Any, reified E : Applier<*>> ComposeNode(
@@ -67,7 +67,7 @@ package androidx.compose.runtime
  *
  * @see Updater
  * @see Applier
- * @see compositionFor
+ * @see Composition
  */
 @OptIn(ComposeCompilerApi::class)
 @Composable
@@ -111,7 +111,7 @@ inline fun <T : Any?, reified E : Applier<*>> ComposeNode(
  * @see Updater
  * @see SkippableUpdater
  * @see Applier
- * @see compositionFor
+ * @see Composition
  */
 @OptIn(ComposeCompilerApi::class)
 @Composable @ComposableContract(readonly = true)
