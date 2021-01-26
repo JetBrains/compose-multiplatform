@@ -49,6 +49,7 @@ val ALLOW_RERUNNING_TASKS = setOf(
     "createProjectZip",
     "externalNativeBuildDebug",
     "externalNativeBuildRelease",
+    "generateDebugUnitTestConfig",
     "generateJsonModelDebug",
     "generateJsonModelRelease",
     "generateMetadataFileForAndroidDebugPublication",
@@ -104,12 +105,17 @@ val ALLOW_RERUNNING_TASKS = setOf(
      * https://github.com/johnrengelman/shadow/issues/561
      */
     "relocateShadowJar",
+    "testDebugUnitTest",
     "stripArchiveForPartialDejetification",
     "verifyDependencyVersions",
     "zipTestConfigsWithApks",
+    "zipHtmlResultsOfTestDebugUnitTest",
+    "zipXmlResultsOfTestDebugUnitTest",
 
     ":camera:integration-tests:camera-testapp-core:mergeLibDexDebug",
     ":camera:integration-tests:camera-testapp-core:packageDebug",
+    ":camera:integration-tests:camera-testapp-extensions:mergeLibDexDebug",
+    ":camera:integration-tests:camera-testapp-extensions:packageDebug",
     ":camera:integration-tests:camera-testapp-uiwidgets:mergeLibDexDebug",
     ":camera:integration-tests:camera-testapp-uiwidgets:packageDebug",
     ":camera:integration-tests:camera-testapp-core:GenerateTestConfigurationdebug",
@@ -121,9 +127,13 @@ val ALLOW_RERUNNING_TASKS = setOf(
 )
 
 // Additional tasks that are expected to be temporarily out-of-date after running once
-// Tasks in this set we don't even try to rerun, because they're known to be somewhat slow
-// and also known to not generate any new, necessary files during subsequent runs
+// Tasks in this set we don't even try to rerun, because they're known to be unnecessary
 val DONT_TRY_RERUNNING_TASKS = setOf(
+    "listTaskOutputs",
+    "properties",
+    "tasks",
+    "zipEcFiles",
+
     // More information about the fact that these dokka tasks rerun can be found at b/167569304
     "dokkaKotlinDocs",
     "zipDokkaDocs",

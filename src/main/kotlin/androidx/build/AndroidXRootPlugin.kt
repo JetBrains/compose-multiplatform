@@ -103,7 +103,7 @@ class AndroidXRootPlugin : Plugin<Project> {
             project.plugins.withType(AndroidBasePlugin::class.java) {
                 buildOnServerTask.dependsOn("${project.path}:assembleDebug")
                 buildOnServerTask.dependsOn("${project.path}:assembleAndroidTest")
-                if (!project.rootProject.hasProperty(AndroidXPlugin.USE_MAX_DEP_VERSIONS)) {
+                if (!project.usingMaxDepVersions()) {
                     buildOnServerTask.dependsOn("${project.path}:lintDebug")
                 }
             }
@@ -153,7 +153,7 @@ class AndroidXRootPlugin : Plugin<Project> {
 
         // If useMaxDepVersions is set, iterate through all the project and substitute any androidx
         // artifact dependency with the local tip of tree version of the library.
-        if (hasProperty(AndroidXPlugin.USE_MAX_DEP_VERSIONS)) {
+        if (project.usingMaxDepVersions()) {
             // This requires evaluating all sub-projects to create the module:project map
             // and project dependencies.
             evaluationDependsOnChildren()
