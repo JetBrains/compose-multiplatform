@@ -79,7 +79,7 @@ class DesktopCanvas(val skija: org.jetbrains.skija.Canvas) : Canvas {
 
     override fun concat(matrix: Matrix) {
         if (!matrix.isIdentity()) {
-            skija.concat(Matrix44(*matrix.values))
+            skija.concat(matrix.toSkija())
         }
     }
 
@@ -343,4 +343,26 @@ class DesktopCanvas(val skija: org.jetbrains.skija.Canvas) : Canvas {
         ClipOp.Difference -> SkijaClipMode.DIFFERENCE
         ClipOp.Intersect -> SkijaClipMode.INTERSECT
     }
+
+    private fun Matrix.toSkija() = Matrix44(
+        this[0, 0],
+        this[1, 0],
+        this[2, 0],
+        this[3, 0],
+
+        this[0, 1],
+        this[1, 1],
+        this[2, 1],
+        this[3, 1],
+
+        this[0, 2],
+        this[1, 2],
+        this[2, 2],
+        this[3, 2],
+
+        this[0, 3],
+        this[1, 3],
+        this[2, 3],
+        this[3, 3]
+    )
 }
