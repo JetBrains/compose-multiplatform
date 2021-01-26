@@ -81,7 +81,7 @@ class DesktopPaintTest : DesktopGraphicsTest() {
             image = imageFromResource("androidx/compose/desktop/test.png"),
             topLeftOffset = Offset(2f, 4f),
             paint = Paint().apply {
-                colorFilter = ColorFilter(Color.Blue, BlendMode.Plus)
+                colorFilter = ColorFilter.tint(Color.Blue, BlendMode.Plus)
             }
         )
 

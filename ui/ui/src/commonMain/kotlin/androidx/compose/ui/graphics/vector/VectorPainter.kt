@@ -84,7 +84,7 @@ fun rememberVectorPainter(
         // vector itself. Note this tint can be overridden by an explicit ColorFilter
         // provided on the Modifier.paint call
         painter.intrinsicColorFilter = if (tintColor != Color.Unspecified) {
-            ColorFilter(tintColor, tintBlendMode)
+            ColorFilter.tint(tintColor, tintBlendMode)
         } else {
             null
         }

@@ -28,18 +28,70 @@ import androidx.compose.runtime.Stable
  * to the [Paint.blendMode], using the output of this filter as the source
  * and the background as the destination.
  */
+@Deprecated(
+    "Use ColorFilter.tint(color, blendmode) instead",
+    ReplaceWith(
+        "ColorFilter.tint(color, blendMode)",
+        "androidx.compose.ui.graphics"
+    )
+)
+fun ColorFilter(
+    color: Color,
+    blendMode: BlendMode
+) = ColorFilter.tint(color, blendMode)
+
+// TODO mark internal once https://youtrack.jetbrains.com/issue/KT-36695 is fixed
+/* internal */ expect class NativeColorFilter
+
+/**
+ * Effect used to modify the color of each pixel drawn on a [Paint] that it is installed on
+ */
 @Immutable
-data class ColorFilter(
-    @Stable
-    val color: Color,
-    @Stable
-    val blendMode: BlendMode
-) {
+class ColorFilter internal constructor(internal val nativeColorFilter: NativeColorFilter) {
     companion object {
         /**
-         * Helper method to create a [ColorFilter] that tints contents to the specified color
+         * Creates a color filter that applies the blend mode given as the second
+         * argument. The source color is the one given as the first argument, and the
+         * destination color is the one from the layer being composited.
+         *
+         * The output of this filter is then composited into the background according
+         * to the [Paint.blendMode], using the output of this filter as the source
+         * and the background as the destination.
+         *
+         * @param color Color used to blend source content
+         * @param blendMode BlendMode used when compositing the tint color to the destination
          */
         @Stable
-        fun tint(color: Color): ColorFilter = ColorFilter(color, BlendMode.SrcIn)
+        fun tint(color: Color, blendMode: BlendMode = BlendMode.SrcIn): ColorFilter =
+            actualTintColorFilter(color, blendMode)
+
+        /**
+         * Create a [ColorFilter] that transforms colors through a 4x5 color matrix. This filter can
+         * be used to change the saturation of pixels, convert from YUV to RGB, etc.
+         *
+         * @param colorMatrix ColorMatrix used to transform pixel values when drawn
+         */
+        @Stable
+        fun colorMatrix(colorMatrix: ColorMatrix): ColorFilter =
+            actualColorMatrixColorFilter(colorMatrix)
+
+        /**
+         * Create a [ColorFilter] that can be used to simulate simple lighting effects.
+         * A lighting ColorFilter is defined by two parameters, one used to multiply the source
+         * color and one used to add to the source color
+         *
+         * @param multiply Color that will be added to the source color when the color
+         *          filter is applied
+         * @param add Color used to multiply the source color when the color filter is applied.
+         */
+        @Stable
+        fun lighting(multiply: Color, add: Color): ColorFilter =
+            actualLightingColorFilter(multiply, add)
     }
 }
+
+internal expect fun actualTintColorFilter(color: Color, blendMode: BlendMode): ColorFilter
+
+internal expect fun actualColorMatrixColorFilter(colorMatrix: ColorMatrix): ColorFilter
+
+internal expect fun actualLightingColorFilter(multiply: Color, add: Color): ColorFilter
