@@ -361,7 +361,14 @@ data class ProgressBarRangeInfo(
     val range: ClosedFloatingPointRange<Float>,
     /*@IntRange(from = 0)*/
     val steps: Int = 0
-)
+) {
+    companion object {
+        /**
+         * Accessibility range information to present indeterminate progress bar
+         */
+        val Indeterminate = ProgressBarRangeInfo(0f, 0f..0f)
+    }
+}
 
 /**
  * The scroll state of one axis if this node is scrollable.

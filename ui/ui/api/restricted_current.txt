@@ -2616,6 +2616,12 @@ package androidx.compose.ui.semantics {
     property public final float current;
     property public final kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> range;
     property public final int steps;
+    field public static final androidx.compose.ui.semantics.ProgressBarRangeInfo.Companion Companion;
+  }
+
+  public static final class ProgressBarRangeInfo.Companion {
+    method public androidx.compose.ui.semantics.ProgressBarRangeInfo getIndeterminate();
+    property public final androidx.compose.ui.semantics.ProgressBarRangeInfo Indeterminate;
   }
 
   public enum Role {
