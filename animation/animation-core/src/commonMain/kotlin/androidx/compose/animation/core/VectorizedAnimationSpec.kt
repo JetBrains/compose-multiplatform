@@ -41,6 +41,13 @@ import kotlin.math.min
  */
 interface VectorizedAnimationSpec<V : AnimationVector> {
     /**
+     * Whether or not the [VectorizedAnimationSpec] specifies an infinite animation. That is, one
+     * that will not finish by itself, one that needs an external action to stop. For examples, an
+     * indeterminate progress bar, which will only stop when it is removed from the composition.
+     */
+    val isInfinite: Boolean
+
+    /**
      * Calculates the value of the animation at given the playtime, with the provided start/end
      * values, and start velocity.
      *
@@ -111,7 +118,9 @@ interface VectorizedAnimationSpec<V : AnimationVector> {
  * [VectorizedSnapSpec], [VectorizedSpringSpec], etc. The [VectorizedAnimationSpec] that does
  * __not__ implement this is: [InfiniteRepeatableSpec].
  */
-interface VectorizedFiniteAnimationSpec<V : AnimationVector> : VectorizedAnimationSpec<V>
+interface VectorizedFiniteAnimationSpec<V : AnimationVector> : VectorizedAnimationSpec<V> {
+    override val isInfinite: Boolean get() = false
+}
 
 /**
  * Base class for [VectorizedAnimationSpec]s that are based on a fixed [durationMillis].
@@ -290,7 +299,9 @@ class VectorizedInfiniteRepeatableSpec<V : AnimationVector>(
     private val animation: VectorizedDurationBasedAnimationSpec<V>,
     private val repeatMode: RepeatMode = RepeatMode.Restart
 ) : VectorizedAnimationSpec<V> by
-    VectorizedRepeatableSpec<V>(InfiniteIterations, animation, repeatMode)
+    VectorizedRepeatableSpec<V>(InfiniteIterations, animation, repeatMode) {
+    override val isInfinite: Boolean get() = true
+}
 
 /**
  * This animation takes another [VectorizedDurationBasedAnimationSpec] and plays it

@@ -53,6 +53,13 @@ interface Animation<T, V : AnimationVector> {
     val targetValue: T
 
     /**
+     * Whether or not the [Animation] represents an infinite animation. That is, one that will
+     * not finish by itself, one that needs an external action to stop. For examples, an
+     * indeterminate progress bar, which will only stop when it is removed from the composition.
+     */
+    val isInfinite: Boolean
+
+    /**
      * Returns the value of the animation at the given play time.
      *
      * @param playTime the play time that is used to determine the value of the animation.
@@ -216,6 +223,8 @@ class TargetBasedAnimation<T, V : AnimationVector> internal constructor(
         initialVelocityVector?.copy() ?: typeConverter.convertToVector(initialValue)
             .newInstance()
 
+    override val isInfinite: Boolean get() = animationSpec.isInfinite
+
     override fun getValue(playTime: Long): T {
         return if (playTime < durationMillis) {
             typeConverter.convertFromVector(
@@ -283,6 +292,9 @@ class DecayAnimation<T, V : AnimationVector> /*@VisibleForTesting*/ constructor(
         animationSpec.getTarget(initialValueVector, initialVelocityVector)
     )
     override val durationMillis: Long
+
+    // DecayAnimation finishes by design
+    override val isInfinite: Boolean = false
 
     /**
      * [DecayAnimation] is an animation that slows down from [initialVelocityVector] as time goes
