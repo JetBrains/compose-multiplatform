@@ -17,7 +17,7 @@
 package androidx.compose.ui.demos.gestures
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,60 +31,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.DragObserver
-import androidx.compose.ui.gesture.ScaleObserver
-import androidx.compose.ui.gesture.dragGestureFilter
-import androidx.compose.ui.gesture.scaleGestureFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.dp
 
 /**
- * Simple demo that shows off how [dragGestureFilter] and [scaleGestureFilter] automatically
- * interoperate.
+ * Simple demo that shows off how [detectTransformGestures] automatically pans and zooms.
  */
 @Composable
 fun DragAndScaleGestureFilterDemo() {
     val size = remember { mutableStateOf(200.dp) }
     val offset = remember { mutableStateOf(Offset.Zero) }
-    val dragInScale = remember { mutableStateOf(false) }
-
-    val scaleObserver = object : ScaleObserver {
-        override fun onScale(scaleFactor: Float) {
-            size.value *= scaleFactor
-        }
-    }
-
-    val dragObserver = object : DragObserver {
-        override fun onDrag(dragDistance: Offset): Offset {
-            offset.value += dragDistance
-            return dragDistance
-        }
-    }
-
-    val onRelease: (Offset) -> Unit = {
-        dragInScale.value = !dragInScale.value
-    }
-
-    val gestures =
-        if (dragInScale.value) {
-            Modifier
-                .scaleGestureFilter(scaleObserver)
-                .dragGestureFilter(dragObserver)
-                .pointerInput { detectTapGestures(onTap = onRelease) }
-        } else {
-            Modifier
-                .dragGestureFilter(dragObserver)
-                .scaleGestureFilter(scaleObserver)
-                .pointerInput { detectTapGestures(onTap = onRelease) }
-        }
-
-    val color =
-        if (dragInScale.value) {
-            Red
-        } else {
-            Blue
-        }
 
     val (offsetX, offsetY) =
         with(AmbientDensity.current) { offset.value.x.toDp() to offset.value.y.toDp() }
@@ -101,8 +58,13 @@ fun DragAndScaleGestureFilterDemo() {
                 .wrapContentSize(Alignment.Center)
                 .offset(offsetX, offsetY)
                 .preferredSize(size.value)
-                .then(gestures)
-                .background(color)
+                .pointerInput {
+                    detectTransformGestures { _, pan, zoom, _ ->
+                        size.value *= zoom
+                        offset.value += pan
+                    }
+                }
+                .background(Blue)
         )
     }
 }

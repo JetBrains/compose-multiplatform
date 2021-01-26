@@ -7,10 +7,6 @@ CallbackName: androidx.compose.ui.gesture.DragObserver:
     Class should be named DragCallback
 CallbackName: androidx.compose.ui.gesture.LongPressDragObserver:
     Class should be named LongPressDragCallback
-CallbackName: androidx.compose.ui.gesture.RawScaleObserver:
-    Class should be named RawScaleCallback
-CallbackName: androidx.compose.ui.gesture.ScaleObserver:
-    Class should be named ScaleCallback
 
 
 ExecutorRegistration: androidx.compose.ui.gesture.ScrollGestureFilterKt#scrollGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.ScrollCallback, androidx.compose.ui.gesture.scrollorientationlocking.Orientation, kotlin.jvm.functions.Function1<? super androidx.compose.ui.gesture.Direction,java.lang.Boolean>, boolean):
