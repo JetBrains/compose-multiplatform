@@ -53,7 +53,7 @@ abstract class SdkResourceGenerator : DefaultTask() {
     val agpDependency: String = AGP_LATEST
 
     @get:Input
-    val navigationCommon: String = "androidx.navigation:navigation-common:2.0.0"
+    val navigationRuntime: String = "androidx.navigation:navigation-runtime:2.2.0"
 
     @get:Input
     val kotlinStdlib: String = KOTLIN_STDLIB
@@ -77,7 +77,7 @@ abstract class SdkResourceGenerator : DefaultTask() {
         writer.write("minSdkVersion=$minSdkVersion\n")
         writer.write("debugKeystore=${debugKeystore.get().asFile.canonicalPath}\n")
         writer.write("agpDependency=$agpDependency\n")
-        writer.write("navigationCommon=$navigationCommon\n")
+        writer.write("navigationRuntime=$navigationRuntime\n")
         writer.write("kotlinStdlib=$kotlinStdlib\n")
         writer.write("gradleVersion=$gradleVersion\n")
         writer.write("rootProjectPath=$rootProjectPath\n")
