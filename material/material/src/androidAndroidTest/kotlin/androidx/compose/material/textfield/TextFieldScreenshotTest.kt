@@ -46,6 +46,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
@@ -430,6 +431,7 @@ class TextFieldScreenshotTest {
         assertAgainstGolden("textField_readOnly_focused")
     }
 
+    @FlakyTest(bugId = 178510985)
     @Test
     fun textField_readOnly_scrolled() {
         rule.setContent {
