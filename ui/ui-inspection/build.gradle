@@ -34,6 +34,9 @@ dependencies {
     compileOnly(project(":compose:runtime:runtime"))
     compileOnly(project(":compose:ui:ui"))
     compileOnly(project(":compose:ui:ui-tooling"))
+    androidTestImplementation(ANDROIDX_TEST_RUNNER)
+    androidTestImplementation(ANDROIDX_TEST_EXT_JUNIT)
+    androidTestImplementation(TRUTH)
 }
 
 androidx {
@@ -52,6 +55,13 @@ android {
 
     sourceSets {
         main.resources.srcDirs += "src/main/proto"
+    }
+
+    externalNativeBuild {
+        cmake {
+            path "src/main/cpp/CMakeLists.txt"
+            version "3.10.2"
+        }
     }
 
     lintOptions {
