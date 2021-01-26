@@ -105,10 +105,10 @@ class ComposeIntoTests : BaseComposeTest() {
     @Test
     @MediumTest
     fun testCompositionCanBeCollectedWithPendingInvalidate() {
-        val referenceQueue = ReferenceQueue<Composer<*>>()
+        val referenceQueue = ReferenceQueue<Composer>()
         var scope: RecomposeScope? = null
-        var composer: Composer<*>? = null
-        var phantomReference: PhantomReference<Composer<*>>? = null
+        var composer: Composer? = null
+        var phantomReference: PhantomReference<Composer>? = null
         fun doShow() {
             val threadLatch = CountDownLatch(1)
             activity.show {
@@ -117,7 +117,7 @@ class ComposeIntoTests : BaseComposeTest() {
                 threadLatch.countDown()
             }
             threadLatch.wait()
-            phantomReference = PhantomReference<Composer<*>>(composer, referenceQueue)
+            phantomReference = PhantomReference<Composer>(composer, referenceQueue)
         }
 
         doShow()

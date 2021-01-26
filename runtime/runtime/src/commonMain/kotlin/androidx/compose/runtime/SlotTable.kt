@@ -687,7 +687,7 @@ internal class SlotReader(
      * Get the value stored at [index] in the parent group's slot.
      */
     fun get(index: Int) = (currentSlot + index).let { slotIndex ->
-        if (slotIndex < currentSlotEnd) slots[slotIndex] else EMPTY
+        if (slotIndex < currentSlotEnd) slots[slotIndex] else Composer.Empty
     }
 
     /**
@@ -699,15 +699,16 @@ internal class SlotReader(
         val next = current + 1
         val end = if (next < groupsSize) groups.dataAnchor(next) else slotsSize
         val address = start + index
-        return if (address < end) slots[address] else EMPTY
+        return if (address < end) slots[address] else Composer.Empty
     }
 
     /**
-     * Get the value of the slot at [currentGroup] or [EMPTY] if at then end of a group. During empty
-     * mode this value is always [EMPTY] which is the value a newly inserted slot.
+     * Get the value of the slot at [currentGroup] or [Composer.Empty] if at then end of a group.
+     * During empty mode this value is always [Composer.Empty] which is the value a newly inserted
+     * slot.
      */
     fun next(): Any? {
-        if (emptyCount > 0 || currentSlot >= currentSlotEnd) return EMPTY
+        if (emptyCount > 0 || currentSlot >= currentSlotEnd) return Composer.Empty
         return slots[currentSlot++]
     }
 
@@ -720,7 +721,7 @@ internal class SlotReader(
     }
 
     /**
-     * End reporting [EMPTY] for calls to [next] and [get],
+     * End reporting [Composer.Empty] for calls to [next] and [get],
      */
     fun endEmpty() {
         require(emptyCount > 0) { "Unbalanced begin/end empty" }
@@ -857,10 +858,10 @@ internal class SlotReader(
 
     private fun IntArray.node(index: Int) = if (isNode(index)) {
         slots[nodeIndex(index)]
-    } else EMPTY
+    } else Composer.Empty
     private fun IntArray.aux(index: Int) = if (hasAux(index)) {
         slots[auxIndex(index)]
-    } else EMPTY
+    } else Composer.Empty
     private fun IntArray.objectKey(index: Int) = if (hasObjectKey(index)) {
         slots[objectKeyIndex(index)]
     } else null
@@ -1041,7 +1042,7 @@ internal class SlotWriter(
      */
     fun groupAux(index: Int): Any? {
         val address = groupIndexToAddress(index)
-        return if (groups.hasAux(address)) slots[groups.auxIndex(address)] else EMPTY
+        return if (groups.hasAux(address)) slots[groups.auxIndex(address)] else Composer.Empty
     }
 
     /**
@@ -1101,8 +1102,8 @@ internal class SlotWriter(
     }
 
     /**
-     * Set the value of the next slot. Returns the previous value of the slot or [EMPTY] is being
-     * inserted.
+     * Set the value of the next slot. Returns the previous value of the slot or [Composer.Empty]
+     * is being inserted.
      */
     fun update(value: Any?): Any? {
         val result = skip()
@@ -1165,8 +1166,8 @@ internal class SlotWriter(
     }
 
     /**
-     * Skip the current slot without updating. If the slot table is inserting then and [EMPTY] slot
-     * is added and [skip] return [EMPTY].
+     * Skip the current slot without updating. If the slot table is inserting then and
+     * [Composer.Empty] slot is added and [skip] return [Composer.Empty].
      */
     fun skip(): Any? {
         if (insertCount > 0) {
@@ -1236,23 +1237,28 @@ internal class SlotWriter(
      */
     fun startGroup() {
         require(insertCount == 0) { "Key must be supplied when inserting" }
-        startGroup(key = 0, objectKey = EMPTY, isNode = false, aux = EMPTY)
+        startGroup(key = 0, objectKey = Composer.Empty, isNode = false, aux = Composer.Empty)
     }
 
     /**
      * Start a group with a integer key
      */
-    fun startGroup(key: Int) = startGroup(key, EMPTY, isNode = false, aux = EMPTY)
+    fun startGroup(key: Int) = startGroup(key, Composer.Empty, isNode = false, aux = Composer.Empty)
 
     /**
      * Start a group with a data key
      */
-    fun startGroup(key: Int, dataKey: Any?) = startGroup(key, dataKey, isNode = false, aux = EMPTY)
+    fun startGroup(key: Int, dataKey: Any?) = startGroup(
+        key,
+        dataKey,
+        isNode = false,
+        aux = Composer.Empty
+    )
 
     /**
      * Start a node.
      */
-    fun startNode(key: Any?) = startGroup(NodeKey, key, isNode = true, aux = EMPTY)
+    fun startNode(key: Any?) = startGroup(NodeKey, key, isNode = true, aux = Composer.Empty)
 
     /**
      * Start a node
@@ -1272,7 +1278,7 @@ internal class SlotWriter(
     /**
      * Start a data group.
      */
-    fun startData(key: Int, aux: Any?) = startGroup(key, EMPTY, isNode = false, aux = aux)
+    fun startData(key: Int, aux: Any?) = startGroup(key, Composer.Empty, isNode = false, aux = aux)
 
     private fun startGroup(key: Int, objectKey: Any?, isNode: Boolean, aux: Any?) {
         val inserting = insertCount > 0
@@ -1282,8 +1288,8 @@ internal class SlotWriter(
             insertGroups(1)
             val current = currentGroup
             val currentAddress = groupIndexToAddress(current)
-            val hasObjectKey = objectKey !== EMPTY
-            val hasAux = !isNode && aux !== EMPTY
+            val hasObjectKey = objectKey !== Composer.Empty
+            val hasAux = !isNode && aux !== Composer.Empty
             groups.initGroup(
                 address = currentAddress,
                 key = key,
@@ -1318,7 +1324,7 @@ internal class SlotWriter(
             saveCurrentGroupEnd()
             val currentGroup = currentGroup
             val currentGroupAddress = groupIndexToAddress(currentGroup)
-            if (aux != EMPTY) {
+            if (aux != Composer.Empty) {
                 if (isNode)
                     updateNode(aux)
                 else
@@ -2475,15 +2481,6 @@ private const val Slots_Shift = Aux_Shift
 private const val NodeCount_Mask = 0b0000_0111_1111_1111__1111_1111_1111_1111
 
 // Special values
-
-// The value returned for slots that are newly created. It is used instead of null to allow null
-// to be an in band value.
-@PublishedApi
-internal val EMPTY = object {
-    override fun toString(): String {
-        return "EMPTY"
-    }
-}
 
 // The minimum number of groups to allocate the group table
 private const val MinGroupGrowthSize = 32

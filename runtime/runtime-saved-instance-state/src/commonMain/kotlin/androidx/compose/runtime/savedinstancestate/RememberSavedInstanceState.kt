@@ -18,9 +18,8 @@ package androidx.compose.runtime.savedinstancestate
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.currentComposer
+import androidx.compose.runtime.currentCompositeKeyHash
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 
@@ -51,7 +50,6 @@ import androidx.compose.runtime.remember
  * in the composition tree
  * @param init A factory function to create the initial value of this state
  */
-@OptIn(ExperimentalComposeApi::class)
 @Composable
 fun <T : Any> rememberSavedInstanceState(
     vararg inputs: Any?,
@@ -63,7 +61,7 @@ fun <T : Any> rememberSavedInstanceState(
     val finalKey = if (!key.isNullOrEmpty()) {
         key
     } else {
-        currentComposer.currentCompoundKeyHash.toString()
+        currentCompositeKeyHash().toString()
     }
     @Suppress("UNCHECKED_CAST")
     (saver as Saver<T, Any>)

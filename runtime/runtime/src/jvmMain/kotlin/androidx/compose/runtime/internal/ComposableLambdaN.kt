@@ -21,7 +21,6 @@ import androidx.compose.runtime.ComposeCompilerApi
 import androidx.compose.runtime.Composer
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.EMPTY
 import kotlin.jvm.functions.FunctionN
 
 private const val SLOTS_PER_INT = 10
@@ -36,7 +35,7 @@ class ComposableLambdaN<R>(
 ) : FunctionN<R> {
     private var _block: Any? = null
 
-    fun update(block: Any, composer: Composer<*>?) {
+    fun update(block: Any, composer: Composer?) {
         if (block != this._block) {
             if (tracked) {
                 composer?.recordWriteOf(this)
@@ -59,7 +58,7 @@ class ComposableLambdaN<R>(
 
     override fun invoke(vararg args: Any?): R {
         val realParams = realParamCount(args.size)
-        val c = args[realParams] as Composer<*>
+        val c = args[realParams] as Composer
         val allArgsButLast = args.slice(0 until args.size - 1).toTypedArray()
         val lastChanged = args[args.size - 1] as Int
         c.startRestartGroup(key, sourceInformation)
@@ -91,7 +90,7 @@ class ComposableLambdaN<R>(
 @Suppress("unused")
 @ComposeCompilerApi
 fun composableLambdaN(
-    composer: Composer<*>,
+    composer: Composer,
     key: Int,
     tracked: Boolean,
     sourceInformation: String?,
@@ -99,10 +98,10 @@ fun composableLambdaN(
     block: Any
 ): ComposableLambdaN<*> {
     composer.startReplaceableGroup(key)
-    val slot = composer.nextSlot()
-    val result = if (slot === EMPTY) {
+    val slot = composer.rememberedValue()
+    val result = if (slot === Composer.Empty) {
         val value = ComposableLambdaN<Any>(key, tracked, sourceInformation, arity)
-        composer.updateValue(value)
+        composer.updateRememberedValue(value)
         value
     } else {
         @Suppress("UNCHECKED_CAST")

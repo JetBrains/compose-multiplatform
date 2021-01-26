@@ -20,8 +20,8 @@ package androidx.compose.runtime.internal
 
 import androidx.compose.runtime.ComposeCompilerApi
 import androidx.compose.runtime.Composer
-import androidx.compose.runtime.EMPTY
 import androidx.compose.runtime.InternalComposeApi
+import androidx.compose.runtime.RecomposeScope
 import androidx.compose.runtime.RecomposeScopeImpl
 import androidx.compose.runtime.Stable
 
@@ -53,33 +53,33 @@ class ComposableLambda<
     private val tracked: Boolean,
     private val sourceInformation: String?
 ) :
-    Function2<Composer<*>, Int, R>,
-    Function3<P1, Composer<*>, Int, R>,
-    Function4<P1, P2, Composer<*>, Int, R>,
-    Function5<P1, P2, P3, Composer<*>, Int, R>,
-    Function6<P1, P2, P3, P4, Composer<*>, Int, R>,
-    Function7<P1, P2, P3, P4, P5, Composer<*>, Int, R>,
-    Function8<P1, P2, P3, P4, P5, P6, Composer<*>, Int, R>,
-    Function9<P1, P2, P3, P4, P5, P6, P7, Composer<*>, Int, R>,
-    Function10<P1, P2, P3, P4, P5, P6, P7, P8, Composer<*>, Int, R>,
-    Function11<P1, P2, P3, P4, P5, P6, P7, P8, P9, Composer<*>, Int, R>,
-    Function13<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, Composer<*>, Int, Int, R>,
-    Function14<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, Composer<*>, Int, Int, R>,
-    Function15<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, Composer<*>, Int, Int, R>,
-    Function16<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, Composer<*>, Int, Int, R>,
-    Function17<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, Composer<*>, Int,
+    Function2<Composer, Int, R>,
+    Function3<P1, Composer, Int, R>,
+    Function4<P1, P2, Composer, Int, R>,
+    Function5<P1, P2, P3, Composer, Int, R>,
+    Function6<P1, P2, P3, P4, Composer, Int, R>,
+    Function7<P1, P2, P3, P4, P5, Composer, Int, R>,
+    Function8<P1, P2, P3, P4, P5, P6, Composer, Int, R>,
+    Function9<P1, P2, P3, P4, P5, P6, P7, Composer, Int, R>,
+    Function10<P1, P2, P3, P4, P5, P6, P7, P8, Composer, Int, R>,
+    Function11<P1, P2, P3, P4, P5, P6, P7, P8, P9, Composer, Int, R>,
+    Function13<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, Composer, Int, Int, R>,
+    Function14<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, Composer, Int, Int, R>,
+    Function15<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, Composer, Int, Int, R>,
+    Function16<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, Composer, Int, Int, R>,
+    Function17<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, Composer, Int,
         Int, R>,
-    Function18<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, Composer<*>,
+    Function18<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, Composer,
         Int, Int, R>,
     Function19<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16,
-        Composer<*>, Int, Int, R>,
+        Composer, Int, Int, R>,
     Function20<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17,
-        Composer<*>, Int, Int, R>,
+        Composer, Int, Int, R>,
     Function21<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18,
-        Composer<*>, Int, Int, R> {
+        Composer, Int, Int, R> {
     private var _block: Any? = null
-    private var scope: RecomposeScopeImpl? = null
-    private var scopes: MutableList<RecomposeScopeImpl>? = null
+    private var scope: RecomposeScope? = null
+    private var scopes: MutableList<RecomposeScope>? = null
 
     private fun trackWrite() {
         if (tracked) {
@@ -99,19 +99,19 @@ class ComposableLambda<
         }
     }
 
-    private fun trackRead(composer: Composer<*>) {
+    private fun trackRead(composer: Composer) {
         if (tracked) {
-            val scope = composer.currentRecomposeScope
+            val scope = composer.recomposeScope
             if (scope != null) {
                 // Find the first invalid scope and replace it or record it if no scopes are invalid
-                scope.used = true
+                composer.recordUsed(scope)
                 val lastScope = this.scope
                 if (lastScope.replacableWith(scope)) {
                     this.scope = scope
                 } else {
                     val lastScopes = scopes
                     if (lastScopes == null) {
-                        val newScopes = mutableListOf<RecomposeScopeImpl>()
+                        val newScopes = mutableListOf<RecomposeScope>()
                         scopes = newScopes
                         newScopes.add(scope)
                     } else {
@@ -139,23 +139,23 @@ class ComposableLambda<
         }
     }
 
-    override operator fun invoke(c: Composer<*>, changed: Int): R {
+    override operator fun invoke(c: Composer, changed: Int): R {
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(0) else sameBits(0)
-        val result = (_block as (c: Composer<*>, changed: Int) -> R)(c, dirty)
-        c.endRestartGroup()?.updateScope(this as (Composer<*>, Int) -> Unit)
+        val result = (_block as (c: Composer, changed: Int) -> R)(c, dirty)
+        c.endRestartGroup()?.updateScope(this as (Composer, Int) -> Unit)
         return result
     }
 
-    override operator fun invoke(p1: P1, c: Composer<*>, changed: Int): R {
+    override operator fun invoke(p1: P1, c: Composer, changed: Int): R {
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(1) else sameBits(1)
         val result = (
             _block as (
                 p1: P1,
-                c: Composer<*>,
+                c: Composer,
                 changed: Int
             ) -> R
             )(
@@ -167,11 +167,11 @@ class ComposableLambda<
         return result
     }
 
-    override operator fun invoke(p1: P1, p2: P2, c: Composer<*>, changed: Int): R {
+    override operator fun invoke(p1: P1, p2: P2, c: Composer, changed: Int): R {
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(2) else sameBits(2)
-        val result = (_block as (p1: P1, p2: P2, c: Composer<*>, changed: Int) -> R)(
+        val result = (_block as (p1: P1, p2: P2, c: Composer, changed: Int) -> R)(
             p1,
             p2,
             c,
@@ -181,7 +181,7 @@ class ComposableLambda<
         return result
     }
 
-    override operator fun invoke(p1: P1, p2: P2, p3: P3, c: Composer<*>, changed: Int): R {
+    override operator fun invoke(p1: P1, p2: P2, p3: P3, c: Composer, changed: Int): R {
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(3) else sameBits(3)
@@ -190,7 +190,7 @@ class ComposableLambda<
                 p1: P1,
                 p2: P2,
                 p3: P3,
-                c: Composer<*>,
+                c: Composer,
                 changed: Int
             ) -> R
             )(
@@ -209,7 +209,7 @@ class ComposableLambda<
         p2: P2,
         p3: P3,
         p4: P4,
-        c: Composer<*>,
+        c: Composer,
         changed: Int
     ): R {
         c.startRestartGroup(key, sourceInformation)
@@ -221,7 +221,7 @@ class ComposableLambda<
                 p2: P2,
                 p3: P3,
                 p4: P4,
-                c: Composer<*>,
+                c: Composer,
                 changed: Int
             ) -> R
             )(
@@ -244,7 +244,7 @@ class ComposableLambda<
         p3: P3,
         p4: P4,
         p5: P5,
-        c: Composer<*>,
+        c: Composer,
         changed: Int
     ): R {
         c.startRestartGroup(key, sourceInformation)
@@ -257,7 +257,7 @@ class ComposableLambda<
                 p3: P3,
                 p4: P4,
                 p5: P5,
-                c: Composer<*>,
+                c: Composer,
                 changed: Int
             ) -> R
             )(
@@ -282,7 +282,7 @@ class ComposableLambda<
         p4: P4,
         p5: P5,
         p6: P6,
-        c: Composer<*>,
+        c: Composer,
         changed: Int
     ): R {
         c.startRestartGroup(key, sourceInformation)
@@ -296,7 +296,7 @@ class ComposableLambda<
                 p4: P4,
                 p5: P5,
                 p6: P6,
-                c: Composer<*>,
+                c: Composer,
                 changed: Int
             ) -> R
             )(
@@ -323,7 +323,7 @@ class ComposableLambda<
         p5: P5,
         p6: P6,
         p7: P7,
-        c: Composer<*>,
+        c: Composer,
         changed: Int
     ): R {
         c.startRestartGroup(key, sourceInformation)
@@ -338,7 +338,7 @@ class ComposableLambda<
                 p5: P5,
                 p6: P6,
                 p7: P7,
-                c: Composer<*>,
+                c: Composer,
                 changed: Int
             ) -> R
             )(
@@ -367,7 +367,7 @@ class ComposableLambda<
         p6: P6,
         p7: P7,
         p8: P8,
-        c: Composer<*>,
+        c: Composer,
         changed: Int
     ): R {
         c.startRestartGroup(key, sourceInformation)
@@ -383,7 +383,7 @@ class ComposableLambda<
                 p6: P6,
                 p7: P7,
                 p8: P8,
-                c: Composer<*>,
+                c: Composer,
                 changed: Int
             ) -> R
             )(
@@ -414,7 +414,7 @@ class ComposableLambda<
         p7: P7,
         p8: P8,
         p9: P9,
-        c: Composer<*>,
+        c: Composer,
         changed: Int
     ): R {
         c.startRestartGroup(key, sourceInformation)
@@ -431,7 +431,7 @@ class ComposableLambda<
                 p7: P7,
                 p8: P8,
                 p9: P9,
-                c: Composer<*>,
+                c: Composer,
                 changed: Int
             ) -> R
             )(
@@ -464,7 +464,7 @@ class ComposableLambda<
         p8: P8,
         p9: P9,
         p10: P10,
-        c: Composer<*>,
+        c: Composer,
         changed: Int,
         changed1: Int
     ): R {
@@ -483,7 +483,7 @@ class ComposableLambda<
                 p8: P8,
                 p9: P9,
                 p10: P10,
-                c: Composer<*>,
+                c: Composer,
                 changed: Int,
                 changed1: Int
             ) -> R
@@ -520,7 +520,7 @@ class ComposableLambda<
         p9: P9,
         p10: P10,
         p11: P11,
-        c: Composer<*>,
+        c: Composer,
         changed: Int,
         changed1: Int
     ): R {
@@ -540,7 +540,7 @@ class ComposableLambda<
                 p9: P9,
                 p10: P10,
                 p11: P11,
-                c: Composer<*>,
+                c: Composer,
                 changed: Int,
                 changed1: Int
             ) -> R
@@ -579,7 +579,7 @@ class ComposableLambda<
         p10: P10,
         p11: P11,
         p12: P12,
-        c: Composer<*>,
+        c: Composer,
         changed: Int,
         changed1: Int
     ): R {
@@ -600,7 +600,7 @@ class ComposableLambda<
                 p10: P10,
                 p11: P11,
                 p12: P12,
-                c: Composer<*>,
+                c: Composer,
                 changed: Int,
                 changed1: Int
             ) -> R
@@ -641,7 +641,7 @@ class ComposableLambda<
         p11: P11,
         p12: P12,
         p13: P13,
-        c: Composer<*>,
+        c: Composer,
         changed: Int,
         changed1: Int
     ): R {
@@ -663,7 +663,7 @@ class ComposableLambda<
                 p11: P11,
                 p12: P12,
                 p13: P13,
-                c: Composer<*>,
+                c: Composer,
                 changed: Int,
                 changed1: Int
             ) -> R
@@ -723,7 +723,7 @@ class ComposableLambda<
         p12: P12,
         p13: P13,
         p14: P14,
-        c: Composer<*>,
+        c: Composer,
         changed: Int,
         changed1: Int
     ): R {
@@ -746,7 +746,7 @@ class ComposableLambda<
                 p12: P12,
                 p13: P13,
                 p14: P14,
-                c: Composer<*>,
+                c: Composer,
                 changed: Int,
                 changed1: Int
             ) -> R
@@ -809,7 +809,7 @@ class ComposableLambda<
         p13: P13,
         p14: P14,
         p15: P15,
-        c: Composer<*>,
+        c: Composer,
         changed: Int,
         changed1: Int
     ): R {
@@ -833,7 +833,7 @@ class ComposableLambda<
                 p13: P13,
                 p14: P14,
                 p15: P15,
-                c: Composer<*>,
+                c: Composer,
                 changed: Int,
                 changed1: Int
             ) -> R
@@ -899,7 +899,7 @@ class ComposableLambda<
         p14: P14,
         p15: P15,
         p16: P16,
-        c: Composer<*>,
+        c: Composer,
         changed: Int,
         changed1: Int
     ): R {
@@ -924,7 +924,7 @@ class ComposableLambda<
                 p14: P14,
                 p15: P15,
                 p16: P16,
-                c: Composer<*>,
+                c: Composer,
                 changed: Int,
                 changed1: Int
             ) -> R
@@ -993,7 +993,7 @@ class ComposableLambda<
         p15: P15,
         p16: P16,
         p17: P17,
-        c: Composer<*>,
+        c: Composer,
         changed: Int,
         changed1: Int
     ): R {
@@ -1019,7 +1019,7 @@ class ComposableLambda<
                 p15: P15,
                 p16: P16,
                 p17: P17,
-                c: Composer<*>,
+                c: Composer,
                 changed: Int,
                 changed1: Int
             ) -> R
@@ -1091,7 +1091,7 @@ class ComposableLambda<
         p16: P16,
         p17: P17,
         p18: P18,
-        c: Composer<*>,
+        c: Composer,
         changed: Int,
         changed1: Int
     ): R {
@@ -1118,7 +1118,7 @@ class ComposableLambda<
                 p16: P16,
                 p17: P17,
                 p18: P18,
-                c: Composer<*>,
+                c: Composer,
                 changed: Int,
                 changed1: Int
             ) -> R
@@ -1174,8 +1174,12 @@ class ComposableLambda<
     }
 }
 
-private fun RecomposeScopeImpl?.replacableWith(other: RecomposeScopeImpl) =
-    this == null || !this.valid || this == other || this.anchor == other.anchor
+private fun RecomposeScope?.replacableWith(other: RecomposeScope) =
+    this == null || (
+        this is RecomposeScopeImpl && other is RecomposeScopeImpl && (
+            !this.valid || this == other || this.anchor == other.anchor
+            )
+        )
 
 @OptIn(ComposeCompilerApi::class)
 private typealias CLambda = ComposableLambda<Any, Any, Any, Any, Any, Any, Any, Any, Any, Any,
@@ -1184,17 +1188,17 @@ private typealias CLambda = ComposableLambda<Any, Any, Any, Any, Any, Any, Any, 
 @Suppress("unused")
 @ComposeCompilerApi
 fun composableLambda(
-    composer: Composer<*>,
+    composer: Composer,
     key: Int,
     tracked: Boolean,
     sourceInformation: String?,
     block: Any
 ): CLambda {
     composer.startReplaceableGroup(key)
-    val slot = composer.nextSlot()
-    val result = if (slot === EMPTY) {
+    val slot = composer.rememberedValue()
+    val result = if (slot === Composer.Empty) {
         val value = CLambda(key, tracked, sourceInformation)
-        composer.updateValue(value)
+        composer.updateRememberedValue(value)
         value
     } else {
         slot as CLambda

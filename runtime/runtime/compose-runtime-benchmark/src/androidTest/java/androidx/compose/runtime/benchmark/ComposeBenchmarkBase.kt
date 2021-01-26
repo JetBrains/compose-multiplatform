@@ -20,7 +20,7 @@ import android.view.View
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Composer
+import androidx.compose.runtime.ControlledComposition
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.Recomposer
@@ -81,22 +81,26 @@ abstract class ComposeBenchmarkBase {
     fun measureRecompose(block: RecomposeReceiver.() -> Unit) {
         val receiver = RecomposeReceiver()
         receiver.block()
-        var activeComposer: Composer<*>? = null
+        var activeComposition: ControlledComposition? = null
 
         val activity = activityRule.activity
         val emptyView = View(activity)
 
         activity.setContent {
-            activeComposer = currentComposer
+            activeComposition = currentComposer.composition
             receiver.composeCb()
         }
 
-        val composer = activeComposer
-        require(composer != null) { "Composer was null" }
-        val readObserver: SnapshotReadObserver = { composer.recordReadOf(it) }
-        val writeObserver: SnapshotWriteObserver = { composer.recordWriteOf(it) }
+        val composition = activeComposition
+        require(composition != null) { "Composition was null" }
+        val readObserver: SnapshotReadObserver = {
+            composition.recordReadOf(it)
+        }
+        val writeObserver: SnapshotWriteObserver = {
+            composition.recordWriteOf(it)
+        }
         val unregisterApplyObserver = Snapshot.registerApplyObserver { changed, _ ->
-            composer.recordModificationsOf(changed)
+            composition.recordModificationsOf(changed)
         }
         try {
             benchmarkRule.measureRepeated {
@@ -104,12 +108,12 @@ abstract class ComposeBenchmarkBase {
                     receiver.updateModelCb()
                     Snapshot.sendApplyNotifications()
                 }
-                val didSomething = composer.performRecompose(readObserver, writeObserver)
+                val didSomething = composition.performRecompose(readObserver, writeObserver)
                 assertTrue(didSomething)
                 runWithTimingDisabled {
                     receiver.resetCb()
                     Snapshot.sendApplyNotifications()
-                    composer.performRecompose(readObserver, writeObserver)
+                    composition.performRecompose(readObserver, writeObserver)
                 }
             }
         } finally {
@@ -187,8 +191,7 @@ inline fun BenchmarkRule.measureRepeatedSuspendable(block: BenchmarkRule.Scope.(
     }
 }
 
-@OptIn(ExperimentalComposeApi::class, InternalComposeApi::class)
-fun Composer<*>.performRecompose(
+fun ControlledComposition.performRecompose(
     readObserver: SnapshotReadObserver,
     writeObserver: SnapshotWriteObserver
 ): Boolean {

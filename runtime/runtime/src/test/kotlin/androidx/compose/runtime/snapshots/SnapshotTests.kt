@@ -109,7 +109,7 @@ class SnapshotTests {
         // Create count snapshots
         val snapshots = MutableList(count) { takeMutableSnapshot() }
         try {
-            snapshots.forEachIndexed() { index, snapshot ->
+            snapshots.forEachIndexed { index, snapshot ->
                 snapshot.enter { state[index].value = index }
             }
 
@@ -481,10 +481,10 @@ class SnapshotTests {
     fun writingToANestedSnapshotNotifiesNestedAndItsParent() {
         val state = mutableStateOf(0)
         val parentWritten = HashSet<Any>()
-        val nestedWritted = HashSet<Any>()
+        val nestedWritten = HashSet<Any>()
         val snapshot = takeMutableSnapshot { parentWritten.add(it) }
         try {
-            val nested = snapshot.takeNestedMutableSnapshot { nestedWritted.add(it) }
+            val nested = snapshot.takeNestedMutableSnapshot { nestedWritten.add(it) }
             try {
                 nested.enter { state.value = 2 }
             } finally {
@@ -494,7 +494,7 @@ class SnapshotTests {
             snapshot.dispose()
         }
         assertTrue(parentWritten.contains(state))
-        assertTrue(nestedWritted.contains(state))
+        assertTrue(nestedWritten.contains(state))
     }
 
     @Test
