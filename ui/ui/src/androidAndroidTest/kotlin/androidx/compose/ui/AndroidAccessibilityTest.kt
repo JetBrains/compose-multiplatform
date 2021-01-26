@@ -498,6 +498,7 @@ class AndroidAccessibilityTest {
     }
 
     @Test
+    @Ignore("b/178524529")
     fun traverseEventBeforeSelectionEvent_whenTraverseTextField() {
         val textFieldNode = rule.onNodeWithTag(TextFieldTag)
             .assertIsDisplayed()
@@ -756,6 +757,7 @@ class AndroidAccessibilityTest {
     }
 
     @Test
+    @Ignore("b/178524529")
     fun testPaneDisappear() {
         rule.onNodeWithTag(PaneTag).assertDoesNotExist()
         isPaneVisible = true
