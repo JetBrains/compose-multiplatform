@@ -14,7 +14,6 @@ package androidx.compose.ui.test {
 
   public final class AndroidImageHelpersKt {
     method @RequiresApi(android.os.Build.VERSION_CODES.O) public static androidx.compose.ui.graphics.ImageBitmap captureToImage(androidx.compose.ui.test.SemanticsNodeInteraction);
-    method @RequiresApi(android.os.Build.VERSION_CODES.O) public static androidx.compose.ui.graphics.ImageBitmap captureToImage(android.view.View);
   }
 
   public final class AndroidInputDispatcherKt {
