@@ -46,11 +46,18 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
     @get:Internal
     abstract val appLoader: Property<BuiltArtifactsLoader>
 
+    @get:Input
+    @get:Optional
+    abstract val appProjectPath: Property<String>
+
     @get:InputFiles
     abstract val testFolder: DirectoryProperty
 
     @get:Internal
     abstract val testLoader: Property<BuiltArtifactsLoader>
+
+    @get:Input
+    abstract val testProjectPath: Property<String>
 
     @get:Input
     abstract val minSdk: Property<Int>
@@ -60,9 +67,6 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
 
     @get:Input
     abstract val testRunner: Property<String>
-
-    @get:Input
-    abstract val projectPath: Property<String>
 
     @get:Input
     abstract val affectedModuleDetectorSubset: Property<ProjectSubset>
@@ -86,8 +90,9 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
         if (appLoader.isPresent) {
             val appApk = appLoader.get().load(appFolder.get())
                 ?: throw RuntimeException("Cannot load required APK for task: $name")
+            // We don't need to check hasBenchmarkPlugin because benchmarks shouldn't have test apps
             val appName = appApk.elements.single().outputFile.substringAfterLast("/")
-                .renameApkForTesting(projectPath.get(), hasBenchmarkPlugin.get())
+                .renameApkForTesting(appProjectPath.get(), hasBenchmarkPlugin = false)
             configBuilder.appApkName(appName)
         }
         val isPostsubmit: Boolean = when (affectedModuleDetectorSubset.get()) {
@@ -112,14 +117,14 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
             } else {
                 configBuilder.tag("microbenchmarks_presubmit")
             }
-        } else if (projectPath.get().endsWith("macrobenchmark")) {
+        } else if (testProjectPath.get().endsWith("macrobenchmark")) {
             configBuilder.tag("macrobenchmarks")
         }
         val testApk = testLoader.get().load(testFolder.get())
             ?: throw RuntimeException("Cannot load required APK for task: $name")
         val testName = testApk.elements.single().outputFile
             .substringAfterLast("/")
-            .renameApkForTesting(projectPath.get(), hasBenchmarkPlugin.get())
+            .renameApkForTesting(testProjectPath.get(), hasBenchmarkPlugin.get())
         configBuilder.testApkName(testName)
             .applicationId(testApk.applicationId)
             .minSdk(minSdk.get().toString())
