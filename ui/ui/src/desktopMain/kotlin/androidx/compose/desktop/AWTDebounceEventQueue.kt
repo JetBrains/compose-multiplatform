@@ -16,7 +16,6 @@
 
 package androidx.compose.desktop
 
-import androidx.compose.ui.unit.milliseconds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
@@ -41,7 +40,7 @@ import kotlin.coroutines.CoroutineContext
  */
 internal class AWTDebounceEventQueue constructor(
     // 4 ms is enough for the user not to see the lags
-    private val maxNanosToBlockThread: Long = 4.milliseconds.nanoseconds,
+    private val maxNanosToBlockThread: Long = 4_000_000, // 4 milliseconds
     private val nanoTime: () -> Long = System::nanoTime,
     context: CoroutineContext = Dispatchers.Swing
 ) {
