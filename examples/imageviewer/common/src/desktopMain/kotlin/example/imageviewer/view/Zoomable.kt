@@ -1,14 +1,16 @@
 package example.imageviewer.view
 
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.clickable
-import androidx.compose.runtime.Composable
 import androidx.compose.material.Surface
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.focus.FocusReference
-import androidx.compose.ui.input.key.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusModifier
-import androidx.compose.ui.focus.focusReference
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.shortcuts
 import example.imageviewer.style.Transparent
 
 @Composable
@@ -17,7 +19,7 @@ fun Zoomable(
     modifier: Modifier = Modifier,
     children: @Composable() () -> Unit
 ) {
-    val focusRequester = remember { FocusReference() }
+    val focusRequester = remember { FocusRequester() }
 
     Surface(
         color = Transparent,
@@ -32,9 +34,9 @@ fun Zoomable(
                 onScale.resetFactor()
             }
         }
-        .focusReference(focusRequester)
+        .focusRequester(focusRequester)
         .focusModifier()
-        .clickable(indication = null) { focusRequester.requestFocus() }
+        .clickable(interactionState = InteractionState(), indication = null) { focusRequester.requestFocus() }
     ) {
         children()
     }

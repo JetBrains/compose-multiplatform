@@ -1,50 +1,49 @@
 package example.imageviewer.view
 
 import android.content.res.Configuration
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollableColumn
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredWidth
-import androidx.compose.foundation.layout.preferredSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Card
-import androidx.compose.material.Divider
-import androidx.compose.material.Surface
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.asImageAsset
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import example.imageviewer.common.R
 import example.imageviewer.model.AppState
+import example.imageviewer.model.ContentState
 import example.imageviewer.model.Picture
 import example.imageviewer.model.ScreenType
-import example.imageviewer.model.ContentState
 import example.imageviewer.style.DarkGray
 import example.imageviewer.style.DarkGreen
 import example.imageviewer.style.Foreground
-import example.imageviewer.style.Transparent
-import example.imageviewer.style.MiniatureColor
 import example.imageviewer.style.LightGray
-import example.imageviewer.style.icRefresh
-import example.imageviewer.style.icEmpty
+import example.imageviewer.style.MiniatureColor
+import example.imageviewer.style.Transparent
 import example.imageviewer.style.icDots
+import example.imageviewer.style.icEmpty
+import example.imageviewer.style.icRefresh
 
 
 @Composable
@@ -86,8 +85,7 @@ fun setLoadingScreen(content: ContentState) {
 
 @Composable
 fun setTopContent(content: ContentState) {
-
-    setTitleBar(text = "ImageViewer", content = content)
+    setTitleBar(text = content.getString(R.string.app_name), content = content)
     if (content.getOrientation() == Configuration.ORIENTATION_PORTRAIT) {
         setPreviewImageUI(content)
         setSpacer(h = 10)
@@ -102,32 +100,32 @@ fun setTitleBar(text: String, content: ContentState) {
     TopAppBar(
         backgroundColor = DarkGreen,
         title = {
-        Row(Modifier.preferredHeight(50.dp)) {
-            Text(
-                text,
-                color = Foreground,
-                modifier = Modifier.weight(1f).align(Alignment.CenterVertically)
-            )
-            Surface(
-                color = Transparent,
-                modifier = Modifier.padding(end = 20.dp).align(Alignment.CenterVertically),
-                shape = CircleShape
-            ) {
-                Clickable(
-                    onClick = {
-                        if (content.isContentReady()) {
-                            content.refresh()
-                        }
-                    }
+            Row(Modifier.preferredHeight(50.dp)) {
+                Text(
+                    text,
+                    color = Foreground,
+                    modifier = Modifier.weight(1f).align(Alignment.CenterVertically)
+                )
+                Surface(
+                    color = Transparent,
+                    modifier = Modifier.padding(end = 20.dp).align(Alignment.CenterVertically),
+                    shape = CircleShape
                 ) {
-                    Image(
-                        icRefresh(),
-                        modifier = Modifier.preferredSize(35.dp)
-                    )
+                    Clickable(
+                        onClick = {
+                            if (content.isContentReady()) {
+                                content.refresh()
+                            }
+                        }
+                    ) {
+                        Image(
+                            icRefresh(),
+                            modifier = Modifier.preferredSize(35.dp)
+                        )
+                    }
                 }
             }
-        }
-    })
+        })
 }
 
 @Composable
@@ -145,8 +143,7 @@ fun setPreviewImageUI(content: ContentState) {
             Image(
                 if (content.isMainImageEmpty()) {
                     icEmpty()
-                }
-                else {
+                } else {
                     content.getSelectedImage().asImageBitmap()
                 },
                 modifier = Modifier
@@ -196,14 +193,14 @@ fun setMiniatureUI(
 
             Clickable(
                 modifier = Modifier.preferredHeight(70.dp)
-                        .preferredWidth(30.dp),
+                    .preferredWidth(30.dp),
                 onClick = {
                     showPopUpMessage(
                         "${content.getString(R.string.picture)} " +
-                        "${picture.name} \n" +
-                        "${content.getString(R.string.size)} " +
-                        "${picture.width}x${picture.height} " +
-                        "${content.getString(R.string.pixels)}",
+                                "${picture.name} \n" +
+                                "${content.getString(R.string.size)} " +
+                                "${picture.width}x${picture.height} " +
+                                "${content.getString(R.string.pixels)}",
                         content.getContext()
                     )
                 }

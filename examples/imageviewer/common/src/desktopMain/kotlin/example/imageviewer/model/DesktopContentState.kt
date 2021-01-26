@@ -1,20 +1,19 @@
 package example.imageviewer.model
 
-import java.awt.image.BufferedImage
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import example.imageviewer.ResString
 import example.imageviewer.core.FilterType
 import example.imageviewer.model.filtration.FiltersManager
-import example.imageviewer.utils.clearCache
 import example.imageviewer.utils.cacheImagePath
+import example.imageviewer.utils.clearCache
 import example.imageviewer.utils.isInternetAvailable
 import example.imageviewer.view.showPopUpMessage
-import example.imageviewer.ResString
+import java.awt.image.BufferedImage
 import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import javax.swing.SwingUtilities.invokeLater
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 
 
 object ContentState {
@@ -22,7 +21,6 @@ object ContentState {
     private lateinit var repository: ImageRepository
     private lateinit var uriRepository: String
 
-    @Composable
     fun applyContent(uriRepository: String): ContentState {
         if (this::uriRepository.isInitialized && this.uriRepository == uriRepository) {
             return this
