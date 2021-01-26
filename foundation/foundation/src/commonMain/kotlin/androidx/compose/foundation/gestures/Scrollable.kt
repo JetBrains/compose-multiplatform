@@ -22,10 +22,7 @@ import androidx.compose.animation.asDisposableClock
 import androidx.compose.animation.core.AnimatedFloat
 import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.AnimationClockObserver
-import androidx.compose.animation.core.AnimationEndReason
-import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.SpringSpec
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.animation.FlingConfig
@@ -97,23 +94,6 @@ class ScrollableController(
     animationClock: AnimationClockObservable,
     internal val interactionState: InteractionState? = null
 ) : Scrollable {
-    /**
-     * Smooth scroll by [value] amount of pixels
-     *
-     * @param value delta to scroll by
-     * @param spec [AnimationSpec] to be used for this smooth scrolling
-     * @param onEnd lambda to be called when smooth scrolling has ended
-     */
-    @Deprecated("Use suspend fun smoothScrollBy instead")
-    fun smoothScrollBy(
-        value: Float,
-        spec: AnimationSpec<Float> = SpringSpec(),
-        onEnd: (endReason: AnimationEndReason, finishValue: Float) -> Unit = { _, _ -> }
-    ) {
-        val to = animatedFloat.value + value
-        animatedFloat.animateTo(to, anim = spec, onEnd = onEnd)
-    }
-
     private val scrollControlJob = AtomicReference<Job?>(null)
     private val scrollControlMutex = Mutex()
 
