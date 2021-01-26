@@ -259,6 +259,11 @@ internal class ComposeViewAdapter : FrameLayout {
         }
     }
 
+    override fun onAttachedToWindow() {
+        ViewTreeLifecycleOwner.set(composeView.rootView, FakeSavedStateRegistryOwner)
+        super.onAttachedToWindow()
+    }
+
     /**
      * Finds all the transition animations defined in the Compose tree where the root is the
      * `@Composable` being previewed. We only return animations defined in the user code, i.e.
@@ -497,8 +502,8 @@ internal class ComposeViewAdapter : FrameLayout {
 
     private fun init(attrs: AttributeSet) {
         // ComposeView and lifecycle initialization
-        ViewTreeLifecycleOwner.set(this, FakeSavedStateRegistryOwnerOwner)
-        ViewTreeSavedStateRegistryOwner.set(this, FakeSavedStateRegistryOwnerOwner)
+        ViewTreeLifecycleOwner.set(this, FakeSavedStateRegistryOwner)
+        ViewTreeSavedStateRegistryOwner.set(this, FakeSavedStateRegistryOwner)
         ViewTreeViewModelStoreOwner.set(this, FakeViewModelStoreOwner)
         addView(composeView)
 
@@ -543,7 +548,7 @@ internal class ComposeViewAdapter : FrameLayout {
         )
     }
 
-    private val FakeSavedStateRegistryOwnerOwner = object : SavedStateRegistryOwner {
+    private val FakeSavedStateRegistryOwner = object : SavedStateRegistryOwner {
         private val lifecycle = LifecycleRegistry(this)
         private val controller = SavedStateRegistryController.create(this).apply {
             performRestore(Bundle())
