@@ -33,7 +33,6 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -120,7 +119,7 @@ fun BottomNavigation(
  * A BottomNavigationItem always shows text labels (if it exists) when selected. Showing text
  * labels if not selected is controlled by [alwaysShowLabels].
  *
- * @param icon icon for this item, typically this will be a [Icon]
+ * @param icon icon for this item, typically this will be an [Icon]
  * @param selected whether this item is selected
  * @param onClick the callback to be invoked when this item is selected
  * @param modifier optional [Modifier] for this item
@@ -144,15 +143,17 @@ fun RowScope.BottomNavigationItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    label: @Composable () -> Unit = emptyContent(),
+    label: @Composable (() -> Unit)? = null,
     alwaysShowLabels: Boolean = true,
     interactionState: InteractionState = remember { InteractionState() },
     selectedContentColor: Color = AmbientContentColor.current,
     unselectedContentColor: Color = selectedContentColor.copy(alpha = ContentAlpha.medium)
 ) {
-    val styledLabel = @Composable {
-        val style = MaterialTheme.typography.caption.copy(textAlign = TextAlign.Center)
-        ProvideTextStyle(style, content = label)
+    val styledLabel: @Composable (() -> Unit)? = label?.let {
+        @Composable {
+            val style = MaterialTheme.typography.caption.copy(textAlign = TextAlign.Center)
+            ProvideTextStyle(style, content = label)
+        }
     }
     // The color of the Ripple should always the selected color, as we want to show the color
     // before the item is considered selected, and hence before the new contentColor is
@@ -236,37 +237,39 @@ private fun BottomNavigationTransition(
 @Composable
 private fun BottomNavigationItemBaselineLayout(
     icon: @Composable () -> Unit,
-    label: @Composable () -> Unit,
+    label: @Composable (() -> Unit)?,
     /*@FloatRange(from = 0.0, to = 1.0)*/
     iconPositionAnimationProgress: Float
 ) {
     Layout(
         {
             Box(Modifier.layoutId("icon")) { icon() }
-            Box(
-                Modifier
-                    .layoutId("label")
-                    .alpha(iconPositionAnimationProgress)
-                    .padding(horizontal = BottomNavigationItemHorizontalPadding)
-            ) { label() }
+            if (label != null) {
+                Box(
+                    Modifier
+                        .layoutId("label")
+                        .alpha(iconPositionAnimationProgress)
+                        .padding(horizontal = BottomNavigationItemHorizontalPadding)
+                ) { label() }
+            }
         }
     ) { measurables, constraints ->
         val iconPlaceable = measurables.first { it.layoutId == "icon" }.measure(constraints)
 
-        val labelPlaceable = measurables.first { it.layoutId == "label" }.measure(
-            // Measure with loose constraints for height as we don't want the label to take up more
-            // space than it needs
-            constraints.copy(minHeight = 0)
-        )
+        val labelPlaceable = label?.let {
+            measurables.first { it.layoutId == "label" }.measure(
+                // Measure with loose constraints for height as we don't want the label to take up more
+                // space than it needs
+                constraints.copy(minHeight = 0)
+            )
+        }
 
-        // If the label is empty, just place the icon.
-        if (labelPlaceable.width <= BottomNavigationItemHorizontalPadding.toIntPx() * 2 &&
-            labelPlaceable.height == 0
-        ) {
+        // If there is no label, just place the icon.
+        if (label == null) {
             placeIcon(iconPlaceable, constraints)
         } else {
             placeLabelAndIcon(
-                labelPlaceable,
+                labelPlaceable!!,
                 iconPlaceable,
                 constraints,
                 iconPositionAnimationProgress
