@@ -89,9 +89,9 @@ fun <T : Any> rememberSaveable(
                 with(saverHolder.value) { SaverScope { registry.canBeSaved(it) }.save(value) }
             }
             registry.requireCanBeSaved(valueProvider())
-            registry.registerProvider(finalKey, valueProvider)
+            val entry = registry.registerProvider(finalKey, valueProvider)
             onDispose {
-                registry.unregisterProvider(finalKey, valueProvider)
+                entry.unregister()
             }
         }
     }
