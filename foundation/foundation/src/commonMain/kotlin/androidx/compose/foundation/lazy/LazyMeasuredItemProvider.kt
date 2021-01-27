@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation.lazy
 
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.SubcomposeMeasureScope
 import androidx.compose.ui.unit.Constraints
@@ -29,8 +28,9 @@ internal class LazyMeasuredItemProvider(
     constraints: Constraints,
     isVertical: Boolean,
     private val scope: SubcomposeMeasureScope,
-    private val itemContentFactory: (Int) -> @Composable () -> Unit,
-    private val measuredItemFactory: (DataIndex, List<Placeable>) -> LazyMeasuredItem
+    private val itemContentFactory: (Int) -> ItemContent,
+    private val measuredItemFactory:
+        (index: DataIndex, key: Any, placeables: List<Placeable>) -> LazyMeasuredItem
 ) {
     // the constraints we will measure child with. the main axis is not restricted
     private val childConstraints = Constraints(
@@ -44,9 +44,10 @@ internal class LazyMeasuredItemProvider(
      * This method can be called only once with each [index] per the measure pass.
      */
     fun getAndMeasure(index: DataIndex): LazyMeasuredItem {
-        val placeables = scope.subcompose(index, itemContentFactory(index.value)).fastMap {
+        val itemContent = itemContentFactory(index.value)
+        val placeables = scope.subcompose(itemContent.key, itemContent.content).fastMap {
             it.measure(childConstraints)
         }
-        return measuredItemFactory(index, placeables)
+        return measuredItemFactory(index, itemContent.key, placeables)
     }
 }

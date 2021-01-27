@@ -49,6 +49,7 @@ import androidx.compose.foundation.samples.StickyHeaderSample
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.integration.demos.common.ComposableDemo
+import androidx.compose.material.Button
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
@@ -88,6 +89,7 @@ val LazyListDemos = listOf(
     ComposableDemo("Reverse scroll direction") { ReverseLayout() },
     ComposableDemo("Nested lazy lists") { NestedLazyDemo() },
     ComposableDemo("LazyGrid") { LazyGridDemo() },
+    ComposableDemo("Custom keys") { ReorderWithCustomKeys() },
     PagingDemos
 )
 
@@ -99,13 +101,16 @@ private fun LazyColumnDemo() {
                 "Hello,", "World:", "It works!", "",
                 "this one is really long and spans a few lines for scrolling purposes",
                 "these", "are", "offscreen"
-            ) + (1..100).map { "$it" }
+            )
         ) {
             Text(text = it, fontSize = 80.sp)
 
             if (it.contains("works")) {
                 Text("You can even emit multiple components per item.")
             }
+        }
+        items(100) {
+            Text(text = "$it", fontSize = 80.sp)
         }
     }
 }
@@ -527,6 +532,33 @@ private fun LazyGridForMode(mode: GridCells) {
                     .background(Color.Gray.copy(alpha = (it % 10) / 10f))
                     .padding(8.dp)
             )
+        }
+    }
+}
+
+@Composable
+private fun ReorderWithCustomKeys() {
+    var names by remember { mutableStateOf(listOf("John", "Sara", "Dan")) }
+    Column {
+        Button(onClick = { names = names.shuffled() }) {
+            Text("Shuffle")
+        }
+        LazyColumn {
+            item {
+                var counter by rememberSaveable { mutableStateOf(0) }
+                Button(onClick = { counter++ }) {
+                    Text("Header has $counter")
+                }
+            }
+            items(
+                items = names,
+                key = { it }
+            ) {
+                var counter by rememberSaveable { mutableStateOf(0) }
+                Button(onClick = { counter++ }) {
+                    Text("$it has $counter")
+                }
+            }
         }
     }
 }
