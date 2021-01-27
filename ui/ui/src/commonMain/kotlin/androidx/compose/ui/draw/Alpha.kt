@@ -36,15 +36,3 @@ fun Modifier.alpha(
     /*@FloatRange(from = 0.0, to = 1.0)*/
     alpha: Float
 ) = if (alpha != 1.0f) graphicsLayer(alpha = alpha, clip = true) else this
-
-/**
- * Draw content with modified alpha that may be less than 1.
- *
- * @param opacity the fraction of children's alpha value.
- */
-@Deprecated(
-    "Use alpha instead",
-    ReplaceWith("alpha(opacity)", "androidx.compose.ui.draw")
-)
-@Stable
-fun Modifier.drawOpacity(opacity: Float) = alpha(opacity)

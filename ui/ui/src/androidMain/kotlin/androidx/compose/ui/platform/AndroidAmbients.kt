@@ -43,20 +43,6 @@ import androidx.savedstate.SavedStateRegistryOwner
  * The Android [Configuration]. The [Configuration] is useful for determining how to organize the
  * UI.
  */
-@Suppress("AmbientNaming")
-@Deprecated(
-    "Renamed to AmbientConfiguration",
-    replaceWith = ReplaceWith(
-        "AmbientConfiguration",
-        "androidx.compose.ui.platform.AmbientConfiguration"
-    )
-)
-val ConfigurationAmbient get() = AmbientConfiguration
-
-/**
- * The Android [Configuration]. The [Configuration] is useful for determining how to organize the
- * UI.
- */
 val AmbientConfiguration = ambientOf<Configuration>(
     @OptIn(ExperimentalComposeApi::class)
     neverEqualPolicy()
@@ -65,33 +51,7 @@ val AmbientConfiguration = ambientOf<Configuration>(
 /**
  * Provides a [Context] that can be used by Android applications.
  */
-@Suppress("AmbientNaming")
-@Deprecated(
-    "Renamed to AmbientContext",
-    replaceWith = ReplaceWith(
-        "AmbientContext",
-        "androidx.compose.ui.platform.AmbientContext"
-    )
-)
-val ContextAmbient get() = AmbientContext
-
-/**
- * Provides a [Context] that can be used by Android applications.
- */
 val AmbientContext = staticAmbientOf<Context>()
-
-/**
- * The ambient containing the current [LifecycleOwner].
- */
-@Suppress("AmbientNaming")
-@Deprecated(
-    "Renamed to AmbientLifecycleOwner",
-    replaceWith = ReplaceWith(
-        "AmbientLifecycleOwner",
-        "androidx.compose.ui.platform.AmbientLifecycleOwner"
-    )
-)
-val LifecycleOwnerAmbient get() = AmbientLifecycleOwner
 
 /**
  * The ambient containing the current [LifecycleOwner].
@@ -106,33 +66,7 @@ val AmbientSavedStateRegistryOwner = staticAmbientOf<SavedStateRegistryOwner>()
 /**
  * The ambient containing the current Compose [View].
  */
-@Suppress("AmbientNaming")
-@Deprecated(
-    "Renamed to AmbientView",
-    replaceWith = ReplaceWith(
-        "AmbientView",
-        "androidx.compose.ui.platform.AmbientView"
-    )
-)
-val ViewAmbient get() = AmbientView
-
-/**
- * The ambient containing the current Compose [View].
- */
 val AmbientView = staticAmbientOf<View>()
-
-/**
- * The ambient containing the current [ViewModelStoreOwner].
- */
-@Suppress("AmbientNaming")
-@Deprecated(
-    "Renamed to AmbientViewModelStoreOwner",
-    replaceWith = ReplaceWith(
-        "AmbientViewModelStoreOwner",
-        "androidx.compose.ui.platform.AmbientViewModelStoreOwner"
-    )
-)
-val ViewModelStoreOwnerAmbient get() = AmbientViewModelStoreOwner
 
 /**
  * The ambient containing the current [ViewModelStoreOwner].

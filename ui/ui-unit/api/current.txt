@@ -60,7 +60,6 @@ package androidx.compose.ui.unit {
     method @androidx.compose.runtime.Stable public static boolean isSatisfiedBy-m9CmiCs(long, long size);
     method public static boolean isZero-BRTryo0(long);
     method @androidx.compose.runtime.Stable public static long offset-dAqVMF8(long, optional int horizontal, optional int vertical);
-    method @Deprecated @androidx.compose.runtime.Stable public static boolean satisfiedBy-m9CmiCs(long, long size);
   }
 
   @androidx.compose.runtime.Immutable public interface Density {
@@ -118,7 +117,6 @@ package androidx.compose.ui.unit {
 
   public final class DpKt {
     method @androidx.compose.runtime.Stable public static inline long DpOffset-ioHfwGI(float x, float y);
-    method @Deprecated @androidx.compose.runtime.Stable public static inline long Position-ioHfwGI(float x, float y);
     method @androidx.compose.runtime.Stable public static inline float coerceAtLeast-ioHfwGI(float, float minimumValue);
     method @androidx.compose.runtime.Stable public static inline float coerceAtMost-ioHfwGI(float, float maximumValue);
     method @androidx.compose.runtime.Stable public static inline float coerceIn-qYQSm_w(float, float minimumValue, float maximumValue);
@@ -261,7 +259,6 @@ package androidx.compose.ui.unit {
     ctor public TextUnit();
     method public static inline operator int compareTo--R2X_6o(long $this, long other);
     method public static long constructor-impl(long packedValue);
-    method @Deprecated public static inline operator float div--R2X_6o(long $this, long other);
     method public static inline operator long div-XSAIIZE(long $this, float other);
     method public static inline operator long div-XSAIIZE(long $this, double other);
     method public static inline operator long div-XSAIIZE(long $this, int other);
@@ -273,8 +270,6 @@ package androidx.compose.ui.unit {
     method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(long p);
     method public static boolean isEm-impl(long $this);
     method public static boolean isSp-impl(long $this);
-    method @Deprecated public static inline operator long minus--R2X_6o(long $this, long other);
-    method @Deprecated public static inline operator long plus--R2X_6o(long $this, long other);
     method public static inline operator long times-XSAIIZE(long $this, float other);
     method public static inline operator long times-XSAIIZE(long $this, double other);
     method public static inline operator long times-XSAIIZE(long $this, int other);
@@ -285,20 +280,11 @@ package androidx.compose.ui.unit {
   }
 
   public static final class TextUnit.Companion {
-    method @Deprecated public long Em-XSAIIZE(int value);
-    method @Deprecated public long Em-XSAIIZE(float value);
-    method @Deprecated public long Em-XSAIIZE(double value);
-    method @Deprecated public long Sp-XSAIIZE(int value);
-    method @Deprecated public long Sp-XSAIIZE(float value);
-    method @Deprecated public long Sp-XSAIIZE(double value);
     method public long getUnspecified-XSAIIZE();
     property public final long Unspecified;
   }
 
   public final class TextUnitKt {
-    method @Deprecated @androidx.compose.runtime.Stable public static inline long coerceAtLeast-8E83U4Q(long, long minimumValue);
-    method @Deprecated @androidx.compose.runtime.Stable public static inline long coerceAtMost-8E83U4Q(long, long maximumValue);
-    method @Deprecated @androidx.compose.runtime.Stable public static inline long coerceIn-HxQ2Pkc(long, long minimumValue, long maximumValue);
     method public static long getEm(float);
     method public static long getEm(double);
     method public static long getEm(int);
@@ -308,8 +294,6 @@ package androidx.compose.ui.unit {
     method public static inline boolean isSpecified--R2X_6o(long);
     method public static boolean isUnspecified--R2X_6o(long);
     method @androidx.compose.runtime.Stable public static long lerp-KeuwX78(long start, long stop, float fraction);
-    method @Deprecated @androidx.compose.runtime.Stable public static inline long max-8E83U4Q(long a, long b);
-    method @Deprecated @androidx.compose.runtime.Stable public static inline long min-8E83U4Q(long a, long b);
     method public static inline long takeOrElse-bAewZlA(long, kotlin.jvm.functions.Function0<androidx.compose.ui.unit.TextUnit> block);
     method @androidx.compose.runtime.Stable public static inline operator long times-0PRCd3Q(double, long other);
     method @androidx.compose.runtime.Stable public static inline operator long times-Ew26DjI(float, long other);
@@ -332,7 +316,6 @@ package androidx.compose.ui.unit {
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
     method public static boolean equals-impl0(long p1, long p2);
     method public long getPackedValue();
-    method @Deprecated public static long getPixelsPerSecond-F1C5BW0(long $this);
     method public static float getX-impl(long $this);
     method public static float getY-impl(long $this);
     method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(long p);
@@ -353,7 +336,6 @@ package androidx.compose.ui.unit {
 
   public final class VelocityKt {
     method @androidx.compose.runtime.Stable public static inline long Velocity(float x, float y);
-    method @Deprecated public static long Velocity-k-4lQ0M(long offset);
   }
 
 }

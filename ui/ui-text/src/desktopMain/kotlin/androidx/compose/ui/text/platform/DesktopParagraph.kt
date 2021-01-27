@@ -235,16 +235,6 @@ internal class DesktopParagraph(
             para.lineMetrics[lineIndex].endIndex.toInt()
         }
 
-    @Deprecated(
-        "This function will be removed.",
-        replaceWith = ReplaceWith(
-            "getLineEnd(lineIndex, true)",
-            "androidx.compose.ui.text.platform"
-        )
-    )
-    override fun getLineVisibleEnd(lineIndex: Int) =
-        para.lineMetrics[lineIndex].endExcludingWhitespaces.toInt()
-
     override fun isLineEllipsized(lineIndex: Int) = false
 
     override fun getLineForOffset(offset: Int) =

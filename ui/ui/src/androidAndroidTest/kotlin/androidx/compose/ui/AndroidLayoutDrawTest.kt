@@ -77,7 +77,6 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.VerticalAlignmentLine
-import androidx.compose.ui.layout.id
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -560,8 +559,8 @@ class AndroidLayoutDrawTest {
                     measurables.forEachIndexed { index, measurable ->
                         measurable.measure(childConstraints[index])
                     }
-                    val measurablesHeader = measurables.filter { it.id == "header" }
-                    val measurablesFooter = measurables.filter { it.id == "footer" }
+                    val measurablesHeader = measurables.filter { it.layoutId == "header" }
+                    val measurablesFooter = measurables.filter { it.layoutId == "footer" }
                     assertEquals(headerChildrenCount, measurablesHeader.size)
                     assertSame(measurables[0], measurablesHeader[0])
                     assertEquals(footerChildrenCount, measurablesFooter.size)
