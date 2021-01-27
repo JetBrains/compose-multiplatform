@@ -33,7 +33,7 @@ import androidx.compose.runtime.setValue
  * [emulateSavedInstanceStateRestore] and assert your state is restored properly.
  *
  * Note that this tests only the restoration of the local state of the composable you passed to
- * [setContent] and useful for testing [savedInstanceState] or [rememberSaveable]
+ * [setContent] and useful for testing [androidx.compose.runtime.saveable.rememberSaveable]
  * integration. It is not testing the integration with any other life cycles or Activity callbacks.
  */
 class StateRestorationTester(private val composeTestRule: ComposeContentTestRule) {

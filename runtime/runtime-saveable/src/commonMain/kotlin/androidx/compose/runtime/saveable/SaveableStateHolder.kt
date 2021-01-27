@@ -24,10 +24,10 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 
 /**
- * Allows to save the state defined with [savedInstanceState] and [rememberSaveable]
- * for the subtree before disposing it to make it possible to compose it back next time with the
- * restored state. It allows different navigation patterns to keep the ui state like scroll
- * position for the currently not composed screens from the backstack.
+ * Allows to save the state defined with [rememberSaveable] for the subtree before disposing it
+ * to make it possible to compose it back next time with the restored state. It allows different
+ * navigation patterns to keep the ui state like scroll position for the currently not composed
+ * screens from the backstack.
  *
  * @sample androidx.compose.runtime.saveable.samples.SimpleNavigationWithSaveableStateSample
  *
@@ -38,9 +38,8 @@ import androidx.compose.runtime.remember
 interface SaveableStateHolder {
     /**
      * Put your content associated with a [key] inside the [content]. This will automatically
-     * save all the states defined with [savedInstanceState] and [rememberSaveable]
-     * before disposing the content and will restore the states when you compose with this key
-     * again.
+     * save all the states defined with [rememberSaveable] before disposing the content and will
+     * restore the states when you compose with this key again.
      *
      * @param key to be used for saving and restoring the states for the subtree. Note that on
      * Android you can only use types which can be stored inside the Bundle.

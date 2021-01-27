@@ -28,7 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.savedInstanceState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.AmbientLayoutDirection
@@ -81,7 +81,7 @@ internal fun EditLine(
     text: String = ""
 ) {
     val controller = remember { mutableStateOf<SoftwareKeyboardController?>(null) }
-    val state = savedInstanceState { text }
+    val state = rememberSaveable { mutableStateOf(text) }
     BasicTextField(
         modifier = demoTextFieldModifiers,
         value = state.value,

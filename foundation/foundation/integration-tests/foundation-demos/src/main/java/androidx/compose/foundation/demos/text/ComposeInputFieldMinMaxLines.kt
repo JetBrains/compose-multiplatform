@@ -19,7 +19,8 @@ package androidx.compose.foundation.demos.text
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.savedinstancestate.savedInstanceState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.InternalTextApi
@@ -54,7 +55,7 @@ fun BasicTextFieldMinMaxDemo() {
 @Composable
 @OptIn(InternalTextApi::class)
 private fun TextFieldWithMaxLines(str: String? = null, maxLines: Int) {
-    val state = savedInstanceState { str ?: "abc ".repeat(20) }
+    val state = rememberSaveable { mutableStateOf(str ?: "abc ".repeat(20)) }
     BasicTextField(
         modifier = demoTextFieldModifiers.clipToBounds(),
         value = state.value,

@@ -24,8 +24,7 @@ package androidx.compose.runtime.saveable
  * be stored in the Bundle class can be saved.
  * The implementations can check that the provided value can be saved via [SaverScope.canBeSaved]
  *
- * You can pass the implementations of this class as a parameter for [savedInstanceState] or
- * [rememberSaveable].
+ * You can pass the implementations of this class as a parameter for [rememberSaveable].
  *
  * @sample androidx.compose.runtime.saveable.samples.CustomSaverSample
  */
@@ -50,8 +49,7 @@ interface Saver<Original, Saveable : Any> {
  * be stored in the Bundle class can be saved.
  * The implementations can check that the provided value can be saved via [SaverScope.canBeSaved]
  *
- * You can pass the implementations of this class as a parameter for [savedInstanceState] or
- * [rememberSaveable].
+ * You can pass the implementations of this class as a parameter for [rememberSaveable].
  *
  * @sample androidx.compose.runtime.saveable.samples.CustomSaverSample
  *
@@ -87,7 +85,7 @@ fun interface SaverScope {
 /**
  * The default implementation of [Saver] which does not perform any conversion.
  *
- * It is used by [savedInstanceState] and [rememberSaveable] by default.
+ * It is used by [rememberSaveable] by default.
  *
  * @see Saver
  */

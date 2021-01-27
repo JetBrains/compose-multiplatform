@@ -20,7 +20,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.savedinstancestate.savedInstanceState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.sp
@@ -42,7 +43,7 @@ fun InputFieldTrickyUseCase() {
 
 @Composable
 private fun RejectNonDigits() {
-    val state = savedInstanceState { "" }
+    val state = rememberSaveable { mutableStateOf("") }
     BasicTextField(
         modifier = demoTextFieldModifiers,
         value = state.value,
@@ -58,7 +59,7 @@ private fun RejectNonDigits() {
 
 @Composable
 private fun RejectComposition() {
-    val state = savedInstanceState { "" }
+    val state = rememberSaveable { mutableStateOf(({ "" })()) }
     BasicTextField(
         modifier = demoTextFieldModifiers,
         value = state.value,

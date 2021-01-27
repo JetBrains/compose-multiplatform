@@ -57,7 +57,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.savedInstanceState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -150,15 +150,15 @@ fun VerticalAlignmentsInTextField() {
 @Composable
 fun MaterialTextFieldDemo() {
     Column(Modifier.verticalScroll(rememberScrollState()).padding(PaddingValues(10.dp))) {
-        var text by savedInstanceState { "" }
-        var leadingChecked by savedInstanceState { false }
-        var trailingChecked by savedInstanceState { false }
-        val characterCounterChecked by savedInstanceState { false }
-        var singleLineChecked by savedInstanceState { true }
-        var selectedOption by savedInstanceState { Option.None }
-        var selectedTextField by savedInstanceState { TextFieldType.Filled }
-        var disabled by savedInstanceState { false }
-        var readOnly by savedInstanceState { false }
+        var text by rememberSaveable { mutableStateOf("") }
+        var leadingChecked by rememberSaveable { mutableStateOf(false) }
+        var trailingChecked by rememberSaveable { mutableStateOf(false) }
+        val characterCounterChecked by rememberSaveable { mutableStateOf(false) }
+        var singleLineChecked by rememberSaveable { mutableStateOf(true) }
+        var selectedOption by rememberSaveable { mutableStateOf(Option.None) }
+        var selectedTextField by rememberSaveable { mutableStateOf(TextFieldType.Filled) }
+        var disabled by rememberSaveable { mutableStateOf(false) }
+        var readOnly by rememberSaveable { mutableStateOf(false) }
 
         val textField: @Composable () -> Unit = @Composable {
             when (selectedTextField) {
