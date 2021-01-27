@@ -55,6 +55,7 @@ fun consumeCompositionLocal() {
     }
 }
 
+@Suppress("CompositionLocalNaming")
 private val ActiveUser = compositionLocalOf<User> { error("No active user found!") }
 
 @Composable private fun SomeScreen() {}

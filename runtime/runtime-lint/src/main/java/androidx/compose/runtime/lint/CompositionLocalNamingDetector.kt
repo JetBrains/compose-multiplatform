@@ -24,70 +24,68 @@ import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Implementation
 import com.android.tools.lint.detector.api.Issue
 import com.android.tools.lint.detector.api.JavaContext
-import com.android.tools.lint.detector.api.LintFix
 import com.android.tools.lint.detector.api.Scope
 import com.android.tools.lint.detector.api.Severity
 import com.android.tools.lint.detector.api.SourceCodeScanner
 import com.intellij.psi.util.InheritanceUtil
+import org.jetbrains.kotlin.psi.KtParameter
+import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.uast.UElement
+import org.jetbrains.uast.UParameter
 import org.jetbrains.uast.UVariable
 import java.util.EnumSet
-import java.util.Locale
 
 /**
- * [Detector] that checks the naming of Ambient properties for consistency with guidelines.
+ * [Detector] that checks the naming of CompositionLocal properties for consistency with guidelines.
  *
- * - `Ambient` should not be used as a noun (suffix) in the name of an Ambient property. It may
- * be used as an adjective (prefix) in lieu of a more descriptive adjective.
+ * CompositionLocal properties should be prefixed with `Local` to make it clear that their value
+ * is local to the current composition.
  */
-class AmbientNamingDetector : Detector(), SourceCodeScanner {
+class CompositionLocalNamingDetector : Detector(), SourceCodeScanner {
     override fun getApplicableUastTypes() = listOf(UVariable::class.java)
 
     override fun createUastHandler(context: JavaContext) = object : UElementHandler() {
         override fun visitVariable(node: UVariable) {
+            // Ignore parameters of type CompositionLocal
+            if (node is UParameter) return
+            if (node.sourcePsi is KtParameter) return
+            // Ignore local properties
+            if ((node.sourcePsi as? KtProperty)?.isLocal == true) return
+
             val type = node.type
-            if (!InheritanceUtil.isInheritor(type, AmbientFqn)) return
+            if (!InheritanceUtil.isInheritor(type, CompositionLocalFqn)) return
 
             val name = node.name
-            if (!name!!.endsWith(AmbientShortName)) return
-
-            val newName = AmbientShortName + name.replace(AmbientShortName, "")
-                .capitalize(Locale.getDefault())
+            if (name!!.startsWith(CompositionLocalPrefix, ignoreCase = true)) return
 
             // Kotlinc can't disambiguate overloads for report / getNameLocation otherwise
             val uElementNode: UElement = node
 
             context.report(
-                AmbientNaming,
+                CompositionLocalNaming,
                 uElementNode,
                 context.getNameLocation(uElementNode),
-                "`Ambient` should not be used as a noun when naming Ambient properties",
-                LintFix.create()
-                    .replace()
-                    .name("Use Ambient as an adjective (prefix)")
-                    .text(name)
-                    .with(newName)
-                    .autoFix()
-                    .build()
+                "CompositionLocal properties should be prefixed with `Local`",
             )
         }
     }
 
     companion object {
-        val AmbientNaming = Issue.create(
-            "AmbientNaming",
-            "Incorrect naming for Ambient properties",
-            "`Ambient` should not be used as a anoun when naming Ambient properties. It may be " +
-                "used as an adjective in lieu of a more descriptive adjective. Otherwise Ambients" +
-                " follow standard property naming guidelines.",
-            Category.CORRECTNESS, 3, Severity.ERROR,
+        val CompositionLocalNaming = Issue.create(
+            "CompositionLocalNaming",
+            "CompositionLocal properties should be prefixed with `Local`",
+            "CompositionLocal properties should be prefixed with `Local`. This helps make " +
+                "it clear at their use site that these values are local to the current " +
+                "composition. Typically the full name will be `Local` + the type of the " +
+                "CompositionLocal, for example val LocalFoo = compositionLocalOf { Foo() }.",
+            Category.CORRECTNESS, 3, Severity.WARNING,
             Implementation(
-                AmbientNamingDetector::class.java,
+                CompositionLocalNamingDetector::class.java,
                 EnumSet.of(Scope.JAVA_FILE, Scope.TEST_SOURCES)
             )
         )
     }
 }
 
-private const val AmbientFqn = "androidx.compose.runtime.Ambient"
-private val AmbientShortName get() = AmbientFqn.split(".").last()
+private const val CompositionLocalFqn = "androidx.compose.runtime.CompositionLocal"
+private const val CompositionLocalPrefix = "Local"
