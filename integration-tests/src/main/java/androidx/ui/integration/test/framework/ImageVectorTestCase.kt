@@ -25,12 +25,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.PathData
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.testutils.ComposeTestCase
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 
 /**
@@ -47,13 +48,13 @@ sealed class ImageVectorTestCase : ComposeTestCase {
             Box(
                 Modifier.testTag(testTag)
                     .preferredSize(24.dp)
-                    .paint(rememberVectorPainter(getImageVector()))
+                    .paint(getPainter())
             )
         }
     }
 
     @Composable
-    abstract fun getImageVector(): ImageVector
+    abstract fun getPainter(): Painter
 
     abstract val testTag: String
 }
@@ -64,7 +65,7 @@ sealed class ImageVectorTestCase : ComposeTestCase {
 class XmlVectorTestCase : ImageVectorTestCase() {
     // TODO: should switch to async loading here, and force that to be run synchronously
     @Composable
-    override fun getImageVector() = vectorResource(
+    override fun getPainter() = painterResource(
         androidx.ui.integration.test.R.drawable.ic_baseline_menu_24
     )
 
@@ -80,43 +81,45 @@ class ProgrammaticVectorTestCase : ImageVectorTestCase() {
      * Returns a clone of ic_baseline_menu_24 built purely in code
      */
     @Composable
-    override fun getImageVector() = ImageVector.Builder(
-        defaultWidth = 24.dp,
-        defaultHeight = 24.dp,
-        viewportWidth = 24f,
-        viewportHeight = 24f
-    ).apply {
-        addPath(
-            PathData {
-                moveTo(3f, 18f)
-                horizontalLineToRelative(18f)
-                verticalLineToRelative(-2f)
-                lineTo(3f, 16f)
-                verticalLineToRelative(2f)
-                close()
-                moveTo(3f, 13f)
-                horizontalLineToRelative(18f)
-                verticalLineToRelative(-2f)
-                lineTo(3f, 11f)
-                verticalLineToRelative(2f)
-                close()
-                moveTo(3f, 6f)
-                verticalLineToRelative(2f)
-                horizontalLineToRelative(18f)
-                lineTo(21f, 6f)
-                lineTo(3f, 6f)
-                close()
-            },
-            fill = SolidColor(Color.Black),
-            fillAlpha = 1f,
-            stroke = null,
-            strokeAlpha = 1f,
-            strokeLineWidth = 1f,
-            strokeLineCap = StrokeCap.Butt,
-            strokeLineJoin = StrokeJoin.Bevel,
-            strokeLineMiter = 1f
-        )
-    }.build()
+    override fun getPainter() = rememberVectorPainter(
+        ImageVector.Builder(
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f
+        ).apply {
+            addPath(
+                PathData {
+                    moveTo(3f, 18f)
+                    horizontalLineToRelative(18f)
+                    verticalLineToRelative(-2f)
+                    lineTo(3f, 16f)
+                    verticalLineToRelative(2f)
+                    close()
+                    moveTo(3f, 13f)
+                    horizontalLineToRelative(18f)
+                    verticalLineToRelative(-2f)
+                    lineTo(3f, 11f)
+                    verticalLineToRelative(2f)
+                    close()
+                    moveTo(3f, 6f)
+                    verticalLineToRelative(2f)
+                    horizontalLineToRelative(18f)
+                    lineTo(21f, 6f)
+                    lineTo(3f, 6f)
+                    close()
+                },
+                fill = SolidColor(Color.Black),
+                fillAlpha = 1f,
+                stroke = null,
+                strokeAlpha = 1f,
+                strokeLineWidth = 1f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Bevel,
+                strokeLineMiter = 1f
+            )
+        }.build()
+    )
 
     override val testTag = "Vector"
 }

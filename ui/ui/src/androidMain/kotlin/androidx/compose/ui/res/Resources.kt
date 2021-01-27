@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.ui.res
 
 import android.os.Handler
@@ -50,6 +52,7 @@ internal enum class LoadingState { PENDING, LOADED, FAILED }
  * A class used for the result of the asynchronous resource loading.
  */
 @Stable
+@Deprecated("DeferredResource has been deprecated.  Use State instead")
 class DeferredResource<T> internal constructor(
     state: LoadingState = LoadingState.PENDING,
     private val pendingResource: T? = null,
@@ -87,22 +90,26 @@ class DeferredResource<T> internal constructor(
  *
  * @param resource the resource
  */
+@Deprecated("Resource has been deprecated.  Use State instead")
 sealed class Resource<T>(val resource: T?)
 
 /**
  * A class represents the loaded resource.
  */
+@Deprecated("LoadedResource has been deprecated.  Use State instead")
 class LoadedResource<T>(resource: T) : Resource<T>(resource)
 
 /**
  * A class represents the alternative resource due to background loading.
  */
+@Deprecated("PendingResource has been deprecated.  Use State instead")
 class PendingResource<T>(resource: T?) : Resource<T>(resource)
 
 /**
  * A class represents the alternative resource due to failed to load the requested resource.
  * @param throwable the reason of the failure.
  */
+@Deprecated("FailedResource has been deprecated.  Use State instead")
 class FailedResource<T>(resource: T?, val throwable: Throwable?) : Resource<T>(resource)
 
 /**

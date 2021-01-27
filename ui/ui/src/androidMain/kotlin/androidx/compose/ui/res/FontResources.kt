@@ -75,10 +75,10 @@ internal fun fontResourceFromContext(context: Context, fontFamily: FontFamily): 
  * [FontFamily] that can be loaded synchronously can be used as a failedFontFamily.
  * @throws IllegalArgumentException if [FontFamily] other than synchronously loadable ones are
  * passed as an argument of pendingFontFamily or failedFontFamily.
- *
- * @sample androidx.compose.ui.samples.FontResourcesFontFamily
  */
 @Composable
+@Suppress("DEPRECATION")
+@Deprecated("loadFontResource has been deprecated.  Use fontResource instead")
 fun loadFontResource(
     fontFamily: FontFamily,
     pendingFontFamily: FontFamily? = null,
@@ -128,10 +128,10 @@ fun loadFontResource(
  * @param failedTypeface an optional resource to be used during loading instead.
  * @throws IllegalArgumentException if [FontFamily] other than synchronously loadable ones are
  * passed as an argument of pendingFontFamily or failedFontFamily.
- *
- * @sample androidx.compose.ui.samples.FontResourcesTypeface
  */
 @Composable
+@Suppress("DEPRECATION")
+@Deprecated("loadFontResource has been deprecated.  Use fontResource instead")
 fun loadFontResource(
     fontFamily: FontFamily,
     pendingTypeface: Typeface? = null,

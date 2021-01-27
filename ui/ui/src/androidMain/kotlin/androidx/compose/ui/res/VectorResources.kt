@@ -33,6 +33,26 @@ import androidx.compose.ui.util.trace
 import org.xmlpull.v1.XmlPullParserException
 
 /**
+ * Load an ImageVector from a vector resource.
+ *
+ * This function is intended to be used for when low-level ImageVector-specific
+ * functionality is required.  For simply displaying onscreen, the vector/bitmap-agnostic
+ * [painterResource] is recommended instead.
+ *
+ * @param id the resource identifier
+ * @return the vector data associated with the resource
+ */
+@Composable
+internal fun lowLevelVectorResource(@DrawableRes id: Int): ImageVector {
+    val context = LocalContext.current
+    val res = context.resources
+    val theme = context.theme
+    return remember(id) {
+        loadVectorResource(theme, res, id)
+    }
+}
+
+/**
  * Load a [ImageVector] from an Android resource id
  * This is useful for querying top level properties of the [ImageVector]
  * such as it's intrinsic width and height to be able to size components
@@ -43,14 +63,9 @@ import org.xmlpull.v1.XmlPullParserException
  * For loading generic loading of rasterized or vector assets see [painterResource]
  */
 @Composable
-fun vectorResource(@DrawableRes id: Int): ImageVector {
-    val context = LocalContext.current
-    val res = context.resources
-    val theme = context.theme
-    return remember(id) {
-        loadVectorResource(theme, res, id)
-    }
-}
+@Suppress("DEPRECATION")
+@Deprecated("vectorResource has been deprecated.  Use painterResource instead")
+fun vectorResource(@DrawableRes id: Int): ImageVector = lowLevelVectorResource(id)
 
 /**
  * Load the vector drawable in background thread.
@@ -67,6 +82,8 @@ fun vectorResource(@DrawableRes id: Int): ImageVector {
  * @return the deferred vector drawable resource.
  */
 @Composable
+@Suppress("DEPRECATION")
+@Deprecated("loadVectorResource has been deprecated.  Use painterResource instead")
 fun loadVectorResource(
     id: Int,
     pendingResource: ImageVector? = null,
@@ -90,7 +107,6 @@ fun loadVectorResource(
 }
 
 @Throws(XmlPullParserException::class)
-@SuppressWarnings("RestrictedApi")
 internal fun loadVectorResource(
     theme: Resources.Theme? = null,
     res: Resources,

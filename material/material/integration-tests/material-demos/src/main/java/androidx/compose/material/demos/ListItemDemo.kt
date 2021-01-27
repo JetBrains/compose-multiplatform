@@ -27,14 +27,15 @@ import androidx.compose.material.samples.ThreeLineRtlLtrListItems
 import androidx.compose.material.samples.TwoLineListItems
 import androidx.compose.material.samples.TwoLineRtlLtrListItems
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.painterResource
 
 @Composable
 fun ListItemDemo() {
-    val icon24 = imageResource(R.drawable.ic_bluetooth)
-    val icon40 = imageResource(R.drawable.ic_account_box)
-    val icon56 = imageResource(R.drawable.ic_android)
-    val vectorIcon = Icons.Default.Call
+    val icon24 = painterResource(R.drawable.ic_bluetooth)
+    val icon40 = painterResource(R.drawable.ic_account_box)
+    val icon56 = painterResource(R.drawable.ic_android)
+    val vectorIcon = rememberVectorPainter(Icons.Default.Call)
     LazyColumn {
         item {
             ClickableListItems()
@@ -53,8 +54,8 @@ fun ListItemDemo() {
 
 @Composable
 fun MixedRtlLtrListItemDemo() {
-    val icon24 = imageResource(R.drawable.ic_bluetooth)
-    val icon40 = imageResource(R.drawable.ic_account_box)
+    val icon24 = painterResource(R.drawable.ic_bluetooth)
+    val icon40 = painterResource(R.drawable.ic_account_box)
     LazyColumn {
         item {
             OneLineRtlLtrListItems(icon24, icon40)

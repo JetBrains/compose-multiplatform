@@ -36,7 +36,21 @@ import androidx.compose.ui.util.trace
  * @return the decoded image data associated with the resource
  */
 @Composable
-fun imageResource(@DrawableRes id: Int): ImageBitmap {
+@Deprecated("imageResource has been deprecated.  Use painterResource instead")
+fun imageResource(@DrawableRes id: Int): ImageBitmap = lowLevelImageResource(id)
+
+/**
+ * Load an ImageBitmap from an image resource.
+ *
+ * This function is intended to be used for when low-level ImageBitmap-specific
+ * functionality is required.  For simply displaying onscreen, the vector/bitmap-agnostic
+ * [painterResource] is recommended instead.
+ *
+ * @param id the resource identifier
+ * @return the decoded image data associated with the resource
+ */
+@Composable
+internal fun lowLevelImageResource(@DrawableRes id: Int): ImageBitmap {
     val context = LocalContext.current
     val value = remember { TypedValue() }
     context.resources.getValue(id, value, true)
@@ -59,6 +73,8 @@ fun imageResource(@DrawableRes id: Int): ImageBitmap {
  * @return the deferred image resource.
  */
 @Composable
+@Suppress("DEPRECATION")
+@Deprecated("loadImageResource has been deprecated.  Use painterResource instead")
 fun loadImageResource(
     id: Int,
     pendingImage: ImageBitmap? = null,

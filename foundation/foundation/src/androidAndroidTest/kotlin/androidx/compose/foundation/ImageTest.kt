@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.test.R
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -39,30 +40,26 @@ import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.painter.ImagePainter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.loadVectorResource
-import androidx.compose.ui.test.captureToImage
-import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onRoot
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
-import androidx.compose.testutils.assertPixels
-import androidx.compose.ui.graphics.painter.ColorPainter
-import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
@@ -428,20 +425,15 @@ class ImageTest {
                     .background(color = Color.White)
                     .wrapContentSize(Alignment.Center)
             ) {
-                // This is an async call to parse the VectorDrawable xml asset into
-                // a ImageVector, update the latch once we receive this callback
-                // and draw the Image composable
-                loadVectorResource(R.drawable.ic_vector_asset_test).resource.resource?.let {
-                    Image(
-                        it,
-                        null,
-                        modifier = Modifier.preferredSizeIn(
-                            minWidth = minWidth,
-                            minHeight = minHeight
-                        )
-                            .drawBehind { vectorDrawn = true }
+                Image(
+                    painterResource(R.drawable.ic_vector_asset_test),
+                    null,
+                    modifier = Modifier.preferredSizeIn(
+                        minWidth = minWidth,
+                        minHeight = minHeight
                     )
-                }
+                        .drawBehind { vectorDrawn = true }
+                )
             }
         }
 
@@ -543,16 +535,11 @@ class ImageTest {
     @LargeTest
     fun testPainterResourceWithImage() {
         val testTag = "testTag"
-        var imageColor = Color.Black
+        var imageColor = Color(0.023529412f, 0.0f, 1.0f, 1.0f) // ic_image_test color
 
         rule.setContent {
             val painterId = remember {
                 mutableStateOf(R.drawable.ic_vector_square_asset_test)
-            }
-            with(imageResource(R.drawable.ic_image_test)) {
-                // Sample the actual color of the image to make sure we are loading it properly
-                // when we toggle the state of the resource id
-                imageColor = toPixelMap()[width / 2, height / 2]
             }
             Image(
                 painterResource(painterId.value),
