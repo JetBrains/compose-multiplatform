@@ -109,6 +109,7 @@ private val GraphicsDemos = DemoCategory(
     "Graphics",
     listOf(
         ComposableDemo("VectorGraphicsDemo") { VectorGraphicsDemo() },
+        ComposableDemo("AnimatedVectorGraphicsDemo") { AnimatedVectorGraphicsDemo() },
         ComposableDemo("DeclarativeGraphicsDemo") { DeclarativeGraphicsDemo() }
     )
 )

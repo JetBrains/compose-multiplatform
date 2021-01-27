@@ -625,6 +625,17 @@ package androidx.compose.ui.graphics {
 
 package androidx.compose.ui.graphics.vector {
 
+  @androidx.compose.runtime.Immutable @androidx.compose.ui.ExperimentalComposeUiApi public final class AnimatedImageVector {
+    method public androidx.compose.ui.graphics.vector.ImageVector getImageVector();
+    method public int getTotalDuration();
+    method @androidx.compose.runtime.Composable public androidx.compose.ui.graphics.painter.Painter painterFor(boolean atEnd);
+    property public final androidx.compose.ui.graphics.vector.ImageVector imageVector;
+    property public final int totalDuration;
+  }
+
+  public final class AnimatorKt {
+  }
+
   @androidx.compose.runtime.Immutable public final class ImageVector {
     method public float getDefaultHeight-D9Ej5fM();
     method public float getDefaultWidth-D9Ej5fM();
@@ -774,6 +785,15 @@ package androidx.compose.ui.graphics.vector {
 }
 
 package androidx.compose.ui.graphics.vector.compat {
+
+  public final class XmlAnimatedVectorParserKt {
+  }
+
+  public final class XmlAnimatorParserKt {
+  }
+
+  public final class XmlPullParserUtilsKt {
+  }
 
   public final class XmlVectorParserKt {
   }
@@ -2246,6 +2266,13 @@ package androidx.compose.ui.platform.actionmodecallback {
 }
 
 package androidx.compose.ui.res {
+
+  public final class AnimatedVectorResourcesKt {
+    method @androidx.compose.runtime.Composable @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.ui.graphics.vector.AnimatedImageVector animatedVectorResource(@DrawableRes int id);
+  }
+
+  public final class AnimatorResourcesKt {
+  }
 
   public final class ColorResourcesKt {
     method @androidx.compose.runtime.Composable public static long colorResource(@ColorRes int id);
