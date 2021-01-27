@@ -17,7 +17,7 @@ package androidx.compose.runtime {
   }
 
   public final class ActualAndroidKt {
-    method public static androidx.compose.runtime.EmbeddingContext EmbeddingContext();
+    method public static androidx.compose.runtime.MonotonicFrameClock getDefaultMonotonicFrameClock();
   }
 
   public final class ActualJvmKt {
@@ -49,6 +49,16 @@ package androidx.compose.runtime {
   }
 
   public final class BitwiseOperatorsKt {
+  }
+
+  public final class BroadcastFrameClock implements androidx.compose.runtime.MonotonicFrameClock {
+    ctor public BroadcastFrameClock(kotlin.jvm.functions.Function0<kotlin.Unit>? onNewAwaiters);
+    ctor public BroadcastFrameClock();
+    method public void cancel(optional java.util.concurrent.CancellationException cancellationException);
+    method public boolean getHasAwaiters();
+    method public void sendFrame(long timeNanos);
+    method public suspend <R> Object? withFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
+    property public final boolean hasAwaiters;
   }
 
   @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface Composable {
@@ -219,11 +229,6 @@ package androidx.compose.runtime {
     method public inline androidx.compose.runtime.DisposableEffectResult onDispose(kotlin.jvm.functions.Function0<kotlin.Unit> onDisposeEffect);
   }
 
-  public interface EmbeddingContext {
-    method public boolean isMainThread();
-    method public kotlin.coroutines.CoroutineContext mainThreadCompositionContext();
-  }
-
   public final class ExpectKt {
   }
 
@@ -269,6 +274,22 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.InternalComposeApi public static void resetSourceInfo();
   }
 
+  public interface MonotonicFrameClock extends kotlin.coroutines.CoroutineContext.Element {
+    method public default kotlin.coroutines.CoroutineContext.Key<?> getKey();
+    method public suspend <R> Object? withFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
+    property public default kotlin.coroutines.CoroutineContext.Key<?> key;
+    field public static final androidx.compose.runtime.MonotonicFrameClock.Key Key;
+  }
+
+  public static final class MonotonicFrameClock.Key implements kotlin.coroutines.CoroutineContext.Key<androidx.compose.runtime.MonotonicFrameClock> {
+  }
+
+  public final class MonotonicFrameClockKt {
+    method public static suspend inline <R> Object? withFrameMillis(androidx.compose.runtime.MonotonicFrameClock, kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
+    method public static suspend <R> Object? withFrameMillis(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
+    method public static suspend <R> Object? withFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
+  }
+
   @androidx.compose.runtime.Stable public interface MutableState<T> extends androidx.compose.runtime.State<T> {
     method public operator T! component1();
     method public operator kotlin.jvm.functions.Function1<T,kotlin.Unit> component2();
@@ -294,8 +315,8 @@ package androidx.compose.runtime {
   @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface NoLiveLiterals {
   }
 
-  public final class PausableMonotonicFrameClock implements androidx.compose.runtime.dispatch.MonotonicFrameClock {
-    ctor public PausableMonotonicFrameClock(androidx.compose.runtime.dispatch.MonotonicFrameClock frameClock);
+  public final class PausableMonotonicFrameClock implements androidx.compose.runtime.MonotonicFrameClock {
+    ctor public PausableMonotonicFrameClock(androidx.compose.runtime.MonotonicFrameClock frameClock);
     method public boolean isPaused();
     method public void pause();
     method public void resume();

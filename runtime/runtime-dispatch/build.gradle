@@ -40,6 +40,8 @@ if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         api(KOTLIN_COROUTINES_CORE)
         api "androidx.annotation:annotation:1.1.0"
 
+        api(project(":compose:ui:ui"))
+
         implementation(KOTLIN_STDLIB_COMMON)
         implementation(KOTLIN_STDLIB)
         implementation("androidx.core:core-ktx:1.1.0")
@@ -69,6 +71,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             commonMain.dependencies {
                 implementation(KOTLIN_STDLIB_COMMON)
                 api(KOTLIN_COROUTINES_CORE)
+                api(project(":compose:ui:ui"))
             }
             jvmMain.dependencies {
                 implementation(KOTLIN_STDLIB)

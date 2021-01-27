@@ -42,10 +42,10 @@ dependencies {
         api "androidx.annotation:annotation:1.1.0"
 
         implementation project(":compose:runtime:runtime")
-        implementation project(":compose:runtime:runtime-dispatch")
         implementation project(":compose:ui:ui-unit")
         implementation project(":compose:ui:ui-util")
         implementation (KOTLIN_STDLIB)
+        api(KOTLIN_COROUTINES_CORE)
 
         testImplementation(ANDROIDX_TEST_RULES)
         testImplementation(ANDROIDX_TEST_RUNNER)
@@ -74,10 +74,10 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         sourceSets {
             commonMain.dependencies {
                 implementation project(":compose:runtime:runtime")
-                implementation project(":compose:runtime:runtime-dispatch")
                 implementation project(":compose:ui:ui-unit")
                 implementation project(":compose:ui:ui-util")
                 implementation(KOTLIN_STDLIB_COMMON)
+                api(KOTLIN_COROUTINES_CORE)
             }
             androidMain.dependencies {
                 api "androidx.annotation:annotation:1.1.0"

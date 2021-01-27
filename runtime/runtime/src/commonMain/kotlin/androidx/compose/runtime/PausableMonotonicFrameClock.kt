@@ -16,8 +16,6 @@
 
 package androidx.compose.runtime
 
-import androidx.compose.runtime.dispatch.MonotonicFrameClock
-
 /**
  * A [MonotonicFrameClock] wrapper that can be [pause]d and [resume]d.
  *

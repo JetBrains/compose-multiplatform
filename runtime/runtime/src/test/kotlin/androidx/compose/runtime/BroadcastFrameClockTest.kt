@@ -29,7 +29,7 @@ import kotlin.test.assertTrue
 class BroadcastFrameClockTest {
     @Test
     fun sendAndReceiveFrames() = runBlockingTest {
-        val clock = BroadcastFrameClock()
+        val clock = androidx.compose.runtime.BroadcastFrameClock()
 
         val frameAwaiter = async { clock.withFrameNanos { it } }
 
@@ -49,7 +49,7 @@ class BroadcastFrameClockTest {
 
     @Test
     fun cancelClock() = runBlockingTest {
-        val clock = BroadcastFrameClock()
+        val clock = androidx.compose.runtime.BroadcastFrameClock()
         val frameAwaiter = async { clock.withFrameNanos { it } }
 
         clock.cancel()
@@ -64,7 +64,7 @@ class BroadcastFrameClockTest {
 
     @Test
     fun failClockWhenNewAwaitersNotified() = runBlockingTest {
-        val clock = BroadcastFrameClock {
+        val clock = androidx.compose.runtime.BroadcastFrameClock {
             throw CancellationException("failed frame clock")
         }
 
