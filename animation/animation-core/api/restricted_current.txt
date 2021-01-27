@@ -81,7 +81,9 @@ package androidx.compose.animation.core {
     method public T! getValue(long playTime);
     method public V getVelocityVector(long playTime);
     method public default boolean isFinished(long playTime);
+    method public boolean isInfinite();
     property public abstract long durationMillis;
+    property public abstract boolean isInfinite;
     property public abstract T! targetValue;
     property public abstract androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter;
   }
@@ -294,9 +296,11 @@ package androidx.compose.animation.core {
     method public androidx.compose.animation.core.TwoWayConverter<T,V> getTypeConverter();
     method public T! getValue(long playTime);
     method public V getVelocityVector(long playTime);
+    method public boolean isInfinite();
     property public long durationMillis;
     property public final T! initialValue;
     property public final V initialVelocityVector;
+    property public boolean isInfinite;
     property public T! targetValue;
     property public androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter;
   }
@@ -560,8 +564,10 @@ package androidx.compose.animation.core {
     method public androidx.compose.animation.core.TwoWayConverter<T,V> getTypeConverter();
     method public T! getValue(long playTime);
     method public V getVelocityVector(long playTime);
+    method public boolean isInfinite();
     property public long durationMillis;
     property public final T! initialValue;
+    property public boolean isInfinite;
     property public T! targetValue;
     property public androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter;
   }
@@ -658,6 +664,8 @@ package androidx.compose.animation.core {
     method public default V getEndVelocity(V start, V end, V startVelocity);
     method public V getValue(long playTime, V start, V end, V startVelocity);
     method public V getVelocity(long playTime, V start, V end, V startVelocity);
+    method public boolean isInfinite();
+    property public abstract boolean isInfinite;
   }
 
   public final class VectorizedAnimationSpecKt {
@@ -681,6 +689,8 @@ package androidx.compose.animation.core {
   }
 
   public interface VectorizedFiniteAnimationSpec<V extends androidx.compose.animation.core.AnimationVector> extends androidx.compose.animation.core.VectorizedAnimationSpec<V> {
+    method public default boolean isInfinite();
+    property public default boolean isInfinite;
   }
 
   public final class VectorizedFloatAnimationSpec<V extends androidx.compose.animation.core.AnimationVector> implements androidx.compose.animation.core.VectorizedFiniteAnimationSpec<V> {
@@ -692,6 +702,8 @@ package androidx.compose.animation.core {
 
   public final class VectorizedInfiniteRepeatableSpec<V extends androidx.compose.animation.core.AnimationVector> implements androidx.compose.animation.core.VectorizedAnimationSpec<V> {
     ctor public VectorizedInfiniteRepeatableSpec(androidx.compose.animation.core.VectorizedDurationBasedAnimationSpec<V> animation, androidx.compose.animation.core.RepeatMode repeatMode);
+    method public boolean isInfinite();
+    property public boolean isInfinite;
   }
 
   public final class VectorizedKeyframesSpec<V extends androidx.compose.animation.core.AnimationVector> implements androidx.compose.animation.core.VectorizedDurationBasedAnimationSpec<V> {
