@@ -24,7 +24,6 @@ import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.runtime.snapshots.StateObject
 import androidx.compose.runtime.snapshots.StateRecord
 import androidx.compose.runtime.snapshots.readable
-import androidx.compose.runtime.snapshots.takeSnapshot
 import androidx.compose.runtime.snapshots.withCurrent
 import androidx.compose.runtime.snapshots.writable
 import kotlin.reflect.KProperty
@@ -272,7 +271,7 @@ private object NeverEqualPolicy : SnapshotMutationPolicy<Any?> {
  * @see mutableStateOf
  * @see mutableListOf
  * @see MutableList
- * @see takeSnapshot
+ * @see Snapshot.takeSnapshot
  */
 fun <T> mutableStateListOf() = SnapshotStateList<T>()
 
@@ -282,7 +281,7 @@ fun <T> mutableStateListOf() = SnapshotStateList<T>()
  * @see mutableStateOf
  * @see mutableListOf
  * @see MutableList
- * @see takeSnapshot
+ * @see Snapshot.takeSnapshot
  */
 fun <T> mutableStateListOf(vararg elements: T) =
     SnapshotStateList<T>().also { it.addAll(elements.toList()) }
@@ -300,7 +299,7 @@ fun <T> Collection<T>.toMutableStateList() = SnapshotStateList<T>().also { it.ad
  * @see mutableStateOf
  * @see mutableMapOf
  * @see MutableMap
- * @see takeSnapshot
+ * @see Snapshot.takeSnapshot
  */
 fun <K, V> mutableStateMapOf() = SnapshotStateMap<K, V>()
 
@@ -310,7 +309,7 @@ fun <K, V> mutableStateMapOf() = SnapshotStateMap<K, V>()
  * @see mutableStateOf
  * @see mutableMapOf
  * @see MutableMap
- * @see takeSnapshot
+ * @see Snapshot.takeSnapshot
  */
 fun <K, V> mutableStateMapOf(vararg pairs: Pair<K, V>) =
     SnapshotStateMap<K, V>().apply { putAll(pairs.toMap()) }

@@ -68,7 +68,7 @@ class DerivedSnapshotStateTests {
         val a = mutableStateOf(1)
         val b = mutableStateOf(10)
         val c = derivedStateOf { a.value + b.value }
-        val snapshot = takeMutableSnapshot()
+        val snapshot = Snapshot.takeMutableSnapshot()
         try {
             assertEquals(11, c.value)
             a.value += 1
@@ -84,7 +84,7 @@ class DerivedSnapshotStateTests {
     fun snapshotsAreIsolatedFromGlobalChanges() {
         var state by mutableStateOf(0)
         val derived by derivedStateOf { state }
-        val snapshot = takeSnapshot()
+        val snapshot = Snapshot.takeSnapshot()
         try {
             state = 1
             assertEquals(1, state)
@@ -100,7 +100,7 @@ class DerivedSnapshotStateTests {
     fun mutableSnapshotsCanBeApplied() {
         var state by mutableStateOf(0)
         val derived by derivedStateOf { state }
-        val snapshot = takeMutableSnapshot()
+        val snapshot = Snapshot.takeMutableSnapshot()
         try {
             snapshot.enter {
                 assertEquals(0, state)
@@ -131,21 +131,21 @@ class DerivedSnapshotStateTests {
     }
 
     @Test
-    @Ignore("b/169406779: Flakey test")
+    @Ignore("b/169406779: Flaky test")
     fun multipleSnapshotsAreIsolatedAndCanBeApplied() {
         val count = 2
         val state = MutableList(count) { mutableStateOf(0) }
         val derived = state.map { derivedStateOf { it.value } }
 
         // Create count snapshots
-        val snapshots = MutableList(count) { takeMutableSnapshot() }
+        val snapshots = MutableList(count) { Snapshot.takeMutableSnapshot() }
         try {
             repeat(count) {
                 assertEquals(0, state[it].value)
                 assertEquals(0, derived[it].value)
             }
 
-            snapshots.forEachIndexed() { index, snapshot ->
+            snapshots.forEachIndexed { index, snapshot ->
                 snapshot.enter { state[index].value = index }
             }
 
@@ -190,7 +190,7 @@ class DerivedSnapshotStateTests {
 
         var readCount = 0
         val readStates = mutableSetOf<Any>()
-        val snapshot = takeSnapshot {
+        val snapshot = Snapshot.takeSnapshot {
             readCount++
             readStates.add(it)
         }
@@ -218,7 +218,7 @@ class DerivedSnapshotStateTests {
         assertEquals(0, derived.value)
 
         val readStates = mutableListOf<Any>()
-        val snapshot = takeSnapshot {
+        val snapshot = Snapshot.takeSnapshot {
             readStates.add(it)
         }
         try {
