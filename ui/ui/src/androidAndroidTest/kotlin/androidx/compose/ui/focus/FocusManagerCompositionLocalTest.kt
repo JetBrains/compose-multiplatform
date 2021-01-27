@@ -21,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusState.Active
 import androidx.compose.ui.focus.FocusState.ActiveParent
 import androidx.compose.ui.focus.FocusState.Inactive
-import androidx.compose.ui.platform.AmbientFocusManager
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -32,7 +32,7 @@ import org.junit.runner.RunWith
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-class FocusManagerAmbientTest {
+class FocusManagerCompositionLocalTest {
     @get:Rule
     val rule = createComposeRule()
 
@@ -43,7 +43,7 @@ class FocusManagerAmbientTest {
         lateinit var focusRequester: FocusRequester
         var focusState = Inactive
         rule.setFocusableContent {
-            focusManager = AmbientFocusManager.current
+            focusManager = LocalFocusManager.current
             focusRequester = FocusRequester()
             Box(
                 modifier = Modifier
@@ -73,7 +73,7 @@ class FocusManagerAmbientTest {
         var parentFocusState = Inactive
         var grandparentFocusState = Inactive
         rule.setFocusableContent {
-            focusManager = AmbientFocusManager.current
+            focusManager = LocalFocusManager.current
             focusRequester = FocusRequester()
             Box(
                 modifier = Modifier

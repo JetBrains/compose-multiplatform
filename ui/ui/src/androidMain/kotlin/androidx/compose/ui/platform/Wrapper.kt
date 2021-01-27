@@ -93,7 +93,7 @@ fun ComponentActivity.setContent(
  * Composes the given composable into the given view.
  *
  * The new composition can be logically "linked" to an existing one, by providing a
- * [parent]. This will ensure that invalidations and ambients will flow through
+ * [parent]. This will ensure that invalidations and CompositionLocals will flow through
  * the two compositions as if they were not separate.
  *
  * Note that this [ViewGroup] should have an unique id for the saved instance state mechanism to
@@ -196,7 +196,7 @@ private class WrappedComposition(
                         LaunchedEffect(owner) { owner.boundsUpdatesEventLoop() }
 
                         Providers(LocalInspectionTables provides inspectionTable) {
-                            ProvideAndroidAmbients(owner, content)
+                            ProvideAndroidCompositionLocals(owner, content)
                         }
                     }
                 }

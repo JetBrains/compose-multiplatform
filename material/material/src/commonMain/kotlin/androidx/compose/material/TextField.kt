@@ -102,7 +102,7 @@ import kotlin.math.roundToInt
  * field can not be modified, however, a user can focus it and copy text from it. Read-only text
  * fields are usually used to display pre-filled forms that user can not edit
  * @param textStyle the style to be applied to the input text. The default [textStyle] uses the
- * [AmbientTextStyle] defined by the theme
+ * [LocalTextStyle] defined by the theme
  * @param label the optional label to be displayed inside the text field container. The default
  * text style for internal [Text] is [Typography.caption] when the text field is in focus and
  * [Typography.subtitle1] when the text field is not in focus
@@ -154,7 +154,7 @@ fun TextField(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     readOnly: Boolean = false,
-    textStyle: TextStyle = AmbientTextStyle.current,
+    textStyle: TextStyle = LocalTextStyle.current,
     label: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
@@ -234,7 +234,7 @@ fun TextField(
  * field can not be modified, however, a user can focus it and copy text from it. Read-only text
  * fields are usually used to display pre-filled forms that user can not edit
  * @param textStyle the style to be applied to the input text. The default [textStyle] uses the
- * [AmbientTextStyle] defined by the theme
+ * [LocalTextStyle] defined by the theme
  * @param label the optional label to be displayed inside the text field container. The default
  * text style for internal [Text] is [Typography.caption] when the text field is in focus and
  * [Typography.subtitle1] when the text field is not in focus
@@ -286,7 +286,7 @@ fun TextField(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     readOnly: Boolean = false,
-    textStyle: TextStyle = AmbientTextStyle.current,
+    textStyle: TextStyle = LocalTextStyle.current,
     label: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,

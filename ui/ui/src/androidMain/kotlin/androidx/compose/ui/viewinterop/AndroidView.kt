@@ -24,8 +24,8 @@ import androidx.compose.runtime.ComposeNode
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.materialize
 import androidx.compose.ui.node.UiApplier
-import androidx.compose.ui.platform.AmbientContext
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 
 /**
  * Composes an Android [View] obtained from [viewBlock]. The [viewBlock] block will be called
@@ -49,9 +49,9 @@ fun <T : View> AndroidView(
     modifier: Modifier = Modifier,
     update: (T) -> Unit = NoOpUpdate
 ) {
-    val context = AmbientContext.current
+    val context = LocalContext.current
     val materialized = currentComposer.materialize(modifier)
-    val density = AmbientDensity.current
+    val density = LocalDensity.current
     ComposeNode<ViewBlockHolder<T>, UiApplier>(
         factory = { ViewBlockHolder(context) },
         update = {

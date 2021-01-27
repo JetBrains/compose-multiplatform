@@ -20,7 +20,7 @@ import android.os.Build
 import androidx.annotation.ColorRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.LocalContext
 
 /**
  * Load a color resource.
@@ -30,7 +30,7 @@ import androidx.compose.ui.platform.AmbientContext
  */
 @Composable
 fun colorResource(@ColorRes id: Int): Color {
-    val context = AmbientContext.current
+    val context = LocalContext.current
     return if (Build.VERSION.SDK_INT >= 23) {
         Color(context.resources.getColor(id, context.theme))
     } else {

@@ -73,9 +73,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.AbstractComposeView
-import androidx.compose.ui.platform.AmbientConfiguration
-import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
@@ -242,7 +242,7 @@ private object InteropSnippet6 {
 private object InteropSnippet8 {
     @Composable
     fun rememberCustomView(): CustomView {
-        val context = AmbientContext.current
+        val context = LocalContext.current
         return remember { CustomView(context).apply { /*...*/ } }
     }
 }
@@ -441,7 +441,7 @@ private object BetaSnippets {
     private object InteropSnippet1 {
         @Composable
         fun rememberCustomView(): CustomView {
-            val context = AmbientContext.current
+            val context = LocalContext.current
             return remember { CustomView(context).apply { /*...*/ } }
         }
     }
@@ -532,7 +532,7 @@ private object BetaSnippets {
     private object InteropSnippet6 {
         @Composable
         fun MyComposable() {
-            val isPortrait = AmbientConfiguration.current.orientation == ORIENTATION_PORTRAIT
+            val isPortrait = LocalConfiguration.current.orientation == ORIENTATION_PORTRAIT
             if (isPortrait) {
                 /* Portrait-displayed content */
             } else {
@@ -675,7 +675,7 @@ private object BetaSnippets {
             onSystemEvent: (intent: Intent?) -> Unit
         ) {
             // Grab the current context in this part of the UI tree
-            val context = AmbientContext.current
+            val context = LocalContext.current
 
             // Safely use the latest onSystemEvent lambda passed to the function
             val currentOnSystemEvent by rememberUpdatedState(onSystemEvent)

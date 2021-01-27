@@ -16,12 +16,12 @@
 
 package androidx.compose.ui.platform
 
-import androidx.compose.runtime.staticAmbientOf
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.plus
 import androidx.compose.ui.text.AnnotatedString
 
-val SelectionTrackerAmbient = staticAmbientOf<SelectionTracker>()
+val SelectionTrackerAmbient = staticCompositionLocalOf<SelectionTracker>()
 
 class SelectionTracker {
     var getSelectedText: (() -> AnnotatedString?)? = null

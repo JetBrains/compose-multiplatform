@@ -20,7 +20,7 @@ import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.Density
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -38,14 +38,14 @@ class LayoutDensityTest {
     val rule = createComposeRule()
 
     @Test
-    fun layoutReadsAmbientDensity() {
-        var ambientDensity by mutableStateOf(5f)
-        var ambientFontScale by mutableStateOf(7f)
+    fun layoutReadsCompositionLocalDensity() {
+        var localDensity by mutableStateOf(5f)
+        var localFontScale by mutableStateOf(7f)
 
         var measureScopeDensity = 0f
         var measureScopeFontScale = 0f
         rule.setContent {
-            Providers(AmbientDensity provides Density(ambientDensity, ambientFontScale)) {
+            Providers(LocalDensity provides Density(localDensity, localFontScale)) {
                 Layout({}) { _, _ ->
                     measureScopeDensity = density
                     measureScopeFontScale = fontScale
@@ -55,15 +55,15 @@ class LayoutDensityTest {
         }
 
         rule.runOnIdle {
-            Assert.assertEquals(ambientDensity, measureScopeDensity)
-            Assert.assertEquals(ambientFontScale, measureScopeFontScale)
-            ambientDensity = 9f
-            ambientFontScale = 11f
+            Assert.assertEquals(localDensity, measureScopeDensity)
+            Assert.assertEquals(localFontScale, measureScopeFontScale)
+            localDensity = 9f
+            localFontScale = 11f
         }
 
         rule.runOnIdle {
-            Assert.assertEquals(ambientDensity, measureScopeDensity)
-            Assert.assertEquals(ambientFontScale, measureScopeFontScale)
+            Assert.assertEquals(localDensity, measureScopeDensity)
+            Assert.assertEquals(localFontScale, measureScopeFontScale)
         }
     }
 }

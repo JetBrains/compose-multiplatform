@@ -20,8 +20,8 @@ import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.platform.AmbientLayoutDirection
-import androidx.compose.ui.platform.AmbientViewConfiguration
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.SemanticsActions
@@ -175,7 +175,7 @@ class SliderTest {
         var slop = 0f
 
         rule.setMaterialContent {
-            slop = AmbientViewConfiguration.current.touchSlop
+            slop = LocalViewConfiguration.current.touchSlop
             Slider(
                 modifier = Modifier.testTag(tag),
                 value = state.value,
@@ -236,8 +236,8 @@ class SliderTest {
         var slop = 0f
 
         rule.setMaterialContent {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
-                slop = AmbientViewConfiguration.current.touchSlop
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                slop = LocalViewConfiguration.current.touchSlop
                 Slider(
                     modifier = Modifier.testTag(tag),
                     value = state.value,
@@ -270,7 +270,7 @@ class SliderTest {
         val state = mutableStateOf(0f)
 
         rule.setMaterialContent {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Slider(
                     modifier = Modifier.testTag(tag),
                     value = state.value,

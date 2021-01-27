@@ -43,7 +43,7 @@ interface WindowInfo {
 @OptIn(ExperimentalComposeApi::class)
 @Composable
 internal fun WindowFocusObserver(onWindowFocusChanged: (isWindowFocused: Boolean) -> Unit) {
-    val windowInfo = AmbientWindowInfo.current
+    val windowInfo = LocalWindowInfo.current
     val callback = rememberUpdatedState(onWindowFocusChanged)
     LaunchedEffect(windowInfo) {
         snapshotFlow { windowInfo.isWindowFocused }.collect { callback.value(it) }

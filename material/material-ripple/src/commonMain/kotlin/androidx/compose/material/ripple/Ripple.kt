@@ -58,7 +58,7 @@ import kotlinx.coroutines.launch
  * If you are using MaterialTheme in your hierarchy, a Ripple will be used as the default
  * [Indication] inside components such as [androidx.compose.foundation.clickable] and
  * [androidx.compose.foundation.indication]. You can also manually provide Ripples through
- * [androidx.compose.foundation.AmbientIndication] for the same effect if you are not using
+ * [androidx.compose.foundation.LocalIndication] for the same effect if you are not using
  * MaterialTheme.
  *
  * You can also explicitly create a Ripple and provide it to components in order to change the
@@ -81,7 +81,7 @@ public fun rememberRipple(
     radius: Dp = Dp.Unspecified,
     color: Color = Color.Unspecified
 ): Indication {
-    val theme = AmbientRippleTheme.current
+    val theme = LocalRippleTheme.current
     val scope = rememberCoroutineScope()
     val resolvedColor = color.takeOrElse { theme.defaultColor() }
     val colorState = remember { mutableStateOf(resolvedColor, structuralEqualityPolicy()) }
@@ -103,7 +103,7 @@ public fun rememberRipple(
  * If you are using MaterialTheme in your hierarchy, a Ripple will be used as the default
  * [Indication] inside components such as [androidx.compose.foundation.clickable] and
  * [androidx.compose.foundation.indication]. You can also manually provide Ripples through
- * [androidx.compose.foundation.AmbientIndication] for the same effect if you are not using
+ * [androidx.compose.foundation.LocalIndication] for the same effect if you are not using
  * MaterialTheme.
  *
  * You can also explicitly create a Ripple and provide it to components in order to change the

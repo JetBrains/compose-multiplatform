@@ -32,7 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.gesture.rawDragGestureFilter
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 
 /**
@@ -50,7 +50,7 @@ fun RawDragGestureFilterDemo() {
     }
 
     val (offsetX, offsetY) =
-        with(AmbientDensity.current) { offset.value.x.toDp() to offset.value.y.toDp() }
+        with(LocalDensity.current) { offset.value.x.toDp() to offset.value.y.toDp() }
 
     Column {
         Text("Demonstrates dragging that starts immediately (no slop or anything else).")

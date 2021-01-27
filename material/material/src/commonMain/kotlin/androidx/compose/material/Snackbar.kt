@@ -91,7 +91,7 @@ fun Snackbar(
         color = backgroundColor,
         contentColor = contentColor
     ) {
-        Providers(AmbientContentAlpha provides ContentAlpha.high) {
+        Providers(LocalContentAlpha provides ContentAlpha.high) {
             val textStyle = MaterialTheme.typography.body2
             ProvideTextStyle(value = textStyle) {
                 when {

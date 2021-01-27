@@ -21,12 +21,12 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.selection.toggleable
-import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.ListItem
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -105,7 +105,7 @@ fun OneLineListItems(
                 Image(
                     icon24x24,
                     contentDescription = null,
-                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                    colorFilter = ColorFilter.tint(LocalContentColor.current)
                 )
             }
         )
@@ -116,7 +116,7 @@ fun OneLineListItems(
                 Image(
                     icon40x40,
                     contentDescription = null,
-                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                    colorFilter = ColorFilter.tint(LocalContentColor.current)
                 )
             }
         )
@@ -127,7 +127,7 @@ fun OneLineListItems(
                 Image(
                     icon56x56,
                     contentDescription = null,
-                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                    colorFilter = ColorFilter.tint(LocalContentColor.current)
                 )
             }
         )
@@ -138,7 +138,7 @@ fun OneLineListItems(
                 Image(
                     icon56x56,
                     contentDescription = null,
-                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                    colorFilter = ColorFilter.tint(LocalContentColor.current)
                 )
             },
             modifier = Modifier.clickable { }
@@ -155,7 +155,7 @@ fun OneLineListItems(
                 Image(
                     icon40x40,
                     contentDescription = null,
-                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                    colorFilter = ColorFilter.tint(LocalContentColor.current)
                 )
             },
             trailing = { Icon(vectorIcon, contentDescription = "Localized description") }
@@ -186,7 +186,7 @@ fun TwoLineListItems(icon24x24: ImageBitmap, icon40x40: ImageBitmap) {
                 Image(
                     icon24x24,
                     contentDescription = null,
-                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                    colorFilter = ColorFilter.tint(LocalContentColor.current)
                 )
             }
         )
@@ -198,7 +198,7 @@ fun TwoLineListItems(icon24x24: ImageBitmap, icon40x40: ImageBitmap) {
                 Image(
                     icon40x40,
                     contentDescription = null,
-                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                    colorFilter = ColorFilter.tint(LocalContentColor.current)
                 )
             }
         )
@@ -211,7 +211,7 @@ fun TwoLineListItems(icon24x24: ImageBitmap, icon40x40: ImageBitmap) {
                 Image(
                     icon40x40,
                     contentDescription = null,
-                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                    colorFilter = ColorFilter.tint(LocalContentColor.current)
                 )
             }
         )
@@ -254,7 +254,7 @@ fun ThreeLineListItems(icon24x24: ImageBitmap, vectorIcon: ImageVector) {
                 Image(
                     icon24x24,
                     contentDescription = null,
-                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                    colorFilter = ColorFilter.tint(LocalContentColor.current)
                 )
             }
         )
@@ -294,7 +294,7 @@ fun OneLineRtlLtrListItems(icon24x24: ImageBitmap, icon40x40: ImageBitmap) {
                 Image(
                     icon40x40,
                     contentDescription = null,
-                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                    colorFilter = ColorFilter.tint(LocalContentColor.current)
                 )
             }
         )
@@ -305,7 +305,7 @@ fun OneLineRtlLtrListItems(icon24x24: ImageBitmap, icon40x40: ImageBitmap) {
                 Image(
                     icon40x40,
                     contentDescription = null,
-                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                    colorFilter = ColorFilter.tint(LocalContentColor.current)
                 )
             }
         )
@@ -316,7 +316,7 @@ fun OneLineRtlLtrListItems(icon24x24: ImageBitmap, icon40x40: ImageBitmap) {
                 Image(
                     icon24x24,
                     contentDescription = null,
-                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                    colorFilter = ColorFilter.tint(LocalContentColor.current)
                 )
             }
         )
@@ -350,7 +350,7 @@ fun TwoLineRtlLtrListItems(icon40x40: ImageBitmap) {
                 Image(
                     icon40x40,
                     contentDescription = null,
-                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                    colorFilter = ColorFilter.tint(LocalContentColor.current)
                 )
             }
         )
@@ -362,7 +362,7 @@ fun TwoLineRtlLtrListItems(icon40x40: ImageBitmap) {
                 Image(
                     icon40x40,
                     contentDescription = null,
-                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                    colorFilter = ColorFilter.tint(LocalContentColor.current)
                 )
             },
             modifier = Modifier.clickable { }
@@ -400,7 +400,7 @@ fun ThreeLineRtlLtrListItems(icon40x40: ImageBitmap) {
                 Image(
                     icon40x40,
                     contentDescription = null,
-                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                    colorFilter = ColorFilter.tint(LocalContentColor.current)
                 )
             }
         )

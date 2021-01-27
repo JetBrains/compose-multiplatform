@@ -46,7 +46,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.padding
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.captureToImage
@@ -298,7 +298,7 @@ class GraphicsLayerTest {
         var coords1: LayoutCoordinates? = null
         var coords2: LayoutCoordinates? = null
         rule.setContent {
-            with(AmbientDensity.current) {
+            with(LocalDensity.current) {
                 Box(
                     Modifier.size(25.toDp())
                         .graphicsLayer(
@@ -460,7 +460,7 @@ class GraphicsLayerTest {
         var testDpConversion = 0f
         var testFontScaleConversion = 0f
         rule.setContent {
-            density = AmbientDensity.current
+            density = LocalDensity.current
             // Verify that the current density is passed to the graphics layer
             // implementation and that density dependent methods are consuming it
             Box(

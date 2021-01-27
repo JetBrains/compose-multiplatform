@@ -26,7 +26,7 @@ import androidx.compose.ui.graphics.luminance
 
 /**
  * Defines the appearance for Ripples. You can define a new theme and apply it using
- * [AmbientRippleTheme]. See [defaultRippleColor] and [defaultRippleAlpha] for default values
+ * [LocalRippleTheme]. See [defaultRippleColor] and [defaultRippleAlpha] for default values
  * that can be used when creating your own [RippleTheme].
  *
  * @see rememberRipple

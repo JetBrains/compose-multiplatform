@@ -27,8 +27,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.platform.AmbientFocusManager
-import androidx.compose.ui.platform.AmbientView
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -56,7 +56,7 @@ class CoreTextFieldSoftKeyboardTest {
         // Arrange.
         lateinit var view: View
         rule.setContent {
-            view = AmbientView.current
+            view = LocalView.current
             CoreTextField(
                 value = TextFieldValue("Hello"),
                 onValueChange = {},
@@ -78,7 +78,7 @@ class CoreTextFieldSoftKeyboardTest {
         val focusRequester = FocusRequester()
         lateinit var view: View
         rule.setContent {
-            view = AmbientView.current
+            view = LocalView.current
             CoreTextField(
                 value = TextFieldValue("Hello"),
                 onValueChange = {},
@@ -101,8 +101,8 @@ class CoreTextFieldSoftKeyboardTest {
         lateinit var view: View
         val focusRequester = FocusRequester()
         rule.setContent {
-            view = AmbientView.current
-            focusManager = AmbientFocusManager.current
+            view = LocalView.current
+            focusManager = LocalFocusManager.current
             CoreTextField(
                 value = TextFieldValue("Hello"),
                 onValueChange = {},
@@ -127,7 +127,7 @@ class CoreTextFieldSoftKeyboardTest {
         // Arrange.
         lateinit var view: View
         rule.setContent {
-            view = AmbientView.current
+            view = LocalView.current
             CoreTextField(
                 value = TextFieldValue("Hello"),
                 onValueChange = {},
@@ -156,7 +156,7 @@ class CoreTextFieldSoftKeyboardTest {
         val (focusRequester1, focusRequester2) = FocusRequester.createRefs()
         lateinit var view: View
         rule.setContent {
-            view = AmbientView.current
+            view = LocalView.current
             Column {
                 CoreTextField(
                     value = TextFieldValue("Hello"),

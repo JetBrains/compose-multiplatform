@@ -23,7 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusState.Inactive
 import androidx.compose.ui.focus.FocusState.Active
-import androidx.compose.ui.platform.AmbientFocusManager
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -128,7 +128,7 @@ class FocusEventCountTest {
         val focusRequester = FocusRequester()
         lateinit var focusManager: FocusManager
         rule.setFocusableContent {
-            focusManager = AmbientFocusManager.current
+            focusManager = LocalFocusManager.current
             Box(
                 modifier = Modifier
                     .onFocusEvent { focusStates.add(it) }

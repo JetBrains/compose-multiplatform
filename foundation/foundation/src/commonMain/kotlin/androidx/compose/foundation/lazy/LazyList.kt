@@ -29,7 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.layout.SubcomposeLayout
-import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 
 @Composable
@@ -59,7 +59,7 @@ internal fun LazyList(
     /** The factory defining the content for an item on the given position in the list */
     itemContent: LazyItemScope.(Int) -> @Composable () -> Unit
 ) {
-    val isRtl = AmbientLayoutDirection.current == LayoutDirection.Rtl
+    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     // reverse scroll by default, to have "natural" gesture that goes reversed to layout
     // if rtl and horizontal, do not reverse to make it right-to-left
     val reverseScrollDirection = if (!isVertical && isRtl) reverseLayout else !reverseLayout

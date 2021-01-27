@@ -38,7 +38,7 @@ import androidx.compose.ui.input.pointer.anyPositionChangeConsumed
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChanged
-import androidx.compose.ui.platform.AmbientAnimationClock
+import androidx.compose.ui.platform.LocalAnimationClock
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
@@ -53,7 +53,7 @@ import kotlin.math.abs
  */
 @Composable
 fun rememberZoomableController(onZoomDelta: (Float) -> Unit): ZoomableController {
-    val clocks = AmbientAnimationClock.current.asDisposableClock()
+    val clocks = LocalAnimationClock.current.asDisposableClock()
     return remember(clocks) { ZoomableController(clocks, onZoomDelta) }
 }
 

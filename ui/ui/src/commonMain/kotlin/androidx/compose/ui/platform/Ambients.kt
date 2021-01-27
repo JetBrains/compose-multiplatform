@@ -303,27 +303,27 @@ val LocalWindowInfo = staticCompositionLocalOf<WindowInfo>()
 
 @ExperimentalComposeUiApi
 @Composable
-internal fun ProvideCommonAmbients(
+internal fun ProvideCommonCompositionLocals(
     owner: Owner,
     animationClock: AnimationClockObservable,
     uriHandler: UriHandler,
     content: @Composable () -> Unit
 ) {
     Providers(
-        AmbientAnimationClock provides animationClock,
-        AmbientAutofill provides owner.autofill,
-        AmbientAutofillTree provides owner.autofillTree,
-        AmbientClipboardManager provides owner.clipboardManager,
-        AmbientDensity provides owner.density,
-        AmbientFocusManager provides owner.focusManager,
-        AmbientFontLoader provides owner.fontLoader,
-        AmbientHapticFeedback provides owner.hapticFeedBack,
-        AmbientLayoutDirection providesDefault owner.layoutDirection,
-        AmbientTextInputService provides owner.textInputService,
-        AmbientTextToolbar provides owner.textToolbar,
-        AmbientUriHandler provides uriHandler,
-        AmbientViewConfiguration provides owner.viewConfiguration,
-        AmbientWindowInfo provides owner.windowInfo,
+        LocalAnimationClock provides animationClock,
+        LocalAutofill provides owner.autofill,
+        LocalAutofillTree provides owner.autofillTree,
+        LocalClipboardManager provides owner.clipboardManager,
+        LocalDensity provides owner.density,
+        LocalFocusManager provides owner.focusManager,
+        LocalFontLoader provides owner.fontLoader,
+        LocalHapticFeedback provides owner.hapticFeedBack,
+        LocalLayoutDirection providesDefault owner.layoutDirection,
+        LocalTextInputService provides owner.textInputService,
+        LocalTextToolbar provides owner.textToolbar,
+        LocalUriHandler provides uriHandler,
+        LocalViewConfiguration provides owner.viewConfiguration,
+        LocalWindowInfo provides owner.windowInfo,
         content = content
     )
 }

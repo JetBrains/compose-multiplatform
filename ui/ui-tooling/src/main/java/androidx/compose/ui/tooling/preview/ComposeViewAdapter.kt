@@ -37,8 +37,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.AmbientFontLoader
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalFontLoader
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.tooling.CompositionDataRecord
 import androidx.compose.ui.tooling.Group
@@ -384,7 +384,7 @@ internal class ComposeViewAdapter : FrameLayout {
         // We need to replace the FontResourceLoader to avoid using ResourcesCompat.
         // ResourcesCompat can not load fonts within Layoutlib and, since Layoutlib always runs
         // the latest version, we do not need it.
-        Providers(AmbientFontLoader provides LayoutlibFontResourceLoader(context)) {
+        Providers(LocalFontLoader provides LayoutlibFontResourceLoader(context)) {
             Inspectable(slotTableRecord, content)
         }
     }

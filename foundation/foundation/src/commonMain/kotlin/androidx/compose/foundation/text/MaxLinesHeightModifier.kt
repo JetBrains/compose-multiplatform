@@ -20,9 +20,9 @@ import androidx.compose.foundation.layout.preferredHeightIn
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.platform.AmbientDensity
-import androidx.compose.ui.platform.AmbientFontLoader
-import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFontLoader
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.resolveDefaults
@@ -47,9 +47,9 @@ internal fun Modifier.maxLinesHeight(
     }
     if (maxLines == Int.MAX_VALUE) return@composed Modifier
 
-    val density = AmbientDensity.current
-    val resourceLoader = AmbientFontLoader.current
-    val layoutDirection = AmbientLayoutDirection.current
+    val density = LocalDensity.current
+    val resourceLoader = LocalFontLoader.current
+    val layoutDirection = LocalLayoutDirection.current
 
     // Difference between the height of two lines paragraph and one line paragraph gives us
     // an approximation of height of one line

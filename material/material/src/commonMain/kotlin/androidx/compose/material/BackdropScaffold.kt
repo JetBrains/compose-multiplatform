@@ -47,8 +47,8 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.SubcomposeLayout
-import androidx.compose.ui.platform.AmbientAnimationClock
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalAnimationClock
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -182,7 +182,7 @@ class BackdropScaffoldState(
 @ExperimentalMaterialApi
 fun rememberBackdropScaffoldState(
     initialValue: BackdropValue,
-    clock: AnimationClockObservable = AmbientAnimationClock.current,
+    clock: AnimationClockObservable = LocalAnimationClock.current,
     animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
     confirmStateChange: (BackdropValue) -> Boolean = { true },
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
@@ -290,8 +290,8 @@ fun BackdropScaffold(
     backLayerContent: @Composable () -> Unit,
     frontLayerContent: @Composable () -> Unit
 ) {
-    val peekHeightPx = with(AmbientDensity.current) { peekHeight.toPx() }
-    val headerHeightPx = with(AmbientDensity.current) { headerHeight.toPx() }
+    val peekHeightPx = with(LocalDensity.current) { peekHeight.toPx() }
+    val headerHeightPx = with(LocalDensity.current) { headerHeight.toPx() }
 
     val backLayer = @Composable {
         if (persistentAppBar) {
@@ -414,7 +414,7 @@ private fun BackLayerTransition(
     val animationProgress by animateFloatAsState(
         targetValue = if (target == Revealed) 0f else 2f, animationSpec = TweenSpec()
     )
-    val animationSlideOffset = with(AmbientDensity.current) { AnimationSlideOffset.toPx() }
+    val animationSlideOffset = with(LocalDensity.current) { AnimationSlideOffset.toPx() }
 
     val appBarFloat = (animationProgress - 1).coerceIn(0f, 1f)
     val contentFloat = (1 - animationProgress).coerceIn(0f, 1f)

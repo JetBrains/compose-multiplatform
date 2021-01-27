@@ -34,7 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -61,11 +61,11 @@ fun RtlDemo() {
         )
         CustomLayout(false)
         Text("WITH CONSTRAINTS", Modifier.align(Alignment.CenterHorizontally))
-        Providers(AmbientLayoutDirection provides LayoutDirection.Ltr) {
-            LayoutWithConstraints("LD: set LTR via ambient")
+        Providers(LocalLayoutDirection provides LayoutDirection.Ltr) {
+            LayoutWithConstraints("LD: set LTR via CompositionLocal")
         }
-        Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
-            LayoutWithConstraints("LD: set RTL via ambient")
+        Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
+            LayoutWithConstraints("LD: set RTL via CompositionLocal")
         }
         LayoutWithConstraints(text = "LD: locale")
         Text("STACK EXAMPLE", Modifier.align(Alignment.CenterHorizontally))
@@ -109,7 +109,7 @@ private fun TestRowWithModifier() {
     Row {
         Box(boxSize.background(Color.Red)) {}
         Box(boxSize.background(Color.Green)) {}
-        Providers(AmbientLayoutDirection provides LayoutDirection.Ltr) {
+        Providers(LocalLayoutDirection provides LayoutDirection.Ltr) {
             Row {
                 Box(boxSize.background(Color.Magenta)) {}
                 Box(boxSize.background(Color.Yellow)) {}
@@ -179,7 +179,7 @@ private fun CustomLayout(rtlSupport: Boolean) {
 private fun LayoutWithConstraints(text: String) {
     BoxWithConstraints {
         val w = maxWidth / 3
-        val color = if (AmbientLayoutDirection.current == LayoutDirection.Ltr) {
+        val color = if (LocalLayoutDirection.current == LayoutDirection.Ltr) {
             Color.Red
         } else {
             Color.Magenta

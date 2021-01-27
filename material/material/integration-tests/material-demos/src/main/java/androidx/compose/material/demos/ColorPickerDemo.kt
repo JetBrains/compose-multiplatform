@@ -39,7 +39,7 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.GenericShape
-import androidx.compose.material.AmbientTextStyle
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
@@ -65,7 +65,7 @@ import androidx.compose.ui.graphics.SweepGradientShader
 import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.toPixelMap
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -165,7 +165,7 @@ private fun Modifier.simplePointerInput(
  */
 @Composable
 private fun Magnifier(visible: Boolean, position: Offset, color: Color) {
-    val offset = with(AmbientDensity.current) {
+    val offset = with(LocalDensity.current) {
         Modifier.offset(
             position.x.toDp() - MagnifierWidth / 2,
             // Align with the center of the selection circle
@@ -244,7 +244,7 @@ private fun MagnifierLabel(modifier: Modifier, color: Color) {
             Box(Modifier.weight(0.25f).fillMaxHeight().background(color))
             // Add `#` and drop alpha characters
             val text = "#" + Integer.toHexString(color.toArgb()).toUpperCase(Locale.ROOT).drop(2)
-            val textStyle = AmbientTextStyle.current.copy(textAlign = TextAlign.Center)
+            val textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center)
             Text(
                 text = text,
                 modifier = Modifier.weight(0.75f).padding(top = 10.dp, bottom = 20.dp),

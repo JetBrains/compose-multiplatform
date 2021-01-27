@@ -31,7 +31,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.graphics.vector.VectorPainter
 import androidx.compose.ui.graphics.vector.compat.seekToStartTag
-import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.LocalContext
 
 /**
  * Create a [Painter] from an Android resource id. This can load either an instance of
@@ -55,7 +55,7 @@ import androidx.compose.ui.platform.AmbientContext
  */
 @Composable
 fun painterResource(@DrawableRes id: Int): Painter {
-    val context = AmbientContext.current
+    val context = LocalContext.current
     val res = context.resources
     val value = remember { TypedValue() }
     res.getValue(id, value, true)

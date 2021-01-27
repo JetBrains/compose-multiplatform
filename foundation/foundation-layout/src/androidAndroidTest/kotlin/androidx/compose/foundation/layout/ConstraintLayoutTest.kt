@@ -27,8 +27,8 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -538,7 +538,7 @@ class ConstraintLayoutTest : LayoutTest() {
         val position = Array(3) { Ref<Offset>() }
 
         rule.setContent {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 ConstraintLayout(Modifier.fillMaxSize()) {
                     val (box0, box1, box2) = createRefs()
                     Box(
@@ -658,7 +658,7 @@ class ConstraintLayoutTest : LayoutTest() {
 
         val position = Array(8) { 0f }
         rule.setContent {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 ConstraintLayout(Modifier.size(size)) {
                     val guidelines = arrayOf(
                         createGuidelineFromStart(offset),
@@ -758,7 +758,7 @@ class ConstraintLayoutTest : LayoutTest() {
 
         val position = Array(4) { 0f }
         rule.setContent {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 ConstraintLayout(Modifier.size(size)) {
                     val (box1, box2) = createRefs()
                     val guideline1 = createGuidelineFromAbsoluteLeft(offset)
@@ -887,7 +887,7 @@ class ConstraintLayoutTest : LayoutTest() {
 
         val position = Array(16) { 0f }
         rule.setContent {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 ConstraintLayout(Modifier.size(size)) {
                     val box = createRef()
                     val guideline = createGuidelineFromAbsoluteLeft(offset)

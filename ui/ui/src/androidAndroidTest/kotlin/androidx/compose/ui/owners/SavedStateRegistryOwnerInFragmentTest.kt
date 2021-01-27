@@ -19,8 +19,8 @@ package androidx.compose.ui.owners
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.compose.ui.platform.AmbientSavedStateRegistryOwner
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentContainerView
@@ -80,7 +80,7 @@ class SavedStateRegistryOwnerInFragmentTest {
             savedInstanceState: Bundle?
         ) = ComposeView(requireContext()).apply {
             setContent {
-                owner = AmbientSavedStateRegistryOwner.current
+                owner = LocalSavedStateRegistryOwner.current
                 latch.countDown()
             }
         }

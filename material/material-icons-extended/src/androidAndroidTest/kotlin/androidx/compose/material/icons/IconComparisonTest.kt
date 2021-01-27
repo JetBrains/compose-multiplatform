@@ -34,8 +34,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.VectorGroup
 import androidx.compose.ui.graphics.vector.VectorPath
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.platform.AmbientContext
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.vectorResource
@@ -207,7 +207,7 @@ private fun ImageVector.copy(name: String): ImageVector {
  */
 @Composable
 private fun String.toImageVector(): ImageVector {
-    val context = AmbientContext.current
+    val context = LocalContext.current
     val resId = context.resources.getIdentifier(this, "drawable", context.packageName)
     return vectorResource(resId)
 }
@@ -281,7 +281,7 @@ private fun DrawVectors(programmaticVector: ImageVector, xmlVector: ImageVector)
         // against in CI, on some devices using DP here causes there to be anti-aliasing issues.
         // Using ipx directly ensures that we will always have a consistent layout / drawing
         // story, so anti-aliasing should be identical.
-        val layoutSize = with(AmbientDensity.current) {
+        val layoutSize = with(LocalDensity.current) {
             Modifier.preferredSize(72.toDp())
         }
         Row(Modifier.align(Alignment.Center)) {

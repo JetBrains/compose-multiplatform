@@ -256,7 +256,7 @@ class DialogUiTest {
     }
 
     @Test
-    fun dialog_preservesAmbients() {
+    fun dialog_preservesCompositionLocals() {
         val compositionLocal = compositionLocalOf<Float>()
         var value = 0f
         rule.setContent {

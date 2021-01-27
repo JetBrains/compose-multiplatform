@@ -26,9 +26,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.dragGestureFilter
-import androidx.compose.ui.platform.AmbientClipboardManager
-import androidx.compose.ui.platform.AmbientHapticFeedback
-import androidx.compose.ui.platform.AmbientTextToolbar
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.text.InternalTextApi
 
 /**
@@ -87,9 +87,9 @@ internal fun SelectionContainer(
     val registrarImpl = remember { SelectionRegistrarImpl() }
     val manager = remember { SelectionManager(registrarImpl) }
 
-    manager.hapticFeedBack = AmbientHapticFeedback.current
-    manager.clipboardManager = AmbientClipboardManager.current
-    manager.textToolbar = AmbientTextToolbar.current
+    manager.hapticFeedBack = LocalHapticFeedback.current
+    manager.clipboardManager = LocalClipboardManager.current
+    manager.textToolbar = LocalTextToolbar.current
     manager.onSelectionChange = onSelectionChange
     manager.selection = selection
 

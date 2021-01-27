@@ -122,7 +122,7 @@ fun Button(
             indication = null
         )
     ) {
-        Providers(AmbientContentAlpha provides contentColor.alpha) {
+        Providers(LocalContentAlpha provides contentColor.alpha) {
             ProvideTextStyle(
                 value = MaterialTheme.typography.button
             ) {

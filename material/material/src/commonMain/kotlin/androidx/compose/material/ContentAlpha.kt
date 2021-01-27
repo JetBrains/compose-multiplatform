@@ -23,7 +23,7 @@ import androidx.compose.ui.graphics.luminance
 /**
  * Default alpha levels used by Material components.
  *
- * See [AmbientContentAlpha].
+ * See [LocalContentAlpha].
  */
 object ContentAlpha {
     /**
@@ -74,7 +74,7 @@ object ContentAlpha {
         /*@FloatRange(from = 0.0, to = 1.0)*/
         lowContrastAlpha: Float
     ): Float {
-        val contentColor = AmbientContentColor.current
+        val contentColor = LocalContentColor.current
         val lightTheme = MaterialTheme.colors.isLight
         return if (lightTheme) {
             if (contentColor.luminance() > 0.5) highContrastAlpha else lowContrastAlpha

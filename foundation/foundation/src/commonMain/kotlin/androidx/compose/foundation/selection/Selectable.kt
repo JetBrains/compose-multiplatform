@@ -16,10 +16,10 @@
 
 package androidx.compose.foundation.selection
 
-import androidx.compose.foundation.AmbientIndication
 import androidx.compose.foundation.Indication
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.Strings
 import androidx.compose.foundation.clickable
 import androidx.compose.runtime.remember
@@ -40,7 +40,7 @@ import androidx.compose.ui.semantics.stateDescription
  * using [Modifier.toggleable]
  *
  * This version has no [InteractionState] or [Indication] parameters, default indication from
- * [AmbientIndication] will be used. To specify [InteractionState] or [Indication], use another
+ * [LocalIndication] will be used. To specify [InteractionState] or [Indication], use another
  * overload.
  *
  * @sample androidx.compose.foundation.samples.SelectableSample
@@ -71,7 +71,7 @@ fun Modifier.selectable(
         enabled = enabled,
         role = role,
         interactionState = remember { InteractionState() },
-        indication = AmbientIndication.current(),
+        indication = LocalIndication.current(),
         onClick = onClick
     )
 }
@@ -93,8 +93,8 @@ fun Modifier.selectable(
  * @param interactionState [InteractionState] that will be updated when this element is
  * pressed, using [Interaction.Pressed]
  * @param indication indication to be shown when the modified element is pressed. By default,
- * the indication from [AmbientIndication] will be used. Set to `null` to show no indication, or
- * current value from [AmbientIndication] to show theme default
+ * the indication from [LocalIndication] will be used. Set to `null` to show no indication, or
+ * current value from [LocalIndication] to show theme default
  * @param enabled whether or not this [selectable] will handle input events
  * and appear enabled from a semantics perspective
  * @param role the type of user interface element. Accessibility services might use this

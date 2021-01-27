@@ -46,8 +46,8 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.AbstractComposeView
-import androidx.compose.ui.platform.AmbientDensity
-import androidx.compose.ui.platform.AmbientView
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.semantics.popup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Density
@@ -122,8 +122,8 @@ internal actual fun ActualPopup(
     properties: PopupProperties?,
     content: @Composable () -> Unit
 ) {
-    val view = AmbientView.current
-    val density = AmbientDensity.current
+    val view = LocalView.current
+    val density = LocalDensity.current
     val testTag = LocalPopupTestTag.current
     val parentComposition = rememberCompositionReference()
     val currentContent by rememberUpdatedState(content)

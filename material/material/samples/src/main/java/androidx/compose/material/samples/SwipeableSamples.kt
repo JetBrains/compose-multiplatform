@@ -32,7 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -48,7 +48,7 @@ fun SwipeableSample() {
     val squareSize = 50.dp
 
     val swipeableState = rememberSwipeableState("A")
-    val sizePx = with(AmbientDensity.current) { (width - squareSize).toPx() }
+    val sizePx = with(LocalDensity.current) { (width - squareSize).toPx() }
     val anchors = mapOf(0f to "A", sizePx / 2 to "B", sizePx to "C")
 
     Box(

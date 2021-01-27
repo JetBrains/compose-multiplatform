@@ -20,7 +20,7 @@ import android.view.KeyEvent
 import android.view.View
 import android.widget.EditText
 import androidx.activity.ComponentActivity
-import androidx.compose.ui.platform.AmbientView
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.text.InternalTextApi
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -43,7 +43,7 @@ class EditTextInteropTest {
         lateinit var editText: EditText
         lateinit var ownerView: View
         rule.setContent {
-            ownerView = AmbientView.current
+            ownerView = LocalView.current
             AndroidView({
                 EditText(it).apply { width = 500; editText = this }
             })

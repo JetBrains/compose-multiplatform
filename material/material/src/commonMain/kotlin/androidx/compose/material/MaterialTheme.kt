@@ -16,10 +16,10 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.AmbientIndication
 import androidx.compose.foundation.Indication
-import androidx.compose.material.ripple.AmbientRippleTheme
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.material.ripple.ExperimentalRippleApi
+import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material.ripple.RippleTheme
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
@@ -73,9 +73,9 @@ fun MaterialTheme(
     val selectionColors = rememberTextSelectionColors(rememberedColors)
     Providers(
         LocalColors provides rememberedColors,
-        AmbientContentAlpha provides ContentAlpha.high,
-        AmbientIndication provides indicationFactory,
-        AmbientRippleTheme provides MaterialRippleTheme,
+        LocalContentAlpha provides ContentAlpha.high,
+        LocalIndication provides indicationFactory,
+        LocalRippleTheme provides MaterialRippleTheme,
         LocalShapes provides shapes,
         LocalTextSelectionColors provides selectionColors,
         LocalTypography provides typography
@@ -123,13 +123,13 @@ object MaterialTheme {
 private object MaterialRippleTheme : RippleTheme {
     @Composable
     override fun defaultColor() = RippleTheme.defaultRippleColor(
-        contentColor = AmbientContentColor.current,
+        contentColor = LocalContentColor.current,
         lightTheme = MaterialTheme.colors.isLight
     )
 
     @Composable
     override fun rippleAlpha() = RippleTheme.defaultRippleAlpha(
-        contentColor = AmbientContentColor.current,
+        contentColor = LocalContentColor.current,
         lightTheme = MaterialTheme.colors.isLight
     )
 }

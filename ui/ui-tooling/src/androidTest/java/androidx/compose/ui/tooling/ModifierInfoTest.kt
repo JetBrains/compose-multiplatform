@@ -28,7 +28,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.OwnedLayer
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import org.junit.Assert.assertEquals
@@ -47,7 +47,7 @@ class ModifierInfoTest : ToolingTest() {
         val slotTableRecord = CompositionDataRecord.create()
         show {
             Inspectable(slotTableRecord) {
-                with(AmbientDensity.current) {
+                with(LocalDensity.current) {
                     val px10 = 10f.toDp()
                     val px5 = 5f.toDp()
                     Box {

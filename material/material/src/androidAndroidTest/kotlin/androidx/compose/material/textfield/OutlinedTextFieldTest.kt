@@ -24,9 +24,9 @@ import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.AmbientContentAlpha
-import androidx.compose.material.AmbientContentColor
-import androidx.compose.material.AmbientTextStyle
+import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.LocalContentColor
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
@@ -48,7 +48,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.platform.AmbientTextInputService
+import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertWidthIsEqualTo
@@ -468,8 +468,8 @@ class OutlinedTextFieldTest {
                 placeholder = {
                     Text("placeholder")
                     assertThat(
-                        AmbientContentColor.current.copy(
-                            alpha = AmbientContentAlpha.current
+                        LocalContentColor.current.copy(
+                            alpha = LocalContentAlpha.current
                         )
                     )
                         .isEqualTo(
@@ -477,7 +477,7 @@ class OutlinedTextFieldTest {
                                 alpha = 0.6f
                             )
                         )
-                    assertThat(AmbientTextStyle.current)
+                    assertThat(LocalTextStyle.current)
                         .isEqualTo(MaterialTheme.typography.subtitle1)
                 }
             )
@@ -610,7 +610,7 @@ class OutlinedTextFieldTest {
                 label = {},
                 isErrorValue = false,
                 leadingIcon = {
-                    assertThat(AmbientContentColor.current)
+                    assertThat(LocalContentColor.current)
                         .isEqualTo(
                             MaterialTheme.colors.onSurface.copy(
                                 IconColorAlpha
@@ -618,7 +618,7 @@ class OutlinedTextFieldTest {
                         )
                 },
                 trailingIcon = {
-                    assertThat(AmbientContentColor.current)
+                    assertThat(LocalContentColor.current)
                         .isEqualTo(
                             MaterialTheme.colors.onSurface.copy(
                                 IconColorAlpha
@@ -638,7 +638,7 @@ class OutlinedTextFieldTest {
                 label = {},
                 isErrorValue = true,
                 leadingIcon = {
-                    assertThat(AmbientContentColor.current)
+                    assertThat(LocalContentColor.current)
                         .isEqualTo(
                             MaterialTheme.colors.onSurface.copy(
                                 IconColorAlpha
@@ -646,7 +646,7 @@ class OutlinedTextFieldTest {
                         )
                 },
                 trailingIcon = {
-                    assertThat(AmbientContentColor.current).isEqualTo(MaterialTheme.colors.error)
+                    assertThat(LocalContentColor.current).isEqualTo(MaterialTheme.colors.error)
                 }
             )
         }
@@ -658,7 +658,7 @@ class OutlinedTextFieldTest {
         val textInputService = mock<TextInputService>()
         rule.setContent {
             Providers(
-                AmbientTextInputService provides textInputService
+                LocalTextInputService provides textInputService
             ) {
                 var text = remember { mutableStateOf("") }
                 OutlinedTextField(

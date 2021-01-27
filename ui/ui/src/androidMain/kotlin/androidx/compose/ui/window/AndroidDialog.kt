@@ -41,8 +41,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.R
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.AbstractComposeView
-import androidx.compose.ui.platform.AmbientDensity
-import androidx.compose.ui.platform.AmbientView
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.semantics.dialog
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Density
@@ -110,8 +110,8 @@ internal actual fun ActualDialog(
     properties: DialogProperties?,
     content: @Composable () -> Unit
 ) {
-    val view = AmbientView.current
-    val density = AmbientDensity.current
+    val view = LocalView.current
+    val density = LocalDensity.current
     val composition = rememberCompositionReference()
     val currentContent by rememberUpdatedState(content)
     val dialog = remember(view, density) {

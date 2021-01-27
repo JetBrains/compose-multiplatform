@@ -458,8 +458,8 @@ class Transition<S> internal constructor(
  * [targetValueByState] is used as a mapping from a target state to the target value of this
  * animation. [Transition] will be using this mapping to determine what value to target this
  * animation towards. __Note__ that [targetValueByState] is a composable function. This means the
- * mapping function could access states, ambient, themes, etc. If the targetValue changes outside
- * of a [Transition] run (i.e. when the [Transition] already reached its targetState), the
+ * mapping function could access states, CompositionLocals, themes, etc. If the targetValue changes
+ * outside of a [Transition] run (i.e. when the [Transition] already reached its targetState), the
  * [Transition] will start running again to ensure this animation reaches its new target smoothly.
  *
  * An optional [transitionSpec] can be provided to specify (potentially different) animation for
@@ -533,8 +533,8 @@ inline fun <S, T, V : AnimationVector> Transition<S>.animateValue(
  * [targetValueByState] is used as a mapping from a target state to the target value of this
  * animation. [Transition] will be using this mapping to determine what value to target this
  * animation towards. __Note__ that [targetValueByState] is a composable function. This means the
- * mapping function could access states, ambient, themes, etc. If the targetValue changes outside
- * of a [Transition] run (i.e. when the [Transition] already reached its targetState), the
+ * mapping function could access states, CompositionLocals, themes, etc. If the targetValue changes
+ * outside of a [Transition] run (i.e. when the [Transition] already reached its targetState), the
  * [Transition] will start running again to ensure this animation reaches its new target smoothly.
  *
  * An optional [transitionSpec] can be provided to specify (potentially different) animation for
@@ -568,8 +568,8 @@ inline fun <S> Transition<S>.animateFloat(
  * [targetValueByState] is used as a mapping from a target state to the target value of this
  * animation. [Transition] will be using this mapping to determine what value to target this
  * animation towards. __Note__ that [targetValueByState] is a composable function. This means the
- * mapping function could access states, ambient, themes, etc. If the targetValue changes outside
- * of a [Transition] run (i.e. when the [Transition] already reached its targetState), the
+ * mapping function could access states, CompositionLocals, themes, etc. If the targetValue changes
+ * outside of a [Transition] run (i.e. when the [Transition] already reached its targetState), the
  * [Transition] will start running again to ensure this animation reaches its new target smoothly.
  *
  * An optional [transitionSpec] can be provided to specify (potentially different) animation for
@@ -599,8 +599,8 @@ inline fun <S> Transition<S>.animateDp(
  * [targetValueByState] is used as a mapping from a target state to the target value of this
  * animation. [Transition] will be using this mapping to determine what value to target this
  * animation towards. __Note__ that [targetValueByState] is a composable function. This means the
- * mapping function could access states, ambient, themes, etc. If the targetValue changes outside
- * of a [Transition] run (i.e. when the [Transition] already reached its targetState), the
+ * mapping function could access states, CompositionLocals, themes, etc. If the targetValue changes
+ * outside of a [Transition] run (i.e. when the [Transition] already reached its targetState), the
  * [Transition] will start running again to ensure this animation reaches its new target smoothly.
  *
  * An optional [transitionSpec] can be provided to specify (potentially different) animation for
@@ -630,8 +630,8 @@ inline fun <S> Transition<S>.animateOffset(
  * [targetValueByState] is used as a mapping from a target state to the target value of this
  * animation. [Transition] will be using this mapping to determine what value to target this
  * animation towards. __Note__ that [targetValueByState] is a composable function. This means the
- * mapping function could access states, ambient, themes, etc. If the targetValue changes outside
- * of a [Transition] run (i.e. when the [Transition] already reached its targetState), the
+ * mapping function could access states, CompositionLocals, themes, etc. If the targetValue changes
+ * outside of a [Transition] run (i.e. when the [Transition] already reached its targetState), the
  * [Transition] will start running again to ensure this animation reaches its new target smoothly.
  *
  * An optional [transitionSpec] can be provided to specify (potentially different) animation for
@@ -661,8 +661,8 @@ inline fun <S> Transition<S>.animateSize(
  * [targetValueByState] is used as a mapping from a target state to the target value of this
  * animation. [Transition] will be using this mapping to determine what value to target this
  * animation towards. __Note__ that [targetValueByState] is a composable function. This means the
- * mapping function could access states, ambient, themes, etc. If the targetValue changes outside
- * of a [Transition] run (i.e. when the [Transition] already reached its targetState), the
+ * mapping function could access states, CompositionLocals, themes, etc. If the targetValue changes
+ * outside of a [Transition] run (i.e. when the [Transition] already reached its targetState), the
  * [Transition] will start running again to ensure this animation reaches its new target smoothly.
  *
  * An optional [transitionSpec] can be provided to specify (potentially different) animation for
@@ -692,8 +692,8 @@ inline fun <S> Transition<S>.animateIntOffset(
  * [targetValueByState] is used as a mapping from a target state to the target value of this
  * animation. [Transition] will be using this mapping to determine what value to target this
  * animation towards. __Note__ that [targetValueByState] is a composable function. This means the
- * mapping function could access states, ambient, themes, etc. If the targetValue changes outside
- * of a [Transition] run (i.e. when the [Transition] already reached its targetState), the
+ * mapping function could access states, CompositionLocals, themes, etc. If the targetValue changes
+ * outside of a [Transition] run (i.e. when the [Transition] already reached its targetState), the
  * [Transition] will start running again to ensure this animation reaches its new target smoothly.
  *
  * An optional [transitionSpec] can be provided to specify (potentially different) animation for
@@ -723,8 +723,8 @@ inline fun <S> Transition<S>.animateInt(
  * [targetValueByState] is used as a mapping from a target state to the target value of this
  * animation. [Transition] will be using this mapping to determine what value to target this
  * animation towards. __Note__ that [targetValueByState] is a composable function. This means the
- * mapping function could access states, ambient, themes, etc. If the targetValue changes outside
- * of a [Transition] run (i.e. when the [Transition] already reached its targetState), the
+ * mapping function could access states, CompositionLocals, themes, etc. If the targetValue changes
+ * outside of a [Transition] run (i.e. when the [Transition] already reached its targetState), the
  * [Transition] will start running again to ensure this animation reaches its new target smoothly.
  *
  * An optional [transitionSpec] can be provided to specify (potentially different) animation for
@@ -753,9 +753,10 @@ inline fun <S> Transition<S>.animateIntSize(
  * [targetValueByState] is used as a mapping from a target state to the target value of this
  * animation. [Transition] will be using this mapping to determine what value to target this
  * animation towards. __Note__ that [targetValueByState] is a composable function. This means the
- * mapping function could access states, ambient, themes, etc. If the targetValue changes outside
- * of a [Transition] run (i.e. when the [Transition] already reached its targetState), the
- * [Transition] will start running again to ensure this animation reaches its new target smoothly.
+ * mapping function could access states, CompositionLocals, themes, etc. If the targetValue changes
+ * outside of a [Transition] run (i.e. when the [Transition] already reached its targetState),
+ * the [Transition] will start running again to ensure this animation reaches its new target
+ * smoothly.
  *
  * An optional [transitionSpec] can be provided to specify (potentially different) animation for
  * each pair of initialState and targetState. [FiniteAnimationSpec] includes any non-infinite
@@ -784,8 +785,8 @@ inline fun <S> Transition<S>.animateBounds(
  * [targetValueByState] is used as a mapping from a target state to the target value of this
  * animation. [Transition] will be using this mapping to determine what value to target this
  * animation towards. __Note__ that [targetValueByState] is a composable function. This means the
- * mapping function could access states, ambient, themes, etc. If the targetValue changes outside
- * of a [Transition] run (i.e. when the [Transition] already reached its targetState), the
+ * mapping function could access states, CompositionLocals, themes, etc. If the targetValue changes
+ * outside of a [Transition] run (i.e. when the [Transition] already reached its targetState), the
  * [Transition] will start running again to ensure this animation reaches its new target smoothly.
  *
  * An optional [transitionSpec] can be provided to specify (potentially different) animation for

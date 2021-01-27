@@ -25,7 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.background
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -71,7 +71,7 @@ class DialogScreenshotTest {
     fun dialogWithElevation() {
         rule.setContent {
             Dialog(onDismissRequest = {}) {
-                val elevation = with(AmbientDensity.current) { 16.dp.toPx() }
+                val elevation = with(LocalDensity.current) { 16.dp.toPx() }
                 Box(
                     Modifier
                         .graphicsLayer(

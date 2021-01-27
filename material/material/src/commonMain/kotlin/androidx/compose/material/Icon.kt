@@ -38,7 +38,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 
 /**
- * Icon component that draws [imageVector] using [tint], defaulting to [AmbientContentColor]. For a
+ * Icon component that draws [imageVector] using [tint], defaulting to [LocalContentColor]. For a
  * clickable icon, see [IconButton].
  *
  * @param imageVector [ImageVector] to draw inside this Icon
@@ -55,7 +55,7 @@ fun Icon(
     imageVector: ImageVector,
     contentDescription: String?,
     modifier: Modifier = Modifier,
-    tint: Color = AmbientContentColor.current.copy(alpha = AmbientContentAlpha.current)
+    tint: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
 ) {
     Icon(
         painter = rememberVectorPainter(imageVector),
@@ -66,7 +66,7 @@ fun Icon(
 }
 
 /**
- * Icon component that draws [bitmap] using [tint], defaulting to [AmbientContentColor]. For a
+ * Icon component that draws [bitmap] using [tint], defaulting to [LocalContentColor]. For a
  * clickable icon, see [IconButton].
  *
  * @param bitmap [ImageBitmap] to draw inside this Icon
@@ -83,7 +83,7 @@ fun Icon(
     bitmap: ImageBitmap,
     contentDescription: String?,
     modifier: Modifier = Modifier,
-    tint: Color = AmbientContentColor.current
+    tint: Color = LocalContentColor.current
 ) {
     val painter = remember(bitmap) { ImagePainter(bitmap) }
     Icon(
@@ -95,7 +95,7 @@ fun Icon(
 }
 
 /**
- * Icon component that draws a [painter] using [tint], defaulting to [AmbientContentColor]. For a
+ * Icon component that draws a [painter] using [tint], defaulting to [LocalContentColor]. For a
  * clickable icon, see [IconButton].
  *
  * @param painter [Painter] to draw inside this Icon
@@ -112,7 +112,7 @@ fun Icon(
     painter: Painter,
     contentDescription: String?,
     modifier: Modifier = Modifier,
-    tint: Color = AmbientContentColor.current.copy(alpha = AmbientContentAlpha.current)
+    tint: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
 ) {
     // TODO: consider allowing developers to override the intrinsic size, and specify their own
     // size that this icon will be forced to take up.

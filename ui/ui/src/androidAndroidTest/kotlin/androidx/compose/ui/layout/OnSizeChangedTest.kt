@@ -23,7 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.unit.IntSize
@@ -64,7 +64,7 @@ class OnSizeChangedTest {
 
         rule.runOnUiThread {
             activity.setContent {
-                with(AmbientDensity.current) {
+                with(LocalDensity.current) {
                     Box(
                         Modifier.padding(10.toDp()).onSizeChanged {
                             changedSize = it
@@ -100,7 +100,7 @@ class OnSizeChangedTest {
 
         rule.runOnUiThread {
             activity.setContent {
-                with(AmbientDensity.current) {
+                with(LocalDensity.current) {
                     Box(
                         Modifier.padding(10.toDp())
                             .onSizeChanged {
@@ -136,7 +136,7 @@ class OnSizeChangedTest {
 
         rule.runOnUiThread {
             activity.setContent {
-                with(AmbientDensity.current) {
+                with(LocalDensity.current) {
                     Box(
                         Modifier.padding(sizePx.toDp()).onSizeChanged {
                             changedSize = it
@@ -169,7 +169,7 @@ class OnSizeChangedTest {
 
         rule.runOnUiThread {
             activity.setContent {
-                with(AmbientDensity.current) {
+                with(LocalDensity.current) {
                     Box(
                         Modifier.padding(10.toDp()).onSizeChanged {
                             changedSize = it
@@ -208,7 +208,7 @@ class OnSizeChangedTest {
 
         rule.runOnUiThread {
             activity.setContent {
-                with(AmbientDensity.current) {
+                with(LocalDensity.current) {
                     val mod = if (addModifier) Modifier.onSizeChanged {
                         changedSize2 = it
                         latch2.countDown()

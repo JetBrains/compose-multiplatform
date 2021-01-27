@@ -17,7 +17,7 @@
 package androidx.compose.foundation.text
 
 import androidx.compose.runtime.Providers
-import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.input.TextFieldValue
@@ -40,7 +40,7 @@ class TextLayoutDirectionTest {
         var layoutDirection: LayoutDirection? = null
 
         rule.setContent {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 @OptIn(InternalTextApi::class)
                 CoreTextField(
                     value = TextFieldValue("..."),

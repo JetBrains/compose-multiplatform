@@ -18,7 +18,7 @@ package androidx.compose.desktop
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionReference
 import androidx.compose.runtime.Providers
-import androidx.compose.runtime.ambientOf
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.platform.Keyboard
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -34,7 +34,7 @@ import javax.swing.JMenuBar
 import javax.swing.SwingUtilities
 import javax.swing.WindowConstants
 
-val AppWindowAmbient = ambientOf<AppWindow?>()
+val AppWindowAmbient = compositionLocalOf<AppWindow?>()
 
 /**
  * Opens a window with the given content.

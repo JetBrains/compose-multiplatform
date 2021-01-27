@@ -22,7 +22,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -61,7 +61,7 @@ fun Modifier.shadow(
         }
     ) {
         graphicsLayer(
-            shadowElevation = with(AmbientDensity.current) { elevation.toPx() },
+            shadowElevation = with(LocalDensity.current) { elevation.toPx() },
             shape = shape,
             clip = clip
         )

@@ -22,7 +22,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -222,7 +222,7 @@ class SwipeToDismissTest {
     fun swipeToDismiss_dismissBySwipe_toEnd_rtl() {
         val dismissState = DismissState(DismissValue.Default, clock)
         rule.setContent {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 SwipeToDismiss(
                     modifier = Modifier.testTag(swipeToDismissTag),
                     state = dismissState,
@@ -246,7 +246,7 @@ class SwipeToDismissTest {
     fun swipeToDismiss_dismissBySwipe_toStart_rtl() {
         val dismissState = DismissState(DismissValue.Default, clock)
         rule.setContent {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 SwipeToDismiss(
                     modifier = Modifier.testTag(swipeToDismissTag),
                     state = dismissState,

@@ -62,7 +62,7 @@ val LocalElevationOverlay: ProvidableCompositionLocal<ElevationOverlay?> =
  * the Material specification for
  * [Dark Theme](https://material.io/design/color/dark-theme.html#properties).
  *
- * See [AmbientElevationOverlay] to provide your own [ElevationOverlay]. You can provide `null`
+ * See [LocalElevationOverlay] to provide your own [ElevationOverlay]. You can provide `null`
  * to have no ElevationOverlay applied.
  */
 interface ElevationOverlay {

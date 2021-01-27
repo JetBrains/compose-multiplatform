@@ -266,16 +266,16 @@ fun Colors.contentColorFor(backgroundColor: Color): Color {
  * [backgroundColor] is [Colors.primary], this will return [Colors.onPrimary].
  *
  * If [backgroundColor] does not match a background color in the theme, this will return
- * the current value of [AmbientContentColor] as a best-effort color.
+ * the current value of [LocalContentColor] as a best-effort color.
  *
  * @return the matching content color for [backgroundColor]. If [backgroundColor] is not present in
- * the theme's [Colors], then returns the current value of [AmbientContentColor].
+ * the theme's [Colors], then returns the current value of [LocalContentColor].
  *
  * @see Colors.contentColorFor
  */
 @Composable
 fun contentColorFor(backgroundColor: Color) =
-    MaterialTheme.colors.contentColorFor(backgroundColor).takeOrElse { AmbientContentColor.current }
+    MaterialTheme.colors.contentColorFor(backgroundColor).takeOrElse { LocalContentColor.current }
 
 /**
  * Updates the internal values of the given [Colors] with values from the [other] [Colors]. This

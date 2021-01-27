@@ -37,8 +37,8 @@ import androidx.compose.ui.Wrap
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.padding
-import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.runOnUiThreadIR
 import androidx.compose.ui.test.TestActivity
@@ -399,7 +399,7 @@ class OnGloballyPositionedTest {
 
         rule.runOnUiThread {
             activity.setContent {
-                with(AmbientDensity.current) {
+                with(LocalDensity.current) {
                     DelayedMeasure(50) {
                         Box(Modifier.size(25.toDp())) {
                             Box(
@@ -445,7 +445,7 @@ class OnGloballyPositionedTest {
         val positionedLatch = CountDownLatch(1)
         rule.runOnUiThread {
             activity.setContent {
-                with(AmbientDensity.current) {
+                with(LocalDensity.current) {
                     Box(
                         Modifier.fillMaxSize()
                             .padding(start = paddingLeftPx.toDp(), top = paddingTopPx.toDp())
@@ -474,7 +474,7 @@ class OnGloballyPositionedTest {
         val positionedLatch = CountDownLatch(2)
         rule.runOnUiThread {
             activity.setContent {
-                with(AmbientDensity.current) {
+                with(LocalDensity.current) {
                     Box(
                         Modifier.padding(start = firstPaddingPx.toDp()).then(
                             Modifier.onGloballyPositioned {
@@ -575,7 +575,7 @@ class OnGloballyPositionedTest {
         var positionedLatch = CountDownLatch(1)
         rule.runOnUiThread {
             activity.setContent {
-                with(AmbientDensity.current) {
+                with(LocalDensity.current) {
                     Box {
                         Box(
                             Modifier.onGloballyPositioned {
@@ -608,7 +608,7 @@ class OnGloballyPositionedTest {
         var positionedLatch = CountDownLatch(1)
         rule.runOnUiThread {
             activity.setContent {
-                with(AmbientDensity.current) {
+                with(LocalDensity.current) {
                     Box {
                         Offset(left) {
                             Box(Modifier.size(10.toDp())) {

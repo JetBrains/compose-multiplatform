@@ -34,7 +34,7 @@ import androidx.compose.ui.gesture.Direction
 import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 
 /**
@@ -105,7 +105,7 @@ fun DragGestureFilterDemo() {
         }
 
     val (offsetX, offsetY) =
-        with(AmbientDensity.current) { offset.value.x.toDp() to offset.value.y.toDp() }
+        with(LocalDensity.current) { offset.value.x.toDp() to offset.value.y.toDp() }
 
     Column {
         Text(

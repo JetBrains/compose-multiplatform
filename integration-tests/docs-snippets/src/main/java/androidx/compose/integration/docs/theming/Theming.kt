@@ -24,11 +24,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.AmbientContentAlpha
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Colors
 import androidx.compose.material.ContentAlpha
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Shapes
 import androidx.compose.material.Surface
@@ -141,12 +141,12 @@ TopAppBar(
 }
 
 @Composable private fun ThemingSnippet7() {
-    // By default, both Icon & Text use the combination of AmbientContentColor &
-    // AmbientContentAlpha. De-emphasize content by setting content alpha
-    Providers(AmbientContentAlpha provides ContentAlpha.medium) {
+    // By default, both Icon & Text use the combination of LocalContentColor &
+    // LocalContentAlpha. De-emphasize content by setting content alpha
+    Providers(LocalContentAlpha provides ContentAlpha.medium) {
         Text(/*...*/)
     }
-    Providers(AmbientContentAlpha provides ContentAlpha.disabled) {
+    Providers(LocalContentAlpha provides ContentAlpha.disabled) {
         Icon(/*...*/)
         Text(/*...*/)
     }

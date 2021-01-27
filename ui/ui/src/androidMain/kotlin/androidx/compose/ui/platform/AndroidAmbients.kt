@@ -148,7 +148,10 @@ val LocalViewModelStoreOwner = staticCompositionLocalOf<ViewModelStoreOwner>()
 
 @Composable
 @OptIn(ExperimentalComposeUiApi::class, InternalAnimationApi::class)
-internal fun ProvideAndroidAmbients(owner: AndroidComposeView, content: @Composable () -> Unit) {
+internal fun ProvideAndroidCompositionLocals(
+    owner: AndroidComposeView,
+    content: @Composable () -> Unit
+) {
     val view = owner
     val context = view.context
     val scope = rememberCoroutineScope()
@@ -181,15 +184,15 @@ internal fun ProvideAndroidAmbients(owner: AndroidComposeView, content: @Composa
     }
 
     Providers(
-        AmbientConfiguration provides configuration,
-        AmbientContext provides context,
-        AmbientLifecycleOwner provides viewTreeOwners.lifecycleOwner,
-        AmbientSavedStateRegistryOwner provides viewTreeOwners.savedStateRegistryOwner,
+        LocalConfiguration provides configuration,
+        LocalContext provides context,
+        LocalLifecycleOwner provides viewTreeOwners.lifecycleOwner,
+        LocalSavedStateRegistryOwner provides viewTreeOwners.savedStateRegistryOwner,
         LocalSaveableStateRegistry provides saveableStateRegistry,
-        AmbientView provides owner.view,
-        AmbientViewModelStoreOwner provides viewTreeOwners.viewModelStoreOwner
+        LocalView provides owner.view,
+        LocalViewModelStoreOwner provides viewTreeOwners.viewModelStoreOwner
     ) {
-        ProvideCommonAmbients(
+        ProvideCommonCompositionLocals(
             owner = owner,
             animationClock = rootAnimationClock,
             uriHandler = uriHandler,

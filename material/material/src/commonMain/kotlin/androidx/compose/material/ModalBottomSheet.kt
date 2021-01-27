@@ -42,7 +42,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.SubcomposeLayout
-import androidx.compose.ui.platform.AmbientAnimationClock
+import androidx.compose.ui.platform.LocalAnimationClock
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -164,7 +164,7 @@ class ModalBottomSheetState(
 
 /**
  * Create a [ModalBottomSheetState] and [remember] it against the [clock]. If a clock is not
- * specified, the default animation clock will be used, as provided by [AnimationClockAmbient].
+ * specified, the default animation clock will be used, as provided by [LocalAnimationClock].
  *
  * @param initialValue The initial value of the state.
  * @param clock The animation clock that will be used to drive the animations.
@@ -175,7 +175,7 @@ class ModalBottomSheetState(
 @ExperimentalMaterialApi
 fun rememberModalBottomSheetState(
     initialValue: ModalBottomSheetValue,
-    clock: AnimationClockObservable = AmbientAnimationClock.current,
+    clock: AnimationClockObservable = LocalAnimationClock.current,
     animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
     confirmStateChange: (ModalBottomSheetValue) -> Boolean = { true }
 ): ModalBottomSheetState {

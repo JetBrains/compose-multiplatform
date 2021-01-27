@@ -37,7 +37,7 @@ import androidx.compose.ui.platform.debugInspectorInfo
  * [indication] modifier.
  *
  * If you want to override default behaviour for [indication] for the whole subtree, consider
- * creating object of this factory and providing it in [AmbientIndication].
+ * creating object of this factory and providing it in [LocalIndication].
  */
 @Stable
 interface Indication {

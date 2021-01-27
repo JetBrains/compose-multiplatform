@@ -40,8 +40,8 @@ import androidx.compose.ui.unit.TextUnit
 /**
  * High level element that displays text and provides semantics / accessibility information.
  *
- * The default [style] uses the [AmbientTextStyle] provided by the [MaterialTheme] / components. If
- * you are setting your own style, you may want to consider first retrieving [AmbientTextStyle],
+ * The default [style] uses the [LocalTextStyle] provided by the [MaterialTheme] / components. If
+ * you are setting your own style, you may want to consider first retrieving [LocalTextStyle],
  * and using [TextStyle.copy] to keep any theme defined attributes, only modifying the specific
  * attributes you want to override.
  *
@@ -53,14 +53,14 @@ import androidx.compose.ui.unit.TextUnit
  * from [style] will be used instead.
  *
  * Additionally, for [color], if [color] is not set, and [style] does not have a color, then
- * [AmbientContentColor] will be used with an alpha of [AmbientContentAlpha]- this allows this
+ * [LocalContentColor] will be used with an alpha of [LocalContentAlpha]- this allows this
  * [Text] or element containing this [Text] to adapt to different background colors and still
  * maintain contrast and accessibility.
  *
  * @param text The text to be displayed.
  * @param modifier [Modifier] to apply to this layout node.
  * @param color [Color] to apply to the text. If [Color.Unspecified], and [style] has no color set,
- * this will be [AmbientContentColor].
+ * this will be [LocalContentColor].
  * @param fontSize The size of glyphs to use when painting the text. See [TextStyle.fontSize].
  * @param fontStyle The typeface variant to use when drawing the letters (e.g., italic).
  * See [TextStyle.fontStyle].
@@ -101,7 +101,7 @@ fun Text(
     softWrap: Boolean = true,
     maxLines: Int = Int.MAX_VALUE,
     onTextLayout: (TextLayoutResult) -> Unit = {},
-    style: TextStyle = AmbientTextStyle.current
+    style: TextStyle = LocalTextStyle.current
 ) {
     Text(
         AnnotatedString(text),
@@ -127,8 +127,8 @@ fun Text(
 /**
  * High level element that displays text and provides semantics / accessibility information.
  *
- * The default [style] uses the [AmbientTextStyle] provided by the [MaterialTheme] / components. If
- * you are setting your own style, you may want to consider first retrieving [AmbientTextStyle],
+ * The default [style] uses the [LocalTextStyle] provided by the [MaterialTheme] / components. If
+ * you are setting your own style, you may want to consider first retrieving [LocalTextStyle],
  * and using [TextStyle.copy] to keep any theme defined attributes, only modifying the specific
  * attributes you want to override.
  *
@@ -140,14 +140,14 @@ fun Text(
  * from [style] will be used instead.
  *
  * Additionally, for [color], if [color] is not set, and [style] does not have a color, then
- * [AmbientContentColor] will be used with an alpha of [AmbientContentAlpha]- this allows this
+ * [LocalContentColor] will be used with an alpha of [LocalContentAlpha]- this allows this
  * [Text] or element containing this [Text] to adapt to different background colors and still
  * maintain contrast and accessibility.
  *
  * @param text The text to be displayed.
  * @param modifier [Modifier] to apply to this layout node.
  * @param color [Color] to apply to the text. If [Color.Unspecified], and [style] has no color set,
- * this will be [AmbientContentColor].
+ * this will be [LocalContentColor].
  * @param fontSize The size of glyphs to use when painting the text. See [TextStyle.fontSize].
  * @param fontStyle The typeface variant to use when drawing the letters (e.g., italic).
  * See [TextStyle.fontStyle].
@@ -191,11 +191,11 @@ fun Text(
     maxLines: Int = Int.MAX_VALUE,
     inlineContent: Map<String, InlineTextContent> = mapOf(),
     onTextLayout: (TextLayoutResult) -> Unit = {},
-    style: TextStyle = AmbientTextStyle.current
+    style: TextStyle = LocalTextStyle.current
 ) {
     val textColor = color.takeOrElse {
         style.color.takeOrElse {
-            AmbientContentColor.current.copy(alpha = AmbientContentAlpha.current)
+            LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
         }
     }
     val mergedStyle = style.merge(
@@ -248,16 +248,16 @@ val AmbientTextStyle get() = LocalTextStyle
  */
 val LocalTextStyle = compositionLocalOf(structuralEqualityPolicy()) { TextStyle.Default }
 
-// TODO: b/156598010 remove this and replace with fold definition on the backing Ambient
+// TODO: b/156598010 remove this and replace with fold definition on the backing CompositionLocal
 /**
- * This function is used to set the current value of [AmbientTextStyle], merging the given style
+ * This function is used to set the current value of [LocalTextStyle], merging the given style
  * with the current style values for any missing attributes. Any [Text] components included in
  * this component's [content] will be styled with this style unless styled explicitly.
  *
- * @see AmbientTextStyle
+ * @see LocalTextStyle
  */
 @Composable
 fun ProvideTextStyle(value: TextStyle, content: @Composable () -> Unit) {
-    val mergedStyle = AmbientTextStyle.current.merge(value)
-    Providers(AmbientTextStyle provides mergedStyle, content = content)
+    val mergedStyle = LocalTextStyle.current.merge(value)
+    Providers(LocalTextStyle provides mergedStyle, content = content)
 }

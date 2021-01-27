@@ -22,7 +22,7 @@ import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.tooling.LocalInspectionTables
-import androidx.compose.ui.platform.InspectionMode
+import androidx.compose.ui.platform.LocalInspectionMode
 import java.util.Collections
 import java.util.WeakHashMap
 
@@ -62,7 +62,7 @@ internal fun Inspectable(
     val store = (compositionDataRecord as CompositionDataRecordImpl).store
     store.add(currentComposer.compositionData)
     Providers(
-        InspectionMode provides true,
+        LocalInspectionMode provides true,
         LocalInspectionTables provides store,
         content = content
     )
@@ -74,7 +74,7 @@ internal fun Inspectable(
  */
 @Composable
 fun InInspectionModeOnly(content: @Composable () -> Unit) {
-    if (InspectionMode.current) {
+    if (LocalInspectionMode.current) {
         content()
     }
 }

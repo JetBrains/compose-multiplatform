@@ -43,8 +43,8 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.MeasureBlock
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
-import androidx.compose.ui.platform.AmbientDensity
-import androidx.compose.ui.platform.AmbientFontLoader
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFontLoader
 import androidx.compose.foundation.text.selection.LocalSelectionRegistrar
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.Selectable
@@ -108,8 +108,8 @@ internal fun CoreText(
 
     // selection registrar, if no SelectionContainer is added ambient value will be null
     val selectionRegistrar = LocalSelectionRegistrar.current
-    val density = AmbientDensity.current
-    val resourceLoader = AmbientFontLoader.current
+    val density = LocalDensity.current
+    val resourceLoader = LocalFontLoader.current
     val selectionBackgroundColor = LocalTextSelectionColors.current.backgroundColor
 
     val (placeholders, inlineComposables) = resolveInlineContent(text, inlineContent)

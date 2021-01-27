@@ -31,8 +31,8 @@ import androidx.compose.testutils.MockAnimationClock
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.platform.AmbientDensity
-import androidx.compose.ui.platform.AmbientViewConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.bottomCenter
@@ -172,8 +172,8 @@ class SendSwipeTest {
             animationClock = MockAnimationClock()
         )
         rule.setContent {
-            Providers(AmbientViewConfiguration provides FakeViewConfiguration) {
-                with(AmbientDensity.current) {
+            Providers(LocalViewConfiguration provides FakeViewConfiguration) {
+                with(LocalDensity.current) {
                     // Scrollable with a viewport the size of 10 boxes
                     Column(
                         Modifier

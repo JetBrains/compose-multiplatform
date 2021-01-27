@@ -29,7 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.captureToImage
@@ -62,7 +62,7 @@ class CanvasTest {
     fun testCanvas() {
         val strokeWidth = 5.0f
         rule.setContent {
-            val density = AmbientDensity.current.density
+            val density = LocalDensity.current.density
             val containerSize = (containerSize * 2 / density).dp
             val minWidth = (boxWidth / density).dp
             val minHeight = (boxHeight / density).dp

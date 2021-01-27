@@ -96,8 +96,8 @@ internal fun TextFieldImpl(
     // TODO(soboleva): b/171305338 provide colors object and apply alpha there instead
     // If color is not provided via the text style, use content color as a default
     val textColor = textStyle.color.takeOrElse {
-        AmbientContentColor.current
-    }.copy(alpha = if (enabled) AmbientContentAlpha.current else ContentAlpha.disabled)
+        LocalContentColor.current
+    }.copy(alpha = if (enabled) LocalContentAlpha.current else ContentAlpha.disabled)
     val mergedTextStyle = textStyle.merge(TextStyle(color = textColor))
 
     val keyboardController: Ref<SoftwareKeyboardController> = remember { Ref() }
@@ -253,15 +253,15 @@ internal fun Decoration(
     content: @Composable () -> Unit
 ) {
     val colorAndEmphasis = @Composable {
-        Providers(AmbientContentColor provides contentColor) {
+        Providers(LocalContentColor provides contentColor) {
             if (contentAlpha != null) {
                 Providers(
-                    AmbientContentAlpha provides contentAlpha,
+                    LocalContentAlpha provides contentAlpha,
                     content = content
                 )
             } else {
                 Providers(
-                    AmbientContentAlpha provides contentColor.alpha,
+                    LocalContentAlpha provides contentColor.alpha,
                     content = content
                 )
             }

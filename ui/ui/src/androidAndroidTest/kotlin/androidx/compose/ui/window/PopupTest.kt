@@ -30,7 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.node.Owner
-import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
@@ -205,7 +205,7 @@ class PopupTest {
     }
 
     @Test
-    fun preservesAmbients() {
+    fun preservesCompositionLocals() {
         val compositionLocal = compositionLocalOf<Float>()
         var value = 0f
         rule.setContent {
@@ -224,9 +224,9 @@ class PopupTest {
     fun preservesLayoutDirection() {
         var value = LayoutDirection.Ltr
         rule.setContent {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Popup {
-                    value = AmbientLayoutDirection.current
+                    value = LocalLayoutDirection.current
                 }
             }
         }

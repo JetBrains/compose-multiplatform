@@ -49,8 +49,8 @@ import androidx.compose.foundation.samples.StickyHeaderSample
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.integration.demos.common.ComposableDemo
-import androidx.compose.material.AmbientContentColor
-import androidx.compose.material.AmbientTextStyle
+import androidx.compose.material.LocalContentColor
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
@@ -63,8 +63,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.AmbientDensity
-import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -123,7 +123,7 @@ private fun ListAddRemoveItemsDemo() {
         }
         LazyColumn(Modifier.fillMaxWidth()) {
             items((1..numItems).map { it + offset }) {
-                Text("$it", style = AmbientTextStyle.current.copy(fontSize = 40.sp))
+                Text("$it", style = LocalTextStyle.current.copy(fontSize = 40.sp))
             }
         }
     }
@@ -139,7 +139,7 @@ private fun ListHoistedStateDemo() {
         @Suppress("DEPRECATION")
         FlowRow {
             val buttonModifier = Modifier.padding(8.dp)
-            val density = AmbientDensity.current
+            val density = LocalDensity.current
             val coroutineScope = rememberCoroutineScope()
             Button(
                 modifier = buttonModifier,
@@ -196,7 +196,7 @@ private fun ListHoistedStateDemo() {
             state = state
         ) {
             items(1000) {
-                Text("$it", style = AmbientTextStyle.current.copy(fontSize = 40.sp))
+                Text("$it", style = LocalTextStyle.current.copy(fontSize = 40.sp))
             }
         }
     }
@@ -210,7 +210,7 @@ fun Button(modifier: Modifier = Modifier, onClick: () -> Unit, content: @Composa
             .background(Color(0xFF6200EE), RoundedCornerShape(4.dp))
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
-        Providers(AmbientContentColor provides Color.White, content = content)
+        Providers(LocalContentColor provides Color.White, content = content)
     }
 }
 
@@ -253,7 +253,7 @@ private fun ListWithIndexSample() {
 
 @Composable
 private fun RtlListDemo() {
-    Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+    Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
         LazyRow(Modifier.fillMaxWidth()) {
             items(100) {
                 Text(
