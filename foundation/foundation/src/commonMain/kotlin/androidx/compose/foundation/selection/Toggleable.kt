@@ -21,14 +21,13 @@ import androidx.compose.foundation.Indication
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.Strings
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.indication
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.gesture.pressIndicatorGestureFilter
+import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.disabled
@@ -231,7 +230,7 @@ fun Modifier.triStateToggleable(
     }
 )
 
-@Suppress("ModifierInspectorInfo")
+@Suppress("ModifierInspectorInfo", "DEPRECATION")
 private fun Modifier.toggleableImpl(
     state: ToggleableState,
     enabled: Boolean,
@@ -257,22 +256,17 @@ private fun Modifier.toggleableImpl(
             disabled()
         }
     }
-    val clickState = rememberUpdatedState(onClick)
-    val interactionStateState = rememberUpdatedState(interactionState)
-    val gestures = if (enabled) {
-        Modifier.pointerInput {
-            detectTapGestures(
-                onTap = { clickState.value.invoke() },
-                onPress = {
-                    interactionStateState.value.addInteraction(Interaction.Pressed, it)
-                    tryAwaitRelease()
-                    interactionStateState.value.removeInteraction(Interaction.Pressed)
-                }
+    val interactionUpdate =
+        if (enabled) {
+            Modifier.pressIndicatorGestureFilter(
+                onStart = { interactionState.addInteraction(Interaction.Pressed, it) },
+                onStop = { interactionState.removeInteraction(Interaction.Pressed) },
+                onCancel = { interactionState.removeInteraction(Interaction.Pressed) }
             )
+        } else {
+            Modifier
         }
-    } else {
-        Modifier
-    }
+    val click = if (enabled) Modifier.tapGestureFilter { onClick() } else Modifier
 
     DisposableEffect(interactionState) {
         onDispose {
@@ -282,5 +276,6 @@ private fun Modifier.toggleableImpl(
     this
         .then(semantics)
         .indication(interactionState, indication)
-        .then(gestures)
+        .then(interactionUpdate)
+        .then(click)
 }
