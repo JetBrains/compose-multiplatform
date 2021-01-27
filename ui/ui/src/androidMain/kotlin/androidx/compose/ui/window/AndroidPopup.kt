@@ -124,7 +124,7 @@ internal actual fun ActualPopup(
 ) {
     val view = AmbientView.current
     val density = AmbientDensity.current
-    val testTag = AmbientPopupTestTag.current
+    val testTag = LocalPopupTestTag.current
     val parentComposition = rememberCompositionReference()
     val currentContent by rememberUpdatedState(content)
 

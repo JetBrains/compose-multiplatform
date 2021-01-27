@@ -17,7 +17,7 @@
 package androidx.compose.material
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ambientOf
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.luminance
 
 /**
@@ -85,8 +85,8 @@ object ContentAlpha {
 }
 
 /**
- * Ambient containing the preferred content alpha for a given position in the hierarchy. This
- * alpha is used for text and iconography ([Text] and [Icon]) to emphasize / de-emphasize
+ * CompositionLocal containing the preferred content alpha for a given position in the hierarchy.
+ * This alpha is used for text and iconography ([Text] and [Icon]) to emphasize / de-emphasize
  * different parts of a component. See the Material guide on
  * [Text Legibility](https://material.io/design/color/text-legibility.html) for more information on
  * alpha levels used by text and iconography.
@@ -98,7 +98,30 @@ object ContentAlpha {
  *
  * @sample androidx.compose.material.samples.ContentAlphaSample
  */
-val AmbientContentAlpha = ambientOf { 1f }
+@Deprecated(
+    "Renamed to LocalContentAlpha",
+    replaceWith = ReplaceWith(
+        "LocalContentAlpha",
+        "androidx.compose.material.LocalContentAlpha"
+    )
+)
+val AmbientContentAlpha get() = LocalContentAlpha
+
+/**
+ * CompositionLocal containing the preferred content alpha for a given position in the hierarchy.
+ * This alpha is used for text and iconography ([Text] and [Icon]) to emphasize / de-emphasize
+ * different parts of a component. See the Material guide on
+ * [Text Legibility](https://material.io/design/color/text-legibility.html) for more information on
+ * alpha levels used by text and iconography.
+ *
+ * See [ContentAlpha] for the default levels used by most Material components.
+ *
+ * [MaterialTheme] sets this to [ContentAlpha.high] by default, as this is the default alpha for
+ * body text.
+ *
+ * @sample androidx.compose.material.samples.ContentAlphaSample
+ */
+val LocalContentAlpha = compositionLocalOf { 1f }
 
 /**
  * Alpha levels for high luminance content in light theme, or low luminance content in dark theme.

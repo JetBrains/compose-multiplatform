@@ -59,7 +59,7 @@ fun SelectionContainer(modifier: Modifier = Modifier, content: @Composable () ->
 @Composable
 fun DisableSelection(content: @Composable () -> Unit) {
     Providers(
-        AmbientSelectionRegistrar provides null,
+        LocalSelectionRegistrar provides null,
         content = content
     )
 }
@@ -93,7 +93,7 @@ internal fun SelectionContainer(
     manager.onSelectionChange = onSelectionChange
     manager.selection = selection
 
-    Providers(AmbientSelectionRegistrar provides registrarImpl) {
+    Providers(LocalSelectionRegistrar provides registrarImpl) {
         // Get the layout coordinates of the selection container. This is for hit test of
         // cross-composable selection.
         SimpleLayout(modifier = modifier.then(manager.modifier)) {

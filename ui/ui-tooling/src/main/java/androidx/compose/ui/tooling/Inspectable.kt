@@ -21,7 +21,7 @@ import androidx.compose.runtime.CompositionData
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.currentComposer
-import androidx.compose.runtime.tooling.InspectionTables
+import androidx.compose.runtime.tooling.LocalInspectionTables
 import androidx.compose.ui.platform.InspectionMode
 import java.util.Collections
 import java.util.WeakHashMap
@@ -63,7 +63,7 @@ internal fun Inspectable(
     store.add(currentComposer.compositionData)
     Providers(
         InspectionMode provides true,
-        InspectionTables provides store,
+        LocalInspectionTables provides store,
         content = content
     )
 }

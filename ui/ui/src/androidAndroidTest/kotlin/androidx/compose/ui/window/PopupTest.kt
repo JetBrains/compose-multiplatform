@@ -22,7 +22,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Providers
-import androidx.compose.runtime.ambientOf
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -206,12 +206,12 @@ class PopupTest {
 
     @Test
     fun preservesAmbients() {
-        val ambient = ambientOf<Float>()
+        val compositionLocal = compositionLocalOf<Float>()
         var value = 0f
         rule.setContent {
-            Providers(ambient provides 1f) {
+            Providers(compositionLocal provides 1f) {
                 Popup {
-                    value = ambient.current
+                    value = compositionLocal.current
                 }
             }
         }

@@ -402,7 +402,7 @@ class ScaffoldTest {
                 floatingActionButton = fab,
                 floatingActionButtonPosition = FabPosition.End,
                 bottomBar = {
-                    fabPlacement = AmbientFabPlacement.current
+                    fabPlacement = LocalFabPlacement.current
                 }
             ) {
                 Text("body")

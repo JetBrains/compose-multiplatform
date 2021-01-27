@@ -22,7 +22,7 @@
 package androidx.compose.runtime
 
 import androidx.compose.runtime.collection.IdentityScopeMap
-import androidx.compose.runtime.tooling.InspectionTables
+import androidx.compose.runtime.tooling.LocalInspectionTables
 import kotlinx.collections.immutable.PersistentMap
 import kotlinx.collections.immutable.persistentHashMapOf
 import kotlin.coroutines.CoroutineContext
@@ -1142,7 +1142,7 @@ internal class ComposerImpl(
         providersInvalid = changed(parentProvider)
         collectKeySources = parentReference.collectingKeySources
         collectParameterInformation = parentReference.collectingParameterInformation
-        resolveCompositionLocal(InspectionTables, parentProvider)?.let {
+        resolveCompositionLocal(LocalInspectionTables, parentProvider)?.let {
             it.add(slotTable)
             parentReference.recordInspectionTable(it)
         }

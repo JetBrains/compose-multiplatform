@@ -56,7 +56,7 @@ class CardTest {
             Surface(color = background) {
                 Box {
                     cardColor = MaterialTheme.colors.surface
-                    Providers(AmbientShapes provides Shapes(medium = shape)) {
+                    Providers(LocalShapes provides Shapes(medium = shape)) {
                         Card(
                             modifier = Modifier
                                 .semantics(mergeDescendants = true) {}

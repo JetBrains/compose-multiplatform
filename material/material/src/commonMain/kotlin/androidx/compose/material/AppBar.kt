@@ -180,7 +180,7 @@ fun BottomAppBar(
     elevation: Dp = BottomAppBarElevation,
     content: @Composable RowScope.() -> Unit
 ) {
-    val fabPlacement = AmbientFabPlacement.current
+    val fabPlacement = LocalFabPlacement.current
     val shape = if (cutoutShape != null && fabPlacement?.isDocked == true) {
         BottomAppBarCutoutShape(cutoutShape, fabPlacement)
     } else {

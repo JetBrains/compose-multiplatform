@@ -16,11 +16,10 @@
 
 package androidx.compose.material
 
-import androidx.compose.runtime.Ambient
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ProvidableAmbient
+import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.runtime.staticAmbientOf
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.unit.Dp
@@ -28,14 +27,29 @@ import androidx.compose.ui.unit.dp
 import kotlin.math.ln
 
 /**
- * [Ambient] containing the [ElevationOverlay] used by [Surface] components. Provide `null` to
- * turn off [ElevationOverlay]s for the children within this [Ambient].
+ * CompositionLocal containing the [ElevationOverlay] used by [Surface] components. Provide
+ * `null` to turn off [ElevationOverlay]s for the children within this CompositionLocal..
  *
  * @see ElevationOverlay
  */
-val AmbientElevationOverlay: ProvidableAmbient<ElevationOverlay?> = staticAmbientOf {
-    DefaultElevationOverlay
-}
+@Deprecated(
+    "Renamed to LocalElevationOverlay",
+    replaceWith = ReplaceWith(
+        "LocalElevationOverlay",
+        "androidx.compose.material.LocalElevationOverlay"
+    )
+)
+val AmbientElevationOverlay: ProvidableCompositionLocal<ElevationOverlay?>
+    get() = LocalElevationOverlay
+
+/**
+ * CompositionLocal containing the [ElevationOverlay] used by [Surface] components. Provide
+ * `null` to turn off [ElevationOverlay]s for the children within this CompositionLocal..
+ *
+ * @see ElevationOverlay
+ */
+val LocalElevationOverlay: ProvidableCompositionLocal<ElevationOverlay?> =
+    staticCompositionLocalOf { DefaultElevationOverlay }
 
 // TODO: make this a fun interface
 /**

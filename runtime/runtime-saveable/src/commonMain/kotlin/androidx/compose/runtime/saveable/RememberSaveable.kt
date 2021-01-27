@@ -77,7 +77,7 @@ fun <T : Any> rememberSaveable(
     @Suppress("UNCHECKED_CAST")
     (saver as Saver<T, Any>)
 
-    val registry = AmbientSaveableStateRegistry.current
+    val registry = LocalSaveableStateRegistry.current
     // value is restored using the registry or created via [init] lambda
     val value = remember(*inputs) {
         // TODO not restore when the input values changed (use hashKeys?) b/152014032

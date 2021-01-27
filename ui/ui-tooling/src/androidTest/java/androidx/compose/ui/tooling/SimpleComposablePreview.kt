@@ -19,7 +19,7 @@ package androidx.compose.ui.tooling
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.saveable.AmbientSaveableStateRegistry
+import androidx.compose.runtime.saveable.LocalSaveableStateRegistry
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.AmbientLifecycleOwner
 import androidx.compose.ui.tooling.preview.Preview
@@ -80,7 +80,7 @@ private fun LifecyclePreview() {
 @Preview
 @Composable
 private fun SaveableStateRegistryPreview() {
-    if (AmbientSaveableStateRegistry.current == null) throw IllegalArgumentException(
+    if (LocalSaveableStateRegistry.current == null) throw IllegalArgumentException(
         "SaveableStateRegistry is not provided"
     )
     Text("SaveableStateRegistry preview")

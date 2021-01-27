@@ -31,7 +31,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.currentComposer
-import androidx.compose.runtime.tooling.InspectionTables
+import androidx.compose.runtime.tooling.LocalInspectionTables
 import androidx.compose.ui.R
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.UiApplier
@@ -195,7 +195,7 @@ private class WrappedComposition(
                         LaunchedEffect(owner) { owner.keyboardVisibilityEventLoop() }
                         LaunchedEffect(owner) { owner.boundsUpdatesEventLoop() }
 
-                        Providers(InspectionTables provides inspectionTable) {
+                        Providers(LocalInspectionTables provides inspectionTable) {
                             ProvideAndroidAmbients(owner, content)
                         }
                     }

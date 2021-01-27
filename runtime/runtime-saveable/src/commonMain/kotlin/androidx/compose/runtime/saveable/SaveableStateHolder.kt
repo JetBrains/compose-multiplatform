@@ -63,7 +63,7 @@ fun rememberSaveableStateHolder(): SaveableStateHolder =
     ) {
         SaveableStateHolderImpl()
     }.apply {
-        parentSaveableStateRegistry = AmbientSaveableStateRegistry.current
+        parentSaveableStateRegistry = LocalSaveableStateRegistry.current
     }
 
 private class SaveableStateHolderImpl(
@@ -84,7 +84,7 @@ private class SaveableStateHolderImpl(
                 RegistryHolder(key)
             }
             Providers(
-                AmbientSaveableStateRegistry provides registryHolder.registry,
+                LocalSaveableStateRegistry provides registryHolder.registry,
                 content = content
             )
             DisposableEffect(key) {

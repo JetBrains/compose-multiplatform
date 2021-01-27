@@ -71,7 +71,7 @@ class TextSelectionColorsScreenshotTest {
     @Test
     fun text_defaultSelectionColors() {
         rule.setContent {
-            TextTestContent(textSelectionColors = AmbientTextSelectionColors.current)
+            TextTestContent(textSelectionColors = LocalTextSelectionColors.current)
         }
 
         rule.onNodeWithText(Text)
@@ -112,7 +112,7 @@ class TextSelectionColorsScreenshotTest {
     @Test
     fun textField_defaultSelectionColors() {
         rule.setContent {
-            TextFieldTestContent(textSelectionColors = AmbientTextSelectionColors.current)
+            TextFieldTestContent(textSelectionColors = LocalTextSelectionColors.current)
         }
 
         // Click once to focus text field
@@ -174,7 +174,7 @@ class TextSelectionColorsScreenshotTest {
 @OptIn(InternalTextApi::class)
 @Composable
 private fun TextTestContent(textSelectionColors: TextSelectionColors) {
-    Providers(AmbientTextSelectionColors provides textSelectionColors) {
+    Providers(LocalTextSelectionColors provides textSelectionColors) {
         Row(Modifier.testTag(Tag), horizontalArrangement = Arrangement.spacedBy(20.dp)) {
             // Manually draw selection handles as we cannot screenshot the ones drawn in the popup
             DefaultSelectionHandle(
@@ -200,7 +200,7 @@ private fun TextTestContent(textSelectionColors: TextSelectionColors) {
 
 @Composable
 private fun TextFieldTestContent(textSelectionColors: TextSelectionColors) {
-    Providers(AmbientTextSelectionColors provides textSelectionColors) {
+    Providers(LocalTextSelectionColors provides textSelectionColors) {
         Box(Modifier.testTag(Tag)) {
             BasicTextField(value = Text, onValueChange = {})
         }

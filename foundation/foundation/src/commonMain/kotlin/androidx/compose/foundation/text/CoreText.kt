@@ -45,8 +45,8 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.AmbientFontLoader
-import androidx.compose.foundation.text.selection.AmbientSelectionRegistrar
-import androidx.compose.foundation.text.selection.AmbientTextSelectionColors
+import androidx.compose.foundation.text.selection.LocalSelectionRegistrar
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.Selectable
 import androidx.compose.foundation.text.selection.SelectionRegistrar
 import androidx.compose.ui.semantics.getTextLayoutResult
@@ -107,10 +107,10 @@ internal fun CoreText(
     require(maxLines > 0) { "maxLines should be greater than 0" }
 
     // selection registrar, if no SelectionContainer is added ambient value will be null
-    val selectionRegistrar = AmbientSelectionRegistrar.current
+    val selectionRegistrar = LocalSelectionRegistrar.current
     val density = AmbientDensity.current
     val resourceLoader = AmbientFontLoader.current
-    val selectionBackgroundColor = AmbientTextSelectionColors.current.backgroundColor
+    val selectionBackgroundColor = LocalTextSelectionColors.current.backgroundColor
 
     val (placeholders, inlineComposables) = resolveInlineContent(text, inlineContent)
 

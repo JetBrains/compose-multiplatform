@@ -289,7 +289,7 @@ class ButtonTest {
         rule.setMaterialContent {
             surface = MaterialTheme.colors.surface
             primary = MaterialTheme.colors.primary
-            Providers(AmbientShapes provides Shapes(small = shape)) {
+            Providers(LocalShapes provides Shapes(small = shape)) {
                 Button(modifier = Modifier.testTag("myButton"), onClick = {}, elevation = null) {
                     Box(Modifier.preferredSize(10.dp, 10.dp))
                 }

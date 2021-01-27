@@ -52,7 +52,7 @@ import androidx.compose.ui.platform.AmbientFontLoader
 import androidx.compose.ui.platform.AmbientHapticFeedback
 import androidx.compose.ui.platform.AmbientTextInputService
 import androidx.compose.ui.platform.AmbientTextToolbar
-import androidx.compose.foundation.text.selection.AmbientTextSelectionColors
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.SimpleLayout
 import androidx.compose.ui.semantics.copyText
 import androidx.compose.ui.semantics.cutText
@@ -186,7 +186,7 @@ internal fun CoreTextField(
     val textInputService = if (!enabled || readOnly) null else AmbientTextInputService.current
     val density = AmbientDensity.current
     val resourceLoader = AmbientFontLoader.current
-    val selectionBackgroundColor = AmbientTextSelectionColors.current.backgroundColor
+    val selectionBackgroundColor = LocalTextSelectionColors.current.backgroundColor
 
     // Scroll state
     val singleLine = maxLines == 1 && !softWrap && imeOptions.singleLine

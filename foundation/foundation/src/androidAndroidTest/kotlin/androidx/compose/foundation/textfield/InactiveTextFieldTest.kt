@@ -25,7 +25,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.testTag
-import androidx.compose.foundation.text.selection.AmbientSelectionRegistrar
+import androidx.compose.foundation.text.selection.LocalSelectionRegistrar
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.assertIsNotEnabled
@@ -102,7 +102,7 @@ class InactiveTextFieldTest {
             InactiveTextField(
                 value = text,
                 modifier = Modifier.testTag(tag).width(100.dp).composed {
-                    assertThat(AmbientSelectionRegistrar.current).isNull()
+                    assertThat(LocalSelectionRegistrar.current).isNull()
                     Modifier
                 },
                 enabled = false
@@ -116,7 +116,7 @@ class InactiveTextFieldTest {
             InactiveTextField(
                 value = text,
                 modifier = Modifier.composed {
-                    assertThat(AmbientSelectionRegistrar.current).isNotNull()
+                    assertThat(LocalSelectionRegistrar.current).isNotNull()
                     Modifier
                 },
                 enabled = true

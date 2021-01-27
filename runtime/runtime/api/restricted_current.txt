@@ -898,7 +898,7 @@ package androidx.compose.runtime.snapshots {
 package androidx.compose.runtime.tooling {
 
   public final class InspectionTablesKt {
-    method public static androidx.compose.runtime.ProvidableCompositionLocal<java.util.Set<androidx.compose.runtime.CompositionData>> getInspectionTables();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<java.util.Set<androidx.compose.runtime.CompositionData>> getLocalInspectionTables();
   }
 
 }

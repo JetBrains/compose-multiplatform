@@ -23,7 +23,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.staticAmbientOf
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -275,7 +275,7 @@ private fun ScaffoldLayout(
 
             val bottomBarPlaceables = subcompose(ScaffoldLayoutContent.BottomBar) {
                 Providers(
-                    AmbientFabPlacement provides fabPlacement,
+                    LocalFabPlacement provides fabPlacement,
                     content = bottomBar
                 )
             }.fastMap { it.measure(looseConstraints) }
@@ -357,9 +357,10 @@ internal class FabPlacement(
 )
 
 /**
- * Ambient containing a [FabPlacement] that is read by [BottomAppBar] to calculate notch location.
+ * CompositionLocal containing a [FabPlacement] that is read by [BottomAppBar] to calculate notch
+ * location.
  */
-internal val AmbientFabPlacement = staticAmbientOf<FabPlacement?> { null }
+internal val LocalFabPlacement = staticCompositionLocalOf<FabPlacement?> { null }
 
 // FAB spacing above the bottom bar / bottom of the Scaffold
 private val FabSpacing = 16.dp

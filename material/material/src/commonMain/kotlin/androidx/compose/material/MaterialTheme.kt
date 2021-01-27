@@ -27,7 +27,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
-import androidx.compose.foundation.text.selection.AmbientTextSelectionColors
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 
 /**
  * A MaterialTheme defines the styling principles from the Material design specification.
@@ -72,13 +72,13 @@ fun MaterialTheme(
     }
     val selectionColors = rememberTextSelectionColors(rememberedColors)
     Providers(
-        AmbientColors provides rememberedColors,
+        LocalColors provides rememberedColors,
         AmbientContentAlpha provides ContentAlpha.high,
         AmbientIndication provides indicationFactory,
         AmbientRippleTheme provides MaterialRippleTheme,
-        AmbientShapes provides shapes,
-        AmbientTextSelectionColors provides selectionColors,
-        AmbientTypography provides typography
+        LocalShapes provides shapes,
+        LocalTextSelectionColors provides selectionColors,
+        LocalTypography provides typography
     ) {
         ProvideTextStyle(value = typography.body1, content = content)
     }
@@ -97,7 +97,7 @@ object MaterialTheme {
     val colors: Colors
         @Composable
         @ReadOnlyComposable
-        get() = AmbientColors.current
+        get() = LocalColors.current
 
     /**
      * Retrieves the current [Typography] at the call site's position in the hierarchy.
@@ -107,7 +107,7 @@ object MaterialTheme {
     val typography: Typography
         @Composable
         @ReadOnlyComposable
-        get() = AmbientTypography.current
+        get() = LocalTypography.current
 
     /**
      * Retrieves the current [Shapes] at the call site's position in the hierarchy.
@@ -115,7 +115,7 @@ object MaterialTheme {
     val shapes: Shapes
         @Composable
         @ReadOnlyComposable
-        get() = AmbientShapes.current
+        get() = LocalShapes.current
 }
 
 @OptIn(ExperimentalRippleApi::class)
