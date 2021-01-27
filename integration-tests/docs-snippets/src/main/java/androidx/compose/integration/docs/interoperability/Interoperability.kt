@@ -18,7 +18,7 @@
 // Ignore lint warnings in documentation snippets
 @file:Suppress(
     "unused", "UNUSED_PARAMETER", "UNUSED_VARIABLE", "UNUSED_ANONYMOUS_PARAMETER",
-    "RedundantSuspendModifier", "CascadeIf", "ClassName"
+    "RedundantSuspendModifier", "CascadeIf", "ClassName", "RemoveExplicitTypeArguments"
 )
 
 package androidx.compose.integration.docs.interoperability
@@ -48,6 +48,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.integration.docs.databinding.ExampleLayoutBinding
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -71,6 +72,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.platform.AmbientConfiguration
 import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.platform.ComposeView
@@ -630,6 +632,40 @@ private object BetaSnippets {
 
     private object InteropSnippet10 {
         @Composable
+        fun LoginButton(
+            onClick: () -> Unit,
+            modifier: Modifier = Modifier,
+        ) {
+            Button(
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = MaterialTheme.colors.secondary
+                ),
+                onClick = onClick,
+                modifier = modifier,
+            ) {
+                Text(stringResource(R.string.login))
+            }
+        }
+
+        class LoginViewButton @JvmOverloads constructor(
+            context: Context,
+            attrs: AttributeSet? = null,
+            defStyle: Int = 0
+        ) : AbstractComposeView(context, attrs, defStyle) {
+
+            var onClick by mutableStateOf<() -> Unit>({})
+
+            @Composable
+            override fun Content() {
+                YourAppTheme {
+                    LoginButton(onClick)
+                }
+            }
+        }
+    }
+
+    private object InteropSnippet11 {
+        @Composable
         fun SystemBroadcastReceiver(
             systemAction: String,
             onSystemEvent: (intent: Intent?) -> Unit
@@ -686,15 +722,16 @@ private object R {
     object string {
         const val ok = 4
         const val plane_description = 5
+        const val login = 6
     }
     object dimen {
-        const val padding_small = 6
+        const val padding_small = 7
     }
     object drawable {
-        const val ic_plane = 7
+        const val ic_plane = 8
     }
     object color {
-        const val Blue700 = 8
+        const val Blue700 = 9
     }
 }
 
@@ -730,6 +767,7 @@ private fun ExampleComposable() { }
 @Composable private fun AppCompatTheme(content: @Composable () -> Unit) { }
 @Composable private fun BlueTheme(content: @Composable () -> Unit) { }
 @Composable private fun PinkTheme(content: @Composable () -> Unit) { }
+@Composable private fun YourAppTheme(content: @Composable () -> Unit) { }
 @Composable private fun ProvideWindowInsets(content: @Composable () -> Unit) { }
 @Composable private fun Icon() { }
 
