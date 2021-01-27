@@ -135,7 +135,7 @@ private fun canBeSavedToBundle(value: Any): Boolean {
 private val AcceptableClasses = arrayOf(
     Serializable::class.java,
     Parcelable::class.java,
-    CharSequence::class.java,
+    String::class.java,
     SparseArray::class.java,
     Binder::class.java,
     Size::class.java,
