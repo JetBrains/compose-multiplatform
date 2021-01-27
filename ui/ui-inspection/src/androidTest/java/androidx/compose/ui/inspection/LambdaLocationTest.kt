@@ -21,6 +21,7 @@ import androidx.compose.ui.inspection.testdata.TestLambdas
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -33,6 +34,7 @@ class LambdaLocationTest {
     val rule = JvmtiRule()
 
     @Test
+    @Ignore // b/179040867
     fun test() {
         assertThat(LambdaLocation.resolve(TestLambdas.short))
             .isEqualTo(LambdaLocation("TestLambdas.kt", 20, 20))
