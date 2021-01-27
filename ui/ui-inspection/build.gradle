@@ -79,3 +79,7 @@ tasks.withType(KotlinCompile).configureEach {
         ]
     }
 }
+
+inspection {
+    name = "compose-ui-inspection.jar"
+}
