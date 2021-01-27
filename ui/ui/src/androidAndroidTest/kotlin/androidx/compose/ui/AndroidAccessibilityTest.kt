@@ -757,7 +757,6 @@ class AndroidAccessibilityTest {
     }
 
     @Test
-    @Ignore("b/178524529")
     fun testPaneDisappear() {
         rule.onNodeWithTag(PaneTag).assertDoesNotExist()
         isPaneVisible = true
@@ -770,7 +769,6 @@ class AndroidAccessibilityTest {
             )
             .assertIsDisplayed()
         waitForSubtreeEventToSend()
-        val paneNode = rule.onNodeWithTag(PaneTag).fetchSemanticsNode()
         isPaneVisible = false
         rule.onNodeWithTag(PaneTag).assertDoesNotExist()
         rule.runOnIdle {
@@ -778,8 +776,7 @@ class AndroidAccessibilityTest {
                 eq(androidComposeView),
                 argThat(
                     ArgumentMatcher {
-                        getAccessibilityEventSourceSemanticsNodeId(it) == paneNode.id &&
-                            it.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED &&
+                        it.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED &&
                             it.contentChangeTypes ==
                             AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED
                     }
