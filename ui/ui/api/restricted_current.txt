@@ -2245,7 +2245,7 @@ package androidx.compose.ui.platform {
   public final class DebugUtilsKt {
   }
 
-  public final class DisposableUiSavedStateRegistryKt {
+  public final class DisposableSaveableStateRegistryKt {
   }
 
   public interface InspectableValue {

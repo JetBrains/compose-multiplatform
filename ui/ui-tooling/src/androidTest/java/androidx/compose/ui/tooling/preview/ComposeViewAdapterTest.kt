@@ -238,10 +238,10 @@ class ComposeViewAdapterTest {
     }
 
     @Test
-    fun uiSavedStateRegistryUsedInsidePreview() {
+    fun saveableStateRegistryUsedInsidePreview() {
         assertRendersCorrectly(
             "androidx.compose.ui.tooling.SimpleComposablePreviewKt",
-            "UiSavedStateRegistryPreview"
+            "SaveableStateRegistryPreview"
         )
     }
 

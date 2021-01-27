@@ -20,7 +20,7 @@ package androidx.compose.runtime.saveable
  * The [Saver] describes how the object of [Original] class can be simplified and converted into
  * something which is [Saveable].
  *
- * What types can be saved is defined by [UiSavedStateRegistry], by default everything which can
+ * What types can be saved is defined by [SaveableStateRegistry], by default everything which can
  * be stored in the Bundle class can be saved.
  * The implementations can check that the provided value can be saved via [SaverScope.canBeSaved]
  *
@@ -46,7 +46,7 @@ interface Saver<Original, Saveable : Any> {
  * The [Saver] describes how the object of [Original] class can be simplified and converted into
  * something which is [Saveable].
  *
- * What types can be saved is defined by [UiSavedStateRegistry], by default everything which can
+ * What types can be saved is defined by [SaveableStateRegistry], by default everything which can
  * be stored in the Bundle class can be saved.
  * The implementations can check that the provided value can be saved via [SaverScope.canBeSaved]
  *
@@ -78,7 +78,7 @@ fun <Original, Saveable : Any> Saver(
  */
 fun interface SaverScope {
     /**
-     * What types can be saved is defined by [UiSavedStateRegistry], by default everything which can
+     * What types can be saved is defined by [SaveableStateRegistry], by default everything which can
      * be stored in the Bundle class can be saved.
      */
     fun canBeSaved(value: Any): Boolean

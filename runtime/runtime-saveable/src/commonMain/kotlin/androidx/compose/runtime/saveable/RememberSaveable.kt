@@ -22,8 +22,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.currentCompositeKeyHash
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.AmbientUiSavedStateRegistry
-import androidx.compose.runtime.savedinstancestate.UiSavedStateRegistry
 
 /**
  * Remember the value produced by [init].
@@ -68,7 +66,7 @@ fun <T : Any> rememberSaveable(
     @Suppress("UNCHECKED_CAST")
     (saver as Saver<T, Any>)
 
-    val registry = AmbientUiSavedStateRegistry.current
+    val registry = AmbientSaveableStateRegistry.current
     // value is restored using the registry or created via [init] lambda
     val value = remember(*inputs) {
         // TODO not restore when the input values changed (use hashKeys?) b/152014032
@@ -100,7 +98,7 @@ fun <T : Any> rememberSaveable(
     return value
 }
 
-private fun UiSavedStateRegistry.requireCanBeSaved(value: Any?) {
+private fun SaveableStateRegistry.requireCanBeSaved(value: Any?) {
     if (value != null && !canBeSaved(value)) {
         throw IllegalArgumentException(
             if (value is MutableState<*>) {
