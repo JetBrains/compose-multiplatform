@@ -45,7 +45,7 @@ package androidx.compose.material {
   }
 
   public static final class BackdropScaffoldState.Companion {
-    method public androidx.compose.runtime.savedinstancestate.Saver<androidx.compose.material.BackdropScaffoldState,?> Saver(androidx.compose.animation.core.AnimationClockObservable clock, androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, kotlin.jvm.functions.Function1<? super androidx.compose.material.BackdropValue,java.lang.Boolean> confirmStateChange, androidx.compose.material.SnackbarHostState snackbarHostState);
+    method public androidx.compose.runtime.saveable.Saver<androidx.compose.material.BackdropScaffoldState,?> Saver(androidx.compose.animation.core.AnimationClockObservable clock, androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, kotlin.jvm.functions.Function1<? super androidx.compose.material.BackdropValue,java.lang.Boolean> confirmStateChange, androidx.compose.material.SnackbarHostState snackbarHostState);
   }
 
   public enum BackdropValue {
@@ -68,7 +68,7 @@ package androidx.compose.material {
   }
 
   public static final class BottomDrawerState.Companion {
-    method public androidx.compose.runtime.savedinstancestate.Saver<androidx.compose.material.BottomDrawerState,androidx.compose.material.BottomDrawerValue> Saver(androidx.compose.animation.core.AnimationClockObservable clock, kotlin.jvm.functions.Function1<? super androidx.compose.material.BottomDrawerValue,java.lang.Boolean> confirmStateChange);
+    method public androidx.compose.runtime.saveable.Saver<androidx.compose.material.BottomDrawerState,androidx.compose.material.BottomDrawerValue> Saver(androidx.compose.animation.core.AnimationClockObservable clock, kotlin.jvm.functions.Function1<? super androidx.compose.material.BottomDrawerValue,java.lang.Boolean> confirmStateChange);
   }
 
   public enum BottomDrawerValue {
@@ -118,7 +118,7 @@ package androidx.compose.material {
   }
 
   public static final class BottomSheetState.Companion {
-    method public androidx.compose.runtime.savedinstancestate.Saver<androidx.compose.material.BottomSheetState,?> Saver(androidx.compose.animation.core.AnimationClockObservable clock, androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, kotlin.jvm.functions.Function1<? super androidx.compose.material.BottomSheetValue,java.lang.Boolean> confirmStateChange);
+    method public androidx.compose.runtime.saveable.Saver<androidx.compose.material.BottomSheetState,?> Saver(androidx.compose.animation.core.AnimationClockObservable clock, androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, kotlin.jvm.functions.Function1<? super androidx.compose.material.BottomSheetValue,java.lang.Boolean> confirmStateChange);
   }
 
   @androidx.compose.material.ExperimentalMaterialApi public enum BottomSheetValue {
@@ -257,7 +257,7 @@ package androidx.compose.material {
   }
 
   public static final class DismissState.Companion {
-    method public androidx.compose.runtime.savedinstancestate.Saver<androidx.compose.material.DismissState,androidx.compose.material.DismissValue> Saver(androidx.compose.animation.core.AnimationClockObservable clock, kotlin.jvm.functions.Function1<? super androidx.compose.material.DismissValue,java.lang.Boolean> confirmStateChange);
+    method public androidx.compose.runtime.saveable.Saver<androidx.compose.material.DismissState,androidx.compose.material.DismissValue> Saver(androidx.compose.animation.core.AnimationClockObservable clock, kotlin.jvm.functions.Function1<? super androidx.compose.material.DismissValue,java.lang.Boolean> confirmStateChange);
   }
 
   public enum DismissValue {
@@ -298,7 +298,7 @@ package androidx.compose.material {
   }
 
   public static final class DrawerState.Companion {
-    method public androidx.compose.runtime.savedinstancestate.Saver<androidx.compose.material.DrawerState,androidx.compose.material.DrawerValue> Saver(androidx.compose.animation.core.AnimationClockObservable clock, kotlin.jvm.functions.Function1<? super androidx.compose.material.DrawerValue,java.lang.Boolean> confirmStateChange);
+    method public androidx.compose.runtime.saveable.Saver<androidx.compose.material.DrawerState,androidx.compose.material.DrawerValue> Saver(androidx.compose.animation.core.AnimationClockObservable clock, kotlin.jvm.functions.Function1<? super androidx.compose.material.DrawerValue,java.lang.Boolean> confirmStateChange);
   }
 
   public enum DrawerValue {
@@ -418,7 +418,7 @@ package androidx.compose.material {
   }
 
   public static final class ModalBottomSheetState.Companion {
-    method public androidx.compose.runtime.savedinstancestate.Saver<androidx.compose.material.ModalBottomSheetState,?> Saver(androidx.compose.animation.core.AnimationClockObservable clock, androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, kotlin.jvm.functions.Function1<? super androidx.compose.material.ModalBottomSheetValue,java.lang.Boolean> confirmStateChange);
+    method public androidx.compose.runtime.saveable.Saver<androidx.compose.material.ModalBottomSheetState,?> Saver(androidx.compose.animation.core.AnimationClockObservable clock, androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, kotlin.jvm.functions.Function1<? super androidx.compose.material.ModalBottomSheetValue,java.lang.Boolean> confirmStateChange);
   }
 
   @androidx.compose.material.ExperimentalMaterialApi public enum ModalBottomSheetValue {
@@ -624,7 +624,7 @@ package androidx.compose.material {
   }
 
   public static final class SwipeableState.Companion {
-    method public <T> androidx.compose.runtime.savedinstancestate.Saver<androidx.compose.material.SwipeableState<T>,T> Saver(androidx.compose.animation.core.AnimationClockObservable clock, androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> confirmStateChange);
+    method public <T> androidx.compose.runtime.saveable.Saver<androidx.compose.material.SwipeableState<T>,T> Saver(androidx.compose.animation.core.AnimationClockObservable clock, androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> confirmStateChange);
   }
 
   @androidx.compose.runtime.Stable public interface SwitchColors {

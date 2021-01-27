@@ -19,7 +19,7 @@ package androidx.compose.foundation.lazy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -44,14 +44,14 @@ class LazyItemStateRestoration {
         restorationTester.setContent {
             LazyColumn {
                 item {
-                    realState[0] = rememberSavedInstanceState { counter0++ }
+                    realState[0] = rememberSaveable { counter0++ }
                     Box(Modifier.size(1.dp))
                 }
                 items((1..2).toList()) {
                     if (it == 1) {
-                        realState[1] = rememberSavedInstanceState { counter1++ }
+                        realState[1] = rememberSaveable { counter1++ }
                     } else {
-                        realState[2] = rememberSavedInstanceState { counter2++ }
+                        realState[2] = rememberSaveable { counter2++ }
                     }
                     Box(Modifier.size(1.dp))
                 }
@@ -88,7 +88,7 @@ class LazyItemStateRestoration {
             ) {
                 items((0..1).toList()) {
                     if (it == 0) {
-                        realState = rememberSavedInstanceState { counter0++ }
+                        realState = rememberSaveable { counter0++ }
                         DisposableEffect(Unit) {
                             onDispose {
                                 itemDisposed = true
@@ -134,9 +134,9 @@ class LazyItemStateRestoration {
             ) {
                 items((0..1).toList()) {
                     if (it == 0) {
-                        realState[0] = rememberSavedInstanceState { counter0++ }
+                        realState[0] = rememberSaveable { counter0++ }
                     } else {
-                        realState[1] = rememberSavedInstanceState { counter1++ }
+                        realState[1] = rememberSaveable { counter1++ }
                     }
                     Box(Modifier.size(30.dp))
                 }
@@ -185,7 +185,7 @@ class LazyItemStateRestoration {
                     if (it == 0) {
                         LazyRow {
                             item {
-                                realState = rememberSavedInstanceState { counter0++ }
+                                realState = rememberSaveable { counter0++ }
                                 DisposableEffect(Unit) {
                                     onDispose {
                                         itemDisposed = true

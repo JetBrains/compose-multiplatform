@@ -33,8 +33,8 @@ import androidx.compose.foundation.layout.preferredSizeIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.Saver
-import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.nestedscroll.nestedScroll
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
@@ -286,7 +286,7 @@ fun rememberDrawerState(
     confirmStateChange: (DrawerValue) -> Boolean = { true }
 ): DrawerState {
     val clock = AmbientAnimationClock.current.asDisposableClock()
-    return rememberSavedInstanceState(
+    return rememberSaveable(
         clock,
         saver = DrawerState.Saver(clock, confirmStateChange)
     ) {
@@ -306,7 +306,7 @@ fun rememberBottomDrawerState(
     confirmStateChange: (BottomDrawerValue) -> Boolean = { true }
 ): BottomDrawerState {
     val clock = AmbientAnimationClock.current.asDisposableClock()
-    return rememberSavedInstanceState(
+    return rememberSaveable(
         clock,
         saver = BottomDrawerState.Saver(clock, confirmStateChange)
     ) {

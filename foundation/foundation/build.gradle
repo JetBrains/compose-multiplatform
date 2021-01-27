@@ -41,7 +41,6 @@ dependencies {
         api "androidx.annotation:annotation:1.1.0"
         api project(':compose:animation:animation')
         api project(':compose:runtime:runtime')
-        api project(':compose:runtime:runtime-saved-instance-state')
         api project(':compose:ui:ui')
 
         implementation(KOTLIN_STDLIB_COMMON)
@@ -92,7 +91,6 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation(KOTLIN_STDLIB_COMMON)
                 api project(':compose:animation:animation')
                 api project(':compose:runtime:runtime')
-                api project(':compose:runtime:runtime-saved-instance-state')
                 api project(':compose:ui:ui')
                 implementation project(":compose:ui:ui-text")
                 implementation project(":compose:ui:ui-util")

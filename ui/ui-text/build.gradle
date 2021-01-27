@@ -43,7 +43,7 @@ if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         api "androidx.annotation:annotation:1.1.0"
 
         implementation project(":compose:runtime:runtime")
-        implementation project(":compose:runtime:runtime-saved-instance-state")
+        implementation project(":compose:runtime:runtime-saveable")
         implementation project(":compose:ui:ui-util")
         implementation(KOTLIN_STDLIB)
         implementation "androidx.collection:collection:1.1.0"
@@ -101,7 +101,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 api project(":compose:ui:ui-unit")
 
                 implementation project(":compose:runtime:runtime")
-                implementation project(":compose:runtime:runtime-saved-instance-state")
+                implementation project(":compose:runtime:runtime-saveable")
                 implementation project(":compose:ui:ui-util")
             }
 

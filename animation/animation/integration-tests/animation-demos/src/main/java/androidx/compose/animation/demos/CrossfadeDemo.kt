@@ -27,9 +27,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.savedinstancestate.ExperimentalRestorableStateHolder
-import androidx.compose.runtime.savedinstancestate.rememberRestorableStateHolder
-import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -38,7 +37,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import kotlin.random.Random
 
-@OptIn(ExperimentalRestorableStateHolder::class)
 @Composable
 fun CrossfadeDemo() {
     var current by savedInstanceState { 0 }
@@ -58,11 +56,12 @@ fun CrossfadeDemo() {
                 )
             }
         }
-        val restorableStateHolder = rememberRestorableStateHolder<Int>()
+        val saveableStateHolder = rememberSaveableStateHolder()
         Crossfade(current = current) { current ->
-            restorableStateHolder.RestorableStateProvider(current) {
+            saveableStateHolder.SaveableStateProvider(current) {
                 val tab = tabs[current]
-                tab.lastInt = rememberSavedInstanceState { Random.nextInt() }
+                arrayOf<Any?>()
+                tab.lastInt = rememberSaveable { Random.nextInt() }
                 Box(Modifier.fillMaxSize().background(tab.color))
             }
         }

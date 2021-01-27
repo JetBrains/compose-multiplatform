@@ -23,8 +23,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.ExperimentalRestorableStateHolder
-import androidx.compose.runtime.savedinstancestate.rememberRestorableStateHolder
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -153,19 +152,18 @@ internal fun LazyList(
 /**
  * Converts item content factory to another one which adds auto state restoration functionality.
  */
-@OptIn(ExperimentalRestorableStateHolder::class)
 @Composable
 internal fun wrapWithStateRestoration(
     itemContentFactory: LazyItemScope.(Int) -> @Composable () -> Unit
 ): LazyItemScope.(Int) -> @Composable () -> Unit {
-    val restorableStateHolder = rememberRestorableStateHolder<Any>()
+    val saveableStateHolder = rememberSaveableStateHolder()
     return remember(itemContentFactory) {
         { index ->
             val content = itemContentFactory(index)
             // we just wrap our original lambda with the one which auto restores the state
             // currently we use index in the list as a key for the restoration, but in the future
             // we will use the user provided key
-            (@Composable { restorableStateHolder.RestorableStateProvider(index, content) })
+            (@Composable { saveableStateHolder.SaveableStateProvider(index, content) })
         }
     }
 }

@@ -154,7 +154,7 @@ package androidx.compose.foundation {
   }
 
   public static final class ScrollState.Companion {
-    method public androidx.compose.runtime.savedinstancestate.Saver<androidx.compose.foundation.ScrollState,?> Saver(androidx.compose.foundation.animation.FlingConfig flingConfig, androidx.compose.animation.core.AnimationClockObservable animationClock, androidx.compose.foundation.InteractionState? interactionState);
+    method public androidx.compose.runtime.saveable.Saver<androidx.compose.foundation.ScrollState,?> Saver(androidx.compose.foundation.animation.FlingConfig flingConfig, androidx.compose.animation.core.AnimationClockObservable animationClock, androidx.compose.foundation.InteractionState? interactionState);
   }
 
 }
@@ -399,7 +399,7 @@ package androidx.compose.foundation.lazy {
   }
 
   public static final class LazyListState.Companion {
-    method public androidx.compose.runtime.savedinstancestate.Saver<androidx.compose.foundation.lazy.LazyListState,?> Saver(androidx.compose.foundation.animation.FlingConfig flingConfig, androidx.compose.animation.core.AnimationClockObservable animationClock, androidx.compose.foundation.InteractionState? interactionState);
+    method public androidx.compose.runtime.saveable.Saver<androidx.compose.foundation.lazy.LazyListState,?> Saver(androidx.compose.foundation.animation.FlingConfig flingConfig, androidx.compose.animation.core.AnimationClockObservable animationClock, androidx.compose.foundation.InteractionState? interactionState);
   }
 
   public final class LazyListStateKt {
