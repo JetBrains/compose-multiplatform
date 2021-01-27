@@ -106,6 +106,8 @@ val taskNamesKnownToDuplicateOutputs = setOf(
     "jarRelease",
     "jarDebug",
     "kotlinSourcesJar",
+    "releaseSourcesJar",
+    "sourceJarRelease",
     "lint",
     "lintFix",
     "lintVital",
