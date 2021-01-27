@@ -41,7 +41,6 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.math.sign
 
-@PublishedApi
 internal fun rowColumnMeasureBlocks(
     orientation: LayoutOrientation,
     arrangement: (Int, IntArray, LayoutDirection, Density, IntArray) -> Unit,
