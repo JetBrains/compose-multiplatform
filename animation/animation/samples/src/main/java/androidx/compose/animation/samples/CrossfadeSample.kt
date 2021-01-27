@@ -24,7 +24,7 @@ import androidx.compose.runtime.Composable
 @Sampled
 @Composable
 fun CrossfadeSample() {
-    Crossfade(current = "A") { screen ->
+    Crossfade(targetState = "A") { screen ->
         when (screen) {
             "A" -> Text("Page A")
             "B" -> Text("Page B")
