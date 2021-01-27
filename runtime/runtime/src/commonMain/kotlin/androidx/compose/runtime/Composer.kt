@@ -250,39 +250,46 @@ internal enum class InvalidationResult {
 
 /**
  * An instance to hold a value provided by [Providers] and is created by the
- * [ProvidableAmbient.provides] infixed operator. If [canOverride] is `false`, the
+ * [ProvidableCompositionLocal.provides] infixed operator. If [canOverride] is `false`, the
  * provided value will not overwrite a potentially already existing value in the scope.
  */
 class ProvidedValue<T> internal constructor(
-    val ambient: Ambient<T>,
+    val compositionLocal: CompositionLocal<T>,
     val value: T,
     val canOverride: Boolean
 )
 
 /**
- * An ambient map is is an immutable map that maps ambient keys to a provider of their current
- * value. It is used to represent the combined scope of all provided ambients.
+ * A [CompositionLocal] map is is an immutable map that maps [CompositionLocal] keys to a provider
+ * of their current value. It is used to represent the combined scope of all provided
+ * [CompositionLocal]s.
  */
-internal typealias AmbientMap = PersistentMap<Ambient<Any?>, State<Any?>>
+internal typealias CompositionLocalMap = PersistentMap<CompositionLocal<Any?>, State<Any?>>
 
-internal inline fun AmbientMap.mutate(
-    mutator: (MutableMap<Ambient<Any?>, State<Any?>>) -> Unit
-): AmbientMap = builder().apply(mutator).build()
-
-@Suppress("UNCHECKED_CAST")
-internal fun <T> AmbientMap.contains(key: Ambient<T>) = this.containsKey(key as Ambient<Any?>)
+internal inline fun CompositionLocalMap.mutate(
+    mutator: (MutableMap<CompositionLocal<Any?>, State<Any?>>) -> Unit
+): CompositionLocalMap = builder().apply(mutator).build()
 
 @Suppress("UNCHECKED_CAST")
-internal fun <T> AmbientMap.getValueOf(key: Ambient<T>) = this[key as Ambient<Any?>]?.value as T
+internal fun <T> CompositionLocalMap.contains(key: CompositionLocal<T>) =
+    this.containsKey(key as CompositionLocal<Any?>)
+
+@Suppress("UNCHECKED_CAST")
+internal fun <T> CompositionLocalMap.getValueOf(key: CompositionLocal<T>) =
+    this[key as CompositionLocal<Any?>]?.value as T
 
 @Composable
-private fun ambientMapOf(values: Array<out ProvidedValue<*>>, parentScope: AmbientMap): AmbientMap {
-    val result: AmbientMap = persistentHashMapOf()
+private fun compositionLocalMapOf(
+    values: Array<out ProvidedValue<*>>,
+    parentScope: CompositionLocalMap
+): CompositionLocalMap {
+    val result: CompositionLocalMap = persistentHashMapOf()
     return result.mutate {
         for (provided in values) {
-            if (provided.canOverride || !parentScope.contains(provided.ambient)) {
+            if (provided.canOverride || !parentScope.contains(provided.compositionLocal)) {
                 @Suppress("UNCHECKED_CAST")
-                it[provided.ambient as Ambient<Any?>] = provided.ambient.provided(provided.value)
+                it[provided.compositionLocal as CompositionLocal<Any?>] =
+                    provided.compositionLocal.provided(provided.value)
             }
         }
     }
@@ -319,7 +326,7 @@ interface Composer {
      *
      * Reflects whether the [Composable] function can skip. Even if a [Composable] function is
      * called with the same parameters it might still need to run because, for example, a new
-     * value was provided for an ambient created by [staticAmbientOf].
+     * value was provided for a [CompositionLocal] created by [staticCompositionLocalOf].
      */
     @ComposeCompilerApi
     val skipping: Boolean
@@ -786,19 +793,19 @@ interface Composer {
     /**
      * A Compose internal function. DO NOT call directly.
      *
-     * Return the ambient value associated with [key]. This is the primitive function used to
-     * implement [Ambient.current].
+     * Return the [CompositionLocal] value associated with [key]. This is the primitive function
+     * used to implement [CompositionLocal.current].
      *
-     * @param key the ambient value to be retrieved.
+     * @param key the [CompositionLocal] value to be retrieved.
      */
     @InternalComposeApi
-    fun <T> consume(key: Ambient<T>): T
+    fun <T> consume(key: CompositionLocal<T>): T
 
     /**
      * A Compose internal function. DO NOT call directly.
      *
-     * Provide the given values for tha associated [Ambient] keys. This is the primitive function
-     * used to implement [Providers].
+     * Provide the given values for the associated [CompositionLocal] keys. This is the primitive
+     * function used to implement [Providers].
      *
      * @param values an array of value to provider key pairs.
      */
@@ -862,7 +869,7 @@ interface Composer {
      *
      * Build a composition reference that can be used to created a subcomposition. A composition
      * reference is used to communicate information from this composition to the subcompositions
-     * such as the all the ambients provided at the point the reference is created.
+     * such as the all the [CompositionLocal]s provided at the point the reference is created.
      */
     @InternalComposeApi
     fun buildReference(): CompositionReference
@@ -965,8 +972,8 @@ internal class ComposerImpl(
     private val invalidations: MutableList<Invalidation> = mutableListOf()
     internal var pendingInvalidScopes = false
     private val entersStack = IntStack()
-    private var parentProvider: AmbientMap = persistentHashMapOf()
-    private val providerUpdates = HashMap<Int, AmbientMap>()
+    private var parentProvider: CompositionLocalMap = persistentHashMapOf()
+    private val providerUpdates = HashMap<Int, CompositionLocalMap>()
     private var providersInvalid = false
     private val providersInvalidStack = IntStack()
     private var childrenComposing: Int = 0
@@ -1130,12 +1137,12 @@ internal class ComposerImpl(
 
         // parent reference management
         parentReference.startComposing()
-        parentProvider = parentReference.getAmbientScope()
+        parentProvider = parentReference.getCompositionLocalScope()
         providersInvalidStack.push(providersInvalid.asInt())
         providersInvalid = changed(parentProvider)
         collectKeySources = parentReference.collectingKeySources
         collectParameterInformation = parentReference.collectingParameterInformation
-        resolveAmbient(InspectionTables, parentProvider)?.let {
+        resolveCompositionLocal(InspectionTables, parentProvider)?.let {
             it.add(slotTable)
             parentReference.recordInspectionTable(it)
         }
@@ -1759,17 +1766,17 @@ internal class ComposerImpl(
     }
 
     /**
-     * Return the current ambient scope which was provided by a parent group.
+     * Return the current [CompositionLocal] scope which was provided by a parent group.
      */
-    private fun currentAmbientScope(): AmbientMap {
+    private fun currentCompositionLocalScope(): CompositionLocalMap {
         if (inserting && hasProvider) {
             var current = writer.parent
             while (current > 0) {
-                if (writer.groupKey(current) == ambientMapKey &&
-                    writer.groupObjectKey(current) == ambientMap
+                if (writer.groupKey(current) == compositionLocalMapKey &&
+                    writer.groupObjectKey(current) == compositionLocalMap
                 ) {
                     @Suppress("UNCHECKED_CAST")
-                    return writer.groupAux(current) as AmbientMap
+                    return writer.groupAux(current) as CompositionLocalMap
                 }
                 current = writer.parent(current)
             }
@@ -1777,11 +1784,12 @@ internal class ComposerImpl(
         if (slotTable.groupsSize > 0) {
             var current = reader.parent
             while (current > 0) {
-                if (reader.groupKey(current) == ambientMapKey &&
-                    reader.groupObjectKey(current) == ambientMap
+                if (reader.groupKey(current) == compositionLocalMapKey &&
+                    reader.groupObjectKey(current) == compositionLocalMap
                 ) {
                     @Suppress("UNCHECKED_CAST")
-                    return providerUpdates[current] ?: reader.groupAux(current) as AmbientMap
+                    return providerUpdates[current]
+                        ?: reader.groupAux(current) as CompositionLocalMap
                 }
                 current = reader.parent(current)
             }
@@ -1790,27 +1798,28 @@ internal class ComposerImpl(
     }
 
     /**
-     * Return the ambient scope for the location provided. If this is while the composer is
-     * composing then this is a query from a sub-composition that is being recomposed by this
-     * compose which might be inserting the sub-composition. In that case the current scope
+     * Return the [CompositionLocal] scope for the location provided. If this is while the
+     * composer is composing then this is a query from a sub-composition that is being recomposed
+     * by this compose which might be inserting the sub-composition. In that case the current scope
      * is the correct scope.
      */
-    private fun ambientScopeAt(location: Int): AmbientMap {
+    private fun compositionLocalScopeAt(location: Int): CompositionLocalMap {
         if (isComposing) {
             // The sub-composer is being composed as part of a nested composition then use the
-            // current ambient scope as the one in the slot table might be out of date.
-            return currentAmbientScope()
+            // current CompositionLocal scope as the one in the slot table might be out of date.
+            return currentCompositionLocalScope()
         }
 
         if (location >= 0) {
             slotTable.read { reader ->
                 var current = location
                 while (current > 0) {
-                    if (reader.groupKey(current) == ambientMapKey &&
-                        reader.groupObjectKey(current) == ambientMap
+                    if (reader.groupKey(current) == compositionLocalMapKey &&
+                        reader.groupObjectKey(current) == compositionLocalMap
                     ) {
                         @Suppress("UNCHECKED_CAST")
-                        return providerUpdates[current] ?: reader.groupAux(current) as AmbientMap
+                        return providerUpdates[current]
+                            ?: reader.groupAux(current) as CompositionLocalMap
                     }
                     current = reader.parent(current)
                 }
@@ -1825,9 +1834,9 @@ internal class ComposerImpl(
      * inserts, updates and deletes to the providers.
      */
     private fun updateProviderMapGroup(
-        parentScope: AmbientMap,
-        currentProviders: AmbientMap
-    ): AmbientMap {
+        parentScope: CompositionLocalMap,
+        currentProviders: CompositionLocalMap
+    ): CompositionLocalMap {
         val providerScope = parentScope.mutate { it.putAll(currentProviders) }
         startGroup(providerMapsKey, providerMaps)
         changed(providerScope)
@@ -1838,15 +1847,17 @@ internal class ComposerImpl(
 
     @InternalComposeApi
     override fun startProviders(values: Array<out ProvidedValue<*>>) {
-        val parentScope = currentAmbientScope()
+        val parentScope = currentCompositionLocalScope()
         startGroup(providerKey, provider)
-        // The group is needed here because ambientMapOf() might change the number or kind of
-        // slots consumed depending on the content of values to remember, for example, the value
-        // holders used last time.
+        // The group is needed here because compositionLocalMapOf() might change the number or
+        // kind of slots consumed depending on the content of values to remember, for example, the
+        // value holders used last time.
         startGroup(providerValuesKey, providerValues)
-        val currentProviders = invokeComposableForResult(this) { ambientMapOf(values, parentScope) }
+        val currentProviders = invokeComposableForResult(this) {
+            compositionLocalMapOf(values, parentScope)
+        }
         endGroup()
-        val providers: AmbientMap
+        val providers: CompositionLocalMap
         val invalid: Boolean
         if (inserting) {
             providers = updateProviderMapGroup(parentScope, currentProviders)
@@ -1854,10 +1865,10 @@ internal class ComposerImpl(
             hasProvider = true
         } else {
             @Suppress("UNCHECKED_CAST")
-            val oldScope = reader.groupGet(0) as AmbientMap
+            val oldScope = reader.groupGet(0) as CompositionLocalMap
 
             @Suppress("UNCHECKED_CAST")
-            val oldValues = reader.groupGet(1) as AmbientMap
+            val oldValues = reader.groupGet(1) as CompositionLocalMap
 
             // skipping is true iff parentScope has not changed.
             if (!skipping || oldValues != currentProviders) {
@@ -1883,7 +1894,7 @@ internal class ComposerImpl(
         }
         providersInvalidStack.push(providersInvalid.asInt())
         providersInvalid = invalid
-        start(ambientMapKey, ambientMap, false, providers)
+        start(compositionLocalMapKey, compositionLocalMap, false, providers)
     }
 
     @InternalComposeApi
@@ -1894,7 +1905,8 @@ internal class ComposerImpl(
     }
 
     @InternalComposeApi
-    override fun <T> consume(key: Ambient<T>): T = resolveAmbient(key, currentAmbientScope())
+    override fun <T> consume(key: CompositionLocal<T>): T =
+        resolveCompositionLocal(key, currentCompositionLocalScope())
 
     /**
      * Create or use a memoized `CompositionReference` instance at this position in the slot table.
@@ -1921,13 +1933,20 @@ internal class ComposerImpl(
         return ref.ref
     }
 
-    private fun <T> resolveAmbient(key: Ambient<T>, scope: AmbientMap): T =
-        if (scope.contains(key)) scope.getValueOf(key) else parentReference.getAmbient(key)
+    private fun <T> resolveCompositionLocal(
+        key: CompositionLocal<T>,
+        scope: CompositionLocalMap
+    ): T = if (scope.contains(key)) {
+        scope.getValueOf(key)
+    } else {
+        parentReference.getCompositionLocal(key)
+    }
 
-    internal fun <T> parentAmbient(key: Ambient<T>): T = resolveAmbient(key, currentAmbientScope())
+    internal fun <T> parentCompositionLocal(key: CompositionLocal<T>): T =
+        resolveCompositionLocal(key, currentCompositionLocalScope())
 
-    private fun <T> parentAmbient(key: Ambient<T>, location: Int): T =
-        resolveAmbient(key, ambientScopeAt(location))
+    private fun <T> parentCompositionLocal(key: CompositionLocal<T>, location: Int): T =
+        resolveCompositionLocal(key, compositionLocalScopeAt(location))
 
     /**
      * The number of changes that have been scheduled to be applied during [applyChanges].
@@ -3089,19 +3108,20 @@ internal class ComposerImpl(
             parentReference.invalidate(composition)
         }
 
-        override fun <T> getAmbient(key: Ambient<T>): T {
+        override fun <T> getCompositionLocal(key: CompositionLocal<T>): T {
             val anchor = scope.anchor
             return if (anchor != null && anchor.valid) {
-                parentAmbient(key, anchor.toIndexFor(slotTable))
+                parentCompositionLocal(key, anchor.toIndexFor(slotTable))
             } else {
-                // The composition is composing and the ambient has not landed in the slot table
-                // yet. This is a synchronous read from a sub-composition so the current ambient
-                parentAmbient(key)
+                // The composition is composing and the CompositionLocal has not landed in the slot
+                // table yet. This is a synchronous read from a sub-composition so the current
+                // CompositionLocal.
+                parentCompositionLocal(key)
             }
         }
 
-        override fun getAmbientScope(): AmbientMap {
-            return ambientScopeAt(scope.anchor?.toIndexFor(slotTable) ?: 0)
+        override fun getCompositionLocalScope(): CompositionLocalMap {
+            return compositionLocalScopeAt(scope.anchor?.toIndexFor(slotTable) ?: 0)
         }
 
         override fun recordInspectionTable(table: MutableSet<CompositionData>) {
@@ -3561,11 +3581,11 @@ internal const val providerKey = 201
 internal val provider = OpaqueKey("provider")
 
 @PublishedApi
-internal const val ambientMapKey = 202
+internal const val compositionLocalMapKey = 202
 
 @PublishedApi
 @Suppress("HiddenTypeParameter")
-internal val ambientMap = OpaqueKey("ambientMap")
+internal val compositionLocalMap = OpaqueKey("compositionLocalMap")
 
 @PublishedApi
 internal const val providerValuesKey = 203

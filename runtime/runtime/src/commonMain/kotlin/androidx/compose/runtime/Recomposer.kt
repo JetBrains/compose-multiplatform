@@ -603,7 +603,7 @@ class Recomposer(
 
     internal override fun recordInspectionTable(table: MutableSet<CompositionData>) {
         // TODO: The root recomposer might be a better place to set up inspection
-        // than the current configuration with an ambient
+        // than the current configuration with an CompositionLocal
     }
 
     internal override fun registerComposition(composition: ControlledComposition) {

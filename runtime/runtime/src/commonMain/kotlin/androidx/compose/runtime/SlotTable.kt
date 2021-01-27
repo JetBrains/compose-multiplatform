@@ -33,9 +33,9 @@ import kotlin.math.min
 //                and data anchors in the group fields which are also anchors but not Anchor
 //                instances.
 // Aux          - auxiliary data that can be associated with a node and set independent of groups
-//                slots. This is used, for example, by the composer to record ambient maps as the
-//                map is not known at the when the group starts, only when the map is calculated
-//                after using an arbitrary number of slots.
+//                slots. This is used, for example, by the composer to record CompositionLocal
+//                maps as the map is not known at the when the group starts, only when the map is
+//                calculated after using an arbitrary number of slots.
 // Data         - the portion of the slot array associated with the group that contains the slots as
 //                well as the ObjectKey, Node, and Aux if present. The slots for a group are after
 //                the optional fixed group data.

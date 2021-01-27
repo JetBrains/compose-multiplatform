@@ -548,10 +548,10 @@ class EffectsTests : BaseComposeTest() {
     }
 
     @Test
-    fun testAmbient1() {
+    fun testCompositionLocal1() {
         val tv1Id = 100
 
-        val Foo = ambientOf<String>()
+        val Foo = compositionLocalOf<String>()
         var current by mutableStateOf("Hello World")
 
         @Composable
@@ -575,20 +575,20 @@ class EffectsTests : BaseComposeTest() {
     }
 
     @Test
-    fun testAmbient2() {
-        val MyAmbient = ambientOf<Int> { throw Exception("not set") }
+    fun testCompositionLocal2() {
+        val MyCompositionLocal = compositionLocalOf<Int> { throw Exception("not set") }
 
         var scope: RecomposeScope? = null
-        var ambientValue = 1
+        var compositionLocalValue = 1
 
         @Composable fun SimpleComposable2() {
-            val value = MyAmbient.current
+            val value = MyCompositionLocal.current
             TextView(text = "$value")
         }
 
         @Composable fun SimpleComposable() {
             scope = currentRecomposeScope
-            Providers(MyAmbient provides ambientValue++) {
+            Providers(MyCompositionLocal provides compositionLocalValue++) {
                 SimpleComposable2()
                 Button(id = 123)
             }
@@ -616,22 +616,22 @@ class EffectsTests : BaseComposeTest() {
     }
 
     @Test
-    fun testAmbient_RecomposeScope() {
-        val MyAmbient = ambientOf<Int> { throw Exception("not set") }
+    fun testCompositionLocal_RecomposeScope() {
+        val MyCompositionLocal = compositionLocalOf<Int> { throw Exception("not set") }
 
         var scope: RecomposeScope? = null
         var componentComposed = false
-        var ambientValue = 1
+        var compositionLocalValue = 1
 
         @Composable fun SimpleComposable2() {
             componentComposed = true
-            val value = MyAmbient.current
+            val value = MyCompositionLocal.current
             TextView(text = "$value")
         }
 
         @Composable fun SimpleComposable() {
             scope = currentRecomposeScope
-            Providers(MyAmbient provides ambientValue++) {
+            Providers(MyCompositionLocal provides compositionLocalValue++) {
                 SimpleComposable2()
                 Button(id = 123)
             }
