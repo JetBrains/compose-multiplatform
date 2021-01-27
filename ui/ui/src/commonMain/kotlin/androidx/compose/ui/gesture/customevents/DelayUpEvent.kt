@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.gesture.customevents
 
-import androidx.compose.ui.gesture.DoubleTapGestureFilter
 import androidx.compose.ui.gesture.TapGestureFilter
 import androidx.compose.ui.input.pointer.CustomEvent
 import androidx.compose.ui.input.pointer.PointerId

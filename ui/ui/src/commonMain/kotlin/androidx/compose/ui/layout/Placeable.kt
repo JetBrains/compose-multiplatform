@@ -16,13 +16,11 @@
 
 package androidx.compose.ui.layout
 
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.round
 
 /**
  * A [Placeable] corresponds to a child layout that can be positioned by its
@@ -150,21 +148,6 @@ abstract class Placeable {
             placeAutoMirrored(position, zIndex, null)
 
         /**
-         * Place a [Placeable] at [position] in its parent's coordinate system.
-         * If the layout direction is right-to-left, the given [position] will be horizontally
-         * mirrored so that the position of the [Placeable] implicitly reacts to RTL layout
-         * direction contexts.
-         * If this method is used outside the [MeasureScope.layout] positioning block, the
-         * automatic position mirroring will not happen and the [Placeable] will be placed at the
-         * given [position], similar to the [place] method.
-         */
-        @Deprecated(
-            "Use the overloads with IntOffset instead",
-            ReplaceWith("placeRelative(position.round())", "androidx.compose.ui.unit.round")
-        )
-        fun Placeable.placeRelative(position: Offset) = placeRelative(position.round())
-
-        /**
          * Place a [Placeable] at [x], [y] in its parent's coordinate system.
          * If the layout direction is right-to-left, the given position will be horizontally
          * mirrored so that the position of the [Placeable] implicitly reacts to RTL layout
@@ -179,17 +162,6 @@ abstract class Placeable {
          */
         fun Placeable.placeRelative(x: Int, y: Int, zIndex: Float = 0f) =
             placeRelative(IntOffset(x, y), zIndex)
-
-        /**
-         * Place a [Placeable] at [position] in its parent's coordinate system.
-         * Unlike [placeRelative], the given [position] will not implicitly react in RTL layout direction
-         * contexts.
-         */
-        @Deprecated(
-            "Use the overloads with IntOffset instead",
-            ReplaceWith("place(position.round())", "androidx.compose.ui.unit.round")
-        )
-        fun Placeable.place(position: Offset) = place(position.round())
 
         /**
          * Place a [Placeable] at [x], [y] in its parent's coordinate system.

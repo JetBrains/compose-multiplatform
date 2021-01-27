@@ -18,13 +18,9 @@ package androidx.compose.ui.unit
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.util.packFloats
 import androidx.compose.ui.util.unpackFloat1
 import androidx.compose.ui.util.unpackFloat2
-
-@Deprecated("Use component constructor", ReplaceWith("Velocity(offset.x, offset.y"))
-fun Velocity(offset: Offset) = Velocity(offset.x, offset.y)
 
 /**
  * Constructs an Velocity from the given relative x and y velocities.
@@ -42,13 +38,6 @@ inline fun Velocity(x: Float, y: Float) = Velocity(packFloats(x, y))
 @Suppress("EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
 inline class Velocity(val packedValue: Long) {
-    @Deprecated(
-        "Don't convert directly to Offset. Use the x & y components.",
-        ReplaceWith("Offset(x, y)"),
-        level = DeprecationLevel.ERROR
-    )
-    val pixelsPerSecond: Offset get() = Offset(x, y)
-
     /**
      * The horizontal component of the velocity in pixels per second.
      */

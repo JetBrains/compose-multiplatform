@@ -17,7 +17,6 @@ package androidx.compose.ui.graphics {
 
   public final class AndroidImageBitmapKt {
     method public static android.graphics.Bitmap asAndroidBitmap(androidx.compose.ui.graphics.ImageBitmap);
-    method @Deprecated public static androidx.compose.ui.graphics.ImageBitmap asImageAsset(android.graphics.Bitmap);
     method public static androidx.compose.ui.graphics.ImageBitmap asImageBitmap(android.graphics.Bitmap);
     method public static androidx.compose.ui.graphics.ImageBitmap imageFromResource(android.content.res.Resources res, int resId);
   }
@@ -35,7 +34,6 @@ package androidx.compose.ui.graphics {
     method public long getColor-0d7_KjU();
     method public androidx.compose.ui.graphics.ColorFilter? getColorFilter();
     method public androidx.compose.ui.graphics.FilterQuality getFilterQuality();
-    method public android.graphics.PathEffect? getNativePathEffect();
     method public androidx.compose.ui.graphics.PathEffect? getPathEffect();
     method public android.graphics.Shader? getShader();
     method public androidx.compose.ui.graphics.StrokeCap getStrokeCap();
@@ -50,7 +48,6 @@ package androidx.compose.ui.graphics {
     method public void setColor-8_81llA(long color);
     method public void setColorFilter(androidx.compose.ui.graphics.ColorFilter? value);
     method public void setFilterQuality(androidx.compose.ui.graphics.FilterQuality value);
-    method public void setNativePathEffect(android.graphics.PathEffect? value);
     method public void setPathEffect(androidx.compose.ui.graphics.PathEffect? value);
     method public void setShader(android.graphics.Shader? value);
     method public void setStrokeCap(androidx.compose.ui.graphics.StrokeCap value);
@@ -64,7 +61,6 @@ package androidx.compose.ui.graphics {
     property public androidx.compose.ui.graphics.ColorFilter? colorFilter;
     property public androidx.compose.ui.graphics.FilterQuality filterQuality;
     property public boolean isAntiAlias;
-    property public android.graphics.PathEffect? nativePathEffect;
     property public androidx.compose.ui.graphics.PathEffect? pathEffect;
     property public android.graphics.Shader? shader;
     property public androidx.compose.ui.graphics.StrokeCap strokeCap;
@@ -178,7 +174,6 @@ package androidx.compose.ui.graphics {
   }
 
   @androidx.compose.runtime.Immutable public abstract sealed class Brush {
-    method @Deprecated public void applyTo(androidx.compose.ui.graphics.Paint p, float alpha);
     method public abstract void applyTo-TJof4Gw(long size, androidx.compose.ui.graphics.Paint p, float alpha);
     field public static final androidx.compose.ui.graphics.Brush.Companion Companion;
   }
@@ -197,17 +192,7 @@ package androidx.compose.ui.graphics {
   }
 
   public final class BrushKt {
-    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.LinearGradient HorizontalGradient(java.util.List<androidx.compose.ui.graphics.Color> colors, float startX, float endX, optional androidx.compose.ui.graphics.TileMode tileMode);
-    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.LinearGradient HorizontalGradient(kotlin.Pair<java.lang.Float,androidx.compose.ui.graphics.Color>![] colorStops, float startX, float endX, optional androidx.compose.ui.graphics.TileMode tileMode);
-    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.LinearGradient LinearGradient(java.util.List<androidx.compose.ui.graphics.Color> colors, float startX, float startY, float endX, float endY, optional androidx.compose.ui.graphics.TileMode tileMode);
-    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.LinearGradient LinearGradient(kotlin.Pair<java.lang.Float,androidx.compose.ui.graphics.Color>![] colorStops, float startX, float startY, float endX, float endY, optional androidx.compose.ui.graphics.TileMode tileMode);
-    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.RadialGradient RadialGradient(kotlin.Pair<java.lang.Float,androidx.compose.ui.graphics.Color>![] colorStops, float centerX, float centerY, float radius, optional androidx.compose.ui.graphics.TileMode tileMode);
-    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.RadialGradient RadialGradient(java.util.List<androidx.compose.ui.graphics.Color> colors, float centerX, float centerY, float radius, optional androidx.compose.ui.graphics.TileMode tileMode);
     method public static androidx.compose.ui.graphics.ShaderBrush ShaderBrush(android.graphics.Shader shader);
-    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.SweepGradient SweepGradient-PvDSl28(kotlin.Pair<java.lang.Float,androidx.compose.ui.graphics.Color>![] colorStops, long center);
-    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.SweepGradient SweepGradient-acbAMd8(java.util.List<androidx.compose.ui.graphics.Color> colors, long center);
-    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.LinearGradient VerticalGradient(java.util.List<androidx.compose.ui.graphics.Color> colors, float startY, float endY, optional androidx.compose.ui.graphics.TileMode tileMode);
-    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.LinearGradient VerticalGradient(kotlin.Pair<java.lang.Float,androidx.compose.ui.graphics.Color>![] colorStops, float startY, float endY, optional androidx.compose.ui.graphics.TileMode tileMode);
   }
 
   public interface Canvas {
@@ -341,7 +326,6 @@ package androidx.compose.ui.graphics {
     method @androidx.compose.runtime.Stable public static float luminance-8_81llA(long);
     method public static inline long takeOrElse-iYUlWp8(long, kotlin.jvm.functions.Function0<androidx.compose.ui.graphics.Color> block);
     method @androidx.compose.runtime.Stable public static int toArgb-8_81llA(long);
-    method @Deprecated public static inline long useOrElse-iYUlWp8(long, kotlin.jvm.functions.Function0<androidx.compose.ui.graphics.Color> block);
   }
 
   public final inline class ColorMatrix {
@@ -404,7 +388,6 @@ package androidx.compose.ui.graphics {
   }
 
   public final class ImageBitmapKt {
-    method @Deprecated public static androidx.compose.ui.graphics.ImageBitmap ImageAsset(int width, int height, optional androidx.compose.ui.graphics.ImageBitmapConfig config, optional boolean hasAlpha, optional androidx.compose.ui.graphics.colorspace.ColorSpace colorSpace);
     method public static androidx.compose.ui.graphics.ImageBitmap ImageBitmap(int width, int height, optional androidx.compose.ui.graphics.ImageBitmapConfig config, optional boolean hasAlpha, optional androidx.compose.ui.graphics.colorspace.ColorSpace colorSpace);
     method public static androidx.compose.ui.graphics.PixelMap toPixelMap(androidx.compose.ui.graphics.ImageBitmap, optional int startX, optional int startY, optional int width, optional int height, optional int[] buffer, optional int bufferOffset, optional int stride);
   }
@@ -506,7 +489,6 @@ package androidx.compose.ui.graphics {
     method public long getColor-0d7_KjU();
     method public androidx.compose.ui.graphics.ColorFilter? getColorFilter();
     method public androidx.compose.ui.graphics.FilterQuality getFilterQuality();
-    method @Deprecated public android.graphics.PathEffect? getNativePathEffect();
     method public androidx.compose.ui.graphics.PathEffect? getPathEffect();
     method public android.graphics.Shader? getShader();
     method public androidx.compose.ui.graphics.StrokeCap getStrokeCap();
@@ -521,7 +503,6 @@ package androidx.compose.ui.graphics {
     method public void setColor-8_81llA(long p);
     method public void setColorFilter(androidx.compose.ui.graphics.ColorFilter? p);
     method public void setFilterQuality(androidx.compose.ui.graphics.FilterQuality p);
-    method @Deprecated public void setNativePathEffect(android.graphics.PathEffect? p);
     method public void setPathEffect(androidx.compose.ui.graphics.PathEffect? p);
     method public void setShader(android.graphics.Shader? p);
     method public void setStrokeCap(androidx.compose.ui.graphics.StrokeCap p);
@@ -535,7 +516,6 @@ package androidx.compose.ui.graphics {
     property public abstract androidx.compose.ui.graphics.ColorFilter? colorFilter;
     property public abstract androidx.compose.ui.graphics.FilterQuality filterQuality;
     property public abstract boolean isAntiAlias;
-    property @Deprecated public abstract android.graphics.PathEffect? nativePathEffect;
     property public abstract androidx.compose.ui.graphics.PathEffect? pathEffect;
     property public abstract android.graphics.Shader? shader;
     property public abstract androidx.compose.ui.graphics.StrokeCap strokeCap;

@@ -63,9 +63,6 @@ package androidx.compose.ui.test.junit4 {
     method public org.junit.runners.model.Statement apply(org.junit.runners.model.Statement base, org.junit.runner.Description? description);
   }
 
-  public final class DisableTransitionsTestRuleKt {
-  }
-
   public final class StateRestorationTester {
     ctor public StateRestorationTester(androidx.compose.ui.test.junit4.ComposeContentTestRule composeTestRule);
     method public void emulateSavedInstanceStateRestore();

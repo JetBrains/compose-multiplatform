@@ -152,17 +152,6 @@ fun Font(
     style: FontStyle = FontStyle.Normal
 ): DesktopFont = FileFont(file, weight, style)
 
-@Deprecated(
-    message = "Use resourceFont",
-    replaceWith = ReplaceWith("resourceFont(path, weight, style)")
-)
-fun font(
-    @Suppress("UNUSED_PARAMETER") alias: String,
-    path: String,
-    weight: FontWeight = FontWeight.Normal,
-    style: FontStyle = FontStyle.Normal
-): DesktopFont = ResourceFont(path, weight, style)
-
 /**
  * Defines a Font using resource name.
  *

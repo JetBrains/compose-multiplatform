@@ -248,12 +248,6 @@ fun lerp(start: Dp, stop: Dp, fraction: Float): Dp {
 // Structures using Dp
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-@Deprecated(
-    "Use DpOffset",
-    ReplaceWith("DpOffset", "androidx.compose.ui.unit.DpOffset")
-)
-typealias Position = DpOffset
-
 /**
  * A two-dimensional offset using [Dp] for units
  */
@@ -312,14 +306,6 @@ inline class DpOffset(@PublishedApi internal val packedValue: Long) {
 @OptIn(ExperimentalUnsignedTypes::class)
 @Stable
 inline fun DpOffset(x: Dp, y: Dp): DpOffset = DpOffset(packFloats(x.value, y.value))
-
-@Deprecated(
-    "Use DpOffset",
-    ReplaceWith("DpOffset(x, y)", "androidx.compose.ui.unit.DpOffset")
-)
-@OptIn(ExperimentalUnsignedTypes::class)
-@Stable
-inline fun Position(x: Dp, y: Dp): DpOffset = DpOffset(packFloats(x.value, y.value))
 
 /**
  * Linearly interpolate between two [DpOffset]s.

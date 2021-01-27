@@ -457,12 +457,6 @@ var SemanticsPropertyReceiver.stateDescription by SemanticsProperties.StateDescr
  */
 var SemanticsPropertyReceiver.progressBarRangeInfo by SemanticsProperties.ProgressBarRangeInfo
 
-@Deprecated(
-    "stateDescriptionRange was renamed to progressBarRangeInfo",
-    ReplaceWith("progressBarRangeInfo", "androidx.compose.ui.semantics")
-)
-var SemanticsPropertyReceiver.stateDescriptionRange by SemanticsProperties.ProgressBarRangeInfo
-
 /**
  * The node is marked as heading for accessibility.
  *
@@ -516,29 +510,6 @@ var SemanticsPropertyReceiver.focused by SemanticsProperties.Focused
 fun SemanticsPropertyReceiver.invisibleToUser() {
     this[SemanticsProperties.InvisibleToUser] = Unit
 }
-
-@Deprecated(
-    "hidden was renamed to invisibleToUser",
-    ReplaceWith("invisibleToUser", "androidx.compose.ui.semantics")
-)
-@OptIn(ExperimentalComposeUiApi::class)
-fun SemanticsPropertyReceiver.hidden() {
-    this[SemanticsProperties.InvisibleToUser] = Unit
-}
-
-@Deprecated(
-    "horizontalAccessibilityScrollState was renamed to horizontalScrollAxisRange",
-    ReplaceWith("horizontalScrollAxisRange", "androidx.compose.ui.semantics")
-)
-var SemanticsPropertyReceiver.horizontalAccessibilityScrollState
-by SemanticsProperties.HorizontalScrollAxisRange
-
-@Deprecated(
-    "verticalAccessibilityScrollState was renamed to verticalScrollAxisRange",
-    ReplaceWith("verticalScrollAxisRange", "androidx.compose.ui.semantics")
-)
-var SemanticsPropertyReceiver.verticalAccessibilityScrollState
-by SemanticsProperties.VerticalScrollAxisRange
 
 /**
  * The horizontal scroll state of this node if this node is scrollable.

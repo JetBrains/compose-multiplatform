@@ -38,9 +38,6 @@ import kotlin.coroutines.RestrictsSuspension
 import kotlin.coroutines.createCoroutine
 import kotlin.coroutines.resume
 
-@Deprecated("Use AwaitPointerEventScope", ReplaceWith("AwaitPointerEventScope"))
-typealias HandlePointerInputScope = AwaitPointerEventScope
-
 /**
  * Receiver scope for awaiting pointer events in a call to [PointerInputScope.awaitPointerEventScope].
  *
@@ -118,11 +115,6 @@ interface PointerInputScope : Density {
     suspend fun <R> awaitPointerEventScope(
         block: suspend AwaitPointerEventScope.() -> R
     ): R
-
-    @Deprecated("Use awaitPointerEventScope", ReplaceWith("awaitPointerEventScope(handler)"))
-    suspend fun <R> handlePointerInput(
-        handler: suspend AwaitPointerEventScope.() -> R
-    ): R = awaitPointerEventScope(handler)
 }
 
 /**

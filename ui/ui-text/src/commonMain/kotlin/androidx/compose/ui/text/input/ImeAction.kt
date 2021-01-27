@@ -27,22 +27,7 @@ enum class ImeAction {
      * keyboards will mostly show one of [Done] or [None] actions based on the single/multi
      * line configuration.
      */
-    @Deprecated("Use Default instead", ReplaceWith("Default"))
-    Unspecified,
-
-    /**
-     * Use the platform and keyboard defaults and let the keyboard to decide the action. The
-     * keyboards will mostly show one of [Done] or [None] actions based on the single/multi
-     * line configuration.
-     */
     Default,
-
-    /**
-     * Represents that no IME action is available in editor. The keyboards will mostly show new line
-     * action.
-     */
-    @Deprecated("Use None instead", ReplaceWith("None"))
-    NoAction,
 
     /**
      * Represents that no action is expected from the keyboard. Keyboard might choose to show an

@@ -179,61 +179,6 @@ class ImageVector internal constructor(
         }
 
         /**
-         * Create a new group and push it to the front of the stack of ImageVector nodes
-         *
-         * @param name the name of the group
-         * @param rotate the rotation of the group in degrees
-         * @param pivotX the x coordinate of the pivot point to rotate or scale the group
-         * @param pivotY the y coordinate of the pivot point to rotate or scale the group
-         * @param scaleX the scale factor in the X-axis to apply to the group
-         * @param scaleY the scale factor in the Y-axis to apply to the group
-         * @param translationX the translation in virtual pixels to apply along the x-axis
-         * @param translationY the translation in virtual pixels to apply along the y-axis
-         * @param clipPathData the path information used to clip the content within the group
-         *
-         * @return This ImageVector.Builder instance as a convenience for chaining calls
-         */
-        @Deprecated(
-            "Use addGroup instead",
-            ReplaceWith(
-                "addGroup(" +
-                    "name, " +
-                    "rotate, " +
-                    "pivotX, " +
-                    "pivotY, " +
-                    "scaleX, " +
-                    "scaleY, " +
-                    "translationX, " +
-                    "translationY, " +
-                    "clipPathData",
-                "androidx.compose.ui.graphics.vector"
-            )
-        )
-        @Suppress("BuilderSetStyle")
-        fun pushGroup(
-            name: String = DefaultGroupName,
-            rotate: Float = DefaultRotation,
-            pivotX: Float = DefaultPivotX,
-            pivotY: Float = DefaultPivotY,
-            scaleX: Float = DefaultScaleX,
-            scaleY: Float = DefaultScaleY,
-            translationX: Float = DefaultTranslationX,
-            translationY: Float = DefaultTranslationY,
-            clipPathData: List<PathNode> = EmptyPath
-        ): Builder =
-            addGroup(
-                name,
-                rotate,
-                pivotX,
-                pivotY,
-                scaleX,
-                scaleY,
-                translationX,
-                translationY,
-                clipPathData
-            )
-
-        /**
          * Pops the topmost VectorGroup from this ImageVector.Builder. This is used to indicate
          * that no additional ImageVector nodes will be added to the current VectorGroup
          * @return This ImageVector.Builder instance as a convenience for chaining calls
@@ -244,21 +189,6 @@ class ImageVector internal constructor(
             currentGroup.children.add(popped.asVectorGroup())
             return this
         }
-
-        /**
-         * Pops the topmost VectorGroup from this ImageVector.Builder. This is used to indicate
-         * that no additional ImageVector nodes will be added to the current VectorGroup
-         * @return This ImageVector.Builder instance as a convenience for chaining calls
-         */
-        @Suppress("BuilderSetStyle")
-        @Deprecated(
-            "Use clearGroup instead",
-            ReplaceWith(
-                "clearGroup()",
-                "androidx.compose.ui.graphics.vector"
-            )
-        )
-        fun popGroup(): Builder = clearGroup()
 
         /**
          * Add a path to the ImageVector graphic. This represents a leaf node in the ImageVector graphics
@@ -752,15 +682,6 @@ inline fun ImageVector.Builder.group(
     block()
     clearGroup()
 }
-
-@Deprecated(
-    "Use ImageVector.Builder instead",
-    ReplaceWith(
-        "ImageVector.Builder",
-        "androidx.compose.ui.graphics.vector"
-    )
-)
-typealias VectorAssetBuilder = ImageVector.Builder
 
 @Suppress("EXPERIMENTAL_FEATURE_WARNING")
 private inline class Stack<T>(private val backing: ArrayList<T> = ArrayList<T>()) {

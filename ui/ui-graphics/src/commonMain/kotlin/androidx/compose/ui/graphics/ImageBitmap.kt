@@ -238,24 +238,3 @@ fun ImageBitmap(
     hasAlpha,
     colorSpace
 )
-
-@Deprecated(
-    "Use ImageBitmap instead",
-    ReplaceWith(
-        "ImageBitmap(width, height, config, hasAlpha, colorSpace)",
-        "androidx.compose.ui.graphics"
-    )
-)
-fun ImageAsset(
-    width: Int,
-    height: Int,
-    config: ImageBitmapConfig = ImageBitmapConfig.Argb8888,
-    hasAlpha: Boolean = true,
-    colorSpace: ColorSpace = ColorSpaces.Srgb
-): ImageBitmap = ActualImageBitmap(
-    width,
-    height,
-    config,
-    hasAlpha,
-    colorSpace
-)
