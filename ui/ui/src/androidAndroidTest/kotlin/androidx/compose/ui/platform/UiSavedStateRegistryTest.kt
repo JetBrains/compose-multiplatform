@@ -21,7 +21,6 @@ import android.os.Binder
 import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
-import android.text.SpannableString
 import android.util.Size
 import android.util.SizeF
 import android.util.SparseArray
@@ -125,8 +124,6 @@ class DisposableUiSavedStateRegistryTest {
         assertTrue(registry.canBeSaved(5.toChar()))
         assertTrue(registry.canBeSaved(5.toChar().asBoxed()))
         assertTrue(registry.canBeSaved(charArrayOf(5.toChar())))
-        assertTrue(registry.canBeSaved(SpannableString("CharSequence")))
-        assertTrue(registry.canBeSaved(arrayOf(SpannableString("CharSequence"))))
         assertTrue(registry.canBeSaved(5.toFloat()))
         assertTrue(registry.canBeSaved(5.toFloat().asBoxed()))
         assertTrue(registry.canBeSaved(floatArrayOf(5.toFloat())))
@@ -156,12 +153,30 @@ class DisposableUiSavedStateRegistryTest {
         assertFalse(registry.canBeSaved(CustomClass()))
     }
 
+    @UiThreadTest
+    @Test
+    fun charSequenceCantBeSaved() {
+        val registry = DisposableUiSavedStateRegistry(ContainerKey, TestOwner())
+
+        assertFalse(registry.canBeSaved(CustomCharSequence()))
+    }
+
     private fun Any?.asBoxed(): Any = this!!
 }
 
 private class CustomClass
 
 private class CustomSerializable : Serializable
+
+private class CustomCharSequence : CharSequence {
+    override val length: Int = 0
+
+    override fun get(index: Int): Char = throw IllegalStateException()
+
+    override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
+        throw IllegalStateException()
+    }
+}
 
 @SuppressLint("BanParcelableUsage")
 private class CustomParcelable(parcel: Parcel? = null) : Parcelable {
