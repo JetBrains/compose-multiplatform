@@ -16,13 +16,14 @@
 
 package androidx.compose.foundation
 
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.gesture.doubleTapGestureFilter
+import androidx.compose.ui.gesture.longPressGestureFilter
+import androidx.compose.ui.gesture.pressIndicatorGestureFilter
+import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.disabled
@@ -106,6 +107,7 @@ fun Modifier.clickable(
  * @param onDoubleClick will be called when user double clicks on the element
  * @param onClick will be called when user clicks on the element
  */
+@Suppress("DEPRECATION")
 fun Modifier.clickable(
     enabled: Boolean = true,
     interactionState: InteractionState,
@@ -131,32 +133,25 @@ fun Modifier.clickable(
                 disabled()
             }
         }
-        val onClickState = rememberUpdatedState(onClick)
-        val interactionStateState = rememberUpdatedState(interactionState)
-        val gesture =
+        val interactionUpdate =
             if (enabled) {
-                remember(onDoubleClick, onLongClick) {
-                    Modifier.pointerInput {
-                        detectTapGestures(
-                            onDoubleTap = if (onDoubleClick != null) {
-                                { onDoubleClick() }
-                            } else {
-                                null
-                            },
-                            onLongPress = if (onLongClick != null) {
-                                { onLongClick() }
-                            } else {
-                                null
-                            },
-                            onPress = {
-                                interactionStateState.value.addInteraction(Interaction.Pressed, it)
-                                tryAwaitRelease()
-                                interactionStateState.value.removeInteraction(Interaction.Pressed)
-                            },
-                            onTap = { onClickState.value.invoke() }
-                        )
-                    }
-                }
+                Modifier.pressIndicatorGestureFilter(
+                    onStart = { interactionState.addInteraction(Interaction.Pressed, it) },
+                    onStop = { interactionState.removeInteraction(Interaction.Pressed) },
+                    onCancel = { interactionState.removeInteraction(Interaction.Pressed) }
+                )
+            } else {
+                Modifier
+            }
+        val tap = if (enabled) tapGestureFilter(onTap = { onClick() }) else Modifier
+        val longTap = if (enabled && onLongClick != null) {
+            longPressGestureFilter(onLongPress = { onLongClick() })
+        } else {
+            Modifier
+        }
+        val doubleTap =
+            if (enabled && onDoubleClick != null) {
+                doubleTapGestureFilter(onDoubleTap = { onDoubleClick() })
             } else {
                 Modifier
             }
@@ -166,8 +161,11 @@ fun Modifier.clickable(
             }
         }
         semanticModifier
-            .then(gesture)
+            .then(interactionUpdate)
             .indication(interactionState, indication)
+            .then(tap)
+            .then(longTap)
+            .then(doubleTap)
     },
     inspectorInfo = debugInspectorInfo {
         name = "clickable"
