@@ -887,8 +887,8 @@ package androidx.compose.ui.text.input {
   }
 
   public static final class TextFieldValue.Companion {
-    method public androidx.compose.runtime.savedinstancestate.Saver<androidx.compose.ui.text.input.TextFieldValue,java.lang.Object> getSaver();
-    property public final androidx.compose.runtime.savedinstancestate.Saver<androidx.compose.ui.text.input.TextFieldValue,java.lang.Object> Saver;
+    method public androidx.compose.runtime.saveable.Saver<androidx.compose.ui.text.input.TextFieldValue,java.lang.Object> getSaver();
+    property public final androidx.compose.runtime.saveable.Saver<androidx.compose.ui.text.input.TextFieldValue,java.lang.Object> Saver;
   }
 
   public final class TextFieldValueKt {

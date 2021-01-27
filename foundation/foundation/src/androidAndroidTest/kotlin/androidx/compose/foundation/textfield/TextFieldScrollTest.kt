@@ -37,7 +37,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.textFieldScrollable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -327,7 +327,7 @@ class TextFieldScrollTest {
         var scrollerPosition: TextFieldScrollerPosition? = null
 
         restorationTester.setContent {
-            scrollerPosition = rememberSavedInstanceState(
+            scrollerPosition = rememberSaveable(
                 saver = TextFieldScrollerPosition.Saver
             ) {
                 TextFieldScrollerPosition(Orientation.Horizontal)

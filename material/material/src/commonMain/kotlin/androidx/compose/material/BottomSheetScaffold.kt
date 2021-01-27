@@ -35,8 +35,8 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.Saver
-import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.nestedscroll.nestedScroll
@@ -173,7 +173,7 @@ fun rememberBottomSheetState(
     confirmStateChange: (BottomSheetValue) -> Boolean = { true }
 ): BottomSheetState {
     val disposableClock = AmbientAnimationClock.current.asDisposableClock()
-    return rememberSavedInstanceState(
+    return rememberSaveable(
         disposableClock,
         saver = BottomSheetState.Saver(
             clock = disposableClock,

@@ -1,0 +1,83 @@
+// Signature format: 4.0
+package androidx.compose.runtime.saveable {
+
+  public final class ListSaverKt {
+    method public static <Original, Saveable> androidx.compose.runtime.saveable.Saver<Original,java.lang.Object> listSaver(kotlin.jvm.functions.Function2<? super androidx.compose.runtime.saveable.SaverScope,? super Original,? extends java.util.List<? extends Saveable>> save, kotlin.jvm.functions.Function1<? super java.util.List<? extends Saveable>,? extends Original> restore);
+  }
+
+  public final class MapSaverKt {
+    method public static <T> androidx.compose.runtime.saveable.Saver<T,java.lang.Object> mapSaver(kotlin.jvm.functions.Function2<? super androidx.compose.runtime.saveable.SaverScope,? super T,? extends java.util.Map<java.lang.String,?>> save, kotlin.jvm.functions.Function1<? super java.util.Map<java.lang.String,?>,? extends T> restore);
+  }
+
+  public final class RememberSaveableKt {
+    method @androidx.compose.runtime.Composable public static <T> T rememberSaveable(Object![]? inputs, optional androidx.compose.runtime.saveable.Saver<T,?> saver, optional String? key, kotlin.jvm.functions.Function0<? extends T> init);
+  }
+
+  public interface SaveableStateHolder {
+    method @androidx.compose.runtime.Composable public void SaveableStateProvider(Object key, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method public void removeState(Object key);
+  }
+
+  public final class SaveableStateHolderKt {
+    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.saveable.SaveableStateHolder rememberSaveableStateHolder();
+  }
+
+  public interface Saver<Original, Saveable> {
+    method public Original? restore(Saveable value);
+    method public Saveable? save(androidx.compose.runtime.saveable.SaverScope, Original? value);
+  }
+
+  public final class SaverKt {
+    method public static <Original, Saveable> androidx.compose.runtime.saveable.Saver<Original,Saveable> Saver(kotlin.jvm.functions.Function2<? super androidx.compose.runtime.saveable.SaverScope,? super Original,? extends Saveable> save, kotlin.jvm.functions.Function1<? super Saveable,? extends Original> restore);
+    method public static <T> androidx.compose.runtime.saveable.Saver<T,java.lang.Object> autoSaver();
+  }
+
+  public fun interface SaverScope {
+    method public boolean canBeSaved(Object value);
+  }
+
+}
+
+package androidx.compose.runtime.savedinstancestate {
+
+  public final class DeprecatedKt {
+    method @Deprecated public static <Original, Saveable> androidx.compose.runtime.savedinstancestate.Saver<Original,Saveable> Saver(kotlin.jvm.functions.Function2<? super androidx.compose.runtime.savedinstancestate.SaverScope,? super Original,? extends Saveable> save, kotlin.jvm.functions.Function1<? super Saveable,? extends Original> restore);
+    method @Deprecated public static <T> androidx.compose.runtime.savedinstancestate.Saver<T,java.lang.Object> autoSaver();
+    method @Deprecated public static <Original, Saveable> androidx.compose.runtime.savedinstancestate.Saver<Original,?> listSaver(kotlin.jvm.functions.Function2<? super androidx.compose.runtime.savedinstancestate.SaverScope,? super Original,? extends java.util.List<? extends Saveable>> save, kotlin.jvm.functions.Function1<? super java.util.List<? extends Saveable>,? extends Original> restore);
+    method @Deprecated public static <T> androidx.compose.runtime.savedinstancestate.Saver<T,?> mapSaver(kotlin.jvm.functions.Function2<? super androidx.compose.runtime.savedinstancestate.SaverScope,? super T,? extends java.util.Map<java.lang.String,?>> save, kotlin.jvm.functions.Function1<? super java.util.Map<java.lang.String,?>,? extends T> restore);
+    method @Deprecated @androidx.compose.runtime.Composable public static <T> androidx.compose.runtime.savedinstancestate.RestorableStateHolder<T> rememberRestorableStateHolder();
+    method @Deprecated @androidx.compose.runtime.Composable public static <T> T rememberSavedInstanceState(Object![]? inputs, optional androidx.compose.runtime.savedinstancestate.Saver<T,?>? saver, optional String? key, kotlin.jvm.functions.Function0<? extends T> init);
+  }
+
+  @Deprecated public @interface ExperimentalRestorableStateHolder {
+  }
+
+  @Deprecated public interface RestorableStateHolder<T> extends androidx.compose.runtime.saveable.SaveableStateHolder {
+  }
+
+  public final class SavedInstanceStateKt {
+    method @androidx.compose.runtime.Composable public static <T> androidx.compose.runtime.MutableState<T> savedInstanceState(Object![]? inputs, optional androidx.compose.runtime.saveable.Saver<T,?> saver, optional String? key, optional androidx.compose.runtime.SnapshotMutationPolicy<T> policy, kotlin.jvm.functions.Function0<? extends T> init);
+  }
+
+  @Deprecated public interface Saver<Original, Saveable> extends androidx.compose.runtime.saveable.Saver<Original,Saveable> {
+  }
+
+  @Deprecated public interface SaverScope extends androidx.compose.runtime.saveable.SaverScope {
+  }
+
+  public interface UiSavedStateRegistry {
+    method public boolean canBeSaved(Object value);
+    method public Object? consumeRestored(String key);
+    method public java.util.Map<java.lang.String,java.util.List<java.lang.Object>> performSave();
+    method public void registerProvider(String key, kotlin.jvm.functions.Function0<?> valueProvider);
+    method public void unregisterProvider(String key, kotlin.jvm.functions.Function0<?> valueProvider);
+  }
+
+  public final class UiSavedStateRegistryKt {
+    method public static androidx.compose.runtime.savedinstancestate.UiSavedStateRegistry UiSavedStateRegistry(java.util.Map<java.lang.String,? extends java.util.List<?>>? restoredValues, kotlin.jvm.functions.Function1<java.lang.Object,java.lang.Boolean> canBeSaved);
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.runtime.savedinstancestate.UiSavedStateRegistry> getAmbientUiSavedStateRegistry();
+    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.runtime.savedinstancestate.UiSavedStateRegistry>! getUiSavedStateRegistryAmbient();
+  }
+
+}
+

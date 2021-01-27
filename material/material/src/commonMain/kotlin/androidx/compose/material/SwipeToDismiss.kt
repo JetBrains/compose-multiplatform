@@ -33,8 +33,8 @@ import androidx.compose.material.SwipeableDefaults.StandardResistanceFactor
 import androidx.compose.material.SwipeableDefaults.StiffResistanceFactor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.Saver
-import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.platform.AmbientAnimationClock
@@ -170,7 +170,7 @@ fun rememberDismissState(
     confirmStateChange: (DismissValue) -> Boolean = { true }
 ): DismissState {
     val clock = AmbientAnimationClock.current.asDisposableClock()
-    return rememberSavedInstanceState(
+    return rememberSaveable(
         clock,
         saver = DismissState.Saver(clock, confirmStateChange)
     ) {
