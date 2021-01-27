@@ -87,13 +87,15 @@ class InfiniteTransitionTest {
                     val startTime = withFrameNanos { it }
                     var playTime = 0L
                     while (playTime < 2100L) {
-                        playTime = (withFrameNanos { it } - startTime) / 1_000_000L
-                        var iterationTime = playTime % 2000
-                        if (iterationTime > 1000L) {
-                            iterationTime = 2000L - iterationTime
+                        playTime = withFrameNanos { it } - startTime
+                        var iterationTime = playTime % (2000 * MillisToNanos)
+                        if (iterationTime > 1000 * MillisToNanos) {
+                            iterationTime = 2000L * MillisToNanos - iterationTime
                         }
-                        val expectedFloat = keyframesAnim.getValue(iterationTime)
-                        val expectedColor = colorAnim.getValue(playTime % 1000)
+                        val expectedFloat = keyframesAnim.getValueFromNanos(iterationTime)
+                        val expectedColor = colorAnim.getValueFromNanos(
+                            playTime % (1000 * MillisToNanos)
+                        )
                         assertEquals(expectedFloat, animFloat.value, 0.01f)
                         assertEquals(expectedColor, animColor.value)
                     }

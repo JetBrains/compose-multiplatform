@@ -33,7 +33,7 @@ class PhysicsAnimationTest {
         val end = 500f
         val playTime = 150L
 
-        val velocity = animation.getVelocity(playTime, start, end, 0f)
+        val velocity = animation.getVelocityFromMillis(playTime, start, end, 0f)
         val expectedVelocity = animation.toSpring(end).updateValues(start, 0f, playTime).velocity
         assertThat(velocity).isEqualTo(expectedVelocity)
     }
@@ -48,7 +48,7 @@ class PhysicsAnimationTest {
             spring(), Int.VectorConverter, start, end, 0
         )
 
-        val velocity = animation.getVelocity(playTime)
+        val velocity = animation.getVelocityFromMillis(playTime)
 
         val expectedVelocity = FloatSpringSpec().toSpring(end)
             .updateValues(start.toFloat(), 0f, playTime).velocity.toInt()
@@ -67,8 +67,8 @@ class PhysicsAnimationTest {
             spring(), Float.VectorConverter, start1, end1, 0f
         )
 
-        val interruptionValue = animation.getValue(interruptionTime)
-        val interruptionVelocity = animation.getVelocity(interruptionTime)
+        val interruptionValue = animation.getValueFromMillis(interruptionTime)
+        val interruptionVelocity = animation.getVelocityFromMillis(interruptionTime)
 
         // second animation will go from interruptionValue to interruptionValue with
         // applying the velocity from the first interrupted animation.
@@ -81,8 +81,8 @@ class PhysicsAnimationTest {
         )
         // let's verify values after 15 ms of the second animation
         val playTime = 15L
-        val resultValue = animation2.getValue(playTime)
-        val resultVelocity = animation2.getVelocity(playTime)
+        val resultValue = animation2.getValueFromMillis(playTime)
+        val resultVelocity = animation2.getVelocityFromMillis(playTime)
 
         val motion = FloatSpringSpec().toSpring(end2).updateValues(
             start2,
@@ -204,8 +204,8 @@ class PhysicsAnimationTest {
             100f,
             0f
         ).also { animation ->
-            assertEquals(0f, animation.getVelocityVector(animation.durationMillis).value)
-            assertEquals(100f, animation.getValue(animation.durationMillis))
+            assertEquals(0f, animation.getVelocityVectorFromMillis(animation.durationMillis).value)
+            assertEquals(100f, animation.getValueFromMillis(animation.durationMillis))
         }
     }
 
@@ -268,25 +268,25 @@ class PhysicsAnimationTest {
         )
 
         for (time in 0L until duration) {
-            val springVector = springVectorAnimation.getValue(
+            val springVector = springVectorAnimation.getValueFromMillis(
                 time,
                 AnimationVector(100f, 100f, 100f),
                 AnimationVector(0f, 0f, 0f),
                 AnimationVector(0f, 0f, 0f)
             )
-            val float1 = floatAnimation1.getValue(
+            val float1 = floatAnimation1.getValueFromMillis(
                 time,
                 AnimationVector(100f),
                 AnimationVector(0f),
                 AnimationVector(0f)
             )
-            val float2 = floatAnimation2.getValue(
+            val float2 = floatAnimation2.getValueFromMillis(
                 time,
                 AnimationVector(100f),
                 AnimationVector(0f),
                 AnimationVector(0f)
             )
-            val float3 = floatAnimation3.getValue(
+            val float3 = floatAnimation3.getValueFromMillis(
                 time,
                 AnimationVector(100f),
                 AnimationVector(0f),

@@ -35,6 +35,6 @@ class SnapAnimationTest {
         )
 
         assertThat(animation.at(0)).isEqualTo(1f)
-        assertThat(animationWrapper.isFinished(0)).isTrue()
+        assertThat(animationWrapper.isFinishedFromMillis(0)).isTrue()
     }
 }

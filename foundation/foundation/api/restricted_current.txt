@@ -193,10 +193,10 @@ package androidx.compose.foundation.animation {
   public final class FloatAndroidFlingDecaySpec implements androidx.compose.animation.core.FloatDecayAnimationSpec {
     ctor public FloatAndroidFlingDecaySpec(androidx.compose.ui.unit.Density density);
     method public float getAbsVelocityThreshold();
-    method public long getDurationMillis(float start, float startVelocity);
-    method public float getTarget(float start, float startVelocity);
-    method public float getValue(long playTime, float start, float startVelocity);
-    method public float getVelocity(long playTime, float start, float startVelocity);
+    method public long getDurationNanos(float initialValue, float initialVelocity);
+    method public float getTargetValue(float initialValue, float initialVelocity);
+    method public float getValueFromNanos(long playTimeNanos, float initialValue, float initialVelocity);
+    method public float getVelocityFromNanos(long playTimeNanos, float initialValue, float initialVelocity);
     property public float absVelocityThreshold;
   }
 

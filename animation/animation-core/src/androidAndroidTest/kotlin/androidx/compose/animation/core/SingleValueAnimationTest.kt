@@ -350,28 +350,31 @@ class SingleValueAnimationTest {
 
                 val floatValue by animateFloatAsState(if (enabled) 100f else 0f)
 
-                val durationForFloat = specForFloat.getDurationMillis(0f, 100f, 0f)
-                val durationForOffset = specForOffset.getDurationMillis(0f, 100f, 0f)
-                val durationForBounds = specForBounds.getDurationMillis(0f, 100f, 0f)
+                val durationForFloat = specForFloat.getDurationNanos(0f, 100f, 0f)
+                val durationForOffset = specForOffset.getDurationNanos(0f, 100f, 0f)
+                val durationForBounds = specForBounds.getDurationNanos(0f, 100f, 0f)
 
                 if (enabled) {
                     LaunchedEffect(Unit) {
                         val startTime = withFrameNanos { it }
                         var frameTime = startTime
                         do {
-                            val playTime = (frameTime - startTime) / 1_000_000L
-                            val expectFloat = specForFloat.getValue(playTime, 0f, 100f, 0f)
+                            val playTime = frameTime - startTime
+                            val expectFloat =
+                                specForFloat.getValueFromNanos(playTime, 0f, 100f, 0f)
                             assertEquals("play time: $playTime", expectFloat, floatValue)
 
                             if (playTime < durationForOffset) {
-                                val expectOffset = specForOffset.getValue(playTime, 0f, 100f, 0f)
+                                val expectOffset =
+                                    specForOffset.getValueFromNanos(playTime, 0f, 100f, 0f)
                                 assertEquals(Offset(expectOffset, expectOffset), offsetValue)
                             } else {
                                 assertEquals(Offset(100f, 100f), offsetValue)
                             }
 
                             if (playTime < durationForBounds) {
-                                val expectBounds = specForBounds.getValue(playTime, 0f, 100f, 0f)
+                                val expectBounds =
+                                    specForBounds.getValueFromNanos(playTime, 0f, 100f, 0f)
                                 assertEquals(
                                     Bounds(
                                         expectBounds.dp,

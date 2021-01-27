@@ -221,8 +221,8 @@ internal suspend fun <T, V : AnimationVector> AnimationState<T, V>.animate(
     startTimeNanos: Long = AnimationConstants.UnspecifiedTime,
     block: AnimationScope<T, V>.() -> Unit = {}
 ) {
-    val initialValue = animation.getValue(0)
-    val initialVelocityVector = animation.getVelocityVector(0)
+    val initialValue = animation.getValueFromNanos(0)
+    val initialVelocityVector = animation.getVelocityVectorFromNanos(0)
     var lateInitScope: AnimationScope<T, V>? = null
     try {
         val startTimeNanosSpecified =
@@ -278,11 +278,10 @@ private fun <T, V : AnimationVector> AnimationScope<T, V>.doAnimationFrame(
     block: AnimationScope<T, V>.() -> Unit
 ) {
     lastFrameTimeNanos = frameTimeNanos
-    val playTimeMillis = (frameTimeNanos - startTimeNanos) / 1_000_000L
-    // TODO: [Animation] should use nanos for all the value/velocity queries
-    value = anim.getValue(playTimeMillis)
-    velocityVector = anim.getVelocityVector(playTimeMillis)
-    val isLastFrame = anim.isFinished(playTimeMillis)
+    val playTimeNanos = frameTimeNanos - startTimeNanos
+    value = anim.getValueFromNanos(playTimeNanos)
+    velocityVector = anim.getVelocityVectorFromNanos(playTimeNanos)
+    val isLastFrame = anim.isFinishedFromNanos(playTimeNanos)
     if (isLastFrame) {
         // TODO: This could probably be a little more granular
         // TODO: end time isn't necessarily last frame time

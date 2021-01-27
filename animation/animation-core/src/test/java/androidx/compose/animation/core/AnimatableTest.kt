@@ -60,8 +60,12 @@ class AnimatableTest {
                 val result = animatable.animateDecay(20f, animationSpec = exponentialDecay()) {
                     assertTrue(isRunning)
                     assertEquals(anim.targetValue, targetValue)
-                    TestCase.assertEquals(anim.getValue(playTimeMillis), value, 0.001f)
-                    TestCase.assertEquals(anim.getVelocity(playTimeMillis), velocity, 0.001f)
+                    TestCase.assertEquals(anim.getValueFromMillis(playTimeMillis), value, 0.001f)
+                    TestCase.assertEquals(
+                        anim.getVelocityFromMillis(playTimeMillis),
+                        velocity,
+                        0.001f
+                    )
                     playTimeMillis += interval
                     TestCase.assertEquals(value, animatable.value, 0.0001f)
                     TestCase.assertEquals(velocity, animatable.velocity, 0.0001f)
@@ -98,8 +102,8 @@ class AnimatableTest {
                 ) {
                     assertTrue(isRunning)
                     assertEquals(1f, targetValue)
-                    assertEquals(anim.getValue(playTimeMillis), value, 0.001f)
-                    assertEquals(anim.getVelocity(playTimeMillis), velocity, 0.001f)
+                    assertEquals(anim.getValueFromMillis(playTimeMillis), value, 0.001f)
+                    assertEquals(anim.getVelocityFromMillis(playTimeMillis), velocity, 0.001f)
                     playTimeMillis += interval
                 }
                 // After animation
@@ -146,7 +150,7 @@ class AnimatableTest {
                         ) {
                             assertTrue("PlayTime Millis: $playTimeMillis", isRunning)
                             assertEquals(to, targetValue)
-                            val expectedValue = anim.getValue(playTimeMillis)
+                            val expectedValue = anim.getValueFromMillis(playTimeMillis)
                             assertEquals(
                                 "PlayTime Millis: $playTimeMillis",
                                 expectedValue.x,
@@ -207,8 +211,8 @@ class AnimatableTest {
                         ) {
                             assertTrue(isRunning)
                             assertEquals(targetValue, 200f)
-                            assertEquals(anim1.getValue(playTimeMillis), value)
-                            assertEquals(anim1.getVelocity(playTimeMillis), velocity)
+                            assertEquals(anim1.getValueFromMillis(playTimeMillis), value)
+                            assertEquals(anim1.getVelocityFromMillis(playTimeMillis), velocity)
 
                             assertTrue(playTimeMillis <= 100)
                             if (playTimeMillis == 100L) {
@@ -252,11 +256,11 @@ class AnimatableTest {
                 assertTrue(isRunning)
                 assertEquals(300f, targetValue)
                 assertEquals(
-                    anim2.getValue((playTimeMillis2 - 100)),
+                    anim2.getValueFromMillis((playTimeMillis2 - 100)),
                     value
                 )
                 assertEquals(
-                    anim2.getVelocity((playTimeMillis2 - 100)),
+                    anim2.getVelocityFromMillis((playTimeMillis2 - 100)),
                     velocity
                 )
                 playTimeMillis2 += interval

@@ -26,7 +26,7 @@ package androidx.compose.animation.core
  * Since [VectorizedDecayAnimationSpec]s are stateless, it requires starting value/velocity and
  * ending value to be passed in, along with playtime, to calculate the value or velocity at that
  * time. Play time here is the progress of the animation in terms of milliseconds, where 0 means the
- * start of the animation and [getDurationMillis] returns the play time for the end of the
+ * start of the animation and [getDurationNanos] returns the play time for the end of the
  * animation.
  *
  * __Note__: For use cases where the starting values/velocity and ending values aren't expected
@@ -45,23 +45,24 @@ interface VectorizedDecayAnimationSpec<V : AnimationVector> {
     /**
      * Returns the value of the animation at the given time.
      *
-     * @param playTime The time elapsed in milliseconds since the initialValue of the animation
+     * @param playTimeNanos The time elapsed in milliseconds since the initialValue of the animation
      * @param initialValue The initialValue value of the animation
      * @param initialVelocity The initialValue velocity of the animation
      */
-    fun getValue(
-        playTime: Long,
+    fun getValueFromNanos(
+        playTimeNanos: Long,
         initialValue: V,
         initialVelocity: V
     ): V
 
     /**
-     * Returns the duration of the decay animation, in milliseconds.
+     * Returns the duration of the decay animation, in nanoseconds.
      *
      * @param initialValue initialValue value of the animation
      * @param initialVelocity initialValue velocity of the animation
      */
-    fun getDurationMillis(
+    @Suppress("MethodNameUnits")
+    fun getDurationNanos(
         initialValue: V,
         initialVelocity: V
     ): Long
@@ -69,12 +70,12 @@ interface VectorizedDecayAnimationSpec<V : AnimationVector> {
     /**
      * Returns the velocity of the animation at the given time.
      *
-     * @param playTime The time elapsed in milliseconds since the initialValue of the animation
+     * @param playTimeNanos The time elapsed in milliseconds since the initialValue of the animation
      * @param initialValue The initialValue value of the animation
      * @param initialVelocity The initialValue velocity of the animation
      */
-    fun getVelocity(
-        playTime: Long,
+    fun getVelocityFromNanos(
+        playTimeNanos: Long,
         initialValue: V,
         initialVelocity: V
     ): V
@@ -86,7 +87,7 @@ interface VectorizedDecayAnimationSpec<V : AnimationVector> {
      * @param initialValue The initial value of the animation
      * @param initialVelocity The initial velocity of the animation
      */
-    fun getTarget(
+    fun getTargetValue(
         initialValue: V,
         initialVelocity: V
     ): V

@@ -34,15 +34,30 @@ internal class DesktopFlingDecaySpec(density: Density) : FloatDecayAnimationSpec
     private fun flingDistance(startVelocity: Float): Float =
         flingCalculator.flingDistance(startVelocity) * sign(startVelocity)
 
-    override fun getTarget(start: Float, startVelocity: Float): Float =
-        start + flingDistance(startVelocity)
+    override fun getTargetValue(initialValue: Float, initialVelocity: Float): Float =
+        initialValue + flingDistance(initialVelocity)
 
-    override fun getValue(playTime: Long, start: Float, startVelocity: Float): Float =
-        start + flingCalculator.flingInfo(startVelocity).position(playTime)
+    @Suppress("MethodNameUnits")
+    override fun getValueFromNanos(
+        playTimeNanos: Long,
+        initialValue: Float,
+        initialVelocity: Float
+    ): Float {
+        val playTimeMillis = playTimeNanos / 1_000_000L
+        return initialValue + flingCalculator.flingInfo(initialVelocity).position(playTimeMillis)
+    }
 
-    override fun getDurationMillis(start: Float, startVelocity: Float): Long =
-        flingCalculator.flingDuration(startVelocity)
+    @Suppress("MethodNameUnits")
+    override fun getDurationNanos(initialValue: Float, initialVelocity: Float): Long =
+        flingCalculator.flingDuration(initialVelocity)
 
-    override fun getVelocity(playTime: Long, start: Float, startVelocity: Float): Float =
-        flingCalculator.flingInfo(startVelocity).velocity(playTime)
+    @Suppress("MethodNameUnits")
+    override fun getVelocityFromNanos(
+        playTimeNanos: Long,
+        initialValue: Float,
+        initialVelocity: Float
+    ): Float {
+        val playTimeMillis = playTimeNanos / 1_000_000L
+        return flingCalculator.flingInfo(initialVelocity).velocity(playTimeMillis)
+    }
 }
