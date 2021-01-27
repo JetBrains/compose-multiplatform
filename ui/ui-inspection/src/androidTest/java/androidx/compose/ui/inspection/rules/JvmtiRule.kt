@@ -31,10 +31,12 @@ class JvmtiRule : ExternalResource() {
                 // to make art to load JVMTI plugin.
             }
         }
-        fun noop() {}
+        fun ensureInitialised() {
+            // Calling this makes sure init {} block is triggered
+        }
     }
 
     override fun before() {
-        noop()
+        ensureInitialised()
     }
 }
