@@ -258,7 +258,7 @@ class BottomNavigationTest {
                         icon = {
                             Icon(Icons.Filled.Favorite, null, Modifier.testTag("icon"))
                         },
-                        label = {},
+                        label = null,
                         selected = false,
                         onClick = {}
                     )
