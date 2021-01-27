@@ -72,6 +72,7 @@ dependencies {
 
         testImplementation(ANDROIDX_TEST_RULES)
         testImplementation(ANDROIDX_TEST_RUNNER)
+        testImplementation(KOTLIN_COROUTINES_TEST)
         testImplementation(JUNIT)
         testImplementation(TRUTH)
         testImplementation(MOCKITO_CORE)
@@ -87,6 +88,8 @@ dependencies {
         androidTestImplementation(ANDROIDX_TEST_UIAUTOMATOR)
         androidTestImplementation(ANDROIDX_TEST_RULES)
         androidTestImplementation(ANDROIDX_TEST_RUNNER)
+        androidTestImplementation(ANDROIDX_TEST_EXT_KTX)
+        androidTestImplementation(KOTLIN_COROUTINES_TEST)
         androidTestImplementation(ESPRESSO_CORE)
         androidTestImplementation(JUNIT)
         androidTestImplementation(DEXMAKER_MOCKITO, libs.exclude_bytebuddy)
@@ -104,6 +107,7 @@ dependencies {
         androidTestImplementation project(":compose:ui:ui-test-junit4")
         androidTestImplementation project(":test-screenshot")
         androidTestImplementation "androidx.recyclerview:recyclerview:1.1.0"
+        androidTestImplementation("androidx.core:core-ktx:1.1.0")
 
         lintChecks project(":compose:ui:ui-lint")
         lintPublish project(":compose:ui:ui-lint")
@@ -166,6 +170,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             test.dependencies {
                 implementation(ANDROIDX_TEST_RULES)
                 implementation(ANDROIDX_TEST_RUNNER)
+                implementation(KOTLIN_COROUTINES_TEST)
                 implementation(JUNIT)
                 implementation(TRUTH)
                 implementation(MOCKITO_CORE)
@@ -183,6 +188,8 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation(ANDROIDX_TEST_UIAUTOMATOR)
                 implementation(ANDROIDX_TEST_RULES)
                 implementation(ANDROIDX_TEST_RUNNER)
+                implementation(ANDROIDX_TEST_EXT_KTX)
+                implementation(KOTLIN_COROUTINES_TEST)
                 implementation(ESPRESSO_CORE)
                 implementation(JUNIT)
                 implementation(DEXMAKER_MOCKITO, libs.exclude_bytebuddy)
@@ -200,6 +207,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation project(":compose:ui:ui-test-junit4")
                 implementation project(":test-screenshot")
                 implementation "androidx.recyclerview:recyclerview:1.1.0"
+                implementation("androidx.core:core-ktx:1.1.0")
             }
 
             desktopTest.dependencies {

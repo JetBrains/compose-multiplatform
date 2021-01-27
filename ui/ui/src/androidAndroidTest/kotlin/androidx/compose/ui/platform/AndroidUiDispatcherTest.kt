@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package androidx.compose.runtime.dispatch
+package androidx.compose.ui.platform
 
 import android.graphics.Rect
 import android.view.Choreographer
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup.LayoutParams
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.MonotonicFrameClock
+import androidx.compose.runtime.withFrameNanos
 import androidx.core.view.doOnLayout
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -31,9 +34,10 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.withTimeoutOrNull
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -44,7 +48,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class AndroidUiDispatcherTest {
     @get:Rule
-    val rule = activityScenarioRule<TestActivity>()
+    val rule = activityScenarioRule<AppCompatActivity>()
 
     @Test
     fun currentThreadIsMainOnMainThread() = runBlocking(Dispatchers.Main) {
@@ -133,28 +137,32 @@ class AndroidUiDispatcherTest {
             // in the same frame if the resume was triggered by the input event.
             val rect = layoutRect.await()
             swipe(rect.left + 1, rect.top + 1, rect.right - 1, rect.bottom - 1, 30)
+            waitForIdle()
         }
 
-        withTimeout(3_000) {
-            val viewTouched = viewTouchedOnFrame.await()
-            val inputJob = ranInputJobOnFrame.await()
-            assertNotEquals(0, viewTouched)
-            assertNotEquals(0, inputJob)
-            assertEquals(
-                "touch and launched job resume happened on same frame",
-                viewTouched,
-                inputJob
-            )
-            assertEquals(
-                "withFrame ran on the same frame where it was called",
-                inputJob,
-                withFrameOnFrame.await()
-            )
-            assertEquals(
-                "second withFrame call was invoked on the very next frame",
-                inputJob + 1,
-                withFrameSecondCall.await()
-            )
-        }
+        assertNotNull(
+            "Timeout exceeded waiting for response to input events",
+            withTimeoutOrNull(5_000) {
+                val viewTouched = viewTouchedOnFrame.await()
+                val inputJob = ranInputJobOnFrame.await()
+                assertNotEquals(0, viewTouched)
+                assertNotEquals(0, inputJob)
+                assertEquals(
+                    "touch and launched job resume happened on same frame",
+                    viewTouched,
+                    inputJob
+                )
+                assertEquals(
+                    "withFrame ran on the same frame where it was called",
+                    inputJob,
+                    withFrameOnFrame.await()
+                )
+                assertEquals(
+                    "second withFrame call was invoked on the very next frame",
+                    inputJob + 1,
+                    withFrameSecondCall.await()
+                )
+            }
+        )
     }
 }

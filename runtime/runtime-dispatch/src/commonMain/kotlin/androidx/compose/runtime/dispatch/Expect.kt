@@ -16,12 +16,17 @@
 
 package androidx.compose.runtime.dispatch
 
+import androidx.compose.runtime.withFrameMillis
+import androidx.compose.runtime.withFrameNanos
+
 /**
  * The [MonotonicFrameClock] used by [withFrameNanos] and [withFrameMillis] if one is not present
  * in the calling [kotlin.coroutines.CoroutineContext].
  */
-// Implementor's note:
-// This frame clock implementation should try to synchronize with the vsync rate of the device's
-// default display. Without this synchronization, any usage of this default clock will result
-// in inconsistent animation frame timing and associated visual artifacts.
-expect val DefaultMonotonicFrameClock: MonotonicFrameClock
+@Suppress("DEPRECATION")
+@Deprecated(
+    "Moved to androidx.compose.runtime",
+    ReplaceWith("androidx.compose.runtime.DefaultMonotonicFrameClock")
+)
+val DefaultMonotonicFrameClock: MonotonicFrameClock
+    get() = androidx.compose.runtime.DefaultMonotonicFrameClock

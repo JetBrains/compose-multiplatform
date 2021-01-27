@@ -38,7 +38,6 @@ dependencies {
          * corresponding block below
          */
 
-        api project(':compose:runtime:runtime-dispatch')
         api(KOTLIN_COROUTINES_ANDROID)
 
         implementation "androidx.annotation:annotation:1.1.0"
@@ -76,7 +75,6 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             commonMain.dependencies {
                 implementation(KOTLIN_STDLIB_COMMON)
                 implementation(KOTLIN_COROUTINES_CORE)
-                api project(':compose:runtime:runtime-dispatch')
                 implementation "org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3"
             }
             jvmMain.dependencies {

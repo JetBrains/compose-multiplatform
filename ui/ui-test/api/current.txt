@@ -279,7 +279,7 @@ package androidx.compose.ui.test {
   public final class TestContext {
   }
 
-  @kotlinx.coroutines.ExperimentalCoroutinesApi public final class TestMonotonicFrameClock implements androidx.compose.runtime.dispatch.MonotonicFrameClock {
+  @kotlinx.coroutines.ExperimentalCoroutinesApi public final class TestMonotonicFrameClock implements androidx.compose.runtime.MonotonicFrameClock {
     ctor public TestMonotonicFrameClock(kotlinx.coroutines.CoroutineScope coroutineScope, kotlinx.coroutines.test.DelayController delayController, long frameDelayNanos);
     method public long getFrameDelayNanos();
     method public boolean getHasAwaiters();

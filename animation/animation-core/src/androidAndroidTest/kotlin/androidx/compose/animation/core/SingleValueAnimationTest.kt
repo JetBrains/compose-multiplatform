@@ -19,7 +19,7 @@ package androidx.compose.animation.core
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.dispatch.withFrameNanos
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue

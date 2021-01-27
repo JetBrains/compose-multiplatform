@@ -16,7 +16,7 @@
 
 package androidx.compose.animation.core
 
-import androidx.compose.runtime.dispatch.MonotonicFrameClock
+import androidx.compose.runtime.MonotonicFrameClock
 import androidx.compose.ui.geometry.Offset
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse

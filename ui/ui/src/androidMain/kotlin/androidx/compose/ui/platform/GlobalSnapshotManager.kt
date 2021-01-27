@@ -17,7 +17,6 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.dispatch.AndroidUiDispatcher
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.snapshots.SnapshotWriteObserver
 import androidx.compose.ui.platform.GlobalSnapshotManager.ensureStarted

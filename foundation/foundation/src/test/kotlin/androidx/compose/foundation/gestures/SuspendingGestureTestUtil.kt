@@ -25,7 +25,7 @@ import androidx.compose.runtime.Providers
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.ControlledComposition
 import androidx.compose.runtime.currentComposer
-import androidx.compose.runtime.dispatch.MonotonicFrameClock
+import androidx.compose.runtime.MonotonicFrameClock
 import androidx.compose.runtime.withRunningRecomposer
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset

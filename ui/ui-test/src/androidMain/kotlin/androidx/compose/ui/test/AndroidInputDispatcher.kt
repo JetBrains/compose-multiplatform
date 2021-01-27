@@ -25,7 +25,7 @@ import android.view.MotionEvent.ACTION_POINTER_DOWN
 import android.view.MotionEvent.ACTION_POINTER_INDEX_SHIFT
 import android.view.MotionEvent.ACTION_POINTER_UP
 import android.view.MotionEvent.ACTION_UP
-import androidx.compose.runtime.dispatch.AndroidUiDispatcher
+import androidx.compose.ui.platform.AndroidUiDispatcher
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.platform.ViewRootForTest

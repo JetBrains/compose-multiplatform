@@ -446,7 +446,7 @@ package androidx.compose.animation.core {
     property public final boolean hasObservers;
   }
 
-  public final class ManualFrameClock implements androidx.compose.runtime.dispatch.MonotonicFrameClock {
+  public final class ManualFrameClock implements androidx.compose.runtime.MonotonicFrameClock {
     ctor @Deprecated public ManualFrameClock(long initialTime, boolean dispatchOnSubscribe);
     ctor public ManualFrameClock(long initialTime);
     method public void advanceClock(long nanos);

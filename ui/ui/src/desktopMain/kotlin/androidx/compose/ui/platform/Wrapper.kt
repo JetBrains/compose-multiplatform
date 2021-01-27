@@ -18,23 +18,37 @@ package androidx.compose.ui.platform
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionReference
-import androidx.compose.runtime.EmbeddingContext
+import androidx.compose.runtime.DefaultMonotonicFrameClock
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.Recomposer
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.node.LayoutNode
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.swing.Swing
+import javax.swing.SwingUtilities
+
+object SwingEmbeddingContext {
+    fun isMainThread(): Boolean {
+        return SwingUtilities.isEventDispatchThread()
+    }
+
+    fun mainThreadCompositionContext(): CoroutineContext {
+        return Dispatchers.Swing + DefaultMonotonicFrameClock
+    }
+}
 
 // TODO: Replace usages with an appropriately scoped implementation
 // Below is a local copy of the old Recomposer.current() implementation.
 @OptIn(ExperimentalCoroutinesApi::class)
 private val GlobalDefaultRecomposer = run {
-    val embeddingContext = EmbeddingContext()
+    val embeddingContext = SwingEmbeddingContext
     val mainScope = CoroutineScope(
         NonCancellable + embeddingContext.mainThreadCompositionContext()
     )
