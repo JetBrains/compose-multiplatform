@@ -174,10 +174,44 @@ internal class IdentityScopeMap<T : Any> {
     }
 
     /**
+     * Remove [scope] from the scope set for [value]. If the scope set is empty after [scope] has
+     * been remove the reference to [value] is removed as well.
+     *
+     * @param value the key of the scope map
+     * @param scope the scope being removed
+     * @return true if the value was removed from the scope
+     */
+    fun remove(value: Any, scope: T): Boolean {
+        val index = find(value)
+        if (index >= 0) {
+            val valueOrderIndex = valueOrder[index]
+            val set = scopeSets[valueOrderIndex] ?: return false
+            val removed = set.remove(scope)
+            if (set.size == 0) {
+                val startIndex = index + 1
+                val endIndex = size
+                if (startIndex < endIndex) {
+                    valueOrder.copyInto(
+                        destination = valueOrder,
+                        destinationOffset = index,
+                        startIndex = startIndex,
+                        endIndex = endIndex
+                    )
+                }
+                valueOrder[size - 1] = valueOrderIndex
+                values[valueOrderIndex] = null
+                size--
+            }
+            return removed
+        }
+        return false
+    }
+
+    /**
      * Removes all scopes that match [predicate]. If all scopes for a given value have been
      * removed, that value is removed also.
      */
-    inline fun removeValueIf(predicate: (scope: Any) -> Boolean) {
+    inline fun removeValueIf(predicate: (scope: T) -> Boolean) {
         var destinationIndex = 0
         for (i in 0 until size) {
             val valueIndex = valueOrder[i]
