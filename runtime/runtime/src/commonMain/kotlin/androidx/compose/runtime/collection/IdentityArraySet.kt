@@ -107,7 +107,7 @@ internal class IdentityArraySet<T : Any> {
     /**
      * Remove [value] from the set.
      */
-    fun remove(value: T) {
+    fun remove(value: T): Boolean {
         val index = find(value)
         if (index >= 0) {
             if (index < size - 1) {
@@ -120,7 +120,9 @@ internal class IdentityArraySet<T : Any> {
             }
             size--
             values[size] = null
+            return true
         }
+        return false
     }
 
     /**

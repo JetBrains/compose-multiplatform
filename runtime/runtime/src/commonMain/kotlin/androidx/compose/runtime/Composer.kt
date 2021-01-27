@@ -21,6 +21,7 @@
 )
 package androidx.compose.runtime
 
+import androidx.compose.runtime.collection.IdentityScopeMap
 import androidx.compose.runtime.tooling.InspectionTables
 import kotlinx.collections.immutable.PersistentMap
 import kotlinx.collections.immutable.persistentHashMapOf
@@ -959,8 +960,8 @@ internal class ComposerImpl(
     private var collectKeySources = false
     private var collectParameterInformation = false
     private var nodeExpected = false
-    private val observations: MutableList<Any> = mutableListOf()
-    private val observationsProcessed: MutableList<Any> = mutableListOf()
+    private val observations = IdentityScopeMap<RecomposeScopeImpl>()
+    private val observationsProcessed = IdentityScopeMap<RecomposeScopeImpl>()
     private val invalidations: MutableList<Invalidation> = mutableListOf()
     internal var pendingInvalidScopes = false
     private val entersStack = IntStack()
@@ -1231,7 +1232,7 @@ internal class ComposerImpl(
         if (childrenComposing == 0) {
             currentRecomposeScope?.let {
                 it.used = true
-                observations.insertIfMissing(value, it)
+                observations.add(value, it)
             }
         }
     }
@@ -1248,7 +1249,7 @@ internal class ComposerImpl(
         observations.forEachScopeOf(value) { scope ->
             if (scope.invalidateForResult() == InvalidationResult.IMMINENT) {
                 // If we process this during recordWriteOf, ignore it when recording modifications
-                observationsProcessed.insertIfMissing(value, scope)
+                observationsProcessed.add(value, scope)
             }
         }
     }
@@ -1287,7 +1288,7 @@ internal class ComposerImpl(
         var invalidated: HashSet<RecomposeScopeImpl>? = null
         for (value in values) {
             observations.forEachScopeOf(value) { scope ->
-                if (!observationsProcessed.removeValueScope(value, scope) &&
+                if (!observationsProcessed.remove(value, scope) &&
                     scope.invalidateForResult() != InvalidationResult.IGNORED
                 ) {
                     (
@@ -1301,7 +1302,7 @@ internal class ComposerImpl(
             }
         }
         invalidated?.let {
-            observations.removeValueIf { _, scope -> scope in it }
+            observations.removeValueIf { scope -> scope in it }
         }
     }
 
@@ -1429,7 +1430,7 @@ internal class ComposerImpl(
 
                 if (pendingInvalidScopes) {
                     pendingInvalidScopes = false
-                    observations.removeValueIf { _, scope -> !scope.valid }
+                    observations.removeValueIf { scope -> !scope.valid }
                 }
             } finally {
                 manager.dispatchAbandons()
@@ -3377,55 +3378,6 @@ private fun MutableList<Any>.removeValueScope(value: Any, scope: RecomposeScopeI
     return false
 }
 
-private inline fun MutableList<Any>.removeValueIf(
-    predicate: (value: Any, scope: RecomposeScopeImpl) -> Boolean
-) {
-    var copyLocation = 0
-    for (index in 0 until size / 2) {
-        val slot = index * 2
-        val value = get(slot)
-        val scope = get(slot + 1) as RecomposeScopeImpl
-        if (!predicate(value, scope)) {
-            if (copyLocation != slot) {
-                // Keep the value by copying over a value that has been moved or removed.
-                set(copyLocation++, value)
-                set(copyLocation++, scope)
-            } else {
-                // No slots have been removed yet, just update the copy location
-                copyLocation += 2
-            }
-        }
-    }
-    if (copyLocation < size) {
-        // Delete any left-over slots.
-        subList(copyLocation, size).clear()
-    }
-}
-
-/**
- * Iterate through all the scopes associated with [value]. Returns `false` if [value] has no scopes
- * associated with it.
- */
-private inline fun MutableList<Any>.forEachScopeOf(
-    value: Any,
-    block: (scope: RecomposeScopeImpl) -> Unit
-): Boolean {
-    val valueHash = identityHashCode(value)
-    var index = findFirst(valueHash)
-    var result = false
-    while (index < size) {
-        val storedValue = get(index)
-        if (identityHashCode(storedValue) != valueHash) break
-        if (storedValue === value) {
-            val storedScope = get(index + 1) as RecomposeScopeImpl
-            block(storedScope)
-            result = true
-        }
-        index += 2
-    }
-    return result
-}
-
 private fun MutableList<Any>.find(value: Any, scope: RecomposeScopeImpl): Int {
     val valueHash = identityHashCode(value)
     val scopeHash = identityHashCode(scope)
@@ -3444,9 +3396,6 @@ private fun MutableList<Any>.find(value: Any, scope: RecomposeScopeImpl): Int {
     }
     return -(index + 1)
 }
-
-private fun MutableList<Any>.findFirst(valueHash: Int) =
-    find(valueHash, 0).let { if (it < 0) -(it + 1) else it }
 
 private fun MutableList<Any>.find(valueHash: Int, scopeHash: Int): Int {
     var low = 0

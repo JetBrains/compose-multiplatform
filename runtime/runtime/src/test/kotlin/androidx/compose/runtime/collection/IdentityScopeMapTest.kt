@@ -16,8 +16,12 @@
 
 package androidx.compose.runtime.collection
 
+import org.junit.After
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.test.fail
 
@@ -84,6 +88,25 @@ class IdentityScopeMapTest {
     }
 
     @Test
+    fun removeScope() {
+        val valueC = "C"
+        map.add(valueList[0], scopeList[0])
+        map.add(valueList[0], scopeList[1])
+        map.add(valueList[1], scopeList[2])
+        map.add(valueC, scopeList[3])
+
+        // remove a non existent value, should leave the map unmodified
+        val removed1 = map.remove(valueC, scopeList[0])
+        assertFalse(removed1)
+        assertEquals(3, map.size)
+
+        // Remove a reference which should remove the value
+        val removed2 = map.remove(valueList[1], scopeList[2])
+        assertTrue(removed2)
+        assertEquals(2, map.size)
+    }
+
+    @Test
     fun removeValueIf() {
         val valueC = "C"
         map.add(valueList[0], scopeList[0])
@@ -106,6 +129,39 @@ class IdentityScopeMapTest {
 
         map.forEachScopeOf(valueList[1]) {
             fail("There shouldn't be any scopes for this value")
+        }
+    }
+
+    /**
+     * Validate the test maintains the internal assumptions of the map.
+     */
+    @After
+    fun validateMap() {
+        // Ensure that no duplicates exist in value-order and all indexes are represented
+        val pendingRepresentation = mutableSetOf(*map.values.indices.toList().toTypedArray())
+        map.valueOrder.forEach {
+            assertTrue(it in pendingRepresentation, "Index $it was duplicated")
+            pendingRepresentation.remove(it)
+        }
+        assertTrue(pendingRepresentation.isEmpty(), "Not all indexes are in the valueOrder map")
+
+        // Ensure values are non-null and sets are not empty for index < size and values are
+        // null and sets are empty or missing for >= size
+        val size = map.size
+        map.valueOrder.forEachIndexed { index, order ->
+            val value = map.values[order]
+            val set = map.scopeSets[order]
+            if (index < size) {
+                assertNotNull(value, "A value was unexpectedly null")
+                assertNotNull(set, "A set was unexpectedly null")
+                assertTrue(set.size > 0, "An empty set wasn't collected")
+            } else {
+                assertNull(value, "A reference to a removed value was retained")
+                assertTrue(
+                    actual = set == null || set.size == 0,
+                    message = "A non-empty set was dropped"
+                )
+            }
         }
     }
 
