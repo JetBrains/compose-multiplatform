@@ -31,6 +31,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Providers
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -40,7 +41,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.platform.findViewTreeCompositionReference
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.R
 import androidx.compose.ui.test.captureToImage
@@ -49,6 +52,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -340,6 +344,86 @@ class AndroidViewTest {
             }
         }
         rule.waitForIdle()
+    }
+
+    @Test
+    fun androidView_propagatesViewTreeCompositionReference() {
+        lateinit var parentComposeView: ComposeView
+        lateinit var compositionChildView: View
+        rule.activityRule.scenario.onActivity { activity ->
+            parentComposeView = ComposeView(activity).apply {
+                setContent {
+                    AndroidView(::View) {
+                        compositionChildView = it
+                    }
+                }
+                activity.setContentView(this)
+            }
+        }
+        rule.runOnIdle {
+            assertThat(compositionChildView.findViewTreeCompositionReference())
+                .isNotEqualTo(parentComposeView.findViewTreeCompositionReference())
+        }
+    }
+
+    @Test
+    fun androidView_propagatesAmbientsToComposeViewChildren() {
+        val ambient = compositionLocalOf { "unset" }
+        var childComposedAmbientValue = "uncomposed"
+        rule.setContent {
+            Providers(ambient provides "setByParent") {
+                AndroidView(
+                    viewBlock = {
+                        ComposeView(it).apply {
+                            setContent {
+                                childComposedAmbientValue = ambient.current
+                            }
+                        }
+                    }
+                )
+            }
+        }
+        rule.runOnIdle {
+            assertThat(childComposedAmbientValue).isEqualTo("setByParent")
+        }
+    }
+
+    @Test
+    fun androidView_propagatesLayoutDirectionToComposeViewChildren() {
+        var childViewLayoutDirection: Int = Int.MIN_VALUE
+        var childCompositionLayoutDirection: LayoutDirection? = null
+        rule.setContent {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                AndroidView(
+                    viewBlock = {
+                        FrameLayout(it).apply {
+                            addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+                                childViewLayoutDirection = layoutDirection
+                            }
+                            addView(
+                                ComposeView(it).apply {
+                                    // The view hierarchy's layout direction should always override
+                                    // the ambient layout direction from the parent composition.
+                                    layoutDirection = android.util.LayoutDirection.LTR
+                                    setContent {
+                                        childCompositionLayoutDirection =
+                                            LocalLayoutDirection.current
+                                    }
+                                },
+                                ViewGroup.LayoutParams(
+                                    ViewGroup.LayoutParams.MATCH_PARENT,
+                                    ViewGroup.LayoutParams.MATCH_PARENT
+                                )
+                            )
+                        }
+                    }
+                )
+            }
+        }
+        rule.runOnIdle {
+            assertThat(childViewLayoutDirection).isEqualTo(android.util.LayoutDirection.RTL)
+            assertThat(childCompositionLayoutDirection).isEqualTo(LayoutDirection.Ltr)
+        }
     }
 
     private fun Dp.toPx(displayMetrics: DisplayMetrics) =

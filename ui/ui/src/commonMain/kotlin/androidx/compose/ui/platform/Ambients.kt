@@ -318,7 +318,7 @@ internal fun ProvideCommonCompositionLocals(
         LocalFocusManager provides owner.focusManager,
         LocalFontLoader provides owner.fontLoader,
         LocalHapticFeedback provides owner.hapticFeedBack,
-        LocalLayoutDirection providesDefault owner.layoutDirection,
+        LocalLayoutDirection provides owner.layoutDirection,
         LocalTextInputService provides owner.textInputService,
         LocalTextToolbar provides owner.textToolbar,
         LocalUriHandler provides uriHandler,
