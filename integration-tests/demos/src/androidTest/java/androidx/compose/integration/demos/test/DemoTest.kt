@@ -46,12 +46,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-private val demosWithInifinateAnimations = listOf("Material > Progress Indicators")
-
-private val ignoredDemos = listOf(
-    // TODO(b/168695905, fresen): We don't have a way to pause suspend animations yet.
-    "Animation > Suspend Animation Demos > Infinitely Animating",
-    "Animation > State Transition Demos > Infinite transition",
+private val ignoredDemos = listOf<String>(
+    // Not ignoring any of them \o/
 )
 
 @LargeTest
@@ -69,7 +65,7 @@ class DemoTest {
         rule.onNodeWithTag(Tags.FilterButton).performClick()
 
         // TODO: use keyboard input APIs when available to actually filter the list
-        val testDemo = AllDemosWithoutInfiniteAnimations.allLaunchableDemos()
+        val testDemo = AllButIgnoredDemos.allLaunchableDemos()
             // ActivityDemos don't set the title in the AppBar, so we can't verify if we've
             // opened the right one. So, only use ComposableDemos
             .filterIsInstance<ComposableDemo>()
@@ -88,8 +84,7 @@ class DemoTest {
     @MediumTest
     fun testAllDemosAreBeingTested() {
         assertThat(
-            SplitDemoCategories.sumBy { it.allLaunchableDemos().size } +
-                AllDemosWithInfiniteAnimations.allLaunchableDemos().size
+            SplitDemoCategories.sumBy { it.allLaunchableDemos().size }
         ).isEqualTo(AllButIgnoredDemos.allLaunchableDemos().size)
     }
 
@@ -111,13 +106,6 @@ class DemoTest {
     @Test
     fun navigateThroughAllDemos_4() {
         navigateThroughAllDemos(SplitDemoCategories[3])
-    }
-
-    @Test
-    fun navigateThroughAllDemos_withInfiniteAnimations() {
-        // Pause the clock in these tests and forward it manually
-        rule.mainClock.autoAdvance = false
-        navigateThroughAllDemos(AllDemosWithInfiniteAnimations, fastForwardClock = true)
     }
 
     private fun navigateThroughAllDemos(root: DemoCategory, fastForwardClock: Boolean = false) {
@@ -237,17 +225,7 @@ private val AllButIgnoredDemos =
         demo.navigationTitle(path) !in ignoredDemos
     }
 
-private val AllDemosWithoutInfiniteAnimations =
-    AllButIgnoredDemos.filter { path, demo ->
-        demo.navigationTitle(path) !in demosWithInifinateAnimations
-    }
-
-private val AllDemosWithInfiniteAnimations =
-    AllButIgnoredDemos.filter { path, demo ->
-        demo.navigationTitle(path) in demosWithInifinateAnimations
-    }
-
-private val SplitDemoCategories = AllDemosWithoutInfiniteAnimations.let { root ->
+private val SplitDemoCategories = AllButIgnoredDemos.let { root ->
     root.allLaunchableDemos().let { leaves ->
         val size = leaves.size
         leaves.withIndex()

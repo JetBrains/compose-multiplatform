@@ -227,7 +227,7 @@ internal suspend fun <T, V : AnimationVector> AnimationState<T, V>.animate(
     try {
         val startTimeNanosSpecified =
             if (startTimeNanos == AnimationConstants.UnspecifiedTime) {
-                withFrameNanos { it }
+                animation.callWithFrameNanos { it }
             } else {
                 startTimeNanos
             }
@@ -245,7 +245,7 @@ internal suspend fun <T, V : AnimationVector> AnimationState<T, V>.animate(
         lateInitScope.doAnimationFrame(startTimeNanosSpecified, animation, this, block)
         // Subsequent frames
         while (lateInitScope.isRunning) {
-            withFrameNanos {
+            animation.callWithFrameNanos {
                 lateInitScope.doAnimationFrame(it, animation, this, block)
             }
         }
@@ -257,6 +257,20 @@ internal suspend fun <T, V : AnimationVector> AnimationState<T, V>.animate(
             isRunning = false
         }
         throw e
+    }
+}
+
+/**
+ * Calls the [finite][withFrameNanos] or [infinite][withInfiniteAnimationFrameNanos]
+ * variant of `withFrameNanos`, depending on the value of [Animation.isInfinite].
+ */
+private suspend fun <R, T, V : AnimationVector> Animation<T, V>.callWithFrameNanos(
+    onFrame: (frameTimeNanos: Long) -> R
+): R {
+    return if (isInfinite) {
+        withInfiniteAnimationFrameNanos(onFrame)
+    } else {
+        withFrameNanos(onFrame)
     }
 }
 
