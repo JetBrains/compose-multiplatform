@@ -42,8 +42,8 @@ import androidx.compose.ui.unit.dp
  *
  * 1) Clipping: Surface clips its children to the shape specified by [shape]
  *
- * 2) Elevation: Surface elevates its children on the Z axis by [elevation] pixels,
- * and draws the appropriate shadow.
+ * 2) Elevation: Surface draws a shadow to represent depth, where [elevation] represents the
+ * depth of this surface.
  *
  * 3) Borders: If [shape] has a border, then it will also be drawn.
  *
