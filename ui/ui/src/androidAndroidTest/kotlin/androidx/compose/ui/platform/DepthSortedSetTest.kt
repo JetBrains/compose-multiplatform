@@ -155,7 +155,7 @@ class DepthSortedSetTest {
         set.pop()
     }
 
-    abstract class DepthTestOwner : Owner {
+    internal abstract class DepthTestOwner : Owner {
         override val root: LayoutNode
             get() = LayoutNode()
     }

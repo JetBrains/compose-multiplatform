@@ -1981,32 +1981,6 @@ package androidx.compose.ui.node {
   @kotlin.RequiresOptIn(message="This API is internal to library.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface InternalCoreApi {
   }
 
-  public final class LayoutNode implements androidx.compose.ui.layout.LayoutInfo androidx.compose.ui.layout.Measurable androidx.compose.ui.layout.Remeasurement {
-    method public void forceRemeasure();
-    method public androidx.compose.ui.layout.LayoutCoordinates getCoordinates();
-    method public int getHeight();
-    method public java.util.List<androidx.compose.ui.layout.ModifierInfo> getModifierInfo();
-    method public Object? getParentData();
-    method public androidx.compose.ui.layout.LayoutInfo? getParentInfo();
-    method public int getWidth();
-    method public boolean isAttached();
-    method public boolean isPlaced();
-    method public boolean isValid();
-    method public int maxIntrinsicHeight(int width);
-    method public int maxIntrinsicWidth(int height);
-    method public androidx.compose.ui.layout.Placeable measure-BRTryo0(long constraints);
-    method public int minIntrinsicHeight(int width);
-    method public int minIntrinsicWidth(int height);
-    property public androidx.compose.ui.layout.LayoutCoordinates coordinates;
-    property public int height;
-    property public boolean isAttached;
-    property public boolean isPlaced;
-    property public boolean isValid;
-    property public Object? parentData;
-    property public androidx.compose.ui.layout.LayoutInfo? parentInfo;
-    property public int width;
-  }
-
   public final class LayoutNodeKt {
   }
 
@@ -2600,10 +2574,8 @@ package androidx.compose.ui.semantics {
   }
 
   public final class SemanticsOwner {
-    method public androidx.compose.ui.node.LayoutNode getRootNode();
     method public androidx.compose.ui.semantics.SemanticsNode getRootSemanticsNode();
     method public androidx.compose.ui.semantics.SemanticsNode getUnmergedRootSemanticsNode();
-    property public final androidx.compose.ui.node.LayoutNode rootNode;
     property public final androidx.compose.ui.semantics.SemanticsNode rootSemanticsNode;
     property public final androidx.compose.ui.semantics.SemanticsNode unmergedRootSemanticsNode;
   }

@@ -32,8 +32,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Applier
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.ComposeNode
+import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,7 +54,7 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
-import androidx.compose.ui.node.LayoutEmitHelper
+import androidx.compose.ui.node.ComposeUiNode
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.node.Ref
@@ -513,10 +513,10 @@ class AndroidViewCompatTest {
                     ) {
                         it.setContent {
                             ComposeNode<LayoutNode, Applier<Any>>(
-                                factory = LayoutEmitHelper.constructor,
+                                factory = LayoutNode.Constructor,
                                 update = {
                                     init { node = this }
-                                    set(noOpMeasureBlocks, LayoutEmitHelper.setMeasureBlocks)
+                                    set(noOpMeasureBlocks, ComposeUiNode.SetMeasureBlocks)
                                 }
                             )
                         }
