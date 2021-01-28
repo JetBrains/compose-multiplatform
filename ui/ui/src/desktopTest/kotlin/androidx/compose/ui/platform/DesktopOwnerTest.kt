@@ -32,6 +32,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.ExperimentalComposeApi
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -47,9 +48,10 @@ import androidx.compose.ui.input.mouse.MouseScrollUnit
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.test.junit4.DesktopScreenshotTestRule
 import androidx.compose.ui.unit.dp
+import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.yield
 import org.junit.Assert.assertFalse
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 
@@ -209,7 +211,6 @@ class DesktopOwnerTest {
     }
 
     @Test(timeout = 5000)
-    @Ignore("enable after we fix https://github.com/JetBrains/compose-jb/issues/137")
     fun `rendering of transition`() = renderingTest(width = 40, height = 40) {
         var targetValue by mutableStateOf(10f)
 
@@ -221,34 +222,34 @@ class DesktopOwnerTest {
             Box(Modifier.size(value.dp).background(Color.Blue))
         }
 
+        // TODO(demin) can we get rid of 'yield' here and write something more meaningful?
+        // animateFloatAsState will remember the initial animation value
+        // only after two asynchronous points:
+        //
+        // 1. LaunchedEffect in animateFloatAsState (wait with 'yield')
+        // 2. startTimeSpecified/withFrameNanos in SuspendAnimation.kt (wait with 'awaitNextRender')
+        //
+        // We need to wait for this moment because later we will change the target value
+        // to animate to it from the initial remembered value.
+        yield()
         awaitNextRender()
         screenshotRule.snap(surface, "frame1_initial")
 
+        targetValue = 40f
+        awaitNextRender()
+        screenshotRule.snap(surface, "frame2_target40_0ms")
+
+        currentTimeMillis = 10
+        awaitNextRender()
+        screenshotRule.snap(surface, "frame3_target40_10ms")
+
         currentTimeMillis = 20
         awaitNextRender()
-        screenshotRule.snap(surface, "frame2_20ms")
+        screenshotRule.snap(surface, "frame4_target40_20ms")
 
         currentTimeMillis = 30
         awaitNextRender()
-        screenshotRule.snap(surface, "frame3_30ms")
-        assertFalse(hasRenders())
-
-        targetValue = 40f
-        currentTimeMillis = 30
-        awaitNextRender()
-        screenshotRule.snap(surface, "frame4_30ms_target40")
-
-        currentTimeMillis = 40
-        awaitNextRender()
-        screenshotRule.snap(surface, "frame5_40ms_target40")
-
-        currentTimeMillis = 50
-        awaitNextRender()
-        screenshotRule.snap(surface, "frame6_50ms_target40")
-
-        currentTimeMillis = 60
-        awaitNextRender()
-        screenshotRule.snap(surface, "frame7_60ms_target40")
+        screenshotRule.snap(surface, "frame5_target40_30ms")
         assertFalse(hasRenders())
     }
 
@@ -328,7 +329,6 @@ class DesktopOwnerTest {
     }
 
     @Test(timeout = 5000)
-    @Ignore("enable after we fix https://github.com/JetBrains/compose-jb/issues/137")
     fun `rendering, change state before first onRender`() = renderingTest(
         width = 40,
         height = 40
@@ -342,5 +342,19 @@ class DesktopOwnerTest {
         awaitNextRender()
         screenshotRule.snap(surface, "frame1_initial")
         assertFalse(hasRenders())
+    }
+
+    @Test(timeout = 5000)
+    fun `launch effect`() = renderingTest(width = 40, height = 40) {
+        var effectIsLaunched = false
+
+        setContent {
+            LaunchedEffect(Unit) {
+                effectIsLaunched = true
+            }
+        }
+
+        awaitNextRender()
+        Truth.assertThat(effectIsLaunched).isTrue()
     }
 }

@@ -18,8 +18,9 @@ package androidx.compose.ui.test.junit4
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.snapshots.Snapshot
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.platform.DesktopOwner
 import androidx.compose.ui.platform.DesktopOwners
@@ -38,8 +39,13 @@ import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skija.Surface
+import org.jetbrains.skiko.FrameDispatcher
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
 import java.util.LinkedList
@@ -57,16 +63,23 @@ class DesktopComposeTestRule : ComposeContentTestRule {
         var current: DesktopComposeTestRule? = null
     }
 
-    var owners: DesktopOwners? = null
+    private var window: TestWindow? = null
+    val owners: DesktopOwners get() = window!!.owners
     private var owner: DesktopOwner? = null
 
     override val density: Density
-        get() = TODO()
+        get() = Density(1f, 1f)
 
     override val mainClock: MainTestClock
         get() = TODO()
 
     internal val testDisplaySize: IntSize get() = IntSize(1024, 768)
+
+    private val surface = Surface.makeRasterN32Premul(
+        testDisplaySize.width,
+        testDisplaySize.height
+    )
+    private val canvas = surface.canvas
 
     val executionQueue = LinkedList<() -> Unit>()
 
@@ -77,11 +90,22 @@ class DesktopComposeTestRule : ComposeContentTestRule {
         current = this
         return object : Statement() {
             override fun evaluate() {
-                base.evaluate()
-                runExecutionQueue()
+                canvas.clear(Color.Transparent.toArgb())
+
                 runOnUiThread {
-                    owner?.dispose()
-                    owner = null
+                    window = TestWindow()
+                }
+
+                try {
+                    base.evaluate()
+                    runExecutionQueue()
+                } finally {
+                    runOnUiThread {
+                        owner?.dispose()
+                        owner = null
+                        window?.dispose()
+                        window = null
+                    }
                 }
             }
         }
@@ -96,7 +120,7 @@ class DesktopComposeTestRule : ComposeContentTestRule {
     @OptIn(ExperimentalComposeApi::class)
     private fun isIdle() =
         !Snapshot.current.hasPendingChanges() &&
-            !Recomposer.runningRecomposers.value.any { it.hasPendingWork }
+            !owners.hasInvalidations()
 
     override fun waitForIdle() {
         while (!isIdle()) {
@@ -114,12 +138,16 @@ class DesktopComposeTestRule : ComposeContentTestRule {
     }
 
     override fun <T> runOnUiThread(action: () -> T): T {
-        val task: FutureTask<T> = FutureTask(action)
-        invokeAndWait(task)
-        try {
-            return task.get()
-        } catch (e: ExecutionException) { // Expose the original exception
-            throw e.cause!!
+        return if (isEventDispatchThread()) {
+            action()
+        } else {
+            val task: FutureTask<T> = FutureTask(action)
+            invokeAndWait(task)
+            try {
+                return task.get()
+            } catch (e: ExecutionException) { // Expose the original exception
+                throw e.cause!!
+            }
         }
     }
 
@@ -164,12 +192,7 @@ class DesktopComposeTestRule : ComposeContentTestRule {
     }
 
     private fun performSetContent(composable: @Composable() () -> Unit) {
-        val surface = Surface.makeRasterN32Premul(testDisplaySize.width, testDisplaySize.height)
-        val canvas = surface.canvas
-        val owners = DesktopOwners(invalidate = {}).also {
-            owners = it
-        }
-        val owner = DesktopOwner(owners)
+        val owner = DesktopOwner(owners, density)
         owner.setContent(content = composable)
         owner.setSize(testDisplaySize.width, testDisplaySize.height)
         owner.measureAndLayout()
@@ -191,6 +214,27 @@ class DesktopComposeTestRule : ComposeContentTestRule {
         return SemanticsNodeInteractionCollection(testContext, useUnmergedTree, matcher)
     }
 
+    private inner class TestWindow {
+        private val coroutineScope = CoroutineScope(Dispatchers.Swing)
+
+        private val frameDispatcher = FrameDispatcher(
+            onFrame = {
+                val nanoTime = System.nanoTime() // TODO(demin): use mainClock?
+                owners.onFrame(canvas, testDisplaySize.width, testDisplaySize.height, nanoTime)
+            },
+            context = coroutineScope.coroutineContext
+        )
+
+        val owners: DesktopOwners = DesktopOwners(
+            coroutineScope = coroutineScope,
+            invalidate = frameDispatcher::scheduleFrame
+        )
+
+        fun dispose() {
+            coroutineScope.cancel()
+        }
+    }
+
     private class DesktopTestOwner(val rule: DesktopComposeTestRule) : TestOwner {
         override fun sendTextInputCommand(node: SemanticsNode, command: List<EditCommand>) {
             TODO()
@@ -205,7 +249,7 @@ class DesktopComposeTestRule : ComposeContentTestRule {
         }
 
         override fun getRoots(): Set<RootForTest> {
-            return rule.owners!!.list
+            return rule.owners.list
         }
 
         override val mainClock: MainTestClock

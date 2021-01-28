@@ -24,6 +24,9 @@ import androidx.compose.ui.platform.DesktopPlatform
 import androidx.compose.ui.platform.DesktopPlatformAmbient
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.unit.Density
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skija.Surface
 
 class TestComposeWindow(
@@ -34,7 +37,9 @@ class TestComposeWindow(
 ) {
     val surface = Surface.makeRasterN32Premul(width, height)
     val canvas = surface.canvas
-    val owners = DesktopOwners(invalidate = {})
+    val owners = DesktopOwners(
+        coroutineScope = CoroutineScope(Dispatchers.Swing)
+    )
 
     fun setContent(content: @Composable () -> Unit): DesktopOwners {
         val owner = DesktopOwner(owners, density)

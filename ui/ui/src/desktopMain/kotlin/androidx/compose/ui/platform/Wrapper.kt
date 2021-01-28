@@ -18,51 +18,10 @@ package androidx.compose.ui.platform
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionReference
-import androidx.compose.runtime.DefaultMonotonicFrameClock
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Providers
-import androidx.compose.runtime.Recomposer
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.node.LayoutNode
-import kotlin.coroutines.CoroutineContext
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.swing.Swing
-import javax.swing.SwingUtilities
-
-object SwingEmbeddingContext {
-    fun isMainThread(): Boolean {
-        return SwingUtilities.isEventDispatchThread()
-    }
-
-    fun mainThreadCompositionContext(): CoroutineContext {
-        return Dispatchers.Swing + DefaultMonotonicFrameClock
-    }
-}
-
-// TODO: Replace usages with an appropriately scoped implementation
-// Below is a local copy of the old Recomposer.current() implementation.
-@OptIn(ExperimentalCoroutinesApi::class)
-private val GlobalDefaultRecomposer = run {
-    val embeddingContext = SwingEmbeddingContext
-    val mainScope = CoroutineScope(
-        NonCancellable + embeddingContext.mainThreadCompositionContext()
-    )
-
-    Recomposer(mainScope.coroutineContext).also {
-        // NOTE: Launching undispatched so that compositions created with the
-        // singleton instance can assume the recomposer is running
-        // when they perform initial composition. The relevant Recomposer code is
-        // appropriately thread-safe for this.
-        mainScope.launch(start = CoroutineStart.UNDISPATCHED) {
-            it.runRecomposeAndApplyChanges()
-        }
-    }
-}
 
 /**
  * Composes the given composable into [DesktopOwner]
@@ -78,11 +37,7 @@ fun DesktopOwner.setContent(
 ): Composition {
     GlobalSnapshotManager.ensureStarted()
 
-    val composition = Composition(
-        root,
-        DesktopUiApplier(root),
-        parent ?: GlobalDefaultRecomposer
-    )
+    val composition = Composition(root, DesktopUiApplier(root), parent ?: container.recomposer)
     composition.setContent {
         ProvideDesktopAmbients(this) {
             DesktopSelectionContainer(content)
