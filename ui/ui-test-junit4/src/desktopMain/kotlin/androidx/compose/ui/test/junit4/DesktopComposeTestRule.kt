@@ -19,12 +19,8 @@ package androidx.compose.ui.test.junit4
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.snapshots.Snapshot
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.node.RootForTest
-import androidx.compose.ui.platform.DesktopOwner
-import androidx.compose.ui.platform.DesktopOwners
-import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.platform.TestComposeWindow
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.IdlingResource
@@ -39,16 +35,11 @@ import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.swing.Swing
-import org.jetbrains.skija.Surface
-import org.jetbrains.skiko.FrameDispatcher
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
-import java.util.LinkedList
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.FutureTask
 import javax.swing.SwingUtilities.invokeAndWait
@@ -63,10 +54,6 @@ class DesktopComposeTestRule : ComposeContentTestRule {
         var current: DesktopComposeTestRule? = null
     }
 
-    private var window: TestWindow? = null
-    val owners: DesktopOwners get() = window!!.owners
-    private var owner: DesktopOwner? = null
-
     override val density: Density
         get() = Density(1f, 1f)
 
@@ -75,13 +62,7 @@ class DesktopComposeTestRule : ComposeContentTestRule {
 
     internal val testDisplaySize: IntSize get() = IntSize(1024, 768)
 
-    private val surface = Surface.makeRasterN32Premul(
-        testDisplaySize.width,
-        testDisplaySize.height
-    )
-    private val canvas = surface.canvas
-
-    val executionQueue = LinkedList<() -> Unit>()
+    lateinit var window: TestComposeWindow
 
     private val testOwner = DesktopTestOwner(this)
     private val testContext = createTestContext(testOwner)
@@ -90,41 +71,32 @@ class DesktopComposeTestRule : ComposeContentTestRule {
         current = this
         return object : Statement() {
             override fun evaluate() {
-                canvas.clear(Color.Transparent.toArgb())
-
-                runOnUiThread {
-                    window = TestWindow()
-                }
+                window = runOnUiThread(::createWindow)
 
                 try {
                     base.evaluate()
-                    runExecutionQueue()
                 } finally {
-                    runOnUiThread {
-                        owner?.dispose()
-                        owner = null
-                        window?.dispose()
-                        window = null
-                    }
+                    runOnUiThread(window::dispose)
                 }
             }
         }
     }
 
-    private fun runExecutionQueue() {
-        while (executionQueue.isNotEmpty()) {
-            executionQueue.removeFirst()()
-        }
-    }
+    private fun createWindow() = TestComposeWindow(
+        width = testDisplaySize.width,
+        height = testDisplaySize.height,
+        density = density,
+        nanoTime = System::nanoTime, // TODO(demin): use mainClock?
+        coroutineContext = Dispatchers.Swing
+    )
 
     @OptIn(ExperimentalComposeApi::class)
     private fun isIdle() =
         !Snapshot.current.hasPendingChanges() &&
-            !owners.hasInvalidations()
+            !window.hasInvalidations()
 
     override fun waitForIdle() {
         while (!isIdle()) {
-            runExecutionQueue()
             Thread.sleep(10)
         }
     }
@@ -132,7 +104,6 @@ class DesktopComposeTestRule : ComposeContentTestRule {
     @ExperimentalTestApi
     override suspend fun awaitIdle() {
         while (!isIdle()) {
-            runExecutionQueue()
             delay(10)
         }
     }
@@ -173,15 +144,11 @@ class DesktopComposeTestRule : ComposeContentTestRule {
     }
 
     override fun setContent(composable: @Composable () -> Unit) {
-        check(owner == null) {
-            "Cannot call setContent twice per test!"
-        }
-
         if (isEventDispatchThread()) {
-            performSetContent(composable)
+            window.setContent(composable)
         } else {
             runOnUiThread {
-                performSetContent(composable)
+                window.setContent(composable)
             }
 
             // Only wait for idleness if not on the UI thread. If we are on the UI thread, the
@@ -189,15 +156,6 @@ class DesktopComposeTestRule : ComposeContentTestRule {
             // executing future tasks on the main thread.
             waitForIdle()
         }
-    }
-
-    private fun performSetContent(composable: @Composable() () -> Unit) {
-        val owner = DesktopOwner(owners, density)
-        owner.setContent(content = composable)
-        owner.setSize(testDisplaySize.width, testDisplaySize.height)
-        owner.measureAndLayout()
-        owner.draw(canvas)
-        this.owner = owner
     }
 
     override fun onNode(
@@ -214,27 +172,6 @@ class DesktopComposeTestRule : ComposeContentTestRule {
         return SemanticsNodeInteractionCollection(testContext, useUnmergedTree, matcher)
     }
 
-    private inner class TestWindow {
-        private val coroutineScope = CoroutineScope(Dispatchers.Swing)
-
-        private val frameDispatcher = FrameDispatcher(
-            onFrame = {
-                val nanoTime = System.nanoTime() // TODO(demin): use mainClock?
-                owners.onFrame(canvas, testDisplaySize.width, testDisplaySize.height, nanoTime)
-            },
-            context = coroutineScope.coroutineContext
-        )
-
-        val owners: DesktopOwners = DesktopOwners(
-            coroutineScope = coroutineScope,
-            invalidate = frameDispatcher::scheduleFrame
-        )
-
-        fun dispose() {
-            coroutineScope.cancel()
-        }
-    }
-
     private class DesktopTestOwner(val rule: DesktopComposeTestRule) : TestOwner {
         override fun sendTextInputCommand(node: SemanticsNode, command: List<EditCommand>) {
             TODO()
@@ -249,7 +186,7 @@ class DesktopComposeTestRule : ComposeContentTestRule {
         }
 
         override fun getRoots(): Set<RootForTest> {
-            return rule.owners.list
+            return rule.window.roots
         }
 
         override val mainClock: MainTestClock

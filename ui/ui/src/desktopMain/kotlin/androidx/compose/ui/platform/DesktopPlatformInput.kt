@@ -42,7 +42,7 @@ import java.util.Locale
 import kotlin.math.max
 import kotlin.math.min
 
-interface DesktopInputComponent {
+internal interface DesktopInputComponent {
     fun enableInput(inputMethodRequests: InputMethodRequests)
     fun disableInput()
     // Input service needs to know this information to implement Input Method support
