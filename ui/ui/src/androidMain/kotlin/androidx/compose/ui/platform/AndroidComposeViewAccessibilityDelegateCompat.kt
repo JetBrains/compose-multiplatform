@@ -57,6 +57,7 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.platform.toAccessibilitySpannableString
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.core.view.AccessibilityDelegateCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityEventCompat
@@ -435,12 +436,14 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             } else {
                 info.className = "android.widget.ProgressBar"
             }
-            info.rangeInfo = AccessibilityNodeInfoCompat.RangeInfoCompat.obtain(
-                AccessibilityNodeInfoCompat.RangeInfoCompat.RANGE_TYPE_FLOAT,
-                rangeInfo.range.start,
-                rangeInfo.range.endInclusive,
-                rangeInfo.current
-            )
+            if (rangeInfo !== ProgressBarRangeInfo.Indeterminate) {
+                info.rangeInfo = AccessibilityNodeInfoCompat.RangeInfoCompat.obtain(
+                    AccessibilityNodeInfoCompat.RangeInfoCompat.RANGE_TYPE_FLOAT,
+                    rangeInfo.range.start,
+                    rangeInfo.range.endInclusive,
+                    rangeInfo.current
+                )
+            }
             if (semanticsNode.config.contains(SemanticsActions.SetProgress) &&
                 semanticsNode.enabled()
             ) {
