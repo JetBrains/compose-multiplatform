@@ -258,7 +258,7 @@ private class CompositionImpl(
 
     private var disposed = false
 
-    var composable: @Composable () -> Unit = emptyContent()
+    var composable: @Composable () -> Unit = {}
 
     override val isComposing: Boolean
         get() = composer.isComposing
@@ -282,7 +282,7 @@ private class CompositionImpl(
     override fun dispose() {
         if (!disposed) {
             disposed = true
-            composable = emptyContent()
+            composable = {}
             composer.dispose()
             parent.unregisterComposition(this)
             onDispose?.invoke()
@@ -370,7 +370,7 @@ private class HotReloader {
             state.clear()
             val holders = Compositions.collectAll()
             holders.mapTo(state) { it to it.composable }
-            holders.filter { it.isRoot }.forEach { it.setContent(emptyContent()) }
+            holders.filter { it.isRoot }.forEach { it.setContent({}) }
         }
 
         // Called after Dex Code Swap

@@ -24,10 +24,18 @@ private val EmptyComposable: @Composable () -> Unit = {}
  * See [orEmpty] for handling nullable Composable lambdas using empty content.
  */
 @Stable
+@Deprecated(
+    "An empty lambda literal is preferred",
+    replaceWith = ReplaceWith("{}")
+)
 fun emptyContent() = EmptyComposable
 
 /**
  * @return this Composable if not null, else [emptyContent].
  */
-@Suppress("NOTHING_TO_INLINE")
+@Suppress("NOTHING_TO_INLINE", "DEPRECATION")
+@Deprecated(
+    "Use the null coalescing operator instead",
+    replaceWith = ReplaceWith("this ?: {}")
+)
 inline fun (@Composable (() -> Unit))?.orEmpty() = this ?: emptyContent()

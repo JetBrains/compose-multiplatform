@@ -17,7 +17,6 @@
 package androidx.compose.foundation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.Layout
@@ -184,7 +183,7 @@ fun Image(
     // Explicitly use a simple Layout implementation here as Spacer squashes any non fixed
     // constraint with zero
     Layout(
-        emptyContent(),
+        {},
         modifier.then(semantics).clipToBounds().paint(
             painter,
             alignment = alignment,

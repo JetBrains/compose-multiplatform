@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.runtime.emptyContent
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
@@ -66,7 +65,7 @@ class ModalBottomSheetTest {
         rule.setMaterialContent {
             ModalBottomSheetLayout(
                 sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
-                content = emptyContent(),
+                content = {},
                 sheetContent = {
                     Box(
                         Modifier
@@ -88,7 +87,7 @@ class ModalBottomSheetTest {
         rule.setMaterialContent {
             ModalBottomSheetLayout(
                 sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded),
-                content = emptyContent(),
+                content = {},
                 sheetContent = {
                     Box(
                         Modifier
@@ -110,7 +109,7 @@ class ModalBottomSheetTest {
         rule.setMaterialContent {
             ModalBottomSheetLayout(
                 sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
-                content = emptyContent(),
+                content = {},
                 sheetContent = {
                     Box(
                         Modifier
@@ -131,7 +130,7 @@ class ModalBottomSheetTest {
         rule.setMaterialContent {
             ModalBottomSheetLayout(
                 sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded),
-                content = emptyContent(),
+                content = {},
                 sheetContent = {
                     Box(
                         Modifier
@@ -151,7 +150,7 @@ class ModalBottomSheetTest {
         rule.setMaterialContent {
             ModalBottomSheetLayout(
                 sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.HalfExpanded),
-                content = emptyContent(),
+                content = {},
                 sheetContent = {
                     Box(
                         Modifier
@@ -173,7 +172,7 @@ class ModalBottomSheetTest {
         rule.setMaterialContent {
             ModalBottomSheetLayout(
                 sheetState = sheetState,
-                content = emptyContent(),
+                content = {},
                 sheetContent = {
                     Box(
                         Modifier
@@ -215,7 +214,7 @@ class ModalBottomSheetTest {
         rule.setMaterialContent {
             ModalBottomSheetLayout(
                 sheetState = sheetState,
-                content = emptyContent(),
+                content = {},
                 sheetContent = {
                     Box(
                         Modifier
@@ -256,7 +255,7 @@ class ModalBottomSheetTest {
         rule.setMaterialContent {
             ModalBottomSheetLayout(
                 sheetState = sheetState,
-                content = emptyContent(),
+                content = {},
                 sheetContent = {
                     Box(
                         Modifier
@@ -288,7 +287,7 @@ class ModalBottomSheetTest {
         rule.setMaterialContent {
             ModalBottomSheetLayout(
                 sheetState = sheetState,
-                content = emptyContent(),
+                content = {},
                 sheetContent = {
                     Box(
                         Modifier
@@ -319,7 +318,7 @@ class ModalBottomSheetTest {
         rule.setMaterialContent {
             ModalBottomSheetLayout(
                 sheetState = sheetState,
-                content = emptyContent(),
+                content = {},
                 sheetContent = {
                     Box(
                         Modifier

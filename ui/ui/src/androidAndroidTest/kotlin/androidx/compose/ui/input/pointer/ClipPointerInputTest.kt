@@ -21,7 +21,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.emptyContent
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
@@ -316,7 +315,7 @@ class ClipPointerInputTest {
 
     @Composable
     fun Child(modifier: Modifier) {
-        Layout(content = emptyContent(), modifier = modifier) { _, _ ->
+        Layout(content = {}, modifier = modifier) { _, _ ->
             layout(2, 2) {}
         }
     }

@@ -33,7 +33,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -176,7 +175,7 @@ internal actual fun ActualPopup(
     //  used instead of this custom Layout
     // Get the parent's position, size and layout direction
     Layout(
-        content = emptyContent(),
+        content = {},
         modifier = Modifier.onGloballyPositioned { childCoordinates ->
             val coordinates = childCoordinates.parentLayoutCoordinates!!
             val layoutSize = coordinates.size
@@ -289,7 +288,7 @@ private class PopupLayout(
         windowManager.addView(this, params)
     }
 
-    private var content: @Composable () -> Unit by mutableStateOf(emptyContent())
+    private var content: @Composable () -> Unit by mutableStateOf({})
 
     override var shouldCreateCompositionOnAttachedToWindow: Boolean = false
         private set

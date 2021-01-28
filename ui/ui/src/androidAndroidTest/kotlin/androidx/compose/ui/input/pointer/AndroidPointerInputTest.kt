@@ -23,7 +23,6 @@ import androidx.activity.ComponentActivity
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -591,7 +590,7 @@ private class LogEventsGestureFilter(val log: MutableList<List<PointerInputChang
 @Suppress("TestFunctionName")
 @Composable
 private fun FillLayout(modifier: Modifier = Modifier) {
-    Layout(emptyContent(), modifier) { _, constraints ->
+    Layout({}, modifier) { _, constraints ->
         layout(constraints.maxWidth, constraints.maxHeight) {}
     }
 }

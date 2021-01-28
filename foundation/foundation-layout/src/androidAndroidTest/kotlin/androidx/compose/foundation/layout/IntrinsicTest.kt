@@ -17,7 +17,6 @@
 package androidx.compose.foundation.layout
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.emptyContent
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -483,7 +482,7 @@ private fun FixedIntrinsicsBox(
     maxIntrinsicHeight: Dp
 ) {
     Layout(
-        emptyContent(),
+        {},
         minIntrinsicWidthMeasureBlock = { _, _ -> minIntrinsicWidth.toIntPx() },
         minIntrinsicHeightMeasureBlock = { _, _ -> minIntrinsicHeight.toIntPx() },
         maxIntrinsicWidthMeasureBlock = { _, _ -> maxIntrinsicWidth.toIntPx() },

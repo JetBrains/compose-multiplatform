@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.ambientOf
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -81,7 +80,7 @@ class PopupTest {
             SimpleContainer {
                 PopupTestTag(testTag) {
                     Popup(alignment = Alignment.Center) {
-                        SimpleContainer(Modifier.preferredSize(50.dp), content = emptyContent())
+                        SimpleContainer(Modifier.preferredSize(50.dp), content = {})
                     }
                 }
             }
@@ -106,7 +105,7 @@ class PopupTest {
                         SimpleContainer(
                             width = popupWidthDp,
                             height = popupHeightDp,
-                            content = emptyContent()
+                            content = {}
                         )
                     }
                 }

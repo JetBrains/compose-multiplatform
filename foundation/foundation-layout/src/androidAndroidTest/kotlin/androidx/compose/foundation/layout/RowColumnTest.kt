@@ -19,7 +19,6 @@ package androidx.compose.foundation.layout
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
-import androidx.compose.runtime.emptyContent
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.HorizontalAlignmentLine
 import androidx.compose.ui.layout.Layout
@@ -1342,12 +1341,12 @@ class RowColumnTest : LayoutTest() {
                         Modifier.weight(1f),
                         width = sizeDp,
                         height = sizeDp,
-                        content = emptyContent()
+                        content = {}
                     )
                     Container(
                         width = (sizeDp * 2),
                         height = (sizeDp * 2),
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             }
@@ -1476,12 +1475,12 @@ class RowColumnTest : LayoutTest() {
                             Modifier.weight(1f),
                             width = sizeDp,
                             height = sizeDp,
-                            content = emptyContent()
+                            content = {}
                         )
                         Container(
                             width = sizeDp * 2,
                             height = sizeDp * 2,
-                            content = emptyContent()
+                            content = {}
                         )
                     }
                 }
@@ -1812,12 +1811,12 @@ class RowColumnTest : LayoutTest() {
                         Modifier.weight(1f),
                         width = sizeDp,
                         height = sizeDp,
-                        content = emptyContent()
+                        content = {}
                     )
                     Container(
                         width = (sizeDp * 2),
                         height = (sizeDp * 2),
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             }
@@ -1946,12 +1945,12 @@ class RowColumnTest : LayoutTest() {
                             Modifier.weight(1f),
                             width = sizeDp,
                             height = sizeDp,
-                            content = emptyContent()
+                            content = {}
                         )
                         Container(
                             width = sizeDp * 2,
                             height = sizeDp * 2,
-                            content = emptyContent()
+                            content = {}
                         )
                     }
                 }
@@ -2139,7 +2138,7 @@ class RowColumnTest : LayoutTest() {
                                 assertEquals(Constraints(), constraints)
                                 FixedSizeLayout(0, noWeightChildHeight.toIntPx(), mapOf())
                             }
-                            Layout(emptyContent(), Modifier.weight(1f)) { _, constraints ->
+                            Layout({}, Modifier.weight(1f)) { _, constraints ->
                                 assertEquals(
                                     columnMinHeight.toIntPx() - noWeightChildHeight.toIntPx() * 2,
                                     constraints.minHeight
@@ -3206,19 +3205,19 @@ class RowColumnTest : LayoutTest() {
         testIntrinsics(
             @Composable {
                 Row {
-                    Container(Modifier.aspectRatio(2f), content = emptyContent())
+                    Container(Modifier.aspectRatio(2f), content = {})
                     ConstrainedBox(
                         DpConstraints.fixed(50.toDp(), 40.toDp()),
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             },
             @Composable {
                 Row(Modifier.fillMaxWidth()) {
-                    Container(Modifier.aspectRatio(2f), content = emptyContent())
+                    Container(Modifier.aspectRatio(2f), content = {})
                     ConstrainedBox(
                         DpConstraints.fixed(50.toDp(), 40.toDp()),
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             },
@@ -3227,12 +3226,12 @@ class RowColumnTest : LayoutTest() {
                     Container(
                         Modifier.aspectRatio(2f)
                             .align(Alignment.Top),
-                        content = emptyContent()
+                        content = {}
                     )
                     ConstrainedBox(
                         DpConstraints.fixed(50.toDp(), 40.toDp()),
                         Modifier.align(Alignment.CenterVertically),
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             },
@@ -3240,21 +3239,21 @@ class RowColumnTest : LayoutTest() {
                 Row {
                     Container(
                         Modifier.aspectRatio(2f).alignBy(FirstBaseline),
-                        content = emptyContent()
+                        content = {}
                     )
                     ConstrainedBox(
                         DpConstraints.fixed(50.toDp(), 40.toDp()),
                         Modifier.alignBy { it.width },
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             },
             @Composable {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
-                    Container(Modifier.aspectRatio(2f), content = emptyContent())
+                    Container(Modifier.aspectRatio(2f), content = {})
                     ConstrainedBox(
                         DpConstraints.fixed(50.toDp(), 40.toDp()),
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             },
@@ -3262,12 +3261,12 @@ class RowColumnTest : LayoutTest() {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                     Container(
                         Modifier.align(Alignment.CenterVertically).aspectRatio(2f),
-                        content = emptyContent()
+                        content = {}
                     )
                     ConstrainedBox(
                         DpConstraints.fixed(50.toDp(), 40.toDp()),
                         Modifier.align(Alignment.CenterVertically),
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             },
@@ -3275,40 +3274,40 @@ class RowColumnTest : LayoutTest() {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                     Container(
                         Modifier.align(Alignment.Bottom).aspectRatio(2f),
-                        content = emptyContent()
+                        content = {}
                     )
                     ConstrainedBox(
                         DpConstraints.fixed(50.toDp(), 40.toDp()),
                         Modifier.align(Alignment.Bottom),
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             },
             @Composable {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
-                    Container(Modifier.fillMaxHeight().aspectRatio(2f), content = emptyContent())
+                    Container(Modifier.fillMaxHeight().aspectRatio(2f), content = {})
                     ConstrainedBox(
                         DpConstraints.fixed(50.toDp(), 40.toDp()),
                         Modifier.fillMaxHeight(),
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             },
             @Composable {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Container(Modifier.aspectRatio(2f), content = emptyContent())
+                    Container(Modifier.aspectRatio(2f), content = {})
                     ConstrainedBox(
                         DpConstraints.fixed(50.toDp(), 40.toDp()),
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             },
             @Composable {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                    Container(Modifier.aspectRatio(2f), content = emptyContent())
+                    Container(Modifier.aspectRatio(2f), content = {})
                     ConstrainedBox(
                         DpConstraints.fixed(50.toDp(), 40.toDp()),
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             }
@@ -3346,17 +3345,17 @@ class RowColumnTest : LayoutTest() {
                     ConstrainedBox(
                         DpConstraints.fixed(20.toDp(), 30.toDp()),
                         Modifier.weight(3f),
-                        content = emptyContent()
+                        content = {}
                     )
                     ConstrainedBox(
                         DpConstraints.fixed(30.toDp(), 40.toDp()),
                         Modifier.weight(2f),
-                        content = emptyContent()
+                        content = {}
                     )
-                    Container(Modifier.aspectRatio(2f).weight(2f), content = emptyContent())
+                    Container(Modifier.aspectRatio(2f).weight(2f), content = {})
                     ConstrainedBox(
                         DpConstraints.fixed(20.toDp(), 30.toDp()),
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             },
@@ -3365,18 +3364,18 @@ class RowColumnTest : LayoutTest() {
                     ConstrainedBox(
                         DpConstraints.fixed(20.toDp(), 30.toDp()),
                         Modifier.weight(3f).align(Alignment.Top),
-                        content = emptyContent()
+                        content = {}
                     )
                     ConstrainedBox(
                         DpConstraints.fixed(30.toDp(), 40.toDp()),
                         Modifier.weight(2f).align(Alignment.CenterVertically),
-                        content = emptyContent()
+                        content = {}
                     )
-                    Container(Modifier.aspectRatio(2f).weight(2f), content = emptyContent())
+                    Container(Modifier.aspectRatio(2f).weight(2f), content = {})
                     ConstrainedBox(
                         DpConstraints.fixed(20.toDp(), 30.toDp()),
                         Modifier.align(Alignment.Bottom),
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             },
@@ -3385,17 +3384,17 @@ class RowColumnTest : LayoutTest() {
                     ConstrainedBox(
                         DpConstraints.fixed(20.toDp(), 30.toDp()),
                         Modifier.weight(3f),
-                        content = emptyContent()
+                        content = {}
                     )
                     ConstrainedBox(
                         DpConstraints.fixed(30.toDp(), 40.toDp()),
                         Modifier.weight(2f),
-                        content = emptyContent()
+                        content = {}
                     )
-                    Container(Modifier.aspectRatio(2f).weight(2f), content = emptyContent())
+                    Container(Modifier.aspectRatio(2f).weight(2f), content = {})
                     ConstrainedBox(
                         DpConstraints.fixed(20.toDp(), 30.toDp()),
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             },
@@ -3404,21 +3403,21 @@ class RowColumnTest : LayoutTest() {
                     ConstrainedBox(
                         constraints = DpConstraints.fixed(20.toDp(), 30.toDp()),
                         modifier = Modifier.weight(3f).align(Alignment.CenterVertically),
-                        content = emptyContent()
+                        content = {}
                     )
                     ConstrainedBox(
                         constraints = DpConstraints.fixed(30.toDp(), 40.toDp()),
                         modifier = Modifier.weight(2f).align(Alignment.CenterVertically),
-                        content = emptyContent()
+                        content = {}
                     )
                     Container(
                         Modifier.aspectRatio(2f).weight(2f).align(Alignment.CenterVertically),
-                        content = emptyContent()
+                        content = {}
                     )
                     ConstrainedBox(
                         constraints = DpConstraints.fixed(20.toDp(), 30.toDp()),
                         modifier = Modifier.align(Alignment.CenterVertically),
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             },
@@ -3427,21 +3426,21 @@ class RowColumnTest : LayoutTest() {
                     ConstrainedBox(
                         constraints = DpConstraints.fixed(20.toDp(), 30.toDp()),
                         modifier = Modifier.weight(3f).align(Alignment.Bottom),
-                        content = emptyContent()
+                        content = {}
                     )
                     ConstrainedBox(
                         constraints = DpConstraints.fixed(30.toDp(), 40.toDp()),
                         modifier = Modifier.weight(2f).align(Alignment.Bottom),
-                        content = emptyContent()
+                        content = {}
                     )
                     Container(
                         Modifier.aspectRatio(2f).weight(2f).align(Alignment.Bottom),
-                        content = emptyContent()
+                        content = {}
                     )
                     ConstrainedBox(
                         constraints = DpConstraints.fixed(20.toDp(), 30.toDp()),
                         modifier = Modifier.align(Alignment.Bottom),
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             },
@@ -3450,21 +3449,21 @@ class RowColumnTest : LayoutTest() {
                     ConstrainedBox(
                         constraints = DpConstraints.fixed(20.toDp(), 30.toDp()),
                         modifier = Modifier.weight(3f).fillMaxHeight(),
-                        content = emptyContent()
+                        content = {}
                     )
                     ConstrainedBox(
                         constraints = DpConstraints.fixed(30.toDp(), 40.toDp()),
                         modifier = Modifier.weight(2f).fillMaxHeight(),
-                        content = emptyContent()
+                        content = {}
                     )
                     Container(
                         Modifier.aspectRatio(2f).weight(2f).fillMaxHeight(),
-                        content = emptyContent()
+                        content = {}
                     )
                     ConstrainedBox(
                         constraints = DpConstraints.fixed(20.toDp(), 30.toDp()),
                         modifier = Modifier.fillMaxHeight(),
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             },
@@ -3473,17 +3472,17 @@ class RowColumnTest : LayoutTest() {
                     ConstrainedBox(
                         DpConstraints.fixed(20.toDp(), 30.toDp()),
                         Modifier.weight(3f),
-                        content = emptyContent()
+                        content = {}
                     )
                     ConstrainedBox(
                         DpConstraints.fixed(30.toDp(), 40.toDp()),
                         Modifier.weight(2f),
-                        content = emptyContent()
+                        content = {}
                     )
-                    Container(Modifier.aspectRatio(2f).weight(2f), content = emptyContent())
+                    Container(Modifier.aspectRatio(2f).weight(2f), content = {})
                     ConstrainedBox(
                         DpConstraints.fixed(20.toDp(), 30.toDp()),
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             },
@@ -3492,17 +3491,17 @@ class RowColumnTest : LayoutTest() {
                     ConstrainedBox(
                         DpConstraints.fixed(20.toDp(), 30.toDp()),
                         Modifier.weight(3f),
-                        content = emptyContent()
+                        content = {}
                     )
                     ConstrainedBox(
                         DpConstraints.fixed(30.toDp(), 40.toDp()),
                         Modifier.weight(2f),
-                        content = emptyContent()
+                        content = {}
                     )
-                    Container(Modifier.aspectRatio(2f).weight(2f), content = emptyContent())
+                    Container(Modifier.aspectRatio(2f).weight(2f), content = {})
                     ConstrainedBox(
                         DpConstraints.fixed(20.toDp(), 30.toDp()),
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             }
@@ -3559,10 +3558,10 @@ class RowColumnTest : LayoutTest() {
         testIntrinsics(
             @Composable {
                 Column {
-                    Container(Modifier.aspectRatio(2f), content = emptyContent())
+                    Container(Modifier.aspectRatio(2f), content = {})
                     ConstrainedBox(
                         DpConstraints.fixed(50.toDp(), 40.toDp()),
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             },
@@ -3570,12 +3569,12 @@ class RowColumnTest : LayoutTest() {
                 Column {
                     Container(
                         Modifier.aspectRatio(2f).align(Alignment.Start),
-                        content = emptyContent()
+                        content = {}
                     )
                     ConstrainedBox(
                         DpConstraints.fixed(50.toDp(), 40.toDp()),
                         Modifier.align(Alignment.End),
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             },
@@ -3583,30 +3582,30 @@ class RowColumnTest : LayoutTest() {
                 Column {
                     Container(
                         Modifier.aspectRatio(2f).alignBy { 0 },
-                        content = emptyContent()
+                        content = {}
                     )
                     ConstrainedBox(
                         DpConstraints.fixed(50.toDp(), 40.toDp()),
                         Modifier.alignBy(TestVerticalLine),
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             },
             @Composable {
                 Column(Modifier.fillMaxHeight()) {
-                    Container(Modifier.aspectRatio(2f), content = emptyContent())
+                    Container(Modifier.aspectRatio(2f), content = {})
                     ConstrainedBox(
                         DpConstraints.fixed(50.toDp(), 40.toDp()),
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             },
             @Composable {
                 Column(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Top) {
-                    Container(Modifier.aspectRatio(2f), content = emptyContent())
+                    Container(Modifier.aspectRatio(2f), content = {})
                     ConstrainedBox(
                         DpConstraints.fixed(50.toDp(), 40.toDp()),
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             },
@@ -3614,11 +3613,11 @@ class RowColumnTest : LayoutTest() {
                 Column(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center) {
                     Container(
                         Modifier.align(Alignment.CenterHorizontally).aspectRatio(2f),
-                        content = emptyContent()
+                        content = {}
                     )
                     ConstrainedBox(
                         DpConstraints.fixed(50.toDp(), 40.toDp()),
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             },
@@ -3626,31 +3625,31 @@ class RowColumnTest : LayoutTest() {
                 Column(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Bottom) {
                     Container(
                         Modifier.align(Alignment.End).aspectRatio(2f),
-                        content = emptyContent()
+                        content = {}
                     )
                     ConstrainedBox(
                         DpConstraints.fixed(50.toDp(), 40.toDp()),
                         Modifier.align(Alignment.End),
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             },
             @Composable {
                 Column(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.SpaceAround) {
-                    Container(Modifier.fillMaxWidth().aspectRatio(2f), content = emptyContent())
+                    Container(Modifier.fillMaxWidth().aspectRatio(2f), content = {})
                     ConstrainedBox(
                         DpConstraints.fixed(50.toDp(), 40.toDp()),
                         Modifier.fillMaxWidth(),
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             },
             @Composable {
                 Column(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.SpaceBetween) {
-                    Container(Modifier.aspectRatio(2f), content = emptyContent())
+                    Container(Modifier.aspectRatio(2f), content = {})
                     ConstrainedBox(
                         DpConstraints.fixed(50.toDp(), 40.toDp()),
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             },
@@ -3658,11 +3657,11 @@ class RowColumnTest : LayoutTest() {
                 Column(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.SpaceEvenly) {
                     Container(
                         Modifier.aspectRatio(2f),
-                        content = emptyContent()
+                        content = {}
                     )
                     ConstrainedBox(
                         DpConstraints.fixed(50.toDp(), 40.toDp()),
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             }
@@ -3700,20 +3699,20 @@ class RowColumnTest : LayoutTest() {
                     ConstrainedBox(
                         DpConstraints.fixed(30.toDp(), 20.toDp()),
                         Modifier.weight(3f),
-                        content = emptyContent()
+                        content = {}
                     )
                     ConstrainedBox(
                         DpConstraints.fixed(40.toDp(), 30.toDp()),
                         Modifier.weight(2f),
-                        content = emptyContent()
+                        content = {}
                     )
                     Container(
                         Modifier.aspectRatio(0.5f).weight(2f),
-                        content = emptyContent()
+                        content = {}
                     )
                     ConstrainedBox(
                         DpConstraints.fixed(30.toDp(), 20.toDp()),
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             },
@@ -3722,12 +3721,12 @@ class RowColumnTest : LayoutTest() {
                     ConstrainedBox(
                         DpConstraints.fixed(30.toDp(), 20.toDp()),
                         Modifier.weight(3f).align(Alignment.Start),
-                        content = emptyContent()
+                        content = {}
                     )
                     ConstrainedBox(
                         DpConstraints.fixed(40.toDp(), 30.toDp()),
                         Modifier.weight(2f).align(Alignment.CenterHorizontally),
-                        content = emptyContent()
+                        content = {}
                     )
                     Container(Modifier.aspectRatio(0.5f).weight(2f)) { }
                     ConstrainedBox(
@@ -3964,9 +3963,9 @@ class RowColumnTest : LayoutTest() {
                                 containerHeight.value = coordinates.size.height
                                 positionedLatch.countDown()
                             },
-                        content = emptyContent()
+                        content = {}
                     )
-                    Container(Modifier.weight(1f), content = emptyContent())
+                    Container(Modifier.weight(1f), content = {})
                 }
             }
         }
@@ -3990,7 +3989,7 @@ class RowColumnTest : LayoutTest() {
                     modifier = Modifier.alignBy { it.height },
                     width = size,
                     height = size,
-                    content = emptyContent()
+                    content = {}
                 )
                 Container(
                     modifier = Modifier.alignBy { 0 }
@@ -4002,7 +4001,7 @@ class RowColumnTest : LayoutTest() {
                         },
                     width = size,
                     height = size,
-                    content = emptyContent()
+                    content = {}
                 )
             }
         }
@@ -4085,7 +4084,7 @@ class RowColumnTest : LayoutTest() {
                                 childLayoutCoordinates[i] = coordinates
                                 drawLatch.countDown()
                             },
-                            content = emptyContent()
+                            content = {}
                         )
                     }
                 }
@@ -4141,7 +4140,7 @@ class RowColumnTest : LayoutTest() {
                                 childLayoutCoordinates[i] = coordinates
                                 drawLatch.countDown()
                             },
-                            content = emptyContent()
+                            content = {}
                         )
                     }
                 }
@@ -4196,7 +4195,7 @@ class RowColumnTest : LayoutTest() {
                                 childLayoutCoordinates[i] = coordinates
                                 drawLatch.countDown()
                             },
-                            content = emptyContent()
+                            content = {}
                         )
                     }
                 }
@@ -4249,7 +4248,7 @@ class RowColumnTest : LayoutTest() {
                                 childLayoutCoordinates[i] = coordinates
                                 drawLatch.countDown()
                             },
-                            content = emptyContent()
+                            content = {}
                         )
                     }
                 }
@@ -4521,7 +4520,7 @@ class RowColumnTest : LayoutTest() {
                             childLayoutCoordinates[i] = coordinates
                             drawLatch.countDown()
                         },
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             }
@@ -4575,7 +4574,7 @@ class RowColumnTest : LayoutTest() {
                                     coordinates
                                 drawLatch.countDown()
                             },
-                            content = emptyContent()
+                            content = {}
                         )
                     }
                 }
@@ -4628,7 +4627,7 @@ class RowColumnTest : LayoutTest() {
                             childLayoutCoordinates[i] = coordinates
                             drawLatch.countDown()
                         },
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             }
@@ -4688,7 +4687,7 @@ class RowColumnTest : LayoutTest() {
                                     coordinates
                                 drawLatch.countDown()
                             },
-                            content = emptyContent()
+                            content = {}
                         )
                     }
                 }
@@ -4747,7 +4746,7 @@ class RowColumnTest : LayoutTest() {
                             childLayoutCoordinates[i] = coordinates
                             drawLatch.countDown()
                         },
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             }
@@ -4817,7 +4816,7 @@ class RowColumnTest : LayoutTest() {
                                     coordinates
                                 drawLatch.countDown()
                             },
-                            content = emptyContent()
+                            content = {}
                         )
                     }
                 }
@@ -4886,7 +4885,7 @@ class RowColumnTest : LayoutTest() {
                             childLayoutCoordinates[i] = coordinates
                             drawLatch.countDown()
                         },
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             }
@@ -4954,7 +4953,7 @@ class RowColumnTest : LayoutTest() {
                                         coordinates
                                     drawLatch.countDown()
                                 },
-                                content = emptyContent()
+                                content = {}
                             )
                         }
                     }
@@ -5020,7 +5019,7 @@ class RowColumnTest : LayoutTest() {
                             childLayoutCoordinates[i] = coordinates
                             drawLatch.countDown()
                         },
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             }
@@ -5086,7 +5085,7 @@ class RowColumnTest : LayoutTest() {
                                         coordinates
                                     drawLatch.countDown()
                                 },
-                                content = emptyContent()
+                                content = {}
                             )
                         }
                     }
@@ -5149,7 +5148,7 @@ class RowColumnTest : LayoutTest() {
                             childLayoutCoordinates[i] = coordinates
                             drawLatch.countDown()
                         },
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             }
@@ -5218,7 +5217,7 @@ class RowColumnTest : LayoutTest() {
                                         coordinates
                                     drawLatch.countDown()
                                 },
-                                content = emptyContent()
+                                content = {}
                             )
                         }
                     }

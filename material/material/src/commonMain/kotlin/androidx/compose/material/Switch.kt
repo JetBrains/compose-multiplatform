@@ -35,7 +35,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -180,7 +179,7 @@ private fun BoxScope.SwitchImpl(
                 indication = rememberRipple(bounded = false, radius = ThumbRippleRadius)
             )
             .size(ThumbDiameter),
-        content = emptyContent()
+        content = {}
     )
 }
 

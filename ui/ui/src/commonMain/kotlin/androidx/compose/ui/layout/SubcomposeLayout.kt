@@ -24,7 +24,6 @@ import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.ComposeNode
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionReference
 import androidx.compose.ui.Modifier
@@ -148,7 +147,7 @@ private class SubcomposeLayoutState :
         currentIndex++
 
         val nodeState = nodeToNodeState.getOrPut(node) {
-            NodeState(slotId, emptyContent())
+            NodeState(slotId, {})
         }
         val hasPendingChanges = nodeState.composition?.hasInvalidations ?: true
         if (nodeState.content !== content || hasPendingChanges) {

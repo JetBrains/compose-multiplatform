@@ -17,7 +17,6 @@
 package androidx.compose.ui.selection
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.remember
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
@@ -187,7 +186,7 @@ private fun HandleDrawLayout(
     height: Dp,
     onCanvas: DrawScope.() -> Unit
 ) {
-    Layout(emptyContent(), modifier.drawBehind(onCanvas)) { _, _ ->
+    Layout({}, modifier.drawBehind(onCanvas)) { _, _ ->
         // take width and height space of the screen and allow draw modifier to draw inside of it
         layout(width.toIntPx(), height.toIntPx()) {
             // this layout has no children, only draw modifier.

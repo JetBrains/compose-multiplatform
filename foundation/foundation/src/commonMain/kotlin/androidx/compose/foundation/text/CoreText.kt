@@ -22,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.DisposableEffectResult
 import androidx.compose.runtime.DisposableEffectScope
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -148,7 +147,7 @@ internal fun CoreText(
 
     Layout(
         content = if (inlineComposables.isEmpty()) {
-            emptyContent()
+            {}
         } else {
             { InlineChildren(text, inlineComposables) }
         },
