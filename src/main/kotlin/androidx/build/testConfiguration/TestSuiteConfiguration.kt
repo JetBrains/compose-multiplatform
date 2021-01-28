@@ -61,7 +61,12 @@ fun Project.createTestConfigurationGenerationTask(
                 "${this.path.asFilenamePrefix()}$variantName.xml"
             )
         )
-        task.minSdk.set(minSdk)
+        // Disable work tests on < API 18: b/178127496
+        if (this.path.startsWith(":work:")) {
+            task.minSdk.set(maxOf(18, minSdk))
+        } else {
+            task.minSdk.set(minSdk)
+        }
         task.hasBenchmarkPlugin.set(this.hasBenchmarkPlugin())
         task.testRunner.set(testRunner)
         task.testProjectPath.set(this.path)
