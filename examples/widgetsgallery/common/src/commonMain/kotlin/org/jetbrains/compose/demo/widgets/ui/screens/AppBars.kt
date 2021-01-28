@@ -19,7 +19,6 @@ import org.jetbrains.compose.demo.widgets.platform.Res
 import org.jetbrains.compose.demo.widgets.platform.imageResource
 import org.jetbrains.compose.demo.widgets.platform.vectorResource
 import org.jetbrains.compose.demo.widgets.theme.twitterColor
-import org.jetbrains.compose.demo.widgets.theme.typography
 import org.jetbrains.compose.demo.widgets.ui.utils.SubtitleText
 import org.jetbrains.compose.demo.widgets.ui.utils.TitleText
 
@@ -39,7 +38,7 @@ private fun TopAppBarsDemo() {
         elevation = 8.dp,
         navigationIcon = {
             IconButton(onClick = {}) {
-                Icon(Icons.Default.ArrowBack)
+                Icon(Icons.Default.ArrowBack, contentDescription = "ArrowBack")
             }
         }
     )
@@ -53,12 +52,12 @@ private fun TopAppBarsDemo() {
         elevation = 8.dp,
         navigationIcon = {
             IconButton(onClick = {}) {
-                Icon(vectorResource(Res.drawable.ic_instagram))
+                Icon(vectorResource(Res.drawable.ic_instagram), contentDescription = "Instagram")
             }
         },
         actions = {
             IconButton(onClick = {}) {
-                Icon(vectorResource(Res.drawable.ic_send))
+                Icon(vectorResource(Res.drawable.ic_send), contentDescription = "Send")
             }
         }
     )
@@ -69,6 +68,7 @@ private fun TopAppBarsDemo() {
         title = {
             Icon(
                 vectorResource(Res.drawable.ic_twitter),
+                contentDescription = "Twitter",
                 tint = twitterColor,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -79,6 +79,7 @@ private fun TopAppBarsDemo() {
         navigationIcon = {
             Image(
                 imageResource(Res.drawable.p6),
+                contentDescription = "",
                 modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
                     .preferredSize(32.dp).clip(CircleShape)
             )
@@ -86,6 +87,7 @@ private fun TopAppBarsDemo() {
         actions = {
             Icon(
                 Icons.Default.StarBorder,
+                contentDescription = "",
                 modifier = Modifier.padding(horizontal = 8.dp)
             )
         }
@@ -102,7 +104,7 @@ private fun BottomAppBarDemo() {
         cutoutShape = CircleShape
     ) {
         IconButton(onClick = {}) {
-            Icon(Icons.Default.MoreHoriz)
+            Icon(Icons.Default.MoreHoriz, contentDescription = "")
         }
         TitleText(title = "Bottom App Bar")
     }
@@ -115,19 +117,19 @@ private fun NavigationBarDemo() {
     val navItemState = remember { mutableStateOf(NavType.HOME) }
     BottomNavigation(backgroundColor = MaterialTheme.colors.surface) {
         BottomNavigationItem(
-            icon = { Icon(Icons.Outlined.Home) },
+            icon = { Icon(Icons.Outlined.Home, contentDescription = "Home") },
             selected = navItemState.value == NavType.HOME,
             onClick = { navItemState.value = NavType.HOME },
             label = { Text(text = Res.string.spotify_nav_home) },
         )
         BottomNavigationItem(
-            icon = { Icon(Icons.Outlined.Search) },
+            icon = { Icon(Icons.Outlined.Search, contentDescription = "Search") },
             selected = navItemState.value == NavType.SEARCH,
             onClick = { navItemState.value = NavType.SEARCH },
             label = { Text(text = Res.string.spotify_nav_search) }
         )
         BottomNavigationItem(
-            icon = { Icon(Icons.Outlined.LibraryMusic) },
+            icon = { Icon(Icons.Outlined.LibraryMusic, contentDescription = "LibraryMusic") },
             selected = navItemState.value == NavType.LIBRARY,
             onClick = { navItemState.value = NavType.LIBRARY },
             label = { Text(text = Res.string.spotify_nav_library) }
@@ -138,17 +140,17 @@ private fun NavigationBarDemo() {
 
     BottomNavigation {
         BottomNavigationItem(
-            icon = { Icon(Icons.Outlined.ReadMore) },
+            icon = { Icon(Icons.Outlined.ReadMore, contentDescription = "ReadMore") },
             selected = navItemState.value == NavType.HOME,
             onClick = { navItemState.value = NavType.HOME },
         )
         BottomNavigationItem(
-            icon = { Icon(Icons.Outlined.Search) },
+            icon = { Icon(Icons.Outlined.Search, contentDescription = "Search") },
             selected = navItemState.value == NavType.SEARCH,
             onClick = { navItemState.value = NavType.SEARCH },
         )
         BottomNavigationItem(
-            icon = { Icon(Icons.Outlined.CleanHands) },
+            icon = { Icon(Icons.Outlined.CleanHands, contentDescription = "CleanHands") },
             selected = navItemState.value == NavType.LIBRARY,
             onClick = { navItemState.value = NavType.LIBRARY },
         )

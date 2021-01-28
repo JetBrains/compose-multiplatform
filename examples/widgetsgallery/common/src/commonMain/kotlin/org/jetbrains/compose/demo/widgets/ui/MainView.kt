@@ -7,16 +7,20 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.*
+import androidx.compose.material.AmbientContentColor
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.savedinstancestate.savedInstanceState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.selection.DisableSelection
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.*
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.demo.widgets.platform.VerticalScrollbar
 import org.jetbrains.compose.demo.widgets.platform.pointerMoveFilter
 import org.jetbrains.compose.demo.widgets.theme.WidgetGalleryTheme
@@ -24,7 +28,6 @@ import org.jetbrains.compose.demo.widgets.ui.utils.PanelState
 import org.jetbrains.compose.demo.widgets.ui.utils.ResizablePanel
 import org.jetbrains.compose.demo.widgets.ui.utils.VerticalSplittable
 import org.jetbrains.compose.demo.widgets.ui.utils.withoutWidthConstraints
-import kotlin.ranges.coerceAtLeast
 
 @Composable
 fun MainView() {
@@ -37,7 +40,7 @@ fun MainView() {
 
 @Composable
 fun WidgetsPanel() {
-    val widgetsTypeState = savedInstanceState { WidgetsType.sortedValues.first() }
+    val widgetsTypeState = rememberSaveable { mutableStateOf(WidgetsType.sortedValues.first()) }
     val panelState = remember { PanelState() }
 
     val animatedSize = if (panelState.splitter.isResizing) {

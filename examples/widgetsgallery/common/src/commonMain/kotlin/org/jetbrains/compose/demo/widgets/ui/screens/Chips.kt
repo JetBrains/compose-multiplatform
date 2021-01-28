@@ -3,7 +3,6 @@ package org.jetbrains.compose.demo.widgets.ui.screens
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
@@ -17,9 +16,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.demo.widgets.platform.Res
-import org.jetbrains.compose.demo.widgets.theme.typography
-import org.jetbrains.compose.demo.widgets.ui.utils.SubtitleText
 import org.jetbrains.compose.demo.widgets.platform.imageResource
+import org.jetbrains.compose.demo.widgets.ui.utils.SubtitleText
 
 @Composable
 fun Chips() {
@@ -88,6 +86,7 @@ private fun CustomImageChip(
         Row(modifier = Modifier) {
             Image(
                 imageResource(imageId),
+                contentDescription = null,
                 modifier = Modifier.padding(8.dp).preferredSize(20.dp).clip(CircleShape)
             )
             Text(

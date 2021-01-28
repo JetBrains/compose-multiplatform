@@ -27,7 +27,7 @@ fun UICards() {
     Card(
         modifier = Modifier.padding(8.dp).fillMaxWidth(),
         backgroundColor = MaterialTheme.colors.primary,
-        shape = RoundedCornerShape(topLeft = 16.dp, bottomRight = 16.dp)
+        shape = RoundedCornerShape(topStart = 16.dp, bottomEnd = 16.dp)
     ) {
         Column {
             Text(
@@ -53,6 +53,7 @@ fun UICards() {
         Row {
             Image(
                 imageResource(Res.drawable.p3),
+                contentDescription = null,
                 modifier = Modifier.preferredSize(60.dp)
             )
             Text(text = item.title, modifier = Modifier.padding(16.dp))
@@ -75,7 +76,8 @@ fun UICards() {
     Divider(modifier = Modifier.padding(4.dp))
     ListItem(text = { Text(item.title) }, secondaryText = { Text(item.subtitle) }, icon = {
         Image(
-            imageResource(Res.drawable.p3)
+            imageResource(Res.drawable.p3),
+            contentDescription = null
         )
     })
     Divider(modifier = Modifier.padding(4.dp))
@@ -83,7 +85,7 @@ fun UICards() {
     ListItem(
         text = { Text(item.title) },
         secondaryText = { Text(item.subtitle) },
-        icon = { Image(imageResource(Res.drawable.p1)) },
+        icon = { Image(imageResource(Res.drawable.p1), contentDescription = null) },
         overlineText = { Text("Overline text") },
         singleLineSecondaryText = false
     )
@@ -91,8 +93,8 @@ fun UICards() {
     ListItem(
         text = { Text(item.title) },
         secondaryText = { Text(item.subtitle) },
-        icon = { Image(imageResource(Res.drawable.p2)) },
-        trailing = { Icon(Icons.Default.ShoppingCart) },
+        icon = { Image(imageResource(Res.drawable.p2), contentDescription = null) },
+        trailing = { Icon(Icons.Default.ShoppingCart, contentDescription = null) },
         singleLineSecondaryText = false
     )
     Divider()

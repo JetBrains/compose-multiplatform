@@ -1,12 +1,14 @@
 package org.jetbrains.compose.demo.widgets.ui.screens
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.demo.widgets.theme.typography
 
 @Composable
 fun Toggles() {
@@ -21,7 +23,7 @@ fun Toggles() {
         var switched by remember { mutableStateOf(true) }
         Switch(
             checked = switched,
-            colors = SwitchConstants.defaultColors(checkedThumbColor = MaterialTheme.colors.primary),
+            colors = SwitchDefaults.colors(checkedThumbColor = MaterialTheme.colors.primary),
             modifier = Modifier.padding(8.dp),
             onCheckedChange = { switched = it }
         )
