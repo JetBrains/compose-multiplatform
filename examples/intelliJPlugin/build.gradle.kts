@@ -4,7 +4,7 @@ plugins {
     id("org.jetbrains.intellij") version "0.6.5"
     java
     kotlin("jvm") version "1.4.21-2"
-    id("org.jetbrains.compose") version "0.0.0-vsync-build30"
+    id("org.jetbrains.compose") version "0.3.0-build146"
 }
 
 group = "org.example"
