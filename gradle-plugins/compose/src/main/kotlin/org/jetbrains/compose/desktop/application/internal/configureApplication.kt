@@ -53,10 +53,6 @@ internal fun Project.configureFromMppPlugin(mainApplication: Application) {
 
 internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
     for (app in apps) {
-        val run = project.tasks.composeTask<JavaExec>(taskName("run", app)) {
-            configureRunTask(app)
-        }
-
         val createRuntimeImage = tasks.composeTask<AbstractJLinkTask>(
             taskName("createRuntimeImage", app)
         ) {
@@ -65,12 +61,19 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
             destinationDir.set(project.layout.buildDirectory.dir("compose/tmp/${app.name}/runtime"))
         }
 
+        val createDistributable = tasks.composeTask<AbstractJPackageTask>(
+            taskName("createDistributable", app),
+            args = listOf(TargetFormat.AppImage)
+        ) {
+            configurePackagingTask(app, createRuntimeImage = createRuntimeImage)
+        }
+
         val packageFormats = app.nativeDistributions.targetFormats.map { targetFormat ->
             tasks.composeTask<AbstractJPackageTask>(
                 taskName("package", app, targetFormat.name),
                 args = listOf(targetFormat)
             ) {
-                configurePackagingTask(app, createRuntimeImage)
+                configurePackagingTask(app, createAppImage = createDistributable)
             }
         }
 
@@ -82,29 +85,33 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
             configurePackageUberJarForCurrentOS(app)
         }
 
-        val createDistributable = tasks.composeTask<AbstractJPackageTask>(
-            taskName("createDistributable", app),
-            args = listOf(TargetFormat.AppImage)
-        ) {
-            configurePackagingTask(app, createRuntimeImage)
-        }
-
         val runDistributable = project.tasks.composeTask<AbstractRunDistributableTask>(
             taskName("runDistributable", app),
             args = listOf(createDistributable)
         )
+
+        val run = project.tasks.composeTask<JavaExec>(taskName("run", app)) {
+            configureRunTask(app)
+        }
     }
 }
 
 internal fun AbstractJPackageTask.configurePackagingTask(
     app: Application,
-    createRuntimeImage: TaskProvider<AbstractJLinkTask>
+    createAppImage: TaskProvider<AbstractJPackageTask>? = null,
+    createRuntimeImage: TaskProvider<AbstractJLinkTask>? = null
 ) {
     enabled = targetFormat.isCompatibleWithCurrentOS
 
-    val runtimeImageDir = createRuntimeImage.flatMap { it.destinationDir }
-    dependsOn(createRuntimeImage)
-    runtimeImage.set(runtimeImageDir)
+    createAppImage?.let { createAppImage ->
+        dependsOn(createAppImage)
+        appImage.set(createAppImage.flatMap { it.destinationDir })
+    }
+
+    createRuntimeImage?.let { createRuntimeImage ->
+        dependsOn(createRuntimeImage)
+        runtimeImage.set(createRuntimeImage.flatMap { it.destinationDir })
+    }
 
     configurePlatformSettings(app)
 

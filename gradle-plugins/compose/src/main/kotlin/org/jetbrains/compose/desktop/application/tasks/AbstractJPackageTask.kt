@@ -161,40 +161,30 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:Optional
     val runtimeImage: DirectoryProperty = objects.directoryProperty()
 
+    @get:InputDirectory
+    @get:Optional
+    val appImage: DirectoryProperty = objects.directoryProperty()
+
     @get:LocalState
     protected val signDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/sign")
 
     override fun makeArgs(tmpDir: File): MutableList<String> = super.makeArgs(tmpDir).apply {
-        cliArg("--input", tmpDir)
-        cliArg("--type", targetFormat.id)
-
-        cliArg("--dest", destinationDir)
-        cliArg("--verbose", verbose)
-
-        if (targetFormat != TargetFormat.AppImage) {
+        if (targetFormat == TargetFormat.AppImage) {
+            cliArg("--input", tmpDir)
+            check(runtimeImage.isPresent) { "runtimeImage must be set for ${TargetFormat.AppImage}" }
+            check(!appImage.isPresent) { "appImage must not be set for ${TargetFormat.AppImage}" }
+            cliArg("--runtime-image", runtimeImage)
+            cliArg("--main-jar", launcherMainJar.ioFile.name)
+            cliArg("--main-class", launcherMainClass)
+        } else {
+            check(!runtimeImage.isPresent) { "runtimeImage must not be set for $targetFormat" }
+            check(appImage.isPresent) { "appImage must be set for $targetFormat" }
+            cliArg("--app-image", appImage)
             cliArg("--install-dir", installationPath)
             cliArg("--license-file", licenseFile)
-        }
-        cliArg("--icon", iconFile)
 
-        cliArg("--name", packageName)
-        cliArg("--description", packageDescription)
-        cliArg("--copyright", packageCopyright)
-        cliArg("--app-version", packageVersion)
-        cliArg("--vendor", packageVendor)
-
-        cliArg("--main-jar", launcherMainJar.ioFile.name)
-        cliArg("--main-class", launcherMainClass)
-        launcherArgs.orNull?.forEach {
-            cliArg("--arguments", it)
-        }
-        launcherJvmArgs.orNull?.forEach {
-            cliArg("--java-options", it)
-        }
-
-        when (currentOS) {
-            OS.Linux -> {
-                if (targetFormat != TargetFormat.AppImage) {
+            when (currentOS) {
+                OS.Linux -> {
                     cliArg("--linux-shortcut", linuxShortcut)
                     cliArg("--linux-package-name", linuxPackageName)
                     cliArg("--linux-app-release", linuxAppRelease)
@@ -203,18 +193,7 @@ abstract class AbstractJPackageTask @Inject constructor(
                     cliArg("--linux-menu-group", linuxMenuGroup)
                     cliArg("--linux-rpm-license-type", linuxRpmLicenseType)
                 }
-            }
-            OS.MacOS -> {
-                cliArg("--mac-package-identifier", macPackageIdentifier)
-                cliArg("--mac-package-name", macPackageName)
-                cliArg("--mac-package-signing-prefix", macPackageSigningPrefix)
-                cliArg("--mac-sign", macSign)
-                cliArg("--mac-signing-keychain", macSigningKeychain)
-                cliArg("--mac-signing-key-user-name", macSigningKeyUserName)
-            }
-            OS.Windows -> {
-                cliArg("--win-console", winConsole)
-                if (targetFormat != TargetFormat.AppImage) {
+                OS.Windows -> {
                     cliArg("--win-dir-chooser", winDirChooser)
                     cliArg("--win-per-user-install", winPerUserInstall)
                     cliArg("--win-shortcut", winShortcut)
@@ -225,7 +204,39 @@ abstract class AbstractJPackageTask @Inject constructor(
             }
         }
 
-        cliArg("--runtime-image", runtimeImage)
+        cliArg("--type", targetFormat.id)
+
+        cliArg("--dest", destinationDir)
+        cliArg("--verbose", verbose)
+
+        cliArg("--icon", iconFile)
+
+        cliArg("--name", packageName)
+        cliArg("--description", packageDescription)
+        cliArg("--copyright", packageCopyright)
+        cliArg("--app-version", packageVersion)
+        cliArg("--vendor", packageVendor)
+
+        launcherArgs.orNull?.forEach {
+            cliArg("--arguments", it)
+        }
+        launcherJvmArgs.orNull?.forEach {
+            cliArg("--java-options", it)
+        }
+
+        when (currentOS) {
+            OS.MacOS -> {
+                cliArg("--mac-package-identifier", macPackageIdentifier)
+                cliArg("--mac-package-name", macPackageName)
+                cliArg("--mac-package-signing-prefix", macPackageSigningPrefix)
+                cliArg("--mac-sign", macSign)
+                cliArg("--mac-signing-keychain", macSigningKeychain)
+                cliArg("--mac-signing-key-user-name", macSigningKeyUserName)
+            }
+            OS.Windows -> {
+                cliArg("--win-console", winConsole)
+            }
+        }
     }
 
     override fun prepareWorkingDir(inputChanges: InputChanges) {
