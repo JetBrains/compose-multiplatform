@@ -20,9 +20,9 @@ import androidx.compose.ui.unit.Density
 import java.awt.Point
 import java.awt.im.InputMethodRequests
 
-interface DesktopComponent : DesktopInputComponent
+internal interface DesktopComponent : DesktopInputComponent
 
-object DummyDesktopComponent : DesktopComponent {
+internal object DummyDesktopComponent : DesktopComponent {
     override fun enableInput(inputMethodRequests: InputMethodRequests) {}
     override fun disableInput() {}
     override val locationOnScreen = Point(0, 0)

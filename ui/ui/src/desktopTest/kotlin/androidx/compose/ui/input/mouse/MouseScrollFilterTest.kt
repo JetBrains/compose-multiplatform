@@ -20,10 +20,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
+import androidx.compose.ui.platform.TestComposeWindow
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.test.TestComposeWindow
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -50,7 +50,7 @@ class MouseScrollFilterTest {
             )
         }
 
-        window.owners.onMouseScroll(
+        window.onMouseScroll(
             x = 0,
             y = 0,
             event = MouseScrollEvent(MouseScrollUnit.Line(3f), Orientation.Vertical)
@@ -78,7 +78,7 @@ class MouseScrollFilterTest {
             )
         }
 
-        window.owners.onMouseScroll(
+        window.onMouseScroll(
             x = 20,
             y = 0,
             event = MouseScrollEvent(MouseScrollUnit.Line(3f), Orientation.Vertical)
@@ -116,7 +116,7 @@ class MouseScrollFilterTest {
             )
         }
 
-        window.owners.onMouseScroll(
+        window.onMouseScroll(
             x = 0,
             y = 0,
             event = MouseScrollEvent(MouseScrollUnit.Line(3f), Orientation.Horizontal)
@@ -153,7 +153,7 @@ class MouseScrollFilterTest {
             )
         }
 
-        window.owners.onMouseScroll(
+        window.onMouseScroll(
             x = 0,
             y = 0,
             event = MouseScrollEvent(MouseScrollUnit.Line(3f), Orientation.Horizontal)
@@ -184,7 +184,7 @@ class MouseScrollFilterTest {
             )
         }
 
-        window.owners.onMouseScroll(
+        window.onMouseScroll(
             x = 0,
             y = 0,
             event = MouseScrollEvent(MouseScrollUnit.Line(3f), Orientation.Horizontal)
@@ -224,7 +224,7 @@ class MouseScrollFilterTest {
             }
         }
 
-        window.owners.onMouseScroll(
+        window.onMouseScroll(
             x = 0,
             y = 0,
             event = MouseScrollEvent(MouseScrollUnit.Line(-1f), Orientation.Horizontal)
@@ -262,7 +262,7 @@ class MouseScrollFilterTest {
             }
         }
 
-        window.owners.onMouseScroll(
+        window.onMouseScroll(
             x = 0,
             y = 0,
             event = MouseScrollEvent(MouseScrollUnit.Page(1f), Orientation.Horizontal)
@@ -295,7 +295,7 @@ class MouseScrollFilterTest {
             }
         }
 
-        window.owners.onMouseScroll(
+        window.onMouseScroll(
             x = 0,
             y = 0,
             event = MouseScrollEvent(MouseScrollUnit.Page(1f), Orientation.Horizontal)

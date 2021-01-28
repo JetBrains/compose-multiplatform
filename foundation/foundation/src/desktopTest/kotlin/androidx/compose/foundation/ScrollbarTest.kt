@@ -358,7 +358,7 @@ class ScrollbarTest {
     }
 
     private fun ComposeTestRule.performMouseScroll(x: Int, y: Int, delta: Float) {
-        (this as DesktopComposeTestRule).owners.onMouseScroll(
+        (this as DesktopComposeTestRule).window.onMouseScroll(
             x, y, MouseScrollEvent(MouseScrollUnit.Line(delta), Orientation.Vertical)
         )
     }
