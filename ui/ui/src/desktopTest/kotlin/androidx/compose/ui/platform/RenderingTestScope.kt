@@ -23,9 +23,11 @@ import androidx.compose.ui.graphics.toArgb
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.yield
 import org.jetbrains.skija.Canvas
 import org.jetbrains.skija.Surface
+import org.jetbrains.skiko.FrameDispatcher
 
 internal fun renderingTest(
     width: Int,
@@ -49,13 +51,11 @@ internal class RenderingTestScope(
 ) {
     var currentTimeMillis = 0L
 
-    val frameDispatcher = FrameDispatcher(
-        onFrame = { onRender(it) },
-        framesPerSecond = { Float.POSITIVE_INFINITY },
-        nanoTime = { currentTimeMillis * 1_000_000 }
-    )
+    val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
+        onRender(currentTimeMillis * 1_000_000)
+    }
 
-    val surface: Surface = Surface.makeRasterN32Premul(width, height)!!
+    val surface: Surface = Surface.makeRasterN32Premul(width, height)
     val canvas: Canvas = surface.canvas
     val owners = DesktopOwners(
         invalidate = frameDispatcher::scheduleFrame

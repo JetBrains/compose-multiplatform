@@ -17,26 +17,13 @@ package androidx.compose.desktop
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionReference
-import java.awt.event.ComponentAdapter
-import java.awt.event.ComponentEvent
 import javax.swing.JFrame
 
-class ComposeWindow : JFrame {
-    val parent: AppFrame
+class ComposeWindow(val parent: AppFrame) : JFrame() {
     internal val layer = ComposeLayer()
 
-    val density get() = layer.density
-
-    constructor(parent: AppFrame) : super() {
-        this.parent = parent
-        contentPane.add(layer.wrapped)
-
-        addComponentListener(object : ComponentAdapter() {
-            override fun componentResized(e: ComponentEvent) {
-                layer.reinit()
-                needRedrawLayer()
-            }
-        })
+    init {
+        contentPane.add(layer.component)
     }
 
     /**
@@ -52,25 +39,9 @@ class ComposeWindow : JFrame {
         content: @Composable () -> Unit
     ) {
         layer.setContent(
-            parent = parent,
-            invalidate = this::needRedrawLayer,
             parentComposition = parentComposition,
             content = content
         )
-    }
-
-    private fun updateLayer() {
-        if (!isVisible) {
-            return
-        }
-        layer.updateLayer()
-    }
-
-    internal fun needRedrawLayer() {
-        if (!isVisible) {
-            return
-        }
-        layer.needRedrawLayer()
     }
 
     override fun dispose() {
@@ -81,24 +52,7 @@ class ComposeWindow : JFrame {
     override fun setVisible(value: Boolean) {
         if (value != isVisible) {
             super.setVisible(value)
-            layer.wrapped.requestFocus()
-            updateLayer()
-            needRedrawLayer()
+            layer.component.requestFocus()
         }
-    }
-}
-
-// Simple FPS tracker for debug purposes
-internal class FPSTracker {
-    private var t0 = 0L
-    private val times = DoubleArray(155)
-    private var timesIdx = 0
-
-    fun track() {
-        val t1 = System.nanoTime()
-        times[timesIdx] = (t1 - t0) / 1000000.0
-        t0 = t1
-        timesIdx = (timesIdx + 1) % times.size
-        println("FPS: ${1000 / times.takeWhile { it > 0 }.average()}")
     }
 }
