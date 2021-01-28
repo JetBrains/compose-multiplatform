@@ -428,7 +428,7 @@ class AppWindow : AppFrame {
         }
 
         onCreate(parentComposition) {
-            window.layer.owners?.keyboard = keyboard
+            window.layer.owners.keyboard = keyboard
             content()
         }
 
