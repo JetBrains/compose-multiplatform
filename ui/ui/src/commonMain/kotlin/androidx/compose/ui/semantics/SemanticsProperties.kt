@@ -195,6 +195,11 @@ object SemanticsProperties {
      * @see SemanticsPropertyReceiver.toggleableState
      */
     val ToggleableState = SemanticsPropertyKey<ToggleableState>("ToggleableState")
+
+    /**
+     * @see SemanticsPropertyReceiver.password
+     */
+    val Password = SemanticsPropertyKey<Unit>("Password")
 }
 
 /**
@@ -586,6 +591,13 @@ var SemanticsPropertyReceiver.selected by SemanticsProperties.Selected
  */
 var SemanticsPropertyReceiver.toggleableState
 by SemanticsProperties.ToggleableState
+
+/**
+ * The node is marked as a password.
+ */
+fun SemanticsPropertyReceiver.password() {
+    this[SemanticsProperties.Password] = Unit
+}
 
 /**
  * Custom actions which are defined by app developers.

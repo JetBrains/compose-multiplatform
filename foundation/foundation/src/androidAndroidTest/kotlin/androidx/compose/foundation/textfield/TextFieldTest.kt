@@ -83,6 +83,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.CommitTextCommand
 import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextFieldValue.Companion.Saver
 import androidx.compose.ui.text.input.TextInputService
@@ -588,6 +589,22 @@ class TextFieldTest {
             assertThat(value.text).isEqualTo("World")
             assertThat(value.selection).isEqualTo(TextRange(0, 0))
         }
+    }
+
+    @Test
+    fun semantics_passwordTextField_noCopyCutActions() {
+        rule.setContent {
+            BasicTextField(
+                modifier = Modifier.testTag(Tag),
+                value = TextFieldValue("Hello", TextRange(0, 3)),
+                onValueChange = {},
+                visualTransformation = PasswordVisualTransformation()
+            )
+        }
+
+        rule.onNodeWithTag(Tag)
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.CopyText))
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.CutText))
     }
 
     @LargeTest

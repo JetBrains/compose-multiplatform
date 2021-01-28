@@ -26,7 +26,6 @@ import android.os.Looper
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewParent
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityManager
 import android.view.accessibility.AccessibilityNodeInfo
@@ -311,6 +310,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         semanticsNode.config.getOrNull(SemanticsProperties.Heading)?.let {
             info.isHeading = true
         }
+        info.isPassword = semanticsNode.isPassword
         // Note editable is not added to semantics properties api.
         info.isEditable = semanticsNode.config.contains(SemanticsActions.SetText)
         info.isEnabled = semanticsNode.enabled()
@@ -366,14 +366,6 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     )
                 )
             }
-            semanticsNode.config.getOrNull(SemanticsActions.SetSelection)?.let {
-                info.addAction(
-                    AccessibilityNodeInfoCompat.AccessibilityActionCompat(
-                        AccessibilityNodeInfoCompat.ACTION_SET_SELECTION,
-                        it.label
-                    )
-                )
-            }
 
             // The config will contain this action only if there is a text selection at the moment.
             semanticsNode.config.getOrNull(SemanticsActions.CutText)?.let {
@@ -405,12 +397,15 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 getAccessibilitySelectionStart(semanticsNode),
                 getAccessibilitySelectionEnd(semanticsNode)
             )
-            if (semanticsNode.config.getOrNull(SemanticsActions.SetSelection) == null ||
-                !semanticsNode.enabled()
-            ) {
-                // Note this is the default set selection action provided by the framework.
-                info.addAction(AccessibilityNodeInfoCompat.ACTION_SET_SELECTION)
-            }
+            val setSelectionAction = semanticsNode.config.getOrNull(SemanticsActions.SetSelection)
+            // ACTION_SET_SELECTION should be provided even when SemanticsActions.SetSelection
+            // semantics action is not provided by the component
+            info.addAction(
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+                    AccessibilityNodeInfoCompat.ACTION_SET_SELECTION,
+                    setSelectionAction?.label
+                )
+            )
             info.addAction(AccessibilityNodeInfoCompat.ACTION_NEXT_AT_MOVEMENT_GRANULARITY)
             info.addAction(AccessibilityNodeInfoCompat.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY)
             info.movementGranularities =
@@ -649,9 +644,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             if (focusedVirtualViewId != InvalidId) {
                 sendEventForVirtualView(
                     focusedVirtualViewId,
-                    AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUS_CLEARED,
-                    null,
-                    null
+                    AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUS_CLEARED
                 )
             }
 
@@ -661,9 +654,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             view.invalidate()
             sendEventForVirtualView(
                 virtualViewId,
-                AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED,
-                null,
-                null
+                AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED
             )
             return true
         }
@@ -699,8 +690,6 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             return false
         }
 
-        val parent: ViewParent = view.parent
-
         val event: AccessibilityEvent = createEvent(virtualViewId, eventType)
         if (contentChangeType != null) {
             event.contentChangeTypes = contentChangeType
@@ -709,7 +698,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             event.contentDescription = contentDescription
         }
 
-        return parent.requestSendAccessibilityEvent(view, event)
+        return sendEvent(event)
     }
 
     /**
@@ -746,6 +735,11 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         event.packageName = view.context.packageName
         event.setSource(view, virtualViewId)
 
+        // populate additional information from the node
+        currentSemanticsNodes[virtualViewId]?.let {
+            event.isPassword = it.isPassword
+        }
+
         return event
     }
 
@@ -762,9 +756,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             view.invalidate()
             sendEventForVirtualView(
                 virtualViewId,
-                AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUS_CLEARED,
-                null,
-                null
+                AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUS_CLEARED
             )
             return true
         }
@@ -1199,18 +1191,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         Stay consistent with framework behavior by sending ENTER/EXIT pairs
         in reverse order. This is accurate as of API 18.
         */
-        sendEventForVirtualView(
-            virtualViewId,
-            AccessibilityEvent.TYPE_VIEW_HOVER_ENTER,
-            null,
-            null
-        )
-        sendEventForVirtualView(
-            previousVirtualViewId,
-            AccessibilityEvent.TYPE_VIEW_HOVER_EXIT,
-            null,
-            null
-        )
+        sendEventForVirtualView(virtualViewId, AccessibilityEvent.TYPE_VIEW_HOVER_ENTER)
+        sendEventForVirtualView(previousVirtualViewId, AccessibilityEvent.TYPE_VIEW_HOVER_EXIT)
     }
 
     override fun getAccessibilityNodeProvider(host: View?): AccessibilityNodeProviderCompat {
@@ -1342,11 +1324,10 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             return
         }
 
-        sendEvent(
-            createEvent(
-                semanticsNodeIdToAccessibilityVirtualNodeId(id),
-                AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
-            ).also { it.contentChangeTypes = AccessibilityEvent.CONTENT_CHANGE_TYPE_SUBTREE }
+        sendEventForVirtualView(
+            semanticsNodeIdToAccessibilityVirtualNodeId(id),
+            AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED,
+            AccessibilityEvent.CONTENT_CHANGE_TYPE_SUBTREE
         )
     }
 
@@ -1479,8 +1460,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                             sendEventForVirtualView(
                                 semanticsNodeIdToAccessibilityVirtualNodeId(id),
                                 AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED,
-                                AccessibilityEvent.CONTENT_CHANGE_TYPE_TEXT,
-                                null
+                                AccessibilityEvent.CONTENT_CHANGE_TYPE_TEXT
                             )
                         }
                     }
@@ -1914,6 +1894,7 @@ private fun SemanticsNode.propertiesDeleted(
 }
 
 private fun SemanticsNode.hasPaneTitle() = config.contains(SemanticsProperties.PaneTitle)
+private val SemanticsNode.isPassword: Boolean get() = config.contains(SemanticsProperties.Password)
 
 /**
  * Finds pruned [SemanticsNode]s in the tree owned by this [SemanticsOwner]. A semantics node
