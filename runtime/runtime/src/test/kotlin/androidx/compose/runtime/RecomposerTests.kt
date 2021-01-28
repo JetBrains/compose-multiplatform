@@ -17,7 +17,7 @@
 package androidx.compose.runtime
 
 import androidx.compose.runtime.mock.TestMonotonicFrameClock
-import androidx.compose.runtime.snapshots.withMutableSnapshot
+import androidx.compose.runtime.snapshots.Snapshot
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
@@ -48,7 +48,7 @@ class RecomposerTests {
                 lastRecomposedState = state
             }
             assertEquals(0, lastRecomposedState, "initial composition")
-            withMutableSnapshot { state = 1 }
+            Snapshot.withMutableSnapshot { state = 1 }
             assertNotNull(
                 withTimeoutOrNull(3_000) { recomposer.awaitIdle() },
                 "timed out waiting for recomposer idle for recomposition"
@@ -63,7 +63,7 @@ class RecomposerTests {
                 withTimeoutOrNull(3_000) { runner.join() },
                 "timed out waiting for recomposer runner job"
             )
-            withMutableSnapshot { state = 2 }
+            Snapshot.withMutableSnapshot { state = 2 }
             assertNotNull(
                 withTimeoutOrNull(3_000) {
                     recomposer.state.first { it <= Recomposer.State.PendingWork }
