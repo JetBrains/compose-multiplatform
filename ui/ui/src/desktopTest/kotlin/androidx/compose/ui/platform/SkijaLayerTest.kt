@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
@@ -315,7 +316,7 @@ class SkijaLayerTest {
     }
 
     private fun TestSkijaLayer() = SkijaLayer(
-        owner = DesktopOwner(DesktopOwners(invalidate = {})),
+        { Density(1f, 1f) },
         invalidateParentLayer = {},
         drawBlock = {}
     )
