@@ -23,9 +23,9 @@ import androidx.compose.material.ripple.ExperimentalRippleApi
 import androidx.compose.material.ripple.RippleTheme
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ComposableContract
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Providers
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.selection.AmbientTextSelectionColors
 
@@ -96,7 +96,7 @@ object MaterialTheme {
      */
     val colors: Colors
         @Composable
-        @ComposableContract(readonly = true)
+        @ReadOnlyComposable
         get() = AmbientColors.current
 
     /**
@@ -106,7 +106,7 @@ object MaterialTheme {
      */
     val typography: Typography
         @Composable
-        @ComposableContract(readonly = true)
+        @ReadOnlyComposable
         get() = AmbientTypography.current
 
     /**
@@ -114,7 +114,7 @@ object MaterialTheme {
      */
     val shapes: Shapes
         @Composable
-        @ComposableContract(readonly = true)
+        @ReadOnlyComposable
         get() = AmbientShapes.current
 }
 

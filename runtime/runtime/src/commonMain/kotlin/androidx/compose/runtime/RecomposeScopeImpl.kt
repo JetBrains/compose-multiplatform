@@ -32,7 +32,7 @@ interface RecomposeScope {
  * This object can be used to manually cause recompositions.
  */
 val currentRecomposeScope: RecomposeScope
-    @ComposableContract(readonly = true)
+    @ReadOnlyComposable
     @OptIn(InternalComposeApi::class)
     @Composable get() {
         val scope = currentComposer.recomposeScope ?: error("no recompose scope found")

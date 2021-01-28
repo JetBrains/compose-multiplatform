@@ -17,8 +17,8 @@
 package androidx.compose.runtime.mock
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ComposableContract
 import androidx.compose.runtime.ComposeNode
+import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.key
 
 @Composable
@@ -43,7 +43,7 @@ fun Linear(content: @Composable () -> Unit) {
     }
 }
 
-@Composable @ComposableContract(restartable = false)
+@Composable @NonRestartableComposable
 fun Text(value: String) {
     ComposeNode<View, ViewApplier>(
         factory = { View().also { it.name = "text" } },
