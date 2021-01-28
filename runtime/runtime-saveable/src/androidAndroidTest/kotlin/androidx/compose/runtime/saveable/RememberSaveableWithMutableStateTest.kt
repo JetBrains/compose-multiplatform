@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package androidx.compose.runtime.savedinstancestate
+package androidx.compose.runtime.saveable
 
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.saveable.Holder
-import androidx.compose.runtime.saveable.HolderSaver
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -30,7 +29,7 @@ import org.junit.runner.RunWith
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-class SavedInstanceStateTest {
+class RememberSaveableWithMutableStateTest {
 
     @get:Rule
     val rule = createComposeRule()
@@ -41,7 +40,7 @@ class SavedInstanceStateTest {
     fun simpleRestore() {
         var state: MutableState<Int>? = null
         restorationTester.setContent {
-            state = savedInstanceState { 0 }
+            state = rememberSaveable { mutableStateOf(0) }
         }
 
         rule.runOnUiThread {
@@ -63,8 +62,8 @@ class SavedInstanceStateTest {
     fun restoreWithSaver() {
         var state: MutableState<Holder>? = null
         restorationTester.setContent {
-            state = savedInstanceState(saver = HolderSaver) {
-                Holder(0)
+            state = rememberSaveable(stateSaver = HolderSaver) {
+                mutableStateOf(Holder(0))
             }
         }
 
@@ -87,7 +86,7 @@ class SavedInstanceStateTest {
     fun nullableStateRestoresNonNullValue() {
         var state: MutableState<String?>? = null
         restorationTester.setContent {
-            state = savedInstanceState<String?> { null }
+            state = rememberSaveable { mutableStateOf(null) }
         }
 
         rule.runOnUiThread {
@@ -109,7 +108,7 @@ class SavedInstanceStateTest {
     fun nullableStateRestoresNullValue() {
         var state: MutableState<String?>? = null
         restorationTester.setContent {
-            state = savedInstanceState<String?> { "initial" }
+            state = rememberSaveable { mutableStateOf("initial") }
         }
 
         rule.runOnUiThread {

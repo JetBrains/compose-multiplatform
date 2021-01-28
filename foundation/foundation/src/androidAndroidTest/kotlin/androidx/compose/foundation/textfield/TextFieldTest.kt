@@ -41,7 +41,7 @@ import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.savedInstanceState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
@@ -376,7 +376,7 @@ class TextFieldTest {
 
         val restorationTester = StateRestorationTester(rule)
         restorationTester.setContent {
-            state = savedInstanceState(saver = Saver) { TextFieldValue() }
+            state = rememberSaveable(stateSaver = Saver) { mutableStateOf(TextFieldValue()) }
         }
 
         rule.runOnIdle {

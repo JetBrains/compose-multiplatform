@@ -58,7 +58,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.savedinstancestate.savedInstanceState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -472,7 +472,7 @@ private fun NestedLazyDemo() {
             Modifier.padding(16.dp).size(200.dp).background(Color.LightGray),
             contentAlignment = Alignment.Center
         ) {
-            var state by savedInstanceState { 0 }
+            var state by rememberSaveable { mutableStateOf(0) }
             Button(onClick = { state++ }) {
                 Text("Index=$index State=$state")
             }

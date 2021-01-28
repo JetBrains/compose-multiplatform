@@ -20,10 +20,39 @@ package androidx.compose.runtime.saveable.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 
 @Sampled
 @Composable
 fun RememberSaveable() {
     val list = rememberSaveable { mutableListOf<Int>() }
 }
+
+@Sampled
+@Composable
+fun RememberSaveableWithMutableState() {
+    var value by rememberSaveable { mutableStateOf(({ "value" })()) }
+}
+
+@Sampled
+@Composable
+fun RememberSaveableCustomSaver() {
+    val holder = rememberSaveable(saver = HolderSaver) { Holder(0) }
+}
+
+@Sampled
+@Composable
+fun RememberSaveableWithMutableStateAndCustomSaver() {
+    val holder = rememberSaveable(stateSaver = HolderSaver) { mutableStateOf(Holder(0)) }
+}
+
+private data class Holder(var value: Int)
+
+private val HolderSaver = Saver<Holder, Int>(
+    save = { it.value },
+    restore = { Holder(it) }
+)

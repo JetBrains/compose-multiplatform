@@ -16,14 +16,22 @@
 
 package androidx.compose.ui.platform
 
+import android.annotation.SuppressLint
 import android.os.Binder
 import android.os.Bundle
+import android.os.Parcel
 import android.os.Parcelable
 import android.util.Size
 import android.util.SizeF
 import android.util.SparseArray
 import android.view.View
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.neverEqualPolicy
+import androidx.compose.runtime.referentialEqualityPolicy
 import androidx.compose.runtime.saveable.SaveableStateRegistry
+import androidx.compose.runtime.snapshots.SnapshotMutableState
+import androidx.compose.runtime.structuralEqualityPolicy
+import androidx.compose.ui.util.fastForEachIndexed
 import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryOwner
 import java.io.Serializable
@@ -113,6 +121,15 @@ private fun canBeSavedToBundle(value: Any): Boolean {
             return true
         }
     }
+    if (value is SnapshotMutableState<*>) {
+        if (value.policy === neverEqualPolicy<Any?>() ||
+            value.policy === structuralEqualityPolicy<Any?>() ||
+            value.policy === referentialEqualityPolicy<Any?>()
+        ) {
+            val stateValue = value.value
+            return if (stateValue == null) true else canBeSavedToBundle(stateValue)
+        }
+    }
     return false
 }
 
@@ -145,7 +162,14 @@ private val AcceptableClasses = arrayOf(
 private fun Bundle.toMap(): Map<String, List<Any?>>? {
     val map = mutableMapOf<String, List<Any?>>()
     this.keySet().forEach { key ->
-        map[key] = getParcelableArrayList<Parcelable?>(key) as List<Any?>
+        @Suppress("UNCHECKED_CAST")
+        val list = getParcelableArrayList<Parcelable?>(key) as ArrayList<Any?>
+        list.fastForEachIndexed { index, value ->
+            if (value is ParcelableMutableStateHolder) {
+                list[index] = value.state
+            }
+        }
+        map[key] = list
     }
     return map
 }
@@ -153,7 +177,12 @@ private fun Bundle.toMap(): Map<String, List<Any?>>? {
 private fun Map<String, List<Any?>>.toBundle(): Bundle {
     val bundle = Bundle()
     forEach { (key, list) ->
-        val arrayList = if (list is ArrayList<*>) list else ArrayList(list)
+        val arrayList = if (list is ArrayList<Any?>) list else ArrayList(list)
+        arrayList.fastForEachIndexed { index, value ->
+            if (value is SnapshotMutableState<*>) {
+                arrayList[index] = ParcelableMutableStateHolder(value)
+            }
+        }
         @Suppress("UNCHECKED_CAST")
         bundle.putParcelableArrayList(
             key,
@@ -161,4 +190,67 @@ private fun Map<String, List<Any?>>.toBundle(): Bundle {
         )
     }
     return bundle
+}
+
+@SuppressLint("BanParcelableUsage")
+private class ParcelableMutableStateHolder : Parcelable {
+
+    val state: SnapshotMutableState<*>
+
+    constructor(state: SnapshotMutableState<*>) {
+        this.state = state
+    }
+
+    private constructor(parcel: Parcel, loader: ClassLoader?) {
+        val value = parcel.readValue(loader ?: javaClass.classLoader)
+        val policyIndex = parcel.readInt()
+        state = mutableStateOf(
+            value,
+            when (policyIndex) {
+                PolicyNeverEquals -> neverEqualPolicy()
+                PolicyStructuralEquality -> structuralEqualityPolicy()
+                PolicyReferentialEquality -> referentialEqualityPolicy()
+                else -> throw IllegalStateException(
+                    "Restored an incorrect MutableState policy $policyIndex"
+                )
+            }
+        ) as SnapshotMutableState
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeValue(state.value)
+        parcel.writeInt(
+            when (state.policy) {
+                neverEqualPolicy<Any?>() -> PolicyNeverEquals
+                structuralEqualityPolicy<Any?>() -> PolicyStructuralEquality
+                referentialEqualityPolicy<Any?>() -> PolicyReferentialEquality
+                else -> throw IllegalStateException(
+                    "Only known types of MutableState's SnapshotMutationPolicy are supported"
+                )
+            }
+        )
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object {
+        private const val PolicyNeverEquals = 0
+        private const val PolicyStructuralEquality = 1
+        private const val PolicyReferentialEquality = 2
+
+        @Suppress("unused")
+        @JvmField
+        val CREATOR: Parcelable.Creator<ParcelableMutableStateHolder> =
+            object : Parcelable.ClassLoaderCreator<ParcelableMutableStateHolder> {
+                override fun createFromParcel(parcel: Parcel, loader: ClassLoader) =
+                    ParcelableMutableStateHolder(parcel, loader)
+
+                override fun createFromParcel(parcel: Parcel) =
+                    ParcelableMutableStateHolder(parcel, null)
+
+                override fun newArray(size: Int) = arrayOfNulls<ParcelableMutableStateHolder?>(size)
+            }
+    }
 }

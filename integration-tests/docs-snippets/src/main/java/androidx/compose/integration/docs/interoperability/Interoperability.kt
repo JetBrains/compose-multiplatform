@@ -66,7 +66,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.mapSaver
-import androidx.compose.runtime.savedinstancestate.savedInstanceState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -367,7 +367,7 @@ private object InteropSnippet14 {
 private object InteropSnippet15 {
     @Composable
     fun MyExample() {
-        var selectedId by savedInstanceState<String?> { null }
+        var selectedId by rememberSaveable { mutableStateOf<String?>(null) }
         /*...*/
     }
 }
@@ -380,7 +380,7 @@ private object InteropSnippet16 {
 
     @Composable
     fun MyExample() {
-        var selectedCity = savedInstanceState { City("Madrid", "Spain") }
+        var selectedCity = rememberSaveable { mutableStateOf(City("Madrid", "Spain")) }
     }
      */
 }
@@ -399,7 +399,9 @@ private object InteropSnippet17 {
 
     @Composable
     fun MyExample() {
-        var selectedCity = savedInstanceState(CitySaver) { City("Madrid", "Spain") }
+        var selectedCity = rememberSaveable(stateSaver = CitySaver) {
+            mutableStateOf(City("Madrid", "Spain"))
+        }
     }
 }
 
@@ -413,7 +415,9 @@ private object InteropSnippet18 {
 
     @Composable
     fun MyExample() {
-        var selectedCity = savedInstanceState(CitySaver) { City("Madrid", "Spain") }
+        var selectedCity = rememberSaveable(stateSaver = CitySaver) {
+            mutableStateOf(City("Madrid", "Spain"))
+        }
         /*...*/
     }
 }

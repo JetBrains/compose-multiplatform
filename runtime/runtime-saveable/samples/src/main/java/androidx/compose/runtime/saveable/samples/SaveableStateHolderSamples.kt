@@ -29,8 +29,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
-import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -58,7 +59,7 @@ fun SimpleNavigationWithSaveableStateSample() {
     }
 
     Column {
-        var screen by savedInstanceState { "screen1" }
+        var screen by rememberSaveable { mutableStateOf("screen1") }
         Row(horizontalArrangement = Arrangement.SpaceEvenly) {
             Button(onClick = { screen = "screen1" }) {
                 Text("Go to screen1")
@@ -79,7 +80,7 @@ fun SimpleNavigationWithSaveableStateSample() {
 
 @Composable
 fun Screen1() {
-    var counter by savedInstanceState { 0 }
+    var counter by rememberSaveable { mutableStateOf(0) }
     Button(onClick = { counter++ }) {
         Text("Counter=$counter on Screen1")
     }
