@@ -22,6 +22,19 @@ package androidx.compose.runtime.saveable {
     method @androidx.compose.runtime.Composable public static androidx.compose.runtime.saveable.SaveableStateHolder rememberSaveableStateHolder();
   }
 
+  public interface SaveableStateRegistry {
+    method public boolean canBeSaved(Object value);
+    method public Object? consumeRestored(String key);
+    method public java.util.Map<java.lang.String,java.util.List<java.lang.Object>> performSave();
+    method public void registerProvider(String key, kotlin.jvm.functions.Function0<?> valueProvider);
+    method public void unregisterProvider(String key, kotlin.jvm.functions.Function0<?> valueProvider);
+  }
+
+  public final class SaveableStateRegistryKt {
+    method public static androidx.compose.runtime.saveable.SaveableStateRegistry SaveableStateRegistry(java.util.Map<java.lang.String,? extends java.util.List<?>>? restoredValues, kotlin.jvm.functions.Function1<java.lang.Object,java.lang.Boolean> canBeSaved);
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.runtime.saveable.SaveableStateRegistry> getAmbientSaveableStateRegistry();
+  }
+
   public interface Saver<Original, Saveable> {
     method public Original? restore(Saveable value);
     method public Saveable? save(androidx.compose.runtime.saveable.SaverScope, Original? value);
@@ -42,7 +55,9 @@ package androidx.compose.runtime.savedinstancestate {
 
   public final class DeprecatedKt {
     method @Deprecated public static <Original, Saveable> androidx.compose.runtime.savedinstancestate.Saver<Original,Saveable> Saver(kotlin.jvm.functions.Function2<? super androidx.compose.runtime.savedinstancestate.SaverScope,? super Original,? extends Saveable> save, kotlin.jvm.functions.Function1<? super Saveable,? extends Original> restore);
+    method @Deprecated public static androidx.compose.runtime.savedinstancestate.UiSavedStateRegistry UiSavedStateRegistry(java.util.Map<java.lang.String,? extends java.util.List<?>>? restoredValues, kotlin.jvm.functions.Function1<java.lang.Object,java.lang.Boolean> canBeSaved);
     method @Deprecated public static <T> androidx.compose.runtime.savedinstancestate.Saver<T,java.lang.Object> autoSaver();
+    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.runtime.savedinstancestate.UiSavedStateRegistry> getAmbientUiSavedStateRegistry();
     method @Deprecated public static <Original, Saveable> androidx.compose.runtime.savedinstancestate.Saver<Original,?> listSaver(kotlin.jvm.functions.Function2<? super androidx.compose.runtime.savedinstancestate.SaverScope,? super Original,? extends java.util.List<? extends Saveable>> save, kotlin.jvm.functions.Function1<? super java.util.List<? extends Saveable>,? extends Original> restore);
     method @Deprecated public static <T> androidx.compose.runtime.savedinstancestate.Saver<T,?> mapSaver(kotlin.jvm.functions.Function2<? super androidx.compose.runtime.savedinstancestate.SaverScope,? super T,? extends java.util.Map<java.lang.String,?>> save, kotlin.jvm.functions.Function1<? super java.util.Map<java.lang.String,?>,? extends T> restore);
     method @Deprecated @androidx.compose.runtime.Composable public static <T> androidx.compose.runtime.savedinstancestate.RestorableStateHolder<T> rememberRestorableStateHolder();
@@ -65,18 +80,7 @@ package androidx.compose.runtime.savedinstancestate {
   @Deprecated public interface SaverScope extends androidx.compose.runtime.saveable.SaverScope {
   }
 
-  public interface UiSavedStateRegistry {
-    method public boolean canBeSaved(Object value);
-    method public Object? consumeRestored(String key);
-    method public java.util.Map<java.lang.String,java.util.List<java.lang.Object>> performSave();
-    method public void registerProvider(String key, kotlin.jvm.functions.Function0<?> valueProvider);
-    method public void unregisterProvider(String key, kotlin.jvm.functions.Function0<?> valueProvider);
-  }
-
-  public final class UiSavedStateRegistryKt {
-    method public static androidx.compose.runtime.savedinstancestate.UiSavedStateRegistry UiSavedStateRegistry(java.util.Map<java.lang.String,? extends java.util.List<?>>? restoredValues, kotlin.jvm.functions.Function1<java.lang.Object,java.lang.Boolean> canBeSaved);
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.runtime.savedinstancestate.UiSavedStateRegistry> getAmbientUiSavedStateRegistry();
-    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.runtime.savedinstancestate.UiSavedStateRegistry>! getUiSavedStateRegistryAmbient();
+  @Deprecated public interface UiSavedStateRegistry extends androidx.compose.runtime.saveable.SaveableStateRegistry {
   }
 
 }

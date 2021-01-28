@@ -23,29 +23,29 @@ import android.util.Size
 import android.util.SizeF
 import android.util.SparseArray
 import android.view.View
-import androidx.compose.runtime.savedinstancestate.UiSavedStateRegistry
+import androidx.compose.runtime.saveable.SaveableStateRegistry
 import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryOwner
 import java.io.Serializable
 
 /**
- * Creates [DisposableUiSavedStateRegistry] associated with these [view] and [owner].
+ * Creates [DisposableSaveableStateRegistry] associated with these [view] and [owner].
  */
-internal fun DisposableUiSavedStateRegistry(
+internal fun DisposableSaveableStateRegistry(
     view: View,
     owner: SavedStateRegistryOwner
-): DisposableUiSavedStateRegistry {
+): DisposableSaveableStateRegistry {
     // When AndroidComposeView is composed into some ViewGroup we just added as a child for this
     // ViewGroup. And we don't have any id on AndroidComposeView as we can't make it unique, but
     // we require this parent ViewGroup to have an unique id for the saved instance state mechanism
     // to work (similarly to how it works without Compose). When we composed into Activity our
     // parent is the ViewGroup with android.R.id.content.
     val parentId: Int = (view.parent as? View)?.id ?: View.NO_ID
-    return DisposableUiSavedStateRegistry(parentId, owner)
+    return DisposableSaveableStateRegistry(parentId, owner)
 }
 
 /**
- * Creates [DisposableUiSavedStateRegistry] with the restored values using [SavedStateRegistry] and
+ * Creates [DisposableSaveableStateRegistry] with the restored values using [SavedStateRegistry] and
  * saves the values when [SavedStateRegistry] performs save.
  *
  * To provide a namespace we require unique [id]. We can't use the default way of doing it when we
@@ -59,22 +59,22 @@ internal fun DisposableUiSavedStateRegistry(
  * id for this ViewGroup. If @GenerateView will be used then we will ask users to set an id on
  * this generated View.
  */
-internal fun DisposableUiSavedStateRegistry(
+internal fun DisposableSaveableStateRegistry(
     id: Int,
     savedStateRegistryOwner: SavedStateRegistryOwner
-): DisposableUiSavedStateRegistry {
-    val key = "${UiSavedStateRegistry::class.java.simpleName}:$id"
+): DisposableSaveableStateRegistry {
+    val key = "${SaveableStateRegistry::class.java.simpleName}:$id"
 
     val androidxRegistry = savedStateRegistryOwner.savedStateRegistry
     val bundle = androidxRegistry.consumeRestoredStateForKey(key)
     val restored: Map<String, List<Any?>>? = bundle?.toMap()
 
-    val uiSavedStateRegistry = UiSavedStateRegistry(restored) {
+    val saveableStateRegistry = SaveableStateRegistry(restored) {
         canBeSavedToBundle(it)
     }
     val registered = try {
         androidxRegistry.registerSavedStateProvider(key) {
-            uiSavedStateRegistry.performSave().toBundle()
+            saveableStateRegistry.performSave().toBundle()
         }
         true
     } catch (ignore: IllegalArgumentException) {
@@ -84,7 +84,7 @@ internal fun DisposableUiSavedStateRegistry(
         // TODO: we should verify our strategy for such cases and improve it. b/162397322
         false
     }
-    return DisposableUiSavedStateRegistry(uiSavedStateRegistry) {
+    return DisposableSaveableStateRegistry(saveableStateRegistry) {
         if (registered) {
             androidxRegistry.unregisterSavedStateProvider(key)
         }
@@ -92,12 +92,12 @@ internal fun DisposableUiSavedStateRegistry(
 }
 
 /**
- * [UiSavedStateRegistry] which can be disposed using [dispose].
+ * [SaveableStateRegistry] which can be disposed using [dispose].
  */
-internal class DisposableUiSavedStateRegistry(
-    uiSavedStateRegistry: UiSavedStateRegistry,
+internal class DisposableSaveableStateRegistry(
+    saveableStateRegistry: SaveableStateRegistry,
     private val onDispose: () -> Unit
-) : UiSavedStateRegistry by uiSavedStateRegistry {
+) : SaveableStateRegistry by saveableStateRegistry {
 
     fun dispose() {
         onDispose()

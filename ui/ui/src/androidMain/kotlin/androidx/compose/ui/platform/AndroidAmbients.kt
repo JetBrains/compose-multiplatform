@@ -31,7 +31,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.neverEqualPolicy
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.savedinstancestate.AmbientUiSavedStateRegistry
+import androidx.compose.runtime.saveable.AmbientSaveableStateRegistry
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticAmbientOf
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -98,12 +98,12 @@ internal fun ProvideAndroidAmbients(owner: AndroidComposeView, content: @Composa
         "Called when the ViewTreeOwnersAvailability is not yet in Available state"
     )
 
-    val uiSavedStateRegistry = remember {
-        DisposableUiSavedStateRegistry(view, viewTreeOwners.savedStateRegistryOwner)
+    val saveableStateRegistry = remember {
+        DisposableSaveableStateRegistry(view, viewTreeOwners.savedStateRegistryOwner)
     }
     DisposableEffect(Unit) {
         onDispose {
-            uiSavedStateRegistry.dispose()
+            saveableStateRegistry.dispose()
         }
     }
 
@@ -112,7 +112,7 @@ internal fun ProvideAndroidAmbients(owner: AndroidComposeView, content: @Composa
         AmbientContext provides context,
         AmbientLifecycleOwner provides viewTreeOwners.lifecycleOwner,
         AmbientSavedStateRegistryOwner provides viewTreeOwners.savedStateRegistryOwner,
-        AmbientUiSavedStateRegistry provides uiSavedStateRegistry,
+        AmbientSaveableStateRegistry provides saveableStateRegistry,
         AmbientView provides owner.view,
         AmbientViewModelStoreOwner provides viewTreeOwners.viewModelStoreOwner
     ) {

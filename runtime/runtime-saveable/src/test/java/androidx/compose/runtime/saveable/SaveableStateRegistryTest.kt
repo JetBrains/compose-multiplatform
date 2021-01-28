@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.runtime.savedinstancestate
+package androidx.compose.runtime.saveable
 
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
@@ -22,7 +22,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
-class UiSavedStateRegistryTest {
+class SaveableStateRegistryTest {
 
     @Test
     fun saveSimpleValue() {
@@ -193,5 +193,5 @@ class UiSavedStateRegistryTest {
     private fun createRegistry(
         restored: Map<String, List<Any?>>? = null,
         canBeSaved: (Any) -> Boolean = { true }
-    ) = UiSavedStateRegistry(restored, canBeSaved)
+    ) = SaveableStateRegistry(restored, canBeSaved)
 }
