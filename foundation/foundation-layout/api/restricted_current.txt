@@ -387,7 +387,6 @@ package androidx.compose.foundation.layout {
   }
 
   public final class RowColumnImplKt {
-    method @kotlin.PublishedApi internal static androidx.compose.ui.node.MeasureBlocks rowColumnMeasureBlocks-GZ6WFlY(androidx.compose.foundation.layout.LayoutOrientation orientation, kotlin.jvm.functions.Function5<? super java.lang.Integer,? super int[],? super androidx.compose.ui.unit.LayoutDirection,? super androidx.compose.ui.unit.Density,? super int[],kotlin.Unit> arrangement, float arrangementSpacing, androidx.compose.foundation.layout.SizeMode crossAxisSize, androidx.compose.foundation.layout.CrossAxisAlignment crossAxisAlignment);
   }
 
   public final class RowKt {
