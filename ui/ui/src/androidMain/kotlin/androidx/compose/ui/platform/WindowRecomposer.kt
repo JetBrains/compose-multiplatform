@@ -76,7 +76,7 @@ fun interface WindowRecomposerFactory {
     /**
      * Get a [Recomposer] for the window where [windowRootView] is at the root of the window's
      * [View] hierarchy. The factory is responsible for establishing a policy for
-     * [shutting down][Recomposer.shutDown] the returned [Recomposer]. [windowRootView] will
+     * [shutting down][Recomposer.cancel] the returned [Recomposer]. [windowRootView] will
      * hold a hard reference to the returned [Recomposer] until it [joins][Recomposer.join]
      * after shutting down.
      */
@@ -228,7 +228,7 @@ private fun View.createLifecycleAwareViewTreeRecomposer(): Recomposer {
                 Lifecycle.Event.ON_START -> pausableClock?.resume()
                 Lifecycle.Event.ON_STOP -> pausableClock?.pause()
                 Lifecycle.Event.ON_DESTROY -> {
-                    recomposer.shutDown()
+                    recomposer.cancel()
                 }
             }
         }

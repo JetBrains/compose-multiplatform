@@ -106,6 +106,8 @@ internal class SuspendingGestureTestUtil(
             }
             yield()
             block()
+            // Pointer input effects will loop indefinitely; fully cancel them.
+            recomposer.cancel()
         }
     }
 

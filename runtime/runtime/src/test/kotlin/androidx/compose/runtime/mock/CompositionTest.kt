@@ -67,7 +67,7 @@ fun compositionTest(block: suspend CompositionTestScope.() -> Unit) = runBlockin
         }
         scope.block()
         scope.composition?.dispose()
-        recomposer.shutDown()
+        recomposer.cancel()
         recomposer.join()
     }
 }

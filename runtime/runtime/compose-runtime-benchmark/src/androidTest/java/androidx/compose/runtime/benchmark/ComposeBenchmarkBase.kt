@@ -74,7 +74,7 @@ abstract class ComposeBenchmarkBase {
         } finally {
             activity.setContentView(emptyView)
             advanceUntilIdle()
-            recomposer.shutDown()
+            recomposer.cancel()
         }
     }
 
@@ -163,7 +163,7 @@ abstract class ComposeBenchmarkBase {
         }
 
         activity.setContentView(emptyView)
-        recomposer.shutDown()
+        recomposer.cancel()
     }
 }
 

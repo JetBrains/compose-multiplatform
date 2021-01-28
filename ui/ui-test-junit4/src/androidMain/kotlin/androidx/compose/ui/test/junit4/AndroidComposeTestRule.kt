@@ -341,7 +341,7 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
                 }
                 base.evaluate()
             } finally {
-                recomposer.shutDown()
+                recomposer.cancel()
                 // FYI: Not canceling these scope below would end up cleanupTestCoroutines
                 // throwing errors on active coroutines
                 recomposerApplyCoroutineScope.cancel()

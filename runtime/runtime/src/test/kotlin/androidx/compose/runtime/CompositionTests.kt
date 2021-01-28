@@ -2806,7 +2806,7 @@ private suspend fun <R> localRecomposerTest(
     block(recomposer)
     // This call doesn't need to be in a finally; everything it does will be torn down
     // in exceptional cases by the coroutineScope failure
-    recomposer.shutDown()
+    recomposer.cancel()
 }
 
 @Composable fun Wrap(content: @Composable () -> Unit) {
