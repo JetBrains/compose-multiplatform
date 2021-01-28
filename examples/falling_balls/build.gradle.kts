@@ -3,8 +3,10 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.4.21"
-    id("org.jetbrains.compose") version "0.3.0-build136"
+    // __KOTLIN_COMPOSE_VERSION__
+    kotlin("jvm") version "1.4.21-2"
+    // __LATEST_COMPOSE_RELEASE_VERSION__
+    id("org.jetbrains.compose") version "0.3.0-build146"
 }
 
 group = "me.user"
