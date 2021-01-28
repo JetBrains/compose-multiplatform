@@ -17,7 +17,7 @@ fun <T> uiStateFrom(
 ): MutableState<UiState<T>> {
     val state: MutableState<UiState<T>> = remember { mutableStateOf(UiState.Loading) }
 
-    onCommit(*inputs) {
+    DisposableEffect(*inputs) {
         state.value = UiState.Loading
         repositoryCall { result ->
             state.value = when (result) {
@@ -25,6 +25,7 @@ fun <T> uiStateFrom(
                 is Result.Error -> UiState.Error(result.exception)
             }
         }
+        onDispose {  }
     }
 
     return state

@@ -18,14 +18,12 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
-import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.selection.DisableSelection
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -38,6 +36,7 @@ import androidx.ui.examples.jetissues.query.IssueQuery
 import androidx.ui.examples.jetissues.query.IssuesQuery
 import androidx.ui.examples.jetissues.query.type.OrderDirection
 import androidx.ui.examples.jetissues.view.common.SelectionContainer
+import kotlinx.coroutines.runBlocking
 import org.ocpsoft.prettytime.PrettyTime
 import java.lang.Integer.parseInt
 import java.util.*
@@ -59,7 +58,7 @@ fun JetIssuesView() {
 @Composable
 fun Main() {
     val currentIssue: MutableState<IssuesQuery.Node?> = remember { mutableStateOf(null) }
-    WithConstraints {
+    BoxWithConstraints {
        if (maxWidth.value > 1000) {
            TwoColumnsLayout(currentIssue)
        } else {
@@ -203,14 +202,18 @@ fun OrderButton(order: MutableState<OrderDirection>, scroll: ScrollState) {
         OrderDirection.DESC ->
             Button(onClick = {
                 order.value = OrderDirection.ASC
-                scroll.scrollTo(0F)
+                runBlocking {
+                    scroll.scrollTo(0F)
+                }
             }) {
                 Text("ASC")
             }
         OrderDirection.ASC ->
             Button(onClick = {
                 order.value = OrderDirection.DESC
-                scroll.scrollTo(0F)
+                runBlocking {
+                    scroll.scrollTo(0F)
+                }
             }) {
                 Text("DESC")
             }
@@ -228,7 +231,9 @@ fun FilterTabs(issuesState: MutableState<IssuesState>, scroll: ScrollState) {
                 selected = issuesState.value == it,
                 onClick = {
                     issuesState.value = it
-                    scroll.scrollTo(0F)
+                    runBlocking {
+                        scroll.scrollTo(0F)
+                    }
                 }
             )
         }
