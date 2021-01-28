@@ -17,19 +17,14 @@
 package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.constrainHeight
-import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
 
 /**
@@ -81,6 +76,7 @@ fun LazyVerticalGrid(
 /**
  * This class describes how cells form columns in vertical grids or rows in horizontal grids.
  */
+@ExperimentalFoundationApi
 sealed class GridCells {
     /**
      * Combines cells with fixed number rows or columns.
@@ -88,6 +84,7 @@ sealed class GridCells {
      * For example, for the vertical [LazyVerticalGrid] Fixed(3) would mean that there are 3 columns 1/3
      * of the parent wide.
      */
+    @ExperimentalFoundationApi
     class Fixed(val count: Int) : GridCells()
 
     /**
@@ -99,12 +96,14 @@ sealed class GridCells {
      * many columns as possible and every column will be at least 20.dp and all the columns will
      * have equal width. If the screen is 88.dp wide then there will be 4 columns 22.dp each.
      */
+    @ExperimentalFoundationApi
     class Adaptive(val minSize: Dp) : GridCells()
 }
 
 /**
  * Receiver scope which is used by [LazyVerticalGrid].
  */
+@ExperimentalFoundationApi
 interface LazyGridScope {
     /**
      * Adds a single item to the scope.
@@ -128,6 +127,7 @@ interface LazyGridScope {
  * @param items the data list
  * @param itemContent the content displayed by a single item
  */
+@ExperimentalFoundationApi
 inline fun <T> LazyGridScope.items(
     items: List<T>,
     crossinline itemContent: @Composable LazyItemScope.(item: T) -> Unit
@@ -141,6 +141,7 @@ inline fun <T> LazyGridScope.items(
  * @param items the data list
  * @param itemContent the content displayed by a single item
  */
+@ExperimentalFoundationApi
 inline fun <T> LazyGridScope.itemsIndexed(
     items: List<T>,
     crossinline itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
@@ -154,6 +155,7 @@ inline fun <T> LazyGridScope.itemsIndexed(
  * @param items the data array
  * @param itemContent the content displayed by a single item
  */
+@ExperimentalFoundationApi
 inline fun <T> LazyGridScope.items(
     items: Array<T>,
     crossinline itemContent: @Composable LazyItemScope.(item: T) -> Unit
@@ -167,6 +169,7 @@ inline fun <T> LazyGridScope.items(
  * @param items the data array
  * @param itemContent the content displayed by a single item
  */
+@ExperimentalFoundationApi
 inline fun <T> LazyGridScope.itemsIndexed(
     items: Array<T>,
     crossinline itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
@@ -175,6 +178,7 @@ inline fun <T> LazyGridScope.itemsIndexed(
 }
 
 @Composable
+@ExperimentalFoundationApi
 private fun FixedLazyGrid(
     nColumns: Int,
     modifier: Modifier = Modifier,
@@ -183,25 +187,21 @@ private fun FixedLazyGrid(
     scope: LazyGridScopeImpl
 ) {
     val rows = (scope.totalSize + nColumns - 1) / nColumns
-    LazyList(
-        itemsCount = rows,
+    LazyColumn(
         modifier = modifier,
         state = state,
-        contentPadding = contentPadding,
-        isVertical = true,
-        horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.Top,
-        reverseLayout = false
-    ) { rowIndex ->
-        @Composable {
+        contentPadding = contentPadding
+    ) {
+        items(rows) { rowIndex ->
             Row {
                 for (columnIndex in 0 until nColumns) {
                     val itemIndex = rowIndex * nColumns + columnIndex
                     if (itemIndex < scope.totalSize) {
-                        GridCellBox(
-                            modifier = Modifier.weight(1f, fill = true)
+                        Box(
+                            modifier = Modifier.weight(1f, fill = true),
+                            propagateMinConstraints = true
                         ) {
-                            scope.contentFor(itemIndex, this@LazyList).invoke()
+                            scope.contentFor(itemIndex, this@items).invoke()
                         }
                     } else {
                         Spacer(Modifier.weight(1f, fill = true))
@@ -212,24 +212,7 @@ private fun FixedLazyGrid(
     }
 }
 
-/**
- * TODO: Remove when the Box component supports fixed constraints.
- */
-@Composable
-private fun GridCellBox(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    Layout(content, modifier) { measurables, constraints ->
-        val placeables = measurables.map { it.measure(constraints) }
-        val size = placeables.fold(IntSize.Zero) { size, item ->
-            IntSize(maxOf(size.width, item.width), maxOf(size.height, item.height))
-        }
-        layout(constraints.constrainWidth(size.width), constraints.constrainHeight(size.height)) {
-            placeables.forEach {
-                it.place(0, 0)
-            }
-        }
-    }
-}
-
+@ExperimentalFoundationApi
 internal class LazyGridScopeImpl : LazyGridScope {
     private val intervals = IntervalList<LazyItemScope.(Int) -> (@Composable () -> Unit)>()
 

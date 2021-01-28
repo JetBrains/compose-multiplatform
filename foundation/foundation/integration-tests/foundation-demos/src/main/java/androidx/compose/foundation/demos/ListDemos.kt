@@ -37,13 +37,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.samples.StickyHeaderSample
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -492,6 +492,7 @@ private fun NestedLazyDemo() {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun LazyGridDemo() {
     val columnModes = listOf(
