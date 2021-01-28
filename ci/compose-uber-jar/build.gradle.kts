@@ -23,7 +23,7 @@ val composeVersion: String by lazy {
 }
 
 dependencies {
-    implementation("org.jetbrains.compose.desktop:desktop-jvm-linux:$composeVersion")
+    implementation("org.jetbrains.compose.desktop:desktop-jvm-linux-x64:$composeVersion")
 }
 
 val shadowJar = tasks.named("shadowJar", ShadowJar::class) {
