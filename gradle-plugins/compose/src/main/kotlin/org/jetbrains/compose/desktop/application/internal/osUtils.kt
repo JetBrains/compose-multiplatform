@@ -46,3 +46,21 @@ internal fun executableName(nameWithoutExtension: String): String =
 
 internal fun javaExecutable(javaHome: String): String =
     File(javaHome).resolve("bin/${executableName("java")}").absolutePath
+
+internal object MacUtils {
+    val codesign: File by lazy {
+        File("/usr/bin/codesign").checkExistingFile()
+    }
+
+    val security: File by lazy {
+        File("/usr/bin/security").checkExistingFile()
+    }
+}
+
+internal fun File.checkExistingFile(): File =
+    apply {
+        check(isFile) { "'$absolutePath' does not exist" }
+    }
+
+internal val File.isJarFile: Boolean
+    get() = name.endsWith(".jar", ignoreCase = true) && isFile

@@ -165,9 +165,9 @@ internal fun AbstractJPackageTask.configurePlatformSettings(app: Application) {
                 macPackageName.set(provider { mac.packageName })
                 macPackageIdentifier.set(provider { mac.packageIdentifier })
                 macSign.set(provider { mac.signing.sign })
-                macSigningKeyUserName.set(provider { mac.signing.keyUserName })
+                macSigningKeyUserName.set(provider { mac.signing.signIdentity })
                 macSigningKeychain.set(project.layout.file(provider { mac.signing.keychain }))
-                macPackageSigningPrefix.set(provider { mac.signing.signingPrefix ?: mac.signing.bundlePrefix })
+                macPackageSigningPrefix.set(provider { mac.signing.signPrefix })
                 iconFile.set(mac.iconFile)
             }
         }

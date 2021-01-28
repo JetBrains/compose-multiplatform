@@ -1,10 +1,12 @@
 package org.jetbrains.compose.desktop.application.tasks
 
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 import org.gradle.process.ExecResult
 import org.gradle.process.ExecSpec
@@ -159,6 +161,9 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:Optional
     val runtimeImage: DirectoryProperty = objects.directoryProperty()
 
+    @get:LocalState
+    protected val signDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/sign")
+
     override fun makeArgs(tmpDir: File): MutableList<String> = super.makeArgs(tmpDir).apply {
         cliArg("--input", tmpDir)
         cliArg("--type", targetFormat.id)
@@ -226,6 +231,24 @@ abstract class AbstractJPackageTask @Inject constructor(
     override fun prepareWorkingDir(inputChanges: InputChanges) {
         val workingDir = workingDir.ioFile
 
+        // todo: parallel processing
+        val fileProcessor =
+            if (currentOS == OS.MacOS && macSign.orNull == true) {
+                val tmpDirForSign = signDir.ioFile
+                fileOperations.delete(tmpDirForSign)
+                tmpDirForSign.mkdirs()
+
+                MacJarSignFileCopyingProcessor(
+                    tempDir = tmpDirForSign,
+                    execOperations = execOperations,
+                    macSign = macSign,
+                    macPackageIdentifier = macPackageIdentifier,
+                    macPackageSigningPrefix = macPackageSigningPrefix,
+                    macSigningKeyUserName = macSigningKeyUserName,
+                    macSigningKeychain = macSigningKeychain
+                )
+            } else SimpleFileCopyingProcessor
+
         if (inputChanges.isIncremental) {
             logger.debug("Updating working dir incrementally: $workingDir")
             val allChanges = inputChanges.getFileChanges(files).asSequence() +
@@ -238,7 +261,7 @@ abstract class AbstractJPackageTask @Inject constructor(
                     fileOperations.delete(targetFile)
                     logger.debug("Deleted: $targetFile")
                 } else {
-                    sourceFile.copyTo(targetFile, overwrite = true)
+                    fileProcessor.copy(sourceFile, targetFile)
                     logger.debug("Updated: $targetFile")
                 }
             }
@@ -246,10 +269,14 @@ abstract class AbstractJPackageTask @Inject constructor(
             logger.debug("Updating working dir non-incrementally: $workingDir")
             fileOperations.delete(workingDir)
             fileOperations.mkdir(workingDir)
-            fileOperations.copy {
-                it.from(files)
-                it.from(launcherMainJar)
-                it.into(workingDir)
+
+            files.forEach { sourceFile ->
+                val targetFile = workingDir.resolve(sourceFile.name)
+                if (targetFile.exists()) {
+                    // todo: handle possible clashes
+                    logger.warn("w: File already exists: $targetFile")
+                }
+                fileProcessor.copy(sourceFile, targetFile)
             }
         }
     }
