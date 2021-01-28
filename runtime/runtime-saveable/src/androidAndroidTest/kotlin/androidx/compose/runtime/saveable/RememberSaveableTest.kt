@@ -20,8 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.savedinstancestate.AmbientUiSavedStateRegistry
-import androidx.compose.runtime.savedinstancestate.UiSavedStateRegistry
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -166,7 +164,7 @@ class RememberSaveableTest {
     @Test
     fun unregistersFromPrevProviderAndRegistersToTheNewOne() {
         var unregisterCalledForKey: String? = null
-        var registryFactory by mutableStateOf<(UiSavedStateRegistry) -> UiSavedStateRegistry>(
+        var registryFactory by mutableStateOf<(SaveableStateRegistry) -> SaveableStateRegistry>(
             value = {
                 object : DelegateRegistry(it) {
                     override fun unregisterProvider(key: String, valueProvider: () -> Any?) {
@@ -352,14 +350,14 @@ class RememberSaveableTest {
 
 @Composable
 private fun WrapRegistry(
-    wrap: @Composable (UiSavedStateRegistry) -> UiSavedStateRegistry,
+    wrap: @Composable (SaveableStateRegistry) -> SaveableStateRegistry,
     content: @Composable () -> Unit
 ) {
     Providers(
-        AmbientUiSavedStateRegistry provides wrap(AmbientUiSavedStateRegistry.current!!),
+        AmbientSaveableStateRegistry provides wrap(AmbientSaveableStateRegistry.current!!),
         content = content
     )
 }
 
-private open class DelegateRegistry(original: UiSavedStateRegistry) :
-    UiSavedStateRegistry by original
+private open class DelegateRegistry(original: SaveableStateRegistry) :
+    SaveableStateRegistry by original

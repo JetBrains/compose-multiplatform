@@ -21,6 +21,8 @@
 package androidx.compose.runtime.savedinstancestate
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.saveable.SaveableStateRegistry
+import androidx.compose.runtime.staticAmbientOf
 
 @Deprecated(
     "It was moved to androidx.compose.runtime.saveable package",
@@ -127,3 +129,48 @@ fun <T : Any> rememberSavedInstanceState(
 ): T = throw IllegalStateException(
     "This method is deprecated and moved to androidx.compose.runtime.saveable package"
 )
+
+@Deprecated(
+    "It was renamed to SaveableStateRegistry and moved to androidx.compose.runtime.saveable" +
+        " package",
+    ReplaceWith(
+        "SaveableStateRegistry",
+        "androidx.compose.runtime.saveable.SaveableStateRegistry"
+    ),
+    level = DeprecationLevel.ERROR
+)
+interface UiSavedStateRegistry : SaveableStateRegistry
+
+@Deprecated(
+    "It was renamed to SaveableStateRegistry and moved to androidx.compose.runtime.saveable" +
+        " package",
+    ReplaceWith(
+        "SaveableStateRegistry(restoredValues, canBeSaved)",
+        "androidx.compose.runtime.saveable.SaveableStateRegistry"
+    ),
+    level = DeprecationLevel.ERROR
+)
+@Suppress("DocumentExceptions")
+fun UiSavedStateRegistry(
+    restoredValues: Map<String, List<Any?>>?,
+    canBeSaved: (Any) -> Boolean
+): UiSavedStateRegistry = throw IllegalStateException(
+    "It was renamed to SaveableStateRegistry and moved to androidx.compose.runtime.saveable" +
+        " package"
+)
+
+@Deprecated(
+    "It was renamed to AmbientSaveableStateRegistry and moved to" +
+        " androidx.compose.runtime.saveable package",
+    ReplaceWith(
+        "AmbientSaveableStateRegistry",
+        "androidx.compose.runtime.saveable.AmbientSaveableStateRegistry"
+    ),
+    level = DeprecationLevel.ERROR
+)
+val AmbientUiSavedStateRegistry = staticAmbientOf<UiSavedStateRegistry?> {
+    throw IllegalStateException(
+        "It was renamed to SaveableStateRegistry and moved to androidx.compose.runtime.saveable" +
+            " package"
+    )
+}

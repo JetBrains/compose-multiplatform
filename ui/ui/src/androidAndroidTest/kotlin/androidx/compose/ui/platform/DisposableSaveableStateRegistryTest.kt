@@ -41,7 +41,7 @@ import java.io.Serializable
 
 @SmallTest
 @RunWith(AndroidJUnit4::class)
-class DisposableUiSavedStateRegistryTest {
+class DisposableSaveableStateRegistryTest {
 
     private val ContainerKey = 100
     private val SaveKey = "key"
@@ -51,12 +51,12 @@ class DisposableUiSavedStateRegistryTest {
     @Test
     fun simpleSaveAndRestore() {
         val owner1 = TestOwner()
-        var registry = DisposableUiSavedStateRegistry(ContainerKey, owner1)
+        var registry = DisposableSaveableStateRegistry(ContainerKey, owner1)
         registry.registerProvider(SaveKey) { SaveValue }
         val bundle = owner1.save()
 
         val owner2 = TestOwner(bundle)
-        registry = DisposableUiSavedStateRegistry(ContainerKey, owner2)
+        registry = DisposableSaveableStateRegistry(ContainerKey, owner2)
         val restoredValue = registry.consumeRestored(SaveKey)
         assertEquals(SaveValue, restoredValue)
     }
@@ -72,22 +72,22 @@ class DisposableUiSavedStateRegistryTest {
         val value2 = 2
 
         // save first view
-        val registryToSave1 = DisposableUiSavedStateRegistry(parentKey1, owner1)
+        val registryToSave1 = DisposableSaveableStateRegistry(parentKey1, owner1)
         registryToSave1.registerProvider(SaveKey) { value1 }
 
         // save second view
-        val registryToSave2 = DisposableUiSavedStateRegistry(parentKey2, owner1)
+        val registryToSave2 = DisposableSaveableStateRegistry(parentKey2, owner1)
         registryToSave2.registerProvider(SaveKey) { value2 }
 
         val owner2 = TestOwner(owner1.save())
 
         // restore first view
-        val registryToRestore1 = DisposableUiSavedStateRegistry(parentKey1, owner2)
+        val registryToRestore1 = DisposableSaveableStateRegistry(parentKey1, owner2)
         val restoredValue1 = registryToRestore1.consumeRestored(SaveKey)
         assertEquals(value1, restoredValue1)
 
         // restore second view
-        val registryToRestore2 = DisposableUiSavedStateRegistry(parentKey2, owner2)
+        val registryToRestore2 = DisposableSaveableStateRegistry(parentKey2, owner2)
         val restoredValue2 = registryToRestore2.consumeRestored(SaveKey)
         assertEquals(value2, restoredValue2)
     }
@@ -95,7 +95,7 @@ class DisposableUiSavedStateRegistryTest {
     @UiThreadTest
     @Test
     fun typesSupportedByBaseBundleCanBeSaved() {
-        val registry = DisposableUiSavedStateRegistry(ContainerKey, TestOwner())
+        val registry = DisposableSaveableStateRegistry(ContainerKey, TestOwner())
 
         assertTrue(registry.canBeSaved(true))
         assertTrue(registry.canBeSaved(true.asBoxed()))
@@ -114,7 +114,7 @@ class DisposableUiSavedStateRegistryTest {
     @UiThreadTest
     @Test
     fun typesSupportedByBundleCanBeSaved() {
-        val registry = DisposableUiSavedStateRegistry(ContainerKey, TestOwner())
+        val registry = DisposableSaveableStateRegistry(ContainerKey, TestOwner())
 
         assertTrue(registry.canBeSaved(Binder()))
         assertTrue(registry.canBeSaved(Bundle()))
@@ -148,7 +148,7 @@ class DisposableUiSavedStateRegistryTest {
     @UiThreadTest
     @Test
     fun customTypeCantBeSaved() {
-        val registry = DisposableUiSavedStateRegistry(ContainerKey, TestOwner())
+        val registry = DisposableSaveableStateRegistry(ContainerKey, TestOwner())
 
         assertFalse(registry.canBeSaved(CustomClass()))
     }
@@ -156,7 +156,7 @@ class DisposableUiSavedStateRegistryTest {
     @UiThreadTest
     @Test
     fun charSequenceCantBeSaved() {
-        val registry = DisposableUiSavedStateRegistry(ContainerKey, TestOwner())
+        val registry = DisposableSaveableStateRegistry(ContainerKey, TestOwner())
 
         assertFalse(registry.canBeSaved(CustomCharSequence()))
     }

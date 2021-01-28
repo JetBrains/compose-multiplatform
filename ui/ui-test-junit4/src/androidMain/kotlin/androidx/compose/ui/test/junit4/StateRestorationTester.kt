@@ -21,9 +21,9 @@ import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.AmbientUiSavedStateRegistry
+import androidx.compose.runtime.saveable.AmbientSaveableStateRegistry
+import androidx.compose.runtime.saveable.SaveableStateRegistry
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.savedinstancestate.UiSavedStateRegistry
 
 /**
  * Helps to test the state restoration for your Composable component.
@@ -78,24 +78,24 @@ class StateRestorationTester(private val composeTestRule: ComposeContentTestRule
 
     @Composable
     private fun InjectRestorationRegistry(content: @Composable (RestorationRegistry) -> Unit) {
-        val original = requireNotNull(AmbientUiSavedStateRegistry.current) {
+        val original = requireNotNull(AmbientSaveableStateRegistry.current) {
             "StateRestorationTester requires composeTestRule.setContent() to provide " +
-                "an UiSavedStateRegistry implementation via UiSavedStateRegistryAmbient"
+                "an SaveableStateRegistry implementation via AmbientSaveableStateRegistry"
         }
         val restorationRegistry = remember { RestorationRegistry(original) }
-        Providers(AmbientUiSavedStateRegistry provides restorationRegistry) {
+        Providers(AmbientSaveableStateRegistry provides restorationRegistry) {
             if (restorationRegistry.shouldEmitChildren) {
                 content(restorationRegistry)
             }
         }
     }
 
-    private class RestorationRegistry(private val original: UiSavedStateRegistry) :
-        UiSavedStateRegistry {
+    private class RestorationRegistry(private val original: SaveableStateRegistry) :
+        SaveableStateRegistry {
 
         var shouldEmitChildren by mutableStateOf(true)
             private set
-        private var currentRegistry: UiSavedStateRegistry = original
+        private var currentRegistry: SaveableStateRegistry = original
         private var savedMap: Map<String, List<Any?>> = emptyMap()
 
         fun saveStateAndDisposeChildren() {
@@ -104,7 +104,7 @@ class StateRestorationTester(private val composeTestRule: ComposeContentTestRule
         }
 
         fun emitChildrenWithRestoredState() {
-            currentRegistry = UiSavedStateRegistry(
+            currentRegistry = SaveableStateRegistry(
                 restoredValues = savedMap,
                 canBeSaved = { original.canBeSaved(it) }
             )

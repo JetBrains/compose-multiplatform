@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package androidx.compose.runtime.savedinstancestate
+package androidx.compose.runtime.saveable
 
 import androidx.compose.runtime.staticAmbientOf
 
 /**
  * Allows components to save and restore their state using the saved instance state mechanism.
  */
-interface UiSavedStateRegistry {
+interface SaveableStateRegistry {
     /**
      * Returns the restored value for the given key.
      * Once being restored the value is cleared, so you can't restore the same key twice.
@@ -71,38 +71,25 @@ interface UiSavedStateRegistry {
 }
 
 /**
- * Creates [UiSavedStateRegistry].
+ * Creates [SaveableStateRegistry].
  *
  * @param restoredValues The map of the restored values
  * @param canBeSaved Function which returns true if the given value can be saved by the registry
  */
-fun UiSavedStateRegistry(
+fun SaveableStateRegistry(
     restoredValues: Map<String, List<Any?>>?,
     canBeSaved: (Any) -> Boolean
-): UiSavedStateRegistry = UiSavedStateRegistryImpl(restoredValues, canBeSaved)
+): SaveableStateRegistry = SaveableStateRegistryImpl(restoredValues, canBeSaved)
 
 /**
- * Ambient with a current [UiSavedStateRegistry] instance.
+ * Ambient with a current [SaveableStateRegistry] instance.
  */
-@Suppress("AmbientNaming")
-@Deprecated(
-    "Renamed to AmbientUiSavedStateRegistry",
-    replaceWith = ReplaceWith(
-        "AmbientUiSavedStateRegistry",
-        "androidx.compose.runtime.savedinstancestate.AmbientUiSavedStateRegistry"
-    )
-)
-val UiSavedStateRegistryAmbient get() = AmbientUiSavedStateRegistry
+val AmbientSaveableStateRegistry = staticAmbientOf<SaveableStateRegistry?> { null }
 
-/**
- * Ambient with a current [UiSavedStateRegistry] instance.
- */
-val AmbientUiSavedStateRegistry = staticAmbientOf<UiSavedStateRegistry?> { null }
-
-private class UiSavedStateRegistryImpl(
+private class SaveableStateRegistryImpl(
     restored: Map<String, List<Any?>>?,
     private val canBeSaved: (Any) -> Boolean
-) : UiSavedStateRegistry {
+) : SaveableStateRegistry {
 
     private val restored: MutableMap<String, List<Any?>> =
         restored?.toMutableMap() ?: mutableMapOf()

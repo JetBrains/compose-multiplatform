@@ -22,8 +22,6 @@ import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.AmbientUiSavedStateRegistry
-import androidx.compose.runtime.savedinstancestate.UiSavedStateRegistry
 
 /**
  * Allows to save the state defined with [savedInstanceState] and [rememberSaveable]
@@ -66,28 +64,28 @@ fun rememberSaveableStateHolder(): SaveableStateHolder =
     ) {
         SaveableStateHolderImpl()
     }.apply {
-        parentSavedStateRegistry = AmbientUiSavedStateRegistry.current
+        parentSaveableStateRegistry = AmbientSaveableStateRegistry.current
     }
 
 private class SaveableStateHolderImpl(
     private val savedStates: MutableMap<Any, Map<String, List<Any?>>> = mutableMapOf()
 ) : SaveableStateHolder {
     private val registryHolders = mutableMapOf<Any, RegistryHolder>()
-    var parentSavedStateRegistry: UiSavedStateRegistry? = null
+    var parentSaveableStateRegistry: SaveableStateRegistry? = null
 
     @OptIn(ExperimentalComposeApi::class)
     @Composable
     override fun SaveableStateProvider(key: Any, content: @Composable () -> Unit) {
         key(key) {
             val registryHolder = remember {
-                require(parentSavedStateRegistry?.canBeSaved(key) ?: true) {
+                require(parentSaveableStateRegistry?.canBeSaved(key) ?: true) {
                     "Type of the key used for withRestorableState is not supported. On Android " +
                         "you can only use types which can be stored inside the Bundle."
                 }
                 RegistryHolder(key)
             }
             Providers(
-                AmbientUiSavedStateRegistry provides registryHolder.registry,
+                AmbientSaveableStateRegistry provides registryHolder.registry,
                 content = content
             )
             DisposableEffect(key) {
@@ -121,8 +119,8 @@ private class SaveableStateHolderImpl(
         val key: Any
     ) {
         var shouldSave = true
-        val registry: UiSavedStateRegistry = UiSavedStateRegistry(savedStates[key]) {
-            parentSavedStateRegistry?.canBeSaved(it) ?: true
+        val registry: SaveableStateRegistry = SaveableStateRegistry(savedStates[key]) {
+            parentSaveableStateRegistry?.canBeSaved(it) ?: true
         }
 
         fun saveTo(map: MutableMap<Any, Map<String, List<Any?>>>) {

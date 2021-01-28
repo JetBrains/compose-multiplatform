@@ -20,7 +20,7 @@ package androidx.compose.runtime.saveable
  * The [Saver] implementation which allows to represent your class as a map of values which can
  * be saved individually.
  *
- * What types can be saved is defined by [UiSavedStateRegistry], by default everything which can
+ * What types can be saved is defined by [SaveableStateRegistry], by default everything which can
  * be stored in the Bundle class can be saved.
  *
  * You can use it as a parameter for [savedInstanceState] or [rememberSaveable].
