@@ -3,14 +3,12 @@ CallbackMethodName: androidx.compose.ui.gesture.ScrollCallback#onStart-k-4lQ0M(l
     Callback method names must follow the on<Something> style: onStart-k-4lQ0M
 
 
-CallbackName: androidx.compose.ui.gesture.DragObserver:
-    Class should be named DragCallback
-CallbackName: androidx.compose.ui.gesture.LongPressDragObserver:
-    Class should be named LongPressDragCallback
-
-
-ExecutorRegistration: androidx.compose.ui.gesture.ScrollGestureFilterKt#scrollGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.ScrollCallback, androidx.compose.ui.gesture.scrollorientationlocking.Orientation, kotlin.jvm.functions.Function1<? super androidx.compose.ui.gesture.Direction,java.lang.Boolean>, boolean):
-    Registration methods should have overload that accepts delivery Executor: `scrollGestureFilter`
+GetterSetterNames: androidx.compose.ui.graphics.GraphicsLayerScope#getClip():
+    Symmetric method for `setClip` must be named `isClip`; was `getClip`
+GetterSetterNames: androidx.compose.ui.input.pointer.ConsumedData#getDownChange():
+    Symmetric method for `setDownChange` must be named `isDownChange`; was `getDownChange`
+GetterSetterNames: androidx.compose.ui.platform.AbstractComposeView#getShowLayoutBounds():
+    Symmetric method for `setShowLayoutBounds` must be named `isShowLayoutBounds`; was `getShowLayoutBounds`
 
 
 ListenerLast: androidx.compose.ui.gesture.ScrollGestureFilterKt#scrollGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.ScrollCallback, androidx.compose.ui.gesture.scrollorientationlocking.Orientation, kotlin.jvm.functions.Function1<? super androidx.compose.ui.gesture.Direction,java.lang.Boolean>, boolean) parameter #2:
@@ -49,7 +47,3 @@ MissingNullability: androidx.compose.ui.layout.Measured#toString-impl(androidx.c
     Missing nullability on method `toString-impl` return
 MissingNullability: androidx.compose.ui.layout.Measured#toString-impl(androidx.compose.ui.layout.Placeable) parameter #0:
     Missing nullability on parameter `p` in method `toString-impl`
-
-
-NotCloseable: androidx.compose.ui.node.OwnedLayer:
-    Classes that release resources (destroy()) should implement AutoClosable and CloseGuard: class androidx.compose.ui.node.OwnedLayer

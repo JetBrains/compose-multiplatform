@@ -19,8 +19,6 @@ BuilderSetStyle: androidx.compose.ui.text.AnnotatedString.Builder#pushTtsAnnotat
     Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.text.AnnotatedString.Builder.pushTtsAnnotation(androidx.compose.ui.text.TtsAnnotation)
 BuilderSetStyle: androidx.compose.ui.text.AnnotatedString.Builder#toAnnotatedString():
     Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.text.AnnotatedString.Builder.toAnnotatedString()
-BuilderSetStyle: androidx.compose.ui.text.AnnotatedString.Builder#toString():
-    Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.text.AnnotatedString.Builder.toString()
 
 
 GetterOnBuilder: androidx.compose.ui.text.AnnotatedString.Builder#getLength():

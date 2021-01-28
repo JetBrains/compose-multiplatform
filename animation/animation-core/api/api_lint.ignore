@@ -1,7 +1,3 @@
 // Baseline format: 1.0
 CallbackName: androidx.compose.animation.core.AnimationClockObserver:
     Class should be named AnimationClockCallback
-
-
-NotCloseable: androidx.compose.animation.core.BaseAnimatedValue:
-    Classes that release resources (stop()) should implement AutoClosable and CloseGuard: class androidx.compose.animation.core.BaseAnimatedValue
