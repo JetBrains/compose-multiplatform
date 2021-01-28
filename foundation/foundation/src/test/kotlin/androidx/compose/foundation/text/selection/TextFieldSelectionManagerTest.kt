@@ -33,6 +33,7 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextOverflow
@@ -479,6 +480,17 @@ class TextFieldSelectionManagerTest {
         manager.showSelectionToolbar()
 
         verify(textToolbar, times(1)).showMenu(any(), isNull(), isNull(), isNull(), isNull())
+    }
+
+    @Test
+    fun showSelectionToolbar_passwordTextField_not_show_copy_cut() {
+        manager.visualTransformation = PasswordVisualTransformation()
+        whenever(clipboardManager.getText()).thenReturn(AnnotatedString(text))
+        manager.value = TextFieldValue(text, TextRange(0, 5))
+
+        manager.showSelectionToolbar()
+
+        verify(textToolbar, times(1)).showMenu(any(), isNull(), any(), isNull(), any())
     }
 
     @Test

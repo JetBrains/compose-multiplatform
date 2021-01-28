@@ -62,6 +62,7 @@ import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.core.view.ViewCompat
@@ -201,7 +202,8 @@ class AndroidAccessibilityTest {
                                 .testTag(TextFieldTag),
                             value = value,
                             onValueChange = { value = it },
-                            onTextLayout = { textLayoutResult = it }
+                            onTextLayout = { textLayoutResult = it },
+                            visualTransformation = PasswordVisualTransformation()
                         )
                     }
                 }
@@ -786,6 +788,19 @@ class AndroidAccessibilityTest {
                 )
             )
         }
+    }
+
+    @Test
+    fun testEventForPasswordTextField() {
+        val textFieldNode = rule.onNodeWithTag(TextFieldTag)
+            .fetchSemanticsNode("Couldn't fetch node with tag $TextFieldTag")
+
+        val event = delegate.createEvent(
+            textFieldNode.id,
+            AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED
+        )
+
+        assertTrue(event.isPassword)
     }
 
     private fun eventIndex(list: List<AccessibilityEvent>, event: AccessibilityEvent): Int {
