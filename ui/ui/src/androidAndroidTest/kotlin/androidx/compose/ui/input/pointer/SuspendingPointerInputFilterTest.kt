@@ -21,7 +21,7 @@ import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.withMutableSnapshot
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.InspectableValue
@@ -264,7 +264,7 @@ class SuspendingPointerInputFilterTest {
                 }
             }
             scenario.moveToState(Lifecycle.State.STARTED)
-            withMutableSnapshot {
+            Snapshot.withMutableSnapshot {
                 toAdd = "secondary"
             }
             assertTrue("waiting for relaunch timed out", latch.await(1, TimeUnit.SECONDS))

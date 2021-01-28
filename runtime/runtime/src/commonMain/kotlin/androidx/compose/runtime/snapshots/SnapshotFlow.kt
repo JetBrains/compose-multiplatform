@@ -60,7 +60,6 @@ import kotlinx.coroutines.flow.flow
  * intermediate states as well as run multiple times for the same state and the result should
  * be the same.
  */
-@ExperimentalComposeApi
 fun <T> snapshotFlow(
     block: () -> T
 ): Flow<T> = flow {
@@ -140,6 +139,12 @@ private fun <T> Set<T>.intersects(other: Set<T>): Boolean =
  */
 // TODO: determine a good way to prevent/discourage suspending in an inlined [block]
 @ExperimentalComposeApi
+@Deprecated(
+    "Use Snapshot.withMutableSnapshot() instead",
+    ReplaceWith(
+        "Snapshot.withMutableSnapshot(block)"
+    )
+)
 inline fun <R> withMutableSnapshot(
     block: () -> R
 ): R = takeMutableSnapshot().run {
