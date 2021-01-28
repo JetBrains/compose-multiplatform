@@ -37,9 +37,8 @@ import androidx.lifecycle.Observer
  *
  * @sample androidx.compose.runtime.livedata.samples.LiveDataSample
  */
-@Suppress("NOTHING_TO_INLINE")
 @Composable
-inline fun <T> LiveData<T>.observeAsState(): State<T?> = observeAsState(value)
+fun <T> LiveData<T>.observeAsState(): State<T?> = observeAsState(value)
 
 /**
  * Starts observing this [LiveData] and represents its values via [State]. Every time there would
