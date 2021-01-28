@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.runtime.savedinstancestate
+package androidx.compose.runtime.saveable
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -22,8 +22,9 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.activity.ComponentActivity
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.test.R
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.setContent
@@ -131,6 +132,26 @@ class ActivityRecreationTest {
         }
     }
 
+    @Test
+    fun valueStoredInMutableStateIsRestored() {
+        val activityScenario: ActivityScenario<RecreationTest5Activity> =
+            ActivityScenario.launch(RecreationTest5Activity::class.java)
+
+        activityScenario.moveToState(Lifecycle.State.RESUMED)
+
+        activityScenario.onActivity {
+            assertThat(it.state.value).isEqualTo(0)
+            // change the value, so we can assert this change will be restored
+            it.state.value = 1
+        }
+
+        activityScenario.recreate()
+
+        activityScenario.onActivity {
+            assertThat(it.state.value).isEqualTo(1)
+        }
+    }
+
     private fun FragmentActivity.findFragment(id: Int) =
         supportFragmentManager.findFragmentById(id) as TestFragment
 }
@@ -221,6 +242,18 @@ class RecreationTest4Activity : FragmentActivity() {
                 .replace(R.id.child1, TestFragment())
                 .replace(R.id.child2, TestFragment())
                 .commitNow()
+        }
+    }
+}
+
+class RecreationTest5Activity : ComponentActivity() {
+
+    lateinit var state: MutableState<Int>
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            state = rememberSaveable { mutableStateOf(0) }
         }
     }
 }

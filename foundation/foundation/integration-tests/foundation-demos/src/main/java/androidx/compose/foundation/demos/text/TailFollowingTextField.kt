@@ -21,7 +21,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.savedinstancestate.savedInstanceState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.layout.Layout
@@ -34,7 +35,9 @@ import kotlin.math.min
 @Composable
 fun TailFollowingTextFieldDemo() {
     Column {
-        val hstate = savedInstanceState { "abc def ghi jkl mno pqr stu vwx yz" }
+        val hstate = rememberSaveable {
+            mutableStateOf("abc def ghi jkl mno pqr stu vwx yz")
+        }
         HorizontalTailFollowingTextField(
             value = hstate.value,
             onValueChange = { hstate.value = it },
@@ -44,7 +47,9 @@ fun TailFollowingTextFieldDemo() {
                 .clipToBounds()
         )
 
-        val vstate = savedInstanceState { "a\nb\nc\nd\ne\nf\ng\nh" }
+        val vstate = rememberSaveable {
+            mutableStateOf("a\nb\nc\nd\ne\nf\ng\nh")
+        }
         VerticalTailFollowintTextField(
             value = vstate.value,
             onValueChange = { vstate.value = it },

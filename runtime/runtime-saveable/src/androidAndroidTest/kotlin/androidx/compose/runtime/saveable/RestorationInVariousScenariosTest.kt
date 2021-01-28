@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package androidx.compose.runtime.savedinstancestate
+package androidx.compose.runtime.saveable
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -42,7 +43,7 @@ class RestorationInVariousScenariosTest {
         val states = arrayOfNulls<MutableState<Int>>(2)
         restorationTester.setContent {
             for (i in 0..1) {
-                states[i] = savedInstanceState { 0 }
+                states[i] = rememberSaveable { mutableStateOf(0) }
             }
         }
 
@@ -72,7 +73,7 @@ class RestorationInVariousScenariosTest {
         restorationTester.setContent {
             for (i in 0..1) {
                 key(i) {
-                    states[i] = savedInstanceState { 0 }
+                    states[i] = rememberSaveable { mutableStateOf(0) }
                 }
             }
         }
@@ -133,9 +134,9 @@ class RestorationInVariousScenariosTest {
         var stateOutside: MutableState<String>? = null
         restorationTester.setContent {
             repeat(number) {
-                statesInLoop[it] = savedInstanceState { 0 }
+                statesInLoop[it] = rememberSaveable { mutableStateOf(0) }
             }
-            stateOutside = savedInstanceState { "0" }
+            stateOutside = rememberSaveable { mutableStateOf("0") }
         }
 
         rule.runOnIdle {
@@ -158,8 +159,8 @@ class RestorationInVariousScenariosTest {
     fun twoStates() {
         val states = arrayOfNulls<MutableState<Int>>(2)
         restorationTester.setContent {
-            states[0] = savedInstanceState { 0 }
-            states[1] = savedInstanceState { 0 }
+            states[0] = rememberSaveable { mutableStateOf(0) }
+            states[1] = rememberSaveable { mutableStateOf(0) }
         }
 
         rule.runOnUiThread {
@@ -188,9 +189,9 @@ class RestorationInVariousScenariosTest {
         val states = arrayOfNulls<MutableState<Int>>(2)
         restorationTester.setContent {
             if (needFirst) {
-                states[0] = savedInstanceState { 0 }
+                states[0] = rememberSaveable { mutableStateOf(0) }
             }
-            states[1] = savedInstanceState { 0 }
+            states[1] = rememberSaveable { mutableStateOf(0) }
         }
 
         rule.runOnUiThread {
@@ -276,6 +277,6 @@ class RestorationInVariousScenariosTest {
 
     @Composable
     fun FunctionWithState(states: Array<MutableState<Int>?>, index: Int) {
-        states[index] = savedInstanceState { 0 }
+        states[index] = rememberSaveable { mutableStateOf(0) }
     }
 }

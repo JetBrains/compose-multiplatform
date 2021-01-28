@@ -21,6 +21,7 @@
 package androidx.compose.runtime.savedinstancestate
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.saveable.SaveableStateRegistry
 import androidx.compose.runtime.staticAmbientOf
 
@@ -174,3 +175,63 @@ val AmbientUiSavedStateRegistry = staticAmbientOf<UiSavedStateRegistry?> {
             " package"
     )
 }
+
+@Deprecated(
+    "It was removed in favor or using rememberSaveable { mutableStateOf(value) }. If you used it " +
+        "with a custom saver you can now pass it like this: rememberSaveable(stateSaver = " +
+        "MySaver) { mutableStateOf(value) }",
+    ReplaceWith(
+        "rememberSaveable { mutableStateOf(init()) }",
+        "androidx.compose.runtime.saveable.rememberSaveable",
+        "androidx.compose.runtime.mutableStateOf"
+    ),
+    level = DeprecationLevel.ERROR
+)
+@Suppress("DocumentExceptions")
+@Composable
+fun <T> savedInstanceState(
+    key: String? = null,
+    init: () -> T
+): MutableState<T> = throw IllegalStateException(
+    "It was removed in favor or using rememberSaveable { mutableStateOf(value) }"
+)
+
+@Deprecated(
+    "It was removed in favor or using rememberSaveable(stateSaver = MySaver) { mutableStateOf" +
+        "(value) }",
+    ReplaceWith(
+        "rememberSaveable(stateSaver = saver) { mutableStateOf(init()) }",
+        "androidx.compose.runtime.saveable.rememberSaveable",
+        "androidx.compose.runtime.mutableStateOf"
+    ),
+    level = DeprecationLevel.ERROR
+)
+@Suppress("DocumentExceptions")
+@Composable
+fun <T> savedInstanceState(
+    saver: Saver<T, out Any>,
+    key: String? = null,
+    init: () -> T
+): MutableState<T> = throw IllegalStateException(
+    "It was removed in favor or using rememberSaveable { mutableStateOf(value) }"
+)
+
+@Deprecated(
+    "It was removed in favor or using rememberSaveable(stateSaver = MySaver) { mutableStateOf" +
+        "(value) }",
+    ReplaceWith(
+        "rememberSaveable(stateSaver = saver) { mutableStateOf(init()) }",
+        "androidx.compose.runtime.saveable.rememberSaveable",
+        "androidx.compose.runtime.mutableStateOf"
+    ),
+    level = DeprecationLevel.ERROR
+)
+@Suppress("DocumentExceptions")
+@Composable
+fun <T> savedInstanceState(
+    saver: androidx.compose.runtime.saveable.Saver<T, out Any>,
+    key: String? = null,
+    init: () -> T
+): MutableState<T> = throw IllegalStateException(
+    "It was removed in favor or using rememberSaveable { mutableStateOf(value) }"
+)

@@ -23,7 +23,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.savedinstancestate.savedInstanceState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.TextFieldValue
 
@@ -32,7 +33,9 @@ import androidx.compose.ui.text.input.TextFieldValue
 @OptIn(ExperimentalFoundationApi::class)
 @Suppress("DEPRECATION")
 fun TextFieldSample() {
-    var value by savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
+    var value by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        mutableStateOf(TextFieldValue())
+    }
     BaseTextField(
         value = value,
         onValueChange = { value = it }
@@ -44,7 +47,9 @@ fun TextFieldSample() {
 @OptIn(ExperimentalFoundationApi::class)
 @Suppress("DEPRECATION")
 fun PlaceholderTextFieldSample() {
-    val state = savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
+    val state = rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        mutableStateOf(TextFieldValue())
+    }
     Box {
         BaseTextField(
             value = state.value,

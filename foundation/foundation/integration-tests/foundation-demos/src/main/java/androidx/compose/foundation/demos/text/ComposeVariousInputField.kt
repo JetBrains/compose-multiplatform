@@ -22,12 +22,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Text
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.savedInstanceState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
@@ -252,7 +253,7 @@ private fun VariousEditLine(
     onValueChange: (String, String) -> String = { _, new -> new },
     visualTransformation: VisualTransformation
 ) {
-    val state = savedInstanceState { "" }
+    val state = rememberSaveable { mutableStateOf("") }
     BasicTextField(
         modifier = demoTextFieldModifiers,
         value = state.value,
@@ -272,7 +273,7 @@ private fun VariousEditLine(
 
 @Composable
 private fun HintEditText(content: @Composable () -> Unit) {
-    val state = savedInstanceState { "" }
+    val state = rememberSaveable { mutableStateOf("") }
 
     Box(demoTextFieldModifiers) {
         BasicTextField(
@@ -289,7 +290,9 @@ private fun HintEditText(content: @Composable () -> Unit) {
 
 @Composable
 private fun InteractionStateTextField() {
-    val state = savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
+    val state = rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        mutableStateOf(TextFieldValue())
+    }
     val interactionState = remember { InteractionState() }
 
     Column(demoTextFieldModifiers) {

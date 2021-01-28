@@ -22,9 +22,10 @@
         android:debuggable="false"
         tools:ignore="HardcodedDebugMode"
         tools:replace="android:debuggable">
-        <activity android:name="androidx.compose.runtime.savedinstancestate.RecreationTest1Activity" />
-        <activity android:name="androidx.compose.runtime.savedinstancestate.RecreationTest2Activity" />
-        <activity android:name="androidx.compose.runtime.savedinstancestate.RecreationTest3Activity" />
-        <activity android:name="androidx.compose.runtime.savedinstancestate.RecreationTest4Activity" />
+        <activity android:name="androidx.compose.runtime.saveable.RecreationTest1Activity" />
+        <activity android:name="androidx.compose.runtime.saveable.RecreationTest2Activity" />
+        <activity android:name="androidx.compose.runtime.saveable.RecreationTest3Activity" />
+        <activity android:name="androidx.compose.runtime.saveable.RecreationTest4Activity" />
+        <activity android:name="androidx.compose.runtime.saveable.RecreationTest5Activity" />
     </application>
 </manifest>
