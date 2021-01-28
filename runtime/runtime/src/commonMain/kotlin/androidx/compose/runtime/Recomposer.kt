@@ -22,7 +22,6 @@ import androidx.compose.runtime.snapshots.SnapshotApplyResult
 import androidx.compose.runtime.snapshots.SnapshotReadObserver
 import androidx.compose.runtime.snapshots.SnapshotWriteObserver
 import androidx.compose.runtime.snapshots.fastForEach
-import androidx.compose.runtime.snapshots.takeMutableSnapshot
 import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CancellationException
@@ -539,7 +538,7 @@ class Recomposer(
     }
 
     private inline fun <T> composing(composition: ControlledComposition, block: () -> T): T {
-        val snapshot = takeMutableSnapshot(
+        val snapshot = Snapshot.takeMutableSnapshot(
             readObserverOf(composition), writeObserverOf(composition)
         )
         try {

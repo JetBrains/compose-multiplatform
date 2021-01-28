@@ -453,7 +453,7 @@ class SnapshotStateMapTests {
     @Test
     fun validateMapsCanBeSnapshot() {
         val map = defaultMap()
-        val snapshot = takeSnapshot()
+        val snapshot = Snapshot.takeSnapshot()
         try {
             map[100] = 100f
             assertTrue(map.contains(100))
