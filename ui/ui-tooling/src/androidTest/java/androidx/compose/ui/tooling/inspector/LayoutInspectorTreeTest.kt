@@ -37,7 +37,7 @@ import androidx.compose.runtime.resetSourceInfo
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.node.OwnedLayer
+import androidx.compose.ui.layout.GraphicLayerInfo
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
@@ -567,7 +567,7 @@ class LayoutInspectorTreeTest : ToolingTest() {
     private fun dumpGroup(group: Group, indent: Int) {
         val position = group.position?.let { "\"$it\"" } ?: "null"
         val box = group.box
-        val id = group.modifierInfo.mapNotNull { (it.extra as? OwnedLayer)?.layerId }
+        val id = group.modifierInfo.mapNotNull { (it.extra as? GraphicLayerInfo)?.layerId }
             .singleOrNull() ?: 0
         println(
             "\"${"  ".repeat(indent)}\", ${group.javaClass.simpleName}, \"${group.name}\", " +

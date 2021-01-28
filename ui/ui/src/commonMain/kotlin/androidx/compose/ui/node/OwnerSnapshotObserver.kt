@@ -23,10 +23,9 @@ import androidx.compose.runtime.snapshots.SnapshotStateObserver
  * Performs snapshot observation for blocks like draw and layout which should be re-invoked
  * automatically when the snapshot value has been changed.
  */
-// TODO make it internal once Owner is internal
 @OptIn(ExperimentalComposeApi::class)
 @Suppress("CallbackName") // TODO rename this and SnapshotStateObserver. b/173401548
-class OwnerSnapshotObserver(onChangedExecutor: (callback: () -> Unit) -> Unit) {
+internal class OwnerSnapshotObserver(onChangedExecutor: (callback: () -> Unit) -> Unit) {
 
     private val observer = SnapshotStateObserver(onChangedExecutor)
 

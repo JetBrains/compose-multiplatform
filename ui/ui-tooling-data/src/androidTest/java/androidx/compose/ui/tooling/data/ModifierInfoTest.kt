@@ -25,9 +25,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.GraphicLayerInfo
 import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.positionInRoot
-import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -106,7 +106,7 @@ class ModifierInfoTest : ToolingTest() {
                     "but was ${columnModifierInfo[1].modifier}",
                 columnModifierInfo[1].modifier is LayoutModifier
             )
-            assertTrue(columnModifierInfo[2].extra is OwnedLayer)
+            assertTrue(columnModifierInfo[2].extra is GraphicLayerInfo)
             assertEquals(10f, columnModifierInfo[1].coordinates.positionInRoot().x)
             assertTrue(
                 "The third modifier in the column should be a DrawModifier" +
