@@ -108,7 +108,6 @@ fun getApiLintArgs(targetsJavaConsumers: Boolean): List<String> {
             "ParcelableList", // This check is only relevant to android platform that has managers.
 
             // List of checks that have bugs, but should be enabled once fixed.
-            "GetterSetterNames", // b/135498039
             "StaticUtils", // b/135489083
             "StartWithLower", // b/135710527
 
@@ -123,6 +122,7 @@ fun getApiLintArgs(targetsJavaConsumers: Boolean): List<String> {
         "--error",
         listOf(
             "AllUpper",
+            "GetterSetterNames",
             "MinMaxConstant",
             "TopLevelBuilder",
             "BuilderSetStyle",
