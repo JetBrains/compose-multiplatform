@@ -137,6 +137,7 @@ fun setTitleBar(text: String, content: ContentState) {
                 ) {
                     Image(
                         icRefresh(),
+                        contentDescription = null,
                         modifier = Modifier.preferredSize(35.dp)
                     )
                 }
@@ -165,6 +166,7 @@ fun setPreviewImageUI(content: ContentState) {
                 else org.jetbrains.skija.Image.makeFromEncoded(
                     toByteArray(content.getSelectedImage())
                 ).asImageBitmap(),
+                contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth().padding(start = 1.dp, top = 1.dp, end = 1.dp, bottom = 5.dp),
                 contentScale = ContentScale.Fit
@@ -207,6 +209,7 @@ fun setMiniatureUI(
                     org.jetbrains.skija.Image.makeFromEncoded(
                         toByteArray(picture.image)
                     ).asImageBitmap(),
+                    contentDescription = null,
                     modifier = Modifier.preferredHeight(70.dp)
                         .preferredWidth(90.dp)
                         .padding(start = 1.dp, top = 1.dp, end = 1.dp, bottom = 1.dp),
@@ -248,6 +251,7 @@ fun setMiniatureUI(
             ) {
                 Image(
                     icDots(),
+                    contentDescription = null,
                     modifier = Modifier.preferredHeight(70.dp)
                         .preferredWidth(30.dp)
                         .padding(start = 1.dp, top = 25.dp, end = 1.dp, bottom = 25.dp),

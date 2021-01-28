@@ -1,16 +1,15 @@
 package example.imageviewer.view
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.gesture.RawScaleObserver
-import androidx.compose.ui.gesture.doubleTapGestureFilter
-import androidx.compose.ui.gesture.rawScaleGestureFilter
-import androidx.compose.ui.Modifier
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.material.Surface
-import example.imageviewer.style.Transparent
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
+import example.imageviewer.style.Transparent
 
+// TODO fix, it doesn't work
 @Composable
 fun Scalable(
     onScale: ScaleHandler,
@@ -19,17 +18,18 @@ fun Scalable(
 ) {
     Surface(
         color = Transparent,
-        modifier = modifier.rawScaleGestureFilter(
-            scaleObserver = onScale,
-            canStartScaling = { true }
-        ).doubleTapGestureFilter(onDoubleTap = { onScale.resetFactor() }),
+        modifier = modifier.pointerInput {
+            detectTapGestures(onDoubleTap = { onScale.resetFactor() })
+            detectTransformGestures { _, _, zoom, _ ->
+                onScale.onScale(zoom)
+            }
+        },
     ) {
         children()
     }
 }
 
-class ScaleHandler(private val maxFactor: Float = 5f, private val minFactor: Float = 1f) :
-    RawScaleObserver {
+class ScaleHandler(private val maxFactor: Float = 5f, private val minFactor: Float = 1f) {
     val factor = mutableStateOf(1f)
 
     fun resetFactor() {
@@ -37,7 +37,7 @@ class ScaleHandler(private val maxFactor: Float = 5f, private val minFactor: Flo
             factor.value = minFactor
     }
 
-    override fun onScale(scaleFactor: Float): Float {
+    fun onScale(scaleFactor: Float): Float {
         factor.value += scaleFactor - 1f
 
         if (maxFactor < factor.value) factor.value = maxFactor

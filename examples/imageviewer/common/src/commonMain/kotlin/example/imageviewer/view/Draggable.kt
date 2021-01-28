@@ -2,15 +2,11 @@ package example.imageviewer.view
 
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.onDispose
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.gesture.rawDragGestureFilter
-import androidx.compose.runtime.mutableStateOf
 import example.imageviewer.core.EventLocker
 import example.imageviewer.style.Transparent
 

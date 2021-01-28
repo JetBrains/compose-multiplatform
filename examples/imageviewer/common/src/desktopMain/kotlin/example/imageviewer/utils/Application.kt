@@ -5,12 +5,12 @@ import androidx.compose.desktop.AppWindow
 import androidx.compose.desktop.WindowEvents
 import androidx.compose.runtime.Applier
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Composition
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MonotonicFrameClock
 import androidx.compose.runtime.Recomposer
-import androidx.compose.runtime.compositionFor
-import androidx.compose.runtime.dispatch.MonotonicFrameClock
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,7 +46,7 @@ class ApplicationScope(
     private val scope = CoroutineScope(context)
 
     private val recomposer = Recomposer(context)
-    private val composition = compositionFor(Unit, EmptyApplier(), recomposer)
+    private val composition = Composition(Unit, EmptyApplier(), recomposer)
 
     private val windows = mutableSetOf<AppWindow>()
     private var windowsVersion by mutableStateOf(Any())

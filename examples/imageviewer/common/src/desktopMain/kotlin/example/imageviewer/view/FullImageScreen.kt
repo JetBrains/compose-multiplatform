@@ -1,33 +1,34 @@
 package example.imageviewer.view
 
-import java.awt.image.BufferedImage
-import androidx.compose.foundation.background
-import androidx.compose.foundation.ScrollableRow
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
+import androidx.compose.foundation.ScrollableRow
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.shortcuts
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import example.imageviewer.core.FilterType
 import example.imageviewer.model.AppState
@@ -37,29 +38,24 @@ import example.imageviewer.style.DarkGray
 import example.imageviewer.style.DarkGreen
 import example.imageviewer.style.Foreground
 import example.imageviewer.style.MiniatureColor
-import example.imageviewer.style.Transparent
 import example.imageviewer.style.TranslucentBlack
-import example.imageviewer.style.TranslucentWhite
+import example.imageviewer.style.Transparent
 import example.imageviewer.style.icBack
-import example.imageviewer.style.icFilterGrayscaleOn
-import example.imageviewer.style.icFilterGrayscaleOff
-import example.imageviewer.style.icFilterPixelOn
-import example.imageviewer.style.icFilterPixelOff
-import example.imageviewer.style.icFilterBlurOn
 import example.imageviewer.style.icFilterBlurOff
-import example.imageviewer.style.icFilterUnknown
-import example.imageviewer.utils.displayHeight
+import example.imageviewer.style.icFilterBlurOn
+import example.imageviewer.style.icFilterGrayscaleOff
+import example.imageviewer.style.icFilterGrayscaleOn
+import example.imageviewer.style.icFilterPixelOff
+import example.imageviewer.style.icFilterPixelOn
+import example.imageviewer.utils.cropImage
 import example.imageviewer.utils.displayWidth
 import example.imageviewer.utils.getDisplayBounds
 import example.imageviewer.utils.toByteArray
-import example.imageviewer.utils.cropImage
-import kotlin.math.abs
+import java.awt.Rectangle
+import java.awt.event.KeyEvent
+import java.awt.image.BufferedImage
 import kotlin.math.pow
 import kotlin.math.roundToInt
-import org.jetbrains.skija.IRect
-import java.awt.event.KeyEvent
-import java.awt.Rectangle
-import androidx.compose.ui.input.key.*
 
 @Composable
 fun setImageFullScreen(
@@ -126,6 +122,7 @@ fun setToolBar(
                     }) {
                     Image(
                         icBack(),
+                        contentDescription = null,
                         modifier = Modifier.preferredSize(38.dp)
                     )
                 }
@@ -182,6 +179,7 @@ fun FilterButton(
         ) {
             Image(
                 getFilterImage(type = type, content = content),
+                contentDescription = null,
                 modifier
             )
         }
@@ -225,6 +223,7 @@ fun setImage(content: ContentState) {
                 val bitmap = imageByGesture(content, scale, drag)
                 Image(
                     bitmap = bitmap,
+                    contentDescription = null,
                     contentScale = ContentScale.Fit
                 )
             }
