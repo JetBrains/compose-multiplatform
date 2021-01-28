@@ -38,6 +38,11 @@ const val DISPLAY_TEST_OUTPUT = "androidx.displayTestOutput"
 const val ALL_WARNINGS_AS_ERRORS = "androidx.allWarningsAsErrors"
 
 /**
+ * Setting this property changes "url" property in publishing maven artifact metadata
+ */
+const val ALTERNATIVE_PROJECT_URL = "androidx.alternativeProjectUrl"
+
+/**
  * Check that version extra meets the specified rules
  * (version is in format major.minor.patch-extra)
  */
@@ -104,6 +109,7 @@ const val EXPERIMENTAL_KOTLIN_BACKEND_ENABLED = "androidx.experimentalKotlinBack
 
 val ALL_ANDROIDX_PROPERTIES = setOf(
     ALL_WARNINGS_AS_ERRORS,
+    ALTERNATIVE_PROJECT_URL,
     VERSION_EXTRA_CHECK_ENABLED,
     COMPOSE_MPP_ENABLED,
     COVERAGE_ENABLED,
@@ -125,6 +131,15 @@ val ALL_ANDROIDX_PROPERTIES = setOf(
     PLAYGROUND_DOKKA_BUILD_ID,
     EXPERIMENTAL_KOTLIN_BACKEND_ENABLED
 )
+
+/**
+ * Returns alternative project url that will be used as "url" property
+ * in publishing maven artifact metadata.
+ *
+ * Returns null if there is no alternative project url.
+ */
+fun Project.getAlternativeProjectUrl(): String? =
+    project.findProperty(ALTERNATIVE_PROJECT_URL) as? String
 
 /**
  * Check that version extra meets the specified rules
