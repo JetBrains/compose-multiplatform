@@ -9,10 +9,7 @@ import androidx.compose.runtime.Providers
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.AmbientDensity
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.lerp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.*
 import org.jetbrains.codeviewer.ui.common.Settings
 
 private val MinFontSize = 6.sp
@@ -46,3 +43,5 @@ fun StatusBar(settings: Settings) = Box(
 }
 
 private fun Density.scale(scale: Float) = Density(density * scale, fontScale * scale)
+private operator fun TextUnit.minus(other: TextUnit) = (value - other.value).sp
+private operator fun TextUnit.div(other: TextUnit) = value / other.value

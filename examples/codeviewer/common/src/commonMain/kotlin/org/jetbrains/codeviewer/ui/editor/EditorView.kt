@@ -14,10 +14,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.drawOpacity
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.selection.DisableSelection
-import androidx.compose.ui.text.*
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import org.jetbrains.codeviewer.platform.SelectionContainer
 import org.jetbrains.codeviewer.platform.VerticalScrollbar

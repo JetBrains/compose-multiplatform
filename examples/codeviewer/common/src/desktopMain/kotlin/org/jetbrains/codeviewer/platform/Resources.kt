@@ -21,5 +21,5 @@ actual suspend fun imageFromUrl(url: String): ImageBitmap = withContext(Dispatch
 }
 
 @Composable
-actual fun font(name: String, res: String, weight: FontWeight, style: FontStyle): Font =
-       androidx.compose.ui.text.platform.font(name, "font/$res.ttf", weight, style)
+actual fun Font(name: String, res: String, weight: FontWeight, style: FontStyle): Font =
+       androidx.compose.ui.text.platform.Font("font/$res.ttf", weight, style)

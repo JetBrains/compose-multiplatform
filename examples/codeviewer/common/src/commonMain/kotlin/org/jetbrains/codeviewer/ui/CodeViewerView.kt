@@ -91,6 +91,7 @@ private fun ResizablePanel(
 
         Icon(
             if (state.isExpanded) Icons.Default.ArrowBack else Icons.Default.ArrowForward,
+            contentDescription = if (state.isExpanded) "Collapse" else "Expand",
             tint = AmbientContentColor.current,
             modifier = Modifier
                 .padding(top = 4.dp)

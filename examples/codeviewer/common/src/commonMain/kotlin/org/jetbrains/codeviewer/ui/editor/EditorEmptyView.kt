@@ -20,6 +20,7 @@ fun EditorEmptyView() = Box(Modifier.fillMaxSize()) {
     Column(Modifier.align(Alignment.Center)) {
         Icon(
             Icons.Default.Code,
+            contentDescription = null,
             tint = AmbientContentColor.current.copy(alpha = 0.60f),
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )

@@ -24,8 +24,8 @@ actual suspend fun imageFromUrl(url: String): ImageBitmap {
 }
 
 @Composable
-actual fun font(name: String, res: String, weight: FontWeight, style: FontStyle): Font {
+actual fun Font(name: String, res: String, weight: FontWeight, style: FontStyle): Font {
     val context = AmbientContext.current
     val id = context.resources.getIdentifier(res, "font", context.packageName)
-    return androidx.compose.ui.text.font.font(id, weight, style)
+    return androidx.compose.ui.text.font.Font(id, weight, style)
 }

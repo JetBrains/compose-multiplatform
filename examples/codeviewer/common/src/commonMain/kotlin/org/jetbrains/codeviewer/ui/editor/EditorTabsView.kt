@@ -55,12 +55,16 @@ fun EditorTabView(model: Editor) = Surface(
 
         if (close != null) {
             Icon(
-                Icons.Default.Close, tint = AmbientContentColor.current, modifier = Modifier
-                .size(24.dp)
-                .padding(4.dp)
-                .clickable {
-                    close()
-                })
+                Icons.Default.Close,
+                tint = AmbientContentColor.current,
+                contentDescription = "Close",
+                modifier = Modifier
+                    .size(24.dp)
+                    .padding(4.dp)
+                    .clickable {
+                        close()
+                    }
+            )
         } else {
             Box(
                 modifier = Modifier

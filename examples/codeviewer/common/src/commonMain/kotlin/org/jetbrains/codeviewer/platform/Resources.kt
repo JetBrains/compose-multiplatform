@@ -12,4 +12,4 @@ expect fun imageResource(res: String): ImageBitmap
 expect suspend fun imageFromUrl(url: String): ImageBitmap
 
 @Composable
-expect fun font(name: String, res: String, weight: FontWeight, style: FontStyle): Font
+expect fun Font(name: String, res: String, weight: FontWeight, style: FontStyle): Font
