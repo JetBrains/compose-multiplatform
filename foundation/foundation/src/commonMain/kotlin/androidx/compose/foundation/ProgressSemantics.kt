@@ -78,5 +78,8 @@ fun Modifier.progressSemantics(
  */
 @Stable
 fun Modifier.progressSemantics(): Modifier {
-    return semantics { stateDescription = Strings.InProgress }
+    return semantics {
+        stateDescription = Strings.InProgress
+        progressBarRangeInfo = ProgressBarRangeInfo.Indeterminate
+    }
 }
