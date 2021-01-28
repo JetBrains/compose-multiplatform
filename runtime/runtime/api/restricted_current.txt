@@ -395,13 +395,15 @@ package androidx.compose.runtime {
     ctor public Recomposer(kotlin.coroutines.CoroutineContext effectCoroutineContext);
     method public androidx.compose.runtime.RecomposerInfo asRecomposerInfo();
     method public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public void cancel();
+    method public void close();
     method public long getChangeCount();
     method public boolean getHasPendingWork();
     method public kotlinx.coroutines.flow.Flow<androidx.compose.runtime.Recomposer.State> getState();
     method @Deprecated public boolean hasInvalidations();
     method public suspend Object? join(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public suspend Object? runRecomposeAndApplyChanges(kotlin.coroutines.Continuation<?> p);
-    method public void shutDown();
+    method public suspend Object? runRecomposeAndApplyChanges(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method @Deprecated public void shutDown();
     property public final long changeCount;
     property public final boolean hasPendingWork;
     property public final kotlinx.coroutines.flow.Flow<androidx.compose.runtime.Recomposer.State> state;
