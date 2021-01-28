@@ -61,6 +61,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.TestCoroutineExceptionHandler
 import kotlinx.coroutines.withContext
 import org.junit.rules.RuleChain
 import org.junit.rules.TestRule
@@ -172,6 +173,8 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
     private val testCoroutineDispatcher: TestCoroutineDispatcher
     private val recomposerApplyCoroutineScope: CoroutineScope
     private val frameCoroutineScope: CoroutineScope
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val coroutineExceptionHandler: TestCoroutineExceptionHandler
 
     override val mainClock: MainTestClock
         get() = mainClockImpl
@@ -192,8 +195,11 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
             }
         }
         @OptIn(ExperimentalCoroutinesApi::class)
+        coroutineExceptionHandler = TestCoroutineExceptionHandler()
+        @OptIn(ExperimentalCoroutinesApi::class)
         recomposerApplyCoroutineScope = CoroutineScope(
-            testCoroutineDispatcher + frameClock + infiniteAnimationPolicy + Job()
+            testCoroutineDispatcher + frameClock + infiniteAnimationPolicy +
+                coroutineExceptionHandler + Job()
         )
         recomposer = Recomposer(recomposerApplyCoroutineScope.coroutineContext)
             .also { recomposerApplyCoroutineScope.launch { it.runRecomposeAndApplyChanges() } }
@@ -269,6 +275,7 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
             // Then await composition(s)
             runEspressoOnIdle()
         }
+        checkUncaughtCoroutineExceptions()
     }
 
     override fun <T> runOnUiThread(action: () -> T): T {
@@ -307,6 +314,18 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
         idlingResourceRegistry.unregisterIdlingResource(idlingResource)
     }
 
+    /**
+     * Checks if the [coroutineExceptionHandler] has caught uncaught exceptions. If so, will
+     * rethrow the first to fail the test. Rather than only calling this only at the end of the
+     * test, as recommended by [cleanupTestCoroutines][kotlinx.coroutines.test
+     * .UncaughtExceptionCaptor.cleanupTestCoroutines], try calling this at a few strategic
+     * points to fail the test asap after the exception was caught.
+     */
+    private fun checkUncaughtCoroutineExceptions() {
+        @OptIn(ExperimentalCoroutinesApi::class)
+        coroutineExceptionHandler.cleanupTestCoroutines()
+    }
+
     inner class AndroidComposeStatement(
         private val base: Statement
     ) : Statement() {
@@ -332,6 +351,7 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
                 // throwing errors on active coroutines
                 recomposerApplyCoroutineScope.cancel()
                 frameCoroutineScope.cancel()
+                checkUncaughtCoroutineExceptions()
                 @OptIn(ExperimentalCoroutinesApi::class)
                 testCoroutineDispatcher.cleanupTestCoroutines()
                 textInputServiceFactory = oldTextInputFactory
@@ -423,6 +443,8 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
             //  That means that ComposeRootRegistry.getComposeRoots() may still return an empty list
             //  between now and when the new Activity has created its compose root, even though
             //  waitForComposeRoots() suggests that we are now guaranteed one.
+
+            checkUncaughtCoroutineExceptions()
         }
 
         override fun getRoots(atLeastOneRootExpected: Boolean): Set<RootForTest> {
