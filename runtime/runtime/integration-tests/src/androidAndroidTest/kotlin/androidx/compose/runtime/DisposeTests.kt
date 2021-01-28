@@ -48,7 +48,7 @@ class DisposeTests : BaseComposeTest() {
 
         lateinit var recomposeScope: RecomposeScope
         @OptIn(ExperimentalComposeApi::class)
-        val composable = @Composable @ComposableContract(tracked = false) {
+        val composable = @Composable {
             recomposeScope = currentRecomposeScope
             DisposableEffect(NeverEqualObject) {
                 log.add("onCommit")

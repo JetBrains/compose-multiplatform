@@ -248,7 +248,7 @@ fun Nothing() {
 }
 
 @Composable
-@ComposableContract(restartable = false)
+@NonRestartableComposable
 fun DirectNothing() {
 }
 

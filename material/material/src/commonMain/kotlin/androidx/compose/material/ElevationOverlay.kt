@@ -18,8 +18,8 @@ package androidx.compose.material
 
 import androidx.compose.runtime.Ambient
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ComposableContract
 import androidx.compose.runtime.ProvidableAmbient
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticAmbientOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
@@ -65,7 +65,7 @@ interface ElevationOverlay {
  * The default [ElevationOverlay] implementation.
  */
 private object DefaultElevationOverlay : ElevationOverlay {
-    @ComposableContract(readonly = true)
+    @ReadOnlyComposable
     @Composable
     override fun apply(color: Color, elevation: Dp): Color {
         val colors = MaterialTheme.colors
@@ -83,7 +83,7 @@ private object DefaultElevationOverlay : ElevationOverlay {
  * the resultant color. This color is the [contentColorFor] the [backgroundColor], with alpha
  * applied depending on the value of [elevation].
  */
-@ComposableContract(readonly = true)
+@ReadOnlyComposable
 @Composable
 private fun calculateForegroundColor(backgroundColor: Color, elevation: Dp): Color {
     val alpha = ((4.5f * ln(elevation.value + 1)) + 2f) / 100f

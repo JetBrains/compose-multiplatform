@@ -70,7 +70,7 @@ sealed class Ambient<T> constructor(defaultFactory: (() -> T)? = null) {
      */
     @OptIn(InternalComposeApi::class)
     inline val current: T
-        @ComposableContract(readonly = true)
+        @ReadOnlyComposable
         @Composable
         get() = currentComposer.consume(this)
 }
