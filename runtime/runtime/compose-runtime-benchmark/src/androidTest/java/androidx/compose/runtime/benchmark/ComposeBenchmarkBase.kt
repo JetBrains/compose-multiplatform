@@ -28,7 +28,6 @@ import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.snapshots.SnapshotReadObserver
 import androidx.compose.runtime.snapshots.SnapshotWriteObserver
-import androidx.compose.runtime.snapshots.takeMutableSnapshot
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.TestMonotonicFrameClock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -195,7 +194,7 @@ fun ControlledComposition.performRecompose(
     readObserver: SnapshotReadObserver,
     writeObserver: SnapshotWriteObserver
 ): Boolean {
-    val snapshot = takeMutableSnapshot(readObserver, writeObserver)
+    val snapshot = Snapshot.takeMutableSnapshot(readObserver, writeObserver)
     val result = snapshot.enter {
         recompose().also { applyChanges() }
     }

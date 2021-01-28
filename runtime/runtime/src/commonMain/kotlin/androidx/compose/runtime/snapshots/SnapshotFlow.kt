@@ -77,7 +77,7 @@ fun <T> snapshotFlow(
     }
 
     try {
-        var lastValue = takeSnapshot(readObserver).run {
+        var lastValue = Snapshot.takeSnapshot(readObserver).run {
             try {
                 enter(block)
             } finally {
@@ -100,7 +100,7 @@ fun <T> snapshotFlow(
 
             if (found) {
                 readSet.clear()
-                val newValue = takeSnapshot(readObserver).run {
+                val newValue = Snapshot.takeSnapshot(readObserver).run {
                     try {
                         enter(block)
                     } finally {
@@ -147,7 +147,7 @@ private fun <T> Set<T>.intersects(other: Set<T>): Boolean =
 )
 inline fun <R> withMutableSnapshot(
     block: () -> R
-): R = takeMutableSnapshot().run {
+): R = Snapshot.takeMutableSnapshot().run {
     try {
         enter(block).also { apply().check() }
     } catch (t: Throwable) {

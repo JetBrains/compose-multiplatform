@@ -516,7 +516,7 @@ class SnapshotStateListTests {
         val original = listOf(0, 1, 2, 3, 4, 5, 6)
         val mutableList = original.toMutableList()
         val list = mutableStateListOf(0, 1, 2, 3, 4, 5, 6)
-        val snapshot = takeSnapshot()
+        val snapshot = Snapshot.takeSnapshot()
         try {
             list[1] = 100
             mutableList[1] = 100
