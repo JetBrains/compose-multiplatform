@@ -106,9 +106,9 @@ class InfiniteTransition internal constructor() {
                 startOnTheNextFrame = false
                 playTimeNanosOffset = playTimeNanos
             }
-            val playTimeMillis = (playTimeNanos - playTimeNanosOffset) / 1_000_000L
-            value = animation.getValue(playTimeMillis)
-            isFinished = animation.isFinished(playTimeMillis)
+            val playTime = playTimeNanos - playTimeNanosOffset
+            value = animation.getValueFromNanos(playTime)
+            isFinished = animation.isFinishedFromNanos(playTime)
         }
     }
 

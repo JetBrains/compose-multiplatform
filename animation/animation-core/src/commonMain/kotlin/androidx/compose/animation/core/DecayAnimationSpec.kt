@@ -60,7 +60,7 @@ fun <T, V : AnimationVector> DecayAnimationSpec<T>.calculateTargetValue(
     initialVelocity: T
 ): T {
     val vectorizedSpec = vectorize(typeConverter)
-    val targetVector = vectorizedSpec.getTarget(
+    val targetVector = vectorizedSpec.getTargetValue(
         typeConverter.convertToVector(initialValue),
         typeConverter.convertToVector(initialVelocity)
     )
@@ -78,7 +78,7 @@ fun DecayAnimationSpec<Float>.calculateTargetValue(
     initialVelocity: Float
 ): Float {
     val vectorizedSpec = vectorize(Float.VectorConverter)
-    val targetVector = vectorizedSpec.getTarget(
+    val targetVector = vectorizedSpec.getTargetValue(
         AnimationVector(initialValue),
         AnimationVector(initialVelocity)
     )
@@ -136,17 +136,21 @@ private class VectorizedFloatDecaySpec<V : AnimationVector>(
     private lateinit var targetVector: V
     override val absVelocityThreshold: Float = floatDecaySpec.absVelocityThreshold
 
-    override fun getValue(playTime: Long, initialValue: V, initialVelocity: V): V {
+    override fun getValueFromNanos(playTimeNanos: Long, initialValue: V, initialVelocity: V): V {
         if (!::valueVector.isInitialized) {
             valueVector = initialValue.newInstance()
         }
         for (i in 0 until valueVector.size) {
-            valueVector[i] = floatDecaySpec.getValue(playTime, initialValue[i], initialVelocity[i])
+            valueVector[i] = floatDecaySpec.getValueFromNanos(
+                playTimeNanos,
+                initialValue[i],
+                initialVelocity[i]
+            )
         }
         return valueVector
     }
 
-    override fun getDurationMillis(initialValue: V, initialVelocity: V): Long {
+    override fun getDurationNanos(initialValue: V, initialVelocity: V): Long {
         var maxDuration = 0L
         if (!::velocityVector.isInitialized) {
             velocityVector = initialValue.newInstance()
@@ -154,19 +158,19 @@ private class VectorizedFloatDecaySpec<V : AnimationVector>(
         for (i in 0 until velocityVector.size) {
             maxDuration = maxOf(
                 maxDuration,
-                floatDecaySpec.getDurationMillis(initialValue[i], initialVelocity[i])
+                floatDecaySpec.getDurationNanos(initialValue[i], initialVelocity[i])
             )
         }
         return maxDuration
     }
 
-    override fun getVelocity(playTime: Long, initialValue: V, initialVelocity: V): V {
+    override fun getVelocityFromNanos(playTimeNanos: Long, initialValue: V, initialVelocity: V): V {
         if (!::velocityVector.isInitialized) {
             velocityVector = initialValue.newInstance()
         }
         for (i in 0 until velocityVector.size) {
-            velocityVector[i] = floatDecaySpec.getVelocity(
-                playTime,
+            velocityVector[i] = floatDecaySpec.getVelocityFromNanos(
+                playTimeNanos,
                 initialValue[i],
                 initialVelocity[i]
             )
@@ -174,12 +178,12 @@ private class VectorizedFloatDecaySpec<V : AnimationVector>(
         return velocityVector
     }
 
-    override fun getTarget(initialValue: V, initialVelocity: V): V {
+    override fun getTargetValue(initialValue: V, initialVelocity: V): V {
         if (!::targetVector.isInitialized) {
             targetVector = initialValue.newInstance()
         }
         for (i in 0 until targetVector.size) {
-            targetVector[i] = floatDecaySpec.getTarget(
+            targetVector[i] = floatDecaySpec.getTargetValue(
                 initialValue[i],
                 initialVelocity[i]
             )

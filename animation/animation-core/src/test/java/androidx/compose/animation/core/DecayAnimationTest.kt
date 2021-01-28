@@ -35,29 +35,34 @@ class DecayAnimationTest {
 
         val animWrapper = anim.createAnimation(startValue, startVelocity)
         // Obtain finish value by passing in an absurdly large playtime.
-        val finishValue = animWrapper.getValue(Int.MAX_VALUE.toLong())
-        val finishTime = animWrapper.durationMillis
+        val finishValue = animWrapper.getValueFromNanos(Int.MAX_VALUE.toLong())
+        val finishTimeNanos = animWrapper.durationMillis * MillisToNanos
 
-        for (playTime in 0L..4000L step 200L) {
-            val value = anim.getValue(playTime, startValue, startVelocity)
-            val velocity = anim.getVelocity(playTime, startValue, startVelocity)
-            val finished = playTime >= finishTime
-            assertTrue(finished == animWrapper.isFinished(playTime))
+        for (playTimeMillis in 0L..4000L step 200L) {
+            val playTimeNanos = playTimeMillis * MillisToNanos
+            val value = anim.getValueFromNanos(playTimeNanos, startValue, startVelocity)
+            val velocity = anim.getVelocityFromNanos(playTimeNanos, startValue, startVelocity)
+            val finished = playTimeNanos >= finishTimeNanos
+            assertTrue(finished == animWrapper.isFinishedFromNanos(playTimeNanos))
 
             if (!finished) {
                 // Before the animation finishes, absolute velocity is above the threshold
                 assertTrue(Math.abs(velocity) >= 2.0f)
-                assertEquals(value, animWrapper.getValue(playTime), epsilon)
-                assertEquals(velocity, animWrapper.getVelocityVector(playTime).value, epsilon)
-                assertTrue(playTime < finishTime)
+                assertEquals(value, animWrapper.getValueFromNanos(playTimeNanos), epsilon)
+                assertEquals(
+                    velocity,
+                    animWrapper.getVelocityVectorFromNanos(playTimeNanos).value,
+                    epsilon
+                )
+                assertTrue(playTimeNanos < finishTimeNanos)
             } else {
                 // When the animation is finished, expect absolute velocity < threshold
                 assertTrue(Math.abs(velocity) < 2.0f)
 
                 // Once the animation is finished, the value should not change any more
-                assertEquals(finishValue, animWrapper.getValue(playTime), epsilon)
+                assertEquals(finishValue, animWrapper.getValueFromNanos(playTimeNanos), epsilon)
 
-                assertTrue(playTime >= finishTime)
+                assertTrue(playTimeNanos >= finishTimeNanos)
             }
         }
     }
@@ -80,20 +85,20 @@ class DecayAnimationTest {
             startVelocity
         )
 
-        val finishValue = fullAnim.getValue(Int.MAX_VALUE.toLong())
+        val finishValue = fullAnim.getValueFromNanos(Int.MAX_VALUE.toLong())
 
         val finishValue1 = anim1.createAnimation(startValue, startVelocity)
-            .getValue(Int.MAX_VALUE.toLong())
+            .getValueFromNanos(Int.MAX_VALUE.toLong())
 
         val finishVelocity1 = anim1.createAnimation(startValue, startVelocity)
-            .getVelocityVector(Int.MAX_VALUE.toLong()).value
+            .getVelocityVectorFromNanos(Int.MAX_VALUE.toLong()).value
 
         // Verify that the finish velocity is at the threshold
         assertEquals(threshold, finishVelocity1, epsilon)
 
         // Feed in the finish value from anim1 to anim2
         val finishValue2 = anim2.createAnimation(finishValue1, finishVelocity1)
-            .getValue(Int.MAX_VALUE.toLong())
+            .getValueFromNanos(Int.MAX_VALUE.toLong())
 
         assertEquals(finishValue, finishValue2, 2f)
     }

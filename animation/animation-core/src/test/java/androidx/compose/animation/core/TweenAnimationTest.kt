@@ -38,7 +38,7 @@ class TweenAnimationTest {
         )
 
         fun atPlaytime(playTime: Long) =
-            animation.getValue(playTime, start, end, AnimationVector1D(0f)).value
+            animation.getValueFromMillis(playTime, start, end, AnimationVector1D(0f)).value
 
         assertThat(atPlaytime(0L)).isZero()
         assertThat(atPlaytime(testDelay / 2)).isZero()

@@ -105,6 +105,7 @@ sealed class BaseAnimatedValue<T, V : AnimationVector>(
     internal var onEnd: ((AnimationEndReason, T) -> Unit)? = null
     private lateinit var anim: Animation<T, V>
     private var startTime: Long = Unset
+
     // last frame time only gets updated during the animation pulse. It will be reset at the
     // end of the animation.
     private var lastFrameTime: Long = Unset
@@ -188,21 +189,21 @@ sealed class BaseAnimatedValue<T, V : AnimationVector>(
         }
 
         lastFrameTime = timeMillis
-        velocityVector = anim.getVelocityVector(playtime)
-        value = anim.getValue(playtime)
+        velocityVector = anim.getVelocityVectorFromNanos(playtime * MillisToNanos)
+        value = anim.getValueFromNanos(playtime * MillisToNanos)
 
         checkFinished(playtime)
     }
 
     protected open fun checkFinished(playtime: Long) {
-        val animationFinished = anim.isFinished(playtime)
+        val animationFinished = anim.isFinishedFromNanos(playtime * MillisToNanos)
         if (animationFinished) endAnimation()
     }
 
     internal fun startAnimation(anim: Animation<T, V>) {
         this.anim = anim
         // Quick check before officially starting
-        if (anim.isFinished(0)) {
+        if (anim.isFinishedFromNanos(0)) {
             // If the animation value & velocity is already meeting the finished condition before
             // the animation even starts, end it now.
             endAnimation()
@@ -275,6 +276,7 @@ abstract class AnimatedFloat(
      */
     var min: Float = Float.NEGATIVE_INFINITY
         private set
+
     /**
      * Upper bound of the animation value. When animations reach this upper bound, it will
      * automatically stop with [AnimationEndReason] being [AnimationEndReason.BoundReached].
@@ -367,7 +369,7 @@ fun AnimatedFloat.fling(
     }
 
     // start from current value with the given velocity
-    targetValue = decay.getTarget(value, startVelocity)
+    targetValue = decay.getTargetValue(value, startVelocity)
     startAnimation(DecayAnimation(decay, value, startVelocity))
 }
 
@@ -402,7 +404,7 @@ fun AnimatedFloat.fling(
     }
 
     // start from current value with the given velocity
-    targetValue = decay.getTarget(value, startVelocity)
+    targetValue = decay.getTargetValue(value, startVelocity)
     val targetAnimation = adjustTarget(targetValue)
     if (targetAnimation == null) {
         val animWrapper = decay.createAnimation(value, startVelocity)

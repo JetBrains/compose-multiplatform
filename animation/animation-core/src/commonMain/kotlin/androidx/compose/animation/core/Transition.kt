@@ -375,13 +375,13 @@ class Transition<S> internal constructor(
             internal set
         internal var velocityVector: V = initialVelocityVector
         internal val durationNanos
-            get() = animation.durationMillis.times(1_000_000L)
+            get() = animation.durationNanos
 
         internal fun onPlayTimeChanged(playTimeNanos: Long) {
-            val playTimeMillis = (playTimeNanos - offsetTimeNanos) / 1_000_000L
-            value = animation.getValue(playTimeMillis)
-            velocityVector = animation.getVelocityVector(playTimeMillis)
-            if (animation.isFinished(playTimeMillis)) {
+            val playTime = playTimeNanos - offsetTimeNanos
+            value = animation.getValueFromNanos(playTime)
+            velocityVector = animation.getVelocityVectorFromNanos(playTime)
+            if (animation.isFinishedFromNanos(playTime)) {
                 isFinished = true
                 offsetTimeNanos = 0
             }
@@ -390,9 +390,8 @@ class Transition<S> internal constructor(
         internal fun seekTo(playTimeNanos: Long) {
             // TODO: unlikely but need to double check that animation returns the correct values
             // when play time is way past their durations.
-            val playTimeMillis = playTimeNanos / 1_000_000L
-            value = animation.getValue(playTimeMillis)
-            velocityVector = animation.getVelocityVector(playTimeMillis)
+            value = animation.getValueFromNanos(playTimeNanos)
+            velocityVector = animation.getVelocityVectorFromNanos(playTimeNanos)
         }
 
         private fun updateAnimation(initialValue: T = value) {
