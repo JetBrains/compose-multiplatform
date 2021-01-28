@@ -26,8 +26,11 @@ package androidx.compose.runtime.saveable {
     method public boolean canBeSaved(Object value);
     method public Object? consumeRestored(String key);
     method public java.util.Map<java.lang.String,java.util.List<java.lang.Object>> performSave();
-    method public void registerProvider(String key, kotlin.jvm.functions.Function0<?> valueProvider);
-    method public void unregisterProvider(String key, kotlin.jvm.functions.Function0<?> valueProvider);
+    method public androidx.compose.runtime.saveable.SaveableStateRegistry.Entry registerProvider(String key, kotlin.jvm.functions.Function0<?> valueProvider);
+  }
+
+  public static interface SaveableStateRegistry.Entry {
+    method public void unregister();
   }
 
   public final class SaveableStateRegistryKt {

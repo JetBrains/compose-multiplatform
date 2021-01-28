@@ -40,8 +40,8 @@ class SaveableStateRegistryTest {
         val registry = createRegistry()
 
         val provider = { 10 }
-        registry.registerProvider("key", provider)
-        registry.unregisterProvider("key", provider)
+        val entry = registry.registerProvider("key", provider)
+        entry.unregister()
 
         registry.performSave().apply {
             assertThat(containsKey("key")).isFalse()
@@ -53,8 +53,8 @@ class SaveableStateRegistryTest {
         val registry = createRegistry()
 
         val provider1 = { "value1" }
-        registry.registerProvider("key", provider1)
-        registry.unregisterProvider("key", provider1)
+        val entry = registry.registerProvider("key", provider1)
+        entry.unregister()
         registry.registerProvider("key") { "value2" }
 
         registry.performSave().apply {
@@ -68,10 +68,10 @@ class SaveableStateRegistryTest {
 
         registry.registerProvider("key1") { 100L }
         val provider2 = { 100 }
-        registry.registerProvider("key2", provider2)
+        val entry = registry.registerProvider("key2", provider2)
         registry.registerProvider("key3") { "value" }
         registry.registerProvider("key4") { listOf("item") }
-        registry.unregisterProvider("key2", provider2)
+        entry.unregister()
 
         registry.performSave().apply {
             assertThat(get("key1")).isEqualTo(listOf(100L))
@@ -180,10 +180,9 @@ class SaveableStateRegistryTest {
         val registry = createRegistry()
 
         registry.registerProvider("key") { 1L }
-        val provider2 = { 2 }
-        registry.registerProvider("key", provider2)
-        registry.registerProvider("key") { 3 }
-        registry.unregisterProvider("key", provider2)
+        val entry = registry.registerProvider("key") { 2L }
+        registry.registerProvider("key") { 3L }
+        entry.unregister()
 
         val restoredRegistry = createRegistry(registry.performSave())
         assertThat(restoredRegistry.consumeRestored("key")).isEqualTo(1L)

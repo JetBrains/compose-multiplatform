@@ -116,9 +116,6 @@ class StateRestorationTester(private val composeTestRule: ComposeContentTestRule
         override fun registerProvider(key: String, valueProvider: () -> Any?) =
             currentRegistry.registerProvider(key, valueProvider)
 
-        override fun unregisterProvider(key: String, valueProvider: () -> Any?) =
-            currentRegistry.unregisterProvider(key, valueProvider)
-
         override fun canBeSaved(value: Any) = currentRegistry.canBeSaved(value)
 
         override fun performSave() = currentRegistry.performSave()

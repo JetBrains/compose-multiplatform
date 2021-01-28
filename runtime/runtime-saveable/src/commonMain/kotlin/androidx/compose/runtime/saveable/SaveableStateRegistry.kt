@@ -16,6 +16,7 @@
 
 package androidx.compose.runtime.saveable
 
+import androidx.compose.runtime.saveable.SaveableStateRegistry.Entry
 import androidx.compose.runtime.staticAmbientOf
 
 /**
@@ -44,16 +45,9 @@ interface SaveableStateRegistry {
      * @param key Key to use for storing the value
      * @param valueProvider Provides the current value, to be executed when [performSave]
      * will be triggered to collect all the registered values
+     * @return the registry entry which you can use to unregister the provider
      */
-    fun registerProvider(key: String, valueProvider: () -> Any?)
-
-    /**
-     * Unregisters the value provider previously registered via [registerProvider].
-     *
-     * @param key Key of the value which shouldn't be saved anymore
-     * @param valueProvider The provider previously passed to [registerProvider]
-     */
-    fun unregisterProvider(key: String, valueProvider: () -> Any?)
+    fun registerProvider(key: String, valueProvider: () -> Any?): Entry
 
     /**
      * Returns true if the value can be saved using this Registry.
@@ -68,6 +62,16 @@ interface SaveableStateRegistry {
      * a list of values for each key as it is allowed to have multiple providers for the same key.
      */
     fun performSave(): Map<String, List<Any?>>
+
+    /**
+     * The registry entry which you get when you use [registerProvider].
+     */
+    interface Entry {
+        /**
+         * Unregister previously registered entry.
+         */
+        fun unregister()
+    }
 }
 
 /**
@@ -109,21 +113,19 @@ private class SaveableStateRegistryImpl(
         }
     }
 
-    override fun registerProvider(key: String, valueProvider: () -> Any?) {
+    override fun registerProvider(key: String, valueProvider: () -> Any?): Entry {
         require(key.isNotBlank()) { "Registered key is empty or blank" }
         @Suppress("UNCHECKED_CAST")
         valueProviders.getOrPut(key) { mutableListOf() }.add(valueProvider)
-    }
-
-    override fun unregisterProvider(key: String, valueProvider: () -> Any?) {
-        val list = valueProviders.remove(key)
-        val found = list?.remove(valueProvider)
-        require(found == true) {
-            "The given key $key , valueProvider pair wasn't previously registered"
-        }
-        if (list.isNotEmpty()) {
-            // if there are other providers for this key return list back to the map
-            valueProviders[key] = list
+        return object : Entry {
+            override fun unregister() {
+                val list = valueProviders.remove(key)
+                list?.remove(valueProvider)
+                if (list != null && list.isNotEmpty()) {
+                    // if there are other providers for this key return list back to the map
+                    valueProviders[key] = list
+                }
+            }
         }
     }
 
