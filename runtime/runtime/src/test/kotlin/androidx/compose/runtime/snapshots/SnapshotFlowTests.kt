@@ -45,7 +45,7 @@ class SnapshotFlowTests {
 
         assertEquals(2, result, "value after initial run")
 
-        withMutableSnapshot {
+        Snapshot.withMutableSnapshot {
             state = 5
         }
 
@@ -69,13 +69,13 @@ class SnapshotFlowTests {
         yield()
         assertEquals(1, runCount, "snapshot collector initial run")
 
-        withMutableSnapshot { state++ }
+        Snapshot.withMutableSnapshot { state++ }
         yield()
 
         assertEquals(2, runCount, "made one change")
 
-        withMutableSnapshot { state++ }
-        withMutableSnapshot { state++ }
+        Snapshot.withMutableSnapshot { state++ }
+        Snapshot.withMutableSnapshot { state++ }
         yield()
 
         assertEquals(3, runCount, "coalesced two changes")
@@ -98,7 +98,7 @@ class SnapshotFlowTests {
 
         assertEquals(1, runCount, "initial run")
 
-        withMutableSnapshot { unrelatedState++ }
+        Snapshot.withMutableSnapshot { unrelatedState++ }
         yield()
 
         assertEquals(1, runCount, "after changing unrelated state")

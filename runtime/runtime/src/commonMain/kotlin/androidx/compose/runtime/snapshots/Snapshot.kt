@@ -317,6 +317,31 @@ sealed class Snapshot(
         }
 
         /**
+         * Take a [MutableSnapshot] and run [block] within it. When [block] returns successfully,
+         * attempt to [MutableSnapshot.apply] the snapshot. Returns the result of [block] or throws
+         * [SnapshotApplyConflictException] if snapshot changes attempted by [block] could not be
+         * applied.
+         *
+         * Prior to returning, any changes made to snapshot state (e.g. state holders returned by
+         * [androidx.compose.runtime.mutableStateOf] are not visible to other threads. When
+         * [withMutableSnapshot] returns successfully those changes will be made visible to other
+         * threads  and any snapshot observers (e.g. [snapshotFlow]) will be notified of changes.
+         *
+         * [block] must not suspend if [withMutableSnapshot] is called from a suspend function.
+         */
+        // TODO: determine a good way to prevent/discourage suspending in an inlined [block]
+        inline fun <R> withMutableSnapshot(
+            block: () -> R
+        ): R = takeMutableSnapshot().run {
+            try {
+                enter(block).also { apply().check() }
+            } catch (t: Throwable) {
+                dispose()
+                throw t
+            }
+        }
+
+        /**
          * Observe reads and or write of state objects in the current thread.
          *
          * This only affects the current snapshot (if any) and any new snapshots create from
