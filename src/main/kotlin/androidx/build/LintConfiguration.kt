@@ -152,6 +152,8 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
                 } else {
                     disable("MissingTranslation")
                 }
+            } else {
+                disable("BanUncheckedReflection")
             }
 
             // If the project has not overridden the lint config, set the default one.
