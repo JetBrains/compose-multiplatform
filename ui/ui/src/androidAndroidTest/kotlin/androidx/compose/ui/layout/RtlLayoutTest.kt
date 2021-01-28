@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.FixedSize
 import androidx.compose.ui.Modifier
@@ -261,7 +260,7 @@ class RtlLayoutTest {
                 Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
                     Box {
                         Providers(AmbientLayoutDirection provides initialLayoutDirection) {
-                            Layout(emptyContent()) { _, _ ->
+                            Layout({}) { _, _ ->
                                 resultLayoutDirection.value = layoutDirection
                                 latch.countDown()
                                 layout(0, 0) {}

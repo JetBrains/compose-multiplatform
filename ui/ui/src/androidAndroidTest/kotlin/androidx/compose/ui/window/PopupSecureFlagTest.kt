@@ -20,7 +20,6 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -123,7 +122,7 @@ class PopupSecureFlagTest(private val setSecureFlagOnActivity: Boolean) {
                     alignment = Alignment.Center,
                     properties = popupProperties
                 ) {
-                    SimpleContainer(Modifier.preferredSize(50.dp), content = emptyContent())
+                    SimpleContainer(Modifier.preferredSize(50.dp), content = {})
                 }
             }
         }

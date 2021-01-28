@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -151,7 +150,7 @@ class LayerTouchTransformTest {
 }
 
 @Composable
-fun SimpleLayout(modifier: Modifier, content: @Composable () -> Unit = emptyContent()) {
+fun SimpleLayout(modifier: Modifier, content: @Composable () -> Unit = {}) {
     Layout(
         content,
         modifier

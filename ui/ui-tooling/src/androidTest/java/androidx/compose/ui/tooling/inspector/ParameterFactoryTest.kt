@@ -239,7 +239,9 @@ class ParameterFactoryTest {
 
     @Test
     fun testComposableLambda() = runBlocking {
-        val c: @Composable () -> Unit = { Text(text = "Hello World") }
+        // capture here to force the lambda to not be created as a singleton.
+        val capture = "Hello World"
+        val c: @Composable () -> Unit = { Text(text = capture) }
         val result = lookup(c as Any) ?: error("Lookup of ComposableLambda failed")
         val array = result.second as Array<*>
         assertThat(result.first).isEqualTo(ParameterType.Lambda)

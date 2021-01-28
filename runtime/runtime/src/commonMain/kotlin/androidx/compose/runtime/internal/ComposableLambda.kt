@@ -1210,5 +1210,5 @@ fun composableLambda(
 
 @Suppress("unused")
 @ComposeCompilerApi
-fun composableLambdaInstance(key: Int, tracked: Boolean, block: Any) =
-    CLambda(key, tracked, null).apply { update(block) }
+fun composableLambdaInstance(key: Int, tracked: Boolean, sourceInformation: String?, block: Any) =
+    CLambda(key, tracked, sourceInformation).apply { update(block) }

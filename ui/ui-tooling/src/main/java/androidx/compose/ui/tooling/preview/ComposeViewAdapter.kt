@@ -33,7 +33,6 @@ import androidx.compose.runtime.Composition
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.currentComposer
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.graphics.Color
@@ -59,6 +58,8 @@ import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.ViewTreeSavedStateRegistryOwner
 
 const val TOOLS_NS_URI = "http://schemas.android.com/tools"
+
+private val emptyContent: @Composable () -> Unit = @Composable {}
 
 /**
  * Class containing the minimum information needed by the Preview to map components to the
@@ -146,14 +147,14 @@ internal class ComposeViewAdapter : FrameLayout {
      * The [Composable] to be rendered in the preview. It is initialized when this adapter
      * is initialized.
      */
-    private var previewComposition: @Composable () -> Unit = emptyContent()
+    private var previewComposition: @Composable () -> Unit = {}
 
-    // Note: the call to emptyContent() below instead of a literal {} works around
+    // Note: the constant emptyContent below instead of a literal {} works around
     // https://youtrack.jetbrains.com/issue/KT-17467, which causes the compiler to emit classes
     // named `content` and `Content` (from the Content method's composable update scope)
     // which causes compilation problems on case-insensitive filesystems.
     @Suppress("RemoveExplicitTypeArguments")
-    private val content = mutableStateOf<@Composable () -> Unit>(emptyContent())
+    private val content = mutableStateOf<@Composable () -> Unit>(emptyContent)
 
     /**
      * When true, the composition will be immediately invalidated after being drawn. This will
@@ -334,7 +335,7 @@ internal class ComposeViewAdapter : FrameLayout {
 
     private fun invalidateComposition() {
         // Invalidate the full composition by setting it to empty and back to the actual value
-        content.value = emptyContent()
+        content.value = {}
         content.value = previewComposition
         // Invalidate the state of the view so it gets redrawn
         invalidate()

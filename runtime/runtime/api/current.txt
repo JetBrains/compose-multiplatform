@@ -79,8 +79,8 @@ package androidx.compose.runtime {
   }
 
   public final class ComposeKt {
-    method @androidx.compose.runtime.Stable public static kotlin.jvm.functions.Function0<kotlin.Unit> emptyContent();
-    method public static inline kotlin.jvm.functions.Function0<kotlin.Unit> orEmpty(kotlin.jvm.functions.Function0<kotlin.Unit>?);
+    method @Deprecated @androidx.compose.runtime.Stable public static kotlin.jvm.functions.Function0<kotlin.Unit> emptyContent();
+    method @Deprecated public static inline kotlin.jvm.functions.Function0<kotlin.Unit> orEmpty(kotlin.jvm.functions.Function0<kotlin.Unit>?);
   }
 
   public final class ComposeNodeKt {
@@ -597,7 +597,7 @@ package androidx.compose.runtime.internal {
 
   public final class ComposableLambdaKt {
     method @androidx.compose.runtime.ComposeCompilerApi public static androidx.compose.runtime.internal.ComposableLambda<java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object> composableLambda(androidx.compose.runtime.Composer composer, int key, boolean tracked, String? sourceInformation, Object block);
-    method @androidx.compose.runtime.ComposeCompilerApi public static androidx.compose.runtime.internal.ComposableLambda<java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object> composableLambdaInstance(int key, boolean tracked, Object block);
+    method @androidx.compose.runtime.ComposeCompilerApi public static androidx.compose.runtime.internal.ComposableLambda<java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object> composableLambdaInstance(int key, boolean tracked, String? sourceInformation, Object block);
   }
 
   @androidx.compose.runtime.ComposeCompilerApi @androidx.compose.runtime.Stable public final class ComposableLambdaN<R> implements kotlin.jvm.functions.FunctionN<R> {

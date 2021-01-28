@@ -17,7 +17,6 @@
 package androidx.compose.foundation.layout
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.Layout
@@ -1295,7 +1294,7 @@ class SizeTest : LayoutTest() {
         // Clear contents before each test so that we don't recompose the BoxWithConstraints call;
         // doing so would recompose the old subcomposition with old constraints in the presence of
         // new content before the measurement performs explicit composition the new constraints.
-        show(emptyContent())
+        show({})
         show {
             Layout({
                 BoxWithConstraints(modifier) {

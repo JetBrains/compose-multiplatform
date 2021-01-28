@@ -19,7 +19,6 @@ package androidx.compose.ui.window
 import android.view.View
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
-import androidx.compose.runtime.emptyContent
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
@@ -332,7 +331,7 @@ class PopupAlignmentTest {
                                         modifier = Modifier.onGloballyPositioned {
                                             measureLatch.countDown()
                                         },
-                                        content = emptyContent()
+                                        content = {}
                                     )
                                 }
                             }

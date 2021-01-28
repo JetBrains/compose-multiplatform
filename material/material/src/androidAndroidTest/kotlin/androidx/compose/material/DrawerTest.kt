@@ -22,7 +22,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Providers
-import androidx.compose.runtime.emptyContent
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.AmbientLayoutDirection
@@ -72,7 +71,7 @@ class DrawerTest {
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag("content"))
                 },
-                bodyContent = emptyContent()
+                bodyContent = {}
             )
         }
 
@@ -89,7 +88,7 @@ class DrawerTest {
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag("content"))
                 },
-                bodyContent = emptyContent()
+                bodyContent = {}
             )
         }
 
@@ -107,7 +106,7 @@ class DrawerTest {
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag("content"))
                 },
-                bodyContent = emptyContent()
+                bodyContent = {}
             )
         }
 
@@ -124,7 +123,7 @@ class DrawerTest {
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag("content"))
                 },
-                bodyContent = emptyContent()
+                bodyContent = {}
             )
         }
 
@@ -144,7 +143,7 @@ class DrawerTest {
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag("content"))
                 },
-                bodyContent = emptyContent()
+                bodyContent = {}
             )
         }
 
@@ -164,7 +163,7 @@ class DrawerTest {
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag("drawer"))
                 },
-                bodyContent = emptyContent()
+                bodyContent = {}
             )
         }
 
@@ -326,7 +325,7 @@ class DrawerTest {
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag("drawer"))
                 },
-                bodyContent = emptyContent()
+                bodyContent = {}
             )
         }
 
@@ -515,7 +514,7 @@ class DrawerTest {
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag("drawer"))
                 },
-                bodyContent = emptyContent()
+                bodyContent = {}
             )
         }
 
@@ -554,7 +553,7 @@ class DrawerTest {
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag("drawer"))
                 },
-                bodyContent = emptyContent()
+                bodyContent = {}
             )
         }
 

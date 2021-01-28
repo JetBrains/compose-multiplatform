@@ -44,7 +44,6 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -267,7 +266,7 @@ private fun MagnifierSelectionCircle(modifier: Modifier, color: Color) {
         elevation = 4.dp,
         color = color,
         border = BorderStroke(2.dp, SolidColor(Color.Black.copy(alpha = 0.75f))),
-        content = emptyContent()
+        content = {}
     )
 }
 

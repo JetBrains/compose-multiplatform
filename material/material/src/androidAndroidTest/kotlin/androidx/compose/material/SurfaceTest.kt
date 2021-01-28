@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSize
-import androidx.compose.runtime.emptyContent
 import androidx.compose.testutils.assertPixels
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
@@ -115,7 +114,7 @@ class SurfaceTest {
                         Modifier.fillMaxSize().padding(2.dp),
                         elevation = 2.dp,
                         color = Color.Blue,
-                        content = emptyContent()
+                        content = {}
                     )
                 }
 
@@ -132,7 +131,7 @@ class SurfaceTest {
                             Modifier.fillMaxSize().padding(2.dp),
                             elevation = 2.dp,
                             color = Color.Blue,
-                            content = emptyContent()
+                            content = {}
                         )
                     }
                 }

@@ -124,7 +124,7 @@ class BoundsTest : ToolingTest() {
                 }
             }.flatten().groupBy { it.location }
 
-            Assert.assertTrue(boundingBoxes.size >= 6)
+            Assert.assertTrue(boundingBoxes.size >= 4)
         }
     }
 
