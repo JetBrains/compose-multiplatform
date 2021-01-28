@@ -92,9 +92,9 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
     }
 
     /**
-     * Do not decompose instances from these package prefixes.
+     * Do not decompose instances or lookup constants from these package prefixes
      */
-    private val ignoredPackagePrefixes = listOf("android.graphics.")
+    private val ignoredPackagePrefixes = listOf("android.", "java.", "javax.")
 
     var density = Density(1.0f)
 
@@ -129,7 +129,9 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
     }
 
     private fun loadConstantsFrom(javaClass: Class<*>) {
-        if (valuesLoaded.contains(javaClass)) {
+        if (valuesLoaded.contains(javaClass) ||
+            ignoredPackagePrefixes.any { javaClass.name.startsWith(it) }
+        ) {
             return
         }
         val related = generateSequence(javaClass) { it.superclass }.plus(javaClass.interfaces)
