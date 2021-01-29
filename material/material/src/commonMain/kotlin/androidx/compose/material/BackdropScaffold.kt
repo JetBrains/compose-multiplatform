@@ -49,6 +49,9 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.platform.LocalAnimationClock
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.collapse
+import androidx.compose.ui.semantics.expand
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -334,6 +337,13 @@ fun BackdropScaffold(
                     orientation = Orientation.Vertical,
                     enabled = gesturesEnabled
                 )
+                .semantics {
+                    if (scaffoldState.isConcealed) {
+                        collapse { scaffoldState.reveal(); true }
+                    } else {
+                        expand { scaffoldState.conceal(); true }
+                    }
+                }
 
             // Front layer
             Surface(

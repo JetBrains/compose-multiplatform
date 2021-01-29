@@ -546,6 +546,24 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         info.paneTitle = semanticsNode.config.getOrNull(SemanticsProperties.PaneTitle)
 
         if (semanticsNode.enabled()) {
+            semanticsNode.config.getOrNull(SemanticsActions.Expand)?.let {
+                info.addAction(
+                    AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+                        AccessibilityNodeInfoCompat.ACTION_EXPAND,
+                        it.label
+                    )
+                )
+            }
+
+            semanticsNode.config.getOrNull(SemanticsActions.Collapse)?.let {
+                info.addAction(
+                    AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+                        AccessibilityNodeInfoCompat.ACTION_COLLAPSE,
+                        it.label
+                    )
+                )
+            }
+
             semanticsNode.config.getOrNull(SemanticsActions.Dismiss)?.let {
                 info.addAction(
                     AccessibilityNodeInfoCompat.AccessibilityActionCompat(
@@ -989,6 +1007,16 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             }
             AccessibilityNodeInfoCompat.ACTION_CUT -> {
                 return node.config.getOrNull(SemanticsActions.CutText)?.let {
+                    it.action()
+                } ?: false
+            }
+            AccessibilityNodeInfoCompat.ACTION_EXPAND -> {
+                return node.config.getOrNull(SemanticsActions.Expand)?.let {
+                    it.action()
+                } ?: false
+            }
+            AccessibilityNodeInfoCompat.ACTION_COLLAPSE -> {
+                return node.config.getOrNull(SemanticsActions.Collapse)?.let {
                     it.action()
                 } ?: false
             }
