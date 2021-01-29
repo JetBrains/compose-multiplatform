@@ -146,6 +146,7 @@ class AndroidXUiPlugin : Plugin<Project> {
                 error("ComposableNaming")
                 error("ComposableLambdaParameterNaming")
                 error("ComposableLambdaParameterPosition")
+                error("CompositionLocalNaming")
             }
 
             // TODO(148540713): remove this exclusion when Lint can support using multiple lint jars
