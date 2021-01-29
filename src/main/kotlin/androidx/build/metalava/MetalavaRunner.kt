@@ -322,8 +322,9 @@ fun getGenerateApiArgs(
                     """
     ${TERMINAL_RED}Your change has API lint issues. Fix the code according to the messages above.$TERMINAL_RESET
 
-    If a check is broken, suppress it in code with @Suppress("id")/@SuppressWarnings("id")
-    and file bug to https://issuetracker.google.com/issues/new?component=739152&template=1344623
+    If a check is broken, suppress it in code in Kotlin with @Suppress("id")/@get:Suppress("id")
+    and in Java with @SuppressWarnings("id") and file bug to
+    https://issuetracker.google.com/issues/new?component=739152&template=1344623
 
     If you are doing a refactoring or suppression above does not work, use ./gradlew updateApiLintBaseline
 """
