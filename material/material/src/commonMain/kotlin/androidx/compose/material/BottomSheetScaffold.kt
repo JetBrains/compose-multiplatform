@@ -47,6 +47,9 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalAnimationClock
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.collapse
+import androidx.compose.ui.semantics.expand
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
@@ -316,6 +319,13 @@ fun BottomSheetScaffold(
                 enabled = sheetGesturesEnabled,
                 resistance = null
             )
+            .semantics {
+                if (scaffoldState.bottomSheetState.isCollapsed) {
+                    expand { scaffoldState.bottomSheetState.expand(); true }
+                } else {
+                    collapse { scaffoldState.bottomSheetState.collapse(); true }
+                }
+            }
 
         val child = @Composable {
             BottomSheetScaffoldStack(
