@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2021 The Android Open Source Project
+<?xml version="1.0" encoding="utf-8"?><!-- Copyright (C) 2021 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -13,4 +12,10 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<manifest package="androidx.compose.ui.inspection.test" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="androidx.compose.ui.inspection.test">
+
+    <application>
+        <activity android:name="androidx.compose.ui.inspection.testdata.ParametersTestActivity" />
+    </application>
+</manifest>

@@ -22,18 +22,24 @@ import static androidx.build.dependencies.DependenciesKt.*
 
 plugins {
     id("AndroidXPlugin")
+    id("AndroidXUiPlugin")
     id("com.android.library")
     id("kotlin-android")
     id("androidx.inspection")
 }
 
 dependencies {
+    kotlinPlugin project(":compose:compiler:compiler")
     implementation("androidx.annotation:annotation:1.1.0")
     implementation(KOTLIN_STDLIB)
     compileOnly(projectOrArtifact(":inspection:inspection"))
     compileOnly(project(":compose:runtime:runtime"))
     compileOnly(project(":compose:ui:ui"))
     compileOnly(project(":compose:ui:ui-tooling"))
+    androidTestImplementation(KOTLIN_COROUTINES_ANDROID)
+    androidTestImplementation(project(":compose:ui:ui-tooling"))
+    androidTestImplementation(project(":compose:material:material"))
+    androidTestImplementation(project(":inspection:inspection-testing"))
     androidTestImplementation(ANDROIDX_TEST_RUNNER)
     androidTestImplementation(ANDROIDX_TEST_EXT_JUNIT)
     androidTestImplementation(TRUTH)
