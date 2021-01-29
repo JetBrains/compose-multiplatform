@@ -61,7 +61,7 @@ class ResourcesTest {
         var bitmapDrawable: BitmapDrawable? = null
         var imageBitmap: ImageBitmap? = null
         rule.setContent {
-            val resource = AmbientContext.current.resources
+            val resource = LocalContext.current.resources
             bitmapDrawable = resource.getDrawable(R.drawable.loaded_image, null) as BitmapDrawable
             imageBitmap = imageResource(R.drawable.loaded_image)
         }
