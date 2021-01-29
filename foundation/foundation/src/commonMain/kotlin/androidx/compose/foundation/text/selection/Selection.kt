@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.selection
+package androidx.compose.foundation.text.selection
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.text.ExperimentalTextApi
@@ -26,7 +26,7 @@ import androidx.compose.ui.text.style.ResolvedTextDirection
  */
 @Immutable
 @OptIn(ExperimentalTextApi::class)
-data class Selection(
+internal data class Selection(
     /**
      * Information about the start of the selection.
      */
@@ -51,7 +51,7 @@ data class Selection(
      * Contains information about an anchor (start/end) of selection.
      */
     @Immutable
-    data class AnchorInfo(
+    internal data class AnchorInfo(
         /**
          * Text direction of the character in selection edge.
          */

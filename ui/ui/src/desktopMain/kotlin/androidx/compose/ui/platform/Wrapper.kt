@@ -40,15 +40,13 @@ internal fun DesktopOwner.setContent(
     val composition = Composition(root, DesktopUiApplier(root), parent ?: container.recomposer)
     composition.setContent {
         ProvideDesktopAmbients(this) {
-            DesktopSelectionContainer(content)
+            content()
         }
     }
 
     keyboard?.setShortcut(copyToClipboardKeySet) {
-        selectionManager.recentManager?.let { selector ->
-            selector.getSelectedText()?.let {
-                clipboardManager.setText(it)
-            }
+        selectionTracker.getSelectedText?.invoke()?.let {
+            clipboardManager.setText(it)
         }
     }
 
@@ -59,7 +57,7 @@ internal fun DesktopOwner.setContent(
 private fun ProvideDesktopAmbients(owner: DesktopOwner, content: @Composable () -> Unit) {
     Providers(
         DesktopOwnersAmbient provides owner.container,
-        SelectionManagerTrackerAmbient provides owner.selectionManager
+        SelectionTrackerAmbient provides owner.selectionTracker
     ) {
         ProvideCommonAmbients(
             owner = owner,

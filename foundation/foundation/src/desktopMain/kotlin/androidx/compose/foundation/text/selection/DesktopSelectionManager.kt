@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,14 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.platform
+package androidx.compose.foundation.text.selection
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.selection.Selectable
-import androidx.compose.ui.selection.Selection
-import androidx.compose.ui.selection.SelectionRegistrarImpl
-import androidx.compose.ui.selection.getCurrentSelectedText
-import androidx.compose.ui.selection.merge
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.platform.ClipboardManager
 
 @OptIn(ExperimentalTextApi::class)
 internal class DesktopSelectionManager(private val selectionRegistrar: SelectionRegistrarImpl) {

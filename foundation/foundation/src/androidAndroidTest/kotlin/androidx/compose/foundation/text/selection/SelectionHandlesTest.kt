@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,28 +14,38 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.selection
+package androidx.compose.foundation.text.selection
 
+import android.graphics.Bitmap
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
+import android.view.PixelCopy
+import android.view.View
+import android.view.ViewGroup
+import android.view.ViewTreeObserver
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.TestActivity
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.setContent
-import androidx.compose.ui.runOnUiThreadIR
-import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.style.ResolvedTextDirection
-import androidx.compose.ui.waitAndScreenShot
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.mock
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @MediumTest
@@ -44,7 +54,7 @@ import java.util.concurrent.TimeUnit
 class SelectionHandlesTest {
     @Suppress("DEPRECATION")
     @get:Rule
-    val rule = androidx.test.rule.ActivityTestRule<TestActivity>(TestActivity::class.java)
+    val rule = androidx.test.rule.ActivityTestRule(TestActivity::class.java)
     private lateinit var activity: TestActivity
 
     private val HANDLE_COLOR = Color(0xFF4286F4)
@@ -212,4 +222,101 @@ class SelectionHandlesTest {
             isHandleLtrDirection(direction = ResolvedTextDirection.Rtl, areHandlesCrossed = true)
         ).isTrue()
     }
+}
+
+@Suppress("DEPRECATION")
+// We only need this because IR compiler doesn't like converting lambdas to Runnables
+private fun androidx.test.rule.ActivityTestRule<*>.runOnUiThreadIR(block: () -> Unit) {
+    val runnable: Runnable = object : Runnable {
+        override fun run() {
+            block()
+        }
+    }
+    runOnUiThread(runnable)
+}
+
+@Suppress("DEPRECATION")
+fun androidx.test.rule.ActivityTestRule<*>.findAndroidComposeView(): ViewGroup {
+    val contentViewGroup = activity.findViewById<ViewGroup>(android.R.id.content)
+    return findAndroidComposeView(contentViewGroup)!!
+}
+
+fun findAndroidComposeView(parent: ViewGroup): ViewGroup? {
+    for (index in 0 until parent.childCount) {
+        val child = parent.getChildAt(index)
+        if (child is ViewGroup) {
+            if (child is ComposeView)
+                return child
+            else {
+                val composeView = findAndroidComposeView(child)
+                if (composeView != null) {
+                    return composeView
+                }
+            }
+        }
+    }
+    return null
+}
+
+@Suppress("DEPRECATION")
+@RequiresApi(Build.VERSION_CODES.O)
+fun androidx.test.rule.ActivityTestRule<*>.waitAndScreenShot(
+    forceInvalidate: Boolean = true
+): Bitmap = waitAndScreenShot(findAndroidComposeView(), forceInvalidate)
+
+class DrawCounterListener(private val view: View) :
+    ViewTreeObserver.OnPreDrawListener {
+    val latch = CountDownLatch(5)
+
+    override fun onPreDraw(): Boolean {
+        latch.countDown()
+        if (latch.count > 0) {
+            view.postInvalidate()
+        } else {
+            view.viewTreeObserver.removeOnPreDrawListener(this)
+        }
+        return true
+    }
+}
+
+@Suppress("DEPRECATION")
+@RequiresApi(Build.VERSION_CODES.O)
+fun androidx.test.rule.ActivityTestRule<*>.waitAndScreenShot(
+    view: View,
+    forceInvalidate: Boolean = true
+): Bitmap {
+    val flushListener = DrawCounterListener(view)
+    val offset = intArrayOf(0, 0)
+    var handler: Handler? = null
+    runOnUiThread {
+        view.getLocationInWindow(offset)
+        if (forceInvalidate) {
+            view.viewTreeObserver.addOnPreDrawListener(flushListener)
+            view.invalidate()
+        }
+        handler = Handler(Looper.getMainLooper())
+    }
+
+    if (forceInvalidate) {
+        assertTrue("Drawing latch timed out", flushListener.latch.await(1, TimeUnit.SECONDS))
+    }
+    val width = view.width
+    val height = view.height
+
+    val dest =
+        Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+    val srcRect = android.graphics.Rect(0, 0, width, height)
+    srcRect.offset(offset[0], offset[1])
+    val latch = CountDownLatch(1)
+    var copyResult = 0
+    val onCopyFinished = object : PixelCopy.OnPixelCopyFinishedListener {
+        override fun onPixelCopyFinished(result: Int) {
+            copyResult = result
+            latch.countDown()
+        }
+    }
+    PixelCopy.request(activity.window, srcRect, dest, onCopyFinished, handler!!)
+    assertTrue("Pixel copy latch timed out", latch.await(1, TimeUnit.SECONDS))
+    assertEquals(PixelCopy.SUCCESS, copyResult)
+    return dest
 }

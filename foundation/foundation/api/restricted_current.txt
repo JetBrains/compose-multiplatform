@@ -612,10 +612,38 @@ package androidx.compose.foundation.text.selection {
   public final class MultiWidgetSelectionDelegateKt {
   }
 
+  public final class SelectionContainerKt {
+    method @androidx.compose.runtime.Composable public static void DisableSelection(kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static void SelectionContainer(optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+  }
+
+  public final class SelectionHandlesKt {
+  }
+
+  public final class SelectionManagerKt {
+  }
+
+  public final class SelectionRegistrarKt {
+  }
+
+  public final class SimpleLayoutKt {
+  }
+
   public final class TextFieldSelectionDelegateKt {
   }
 
   public final class TextFieldSelectionManagerKt {
+  }
+
+  @androidx.compose.runtime.Immutable public final class TextSelectionColors {
+    method public long getBackgroundColor-0d7_KjU();
+    method public long getHandleColor-0d7_KjU();
+    property public final long backgroundColor;
+    property public final long handleColor;
+  }
+
+  public final class TextSelectionColorsKt {
+    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.foundation.text.selection.TextSelectionColors> getAmbientTextSelectionColors();
   }
 
   public final class TextSelectionDelegateKt {

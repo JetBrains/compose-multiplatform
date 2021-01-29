@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.selection
+package androidx.compose.foundation.text.selection
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.ExperimentalTextApi
 
 /**
  * Provides [Selection] information for a composable to SelectionContainer. Composables who can
  * be selected should subscribe to [SelectionRegistrar] using this interface.
  */
-@ExperimentalTextApi
-interface Selectable {
+
+internal interface Selectable {
     /**
      * Returns [Selection] information for a selectable composable. If no selection can be provided
      * null should be returned.

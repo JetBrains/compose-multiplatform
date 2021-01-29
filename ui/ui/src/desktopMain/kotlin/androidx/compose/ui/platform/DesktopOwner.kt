@@ -156,7 +156,7 @@ internal class DesktopOwner(
 
     override val clipboardManager = DesktopClipboardManager()
 
-    internal val selectionManager = SelectionManagerTracker()
+    internal val selectionTracker = SelectionTracker()
 
     override val textToolbar = DesktopTextToolbar()
 

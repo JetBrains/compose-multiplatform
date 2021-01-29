@@ -52,8 +52,8 @@ import androidx.compose.ui.platform.AmbientFontLoader
 import androidx.compose.ui.platform.AmbientHapticFeedback
 import androidx.compose.ui.platform.AmbientTextInputService
 import androidx.compose.ui.platform.AmbientTextToolbar
-import androidx.compose.ui.selection.AmbientTextSelectionColors
-import androidx.compose.ui.selection.SimpleLayout
+import androidx.compose.foundation.text.selection.AmbientTextSelectionColors
+import androidx.compose.foundation.text.selection.SimpleLayout
 import androidx.compose.ui.semantics.copyText
 import androidx.compose.ui.semantics.cutText
 import androidx.compose.ui.semantics.disabled
