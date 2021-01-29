@@ -1,4 +1,5 @@
 [![official project](http://jb.gg/badges/official.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
+[![Latest version](https://img.shields.io/github/tag/JetBrains/compose-jb.svg?color=1081c2)](https://github.com/JetBrains/compose-jb/tags)
 # Compose for Desktop, by JetBrains
 ![](artwork/readme/apps.png)
 Compose Kotlin UI framework port for desktop platforms (macOS, Linux, Windows), components outside of the core Compose repository
