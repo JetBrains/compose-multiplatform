@@ -250,13 +250,13 @@ fun rememberBackdropScaffoldState(
  * @param stickyFrontLayer Whether the front layer should stick to the height of the back layer.
  * @param backLayerBackgroundColor The background color of the back layer.
  * @param backLayerContentColor The preferred content color provided by the back layer to its
- * children. Defaults to the matching `onFoo` color for [backLayerBackgroundColor], or if that
+ * children. Defaults to the matching content color for [backLayerBackgroundColor], or if that
  * is not a color from the theme, this will keep the same content color set above the back layer.
  * @param frontLayerShape The shape of the front layer.
  * @param frontLayerElevation The elevation of the front layer.
  * @param frontLayerBackgroundColor The background color of the front layer.
  * @param frontLayerContentColor The preferred content color provided by the back front to its
- * children. Defaults to the matching `onFoo` color for [frontLayerBackgroundColor], or if that
+ * children. Defaults to the matching content color for [frontLayerBackgroundColor], or if that
  * is not a color from the theme, this will keep the same content color set above the front layer.
  * @param frontLayerScrimColor The color of the scrim applied to the front layer when the back
  * layer is revealed. If you set this to `Color.Transparent`, then a scrim will not be applied
