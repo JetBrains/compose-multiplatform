@@ -425,11 +425,12 @@ class Transition<S> internal constructor(
         }
 
         @PublishedApi
+        @Suppress("ControlFlowWithEmptyBody")
         // This gets called *during* composition
         internal fun updateInitialAndTargetValue(initialValue: T, targetValue: T) {
             this.targetValue = targetValue
             if (animation.initialValue == initialValue && animation.targetValue == targetValue) {
-                return
+                // TODO(b/178811102): we should be able to return early here.
             }
             updateAnimation(initialValue)
         }
