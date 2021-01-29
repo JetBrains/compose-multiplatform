@@ -9,9 +9,7 @@ import org.gradle.api.tasks.*
 import org.gradle.jvm.tasks.Jar
 import org.jetbrains.compose.desktop.application.dsl.Application
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.compose.desktop.application.tasks.AbstractJLinkTask
-import org.jetbrains.compose.desktop.application.tasks.AbstractJPackageTask
-import org.jetbrains.compose.desktop.application.tasks.AbstractRunDistributableTask
+import org.jetbrains.compose.desktop.application.tasks.*
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import java.io.File
@@ -69,12 +67,33 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
         }
 
         val packageFormats = app.nativeDistributions.targetFormats.map { targetFormat ->
-            tasks.composeTask<AbstractJPackageTask>(
+            val packageFormat = tasks.composeTask<AbstractJPackageTask>(
                 taskName("package", app, targetFormat.name),
                 args = listOf(targetFormat)
             ) {
                 configurePackagingTask(app, createAppImage = createDistributable)
             }
+
+            if (targetFormat.isCompatibleWith(OS.MacOS)) {
+                check(targetFormat == TargetFormat.Dmg || targetFormat == TargetFormat.Pkg) {
+                    "Unexpected target format for MacOS: $targetFormat"
+                }
+
+                val upload = tasks.composeTask<AbstractUploadAppForNotarizationTask>(
+                    taskName("notarize", app, targetFormat.name),
+                    args = listOf(targetFormat)
+                ) {
+                    configureUploadForNotarizationTask(app, packageFormat, targetFormat)
+                }
+
+                tasks.composeTask<AbstractCheckNotarizationStatusTask>(
+                    taskName("checkNotarizationStatus", app, targetFormat.name)
+                ) {
+                    configureCheckNotarizationStatusTask(app, upload)
+                }
+            }
+
+            packageFormat
         }
 
         val packageAll = tasks.composeTask<DefaultTask>(taskName("package", app)) {
@@ -139,6 +158,28 @@ internal fun AbstractJPackageTask.configurePackagingTask(
     launcherMainClass.set(provider { app.mainClass })
     launcherJvmArgs.set(provider { app.jvmArgs })
     launcherArgs.set(provider { app.args })
+}
+
+internal fun AbstractUploadAppForNotarizationTask.configureUploadForNotarizationTask(
+    app: Application,
+    packageFormat: TaskProvider<AbstractJPackageTask>,
+    targetFormat: TargetFormat
+) {
+    dependsOn(packageFormat)
+    inputDir.set(packageFormat.flatMap { it.destinationDir })
+    username.set(provider { app.nativeDistributions.macOS.notarization.username })
+    password.set(provider { app.nativeDistributions.macOS.notarization.password })
+    macBundleId.set(provider { app.nativeDistributions.macOS.packageIdentifier })
+    requestIDFile.set(project.layout.buildDirectory.file("compose/notarization/${app.name}-${targetFormat.id}-request-id.txt"))
+}
+
+internal fun AbstractCheckNotarizationStatusTask.configureCheckNotarizationStatusTask(
+    app: Application,
+    uploadTask: Provider<AbstractUploadAppForNotarizationTask>
+) {
+    requestIDFile.set(uploadTask.flatMap { it.requestIDFile })
+    username.set(provider { app.nativeDistributions.macOS.notarization.username })
+    password.set(provider { app.nativeDistributions.macOS.notarization.password })
 }
 
 internal fun AbstractJPackageTask.configurePlatformSettings(app: Application) {

@@ -308,13 +308,7 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     override fun checkResult(result: ExecResult) {
         super.checkResult(result)
-
-        val finalLocation = destinationDir.ioFile.let { destinationDir ->
-            when (targetFormat) {
-                TargetFormat.AppImage -> destinationDir
-                else -> destinationDir.walk().first { it.isFile && it.name.endsWith(targetFormat.fileExt) }
-            }
-        }
-        logger.lifecycle("The distribution is written to ${finalLocation.canonicalPath}")
+        val outputFile = findOutputFileOrDir(destinationDir.ioFile, targetFormat)
+        logger.lifecycle("The distribution is written to ${outputFile.canonicalPath}")
     }
 }

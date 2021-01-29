@@ -1,5 +1,7 @@
 package org.jetbrains.compose.desktop.application.internal
 
+import org.gradle.api.tasks.Internal
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import java.io.File
 
 internal enum class OS(val id: String) {
@@ -55,7 +57,18 @@ internal object MacUtils {
     val security: File by lazy {
         File("/usr/bin/security").checkExistingFile()
     }
+
+    val xcrun: File by lazy {
+        File("/usr/bin/xcrun").checkExistingFile()
+    }
 }
+
+@Internal
+internal fun findOutputFileOrDir(dir: File, targetFormat: TargetFormat): File =
+    when (targetFormat) {
+        TargetFormat.AppImage -> dir
+        else -> dir.walk().first { it.isFile && it.name.endsWith(targetFormat.fileExt) }
+    }
 
 internal fun File.checkExistingFile(): File =
     apply {

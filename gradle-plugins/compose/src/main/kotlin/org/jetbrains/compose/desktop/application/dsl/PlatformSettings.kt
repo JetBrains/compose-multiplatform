@@ -13,8 +13,8 @@ abstract class PlatformSettings (objects: ObjectFactory) {
 open class MacOSPlatformSettings @Inject constructor(objects: ObjectFactory): PlatformSettings(objects) {
     var packageIdentifier: String? = null
     var packageName: String? = null
-    val signing: MacOSSigningSettings = MacOSSigningSettings()
 
+    val signing: MacOSSigningSettings = MacOSSigningSettings()
     private var isSignInitialized = false
     fun signing(fn: Action<MacOSSigningSettings>) {
         // enable sign if it the corresponding block is present in DSL
@@ -23,6 +23,11 @@ open class MacOSPlatformSettings @Inject constructor(objects: ObjectFactory): Pl
             signing.sign = true
         }
         fn.execute(signing)
+    }
+
+    val notarization: MacOSNotarizationSettings = MacOSNotarizationSettings()
+    fun notarization(fn: Action<MacOSNotarizationSettings>) {
+        fn.execute(notarization)
     }
 }
 
@@ -33,6 +38,11 @@ open class MacOSSigningSettings {
     var bundlePrefix: String? = null
     var signPrefix: String? = null
     var signIdentity: String? = null
+}
+
+open class MacOSNotarizationSettings {
+    var username: String? = null
+    var password: String? = null
 }
 
 open class LinuxPlatformSettings @Inject constructor(objects: ObjectFactory): PlatformSettings(objects) {
