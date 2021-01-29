@@ -15,7 +15,6 @@ package androidx.compose.ui.util {
   }
 
   public final class JvmMiscHelpersKt {
-    method public static StringBuilder deleteAt(StringBuilder, int index);
     method public static String format(String, java.lang.Object?... args);
   }
 
