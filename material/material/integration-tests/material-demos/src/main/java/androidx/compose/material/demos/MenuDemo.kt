@@ -76,21 +76,19 @@ fun MenuInstance(modifier: Modifier = Modifier) {
 
     var expanded by remember { mutableStateOf(false) }
 
-    val iconButton = @Composable {
+    Box(modifier) {
         IconButton(onClick = { expanded = true }) {
             Icon(Icons.Default.MoreVert, null)
         }
-    }
-    DropdownMenu(
-        expanded = expanded,
-        onDismissRequest = { expanded = false },
-        toggle = iconButton,
-        dropdownOffset = DpOffset(24.dp, 0.dp),
-        toggleModifier = modifier
-    ) {
-        options.forEach {
-            DropdownMenuItem(onClick = {}) {
-                Text(it)
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            offset = DpOffset(24.dp, 0.dp),
+        ) {
+            options.forEach {
+                DropdownMenuItem(onClick = {}) {
+                    Text(it)
+                }
             }
         }
     }

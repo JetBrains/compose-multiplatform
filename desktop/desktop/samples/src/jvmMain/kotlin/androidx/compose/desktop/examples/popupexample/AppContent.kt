@@ -403,15 +403,13 @@ fun ContextMenu() {
         color = Color(255, 255, 255, 40),
         shape = RoundedCornerShape(4.dp)
     ) {
+        TextBox(
+            text = "Selected: ${items[selectedIndex.value]}",
+            modifier = Modifier
+                .height(35.dp)
+                .padding(start = 4.dp, end = 4.dp)
+        )
         DropdownMenu(
-            toggle = {
-                TextBox(
-                    text = "Selected: ${items[selectedIndex.value]}",
-                    modifier = Modifier
-                        .height(35.dp)
-                        .padding(start = 4.dp, end = 4.dp)
-                )
-            },
             expanded = showMenu.value,
             onDismissRequest = { showMenu.value = false }
         ) {
