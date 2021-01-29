@@ -411,7 +411,12 @@ class AndroidXPlugin : Plugin<Project> {
                     val target = dep.target
                     val version = target.version
                     // Enforce the ban on declaring dependencies with version ranges.
-                    if (version != null && Version.isDependencyRange(version)) {
+                    // Note: In playground, this ban is exempted to allow unresolvable prebuilts
+                    // to automatically get bumped to snapshot versions via version range
+                    // substitution.
+                    if (version != null && Version.isDependencyRange(version) &&
+                        project.rootProject.rootDir == project.getSupportRootFolder()
+                    ) {
                         throw IllegalArgumentException(
                             "Dependency ${dep.target} declares its version as " +
                                 "version range ${dep.target.version} however the use of " +
