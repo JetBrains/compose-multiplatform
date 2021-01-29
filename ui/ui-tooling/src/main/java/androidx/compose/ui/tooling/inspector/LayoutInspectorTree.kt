@@ -23,11 +23,12 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutInfo
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.OwnedLayer
-import androidx.compose.ui.tooling.Group
-import androidx.compose.ui.tooling.NodeGroup
-import androidx.compose.ui.tooling.ParameterInformation
 import androidx.compose.ui.tooling.R
-import androidx.compose.ui.tooling.asTree
+import androidx.compose.ui.tooling.data.Group
+import androidx.compose.ui.tooling.data.NodeGroup
+import androidx.compose.ui.tooling.data.ParameterInformation
+import androidx.compose.ui.tooling.data.UiToolingDataApi
+import androidx.compose.ui.tooling.data.asTree
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.toSize
@@ -246,13 +247,14 @@ class LayoutInspectorTree {
         return out
     }
 
-    @OptIn(InternalComposeApi::class)
+    @OptIn(InternalComposeApi::class, UiToolingDataApi::class)
     private fun convert(table: CompositionData): MutableInspectorNode {
         val fakeParent = newNode()
         addToParent(fakeParent, listOf(convert(table.asTree())), buildFakeChildNodes = true)
         return fakeParent
     }
 
+    @OptIn(UiToolingDataApi::class)
     private fun convert(group: Group): MutableInspectorNode {
         val children = convertChildren(group)
         val parent = parse(group)
@@ -260,6 +262,7 @@ class LayoutInspectorTree {
         return parent
     }
 
+    @OptIn(UiToolingDataApi::class)
     private fun convertChildren(group: Group): List<MutableInspectorNode> {
         if (group.children.isEmpty()) {
             return emptyList()
@@ -314,6 +317,7 @@ class LayoutInspectorTree {
         parentNode.id = if (parentNode.id == 0L && nodeId != null) nodeId else parentNode.id
     }
 
+    @OptIn(UiToolingDataApi::class)
     private fun parse(group: Group): MutableInspectorNode {
         val node = newNode()
         node.id = getRenderNode(group)
@@ -333,6 +337,7 @@ class LayoutInspectorTree {
         return node
     }
 
+    @OptIn(UiToolingDataApi::class)
     private fun parsePosition(group: Group, node: MutableInspectorNode) {
         val box = group.box
         node.top = box.top
@@ -341,6 +346,7 @@ class LayoutInspectorTree {
         node.width = box.right - box.left
     }
 
+    @OptIn(UiToolingDataApi::class)
     private fun parseLayoutInfo(group: Group, node: MutableInspectorNode) {
         val layoutInfo = (group as? NodeGroup)?.node as? LayoutInfo ?: return
         node.layoutNodes.add(layoutInfo)
@@ -373,6 +379,7 @@ class LayoutInspectorTree {
     private fun markUnwanted(node: MutableInspectorNode): MutableInspectorNode =
         node.apply { markUnwanted() }
 
+    @OptIn(UiToolingDataApi::class)
     private fun parseCallLocation(group: Group, node: MutableInspectorNode): Boolean {
         val location = group.location ?: return false
         val fileName = location.sourceFile ?: return false
@@ -384,6 +391,7 @@ class LayoutInspectorTree {
         return true
     }
 
+    @OptIn(UiToolingDataApi::class)
     private fun getRenderNode(group: Group): Long =
         group.modifierInfo.asSequence()
             .map { it.extra }
@@ -391,14 +399,17 @@ class LayoutInspectorTree {
             .map { it.layerId }
             .firstOrNull() ?: 0
 
+    @OptIn(UiToolingDataApi::class)
     private fun addParameters(parameters: List<ParameterInformation>, node: MutableInspectorNode) =
         parameters.forEach { addParameter(it, node) }
 
+    @OptIn(UiToolingDataApi::class)
     private fun addParameter(parameter: ParameterInformation, node: MutableInspectorNode) {
         val castedValue = castValue(parameter)
         node.parameters.add(RawParameter(parameter.name, castedValue))
     }
 
+    @OptIn(UiToolingDataApi::class)
     private fun castValue(parameter: ParameterInformation): Any? {
         val value = parameter.value ?: return null
         if (parameter.inlineClass == null) return value

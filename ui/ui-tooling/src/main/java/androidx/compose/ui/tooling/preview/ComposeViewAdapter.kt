@@ -41,10 +41,11 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalFontLoader
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.tooling.CompositionDataRecord
-import androidx.compose.ui.tooling.Group
 import androidx.compose.ui.tooling.Inspectable
-import androidx.compose.ui.tooling.SourceLocation
-import androidx.compose.ui.tooling.asTree
+import androidx.compose.ui.tooling.data.Group
+import androidx.compose.ui.tooling.data.SourceLocation
+import androidx.compose.ui.tooling.data.UiToolingDataApi
+import androidx.compose.ui.tooling.data.asTree
 import androidx.compose.ui.tooling.preview.animation.PreviewAnimationClock
 import androidx.compose.ui.unit.IntRect
 import androidx.lifecycle.Lifecycle
@@ -67,6 +68,7 @@ private val emptyContent: @Composable () -> Unit = @Composable {}
  *
  * @suppress
  */
+@OptIn(UiToolingDataApi::class)
 data class ViewInfo(
     val fileName: String,
     val lineNumber: Int,
@@ -105,6 +107,7 @@ data class ViewInfo(
  * @suppress
  */
 @Suppress("unused")
+@OptIn(UiToolingDataApi::class)
 internal class ComposeViewAdapter : FrameLayout {
     private val TAG = "ComposeViewAdapter"
 

@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.tooling
+package androidx.compose.ui.tooling.data
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.LayoutModifier
@@ -36,6 +36,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@UiToolingDataApi
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class ModifierInfoTest : ToolingTest() {

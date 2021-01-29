@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.tooling
+package androidx.compose.ui.tooling.data
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -44,6 +44,7 @@ import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
+@UiToolingDataApi
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class InspectableTests : ToolingTest() {
@@ -373,7 +374,7 @@ class InspectableTests : ToolingTest() {
         activity.runOnUiThread { }
 
         assertFalse(tables.isNullOrEmpty())
-        assertTrue(tables!!.size > 1)
+        assertTrue(tables.size > 1)
 
         val calls = tables.flatMap { table ->
             if (!table.isEmpty) table.asTree().asList() else emptyList()
@@ -410,6 +411,7 @@ fun ThreeDefaultParameters(a: Int = 1, b: Int = 2, c: Int = 3) {
 }
 
 // BFS
+@UiToolingDataApi
 internal fun Group.firstOrNull(predicate: (Group) -> Boolean): Group? {
     val stack = mutableListOf(this)
     while (stack.isNotEmpty()) {
@@ -420,6 +422,7 @@ internal fun Group.firstOrNull(predicate: (Group) -> Boolean): Group? {
     return null
 }
 
+@UiToolingDataApi
 internal fun Group.asList(): List<Group> {
     val result = mutableListOf<Group>()
     val stack = mutableListOf(this)

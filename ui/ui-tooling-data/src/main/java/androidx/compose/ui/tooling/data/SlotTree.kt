@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.tooling
+package androidx.compose.ui.tooling.data
 
 import androidx.compose.runtime.CompositionData
 import androidx.compose.runtime.CompositionGroup
@@ -30,6 +30,7 @@ import kotlin.math.roundToInt
 /**
  * A group in the slot table. Represents either a call or an emitted node.
  */
+@UiToolingDataApi
 sealed class Group(
     /**
      * The key is the key generated for the group
@@ -72,6 +73,7 @@ sealed class Group(
     open val parameters: List<ParameterInformation> get() = emptyList()
 }
 
+@UiToolingDataApi
 data class ParameterInformation(
     val name: String,
     val value: Any?,
@@ -85,6 +87,7 @@ data class ParameterInformation(
 /**
  * Source location of the call that produced the call group.
  */
+@UiToolingDataApi
 data class SourceLocation(
     /**
      * A 0 offset line number of the source location.
@@ -125,6 +128,7 @@ data class SourceLocation(
 /**
  * A group that represents the invocation of a component
  */
+@UiToolingDataApi
 class CallGroup(
     key: Any?,
     name: String?,
@@ -138,6 +142,7 @@ class CallGroup(
 /**
  * A group that represents an emitted node
  */
+@UiToolingDataApi
 class NodeGroup(
     key: Any?,
 
@@ -154,6 +159,7 @@ class NodeGroup(
 /**
  * A key that has being joined together to form one key.
  */
+@UiToolingDataApi
 data class JoinedKey(val left: Any?, val right: Any?)
 
 internal val emptyBox = IntRect(0, 0, 0, 0)
@@ -171,6 +177,7 @@ private fun MatchResult.callName() = groupValues[8]
 
 private class SourceLocationInfo(val lineNumber: Int?, val offset: Int?, val length: Int?)
 
+@UiToolingDataApi
 private class SourceInformationContext(
     val name: String?,
     val sourceFile: String?,
@@ -318,6 +325,7 @@ private fun parseParameters(parameters: String): List<Parameter> {
     }
 }
 
+@UiToolingDataApi
 private fun sourceInformationContextOf(
     information: String,
     parent: SourceInformationContext?
@@ -425,6 +433,7 @@ private fun sourceInformationContextOf(
 /**
  * Iterate the slot table and extract a group tree that corresponds to the content of the table.
  */
+@UiToolingDataApi
 private fun CompositionGroup.getGroup(parentContext: SourceInformationContext?): Group {
     val key = key
     val context = sourceInfo?.let { sourceInformationContextOf(it, parentContext) }
@@ -493,6 +502,7 @@ private fun boundsOfLayoutNode(node: LayoutInfo): IntRect {
  * Return a group tree for for the slot table that represents the entire content of the slot
  * table.
  */
+@UiToolingDataApi
 fun CompositionData.asTree(): Group = compositionGroups.first().getGroup(null)
 
 internal fun IntRect.union(other: IntRect): IntRect {
@@ -506,6 +516,7 @@ internal fun IntRect.union(other: IntRect): IntRect {
     )
 }
 
+@UiToolingDataApi
 private fun keyPosition(key: Any?): String? = when (key) {
     is String -> key
     is JoinedKey ->
@@ -521,6 +532,7 @@ private const val changedFieldName = "${internalFieldPrefix}changed"
 private const val jacocoDataField = "${parameterPrefix}jacoco"
 private const val recomposeScopeNameSuffix = ".RecomposeScopeImpl"
 
+@UiToolingDataApi
 private fun extractParameterInfo(
     data: List<Any?>,
     context: SourceInformationContext?
@@ -595,7 +607,10 @@ private const val STABLE_BITS = 0b100
 /**
  * The source position of the group extracted from the key, if one exists for the group.
  */
-val Group.position: String? get() = keyPosition(key)
+@UiToolingDataApi
+val Group.position: String?
+    @UiToolingDataApi
+    get() = keyPosition(key)
 
 private fun Class<*>.accessibleField(name: String): Field? = declaredFields.firstOrNull {
     it.name == name
