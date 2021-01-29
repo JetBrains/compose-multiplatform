@@ -9,7 +9,7 @@ fun <T, K> crossfade(): @Composable (currentChild: T, currentKey: K, children: @
 
 @Composable
 private fun <T, K> KeyedCrossfade(currentChild: T, currentKey: K, children: @Composable (T, K) -> Unit) {
-    androidx.compose.animation.Crossfade(current = ChildWrapper(currentChild, currentKey)) {
+    androidx.compose.animation.Crossfade(ChildWrapper(currentChild, currentKey)) {
         children(it.child, it.key)
     }
 }

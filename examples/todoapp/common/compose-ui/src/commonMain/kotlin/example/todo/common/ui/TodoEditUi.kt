@@ -31,7 +31,10 @@ fun TodoEditContent(component: TodoEdit) {
             title = { Text("Edit todo") },
             navigationIcon = {
                 IconButton(onClick = component::onCloseClicked) {
-                    Icon(Icons.Default.ArrowBack)
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = null
+                    )
                 }
             }
         )
