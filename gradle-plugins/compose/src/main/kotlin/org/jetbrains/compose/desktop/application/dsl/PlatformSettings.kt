@@ -3,7 +3,8 @@ package org.jetbrains.compose.desktop.application.dsl
 import org.gradle.api.Action
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
-import java.io.File
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import javax.inject.Inject
 
 abstract class PlatformSettings (objects: ObjectFactory) {
@@ -11,38 +12,56 @@ abstract class PlatformSettings (objects: ObjectFactory) {
 }
 
 open class MacOSPlatformSettings @Inject constructor(objects: ObjectFactory): PlatformSettings(objects) {
-    var packageIdentifier: String? = null
     var packageName: String? = null
 
-    val signing: MacOSSigningSettings = MacOSSigningSettings()
-    private var isSignInitialized = false
+    /**
+     * An application's unique identifier across Apple's ecosystem.
+     *
+     * May only contain alphanumeric characters (A-Z,a-z,0-9), hyphen (-) and period (.) characters
+     *
+     * Use of a reverse DNS notation (e.g. com.mycompany.myapp) is recommended.
+     */
+    var bundleID: String? = null
+
+    internal var signSettings: MacOSSigningSettings? = null
     fun signing(fn: Action<MacOSSigningSettings>) {
-        // enable sign if it the corresponding block is present in DSL
-        if (!isSignInitialized) {
-            isSignInitialized = true
-            signing.sign = true
+        check(signSettings == null) { "Signing is already configured" }
+        signSettings = MacOSSigningSettings().also {
+            fn.execute(it)
+            checkNotNull(it.identity)
         }
-        fn.execute(signing)
     }
 
-    val notarization: MacOSNotarizationSettings = MacOSNotarizationSettings()
+    internal var notarizationSettings: MacOSNotarizationSettings? = null
     fun notarization(fn: Action<MacOSNotarizationSettings>) {
-        fn.execute(notarization)
+        check(notarizationSettings == null) { "Notarization is already configured" }
+        notarizationSettings = MacOSNotarizationSettings().also {
+            fn.execute(it)
+            checkNotNull(it.appleID)
+            checkNotNull(it.password)
+        }
     }
 }
 
 open class MacOSSigningSettings {
-    var sign: Boolean = false
-    var keychain: File? = null
-    @Deprecated("bundlePrefix is Deprecated", ReplaceWith("signPrefix"))
-    var bundlePrefix: String? = null
+    @get:Input
+    lateinit var identity: String
+
+    @get:Input
+    @get:Optional
+    var keychain: String? = null
+
+    @get:Input
+    @get:Optional
     var signPrefix: String? = null
-    var signIdentity: String? = null
 }
 
 open class MacOSNotarizationSettings {
-    var username: String? = null
-    var password: String? = null
+    @get:Input
+    lateinit var appleID: String
+
+    @get:Input
+    lateinit var password: String
 }
 
 open class LinuxPlatformSettings @Inject constructor(objects: ObjectFactory): PlatformSettings(objects) {

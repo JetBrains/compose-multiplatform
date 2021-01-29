@@ -167,9 +167,8 @@ internal fun AbstractUploadAppForNotarizationTask.configureUploadForNotarization
 ) {
     dependsOn(packageFormat)
     inputDir.set(packageFormat.flatMap { it.destinationDir })
-    username.set(provider { app.nativeDistributions.macOS.notarization.username })
-    password.set(provider { app.nativeDistributions.macOS.notarization.password })
-    macBundleId.set(provider { app.nativeDistributions.macOS.packageIdentifier })
+    notarizationSettings.set(provider { app.nativeDistributions.macOS.notarizationSettings })
+    macBundleID.set(provider { app.nativeDistributions.macOS.bundleID })
     requestIDFile.set(project.layout.buildDirectory.file("compose/notarization/${app.name}-${targetFormat.id}-request-id.txt"))
 }
 
@@ -178,8 +177,7 @@ internal fun AbstractCheckNotarizationStatusTask.configureCheckNotarizationStatu
     uploadTask: Provider<AbstractUploadAppForNotarizationTask>
 ) {
     requestIDFile.set(uploadTask.flatMap { it.requestIDFile })
-    username.set(provider { app.nativeDistributions.macOS.notarization.username })
-    password.set(provider { app.nativeDistributions.macOS.notarization.password })
+    notarizationSettings.set(provider { app.nativeDistributions.macOS.notarizationSettings })
 }
 
 internal fun AbstractJPackageTask.configurePlatformSettings(app: Application) {
@@ -211,11 +209,8 @@ internal fun AbstractJPackageTask.configurePlatformSettings(app: Application) {
         OS.MacOS -> {
             app.nativeDistributions.macOS.also { mac ->
                 macPackageName.set(provider { mac.packageName })
-                macPackageIdentifier.set(provider { mac.packageIdentifier })
-                macSign.set(provider { mac.signing.sign })
-                macSigningKeyUserName.set(provider { mac.signing.signIdentity })
-                macSigningKeychain.set(project.layout.file(provider { mac.signing.keychain }))
-                macPackageSigningPrefix.set(provider { mac.signing.signPrefix })
+                macBundleID.set(provider { mac.bundleID })
+                macSignSetting.set(provider { mac.signSettings })
                 iconFile.set(mac.iconFile)
             }
         }

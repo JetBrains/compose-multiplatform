@@ -7,6 +7,7 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.gradle.process.ExecOperations
+import org.jetbrains.compose.desktop.application.dsl.MacOSNotarizationSettings
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.*
 import org.jetbrains.compose.desktop.application.internal.MacUtils
@@ -19,7 +20,7 @@ import javax.inject.Inject
 
 abstract class AbstractUploadAppForNotarizationTask @Inject constructor(
     @get:Input
-    val targetFormat: TargetFormat
+    val targetFormat: TargetFormat,
 ) : DefaultTask() {
     @get:Inject
     protected abstract val objects: ObjectFactory
@@ -27,13 +28,11 @@ abstract class AbstractUploadAppForNotarizationTask @Inject constructor(
     protected abstract val execOperations: ExecOperations
 
     @get:Input
-    val username: Property<String?> = objects.nullableProperty()
+    val macBundleID: Property<String?> = objects.nullableProperty()
 
-    @get:Input
-    val password: Property<String?> = objects.nullableProperty()
-
-    @get:Input
-    val macBundleId: Property<String?> = objects.nullableProperty()
+    @get:Nested
+    @get:Optional
+    val notarizationSettings: Property<MacOSNotarizationSettings?> = objects.nullableProperty()
 
     @get:InputDirectory
     val inputDir: DirectoryProperty = objects.directoryProperty()
@@ -47,20 +46,15 @@ abstract class AbstractUploadAppForNotarizationTask @Inject constructor(
 
     @TaskAction
     fun run() {
-        check(username.isPresent) {
-            "Specify a username for notarization using DSL property 'nativeExecutables.macOS.notarization.username'"
-        }
-        check(password.isPresent) {
-            "Specify a password for notarization using DSL property 'nativeExecutables.macOS.notarization.password'"
-        }
-        check(macBundleId.isPresent) {
-            "Specify a unique package identifier using DSL property 'nativeExecutables.macOS.packageIdentifier'"
+        check(macBundleID.isPresent) {
+            "Specify a unique package identifier using DSL property 'nativeExecutables.macOS.bundleID'"
         }
 
+        val bundleId = macBundleID.get()
+        val notarization = validateNotarizationSettings(notarizationSettings)
         val inputFile = findOutputFileOrDir(inputDir.ioFile, targetFormat)
         val file = inputFile.checkExistingFile()
 
-        val bundleId = macBundleId.get()
         logger.quiet("Uploading '${file.name}' for notarization (package id: '$bundleId')")
         val (res, output) = ByteArrayOutputStream().use { baos ->
             PrintStream(baos).use { ps ->
@@ -70,8 +64,8 @@ abstract class AbstractUploadAppForNotarizationTask @Inject constructor(
                         "altool",
                         "--notarize-app",
                         "--primary-bundle-id", bundleId,
-                        "--username", username.get(),
-                        "--password", password.get(),
+                        "--username", notarization.appleID,
+                        "--password", notarization.password,
                         "--file", file
                     )
                     exec.standardOutput = ps

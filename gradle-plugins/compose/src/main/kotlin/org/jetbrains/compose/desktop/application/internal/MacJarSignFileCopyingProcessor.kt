@@ -1,8 +1,8 @@
 package org.jetbrains.compose.desktop.application.internal
 
-import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.process.ExecOperations
+import org.jetbrains.compose.desktop.application.dsl.MacOSSigningSettings
 import java.io.*
 import java.util.regex.Pattern
 import java.util.zip.ZipEntry
@@ -12,39 +12,34 @@ import java.util.zip.ZipOutputStream
 internal class MacJarSignFileCopyingProcessor(
     private val tempDir: File,
     private val execOperations: ExecOperations,
-    macSign: Property<Boolean?>,
-    macPackageIdentifier: Property<String?>,
-    macPackageSigningPrefix: Property<String?>,
-    macSigningKeyUserName: Property<String?>,
-    macSigningKeychain: RegularFileProperty,
+    macBundleID: Property<String?>,
+    signSettings: MacOSSigningSettings,
 ) : FileCopyingProcessor {
-    private val bundleId = macPackageIdentifier.orNull
-    private val keychainPath = macSigningKeychain.asFile.orNull?.absolutePath
+    private val bundleId = macBundleID.orNull
+    private val keychainPath = signSettings.keychain
     private val signPrefix: String
     private val signKey: String
 
     init {
         check(currentOS == OS.MacOS) { "$currentOS is not compatible with ${this::class.java}" }
-        check(macSign.orNull == true) { "Sign is not enabled" }
         check(bundleId != null) {
-            "Signing requires to specify unique package identifier (e.g. com.mycompany.myapp). Specify an identifier using DSL like so:\n" +
+            "Signing requires to specify unique application's identifier  (e.g. com.mycompany.myapp). Specify an identifier using DSL like so:\n" +
             """|nativeExecutables {
                |  macOS {
-               |      packageIdentifier = "com.mycompany.myapp"
+               |      bundleID = "com.mycompany.myapp"
                |  }
-               |packageIdentifier may only contain alphanumeric characters (A-Z,a-z,0-9), hyphen (-) and period (.) characters}
+               |bundleID may only contain alphanumeric characters (A-Z,a-z,0-9), hyphen (-) and period (.) characters}
                |""".trimMargin()
         }
         check(bundleId.matches("[A-Za-z0-9\\-\\.]+".toRegex())) {
-            "macOS.packageIdentifier may only contain alphanumeric characters (A-Z,a-z,0-9), hyphen (-)" +
+            "bundleID may only contain alphanumeric characters (A-Z,a-z,0-9), hyphen (-)" +
                     " and period (.) characters"
         }
-        signPrefix = macPackageSigningPrefix.orNull
+        signPrefix = signSettings.signPrefix
             ?: (bundleId.substringBeforeLast(".") + ".").takeIf { bundleId.contains('.') }
-            ?: error("Could not infer 'macOS.signing.signPrefix'. Specify explicitly or use reverse DNS notation for packageIdentifier")
+            ?: error("Could not infer 'signPrefix'. Specify explicitly or use reverse DNS notation for bundleID")
 
-        val identity = macSigningKeyUserName.orNull
-        check(identity != null) { "Specify 'macOS.signing.signIdentity'" }
+        val identity = signSettings.identity
 
         val developerIdPrefix = "Developer ID Application: "
         val thirdPartyMacDeveloperPrefix = "3rd Party Mac Developer Application: "
