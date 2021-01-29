@@ -18,8 +18,8 @@ package androidx.compose.ui.platform
 import androidx.compose.animation.core.MonotonicFrameAnimationClock
 import androidx.compose.runtime.BroadcastFrameClock
 import androidx.compose.runtime.Recomposer
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.runtime.snapshots.Snapshot
-import androidx.compose.runtime.staticAmbientOf
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.mouse.MouseScrollEvent
 import androidx.compose.ui.input.pointer.PointerId
@@ -36,7 +36,7 @@ import java.awt.event.KeyEvent
 import java.awt.event.MouseEvent
 import androidx.compose.ui.input.key.KeyEvent as ComposeKeyEvent
 
-internal val DesktopOwnersAmbient = staticAmbientOf<DesktopOwners>()
+internal val DesktopOwnersAmbient = staticCompositionLocalOf<DesktopOwners>()
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class DesktopOwners(

@@ -59,7 +59,7 @@ private fun ProvideDesktopAmbients(owner: DesktopOwner, content: @Composable () 
         DesktopOwnersAmbient provides owner.container,
         SelectionTrackerAmbient provides owner.selectionTracker
     ) {
-        ProvideCommonAmbients(
+        ProvideCommonCompositionLocals(
             owner = owner,
             animationClock = owner.container.animationClock,
             uriHandler = DesktopUriHandler(),

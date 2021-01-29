@@ -17,10 +17,10 @@
 package androidx.compose.foundation.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.AmbientIndication
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.draggable
@@ -31,7 +31,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material.AmbientTextStyle
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -72,14 +72,14 @@ fun PriorityInteractionStateSample() {
                 .fillMaxSize()
                 .clickable(
                     interactionState = interactionState,
-                    indication = AmbientIndication.current()
+                    indication = LocalIndication.current()
                 ) { /* do nothing */ }
                 .then(draggable)
                 .border(BorderStroke(3.dp, color))
                 .padding(3.dp)
         ) {
             Text(
-                text, style = AmbientTextStyle.current.copy(textAlign = TextAlign.Center),
+                text, style = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
                 modifier = Modifier.fillMaxSize().wrapContentSize()
             )
         }
@@ -98,7 +98,7 @@ fun MultipleInteractionStateSample() {
 
     val clickable = Modifier.clickable(
         interactionState = interactionState,
-        indication = AmbientIndication.current()
+        indication = LocalIndication.current()
     ) {
         /* update some business state here */
     }
@@ -136,7 +136,7 @@ fun MultipleInteractionStateSample() {
                 val pressed = Interaction.Pressed in interactionState
                 Text(
                     text = if (pressed) "Pressed" else "Not pressed",
-                    style = AmbientTextStyle.current.copy(textAlign = TextAlign.Center),
+                    style = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
                     modifier = Modifier.fillMaxSize().wrapContentSize()
                 )
             }
@@ -150,14 +150,14 @@ fun MultipleInteractionStateSample() {
                 val dragged = Interaction.Dragged in interactionState
                 Text(
                     text = if (dragged) "Dragged" else "Not dragged",
-                    style = AmbientTextStyle.current.copy(textAlign = TextAlign.Center),
+                    style = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
                     modifier = Modifier.fillMaxSize().wrapContentSize()
                 )
             }
         }
         Text(
             text = text,
-            style = AmbientTextStyle.current.copy(textAlign = TextAlign.Center),
+            style = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
             modifier = Modifier.fillMaxSize().wrapContentSize()
         )
     }

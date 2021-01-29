@@ -51,8 +51,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.AmbientTextInputService
-import androidx.compose.ui.platform.AmbientTextToolbar
+import androidx.compose.ui.platform.LocalTextInputService
+import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.TextToolbarStatus
 import androidx.compose.ui.platform.testTag
@@ -123,7 +123,7 @@ class TextFieldTest {
         rule.setContent {
             val state = remember { mutableStateOf("") }
             Providers(
-                AmbientTextInputService provides inputService
+                LocalTextInputService provides inputService
             ) {
                 BasicTextField(
                     value = state.value,
@@ -162,7 +162,7 @@ class TextFieldTest {
 
         rule.setContent {
             Providers(
-                AmbientTextInputService provides textInputService
+                LocalTextInputService provides textInputService
             ) {
                 TextFieldApp()
             }
@@ -233,7 +233,7 @@ class TextFieldTest {
 
         rule.setContent {
             Providers(
-                AmbientTextInputService provides textInputService
+                LocalTextInputService provides textInputService
             ) {
                 OnlyDigitsApp()
             }
@@ -292,7 +292,7 @@ class TextFieldTest {
         val onTextLayout: (TextLayoutResult) -> Unit = mock()
         rule.setContent {
             Providers(
-                AmbientTextInputService provides textInputService
+                LocalTextInputService provides textInputService
             ) {
                 val state = remember { mutableStateOf("") }
                 BasicTextField(
@@ -615,7 +615,7 @@ class TextFieldTest {
         var toolbar: TextToolbar? = null
 
         rule.setContent {
-            toolbar = AmbientTextToolbar.current
+            toolbar = LocalTextToolbar.current
             BasicTextField(
                 modifier = Modifier.testTag(Tag),
                 value = value,

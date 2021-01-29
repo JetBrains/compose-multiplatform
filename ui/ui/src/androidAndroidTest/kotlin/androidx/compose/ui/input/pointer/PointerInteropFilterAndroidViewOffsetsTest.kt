@@ -26,8 +26,8 @@ import android.widget.FrameLayout
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.unit.dp
@@ -90,7 +90,7 @@ class PointerInteropFilterAndroidViewOffsetsTest {
                 )
                 setPadding(3, 13, 0, 0)
                 setContent {
-                    with(AmbientDensity.current) {
+                    with(LocalDensity.current) {
                         // Box is "three"
                         Box(
                             Modifier.padding(start = (2f / density).dp, top = (12f / density).dp)

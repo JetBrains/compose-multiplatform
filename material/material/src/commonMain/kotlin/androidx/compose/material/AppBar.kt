@@ -86,7 +86,7 @@ fun TopAppBar(
         } else {
             Row(TitleIconModifier, verticalAlignment = Alignment.CenterVertically) {
                 Providers(
-                    AmbientContentAlpha provides ContentAlpha.high,
+                    LocalContentAlpha provides ContentAlpha.high,
                     content = navigationIcon
                 )
             }
@@ -97,11 +97,11 @@ fun TopAppBar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             ProvideTextStyle(value = MaterialTheme.typography.h6) {
-                Providers(AmbientContentAlpha provides ContentAlpha.high, content = title)
+                Providers(LocalContentAlpha provides ContentAlpha.high, content = title)
             }
         }
 
-        Providers(AmbientContentAlpha provides ContentAlpha.medium) {
+        Providers(LocalContentAlpha provides ContentAlpha.medium) {
             Row(
                 Modifier.fillMaxHeight(),
                 horizontalArrangement = Arrangement.End,
@@ -180,7 +180,7 @@ fun BottomAppBar(
     elevation: Dp = BottomAppBarElevation,
     content: @Composable RowScope.() -> Unit
 ) {
-    val fabPlacement = AmbientFabPlacement.current
+    val fabPlacement = LocalFabPlacement.current
     val shape = if (cutoutShape != null && fabPlacement?.isDocked == true) {
         BottomAppBarCutoutShape(cutoutShape, fabPlacement)
     } else {

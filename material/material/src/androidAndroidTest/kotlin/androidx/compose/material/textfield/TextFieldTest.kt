@@ -30,9 +30,9 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.AmbientContentAlpha
-import androidx.compose.material.AmbientContentColor
-import androidx.compose.material.AmbientTextStyle
+import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.LocalContentColor
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
@@ -56,8 +56,8 @@ import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.platform.AmbientTextInputService
-import androidx.compose.ui.platform.AmbientView
+import androidx.compose.ui.platform.LocalTextInputService
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertHeightIsEqualTo
@@ -219,7 +219,7 @@ class TextFieldTest {
         val (focusRequester, parentFocusRequester) = FocusRequester.createRefs()
         lateinit var hostView: View
         rule.setMaterialContent {
-            hostView = AmbientView.current
+            hostView = LocalView.current
             Box {
                 TextField(
                     modifier = Modifier
@@ -250,7 +250,7 @@ class TextFieldTest {
         lateinit var softwareKeyboardController: SoftwareKeyboardController
         lateinit var hostView: View
         rule.setMaterialContent {
-            hostView = AmbientView.current
+            hostView = LocalView.current
             Box {
                 TextField(
                     modifier = Modifier
@@ -615,8 +615,8 @@ class TextFieldTest {
                 placeholder = {
                     Text("placeholder")
                     assertThat(
-                        AmbientContentColor.current.copy(
-                            alpha = AmbientContentAlpha.current
+                        LocalContentColor.current.copy(
+                            alpha = LocalContentAlpha.current
                         )
                     )
                         .isEqualTo(
@@ -624,7 +624,7 @@ class TextFieldTest {
                                 alpha = 0.6f
                             )
                         )
-                    assertThat(AmbientTextStyle.current)
+                    assertThat(LocalTextStyle.current)
                         .isEqualTo(MaterialTheme.typography.subtitle1)
                 }
             )
@@ -764,7 +764,7 @@ class TextFieldTest {
                 label = {},
                 isErrorValue = false,
                 leadingIcon = {
-                    assertThat(AmbientContentColor.current)
+                    assertThat(LocalContentColor.current)
                         .isEqualTo(
                             MaterialTheme.colors.onSurface.copy(
                                 IconColorAlpha
@@ -772,7 +772,7 @@ class TextFieldTest {
                         )
                 },
                 trailingIcon = {
-                    assertThat(AmbientContentColor.current)
+                    assertThat(LocalContentColor.current)
                         .isEqualTo(
                             MaterialTheme.colors.onSurface.copy(
                                 IconColorAlpha
@@ -792,7 +792,7 @@ class TextFieldTest {
                 label = {},
                 isErrorValue = true,
                 leadingIcon = {
-                    assertThat(AmbientContentColor.current)
+                    assertThat(LocalContentColor.current)
                         .isEqualTo(
                             MaterialTheme.colors.onSurface.copy(
                                 IconColorAlpha
@@ -800,7 +800,7 @@ class TextFieldTest {
                         )
                 },
                 trailingIcon = {
-                    assertThat(AmbientContentColor.current).isEqualTo(MaterialTheme.colors.error)
+                    assertThat(LocalContentColor.current).isEqualTo(MaterialTheme.colors.error)
                 }
             )
         }
@@ -812,7 +812,7 @@ class TextFieldTest {
         val textInputService = mock<TextInputService>()
         rule.setContent {
             Providers(
-                AmbientTextInputService provides textInputService
+                LocalTextInputService provides textInputService
             ) {
                 val text = remember { mutableStateOf("") }
                 TextField(

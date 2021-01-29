@@ -21,8 +21,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.staticAmbientOf
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.Density
@@ -37,7 +37,7 @@ class DesktopPopupTest {
 
     @Test
     fun `pass ambients to popup`() {
-        val ambient = staticAmbientOf<Int>()
+        val ambient = staticCompositionLocalOf<Int>()
 
         var actualAmbientValue = 0
 
@@ -81,9 +81,9 @@ class DesktopPopupTest {
         var densityInsidePopup = 0f
 
         rule.setContent {
-            Providers(AmbientDensity provides density) {
+            Providers(LocalDensity provides density) {
                 Popup {
-                    densityInsidePopup = AmbientDensity.current.density
+                    densityInsidePopup = LocalDensity.current.density
                 }
             }
         }

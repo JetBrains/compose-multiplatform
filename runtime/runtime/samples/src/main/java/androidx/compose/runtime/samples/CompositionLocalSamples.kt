@@ -21,15 +21,15 @@ package androidx.compose.runtime.samples
 import androidx.annotation.Sampled
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
-import androidx.compose.runtime.ambientOf
+import androidx.compose.runtime.compositionLocalOf
 
 @Sampled
-fun createAmbient() {
-    val ActiveUser = ambientOf<User> { error("No active user found!") }
+fun createCompositionLocal() {
+    val ActiveUser = compositionLocalOf<User> { error("No active user found!") }
 }
 
 @Sampled
-fun ambientProvider() {
+fun compositionLocalProvider() {
     @Composable
     fun App(user: User) {
         Providers(ActiveUser provides user) {
@@ -47,7 +47,7 @@ fun someScreenSample() {
 }
 
 @Sampled
-fun consumeAmbient() {
+fun consumeCompositionLocal() {
     @Composable
     fun UserPhoto() {
         val user = ActiveUser.current
@@ -55,7 +55,8 @@ fun consumeAmbient() {
     }
 }
 
-private val ActiveUser = ambientOf<User> { error("No active user found!") }
+@Suppress("CompositionLocalNaming")
+private val ActiveUser = compositionLocalOf<User> { error("No active user found!") }
 
 @Composable private fun SomeScreen() {}
 

@@ -31,7 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.LightGray
 import androidx.compose.ui.graphics.Color.Companion.White
-import androidx.compose.ui.platform.AmbientWindowInfo
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -41,7 +41,7 @@ fun FocusInDialogDemo() {
     var showDialog by remember { mutableStateOf(false) }
     var mainText by remember { mutableStateOf(TextFieldValue("Enter Value")) }
     var dialogText by remember { mutableStateOf(TextFieldValue("Enter Value")) }
-    val windowInfo = AmbientWindowInfo.current
+    val windowInfo = LocalWindowInfo.current
 
     Column(Modifier.background(if (windowInfo.isWindowFocused) White else LightGray)) {
         Text("Click the button to show the dialog. Click outside the dialog to dismiss it.")
@@ -70,6 +70,6 @@ fun FocusInDialogDemo() {
 
 @Composable
 private fun FocusStatus() {
-    val windowInfo = AmbientWindowInfo.current
+    val windowInfo = LocalWindowInfo.current
     Text("Status: Window ${if (windowInfo.isWindowFocused) "is" else "is not"} focused.")
 }

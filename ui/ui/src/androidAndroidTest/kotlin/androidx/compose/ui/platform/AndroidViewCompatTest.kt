@@ -408,7 +408,7 @@ class AndroidViewCompatTest {
         var size by mutableStateOf(20)
         rule.setContent {
             Box(Modifier.graphicsLayer().fillMaxSize()) {
-                val context = AmbientContext.current
+                val context = LocalContext.current
                 val view = remember { View(context) }
                 AndroidView({ view }, Modifier.testTag("view"))
                 view.layoutParams = ViewGroup.LayoutParams(size, size)
@@ -438,7 +438,7 @@ class AndroidViewCompatTest {
 
         rule.setContent {
             Box(Modifier.onGloballyPositioned { outer = it.positionInWindow() }) {
-                val paddingDp = with(AmbientDensity.current) { padding.toDp() }
+                val paddingDp = with(LocalDensity.current) { padding.toDp() }
                 Box(Modifier.padding(paddingDp)) {
                     AndroidView(::ComposeView) {
                         it.setContent {
@@ -478,7 +478,7 @@ class AndroidViewCompatTest {
 
             view.setContent {
                 Box {
-                    val paddingDp = with(AmbientDensity.current) { padding.toDp() }
+                    val paddingDp = with(LocalDensity.current) { padding.toDp() }
                     Box(Modifier.padding(paddingDp)) {
                         AndroidView(::ComposeView) {
                             it.setContent {

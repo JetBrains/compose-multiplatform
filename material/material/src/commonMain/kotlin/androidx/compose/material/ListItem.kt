@@ -416,7 +416,7 @@ private fun applyTextStyle(
 ): @Composable (() -> Unit)? {
     if (icon == null) return null
     return {
-        Providers(AmbientContentAlpha provides contentAlpha) {
+        Providers(LocalContentAlpha provides contentAlpha) {
             ProvideTextStyle(textStyle, icon)
         }
     }

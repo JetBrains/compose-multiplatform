@@ -39,8 +39,8 @@ import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
-import androidx.compose.ui.platform.AmbientAnimationClock
-import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.LocalAnimationClock
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
@@ -67,7 +67,7 @@ internal fun Modifier.textFieldScrollable(
     }
 ) {
     // do not reverse direction only in case of RTL in horizontal orientation
-    val rtl = AmbientLayoutDirection.current == LayoutDirection.Rtl
+    val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     val reverseDirection = scrollerPosition.orientation == Orientation.Vertical || !rtl
     val controller = rememberScrollableController(
         scrollerPosition,
@@ -130,7 +130,7 @@ private fun rememberScrollableController(
     interactionState: InteractionState? = null,
     consumeScrollDelta: (Float) -> Float
 ): ScrollableController {
-    val clocks = AmbientAnimationClock.current.asDisposableClock()
+    val clocks = LocalAnimationClock.current.asDisposableClock()
     val flingConfig = defaultFlingConfig()
     return remember(inputs, clocks, flingConfig, interactionState) {
         ScrollableController(consumeScrollDelta, flingConfig, clocks, interactionState)

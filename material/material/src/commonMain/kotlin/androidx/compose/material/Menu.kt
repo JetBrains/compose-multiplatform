@@ -46,7 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntBounds
@@ -107,7 +107,7 @@ fun DropdownMenu(
 
         if (expandedStates.currentState || expandedStates.targetState) {
             val transformOriginState = remember { mutableStateOf(TransformOrigin.Center) }
-            val density = AmbientDensity.current
+            val density = LocalDensity.current
             val popupPositionProvider = DropdownMenuPositionProvider(
                 dropdownOffset,
                 density
@@ -236,7 +236,7 @@ fun DropdownMenuItem(
         val typography = MaterialTheme.typography
         ProvideTextStyle(typography.subtitle1) {
             val contentAlpha = if (enabled) ContentAlpha.high else ContentAlpha.disabled
-            Providers(AmbientContentAlpha provides contentAlpha, content = content)
+            Providers(LocalContentAlpha provides contentAlpha, content = content)
         }
     }
 }

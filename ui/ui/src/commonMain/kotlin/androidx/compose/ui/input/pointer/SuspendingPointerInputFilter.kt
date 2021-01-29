@@ -21,8 +21,8 @@ import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.platform.AmbientDensity
-import androidx.compose.ui.platform.AmbientViewConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Density
@@ -133,8 +133,8 @@ fun Modifier.pointerInput(
         this.properties["block"] = block
     }
 ) {
-    val density = AmbientDensity.current
-    val viewConfiguration = AmbientViewConfiguration.current
+    val density = LocalDensity.current
+    val viewConfiguration = LocalViewConfiguration.current
     remember(density) { SuspendingPointerInputFilter(viewConfiguration, density) }.apply {
         LaunchedEffect(this) {
             block()
@@ -152,7 +152,7 @@ private val DownChangeConsumed = ConsumedData(downChange = true)
  * a LayoutNode.
  *
  * [SuspendingPointerInputFilter] implements the [PointerInputScope] used to offer the
- * [Modifier.pointerInput] DSL and carries the [Density] from [AmbientDensity] at the point of
+ * [Modifier.pointerInput] DSL and carries the [Density] from [LocalDensity] at the point of
  * the modifier's materialization. Even if this value were returned to the [PointerInputFilter]
  * callbacks, we would still need the value at composition time in order for [Modifier.pointerInput]
  * to begin its internal [LaunchedEffect] for the provided code block.

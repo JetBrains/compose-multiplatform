@@ -114,7 +114,7 @@ internal fun DesktopSelectionContainer(
         }
     }
 
-    Providers(AmbientSelectionRegistrar provides registrarImpl) {
+    Providers(LocalSelectionRegistrar provides registrarImpl) {
         Wrap(modifier) {
             content()
         }

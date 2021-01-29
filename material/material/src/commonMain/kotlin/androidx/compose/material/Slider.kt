@@ -58,9 +58,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.AmbientAnimationClock
-import androidx.compose.ui.platform.AmbientDensity
-import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.LocalAnimationClock
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.setProgress
 import androidx.compose.ui.unit.LayoutDirection
@@ -126,7 +126,7 @@ fun Slider(
     activeTickColor: Color = MaterialTheme.colors.onPrimary.copy(alpha = TickColorAlpha),
     inactiveTickColor: Color = activeTrackColor.copy(alpha = TickColorAlpha)
 ) {
-    val clock = AmbientAnimationClock.current.asDisposableClock()
+    val clock = LocalAnimationClock.current.asDisposableClock()
     val position = remember(valueRange, steps) {
         SliderPosition(value, valueRange, steps, clock, onValueChange)
     }
@@ -135,7 +135,7 @@ fun Slider(
     BoxWithConstraints(
         modifier.sliderSemantics(value, position, onValueChange, valueRange, steps)
     ) {
-        val isRtl = AmbientLayoutDirection.current == LayoutDirection.Rtl
+        val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
         val maxPx = constraints.maxWidth.toFloat()
         val minPx = 0f
         position.setBounds(minPx, maxPx)
@@ -223,7 +223,7 @@ private fun SliderImpl(
     interactionState: InteractionState,
     modifier: Modifier
 ) {
-    val widthDp = with(AmbientDensity.current) {
+    val widthDp = with(LocalDensity.current) {
         width.toDp()
     }
     Box(modifier.then(DefaultSliderConstraints)) {
@@ -233,7 +233,7 @@ private fun SliderImpl(
 
         val trackStrokeWidth: Float
         val thumbPx: Float
-        with(AmbientDensity.current) {
+        with(LocalDensity.current) {
             trackStrokeWidth = TrackHeight.toPx()
             thumbPx = ThumbRadius.toPx()
         }

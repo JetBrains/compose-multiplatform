@@ -48,7 +48,7 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -643,7 +643,7 @@ class BoxWithConstraintsTest : LayoutTest() {
             Layout(
                 content = @Composable {
                     BoxWithConstraints {
-                        with(AmbientDensity.current) {
+                        with(LocalDensity.current) {
                             assertEquals(minWidthConstraint.toIntPx(), minWidth.toIntPx())
                             assertEquals(maxWidthConstraint.toIntPx(), maxWidth.toIntPx())
                             assertEquals(minHeightConstraint.toIntPx(), minHeight.toIntPx())

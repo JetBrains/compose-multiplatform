@@ -18,8 +18,8 @@ package androidx.compose.material.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material.AmbientContentAlpha
 import androidx.compose.material.ContentAlpha
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
@@ -34,16 +34,16 @@ fun ContentAlphaSample() {
             "No content alpha applied - uses the default content alpha set by MaterialTheme - " +
                 "87% alpha"
         )
-        Providers(AmbientContentAlpha provides 1.00f) {
+        Providers(LocalContentAlpha provides 1.00f) {
             Text("1.00f alpha applied - 100% alpha")
         }
-        Providers(AmbientContentAlpha provides ContentAlpha.high) {
+        Providers(LocalContentAlpha provides ContentAlpha.high) {
             Text("High content alpha applied - 87% alpha")
         }
-        Providers(AmbientContentAlpha provides ContentAlpha.medium) {
+        Providers(LocalContentAlpha provides ContentAlpha.medium) {
             Text("Medium content alpha applied - 60% alpha")
         }
-        Providers(AmbientContentAlpha provides ContentAlpha.disabled) {
+        Providers(LocalContentAlpha provides ContentAlpha.disabled) {
             Text("Disabled content alpha applied - 38% alpha")
         }
     }

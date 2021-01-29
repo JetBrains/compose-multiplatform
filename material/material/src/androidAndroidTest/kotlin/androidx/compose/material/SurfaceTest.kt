@@ -80,14 +80,14 @@ class SurfaceTest {
     }
 
     @Test
-    fun absoluteElevationAmbientIsSet() {
+    fun absoluteElevationCompositionLocalIsSet() {
         var outerElevation: Dp? = null
         var innerElevation: Dp? = null
         rule.setMaterialContent {
             Surface(elevation = 2.dp) {
-                outerElevation = AmbientAbsoluteElevation.current
+                outerElevation = LocalAbsoluteElevation.current
                 Surface(elevation = 4.dp) {
-                    innerElevation = AmbientAbsoluteElevation.current
+                    innerElevation = LocalAbsoluteElevation.current
                 }
             }
         }

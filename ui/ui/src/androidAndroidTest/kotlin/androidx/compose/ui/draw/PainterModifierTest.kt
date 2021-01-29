@@ -60,9 +60,9 @@ import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
-import androidx.compose.ui.platform.AmbientDensity
-import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
@@ -494,8 +494,8 @@ class PainterModifierTest {
         var composableWidth = 0f
         var composableHeight = 0f
         rule.setContent {
-            composableWidth = composableWidthPx / AmbientDensity.current.density
-            composableHeight = composableHeightPx / AmbientDensity.current.density
+            composableWidth = composableWidthPx / LocalDensity.current.density
+            composableHeight = composableHeightPx / LocalDensity.current.density
             // Because the painter is told to fit inside the constraints, the width should
             // match that of the provided fixed width and the height should match that of the
             // composable as no scaling is being done
@@ -540,8 +540,8 @@ class PainterModifierTest {
                 modifier = Modifier
                     .testTag(testTag)
                     .background(color = Color.Gray)
-                    .width((boxWidth / AmbientDensity.current.density).dp)
-                    .height((boxHeight / AmbientDensity.current.density).dp)
+                    .width((boxWidth / LocalDensity.current.density).dp)
+                    .height((boxHeight / LocalDensity.current.density).dp)
                     .paint(ImagePainter(srcImage), contentScale = ContentScale.FillHeight)
             )
         }
@@ -585,8 +585,8 @@ class PainterModifierTest {
                 modifier = Modifier
                     .testTag(testTag)
                     .background(color = Color.Gray)
-                    .width((boxWidth / AmbientDensity.current.density).dp)
-                    .height((boxHeight / AmbientDensity.current.density).dp)
+                    .width((boxWidth / LocalDensity.current.density).dp)
+                    .height((boxHeight / LocalDensity.current.density).dp)
                     .paint(ImagePainter(srcImage), contentScale = ContentScale.FillBounds)
             )
         }
@@ -608,12 +608,12 @@ class PainterModifierTest {
         val vectorWidth = 100
         val vectorHeight = 200
         rule.setContent {
-            val vectorWidthDp = (vectorWidth / AmbientDensity.current.density).dp
-            val vectorHeightDp = (vectorHeight / AmbientDensity.current.density).dp
+            val vectorWidthDp = (vectorWidth / LocalDensity.current.density).dp
+            val vectorHeightDp = (vectorHeight / LocalDensity.current.density).dp
             Box(
                 modifier = Modifier.background(color = Color.Gray)
-                    .width((boxWidth / AmbientDensity.current.density).dp)
-                    .height((boxHeight / AmbientDensity.current.density).dp)
+                    .width((boxWidth / LocalDensity.current.density).dp)
+                    .height((boxHeight / LocalDensity.current.density).dp)
                     .paint(
                         rememberVectorPainter(
                             defaultWidth = vectorWidthDp,
@@ -679,7 +679,7 @@ class PainterModifierTest {
     ) {
         val p = TestPainter(containerWidth, containerHeight)
         val layoutDirection = if (rtl) LayoutDirection.Rtl else LayoutDirection.Ltr
-        Providers(AmbientLayoutDirection provides layoutDirection) {
+        Providers(LocalLayoutDirection provides layoutDirection) {
             AtLeastSize(
                 modifier = Modifier.background(Color.White)
                     .paint(p, alpha = alpha, colorFilter = colorFilter),

@@ -41,7 +41,7 @@ internal fun rememberTextSelectionColors(colors: Colors): TextSelectionColors {
     // text shouldn't be selectable / is noted as disabled for accessibility purposes.
     val textColorWithLowestAlpha = colors.contentColorFor(backgroundColor)
         .takeOrElse {
-            AmbientContentColor.current
+            LocalContentColor.current
         }.copy(
             alpha = ContentAlpha.medium
         )

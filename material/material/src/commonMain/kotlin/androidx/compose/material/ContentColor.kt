@@ -16,12 +16,12 @@
 
 package androidx.compose.material
 
-import androidx.compose.runtime.ambientOf
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
 
 /**
- * Ambient containing the preferred content color for a given position in the hierarchy. This
- * typically represents the `on` color for a color in [Colors]. For example, if the background
+ * CompositionLocal containing the preferred content color for a given position in the hierarchy.
+ * This typically represents the `on` color for a color in [Colors]. For example, if the background
  * color is [Colors.surface], this color is typically set to [Colors.onSurface].
  *
  * This color should be used for any typography / iconography, to ensure that the color of these
@@ -30,4 +30,24 @@ import androidx.compose.ui.graphics.Color
  *
  * Defaults to [Color.Black] if no color has been explicitly set.
  */
-val AmbientContentColor = ambientOf { Color.Black }
+@Deprecated(
+    "Renamed to LocalContentColor",
+    replaceWith = ReplaceWith(
+        "LocalContentColor",
+        "androidx.compose.material.LocalContentColor"
+    )
+)
+val AmbientContentColor get() = LocalContentColor
+
+/**
+ * CompositionLocal containing the preferred content color for a given position in the hierarchy.
+ * This typically represents the `on` color for a color in [Colors]. For example, if the background
+ * color is [Colors.surface], this color is typically set to [Colors.onSurface].
+ *
+ * This color should be used for any typography / iconography, to ensure that the color of these
+ * adjusts when the background color changes. For example, on a dark background, text should be
+ * light, and on a light background, text should be dark.
+ *
+ * Defaults to [Color.Black] if no color has been explicitly set.
+ */
+val LocalContentColor = compositionLocalOf { Color.Black }

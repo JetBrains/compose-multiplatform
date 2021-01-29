@@ -17,7 +17,7 @@
 package androidx.compose.ui.viewinterop
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.AmbientViewModelStoreOwner
+import androidx.compose.ui.platform.LocalViewModelStoreOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
@@ -57,7 +57,7 @@ fun <T : ViewModel> viewModel(
     modelClass: Class<T>,
     key: String? = null,
     factory: ViewModelProvider.Factory? = null
-): T = AmbientViewModelStoreOwner.current.get(modelClass, key, factory)
+): T = LocalViewModelStoreOwner.current.get(modelClass, key, factory)
 
 private fun <T : ViewModel> ViewModelStoreOwner.get(
     javaClass: Class<T>,

@@ -146,7 +146,7 @@ fun RowScope.BottomNavigationItem(
     label: @Composable (() -> Unit)? = null,
     alwaysShowLabels: Boolean = true,
     interactionState: InteractionState = remember { InteractionState() },
-    selectedContentColor: Color = AmbientContentColor.current,
+    selectedContentColor: Color = LocalContentColor.current,
     unselectedContentColor: Color = selectedContentColor.copy(alpha = ContentAlpha.medium)
 ) {
     val styledLabel: @Composable (() -> Unit)? = label?.let {
@@ -191,15 +191,15 @@ fun RowScope.BottomNavigationItem(
 }
 
 /**
- * Transition that animates [AmbientContentColor] between [inactiveColor] and [activeColor], depending
+ * Transition that animates [LocalContentColor] between [inactiveColor] and [activeColor], depending
  * on [selected]. This component also provides the animation fraction as a parameter to [content],
  * to allow animating the position of the icon and the scale of the label alongside this color
  * animation.
  *
- * @param activeColor [AmbientContentColor] when this item is [selected]
- * @param inactiveColor [AmbientContentColor] when this item is not [selected]
+ * @param activeColor [LocalContentColor] when this item is [selected]
+ * @param inactiveColor [LocalContentColor] when this item is not [selected]
  * @param selected whether this item is selected
- * @param content the content of the [BottomNavigationItem] to animate [AmbientContentColor] for,
+ * @param content the content of the [BottomNavigationItem] to animate [LocalContentColor] for,
  * where the animationProgress is the current progress of the animation from 0f to 1f.
  */
 @Composable
@@ -217,8 +217,8 @@ private fun BottomNavigationTransition(
     val color = lerp(inactiveColor, activeColor, animationProgress)
 
     Providers(
-        AmbientContentColor provides color.copy(alpha = 1f),
-        AmbientContentAlpha provides color.alpha,
+        LocalContentColor provides color.copy(alpha = 1f),
+        LocalContentAlpha provides color.alpha,
     ) {
         content(animationProgress)
     }

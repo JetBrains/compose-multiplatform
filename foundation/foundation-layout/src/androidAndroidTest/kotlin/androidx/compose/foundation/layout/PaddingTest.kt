@@ -25,8 +25,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.unit.Constraints
@@ -260,7 +260,7 @@ class PaddingTest : LayoutTest() {
         // ltr: P1 S P2 | S P3 | P1 S
         // rtl:    S P1 | P3 S | P2 S P1
         show {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Row(Modifier.fillMaxSize()) {
                     Box(
                         Modifier.padding(start = padding1Dp, end = padding2Dp)
@@ -336,7 +336,7 @@ class PaddingTest : LayoutTest() {
         // ltr: P1 S P2 | S P3
         // rtl:    S P3 | P1 S P2
         show {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Row(Modifier.fillMaxSize()) {
                     Box(
                         Modifier.absolutePadding(left = padding1Dp, right = padding2Dp)

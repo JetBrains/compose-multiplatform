@@ -50,7 +50,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -178,7 +178,7 @@ private fun DemoAppBar(
 private object AppBarIcons {
     @Composable
     fun Back(onClick: () -> Unit) {
-        val icon = when (AmbientLayoutDirection.current) {
+        val icon = when (LocalLayoutDirection.current) {
             LayoutDirection.Ltr -> Icons.Filled.ArrowBack
             LayoutDirection.Rtl -> Icons.Filled.ArrowForward
         }

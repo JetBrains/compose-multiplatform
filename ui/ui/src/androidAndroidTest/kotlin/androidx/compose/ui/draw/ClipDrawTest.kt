@@ -40,7 +40,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.padding
-import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.runOnUiThreadIR
 import androidx.compose.ui.test.TestActivity
@@ -485,7 +485,7 @@ class ClipDrawTest {
 
         rule.runOnUiThreadIR {
             activity.setContent {
-                Providers(AmbientLayoutDirection provides direction.value) {
+                Providers(LocalLayoutDirection provides direction.value) {
                     AtLeastSize(
                         size = 30,
                         modifier = Modifier.fillColor(Color.Green)

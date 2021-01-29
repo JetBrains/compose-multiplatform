@@ -47,7 +47,7 @@ import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -81,7 +81,7 @@ fun VerticalScrollerInDrawerDemo() {
 private fun DrawerLayout(drawerWidth: Dp, content: @Composable ColumnScope.() -> Unit) {
 
     val minOffset =
-        with(AmbientDensity.current) {
+        with(LocalDensity.current) {
             -drawerWidth.toPx()
         }
 

@@ -93,7 +93,7 @@ fun Tab(
     text: @Composable (() -> Unit)? = null,
     icon: @Composable (() -> Unit)? = null,
     interactionState: InteractionState = remember { InteractionState() },
-    selectedContentColor: Color = AmbientContentColor.current,
+    selectedContentColor: Color = LocalContentColor.current,
     unselectedContentColor: Color = selectedContentColor.copy(alpha = ContentAlpha.medium)
 ) {
     val styledText: @Composable (() -> Unit)? = text?.let {
@@ -145,7 +145,7 @@ fun Tab(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionState: InteractionState = remember { InteractionState() },
-    selectedContentColor: Color = AmbientContentColor.current,
+    selectedContentColor: Color = LocalContentColor.current,
     unselectedContentColor: Color = selectedContentColor.copy(alpha = ContentAlpha.medium),
     content: @Composable ColumnScope.() -> Unit
 ) {
@@ -196,7 +196,7 @@ object TabDefaults {
     fun Divider(
         modifier: Modifier = Modifier,
         thickness: Dp = DividerThickness,
-        color: Color = AmbientContentColor.current.copy(alpha = DividerOpacity)
+        color: Color = LocalContentColor.current.copy(alpha = DividerOpacity)
     ) {
         androidx.compose.material.Divider(modifier = modifier, thickness = thickness, color = color)
     }
@@ -213,7 +213,7 @@ object TabDefaults {
     fun Indicator(
         modifier: Modifier = Modifier,
         height: Dp = IndicatorHeight,
-        color: Color = AmbientContentColor.current
+        color: Color = LocalContentColor.current
     ) {
         Box(
             modifier
@@ -274,7 +274,7 @@ object TabDefaults {
 
 /**
  * Transition defining how the tint color for a tab animates, when a new tab is selected. This
- * component uses [AmbientContentColor] to provide an interpolated value between [activeColor]
+ * component uses [LocalContentColor] to provide an interpolated value between [activeColor]
  * and [inactiveColor] depending on the animation status.
  */
 @Composable
@@ -304,8 +304,8 @@ private fun TabTransition(
         if (it) activeColor else inactiveColor
     }
     Providers(
-        AmbientContentColor provides color.copy(alpha = 1f),
-        AmbientContentAlpha provides color.alpha,
+        LocalContentColor provides color.copy(alpha = 1f),
+        LocalContentAlpha provides color.alpha,
         content = content
     )
 }

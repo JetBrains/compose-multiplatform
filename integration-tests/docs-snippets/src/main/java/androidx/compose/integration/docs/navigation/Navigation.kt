@@ -32,7 +32,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.app.TaskStackBuilder
 import androidx.core.net.toUri
@@ -139,7 +139,7 @@ private fun NavGraphBuilder.NavigationSnippet9(navController: NavHostController)
 @Composable
 private fun NavigationSnippet10() {
     val id = "exampleId"
-    val context = AmbientContext.current
+    val context = LocalContext.current
     val deepLinkIntent = Intent(
         Intent.ACTION_VIEW,
         "https://example.com/$id".toUri(),

@@ -18,13 +18,13 @@ package androidx.compose.foundation.text.selection
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.ambientOf
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
 
 /**
  * Represents the colors used for text selection by text and text field components.
  *
- * See [AmbientTextSelectionColors] to provide new values for this throughout the hierarchy.
+ * See [LocalTextSelectionColors] to provide new values for this throughout the hierarchy.
  *
  * @property handleColor the color used for the selection handles on either side of the
  * selection region.
@@ -62,10 +62,10 @@ class TextSelectionColors(
 }
 
 /**
- * Ambient used to change the [TextSelectionColors] used by text and text field components in the
- * hierarchy.
+ * CompositionLocal used to change the [TextSelectionColors] used by text and text field
+ * components in the hierarchy.
  */
-val AmbientTextSelectionColors = ambientOf { DefaultTextSelectionColors }
+val LocalTextSelectionColors = compositionLocalOf { DefaultTextSelectionColors }
 
 /**
  * Default color used is the blue from the Compose logo, b/172679845 for context

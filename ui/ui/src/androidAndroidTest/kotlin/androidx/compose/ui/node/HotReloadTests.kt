@@ -27,7 +27,7 @@ import androidx.compose.runtime.clearRoots
 import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.simulateHotReload
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
@@ -66,7 +66,7 @@ class HotReloadTests {
         var value = "First value"
 
         @Composable fun text(text: String, id: Int = -1) {
-            val context = AmbientContext.current
+            val context = LocalContext.current
             ComposeNode<TextView, UiApplier>(
                 factory = { TextView(context) },
                 update = {
@@ -77,7 +77,7 @@ class HotReloadTests {
         }
 
         @Composable fun column(content: @Composable () -> Unit) {
-            val context = AmbientContext.current
+            val context = LocalContext.current
             ComposeNode<LinearLayout, UiApplier>(
                 factory = { LinearLayout(context) },
                 update = {},

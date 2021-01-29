@@ -34,7 +34,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
@@ -56,7 +56,7 @@ fun AndroidViewSample() {
 @Sampled
 @Composable
 fun AndroidDrawableInDrawScopeSample() {
-    val drawable = ContextCompat.getDrawable(AmbientContext.current, R.drawable.sample_drawable)
+    val drawable = ContextCompat.getDrawable(LocalContext.current, R.drawable.sample_drawable)
     Box(
         modifier = Modifier.size(100.dp)
             .drawBehind {

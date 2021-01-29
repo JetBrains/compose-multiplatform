@@ -27,8 +27,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ripple.AmbientRippleTheme
 import androidx.compose.material.ripple.ExperimentalRippleApi
+import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material.ripple.RippleAlpha
 import androidx.compose.material.ripple.RippleTheme
 import androidx.compose.material.ripple.rememberRipple
@@ -436,7 +436,7 @@ class MaterialRippleThemeTest {
 
         rule.setContent {
             MaterialTheme {
-                Providers(AmbientRippleTheme provides rippleTheme) {
+                Providers(LocalRippleTheme provides rippleTheme) {
                     Surface(contentColor = contentColor) {
                         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             RippleBox(interactionState, rememberRipple())
@@ -475,7 +475,7 @@ class MaterialRippleThemeTest {
 
         rule.setContent {
             MaterialTheme {
-                Providers(AmbientRippleTheme provides rippleTheme) {
+                Providers(LocalRippleTheme provides rippleTheme) {
                     Surface(contentColor = contentColor) {
                         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             RippleBox(interactionState, rememberRipple())
@@ -514,7 +514,7 @@ class MaterialRippleThemeTest {
 
         rule.setContent {
             MaterialTheme {
-                Providers(AmbientRippleTheme provides rippleTheme) {
+                Providers(LocalRippleTheme provides rippleTheme) {
                     Surface(contentColor = Color.Black) {
                         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             RippleBox(interactionState, rememberRipple())

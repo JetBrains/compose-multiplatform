@@ -33,8 +33,8 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.SemanticsNodeInteraction
@@ -275,7 +275,7 @@ class DrawModifierTest {
         var layoutDirection by mutableStateOf(LayoutDirection.Ltr)
         var realLayoutDirection: LayoutDirection? = null
         rule.setContent {
-            Providers(AmbientLayoutDirection provides layoutDirection) {
+            Providers(LocalLayoutDirection provides layoutDirection) {
                 AtLeastSize(
                     size = 10,
                     modifier = Modifier.drawWithCache {

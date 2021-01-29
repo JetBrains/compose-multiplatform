@@ -26,8 +26,8 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
-import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.unit.Constraints
@@ -1417,7 +1417,7 @@ class SizeTest : LayoutTest() {
         val childSize = Array(3) { Ref<IntSize>() }
         val childPosition = Array(3) { Ref<Offset>() }
         show {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Box(Modifier.fillMaxSize()) {
                     Box(Modifier.fillMaxSize().wrapContentSize(Alignment.TopStart)) {
                         Box(

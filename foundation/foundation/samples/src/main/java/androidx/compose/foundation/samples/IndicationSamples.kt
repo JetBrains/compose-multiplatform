@@ -17,8 +17,8 @@
 package androidx.compose.foundation.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.AmbientIndication
 import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.layout.Column
@@ -51,8 +51,8 @@ fun IndicationSample() {
             text = "I'm neighbour and I indicate when you click the other one",
             modifier = Modifier
                 // this element doesn't have a click, but will show default indication from the
-                // ambient as it accepts same interaction state
-                .indication(interactionState, AmbientIndication.current())
+                // CompositionLocal as it accepts same interaction state
+                .indication(interactionState, LocalIndication.current())
                 .padding(10.dp)
         )
     }

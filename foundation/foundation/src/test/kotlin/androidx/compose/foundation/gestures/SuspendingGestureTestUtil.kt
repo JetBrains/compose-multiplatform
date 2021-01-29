@@ -38,8 +38,8 @@ import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.materialize
-import androidx.compose.ui.platform.AmbientDensity
-import androidx.compose.ui.platform.AmbientViewConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
@@ -96,8 +96,8 @@ internal class SuspendingGestureTestUtil(
         withRunningRecomposer { recomposer ->
             compose(recomposer) {
                 Providers(
-                    AmbientDensity provides Density(1f),
-                    AmbientViewConfiguration provides TestViewConfiguration()
+                    LocalDensity provides Density(1f),
+                    LocalViewConfiguration provides TestViewConfiguration()
                 ) {
                     pointerInputFilter = currentComposer
                         .materialize(Modifier.pointerInput(gestureDetector)) as

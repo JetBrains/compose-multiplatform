@@ -188,7 +188,7 @@ private class SnapshotMutableStateImpl<T>(
  * A policy to control how the result of [mutableStateOf] report and merge changes to
  * the state object.
  *
- * A mutation policy can be passed as an parameter to [mutableStateOf], and [ambientOf].
+ * A mutation policy can be passed as an parameter to [mutableStateOf], and [compositionLocalOf].
  *
  * Typically, one of the stock policies should be used such as [referentialEqualityPolicy],
  * [structuralEqualityPolicy], or [neverEqualPolicy]. However, a custom mutation policy can be

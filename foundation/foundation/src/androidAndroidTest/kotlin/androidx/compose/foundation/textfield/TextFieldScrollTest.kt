@@ -44,8 +44,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.platform.AmbientViewConfiguration
 import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.captureToImage
@@ -396,7 +396,7 @@ class TextFieldScrollTest {
         var touchSlop = 0f
 
         rule.setContent {
-            touchSlop = AmbientViewConfiguration.current.touchSlop
+            touchSlop = LocalViewConfiguration.current.touchSlop
             Column(
                 Modifier
                     .preferredSize(size)

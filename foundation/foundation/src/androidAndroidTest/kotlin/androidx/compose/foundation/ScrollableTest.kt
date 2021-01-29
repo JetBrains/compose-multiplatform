@@ -40,8 +40,8 @@ import androidx.compose.ui.gesture.nestedscroll.NestedScrollDispatcher
 import androidx.compose.ui.gesture.nestedscroll.NestedScrollSource
 import androidx.compose.ui.gesture.nestedscroll.nestedScroll
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
-import androidx.compose.ui.platform.AmbientViewConfiguration
 import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
@@ -931,7 +931,7 @@ class ScrollableTest {
             )
 
             rule.setContent {
-                touchSlop = AmbientViewConfiguration.current.touchSlop
+                touchSlop = LocalViewConfiguration.current.touchSlop
                 Box {
                     Box(
                         modifier = Modifier.preferredSize(300.dp)

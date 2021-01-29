@@ -26,7 +26,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.AccessibilityIterators
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -426,8 +426,8 @@ class AccessibilityIteratorsTest {
     ): TextLayoutResult {
         var textLayoutResult: TextLayoutResult? = null
         rule.setContent {
-            // TODO(yingleiw): use predefined DensityAmbient.current when b/163142237 is fixed.
-            with(AmbientDensity.current) {
+            // TODO(yingleiw): use predefined LocalDensity.current when b/163142237 is fixed.
+            with(LocalDensity.current) {
                 BasicText(
                     style = TextStyle(
                         fontSize = fontSize,

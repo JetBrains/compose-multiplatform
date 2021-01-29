@@ -28,7 +28,7 @@ import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.painter.ImagePainter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -90,7 +90,7 @@ class IconTest {
         val height = 24.dp
         rule
             .setMaterialContentForSizeAssertions {
-                val image = with(AmbientDensity.current) {
+                val image = with(LocalDensity.current) {
                     ImageBitmap(width.toIntPx(), height.toIntPx())
                 }
 
@@ -107,7 +107,7 @@ class IconTest {
 
         rule
             .setMaterialContentForSizeAssertions {
-                val image = with(AmbientDensity.current) {
+                val image = with(LocalDensity.current) {
                     ImageBitmap(width.toIntPx(), height.toIntPx())
                 }
 
@@ -137,7 +137,7 @@ class IconTest {
 
         rule
             .setMaterialContentForSizeAssertions {
-                val image = with(AmbientDensity.current) {
+                val image = with(LocalDensity.current) {
                     ImageBitmap(width.toIntPx(), height.toIntPx())
                 }
 
@@ -156,7 +156,7 @@ class IconTest {
         val testTag = "testTag"
         rule.setMaterialContentForSizeAssertions {
             val image: ImageBitmap
-            with(AmbientDensity.current) {
+            with(LocalDensity.current) {
                 image = createBitmapWithColor(
                     this,
                     width.toIntPx(),
@@ -179,7 +179,7 @@ class IconTest {
         val testTag = "testTag"
         rule.setMaterialContentForSizeAssertions {
             val image: ImageBitmap
-            with(AmbientDensity.current) {
+            with(LocalDensity.current) {
                 image = createBitmapWithColor(
                     this,
                     width.toIntPx(),

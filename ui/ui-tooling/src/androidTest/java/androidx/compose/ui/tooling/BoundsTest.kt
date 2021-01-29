@@ -28,7 +28,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.resetSourceInfo
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -138,7 +138,7 @@ class BoundsTest : ToolingTest() {
             Inspectable(slotTableRecord) {
                 key(value) {
                     BoxWithConstraints {
-                        requireNotNull(AmbientDensity.current)
+                        requireNotNull(LocalDensity.current)
                         Text("Hello")
                     }
                 }

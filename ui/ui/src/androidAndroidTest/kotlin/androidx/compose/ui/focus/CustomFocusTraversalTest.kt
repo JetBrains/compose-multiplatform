@@ -31,7 +31,7 @@ import androidx.compose.ui.input.key.Key.Companion.DirectionLeft
 import androidx.compose.ui.input.key.Key.Companion.DirectionRight
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.nativeKeyCode
-import androidx.compose.ui.platform.AmbientFocusManager
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performKeyPress
@@ -64,7 +64,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
         val (item1, item3) = FocusRequester.createRefs()
         lateinit var focusManager: FocusManager
         rule.setFocusableContent {
-            focusManager = AmbientFocusManager.current
+            focusManager = LocalFocusManager.current
             Row {
                 Box(
                     Modifier
@@ -111,7 +111,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
         val (item1, item3) = FocusRequester.createRefs()
         lateinit var focusManager: FocusManager
         rule.setFocusableContent {
-            focusManager = AmbientFocusManager.current
+            focusManager = LocalFocusManager.current
             Row {
                 Box(
                     Modifier
@@ -159,7 +159,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
         val (item1, item3) = FocusRequester.createRefs()
         lateinit var focusManager: FocusManager
         rule.setFocusableContent {
-            focusManager = AmbientFocusManager.current
+            focusManager = LocalFocusManager.current
             Column {
                 Box(
                     Modifier
@@ -207,7 +207,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
         val (item1, item3) = FocusRequester.createRefs()
         lateinit var focusManager: FocusManager
         rule.setFocusableContent {
-            focusManager = AmbientFocusManager.current
+            focusManager = LocalFocusManager.current
             Column {
                 Box(
                     Modifier
@@ -255,7 +255,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
         val (item1, item3) = FocusRequester.createRefs()
         lateinit var focusManager: FocusManager
         rule.setFocusableContent {
-            focusManager = AmbientFocusManager.current
+            focusManager = LocalFocusManager.current
             Row {
                 Box(
                     Modifier
@@ -303,7 +303,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
         val (item1, item3) = FocusRequester.createRefs()
         lateinit var focusManager: FocusManager
         rule.setFocusableContent {
-            focusManager = AmbientFocusManager.current
+            focusManager = LocalFocusManager.current
             Row {
                 Box(
                     Modifier
@@ -342,7 +342,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
         }
     }
 
-    // TODO(b/176847718): Verify that this test works correctly when the AmbientLayoutDirection
+    // TODO(b/176847718): Verify that this test works correctly when the LocalLayoutDirection
     //  changes.
     @Test
     fun focusOrder_start() {
@@ -353,7 +353,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
         val (item1, item3) = FocusRequester.createRefs()
         lateinit var focusManager: FocusManager
         rule.setFocusableContent {
-            focusManager = AmbientFocusManager.current
+            focusManager = LocalFocusManager.current
             Row {
                 Box(
                     Modifier
@@ -392,7 +392,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
         }
     }
 
-    // TODO(b/176847718): Verify that this test works correctly when the AmbientLayoutDirection
+    // TODO(b/176847718): Verify that this test works correctly when the LocalLayoutDirection
     //  changes.
     @Test
     fun focusOrder_end() {
@@ -403,7 +403,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
         val (item1, item3) = FocusRequester.createRefs()
         lateinit var focusManager: FocusManager
         rule.setFocusableContent {
-            focusManager = AmbientFocusManager.current
+            focusManager = LocalFocusManager.current
             Row {
                 Box(
                     Modifier
@@ -452,7 +452,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
         val (item1, item3, item4) = FocusRequester.createRefs()
         lateinit var focusManager: FocusManager
         rule.setFocusableContent {
-            focusManager = AmbientFocusManager.current
+            focusManager = LocalFocusManager.current
             Row {
                 Box(Modifier.focusOrder { next = item4 }) {
                     Box(
@@ -508,7 +508,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
         val (item1, item3) = FocusRequester.createRefs()
         lateinit var focusManager: FocusManager
         rule.setFocusableContent {
-            focusManager = AmbientFocusManager.current
+            focusManager = LocalFocusManager.current
             Row {
                 Box(Modifier.focusOrder { next = FocusRequester.Default }) {
                     Box(
@@ -559,7 +559,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
         val (item1, item3) = FocusRequester.createRefs()
         lateinit var focusManager: FocusManager
         rule.setFocusableContent {
-            focusManager = AmbientFocusManager.current
+            focusManager = LocalFocusManager.current
             Row {
                 Box(Modifier.focusOrder { }) {
                     Box(

@@ -38,8 +38,8 @@ import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.AmbientHapticFeedback
-import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.test.click
@@ -273,8 +273,8 @@ class SelectionContainerTest {
         val layoutDirection = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
         rule.setContent {
             Providers(
-                AmbientHapticFeedback provides hapticFeedback,
-                AmbientLayoutDirection provides layoutDirection
+                LocalHapticFeedback provides hapticFeedback,
+                LocalLayoutDirection provides layoutDirection
             ) {
                 TestParent(Modifier.testTag("selectionContainer").gestureSpy(log)) {
                     SelectionContainer(

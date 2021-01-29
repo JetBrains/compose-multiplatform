@@ -37,8 +37,8 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
-import androidx.compose.ui.platform.AmbientAnimationClock
-import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.LocalAnimationClock
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import kotlin.math.roundToInt
@@ -169,7 +169,7 @@ fun rememberDismissState(
     initialValue: DismissValue = Default,
     confirmStateChange: (DismissValue) -> Boolean = { true }
 ): DismissState {
-    val clock = AmbientAnimationClock.current.asDisposableClock()
+    val clock = LocalAnimationClock.current.asDisposableClock()
     return rememberSaveable(
         clock,
         saver = DismissState.Saver(clock, confirmStateChange)
@@ -202,7 +202,7 @@ fun SwipeToDismiss(
     dismissContent: @Composable RowScope.() -> Unit
 ) = BoxWithConstraints(modifier) {
     val width = constraints.maxWidth.toFloat()
-    val isRtl = AmbientLayoutDirection.current == LayoutDirection.Rtl
+    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
 
     val anchors = mutableMapOf(0f to Default)
     if (StartToEnd in directions) anchors += width to DismissedToEnd

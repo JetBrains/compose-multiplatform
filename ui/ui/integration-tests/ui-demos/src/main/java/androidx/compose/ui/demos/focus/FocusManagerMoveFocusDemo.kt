@@ -51,7 +51,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.AmbientFocusManager
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,7 +59,7 @@ import androidx.compose.ui.unit.sp
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun FocusManagerMoveFocusDemo() {
-    val focusManager = AmbientFocusManager.current
+    val focusManager = LocalFocusManager.current
     Column {
         Text(
             text = "Use the buttons to move focus",

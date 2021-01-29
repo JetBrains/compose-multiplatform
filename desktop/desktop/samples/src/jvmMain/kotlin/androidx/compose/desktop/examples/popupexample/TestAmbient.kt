@@ -16,6 +16,6 @@
 
 package androidx.compose.desktop.examples.popupexample
 
-import androidx.compose.runtime.staticAmbientOf
+import androidx.compose.runtime.staticCompositionLocalOf
 
-val AmbientTest = staticAmbientOf<Int>()
+val AmbientTest = staticCompositionLocalOf<Int>()

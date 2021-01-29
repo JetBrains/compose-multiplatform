@@ -43,7 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.platform.AmbientViewConfiguration
+import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.SemanticsNodeInteraction
@@ -1278,7 +1278,7 @@ internal fun ComposeContentTestRule.setContentWithTestViewConfiguration(
     composable: @Composable () -> Unit
 ) {
     this.setContent {
-        Providers(AmbientViewConfiguration provides FakeViewConfiguration) {
+        Providers(LocalViewConfiguration provides FakeViewConfiguration) {
             composable()
         }
     }

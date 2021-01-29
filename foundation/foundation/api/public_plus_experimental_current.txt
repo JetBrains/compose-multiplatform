@@ -6,10 +6,6 @@ package androidx.compose.foundation {
     method public static androidx.compose.ui.Modifier background-1xq40Q0(androidx.compose.ui.Modifier, long color, optional androidx.compose.ui.graphics.Shape shape);
   }
 
-  public final class BaseTextFieldKt {
-    method @Deprecated @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Composable public static void BaseTextField-ngE-tqQ(androidx.compose.ui.text.input.TextFieldValue value, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.TextFieldValue,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional long textColor, optional androidx.compose.ui.text.TextStyle textStyle, optional androidx.compose.ui.text.input.KeyboardType keyboardType, optional androidx.compose.ui.text.input.ImeAction imeAction, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.ImeAction,kotlin.Unit> onImeActionPerformed, optional androidx.compose.ui.text.input.VisualTransformation visualTransformation, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted, optional long cursorColor);
-  }
-
   public final class BorderKt {
     method public static androidx.compose.ui.Modifier border(androidx.compose.ui.Modifier, androidx.compose.foundation.BorderStroke border, optional androidx.compose.ui.graphics.Shape shape);
     method public static androidx.compose.ui.Modifier border-bMj1UE0(androidx.compose.ui.Modifier, float width, androidx.compose.ui.graphics.Brush brush, androidx.compose.ui.graphics.Shape shape);
@@ -43,11 +39,6 @@ package androidx.compose.foundation {
     method @androidx.compose.runtime.Composable public static void ClickableText(androidx.compose.ui.text.AnnotatedString text, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.text.TextStyle style, optional boolean softWrap, optional androidx.compose.ui.text.style.TextOverflow overflow, optional int maxLines, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout, kotlin.jvm.functions.Function1<? super java.lang.Integer,kotlin.Unit> onClick);
   }
 
-  public final class ContentColorKt {
-    method @Deprecated @androidx.compose.runtime.Composable public static long contentColor();
-    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.graphics.Color> getAmbientContentColor();
-  }
-
   public final class DarkThemeKt {
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public static boolean isSystemInDarkTheme();
   }
@@ -57,12 +48,6 @@ package androidx.compose.foundation {
 
   public final class FocusableKt {
     method public static androidx.compose.ui.Modifier focusable(androidx.compose.ui.Modifier, optional boolean enabled, optional androidx.compose.foundation.InteractionState? interactionState);
-  }
-
-  public final class IconKt {
-    method @Deprecated @androidx.compose.runtime.Composable public static void Icon-1Wn-iBs(androidx.compose.ui.graphics.ImageBitmap bitmap, optional androidx.compose.ui.Modifier modifier, optional long tint);
-    method @Deprecated @androidx.compose.runtime.Composable public static void Icon-1eoVtfs(androidx.compose.ui.graphics.painter.Painter painter, optional androidx.compose.ui.Modifier modifier, optional long tint);
-    method @Deprecated @androidx.compose.runtime.Composable public static void Icon-tu7MLKI(androidx.compose.ui.graphics.vector.ImageVector imageVector, optional androidx.compose.ui.Modifier modifier, optional long tint);
   }
 
   public final class ImageKt {
@@ -81,7 +66,8 @@ package androidx.compose.foundation {
   }
 
   public final class IndicationKt {
-    method public static androidx.compose.runtime.ProvidableAmbient<kotlin.jvm.functions.Function0<androidx.compose.foundation.Indication>> getAmbientIndication();
+    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<kotlin.jvm.functions.Function0<androidx.compose.foundation.Indication>>! getAmbientIndication();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<kotlin.jvm.functions.Function0<androidx.compose.foundation.Indication>> getLocalIndication();
     method public static androidx.compose.ui.Modifier indication(androidx.compose.ui.Modifier, androidx.compose.foundation.InteractionState interactionState, optional androidx.compose.foundation.Indication? indication);
   }
 
@@ -643,7 +629,7 @@ package androidx.compose.foundation.text.selection {
   }
 
   public final class TextSelectionColorsKt {
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.foundation.text.selection.TextSelectionColors> getAmbientTextSelectionColors();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.foundation.text.selection.TextSelectionColors> getLocalTextSelectionColors();
   }
 
   public final class TextSelectionDelegateKt {

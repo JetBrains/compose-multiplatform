@@ -45,8 +45,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.AmbientAnimationClock
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalAnimationClock
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
@@ -172,7 +172,7 @@ fun rememberBottomSheetState(
     animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
     confirmStateChange: (BottomSheetValue) -> Boolean = { true }
 ): BottomSheetState {
-    val disposableClock = AmbientAnimationClock.current.asDisposableClock()
+    val disposableClock = LocalAnimationClock.current.asDisposableClock()
     return rememberSaveable(
         disposableClock,
         saver = BottomSheetState.Saver(
@@ -301,7 +301,7 @@ fun BottomSheetScaffold(
 ) {
     BoxWithConstraints(modifier) {
         val fullHeight = constraints.maxHeight.toFloat()
-        val peekHeightPx = with(AmbientDensity.current) { sheetPeekHeight.toPx() }
+        val peekHeightPx = with(LocalDensity.current) { sheetPeekHeight.toPx() }
         var bottomSheetHeight by remember { mutableStateOf(fullHeight) }
 
         val swipeable = Modifier

@@ -26,11 +26,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.integration.demos.common.Demo
-import androidx.compose.material.AmbientContentColor
-import androidx.compose.material.AmbientTextStyle
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
+import androidx.compose.material.LocalContentColor
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
@@ -115,8 +115,8 @@ private fun FilterField(
         modifier = modifier.focusRequester(focusRequester),
         value = filterText,
         onValueChange = onFilter,
-        textStyle = AmbientTextStyle.current,
-        cursorColor = AmbientContentColor.current
+        textStyle = LocalTextStyle.current,
+        cursorColor = LocalContentColor.current
     )
     DisposableEffect(focusRequester) {
         focusRequester.requestFocus()

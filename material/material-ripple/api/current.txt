@@ -27,7 +27,8 @@ package androidx.compose.material.ripple {
   }
 
   public final class RippleThemeKt {
-    method @androidx.compose.material.ripple.ExperimentalRippleApi public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.material.ripple.RippleTheme> getAmbientRippleTheme();
+    method @Deprecated @androidx.compose.material.ripple.ExperimentalRippleApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.material.ripple.RippleTheme> getAmbientRippleTheme();
+    method @androidx.compose.material.ripple.ExperimentalRippleApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.material.ripple.RippleTheme> getLocalRippleTheme();
   }
 
 }

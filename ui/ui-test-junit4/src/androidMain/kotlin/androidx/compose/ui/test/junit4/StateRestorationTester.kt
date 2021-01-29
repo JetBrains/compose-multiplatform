@@ -21,7 +21,7 @@ import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.AmbientSaveableStateRegistry
+import androidx.compose.runtime.saveable.LocalSaveableStateRegistry
 import androidx.compose.runtime.saveable.SaveableStateRegistry
 import androidx.compose.runtime.setValue
 
@@ -78,12 +78,12 @@ class StateRestorationTester(private val composeTestRule: ComposeContentTestRule
 
     @Composable
     private fun InjectRestorationRegistry(content: @Composable (RestorationRegistry) -> Unit) {
-        val original = requireNotNull(AmbientSaveableStateRegistry.current) {
+        val original = requireNotNull(LocalSaveableStateRegistry.current) {
             "StateRestorationTester requires composeTestRule.setContent() to provide " +
-                "an SaveableStateRegistry implementation via AmbientSaveableStateRegistry"
+                "a SaveableStateRegistry implementation via LocalSaveableStateRegistry"
         }
         val restorationRegistry = remember { RestorationRegistry(original) }
-        Providers(AmbientSaveableStateRegistry provides restorationRegistry) {
+        Providers(LocalSaveableStateRegistry provides restorationRegistry) {
             if (restorationRegistry.shouldEmitChildren) {
                 content(restorationRegistry)
             }

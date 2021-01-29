@@ -23,7 +23,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusState.Active
 import androidx.compose.ui.focus.FocusState.Inactive
-import androidx.compose.ui.platform.AmbientView
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -259,7 +259,7 @@ class FocusRequesterTest {
         var focusState = Inactive
         val (focusRequester1, focusRequester2) = FocusRequester.createRefs()
         rule.setFocusableContent {
-            hostView = AmbientView.current
+            hostView = LocalView.current
             Column(
                 modifier = Modifier.onFocusChanged { focusState = it }
             ) {

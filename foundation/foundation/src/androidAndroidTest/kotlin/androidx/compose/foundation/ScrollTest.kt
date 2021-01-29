@@ -37,8 +37,8 @@ import androidx.compose.testutils.MockAnimationClock
 import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
@@ -769,7 +769,7 @@ class ScrollTest {
         with(rule.density) {
             rule.setContent {
                 val direction = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
-                Providers(AmbientLayoutDirection provides direction) {
+                Providers(LocalLayoutDirection provides direction) {
                     Box {
                         Row(
                             modifier = Modifier
@@ -856,7 +856,7 @@ class ScrollTest {
                         }
                     } else {
                         val direction = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
-                        Providers(AmbientLayoutDirection provides direction) {
+                        Providers(LocalLayoutDirection provides direction) {
                             Row(
                                 Modifier.testTag(scrollerTag)
                                     .horizontalScroll(scrollState, reverseScrolling = isReversed)

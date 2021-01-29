@@ -30,7 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 
 /**
@@ -66,7 +66,7 @@ fun rememberVectorPainter(
     tintBlendMode: BlendMode = BlendMode.SrcIn,
     content: @Composable (viewportWidth: Float, viewportHeight: Float) -> Unit
 ): VectorPainter {
-    val density = AmbientDensity.current
+    val density = LocalDensity.current
     val widthPx = with(density) { defaultWidth.toPx() }
     val heightPx = with(density) { defaultHeight.toPx() }
 

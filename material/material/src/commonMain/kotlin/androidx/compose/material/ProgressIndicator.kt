@@ -41,7 +41,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -220,7 +220,7 @@ fun CircularProgressIndicator(
     color: Color = MaterialTheme.colors.primary,
     strokeWidth: Dp = ProgressIndicatorDefaults.StrokeWidth
 ) {
-    val stroke = with(AmbientDensity.current) {
+    val stroke = with(LocalDensity.current) {
         Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Butt)
     }
     Canvas(
@@ -249,7 +249,7 @@ fun CircularProgressIndicator(
     color: Color = MaterialTheme.colors.primary,
     strokeWidth: Dp = ProgressIndicatorDefaults.StrokeWidth
 ) {
-    val stroke = with(AmbientDensity.current) {
+    val stroke = with(LocalDensity.current) {
         Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Square)
     }
 

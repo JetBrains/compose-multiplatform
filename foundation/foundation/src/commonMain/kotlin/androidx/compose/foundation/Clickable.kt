@@ -38,7 +38,7 @@ import androidx.compose.ui.semantics.semantics
  * Add this modifier to the element to make it clickable within its bounds.
  *
  * This version has no [InteractionState] or [Indication] parameters, default indication from
- * [AmbientIndication] will be used. To specify [InteractionState] or [Indication], use another
+ * [LocalIndication] will be used. To specify [InteractionState] or [Indication], use another
  * overload.
  *
  * @sample androidx.compose.foundation.samples.ClickableSample
@@ -80,7 +80,7 @@ fun Modifier.clickable(
         onDoubleClick = onDoubleClick,
         onClick = onClick,
         role = role,
-        indication = AmbientIndication.current(),
+        indication = LocalIndication.current(),
         interactionState = remember { InteractionState() }
     )
 }
@@ -98,8 +98,8 @@ fun Modifier.clickable(
  * pressed, using [Interaction.Pressed]. Only initial (first) press will be recorded and added to
  * [InteractionState]
  * @param indication indication to be shown when modified element is pressed. Be default,
- * indication from [AmbientIndication] will be used. Pass `null` to show no indication, or
- * current value from [AmbientIndication] to show theme default
+ * indication from [LocalIndication] will be used. Pass `null` to show no indication, or
+ * current value from [LocalIndication] to show theme default
  * @param onClickLabel semantic / accessibility label for the [onClick] action
  * @param role the type of user interface element. Accessibility services might use this
  * to describe the element or do customizations

@@ -25,7 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.staticAmbientOf
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.testutils.ComposeTestCase
 import androidx.compose.testutils.ToggleableTestCase
@@ -155,7 +155,8 @@ private class ObservableThemeTestCase : ThemeTestCase() {
 
 /**
  * Test case using an immutable [TestTheme], that will cause a new value to be assigned to the
- * ambient every time we change this object, causing everything consuming this ambient to recompose.
+ * CompositionLocal every time we change this object, causing everything consuming this
+ * CompositionLocal to recompose.
  */
 private class ImmutableThemeTestCase : ThemeTestCase() {
     @Composable
@@ -172,7 +173,7 @@ private fun App(
     primaryTracker: CompositionTracker,
     secondaryTracker: CompositionTracker
 ) {
-    Providers(AmbientTestTheme provides theme) {
+    Providers(LocalTestTheme provides theme) {
         CheapPrimaryColorConsumer(primaryTracker)
         ExpensiveSecondaryColorConsumer(secondaryTracker)
         CheapPrimaryColorConsumer(primaryTracker)
@@ -181,7 +182,7 @@ private fun App(
 
 @Composable
 private fun CheapPrimaryColorConsumer(compositionTracker: CompositionTracker) {
-    val primary = AmbientTestTheme.current.primary
+    val primary = LocalTestTheme.current.primary
     // Consume color variable to avoid any optimizations
     println("Color $primary")
     compositionTracker.compositions++
@@ -189,7 +190,7 @@ private fun CheapPrimaryColorConsumer(compositionTracker: CompositionTracker) {
 
 @Composable
 private fun ExpensiveSecondaryColorConsumer(compositionTracker: CompositionTracker) {
-    val secondary = AmbientTestTheme.current.secondary
+    val secondary = LocalTestTheme.current.secondary
     // simulate some (relatively) expensive work
     Thread.sleep(1)
     // Consume color variable to avoid any optimizations
@@ -198,10 +199,10 @@ private fun ExpensiveSecondaryColorConsumer(compositionTracker: CompositionTrack
 }
 
 /**
- * Immutable as we want to ensure that we always skip recomposition unless the ambient value
- * inside the function changes.
+ * Immutable as we want to ensure that we always skip recomposition unless the CompositionLocal
+ * value inside the function changes.
  */
 @Immutable
 private class CompositionTracker(var compositions: Int = 0)
 
-private val AmbientTestTheme = staticAmbientOf<TestTheme>()
+private val LocalTestTheme = staticCompositionLocalOf<TestTheme>()

@@ -23,7 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.test.captureToImage
@@ -91,7 +91,7 @@ class ImageVectorTest {
         val testTag = "testTag"
         var insetRectSize: Int = 0
         rule.setContent {
-            with(AmbientDensity.current) {
+            with(LocalDensity.current) {
                 insetRectSize = (10f * this.density).roundToInt()
             }
             val imageVector =

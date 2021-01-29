@@ -123,7 +123,7 @@ fun takeSnapshot(
  * Composition uses [writeObserver] to track when a state object is modified during composition
  * in order to invalidate the reads that have not yet occurred. This allows a single pass of
  * composition for state objects that are written to before they are read (such as modifying the
- * value of a dynamic ambient provider).
+ * value of a dynamic CompositionLocal provider).
  *
  * @see takeSnapshot
  * @see Snapshot

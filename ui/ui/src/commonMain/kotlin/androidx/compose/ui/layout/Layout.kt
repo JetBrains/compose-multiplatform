@@ -31,8 +31,8 @@ import androidx.compose.ui.materialize
 import androidx.compose.ui.node.LayoutEmitHelper
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.MeasureBlocks
-import androidx.compose.ui.platform.AmbientDensity
-import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.simpleIdentityToString
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -225,8 +225,8 @@ fun measureBlocksOf(
     modifier: Modifier = Modifier
 ) {
     @OptIn(ExperimentalComposeApi::class)
-    val density = AmbientDensity.current
-    val layoutDirection = AmbientLayoutDirection.current
+    val density = LocalDensity.current
+    val layoutDirection = LocalLayoutDirection.current
     ComposeNode<LayoutNode, Applier<Any>>(
         factory = LayoutEmitHelper.constructor,
         update = {
@@ -262,8 +262,8 @@ fun MultiMeasureLayout(
 ) {
     val measureBlocks = remember(measureBlock) { MeasuringIntrinsicsMeasureBlocks(measureBlock) }
     val materialized = currentComposer.materialize(modifier)
-    val density = AmbientDensity.current
-    val layoutDirection = AmbientLayoutDirection.current
+    val density = LocalDensity.current
+    val layoutDirection = LocalLayoutDirection.current
 
     @OptIn(ExperimentalComposeApi::class)
     ComposeNode<LayoutNode, Applier<Any>>(
