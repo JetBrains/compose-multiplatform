@@ -57,6 +57,7 @@ import kotlin.math.abs
  * those that are included in the given orientation and does not consider pointers that are locked
  * to other orientations.
  */
+@Deprecated("Use Modifier.pointerInput{ } and awaitTouchSlopOrCancellation function")
 fun Modifier.dragSlopExceededGestureFilter(
     onDragSlopExceeded: () -> Unit,
     canDrag: ((Direction) -> Boolean)? = null,

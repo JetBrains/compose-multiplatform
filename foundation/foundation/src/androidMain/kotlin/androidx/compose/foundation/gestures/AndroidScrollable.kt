@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.foundation.gestures
 
 import androidx.compose.runtime.State
@@ -132,6 +134,7 @@ private suspend fun PointerInputScope.dragForEachGesture(
     }
 }
 
+@Suppress("DEPRECATION")
 internal actual fun Modifier.mouseScrollable(
     scrollCallback: ScrollCallback,
     orientation: Orientation

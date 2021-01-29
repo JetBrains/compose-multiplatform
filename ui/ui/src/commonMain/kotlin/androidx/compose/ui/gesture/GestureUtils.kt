@@ -32,7 +32,7 @@ import androidx.compose.ui.util.fastAny
  *
  * @return True if at least one pointer is in bounds.
  */
-fun List<PointerInputChange>.anyPointersInBounds(bounds: IntSize) =
+internal fun List<PointerInputChange>.anyPointersInBounds(bounds: IntSize) =
     fastAny {
         it.pressed &&
             it.position.x >= 0 &&

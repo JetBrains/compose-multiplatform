@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.ui.gesture
 
 import androidx.compose.runtime.remember
@@ -27,6 +29,7 @@ import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.IntSize
 
+@Deprecated("Use Modifier.pointerInput {detectDragGesturesAfterLongPress(...)} instead")
 interface LongPressDragObserver {
 
     /**
@@ -117,7 +120,7 @@ interface LongPressDragObserver {
  * @param longPressDragObserver The callback interface to report all events.
  * @see LongPressDragObserver
  */
-@Suppress("DEPRECATION")
+@Deprecated("Use Modifier.pointerInput { detectDragGesturesAfterLongPress(...)} instead.")
 fun Modifier.longPressDragGestureFilter(
     longPressDragObserver: LongPressDragObserver
 ): Modifier = composed(

@@ -459,34 +459,33 @@ package androidx.compose.ui.gesture {
   }
 
   public final class DragGestureFilterKt {
-    method public static androidx.compose.ui.Modifier dragGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.DragObserver dragObserver, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.gesture.Direction,java.lang.Boolean>? canDrag, optional boolean startDragImmediately);
+    method @Deprecated public static androidx.compose.ui.Modifier dragGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.DragObserver dragObserver, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.gesture.Direction,java.lang.Boolean>? canDrag, optional boolean startDragImmediately);
   }
 
-  public interface DragObserver {
-    method public default void onCancel();
-    method public default long onDrag-k-4lQ0M(long dragDistance);
-    method public default void onStart-k-4lQ0M(long downPosition);
-    method public default void onStop-k-4lQ0M(long velocity);
+  @Deprecated public interface DragObserver {
+    method @Deprecated public default void onCancel();
+    method @Deprecated public default long onDrag-k-4lQ0M(long dragDistance);
+    method @Deprecated public default void onStart-k-4lQ0M(long downPosition);
+    method @Deprecated public default void onStop-k-4lQ0M(long velocity);
   }
 
   public final class DragSlopExceededGestureFilterKt {
-    method public static androidx.compose.ui.Modifier dragSlopExceededGestureFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function0<kotlin.Unit> onDragSlopExceeded, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.gesture.Direction,java.lang.Boolean>? canDrag, optional androidx.compose.ui.gesture.scrollorientationlocking.Orientation? orientation);
+    method @Deprecated public static androidx.compose.ui.Modifier dragSlopExceededGestureFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function0<kotlin.Unit> onDragSlopExceeded, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.gesture.Direction,java.lang.Boolean>? canDrag, optional androidx.compose.ui.gesture.scrollorientationlocking.Orientation? orientation);
   }
 
   public final class GestureUtilsKt {
-    method public static boolean anyPointersInBounds-5eFHUEc(java.util.List<androidx.compose.ui.input.pointer.PointerInputChange>, long bounds);
   }
 
   public final class LongPressDragGestureFilterKt {
-    method public static androidx.compose.ui.Modifier longPressDragGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.LongPressDragObserver longPressDragObserver);
+    method @Deprecated public static androidx.compose.ui.Modifier longPressDragGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.LongPressDragObserver longPressDragObserver);
   }
 
-  public interface LongPressDragObserver {
-    method public default void onCancel();
-    method public default long onDrag-k-4lQ0M(long dragDistance);
-    method public default void onDragStart();
-    method public default void onLongPress-k-4lQ0M(long pxPosition);
-    method public default void onStop-k-4lQ0M(long velocity);
+  @Deprecated public interface LongPressDragObserver {
+    method @Deprecated public default void onCancel();
+    method @Deprecated public default long onDrag-k-4lQ0M(long dragDistance);
+    method @Deprecated public default void onDragStart();
+    method @Deprecated public default void onLongPress-k-4lQ0M(long pxPosition);
+    method @Deprecated public default void onStop-k-4lQ0M(long velocity);
   }
 
   public final class LongPressGestureFilterKt {
@@ -498,25 +497,25 @@ package androidx.compose.ui.gesture {
   }
 
   public final class RawDragGestureFilterKt {
-    method public static androidx.compose.ui.Modifier rawDragGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.DragObserver dragObserver, optional kotlin.jvm.functions.Function0<java.lang.Boolean>? canStartDragging, optional androidx.compose.ui.gesture.scrollorientationlocking.Orientation? orientation);
+    method @Deprecated public static androidx.compose.ui.Modifier rawDragGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.DragObserver dragObserver, optional kotlin.jvm.functions.Function0<java.lang.Boolean>? canStartDragging, optional androidx.compose.ui.gesture.scrollorientationlocking.Orientation? orientation);
   }
 
   public final class RawPressStartGestureFilterKt {
-    method public static androidx.compose.ui.Modifier rawPressStartGestureFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onPressStart, optional boolean enabled, optional androidx.compose.ui.input.pointer.PointerEventPass executionPass);
+    method @Deprecated public static androidx.compose.ui.Modifier rawPressStartGestureFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onPressStart, optional boolean enabled, optional androidx.compose.ui.input.pointer.PointerEventPass executionPass);
   }
 
   public final class ScaleUtilKt {
   }
 
-  public interface ScrollCallback {
-    method public default void onCancel();
-    method public default float onScroll(float scrollDistance);
-    method public default void onStart-k-4lQ0M(long downPosition);
-    method public default void onStop(float velocity);
+  @Deprecated public interface ScrollCallback {
+    method @Deprecated public default void onCancel();
+    method @Deprecated public default float onScroll(float scrollDistance);
+    method @Deprecated public default void onStart-k-4lQ0M(long downPosition);
+    method @Deprecated public default void onStop(float velocity);
   }
 
   public final class ScrollGestureFilterKt {
-    method public static androidx.compose.ui.Modifier scrollGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.ScrollCallback scrollCallback, androidx.compose.ui.gesture.scrollorientationlocking.Orientation orientation, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.gesture.Direction,java.lang.Boolean>? canDrag, optional boolean startDragImmediately);
+    method @Deprecated public static androidx.compose.ui.Modifier scrollGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.ScrollCallback scrollCallback, androidx.compose.ui.gesture.scrollorientationlocking.Orientation orientation, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.gesture.Direction,java.lang.Boolean>? canDrag, optional boolean startDragImmediately);
   }
 
   public final class TapGestureFilterKt {

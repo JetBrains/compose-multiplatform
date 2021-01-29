@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION") // LongPressDragObserver
+
 package androidx.compose.foundation.text
 
 import androidx.compose.ui.geometry.Offset

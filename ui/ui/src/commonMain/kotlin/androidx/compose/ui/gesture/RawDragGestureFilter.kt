@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.ui.gesture
 
 import androidx.compose.runtime.remember
@@ -44,6 +46,8 @@ import androidx.compose.ui.util.fastForEach
 /**
  * Defines the callbacks associated with dragging.
  */
+
+@Deprecated("Use Modifier.pointerInput { detectDragGestures(...) }")
 interface DragObserver {
 
     /**
@@ -145,6 +149,7 @@ interface DragObserver {
 
 // TODO(b/129784010): Consider also allowing onStart, onDrag, and onStop to be set individually
 //  (instead of all being set via DragObserver).
+@Deprecated("use Modifier.pointerInput { } with awaitFirstDown() and drag() functions")
 fun Modifier.rawDragGestureFilter(
     dragObserver: DragObserver,
     canStartDragging: (() -> Boolean)? = null,

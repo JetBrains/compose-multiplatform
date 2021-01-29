@@ -26,6 +26,7 @@ import androidx.compose.foundation.gestures.awaitTouchSlopOrCancellation
 import androidx.compose.foundation.gestures.awaitVerticalDragOrCancellation
 import androidx.compose.foundation.gestures.awaitVerticalTouchSlopOrCancellation
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.gestures.drag
@@ -413,6 +414,40 @@ fun DetectDragGesturesSample() {
                 .background(Color.Blue)
                 .pointerInput {
                     detectDragGestures { change, dragAmount ->
+                        val original = Offset(offsetX.value, offsetY.value)
+                        val summed = original + dragAmount
+                        val newValue = Offset(
+                            x = summed.x.coerceIn(0f, size.width - 50.dp.toPx()),
+                            y = summed.y.coerceIn(0f, size.height - 50.dp.toPx())
+                        )
+                        change.consumePositionChange(
+                            consumedDx = newValue.x - original.x,
+                            consumedDy = newValue.y - original.y
+                        )
+                        offsetX.value = newValue.x
+                        offsetY.value = newValue.y
+                    }
+                }
+        )
+    }
+}
+
+@Composable
+@Sampled
+fun DetectDragWithLongPressGesturesSample() {
+    val offsetX = remember { mutableStateOf(0f) }
+    val offsetY = remember { mutableStateOf(0f) }
+    var size by remember { mutableStateOf(Size.Zero) }
+    Box(
+        Modifier.fillMaxSize()
+            .onSizeChanged { size = it.toSize() }
+    ) {
+        Box(
+            Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
+                .size(50.dp)
+                .background(Color.Blue)
+                .pointerInput {
+                    detectDragGesturesAfterLongPress { change, dragAmount ->
                         val original = Offset(offsetX.value, offsetY.value)
                         val summed = original + dragAmount
                         val newValue = Offset(
