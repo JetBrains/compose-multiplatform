@@ -232,7 +232,7 @@ class SnapshotTests {
             assertEquals(snapshot, observedSnapshot)
         } finally {
             snapshot.dispose()
-            unregister()
+            unregister.dispose()
         }
     }
 
@@ -258,7 +258,7 @@ class SnapshotTests {
 
             assertTrue(applyObserved)
         } finally {
-            unregister()
+            unregister.dispose()
         }
     }
 
@@ -645,7 +645,7 @@ internal fun <T> changesOf(state: State<T>, block: () -> Unit): Int {
         block()
         Snapshot.sendApplyNotifications()
     } finally {
-        removeObserver()
+        removeObserver.dispose()
     }
     return changes
 }

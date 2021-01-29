@@ -25,7 +25,7 @@ import kotlinx.collections.immutable.persistentListOf
 
 /**
  * An implementation of [MutableList] that can be observed and snapshot. This is the result type
- * created by [androidx.compose.mutableStateListOf].
+ * created by [androidx.compose.runtime.mutableStateListOf].
  *
  * This class closely implements the same semantics as [ArrayList].
  *
@@ -33,7 +33,7 @@ import kotlinx.collections.immutable.persistentListOf
  */
 @Stable
 class SnapshotStateList<T> : MutableList<T>, StateObject {
-    override var firstStateRecord: StateListStateRecord<T> =
+    override var firstStateRecord: StateRecord =
         StateListStateRecord<T>(persistentListOf())
         private set
 
@@ -47,12 +47,12 @@ class SnapshotStateList<T> : MutableList<T>, StateObject {
 
     @Suppress("UNCHECKED_CAST")
     internal val readable: StateListStateRecord<T> get() =
-        firstStateRecord.readable(this)
+        (firstStateRecord as StateListStateRecord<T>).readable(this)
 
     /**
      * This is an internal implementation class of [SnapshotStateList]. Do not use.
      */
-    class StateListStateRecord<T> internal constructor(
+    internal class StateListStateRecord<T> internal constructor(
         internal var list: PersistentList<T>
     ) : StateRecord() {
         internal var modification = 0
@@ -102,11 +102,11 @@ class SnapshotStateList<T> : MutableList<T>, StateObject {
 
     private inline fun <R> writable(block: StateListStateRecord<T>.() -> R): R =
         @Suppress("UNCHECKED_CAST")
-        firstStateRecord.writable(this, block)
+        (firstStateRecord as StateListStateRecord<T>).writable(this, block)
 
     private inline fun <R> withCurrent(block: StateListStateRecord<T>.() -> R): R =
         @Suppress("UNCHECKED_CAST")
-        firstStateRecord.withCurrent(block)
+        (firstStateRecord as StateListStateRecord<T>).withCurrent(block)
 
     private inline fun <R> mutate(block: (MutableList<T>) -> R): R =
         withCurrent {

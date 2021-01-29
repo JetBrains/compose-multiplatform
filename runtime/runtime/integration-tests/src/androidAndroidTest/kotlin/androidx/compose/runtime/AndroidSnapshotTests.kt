@@ -59,7 +59,7 @@ class AndroidSnapshotTests : BaseComposeTest() {
                     }
                 }
             } finally {
-                unregister()
+                unregister.dispose()
             }
         } finally {
             stop = true

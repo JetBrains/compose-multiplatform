@@ -19,8 +19,6 @@ package androidx.compose.runtime
 import androidx.compose.runtime.snapshots.MutableSnapshot
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.snapshots.SnapshotApplyResult
-import androidx.compose.runtime.snapshots.SnapshotReadObserver
-import androidx.compose.runtime.snapshots.SnapshotWriteObserver
 import androidx.compose.runtime.snapshots.fastForEach
 import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.coroutines.CancellableContinuation
@@ -443,7 +441,7 @@ class Recomposer(
                     }
                 }
             } finally {
-                unregisterApplyObserver()
+                unregisterApplyObserver.dispose()
                 synchronized(stateLock) {
                     if (runnerJob === callingJob) {
                         runnerJob = null
@@ -529,11 +527,11 @@ class Recomposer(
         ) composition else null
     }
 
-    private fun readObserverOf(composition: ControlledComposition): SnapshotReadObserver {
+    private fun readObserverOf(composition: ControlledComposition): (Any) -> Unit {
         return { value -> composition.recordReadOf(value) }
     }
 
-    private fun writeObserverOf(composition: ControlledComposition): SnapshotWriteObserver {
+    private fun writeObserverOf(composition: ControlledComposition): (Any) -> Unit {
         return { value -> composition.recordWriteOf(value) }
     }
 
