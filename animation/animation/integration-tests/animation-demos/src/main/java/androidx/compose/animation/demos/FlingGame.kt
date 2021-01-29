@@ -49,14 +49,18 @@ fun FlingGame() {
                     while (true) {
                         val pointerId = awaitPointerEventScope {
                             awaitFirstDown().run {
-                                anim.snapTo(position)
+                                launch {
+                                    anim.snapTo(position)
+                                }
                                 id
                             }
                         }
                         val velocityTracker = VelocityTracker()
                         awaitPointerEventScope {
                             drag(pointerId) {
-                                anim.snapTo(anim.value + it.positionChange())
+                                launch {
+                                    anim.snapTo(anim.value + it.positionChange())
+                                }
                                 velocityTracker.addPosition(
                                     it.uptimeMillis,
                                     it.position

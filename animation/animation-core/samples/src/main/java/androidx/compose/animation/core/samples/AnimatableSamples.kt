@@ -111,7 +111,9 @@ fun AnimatableDecayAndAnimateToSample() {
                     awaitPointerEventScope {
                         verticalDrag(pointerId) {
                             // Snaps the value by the amount of finger movement
-                            animatedOffset.snapTo(animatedOffset.value + it.positionChange().y)
+                            launch {
+                                animatedOffset.snapTo(animatedOffset.value + it.positionChange().y)
+                            }
                             velocityTracker.addPosition(
                                 it.uptimeMillis,
                                 it.position
