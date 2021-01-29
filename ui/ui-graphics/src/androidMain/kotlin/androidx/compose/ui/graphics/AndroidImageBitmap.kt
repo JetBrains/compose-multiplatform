@@ -18,7 +18,7 @@ package androidx.compose.ui.graphics
 
 import android.content.res.Resources
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
 import android.os.Build
 import android.util.DisplayMetrics
 import androidx.annotation.RequiresApi
@@ -34,7 +34,7 @@ import androidx.compose.ui.graphics.colorspace.ColorSpaces
  * @return Loaded image file represented as an [ImageBitmap]
  */
 fun imageFromResource(res: Resources, resId: Int): ImageBitmap {
-    return AndroidImageBitmap(BitmapFactory.decodeResource(res, resId))
+    return (res.getDrawable(resId, null) as BitmapDrawable).bitmap.asImageBitmap()
 }
 
 /**

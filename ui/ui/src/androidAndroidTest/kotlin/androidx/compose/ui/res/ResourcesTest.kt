@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.res
 
+import android.graphics.drawable.BitmapDrawable
 import android.util.LruCache
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.graphics.ImageBitmap
@@ -28,6 +29,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -51,6 +54,21 @@ class ResourcesTest {
             runnable?.run()
             runnable = null
         }
+    }
+
+    @Test
+    fun ensureImageBitmapIsLoadedFromResourceCache() {
+        var bitmapDrawable: BitmapDrawable? = null
+        var imageBitmap: ImageBitmap? = null
+        rule.setContent {
+            val resource = AmbientContext.current.resources
+            bitmapDrawable = resource.getDrawable(R.drawable.loaded_image, null) as BitmapDrawable
+            imageBitmap = imageResource(R.drawable.loaded_image)
+        }
+
+        assertNotNull(bitmapDrawable)
+        assertNotNull(imageBitmap)
+        assertTrue(bitmapDrawable?.bitmap === imageBitmap?.asAndroidBitmap())
     }
 
     @Test
