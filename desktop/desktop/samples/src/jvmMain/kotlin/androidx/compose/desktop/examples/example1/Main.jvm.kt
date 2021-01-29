@@ -46,6 +46,7 @@ import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.BottomAppBar
 import androidx.compose.material.Button
@@ -301,31 +302,33 @@ private fun ScrollableContent(scrollState: ScrollState) {
         var overText by remember { mutableStateOf("Move mouse over text:") }
         Text(overText, style = TextStyle(letterSpacing = 10.sp))
 
-        Text(
-            text = "fun <T : Comparable<T>> List<T>.quickSort(): List<T> = when {\n" +
-                "  size < 2 -> this\n" +
-                "  else -> {\n" +
-                "    val pivot = first()\n" +
-                "    val (smaller, greater) = drop(1).partition { it <= pivot }\n" +
-                "    smaller.quickSort() + pivot + greater.quickSort()\n" +
-                "   }\n" +
-                "}",
-            fontFamily = italicFont,
-            modifier = Modifier.padding(10.dp).pointerMoveFilter(
-                onMove = {
-                    overText = "Move position: $it"
-                    false
-                },
-                onEnter = {
-                    overText = "Over enter"
-                    false
-                },
-                onExit = {
-                    overText = "Over exit"
-                    false
-                }
+        SelectionContainer {
+            Text(
+                text = "fun <T : Comparable<T>> List<T>.quickSort(): List<T> = when {\n" +
+                    "  size < 2 -> this\n" +
+                    "  else -> {\n" +
+                    "    val pivot = first()\n" +
+                    "    val (smaller, greater) = drop(1).partition { it <= pivot }\n" +
+                    "    smaller.quickSort() + pivot + greater.quickSort()\n" +
+                    "   }\n" +
+                    "}",
+                fontFamily = italicFont,
+                modifier = Modifier.padding(10.dp).pointerMoveFilter(
+                    onMove = {
+                        overText = "Move position: $it"
+                        false
+                    },
+                    onEnter = {
+                        overText = "Over enter"
+                        false
+                    },
+                    onExit = {
+                        overText = "Over exit"
+                        false
+                    }
+                )
             )
-        )
+        }
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             var lastEvent by remember { mutableStateOf<MouseEvent?>(null) }

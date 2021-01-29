@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,10 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.input.pointer
+package androidx.compose.foundation.text
 
-@RequiresOptIn(
-    level = RequiresOptIn.Level.ERROR,
-    message = "This is a temporary API and should be removed after proper mouse handling is " +
-        "settled (b/171402426)."
-)
-@Target(
-    AnnotationTarget.CLASS,
-    AnnotationTarget.FUNCTION,
-    AnnotationTarget.PROPERTY
-)
-annotation class MouseTemporaryApi
+/**
+ * This is a temporary workaround and should be removed after proper mouse handling is settled
+ * (b/171402426).
+ */
+internal expect val isInTouchMode: Boolean

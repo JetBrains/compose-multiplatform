@@ -44,8 +44,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.input.pointer.MouseTemporaryApi
-import androidx.compose.ui.input.pointer.isMouseInput
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.layout.Layout
@@ -157,7 +155,7 @@ import kotlin.math.roundToInt
  * innerTextField exactly once.
  */
 @Composable
-@OptIn(MouseTemporaryApi::class, InternalFoundationTextApi::class)
+@OptIn(InternalFoundationTextApi::class)
 internal fun CoreTextField(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
@@ -305,15 +303,15 @@ internal fun CoreTextField(
     val selectionModifier =
         Modifier.longPressDragGestureFilter(manager.touchSelectionObserver, enabled)
 
-    val pointerModifier = if (isMouseInput) {
+    val pointerModifier = if (isInTouchMode) {
+        Modifier.pressGestureFilter(interactionState = interactionState, enabled = enabled)
+            .then(selectionModifier)
+            .then(focusRequestTapModifier)
+    } else {
         Modifier.mouseDragGestureFilter(
             manager.mouseSelectionObserver(onStart = { focusRequester.requestFocus() }),
             enabled = enabled
         )
-    } else {
-        Modifier.pressGestureFilter(interactionState = interactionState, enabled = enabled)
-            .then(selectionModifier)
-            .then(focusRequestTapModifier)
     }
 
     val drawModifier = Modifier.drawBehind {
@@ -501,7 +499,7 @@ internal fun CoreTextField(
                         state.selectionIsOn &&
                         state.layoutCoordinates != null &&
                         state.layoutCoordinates!!.isAttached &&
-                        !isMouseInput
+                        isInTouchMode
                 )
             }
         }

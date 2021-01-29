@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.input.pointer
+package androidx.compose.foundation.text.selection
 
-@MouseTemporaryApi
-actual val isMouseInput = true
+import androidx.compose.ui.input.key.KeyEvent
+
+// TODO(b/139322105) Implement for Android when hardware keyboard is implemented
+internal actual fun isCopyKeyEvent(keyEvent: KeyEvent) = false
