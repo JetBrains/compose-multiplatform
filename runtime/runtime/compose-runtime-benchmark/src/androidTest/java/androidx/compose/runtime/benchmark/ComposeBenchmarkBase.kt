@@ -26,8 +26,6 @@ import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.snapshots.Snapshot
-import androidx.compose.runtime.snapshots.SnapshotReadObserver
-import androidx.compose.runtime.snapshots.SnapshotWriteObserver
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.TestMonotonicFrameClock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -92,12 +90,8 @@ abstract class ComposeBenchmarkBase {
 
         val composition = activeComposition
         require(composition != null) { "Composition was null" }
-        val readObserver: SnapshotReadObserver = {
-            composition.recordReadOf(it)
-        }
-        val writeObserver: SnapshotWriteObserver = {
-            composition.recordWriteOf(it)
-        }
+        val readObserver = { value: Any -> composition.recordReadOf(value) }
+        val writeObserver = { value: Any -> composition.recordWriteOf(value) }
         val unregisterApplyObserver = Snapshot.registerApplyObserver { changed, _ ->
             composition.recordModificationsOf(changed)
         }
@@ -116,7 +110,7 @@ abstract class ComposeBenchmarkBase {
                 }
             }
         } finally {
-            unregisterApplyObserver()
+            unregisterApplyObserver.dispose()
             activity.setContentView(emptyView)
         }
     }
@@ -191,8 +185,8 @@ inline fun BenchmarkRule.measureRepeatedSuspendable(block: BenchmarkRule.Scope.(
 }
 
 fun ControlledComposition.performRecompose(
-    readObserver: SnapshotReadObserver,
-    writeObserver: SnapshotWriteObserver
+    readObserver: (Any) -> Unit,
+    writeObserver: (Any) -> Unit
 ): Boolean {
     val snapshot = Snapshot.takeMutableSnapshot(readObserver, writeObserver)
     val result = snapshot.enter {

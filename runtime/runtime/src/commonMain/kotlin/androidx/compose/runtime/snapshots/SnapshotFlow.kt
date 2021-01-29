@@ -115,7 +115,7 @@ fun <T> snapshotFlow(
             }
         }
     } finally {
-        unregisterApplyObserver()
+        unregisterApplyObserver.dispose()
     }
 }
 

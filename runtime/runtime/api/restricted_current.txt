@@ -691,7 +691,7 @@ package androidx.compose.runtime.snapshots {
     method public void close$metalava_module();
     method public java.util.Set<androidx.compose.runtime.snapshots.StateObject>? getModified$metalava_module();
     method public kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? getReadObserver$metalava_module();
-    method public boolean getReadonly();
+    method public boolean getReadOnly();
     method public androidx.compose.runtime.snapshots.Snapshot getRoot();
     method public kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? getWriteObserver$metalava_module();
     method public boolean hasPendingChanges();
@@ -704,23 +704,29 @@ package androidx.compose.runtime.snapshots {
     method public androidx.compose.runtime.snapshots.Snapshot takeNestedSnapshot(kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? readObserver);
     property public java.util.Set<androidx.compose.runtime.snapshots.StateObject>? modified;
     property public kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? readObserver;
-    property public boolean readonly;
+    property public boolean readOnly;
     property public androidx.compose.runtime.snapshots.Snapshot root;
     property public kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? writeObserver;
+  }
+
+  public fun interface ObserverHandle {
+    method public void dispose();
   }
 
   public abstract sealed class Snapshot {
     method public void dispose();
     method public final inline <T> T! enter(kotlin.jvm.functions.Function0<? extends T> block);
     method public int getId();
-    method public abstract boolean getReadonly();
+    method public abstract boolean getReadOnly();
+    method @Deprecated public final boolean getReadonly();
     method public abstract androidx.compose.runtime.snapshots.Snapshot getRoot();
     method public abstract boolean hasPendingChanges();
     method @kotlin.PublishedApi internal androidx.compose.runtime.snapshots.Snapshot? makeCurrent();
     method @kotlin.PublishedApi internal void restoreCurrent(androidx.compose.runtime.snapshots.Snapshot? snapshot);
     method public abstract androidx.compose.runtime.snapshots.Snapshot takeNestedSnapshot(optional kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? readObserver);
     property public int id;
-    property public abstract boolean readonly;
+    property public abstract boolean readOnly;
+    property @Deprecated public final boolean readonly;
     property public abstract androidx.compose.runtime.snapshots.Snapshot root;
     field public static final androidx.compose.runtime.snapshots.Snapshot.Companion Companion;
   }
@@ -731,8 +737,8 @@ package androidx.compose.runtime.snapshots {
     method public void notifyObjectsInitialized();
     method public <T> T! observe(optional kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? readObserver, optional kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? writeObserver, kotlin.jvm.functions.Function0<? extends T> block);
     method @androidx.compose.runtime.InternalComposeApi public int openSnapshotCount();
-    method public kotlin.jvm.functions.Function0<kotlin.Unit> registerApplyObserver(kotlin.jvm.functions.Function2<? super java.util.Set<?>,? super androidx.compose.runtime.snapshots.Snapshot,kotlin.Unit> observer);
-    method public kotlin.jvm.functions.Function0<kotlin.Unit> registerGlobalWriteObserver(kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit> observer);
+    method public androidx.compose.runtime.snapshots.ObserverHandle registerApplyObserver(kotlin.jvm.functions.Function2<? super java.util.Set<?>,? super androidx.compose.runtime.snapshots.Snapshot,kotlin.Unit> observer);
+    method public androidx.compose.runtime.snapshots.ObserverHandle registerGlobalWriteObserver(kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit> observer);
     method @kotlin.PublishedApi internal androidx.compose.runtime.snapshots.Snapshot? removeCurrent();
     method @kotlin.PublishedApi internal void restoreCurrent(androidx.compose.runtime.snapshots.Snapshot? previous);
     method public void sendApplyNotifications();
@@ -809,7 +815,7 @@ package androidx.compose.runtime.snapshots {
     method public boolean contains(Object? element);
     method public boolean containsAll(java.util.Collection<?> elements);
     method public T! get(int index);
-    method public androidx.compose.runtime.snapshots.SnapshotStateList.StateListStateRecord<T> getFirstStateRecord();
+    method public androidx.compose.runtime.snapshots.StateRecord getFirstStateRecord();
     method public int getSize();
     method public int indexOf(Object? element);
     method public boolean isEmpty();
@@ -825,13 +831,8 @@ package androidx.compose.runtime.snapshots {
     method public boolean retainAll(java.util.Collection<?> elements);
     method public T! set(int index, T? element);
     method public java.util.List<T> subList(int fromIndex, int toIndex);
-    property public androidx.compose.runtime.snapshots.SnapshotStateList.StateListStateRecord<T> firstStateRecord;
+    property public androidx.compose.runtime.snapshots.StateRecord firstStateRecord;
     property public int size;
-  }
-
-  public static final class SnapshotStateList.StateListStateRecord<T> extends androidx.compose.runtime.snapshots.StateRecord {
-    method public void assign(androidx.compose.runtime.snapshots.StateRecord value);
-    method public androidx.compose.runtime.snapshots.StateRecord create();
   }
 
   public final class SnapshotStateListKt {
@@ -844,7 +845,7 @@ package androidx.compose.runtime.snapshots {
     method public boolean containsValue(Object? value);
     method public V? get(Object? key);
     method public java.util.Set<java.util.Map.Entry<K,V>> getEntries();
-    method public androidx.compose.runtime.snapshots.SnapshotStateMap.StateMapStateRecord<K,V> getFirstStateRecord();
+    method public androidx.compose.runtime.snapshots.StateRecord getFirstStateRecord();
     method public java.util.Set<K> getKeys();
     method public int getSize();
     method public java.util.Collection<V> getValues();
@@ -854,15 +855,10 @@ package androidx.compose.runtime.snapshots {
     method public void putAll(java.util.Map<? extends K,? extends V> from);
     method public V? remove(Object? key);
     property public java.util.Set<java.util.Map.Entry<K,V>> entries;
-    property public androidx.compose.runtime.snapshots.SnapshotStateMap.StateMapStateRecord<K,V> firstStateRecord;
+    property public androidx.compose.runtime.snapshots.StateRecord firstStateRecord;
     property public java.util.Set<K> keys;
     property public int size;
     property public java.util.Collection<V> values;
-  }
-
-  public static final class SnapshotStateMap.StateMapStateRecord<K, V> extends androidx.compose.runtime.snapshots.StateRecord {
-    method public void assign(androidx.compose.runtime.snapshots.StateRecord value);
-    method public androidx.compose.runtime.snapshots.StateRecord create();
   }
 
   public final class SnapshotStateMapKt {
