@@ -21,8 +21,11 @@ import android.view.View
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.ComposeNode
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.materialize
+import androidx.compose.ui.node.LayoutNode
+import androidx.compose.ui.node.Ref
 import androidx.compose.ui.node.UiApplier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -52,13 +55,20 @@ fun <T : View> AndroidView(
     val context = LocalContext.current
     val materialized = currentComposer.materialize(modifier)
     val density = LocalDensity.current
-    ComposeNode<ViewBlockHolder<T>, UiApplier>(
-        factory = { ViewBlockHolder(context) },
+
+    val viewBlockHolderRef = remember { Ref<ViewBlockHolder<T>>() }
+    ComposeNode<LayoutNode, UiApplier>(
+        factory = {
+            val viewBlockHolder = ViewBlockHolder<T>(context)
+            viewBlockHolder.viewBlock = viewBlock
+            viewBlockHolderRef.value = viewBlockHolder
+            viewBlockHolder.toLayoutNode()
+        },
         update = {
-            set(viewBlock) { this.viewBlock = it }
-            set(materialized) { this.modifier = it }
-            set(density) { this.density = it }
-            set(update) { this.updateBlock = it }
+            set(viewBlock) { viewBlockHolderRef.value!!.viewBlock = it }
+            set(materialized) { viewBlockHolderRef.value!!.modifier = it }
+            set(density) { viewBlockHolderRef.value!!.density = it }
+            set(update) { viewBlockHolderRef.value!!.updateBlock = it }
         }
     )
 }
