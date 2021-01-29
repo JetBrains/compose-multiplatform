@@ -38,8 +38,8 @@ import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.R
@@ -330,7 +330,7 @@ class AndroidViewTest {
             val size = 50.dp
             val density = Density(3f)
             val sizeIpx = with(density) { size.toIntPx() }
-            Providers(AmbientDensity provides density) {
+            Providers(LocalDensity provides density) {
                 AndroidView(
                     { FrameLayout(it) },
                     Modifier.size(size).onGloballyPositioned {

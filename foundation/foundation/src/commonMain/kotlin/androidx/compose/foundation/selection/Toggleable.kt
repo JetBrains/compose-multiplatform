@@ -16,10 +16,10 @@
 
 package androidx.compose.foundation.selection
 
-import androidx.compose.foundation.AmbientIndication
 import androidx.compose.foundation.Indication
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.Strings
 import androidx.compose.foundation.indication
 import androidx.compose.runtime.DisposableEffect
@@ -45,7 +45,7 @@ import androidx.compose.ui.state.ToggleableState.On
  * Configure component to make it toggleable via input and accessibility events
  *
  * This version has no [InteractionState] or [Indication] parameters, default indication from
- * [AmbientIndication] will be used. To specify [InteractionState] or [Indication], use another
+ * [LocalIndication] will be used. To specify [InteractionState] or [Indication], use another
  * overload.
  *
  * @sample androidx.compose.foundation.samples.ToggleableSample
@@ -80,7 +80,7 @@ fun Modifier.toggleable(
         enabled = enabled,
         role = role,
         interactionState = remember { InteractionState() },
-        indication = AmbientIndication.current()
+        indication = LocalIndication.current()
     )
 }
 
@@ -98,8 +98,8 @@ fun Modifier.toggleable(
  * @param interactionState [InteractionState] that will be updated when this toggleable is
  * pressed, using [Interaction.Pressed]
  * @param indication indication to be shown when modified element is pressed. Be default,
- * indication from [AmbientIndication] will be used. Pass `null` to show no indication, or
- * current value from [AmbientIndication] to show theme default
+ * indication from [LocalIndication] will be used. Pass `null` to show no indication, or
+ * current value from [LocalIndication] to show theme default
  * @param enabled whether or not this [toggleable] will handle input events and appear
  * enabled for semantics purposes
  * * @param role the type of user interface element. Accessibility services might use this
@@ -144,7 +144,7 @@ fun Modifier.toggleable(
  * component and those can have different values.
  *
  * This version has no [InteractionState] or [Indication] parameters, default indication from
- * [AmbientIndication] will be used. To specify [InteractionState] or [Indication], use another
+ * [LocalIndication] will be used. To specify [InteractionState] or [Indication], use another
  * overload.
  *
  * @sample androidx.compose.foundation.samples.TriStateToggleableSample
@@ -177,7 +177,7 @@ fun Modifier.triStateToggleable(
         enabled,
         role,
         remember { InteractionState() },
-        AmbientIndication.current(),
+        LocalIndication.current(),
         onClick
     )
 }
@@ -200,8 +200,8 @@ fun Modifier.triStateToggleable(
  * @param interactionState [InteractionState] that will be updated when this toggleable is
  * pressed, using [Interaction.Pressed]
  * @param indication indication to be shown when modified element is pressed. Be default,
- * indication from [AmbientIndication] will be used. Pass `null` to show no indication, or
- * current value from [AmbientIndication] to show theme default
+ * indication from [LocalIndication] will be used. Pass `null` to show no indication, or
+ * current value from [LocalIndication] to show theme default
  * @param enabled whether or not this [triStateToggleable] will handle input events and
  * appear enabled for semantics purposes
  * @param role the type of user interface element. Accessibility services might use this

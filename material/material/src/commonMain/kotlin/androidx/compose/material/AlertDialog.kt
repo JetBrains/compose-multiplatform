@@ -159,7 +159,7 @@ fun AlertDialog(
                 AlertDialogBaselineLayout(
                     title = title?.let {
                         @Composable {
-                            Providers(AmbientContentAlpha provides ContentAlpha.high) {
+                            Providers(LocalContentAlpha provides ContentAlpha.high) {
                                 val textStyle = MaterialTheme.typography.subtitle1
                                 ProvideTextStyle(textStyle, title)
                             }
@@ -167,7 +167,7 @@ fun AlertDialog(
                     },
                     text = text?.let {
                         @Composable {
-                            Providers(AmbientContentAlpha provides ContentAlpha.medium) {
+                            Providers(LocalContentAlpha provides ContentAlpha.medium) {
                                 val textStyle = MaterialTheme.typography.body2
                                 ProvideTextStyle(textStyle, text)
                             }

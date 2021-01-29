@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit.SECONDS
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-class WindowInfoAmbientTest {
+class WindowInfoCompositionLocalTest {
     @get:Rule
     val rule = createComposeRule()
 
@@ -45,7 +45,7 @@ class WindowInfoAmbientTest {
         val windowFocusGain = CountDownLatch(1)
         rule.setContent {
             BasicText("Main Window")
-            windowInfo = AmbientWindowInfo.current
+            windowInfo = LocalWindowInfo.current
             @Suppress("DEPRECATION")
             WindowFocusObserver { if (it) windowFocusGain.countDown() }
         }
@@ -68,12 +68,12 @@ class WindowInfoAmbientTest {
         val showPopup = mutableStateOf(false)
         rule.setContent {
             BasicText("Main Window")
-            mainWindowInfo = AmbientWindowInfo.current
+            mainWindowInfo = LocalWindowInfo.current
             WindowFocusObserver { if (!it) mainWindowFocusLoss.countDown() }
             if (showPopup.value) {
                 Popup(isFocusable = true, onDismissRequest = { showPopup.value = false }) {
                     BasicText("Popup Window")
-                    popupWindowInfo = AmbientWindowInfo.current
+                    popupWindowInfo = LocalWindowInfo.current
                     WindowFocusObserver { if (it) popupFocusGain.countDown() }
                 }
             }
@@ -99,7 +99,7 @@ class WindowInfoAmbientTest {
         val showPopup = mutableStateOf(false)
         rule.setContent {
             BasicText(text = "Main Window")
-            mainWindowInfo = AmbientWindowInfo.current
+            mainWindowInfo = LocalWindowInfo.current
             WindowFocusObserver { if (it) mainWindowFocusGain.countDown() }
             if (showPopup.value) {
                 Popup(isFocusable = true, onDismissRequest = { showPopup.value = false }) {
@@ -132,12 +132,12 @@ class WindowInfoAmbientTest {
         val showDialog = mutableStateOf(false)
         rule.setContent {
             BasicText("Main Window")
-            mainWindowInfo = AmbientWindowInfo.current
+            mainWindowInfo = LocalWindowInfo.current
             WindowFocusObserver { if (!it) mainWindowFocusLoss.countDown() }
             if (showDialog.value) {
                 Dialog(onDismissRequest = { showDialog.value = false }) {
                     BasicText("Popup Window")
-                    dialogWindowInfo = AmbientWindowInfo.current
+                    dialogWindowInfo = LocalWindowInfo.current
                     WindowFocusObserver { if (it) dialogFocusGain.countDown() }
                 }
             }
@@ -163,7 +163,7 @@ class WindowInfoAmbientTest {
         val showDialog = mutableStateOf(false)
         rule.setContent {
             BasicText(text = "Main Window")
-            mainWindowInfo = AmbientWindowInfo.current
+            mainWindowInfo = LocalWindowInfo.current
             WindowFocusObserver { if (it) mainWindowFocusGain.countDown() }
             if (showDialog.value) {
                 Dialog(onDismissRequest = { showDialog.value = false }) {

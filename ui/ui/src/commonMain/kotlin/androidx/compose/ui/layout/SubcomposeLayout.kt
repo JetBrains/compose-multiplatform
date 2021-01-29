@@ -32,8 +32,8 @@ import androidx.compose.ui.node.LayoutEmitHelper
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNode.LayoutState
 import androidx.compose.ui.node.MeasureBlocks
-import androidx.compose.ui.platform.AmbientDensity
-import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.subcomposeInto
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.LayoutDirection
@@ -67,8 +67,8 @@ fun SubcomposeLayout(
     state.compositionRef = rememberCompositionReference()
 
     val materialized = currentComposer.materialize(modifier)
-    val density = AmbientDensity.current
-    val layoutDirection = AmbientLayoutDirection.current
+    val density = LocalDensity.current
+    val layoutDirection = LocalLayoutDirection.current
     ComposeNode<LayoutNode, Applier<Any>>(
         factory = LayoutEmitHelper.constructor,
         update = {

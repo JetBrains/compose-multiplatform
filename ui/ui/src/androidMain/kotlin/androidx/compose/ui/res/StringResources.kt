@@ -20,8 +20,8 @@ import android.content.res.Resources
 import androidx.annotation.ArrayRes
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.AmbientConfiguration
-import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 
 /**
  * Load a string resource.
@@ -66,6 +66,6 @@ fun stringArrayResource(@ArrayRes id: Int): Array<String> {
  */
 @Composable
 private fun resources(): Resources {
-    AmbientConfiguration.current
-    return AmbientContext.current.resources
+    LocalConfiguration.current
+    return LocalContext.current.resources
 }

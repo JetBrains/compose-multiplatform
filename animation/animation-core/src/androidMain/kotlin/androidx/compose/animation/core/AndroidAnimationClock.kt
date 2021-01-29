@@ -34,7 +34,7 @@ var rootAnimationClockFactory: (CoroutineScope) -> AnimationClockObservable = {
 /**
  * Default Choreographer based clock that pushes a new frame to all subscribers on each
  * Choreographer tick, until all subscribers have unsubscribed. An instance of this clock will be
- * provided through [AnimationClockAmbient][androidx.compose.ui.platform.AnimationClockAmbient] at
+ * provided through [LocalAnimationClock][androidx.compose.ui.platform.LocalAnimationClock] at
  * the root of the composition tree.
  *
  * If initialized from any other thread but the main thread, part of the initialization is done

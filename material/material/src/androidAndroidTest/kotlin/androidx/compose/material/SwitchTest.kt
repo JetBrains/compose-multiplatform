@@ -22,7 +22,7 @@ import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -187,7 +187,7 @@ class SwitchTest {
         rule.setMaterialContent {
 
             // Box is needed because otherwise the control will be expanded to fill its parent
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Box {
                     Switch(
                         modifier = Modifier.testTag(defaultSwitchTag),

@@ -31,25 +31,24 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-// Create a normal (dynamic) ambient with a string value
-val someTextAmbient = ambientOf { "Default" }
+// Create a normal (dynamic) CompositionLocal with a string value
+val someTextCompositionLocal = compositionLocalOf { "Default" }
 
-// Create a normal (dynamic) ambient with an int value
-val someIntAmbient = ambientOf { 1 }
+// Create a normal (dynamic) CompositionLocal with an int value
+val someIntCompositionLocal = compositionLocalOf { 1 }
 
-// Create a non-overridable ambient provider key
-private val someOtherIntProvider = ambientOf { 1 }
+// Create a non-overridable CompositionLocal provider key
+private val someOtherIntProvider = compositionLocalOf { 1 }
 
 // Make public the consumer key.
-val someOtherIntAmbient: Ambient<Int> =
-    someOtherIntProvider
+val someOtherIntCompositionLocal: CompositionLocal<Int> = someOtherIntProvider
 
-// Create a static ambient with an int value
-val someStaticInt = staticAmbientOf { 40 }
+// Create a static CompositionLocal with an int value
+val someStaticInt = staticCompositionLocalOf { 40 }
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-class AmbientTests : BaseComposeTest() {
+class CompositionLocalTests : BaseComposeTest() {
 
     @Composable
     @Suppress("Deprecation")
@@ -58,65 +57,65 @@ class AmbientTests : BaseComposeTest() {
     }
 
     @Composable
-    fun ReadStringAmbient(ambient: Ambient<String>, id: Int = 100) {
-        Text(value = ambient.current, id = id)
+    fun ReadStringCompositionLocal(compositionLocal: CompositionLocal<String>, id: Int = 100) {
+        Text(value = compositionLocal.current, id = id)
     }
 
     @get:Rule
     override val activityRule = makeTestActivityRule()
 
     @Test
-    fun testAmbientApi() {
+    fun testCompositionLocalApi() {
         compose {
-            assertEquals("Default", someTextAmbient.current)
-            assertEquals(1, someIntAmbient.current)
+            assertEquals("Default", someTextCompositionLocal.current)
+            assertEquals(1, someIntCompositionLocal.current)
             Providers(
-                someTextAmbient provides "Test1",
-                someIntAmbient provides 12,
+                someTextCompositionLocal provides "Test1",
+                someIntCompositionLocal provides 12,
                 someOtherIntProvider provides 42,
                 someStaticInt provides 50
             ) {
                 assertEquals(
                     "Test1",
-                    someTextAmbient.current
+                    someTextCompositionLocal.current
                 )
-                assertEquals(12, someIntAmbient.current)
+                assertEquals(12, someIntCompositionLocal.current)
                 assertEquals(
                     42,
-                    someOtherIntAmbient.current
+                    someOtherIntCompositionLocal.current
                 )
                 assertEquals(50, someStaticInt.current)
                 Providers(
-                    someTextAmbient provides "Test2",
+                    someTextCompositionLocal provides "Test2",
                     someStaticInt provides 60
                 ) {
                     assertEquals(
                         "Test2",
-                        someTextAmbient.current
+                        someTextCompositionLocal.current
                     )
                     assertEquals(
                         12,
-                        someIntAmbient.current
+                        someIntCompositionLocal.current
                     )
                     assertEquals(
                         42,
-                        someOtherIntAmbient.current
+                        someOtherIntCompositionLocal.current
                     )
                     assertEquals(60, someStaticInt.current)
                 }
                 assertEquals(
                     "Test1",
-                    someTextAmbient.current
+                    someTextCompositionLocal.current
                 )
-                assertEquals(12, someIntAmbient.current)
+                assertEquals(12, someIntCompositionLocal.current)
                 assertEquals(
                     42,
-                    someOtherIntAmbient.current
+                    someOtherIntCompositionLocal.current
                 )
                 assertEquals(50, someStaticInt.current)
             }
-            assertEquals("Default", someTextAmbient.current)
-            assertEquals(1, someIntAmbient.current)
+            assertEquals("Default", someTextCompositionLocal.current)
+            assertEquals(1, someIntCompositionLocal.current)
         }.then {
             // Force the composition to run
         }
@@ -131,10 +130,10 @@ class AmbientTests : BaseComposeTest() {
         compose {
             invalidates.add(currentRecomposeScope)
             Providers(
-                someTextAmbient provides someText
+                someTextCompositionLocal provides someText
             ) {
-                ReadStringAmbient(
-                    ambient = someTextAmbient,
+                ReadStringCompositionLocal(
+                    compositionLocal = someTextCompositionLocal,
                     id = tvId
                 )
             }
@@ -153,15 +152,15 @@ class AmbientTests : BaseComposeTest() {
         val tvId = 100
         val invalidates = mutableListOf<RecomposeScope>()
         fun doInvalidate() = invalidates.forEach { it.invalidate() }.also { invalidates.clear() }
-        val staticStringAmbient = staticAmbientOf { "Default" }
+        val staticStringCompositionLocal = staticCompositionLocalOf { "Default" }
         var someText = "Unmodified"
         compose {
             invalidates.add(currentRecomposeScope)
             Providers(
-                staticStringAmbient provides someText
+                staticStringCompositionLocal provides someText
             ) {
-                ReadStringAmbient(
-                    ambient = staticStringAmbient,
+                ReadStringCompositionLocal(
+                    compositionLocal = staticStringCompositionLocal,
                     id = tvId
                 )
             }
@@ -185,28 +184,28 @@ class AmbientTests : BaseComposeTest() {
             invalidates.add(currentRecomposeScope)
 
             Providers(
-                someTextAmbient provides someText,
-                someIntAmbient provides 0
+                someTextCompositionLocal provides someText,
+                someIntCompositionLocal provides 0
             ) {
-                ReadStringAmbient(ambient = someTextAmbient, id = tvId)
+                ReadStringCompositionLocal(compositionLocal = someTextCompositionLocal, id = tvId)
 
                 subCompose {
                     assertEquals(
                         someText,
-                        someTextAmbient.current
+                        someTextCompositionLocal.current
                     )
-                    assertEquals(0, someIntAmbient.current)
+                    assertEquals(0, someIntCompositionLocal.current)
 
                     Providers(
-                        someIntAmbient provides 42
+                        someIntCompositionLocal provides 42
                     ) {
                         assertEquals(
                             someText,
-                            someTextAmbient.current
+                            someTextCompositionLocal.current
                         )
                         assertEquals(
                             42,
-                            someIntAmbient.current
+                            someIntCompositionLocal.current
                         )
                     }
                 }
@@ -226,34 +225,33 @@ class AmbientTests : BaseComposeTest() {
         val tvId = 100
         val invalidates = mutableListOf<RecomposeScope>()
         fun doInvalidate() = invalidates.forEach { it.invalidate() }.also { invalidates.clear() }
-        val staticSomeTextAmbient =
-            staticAmbientOf { "Default" }
-        val staticSomeIntAmbient = staticAmbientOf { -1 }
+        val staticSomeTextCompositionLocal = staticCompositionLocalOf { "Default" }
+        val staticSomeIntCompositionLocal = staticCompositionLocalOf { -1 }
         var someText = "Unmodified"
         compose {
             invalidates.add(currentRecomposeScope)
 
             Providers(
-                staticSomeTextAmbient provides someText,
-                staticSomeIntAmbient provides 0
+                staticSomeTextCompositionLocal provides someText,
+                staticSomeIntCompositionLocal provides 0
             ) {
-                assertEquals(someText, staticSomeTextAmbient.current)
-                assertEquals(0, staticSomeIntAmbient.current)
+                assertEquals(someText, staticSomeTextCompositionLocal.current)
+                assertEquals(0, staticSomeIntCompositionLocal.current)
 
-                ReadStringAmbient(
-                    ambient = staticSomeTextAmbient,
+                ReadStringCompositionLocal(
+                    compositionLocal = staticSomeTextCompositionLocal,
                     id = tvId
                 )
 
                 subCompose {
-                    assertEquals(someText, staticSomeTextAmbient.current)
-                    assertEquals(0, staticSomeIntAmbient.current)
+                    assertEquals(someText, staticSomeTextCompositionLocal.current)
+                    assertEquals(0, staticSomeIntCompositionLocal.current)
 
                     Providers(
-                        staticSomeIntAmbient provides 42
+                        staticSomeIntCompositionLocal provides 42
                     ) {
-                        assertEquals(someText, staticSomeTextAmbient.current)
-                        assertEquals(42, staticSomeIntAmbient.current)
+                        assertEquals(someText, staticSomeTextCompositionLocal.current)
+                        assertEquals(42, staticSomeIntCompositionLocal.current)
                     }
                 }
             }
@@ -278,31 +276,31 @@ class AmbientTests : BaseComposeTest() {
             invalidates.add(currentRecomposeScope)
 
             Providers(
-                someTextAmbient provides someText,
-                someIntAmbient provides 0
+                someTextCompositionLocal provides someText,
+                someIntCompositionLocal provides 0
             ) {
-                ReadStringAmbient(
-                    ambient = someTextAmbient,
+                ReadStringCompositionLocal(
+                    compositionLocal = someTextCompositionLocal,
                     id = tvId
                 )
 
                 doSubCompose = deferredSubCompose {
                     assertEquals(
                         someText,
-                        someTextAmbient.current
+                        someTextCompositionLocal.current
                     )
-                    assertEquals(0, someIntAmbient.current)
+                    assertEquals(0, someIntCompositionLocal.current)
 
                     Providers(
-                        someIntAmbient provides 42
+                        someIntCompositionLocal provides 42
                     ) {
                         assertEquals(
                             someText,
-                            someTextAmbient.current
+                            someTextCompositionLocal.current
                         )
                         assertEquals(
                             42,
-                            someIntAmbient.current
+                            someIntCompositionLocal.current
                         )
                     }
                 }
@@ -327,34 +325,33 @@ class AmbientTests : BaseComposeTest() {
         fun doInvalidate() = invalidates.forEach { it.invalidate() }.also { invalidates.clear() }
         var someText = "Unmodified"
         var doSubCompose: () -> Unit = { error("Sub-compose callback not set") }
-        val staticSomeTextAmbient =
-            staticAmbientOf { "Default" }
-        val staticSomeIntAmbient = staticAmbientOf { -1 }
+        val staticSomeTextCompositionLocal = staticCompositionLocalOf { "Default" }
+        val staticSomeIntCompositionLocal = staticCompositionLocalOf { -1 }
         compose {
             invalidates.add(currentRecomposeScope)
 
             Providers(
-                staticSomeTextAmbient provides someText,
-                staticSomeIntAmbient provides 0
+                staticSomeTextCompositionLocal provides someText,
+                staticSomeIntCompositionLocal provides 0
             ) {
-                assertEquals(someText, staticSomeTextAmbient.current)
-                assertEquals(0, staticSomeIntAmbient.current)
+                assertEquals(someText, staticSomeTextCompositionLocal.current)
+                assertEquals(0, staticSomeIntCompositionLocal.current)
 
-                ReadStringAmbient(
-                    ambient = staticSomeTextAmbient,
+                ReadStringCompositionLocal(
+                    compositionLocal = staticSomeTextCompositionLocal,
                     id = tvId
                 )
 
                 doSubCompose = deferredSubCompose {
 
-                    assertEquals(someText, staticSomeTextAmbient.current)
-                    assertEquals(0, staticSomeIntAmbient.current)
+                    assertEquals(someText, staticSomeTextCompositionLocal.current)
+                    assertEquals(0, staticSomeIntCompositionLocal.current)
 
                     Providers(
-                        staticSomeIntAmbient provides 42
+                        staticSomeIntCompositionLocal provides 42
                     ) {
-                        assertEquals(someText, staticSomeTextAmbient.current)
-                        assertEquals(42, staticSomeIntAmbient.current)
+                        assertEquals(someText, staticSomeTextCompositionLocal.current)
+                        assertEquals(42, staticSomeIntCompositionLocal.current)
                     }
                 }
             }
@@ -379,28 +376,31 @@ class AmbientTests : BaseComposeTest() {
         var someText = "Unmodified"
         var doSubCompose1: () -> Unit = { error("Sub-compose-1 callback not set") }
         var doSubCompose2: () -> Unit = { error("Sub-compose-2 callback not set") }
-        val staticSomeTextAmbient = staticAmbientOf { "Default" }
-        val staticSomeIntAmbient = staticAmbientOf { -1 }
+        val staticSomeTextCompositionLocal = staticCompositionLocalOf { "Default" }
+        val staticSomeIntCompositionLocal = staticCompositionLocalOf { -1 }
         compose {
             invalidates.add(currentRecomposeScope)
 
             Providers(
-                staticSomeTextAmbient provides someText,
-                staticSomeIntAmbient provides 0
+                staticSomeTextCompositionLocal provides someText,
+                staticSomeIntCompositionLocal provides 0
             ) {
-                assertEquals(someText, staticSomeTextAmbient.current)
-                assertEquals(0, staticSomeIntAmbient.current)
+                assertEquals(someText, staticSomeTextCompositionLocal.current)
+                assertEquals(0, staticSomeIntCompositionLocal.current)
 
-                ReadStringAmbient(ambient = staticSomeTextAmbient, id = tvId)
+                ReadStringCompositionLocal(
+                    compositionLocal = staticSomeTextCompositionLocal,
+                    id = tvId
+                )
 
                 doSubCompose1 = deferredSubCompose {
 
-                    assertEquals(someText, staticSomeTextAmbient.current)
-                    assertEquals(0, staticSomeIntAmbient.current)
+                    assertEquals(someText, staticSomeTextCompositionLocal.current)
+                    assertEquals(0, staticSomeIntCompositionLocal.current)
 
                     doSubCompose2 = deferredSubCompose {
-                        assertEquals(someText, staticSomeTextAmbient.current)
-                        assertEquals(0, staticSomeIntAmbient.current)
+                        assertEquals(someText, staticSomeTextCompositionLocal.current)
+                        assertEquals(0, staticSomeIntCompositionLocal.current)
                     }
                 }
             }
@@ -425,8 +425,7 @@ class AmbientTests : BaseComposeTest() {
     fun insertShouldSeePreviouslyProvidedValues() {
         val invalidates = mutableListOf<RecomposeScope>()
         fun doInvalidate() = invalidates.forEach { it.invalidate() }.also { invalidates.clear() }
-        val someStaticString =
-            staticAmbientOf { "Default" }
+        val someStaticString = staticCompositionLocalOf { "Default" }
         var shouldRead = false
         compose {
             Providers(
@@ -435,7 +434,7 @@ class AmbientTests : BaseComposeTest() {
                 Observe {
                     invalidates.add(currentRecomposeScope)
                     if (shouldRead)
-                        ReadStringAmbient(someStaticString)
+                        ReadStringCompositionLocal(someStaticString)
                 }
             }
         }.then {
@@ -451,22 +450,25 @@ class AmbientTests : BaseComposeTest() {
     fun providingANewDataClassValueShouldNotRecompose() {
         val invalidates = mutableListOf<RecomposeScope>()
         fun doInvalidate() = invalidates.forEach { it.invalidate() }.also { invalidates.clear() }
-        val someDataAmbient = ambientOf(structuralEqualityPolicy()) { SomeData() }
+        val someDataCompositionLocal = compositionLocalOf(structuralEqualityPolicy()) { SomeData() }
         var composed = false
 
         @Composable
-        fun ReadSomeDataAmbient(ambient: Ambient<SomeData>, id: Int = 100) {
+        fun ReadSomeDataCompositionLocal(
+            compositionLocal: CompositionLocal<SomeData>,
+            id: Int = 100
+        ) {
             composed = true
-            Text(value = ambient.current.value, id = id)
+            Text(value = compositionLocal.current.value, id = id)
         }
 
         compose {
             Observe {
                 invalidates.add(currentRecomposeScope)
                 Providers(
-                    someDataAmbient provides SomeData("provided")
+                    someDataCompositionLocal provides SomeData("provided")
                 ) {
-                    ReadSomeDataAmbient(someDataAmbient)
+                    ReadSomeDataCompositionLocal(someDataCompositionLocal)
                 }
             }
         }.then {

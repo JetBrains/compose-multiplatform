@@ -73,7 +73,8 @@ internal interface Owner {
     val autofillTree: AutofillTree
 
     /**
-     * The [Autofill] class can be used to perform autofill operations. It is used as an ambient.
+     * The [Autofill] class can be used to perform autofill operations. It is used as a
+     * CompositionLocal.
      */
     @get:ExperimentalComposeUiApi
     @ExperimentalComposeUiApi

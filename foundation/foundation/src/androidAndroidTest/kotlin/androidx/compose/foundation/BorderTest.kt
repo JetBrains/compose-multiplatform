@@ -35,9 +35,9 @@ import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.graphics.toPixelMap
-import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -264,7 +264,7 @@ class BorderTest(val shape: Shape) {
         val direction = mutableStateOf(LayoutDirection.Ltr)
         rule.setContent {
             SemanticParent {
-                Providers(AmbientLayoutDirection provides direction.value) {
+                Providers(LocalLayoutDirection provides direction.value) {
                     Box(
                         Modifier.preferredSize(40.0f.toDp(), 40.0f.toDp())
                             .background(color = Color.Blue)
@@ -293,7 +293,7 @@ class BorderTest(val shape: Shape) {
     fun SemanticParent(content: @Composable Density.() -> Unit) {
         Box {
             Box(modifier = Modifier.testTag(testTag)) {
-                AmbientDensity.current.content()
+                LocalDensity.current.content()
             }
         }
     }

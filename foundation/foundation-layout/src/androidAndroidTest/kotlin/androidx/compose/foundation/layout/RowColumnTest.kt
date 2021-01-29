@@ -30,8 +30,8 @@ import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.unit.Constraints
@@ -4022,7 +4022,7 @@ class RowColumnTest : LayoutTest() {
         val drawLatch = CountDownLatch(2)
         val childPosition = arrayOf(Offset.Zero, Offset.Zero)
         show {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Row(Modifier.fillMaxWidth()) {
                     Container(
                         Modifier.preferredSize(sizeDp).onGloballyPositioned { coordinates ->
@@ -4066,7 +4066,7 @@ class RowColumnTest : LayoutTest() {
         val childLayoutCoordinates = arrayOfNulls<LayoutCoordinates?>(childPosition.size)
         var parentLayoutCoordinates: LayoutCoordinates? = null
         show {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -4122,7 +4122,7 @@ class RowColumnTest : LayoutTest() {
         val childLayoutCoordinates = arrayOfNulls<LayoutCoordinates?>(childPosition.size)
         var parentLayoutCoordinates: LayoutCoordinates? = null
         show {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -4177,7 +4177,7 @@ class RowColumnTest : LayoutTest() {
         val childLayoutCoordinates = arrayOfNulls<LayoutCoordinates?>(childPosition.size)
         var parentLayoutCoordinates: LayoutCoordinates? = null
         show {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -4230,7 +4230,7 @@ class RowColumnTest : LayoutTest() {
         val childLayoutCoordinates = arrayOfNulls<LayoutCoordinates?>(childPosition.size)
         var parentLayoutCoordinates: LayoutCoordinates? = null
         show {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -4280,7 +4280,7 @@ class RowColumnTest : LayoutTest() {
         val drawLatch = CountDownLatch(2)
         val childPosition = arrayOf(Offset.Zero, Offset.Zero)
         show {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Row(
                     Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
@@ -4327,7 +4327,7 @@ class RowColumnTest : LayoutTest() {
         val rowSize = rowSizePx.toDp()
         val latch = CountDownLatch(3)
         show {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Column {
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(space, Alignment.End),
@@ -4363,7 +4363,7 @@ class RowColumnTest : LayoutTest() {
         val drawLatch = CountDownLatch(2)
         val childPosition = arrayOf(Offset.Zero, Offset.Zero)
         show {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Column(Modifier.fillMaxWidth()) {
                     Container(
                         Modifier.preferredSize(sizeDp).onGloballyPositioned { coordinates ->
@@ -4408,7 +4408,7 @@ class RowColumnTest : LayoutTest() {
         val drawLatch = CountDownLatch(2)
         val childPosition = arrayOf(Offset.Zero, Offset.Zero)
         show {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Column(Modifier.fillMaxWidth()) {
                     Container(
                         Modifier.preferredSize(sizeDp)
@@ -4447,7 +4447,7 @@ class RowColumnTest : LayoutTest() {
         val drawLatch = CountDownLatch(2)
         val childPosition = arrayOf(Offset.Zero, Offset.Zero)
         show {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Column(Modifier.fillMaxWidth()) {
                     Container(
                         Modifier.preferredSize(sizeDp)
@@ -4555,7 +4555,7 @@ class RowColumnTest : LayoutTest() {
             arrayOfNulls<LayoutCoordinates?>(childPosition.size)
         var parentLayoutCoordinates: LayoutCoordinates? = null
         show {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Row(
                     Modifier
                         .fillMaxWidth()
@@ -4668,7 +4668,7 @@ class RowColumnTest : LayoutTest() {
             arrayOfNulls<LayoutCoordinates?>(childPosition.size)
         var parentLayoutCoordinates: LayoutCoordinates? = null
         show {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -4797,7 +4797,7 @@ class RowColumnTest : LayoutTest() {
             arrayOfNulls<LayoutCoordinates?>(childPosition.size)
         var parentLayoutCoordinates: LayoutCoordinates? = null
         show {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -4933,7 +4933,7 @@ class RowColumnTest : LayoutTest() {
                 arrayOfNulls<LayoutCoordinates?>(childPosition.size)
             var parentLayoutCoordinates: LayoutCoordinates? = null
             show {
-                Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+                Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -5065,7 +5065,7 @@ class RowColumnTest : LayoutTest() {
                 arrayOfNulls<LayoutCoordinates?>(childPosition.size)
             var parentLayoutCoordinates: LayoutCoordinates? = null
             show {
-                Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+                Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -5197,7 +5197,7 @@ class RowColumnTest : LayoutTest() {
                 arrayOfNulls<LayoutCoordinates?>(childPosition.size)
             var parentLayoutCoordinates: LayoutCoordinates? = null
             show {
-                Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+                Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -5268,7 +5268,7 @@ class RowColumnTest : LayoutTest() {
         val rowSize = rowSizePx.toDp()
         val latch = CountDownLatch(3)
         show {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Column {
                     Row(
                         horizontalArrangement = Arrangement.Absolute.spacedBy(space, Alignment.End),

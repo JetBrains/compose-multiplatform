@@ -46,13 +46,13 @@ import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.AmbientClipboardManager
-import androidx.compose.ui.platform.AmbientDensity
-import androidx.compose.ui.platform.AmbientFontLoader
-import androidx.compose.ui.platform.AmbientHapticFeedback
-import androidx.compose.ui.platform.AmbientTextInputService
-import androidx.compose.ui.platform.AmbientTextToolbar
-import androidx.compose.foundation.text.selection.AmbientTextSelectionColors
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFontLoader
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalTextInputService
+import androidx.compose.ui.platform.LocalTextToolbar
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.SimpleLayout
 import androidx.compose.ui.semantics.copyText
 import androidx.compose.ui.semantics.cutText
@@ -181,12 +181,12 @@ internal fun CoreTextField(
     val scope = currentRecomposeScope
     val focusRequester = FocusRequester()
 
-    // Ambients
+    // CompositionLocals
     // If the text field is disabled or read-only, we should not deal with the input service
-    val textInputService = if (!enabled || readOnly) null else AmbientTextInputService.current
-    val density = AmbientDensity.current
-    val resourceLoader = AmbientFontLoader.current
-    val selectionBackgroundColor = AmbientTextSelectionColors.current.backgroundColor
+    val textInputService = if (!enabled || readOnly) null else LocalTextInputService.current
+    val density = LocalDensity.current
+    val resourceLoader = LocalFontLoader.current
+    val selectionBackgroundColor = LocalTextSelectionColors.current.backgroundColor
 
     // Scroll state
     val singleLine = maxLines == 1 && !softWrap && imeOptions.singleLine
@@ -245,9 +245,9 @@ internal fun CoreTextField(
     manager.onValueChange = onValueChangeWrapper
     manager.state = state
     manager.value = value
-    manager.clipboardManager = AmbientClipboardManager.current
-    manager.textToolbar = AmbientTextToolbar.current
-    manager.hapticFeedBack = AmbientHapticFeedback.current
+    manager.clipboardManager = LocalClipboardManager.current
+    manager.textToolbar = LocalTextToolbar.current
+    manager.hapticFeedBack = LocalHapticFeedback.current
     manager.focusRequester = focusRequester
     manager.editable = !readOnly
 

@@ -31,7 +31,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.currentComposer
-import androidx.compose.runtime.tooling.InspectionTables
+import androidx.compose.runtime.tooling.LocalInspectionTables
 import androidx.compose.ui.R
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.UiApplier
@@ -93,7 +93,7 @@ fun ComponentActivity.setContent(
  * Composes the given composable into the given view.
  *
  * The new composition can be logically "linked" to an existing one, by providing a
- * [parent]. This will ensure that invalidations and ambients will flow through
+ * [parent]. This will ensure that invalidations and CompositionLocals will flow through
  * the two compositions as if they were not separate.
  *
  * Note that this [ViewGroup] should have an unique id for the saved instance state mechanism to
@@ -195,8 +195,8 @@ private class WrappedComposition(
                         LaunchedEffect(owner) { owner.keyboardVisibilityEventLoop() }
                         LaunchedEffect(owner) { owner.boundsUpdatesEventLoop() }
 
-                        Providers(InspectionTables provides inspectionTable) {
-                            ProvideAndroidAmbients(owner, content)
+                        Providers(LocalInspectionTables provides inspectionTable) {
+                            ProvideAndroidCompositionLocals(owner, content)
                         }
                     }
                 }

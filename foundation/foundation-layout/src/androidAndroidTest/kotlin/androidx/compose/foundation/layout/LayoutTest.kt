@@ -35,7 +35,7 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.unit.Constraints
@@ -213,7 +213,7 @@ open class LayoutTest {
         modifier: Modifier = Modifier,
         content: @Composable () -> Unit
     ) {
-        with(AmbientDensity.current) {
+        with(LocalDensity.current) {
             val pxConstraints = Constraints(constraints)
             Layout(
                 content,

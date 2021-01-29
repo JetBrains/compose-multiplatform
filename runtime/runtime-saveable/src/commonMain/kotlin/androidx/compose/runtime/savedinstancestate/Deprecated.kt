@@ -161,14 +161,15 @@ fun UiSavedStateRegistry(
 )
 
 @Deprecated(
-    "It was renamed to AmbientSaveableStateRegistry and moved to" +
+    "It was renamed to LocalSaveableStateRegistry and moved to" +
         " androidx.compose.runtime.saveable package",
     ReplaceWith(
-        "AmbientSaveableStateRegistry",
-        "androidx.compose.runtime.saveable.AmbientSaveableStateRegistry"
+        "LocalSaveableStateRegistry",
+        "androidx.compose.runtime.saveable.LocalSaveableStateRegistry"
     ),
     level = DeprecationLevel.ERROR
 )
+@Suppress("CompositionLocalNaming")
 val AmbientUiSavedStateRegistry = staticAmbientOf<UiSavedStateRegistry?> {
     throw IllegalStateException(
         "It was renamed to SaveableStateRegistry and moved to androidx.compose.runtime.saveable" +

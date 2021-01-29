@@ -179,15 +179,15 @@ internal class AndroidComposeView(context: Context) :
     // private val ownerScope = CoroutineScope(Dispatchers.Main.immediate + Job())
 
     /**
-     * Used for updating the ConfigurationAmbient when configuration changes - consume the
-     * configuration ambient instead of changing this observer if you are writing a component
-     * that adapts to configuration changes.
+     * Used for updating LocalConfiguration when configuration changes - consume LocalConfiguration
+     * instead of changing this observer if you are writing a component that adapts to
+     * configuration changes.
      */
     var configurationChangeObserver: (Configuration) -> Unit = {}
 
     private val _autofill = if (autofillSupported()) AndroidAutofill(this, autofillTree) else null
 
-    // Used as an ambient for performing autofill.
+    // Used as a CompositionLocal for performing autofill.
     override val autofill: Autofill? get() = _autofill
 
     private var observationClearRequested = false

@@ -17,8 +17,8 @@
 package androidx.compose.ui.owners
 
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.ui.platform.AmbientSavedStateRegistryOwner
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.compose.ui.platform.setContent
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -54,7 +54,7 @@ class SavedStateRegistryOwnerInAppCompatActivityTest {
 
         activityTestRule.runOnUiThread {
             activity.setContent {
-                owner = AmbientSavedStateRegistryOwner.current
+                owner = LocalSavedStateRegistryOwner.current
                 latch.countDown()
             }
         }
@@ -72,7 +72,7 @@ class SavedStateRegistryOwnerInAppCompatActivityTest {
             val view = ComposeView(activity)
             activity.setContentView(view)
             view.setContent {
-                owner = AmbientSavedStateRegistryOwner.current
+                owner = LocalSavedStateRegistryOwner.current
                 latch.countDown()
             }
         }

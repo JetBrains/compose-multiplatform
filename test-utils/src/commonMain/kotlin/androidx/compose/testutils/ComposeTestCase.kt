@@ -54,7 +54,7 @@ interface LayeredComposeTestCase : ComposeTestCase {
 
     /**
      * This method should emit content that is supposed to be measured. Any other helper containers,
-     * ambients and themes should be set in [ContentWrappers].
+     * CompositionLocals and themes should be set in [ContentWrappers].
      *
      * The lifecycle rules for this method are same as for [Content]
      */
@@ -66,7 +66,7 @@ interface LayeredComposeTestCase : ComposeTestCase {
      *
      * In "first" benchmarks this method's content is set up before the content from
      * [MeasuredContent] gets introduced to be measured. This helps to avoid measuring helper
-     * containers or ambients setups.
+     * containers or CompositionLocal setups.
      *
      * The lifecycle rules for this method are same as for [Content]
      */

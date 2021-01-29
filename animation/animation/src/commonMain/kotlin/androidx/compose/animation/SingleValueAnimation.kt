@@ -47,7 +47,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.AmbientAnimationClock
+import androidx.compose.ui.platform.LocalAnimationClock
 import androidx.compose.ui.unit.Bounds
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -453,7 +453,7 @@ fun <T, V : AnimationVector> animate(
     visibilityThreshold: T? = null,
     endListener: ((T) -> Unit)? = null
 ): T {
-    val clock = AmbientAnimationClock.current.asDisposableClock()
+    val clock = LocalAnimationClock.current.asDisposableClock()
     val anim = remember(clock, converter) {
         AnimatedValueModel(target, converter, clock, visibilityThreshold)
     }

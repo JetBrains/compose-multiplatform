@@ -153,7 +153,7 @@ class AppBarTest {
                 TopAppBar(
                     title = {
                         Text("App Bar Title")
-                        textStyle = AmbientTextStyle.current
+                        textStyle = LocalTextStyle.current
                         h6Style = MaterialTheme.typography.h6
                     }
                 )

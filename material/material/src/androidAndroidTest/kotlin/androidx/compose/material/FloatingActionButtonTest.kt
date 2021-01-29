@@ -178,7 +178,7 @@ class FloatingActionButtonTest {
             Box {
                 surface = MaterialTheme.colors.surface
                 fabColor = MaterialTheme.colors.secondary
-                Providers(AmbientShapes provides Shapes(small = themeShape)) {
+                Providers(LocalShapes provides Shapes(small = themeShape)) {
                     FloatingActionButton(
                         modifier = Modifier.testTag("myButton"),
                         onClick = {},
@@ -215,7 +215,7 @@ class FloatingActionButtonTest {
             Box {
                 surface = MaterialTheme.colors.surface
                 fabColor = MaterialTheme.colors.secondary
-                Providers(AmbientShapes provides Shapes(small = themeShape)) {
+                Providers(LocalShapes provides Shapes(small = themeShape)) {
                     ExtendedFloatingActionButton(
                         modifier = Modifier.testTag("myButton"),
                         onClick = {},

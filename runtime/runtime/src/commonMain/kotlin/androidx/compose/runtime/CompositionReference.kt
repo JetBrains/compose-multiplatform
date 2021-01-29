@@ -19,12 +19,13 @@ package androidx.compose.runtime
 import kotlinx.collections.immutable.persistentHashMapOf
 import kotlin.coroutines.CoroutineContext
 
-private val EmptyAmbientMap: AmbientMap = persistentHashMapOf()
+private val EmptyCompositionLocalMap: CompositionLocalMap = persistentHashMapOf()
 
 /**
  * An Effect to construct a CompositionReference at the current point of composition. This can be used
- * to run a separate composition in the context of the current one, preserving ambients and propagating
- * invalidations. When this call leaves the composition, the reference is invalidated.
+ * to run a separate composition in the context of the current one, preserving [CompositionLocal]s
+ * and propagating invalidations. When this call leaves the composition, the reference is
+ * invalidated.
  */
 @OptIn(InternalComposeApi::class)
 @Composable fun rememberCompositionReference(): CompositionReference {
@@ -35,8 +36,8 @@ private val EmptyAmbientMap: AmbientMap = persistentHashMapOf()
  * A [CompositionReference] is an opaque type that is used to logically "link" two compositions
  * together. The [CompositionReference] instance represents a reference to the "parent" composition
  * in a specific position of that composition's tree, and the instance can then be given to a new
- * "child" composition. This reference ensures that invalidations and ambients flow logically
- * through the two compositions as if they were not separate.
+ * "child" composition. This reference ensures that invalidations and [CompositionLocal]s flow
+ * logically through the two compositions as if they were not separate.
  *
  * The "parent" of a root composition is a [Recomposer].
  *
@@ -60,8 +61,9 @@ abstract class CompositionReference internal constructor() {
     internal abstract fun registerComposition(composition: ControlledComposition)
     internal abstract fun unregisterComposition(composition: ControlledComposition)
 
-    internal open fun <T> getAmbient(key: Ambient<T>): T = key.defaultValueHolder.value
-    internal open fun getAmbientScope(): AmbientMap = EmptyAmbientMap
+    internal open fun <T> getCompositionLocal(key: CompositionLocal<T>): T =
+        key.defaultValueHolder.value
+    internal open fun getCompositionLocalScope(): CompositionLocalMap = EmptyCompositionLocalMap
     internal open fun startComposing() {}
     internal open fun doneComposing() {}
 }

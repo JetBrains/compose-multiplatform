@@ -24,17 +24,6 @@ package androidx.compose.runtime {
     method @kotlin.PublishedApi internal static inline <R> R! synchronized(Object lock, kotlin.jvm.functions.Function0<? extends R> block);
   }
 
-  @androidx.compose.runtime.Stable public abstract sealed class Ambient<T> {
-    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public final inline T! getCurrent();
-    property @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public final inline T! current;
-  }
-
-  public final class AmbientKt {
-    method @androidx.compose.runtime.Composable public static void Providers(androidx.compose.runtime.ProvidedValue<?>![] values, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method public static <T> androidx.compose.runtime.ProvidableAmbient<T> ambientOf(optional androidx.compose.runtime.SnapshotMutationPolicy<T> policy, optional kotlin.jvm.functions.Function0<? extends T>? defaultFactory);
-    method public static <T> androidx.compose.runtime.ProvidableAmbient<T> staticAmbientOf(optional kotlin.jvm.functions.Function0<? extends T>? defaultFactory);
-  }
-
   public interface Applier<N> {
     method public void clear();
     method public void down(N? node);
@@ -104,7 +93,7 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.ComposeCompilerApi public default boolean changed(long value);
     method @androidx.compose.runtime.ComposeCompilerApi public default boolean changed(double value);
     method @androidx.compose.runtime.InternalComposeApi public void collectParameterInformation();
-    method @androidx.compose.runtime.InternalComposeApi public <T> T! consume(androidx.compose.runtime.Ambient<T> key);
+    method @androidx.compose.runtime.InternalComposeApi public <T> T! consume(androidx.compose.runtime.CompositionLocal<T> key);
     method @androidx.compose.runtime.ComposeCompilerApi public <T> void createNode(kotlin.jvm.functions.Function0<? extends T> factory);
     method @androidx.compose.runtime.ComposeCompilerApi public void endDefaults();
     method @androidx.compose.runtime.ComposeCompilerApi public void endMovableGroup();
@@ -161,8 +150,8 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.ComposeCompilerApi public static inline <T> T! cache(androidx.compose.runtime.Composer, boolean invalid, kotlin.jvm.functions.Function0<? extends T> block);
     method @androidx.compose.runtime.Composable public static int currentCompositeKeyHash();
     method @androidx.compose.runtime.Composable public static androidx.compose.runtime.Composer getCurrentComposer();
-    field @kotlin.PublishedApi internal static final androidx.compose.runtime.OpaqueKey ambientMap;
-    field @kotlin.PublishedApi internal static final int ambientMapKey = 202; // 0xca
+    field @kotlin.PublishedApi internal static final androidx.compose.runtime.OpaqueKey compositionLocalMap;
+    field @kotlin.PublishedApi internal static final int compositionLocalMapKey = 202; // 0xca
     field @kotlin.PublishedApi internal static final androidx.compose.runtime.OpaqueKey invocation;
     field @kotlin.PublishedApi internal static final int invocationKey = 200; // 0xc8
     field @kotlin.PublishedApi internal static final androidx.compose.runtime.OpaqueKey provider;
@@ -206,6 +195,19 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.ExperimentalComposeApi public static androidx.compose.runtime.Composition Composition(Object key, androidx.compose.runtime.Applier<?> applier, androidx.compose.runtime.CompositionReference parent, optional kotlin.jvm.functions.Function0<kotlin.Unit> onCreated);
     method @androidx.compose.runtime.ExperimentalComposeApi public static androidx.compose.runtime.Composition Composition(androidx.compose.runtime.Applier<?> applier, androidx.compose.runtime.CompositionReference parent);
     method @org.jetbrains.annotations.TestOnly public static androidx.compose.runtime.ControlledComposition ControlledComposition(androidx.compose.runtime.Applier<?> applier, androidx.compose.runtime.CompositionReference parent);
+  }
+
+  @androidx.compose.runtime.Stable public abstract sealed class CompositionLocal<T> {
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public final inline T! getCurrent();
+    property @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public final inline T! current;
+  }
+
+  public final class CompositionLocalKt {
+    method @androidx.compose.runtime.Composable public static void Providers(androidx.compose.runtime.ProvidedValue<?>![] values, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @Deprecated public static <T> androidx.compose.runtime.ProvidableCompositionLocal<T> ambientOf(optional androidx.compose.runtime.SnapshotMutationPolicy<T> policy, optional kotlin.jvm.functions.Function0<? extends T>? defaultFactory);
+    method public static <T> androidx.compose.runtime.ProvidableCompositionLocal<T> compositionLocalOf(optional androidx.compose.runtime.SnapshotMutationPolicy<T> policy, optional kotlin.jvm.functions.Function0<? extends T>? defaultFactory);
+    method @Deprecated public static <T> androidx.compose.runtime.ProvidableCompositionLocal<T> staticAmbientOf(optional kotlin.jvm.functions.Function0<? extends T>? defaultFactory);
+    method public static <T> androidx.compose.runtime.ProvidableCompositionLocal<T> staticCompositionLocalOf(optional kotlin.jvm.functions.Function0<? extends T>? defaultFactory);
   }
 
   public abstract class CompositionReference {
@@ -366,17 +368,17 @@ package androidx.compose.runtime {
     method public suspend Object? awaitDispose(kotlin.jvm.functions.Function0<kotlin.Unit> onDispose, kotlin.coroutines.Continuation<?> p);
   }
 
-  @androidx.compose.runtime.Stable public abstract class ProvidableAmbient<T> extends androidx.compose.runtime.Ambient<T> {
+  @androidx.compose.runtime.Stable public abstract class ProvidableCompositionLocal<T> extends androidx.compose.runtime.CompositionLocal<T> {
     method public final infix androidx.compose.runtime.ProvidedValue<T> provides(T? value);
     method public final infix androidx.compose.runtime.ProvidedValue<T> providesDefault(T? value);
   }
 
   public final class ProvidedValue<T> {
-    method public androidx.compose.runtime.Ambient<T> getAmbient();
     method public boolean getCanOverride();
+    method public androidx.compose.runtime.CompositionLocal<T> getCompositionLocal();
     method public T! getValue();
-    property public final androidx.compose.runtime.Ambient<T> ambient;
     property public final boolean canOverride;
+    property public final androidx.compose.runtime.CompositionLocal<T> compositionLocal;
     property public final T! value;
   }
 
@@ -896,7 +898,7 @@ package androidx.compose.runtime.snapshots {
 package androidx.compose.runtime.tooling {
 
   public final class InspectionTablesKt {
-    method public static androidx.compose.runtime.ProvidableAmbient<java.util.Set<androidx.compose.runtime.CompositionData>> getInspectionTables();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<java.util.Set<androidx.compose.runtime.CompositionData>> getLocalInspectionTables();
   }
 
 }

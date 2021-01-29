@@ -16,10 +16,10 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.AmbientIndication
 import androidx.compose.foundation.Indication
-import androidx.compose.material.ripple.AmbientRippleTheme
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.material.ripple.ExperimentalRippleApi
+import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material.ripple.RippleTheme
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
@@ -27,7 +27,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
-import androidx.compose.foundation.text.selection.AmbientTextSelectionColors
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 
 /**
  * A MaterialTheme defines the styling principles from the Material design specification.
@@ -72,13 +72,13 @@ fun MaterialTheme(
     }
     val selectionColors = rememberTextSelectionColors(rememberedColors)
     Providers(
-        AmbientColors provides rememberedColors,
-        AmbientContentAlpha provides ContentAlpha.high,
-        AmbientIndication provides indicationFactory,
-        AmbientRippleTheme provides MaterialRippleTheme,
-        AmbientShapes provides shapes,
-        AmbientTextSelectionColors provides selectionColors,
-        AmbientTypography provides typography
+        LocalColors provides rememberedColors,
+        LocalContentAlpha provides ContentAlpha.high,
+        LocalIndication provides indicationFactory,
+        LocalRippleTheme provides MaterialRippleTheme,
+        LocalShapes provides shapes,
+        LocalTextSelectionColors provides selectionColors,
+        LocalTypography provides typography
     ) {
         ProvideTextStyle(value = typography.body1, content = content)
     }
@@ -97,7 +97,7 @@ object MaterialTheme {
     val colors: Colors
         @Composable
         @ReadOnlyComposable
-        get() = AmbientColors.current
+        get() = LocalColors.current
 
     /**
      * Retrieves the current [Typography] at the call site's position in the hierarchy.
@@ -107,7 +107,7 @@ object MaterialTheme {
     val typography: Typography
         @Composable
         @ReadOnlyComposable
-        get() = AmbientTypography.current
+        get() = LocalTypography.current
 
     /**
      * Retrieves the current [Shapes] at the call site's position in the hierarchy.
@@ -115,7 +115,7 @@ object MaterialTheme {
     val shapes: Shapes
         @Composable
         @ReadOnlyComposable
-        get() = AmbientShapes.current
+        get() = LocalShapes.current
 }
 
 @OptIn(ExperimentalRippleApi::class)
@@ -123,13 +123,13 @@ object MaterialTheme {
 private object MaterialRippleTheme : RippleTheme {
     @Composable
     override fun defaultColor() = RippleTheme.defaultRippleColor(
-        contentColor = AmbientContentColor.current,
+        contentColor = LocalContentColor.current,
         lightTheme = MaterialTheme.colors.isLight
     )
 
     @Composable
     override fun rippleAlpha() = RippleTheme.defaultRippleAlpha(
-        contentColor = AmbientContentColor.current,
+        contentColor = LocalContentColor.current,
         lightTheme = MaterialTheme.colors.isLight
     )
 }

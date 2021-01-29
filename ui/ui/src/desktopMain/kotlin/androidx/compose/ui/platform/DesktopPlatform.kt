@@ -16,9 +16,9 @@
 
 package androidx.compose.ui.platform
 
-import androidx.compose.runtime.staticAmbientOf
+import androidx.compose.runtime.staticCompositionLocalOf
 
-val DesktopPlatformAmbient = staticAmbientOf(DesktopPlatform::Current)
+val DesktopPlatformAmbient = staticCompositionLocalOf(DesktopPlatform::Current)
 
 enum class DesktopPlatform {
     Linux,

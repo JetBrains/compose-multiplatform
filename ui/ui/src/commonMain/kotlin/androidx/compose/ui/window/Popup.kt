@@ -19,7 +19,7 @@ package androidx.compose.ui.window
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Providers
-import androidx.compose.runtime.ambientOf
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.IntBounds
@@ -116,11 +116,11 @@ internal fun DropdownPopup(
 // TODO(b/142431825): This is a hack to work around Popups not using Semantics for test tags
 //  We should either remove it, or come up with an abstracted general solution that isn't specific
 //  to Popup
-internal val AmbientPopupTestTag = ambientOf { "DEFAULT_TEST_TAG" }
+internal val LocalPopupTestTag = compositionLocalOf { "DEFAULT_TEST_TAG" }
 
 @Composable
 internal fun PopupTestTag(tag: String, content: @Composable () -> Unit) {
-    Providers(AmbientPopupTestTag provides tag, content = content)
+    Providers(LocalPopupTestTag provides tag, content = content)
 }
 
 /**

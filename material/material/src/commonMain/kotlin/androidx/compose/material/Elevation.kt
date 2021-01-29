@@ -22,7 +22,7 @@ import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.Interaction
-import androidx.compose.runtime.ambientOf
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -116,11 +116,28 @@ private val HoveredOutgoingSpec = TweenSpec<Dp>(
 )
 
 /**
- * Ambient containing the current absolute elevation provided by [Surface] components. This
+ * CompositionLocal containing the current absolute elevation provided by [Surface] components. This
  * absolute elevation is a sum of all the previous elevations. Absolute elevation is only
  * used for calculating elevation overlays in dark theme, and is *not* used for drawing the
  * shadow in a [Surface]. See [ElevationOverlay] for more information on elevation overlays.
  *
  * @sample androidx.compose.material.samples.AbsoluteElevationSample
  */
-val AmbientAbsoluteElevation = ambientOf { 0.dp }
+@Deprecated(
+    "Renamed to LocalAbsoluteElevation",
+    replaceWith = ReplaceWith(
+        "LocalAbsoluteElevation",
+        "androidx.compose.material.LocalAbsoluteElevation"
+    )
+)
+val AmbientAbsoluteElevation get() = LocalAbsoluteElevation
+
+/**
+ * CompositionLocal containing the current absolute elevation provided by [Surface] components. This
+ * absolute elevation is a sum of all the previous elevations. Absolute elevation is only
+ * used for calculating elevation overlays in dark theme, and is *not* used for drawing the
+ * shadow in a [Surface]. See [ElevationOverlay] for more information on elevation overlays.
+ *
+ * @sample androidx.compose.material.samples.AbsoluteElevationSample
+ */
+val LocalAbsoluteElevation = compositionLocalOf { 0.dp }

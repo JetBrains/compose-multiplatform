@@ -27,7 +27,7 @@ import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
@@ -84,7 +84,7 @@ class SwitchScreenshotTest {
     fun switchTest_checked_rtl() {
         rule.setMaterialContent {
             Box(wrapperModifier) {
-                Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+                Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     Switch(checked = true, onCheckedChange = { })
                 }
             }
@@ -120,7 +120,7 @@ class SwitchScreenshotTest {
     fun switchTest_unchecked_rtl() {
         rule.setMaterialContent {
             Box(wrapperModifier) {
-                Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+                Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     Switch(checked = false, onCheckedChange = { })
                 }
             }

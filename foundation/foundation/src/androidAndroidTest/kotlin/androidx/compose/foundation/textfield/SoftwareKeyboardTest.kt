@@ -23,7 +23,7 @@ import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.AmbientTextInputService
+import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.performClick
@@ -58,7 +58,7 @@ class SoftwareKeyboardTest {
         val onTextInputStarted: (SoftwareKeyboardController) -> Unit = mock()
         rule.setContent {
             Providers(
-                AmbientTextInputService provides textInputService
+                LocalTextInputService provides textInputService
             ) {
                 val state = remember { mutableStateOf("") }
                 BasicTextField(

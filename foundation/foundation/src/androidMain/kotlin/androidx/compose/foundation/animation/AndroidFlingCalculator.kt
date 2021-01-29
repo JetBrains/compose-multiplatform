@@ -44,7 +44,7 @@ private fun computeDeceleration(friction: Float, density: Float): Float =
  * Configuration for Android-feel flinging motion at the given density.
  *
  * @param friction scroll friction.
- * @param density density of the screen. Use [DensityAmbient] to get current density in composition.
+ * @param density density of the screen. Use LocalDensity to get current density in composition.
  */
 internal class AndroidFlingCalculator(
     private val friction: Float,

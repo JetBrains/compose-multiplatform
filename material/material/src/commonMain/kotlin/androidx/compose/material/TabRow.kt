@@ -333,7 +333,7 @@ object TabRowDefaults {
     fun Divider(
         modifier: Modifier = Modifier,
         thickness: Dp = DividerThickness,
-        color: Color = AmbientContentColor.current.copy(alpha = DividerOpacity)
+        color: Color = LocalContentColor.current.copy(alpha = DividerOpacity)
     ) {
         androidx.compose.material.Divider(modifier = modifier, thickness = thickness, color = color)
     }
@@ -350,7 +350,7 @@ object TabRowDefaults {
     fun Indicator(
         modifier: Modifier = Modifier,
         height: Dp = IndicatorHeight,
-        color: Color = AmbientContentColor.current
+        color: Color = LocalContentColor.current
     ) {
         Box(
             modifier

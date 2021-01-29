@@ -29,7 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntSize
 
 private val frameLogCount = 1000
@@ -76,7 +76,7 @@ fun window() {
 
     Window(size = IntSize(800, 200)) {
         val window = AppWindowAmbient.current!!
-        val width = (AmbientDensity.current.density * window.window.width).toInt()
+        val width = (LocalDensity.current.density * window.window.width).toInt()
         val singleFrameMillis = remember {
             1000 / window.window.graphicsConfiguration.device.displayMode.refreshRate
         }

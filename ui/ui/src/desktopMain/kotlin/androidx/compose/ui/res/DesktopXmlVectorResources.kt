@@ -19,7 +19,7 @@ package androidx.compose.ui.res
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.vector.parseVectorRoot
 import androidx.compose.ui.unit.Density
 import org.xml.sax.InputSource
@@ -86,7 +86,7 @@ fun vectorXmlResource(resourcePath: String): ImageVector {
  */
 @Composable
 fun vectorXmlResource(inputSource: InputSource): ImageVector {
-    val density = AmbientDensity.current
+    val density = LocalDensity.current
     return remember(inputSource, density) {
         loadVectorXmlResource(inputSource, density)
     }

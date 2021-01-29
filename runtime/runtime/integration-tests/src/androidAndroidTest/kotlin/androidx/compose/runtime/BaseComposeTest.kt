@@ -25,7 +25,7 @@ import android.view.ViewGroup
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.node.UiApplier
-import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.setContent
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -138,7 +138,7 @@ class ComposeTester(val activity: ComponentActivity, val composable: @Composable
     private fun initialComposition(composable: @Composable () -> Unit) {
         activity.show {
             Providers(
-                AmbientContext provides activity
+                LocalContext provides activity
             ) {
                 composable()
             }

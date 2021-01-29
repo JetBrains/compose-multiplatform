@@ -17,7 +17,7 @@
 package androidx.compose.material.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.material.AmbientAbsoluteElevation
+import androidx.compose.material.LocalAbsoluteElevation
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
@@ -28,10 +28,10 @@ import androidx.compose.ui.unit.dp
 fun AbsoluteElevationSample() {
     Surface(elevation = 4.dp) {
         // This will equal 4.dp
-        val elevation = AmbientAbsoluteElevation.current
+        val elevation = LocalAbsoluteElevation.current
         Surface(elevation = 2.dp) {
             // This will equal 6.dp (4 + 2)
-            val elevation = AmbientAbsoluteElevation.current
+            val elevation = LocalAbsoluteElevation.current
         }
     }
 }

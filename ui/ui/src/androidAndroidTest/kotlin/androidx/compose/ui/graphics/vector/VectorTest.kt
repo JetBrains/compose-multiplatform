@@ -39,7 +39,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -326,7 +326,7 @@ class VectorTest {
         tintColor: Color = Color.Unspecified
     ): VectorPainter {
         val sizePx = size.toFloat()
-        val sizeDp = (size / AmbientDensity.current.density).dp
+        val sizeDp = (size / LocalDensity.current.density).dp
         return rememberVectorPainter(
             defaultWidth = sizeDp,
             defaultHeight = sizeDp,
@@ -352,7 +352,7 @@ class VectorTest {
         alignment: Alignment = Alignment.Center
     ) {
         val sizePx = size.toFloat()
-        val sizeDp = (size / AmbientDensity.current.density).dp
+        val sizeDp = (size / LocalDensity.current.density).dp
         val background = Modifier.paint(
             rememberVectorPainter(
                 defaultWidth = sizeDp,
@@ -405,7 +405,7 @@ class VectorTest {
         alignment: Alignment = Alignment.Center
     ) {
         val sizePx = size.toFloat()
-        val sizeDp = (size / AmbientDensity.current.density).dp
+        val sizeDp = (size / LocalDensity.current.density).dp
         val background = Modifier.paint(
             rememberVectorPainter(
                 defaultWidth = sizeDp,

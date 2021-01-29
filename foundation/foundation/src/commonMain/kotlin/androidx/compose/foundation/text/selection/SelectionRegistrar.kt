@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation.text.selection
 
-import androidx.compose.runtime.ambientOf
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.text.ExperimentalTextApi
@@ -103,8 +103,9 @@ internal interface SelectionRegistrar {
 }
 
 /**
- * Ambient of SelectionRegistrar. Composables that implement selection logic can use this ambient
- * to get a [SelectionRegistrar] in order to subscribe and unsubscribe to [SelectionRegistrar].
+ * SelectionRegistrar CompositionLocal. Composables that implement selection logic can use this
+ * CompositionLocal to get a [SelectionRegistrar] in order to subscribe and unsubscribe to
+ * [SelectionRegistrar].
  */
 @OptIn(ExperimentalTextApi::class)
-internal val AmbientSelectionRegistrar = ambientOf<SelectionRegistrar?>()
+internal val LocalSelectionRegistrar = compositionLocalOf<SelectionRegistrar?>()

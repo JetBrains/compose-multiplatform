@@ -25,15 +25,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Providers
-import androidx.compose.runtime.ambientOf
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.neverEqualPolicy
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.AmbientSaveableStateRegistry
+import androidx.compose.runtime.saveable.LocalSaveableStateRegistry
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.staticAmbientOf
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelStoreOwner
@@ -43,7 +43,20 @@ import androidx.savedstate.SavedStateRegistryOwner
  * The Android [Configuration]. The [Configuration] is useful for determining how to organize the
  * UI.
  */
-val AmbientConfiguration = ambientOf<Configuration>(
+@Deprecated(
+    "Renamed to LocalConfiguration",
+    replaceWith = ReplaceWith(
+        "LocalConfiguration",
+        "androidx.compose.ui.platform.LocalConfiguration"
+    )
+)
+val AmbientConfiguration get() = LocalConfiguration
+
+/**
+ * The Android [Configuration]. The [Configuration] is useful for determining how to organize the
+ * UI.
+ */
+val LocalConfiguration = compositionLocalOf<Configuration>(
     @OptIn(ExperimentalComposeApi::class)
     neverEqualPolicy()
 )
@@ -51,31 +64,94 @@ val AmbientConfiguration = ambientOf<Configuration>(
 /**
  * Provides a [Context] that can be used by Android applications.
  */
-val AmbientContext = staticAmbientOf<Context>()
+@Deprecated(
+    "Renamed to LocalContext",
+    replaceWith = ReplaceWith(
+        "LocalContext",
+        "androidx.compose.ui.platform.LocalContext"
+    )
+)
+val AmbientContext get() = LocalContext
 
 /**
- * The ambient containing the current [LifecycleOwner].
+ * Provides a [Context] that can be used by Android applications.
  */
-val AmbientLifecycleOwner = staticAmbientOf<LifecycleOwner>()
+val LocalContext = staticCompositionLocalOf<Context>()
 
 /**
- * The ambient containing the current [SavedStateRegistryOwner].
+ * The CompositionLocal containing the current [LifecycleOwner].
  */
-val AmbientSavedStateRegistryOwner = staticAmbientOf<SavedStateRegistryOwner>()
+@Deprecated(
+    "Renamed to LocalLifecycleOwner",
+    replaceWith = ReplaceWith(
+        "LocalLifecycleOwner",
+        "androidx.compose.ui.platform.LocalLifecycleOwner"
+    )
+)
+val AmbientLifecycleOwner get() = LocalLifecycleOwner
 
 /**
- * The ambient containing the current Compose [View].
+ * The CompositionLocal containing the current [LifecycleOwner].
  */
-val AmbientView = staticAmbientOf<View>()
+val LocalLifecycleOwner = staticCompositionLocalOf<LifecycleOwner>()
 
 /**
- * The ambient containing the current [ViewModelStoreOwner].
+ * The CompositionLocal containing the current [SavedStateRegistryOwner].
  */
-val AmbientViewModelStoreOwner = staticAmbientOf<ViewModelStoreOwner>()
+@Deprecated(
+    "Renamed to LocalSavedStateRegistryOwner",
+    replaceWith = ReplaceWith(
+        "LocalSavedStateRegistryOwner",
+        "androidx.compose.ui.platform.LocalSavedStateRegistryOwner"
+    )
+)
+val AmbientSavedStateRegistryOwner get() = LocalSavedStateRegistryOwner
+
+/**
+ * The CompositionLocal containing the current [SavedStateRegistryOwner].
+ */
+val LocalSavedStateRegistryOwner = staticCompositionLocalOf<SavedStateRegistryOwner>()
+
+/**
+ * The CompositionLocal containing the current Compose [View].
+ */
+@Deprecated(
+    "Renamed to LocalView",
+    replaceWith = ReplaceWith(
+        "LocalView",
+        "androidx.compose.ui.platform.LocalView"
+    )
+)
+val AmbientView get() = LocalView
+
+/**
+ * The CompositionLocal containing the current Compose [View].
+ */
+val LocalView = staticCompositionLocalOf<View>()
+
+/**
+ * The CompositionLocal containing the current [ViewModelStoreOwner].
+ */
+@Deprecated(
+    "Renamed to LocalViewModelStoreOwner",
+    replaceWith = ReplaceWith(
+        "LocalViewModelStoreOwner",
+        "androidx.compose.ui.platform.LocalViewModelStoreOwner"
+    )
+)
+val AmbientViewModelStoreOwner get() = LocalViewModelStoreOwner
+
+/**
+ * The CompositionLocal containing the current [ViewModelStoreOwner].
+ */
+val LocalViewModelStoreOwner = staticCompositionLocalOf<ViewModelStoreOwner>()
 
 @Composable
 @OptIn(ExperimentalComposeUiApi::class, InternalAnimationApi::class)
-internal fun ProvideAndroidAmbients(owner: AndroidComposeView, content: @Composable () -> Unit) {
+internal fun ProvideAndroidCompositionLocals(
+    owner: AndroidComposeView,
+    content: @Composable () -> Unit
+) {
     val view = owner
     val context = view.context
     val scope = rememberCoroutineScope()
@@ -108,15 +184,15 @@ internal fun ProvideAndroidAmbients(owner: AndroidComposeView, content: @Composa
     }
 
     Providers(
-        AmbientConfiguration provides configuration,
-        AmbientContext provides context,
-        AmbientLifecycleOwner provides viewTreeOwners.lifecycleOwner,
-        AmbientSavedStateRegistryOwner provides viewTreeOwners.savedStateRegistryOwner,
-        AmbientSaveableStateRegistry provides saveableStateRegistry,
-        AmbientView provides owner.view,
-        AmbientViewModelStoreOwner provides viewTreeOwners.viewModelStoreOwner
+        LocalConfiguration provides configuration,
+        LocalContext provides context,
+        LocalLifecycleOwner provides viewTreeOwners.lifecycleOwner,
+        LocalSavedStateRegistryOwner provides viewTreeOwners.savedStateRegistryOwner,
+        LocalSaveableStateRegistry provides saveableStateRegistry,
+        LocalView provides owner.view,
+        LocalViewModelStoreOwner provides viewTreeOwners.viewModelStoreOwner
     ) {
-        ProvideCommonAmbients(
+        ProvideCommonCompositionLocals(
             owner = owner,
             animationClock = rootAnimationClock,
             uriHandler = uriHandler,

@@ -22,7 +22,7 @@ import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.platform.AmbientTextInputService
+import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -74,7 +74,7 @@ class TextFieldOnValueChangeTextFieldValueTest {
 
         rule.setContent {
             Providers(
-                AmbientTextInputService provides textInputService
+                LocalTextInputService provides textInputService
             ) {
                 val state = remember {
                     mutableStateOf(

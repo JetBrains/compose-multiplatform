@@ -95,7 +95,7 @@ fun FloatingActionButton(
         contentColor = contentColor,
         elevation = elevation.elevation(interactionState).value
     ) {
-        Providers(AmbientContentAlpha provides contentColor.alpha) {
+        Providers(LocalContentAlpha provides contentColor.alpha) {
             ProvideTextStyle(MaterialTheme.typography.button) {
                 Box(
                     modifier = Modifier

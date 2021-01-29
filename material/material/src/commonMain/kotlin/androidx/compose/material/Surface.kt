@@ -28,7 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -48,9 +48,9 @@ import androidx.compose.ui.unit.dp
  * 3) Borders: If [shape] has a border, then it will also be drawn.
  *
  * 4) Background: Surface fills the shape specified by [shape] with the [color]. If [color] is
- * [Colors.surface], the [ElevationOverlay] from [AmbientElevationOverlay] will be used to apply
+ * [Colors.surface], the [ElevationOverlay] from [LocalElevationOverlay] will be used to apply
  * an overlay - by default this will only occur in dark theme. The color of the overlay depends
- * on the [elevation] of this Surface, and the [AmbientAbsoluteElevation] set by any parent
+ * on the [elevation] of this Surface, and the [LocalAbsoluteElevation] set by any parent
  * surfaces. This ensures that a Surface never appears to have a lower elevation overlay than its
  * ancestors, by summing the elevation of all previous Surfaces.
  *
@@ -68,7 +68,7 @@ import androidx.compose.ui.unit.dp
  * To modify these default style values used by text, use [ProvideTextStyle] or explicitly
  * pass a new [TextStyle] to your text.
  *
- * To manually retrieve the content color inside a surface, use [AmbientContentColor].
+ * To manually retrieve the content color inside a surface, use [LocalContentColor].
  *
  * @param modifier Modifier to be applied to the layout corresponding to the surface
  * @param shape Defines the surface's shape as well its shadow. A shadow is only
@@ -91,9 +91,9 @@ fun Surface(
     elevation: Dp = 0.dp,
     content: @Composable () -> Unit
 ) {
-    val elevationPx = with(AmbientDensity.current) { elevation.toPx() }
-    val elevationOverlay = AmbientElevationOverlay.current
-    val absoluteElevation = AmbientAbsoluteElevation.current + elevation
+    val elevationPx = with(LocalDensity.current) { elevation.toPx() }
+    val elevationOverlay = LocalElevationOverlay.current
+    val absoluteElevation = LocalAbsoluteElevation.current + elevation
     val backgroundColor = if (color == MaterialTheme.colors.surface && elevationOverlay != null) {
         elevationOverlay.apply(color, absoluteElevation)
     } else {
@@ -110,8 +110,8 @@ fun Surface(
         propagateMinConstraints = true
     ) {
         Providers(
-            AmbientContentColor provides contentColor,
-            AmbientAbsoluteElevation provides absoluteElevation,
+            LocalContentColor provides contentColor,
+            LocalAbsoluteElevation provides absoluteElevation,
             content = content
         )
     }

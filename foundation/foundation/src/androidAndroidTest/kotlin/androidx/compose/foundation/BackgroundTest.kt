@@ -32,9 +32,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.platform.AmbientDensity
-import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
@@ -183,7 +183,7 @@ class BackgroundTest {
     fun background_rtl_initially() {
         rule.setContent {
             SemanticParent {
-                Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+                Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     Box(
                         Modifier.preferredSize(40f.toDp())
                             .background(Color.Magenta)
@@ -210,7 +210,7 @@ class BackgroundTest {
         val direction = mutableStateOf(LayoutDirection.Ltr)
         rule.setContent {
             SemanticParent {
-                Providers(AmbientLayoutDirection provides direction.value) {
+                Providers(LocalLayoutDirection provides direction.value) {
                     Box(
                         Modifier.preferredSize(40f.toDp())
                             .background(Color.Magenta)
@@ -267,7 +267,7 @@ class BackgroundTest {
     @Composable
     private fun SemanticParent(content: @Composable Density.() -> Unit) {
         Box(Modifier.testTag(contentTag)) {
-            AmbientDensity.current.content()
+            LocalDensity.current.content()
         }
     }
 }

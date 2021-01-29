@@ -35,7 +35,7 @@ import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.layout.Remeasurement
 import androidx.compose.ui.layout.RemeasurementModifier
-import androidx.compose.ui.platform.AmbientAnimationClock
+import androidx.compose.ui.platform.LocalAnimationClock
 import kotlin.math.abs
 
 /**
@@ -57,7 +57,7 @@ fun rememberLazyListState(
     initialFirstVisibleItemScrollOffset: Int = 0,
     interactionState: InteractionState? = null
 ): LazyListState {
-    val clock = AmbientAnimationClock.current.asDisposableClock()
+    val clock = LocalAnimationClock.current.asDisposableClock()
     val config = defaultFlingConfig()
 
     // Avoid creating a new instance every invocation

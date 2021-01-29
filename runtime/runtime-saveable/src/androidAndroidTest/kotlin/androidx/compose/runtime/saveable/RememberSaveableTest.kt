@@ -390,7 +390,7 @@ private fun WrapRegistry(
     content: @Composable () -> Unit
 ) {
     Providers(
-        AmbientSaveableStateRegistry provides wrap(AmbientSaveableStateRegistry.current!!),
+        LocalSaveableStateRegistry provides wrap(LocalSaveableStateRegistry.current!!),
         content = content
     )
 }

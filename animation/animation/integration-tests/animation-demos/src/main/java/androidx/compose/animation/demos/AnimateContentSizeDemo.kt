@@ -31,8 +31,8 @@ import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.AmbientTextStyle
 import androidx.compose.material.Button
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -82,7 +82,7 @@ private fun Text() {
             } else {
                 longText
             },
-            style = AmbientTextStyle.current.copy(color = Color.White)
+            style = LocalTextStyle.current.copy(color = Color.White)
         )
     }
 }
@@ -101,7 +101,7 @@ private fun Button() {
             } else {
                 longText
             },
-            style = AmbientTextStyle.current.copy(color = Color.White),
+            style = LocalTextStyle.current.copy(color = Color.White),
             modifier = Modifier.animateContentSize()
         )
     }
@@ -123,7 +123,7 @@ private fun Image() {
             } else {
                 "16 : 9"
             },
-            style = AmbientTextStyle.current.copy(color = Color.Black)
+            style = LocalTextStyle.current.copy(color = Color.Black)
         )
     }
 }

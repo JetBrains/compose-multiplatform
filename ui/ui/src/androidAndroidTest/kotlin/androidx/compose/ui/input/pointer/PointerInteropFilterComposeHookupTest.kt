@@ -25,8 +25,8 @@ import android.view.ViewGroup
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -63,7 +63,7 @@ class PointerInteropFilterComposeHookupTest {
 
             val parent = ComposeView(activity).apply {
                 setContent {
-                    with(AmbientDensity.current) {
+                    with(LocalDensity.current) {
                         Box(
                             modifier = Modifier
                                 .spyGestureFilter {

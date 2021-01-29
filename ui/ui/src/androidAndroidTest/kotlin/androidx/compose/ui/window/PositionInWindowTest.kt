@@ -26,7 +26,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -65,7 +65,7 @@ class PositionInWindowTest {
             window.attributes = layoutParams
         }
         rule.setContent {
-            with(AmbientDensity.current) {
+            with(LocalDensity.current) {
                 Box(Modifier.size(size.toDp()).onGloballyPositioned { coordinates = it })
             }
         }

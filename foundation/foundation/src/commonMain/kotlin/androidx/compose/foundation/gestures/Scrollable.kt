@@ -44,7 +44,7 @@ import androidx.compose.ui.gesture.nestedscroll.NestedScrollDispatcher
 import androidx.compose.ui.gesture.nestedscroll.NestedScrollSource
 import androidx.compose.ui.gesture.nestedscroll.nestedScroll
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
-import androidx.compose.ui.platform.AmbientAnimationClock
+import androidx.compose.ui.platform.LocalAnimationClock
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Velocity
 import kotlinx.coroutines.Job
@@ -68,7 +68,7 @@ fun rememberScrollableController(
     interactionState: InteractionState? = null,
     consumeScrollDelta: (Float) -> Float
 ): ScrollableController {
-    val clocks = AmbientAnimationClock.current.asDisposableClock()
+    val clocks = LocalAnimationClock.current.asDisposableClock()
     val flingConfig = defaultFlingConfig()
     return remember(clocks, flingConfig, interactionState) {
         ScrollableController(consumeScrollDelta, flingConfig, clocks, interactionState)

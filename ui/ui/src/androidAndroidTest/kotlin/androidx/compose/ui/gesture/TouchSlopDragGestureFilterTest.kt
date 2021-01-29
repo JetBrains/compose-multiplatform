@@ -22,7 +22,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.TestActivity
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -265,7 +265,7 @@ class TouchSlopDragGestureFilterTest {
         activityTestRule.runOnUiThreadIR {
             activity.setContent {
                 Box {
-                    touchSlop = with(AmbientDensity.current) { TouchSlop.toPx() }
+                    touchSlop = with(LocalDensity.current) { TouchSlop.toPx() }
                     Layout(
                         modifier = Modifier.dragGestureFilter(
                             dragObserver,

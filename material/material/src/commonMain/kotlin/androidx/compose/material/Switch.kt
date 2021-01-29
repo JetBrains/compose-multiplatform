@@ -46,8 +46,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.platform.AmbientDensity
-import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
@@ -82,9 +82,9 @@ fun Switch(
     colors: SwitchColors = SwitchDefaults.colors()
 ) {
     val minBound = 0f
-    val maxBound = with(AmbientDensity.current) { ThumbPathLength.toPx() }
+    val maxBound = with(LocalDensity.current) { ThumbPathLength.toPx() }
     val swipeableState = rememberSwipeableStateFor(checked, onCheckedChange, AnimationSpec)
-    val isRtl = AmbientLayoutDirection.current == LayoutDirection.Rtl
+    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     Box(
         modifier
             .toggleable(

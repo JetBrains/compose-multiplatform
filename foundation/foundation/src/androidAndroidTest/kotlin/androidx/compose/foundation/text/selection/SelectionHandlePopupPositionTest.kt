@@ -26,8 +26,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.AmbientLayoutDirection
-import androidx.compose.ui.platform.AmbientView
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -165,7 +165,7 @@ class SelectionHandlePopupPositionTest {
 
             rule.setContent {
                 // Get the compose view position on screen
-                val composeView = AmbientView.current
+                val composeView = LocalView.current
                 val positionArray = IntArray(2)
                 composeView.getLocationOnScreen(positionArray)
                 composeViewAbsolutePos = IntOffset(
@@ -176,7 +176,7 @@ class SelectionHandlePopupPositionTest {
                 // Align the parent of the popup on the top left corner, this results in the global
                 // position of the parent to be (0, 0)
                 val layoutDirection = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
-                Providers(AmbientLayoutDirection provides layoutDirection) {
+                Providers(LocalLayoutDirection provides layoutDirection) {
                     SimpleLayout {
                         SimpleContainer(width = parentWidthDp, height = parentHeightDp) {}
                         SelectionHandle(

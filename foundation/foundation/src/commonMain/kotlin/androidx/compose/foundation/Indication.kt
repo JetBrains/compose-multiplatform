@@ -20,7 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.staticAmbientOf
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.Modifier
@@ -37,7 +37,7 @@ import androidx.compose.ui.platform.debugInspectorInfo
  * [indication] modifier.
  *
  * If you want to override default behaviour for [indication] for the whole subtree, consider
- * creating object of this factory and providing it in [AmbientIndication].
+ * creating object of this factory and providing it in [LocalIndication].
  */
 @Stable
 interface Indication {
@@ -106,12 +106,31 @@ fun Modifier.indication(
 )
 
 /**
- * Ambient to provide [IndicationInstance] to draw visual indication for press and other events.
+ * CompositionLocal that provides an [IndicationInstance] to draw visual indication for press and
+ * other events.
  *
- * By default there will be [DefaultDebugIndication] created.
+ * By default this will provide [DefaultDebugIndication].
  */
 // TODO : temporary made it to be lambda, fix when b/157150564 is fixed
-val AmbientIndication = staticAmbientOf<@Composable () -> Indication> { { DefaultDebugIndication } }
+@Deprecated(
+    "Renamed to LocalIndication",
+    replaceWith = ReplaceWith(
+        "LocalIndication",
+        "androidx.compose.foundation.LocalIndication"
+    )
+)
+val AmbientIndication get() = LocalIndication
+
+/**
+ * CompositionLocal that provides an [IndicationInstance] to draw visual indication for press and
+ * other events.
+ *
+ * By default this will provide [DefaultDebugIndication].
+ */
+// TODO : temporary made it to be lambda, fix when b/157150564 is fixed
+val LocalIndication = staticCompositionLocalOf<@Composable () -> Indication> {
+    { DefaultDebugIndication }
+}
 
 private object NoIndication : Indication {
     private object NoIndicationInstance : IndicationInstance {

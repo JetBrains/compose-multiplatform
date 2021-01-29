@@ -25,9 +25,9 @@ import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.node.InnerPlaceable
 import androidx.compose.ui.node.LayoutNode
-import androidx.compose.ui.platform.AmbientClipboardManager
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.ScrollAxisRange
 import androidx.compose.ui.semantics.SemanticsModifierCore
@@ -112,7 +112,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
             accessibilityDelegate.accessibilityForceEnabledForTesting = true
         }
         rule.setContent {
-            AmbientClipboardManager.current.setText(AnnotatedString("test"))
+            LocalClipboardManager.current.setText(AnnotatedString("test"))
         }
         info = AccessibilityNodeInfoCompat.obtain()
     }

@@ -17,7 +17,7 @@
 package androidx.compose.runtime.saveable
 
 import androidx.compose.runtime.saveable.SaveableStateRegistry.Entry
-import androidx.compose.runtime.staticAmbientOf
+import androidx.compose.runtime.staticCompositionLocalOf
 
 /**
  * Allows components to save and restore their state using the saved instance state mechanism.
@@ -86,9 +86,9 @@ fun SaveableStateRegistry(
 ): SaveableStateRegistry = SaveableStateRegistryImpl(restoredValues, canBeSaved)
 
 /**
- * Ambient with a current [SaveableStateRegistry] instance.
+ * CompositionLocal with a current [SaveableStateRegistry] instance.
  */
-val AmbientSaveableStateRegistry = staticAmbientOf<SaveableStateRegistry?> { null }
+val LocalSaveableStateRegistry = staticCompositionLocalOf<SaveableStateRegistry?> { null }
 
 private class SaveableStateRegistryImpl(
     restored: Map<String, List<Any?>>?,

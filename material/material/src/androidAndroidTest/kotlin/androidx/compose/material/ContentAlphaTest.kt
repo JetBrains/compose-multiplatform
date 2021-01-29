@@ -57,7 +57,7 @@ class ContentAlphaTest(private val colors: Colors, private val debugParameterNam
                 Surface {
                     val onSurface = MaterialTheme.colors.onSurface
 
-                    assertThat(AmbientContentColor.current).isEqualTo(onSurface)
+                    assertThat(LocalContentColor.current).isEqualTo(onSurface)
                 }
             }
         }
@@ -68,8 +68,8 @@ class ContentAlphaTest(private val colors: Colors, private val debugParameterNam
         rule.setContent {
             MaterialTheme(colors) {
                 Surface {
-                    Providers(AmbientContentAlpha provides ContentAlpha.high) {
-                        assertThat(AmbientContentAlpha.current)
+                    Providers(LocalContentAlpha provides ContentAlpha.high) {
+                        assertThat(LocalContentAlpha.current)
                             .isEqualTo(ReducedContrastHighContentAlpha)
                     }
                 }
@@ -82,8 +82,8 @@ class ContentAlphaTest(private val colors: Colors, private val debugParameterNam
         rule.setContent {
             MaterialTheme(colors) {
                 Surface {
-                    Providers(AmbientContentAlpha provides ContentAlpha.medium) {
-                        assertThat(AmbientContentAlpha.current)
+                    Providers(LocalContentAlpha provides ContentAlpha.medium) {
+                        assertThat(LocalContentAlpha.current)
                             .isEqualTo(ReducedContrastMediumContentAlpha)
                     }
                 }
@@ -96,8 +96,8 @@ class ContentAlphaTest(private val colors: Colors, private val debugParameterNam
         rule.setContent {
             MaterialTheme(colors) {
                 Surface {
-                    Providers(AmbientContentAlpha provides ContentAlpha.disabled) {
-                        assertThat(AmbientContentAlpha.current)
+                    Providers(LocalContentAlpha provides ContentAlpha.disabled) {
+                        assertThat(LocalContentAlpha.current)
                             .isEqualTo(ReducedContrastDisabledContentAlpha)
                     }
                 }
@@ -112,7 +112,7 @@ class ContentAlphaTest(private val colors: Colors, private val debugParameterNam
                 Surface(color = colors.primary) {
                     val onPrimary = MaterialTheme.colors.onPrimary
 
-                    assertThat(AmbientContentColor.current).isEqualTo(onPrimary)
+                    assertThat(LocalContentColor.current).isEqualTo(onPrimary)
                 }
             }
         }
@@ -123,8 +123,8 @@ class ContentAlphaTest(private val colors: Colors, private val debugParameterNam
         rule.setContent {
             MaterialTheme(colors) {
                 Surface(color = colors.primary) {
-                    Providers(AmbientContentAlpha provides ContentAlpha.high) {
-                        assertThat(AmbientContentAlpha.current)
+                    Providers(LocalContentAlpha provides ContentAlpha.high) {
+                        assertThat(LocalContentAlpha.current)
                             .isEqualTo(HighContrastHighContentAlpha)
                     }
                 }
@@ -137,8 +137,8 @@ class ContentAlphaTest(private val colors: Colors, private val debugParameterNam
         rule.setContent {
             MaterialTheme(colors) {
                 Surface(color = colors.primary) {
-                    Providers(AmbientContentAlpha provides ContentAlpha.medium) {
-                        assertThat(AmbientContentAlpha.current)
+                    Providers(LocalContentAlpha provides ContentAlpha.medium) {
+                        assertThat(LocalContentAlpha.current)
                             .isEqualTo(HighContrastMediumContentAlpha)
                     }
                 }
@@ -151,8 +151,8 @@ class ContentAlphaTest(private val colors: Colors, private val debugParameterNam
         rule.setContent {
             MaterialTheme(colors) {
                 Surface(color = colors.primary) {
-                    Providers(AmbientContentAlpha provides ContentAlpha.disabled) {
-                        assertThat(AmbientContentAlpha.current)
+                    Providers(LocalContentAlpha provides ContentAlpha.disabled) {
+                        assertThat(LocalContentAlpha.current)
                             .isEqualTo(HighContrastDisabledContentAlpha)
                     }
                 }
@@ -165,7 +165,7 @@ class ContentAlphaTest(private val colors: Colors, private val debugParameterNam
         rule.setContent {
             MaterialTheme(colors) {
                 Surface(contentColor = Color.Yellow) {
-                    assertThat(AmbientContentColor.current).isEqualTo(Color.Yellow)
+                    assertThat(LocalContentColor.current).isEqualTo(Color.Yellow)
                 }
             }
         }
@@ -177,13 +177,13 @@ class ContentAlphaTest(private val colors: Colors, private val debugParameterNam
             MaterialTheme(colors) {
                 val contentColor = Color(0.9f, 0.9f, 0.9f)
                 Surface(contentColor = contentColor) {
-                    Providers(AmbientContentAlpha provides ContentAlpha.high) {
+                    Providers(LocalContentAlpha provides ContentAlpha.high) {
                         val expectedAlpha = if (colors.isLight) {
                             HighContrastHighContentAlpha
                         } else {
                             ReducedContrastHighContentAlpha
                         }
-                        assertThat(AmbientContentAlpha.current).isEqualTo(expectedAlpha)
+                        assertThat(LocalContentAlpha.current).isEqualTo(expectedAlpha)
                     }
                 }
             }
@@ -196,13 +196,13 @@ class ContentAlphaTest(private val colors: Colors, private val debugParameterNam
             MaterialTheme(colors) {
                 val contentColor = Color(0.9f, 0.9f, 0.9f)
                 Surface(contentColor = contentColor) {
-                    Providers(AmbientContentAlpha provides ContentAlpha.medium) {
+                    Providers(LocalContentAlpha provides ContentAlpha.medium) {
                         val expectedAlpha = if (colors.isLight) {
                             HighContrastMediumContentAlpha
                         } else {
                             ReducedContrastMediumContentAlpha
                         }
-                        assertThat(AmbientContentAlpha.current).isEqualTo(expectedAlpha)
+                        assertThat(LocalContentAlpha.current).isEqualTo(expectedAlpha)
                     }
                 }
             }
@@ -215,13 +215,13 @@ class ContentAlphaTest(private val colors: Colors, private val debugParameterNam
             MaterialTheme(colors) {
                 val contentColor = Color(0.9f, 0.9f, 0.9f)
                 Surface(contentColor = contentColor) {
-                    Providers(AmbientContentAlpha provides ContentAlpha.disabled) {
+                    Providers(LocalContentAlpha provides ContentAlpha.disabled) {
                         val expectedAlpha = if (colors.isLight) {
                             HighContrastDisabledContentAlpha
                         } else {
                             ReducedContrastDisabledContentAlpha
                         }
-                        assertThat(AmbientContentAlpha.current).isEqualTo(expectedAlpha)
+                        assertThat(LocalContentAlpha.current).isEqualTo(expectedAlpha)
                     }
                 }
             }
@@ -234,13 +234,13 @@ class ContentAlphaTest(private val colors: Colors, private val debugParameterNam
             MaterialTheme(colors) {
                 val contentColor = Color(0.1f, 0.1f, 0.1f)
                 Surface(contentColor = contentColor) {
-                    Providers(AmbientContentAlpha provides ContentAlpha.high) {
+                    Providers(LocalContentAlpha provides ContentAlpha.high) {
                         val expectedAlpha = if (colors.isLight) {
                             ReducedContrastHighContentAlpha
                         } else {
                             HighContrastHighContentAlpha
                         }
-                        assertThat(AmbientContentAlpha.current).isEqualTo(expectedAlpha)
+                        assertThat(LocalContentAlpha.current).isEqualTo(expectedAlpha)
                     }
                 }
             }
@@ -253,13 +253,13 @@ class ContentAlphaTest(private val colors: Colors, private val debugParameterNam
             MaterialTheme(colors) {
                 val contentColor = Color(0.1f, 0.1f, 0.1f)
                 Surface(contentColor = contentColor) {
-                    Providers(AmbientContentAlpha provides ContentAlpha.medium) {
+                    Providers(LocalContentAlpha provides ContentAlpha.medium) {
                         val expectedAlpha = if (colors.isLight) {
                             ReducedContrastMediumContentAlpha
                         } else {
                             HighContrastMediumContentAlpha
                         }
-                        assertThat(AmbientContentAlpha.current).isEqualTo(expectedAlpha)
+                        assertThat(LocalContentAlpha.current).isEqualTo(expectedAlpha)
                     }
                 }
             }
@@ -272,13 +272,13 @@ class ContentAlphaTest(private val colors: Colors, private val debugParameterNam
             MaterialTheme(colors) {
                 val contentColor = Color(0.1f, 0.1f, 0.1f)
                 Surface(contentColor = contentColor) {
-                    Providers(AmbientContentAlpha provides ContentAlpha.disabled) {
+                    Providers(LocalContentAlpha provides ContentAlpha.disabled) {
                         val expectedAlpha = if (colors.isLight) {
                             ReducedContrastDisabledContentAlpha
                         } else {
                             HighContrastDisabledContentAlpha
                         }
-                        assertThat(AmbientContentAlpha.current).isEqualTo(expectedAlpha)
+                        assertThat(LocalContentAlpha.current).isEqualTo(expectedAlpha)
                     }
                 }
             }

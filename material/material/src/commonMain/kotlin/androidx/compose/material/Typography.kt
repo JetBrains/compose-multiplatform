@@ -17,7 +17,7 @@
 package androidx.compose.material
 
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.staticAmbientOf
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -277,12 +277,12 @@ private fun TextStyle.withDefaultFontFamily(default: FontFamily): TextStyle {
 }
 
 /**
- * This Ambient holds on to the current definition of typography for this application as described
- * by the Material spec.  You can read the values in it when creating custom components that want
- * to use Material types, as well as override the values when you want to re-style a part of your
- * hierarchy. Material components related to text such as [Button] will use this Ambient
- * to set values with which to style children text components.
+ * This CompositionLocal holds on to the current definition of typography for this application as
+ * described by the Material spec. You can read the values in it when creating custom components
+ * that want to use Material types, as well as override the values when you want to re-style a
+ * part of your hierarchy. Material components related to text such as [Button] will use this
+ * CompositionLocal to set values with which to style children text components.
  *
- * To access values within this ambient, use [MaterialTheme.typography].
+ * To access values within this CompositionLocal, use [MaterialTheme.typography].
  */
-internal val AmbientTypography = staticAmbientOf { Typography() }
+internal val LocalTypography = staticCompositionLocalOf { Typography() }

@@ -22,9 +22,9 @@ import androidx.compose.ui.geometry.Rect
 /**
  * Autofill API.
  *
- * This interface is available to all composables via an ambient. The composable can then request
- * or cancel autofill as required. For instance, the [TextField] can call [requestAutofillForNode]
- * when it gains focus, and [cancelAutofillForNode] when it loses focus.
+ * This interface is available to all composables via a CompositionLocal. The composable can then
+ * request or cancel autofill as required. For instance, the [TextField] can call
+ * [requestAutofillForNode] when it gains focus, and [cancelAutofillForNode] when it loses focus.
  */
 @ExperimentalComposeUiApi
 interface Autofill {

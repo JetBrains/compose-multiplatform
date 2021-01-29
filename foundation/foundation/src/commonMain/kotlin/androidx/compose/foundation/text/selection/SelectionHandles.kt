@@ -110,7 +110,7 @@ internal fun DefaultSelectionHandle(
     handlesCrossed: Boolean
 ) {
     val selectionHandleCache = remember { SelectionHandleCache() }
-    val handleColor = AmbientTextSelectionColors.current.handleColor
+    val handleColor = LocalTextSelectionColors.current.handleColor
     HandleDrawLayout(modifier = modifier, width = HANDLE_WIDTH, height = HANDLE_HEIGHT) {
         drawPath(
             selectionHandleCache.createPath(

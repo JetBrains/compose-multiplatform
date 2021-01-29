@@ -31,7 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -46,7 +46,7 @@ fun InputFieldDemo() {
             TagLine(tag = "LTR Layout")
         }
         item {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Ltr) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Ltr) {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     TagLine(tag = "simple editing single line")
                     EditLine(singleLine = true)
@@ -61,7 +61,7 @@ fun InputFieldDemo() {
             TagLine(tag = "RTL Layout")
         }
         item {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     TagLine(tag = "simple editing RTL")
                     EditLine()
