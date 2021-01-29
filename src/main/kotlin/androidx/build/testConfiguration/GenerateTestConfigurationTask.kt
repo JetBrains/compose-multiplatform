@@ -93,7 +93,12 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
             // We don't need to check hasBenchmarkPlugin because benchmarks shouldn't have test apps
             val appName = appApk.elements.single().outputFile.substringAfterLast("/")
                 .renameApkForTesting(appProjectPath.get(), hasBenchmarkPlugin = false)
-            configBuilder.appApkName(appName)
+            // TODO(b/178776319)
+            if (appProjectPath.get().contains("macrobenchmark-target")) {
+                configBuilder.appApkName(appName.replace("debug-androidTest", "release"))
+            } else {
+                configBuilder.appApkName(appName)
+            }
         }
         val isPostsubmit: Boolean = when (affectedModuleDetectorSubset.get()) {
             ProjectSubset.CHANGED_PROJECTS, ProjectSubset.ALL_AFFECTED_PROJECTS -> {
