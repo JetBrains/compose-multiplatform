@@ -67,13 +67,11 @@ fun <T> Crossfade(
         items.clear()
         keys.mapTo(items) { key ->
             CrossfadeAnimationItem(key) {
-                key(key) {
-                    val alpha by transition.animateFloat(
-                        transitionSpec = { animationSpec }
-                    ) { if (it == key) 1f else 0f }
-                    Box(Modifier.alpha(alpha = alpha)) {
-                        content(key)
-                    }
+                val alpha by transition.animateFloat(
+                    transitionSpec = { animationSpec }
+                ) { if (it == key) 1f else 0f }
+                Box(Modifier.alpha(alpha = alpha)) {
+                    content(key)
                 }
             }
         }
@@ -83,7 +81,11 @@ fun <T> Crossfade(
     }
 
     Box(modifier) {
-        items.fastForEach { it.content() }
+        items.fastForEach {
+            key(it.key) {
+                it.content()
+            }
+        }
     }
 }
 
