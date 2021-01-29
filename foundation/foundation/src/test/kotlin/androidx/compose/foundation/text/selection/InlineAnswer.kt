@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.platform
+package androidx.compose.foundation.text.selection
 
-import androidx.compose.runtime.staticAmbientOf
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.plus
-import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.geometry.Offset
+import org.mockito.invocation.InvocationOnMock
+import org.mockito.stubbing.Answer
+import org.mockito.stubbing.OngoingStubbing
 
-val SelectionTrackerAmbient = staticAmbientOf<SelectionTracker>()
-
-class SelectionTracker {
-    var getSelectedText: (() -> AnnotatedString?)? = null
+class LongAnswer(private val value: Long) : Answer<Any> {
+    override fun answer(invocation: InvocationOnMock?): Any = value
 }
 
-val copyToClipboardKeySet by lazy {
-    when (DesktopPlatform.Current) {
-        DesktopPlatform.MacOS -> Key.MetaLeft + Key.C
-        else -> Key.CtrlLeft + Key.C
-    }
+infix fun <T> OngoingStubbing<T>.doAnswer(offset: Offset): OngoingStubbing<T> {
+    return thenAnswer(LongAnswer(offset.packedValue))
 }

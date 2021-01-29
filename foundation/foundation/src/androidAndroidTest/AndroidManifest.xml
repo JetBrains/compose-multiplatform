@@ -14,4 +14,11 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<manifest package="androidx.compose.foundation" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="androidx.compose.foundation" >
+    <application>
+        <activity
+            android:name="androidx.compose.foundation.TestActivity"
+            android:theme="@android:style/Theme.Material.NoActionBar.Fullscreen" />
+    </application>
+</manifest>

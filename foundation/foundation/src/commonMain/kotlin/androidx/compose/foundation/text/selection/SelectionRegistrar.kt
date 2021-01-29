@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.selection
+package androidx.compose.foundation.text.selection
 
 import androidx.compose.runtime.ambientOf
 import androidx.compose.ui.geometry.Offset
@@ -25,7 +25,7 @@ import androidx.compose.ui.text.ExperimentalTextApi
  *  An interface allowing a composable to subscribe and unsubscribe to selection changes.
  */
 @ExperimentalTextApi
-interface SelectionRegistrar {
+internal interface SelectionRegistrar {
     /**
      * Subscribe to SelectionContainer selection changes.
      */
@@ -107,4 +107,4 @@ interface SelectionRegistrar {
  * to get a [SelectionRegistrar] in order to subscribe and unsubscribe to [SelectionRegistrar].
  */
 @OptIn(ExperimentalTextApi::class)
-val AmbientSelectionRegistrar = ambientOf<SelectionRegistrar?>()
+internal val AmbientSelectionRegistrar = ambientOf<SelectionRegistrar?>()

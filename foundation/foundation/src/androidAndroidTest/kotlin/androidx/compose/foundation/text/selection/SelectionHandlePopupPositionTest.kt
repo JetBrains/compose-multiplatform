@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,26 +14,34 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.selection
+package androidx.compose.foundation.text.selection
 
 import android.view.View
 import android.view.WindowManager
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.node.Owner
 import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.AmbientView
+import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.style.ResolvedTextDirection
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.SimpleContainer
+import androidx.compose.ui.unit.enforce
+import androidx.compose.ui.unit.hasFixedHeight
+import androidx.compose.ui.unit.hasFixedWidth
 import androidx.compose.ui.window.isPopupLayout
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.Root
@@ -50,6 +58,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import kotlin.math.max
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -229,7 +238,7 @@ class SelectionHandlePopupPositionTest {
 internal fun ComposeTestRule.singleSelectionHandleMatches(viewMatcher: Matcher<in View>) {
     // Make sure that current measurement/drawing is finished
     runOnIdle { }
-    Espresso.onView(CoreMatchers.instanceOf(Owner::class.java))
+    Espresso.onView(CoreMatchers.instanceOf(ViewRootForTest::class.java))
         .inRoot(SingleSelectionHandleMatcher())
         .check(ViewAssertions.matches(viewMatcher))
 }
@@ -248,5 +257,61 @@ internal class SingleSelectionHandleMatcher() : TypeSafeMatcher<Root>() {
             lastSeenWindowParams = item!!.windowLayoutParams.get()
         }
         return matches
+    }
+}
+
+/**
+ * A Container Box implementation used for selection children and handle layout
+ */
+@Composable
+internal fun SimpleContainer(
+    modifier: Modifier = Modifier,
+    width: Dp? = null,
+    height: Dp? = null,
+    content: @Composable () -> Unit
+) {
+    Layout(content, modifier) { measurables, incomingConstraints ->
+        val containerConstraints = Constraints()
+            .copy(
+                width?.toIntPx() ?: 0,
+                width?.toIntPx() ?: Constraints.Infinity,
+                height?.toIntPx() ?: 0,
+                height?.toIntPx() ?: Constraints.Infinity
+            )
+            .enforce(incomingConstraints)
+        val childConstraints = containerConstraints.copy(minWidth = 0, minHeight = 0)
+        var placeable: Placeable? = null
+        val containerWidth = if (
+            containerConstraints.hasFixedWidth
+        ) {
+            containerConstraints.maxWidth
+        } else {
+            placeable = measurables.firstOrNull()?.measure(childConstraints)
+            max((placeable?.width ?: 0), containerConstraints.minWidth)
+        }
+        val containerHeight = if (
+            containerConstraints.hasFixedHeight
+        ) {
+            containerConstraints.maxHeight
+        } else {
+            if (placeable == null) {
+                placeable = measurables.firstOrNull()?.measure(childConstraints)
+            }
+            max((placeable?.height ?: 0), containerConstraints.minHeight)
+        }
+        layout(containerWidth, containerHeight) {
+            val p = placeable ?: measurables.firstOrNull()?.measure(childConstraints)
+            p?.let {
+                val position = Alignment.Center.align(
+                    IntSize(it.width, it.height),
+                    IntSize(containerWidth, containerHeight),
+                    layoutDirection
+                )
+                it.placeRelative(
+                    position.x,
+                    position.y
+                )
+            }
+        }
     }
 }

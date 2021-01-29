@@ -62,6 +62,7 @@ dependencies {
 
         androidTestImplementation project(":compose:test-utils")
         androidTestImplementation project(":compose:ui:ui-test-font")
+        androidTestImplementation project(":test-screenshot")
         androidTestImplementation(ANDROIDX_TEST_UIAUTOMATOR)
         androidTestImplementation(ANDROIDX_TEST_RULES)
         androidTestImplementation(ANDROIDX_TEST_RUNNER)
@@ -123,6 +124,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             androidAndroidTest.dependencies {
                 implementation project(":compose:test-utils")
                 implementation project(":compose:ui:ui-test-font")
+                implementation project(":test-screenshot")
 
                 implementation(ANDROIDX_TEST_UIAUTOMATOR)
                 implementation(ANDROIDX_TEST_RULES)
@@ -152,6 +154,13 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         }
     }
 }
+
+// Screenshot tests related setup
+android {
+    sourceSets.androidTest.assets.srcDirs +=
+            project.rootDir.absolutePath + "/../../golden/compose/foundation/foundation"
+}
+
 androidx {
     name = "Compose Foundation"
     publish = Publish.SNAPSHOT_AND_RELEASE

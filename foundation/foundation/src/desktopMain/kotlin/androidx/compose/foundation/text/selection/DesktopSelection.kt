@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package androidx.compose.ui.platform
+package androidx.compose.foundation.text.selection
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
@@ -27,9 +27,7 @@ import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.gesture.rawDragGestureFilter
 import androidx.compose.ui.gesture.rawPressStartGestureFilter
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.selection.AmbientSelectionRegistrar
-import androidx.compose.ui.selection.Selection
-import androidx.compose.ui.selection.SelectionRegistrarImpl
+import androidx.compose.ui.platform.SelectionTrackerAmbient
 import kotlin.math.max
 
 @Composable
@@ -56,7 +54,7 @@ private fun Wrap(modifier: Modifier = Modifier, content: @Composable () -> Unit)
 }
 
 @Composable
-internal fun DesktopSelectionContainer(content: @Composable () -> Unit) {
+fun DesktopSelectionContainer(content: @Composable () -> Unit) {
     val selection = remember { mutableStateOf<Selection?>(null) }
     DesktopSelectionContainer(
         selection = selection.value,
@@ -91,7 +89,7 @@ private class DragGlue(val observer: DragObserver) : DragObserver by observer {
 }
 
 @Composable
-fun DesktopSelectionContainer(
+internal fun DesktopSelectionContainer(
     selection: Selection?,
     onSelectionChange: (Selection?) -> Unit,
     content: @Composable () -> Unit
@@ -99,10 +97,10 @@ fun DesktopSelectionContainer(
     val registrarImpl = remember { SelectionRegistrarImpl() }
     val manager = remember { DesktopSelectionManager(registrarImpl) }
 
-    val managerTracker = SelectionManagerTrackerAmbient.current
+    val selectionTracker = SelectionTrackerAmbient.current
 
     manager.onSelectionChange = {
-        managerTracker.recentManager = manager
+        selectionTracker.getSelectedText = { manager.getSelectedText() }
         onSelectionChange(it)
     }
     manager.selection = selection

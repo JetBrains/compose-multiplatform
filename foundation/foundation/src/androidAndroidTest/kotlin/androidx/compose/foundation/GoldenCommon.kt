@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,6 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.selection
+package androidx.compose.foundation
 
-import androidx.compose.ui.geometry.Offset
-import org.mockito.invocation.InvocationOnMock
-import org.mockito.stubbing.Answer
-import org.mockito.stubbing.OngoingStubbing
-
-class LongAnswer(private val value: Long) : Answer<Any> {
-    override fun answer(invocation: InvocationOnMock?): Any = value
-}
-
-infix fun <T> OngoingStubbing<T>.doAnswer(offset: Offset): OngoingStubbing<T> {
-    return thenAnswer(LongAnswer(offset.packedValue))
-}
+internal const val GOLDEN_UI = "compose/foundation/foundation"

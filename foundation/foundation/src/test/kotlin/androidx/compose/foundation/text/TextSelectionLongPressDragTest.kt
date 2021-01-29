@@ -19,9 +19,9 @@ package androidx.compose.foundation.text
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.LongPressDragObserver
 import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.selection.Selectable
-import androidx.compose.ui.selection.Selection
-import androidx.compose.ui.selection.SelectionRegistrar
+import androidx.compose.foundation.text.selection.Selectable
+import androidx.compose.foundation.text.selection.Selection
+import androidx.compose.foundation.text.selection.SelectionRegistrar
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextDelegate
