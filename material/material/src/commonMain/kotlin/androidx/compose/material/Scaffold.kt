@@ -131,12 +131,12 @@ enum class FabPosition {
  * below the drawer sheet (if set)
  * @param drawerBackgroundColor background color to be used for the drawer sheet
  * @param drawerContentColor color of the content to use inside the drawer sheet. Defaults to
- * either the matching `onFoo` color for [drawerBackgroundColor], or, if it is not a color from
+ * either the matching content color for [drawerBackgroundColor], or, if it is not a color from
  * the theme, this will keep the same value set above this Surface.
  * @param drawerScrimColor color of the scrim that obscures content when the drawer is open
  * @param backgroundColor background of the scaffold body
  * @param contentColor color of the content in scaffold body. Defaults to either the matching
- * `onFoo` color for [backgroundColor], or, if it is not a color from the theme, this will keep
+ * content color for [backgroundColor], or, if it is not a color from the theme, this will keep
  * the same value set above this Surface.
  * @param bodyContent content of your screen. The lambda receives an [PaddingValues] that should be
  * applied to the content root via Modifier.padding to properly offset top and bottom bars. If

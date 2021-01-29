@@ -105,7 +105,7 @@ import kotlinx.coroutines.launch
  * @param backgroundColor The background color for the TabRow. Use [Color.Transparent] to have
  * no color.
  * @param contentColor The preferred content color provided by this TabRow to its children.
- * Defaults to either the matching `onFoo` color for [backgroundColor], or if [backgroundColor] is
+ * Defaults to either the matching content color for [backgroundColor], or if [backgroundColor] is
  * not a color from the theme, this will keep the same value set above this TabRow.
  * @param indicator the indicator that represents which tab is currently selected. By default this
  * will be a [TabRowDefaults.Indicator], using a [TabRowDefaults.tabIndicatorOffset]
@@ -181,7 +181,7 @@ fun TabRow(
  * @param backgroundColor The background color for the ScrollableTabRow. Use [Color.Transparent] to
  * have no color.
  * @param contentColor The preferred content color provided by this ScrollableTabRow to its
- * children. Defaults to either the matching `onFoo` color for [backgroundColor], or if
+ * children. Defaults to either the matching content color for [backgroundColor], or if
  * [backgroundColor] is not a color from the theme, this will keep the same value set above this
  * ScrollableTabRow.
  * @param edgePadding the padding between the starting and ending edge of ScrollableTabRow, and
