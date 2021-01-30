@@ -3,7 +3,7 @@ object Deps {
     object JetBrains {
         object Kotlin {
             // __KOTLIN_COMPOSE_VERSION__
-            private const val VERSION = "1.4.21"
+            private const val VERSION = "1.4.21-2"
             const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$VERSION"
             const val testCommon = "org.jetbrains.kotlin:kotlin-test-common:$VERSION"
             const val testJunit = "org.jetbrains.kotlin:kotlin-test-junit:$VERSION"
@@ -12,7 +12,7 @@ object Deps {
 
         object Compose {
             // __LATEST_COMPOSE_RELEASE_VERSION__
-            private const val VERSION = "0.3.0-build140"
+            private const val VERSION = "0.3.0-build146"
             const val gradlePlugin = "org.jetbrains.compose:compose-gradle-plugin:$VERSION"
         }
     }
@@ -45,7 +45,7 @@ object Deps {
         }
 
         object Decompose {
-            private const val VERSION = "0.1.6"
+            private const val VERSION = "0.1.7"
             const val decompose = "com.arkivanov.decompose:decompose:$VERSION"
             const val decomposeIosX64 = "com.arkivanov.decompose:decompose-iosx64:$VERSION"
             const val decomposeIosArm64 = "com.arkivanov.decompose:decompose-iosarm64:$VERSION"

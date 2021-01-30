@@ -117,7 +117,10 @@ private fun Item(
         Spacer(modifier = Modifier.width(8.dp))
 
         IconButton(onClick = { onDeleteItemClicked(item.id) }) {
-            Icon(Icons.Default.Delete)
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = null
+            )
         }
 
         Spacer(modifier = Modifier.width(MARGIN_SCROLLBAR))
@@ -141,7 +144,10 @@ private fun TodoInput(
         Spacer(modifier = Modifier.width(8.dp))
 
         IconButton(onClick = onAddClicked) {
-            Icon(Icons.Default.Add)
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = null
+            )
         }
     }
 }
