@@ -43,7 +43,7 @@ import org.junit.runner.RunWith
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-class DialogUiTest {
+class DialogTest {
     @get:Rule
     val rule = createComposeRule()
 
@@ -164,7 +164,7 @@ class DialogUiTest {
                     onDismissRequest = {
                         showDialog.value = false
                     },
-                    properties = AndroidDialogProperties(dismissOnClickOutside = false)
+                    properties = DialogProperties(dismissOnClickOutside = false)
                 ) {
                     BasicText(defaultText)
                 }
@@ -239,7 +239,7 @@ class DialogUiTest {
                     onDismissRequest = {
                         showDialog.value = false
                     },
-                    properties = AndroidDialogProperties(dismissOnBackPress = false)
+                    properties = DialogProperties(dismissOnBackPress = false)
                 ) {
                     BasicText(defaultText)
                 }
