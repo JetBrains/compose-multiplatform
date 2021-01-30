@@ -32,6 +32,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 
@@ -48,6 +49,7 @@ class PreviewAnimationClockTest {
         testClock = TestPreviewAnimationClock()
     }
 
+    @Ignore("b/178910730")
     @Test
     fun callbackCalledWhenSettingClockTime() {
         var callbackCalledCount = 0
@@ -58,6 +60,7 @@ class PreviewAnimationClockTest {
         assertEquals(2, callbackCalledCount)
     }
 
+    @Ignore("b/178910730")
     @Test
     fun getAnimatedPropertiesReturnsValuesAtCurrentTime() {
         var rotationAnimation: ComposeAnimation? = null
@@ -90,6 +93,7 @@ class PreviewAnimationClockTest {
         assertEquals(Color.Blue, color.value)
     }
 
+    @Ignore("b/178910730")
     @Test
     fun maxDurationReturnsLongestDuration() {
         // When there are no animations, we should return an invalid duration.
@@ -103,6 +107,7 @@ class PreviewAnimationClockTest {
         assertEquals(1000, testClock.getMaxDuration())
     }
 
+    @Ignore("b/178910730")
     @Test
     fun disposeShouldNotifyUnsubscribed() {
         composeRule.setContent {
@@ -118,6 +123,7 @@ class PreviewAnimationClockTest {
         assertEquals(2, testClock.notifyUnsubscribeCount)
     }
 
+    @Ignore("b/178910730")
     @Test
     fun trackTransitionShouldNotifySubscribed() {
         assertEquals(0, testClock.notifySubscribeCount)
@@ -135,6 +141,7 @@ class PreviewAnimationClockTest {
         assertTrue(states.contains(Offset.O2))
     }
 
+    @Ignore("b/178910730")
     @Test
     fun disposeClearsCachedAnimations() {
         composeRule.setContent { setUpOffsetScenario() }
@@ -149,6 +156,7 @@ class PreviewAnimationClockTest {
         assertTrue(testClock.transitionStates.isEmpty())
     }
 
+    @Ignore("b/178910730")
     @Test
     fun updateFromAndToStatesModifiesCachedTransitionStates() {
         var animation: ComposeAnimation? = null
@@ -168,6 +176,7 @@ class PreviewAnimationClockTest {
         assertEquals(RotationColor.RC1, stateAfterUpdate.target)
     }
 
+    @Ignore("b/178910730")
     @Test
     fun animationLabelIsSetExplicitlyOrImplicitly() {
         val someState = Any()
