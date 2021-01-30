@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-@file:Suppress("Deprecation")
-
 package androidx.compose.ui.platform
 
 import android.content.Context
@@ -32,20 +30,17 @@ import android.widget.LinearLayout
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Applier
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Align
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.background
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -71,9 +66,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.compose.ui.viewinterop.emitView
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA
@@ -502,77 +495,6 @@ class AndroidViewCompatTest {
     }
 
     @Test
-    @Suppress("Deprecation")
-    fun testComposeInsideView_simpleLayout() {
-        val padding = 10f
-        val paddingDp = with(rule.density) { padding.toDp() }
-        val size = 20f
-        val sizeDp = with(rule.density) { size.toDp() }
-
-        var outer: Offset = Offset.Zero
-        var inner1: Offset = Offset.Zero
-        var inner2: Offset = Offset.Zero
-        rule.setContent {
-            Box(Modifier.onGloballyPositioned { outer = it.positionInWindow() }) {
-                Box(Modifier.padding(start = paddingDp, top = paddingDp)) {
-                    emitView(::LinearLayout, {}) {
-                        Box(
-                            Modifier.size(sizeDp).background(Color.Blue).onGloballyPositioned {
-                                inner1 = it.positionInWindow()
-                            }
-                        )
-                        Box(
-                            Modifier.size(sizeDp).background(Color.Gray).onGloballyPositioned {
-                                inner2 = it.positionInWindow()
-                            }
-                        )
-                    }
-                }
-            }
-        }
-
-        rule.runOnIdle {
-            assertEquals(Offset(padding, padding), inner1 - outer)
-            assertEquals(Offset(padding + size, padding), inner2 - outer)
-        }
-    }
-
-    @Test
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-    @Suppress("Deprecation")
-    fun testComposeInsideView_simpleDraw() {
-        val padding = 10f
-        val paddingDp = with(rule.density) { padding.toDp() }
-        val size = 20f
-        val sizeDp = with(rule.density) { size.toDp() }
-
-        rule.setContent {
-            Box(Modifier.testTag("box")) {
-                Box(Modifier.background(Color.Blue).padding(paddingDp)) {
-                    emitView(::LinearLayout, {}) {
-                        Box(Modifier.size(sizeDp).background(Color.White))
-                        Box(Modifier.size(sizeDp).background(Color.Gray))
-                    }
-                }
-            }
-        }
-
-        rule.onNodeWithTag("box").captureToImage().assertPixels(
-            IntSize((padding * 2 + size * 2).roundToInt(), (padding * 2 + size).roundToInt())
-        ) { offset ->
-            if (offset.y < padding || offset.y >= padding + size || offset.x < padding ||
-                offset.x >= padding + size * 2
-            ) {
-                Color.Blue
-            } else if (offset.x >= padding && offset.x < padding + size) {
-                Color.White
-            } else {
-                Color.Gray
-            }
-        }
-    }
-
-    @Test
     @OptIn(ExperimentalComposeApi::class)
     fun testComposeInsideView_attachingAndDetaching() {
         var composeContent by mutableStateOf(true)
@@ -638,78 +560,6 @@ class AndroidViewCompatTest {
             // the node stays attached after the compose view is detached
             assertTrue(node!!.isAttached)
         }
-    }
-
-    @Test
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-    @Suppress("Deprecation")
-    fun testComposeInsideView_remove() {
-        val size = 40.dp
-        val sizePx = with(rule.density) { size.toIntPx() }
-
-        var first by mutableStateOf(true)
-        rule.setContent {
-            Box(Modifier.testTag("view")) {
-                emitView(::LinearLayout, {}) {
-                    if (first) {
-                        Box(Modifier.size(size).background(Color.Green))
-                    } else {
-                        Box(Modifier.size(size).background(Color.Blue))
-                    }
-                }
-            }
-        }
-
-        rule.onNodeWithTag("view")
-            .captureToImage().assertPixels(IntSize(sizePx, sizePx)) { Color.Green }
-
-        rule.runOnIdle { first = false }
-
-        rule.onNodeWithTag("view")
-            .captureToImage().assertPixels(IntSize(sizePx, sizePx)) { Color.Blue }
-    }
-
-    @Test
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-    @Suppress("Deprecation")
-    fun testComposeInsideView_move() {
-        val size = 40.dp
-        val sizePx = with(rule.density) { size.toIntPx() }
-
-        var first by mutableStateOf(true)
-        rule.setContent {
-            Box(Modifier.testTag("view")) {
-                emitView(::LinearLayout, {}) {
-                    if (first) {
-                        key("green") {
-                            Box(Modifier.size(size).background(Color.Green))
-                        }
-                        key("blue") {
-                            Box(Modifier.size(size).background(Color.Blue))
-                        }
-                    } else {
-                        key("blue") {
-                            Box(Modifier.size(size).background(Color.Blue))
-                        }
-                        key("green") {
-                            Box(Modifier.size(size).background(Color.Green))
-                        }
-                    }
-                }
-            }
-        }
-
-        rule.onNodeWithTag("view").captureToImage()
-            .assertPixels(IntSize(sizePx * 2, sizePx)) {
-                if (it.x < sizePx) Color.Green else Color.Blue
-            }
-
-        rule.runOnIdle { first = false }
-
-        rule.onNodeWithTag("view").captureToImage()
-            .assertPixels(IntSize(sizePx * 2, sizePx)) {
-                if (it.x < sizePx) Color.Blue else Color.Green
-            }
     }
 
     class ColoredSquareView(context: Context) : View(context) {
