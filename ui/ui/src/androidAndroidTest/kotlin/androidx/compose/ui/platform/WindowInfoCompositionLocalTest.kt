@@ -21,6 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
@@ -71,7 +72,12 @@ class WindowInfoCompositionLocalTest {
             mainWindowInfo = LocalWindowInfo.current
             WindowFocusObserver { if (!it) mainWindowFocusLoss.countDown() }
             if (showPopup.value) {
-                Popup(isFocusable = true, onDismissRequest = { showPopup.value = false }) {
+                Popup(
+                    properties = PopupProperties(focusable = true),
+                    onDismissRequest = {
+                        showPopup.value = false
+                    }
+                ) {
                     BasicText("Popup Window")
                     popupWindowInfo = LocalWindowInfo.current
                     WindowFocusObserver { if (it) popupFocusGain.countDown() }
@@ -102,7 +108,10 @@ class WindowInfoCompositionLocalTest {
             mainWindowInfo = LocalWindowInfo.current
             WindowFocusObserver { if (it) mainWindowFocusGain.countDown() }
             if (showPopup.value) {
-                Popup(isFocusable = true, onDismissRequest = { showPopup.value = false }) {
+                Popup(
+                    properties = PopupProperties(focusable = true),
+                    onDismissRequest = { showPopup.value = false }
+                ) {
                     BasicText(text = "Popup Window")
                     WindowFocusObserver { if (it) popupFocusGain.countDown() }
                 }

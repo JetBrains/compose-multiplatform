@@ -55,6 +55,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 
 @Composable
 fun PopupDemo() {
@@ -150,7 +151,8 @@ private fun ColumnScope.PopupElevation() {
     Column(Modifier.align(Alignment.CenterHorizontally)) {
         Box(Modifier.preferredSize(110.dp).background(background)) {
             Popup(
-                alignment = Alignment.Center, isFocusable = isFocusable,
+                alignment = Alignment.Center,
+                properties = PopupProperties(focusable = true),
                 onDismissRequest = { dismissCounter++ }
             ) {
                 Card(
@@ -390,7 +392,7 @@ private fun ColumnScope.PopupWithEditText() {
             if (showPopup.value) {
                 Popup(
                     alignment = Alignment.Center,
-                    isFocusable = true,
+                    properties = PopupProperties(focusable = true),
                     onDismissRequest = {
                         showEmail.value = "You entered: " + email.value
                         showPopup.value = false
