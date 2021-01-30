@@ -183,6 +183,7 @@ private object LayoutSnippet8 {
 }
 
 /* ktlint-disable indent */
+@Suppress("Deprecation")
 private object LayoutSnippet9 {
     @Composable
     fun ConstraintLayoutContent() {
@@ -214,6 +215,7 @@ private object LayoutSnippet9 {
 /**
  * Decoupled API
  */
+@Suppress("Deprecation")
 private object LayoutSnippet10 {
     @Composable
     fun DecoupledConstraintLayout() {
