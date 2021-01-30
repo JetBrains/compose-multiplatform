@@ -79,6 +79,7 @@ class UiApplier(root: Any) : AbstractApplier<Any>(root) {
                                 }
                             }
 
+                        @OptIn(InternalInteropApi::class)
                         parent.insertAt(index, androidViewHolder.toLayoutNode())
                     }
                     is LayoutNode -> parent.insertAt(index, instance)
