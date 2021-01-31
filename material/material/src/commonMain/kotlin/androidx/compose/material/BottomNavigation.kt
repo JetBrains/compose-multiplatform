@@ -325,7 +325,7 @@ private fun MeasureScope.placeLabelAndIcon(
     // have a better strategy than overlapping the icon and label
     val baseline = labelPlaceable[LastBaseline]
 
-    val baselineOffset = CombinedItemTextBaseline.toIntPx()
+    val baselineOffset = CombinedItemTextBaseline.roundToPx()
 
     // Label should be [baselineOffset] from the bottom
     val labelY = height - baseline - baselineOffset

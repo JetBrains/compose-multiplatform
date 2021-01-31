@@ -119,7 +119,7 @@ class AndroidAccessibilitySpannableStringTest {
         assertThat(spannableString).hasSpan(
             AbsoluteSizeSpan::class, 5, 10
         ) {
-            it.size == with(density) { fontSize.toIntPx() }
+            it.size == with(density) { fontSize.roundToPx() }
         }
     }
 

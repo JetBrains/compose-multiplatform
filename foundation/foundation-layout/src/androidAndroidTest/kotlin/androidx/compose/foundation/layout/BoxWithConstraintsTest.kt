@@ -644,10 +644,10 @@ class BoxWithConstraintsTest : LayoutTest() {
                 content = @Composable {
                     BoxWithConstraints {
                         with(LocalDensity.current) {
-                            assertEquals(minWidthConstraint.toIntPx(), minWidth.toIntPx())
-                            assertEquals(maxWidthConstraint.toIntPx(), maxWidth.toIntPx())
-                            assertEquals(minHeightConstraint.toIntPx(), minHeight.toIntPx())
-                            assertEquals(maxHeightConstraint.toIntPx(), maxHeight.toIntPx())
+                            assertEquals(minWidthConstraint.roundToPx(), minWidth.roundToPx())
+                            assertEquals(maxWidthConstraint.roundToPx(), maxWidth.roundToPx())
+                            assertEquals(minHeightConstraint.roundToPx(), minHeight.roundToPx())
+                            assertEquals(maxHeightConstraint.roundToPx(), maxHeight.roundToPx())
                         }
                         latch.countDown()
                     }
@@ -656,10 +656,10 @@ class BoxWithConstraintsTest : LayoutTest() {
                 layout(0, 0) {
                     m.first().measure(
                         Constraints(
-                            minWidth = minWidthConstraint.toIntPx(),
-                            maxWidth = maxWidthConstraint.toIntPx(),
-                            minHeight = minHeightConstraint.toIntPx(),
-                            maxHeight = maxHeightConstraint.toIntPx()
+                            minWidth = minWidthConstraint.roundToPx(),
+                            maxWidth = maxWidthConstraint.roundToPx(),
+                            minHeight = minHeightConstraint.roundToPx(),
+                            maxHeight = maxHeightConstraint.roundToPx()
                         )
                     ).place(IntOffset.Zero)
                 }

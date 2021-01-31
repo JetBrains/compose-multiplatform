@@ -219,7 +219,7 @@ private fun Density.getCursorRectInScroller(
     val cursorRect = textLayoutResult?.getCursorRect(
         transformedText.offsetMapping.originalToTransformed(cursorOffset)
     ) ?: Rect.Zero
-    val thickness = DefaultCursorThickness.toIntPx()
+    val thickness = DefaultCursorThickness.roundToPx()
 
     val cursorLeft = if (rtl) {
         textFieldWidth - cursorRect.left - thickness

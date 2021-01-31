@@ -575,7 +575,7 @@ object Arrangement {
             outPositions: IntArray
         ) {
             if (sizes.isEmpty()) return
-            val spacePx = with(density) { space.toIntPx() }
+            val spacePx = with(density) { space.roundToPx() }
 
             var occupied = 0
             var lastSpace = 0

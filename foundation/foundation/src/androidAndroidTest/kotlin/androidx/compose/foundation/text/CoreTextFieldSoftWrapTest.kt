@@ -87,7 +87,7 @@ class CoreTextFieldSoftWrapTest {
         with(density) {
             assertThat(textLayout).isNotNull()
             assertThat(width).isNotNull()
-            assertThat(width).isEqualTo(composableWidth.toIntPx())
+            assertThat(width).isEqualTo(composableWidth.roundToPx())
             assertThat(textLayout?.lineCount).isEqualTo(1)
         }
     }
@@ -124,7 +124,7 @@ class CoreTextFieldSoftWrapTest {
         with(density) {
             assertThat(textLayout).isNotNull()
             assertThat(width).isNotNull()
-            assertThat(width).isEqualTo(composableWidth.toIntPx())
+            assertThat(width).isEqualTo(composableWidth.roundToPx())
             // each character has the same width as composable width
             // therefore the string.length is the line count
             assertThat(textLayout?.lineCount).isEqualTo(string.length)

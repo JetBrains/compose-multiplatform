@@ -64,10 +64,10 @@ class AspectRatioTest : LayoutTest() {
             assertEquals(20, minIntrinsicHeight(40))
             assertEquals(20, maxIntrinsicHeight(40))
 
-            assertEquals(30.dp.toIntPx(), minIntrinsicWidth(Constraints.Infinity))
-            assertEquals(30.dp.toIntPx(), maxIntrinsicWidth(Constraints.Infinity))
-            assertEquals(40.dp.toIntPx(), minIntrinsicHeight(Constraints.Infinity))
-            assertEquals(40.dp.toIntPx(), maxIntrinsicHeight(Constraints.Infinity))
+            assertEquals(30.dp.roundToPx(), minIntrinsicWidth(Constraints.Infinity))
+            assertEquals(30.dp.roundToPx(), maxIntrinsicWidth(Constraints.Infinity))
+            assertEquals(40.dp.roundToPx(), minIntrinsicHeight(Constraints.Infinity))
+            assertEquals(40.dp.roundToPx(), maxIntrinsicHeight(Constraints.Infinity))
         }
     }
 

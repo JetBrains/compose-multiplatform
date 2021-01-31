@@ -245,7 +245,7 @@ class TextFieldCursorTest {
     }
 
     private fun ImageBitmap.assertCursor(cursorWidth: Dp, density: Density) {
-        val cursorWidthPx = (with(density) { cursorWidth.toIntPx() })
+        val cursorWidthPx = (with(density) { cursorWidth.roundToPx() })
         val width = width
         val height = height
         this.assertPixels(

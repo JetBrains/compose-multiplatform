@@ -86,9 +86,9 @@ class BoundsTest : ToolingTest() {
             with(Density(activityTestRule.activity)) {
                 println(boundingBoxes.contentDeepToString())
                 arrayOf(
-                    0.dp.toIntPx(), // Root
-                    10.dp.toIntPx(), // Column
-                    15.dp.toIntPx() // Text
+                    0.dp.roundToPx(), // Root
+                    10.dp.roundToPx(), // Column
+                    15.dp.roundToPx() // Text
                 ).forEachIndexed { index, value ->
                     Assert.assertTrue(boundingBoxes[index] in value - 1..value + 1)
                 }

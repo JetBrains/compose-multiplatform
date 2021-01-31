@@ -350,7 +350,7 @@ private fun TabBaselineLayout(
             LargeTabHeight
         } else {
             SmallTabHeight
-        }.toIntPx()
+        }.roundToPx()
 
         val firstBaseline = textPlaceable?.get(FirstBaseline)
         val lastBaseline = textPlaceable?.get(LastBaseline)
@@ -410,7 +410,7 @@ private fun Placeable.PlacementScope.placeText(
 
     // Total offset between the last text baseline and the bottom of the Tab layout
     val totalOffset = with(density) {
-        baselineOffset.toIntPx() + TabRowDefaults.IndicatorHeight.toIntPx()
+        baselineOffset.roundToPx() + TabRowDefaults.IndicatorHeight.roundToPx()
     }
 
     val textPlaceableY = tabHeight - lastBaseline - totalOffset
@@ -439,13 +439,13 @@ private fun Placeable.PlacementScope.placeTextAndIcon(
 
     // Total offset between the last text baseline and the bottom of the Tab layout
     val textOffset = with(density) {
-        baselineOffset.toIntPx() + TabRowDefaults.IndicatorHeight.toIntPx()
+        baselineOffset.roundToPx() + TabRowDefaults.IndicatorHeight.roundToPx()
     }
 
     // How much space there is between the top of the icon (essentially the top of this layout)
     // and the top of the text layout's bounding box (not baseline)
     val iconOffset = with(density) {
-        iconPlaceable.height + IconDistanceFromBaseline.toIntPx() - firstBaseline
+        iconPlaceable.height + IconDistanceFromBaseline.roundToPx() - firstBaseline
     }
 
     val textPlaceableX = (tabWidth - textPlaceable.width) / 2

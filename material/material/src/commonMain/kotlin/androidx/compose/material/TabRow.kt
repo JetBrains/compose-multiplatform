@@ -231,8 +231,8 @@ fun ScrollableTabRow(
                 .horizontalScroll(scrollState)
                 .clipToBounds()
         ) { constraints ->
-            val minTabWidth = ScrollableTabRowMinimumTabWidth.toIntPx()
-            val padding = edgePadding.toIntPx()
+            val minTabWidth = ScrollableTabRowMinimumTabWidth.roundToPx()
+            val padding = edgePadding.roundToPx()
             val tabConstraints = constraints.copy(minWidth = minTabWidth)
 
             val tabPlaceables = subcompose(TabSlots.Tabs, tabs)
@@ -455,11 +455,11 @@ private class ScrollableTabData(
         edgeOffset: Int,
         tabPositions: List<TabPosition>
     ): Float = with(density) {
-        val totalTabRowWidth = tabPositions.last().right.toIntPx() + edgeOffset
+        val totalTabRowWidth = tabPositions.last().right.roundToPx() + edgeOffset
         val visibleWidth = totalTabRowWidth - scrollState.maxValue.toInt()
-        val tabOffset = left.toIntPx()
+        val tabOffset = left.roundToPx()
         val scrollerCenter = visibleWidth / 2
-        val tabWidth = width.toIntPx()
+        val tabWidth = width.roundToPx()
         val centeredTabOffset = tabOffset - (scrollerCenter - tabWidth / 2)
         // How much space we have to scroll. If the visible width is <= to the total width, then
         // we have no space to scroll as everything is always visible.

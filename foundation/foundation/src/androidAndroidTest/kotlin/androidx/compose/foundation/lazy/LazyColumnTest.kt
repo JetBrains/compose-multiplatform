@@ -471,10 +471,10 @@ class LazyColumnTest {
         var lazyColumnBounds = rule.onNodeWithTag(LazyListTag)
             .getUnclippedBoundsInRoot()
 
-        assertThat(lazyColumnBounds.left.toIntPx()).isWithin1PixelFrom(0.dp.toIntPx())
-        assertThat(lazyColumnBounds.right.toIntPx()).isWithin1PixelFrom(50.dp.toIntPx())
-        assertThat(lazyColumnBounds.top.toIntPx()).isWithin1PixelFrom(0.dp.toIntPx())
-        assertThat(lazyColumnBounds.bottom.toIntPx()).isWithin1PixelFrom(100.dp.toIntPx())
+        assertThat(lazyColumnBounds.left.roundToPx()).isWithin1PixelFrom(0.dp.roundToPx())
+        assertThat(lazyColumnBounds.right.roundToPx()).isWithin1PixelFrom(50.dp.roundToPx())
+        assertThat(lazyColumnBounds.top.roundToPx()).isWithin1PixelFrom(0.dp.roundToPx())
+        assertThat(lazyColumnBounds.bottom.roundToPx()).isWithin1PixelFrom(100.dp.roundToPx())
 
         rule.runOnIdle {
             sameSizeItems = false
@@ -491,10 +491,10 @@ class LazyColumnTest {
         lazyColumnBounds = rule.onNodeWithTag(LazyListTag)
             .getUnclippedBoundsInRoot()
 
-        assertThat(lazyColumnBounds.left.toIntPx()).isWithin1PixelFrom(0.dp.toIntPx())
-        assertThat(lazyColumnBounds.right.toIntPx()).isWithin1PixelFrom(70.dp.toIntPx())
-        assertThat(lazyColumnBounds.top.toIntPx()).isWithin1PixelFrom(0.dp.toIntPx())
-        assertThat(lazyColumnBounds.bottom.toIntPx()).isWithin1PixelFrom(120.dp.toIntPx())
+        assertThat(lazyColumnBounds.left.roundToPx()).isWithin1PixelFrom(0.dp.roundToPx())
+        assertThat(lazyColumnBounds.right.roundToPx()).isWithin1PixelFrom(70.dp.roundToPx())
+        assertThat(lazyColumnBounds.top.roundToPx()).isWithin1PixelFrom(0.dp.roundToPx())
+        assertThat(lazyColumnBounds.bottom.roundToPx()).isWithin1PixelFrom(120.dp.roundToPx())
     }
 
     private val firstItemTag = "firstItemTag"
@@ -527,8 +527,8 @@ class LazyColumnTest {
 
         with(rule.density) {
             // Verify the width of the column
-            assertThat(lazyColumnBounds.left.toIntPx()).isWithin1PixelFrom(0.dp.toIntPx())
-            assertThat(lazyColumnBounds.right.toIntPx()).isWithin1PixelFrom(100.dp.toIntPx())
+            assertThat(lazyColumnBounds.left.roundToPx()).isWithin1PixelFrom(0.dp.roundToPx())
+            assertThat(lazyColumnBounds.right.roundToPx()).isWithin1PixelFrom(100.dp.roundToPx())
         }
     }
 
@@ -889,8 +889,8 @@ class LazyColumnTest {
             with(rule.density) {
                 // TODO(b/169232491): test scrolling doesn't appear to be scrolling exactly the right
                 //  number of pixels
-                val expectedOffset = 10.dp.toIntPx()
-                val tolerance = 2.dp.toIntPx()
+                val expectedOffset = 10.dp.roundToPx()
+                val tolerance = 2.dp.roundToPx()
                 assertThat(state.firstVisibleItemScrollOffset).isEqualTo(expectedOffset, tolerance)
             }
         }
@@ -959,8 +959,8 @@ class LazyColumnTest {
         rule.runOnIdle {
             assertThat(state.firstVisibleItemIndex).isEqualTo(0)
             with(rule.density) {
-                val expectedOffset = 10.dp.toIntPx()
-                val tolerance = 2.dp.toIntPx()
+                val expectedOffset = 10.dp.roundToPx()
+                val tolerance = 2.dp.roundToPx()
                 assertThat(state.firstVisibleItemScrollOffset)
                     .isEqualTo(expectedOffset, tolerance)
             }
@@ -971,7 +971,7 @@ class LazyColumnTest {
     fun initialScrollIsApplied() {
         val items by mutableStateOf((0..20).toList())
         lateinit var state: LazyListState
-        val expectedOffset = with(rule.density) { 10.dp.toIntPx() }
+        val expectedOffset = with(rule.density) { 10.dp.roundToPx() }
         rule.setContentWithTestViewConfiguration {
             state = rememberLazyListState(2, expectedOffset)
             LazyColumn(
@@ -1246,7 +1246,7 @@ class LazyColumnTest {
 
     private fun LazyListState.scrollBy(offset: Dp) {
         runBlocking {
-            smoothScrollBy(with(rule.density) { offset.toIntPx().toFloat() }, snap())
+            smoothScrollBy(with(rule.density) { offset.roundToPx().toFloat() }, snap())
         }
     }
 }
@@ -1288,8 +1288,8 @@ internal fun SemanticsNodeInteraction.scrollBy(x: Dp = 0.dp, y: Dp = 0.dp, densi
     performGesture {
         with(density) {
             val touchSlop = TestTouchSlop.toInt()
-            val xPx = x.toIntPx()
-            val yPx = y.toIntPx()
+            val xPx = x.roundToPx()
+            val yPx = y.roundToPx()
             val offsetX = if (xPx > 0) xPx + touchSlop else if (xPx < 0) xPx - touchSlop else 0
             val offsetY = if (yPx > 0) yPx + touchSlop else if (yPx < 0) yPx - touchSlop else 0
             swipeWithVelocity(

@@ -302,10 +302,10 @@ class LazyRowTest {
         var lazyRowBounds = rule.onNodeWithTag(LazyListTag)
             .getUnclippedBoundsInRoot()
 
-        assertThat(lazyRowBounds.left.toIntPx()).isWithin1PixelFrom(0.dp.toIntPx())
-        assertThat(lazyRowBounds.right.toIntPx()).isWithin1PixelFrom(100.dp.toIntPx())
-        assertThat(lazyRowBounds.top.toIntPx()).isWithin1PixelFrom(0.dp.toIntPx())
-        assertThat(lazyRowBounds.bottom.toIntPx()).isWithin1PixelFrom(50.dp.toIntPx())
+        assertThat(lazyRowBounds.left.roundToPx()).isWithin1PixelFrom(0.dp.roundToPx())
+        assertThat(lazyRowBounds.right.roundToPx()).isWithin1PixelFrom(100.dp.roundToPx())
+        assertThat(lazyRowBounds.top.roundToPx()).isWithin1PixelFrom(0.dp.roundToPx())
+        assertThat(lazyRowBounds.bottom.roundToPx()).isWithin1PixelFrom(50.dp.roundToPx())
 
         rule.runOnIdle {
             sameSizeItems = false
@@ -322,10 +322,10 @@ class LazyRowTest {
         lazyRowBounds = rule.onNodeWithTag(LazyListTag)
             .getUnclippedBoundsInRoot()
 
-        assertThat(lazyRowBounds.left.toIntPx()).isWithin1PixelFrom(0.dp.toIntPx())
-        assertThat(lazyRowBounds.right.toIntPx()).isWithin1PixelFrom(120.dp.toIntPx())
-        assertThat(lazyRowBounds.top.toIntPx()).isWithin1PixelFrom(0.dp.toIntPx())
-        assertThat(lazyRowBounds.bottom.toIntPx()).isWithin1PixelFrom(70.dp.toIntPx())
+        assertThat(lazyRowBounds.left.roundToPx()).isWithin1PixelFrom(0.dp.roundToPx())
+        assertThat(lazyRowBounds.right.roundToPx()).isWithin1PixelFrom(120.dp.roundToPx())
+        assertThat(lazyRowBounds.top.roundToPx()).isWithin1PixelFrom(0.dp.roundToPx())
+        assertThat(lazyRowBounds.bottom.roundToPx()).isWithin1PixelFrom(70.dp.roundToPx())
     }
 
     private val firstItemTag = "firstItemTag"
@@ -358,8 +358,8 @@ class LazyRowTest {
 
         with(rule.density) {
             // Verify the height of the row
-            assertThat(lazyRowBounds.top.toIntPx()).isWithin1PixelFrom(0.dp.toIntPx())
-            assertThat(lazyRowBounds.bottom.toIntPx()).isWithin1PixelFrom(100.dp.toIntPx())
+            assertThat(lazyRowBounds.top.roundToPx()).isWithin1PixelFrom(0.dp.roundToPx())
+            assertThat(lazyRowBounds.bottom.roundToPx()).isWithin1PixelFrom(100.dp.roundToPx())
         }
     }
 
@@ -746,8 +746,8 @@ class LazyRowTest {
             with(rule.density) {
                 // TODO(b/169232491): test scrolling doesn't appear to be scrolling exactly the right
                 //  number of pixels
-                val expectedOffset = 10.dp.toIntPx()
-                val tolerance = 2.dp.toIntPx()
+                val expectedOffset = 10.dp.roundToPx()
+                val tolerance = 2.dp.roundToPx()
                 assertThat(state.firstVisibleItemScrollOffset).isEqualTo(expectedOffset, tolerance)
             }
         }
@@ -774,8 +774,8 @@ class LazyRowTest {
         rule.runOnIdle {
             assertThat(state.firstVisibleItemIndex).isEqualTo(0)
             with(rule.density) {
-                val expectedOffset = 10.dp.toIntPx()
-                val tolerance = 2.dp.toIntPx()
+                val expectedOffset = 10.dp.roundToPx()
+                val tolerance = 2.dp.roundToPx()
                 assertThat(state.firstVisibleItemScrollOffset)
                     .isEqualTo(expectedOffset, tolerance)
             }
@@ -785,7 +785,7 @@ class LazyRowTest {
     @Test
     fun initialScrollIsApplied() {
         lateinit var state: LazyListState
-        val expectedOffset = with(rule.density) { 10.dp.toIntPx() }
+        val expectedOffset = with(rule.density) { 10.dp.roundToPx() }
         rule.setContentWithTestViewConfiguration {
             state = rememberLazyListState(2, expectedOffset)
             LazyRow(Modifier.size(100.dp).testTag(LazyListTag), state = state) {
@@ -1027,7 +1027,7 @@ class LazyRowTest {
 
     private fun LazyListState.scrollBy(offset: Dp) {
         runBlocking {
-            smoothScrollBy(with(rule.density) { offset.toIntPx().toFloat() }, snap())
+            smoothScrollBy(with(rule.density) { offset.roundToPx().toFloat() }, snap())
         }
     }
 }

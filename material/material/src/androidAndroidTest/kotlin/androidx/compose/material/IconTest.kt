@@ -91,7 +91,7 @@ class IconTest {
         rule
             .setMaterialContentForSizeAssertions {
                 val image = with(LocalDensity.current) {
-                    ImageBitmap(width.toIntPx(), height.toIntPx())
+                    ImageBitmap(width.roundToPx(), height.roundToPx())
                 }
 
                 Icon(image, null)
@@ -108,7 +108,7 @@ class IconTest {
         rule
             .setMaterialContentForSizeAssertions {
                 val image = with(LocalDensity.current) {
-                    ImageBitmap(width.toIntPx(), height.toIntPx())
+                    ImageBitmap(width.roundToPx(), height.roundToPx())
                 }
 
                 Icon(image, null)
@@ -138,7 +138,7 @@ class IconTest {
         rule
             .setMaterialContentForSizeAssertions {
                 val image = with(LocalDensity.current) {
-                    ImageBitmap(width.toIntPx(), height.toIntPx())
+                    ImageBitmap(width.roundToPx(), height.roundToPx())
                 }
 
                 val imagePainter = ImagePainter(image)
@@ -159,8 +159,8 @@ class IconTest {
             with(LocalDensity.current) {
                 image = createBitmapWithColor(
                     this,
-                    width.toIntPx(),
-                    height.toIntPx(),
+                    width.roundToPx(),
+                    height.roundToPx(),
                     Color.Red
                 )
             }
@@ -182,8 +182,8 @@ class IconTest {
             with(LocalDensity.current) {
                 image = createBitmapWithColor(
                     this,
-                    width.toIntPx(),
-                    height.toIntPx(),
+                    width.roundToPx(),
+                    height.roundToPx(),
                     Color.Red
                 )
             }

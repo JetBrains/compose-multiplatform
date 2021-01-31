@@ -460,7 +460,7 @@ class SubcomposeLayoutTest {
         rule.setContent {
             val size = 50.dp
             val density = Density(3f)
-            val sizeIpx = with(density) { size.toIntPx() }
+            val sizeIpx = with(density) { size.roundToPx() }
             Providers(LocalDensity provides density) {
                 SubcomposeLayout(
                     Modifier.size(size).onGloballyPositioned {

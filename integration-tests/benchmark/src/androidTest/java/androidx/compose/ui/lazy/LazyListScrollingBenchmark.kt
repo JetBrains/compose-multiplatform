@@ -243,7 +243,7 @@ class ListRemeasureTestCase(
                 }
             }
         ) { _, _ ->
-            val size = size.toIntPx()
+            val size = size.roundToPx()
             layout(size, size) {}
         }
     }
