@@ -42,12 +42,13 @@ import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.CompositionDataRecord
-import androidx.compose.ui.tooling.Group
 import androidx.compose.ui.tooling.Inspectable
 import androidx.compose.ui.tooling.R
 import androidx.compose.ui.tooling.ToolingTest
-import androidx.compose.ui.tooling.asTree
-import androidx.compose.ui.tooling.position
+import androidx.compose.ui.tooling.data.Group
+import androidx.compose.ui.tooling.data.UiToolingDataApi
+import androidx.compose.ui.tooling.data.asTree
+import androidx.compose.ui.tooling.data.position
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -67,6 +68,7 @@ private const val DEBUG = false
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 @SdkSuppress(minSdkVersion = 29) // Render id is not returned for api < 29
+@OptIn(UiToolingDataApi::class)
 class LayoutInspectorTreeTest : ToolingTest() {
     private lateinit var density: Density
     private lateinit var view: View

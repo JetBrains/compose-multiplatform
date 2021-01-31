@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.tooling
+package androidx.compose.ui.tooling.data
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -41,6 +41,7 @@ import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
+@UiToolingDataApi
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class BoundsTest : ToolingTest() {

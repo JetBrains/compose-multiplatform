@@ -20,6 +20,7 @@ import android.app.Activity
 import android.os.Bundle
 import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.ui.tooling.compositionCount
+import androidx.compose.ui.tooling.data.UiToolingDataApi
 import androidx.compose.ui.tooling.preview.animation.PreviewAnimationClock
 import androidx.compose.ui.tooling.test.R
 import org.junit.Assert.assertArrayEquals
@@ -34,6 +35,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
+@OptIn(UiToolingDataApi::class)
 class ComposeViewAdapterTest {
     @Suppress("DEPRECATION")
     @get:Rule
