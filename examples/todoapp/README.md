@@ -1,6 +1,9 @@
-An example of Kotlin Multiplatform todo app with shared Android/Desktop Compose UI and SwiftUI iOS.
+An example of Kotlin Multiplatform todo app with shared Android/Desktop Compose UI and SwiftUI (not Compose) iOS.
 
-Supported targets: `Android`, `JVM` and `iOS`
+This example supports the following targets: 
+- `Android` (Compose)
+- `JVM` (Compose)
+- `iOS` (SwiftUI, not Compose)
 
 Libraries used:
 - Jetpack Compose - shared UI
@@ -20,13 +23,13 @@ There are multiple modules:
 - `:desktop` - Desktop application
 - `ios` - iOS Xcode project
 
-The `root` module is integrated into Android, Desktop and iOS apps.
+The root module is integrated into Android, Desktop and iOS (non-Compose) apps.
 
 Features:
 - 99% of the code is shared: data, business logic, presentation, navigation and UI
 - View state is preserved when navigating between screens, Android configuration change, etc.
 - Model-View-Intent (aka MVI) architectural pattern
-- Pluggable UI - Compose UI for Android and Desktop, SwiftUI for iOS
+- Pluggable UI - Compose UI for Android and Desktop, SwiftUI (not Compose) for iOS
 
 ### Running desktop application
 ```
@@ -48,4 +51,3 @@ Open project in Intellij IDEA or Android Studio and run "android" configuration.
 Open and build the Xcode project located in `ios` folder.
 
 ![Desktop](screenshots/todo.png)
-
