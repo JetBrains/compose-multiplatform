@@ -158,33 +158,6 @@ package androidx.compose.ui.unit {
     property public final long Zero;
   }
 
-  @androidx.compose.runtime.Immutable public final class IntBounds {
-    ctor public IntBounds(int left, int top, int right, int bottom);
-    method public int component1();
-    method public int component2();
-    method public int component3();
-    method public int component4();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.unit.IntBounds copy(int left, int top, int right, int bottom);
-    method public int getBottom();
-    method public int getLeft();
-    method public int getRight();
-    method public int getTop();
-    property public final int bottom;
-    property public final int left;
-    property public final int right;
-    property public final int top;
-  }
-
-  public final class IntBoundsKt {
-    method @androidx.compose.runtime.Stable public static inline androidx.compose.ui.unit.IntBounds IntBounds-TtQJ-B4(long topLeft, long size);
-    method @androidx.compose.runtime.Stable public static inline long center(androidx.compose.ui.unit.IntBounds);
-    method public static inline int getHeight(androidx.compose.ui.unit.IntBounds);
-    method public static inline int getWidth(androidx.compose.ui.unit.IntBounds);
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.unit.IntBounds toBounds-ozmzZPI(long);
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.geometry.Rect toRect(androidx.compose.ui.unit.IntBounds);
-    method @androidx.compose.runtime.Stable public static long toSize(androidx.compose.ui.unit.IntBounds);
-  }
-
   @androidx.compose.runtime.Immutable public final inline class IntOffset {
     ctor public IntOffset();
     method @androidx.compose.runtime.Stable public static operator int component1-impl(long $this);
@@ -222,6 +195,73 @@ package androidx.compose.ui.unit {
     method @androidx.compose.runtime.Stable public static inline long toOffset--gyyYBs(long);
   }
 
+  @androidx.compose.runtime.Immutable public final class IntRect {
+    ctor public IntRect(@androidx.compose.runtime.Stable int left, @androidx.compose.runtime.Stable int top, @androidx.compose.runtime.Stable int right, @androidx.compose.runtime.Stable int bottom);
+    method public int component1();
+    method public int component2();
+    method public int component3();
+    method public int component4();
+    method public boolean contains--gyyYBs(long offset);
+    method @androidx.compose.runtime.Immutable public androidx.compose.ui.unit.IntRect copy(int left, int top, int right, int bottom);
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.unit.IntRect deflate(int delta);
+    method public int getBottom();
+    method public long getBottomCenter-nOcc-ac();
+    method public long getBottomLeft-nOcc-ac();
+    method public long getBottomRight-nOcc-ac();
+    method public long getCenter-nOcc-ac();
+    method public long getCenterLeft-nOcc-ac();
+    method public long getCenterRight-nOcc-ac();
+    method public int getHeight();
+    method public int getLeft();
+    method public int getMaxDimension();
+    method public int getMinDimension();
+    method public int getRight();
+    method public long getSize-YbymL2g();
+    method public int getTop();
+    method public long getTopCenter-nOcc-ac();
+    method public long getTopLeft-nOcc-ac();
+    method public long getTopRight-nOcc-ac();
+    method public int getWidth();
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.unit.IntRect inflate(int delta);
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.unit.IntRect intersect(androidx.compose.ui.unit.IntRect other);
+    method public boolean isEmpty();
+    method public boolean overlaps(androidx.compose.ui.unit.IntRect other);
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.unit.IntRect translate(int translateX, int translateY);
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.unit.IntRect translate--gyyYBs(long offset);
+    property public final int bottom;
+    property public final long bottomCenter;
+    property public final long bottomLeft;
+    property public final long bottomRight;
+    property public final long center;
+    property public final long centerLeft;
+    property public final long centerRight;
+    property public final int height;
+    property public final boolean isEmpty;
+    property public final int left;
+    property public final int maxDimension;
+    property public final int minDimension;
+    property public final int right;
+    property public final long size;
+    property public final int top;
+    property public final long topCenter;
+    property public final long topLeft;
+    property public final long topRight;
+    property public final int width;
+    field public static final androidx.compose.ui.unit.IntRect.Companion Companion;
+  }
+
+  public static final class IntRect.Companion {
+    method public androidx.compose.ui.unit.IntRect getZero();
+    property public final androidx.compose.ui.unit.IntRect Zero;
+  }
+
+  public final class IntRectKt {
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.unit.IntRect IntRect-TtQJ-B4(long offset, long size);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.unit.IntRect IntRect-cS3zvqc(long topLeft, long bottomRight);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.unit.IntRect IntRect-iAZ9QSk(long center, int radius);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.unit.IntRect lerp(androidx.compose.ui.unit.IntRect start, androidx.compose.ui.unit.IntRect stop, float fraction);
+  }
+
   @androidx.compose.runtime.Immutable public final inline class IntSize {
     ctor public IntSize();
     method @androidx.compose.runtime.Stable public static inline operator int component1-impl(long $this);
@@ -247,6 +287,7 @@ package androidx.compose.ui.unit {
     method @androidx.compose.runtime.Stable public static long IntSize(int width, int height);
     method public static long getCenter-ozmzZPI(long);
     method @androidx.compose.runtime.Stable public static operator long times-U1E2UwY(int, long size);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.unit.IntRect toIntRect-ozmzZPI(long);
     method @androidx.compose.runtime.Stable public static long toSize-ozmzZPI(long);
   }
 

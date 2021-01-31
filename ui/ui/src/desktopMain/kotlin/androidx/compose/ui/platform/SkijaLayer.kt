@@ -17,6 +17,7 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.DesktopCanvas
@@ -37,8 +38,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.toBounds
-import androidx.compose.ui.unit.toRect
+import androidx.compose.ui.unit.toSize
 import org.jetbrains.skija.Picture
 import org.jetbrains.skija.PictureRecorder
 import org.jetbrains.skija.Point3
@@ -166,7 +166,7 @@ internal class SkijaLayer(
     override fun drawLayer(canvas: Canvas) {
         outlineCache.density = getDensity()
         if (picture == null) {
-            val bounds = size.toBounds().toRect()
+            val bounds = size.toSize().toRect()
             val pictureCanvas = pictureRecorder.beginRecording(bounds.toSkijaRect())
             performDrawLayer(DesktopCanvas(pictureCanvas), bounds)
             picture = pictureRecorder.finishRecordingAsPicture()

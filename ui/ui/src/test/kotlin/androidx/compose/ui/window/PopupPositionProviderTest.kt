@@ -17,7 +17,7 @@
 package androidx.compose.ui.window
 
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.unit.IntBounds
+import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
@@ -294,7 +294,7 @@ class PopupPositionProviderTest {
     }
 
     private fun calculatePosition(alignment: Alignment, layoutDir: LayoutDirection): IntOffset {
-        val anchorBounds = IntBounds(50, 50, 150, 150)
+        val anchorBounds = IntRect(50, 50, 150, 150)
         val windowSize = IntSize(1000, 1000)
         val offset = IntOffset(10, 10)
         val popupSize = IntSize(40, 20)
@@ -312,7 +312,7 @@ class PopupPositionProviderTest {
         alignment: DropDownAlignment,
         layoutDir: LayoutDirection
     ): IntOffset {
-        val anchorBounds = IntBounds(50, 50, 150, 150)
+        val anchorBounds = IntRect(50, 50, 150, 150)
         val windowSize = IntSize(1000, 1000)
         val offset = IntOffset(10, 10)
         val popupSize = IntSize(40, 20)
