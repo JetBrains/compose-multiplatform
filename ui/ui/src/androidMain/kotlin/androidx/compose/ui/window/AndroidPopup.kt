@@ -51,7 +51,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.semantics.popup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.IntBounds
+import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
@@ -183,7 +183,7 @@ internal actual fun ActualPopup(
             val position = coordinates.positionInWindow()
             val layoutPosition = IntOffset(position.x.roundToInt(), position.y.roundToInt())
 
-            popupLayout.parentBounds = IntBounds(layoutPosition, layoutSize)
+            popupLayout.parentBounds = IntRect(layoutPosition, layoutSize)
             // Update the popup's position
             popupLayout.updatePosition()
         }
@@ -252,7 +252,7 @@ private class PopupLayout(
 
     // Position params
     var parentLayoutDirection: LayoutDirection = LayoutDirection.Ltr
-    var parentBounds: IntBounds? by mutableStateOf(null)
+    var parentBounds: IntRect? by mutableStateOf(null)
     var popupContentSize: IntSize? by mutableStateOf(null)
 
     var properties: AndroidPopupProperties = AndroidPopupProperties()
@@ -454,7 +454,7 @@ private class PopupLayout(
         }
     }
 
-    private fun Rect.toIntBounds() = IntBounds(
+    private fun Rect.toIntBounds() = IntRect(
         left = left,
         top = top,
         right = right,

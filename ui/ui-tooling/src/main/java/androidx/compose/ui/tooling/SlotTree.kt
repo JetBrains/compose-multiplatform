@@ -21,7 +21,7 @@ import androidx.compose.runtime.CompositionGroup
 import androidx.compose.ui.layout.LayoutInfo
 import androidx.compose.ui.layout.ModifierInfo
 import androidx.compose.ui.layout.positionInWindow
-import androidx.compose.ui.unit.IntBounds
+import androidx.compose.ui.unit.IntRect
 import java.lang.reflect.Field
 import kotlin.math.max
 import kotlin.math.min
@@ -49,7 +49,7 @@ sealed class Group(
     /**
      * The bounding layout box for the group.
      */
-    val box: IntBounds,
+    val box: IntRect,
 
     /**
      * Any data that was stored in the slot table for the group
@@ -128,7 +128,7 @@ data class SourceLocation(
 class CallGroup(
     key: Any?,
     name: String?,
-    box: IntBounds,
+    box: IntRect,
     location: SourceLocation?,
     override val parameters: List<ParameterInformation>,
     data: Collection<Any?>,
@@ -145,7 +145,7 @@ class NodeGroup(
      * An emitted node
      */
     val node: Any,
-    box: IntBounds,
+    box: IntRect,
     data: Collection<Any?>,
     override val modifierInfo: List<ModifierInfo>,
     children: Collection<Group>
@@ -156,7 +156,7 @@ class NodeGroup(
  */
 data class JoinedKey(val left: Any?, val right: Any?)
 
-internal val emptyBox = IntBounds(0, 0, 0, 0)
+internal val emptyBox = IntRect(0, 0, 0, 0)
 
 private val tokenizer = Regex("(\\d+)|([,])|([*])|([:])|L|(P\\([^)]*\\))|(C(\\(([^)]*)\\))?)|@")
 
@@ -471,9 +471,9 @@ private fun CompositionGroup.getGroup(parentContext: SourceInformationContext?):
         )
 }
 
-private fun boundsOfLayoutNode(node: LayoutInfo): IntBounds {
+private fun boundsOfLayoutNode(node: LayoutInfo): IntRect {
     if (!node.isAttached) {
-        return IntBounds(
+        return IntRect(
             left = 0,
             top = 0,
             right = node.width,
@@ -486,7 +486,7 @@ private fun boundsOfLayoutNode(node: LayoutInfo): IntBounds {
     val top = position.y.roundToInt()
     val right = left + size.width
     val bottom = top + size.height
-    return IntBounds(left = left, top = top, right = right, bottom = bottom)
+    return IntRect(left = left, top = top, right = right, bottom = bottom)
 }
 
 /**
@@ -495,10 +495,10 @@ private fun boundsOfLayoutNode(node: LayoutInfo): IntBounds {
  */
 fun CompositionData.asTree(): Group = compositionGroups.first().getGroup(null)
 
-internal fun IntBounds.union(other: IntBounds): IntBounds {
+internal fun IntRect.union(other: IntRect): IntRect {
     if (this == emptyBox) return other else if (other == emptyBox) return this
 
-    return IntBounds(
+    return IntRect(
         left = min(left, other.left),
         top = min(top, other.top),
         bottom = max(bottom, other.bottom),

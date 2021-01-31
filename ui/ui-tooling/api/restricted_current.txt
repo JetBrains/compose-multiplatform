@@ -2,12 +2,12 @@
 package androidx.compose.ui.tooling {
 
   public final class CallGroup extends androidx.compose.ui.tooling.Group {
-    ctor public CallGroup(Object? key, String? name, androidx.compose.ui.unit.IntBounds box, androidx.compose.ui.tooling.SourceLocation? location, java.util.List<androidx.compose.ui.tooling.ParameterInformation> parameters, java.util.Collection<?> data, java.util.Collection<? extends androidx.compose.ui.tooling.Group> children);
+    ctor public CallGroup(Object? key, String? name, androidx.compose.ui.unit.IntRect box, androidx.compose.ui.tooling.SourceLocation? location, java.util.List<androidx.compose.ui.tooling.ParameterInformation> parameters, java.util.Collection<?> data, java.util.Collection<? extends androidx.compose.ui.tooling.Group> children);
     property public java.util.List<androidx.compose.ui.tooling.ParameterInformation> parameters;
   }
 
   public abstract sealed class Group {
-    method public final androidx.compose.ui.unit.IntBounds getBox();
+    method public final androidx.compose.ui.unit.IntRect getBox();
     method public final java.util.Collection<androidx.compose.ui.tooling.Group> getChildren();
     method public final java.util.Collection<java.lang.Object> getData();
     method public final Object? getKey();
@@ -15,7 +15,7 @@ package androidx.compose.ui.tooling {
     method public java.util.List<androidx.compose.ui.layout.ModifierInfo> getModifierInfo();
     method public final String? getName();
     method public java.util.List<androidx.compose.ui.tooling.ParameterInformation> getParameters();
-    property public final androidx.compose.ui.unit.IntBounds box;
+    property public final androidx.compose.ui.unit.IntRect box;
     property public final java.util.Collection<androidx.compose.ui.tooling.Group> children;
     property public final java.util.Collection<java.lang.Object> data;
     property public final Object? key;
@@ -41,7 +41,7 @@ package androidx.compose.ui.tooling {
   }
 
   public final class NodeGroup extends androidx.compose.ui.tooling.Group {
-    ctor public NodeGroup(Object? key, Object node, androidx.compose.ui.unit.IntBounds box, java.util.Collection<?> data, java.util.List<androidx.compose.ui.layout.ModifierInfo> modifierInfo, java.util.Collection<? extends androidx.compose.ui.tooling.Group> children);
+    ctor public NodeGroup(Object? key, Object node, androidx.compose.ui.unit.IntRect box, java.util.Collection<?> data, java.util.List<androidx.compose.ui.layout.ModifierInfo> modifierInfo, java.util.Collection<? extends androidx.compose.ui.tooling.Group> children);
     method public Object getNode();
     property public java.util.List<androidx.compose.ui.layout.ModifierInfo> modifierInfo;
     property public final Object node;

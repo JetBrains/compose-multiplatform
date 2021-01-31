@@ -36,7 +36,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.IntBounds
+import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
@@ -144,7 +144,7 @@ class MenuTest {
             DpOffset(offsetX.dp, offsetY.dp),
             density
         ).calculatePosition(
-            IntBounds(anchorPosition, anchorSize),
+            IntRect(anchorPosition, anchorSize),
             windowSize,
             LayoutDirection.Ltr,
             popupSize
@@ -161,7 +161,7 @@ class MenuTest {
             DpOffset(offsetX.dp, offsetY.dp),
             density
         ).calculatePosition(
-            IntBounds(anchorPosition, anchorSize),
+            IntRect(anchorPosition, anchorSize),
             windowSize,
             LayoutDirection.Rtl,
             popupSize
@@ -192,7 +192,7 @@ class MenuTest {
             DpOffset(offsetX.dp, offsetY.dp),
             density
         ).calculatePosition(
-            IntBounds(anchorPosition, anchorSize),
+            IntRect(anchorPosition, anchorSize),
             windowSize,
             LayoutDirection.Ltr,
             popupSize
@@ -209,7 +209,7 @@ class MenuTest {
             DpOffset(offsetX.dp, offsetY.dp),
             density
         ).calculatePosition(
-            IntBounds(anchorPositionRtl, anchorSize),
+            IntRect(anchorPositionRtl, anchorSize),
             windowSize,
             LayoutDirection.Rtl,
             popupSize
@@ -241,7 +241,7 @@ class MenuTest {
             DpOffset(0.dp, 0.dp),
             density
         ).calculatePosition(
-            IntBounds(anchorPosition, anchorSize),
+            IntRect(anchorPosition, anchorSize),
             windowSize,
             LayoutDirection.Ltr,
             popupSize
@@ -264,8 +264,8 @@ class MenuTest {
         val offsetY = 40
         val popupSize = IntSize(50, 80)
 
-        var obtainedParentBounds = IntBounds(0, 0, 0, 0)
-        var obtainedMenuBounds = IntBounds(0, 0, 0, 0)
+        var obtainedParentBounds = IntRect(0, 0, 0, 0)
+        var obtainedMenuBounds = IntRect(0, 0, 0, 0)
         DropdownMenuPositionProvider(
             DpOffset(offsetX.dp, offsetY.dp),
             density
@@ -273,15 +273,15 @@ class MenuTest {
             obtainedParentBounds = parentBounds
             obtainedMenuBounds = menuBounds
         }.calculatePosition(
-            IntBounds(anchorPosition, anchorSize),
+            IntRect(anchorPosition, anchorSize),
             windowSize,
             LayoutDirection.Ltr,
             popupSize
         )
 
-        assertThat(obtainedParentBounds).isEqualTo(IntBounds(anchorPosition, anchorSize))
+        assertThat(obtainedParentBounds).isEqualTo(IntRect(anchorPosition, anchorSize))
         assertThat(obtainedMenuBounds).isEqualTo(
-            IntBounds(
+            IntRect(
                 anchorPosition.x + offsetX,
                 anchorPosition.y + anchorSize.height + offsetY,
                 anchorPosition.x + offsetX + popupSize.width,
