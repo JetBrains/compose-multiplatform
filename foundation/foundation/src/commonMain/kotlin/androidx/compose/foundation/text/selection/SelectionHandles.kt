@@ -188,7 +188,7 @@ private fun HandleDrawLayout(
 ) {
     Layout({}, modifier.drawBehind(onCanvas)) { _, _ ->
         // take width and height space of the screen and allow draw modifier to draw inside of it
-        layout(width.toIntPx(), height.toIntPx()) {
+        layout(width.roundToPx(), height.roundToPx()) {
             // this layout has no children, only draw modifier.
         }
     }

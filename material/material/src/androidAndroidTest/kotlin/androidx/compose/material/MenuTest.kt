@@ -124,7 +124,8 @@ class MenuTest {
         ).assertExists().fetchSemanticsNode()
         with(rule.density) {
             assertThat(node.size.width).isEqualTo(130)
-            assertThat(node.size.height).isEqualTo(DropdownMenuVerticalPadding.toIntPx() * 2 + 200)
+            assertThat(node.size.height)
+                .isEqualTo(DropdownMenuVerticalPadding.roundToPx() * 2 + 200)
         }
     }
 
@@ -235,7 +236,7 @@ class MenuTest {
 
         // The min margin above and below the menu, relative to the screen.
         val MenuVerticalMargin = 32.dp
-        val verticalMargin = with(density) { MenuVerticalMargin.toIntPx() }
+        val verticalMargin = with(density) { MenuVerticalMargin.roundToPx() }
 
         val position = DropdownMenuPositionProvider(
             DpOffset(0.dp, 0.dp),

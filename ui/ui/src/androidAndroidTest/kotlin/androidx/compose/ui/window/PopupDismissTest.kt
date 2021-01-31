@@ -106,8 +106,8 @@ class PopupDismissTest(private val isFocusable: Boolean) {
         with(rule.density) {
             // Need to click via UiDevice as this click has to propagate to multiple windows
             device.click(
-                btnPos.x.toInt() + btnBounds.width.toIntPx() / 2,
-                btnPos.y.toInt() + btnBounds.height.toIntPx() / 2
+                btnPos.x.toInt() + btnBounds.width.roundToPx() / 2,
+                btnPos.y.toInt() + btnBounds.height.roundToPx() / 2
             )
         }
 

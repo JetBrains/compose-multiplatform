@@ -295,10 +295,10 @@ open class LayoutTest {
      */
     @Stable
     fun Density.Constraints(dpConstraints: DpConstraints) = Constraints(
-        minWidth = dpConstraints.minWidth.toIntPx(),
-        maxWidth = dpConstraints.maxWidth.toIntPx(),
-        minHeight = dpConstraints.minHeight.toIntPx(),
-        maxHeight = dpConstraints.maxHeight.toIntPx()
+        minWidth = dpConstraints.minWidth.roundToPx(),
+        maxWidth = dpConstraints.maxWidth.roundToPx(),
+        minHeight = dpConstraints.minHeight.roundToPx(),
+        maxHeight = dpConstraints.maxHeight.roundToPx()
     )
 
     internal fun assertEquals(expected: Size?, actual: Size?) {
@@ -376,13 +376,13 @@ open class LayoutTest {
         Layout(content, modifier) { measurables, incomingConstraints ->
             val containerConstraints = Constraints(constraints)
                 .copy(
-                    width?.toIntPx() ?: constraints.minWidth.toIntPx(),
-                    width?.toIntPx() ?: constraints.maxWidth.toIntPx(),
-                    height?.toIntPx() ?: constraints.minHeight.toIntPx(),
-                    height?.toIntPx() ?: constraints.maxHeight.toIntPx()
+                    width?.roundToPx() ?: constraints.minWidth.roundToPx(),
+                    width?.roundToPx() ?: constraints.maxWidth.roundToPx(),
+                    height?.roundToPx() ?: constraints.minHeight.roundToPx(),
+                    height?.roundToPx() ?: constraints.maxHeight.roundToPx()
                 ).enforce(incomingConstraints)
-            val totalHorizontal = padding.start.toIntPx() + padding.end.toIntPx()
-            val totalVertical = padding.top.toIntPx() + padding.bottom.toIntPx()
+            val totalHorizontal = padding.start.roundToPx() + padding.end.roundToPx()
+            val totalVertical = padding.top.roundToPx() + padding.bottom.roundToPx()
             val childConstraints = containerConstraints
                 .copy(minWidth = 0, minHeight = 0)
                 .offset(-totalHorizontal, -totalVertical)
@@ -414,8 +414,8 @@ open class LayoutTest {
                         layoutDirection
                     )
                     it.placeRelative(
-                        padding.start.toIntPx() + position.x,
-                        padding.top.toIntPx() + position.y
+                        padding.start.roundToPx() + position.x,
+                        padding.top.roundToPx() + position.y
                     )
                 }
             }

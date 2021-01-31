@@ -51,9 +51,9 @@ class VectorInvalidationTestCase() {
         with(LocalDensity.current) {
             imageVector.resource.resource?.let {
                 val width = it.defaultWidth
-                vectorSize = width.toIntPx()
+                vectorSize = width.roundToPx()
                 AtLeastSize(
-                    size = width.toIntPx(),
+                    size = width.roundToPx(),
                     modifier = WhiteBackground.paint(rememberVectorPainter(it))
                 ) {
                     measured = true

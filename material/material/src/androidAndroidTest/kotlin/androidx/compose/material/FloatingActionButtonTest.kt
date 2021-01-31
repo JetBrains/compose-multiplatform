@@ -265,8 +265,8 @@ class FloatingActionButtonTest {
             assertThat(contentBounds.width).isLessThan(buttonBounds.width)
             assertThat(contentBounds.height).isLessThan(buttonBounds.height)
             with(rule.density) {
-                assertThat(contentBounds.width).isEqualTo(2.dp.toIntPx().toFloat())
-                assertThat(contentBounds.height).isEqualTo(2.dp.toIntPx().toFloat())
+                assertThat(contentBounds.width).isEqualTo(2.dp.roundToPx().toFloat())
+                assertThat(contentBounds.height).isEqualTo(2.dp.roundToPx().toFloat())
             }
             assertWithinOnePixel(buttonBounds.center, contentBounds.center)
         }
@@ -297,8 +297,8 @@ class FloatingActionButtonTest {
             assertThat(contentBounds.width).isLessThan(buttonBounds.width)
             assertThat(contentBounds.height).isLessThan(buttonBounds.height)
             with(rule.density) {
-                assertThat(contentBounds.width).isEqualTo(2.dp.toIntPx().toFloat())
-                assertThat(contentBounds.height).isEqualTo(2.dp.toIntPx().toFloat())
+                assertThat(contentBounds.width).isEqualTo(2.dp.roundToPx().toFloat())
+                assertThat(contentBounds.height).isEqualTo(2.dp.roundToPx().toFloat())
             }
             assertWithinOnePixel(buttonBounds.center, contentBounds.center)
         }
@@ -335,14 +335,14 @@ class FloatingActionButtonTest {
             val textBounds = textCoordinates!!.boundsInRoot()
             val iconBounds = iconCoordinates!!.boundsInRoot()
             with(rule.density) {
-                assertThat(textBounds.width).isEqualTo(2.dp.toIntPx().toFloat())
-                assertThat(textBounds.height).isEqualTo(2.dp.toIntPx().toFloat())
-                assertThat(iconBounds.width).isEqualTo(10.dp.toIntPx().toFloat())
-                assertThat(iconBounds.height).isEqualTo(10.dp.toIntPx().toFloat())
+                assertThat(textBounds.width).isEqualTo(2.dp.roundToPx().toFloat())
+                assertThat(textBounds.height).isEqualTo(2.dp.roundToPx().toFloat())
+                assertThat(iconBounds.width).isEqualTo(10.dp.roundToPx().toFloat())
+                assertThat(iconBounds.height).isEqualTo(10.dp.roundToPx().toFloat())
 
                 assertWithinOnePixel(buttonBounds.center.y, iconBounds.center.y)
                 assertWithinOnePixel(buttonBounds.center.y, textBounds.center.y)
-                val halfPadding = 6.dp.toIntPx().toFloat()
+                val halfPadding = 6.dp.roundToPx().toFloat()
                 assertWithinOnePixel(
                     iconBounds.center.x + iconBounds.width / 2 + halfPadding,
                     textBounds.center.x - textBounds.width / 2 - halfPadding

@@ -209,8 +209,8 @@ private class PaddingModifier(
         measurable: Measurable,
         constraints: Constraints
     ): MeasureResult {
-        val horizontal = start.toIntPx() + end.toIntPx()
-        val vertical = top.toIntPx() + bottom.toIntPx()
+        val horizontal = start.roundToPx() + end.roundToPx()
+        val vertical = top.roundToPx() + bottom.roundToPx()
 
         val placeable = measurable.measure(constraints.offset(-horizontal, -vertical))
 
@@ -218,9 +218,9 @@ private class PaddingModifier(
         val height = constraints.constrainHeight(placeable.height + vertical)
         return layout(width, height) {
             if (rtlAware) {
-                placeable.placeRelative(start.toIntPx(), top.toIntPx())
+                placeable.placeRelative(start.roundToPx(), top.roundToPx())
             } else {
-                placeable.place(start.toIntPx(), top.toIntPx())
+                placeable.place(start.roundToPx(), top.roundToPx())
             }
         }
     }

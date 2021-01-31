@@ -58,7 +58,7 @@ class AndroidViewBindingTest {
         }
 
         val size = 50.dp
-        val sizePx = with(rule.density) { size.toIntPx() }
+        val sizePx = with(rule.density) { size.roundToPx() }
         rule.onNodeWithTag("layout").captureToImage().assertPixels(IntSize(sizePx, sizePx * 2)) {
             if (it.y < sizePx) Color.Blue else Color.Black
         }
@@ -75,7 +75,7 @@ class AndroidViewBindingTest {
         }
 
         val size = 50.dp
-        val sizePx = with(rule.density) { size.toIntPx() }
+        val sizePx = with(rule.density) { size.roundToPx() }
         rule.onNodeWithTag("layout").captureToImage()
             .assertPixels(IntSize(sizePx, sizePx * 2)) {
                 if (it.y < sizePx) Color.Blue else color.value
@@ -93,7 +93,7 @@ class AndroidViewBindingTest {
         rule.setContent {
             val size = 50.dp
             val density = Density(3f)
-            val sizeIpx = with(density) { size.toIntPx() }
+            val sizeIpx = with(density) { size.roundToPx() }
             Providers(LocalDensity provides density) {
                 AndroidViewBinding(
                     TestLayoutBinding::inflate,

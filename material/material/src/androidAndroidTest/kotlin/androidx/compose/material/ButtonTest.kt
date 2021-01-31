@@ -545,8 +545,8 @@ class ButtonTest {
             assertThat(contentBounds.width).isLessThan(buttonBounds.width)
             assertThat(contentBounds.height).isLessThan(buttonBounds.height)
             with(rule.density) {
-                assertThat(contentBounds.width).isEqualTo(2.dp.toIntPx().toFloat())
-                assertThat(contentBounds.height).isEqualTo(2.dp.toIntPx().toFloat())
+                assertThat(contentBounds.width).isEqualTo(2.dp.roundToPx().toFloat())
+                assertThat(contentBounds.height).isEqualTo(2.dp.roundToPx().toFloat())
             }
             assertWithinOnePixel(buttonBounds.center, contentBounds.center)
         }
@@ -650,7 +650,7 @@ class ButtonTest {
             val topLeft = childCoordinates!!.localToWindow(Offset.Zero).x -
                 parentCoordinates!!.localToWindow(Offset.Zero).x
             val currentPadding = with(rule.density) {
-                padding.toIntPx().toFloat()
+                padding.roundToPx().toFloat()
             }
             assertThat(currentPadding).isEqualTo(topLeft)
         }

@@ -3141,7 +3141,7 @@ class AndroidLayoutDrawTest {
         val sizeModifier = Modifier.layout { measurable, constraints ->
             measuredSize = size
             layoutLatch.countDown()
-            val pxSize = size.toIntPx()
+            val pxSize = size.roundToPx()
             layout(pxSize, pxSize) {
                 measurable.measure(constraints).place(0, 0)
             }

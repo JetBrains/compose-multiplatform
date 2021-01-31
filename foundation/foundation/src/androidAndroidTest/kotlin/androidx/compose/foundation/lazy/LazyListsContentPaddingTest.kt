@@ -376,7 +376,7 @@ class LazyListsContentPaddingTest {
     fun row_contentPaddingIsNotAffectingScrollPosition() {
         lateinit var state: LazyListState
         val itemSize = with(rule.density) {
-            50.dp.toIntPx().toDp()
+            50.dp.roundToPx().toDp()
         }
         rule.setContent {
             LazyRow(
@@ -612,7 +612,7 @@ class LazyListsContentPaddingTest {
 
     private fun LazyListState.scrollBy(offset: Dp) {
         runBlocking {
-            smoothScrollBy(with(rule.density) { offset.toIntPx().toFloat() }, snap())
+            smoothScrollBy(with(rule.density) { offset.roundToPx().toFloat() }, snap())
         }
     }
 

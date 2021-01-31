@@ -238,10 +238,10 @@ private fun Padding(
         if (measurable == null) {
             layout(constraints.minWidth, constraints.minHeight) { }
         } else {
-            val paddingLeft = padding.start.toIntPx()
-            val paddingTop = padding.top.toIntPx()
-            val paddingRight = padding.end.toIntPx()
-            val paddingBottom = padding.bottom.toIntPx()
+            val paddingLeft = padding.start.roundToPx()
+            val paddingTop = padding.top.roundToPx()
+            val paddingRight = padding.end.roundToPx()
+            val paddingBottom = padding.bottom.roundToPx()
             val horizontalPadding = (paddingLeft + paddingRight)
             val verticalPadding = (paddingTop + paddingBottom)
 

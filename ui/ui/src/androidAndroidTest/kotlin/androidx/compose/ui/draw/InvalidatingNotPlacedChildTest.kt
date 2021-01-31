@@ -172,7 +172,7 @@ private fun ConditionallyPlacedChild(
 @Composable
 private fun MeasureInLayoutBlock(content: @Composable () -> Unit) {
     Layout(content = content) { measurables, constraints ->
-        val size = 5.dp.toIntPx()
+        val size = 5.dp.roundToPx()
         layout(size, size) {
             measurables.first().measure(constraints).place(0, 0)
         }

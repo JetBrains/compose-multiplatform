@@ -90,8 +90,8 @@ class OffsetTest : LayoutTest() {
 
         rule.onNodeWithTag("box").assertExists()
         rule.runOnIdle {
-            assertEquals(offsetX.toIntPx(), positionX)
-            assertEquals(offsetY.toIntPx(), positionY)
+            assertEquals(offsetX.roundToPx(), positionX)
+            assertEquals(offsetY.roundToPx(), positionY)
         }
     }
 
@@ -124,8 +124,8 @@ class OffsetTest : LayoutTest() {
 
         rule.onNodeWithTag("box").assertExists()
         rule.runOnIdle {
-            assertEquals(containerWidth.toIntPx() - offsetX.toIntPx() - boxSize, positionX)
-            assertEquals(offsetY.toIntPx(), positionY)
+            assertEquals(containerWidth.roundToPx() - offsetX.roundToPx() - boxSize, positionX)
+            assertEquals(offsetY.roundToPx(), positionY)
         }
     }
 
@@ -150,8 +150,8 @@ class OffsetTest : LayoutTest() {
 
         rule.onNodeWithTag("box").assertExists()
         rule.runOnIdle {
-            assertEquals(offsetX.toIntPx(), positionX)
-            assertEquals(offsetY.toIntPx(), positionY)
+            assertEquals(offsetX.roundToPx(), positionX)
+            assertEquals(offsetY.roundToPx(), positionY)
         }
     }
 
@@ -184,8 +184,8 @@ class OffsetTest : LayoutTest() {
 
         rule.onNodeWithTag("box").assertExists()
         rule.runOnIdle {
-            assertEquals(containerWidth.toIntPx() - boxSize + offsetX.toIntPx(), positionX)
-            assertEquals(offsetY.toIntPx(), positionY)
+            assertEquals(containerWidth.roundToPx() - boxSize + offsetX.roundToPx(), positionX)
+            assertEquals(offsetY.roundToPx(), positionY)
         }
     }
 
@@ -245,7 +245,7 @@ class OffsetTest : LayoutTest() {
         rule.onNodeWithTag("box").assertExists()
         rule.runOnIdle {
             Assert.assertEquals(
-                containerWidth.toIntPx() - offsetX - boxSize,
+                containerWidth.roundToPx() - offsetX - boxSize,
                 positionX
             )
             Assert.assertEquals(offsetY, positionY)
@@ -308,7 +308,7 @@ class OffsetTest : LayoutTest() {
         rule.onNodeWithTag("box").assertExists()
         rule.runOnIdle {
             Assert.assertEquals(
-                containerWidth.toIntPx() - boxSize + offsetX,
+                containerWidth.roundToPx() - boxSize + offsetX,
                 positionX
             )
             Assert.assertEquals(offsetY, positionY)

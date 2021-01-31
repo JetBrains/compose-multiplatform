@@ -126,7 +126,7 @@ class ConstraintLayoutTest : LayoutTest() {
                 aspectRatioBoxSize.value!!.height
             )
             // Divider has fixed width 1.dp in constraint set.
-            assertEquals(1.dp.toIntPx(), dividerSize.value!!.width)
+            assertEquals(1.dp.roundToPx(), dividerSize.value!!.width)
             // Divider has spread height so it should spread to fill the height of the CL,
             // which in turns is given by the size of the aspect ratio box.
             assertEquals(aspectRatioBoxSize.value!!.height, dividerSize.value!!.height)
@@ -186,7 +186,7 @@ class ConstraintLayoutTest : LayoutTest() {
                 aspectRatioBoxSize.value!!.height
             )
             // Divider has fixed width 1.dp in constraint set.
-            assertEquals(1.dp.toIntPx(), dividerSize.value!!.width)
+            assertEquals(1.dp.roundToPx(), dividerSize.value!!.width)
             // Divider has spread height so it should spread to fill the height of the CL,
             // which in turns is given by the size of the aspect ratio box.
             assertEquals(aspectRatioBoxSize.value!!.height, dividerSize.value!!.height)
@@ -247,7 +247,7 @@ class ConstraintLayoutTest : LayoutTest() {
                 aspectRatioBoxSize.value!!.height
             )
             // Divider has fixed width 1.dp in constraint set.
-            assertEquals(1.dp.toIntPx(), dividerSize.value!!.width)
+            assertEquals(1.dp.roundToPx(), dividerSize.value!!.width)
             // Divider has percent height so it should spread to fill 0.8 of the height of the CL,
             // which in turns is given by the size of the aspect ratio box.
             assertEquals(
@@ -309,7 +309,7 @@ class ConstraintLayoutTest : LayoutTest() {
                 aspectRatioBoxSize.value!!.height
             )
             // Divider has fixed width 1.dp in constraint set.
-            assertEquals(1.dp.toIntPx(), dividerSize.value!!.width)
+            assertEquals(1.dp.roundToPx(), dividerSize.value!!.width)
             // Divider has percent height so it should spread to fill 0.8 of the height of the CL,
             // which in turns is given by the size of the aspect ratio box.
             // TODO(popam; b/150277566): uncomment
@@ -368,15 +368,15 @@ class ConstraintLayoutTest : LayoutTest() {
 
         rule.runOnIdle {
             // The width of the ConstraintLayout should be twice the width of the aspect ratio box.
-            assertEquals(size.toIntPx() * 2, constraintLayoutSize.value!!.width)
+            assertEquals(size.roundToPx() * 2, constraintLayoutSize.value!!.width)
             // The height of the ConstraintLayout should be the height of the aspect ratio box.
-            assertEquals(size.toIntPx() / 2, constraintLayoutSize.value!!.height)
+            assertEquals(size.roundToPx() / 2, constraintLayoutSize.value!!.height)
             // The aspect ratio gets the requested size.
-            assertEquals(size.toIntPx(), aspectRatioBoxSize.value!!.width)
+            assertEquals(size.roundToPx(), aspectRatioBoxSize.value!!.width)
             // Aspect ratio is preserved.
-            assertEquals(size.toIntPx() / 2, aspectRatioBoxSize.value!!.height)
+            assertEquals(size.roundToPx() / 2, aspectRatioBoxSize.value!!.height)
             // Divider has fixed width 1.dp in constraint set.
-            assertEquals(1.dp.toIntPx(), dividerSize.value!!.width)
+            assertEquals(1.dp.roundToPx(), dividerSize.value!!.width)
             // Divider should have the height of the aspect ratio box.
             assertEquals(aspectRatioBoxSize.value!!.height, dividerSize.value!!.height)
         }

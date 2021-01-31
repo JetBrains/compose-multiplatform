@@ -65,8 +65,8 @@ class IntrinsicTest : LayoutTest() {
         }
         assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
 
-        assertEquals(IntSize(10.dp.toIntPx(), 50.dp.toIntPx()), minIntrinsicWidthSize.value)
-        assertEquals(IntSize(10.dp.toIntPx(), 50.dp.toIntPx()), childSize.value)
+        assertEquals(IntSize(10.dp.roundToPx(), 50.dp.roundToPx()), minIntrinsicWidthSize.value)
+        assertEquals(IntSize(10.dp.roundToPx(), 50.dp.roundToPx()), childSize.value)
         assertEquals(Offset(0f, 0f), childPosition.value)
     }
 
@@ -93,8 +93,8 @@ class IntrinsicTest : LayoutTest() {
         }
         assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
 
-        assertEquals(IntSize(20.dp.toIntPx(), 40.dp.toIntPx()), minIntrinsicHeightSize.value)
-        assertEquals(IntSize(20.dp.toIntPx(), 40.dp.toIntPx()), childSize.value)
+        assertEquals(IntSize(20.dp.roundToPx(), 40.dp.roundToPx()), minIntrinsicHeightSize.value)
+        assertEquals(IntSize(20.dp.roundToPx(), 40.dp.roundToPx()), childSize.value)
         assertEquals(Offset(0f, 0f), childPosition.value)
     }
 
@@ -121,8 +121,8 @@ class IntrinsicTest : LayoutTest() {
         }
         assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
 
-        assertEquals(IntSize(30.dp.toIntPx(), 50.dp.toIntPx()), maxIntrinsicWidthSize.value)
-        assertEquals(IntSize(30.dp.toIntPx(), 50.dp.toIntPx()), childSize.value)
+        assertEquals(IntSize(30.dp.roundToPx(), 50.dp.roundToPx()), maxIntrinsicWidthSize.value)
+        assertEquals(IntSize(30.dp.roundToPx(), 50.dp.roundToPx()), childSize.value)
         assertEquals(Offset(0f, 0f), childPosition.value)
     }
 
@@ -149,8 +149,8 @@ class IntrinsicTest : LayoutTest() {
         }
         assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
 
-        assertEquals(IntSize(20.dp.toIntPx(), 60.dp.toIntPx()), maxIntrinsicHeightSize.value)
-        assertEquals(IntSize(20.dp.toIntPx(), 60.dp.toIntPx()), childSize.value)
+        assertEquals(IntSize(20.dp.roundToPx(), 60.dp.roundToPx()), maxIntrinsicHeightSize.value)
+        assertEquals(IntSize(20.dp.roundToPx(), 60.dp.roundToPx()), childSize.value)
         assertEquals(Offset(0f, 0f), childPosition.value)
     }
 
@@ -179,8 +179,8 @@ class IntrinsicTest : LayoutTest() {
         }
         assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
 
-        assertEquals(IntSize(5.dp.toIntPx(), 50.dp.toIntPx()), minIntrinsicWidthSize.value)
-        assertEquals(IntSize(5.dp.toIntPx(), 50.dp.toIntPx()), childSize.value)
+        assertEquals(IntSize(5.dp.roundToPx(), 50.dp.roundToPx()), minIntrinsicWidthSize.value)
+        assertEquals(IntSize(5.dp.roundToPx(), 50.dp.roundToPx()), childSize.value)
         assertEquals(Offset(0f, 0f), childPosition.value)
     }
 
@@ -209,8 +209,8 @@ class IntrinsicTest : LayoutTest() {
         }
         assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
 
-        assertEquals(IntSize(15.dp.toIntPx(), 50.dp.toIntPx()), minIntrinsicWidthSize.value)
-        assertEquals(IntSize(15.dp.toIntPx(), 50.dp.toIntPx()), childSize.value)
+        assertEquals(IntSize(15.dp.roundToPx(), 50.dp.roundToPx()), minIntrinsicWidthSize.value)
+        assertEquals(IntSize(15.dp.roundToPx(), 50.dp.roundToPx()), childSize.value)
         assertEquals(Offset(0f, 0f), childPosition.value)
     }
 
@@ -242,8 +242,8 @@ class IntrinsicTest : LayoutTest() {
         }
         assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
 
-        assertEquals(IntSize(20.dp.toIntPx(), 35.dp.toIntPx()), minIntrinsicHeightSize.value)
-        assertEquals(IntSize(20.dp.toIntPx(), 35.dp.toIntPx()), childSize.value)
+        assertEquals(IntSize(20.dp.roundToPx(), 35.dp.roundToPx()), minIntrinsicHeightSize.value)
+        assertEquals(IntSize(20.dp.roundToPx(), 35.dp.roundToPx()), childSize.value)
         assertEquals(Offset(0f, 0f), childPosition.value)
     }
 
@@ -275,8 +275,8 @@ class IntrinsicTest : LayoutTest() {
         }
         assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
 
-        assertEquals(IntSize(20.dp.toIntPx(), 45.dp.toIntPx()), minIntrinsicHeightSize.value)
-        assertEquals(IntSize(20.dp.toIntPx(), 45.dp.toIntPx()), childSize.value)
+        assertEquals(IntSize(20.dp.roundToPx(), 45.dp.roundToPx()), minIntrinsicHeightSize.value)
+        assertEquals(IntSize(20.dp.roundToPx(), 45.dp.roundToPx()), childSize.value)
         assertEquals(Offset(0f, 0f), childPosition.value)
     }
 
@@ -308,8 +308,8 @@ class IntrinsicTest : LayoutTest() {
         }
         assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
 
-        assertEquals(IntSize(25.dp.toIntPx(), 50.dp.toIntPx()), maxIntrinsicWidthSize.value)
-        assertEquals(IntSize(25.dp.toIntPx(), 50.dp.toIntPx()), childSize.value)
+        assertEquals(IntSize(25.dp.roundToPx(), 50.dp.roundToPx()), maxIntrinsicWidthSize.value)
+        assertEquals(IntSize(25.dp.roundToPx(), 50.dp.roundToPx()), childSize.value)
         assertEquals(Offset(0f, 0f), childPosition.value)
     }
 
@@ -341,8 +341,8 @@ class IntrinsicTest : LayoutTest() {
         }
         assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
 
-        assertEquals(IntSize(35.dp.toIntPx(), 50.dp.toIntPx()), maxIntrinsicWidthSize.value)
-        assertEquals(IntSize(35.dp.toIntPx(), 50.dp.toIntPx()), childSize.value)
+        assertEquals(IntSize(35.dp.roundToPx(), 50.dp.roundToPx()), maxIntrinsicWidthSize.value)
+        assertEquals(IntSize(35.dp.roundToPx(), 50.dp.roundToPx()), childSize.value)
         assertEquals(Offset(0f, 0f), childPosition.value)
     }
 
@@ -374,8 +374,8 @@ class IntrinsicTest : LayoutTest() {
         }
         assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
 
-        assertEquals(IntSize(20.dp.toIntPx(), 55.dp.toIntPx()), maxIntrinsicHeightSize.value)
-        assertEquals(IntSize(20.dp.toIntPx(), 55.dp.toIntPx()), childSize.value)
+        assertEquals(IntSize(20.dp.roundToPx(), 55.dp.roundToPx()), maxIntrinsicHeightSize.value)
+        assertEquals(IntSize(20.dp.roundToPx(), 55.dp.roundToPx()), childSize.value)
         assertEquals(Offset(0f, 0f), childPosition.value)
     }
 
@@ -407,8 +407,8 @@ class IntrinsicTest : LayoutTest() {
         }
         assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
 
-        assertEquals(IntSize(20.dp.toIntPx(), 65.dp.toIntPx()), maxIntrinsicHeightSize.value)
-        assertEquals(IntSize(20.dp.toIntPx(), 65.dp.toIntPx()), childSize.value)
+        assertEquals(IntSize(20.dp.roundToPx(), 65.dp.roundToPx()), maxIntrinsicHeightSize.value)
+        assertEquals(IntSize(20.dp.roundToPx(), 65.dp.roundToPx()), childSize.value)
         assertEquals(Offset(0f, 0f), childPosition.value)
     }
 
@@ -419,10 +419,10 @@ class IntrinsicTest : LayoutTest() {
                 Modifier.preferredWidth(IntrinsicSize.Min), 10.dp, 20.dp, 30.dp, 40.dp, 50.dp, 60.dp
             )
         }) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
-            assertEquals(10.dp.toIntPx(), minIntrinsicWidth(0))
-            assertEquals(40.dp.toIntPx(), minIntrinsicHeight(0))
-            assertEquals(10.dp.toIntPx(), maxIntrinsicWidth(0))
-            assertEquals(60.dp.toIntPx(), maxIntrinsicHeight(0))
+            assertEquals(10.dp.roundToPx(), minIntrinsicWidth(0))
+            assertEquals(40.dp.roundToPx(), minIntrinsicHeight(0))
+            assertEquals(10.dp.roundToPx(), maxIntrinsicWidth(0))
+            assertEquals(60.dp.roundToPx(), maxIntrinsicHeight(0))
         }
     }
 
@@ -434,10 +434,10 @@ class IntrinsicTest : LayoutTest() {
                 10.dp, 20.dp, 30.dp, 40.dp, 50.dp, 60.dp
             )
         }) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
-            assertEquals(10.dp.toIntPx(), minIntrinsicWidth(0))
-            assertEquals(40.dp.toIntPx(), minIntrinsicHeight(0))
-            assertEquals(30.dp.toIntPx(), maxIntrinsicWidth(0))
-            assertEquals(40.dp.toIntPx(), maxIntrinsicHeight(0))
+            assertEquals(10.dp.roundToPx(), minIntrinsicWidth(0))
+            assertEquals(40.dp.roundToPx(), minIntrinsicHeight(0))
+            assertEquals(30.dp.roundToPx(), maxIntrinsicWidth(0))
+            assertEquals(40.dp.roundToPx(), maxIntrinsicHeight(0))
         }
     }
 
@@ -448,10 +448,10 @@ class IntrinsicTest : LayoutTest() {
                 Modifier.preferredWidth(IntrinsicSize.Max), 10.dp, 20.dp, 30.dp, 40.dp, 50.dp, 60.dp
             )
         }) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
-            assertEquals(30.dp.toIntPx(), minIntrinsicWidth(0))
-            assertEquals(40.dp.toIntPx(), minIntrinsicHeight(0))
-            assertEquals(30.dp.toIntPx(), maxIntrinsicWidth(0))
-            assertEquals(60.dp.toIntPx(), maxIntrinsicHeight(0))
+            assertEquals(30.dp.roundToPx(), minIntrinsicWidth(0))
+            assertEquals(40.dp.roundToPx(), minIntrinsicHeight(0))
+            assertEquals(30.dp.roundToPx(), maxIntrinsicWidth(0))
+            assertEquals(60.dp.roundToPx(), maxIntrinsicHeight(0))
         }
     }
 
@@ -463,10 +463,10 @@ class IntrinsicTest : LayoutTest() {
                 10.dp, 20.dp, 30.dp, 40.dp, 50.dp, 60.dp
             )
         }) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
-            assertEquals(10.dp.toIntPx(), minIntrinsicWidth(0))
-            assertEquals(60.dp.toIntPx(), minIntrinsicHeight(0))
-            assertEquals(30.dp.toIntPx(), maxIntrinsicWidth(0))
-            assertEquals(60.dp.toIntPx(), maxIntrinsicHeight(0))
+            assertEquals(10.dp.roundToPx(), minIntrinsicWidth(0))
+            assertEquals(60.dp.roundToPx(), minIntrinsicHeight(0))
+            assertEquals(30.dp.roundToPx(), maxIntrinsicWidth(0))
+            assertEquals(60.dp.roundToPx(), maxIntrinsicHeight(0))
         }
     }
 }
@@ -483,15 +483,15 @@ private fun FixedIntrinsicsBox(
 ) {
     Layout(
         {},
-        minIntrinsicWidthMeasureBlock = { _, _ -> minIntrinsicWidth.toIntPx() },
-        minIntrinsicHeightMeasureBlock = { _, _ -> minIntrinsicHeight.toIntPx() },
-        maxIntrinsicWidthMeasureBlock = { _, _ -> maxIntrinsicWidth.toIntPx() },
-        maxIntrinsicHeightMeasureBlock = { _, _ -> maxIntrinsicHeight.toIntPx() },
+        minIntrinsicWidthMeasureBlock = { _, _ -> minIntrinsicWidth.roundToPx() },
+        minIntrinsicHeightMeasureBlock = { _, _ -> minIntrinsicHeight.roundToPx() },
+        maxIntrinsicWidthMeasureBlock = { _, _ -> maxIntrinsicWidth.roundToPx() },
+        maxIntrinsicHeightMeasureBlock = { _, _ -> maxIntrinsicHeight.roundToPx() },
         modifier = modifier
     ) { _, constraints ->
         layout(
-            constraints.constrainWidth(width.toIntPx()),
-            constraints.constrainHeight(height.toIntPx())
+            constraints.constrainWidth(width.roundToPx()),
+            constraints.constrainHeight(height.roundToPx())
         ) {}
     }
 }
