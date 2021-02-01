@@ -89,7 +89,7 @@ fun SemanticsNodeInteraction.captureToImage(): ImageBitmap {
     // Now these are bounds in window
     nodeBoundsRect.offset(x, y)
 
-    return captureRegionToImage(nodeBoundsRect, view, windowToUse)
+    return captureRegionToImage(testContext, nodeBoundsRect, view, windowToUse)
 }
 
 private fun findDialogWindowProviderInParent(view: View): DialogWindowProvider? {
@@ -101,21 +101,4 @@ private fun findDialogWindowProviderInParent(view: View): DialogWindowProvider? 
         return findDialogWindowProviderInParent(parent)
     }
     return null
-}
-
-/**
- * Captures the underlying view's surface into bitmap.
- *
- * This has currently several limitations. Currently we assume that the view is hosted in
- * Activity's window. Also if there is another window covering part of the component if won't occur
- * in the bitmap as this is taken from the component's window surface.
- */
-@RequiresApi(Build.VERSION_CODES.O)
-fun View.captureToImage(): ImageBitmap {
-    val locationInWindow = intArrayOf(0, 0)
-    getLocationInWindow(locationInWindow)
-    val x = locationInWindow[0]
-    val y = locationInWindow[1]
-    val boundsInWindow = android.graphics.Rect(x, y, x + width, y + height)
-    return captureRegionToImage(boundsInWindow, this)
 }
