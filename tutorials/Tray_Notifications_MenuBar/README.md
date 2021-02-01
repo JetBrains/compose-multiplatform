@@ -15,15 +15,15 @@ You can add an application icon to the system tray. You can also send notificati
 ```kotlin
 import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.Window
-import androidx.compose.material.Text
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Text
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onActive
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.MenuItem
 import androidx.compose.ui.window.Tray
-import androidx.compose.ui.Modifier
 import java.awt.Color
 import java.awt.image.BufferedImage
 
@@ -32,7 +32,7 @@ fun main() {
     Window(
         icon = getMyAppIcon()
     ) {
-        onActive {
+        DisposableEffect(Unit) {
             val tray = Tray().apply {
                 icon(getTrayIcon())
                 menu(
@@ -71,7 +71,7 @@ fun main() {
     }
 }
 
-fun getMyAppIcon() : BufferedImage {
+fun getMyAppIcon(): BufferedImage {
     val size = 256
     val image = BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB)
     val graphics = image.createGraphics()
@@ -85,7 +85,7 @@ fun getMyAppIcon() : BufferedImage {
     return image
 }
 
-fun getTrayIcon() : BufferedImage {
+fun getTrayIcon(): BufferedImage {
     val size = 256
     val image = BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB)
     val graphics = image.createGraphics()

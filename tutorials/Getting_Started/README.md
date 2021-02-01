@@ -61,8 +61,8 @@ Then create `build.gradle.kts` with the following content:
 import org.jetbrains.compose.compose
 
 plugins {
-    kotlin("jvm") version "1.4.20"
-    id("org.jetbrains.compose") version "0.2.0-build132"
+    kotlin("jvm") version "1.4.21-2"
+    id("org.jetbrains.compose") version "0.3.0-build146"
 }
 
 repositories {

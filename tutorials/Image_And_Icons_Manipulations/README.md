@@ -21,6 +21,7 @@ fun main() {
     Window {
         Image(
             bitmap = imageResource("sample.png"), // ImageBitmap
+            contentDescription = "Sample",
             modifier = Modifier.fillMaxSize()
         )
     }
@@ -49,6 +50,7 @@ fun main() {
         val image = remember { imageFromFile(File("sample.png")) }
         Image(
             bitmap = image,
+            contentDescription = "Sample",
             modifier = Modifier.fillMaxSize()
         )
     }
@@ -172,6 +174,7 @@ fun main() {
         val imageAsset = remember { asImageAsset(image) }
         Image(
             bitmap = imageAsset,
+            contentDescription = "Icon",
             modifier = Modifier.fillMaxSize()
         )
     }
@@ -223,6 +226,7 @@ fun main() {
         val imageAsset = remember { asImageAsset(image) }
         Image(
             bitmap = imageAsset,
+            contentDescription = "Icon",
             modifier = Modifier.fillMaxSize()
         )
     }
@@ -264,7 +268,7 @@ import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.Window
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.onActive
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -279,7 +283,7 @@ import javax.imageio.ImageIO
 fun main() {
     val image = getWindowIcon()
     Window {
-        onActive {
+        DisposableEffect(Unit) {
             val tray = Tray().apply {
                 icon(getWindowIcon())
                 menu(
@@ -297,6 +301,7 @@ fun main() {
         val imageAsset = asImageAsset(image)
         Image(
             bitmap = imageAsset,
+            contentDescription = "Icon",
             modifier = Modifier.fillMaxSize()
         )
     }
@@ -355,6 +360,7 @@ fun main() {
     Window {
         Image(
             imageVector = vectorXmlResource("images/compose-logo.xml"),
+            contentDescription = "Compose logo",
             modifier = Modifier.fillMaxSize()
         )
     }
