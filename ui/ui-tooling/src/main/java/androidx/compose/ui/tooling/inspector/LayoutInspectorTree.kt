@@ -20,9 +20,8 @@ import android.view.View
 import androidx.compose.runtime.CompositionData
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.GraphicLayerInfo
 import androidx.compose.ui.layout.LayoutInfo
-import androidx.compose.ui.node.LayoutNode
-import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.tooling.R
 import androidx.compose.ui.tooling.data.Group
 import androidx.compose.ui.tooling.data.NodeGroup
@@ -144,21 +143,21 @@ class LayoutInspectorTree {
         return when (trees.size) {
             0 -> listOf()
             1 -> addTree(mutableListOf(), trees.single())
-            else -> stitchTreesByLayoutNode(trees)
+            else -> stitchTreesByLayoutInfo(trees)
         }
     }
 
     /**
-     * Stitch separate trees together using the [LayoutNode]s found in the [CompositionData]s.
+     * Stitch separate trees together using the [LayoutInfo]s found in the [CompositionData]s.
      *
      * Some constructs in Compose (e.g. ModalDrawerLayout) will result is multiple
      * [CompositionData]s. This code will attempt to stitch the resulting [InspectorNode] trees
-     * together by looking at the parent of each [LayoutNode].
+     * together by looking at the parent of each [LayoutInfo].
      *
      * If this algorithm is successful the result of this function will be a list with a single
      * tree.
      */
-    private fun stitchTreesByLayoutNode(trees: List<MutableInspectorNode>): List<InspectorNode> {
+    private fun stitchTreesByLayoutInfo(trees: List<MutableInspectorNode>): List<InspectorNode> {
         val layoutToTreeMap = IdentityHashMap<LayoutInfo, MutableInspectorNode>()
         trees.forEach { tree -> tree.layoutNodes.forEach { layoutToTreeMap[it] = tree } }
         trees.forEach { tree ->
@@ -395,7 +394,7 @@ class LayoutInspectorTree {
     private fun getRenderNode(group: Group): Long =
         group.modifierInfo.asSequence()
             .map { it.extra }
-            .filterIsInstance<OwnedLayer>()
+            .filterIsInstance<GraphicLayerInfo>()
             .map { it.layerId }
             .firstOrNull() ?: 0
 

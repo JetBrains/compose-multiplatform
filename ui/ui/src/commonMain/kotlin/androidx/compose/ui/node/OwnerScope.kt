@@ -22,7 +22,7 @@ package androidx.compose.ui.node
  *
  * @see Owner.observeReads
  */
-interface OwnerScope {
+internal interface OwnerScope {
     /**
      * `true` when the scope is still in the hierarchy and `false` once it has been removed and
      * observations are no longer necessary.
