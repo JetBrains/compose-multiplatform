@@ -225,9 +225,8 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
             ImeAction.Search -> EditorInfo.IME_ACTION_SEARCH
             ImeAction.Send -> EditorInfo.IME_ACTION_SEND
             ImeAction.Done -> EditorInfo.IME_ACTION_DONE
-            else -> throw IllegalArgumentException(
-                "Unknown ImeAction: ${imeOptions.imeAction}"
-            )
+            // Note: Don't use an else in this when block. These are specified explicitly so
+            // that we don't forget to update this when imeActions are added/removed.
         }
         when (imeOptions.keyboardType) {
             KeyboardType.Text -> outInfo.inputType = InputType.TYPE_CLASS_TEXT
@@ -250,9 +249,8 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
                 outInfo.inputType =
                     InputType.TYPE_CLASS_NUMBER or EditorInfo.TYPE_NUMBER_VARIATION_PASSWORD
             }
-            else -> throw IllegalArgumentException(
-                "Unknown KeyboardType: ${imeOptions.keyboardType}"
-            )
+            // Note: Don't use an else in this when block. These are specified explicitly so
+            // that we don't forget to update this when keyboardTypes are added/removed.
         }
 
         if (!imeOptions.singleLine) {
