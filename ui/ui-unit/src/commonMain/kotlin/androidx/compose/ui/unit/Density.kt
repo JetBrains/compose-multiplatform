@@ -74,7 +74,7 @@ interface Density {
     @Stable
     @Deprecated(
         "toIntPx was renamed to roundToPx.",
-        ReplaceWith("roundToPx", "androidx.compose.ui.unit.roundToPx")
+        ReplaceWith("roundToPx()", "androidx.compose.ui.unit.roundToPx")
     )
     fun Dp.toIntPx() = roundToPx()
 
