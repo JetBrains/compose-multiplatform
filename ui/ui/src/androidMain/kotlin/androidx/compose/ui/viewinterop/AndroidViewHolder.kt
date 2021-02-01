@@ -44,8 +44,7 @@ import kotlin.math.roundToInt
  */
 // Opt in snapshot observing APIs.
 @OptIn(ExperimentalComposeApi::class)
-@InternalInteropApi
-abstract class AndroidViewHolder(context: Context) : ViewGroup(context) {
+internal abstract class AndroidViewHolder(context: Context) : ViewGroup(context) {
     init {
         clipChildren = false
     }
@@ -261,18 +260,6 @@ abstract class AndroidViewHolder(context: Context) : ViewGroup(context) {
         }
     }
 }
-
-@RequiresOptIn(
-    level = RequiresOptIn.Level.ERROR,
-    message = "This is an experimental API for Compose UI LayoutNode and is likely to change " +
-        "before becoming stable."
-)
-@Target(
-    AnnotationTarget.CLASS,
-    AnnotationTarget.FUNCTION,
-    AnnotationTarget.PROPERTY
-)
-annotation class InternalInteropApi
 
 private fun View.layoutAccordingTo(layoutNode: LayoutNode) {
     val position = layoutNode.coordinates.positionInRoot()

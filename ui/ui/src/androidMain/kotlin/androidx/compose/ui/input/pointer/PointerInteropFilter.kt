@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.viewinterop.AndroidViewHolder
-import androidx.compose.ui.viewinterop.InternalInteropApi
 
 /**
  * A special PointerInputModifier that provides access to the underlying [MotionEvent]s originally
@@ -88,7 +87,6 @@ class RequestDisallowInterceptTouchEvent : (Boolean) -> Unit {
  * Similar to the 2 argument overload of [pointerInteropFilter], but connects
  * directly to an [AndroidViewHolder] for more seamless interop with Android.
  */
-@OptIn(InternalInteropApi::class)
 internal fun Modifier.pointerInteropFilter(view: AndroidViewHolder): Modifier {
     val filter = PointerInteropFilter()
     filter.onTouchEvent = { motionEvent ->
