@@ -59,7 +59,7 @@ package androidx.compose.foundation {
   }
 
   @androidx.compose.runtime.Stable public interface Indication {
-    method public androidx.compose.foundation.IndicationInstance createInstance();
+    method @androidx.compose.runtime.Composable public androidx.compose.foundation.IndicationInstance createInstance();
   }
 
   public interface IndicationInstance {
@@ -68,8 +68,8 @@ package androidx.compose.foundation {
   }
 
   public final class IndicationKt {
-    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<kotlin.jvm.functions.Function0<androidx.compose.foundation.Indication>>! getAmbientIndication();
-    method public static androidx.compose.runtime.ProvidableCompositionLocal<kotlin.jvm.functions.Function0<androidx.compose.foundation.Indication>> getLocalIndication();
+    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.foundation.Indication>! getAmbientIndication();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.foundation.Indication> getLocalIndication();
     method public static androidx.compose.ui.Modifier indication(androidx.compose.ui.Modifier, androidx.compose.foundation.InteractionState interactionState, optional androidx.compose.foundation.Indication? indication);
   }
 
