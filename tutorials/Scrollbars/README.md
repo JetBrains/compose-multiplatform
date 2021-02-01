@@ -10,29 +10,29 @@ You can apply scrollbars to scrollable components. The scrollbar and scrollable 
 
 ```kotlin
 import androidx.compose.desktop.Window
-import androidx.compose.foundation.background
 import androidx.compose.foundation.HorizontalScrollbar
+import androidx.compose.foundation.VerticalScrollbar
+import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.ScrollableColumn
-import androidx.compose.foundation.ScrollableRow
+import androidx.compose.foundation.rememberScrollbarAdapter
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
-import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 
 fun main() {
     Window(title = "Scrollbars", size = IntSize(250, 400)) {
@@ -44,18 +44,18 @@ fun main() {
             val stateVertical = rememberScrollState(0f)
             val stateHorizontal = rememberScrollState(0f)
 
-            ScrollableColumn(
-                modifier = Modifier.fillMaxSize()
-                    .padding(end = 12.dp, bottom = 12.dp),
-                scrollState = stateVertical
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(stateVertical)
+                    .padding(end = 12.dp, bottom = 12.dp)
+                    .horizontalScroll(stateHorizontal)
             ) {
-                ScrollableRow(scrollState = stateHorizontal) {
-                    Column {
-                        for (item in 0..30) {
-                            TextBox("Item in ScrollableColumn #$item")
-                            if (item < 30) {
-                                Spacer(modifier = Modifier.height(5.dp))
-                            }
+                Column {
+                    for (item in 0..30) {
+                        TextBox("Item in ScrollableColumn #$item")
+                        if (item < 30) {
+                            Spacer(modifier = Modifier.height(5.dp))
                         }
                     }
                 }
@@ -97,20 +97,26 @@ You can use scrollbars with lazy scrollable components, for example, LazyColumn.
 
 ```kotlin
 import androidx.compose.desktop.Window
-import androidx.compose.foundation.background
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.VerticalScrollbar
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollbarAdapter
-import androidx.compose.foundation.Text
-import androidx.compose.foundation.VerticalScrollbar
-import androidx.compose.foundation.layout.*
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 
 fun main() {
     Window(title = "Scrollbars", size = IntSize(250, 400)) {
@@ -131,7 +137,7 @@ fun LazyScrollable() {
         val itemCount = 1000
 
         LazyColumn(Modifier.fillMaxSize().padding(end = 12.dp), state) {
-            items((1..itemCount).toList()) { x ->
+            items(itemCount) { x ->
                 TextBox("Item in ScrollableColumn #$x")
                 Spacer(modifier = Modifier.height(5.dp))
             }

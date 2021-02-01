@@ -39,8 +39,8 @@ You can see an example of both types of window below.
 
 ```kotlin
 import androidx.compose.desktop.Window
-import androidx.compose.foundation.Text
 import androidx.compose.material.Button
+import androidx.compose.material.Text
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.window.Dialog
