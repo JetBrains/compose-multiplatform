@@ -1,6 +1,6 @@
 # M3
-   * Fix [Ambients are not transferred across pop ups](https://github.com/JetBrains/compose-jb/issues/135)
    * Support [vsync](https://github.com/JetBrains/skiko/pull/44)
+   * Fix [Ambients are not transferred across pop ups](https://github.com/JetBrains/compose-jb/issues/135)
    * Fix [Laggy UI on Linux](https://github.com/JetBrains/compose-jb/issues/23)
 
 # M2 (Dec 2020)
