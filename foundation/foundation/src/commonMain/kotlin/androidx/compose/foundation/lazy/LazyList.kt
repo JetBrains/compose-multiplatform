@@ -16,8 +16,8 @@
 
 package androidx.compose.foundation.lazy
 
-import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.assertNotNestingScrollableContainers
+import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
@@ -36,10 +36,10 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 
-internal class ItemContent(
-    val key: Any,
+internal interface ItemContent {
+    val key: Any
     val content: @Composable() () -> Unit
-)
+}
 
 @Composable
 internal fun LazyList(
@@ -76,8 +76,10 @@ internal fun LazyList(
     val reverseScrollDirection = if (!isVertical && isRtl) reverseLayout else !reverseLayout
 
     val restorableItemContent = wrapWithStateRestoration(itemContent)
-    val cachingItemContentFactory = remember { CachingItemContentFactory(restorableItemContent) }
-    cachingItemContentFactory.itemContentFactory = restorableItemContent
+    val cachingItemContentFactory = remember {
+        CachingItemContentFactory(restorableItemContent, itemsCount)
+    }
+    cachingItemContentFactory.update(restorableItemContent, itemsCount, state)
 
     SubcomposeLayout(
         modifier
@@ -184,8 +186,11 @@ internal fun wrapWithStateRestoration(
         { index ->
             val content = itemContentFactory.invoke(this, index)
             // we just wrap our original lambda with the one which auto restores the state
-            ItemContent(content.key) {
-                saveableStateHolder.SaveableStateProvider(content.key, content.content)
+            object : ItemContent {
+                override val key = content.key
+                override val content = @Composable {
+                    saveableStateHolder.SaveableStateProvider(content.key, content.content)
+                }
             }
         }
     }

@@ -166,6 +166,26 @@ class LazyCustomKeysTest {
         }
 
         rule.runOnIdle {
+            list = listOf(MyClass(1))
+        }
+
+        assertItems("1")
+    }
+
+    @Test
+    fun keepingOneItemAndAddingMore() {
+        var list by mutableStateOf(listOf(MyClass(0), MyClass(1), MyClass(2)))
+        var counter = 0
+
+        rule.setContent {
+            LazyColumn {
+                items(list, key = { it.id }) {
+                    Item(remember { counter++ }.toString())
+                }
+            }
+        }
+
+        rule.runOnIdle {
             list = listOf(MyClass(1), MyClass(3))
         }
 

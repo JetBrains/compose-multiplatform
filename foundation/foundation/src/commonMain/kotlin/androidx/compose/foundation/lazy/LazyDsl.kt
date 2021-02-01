@@ -155,10 +155,10 @@ private class LazyListScopeImpl : LazyListScope {
         val localIntervalIndex = index - interval.startIndex
         val key = interval.content.key?.invoke(localIntervalIndex)
 
-        return ItemContent(
-            key = key ?: "[DefaultKeyForIndex=$index]",
-            content = interval.content.content.invoke(scope, localIntervalIndex)
-        )
+        return object : ItemContent {
+            override val key = key ?: "[DefaultKeyForIndex=$index]"
+            override val content = interval.content.content.invoke(scope, localIntervalIndex)
+        }
     }
 
     override fun items(

@@ -17,11 +17,11 @@
 package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.interaction.InteractionSource
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.ScrollableState
+import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
@@ -121,6 +121,11 @@ class LazyListState constructor(
      * The same as [firstVisibleItemScrollOffset] but the read will not trigger remeasure.
      */
     internal val firstVisibleItemScrollOffsetNonObservable: Int get() = scrollPosition.scrollOffset
+
+    /**
+     * Non-observable way of getting the last visible item index.
+     */
+    internal var lastVisibleItemIndexNonObservable: DataIndex = DataIndex(0)
 
     /**
      * Needed for [animateScrollToItem].  Updated on every measure.
@@ -270,6 +275,9 @@ class LazyListState constructor(
             index = measureResult.firstVisibleItemIndex,
             scrollOffset = measureResult.firstVisibleItemScrollOffset,
             canScrollForward = measureResult.canScrollForward
+        )
+        lastVisibleItemIndexNonObservable = DataIndex(
+            measureResult.visibleItemsInfo.lastOrNull()?.index ?: 0
         )
         scrollToBeConsumed -= measureResult.consumedScroll
         layoutInfoState.value = measureResult
