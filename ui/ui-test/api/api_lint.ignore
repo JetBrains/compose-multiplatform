@@ -1,0 +1,3 @@
+// Baseline format: 1.0
+GetterSetterNames: androidx.compose.ui.test.MainTestClock#getAutoAdvance():
+    Symmetric method for `setAutoAdvance` must be named `isAutoAdvance`; was `getAutoAdvance`
