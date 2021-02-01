@@ -25,7 +25,6 @@ import android.view.ViewParent
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNode.LayoutState.NeedsRemeasure
 import androidx.compose.ui.viewinterop.AndroidViewHolder
-import androidx.compose.ui.viewinterop.InternalInteropApi
 
 /**
  * Used by [AndroidComposeView] to handle the Android [View]s attached to its hierarchy.
@@ -70,7 +69,6 @@ internal class AndroidViewsHandler(context: Context) : ViewGroup(context) {
         layoutNode.keys.forEach { it.layout(it.left, it.top, it.right, it.bottom) }
     }
 
-    @OptIn(InternalInteropApi::class)
     fun drawView(view: AndroidViewHolder, canvas: Canvas) {
         // The canvas is already translated by the Compose logic. But the position of the
         // AndroidViewHolder is also set on it inside the AndroidViewsHandler, for correct
