@@ -2,8 +2,8 @@
 package androidx.compose.material {
 
   public final class AlertDialogKt {
-    method @androidx.compose.runtime.Composable public static void AlertDialog-1J9gtOE(kotlin.jvm.functions.Function0<kotlin.Unit> onDismissRequest, kotlin.jvm.functions.Function0<kotlin.Unit> confirmButton, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function0<kotlin.Unit>? dismissButton, optional kotlin.jvm.functions.Function0<kotlin.Unit>? title, optional kotlin.jvm.functions.Function0<kotlin.Unit>? text, optional androidx.compose.ui.graphics.Shape shape, optional long backgroundColor, optional long contentColor, optional androidx.compose.ui.window.DialogProperties? properties);
-    method @androidx.compose.runtime.Composable public static void AlertDialog-EyAH5Rg(kotlin.jvm.functions.Function0<kotlin.Unit> onDismissRequest, kotlin.jvm.functions.Function0<kotlin.Unit> buttons, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function0<kotlin.Unit>? title, optional kotlin.jvm.functions.Function0<kotlin.Unit>? text, optional androidx.compose.ui.graphics.Shape shape, optional long backgroundColor, optional long contentColor, optional androidx.compose.ui.window.DialogProperties? properties);
+    method @androidx.compose.runtime.Composable public static void AlertDialog--HzSArw(kotlin.jvm.functions.Function0<kotlin.Unit> onDismissRequest, kotlin.jvm.functions.Function0<kotlin.Unit> confirmButton, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function0<kotlin.Unit>? dismissButton, optional kotlin.jvm.functions.Function0<kotlin.Unit>? title, optional kotlin.jvm.functions.Function0<kotlin.Unit>? text, optional androidx.compose.ui.graphics.Shape shape, optional long backgroundColor, optional long contentColor, optional androidx.compose.ui.window.DialogProperties properties);
+    method @androidx.compose.runtime.Composable public static void AlertDialog-PPVLV-g(kotlin.jvm.functions.Function0<kotlin.Unit> onDismissRequest, kotlin.jvm.functions.Function0<kotlin.Unit> buttons, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function0<kotlin.Unit>? title, optional kotlin.jvm.functions.Function0<kotlin.Unit>? text, optional androidx.compose.ui.graphics.Shape shape, optional long backgroundColor, optional long contentColor, optional androidx.compose.ui.window.DialogProperties properties);
   }
 
   public final class AppBarKt {
@@ -395,7 +395,7 @@ package androidx.compose.material {
   }
 
   public final class MenuKt {
-    method @androidx.compose.runtime.Composable public static void DropdownMenu-YJGdngw(boolean expanded, kotlin.jvm.functions.Function0<kotlin.Unit> onDismissRequest, optional androidx.compose.ui.Modifier modifier, optional long offset, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static void DropdownMenu-jyMeD6A(boolean expanded, kotlin.jvm.functions.Function0<kotlin.Unit> onDismissRequest, optional androidx.compose.ui.Modifier modifier, optional long offset, optional androidx.compose.ui.window.PopupProperties properties, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit> content);
     method @androidx.compose.runtime.Composable public static void DropdownMenuItem(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.InteractionState interactionState, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 

@@ -82,7 +82,7 @@ fun AlertDialog(
     shape: Shape = MaterialTheme.shapes.medium,
     backgroundColor: Color = MaterialTheme.colors.surface,
     contentColor: Color = contentColorFor(backgroundColor),
-    properties: DialogProperties? = null
+    properties: DialogProperties = DialogProperties()
 ) {
     AlertDialog(
         onDismissRequest = onDismissRequest,
@@ -143,7 +143,7 @@ fun AlertDialog(
     shape: Shape = MaterialTheme.shapes.medium,
     backgroundColor: Color = MaterialTheme.colors.surface,
     contentColor: Color = contentColorFor(backgroundColor),
-    properties: DialogProperties? = null
+    properties: DialogProperties = DialogProperties()
 ) {
     Dialog(
         onDismissRequest = onDismissRequest,
