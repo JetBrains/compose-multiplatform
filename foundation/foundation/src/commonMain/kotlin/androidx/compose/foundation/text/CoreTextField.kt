@@ -33,6 +33,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
@@ -48,6 +49,7 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalFontLoader
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalTextInputService
@@ -140,6 +142,9 @@ import kotlin.math.roundToInt
  * @param maxLines The maximum height in terms of maximum number of visible lines. Should be
  * equal or greater than 1.
  * @param imeOptions Contains different IME configuration options.
+ * @param keyboardActions When the input service emits an IME action, the corresponding callback
+ * is called. Note that this IME action may be different from what you specified in
+ * [KeyboardOptions.imeAction].
  * @param enabled controls the enabled state of the text field. When `false`, the text
  * field will be neither editable nor focusable, the input of the text field will not be selectable
  * @param readOnly controls the editable state of the [CoreTextField]. When `true`, the text
@@ -163,6 +168,7 @@ internal fun CoreTextField(
     onValueChange: (TextFieldValue) -> Unit,
     modifier: Modifier = Modifier,
     textStyle: TextStyle = TextStyle.Default,
+    // TODO(b/179071523): Deprecate and remove onImeActionPerformed.
     onImeActionPerformed: (ImeAction) -> Unit = {},
     visualTransformation: VisualTransformation = VisualTransformation.None,
     onTextLayout: (TextLayoutResult) -> Unit = {},
@@ -172,6 +178,7 @@ internal fun CoreTextField(
     softWrap: Boolean = true,
     maxLines: Int = Int.MAX_VALUE,
     imeOptions: ImeOptions = ImeOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
     enabled: Boolean = true,
     readOnly: Boolean = false,
     decorationBox: @Composable (innerTextField: @Composable () -> Unit) -> Unit =
@@ -188,6 +195,7 @@ internal fun CoreTextField(
     val density = LocalDensity.current
     val resourceLoader = LocalFontLoader.current
     val selectionBackgroundColor = LocalTextSelectionColors.current.backgroundColor
+    val focusManager = LocalFocusManager.current
 
     // Scroll state
     val singleLine = maxLines == 1 && !softWrap && imeOptions.singleLine
@@ -227,6 +235,8 @@ internal fun CoreTextField(
         resourceLoader,
         onValueChange,
         onImeActionPerformed,
+        keyboardActions,
+        focusManager,
         selectionBackgroundColor
     )
 
@@ -234,8 +244,11 @@ internal fun CoreTextField(
         state.onValueChange(it)
         scope.invalidate()
     }
-    val onImeActionPerformedWrapper: (ImeAction) -> Unit = {
-        state.onImeActionPerformed(it)
+    val onImeActionPerformedWrapper: (ImeAction) -> Unit = { imeAction ->
+        state.keyboardActionRunner.runAction(imeAction)
+
+        // TODO(b/179071523): Deprecate and remove onImeActionPerformed.
+        state.onImeActionPerformed(imeAction)
     }
 
     state.processor.onNewState(value, textInputService, state.inputSession)
@@ -575,12 +588,15 @@ internal class TextFieldState(
     var onImeActionPerformed: (ImeAction) -> Unit = {}
         private set
 
+    val keyboardActionRunner: KeyboardActionRunner = KeyboardActionRunner()
+
     var onValueChange: (TextFieldValue) -> Unit = {}
         private set
 
     /** The paint used to draw highlight background for selected text. */
     val selectionPaint: Paint = Paint()
 
+    // TODO(ralu): Replace this function with a TextFieldState.apply{ ... } at the call site.
     fun update(
         visualText: AnnotatedString,
         textStyle: TextStyle,
@@ -589,11 +605,17 @@ internal class TextFieldState(
         resourceLoader: Font.ResourceLoader,
         onValueChange: (TextFieldValue) -> Unit,
         onImeActionPerformed: (ImeAction) -> Unit,
+        keyboardActions: KeyboardActions,
+        focusManager: FocusManager,
         selectionBackgroundColor: Color
     ) {
         this.onValueChange = onValueChange
         this.onImeActionPerformed = onImeActionPerformed
         this.selectionPaint.color = selectionBackgroundColor
+        this.keyboardActionRunner.apply {
+            this.keyboardActions = keyboardActions
+            this.focusManager = focusManager
+        }
 
         textDelegate = updateTextDelegate(
             current = textDelegate,
