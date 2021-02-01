@@ -116,15 +116,15 @@ actual annotation class CheckResult(actual val suggest: String)
  * obtained using [LaunchedEffect] or [rememberCoroutineScope] they also use
  * [MonotonicFrameClock] which is bound to the current window.
  */
-actual val DefaultMonotonicFrameClock: MonotonicFrameClock by lazy {
-    object : MonotonicFrameClock {
-        private val fps = 60
+actual val DefaultMonotonicFrameClock: MonotonicFrameClock get() = SixtyFpsMonotonicFrameClock
 
-        override suspend fun <R> withFrameNanos(
-            onFrame: (Long) -> R
-        ): R {
-            delay(1000L / fps)
-            return onFrame(System.nanoTime())
-        }
+private object SixtyFpsMonotonicFrameClock : MonotonicFrameClock {
+    private const val fps = 60
+
+    override suspend fun <R> withFrameNanos(
+        onFrame: (Long) -> R
+    ): R {
+        delay(1000L / fps)
+        return onFrame(System.nanoTime())
     }
 }
