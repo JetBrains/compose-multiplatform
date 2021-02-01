@@ -20,17 +20,11 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.currentComposer
-import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.materialize
-import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.node.UiApplier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.viewbinding.ViewBinding
 
 /**
@@ -52,54 +46,22 @@ import androidx.viewbinding.ViewBinding
  */
 @Composable
 fun <T : ViewBinding> AndroidViewBinding(
-    bindingBlock: (LayoutInflater, ViewGroup, Boolean) -> T,
+    bindingBlock: (inflater: LayoutInflater, parent: ViewGroup, attachToParent: Boolean) -> T,
     modifier: Modifier = Modifier,
     update: T.() -> Unit = {}
 ) {
-    val context = LocalContext.current
-    val materialized = currentComposer.materialize(modifier)
-    val density = LocalDensity.current
-
-    val viewBindingHolderRef = remember { Ref<ViewBindingHolder<T>>() }
-    ComposeNode<LayoutNode, UiApplier>(
-        factory = {
-            val viewBindingHolder = ViewBindingHolder<T>(context)
-            viewBindingHolder.bindingBlock = bindingBlock
-            viewBindingHolderRef.value = viewBindingHolder
-            viewBindingHolder.toLayoutNode()
-        },
-        update = {
-            set(materialized) { viewBindingHolderRef.value!!.modifier = it }
-            set(density) { viewBindingHolderRef.value!!.density = it }
-            set(update) { viewBindingHolderRef.value!!.updateBlock = it }
+    val viewBindingRef = remember { Ref<T>() }
+    val viewBlock: (Context) -> View = remember {
+        { context ->
+            val inflater = LayoutInflater.from(context)
+            val viewBinding = bindingBlock(inflater, FrameLayout(context), false)
+            viewBindingRef.value = viewBinding
+            viewBinding.root
         }
+    }
+    AndroidView(
+        viewBlock = viewBlock,
+        modifier = modifier,
+        update = { viewBindingRef.value?.update() }
     )
-}
-
-@OptIn(InternalInteropApi::class)
-internal class ViewBindingHolder<T : ViewBinding>(
-    context: Context
-) : AndroidViewHolder(context) {
-    private var viewBinding: T? = null
-        set(value) {
-            field = value
-            if (value != null) {
-                view = value.root
-            }
-        }
-
-    internal var bindingBlock: ((LayoutInflater, ViewGroup, Boolean) -> T)? = null
-        set(value) {
-            field = value
-            if (value != null) {
-                val layoutParamsParent = (parent as? ViewGroup) ?: this
-                viewBinding = value(LayoutInflater.from(context), layoutParamsParent, false)
-            }
-        }
-
-    internal var updateBlock: (T) -> Unit = {}
-        set(value) {
-            field = value
-            update = { viewBinding?.apply(updateBlock) }
-        }
 }

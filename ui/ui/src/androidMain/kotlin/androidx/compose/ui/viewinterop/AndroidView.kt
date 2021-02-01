@@ -78,7 +78,6 @@ fun <T : View> AndroidView(
  */
 val NoOpUpdate: View.() -> Unit = {}
 
-@OptIn(InternalInteropApi::class)
 internal class ViewBlockHolder<T : View>(
     context: Context
 ) : AndroidViewHolder(context) {

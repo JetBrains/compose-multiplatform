@@ -23,7 +23,6 @@ import androidx.compose.runtime.AbstractApplier
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.viewinterop.AndroidViewHolder
-import androidx.compose.ui.viewinterop.InternalInteropApi
 import androidx.compose.ui.viewinterop.ViewBlockHolder
 
 class UiApplier(root: Any) : AbstractApplier<Any>(root) {
@@ -69,7 +68,6 @@ class UiApplier(root: Any) : AbstractApplier<Any>(root) {
                     is View -> {
                         // Wrap the instance in an AndroidViewHolder, unless the instance
                         // itself is already one.
-                        @OptIn(InternalInteropApi::class)
                         val androidViewHolder =
                             if (instance is AndroidViewHolder) {
                                 instance
@@ -79,7 +77,6 @@ class UiApplier(root: Any) : AbstractApplier<Any>(root) {
                                 }
                             }
 
-                        @OptIn(InternalInteropApi::class)
                         parent.insertAt(index, androidViewHolder.toLayoutNode())
                     }
                     is LayoutNode -> parent.insertAt(index, instance)

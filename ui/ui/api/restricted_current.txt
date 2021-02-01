@@ -2835,22 +2835,6 @@ package androidx.compose.ui.text.input {
 
 package androidx.compose.ui.viewinterop {
 
-  @androidx.compose.ui.viewinterop.InternalInteropApi public abstract class AndroidViewHolder extends android.view.ViewGroup {
-    ctor public AndroidViewHolder(android.content.Context context);
-    method public final androidx.compose.ui.unit.Density getDensity();
-    method public final androidx.compose.ui.Modifier getModifier();
-    method public final kotlin.jvm.functions.Function0<kotlin.Unit> getUpdate();
-    method public final android.view.View? getView();
-    method public final void setDensity(androidx.compose.ui.unit.Density value);
-    method public final void setModifier(androidx.compose.ui.Modifier value);
-    method protected final void setUpdate(kotlin.jvm.functions.Function0<kotlin.Unit> value);
-    method public final androidx.compose.ui.node.LayoutNode toLayoutNode();
-    property public final androidx.compose.ui.unit.Density density;
-    property public final androidx.compose.ui.Modifier modifier;
-    property public final kotlin.jvm.functions.Function0<kotlin.Unit> update;
-    property public final android.view.View? view;
-  }
-
   public final class AndroidViewHolderKt {
   }
 
@@ -2862,9 +2846,6 @@ package androidx.compose.ui.viewinterop {
   public final class EmitViewKt {
     method @Deprecated @androidx.compose.runtime.Composable public static <T extends android.view.View> void emitView(kotlin.jvm.functions.Function1<? super android.content.Context,? extends T> ctor, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> update);
     method @Deprecated @androidx.compose.runtime.Composable public static <T extends android.view.ViewGroup> void emitView(kotlin.jvm.functions.Function1<? super android.content.Context,? extends T> ctor, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> update, kotlin.jvm.functions.Function0<kotlin.Unit> children);
-  }
-
-  @kotlin.RequiresOptIn(level=kotlin.RequiresOptIn.Level, message="This is an experimental API for Compose UI LayoutNode and is likely to change " + "before becoming stable.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface InternalInteropApi {
   }
 
   public final class ViewModelKt {

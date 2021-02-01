@@ -92,7 +92,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.util.trace
 import androidx.compose.ui.viewinterop.AndroidViewHolder
-import androidx.compose.ui.viewinterop.InternalInteropApi
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -376,7 +375,6 @@ internal class AndroidComposeView(context: Context) :
      * Called to inform the owner that a new Android [View] was [attached][Owner.onAttach]
      * to the hierarchy.
      */
-    @OptIn(InternalInteropApi::class)
     fun addAndroidView(view: AndroidViewHolder, layoutNode: LayoutNode) {
         androidViewsHandler.layoutNode[view] = layoutNode
         androidViewsHandler.addView(view)
@@ -386,7 +384,6 @@ internal class AndroidComposeView(context: Context) :
      * Called to inform the owner that an Android [View] was [detached][Owner.onDetach]
      * from the hierarchy.
      */
-    @OptIn(InternalInteropApi::class)
     fun removeAndroidView(view: AndroidViewHolder) {
         androidViewsHandler.removeView(view)
         androidViewsHandler.layoutNode.remove(view)
@@ -395,7 +392,6 @@ internal class AndroidComposeView(context: Context) :
     /**
      * Called to ask the owner to draw a child Android [View] to [canvas].
      */
-    @OptIn(InternalInteropApi::class)
     fun drawAndroidView(view: AndroidViewHolder, canvas: android.graphics.Canvas) {
         androidViewsHandler.drawView(view, canvas)
     }
