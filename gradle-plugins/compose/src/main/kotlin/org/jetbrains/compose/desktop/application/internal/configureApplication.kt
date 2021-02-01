@@ -210,7 +210,7 @@ internal fun AbstractJPackageTask.configurePlatformSettings(app: Application) {
             app.nativeDistributions.macOS.also { mac ->
                 macPackageName.set(provider { mac.packageName })
                 macBundleID.set(provider { mac.bundleID })
-                macSignSetting.set(provider { mac.signSettings })
+                macSignSetting.set(provider { mac.signingSettings })
                 iconFile.set(mac.iconFile)
             }
         }

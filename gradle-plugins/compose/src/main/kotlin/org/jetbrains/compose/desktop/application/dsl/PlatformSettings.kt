@@ -23,10 +23,10 @@ open class MacOSPlatformSettings @Inject constructor(objects: ObjectFactory): Pl
      */
     var bundleID: String? = null
 
-    internal var signSettings: MacOSSigningSettings? = null
+    internal var signingSettings: MacOSSigningSettings? = null
     fun signing(fn: Action<MacOSSigningSettings>) {
-        check(signSettings == null) { "Signing is already configured" }
-        signSettings = MacOSSigningSettings().also {
+        check(signingSettings == null) { "Signing is already configured" }
+        signingSettings = MacOSSigningSettings().also {
             fn.execute(it)
             checkNotNull(it.identity)
         }
