@@ -41,14 +41,6 @@ expect class AtomicReference<V>(value: V) {
 }
 
 @MustBeDocumented
-@Retention(AnnotationRetention.BINARY)
-@Target(
-    AnnotationTarget.FUNCTION,
-    AnnotationTarget.CONSTRUCTOR
-)
-expect annotation class MainThread()
-
-@MustBeDocumented
 @Retention(AnnotationRetention.SOURCE)
 @Target(
     AnnotationTarget.FUNCTION,

@@ -35,8 +35,6 @@ internal actual object Trace {
     }
 }
 
-internal actual typealias MainThread = androidx.annotation.MainThread
-
 internal actual typealias CheckResult = androidx.annotation.CheckResult
 
 /**

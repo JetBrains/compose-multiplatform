@@ -87,7 +87,6 @@ actual fun resetSourceInfo() {
 }
 
 // TODO(igotti): do we need actual processing for those?
-actual annotation class MainThread()
 actual annotation class CheckResult(actual val suggest: String)
 
 /**
