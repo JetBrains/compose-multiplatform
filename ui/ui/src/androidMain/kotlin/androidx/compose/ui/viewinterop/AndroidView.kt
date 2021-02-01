@@ -19,9 +19,11 @@ package androidx.compose.ui.viewinterop
 import android.content.Context
 import android.view.View
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.ComposeNode
+import androidx.compose.runtime.CompositionReference
+import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCompositionReference
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.materialize
 import androidx.compose.ui.node.LayoutNode
@@ -29,6 +31,8 @@ import androidx.compose.ui.node.Ref
 import androidx.compose.ui.node.UiApplier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 
 /**
  * Composes an Android [View] obtained from [viewBlock]. The [viewBlock] block will be called
@@ -55,11 +59,12 @@ fun <T : View> AndroidView(
     val context = LocalContext.current
     val materialized = currentComposer.materialize(modifier)
     val density = LocalDensity.current
-
+    val layoutDirection = LocalLayoutDirection.current
+    val parentReference = rememberCompositionReference()
     val viewBlockHolderRef = remember { Ref<ViewBlockHolder<T>>() }
     ComposeNode<LayoutNode, UiApplier>(
         factory = {
-            val viewBlockHolder = ViewBlockHolder<T>(context)
+            val viewBlockHolder = ViewBlockHolder<T>(context, parentReference)
             viewBlockHolder.viewBlock = viewBlock
             viewBlockHolderRef.value = viewBlockHolder
             viewBlockHolder.toLayoutNode()
@@ -69,6 +74,12 @@ fun <T : View> AndroidView(
             set(materialized) { viewBlockHolderRef.value!!.modifier = it }
             set(density) { viewBlockHolderRef.value!!.density = it }
             set(update) { viewBlockHolderRef.value!!.updateBlock = it }
+            set(layoutDirection) {
+                viewBlockHolderRef.value!!.layoutDirection = when (it) {
+                    LayoutDirection.Ltr -> android.util.LayoutDirection.LTR
+                    LayoutDirection.Rtl -> android.util.LayoutDirection.RTL
+                }
+            }
         }
     )
 }
@@ -79,8 +90,10 @@ fun <T : View> AndroidView(
 val NoOpUpdate: View.() -> Unit = {}
 
 internal class ViewBlockHolder<T : View>(
-    context: Context
-) : AndroidViewHolder(context) {
+    context: Context,
+    parentReference: CompositionReference? = null
+) : AndroidViewHolder(context, parentReference) {
+
     private var typedView: T? = null
 
     var viewBlock: ((Context) -> T)? = null

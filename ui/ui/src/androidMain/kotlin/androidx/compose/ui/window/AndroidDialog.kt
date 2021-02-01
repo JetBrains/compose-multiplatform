@@ -42,10 +42,12 @@ import androidx.compose.ui.R
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.semantics.dialog
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
@@ -139,8 +141,15 @@ internal actual fun ActualDialog(
         }
     }
 
+    val layoutDirection = LocalLayoutDirection.current
     SideEffect {
         dialog.onDismissRequest = onDismissRequest
+        dialog.setLayoutDirection(
+            when (layoutDirection) {
+                LayoutDirection.Ltr -> android.util.LayoutDirection.LTR
+                LayoutDirection.Rtl -> android.util.LayoutDirection.RTL
+            }
+        )
         dialog.setProperties(properties)
     }
 }
@@ -240,6 +249,10 @@ private class DialogWrapper(
             dialogLayout,
             ViewTreeSavedStateRegistryOwner.get(composeView)
         )
+    }
+
+    fun setLayoutDirection(layoutDirection: Int) {
+        dialogLayout.layoutDirection = layoutDirection
     }
 
     // TODO(b/159900354): Make the Android Dialog full screen and the scrim fully transparent

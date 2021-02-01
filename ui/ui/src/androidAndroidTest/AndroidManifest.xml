@@ -15,7 +15,9 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="androidx.compose.ui">
-    <application>
+    <application
+        android:supportsRtl="true"
+        >
         <activity
             android:name="androidx.compose.ui.test.TestActivity"
             android:theme="@android:style/Theme.Material.NoActionBar.Fullscreen" />

@@ -34,6 +34,9 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.ExperimentalComposeApi
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.AndroidAutofill
@@ -278,7 +281,10 @@ internal class AndroidComposeView(context: Context) :
 
     override val fontLoader: Font.ResourceLoader = AndroidFontResourceLoader(context)
 
-    override var layoutDirection = context.resources.configuration.localeLayoutDirection
+    // Backed by mutableStateOf so that the ambient provider recomposes when it changes
+    override var layoutDirection by mutableStateOf(
+        context.resources.configuration.localeLayoutDirection
+    )
         private set
 
     /**
@@ -711,8 +717,11 @@ internal class AndroidComposeView(context: Context) :
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         density = Density(context)
-        layoutDirection = context.resources.configuration.localeLayoutDirection
         configurationChangeObserver(newConfig)
+    }
+
+    override fun onRtlPropertiesChanged(layoutDirection: Int) {
+        this.layoutDirection = layoutDirectionFromInt(layoutDirection)
     }
 
     private fun autofillSupported() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
@@ -776,10 +785,10 @@ internal val Configuration.localeLayoutDirection: LayoutDirection
     // be resolved since the composables may be composed without attaching to the RootViewImpl.
     // In Jetpack Compose, use the locale layout direction (i.e. layoutDirection came from
     // configuration) as a default layout direction.
-    get() = when (layoutDirection) {
-        android.util.LayoutDirection.LTR -> LayoutDirection.Ltr
-        android.util.LayoutDirection.RTL -> LayoutDirection.Rtl
-        // Configuration#getLayoutDirection should only return a resolved layout direction, LTR
-        // or RTL. Fallback to LTR for unexpected return value.
-        else -> LayoutDirection.Ltr
-    }
+    get() = layoutDirectionFromInt(layoutDirection)
+
+private fun layoutDirectionFromInt(layoutDirection: Int): LayoutDirection = when (layoutDirection) {
+    android.util.LayoutDirection.LTR -> LayoutDirection.Ltr
+    android.util.LayoutDirection.RTL -> LayoutDirection.Rtl
+    else -> LayoutDirection.Ltr
+}

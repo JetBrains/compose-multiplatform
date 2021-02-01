@@ -47,6 +47,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.semantics.popup
 import androidx.compose.ui.semantics.semantics
@@ -149,6 +150,7 @@ internal actual fun ActualPopup(
     }
 
     DisposableEffect(popupLayout) {
+        popupLayout.show()
         onDispose {
             popupLayout.disposeComposition()
             // Remove the window
@@ -156,10 +158,17 @@ internal actual fun ActualPopup(
         }
     }
 
+    val layoutDirection = LocalLayoutDirection.current
     SideEffect {
         popupLayout.apply {
             this.onDismissRequest = onDismissRequest
             this.testTag = testTag
+            this.superSetLayoutDirection(
+                when (layoutDirection) {
+                    LayoutDirection.Ltr -> android.util.LayoutDirection.LTR
+                    LayoutDirection.Rtl -> android.util.LayoutDirection.RTL
+                }
+            )
             setIsFocusable(isFocusable)
             setProperties(properties)
         }
@@ -284,8 +293,6 @@ private class PopupLayout(
                 result.alpha = 0f
             }
         }
-
-        windowManager.addView(this, params)
     }
 
     private var content: @Composable () -> Unit by mutableStateOf({})
@@ -293,11 +300,14 @@ private class PopupLayout(
     override var shouldCreateCompositionOnAttachedToWindow: Boolean = false
         private set
 
+    fun show() {
+        windowManager.addView(this, params)
+    }
+
     fun setContent(parent: CompositionReference, content: @Composable () -> Unit) {
         setParentCompositionReference(parent)
         this.content = content
         shouldCreateCompositionOnAttachedToWindow = true
-        createComposition()
     }
 
     @Composable
@@ -418,6 +428,17 @@ private class PopupLayout(
         }
 
         return super.onTouchEvent(event)
+    }
+
+    override fun setLayoutDirection(layoutDirection: Int) {
+        // Do nothing. ViewRootImpl will call this method attempting to set the layout direction
+        // from the context's locale, but we have one already from the parent composition.
+    }
+
+    // Called by composition side effect to set the "real" layout direction for our content
+    // that we obtain from the parent composition.
+    fun superSetLayoutDirection(layoutDirection: Int) {
+        super.setLayoutDirection(layoutDirection)
     }
 
     /**
