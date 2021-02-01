@@ -51,6 +51,7 @@ if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 
         androidTestImplementation project(":compose:ui:ui-graphics:ui-graphics-samples")
         androidTestImplementation project(":compose:ui:ui-test-junit4")
+        androidTestImplementation project(":compose:test-utils")
         androidTestImplementation(ANDROIDX_TEST_RULES)
         androidTestImplementation(ANDROIDX_TEST_RUNNER)
         androidTestImplementation(ESPRESSO_CORE)
@@ -97,6 +98,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             androidAndroidTest.dependencies {
                 implementation project(":compose:ui:ui-graphics:ui-graphics-samples")
                 implementation project(":compose:ui:ui-test-junit4")
+                implementation project(":compose:test-utils")
                 implementation(ANDROIDX_TEST_RULES)
                 implementation(ANDROIDX_TEST_RUNNER)
                 implementation(ESPRESSO_CORE)
