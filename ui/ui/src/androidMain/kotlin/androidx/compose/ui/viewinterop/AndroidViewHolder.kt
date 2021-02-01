@@ -20,6 +20,7 @@ import android.content.Context
 import android.os.Looper
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.CompositionReference
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.snapshots.SnapshotStateObserver
 import androidx.compose.ui.Modifier
@@ -34,9 +35,11 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.platform.AndroidComposeView
+import androidx.compose.ui.platform.compositionReference
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import kotlin.math.roundToInt
+
 /**
  * A base class used to host a [View] inside Compose.
  * This API is not designed to be used directly, but rather using the [AndroidView] and
@@ -44,9 +47,19 @@ import kotlin.math.roundToInt
  */
 // Opt in snapshot observing APIs.
 @OptIn(ExperimentalComposeApi::class)
-internal abstract class AndroidViewHolder(context: Context) : ViewGroup(context) {
+internal abstract class AndroidViewHolder(
+    context: Context,
+    parentReference: CompositionReference?
+) : ViewGroup(context) {
     init {
         clipChildren = false
+
+        // Any [Abstract]ComposeViews that are descendants of this view will host
+        // subcompositions of the host composition.
+        // UiApplier doesn't supply this, only AndroidView.
+        parentReference?.let {
+            compositionReference = it
+        }
     }
 
     /**
@@ -117,9 +130,7 @@ internal abstract class AndroidViewHolder(context: Context) : ViewGroup(context)
     @OptIn(ExperimentalComposeApi::class)
     private val runUpdate: () -> Unit = {
         if (hasUpdateBlock) {
-            snapshotObserver.observeReads(this, onCommitAffectingUpdate) {
-                update()
-            }
+            snapshotObserver.observeReads(this, onCommitAffectingUpdate, update)
         }
     }
 

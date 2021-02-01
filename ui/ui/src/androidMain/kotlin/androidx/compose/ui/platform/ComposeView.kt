@@ -237,6 +237,14 @@ abstract class AbstractComposeView @JvmOverloads constructor(
         )
     }
 
+    override fun onRtlPropertiesChanged(layoutDirection: Int) {
+        // Force the single child for our composition to have the same LayoutDirection
+        // that we do. We will get onRtlPropertiesChanged eagerly as the value changes,
+        // but the composition child view won't until it measures. This can be too late
+        // to catch the composition pass for that frame, so propagate it eagerly.
+        getChildAt(0)?.layoutDirection = layoutDirection
+    }
+
     // Below: enforce restrictions on adding child views to this ViewGroup
 
     override fun addView(child: View?) {
