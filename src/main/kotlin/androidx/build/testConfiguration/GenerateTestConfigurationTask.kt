@@ -119,6 +119,11 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
             }
         } else if (testProjectPath.get().endsWith("macrobenchmark")) {
             configBuilder.tag("macrobenchmarks")
+        } else {
+            configBuilder.tag("androidx_unit_tests")
+            if (project.path.contains(":compose:")) {
+                configBuilder.tag("compose")
+            }
         }
         val testApk = testLoader.get().load(testFolder.get())
             ?: throw RuntimeException("Cannot load required APK for task: $name")
