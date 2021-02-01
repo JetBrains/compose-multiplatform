@@ -64,128 +64,126 @@ import kotlin.math.min
 /**
  * A Material Design [dropdown menu](https://material.io/components/menus#dropdown-menu).
  *
- * The menu has a [toggle], which is the element generating the menu. For example, this can be
- * an icon which, when tapped, triggers the menu.
- * The content of the [DropdownMenu] can be [DropdownMenuItem]s, as well as custom content.
- * [DropdownMenuItem] can be used to achieve items as defined by the Material Design spec.
+ * A [DropdownMenu] behaves similarly to a [Popup], and will use the position of the parent layout
+ * to position itself on screen. Commonly a [DropdownMenu] will be placed in a [Box] with a sibling
+ * that will be used as the 'anchor'. Note that a [DropdownMenu] by itself will not take up any
+ * space in a layout, as the menu is displayed in a separate window, on top of other content.
+ *
+ * The [content] of a [DropdownMenu] will typically be [DropdownMenuItem]s, as well as custom
+ * content. Using [DropdownMenuItem]s will result in a menu that matches the Material
+ * specification for menus.
+ *
  * [onDismissRequest] will be called when the menu should close - for example when there is a
  * tap outside the menu, or when the back key is pressed.
- * The menu will do a best effort to be fully visible on screen. It will try to expand
- * horizontally, depending on layout direction, to the end of the [toggle], then to the start of
- * the [toggle], and then screen end-aligned. Vertically, it will try to expand to the bottom
- * of the [toggle], then from the top of the [toggle], and then screen top-aligned. A
- * [dropdownOffset] can be provided to adjust the positioning of the menu for cases when the
- * layout bounds of the [toggle] do not coincide with its visual bounds. Note the offset will be
- * applied in the direction in which the menu will decide to expand.
+ *
+ * [DropdownMenu] changes its positioning depending on the available space, always trying to be
+ * fully visible. It will try to expand horizontally, depending on layout direction, to the end of
+ * its parent, then to the start of its parent, and then screen end-aligned. Vertically, it will
+ * try to expand to the bottom of its parent, then from the top of its parent, and then screen
+ * top-aligned. An [offset] can be provided to adjust the positioning of the menu for cases when
+ * the layout bounds of its parent do not coincide with its visual bounds. Note the offset will
+ * be applied in the direction in which the menu will decide to expand.
  *
  * Example usage:
  * @sample androidx.compose.material.samples.MenuSample
  *
- * @param toggle The element generating the menu
- * @param expanded Whether the menu is currently open or dismissed
- * @param onDismissRequest Called when the menu should be dismiss
- * @param toggleModifier The modifier to be applied to the toggle
- * @param dropdownOffset Offset to be added to the position of the menu
- * @param dropdownModifier Modifier to be applied to the menu content
+ * @param expanded Whether the menu is currently open and visible to the user
+ * @param onDismissRequest Called when the user requests to dismiss the menu, such as by
+ * tapping outside the menu's bounds
+ * @param offset [DpOffset] to be added to the position of the menu
  */
 @Suppress("ModifierParameter")
 @Composable
 fun DropdownMenu(
-    toggle: @Composable () -> Unit,
     expanded: Boolean,
     onDismissRequest: () -> Unit,
-    toggleModifier: Modifier = Modifier,
-    dropdownOffset: DpOffset = DpOffset(0.dp, 0.dp),
-    dropdownModifier: Modifier = Modifier,
-    dropdownContent: @Composable ColumnScope.() -> Unit
+    modifier: Modifier = Modifier,
+    offset: DpOffset = DpOffset(0.dp, 0.dp),
+    content: @Composable ColumnScope.() -> Unit
 ) {
     val expandedStates = remember { MutableTransitionState(false) }
     expandedStates.targetState = expanded
 
-    Box(toggleModifier) {
-        toggle()
+    if (expandedStates.currentState || expandedStates.targetState) {
+        val transformOriginState = remember { mutableStateOf(TransformOrigin.Center) }
+        val density = LocalDensity.current
+        val popupPositionProvider = DropdownMenuPositionProvider(
+            offset,
+            density
+        ) { parentBounds, menuBounds ->
+            transformOriginState.value = calculateTransformOrigin(parentBounds, menuBounds)
+        }
 
-        if (expandedStates.currentState || expandedStates.targetState) {
-            val transformOriginState = remember { mutableStateOf(TransformOrigin.Center) }
-            val density = LocalDensity.current
-            val popupPositionProvider = DropdownMenuPositionProvider(
-                dropdownOffset,
-                density
-            ) { parentBounds, menuBounds ->
-                transformOriginState.value = calculateTransformOrigin(parentBounds, menuBounds)
+        Popup(
+            isFocusable = true,
+            onDismissRequest = onDismissRequest,
+            popupPositionProvider = popupPositionProvider
+        ) {
+            // Menu open/close animation.
+            val transition = updateTransition(expandedStates, "DropDownMenu")
+
+            val scale by transition.animateFloat(
+                transitionSpec = {
+                    if (false isTransitioningTo true) {
+                        // Dismissed to expanded
+                        tween(
+                            durationMillis = InTransitionDuration,
+                            easing = LinearOutSlowInEasing
+                        )
+                    } else {
+                        // Expanded to dismissed.
+                        tween(
+                            durationMillis = 1,
+                            delayMillis = OutTransitionDuration - 1
+                        )
+                    }
+                }
+            ) {
+                if (it) {
+                    // Menu is expanded.
+                    1f
+                } else {
+                    // Menu is dismissed.
+                    0.8f
+                }
             }
 
-            Popup(
-                isFocusable = true,
-                onDismissRequest = onDismissRequest,
-                popupPositionProvider = popupPositionProvider
+            val alpha by transition.animateFloat(
+                transitionSpec = {
+                    if (false isTransitioningTo true) {
+                        // Dismissed to expanded
+                        tween(durationMillis = 30)
+                    } else {
+                        // Expanded to dismissed.
+                        tween(durationMillis = OutTransitionDuration)
+                    }
+                }
             ) {
-                // Menu open/close animation.
-                val transition = updateTransition(expandedStates, "DropDownMenu")
-
-                val scale by transition.animateFloat(
-                    transitionSpec = {
-                        if (false isTransitioningTo true) {
-                            // Dismissed to expanded
-                            tween(
-                                durationMillis = InTransitionDuration,
-                                easing = LinearOutSlowInEasing
-                            )
-                        } else {
-                            // Expanded to dismissed.
-                            tween(
-                                durationMillis = 1,
-                                delayMillis = OutTransitionDuration - 1
-                            )
-                        }
-                    }
-                ) {
-                    if (it) {
-                        // Menu is expanded.
-                        1f
-                    } else {
-                        // Menu is dismissed.
-                        0.8f
-                    }
+                if (it) {
+                    // Menu is expanded.
+                    1f
+                } else {
+                    // Menu is dismissed.
+                    0f
                 }
-
-                val alpha by transition.animateFloat(
-                    transitionSpec = {
-                        if (false isTransitioningTo true) {
-                            // Dismissed to expanded
-                            tween(durationMillis = 30)
-                        } else {
-                            // Expanded to dismissed.
-                            tween(durationMillis = OutTransitionDuration)
-                        }
-                    }
-                ) {
-                    if (it) {
-                        // Menu is expanded.
-                        1f
-                    } else {
-                        // Menu is dismissed.
-                        0f
-                    }
-                }
-                Card(
-                    modifier = Modifier.graphicsLayer {
-                        scaleX = scale
-                        scaleY = scale
-                        this.alpha = alpha
-                        transformOrigin = transformOriginState.value
-                    },
-                    elevation = MenuElevation
-                ) {
-                    @OptIn(ExperimentalLayout::class)
-                    Column(
-                        modifier = dropdownModifier
-                            .padding(vertical = DropdownMenuVerticalPadding)
-                            .preferredWidth(IntrinsicSize.Max)
-                            .verticalScroll(rememberScrollState()),
-                        content = dropdownContent
-                    )
-                }
+            }
+            Card(
+                modifier = Modifier.graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
+                    this.alpha = alpha
+                    transformOrigin = transformOriginState.value
+                },
+                elevation = MenuElevation
+            ) {
+                @OptIn(ExperimentalLayout::class)
+                Column(
+                    modifier = modifier
+                        .padding(vertical = DropdownMenuVerticalPadding)
+                        .preferredWidth(IntrinsicSize.Max)
+                        .verticalScroll(rememberScrollState()),
+                    content = content
+                )
             }
         }
     }

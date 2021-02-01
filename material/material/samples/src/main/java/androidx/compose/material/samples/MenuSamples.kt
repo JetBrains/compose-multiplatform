@@ -17,6 +17,7 @@
 package androidx.compose.material.samples
 
 import androidx.annotation.Sampled
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.Divider
@@ -40,26 +41,24 @@ import androidx.compose.ui.Modifier
 fun MenuSample() {
     var expanded by remember { mutableStateOf(false) }
 
-    val iconButton = @Composable {
+    Box(modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.TopStart)) {
         IconButton(onClick = { expanded = true }) {
             Icon(Icons.Default.MoreVert, contentDescription = "Localized description")
         }
-    }
-    DropdownMenu(
-        expanded = expanded,
-        onDismissRequest = { expanded = false },
-        toggle = iconButton,
-        toggleModifier = Modifier.fillMaxSize().wrapContentSize(Alignment.TopStart)
-    ) {
-        DropdownMenuItem(onClick = { /* Handle refresh! */ }) {
-            Text("Refresh")
-        }
-        DropdownMenuItem(onClick = { /* Handle settings! */ }) {
-            Text("Settings")
-        }
-        Divider()
-        DropdownMenuItem(onClick = { /* Handle send feedback! */ }) {
-            Text("Send Feedback")
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            DropdownMenuItem(onClick = { /* Handle refresh! */ }) {
+                Text("Refresh")
+            }
+            DropdownMenuItem(onClick = { /* Handle settings! */ }) {
+                Text("Settings")
+            }
+            Divider()
+            DropdownMenuItem(onClick = { /* Handle send feedback! */ }) {
+                Text("Send Feedback")
+            }
         }
     }
 }

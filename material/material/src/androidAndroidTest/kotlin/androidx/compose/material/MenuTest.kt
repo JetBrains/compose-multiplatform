@@ -61,15 +61,14 @@ class MenuTest {
         var expanded by mutableStateOf(false)
 
         rule.setContent {
-            DropdownMenu(
-                expanded = expanded,
-                toggle = {
-                    Box(Modifier.size(20.dp).background(color = Color.Blue))
-                },
-                onDismissRequest = {}
-            ) {
-                DropdownMenuItem(modifier = Modifier.testTag("MenuContent"), onClick = {}) {
-                    Text("Option 1")
+            Box(Modifier.size(20.dp).background(color = Color.Blue)) {
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = {}
+                ) {
+                    DropdownMenuItem(modifier = Modifier.testTag("MenuContent"), onClick = {}) {
+                        Text("Option 1")
+                    }
                 }
             }
         }
@@ -103,15 +102,14 @@ class MenuTest {
     fun menu_hasExpectedSize() {
         rule.setContent {
             with(LocalDensity.current) {
-                DropdownMenu(
-                    expanded = true,
-                    toggle = {
-                        Box(Modifier.size(20.toDp()).background(color = Color.Blue))
-                    },
-                    onDismissRequest = {}
-                ) {
-                    Box(Modifier.testTag("MenuContent1").preferredSize(70.toDp()))
-                    Box(Modifier.testTag("MenuContent2").preferredSize(130.toDp()))
+                Box(Modifier.size(20.toDp()).background(color = Color.Blue)) {
+                    DropdownMenu(
+                        expanded = true,
+                        onDismissRequest = {}
+                    ) {
+                        Box(Modifier.testTag("MenuContent1").preferredSize(70.toDp()))
+                        Box(Modifier.testTag("MenuContent2").preferredSize(130.toDp()))
+                    }
                 }
             }
         }
@@ -303,18 +301,19 @@ class MenuTest {
             onSurface = MaterialTheme.colors.onSurface
             enabledContentAlpha = ContentAlpha.high
             disabledContentAlpha = ContentAlpha.disabled
-            DropdownMenu(
-                toggle = { Box(Modifier.size(20.dp)) },
-                onDismissRequest = {},
-                expanded = true
-            ) {
-                DropdownMenuItem(onClick = {}) {
-                    enabledContentColor = LocalContentColor.current
-                        .copy(alpha = LocalContentAlpha.current)
-                }
-                DropdownMenuItem(enabled = false, onClick = {}) {
-                    disabledContentColor = LocalContentColor.current
-                        .copy(alpha = LocalContentAlpha.current)
+            Box(Modifier.size(20.dp)) {
+                DropdownMenu(
+                    onDismissRequest = {},
+                    expanded = true
+                ) {
+                    DropdownMenuItem(onClick = {}) {
+                        enabledContentColor = LocalContentColor.current
+                            .copy(alpha = LocalContentAlpha.current)
+                    }
+                    DropdownMenuItem(enabled = false, onClick = {}) {
+                        disabledContentColor = LocalContentColor.current
+                            .copy(alpha = LocalContentAlpha.current)
+                    }
                 }
             }
         }
