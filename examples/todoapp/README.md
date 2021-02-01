@@ -1,6 +1,9 @@
-An example of Kotlin Multiplatform todo app with shared Jetpack Compose UI.
+An example of Kotlin Multiplatform todo app with shared Android/Desktop Compose UI and SwiftUI (not Compose) iOS.
 
-Supported targets: `Android` and `JVM`.
+This example supports the following targets: 
+- `Android` (Compose)
+- `JVM` (Compose)
+- `iOS` (SwiftUI, not Compose)
 
 Libraries used:
 - Jetpack Compose - shared UI
@@ -9,26 +12,31 @@ Libraries used:
 - [Reaktive](https://github.com/badoo/Reaktive) - background processing and data transformation
 - [SQLDelight](https://github.com/cashapp/sqldelight) - data storage
 
-There are multiple common modules:
-- `utils` - just some useful helpers
-- `database` - SQLDelight database definition
-- `main` - displays a list of todo items and a text field
-- `edit` - accepts an item id and allows editing
-- `root` - navigates between `main` and `edit` screens
+There are multiple modules:
+- `:common:utils` - just some useful helpers
+- `:common:database` - SQLDelight database definition
+- `:common:main` - displays a list of todo items and a text field
+- `:common:edit` - accepts an item id and allows editing
+- `:common:root` - navigates between `main` and `edit` screens
+- `:common:compose-ui` - Shared Compose UI for `main` and `edit` screens
+- `:android` - Android application
+- `:desktop` - Desktop application
+- `ios` - iOS Xcode project
 
-The `root` module is integrated into both Android and Desktop apps.
+The root module is integrated into Android, Desktop and iOS (non-Compose) apps.
 
 Features:
 - 99% of the code is shared: data, business logic, presentation, navigation and UI
 - View state is preserved when navigating between screens, Android configuration change, etc.
 - Model-View-Intent (aka MVI) architectural pattern
+- Pluggable UI - Compose UI for Android and Desktop, SwiftUI (not Compose) for iOS
 
 ### Running desktop application
 ```
 ./gradlew :desktop:run
 ```
 
-### Building native desktop distribution
+#### Building native desktop distribution
 ```
 ./gradlew :desktop:package
 # outputs are written to desktop/build/compose/binaries
@@ -37,5 +45,9 @@ Features:
 ### Running Android application
 
 Open project in Intellij IDEA or Android Studio and run "android" configuration.
+
+### Running iOS application
+
+Open and build the Xcode project located in `ios` folder.
 
 ![Desktop](screenshots/todo.png)
