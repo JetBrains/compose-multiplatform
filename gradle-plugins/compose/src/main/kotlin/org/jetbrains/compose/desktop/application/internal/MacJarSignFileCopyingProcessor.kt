@@ -23,12 +23,12 @@ internal class MacJarSignFileCopyingProcessor(
     init {
         check(currentOS == OS.MacOS) { "$currentOS is not compatible with ${this::class.java}" }
         check(bundleId != null) {
-            "Signing requires to specify unique application's identifier  (e.g. com.mycompany.myapp). Specify an identifier using DSL like so:\n" +
-            """|nativeExecutables {
+            """|Signing requires to specify unique application's identifier. Specify an identifier using DSL like so:
+               |nativeExecutables {
                |  macOS {
                |      bundleID = "com.mycompany.myapp"
                |  }
-               |bundleID may only contain alphanumeric characters (A-Z,a-z,0-9), hyphen (-) and period (.) characters}
+               |bundleID may only contain alphanumeric characters (A-Z,a-z,0-9), hyphen (-) and period (.) characters
                |""".trimMargin()
         }
         check(bundleId.matches("[A-Za-z0-9\\-\\.]+".toRegex())) {
