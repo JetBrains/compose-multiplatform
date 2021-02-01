@@ -19,14 +19,15 @@ package androidx.compose.ui.demos.gestures
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.rememberScrollableController
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +39,7 @@ import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.samples.NestedScrollDispatcherSample
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -54,11 +56,11 @@ fun NestedScrollingDemo() {
             "There are 3 fake vertical scrollers inside another vertical scroller.  Try " +
                 "scrolling with 1 or many fingers."
         )
-        Scrollable {
+        ScrollableContainer {
             RepeatingColumn(repetitions = 3) {
                 Box(Modifier.preferredHeight(398.dp).padding(72.dp)) {
                     // Inner composable that scrolls
-                    Scrollable {
+                    ScrollableContainer {
                         RepeatingColumn(repetitions = 5) {
                             // Composable that indicates it is being pressed
                             Pressable(
@@ -76,7 +78,7 @@ fun NestedScrollingDemo() {
  * A very simple ScrollView like implementation that allows for vertical scrolling.
  */
 @Composable
-private fun Scrollable(content: @Composable () -> Unit) {
+private fun ScrollableContainer(content: @Composable () -> Unit) {
     val offset = remember { mutableStateOf(0f) }
     val maxOffset = remember { mutableStateOf(0f) }
 
@@ -85,7 +87,7 @@ private fun Scrollable(content: @Composable () -> Unit) {
         modifier = Modifier
             .scrollable(
                 orientation = Orientation.Vertical,
-                controller = rememberScrollableController { scrollDistance ->
+                state = rememberScrollableState { scrollDistance ->
                     val resultingOffset = offset.value + scrollDistance
                     val dyToConsume =
                         when {
@@ -196,6 +198,21 @@ private fun RepeatingColumn(repetitions: Int, content: @Composable () -> Unit) {
                         .background(Color(0f, 0f, 0f, .12f))
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun NestedScrollDispatchDemo() {
+    LazyColumn {
+        items(5) {
+            Text("I'm text $it", modifier = Modifier.padding(16.dp))
+        }
+        item {
+            NestedScrollDispatcherSample()
+        }
+        items(30) {
+            Text("I'm text $it", modifier = Modifier.padding(16.dp))
         }
     }
 }

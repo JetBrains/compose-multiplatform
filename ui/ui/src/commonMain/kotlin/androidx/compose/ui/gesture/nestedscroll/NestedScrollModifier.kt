@@ -17,11 +17,13 @@
 package androidx.compose.ui.gesture.nestedscroll
 
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Velocity
+import kotlinx.coroutines.CoroutineScope
 
 /**
  * A [Modifier.Element] that represents nested scroll node in the hierarchy
@@ -100,7 +102,7 @@ interface NestedScrollConnection {
      *
      * @return the amount this connection wants to consume and take from the child
      */
-    fun onPreFling(available: Velocity): Velocity = Velocity.Zero
+    suspend fun onPreFling(available: Velocity): Velocity = Velocity.Zero
 
     /**
      * Post fling event chain. Called by the child when it is finished flinging (and sending
@@ -109,17 +111,10 @@ interface NestedScrollConnection {
      * @param consumed the amount of velocity consumed by the child
      * @param available the amount of velocity left for a parent to fling after the child (if
      * desired)
-     * @param onFinished callback to be called when this connection finished flinging, to
-     * be called with the amount of velocity consumed by the fling operation. This callback is
-     * crucial to be called in order to ensure nodes above will receive their [onPostFling].
+     * @return the amount of velocity consumed by the fling operation in this connection
      */
-    // TODO: remove notifySelfFinish when b/174485541
-    fun onPostFling(
-        consumed: Velocity,
-        available: Velocity,
-        onFinished: (Velocity) -> Unit
-    ) {
-        onFinished(Velocity.Zero)
+    suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+        return Velocity.Zero
     }
 }
 
@@ -139,6 +134,34 @@ interface NestedScrollConnection {
  * @see NestedScrollConnection to connect to the nested scroll system
  */
 class NestedScrollDispatcher {
+
+    internal var calculateNestedScrollScope: () -> CoroutineScope? = { null }
+
+    /**
+     * Get the outer coroutine scope to dispatch nested fling on.
+     *
+     * There might be situations when then component that is dispatching preFling or postFling to
+     * parent can be disposed together with its scope, so it's recommended to use launch nested
+     * fling dispatch using this scope to prevent abrupt scrolling user experience.
+     *
+     * **Note:** this scope is retrieved from the parent nestedScroll participants, unless the node
+     * knows its parent (which is usually after first composition commits), this will throw
+     * [IllegalStateException].
+     *
+     * @throws IllegalStateException when this field is accessed before the [nestedScroll] modifier
+     * with this [NestedScrollDispatcher] provided knows its nested scroll parent. Should be safe
+     * to access after the initial composition commits.
+     */
+    val coroutineScope: CoroutineScope
+        /**
+         * @throws IllegalStateException when this field is accessed before the [nestedScroll] modifier
+         * with this [NestedScrollDispatcher] provided knows its nested scroll parent. Should be safe
+         * to access after the initial composition commits.
+         */
+        get() = calculateNestedScrollScope.invoke() ?: throw IllegalStateException(
+            "in order to access nested coroutine scope you need to attach dispatcher to the " +
+                "`Modifier.nestedScroll` first."
+        )
 
     /**
      * Parent to be set when attached to nested scrolling chain. `null` is valid and means there no
@@ -181,7 +204,8 @@ class NestedScrollDispatcher {
     }
 
     /**
-     * Dispatch pre fling pass. This triggers [NestedScrollConnection.onPreFling] on all the
+     * Dispatch pre fling pass and suspend until all the interested participants performed
+     * velocity pre consumption. This triggers [NestedScrollConnection.onPreFling] on all the
      * ancestors giving them a possibility to react on the fling that is about to happen and
      * consume part of the velocity.
      *
@@ -190,20 +214,23 @@ class NestedScrollDispatcher {
      * @return total velocity that is pre-consumed by all ancestors in the chain. This velocity is
      * unavailable for this node to consume, so it should adjust the consumption accordingly
      */
-    fun dispatchPreFling(available: Velocity): Velocity {
+    suspend fun dispatchPreFling(available: Velocity): Velocity {
         return parent?.onPreFling(available) ?: Velocity.Zero
     }
 
     /**
-     * Dispatch post fling pass. This triggers [NestedScrollConnection.onPostFling] on all the
-     * ancestors, giving them possibility to react of the velocity that is left after the
-     * dispatching node itself flung with the desired amount.
+     * Dispatch post fling pass and suspend until all the interested participants performed
+     * velocity process. This triggers [NestedScrollConnection.onPostFling] on all the ancestors,
+     * giving them possibility to react of the velocity that is left after the dispatching node
+     * itself flung with the desired amount.
      *
      * @param consumed velocity already consumed by this node
      * @param available velocity that is left for ancestors to consume
+     *
+     * @return velocity that has been consumed by all the ancestors
      */
-    fun dispatchPostFling(consumed: Velocity, available: Velocity) {
-        parent?.onPostFling(consumed, available) {}
+    suspend fun dispatchPostFling(consumed: Velocity, available: Velocity): Velocity {
+        return parent?.onPostFling(consumed, available) ?: Velocity.Zero
     }
 }
 
@@ -234,11 +261,23 @@ enum class NestedScrollSource {
  * events dispatch is optional since there are cases when element wants to participate in the
  * nested scroll, but not a scrollable thing itself.
  *
- * Note: It is recommended to reuse [NestedScrollConnection] and [NestedScrollDispatcher] objects
+ * Here's the collapsing toolbar example that participates in a chain, but doesn't dispatch:
+ * @sample androidx.compose.ui.samples.NestedScrollConnectionSample
+ *
+ * On the other side, dispatch via [NestedScrollDispatcher] is optional. It's needed if a component
+ * is able to receive and react to the drag/fling events and you want this components to be able to
+ * notify parents when scroll occurs, resulting in better overall coordination.
+ *
+ * Here's the example of the component that is draggable and dispatches nested scroll to
+ * participate in the nested scroll chain:
+ * @sample androidx.compose.ui.samples.NestedScrollDispatcherSample
+ *
+ * **Note:** It is recommended to reuse [NestedScrollConnection] and [NestedScrollDispatcher]
+ * objects
  * between recompositions since different object will cause nested scroll graph to be
  * recalculated unnecessary.
  *
- * There are 4 main passes in nested scrolling system:
+ * There are 4 main phases in nested scrolling system:
  *
  * 1. Pre-scroll. This callback is triggered when the descendant is about to perform a scroll
  * operation and gives parent an opportunity to consume part of child's delta beforehand. This
@@ -266,9 +305,9 @@ enum class NestedScrollSource {
  * Parent must call `notifySelfFinish` callback in order to continue the propagation of the
  * velocity that is left to ancestors above.
  *
- * Example of the nested scrolling interaction where component both dispatches and consumed
- * children's delta:
- * @sample androidx.compose.ui.samples.NestedScrollSample
+ * [androidx.compose.foundation.lazy.LazyColumn], [androidx.compose.foundation.verticalScroll] and
+ * [androidx.compose.foundation.gestures.scrollable] have build in support for nested scrolling,
+ * however, it's desirable to be able to react and influence their scroll via nested scroll system.
  *
  * @param connection connection to the nested scroll system to participate in the event chaining,
  * receiving events when scrollable descendant is being scrolled.
@@ -285,11 +324,14 @@ fun Modifier.nestedScroll(
         properties["dispatcher"] = dispatcher
     }
 ) {
+    val scope = rememberCoroutineScope()
     // provide noop dispatcher if needed
     val resolvedDispatcher = dispatcher ?: remember { NestedScrollDispatcher() }
-    remember(connection, resolvedDispatcher) {
+    remember(connection, resolvedDispatcher, scope) {
         object : NestedScrollModifier {
-            override val dispatcher: NestedScrollDispatcher = resolvedDispatcher
+            override val dispatcher: NestedScrollDispatcher = resolvedDispatcher.also {
+                it.calculateNestedScrollScope = { scope }
+            }
             override val connection: NestedScrollConnection = connection
         }
     }

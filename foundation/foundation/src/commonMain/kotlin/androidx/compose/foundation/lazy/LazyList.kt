@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.lazy
 
+import androidx.compose.animation.core.DecayAnimationSpec
 import androidx.compose.foundation.assertNotNestingScrollableContainers
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
@@ -53,6 +54,8 @@ internal fun LazyList(
     reverseLayout: Boolean,
     /** The layout orientation of the list */
     isVertical: Boolean,
+    /** fling configuration for flinging */
+    flingSpec: DecayAnimationSpec<Float>?,
     /** The alignment to align items horizontally. Required when isVertical is true */
     horizontalAlignment: Alignment.Horizontal? = null,
     /** The vertical arrangement for items. Required when isVertical is true */
@@ -80,7 +83,9 @@ internal fun LazyList(
             .scrollable(
                 orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
                 reverseDirection = reverseScrollDirection,
-                controller = state.scrollableController
+                interactionState = state.interactionState,
+                flingSpec = flingSpec,
+                state = state
             )
             .clipToBounds()
             .padding(contentPadding)

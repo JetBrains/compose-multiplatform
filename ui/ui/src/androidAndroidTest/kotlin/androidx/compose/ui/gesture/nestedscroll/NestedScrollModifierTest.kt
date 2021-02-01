@@ -27,12 +27,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.minus
-import androidx.compose.ui.unit.plus
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
+import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -51,7 +50,7 @@ class NestedScrollModifierTest {
     private val postFlingLeft = Velocity(11f, 13f)
 
     @Test
-    fun nestedScroll_twoNodes_orderTest() {
+    fun nestedScroll_twoNodes_orderTest(): Unit = runBlocking {
         var counter = 0
         val childConnection = object : NestedScrollConnection {}
         val parentConnection = object : NestedScrollConnection {
@@ -71,19 +70,19 @@ class NestedScrollModifierTest {
                 return Offset.Zero
             }
 
-            override fun onPreFling(available: Velocity): Velocity {
+            override suspend fun onPreFling(available: Velocity): Velocity {
                 assertThat(counter).isEqualTo(5)
                 counter++
                 return Velocity.Zero
             }
 
-            override fun onPostFling(
+            override suspend fun onPostFling(
                 consumed: Velocity,
-                available: Velocity,
-                onFinished: (Velocity) -> Unit
-            ) {
+                available: Velocity
+            ): Velocity {
                 assertThat(counter).isEqualTo(7)
                 counter++
+                return available
             }
         }
         val childDispatcher = NestedScrollDispatcher()
@@ -95,27 +94,25 @@ class NestedScrollModifierTest {
             }
         }
 
-        rule.runOnIdle {
-            assertThat(counter).isEqualTo(0)
-            counter++
+        assertThat(counter).isEqualTo(0)
+        counter++
 
-            childDispatcher.dispatchPreScroll(preScrollOffset, NestedScrollSource.Drag)
-            assertThat(counter).isEqualTo(2)
-            counter++
+        childDispatcher.dispatchPreScroll(preScrollOffset, NestedScrollSource.Drag)
+        assertThat(counter).isEqualTo(2)
+        counter++
 
-            childDispatcher
-                .dispatchPostScroll(scrollOffset, scrollLeftOffset, NestedScrollSource.Drag)
-            assertThat(counter).isEqualTo(4)
-            counter++
+        childDispatcher
+            .dispatchPostScroll(scrollOffset, scrollLeftOffset, NestedScrollSource.Drag)
+        assertThat(counter).isEqualTo(4)
+        counter++
 
-            childDispatcher.dispatchPreFling(preFling)
-            assertThat(counter).isEqualTo(6)
-            counter++
+        childDispatcher.dispatchPreFling(preFling)
+        assertThat(counter).isEqualTo(6)
+        counter++
 
-            childDispatcher.dispatchPostFling(postFlingConsumed, postFlingLeft)
-            assertThat(counter).isEqualTo(8)
-            counter++
-        }
+        childDispatcher.dispatchPostFling(postFlingConsumed, postFlingLeft)
+        assertThat(counter).isEqualTo(8)
+        counter++
     }
 
     @Test
@@ -207,19 +204,19 @@ class NestedScrollModifierTest {
     }
 
     @Test
-    fun nestedScroll_NNodes_orderTest_preFling() {
+    fun nestedScroll_NNodes_orderTest_preFling(): Unit = runBlocking {
         var counter = 0
         val childConnection = object : NestedScrollConnection {}
         val parentConnection = object : NestedScrollConnection {
 
-            override fun onPreFling(available: Velocity): Velocity {
+            override suspend fun onPreFling(available: Velocity): Velocity {
                 assertThat(counter).isEqualTo(2)
                 counter++
                 return Velocity.Zero
             }
         }
         val grandParentConnection = object : NestedScrollConnection {
-            override fun onPreFling(available: Velocity): Velocity {
+            override suspend fun onPreFling(available: Velocity): Velocity {
                 assertThat(counter).isEqualTo(1)
                 counter++
                 return Velocity.Zero
@@ -236,40 +233,36 @@ class NestedScrollModifierTest {
             }
         }
 
-        rule.runOnIdle {
-            assertThat(counter).isEqualTo(0)
-            counter++
+        assertThat(counter).isEqualTo(0)
+        counter++
 
-            childDispatcher.dispatchPreFling(preFling)
-            assertThat(counter).isEqualTo(3)
-            counter++
-        }
+        childDispatcher.dispatchPreFling(preFling)
+        assertThat(counter).isEqualTo(3)
+        counter++
     }
 
     @Test
-    fun nestedScroll_NNodes_orderTest_fling() {
+    fun nestedScroll_NNodes_orderTest_fling(): Unit = runBlocking {
         var counter = 0
         val childConnection = object : NestedScrollConnection {}
         val parentConnection = object : NestedScrollConnection {
-            override fun onPostFling(
+            override suspend fun onPostFling(
                 consumed: Velocity,
-                available: Velocity,
-                onFinished: (Velocity) -> Unit
-            ) {
+                available: Velocity
+            ): Velocity {
                 assertThat(counter).isEqualTo(1)
                 counter++
-                onFinished.invoke(Velocity.Zero)
+                return Velocity.Zero
             }
         }
         val grandParentConnection = object : NestedScrollConnection {
-            override fun onPostFling(
+            override suspend fun onPostFling(
                 consumed: Velocity,
-                available: Velocity,
-                onFinished: (Velocity) -> Unit
-            ) {
+                available: Velocity
+            ): Velocity {
                 assertThat(counter).isEqualTo(2)
                 counter++
-                onFinished.invoke(Velocity.Zero)
+                return Velocity.Zero
             }
         }
         val childDispatcher = NestedScrollDispatcher()
@@ -283,19 +276,17 @@ class NestedScrollModifierTest {
             }
         }
 
-        rule.runOnIdle {
-            assertThat(counter).isEqualTo(0)
-            counter++
+        assertThat(counter).isEqualTo(0)
+        counter++
 
-            childDispatcher.dispatchPostFling(postFlingConsumed, postFlingLeft)
+        childDispatcher.dispatchPostFling(postFlingConsumed, postFlingLeft)
 
-            assertThat(counter).isEqualTo(3)
-            counter++
-        }
+        assertThat(counter).isEqualTo(3)
+        counter++
     }
 
     @Test
-    fun nestedScroll_twoNodes_hierarchyDispatch() {
+    fun nestedScroll_twoNodes_hierarchyDispatch(): Unit = runBlocking {
         val preScrollReturn = Offset(60f, 30f)
         val preFlingReturn = Velocity(154f, 56f)
         var currentsource = NestedScrollSource.Drag
@@ -319,18 +310,18 @@ class NestedScrollModifierTest {
                 return Offset.Zero
             }
 
-            override fun onPreFling(available: Velocity): Velocity {
+            override suspend fun onPreFling(available: Velocity): Velocity {
                 assertThat(available).isEqualTo(preFling)
                 return preFlingReturn
             }
 
-            override fun onPostFling(
+            override suspend fun onPostFling(
                 consumed: Velocity,
-                available: Velocity,
-                onFinished: (Velocity) -> Unit
-            ) {
+                available: Velocity
+            ): Velocity {
                 assertThat(consumed).isEqualTo(postFlingConsumed)
                 assertThat(available).isEqualTo(postFlingLeft)
+                return Velocity.Zero
             }
         }
         val childDispatcher = NestedScrollDispatcher()
@@ -342,27 +333,21 @@ class NestedScrollModifierTest {
             }
         }
 
-        rule.runOnIdle {
-            val preRes = childDispatcher.dispatchPreScroll(preScrollOffset, currentsource)
-            assertThat(preRes).isEqualTo(preScrollReturn)
+        val preRes1 = childDispatcher.dispatchPreScroll(preScrollOffset, currentsource)
+        assertThat(preRes1).isEqualTo(preScrollReturn)
 
-            childDispatcher.dispatchPostScroll(scrollOffset, scrollLeftOffset, currentsource)
-            // flip to fling to test again below
-            currentsource = NestedScrollSource.Fling
-        }
+        childDispatcher.dispatchPostScroll(scrollOffset, scrollLeftOffset, currentsource)
+        // flip to fling to test again below
+        currentsource = NestedScrollSource.Fling
 
-        rule.runOnIdle {
-            val preRes = childDispatcher.dispatchPreScroll(preScrollOffset, currentsource)
-            assertThat(preRes).isEqualTo(preScrollReturn)
+        val preRes2 = childDispatcher.dispatchPreScroll(preScrollOffset, currentsource)
+        assertThat(preRes2).isEqualTo(preScrollReturn)
 
-            childDispatcher.dispatchPostScroll(scrollOffset, scrollLeftOffset, currentsource)
-        }
+        childDispatcher.dispatchPostScroll(scrollOffset, scrollLeftOffset, currentsource)
 
-        rule.runOnIdle {
-            val preFlingRes = childDispatcher.dispatchPreFling(preFling)
-            assertThat(preFlingRes).isEqualTo(preFlingReturn)
-            childDispatcher.dispatchPostFling(postFlingConsumed, postFlingLeft)
-        }
+        val preFlingRes = childDispatcher.dispatchPreFling(preFling)
+        assertThat(preFlingRes).isEqualTo(preFlingReturn)
+        childDispatcher.dispatchPostFling(postFlingConsumed, postFlingLeft)
     }
 
     @Test
@@ -454,20 +439,20 @@ class NestedScrollModifierTest {
     }
 
     @Test
-    fun nestedScroll_deltaCalculation_preFling() {
+    fun nestedScroll_deltaCalculation_preFling() = runBlocking {
         val dispatchedVelocity = Velocity(10f, 10f)
         val grandParentConsumesPreFling = Velocity(2f, 2f)
         val parentConsumedPreFling = Velocity(1f, 1f)
 
         val childConnection = object : NestedScrollConnection {}
         val grandParentConnection = object : NestedScrollConnection {
-            override fun onPreFling(available: Velocity): Velocity {
+            override suspend fun onPreFling(available: Velocity): Velocity {
                 assertThat(available).isEqualTo(dispatchedVelocity)
                 return grandParentConsumesPreFling
             }
         }
         val parentConnection = object : NestedScrollConnection {
-            override fun onPreFling(available: Velocity): Velocity {
+            override suspend fun onPreFling(available: Velocity): Velocity {
                 assertThat(available)
                     .isEqualTo(dispatchedVelocity - grandParentConsumesPreFling)
                 return parentConsumedPreFling
@@ -484,14 +469,12 @@ class NestedScrollModifierTest {
             }
         }
 
-        rule.runOnIdle {
-            val preRes = childDispatcher.dispatchPreFling(dispatchedVelocity)
-            assertThat(preRes).isEqualTo(grandParentConsumesPreFling + parentConsumedPreFling)
-        }
+        val preRes = childDispatcher.dispatchPreFling(dispatchedVelocity)
+        assertThat(preRes).isEqualTo(grandParentConsumesPreFling + parentConsumedPreFling)
     }
 
     @Test
-    fun nestedScroll_deltaCalculation_fling() {
+    fun nestedScroll_deltaCalculation_fling(): Unit = runBlocking {
         val dispatchedConsumedVelocity = Velocity(4f, 4f)
         val dispatchedLeftVelocity = Velocity(10f, 10f)
         val grandParentConsumedPostFling = Velocity(2f, 2f)
@@ -499,28 +482,26 @@ class NestedScrollModifierTest {
 
         val childConnection = object : NestedScrollConnection {}
         val grandParentConnection = object : NestedScrollConnection {
-            override fun onPostFling(
+            override suspend fun onPostFling(
                 consumed: Velocity,
-                available: Velocity,
-                onFinished: (Velocity) -> Unit
-            ) {
+                available: Velocity
+            ): Velocity {
                 assertThat(consumed)
                     .isEqualTo(parentConsumedPostFling + dispatchedConsumedVelocity)
                 assertThat(available)
                     .isEqualTo(dispatchedLeftVelocity - parentConsumedPostFling)
-                return onFinished(grandParentConsumedPostFling)
+                return grandParentConsumedPostFling
             }
         }
         val parentConnection = object : NestedScrollConnection {
 
-            override fun onPostFling(
+            override suspend fun onPostFling(
                 consumed: Velocity,
-                available: Velocity,
-                onFinished: (Velocity) -> Unit
-            ) {
+                available: Velocity
+            ): Velocity {
                 assertThat(consumed).isEqualTo(dispatchedConsumedVelocity)
                 assertThat(available).isEqualTo(dispatchedLeftVelocity)
-                onFinished(parentConsumedPostFling)
+                return parentConsumedPostFling
             }
         }
         val childDispatcher = NestedScrollDispatcher()
@@ -534,13 +515,11 @@ class NestedScrollModifierTest {
             }
         }
 
-        rule.runOnIdle {
-            childDispatcher.dispatchPostFling(dispatchedConsumedVelocity, dispatchedLeftVelocity)
-        }
+        childDispatcher.dispatchPostFling(dispatchedConsumedVelocity, dispatchedLeftVelocity)
     }
 
     @Test
-    fun nestedScroll_twoNodes_flatDispatch() {
+    fun nestedScroll_twoNodes_flatDispatch(): Unit = runBlocking {
         val preScrollReturn = Offset(60f, 30f)
         val preFlingReturn = Velocity(154f, 56f)
         var currentsource = NestedScrollSource.Drag
@@ -564,18 +543,18 @@ class NestedScrollModifierTest {
                 return Offset.Zero
             }
 
-            override fun onPreFling(available: Velocity): Velocity {
+            override suspend fun onPreFling(available: Velocity): Velocity {
                 assertThat(available).isEqualTo(preFling)
                 return preFlingReturn
             }
 
-            override fun onPostFling(
+            override suspend fun onPostFling(
                 consumed: Velocity,
-                available: Velocity,
-                onFinished: (Velocity) -> Unit
-            ) {
+                available: Velocity
+            ): Velocity {
                 assertThat(consumed).isEqualTo(postFlingConsumed)
                 assertThat(available).isEqualTo(postFlingLeft)
+                return Velocity.Zero
             }
         }
         val childDispatcher = NestedScrollDispatcher()
@@ -588,31 +567,25 @@ class NestedScrollModifierTest {
             )
         }
 
-        rule.runOnIdle {
-            val preRes = childDispatcher.dispatchPreScroll(preScrollOffset, currentsource)
-            assertThat(preRes).isEqualTo(preScrollReturn)
+        val preRes1 = childDispatcher.dispatchPreScroll(preScrollOffset, currentsource)
+        assertThat(preRes1).isEqualTo(preScrollReturn)
 
-            childDispatcher.dispatchPostScroll(scrollOffset, scrollLeftOffset, currentsource)
-            // flip to fling to test again below
-            currentsource = NestedScrollSource.Fling
-        }
+        childDispatcher.dispatchPostScroll(scrollOffset, scrollLeftOffset, currentsource)
+        // flip to fling to test again below
+        currentsource = NestedScrollSource.Fling
 
-        rule.runOnIdle {
-            val preRes = childDispatcher.dispatchPreScroll(preScrollOffset, currentsource)
-            assertThat(preRes).isEqualTo(preScrollReturn)
+        val preRes2 = childDispatcher.dispatchPreScroll(preScrollOffset, currentsource)
+        assertThat(preRes2).isEqualTo(preScrollReturn)
 
-            childDispatcher.dispatchPostScroll(scrollOffset, scrollLeftOffset, currentsource)
-        }
+        childDispatcher.dispatchPostScroll(scrollOffset, scrollLeftOffset, currentsource)
 
-        rule.runOnIdle {
-            val preFlingRes = childDispatcher.dispatchPreFling(preFling)
-            assertThat(preFlingRes).isEqualTo(preFlingReturn)
-            childDispatcher.dispatchPostFling(postFlingConsumed, postFlingLeft)
-        }
+        val preFlingRes = childDispatcher.dispatchPreFling(preFling)
+        assertThat(preFlingRes).isEqualTo(preFlingReturn)
+        childDispatcher.dispatchPostFling(postFlingConsumed, postFlingLeft)
     }
 
     @Test
-    fun nestedScroll_shouldNotCalledSelfConnection() {
+    fun nestedScroll_shouldNotCalledSelfConnection(): Unit = runBlocking {
         val childConnection = object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
                 assertWithMessage("self connection shouldn't be called").fail()
@@ -628,17 +601,17 @@ class NestedScrollModifierTest {
                 return Offset.Zero
             }
 
-            override fun onPreFling(available: Velocity): Velocity {
+            override suspend fun onPreFling(available: Velocity): Velocity {
                 assertWithMessage("self connection shouldn't be called").fail()
                 return Velocity.Zero
             }
 
-            override fun onPostFling(
+            override suspend fun onPostFling(
                 consumed: Velocity,
-                available: Velocity,
-                onFinished: (Velocity) -> Unit
-            ) {
+                available: Velocity
+            ): Velocity {
                 assertWithMessage("self connection shouldn't be called").fail()
+                return Velocity.Zero
             }
         }
         val parentConnection = object : NestedScrollConnection {}
@@ -649,16 +622,12 @@ class NestedScrollModifierTest {
             }
         }
 
-        rule.runOnIdle {
-            childDispatcher.dispatchPreScroll(preScrollOffset, NestedScrollSource.Drag)
-            childDispatcher
-                .dispatchPostScroll(scrollOffset, scrollLeftOffset, NestedScrollSource.Fling)
-        }
+        childDispatcher.dispatchPreScroll(preScrollOffset, NestedScrollSource.Drag)
+        childDispatcher
+            .dispatchPostScroll(scrollOffset, scrollLeftOffset, NestedScrollSource.Fling)
 
-        rule.runOnIdle {
-            childDispatcher.dispatchPreFling(preFling)
-            childDispatcher.dispatchPostFling(postFlingConsumed, postFlingLeft)
-        }
+        childDispatcher.dispatchPreFling(preFling)
+        childDispatcher.dispatchPostFling(postFlingConsumed, postFlingLeft)
     }
 
     @Test
@@ -731,7 +700,7 @@ class NestedScrollModifierTest {
     }
 
     @Test
-    fun nestedScroll_flatDispatch_runtimeSwapChange_orderTest() {
+    fun nestedScroll_flatDispatch_runtimeSwapChange_orderTest() = runBlocking {
         val preScrollReturn = Offset(60f, 30f)
         val preFlingReturn = Velocity(154f, 56f)
         var counter = 0
@@ -755,20 +724,19 @@ class NestedScrollModifierTest {
                 return Offset.Zero
             }
 
-            override fun onPreFling(available: Velocity): Velocity {
+            override suspend fun onPreFling(available: Velocity): Velocity {
                 assertThat(counter).isEqualTo(if (isConnection1Parent.value) 1 else 2)
                 counter++
                 return preFlingReturn
             }
 
-            override fun onPostFling(
+            override suspend fun onPostFling(
                 consumed: Velocity,
-                available: Velocity,
-                onFinished: (Velocity) -> Unit
-            ) {
+                available: Velocity
+            ): Velocity {
                 assertThat(counter).isEqualTo(if (isConnection1Parent.value) 2 else 1)
                 counter++
-                onFinished.invoke(Velocity.Zero)
+                return Velocity.Zero
             }
         }
         val connection2 = object : NestedScrollConnection {
@@ -788,20 +756,19 @@ class NestedScrollModifierTest {
                 return Offset.Zero
             }
 
-            override fun onPreFling(available: Velocity): Velocity {
+            override suspend fun onPreFling(available: Velocity): Velocity {
                 assertThat(counter).isEqualTo(if (isConnection1Parent.value) 2 else 1)
                 counter++
                 return preFlingReturn
             }
 
-            override fun onPostFling(
+            override suspend fun onPostFling(
                 consumed: Velocity,
-                available: Velocity,
-                onFinished: (Velocity) -> Unit
-            ) {
+                available: Velocity
+            ): Velocity {
                 assertThat(counter).isEqualTo(if (isConnection1Parent.value) 1 else 2)
                 counter++
-                onFinished.invoke(Velocity.Zero)
+                return Velocity.Zero
             }
         }
         val childDispatcher = NestedScrollDispatcher()
@@ -820,36 +787,35 @@ class NestedScrollModifierTest {
         }
 
         repeat(2) {
-            rule.runOnIdle {
-                counter = 1
+            counter = 1
 
-                childDispatcher.dispatchPreScroll(preScrollOffset, NestedScrollSource.Drag)
-                assertThat(counter).isEqualTo(3)
-                counter = 1
+            childDispatcher.dispatchPreScroll(preScrollOffset, NestedScrollSource.Drag)
+            assertThat(counter).isEqualTo(3)
+            counter = 1
 
-                childDispatcher.dispatchPostScroll(
-                    scrollOffset,
-                    scrollLeftOffset,
-                    NestedScrollSource.Drag
-                )
-                assertThat(counter).isEqualTo(3)
-                counter = 1
+            childDispatcher.dispatchPostScroll(
+                scrollOffset,
+                scrollLeftOffset,
+                NestedScrollSource.Drag
+            )
+            assertThat(counter).isEqualTo(3)
+            counter = 1
 
-                childDispatcher.dispatchPreFling(preFling)
-                assertThat(counter).isEqualTo(3)
-                counter = 1
+            childDispatcher.dispatchPreFling(preFling)
+            assertThat(counter).isEqualTo(3)
+            counter = 1
 
-                childDispatcher.dispatchPostFling(postFlingConsumed, postFlingLeft)
-                assertThat(counter).isEqualTo(3)
-                counter = 1
+            childDispatcher.dispatchPostFling(postFlingConsumed, postFlingLeft)
+            assertThat(counter).isEqualTo(3)
+            counter = 1
 
-                isConnection1Parent.value = !isConnection1Parent.value
-            }
+            isConnection1Parent.value = !isConnection1Parent.value
+            rule.waitForIdle()
         }
     }
 
     @Test
-    fun nestedScroll_hierarchyDispatch_runtimeSwapChange_orderTest() {
+    fun nestedScroll_hierarchyDispatch_runtimeSwapChange_orderTest() = runBlocking {
         val preScrollReturn = Offset(60f, 30f)
         val preFlingReturn = Velocity(154f, 56f)
         var counter = 0
@@ -873,20 +839,19 @@ class NestedScrollModifierTest {
                 return Offset.Zero
             }
 
-            override fun onPreFling(available: Velocity): Velocity {
+            override suspend fun onPreFling(available: Velocity): Velocity {
                 assertThat(counter).isEqualTo(if (isConnection1Parent.value) 1 else 2)
                 counter++
                 return preFlingReturn
             }
 
-            override fun onPostFling(
+            override suspend fun onPostFling(
                 consumed: Velocity,
-                available: Velocity,
-                onFinished: (Velocity) -> Unit
-            ) {
+                available: Velocity
+            ): Velocity {
                 assertThat(counter).isEqualTo(if (isConnection1Parent.value) 2 else 1)
                 counter++
-                onFinished.invoke(Velocity.Zero)
+                return Velocity.Zero
             }
         }
         val connection2 = object : NestedScrollConnection {
@@ -906,20 +871,19 @@ class NestedScrollModifierTest {
                 return Offset.Zero
             }
 
-            override fun onPreFling(available: Velocity): Velocity {
+            override suspend fun onPreFling(available: Velocity): Velocity {
                 assertThat(counter).isEqualTo(if (isConnection1Parent.value) 2 else 1)
                 counter++
                 return preFlingReturn
             }
 
-            override fun onPostFling(
+            override suspend fun onPostFling(
                 consumed: Velocity,
-                available: Velocity,
-                onFinished: (Velocity) -> Unit
-            ) {
+                available: Velocity
+            ): Velocity {
                 assertThat(counter).isEqualTo(if (isConnection1Parent.value) 1 else 2)
                 counter++
-                onFinished.invoke(Velocity.Zero)
+                return Velocity.Zero
             }
         }
         val childDispatcher = NestedScrollDispatcher()
@@ -934,31 +898,30 @@ class NestedScrollModifierTest {
         }
 
         repeat(2) {
-            rule.runOnIdle {
-                counter = 1
+            counter = 1
 
-                childDispatcher.dispatchPreScroll(preScrollOffset, NestedScrollSource.Drag)
-                assertThat(counter).isEqualTo(3)
-                counter = 1
+            childDispatcher.dispatchPreScroll(preScrollOffset, NestedScrollSource.Drag)
+            assertThat(counter).isEqualTo(3)
+            counter = 1
 
-                childDispatcher.dispatchPostScroll(
-                    scrollOffset,
-                    scrollLeftOffset,
-                    NestedScrollSource.Drag
-                )
-                assertThat(counter).isEqualTo(3)
-                counter = 1
+            childDispatcher.dispatchPostScroll(
+                scrollOffset,
+                scrollLeftOffset,
+                NestedScrollSource.Drag
+            )
+            assertThat(counter).isEqualTo(3)
+            counter = 1
 
-                childDispatcher.dispatchPreFling(preFling)
-                assertThat(counter).isEqualTo(3)
-                counter = 1
+            childDispatcher.dispatchPreFling(preFling)
+            assertThat(counter).isEqualTo(3)
+            counter = 1
 
-                childDispatcher.dispatchPostFling(postFlingConsumed, postFlingLeft)
-                assertThat(counter).isEqualTo(3)
-                counter = 1
+            childDispatcher.dispatchPostFling(postFlingConsumed, postFlingLeft)
+            assertThat(counter).isEqualTo(3)
+            counter = 1
 
-                isConnection1Parent.value = !isConnection1Parent.value
-            }
+            isConnection1Parent.value = !isConnection1Parent.value
+            rule.waitForIdle()
         }
     }
 

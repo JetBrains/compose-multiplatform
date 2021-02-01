@@ -21,7 +21,6 @@ import androidx.compose.foundation.animation.scrollBy
 import androidx.compose.foundation.animation.smoothScrollBy
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Scrollable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -107,7 +106,7 @@ fun ControlledScrollableRowSample() {
             }
             Button(
                 onClick = {
-                    scope.launch { (scrollState as Scrollable).scrollBy(10000f) }
+                    scope.launch { scrollState.scrollBy(10000f) }
                 }
             ) {
                 Text("--- >")
@@ -124,7 +123,7 @@ fun ControlledScrollableRowSample() {
             }
             Button(
                 onClick = {
-                    scope.launch { (scrollState as Scrollable).smoothScrollBy(10000f) }
+                    scope.launch { scrollState.smoothScrollBy(10000f) }
                 }
             ) {
                 Text("--- >")
