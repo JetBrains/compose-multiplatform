@@ -69,3 +69,14 @@ class ModifierInfo(
     val coordinates: LayoutCoordinates,
     val extra: Any? = null
 )
+
+/**
+ * The info about the graphics layers used by tooling.
+ */
+interface GraphicLayerInfo {
+    /**
+     * The ID of the layer. This is used by tooling to match a layer to the associated
+     * LayoutNode.
+     */
+    val layerId: Long
+}
