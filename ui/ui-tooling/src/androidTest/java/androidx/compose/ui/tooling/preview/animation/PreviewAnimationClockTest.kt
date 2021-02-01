@@ -49,7 +49,6 @@ class PreviewAnimationClockTest {
         testClock = TestPreviewAnimationClock()
     }
 
-    @Ignore("b/178910730")
     @Test
     fun callbackCalledWhenSettingClockTime() {
         var callbackCalledCount = 0
@@ -103,11 +102,11 @@ class PreviewAnimationClockTest {
             setUpOffsetScenario() // 800ms
         }
         composeRule.waitForIdle()
+        testClock.setClockTime(0L)
 
         assertEquals(1000, testClock.getMaxDuration())
     }
 
-    @Ignore("b/178910730")
     @Test
     fun disposeShouldNotifyUnsubscribed() {
         composeRule.setContent {
@@ -123,7 +122,6 @@ class PreviewAnimationClockTest {
         assertEquals(2, testClock.notifyUnsubscribeCount)
     }
 
-    @Ignore("b/178910730")
     @Test
     fun trackTransitionShouldNotifySubscribed() {
         assertEquals(0, testClock.notifySubscribeCount)
@@ -141,7 +139,6 @@ class PreviewAnimationClockTest {
         assertTrue(states.contains(Offset.O2))
     }
 
-    @Ignore("b/178910730")
     @Test
     fun disposeClearsCachedAnimations() {
         composeRule.setContent { setUpOffsetScenario() }
@@ -156,7 +153,6 @@ class PreviewAnimationClockTest {
         assertTrue(testClock.transitionStates.isEmpty())
     }
 
-    @Ignore("b/178910730")
     @Test
     fun updateFromAndToStatesModifiesCachedTransitionStates() {
         var animation: ComposeAnimation? = null
@@ -176,7 +172,6 @@ class PreviewAnimationClockTest {
         assertEquals(RotationColor.RC1, stateAfterUpdate.target)
     }
 
-    @Ignore("b/178910730")
     @Test
     fun animationLabelIsSetExplicitlyOrImplicitly() {
         val someState = Any()
@@ -235,7 +230,6 @@ class PreviewAnimationClockTest {
             it.states.contains(RotationColor.RC1)
         }
         testClock.updateFromAndToStates(animation, RotationColor.RC1, RotationColor.RC3)
-        testClock.setClockTime(0)
         return animation
     }
 
@@ -259,7 +253,6 @@ class PreviewAnimationClockTest {
         testClock.trackTransition(transition as Transition<Any>)
         val animation = testClock.trackedTransitions.keys.single { it.states.contains(Offset.O1) }
         testClock.updateFromAndToStates(animation, Offset.O1, Offset.O2)
-        testClock.setClockTime(0)
         return animation
     }
 
