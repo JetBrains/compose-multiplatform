@@ -22,12 +22,15 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -149,6 +152,56 @@ class CrossfadeTest {
 
         rule.onNodeWithText(First).assertDoesNotExist()
         rule.onNodeWithText(Second).assertExists()
+    }
+
+    @Test
+    fun crossfadeTest_rememberSaveableIsNotRecreatedForScreens() {
+        rule.mainClock.autoAdvance = false
+
+        val duration = 100
+        var showFirst by mutableStateOf(true)
+        var counter = 1
+        var counter1 = 0
+        var counter2 = 0
+        rule.setContent {
+            val saveableStateHolder = rememberSaveableStateHolder()
+            Crossfade(
+                showFirst,
+                animationSpec = TweenSpec(durationMillis = duration)
+            ) {
+                saveableStateHolder.SaveableStateProvider(it) {
+                    if (it) {
+                        counter1 = rememberSaveable { counter++ }
+                    } else {
+                        counter2 = rememberSaveable { counter++ }
+                    }
+                }
+            }
+        }
+
+        rule.mainClock.advanceTimeByFrame() // Kick off the animation
+        rule.mainClock.advanceTimeBy(duration.toLong())
+
+        rule.runOnUiThread {
+            showFirst = false
+        }
+
+        rule.mainClock.advanceTimeBy(duration.toLong())
+        rule.mainClock.advanceTimeByFrame()
+        rule.mainClock.advanceTimeByFrame() // Wait for changes to propagate
+
+        // and go back to the second screen
+
+        rule.runOnUiThread {
+            showFirst = true
+        }
+
+        rule.mainClock.advanceTimeBy(duration.toLong())
+        rule.mainClock.advanceTimeByFrame()
+        rule.mainClock.advanceTimeByFrame() // Wait for changes to propagate
+
+        assertEquals(1, counter1)
+        assertEquals(2, counter2)
     }
 
     companion object {
