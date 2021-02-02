@@ -26,14 +26,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.ImagePainter
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.loadVectorResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -59,21 +56,6 @@ fun ImagePainterSubsectionSample() {
         ),
         contentDescription = "Localized description"
     )
-}
-
-@Sampled
-@Composable
-fun ImageVectorSample() {
-    val imageVector = loadVectorResource(R.drawable.ic_sample_vector)
-    imageVector.resource.resource?.let {
-        Image(
-            imageVector = it,
-            contentDescription = null,
-            modifier = Modifier.preferredSize(200.dp, 200.dp),
-            contentScale = ContentScale.Fit,
-            colorFilter = ColorFilter.tint(Color.Cyan)
-        )
-    }
 }
 
 @Sampled

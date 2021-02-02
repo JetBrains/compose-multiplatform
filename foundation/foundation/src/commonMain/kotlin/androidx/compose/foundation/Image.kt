@@ -97,8 +97,6 @@ inline fun Image(
  * background). Any unspecified dimension will leverage the [ImageVector]'s size as a minimum
  * constraint.
  *
- * @sample androidx.compose.foundation.samples.ImageVectorSample
- *
  * @param imageVector The [ImageVector] to draw
  * @param contentDescription text used by accessibility services to describe what this image
  * represents. This should always be provided unless this image is used for decorative purposes,
