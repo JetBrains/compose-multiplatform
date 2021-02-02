@@ -22,7 +22,7 @@ class ConfigBuilder {
     var isBenchmark: Boolean = false
     var isPostsubmit: Boolean = true
     lateinit var minSdk: String
-    var tag: String = "androidx_unit_tests"
+    val tags: MutableList<String> = mutableListOf()
     lateinit var testApkName: String
     lateinit var testRunner: String
 
@@ -31,7 +31,7 @@ class ConfigBuilder {
     fun isBenchmark(isBenchmark: Boolean) = apply { this.isBenchmark = isBenchmark }
     fun isPostsubmit(isPostsubmit: Boolean) = apply { this.isPostsubmit = isPostsubmit }
     fun minSdk(minSdk: String) = apply { this.minSdk = minSdk }
-    fun tag(tag: String) = apply { this.tag = tag }
+    fun tag(tag: String) = apply { this.tags.add(tag) }
     fun testApkName(testApkName: String) = apply { this.testApkName = testApkName }
     fun testRunner(testRunner: String) = apply { this.testRunner = testRunner }
 
@@ -40,8 +40,10 @@ class ConfigBuilder {
         sb.append(XML_HEADER_AND_LICENSE)
             .append(CONFIGURATION_OPEN)
             .append(MIN_API_LEVEL_CONTROLLER_OBJECT.replace("MIN_SDK", minSdk))
-            .append(TEST_SUITE_TAG_OPTION.replace("TEST_SUITE_TAG", tag))
-            .append(MODULE_METADATA_TAG_OPTION.replace("APPLICATION_ID", applicationId))
+        tags.forEach { tag ->
+            sb.append(TEST_SUITE_TAG_OPTION.replace("TEST_SUITE_TAG", tag))
+        }
+        sb.append(MODULE_METADATA_TAG_OPTION.replace("APPLICATION_ID", applicationId))
             .append(WIFI_DISABLE_OPTION)
         if (isBenchmark) {
             if (isPostsubmit) {
@@ -84,7 +86,7 @@ class MediaConfigBuilder {
     lateinit var minSdk: String
     lateinit var serviceApkName: String
     lateinit var serviceApplicationId: String
-    var tag: String = "androidx_unit_tests"
+    var tags: MutableList<String> = mutableListOf()
     lateinit var testRunner: String
 
     fun clientApkName(clientApkName: String) = apply { this.clientApkName = clientApkName }
@@ -101,7 +103,7 @@ class MediaConfigBuilder {
     fun serviceApkName(serviceApkName: String) = apply { this.serviceApkName = serviceApkName }
     fun serviceApplicationId(serviceApplicationId: String) =
         apply { this.serviceApplicationId = serviceApplicationId }
-    fun tag(tag: String) = apply { this.tag = tag }
+    fun tag(tag: String) = apply { this.tags.add(tag) }
     fun testRunner(testRunner: String) = apply { this.testRunner = testRunner }
 
     private fun mediaInstrumentationArgs(): String {
@@ -125,13 +127,14 @@ class MediaConfigBuilder {
         sb.append(XML_HEADER_AND_LICENSE)
             .append(CONFIGURATION_OPEN)
             .append(MIN_API_LEVEL_CONTROLLER_OBJECT.replace("MIN_SDK", minSdk))
-            .append(TEST_SUITE_TAG_OPTION.replace("TEST_SUITE_TAG", tag))
-            .append(TEST_SUITE_TAG_OPTION.replace("TEST_SUITE_TAG", "media_compat"))
-            .append(
-                MODULE_METADATA_TAG_OPTION.replace(
-                    "APPLICATION_ID", "$clientApplicationId;$serviceApplicationId"
-                )
+        tags.forEach { tag ->
+            sb.append(TEST_SUITE_TAG_OPTION.replace("TEST_SUITE_TAG", tag))
+        }
+        sb.append(
+            MODULE_METADATA_TAG_OPTION.replace(
+                "APPLICATION_ID", "$clientApplicationId;$serviceApplicationId"
             )
+        )
             .append(WIFI_DISABLE_OPTION)
             .append(SETUP_INCLUDE)
             .append(TARGET_PREPARER_OPEN)
