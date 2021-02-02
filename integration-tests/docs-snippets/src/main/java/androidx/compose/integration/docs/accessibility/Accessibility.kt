@@ -37,7 +37,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.graphics.painter.ImagePainter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -70,10 +71,14 @@ private object AccessibilitySnippet1 {
 private object AccessibilitySnippet2 {
     @Composable
     fun PostImage(post: Post, modifier: Modifier = Modifier) {
-        val image = post.imageThumb ?: imageResource(R.drawable.placeholder)
+        val image = if (post.imageThumb != null) {
+            ImagePainter(post.imageThumb)
+        } else {
+            painterResource(R.drawable.placeholder)
+        }
 
         Image(
-            bitmap = image,
+            painter = image,
             // Specify that this image has no semantic meaning
             contentDescription = null,
             modifier = modifier
