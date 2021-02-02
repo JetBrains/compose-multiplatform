@@ -135,6 +135,7 @@ fun shouldVerifyDependency(dependency: Dependency): Boolean {
     // Only verify dependencies within the scope of our versioning policies.
     if (dependency.group == null) return false
     if (!dependency.group.toString().startsWith("androidx.")) return false
+    if (dependency.name == "annotation-sampled") return false
     if (dependency.version == AndroidXPlaygroundRootPlugin.SNAPSHOT_MARKER) {
         // This only happens in playground builds where this magic version gets replaced with
         // the version from the snapshotBuildId defined in playground-common/playground.properties.
