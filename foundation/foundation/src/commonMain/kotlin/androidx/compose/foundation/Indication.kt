@@ -104,7 +104,7 @@ fun Modifier.indication(
     factory = {
         val resolvedIndication = indication ?: NoIndication
         val instance = resolvedIndication.createInstance()
-        remember(interactionState, resolvedIndication) {
+        remember(interactionState, instance) {
             IndicationModifier(interactionState, instance)
         }
     },
