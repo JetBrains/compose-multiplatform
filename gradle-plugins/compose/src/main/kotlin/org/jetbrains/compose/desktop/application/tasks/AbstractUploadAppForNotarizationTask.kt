@@ -1,19 +1,10 @@
 package org.jetbrains.compose.desktop.application.tasks
 
-import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
-import org.gradle.process.ExecOperations
-import org.jetbrains.compose.desktop.application.dsl.MacOSNotarizationSettings
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.*
-import org.jetbrains.compose.desktop.application.internal.MacUtils
-import org.jetbrains.compose.desktop.application.internal.findOutputFileOrDir
-import org.jetbrains.compose.desktop.application.internal.ioFile
-import org.jetbrains.compose.desktop.application.internal.nullableProperty
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import javax.inject.Inject
@@ -21,19 +12,7 @@ import javax.inject.Inject
 abstract class AbstractUploadAppForNotarizationTask @Inject constructor(
     @get:Input
     val targetFormat: TargetFormat,
-) : DefaultTask() {
-    @get:Inject
-    protected abstract val objects: ObjectFactory
-    @get:Inject
-    protected abstract val execOperations: ExecOperations
-
-    @get:Input
-    val macBundleID: Property<String?> = objects.nullableProperty()
-
-    @get:Nested
-    @get:Optional
-    val notarizationSettings: Property<MacOSNotarizationSettings?> = objects.nullableProperty()
-
+) : AbstractNotarizationTask() {
     @get:InputDirectory
     val inputDir: DirectoryProperty = objects.directoryProperty()
 
@@ -46,16 +25,12 @@ abstract class AbstractUploadAppForNotarizationTask @Inject constructor(
 
     @TaskAction
     fun run() {
-        check(macBundleID.isPresent) {
-            "Specify a unique package identifier using DSL property 'nativeExecutables.macOS.bundleID'"
-        }
+        val notarization = validateNotarization()
 
-        val bundleId = macBundleID.get()
-        val notarization = validateNotarizationSettings(notarizationSettings)
         val inputFile = findOutputFileOrDir(inputDir.ioFile, targetFormat)
         val file = inputFile.checkExistingFile()
 
-        logger.quiet("Uploading '${file.name}' for notarization (package id: '$bundleId')")
+        logger.quiet("Uploading '${file.name}' for notarization (package id: '${notarization.bundleID}')")
         val (res, output) = ByteArrayOutputStream().use { baos ->
             PrintStream(baos).use { ps ->
                 val res = execOperations.exec { exec ->
@@ -63,7 +38,7 @@ abstract class AbstractUploadAppForNotarizationTask @Inject constructor(
                     exec.args(
                         "altool",
                         "--notarize-app",
-                        "--primary-bundle-id", bundleId,
+                        "--primary-bundle-id", notarization.bundleID,
                         "--username", notarization.appleID,
                         "--password", notarization.password,
                         "--file", file

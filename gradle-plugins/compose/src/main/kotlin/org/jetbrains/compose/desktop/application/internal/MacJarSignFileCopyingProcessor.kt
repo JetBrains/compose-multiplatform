@@ -1,8 +1,7 @@
 package org.jetbrains.compose.desktop.application.internal
 
-import org.gradle.api.provider.Property
 import org.gradle.process.ExecOperations
-import org.jetbrains.compose.desktop.application.dsl.MacOSSigningSettings
+import org.jetbrains.compose.desktop.application.internal.validation.ValidatedMacOSSigningSettings
 import java.io.*
 import java.util.regex.Pattern
 import java.util.zip.ZipEntry
@@ -12,49 +11,17 @@ import java.util.zip.ZipOutputStream
 internal class MacJarSignFileCopyingProcessor(
     private val tempDir: File,
     private val execOperations: ExecOperations,
-    macBundleID: Property<String?>,
-    signSettings: MacOSSigningSettings,
+    private val signing: ValidatedMacOSSigningSettings
 ) : FileCopyingProcessor {
-    private val bundleId = macBundleID.orNull
-    private val keychainPath = signSettings.keychain
-    private val signPrefix: String
     private val signKey: String
 
     init {
-        check(currentOS == OS.MacOS) { "$currentOS is not compatible with ${this::class.java}" }
-        check(bundleId != null) {
-            """|Signing requires to specify unique application's identifier. Specify an identifier using DSL like so:
-               |nativeExecutables {
-               |  macOS {
-               |      bundleID = "com.mycompany.myapp"
-               |  }
-               |bundleID may only contain alphanumeric characters (A-Z,a-z,0-9), hyphen (-) and period (.) characters
-               |""".trimMargin()
-        }
-        check(bundleId.matches("[A-Za-z0-9\\-\\.]+".toRegex())) {
-            "bundleID may only contain alphanumeric characters (A-Z,a-z,0-9), hyphen (-)" +
-                    " and period (.) characters"
-        }
-        signPrefix = signSettings.signPrefix
-            ?: (bundleId.substringBeforeLast(".") + ".").takeIf { bundleId.contains('.') }
-            ?: error("Could not infer 'signPrefix'. Specify explicitly or use reverse DNS notation for bundleID")
-
-        val identity = signSettings.identity
-
-        val developerIdPrefix = "Developer ID Application: "
-        val thirdPartyMacDeveloperPrefix = "3rd Party Mac Developer Application: "
-        val signIdentity = when {
-            identity.startsWith(developerIdPrefix) -> identity
-            identity.startsWith(thirdPartyMacDeveloperPrefix) -> identity
-            else -> developerIdPrefix + identity
-        }
-
         val certificates = ByteArrayOutputStream().use { baos ->
             PrintStream(baos).use { ps ->
                 execOperations.exec { exec ->
                     exec.executable = MacUtils.security.absolutePath
-                    val args = arrayListOf("find-certificate", "-a", "-c", signIdentity)
-                    keychainPath?.let { args.add(it) }
+                    val args = arrayListOf("find-certificate", "-a", "-c", signing.identity)
+                    signing.keychain?.let { args.add(it.absolutePath) }
                     exec.args(*args.toTypedArray())
                     exec.standardOutput = ps
                 }
@@ -63,14 +30,16 @@ internal class MacJarSignFileCopyingProcessor(
         }
         val regex = Pattern.compile("\"alis\"<blob>=\"([^\"]+)\"")
         val m = regex.matcher(certificates)
-        if (!m.find())
+        if (!m.find()) {
+            val keychainPath = signing.keychain?.absolutePath
             error(
-                "Could not find certificate for '$signIdentity'" +
-                " in keychain '$keychainPath'".takeIf { keychainPath != null }.orEmpty()
+                "Could not find certificate for '${signing.identity}'" +
+                        " in keychain [${keychainPath.orEmpty()}]"
             )
+        }
 
         signKey = m.group(1)
-        if (m.find()) error("Multiple matching certificates are found for '$signIdentity'. " +
+        if (m.find()) error("Multiple matching certificates are found for '${signing.identity}'. " +
                 "Please specify keychain containing unique matching certificate.")
     }
 
@@ -128,13 +97,13 @@ internal class MacJarSignFileCopyingProcessor(
             "--timestamp",
             "--options", "runtime",
             "--force",
-            "--prefix", signPrefix,
+            "--prefix", signing.prefix,
             "--sign", signKey
         )
 
-        keychainPath?.let {
+        signing.keychain?.let {
             args.add("--keychain")
-            args.add(it)
+            args.add(it.absolutePath)
         }
 
         args.add(dylibFile.absolutePath)

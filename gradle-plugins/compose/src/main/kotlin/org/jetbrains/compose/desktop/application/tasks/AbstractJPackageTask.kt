@@ -15,6 +15,7 @@ import org.gradle.work.InputChanges
 import org.jetbrains.compose.desktop.application.dsl.MacOSSigningSettings
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.*
+import org.jetbrains.compose.desktop.application.internal.validation.validate
 import java.io.File
 import javax.inject.Inject
 
@@ -108,15 +109,7 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:Input
     @get:Optional
-    val macBundleID: Property<String?> = objects.nullableProperty()
-
-    @get:Input
-    @get:Optional
     val macPackageName: Property<String?> = objects.nullableProperty()
-
-    @get:Nested
-    @get:Optional
-    val macSignSetting: Property<MacOSSigningSettings?> = objects.nullableProperty()
 
     @get:Input
     @get:Optional
@@ -153,6 +146,16 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:InputDirectory
     @get:Optional
     val appImage: DirectoryProperty = objects.directoryProperty()
+
+    @get:Input
+    @get:Optional
+    internal val nonValidatedMacBundleID: Property<String?> = objects.nullableProperty()
+
+    @get:Nested
+    internal lateinit var nonValidatedMacSigningSettings: MacOSSigningSettings
+
+    private fun validateSigning() =
+        nonValidatedMacSigningSettings.validate(nonValidatedMacBundleID)
 
     @get:LocalState
     protected val signDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/sign")
@@ -215,14 +218,15 @@ abstract class AbstractJPackageTask @Inject constructor(
 
         when (currentOS) {
             OS.MacOS -> {
-                cliArg("--mac-package-identifier", macBundleID)
                 cliArg("--mac-package-name", macPackageName)
+                cliArg("--mac-package-identifier", nonValidatedMacBundleID)
 
-                macSignSetting.orNull?.let { sign ->
+                if (nonValidatedMacSigningSettings.sign.get()) {
+                    val signing = validateSigning()
                     cliArg("--mac-sign", true)
-                    cliArg("--mac-signing-key-user-name", sign.identity)
-                    cliArg("--mac-package-signing-prefix", sign.signPrefix)
-                    cliArg("--mac-signing-keychain", sign.keychain)
+                    cliArg("--mac-signing-key-user-name", signing.identity)
+                    cliArg("--mac-signing-keychain", signing.keychain)
+                    cliArg("--mac-package-signing-prefix", signing.prefix)
 
                 }
             }
@@ -236,9 +240,8 @@ abstract class AbstractJPackageTask @Inject constructor(
         val workingDir = workingDir.ioFile
 
         // todo: parallel processing
-        val signSettings = macSignSetting.orNull
         val fileProcessor =
-            if (currentOS == OS.MacOS && signSettings != null) {
+            if (currentOS == OS.MacOS && nonValidatedMacSigningSettings.sign.get()) {
                 val tmpDirForSign = signDir.ioFile
                 fileOperations.delete(tmpDirForSign)
                 tmpDirForSign.mkdirs()
@@ -246,8 +249,7 @@ abstract class AbstractJPackageTask @Inject constructor(
                 MacJarSignFileCopyingProcessor(
                     tempDir = tmpDirForSign,
                     execOperations = execOperations,
-                    macBundleID = macBundleID,
-                    signSettings = signSettings,
+                    signing = validateSigning()
                 )
             } else SimpleFileCopyingProcessor
 

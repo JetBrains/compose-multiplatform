@@ -3,8 +3,6 @@ package org.jetbrains.compose.desktop.application.dsl
 import org.gradle.api.Action
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Optional
 import javax.inject.Inject
 
 abstract class PlatformSettings (objects: ObjectFactory) {
@@ -23,45 +21,15 @@ open class MacOSPlatformSettings @Inject constructor(objects: ObjectFactory): Pl
      */
     var bundleID: String? = null
 
-    internal var signingSettings: MacOSSigningSettings? = null
+    val signing: MacOSSigningSettings = objects.newInstance(MacOSSigningSettings::class.java)
     fun signing(fn: Action<MacOSSigningSettings>) {
-        check(signingSettings == null) { "Signing is already configured" }
-        signingSettings = MacOSSigningSettings().also {
-            fn.execute(it)
-            checkNotNull(it.identity)
-        }
+        fn.execute(signing)
     }
 
-    internal var notarizationSettings: MacOSNotarizationSettings? = null
+    val notarization: MacOSNotarizationSettings = objects.newInstance(MacOSNotarizationSettings::class.java)
     fun notarization(fn: Action<MacOSNotarizationSettings>) {
-        check(notarizationSettings == null) { "Notarization is already configured" }
-        notarizationSettings = MacOSNotarizationSettings().also {
-            fn.execute(it)
-            checkNotNull(it.appleID)
-            checkNotNull(it.password)
-        }
+        fn.execute(notarization)
     }
-}
-
-open class MacOSSigningSettings {
-    @get:Input
-    lateinit var identity: String
-
-    @get:Input
-    @get:Optional
-    var keychain: String? = null
-
-    @get:Input
-    @get:Optional
-    var signPrefix: String? = null
-}
-
-open class MacOSNotarizationSettings {
-    @get:Input
-    lateinit var appleID: String
-
-    @get:Input
-    lateinit var password: String
 }
 
 open class LinuxPlatformSettings @Inject constructor(objects: ObjectFactory): PlatformSettings(objects) {

@@ -51,18 +51,23 @@ the certificate intended for signing.
 
 ## Preparing an App ID
 
+An App ID represents one or more applications in Apple's ecosystem.
+
 #### Viewing existing App IDs
 
-Open https://developer.apple.com/account/resources/identifiers/list
+Open [the page](https://developer.apple.com/account/resources/identifiers/list) on Apple's developer portal.
 
 #### Creating a new App ID
 
-1. Open https://developer.apple.com/account/resources/identifiers/add/bundleId
+
+1. Open [the page](https://developer.apple.com/account/resources/identifiers/add/bundleId) on Apple's developer portal.
 2. Choose `App ID` option.
 3. Choose `App` type.
-4. Enter a unique id to the `Bundle ID` field. 
-   It is recommended to use the reverse DNS notation for your domain (e.g.
-   `com.yoursitename.yourappname`).
+4. Fill the `Bundle ID` field.
+    * A [bundle ID](https://developer.apple.com/documentation/bundleresources/information_property_list/cfbundleidentifier)
+      uniquely identifies an application in Apple's ecosystem.
+    * You can use an explicit bundle ID a wildcard, matching multiple bundle IDs.
+    * It is recommended to use the reverse DNS notation (e.g.`com.yoursitename.yourappname`).
    
 ## Creating an app-specific password
 
@@ -93,7 +98,9 @@ without the need to write the password itself.
 
 ## Configuring Gradle
 
-All properties are set in `macOS` DSL block of Compose Desktop DSL:
+### Gradle DSL
+
+DSL properties should be specified in `macOS` DSL block of Compose Desktop DSL:
 ```kotlin
 import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
@@ -115,49 +122,91 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg)
 
             macOS {
-                bundleID = "com.example-company.example-app"
-            
-                signing { 
-                   identity = "John Doe"
-                }
-                notarization {
-                   appleID = "john.doe@example-company.com"
-                   password = "@keychain:NOTARIZATION_PASSWORD"
-                }
+                // macOS DSL settings
             }
         }
     }
 }
 ```
 
-1. Set `bundleID` to the unique id created previously.
-2. Configure `signing` settings:
-   * Set `identity` to the certificate's name, e.g.:
-        * `"John Doe"`.
-        * `"Developer ID Application: John Doe"`.
-   * Optionally, set `keychain` value to a path to the specific keychain, containing your certificate. 
-     This step is only necessary, if multiple `Developer ID Application` certificates are installed.
-3. Configure `notarization` settings:
-   * Set `appleID` to your Apple ID.
-   * Set `password` to the app-specific password created previously.
-   If the password was added to the keychain, as described previously, it can be set as
-     ```
-     password = "@keychain:NOTARIZATION_PASSWORD"
-     ```
-     
-There is no separate step for the signing an application (it is signed during packaging).
-You can use a project property (a environment variable) to avoid signing
-if necessary.
-For example, to sign only on CI, you can use something like:
+### Gradle properties
+
+Some properties can also be specified using 
+[Gradle properties](https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_configuration_properties).
+
+* Default Gradle properties (`compose.desktop.mac.*`) have lower priority, than DSL properties.
+* Gradle properties can be specified (the items are listed in order of ascending priority):
+    * In `gradle.properties` file in Gradle home;
+    * In `gradle.properties` file in project's root;
+    * In command-line
+    ```
+     ./gradlew packageDmg -Pcompose.desktop.mac.sign=true
+    ```
+* Note, that `local.properties` is not a standard Gradle file, so it is not supported by default.
+You can load custom properties from it manually in a script, if you want.
+
+### Configuring bundle ID
+
 ```
 macOS {
-   if (project.findProperty("isCI") == "true") {
-      signing { 
-         // ... 
-      }
-   }
+    bundleID = "com.example-company.example-app"
 }
 ```
+
+A [bundle ID](https://developer.apple.com/documentation/bundleresources/information_property_list/cfbundleidentifier)
+uniquely identifies an application in Apple's ecosystem. 
+* A bundle ID must be specified using the `bundleID` DSL property.
+* Use only alphanumeric characters (`A-Z`, `a-z`, and `0-9`), hyphen (`-`) and period (`.`) characters.
+* Use the reverse DNS notation of your domain (e.g.
+  `com.yoursitename.yourappname`).
+* The specified bundle ID must match one of your App IDs.
+
+### Configuring signing settings
+
+```
+macOS {
+    signing { 
+         sign.set(true)
+         identity.set("John Doe")
+         // keychain.set("/path/to/keychain") 
+    }
+}
+```
+
+* Set the `sign` DSL property or  to `true`.
+    * Alternatively, the `compose.desktop.mac.sign` Gradle property can be used.
+* Set the `identity` DSL property to the certificate's name, e.g. `"John Doe"`, `"Developer ID Application: John Doe"`.
+    *  Alternatively,  the `compose.desktop.mac.signing.identity` Gradle property can be  used.
+* Optionally, set the `keychain` DSL property to the path to the specific keychain, containing your certificate.
+    * Alternatively, the `compose.desktop.mac.signing.keychain` Gradle property can be used.
+    * This step is only necessary, if multiple `Developer ID Application` certificates are installed.
+  
+The following Gradle properties can be used instead of DSL properties:
+* `compose.desktop.mac.sign` enables or disables signing. 
+  Possible values: `true` or `false`.
+* `compose.desktop.mac.signing.identity` overrides the `identity` DSL property.
+* `compose.desktop.mac.signing.keychain` overrides the `keychain` DSL property.
+
+### Configuring notarization settings
+
+```
+macOS {
+    notarization { 
+         appleID.set("john.doe@example.com")
+         password.set("@keychain:NOTARIZATION_PASSWORD")
+    }
+}
+```
+
+* Set `appleID` to your Apple ID.
+  * Alternatively, the `compose.desktop.mac.notarization.appleID` can be used.
+* Set `password` to the app-specific password created previously.
+    * Alternatively, the `compose.desktop.mac.notarization.password` can be used.
+    * Don't write raw password directly into a build script.
+    * If the password was added to the keychain, as described previously, it can be referenced as
+     ```
+     @keychain:NOTARIZATION_PASSWORD
+     ```
 
 ## Using Gradle
 

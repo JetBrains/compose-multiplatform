@@ -167,9 +167,9 @@ internal fun AbstractUploadAppForNotarizationTask.configureUploadForNotarization
 ) {
     dependsOn(packageFormat)
     inputDir.set(packageFormat.flatMap { it.destinationDir })
-    notarizationSettings.set(provider { app.nativeDistributions.macOS.notarizationSettings })
-    macBundleID.set(provider { app.nativeDistributions.macOS.bundleID })
+    nonValidatedBundleID.set(provider { app.nativeDistributions.macOS.bundleID })
     requestIDFile.set(project.layout.buildDirectory.file("compose/notarization/${app.name}-${targetFormat.id}-request-id.txt"))
+    configureCommonNotarizationSettings(app)
 }
 
 internal fun AbstractCheckNotarizationStatusTask.configureCheckNotarizationStatusTask(
@@ -177,7 +177,13 @@ internal fun AbstractCheckNotarizationStatusTask.configureCheckNotarizationStatu
     uploadTask: Provider<AbstractUploadAppForNotarizationTask>
 ) {
     requestIDFile.set(uploadTask.flatMap { it.requestIDFile })
-    notarizationSettings.set(provider { app.nativeDistributions.macOS.notarizationSettings })
+    configureCommonNotarizationSettings(app)
+}
+
+internal fun AbstractNotarizationTask.configureCommonNotarizationSettings(
+    app: Application
+) {
+    nonValidatedNotarizationSettings = app.nativeDistributions.macOS.notarization
 }
 
 internal fun AbstractJPackageTask.configurePlatformSettings(app: Application) {
@@ -209,8 +215,8 @@ internal fun AbstractJPackageTask.configurePlatformSettings(app: Application) {
         OS.MacOS -> {
             app.nativeDistributions.macOS.also { mac ->
                 macPackageName.set(provider { mac.packageName })
-                macBundleID.set(provider { mac.bundleID })
-                macSignSetting.set(provider { mac.signingSettings })
+                nonValidatedMacBundleID.set(provider { mac.bundleID })
+                nonValidatedMacSigningSettings = app.nativeDistributions.macOS.signing
                 iconFile.set(mac.iconFile)
             }
         }
