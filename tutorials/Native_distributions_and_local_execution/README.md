@@ -71,21 +71,15 @@ The following formats available for the supported operating systems:
 * Windows — `.exe` (`TargetFormat.Exe`), `.msi` (`TargetFormat.Msi`)
 * Linux — `.deb` (`TargetFormat.Deb`), `.rpm` (`TargetFormat.Rpm`)
 
-## Distributing Artifacts
+## Signing & notarization on macOS
 
 By default, Apple does not allow users to execute unsigned applications downloaded from the internet.  Users attempting
 to run such applications will be faced with an error like this:
 
 ![](attrs-error.png)
 
-To temporarily work around this issue, users can try a couple of things (after downloading to target machine, try commands in this order, do not attempt out of order):
-* `xattr -cr  MyFancyProgram.app`
-* `sudo spctl --master-disable`
-* Try right-clicking on the app, and select "Open", then when the dialog pops up, select "Open" again.
-
-A more correct fix is to manually sign & notarize the application:
-* [Apple's Guide on Signing & Notarizing Applications](https://developer.apple.com/documentation/xcode/notarizing_macos_software_before_distribution)
-* [JPackage Documentation on Signing MacOS Applications](https://docs.oracle.com/en/java/javase/15/jpackage/support-application-features.html#GUID-8D9F0607-91F4-4070-8823-02FCAB12238D)
+See [our tutorial](tutorials/Signing_and_notarization_on_macOS/README.md) 
+on how to sign and notarize your application. 
 
 ## Customizing JDK version
 

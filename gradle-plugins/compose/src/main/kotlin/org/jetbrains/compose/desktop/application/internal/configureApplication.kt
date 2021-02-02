@@ -9,9 +9,7 @@ import org.gradle.api.tasks.*
 import org.gradle.jvm.tasks.Jar
 import org.jetbrains.compose.desktop.application.dsl.Application
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.compose.desktop.application.tasks.AbstractJLinkTask
-import org.jetbrains.compose.desktop.application.tasks.AbstractJPackageTask
-import org.jetbrains.compose.desktop.application.tasks.AbstractRunDistributableTask
+import org.jetbrains.compose.desktop.application.tasks.*
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import java.io.File
@@ -53,10 +51,6 @@ internal fun Project.configureFromMppPlugin(mainApplication: Application) {
 
 internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
     for (app in apps) {
-        val run = project.tasks.composeTask<JavaExec>(taskName("run", app)) {
-            configureRunTask(app)
-        }
-
         val createRuntimeImage = tasks.composeTask<AbstractJLinkTask>(
             taskName("createRuntimeImage", app)
         ) {
@@ -65,13 +59,41 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
             destinationDir.set(project.layout.buildDirectory.dir("compose/tmp/${app.name}/runtime"))
         }
 
+        val createDistributable = tasks.composeTask<AbstractJPackageTask>(
+            taskName("createDistributable", app),
+            args = listOf(TargetFormat.AppImage)
+        ) {
+            configurePackagingTask(app, createRuntimeImage = createRuntimeImage)
+        }
+
         val packageFormats = app.nativeDistributions.targetFormats.map { targetFormat ->
-            tasks.composeTask<AbstractJPackageTask>(
+            val packageFormat = tasks.composeTask<AbstractJPackageTask>(
                 taskName("package", app, targetFormat.name),
                 args = listOf(targetFormat)
             ) {
-                configurePackagingTask(app, createRuntimeImage)
+                configurePackagingTask(app, createAppImage = createDistributable)
             }
+
+            if (targetFormat.isCompatibleWith(OS.MacOS)) {
+                check(targetFormat == TargetFormat.Dmg || targetFormat == TargetFormat.Pkg) {
+                    "Unexpected target format for MacOS: $targetFormat"
+                }
+
+                val upload = tasks.composeTask<AbstractUploadAppForNotarizationTask>(
+                    taskName("notarize", app, targetFormat.name),
+                    args = listOf(targetFormat)
+                ) {
+                    configureUploadForNotarizationTask(app, packageFormat, targetFormat)
+                }
+
+                tasks.composeTask<AbstractCheckNotarizationStatusTask>(
+                    taskName("checkNotarizationStatus", app, targetFormat.name)
+                ) {
+                    configureCheckNotarizationStatusTask(app, upload)
+                }
+            }
+
+            packageFormat
         }
 
         val packageAll = tasks.composeTask<DefaultTask>(taskName("package", app)) {
@@ -82,29 +104,33 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
             configurePackageUberJarForCurrentOS(app)
         }
 
-        val createDistributable = tasks.composeTask<AbstractJPackageTask>(
-            taskName("createDistributable", app),
-            args = listOf(TargetFormat.AppImage)
-        ) {
-            configurePackagingTask(app, createRuntimeImage)
-        }
-
         val runDistributable = project.tasks.composeTask<AbstractRunDistributableTask>(
             taskName("runDistributable", app),
             args = listOf(createDistributable)
         )
+
+        val run = project.tasks.composeTask<JavaExec>(taskName("run", app)) {
+            configureRunTask(app)
+        }
     }
 }
 
 internal fun AbstractJPackageTask.configurePackagingTask(
     app: Application,
-    createRuntimeImage: TaskProvider<AbstractJLinkTask>
+    createAppImage: TaskProvider<AbstractJPackageTask>? = null,
+    createRuntimeImage: TaskProvider<AbstractJLinkTask>? = null
 ) {
     enabled = targetFormat.isCompatibleWithCurrentOS
 
-    val runtimeImageDir = createRuntimeImage.flatMap { it.destinationDir }
-    dependsOn(createRuntimeImage)
-    runtimeImage.set(runtimeImageDir)
+    createAppImage?.let { createAppImage ->
+        dependsOn(createAppImage)
+        appImage.set(createAppImage.flatMap { it.destinationDir })
+    }
+
+    createRuntimeImage?.let { createRuntimeImage ->
+        dependsOn(createRuntimeImage)
+        runtimeImage.set(createRuntimeImage.flatMap { it.destinationDir })
+    }
 
     configurePlatformSettings(app)
 
@@ -132,6 +158,32 @@ internal fun AbstractJPackageTask.configurePackagingTask(
     launcherMainClass.set(provider { app.mainClass })
     launcherJvmArgs.set(provider { app.jvmArgs })
     launcherArgs.set(provider { app.args })
+}
+
+internal fun AbstractUploadAppForNotarizationTask.configureUploadForNotarizationTask(
+    app: Application,
+    packageFormat: TaskProvider<AbstractJPackageTask>,
+    targetFormat: TargetFormat
+) {
+    dependsOn(packageFormat)
+    inputDir.set(packageFormat.flatMap { it.destinationDir })
+    requestIDFile.set(project.layout.buildDirectory.file("compose/notarization/${app.name}-${targetFormat.id}-request-id.txt"))
+    configureCommonNotarizationSettings(app)
+}
+
+internal fun AbstractCheckNotarizationStatusTask.configureCheckNotarizationStatusTask(
+    app: Application,
+    uploadTask: Provider<AbstractUploadAppForNotarizationTask>
+) {
+    requestIDFile.set(uploadTask.flatMap { it.requestIDFile })
+    configureCommonNotarizationSettings(app)
+}
+
+internal fun AbstractNotarizationTask.configureCommonNotarizationSettings(
+    app: Application
+) {
+    nonValidatedBundleID.set(app.nativeDistributions.macOS.bundleID)
+    nonValidatedNotarizationSettings = app.nativeDistributions.macOS.notarization
 }
 
 internal fun AbstractJPackageTask.configurePlatformSettings(app: Application) {
@@ -163,11 +215,8 @@ internal fun AbstractJPackageTask.configurePlatformSettings(app: Application) {
         OS.MacOS -> {
             app.nativeDistributions.macOS.also { mac ->
                 macPackageName.set(provider { mac.packageName })
-                macPackageIdentifier.set(provider { mac.packageIdentifier })
-                macSign.set(provider { mac.signing.sign })
-                macSigningKeyUserName.set(provider { mac.signing.keyUserName })
-                macSigningKeychain.set(project.layout.file(provider { mac.signing.keychain }))
-                macBundleSigningPrefix.set(provider { mac.signing.bundlePrefix })
+                nonValidatedMacBundleID.set(provider { mac.bundleID })
+                nonValidatedMacSigningSettings = app.nativeDistributions.macOS.signing
                 iconFile.set(mac.iconFile)
             }
         }

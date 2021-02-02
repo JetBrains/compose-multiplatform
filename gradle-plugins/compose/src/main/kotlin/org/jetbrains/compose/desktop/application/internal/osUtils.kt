@@ -1,5 +1,7 @@
 package org.jetbrains.compose.desktop.application.internal
 
+import org.gradle.api.tasks.Internal
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import java.io.File
 
 internal enum class OS(val id: String) {
@@ -46,3 +48,32 @@ internal fun executableName(nameWithoutExtension: String): String =
 
 internal fun javaExecutable(javaHome: String): String =
     File(javaHome).resolve("bin/${executableName("java")}").absolutePath
+
+internal object MacUtils {
+    val codesign: File by lazy {
+        File("/usr/bin/codesign").checkExistingFile()
+    }
+
+    val security: File by lazy {
+        File("/usr/bin/security").checkExistingFile()
+    }
+
+    val xcrun: File by lazy {
+        File("/usr/bin/xcrun").checkExistingFile()
+    }
+}
+
+@Internal
+internal fun findOutputFileOrDir(dir: File, targetFormat: TargetFormat): File =
+    when (targetFormat) {
+        TargetFormat.AppImage -> dir
+        else -> dir.walk().first { it.isFile && it.name.endsWith(targetFormat.fileExt) }
+    }
+
+internal fun File.checkExistingFile(): File =
+    apply {
+        check(isFile) { "'$absolutePath' does not exist" }
+    }
+
+internal val File.isJarFile: Boolean
+    get() = name.endsWith(".jar", ignoreCase = true) && isFile

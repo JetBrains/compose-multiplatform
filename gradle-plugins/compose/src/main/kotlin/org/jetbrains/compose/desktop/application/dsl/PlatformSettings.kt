@@ -3,7 +3,6 @@ package org.jetbrains.compose.desktop.application.dsl
 import org.gradle.api.Action
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
-import java.io.File
 import javax.inject.Inject
 
 abstract class PlatformSettings (objects: ObjectFactory) {
@@ -11,26 +10,26 @@ abstract class PlatformSettings (objects: ObjectFactory) {
 }
 
 open class MacOSPlatformSettings @Inject constructor(objects: ObjectFactory): PlatformSettings(objects) {
-    var packageIdentifier: String? = null
     var packageName: String? = null
-    val signing: MacOSSigningSettings = MacOSSigningSettings()
 
-    private var isSignInitialized = false
+    /**
+     * An application's unique identifier across Apple's ecosystem.
+     *
+     * May only contain alphanumeric characters (A-Z,a-z,0-9), hyphen (-) and period (.) characters
+     *
+     * Use of a reverse DNS notation (e.g. com.mycompany.myapp) is recommended.
+     */
+    var bundleID: String? = null
+
+    val signing: MacOSSigningSettings = objects.newInstance(MacOSSigningSettings::class.java)
     fun signing(fn: Action<MacOSSigningSettings>) {
-        // enable sign if it the corresponding block is present in DSL
-        if (!isSignInitialized) {
-            isSignInitialized = true
-            signing.sign = true
-        }
         fn.execute(signing)
     }
-}
 
-open class MacOSSigningSettings {
-    var sign: Boolean = false
-    var keychain: File? = null
-    var bundlePrefix: String? = null
-    var keyUserName: String? = null
+    val notarization: MacOSNotarizationSettings = objects.newInstance(MacOSNotarizationSettings::class.java)
+    fun notarization(fn: Action<MacOSNotarizationSettings>) {
+        fn.execute(notarization)
+    }
 }
 
 open class LinuxPlatformSettings @Inject constructor(objects: ObjectFactory): PlatformSettings(objects) {

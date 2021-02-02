@@ -1,17 +1,21 @@
 package org.jetbrains.compose.desktop.application.tasks
 
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 import org.gradle.process.ExecResult
 import org.gradle.process.ExecSpec
 import org.gradle.work.ChangeType
 import org.gradle.work.InputChanges
+import org.jetbrains.compose.desktop.application.dsl.MacOSSigningSettings
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.*
+import org.jetbrains.compose.desktop.application.internal.validation.validate
 import java.io.File
 import javax.inject.Inject
 
@@ -105,27 +109,7 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:Input
     @get:Optional
-    val macPackageIdentifier: Property<String?> = objects.nullableProperty()
-
-    @get:Input
-    @get:Optional
     val macPackageName: Property<String?> = objects.nullableProperty()
-
-    @get:Input
-    @get:Optional
-    val macBundleSigningPrefix: Property<String?> = objects.nullableProperty()
-
-    @get:Input
-    @get:Optional
-    val macSign: Property<Boolean?> = objects.nullableProperty()
-
-    @get:InputFile
-    @get:Optional
-    val macSigningKeychain: RegularFileProperty = objects.fileProperty()
-
-    @get:Input
-    @get:Optional
-    val macSigningKeyUserName: Property<String?> = objects.nullableProperty()
 
     @get:Input
     @get:Optional
@@ -159,37 +143,40 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:Optional
     val runtimeImage: DirectoryProperty = objects.directoryProperty()
 
+    @get:InputDirectory
+    @get:Optional
+    val appImage: DirectoryProperty = objects.directoryProperty()
+
+    @get:Input
+    @get:Optional
+    internal val nonValidatedMacBundleID: Property<String?> = objects.nullableProperty()
+
+    @get:Nested
+    internal lateinit var nonValidatedMacSigningSettings: MacOSSigningSettings
+
+    private fun validateSigning() =
+        nonValidatedMacSigningSettings.validate(nonValidatedMacBundleID)
+
+    @get:LocalState
+    protected val signDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/sign")
+
     override fun makeArgs(tmpDir: File): MutableList<String> = super.makeArgs(tmpDir).apply {
-        cliArg("--input", tmpDir)
-        cliArg("--type", targetFormat.id)
-
-        cliArg("--dest", destinationDir)
-        cliArg("--verbose", verbose)
-
-        if (targetFormat != TargetFormat.AppImage) {
+        if (targetFormat == TargetFormat.AppImage) {
+            cliArg("--input", tmpDir)
+            check(runtimeImage.isPresent) { "runtimeImage must be set for ${TargetFormat.AppImage}" }
+            check(!appImage.isPresent) { "appImage must not be set for ${TargetFormat.AppImage}" }
+            cliArg("--runtime-image", runtimeImage)
+            cliArg("--main-jar", launcherMainJar.ioFile.name)
+            cliArg("--main-class", launcherMainClass)
+        } else {
+            check(!runtimeImage.isPresent) { "runtimeImage must not be set for $targetFormat" }
+            check(appImage.isPresent) { "appImage must be set for $targetFormat" }
+            cliArg("--app-image", appImage)
             cliArg("--install-dir", installationPath)
             cliArg("--license-file", licenseFile)
-        }
-        cliArg("--icon", iconFile)
 
-        cliArg("--name", packageName)
-        cliArg("--description", packageDescription)
-        cliArg("--copyright", packageCopyright)
-        cliArg("--app-version", packageVersion)
-        cliArg("--vendor", packageVendor)
-
-        cliArg("--main-jar", launcherMainJar.ioFile.name)
-        cliArg("--main-class", launcherMainClass)
-        launcherArgs.orNull?.forEach {
-            cliArg("--arguments", it)
-        }
-        launcherJvmArgs.orNull?.forEach {
-            cliArg("--java-options", it)
-        }
-
-        when (currentOS) {
-            OS.Linux -> {
-                if (targetFormat != TargetFormat.AppImage) {
+            when (currentOS) {
+                OS.Linux -> {
                     cliArg("--linux-shortcut", linuxShortcut)
                     cliArg("--linux-package-name", linuxPackageName)
                     cliArg("--linux-app-release", linuxAppRelease)
@@ -198,18 +185,7 @@ abstract class AbstractJPackageTask @Inject constructor(
                     cliArg("--linux-menu-group", linuxMenuGroup)
                     cliArg("--linux-rpm-license-type", linuxRpmLicenseType)
                 }
-            }
-            OS.MacOS -> {
-                cliArg("--mac-package-identifier", macPackageIdentifier)
-                cliArg("--mac-package-name", macPackageName)
-                cliArg("--mac-bundle-signing-prefix", macBundleSigningPrefix)
-                cliArg("--mac-sign", macSign)
-                cliArg("--mac-signing-keychain", macSigningKeychain)
-                cliArg("--mac-signing-key-user-name", macSigningKeyUserName)
-            }
-            OS.Windows -> {
-                cliArg("--win-console", winConsole)
-                if (targetFormat != TargetFormat.AppImage) {
+                OS.Windows -> {
                     cliArg("--win-dir-chooser", winDirChooser)
                     cliArg("--win-per-user-install", winPerUserInstall)
                     cliArg("--win-shortcut", winShortcut)
@@ -220,11 +196,62 @@ abstract class AbstractJPackageTask @Inject constructor(
             }
         }
 
-        cliArg("--runtime-image", runtimeImage)
+        cliArg("--type", targetFormat.id)
+
+        cliArg("--dest", destinationDir)
+        cliArg("--verbose", verbose)
+
+        cliArg("--icon", iconFile)
+
+        cliArg("--name", packageName)
+        cliArg("--description", packageDescription)
+        cliArg("--copyright", packageCopyright)
+        cliArg("--app-version", packageVersion)
+        cliArg("--vendor", packageVendor)
+
+        launcherArgs.orNull?.forEach {
+            cliArg("--arguments", it)
+        }
+        launcherJvmArgs.orNull?.forEach {
+            cliArg("--java-options", it)
+        }
+
+        when (currentOS) {
+            OS.MacOS -> {
+                cliArg("--mac-package-name", macPackageName)
+                cliArg("--mac-package-identifier", nonValidatedMacBundleID)
+
+                if (nonValidatedMacSigningSettings.sign.get()) {
+                    val signing = validateSigning()
+                    cliArg("--mac-sign", true)
+                    cliArg("--mac-signing-key-user-name", signing.identity)
+                    cliArg("--mac-signing-keychain", signing.keychain)
+                    cliArg("--mac-package-signing-prefix", signing.prefix)
+
+                }
+            }
+            OS.Windows -> {
+                cliArg("--win-console", winConsole)
+            }
+        }
     }
 
     override fun prepareWorkingDir(inputChanges: InputChanges) {
         val workingDir = workingDir.ioFile
+
+        // todo: parallel processing
+        val fileProcessor =
+            if (currentOS == OS.MacOS && nonValidatedMacSigningSettings.sign.get()) {
+                val tmpDirForSign = signDir.ioFile
+                fileOperations.delete(tmpDirForSign)
+                tmpDirForSign.mkdirs()
+
+                MacJarSignFileCopyingProcessor(
+                    tempDir = tmpDirForSign,
+                    execOperations = execOperations,
+                    signing = validateSigning()
+                )
+            } else SimpleFileCopyingProcessor
 
         if (inputChanges.isIncremental) {
             logger.debug("Updating working dir incrementally: $workingDir")
@@ -238,7 +265,7 @@ abstract class AbstractJPackageTask @Inject constructor(
                     fileOperations.delete(targetFile)
                     logger.debug("Deleted: $targetFile")
                 } else {
-                    sourceFile.copyTo(targetFile, overwrite = true)
+                    fileProcessor.copy(sourceFile, targetFile)
                     logger.debug("Updated: $targetFile")
                 }
             }
@@ -246,10 +273,14 @@ abstract class AbstractJPackageTask @Inject constructor(
             logger.debug("Updating working dir non-incrementally: $workingDir")
             fileOperations.delete(workingDir)
             fileOperations.mkdir(workingDir)
-            fileOperations.copy {
-                it.from(files)
-                it.from(launcherMainJar)
-                it.into(workingDir)
+
+            files.forEach { sourceFile ->
+                val targetFile = workingDir.resolve(sourceFile.name)
+                if (targetFile.exists()) {
+                    // todo: handle possible clashes
+                    logger.warn("w: File already exists: $targetFile")
+                }
+                fileProcessor.copy(sourceFile, targetFile)
             }
         }
     }
@@ -270,13 +301,7 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     override fun checkResult(result: ExecResult) {
         super.checkResult(result)
-
-        val finalLocation = destinationDir.ioFile.let { destinationDir ->
-            when (targetFormat) {
-                TargetFormat.AppImage -> destinationDir
-                else -> destinationDir.walk().first { it.isFile && it.name.endsWith(targetFormat.fileExt) }
-            }
-        }
-        logger.lifecycle("The distribution is written to ${finalLocation.canonicalPath}")
+        val outputFile = findOutputFileOrDir(destinationDir.ioFile, targetFormat)
+        logger.lifecycle("The distribution is written to ${outputFile.canonicalPath}")
     }
 }
