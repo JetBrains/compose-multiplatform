@@ -71,7 +71,7 @@ fun Modifier.selectable(
         enabled = enabled,
         role = role,
         interactionState = remember { InteractionState() },
-        indication = LocalIndication.current(),
+        indication = LocalIndication.current,
         onClick = onClick
     )
 }

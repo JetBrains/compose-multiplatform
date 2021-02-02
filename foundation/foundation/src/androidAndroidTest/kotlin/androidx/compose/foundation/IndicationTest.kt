@@ -18,6 +18,7 @@ package androidx.compose.foundation
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
@@ -203,6 +204,7 @@ class IndicationTest {
         onDraw: (InteractionState) -> Unit
     ): Indication {
         return object : Indication {
+            @Composable
             override fun createInstance(): IndicationInstance {
                 return object : IndicationInstance {
                     override fun ContentDrawScope.drawIndication(

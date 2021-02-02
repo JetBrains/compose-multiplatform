@@ -73,7 +73,7 @@ fun Modifier.clickable(
         onClickLabel = onClickLabel,
         onClick = onClick,
         role = role,
-        indication = LocalIndication.current(),
+        indication = LocalIndication.current,
         interactionState = remember { InteractionState() }
     )
 }
@@ -185,7 +185,7 @@ fun Modifier.combinedClickable(
         onDoubleClick = onDoubleClick,
         onClick = onClick,
         role = role,
-        indication = LocalIndication.current(),
+        indication = LocalIndication.current,
         interactionState = remember { InteractionState() }
     )
 }

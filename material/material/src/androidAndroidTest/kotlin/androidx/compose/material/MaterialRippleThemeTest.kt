@@ -560,6 +560,56 @@ class MaterialRippleThemeTest {
         }
     }
 
+    @Test
+    fun contentColorProvidedAfterRememberRipple() {
+        val interactionState = InteractionState()
+
+        val alpha = 0.5f
+        val expectedRippleColor = Color.Red
+
+        val theme = object : RippleTheme {
+            @Composable
+            override fun defaultColor() = LocalContentColor.current
+
+            @Composable
+            override fun rippleAlpha() = RippleAlpha { alpha }
+        }
+
+        rule.setContent {
+            MaterialTheme {
+                Providers(LocalRippleTheme provides theme) {
+                    Surface(contentColor = Color.Black) {
+                        // Create ripple where contentColor is black
+                        val ripple = rememberRipple()
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Surface(contentColor = expectedRippleColor) {
+                                // Ripple is used where contentColor is red, so the instance
+                                // should get the red color when it is created
+                                RippleBox(interactionState, ripple)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        rule.runOnUiThread {
+            interactionState.addInteraction(Interaction.Pressed, Offset(10f, 10f))
+        }
+
+        with(rule.onNodeWithTag(Tag)) {
+            val centerPixel = captureToImage().asAndroidBitmap()
+                .run {
+                    getPixel(width / 2, height / 2)
+                }
+
+            val expectedColor =
+                calculateResultingRippleColor(expectedRippleColor, rippleOpacity = alpha)
+
+            Truth.assertThat(Color(centerPixel)).isEqualTo(expectedColor)
+        }
+    }
+
     /**
      * Asserts that the ripple matches the screenshot with identifier [goldenIdentifier], and
      * that the resultant color of the ripple on screen matches [expectedCenterPixelColor].

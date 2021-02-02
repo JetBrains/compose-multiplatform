@@ -80,7 +80,7 @@ fun Modifier.toggleable(
         enabled = enabled,
         role = role,
         interactionState = remember { InteractionState() },
-        indication = LocalIndication.current()
+        indication = LocalIndication.current
     )
 }
 
@@ -177,7 +177,7 @@ fun Modifier.triStateToggleable(
         enabled,
         role,
         remember { InteractionState() },
-        LocalIndication.current(),
+        LocalIndication.current,
         onClick
     )
 }
