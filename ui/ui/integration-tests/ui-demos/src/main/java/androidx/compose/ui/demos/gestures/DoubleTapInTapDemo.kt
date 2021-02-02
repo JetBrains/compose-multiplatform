@@ -68,14 +68,14 @@ fun DoubleTapInTapDemo() {
                 .fillMaxSize()
                 .wrapContentSize(Alignment.Center)
                 .preferredSize(192.dp)
-                .pointerInput { detectTapGestures(onTap = onTap) }
+                .pointerInput(Unit) { detectTapGestures(onTap = onTap) }
                 .border(2.dp, BorderColor)
                 .background(color = outerColor.value)
 
                 .fillMaxSize()
                 .wrapContentSize(Alignment.Center)
                 .preferredSize(96.dp)
-                .pointerInput { detectTapGestures(onDoubleTap = onDoubleTap) }
+                .pointerInput(Unit) { detectTapGestures(onDoubleTap = onDoubleTap) }
                 .border(2.dp, BorderColor)
                 .background(color = innerColor.value, shape = RectangleShape)
         )

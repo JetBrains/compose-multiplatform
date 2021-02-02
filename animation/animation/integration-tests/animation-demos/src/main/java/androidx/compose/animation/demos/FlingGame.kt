@@ -44,7 +44,7 @@ fun FlingGame() {
         Text("Throw me around, see what happens", Modifier.align(Alignment.Center))
         val anim = remember { Animatable(Offset(100f, 100f), Offset.VectorConverter) }
         Box(
-            Modifier.fillMaxSize().pointerInput {
+            Modifier.fillMaxSize().pointerInput(Unit) {
                 coroutineScope {
                     while (true) {
                         val pointerId = awaitPointerEventScope {

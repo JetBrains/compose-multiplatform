@@ -111,7 +111,7 @@ class LayerTouchTransformTest {
                                 }
                                 .then(latchDrawModifier)
                                 .preferredSize(boxDp)
-                                .pointerInput {
+                                .pointerInput(Unit) {
                                     detectTapGestures(
                                         onPress = {
                                             onStart.invoke(it)

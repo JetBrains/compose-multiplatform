@@ -81,7 +81,7 @@ private fun LongPressableContainer(
 
     Box(
         modifier
-            .pointerInput { detectTapGestures(onLongPress = onLongPress) }
+            .pointerInput(Unit) { detectTapGestures(onLongPress = onLongPress) }
             .background(color)
             .border(BorderStroke(2.dp, BorderColor))
             .padding(2.dp),

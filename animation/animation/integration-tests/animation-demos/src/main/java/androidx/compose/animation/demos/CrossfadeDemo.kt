@@ -44,7 +44,7 @@ fun CrossfadeDemo() {
         Row {
             tabs.forEachIndexed { index, tab ->
                 Box(
-                    Modifier.pointerInput {
+                    Modifier.pointerInput(Unit) {
                         detectTapGestures {
                             Log.e("Crossfade", "Switch to $tab")
                             current = index

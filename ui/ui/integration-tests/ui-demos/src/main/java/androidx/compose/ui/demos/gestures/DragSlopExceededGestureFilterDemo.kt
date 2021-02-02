@@ -64,7 +64,7 @@ fun DragSlopExceededGestureFilterDemo() {
             Modifier.fillMaxSize()
                 .wrapContentSize(Alignment.Center)
                 .preferredSize(192.dp)
-                .pointerInput {
+                .pointerInput(Unit) {
                     forEachGesture {
                         awaitPointerEventScope {
                             val down = awaitFirstDown(requireUnconsumed = false)

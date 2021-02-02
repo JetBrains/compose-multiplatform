@@ -47,7 +47,7 @@ fun ScaleGestureFilterDemo() {
             Modifier.fillMaxSize()
                 .wrapContentSize(Alignment.Center)
                 .preferredSize(size.value)
-                .pointerInput {
+                .pointerInput(Unit) {
                     detectTransformGestures { _, _, zoom, _ -> size.value *= zoom }
                 }
                 .background(Color(0xFF9e9e9e.toInt()))

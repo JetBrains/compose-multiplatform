@@ -51,7 +51,7 @@ fun PopupDragDemo() {
             Box {
                 Box(
                     Modifier
-                        .pointerInput {
+                        .pointerInput(Unit) {
                             detectDragGestures { change, dragAmount ->
                                 offset.value = offset.value + dragAmount
                                 change.consumeAllChanges()

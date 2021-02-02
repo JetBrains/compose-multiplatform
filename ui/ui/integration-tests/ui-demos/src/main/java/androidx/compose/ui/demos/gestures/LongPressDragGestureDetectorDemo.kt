@@ -56,7 +56,7 @@ fun LongPressDragGestureFilterDemo() {
                 .fillMaxSize()
                 .wrapContentSize(Alignment.Center)
                 .preferredSize(192.dp)
-                .pointerInput {
+                .pointerInput(Unit) {
                     detectDragGesturesAfterLongPress(
                         onDragStart = { color.value = Blue },
                         onDragEnd = { color.value = Grey },

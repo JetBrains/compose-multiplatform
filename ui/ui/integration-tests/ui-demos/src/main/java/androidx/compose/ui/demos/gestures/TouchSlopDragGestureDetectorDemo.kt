@@ -74,7 +74,7 @@ fun DragGestureFilterDemo() {
                 .fillMaxSize()
                 .wrapContentSize(Alignment.Center)
                 .preferredSize(192.dp)
-                .pointerInput {
+                .pointerInput(Unit) {
                     if (canStartVertically.value) {
                         detectVerticalDragGestures(
                             onDragEnd = { canStartVertically.value = !canStartVertically.value }

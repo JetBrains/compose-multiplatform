@@ -132,7 +132,7 @@ private fun AndroidTapInComposeTap() {
                 .fillMaxSize()
                 .wrapContentSize(Alignment.Center)
                 .preferredSize(240.dp)
-                .pointerInput {
+                .pointerInput(Unit) {
                     detectTapGestures(onTap = onTap)
                 }
         ) {

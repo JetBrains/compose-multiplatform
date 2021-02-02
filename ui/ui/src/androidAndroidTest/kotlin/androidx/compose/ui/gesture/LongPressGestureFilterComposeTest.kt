@@ -50,10 +50,11 @@ class LongPressGestureFilterComposeTest {
             detectTapGestures(onLongPress = {})
         }
         rule.setContent {
-            val modifier = Modifier.pointerInput(block) as InspectableValue
+            val modifier = Modifier.pointerInput(Unit, block) as InspectableValue
             assertThat(modifier.nameFallback).isEqualTo("pointerInput")
             assertThat(modifier.valueOverride).isNull()
             assertThat(modifier.inspectableElements.asIterable()).containsExactly(
+                ValueElement("key1", Unit),
                 ValueElement("block", block)
             )
         }

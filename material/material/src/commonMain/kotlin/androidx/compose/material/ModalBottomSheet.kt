@@ -349,7 +349,7 @@ private fun Scrim(
             animationSpec = TweenSpec()
         )
         val dismissModifier = if (visible) {
-            Modifier.pointerInput { detectTapGestures { onDismiss() } }
+            Modifier.pointerInput(onDismiss) { detectTapGestures { onDismiss() } }
         } else {
             Modifier
         }

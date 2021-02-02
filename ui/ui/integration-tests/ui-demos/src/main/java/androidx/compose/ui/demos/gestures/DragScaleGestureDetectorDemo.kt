@@ -58,7 +58,7 @@ fun DragAndScaleGestureFilterDemo() {
                 .wrapContentSize(Alignment.Center)
                 .offset(offsetX, offsetY)
                 .preferredSize(size.value)
-                .pointerInput {
+                .pointerInput(Unit) {
                     detectTransformGestures { _, pan, zoom, _ ->
                         size.value *= zoom
                         offset.value += pan

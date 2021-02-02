@@ -53,7 +53,7 @@ fun DetectTapGesturesDemo() {
             Modifier.fillMaxSize()
                 .wrapContentSize(Alignment.Center)
                 .preferredSize(192.dp)
-                .pointerInput { detectTapGestures(onTap = onTap) }
+                .pointerInput(Unit) { detectTapGestures(onTap = onTap) }
                 .clipToBounds()
                 .background(color.value)
                 .border(BorderStroke(2.dp, BorderColor))

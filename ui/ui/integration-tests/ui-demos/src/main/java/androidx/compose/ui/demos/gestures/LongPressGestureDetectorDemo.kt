@@ -52,7 +52,7 @@ fun LongPressGestureDetectorDemo() {
             Modifier.fillMaxSize()
                 .wrapContentSize(Alignment.Center)
                 .preferredSize(192.dp)
-                .pointerInput { detectTapGestures(onLongPress = onLongPress) }
+                .pointerInput(Unit) { detectTapGestures(onLongPress = onLongPress) }
                 .background(color.value)
                 .border(BorderStroke(2.dp, BorderColor))
         )

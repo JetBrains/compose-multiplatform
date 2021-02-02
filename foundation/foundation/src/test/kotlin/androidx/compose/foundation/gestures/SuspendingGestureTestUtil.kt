@@ -100,7 +100,7 @@ internal class SuspendingGestureTestUtil(
                     LocalViewConfiguration provides TestViewConfiguration()
                 ) {
                     pointerInputFilter = currentComposer
-                        .materialize(Modifier.pointerInput(gestureDetector)) as
+                        .materialize(Modifier.pointerInput(Unit, gestureDetector)) as
                         PointerInputFilter
                 }
             }
