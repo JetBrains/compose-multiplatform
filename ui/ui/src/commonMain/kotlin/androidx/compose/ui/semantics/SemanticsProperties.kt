@@ -176,6 +176,12 @@ object SemanticsProperties {
         }
     )
 
+    // TODO(b/178121203) might need to be transformed text
+    /**
+     * @see SemanticsPropertyReceiver.editableText
+     */
+    val EditableText = SemanticsPropertyKey<AnnotatedString>(name = "EditableText")
+
     /**
      * @see SemanticsPropertyReceiver.textSelectionRange
      */
@@ -579,11 +585,19 @@ var SemanticsPropertyReceiver.testTag by SemanticsProperties.TestTag
 
 /**
  * Text of the semantics node. It must be real text instead of developer-set content description.
+ *
+ * @see SemanticsPropertyReceiver.editableText
  */
 var SemanticsPropertyReceiver.text by SemanticsProperties.Text
 
 /**
- * Text selection range for edit text.
+ * Input text of the text field. It must be real text entered by the user instead of
+ * developer-set content description.
+ */
+var SemanticsPropertyReceiver.editableText by SemanticsProperties.EditableText
+
+/**
+ * Text selection range for the text field.
  */
 var SemanticsPropertyReceiver.textSelectionRange by SemanticsProperties.TextSelectionRange
 

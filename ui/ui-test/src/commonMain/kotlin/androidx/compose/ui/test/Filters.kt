@@ -197,15 +197,51 @@ fun hasText(text: String, ignoreCase: Boolean = false): SemanticsMatcher {
  * @see hasText
  * @see SemanticsProperties.Text
  */
-fun hasSubstring(substring: String, ignoreCase: Boolean = false):
-    SemanticsMatcher {
-        return SemanticsMatcher(
-            "${SemanticsProperties.Text.name}.contains($substring, $ignoreCase)"
-        ) {
-            it.config.getOrNull(SemanticsProperties.Text)?.text?.contains(substring, ignoreCase)
-                ?: false
-        }
+fun hasSubstring(substring: String, ignoreCase: Boolean = false): SemanticsMatcher {
+    return SemanticsMatcher(
+        "${SemanticsProperties.Text.name}.contains($substring, $ignoreCase)"
+    ) {
+        it.config.getOrNull(SemanticsProperties.Text)?.text?.contains(substring, ignoreCase)
+            ?: false
     }
+}
+
+/**
+ * Returns whether the text field's input matches exactly to the given string.
+ *
+ * If you need to match the text field's label or placeholder, use [hasText] instead.
+ *
+ * @param text Text to match.
+ * @param ignoreCase Whether case should be ignored.
+ *
+ * @see hasEditableSubstring
+ * @see SemanticsProperties.EditableText
+ */
+fun hasEditableText(text: String, ignoreCase: Boolean = false): SemanticsMatcher {
+    return SemanticsMatcher(
+        "${SemanticsProperties.EditableText.name} = '$text' (ignoreCase: $ignoreCase)"
+    ) {
+        it.config.getOrNull(SemanticsProperties.EditableText)?.text.equals(text, ignoreCase)
+    }
+}
+
+/**
+ * Returns whether the text field's input contains the given substring.
+ *
+ * @param substring Substring to check.
+ * @param ignoreCase Whether case should be ignored.
+ *
+ * @see hasEditableText
+ * @see SemanticsProperties.EditableText
+ */
+fun hasEditableSubstring(substring: String, ignoreCase: Boolean = false): SemanticsMatcher {
+    return SemanticsMatcher(
+        "${SemanticsProperties.EditableText.name}.contains($substring, $ignoreCase)"
+    ) {
+        it.config.getOrNull(SemanticsProperties.EditableText)?.text
+            ?.contains(substring, ignoreCase) ?: false
+    }
+}
 
 /**
  * Returns whether the node's value matches exactly to the given accessibility value.
@@ -388,6 +424,7 @@ internal val SemanticsNode.ancestors: Iterable<SemanticsNode>
                 override fun hasNext(): Boolean {
                     return next != null
                 }
+
                 override fun next(): SemanticsNode {
                     return next!!.also { next = it.parent }
                 }

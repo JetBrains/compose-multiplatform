@@ -145,6 +145,15 @@ fun SemanticsNodeInteraction.assertTextEquals(value: String): SemanticsNodeInter
     assert(hasText(value))
 
 /**
+ * Asserts the text field's input is equal to the given String.
+ * For further details please check [SemanticsProperties.EditableText].
+ * Throws [AssertionError] if the text field node's value is not equal to `value`, or if the node
+ * has no value
+ */
+fun SemanticsNodeInteraction.assertEditableTextEquals(value: String): SemanticsNodeInteraction =
+    assert(hasEditableText(value))
+
+/**
  * Asserts the node's value equals the given value.
  *
  * For further details please check [SemanticsProperties.StateDescription].
