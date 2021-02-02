@@ -110,7 +110,6 @@ class ModalBottomSheetState(
      * be half expanded. Otherwise it will be fully expanded.
      *
      * @param onShown Optional callback invoked when the bottom sheet has been shown.
-     * @see expand
      */
     fun show(onShown: (() -> Unit)? = null) {
         val targetValue =
@@ -132,7 +131,7 @@ class ModalBottomSheetState(
      *
      * @param onHalfExpand Optional callback invoked when the bottom sheet has been half-expanded.
      */
-    fun halfExpand(onHalfExpand: (() -> Unit)? = null) {
+    internal fun halfExpand(onHalfExpand: (() -> Unit)? = null) {
         if (!isHalfExpandedEnabled) {
             return
         }
@@ -151,9 +150,8 @@ class ModalBottomSheetState(
      * Fully expand the bottom sheet, with an animation.
      *
      * @param onExpand Optional callback invoked when the bottom sheet has been expanded.
-     * @see show
      */
-    fun expand(onExpand: (() -> Unit)? = null) {
+    internal fun expand(onExpand: (() -> Unit)? = null) {
         animateTo(
             targetValue = ModalBottomSheetValue.Expanded,
             onEnd = { endReason, _ ->
