@@ -46,6 +46,7 @@ dependencies {
     androidTestImplementation project(":compose:runtime:runtime")
     androidTestImplementation project(":compose:test-utils")
     androidTestImplementation project(":compose:ui:ui")
+    androidTestImplementation project(":activity:activity-compose")
     androidTestImplementation(ANDROIDX_TEST_EXT_JUNIT)
     androidTestImplementation(KOTLIN_TEST_COMMON)
     androidTestImplementation(ANDROIDX_TEST_RULES)

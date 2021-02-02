@@ -2410,8 +2410,7 @@ package androidx.compose.ui.platform {
   }
 
   public final class WrapperKt {
-    method public static void setContent(androidx.activity.ComponentActivity, optional androidx.compose.runtime.CompositionReference? parent, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method @Deprecated public static androidx.compose.runtime.Composition setContent(android.view.ViewGroup, androidx.compose.runtime.CompositionReference parent, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @Deprecated public static void setContent(androidx.activity.ComponentActivity, optional androidx.compose.runtime.CompositionReference? parent, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
 }

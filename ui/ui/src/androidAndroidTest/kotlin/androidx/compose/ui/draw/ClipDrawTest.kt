@@ -18,6 +18,7 @@ package androidx.compose.ui.draw
 
 import android.graphics.Bitmap
 import android.os.Build
+import androidx.activity.compose.setContent
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.AtLeastSize
@@ -41,7 +42,6 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.padding
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.runOnUiThreadIR
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.unit.Density

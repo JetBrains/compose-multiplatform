@@ -19,6 +19,7 @@ package androidx.compose.ui.input.pointer
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -29,7 +30,6 @@ import androidx.compose.ui.gesture.PointerCoords
 import androidx.compose.ui.gesture.PointerProperties
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.runOnUiThreadIR
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.unit.IntSize

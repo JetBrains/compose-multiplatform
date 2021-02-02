@@ -18,6 +18,7 @@ package androidx.compose.ui.draw
 
 import android.graphics.Bitmap
 import android.os.Build
+import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,7 +30,6 @@ import androidx.compose.ui.assertRect
 import androidx.compose.ui.background
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.runOnUiThreadIR
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.waitAndScreenShot

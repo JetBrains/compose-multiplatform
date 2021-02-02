@@ -19,15 +19,15 @@ package androidx.compose.ui
 import android.util.Log
 import android.view.View
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.platform.AndroidUiDispatcher
 import androidx.compose.testutils.ComposeTestCase
 import androidx.compose.testutils.createAndroidComposeBenchmarkRunner
-import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.platform.AndroidUiDispatcher
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat

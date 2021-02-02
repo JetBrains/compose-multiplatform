@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.platform
 
+import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.AtLeastSize
 import androidx.compose.ui.Modifier

@@ -61,4 +61,5 @@ dependencies {
     androidTestImplementation(KOTLIN_REFLECT)
     androidTestImplementation(project(":benchmark:benchmark-junit4"))
     androidTestImplementation "androidx.activity:activity:1.2.0-alpha02"
+    androidTestImplementation project(":activity:activity-compose")
 }
