@@ -342,7 +342,7 @@ class SemanticsPropertyKey<T>(
 }
 
 /**
- * Data class for standard accessibility action.
+ * Standard accessibility action.
  *
  * @param label The description of this action
  * @param action The function to invoke when this action is performed. The function should return
@@ -353,7 +353,7 @@ class SemanticsPropertyKey<T>(
 data class AccessibilityAction<T : Function<Boolean>>(val label: CharSequence?, val action: T)
 
 /**
- * Data class for custom accessibility action.
+ * Custom accessibility action.
  *
  * @param label The description of this action
  * @param action The function to invoke when this action is performed. The function should have no
@@ -362,7 +362,7 @@ data class AccessibilityAction<T : Function<Boolean>>(val label: CharSequence?, 
 data class CustomAccessibilityAction(val label: CharSequence, val action: () -> Boolean)
 
 /**
- * Data class for accessibility range information, to represent the status of a progress bar or
+ * Accessibility range information, to represent the status of a progress bar or
  * seekable progress bar.
  *
  * @param current current value in the range
@@ -388,15 +388,15 @@ data class ProgressBarRangeInfo(
 /**
  * The scroll state of one axis if this node is scrollable.
  *
- * @param value current scroll position value in pixels
+ * @param value current 0-based scroll position value (either in pixels, or lazy-item count)
  * @param maxValue maximum bound for [value], or [Float.POSITIVE_INFINITY] if still unknown
  * @param reverseScrolling for horizontal scroll, when this is `true`, 0 [value] will mean right,
  * when`false`, 0 [value] will mean left. For vertical scroll, when this is `true`, 0 [value] will
  * mean bottom, when `false`, 0 [value] will mean top
  */
-data class ScrollAxisRange(
-    val value: Float = 0f,
-    val maxValue: Float = 0f,
+class ScrollAxisRange(
+    val value: () -> Float,
+    val maxValue: () -> Float,
     val reverseScrolling: Boolean = false
 )
 

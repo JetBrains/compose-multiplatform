@@ -2557,18 +2557,13 @@ package androidx.compose.ui.semantics {
   }
 
   public final class ScrollAxisRange {
-    ctor public ScrollAxisRange(float value, float maxValue, boolean reverseScrolling);
-    ctor public ScrollAxisRange();
-    method public float component1();
-    method public float component2();
-    method public boolean component3();
-    method public androidx.compose.ui.semantics.ScrollAxisRange copy(float value, float maxValue, boolean reverseScrolling);
-    method public float getMaxValue();
+    ctor public ScrollAxisRange(kotlin.jvm.functions.Function0<java.lang.Float> value, kotlin.jvm.functions.Function0<java.lang.Float> maxValue, boolean reverseScrolling);
+    method public kotlin.jvm.functions.Function0<java.lang.Float> getMaxValue();
     method public boolean getReverseScrolling();
-    method public float getValue();
-    property public final float maxValue;
+    method public kotlin.jvm.functions.Function0<java.lang.Float> getValue();
+    property public final kotlin.jvm.functions.Function0<java.lang.Float> maxValue;
     property public final boolean reverseScrolling;
-    property public final float value;
+    property public final kotlin.jvm.functions.Function0<java.lang.Float> value;
   }
 
   public final class SemanticsActions {
