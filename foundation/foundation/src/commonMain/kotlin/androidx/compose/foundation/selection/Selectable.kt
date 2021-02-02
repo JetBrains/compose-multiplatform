@@ -33,8 +33,10 @@ import androidx.compose.ui.semantics.stateDescription
 
 /**
  * Configure component to be selectable, usually as a part of a mutually exclusive group, where
- * only one item can be selected at any point in time. A typical example of mutually exclusive set
- * is a RadioGroup or a row of Tabs.
+ * only one item can be selected at any point in time.
+ * A typical example of mutually exclusive set is a RadioGroup or a row of Tabs. To ensure
+ * correct accessibility behavior, make sure to pass [Modifier.selectableGroup] modifier into the
+ * RadioGroup or the row.
  *
  * If you want to make an item support on/off capabilities without being part of a set, consider
  * using [Modifier.toggleable]
@@ -78,8 +80,10 @@ fun Modifier.selectable(
 
 /**
  * Configure component to be selectable, usually as a part of a mutually exclusive group, where
- * only one item can be selected at any point in time. A typical example of mutually exclusive set
- * is a RadioGroup or a row of Tabs.
+ * only one item can be selected at any point in time.
+ * A typical example of mutually exclusive set is a RadioGroup or a row of Tabs. To ensure
+ * correct accessibility behavior, make sure to pass [Modifier.selectableGroup] modifier into the
+ * RadioGroup or the row.
  *
  * If you want to make an item support on/off capabilities without being part of a set, consider
  * using [Modifier.toggleable]
