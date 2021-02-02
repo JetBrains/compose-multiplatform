@@ -100,7 +100,7 @@ fun SemanticsNodeInteraction.performScrollTo(): SemanticsNodeInteraction {
 
     @OptIn(InternalTestApi::class)
     testContext.testOwner.runOnUiThread {
-        scrollableNode.config[SemanticsActions.ScrollBy].action(dx, dy)
+        scrollableNode.config[SemanticsActions.ScrollBy].action?.invoke(dx, dy)
     }
 
     return this
@@ -183,7 +183,7 @@ fun <T : Function<Boolean>> SemanticsNodeInteraction.performSemanticsAction(
 
     @OptIn(InternalTestApi::class)
     testContext.testOwner.runOnUiThread {
-        invocation(node.config[key].action)
+        node.config[key].action?.let { invocation(it) }
     }
 }
 
