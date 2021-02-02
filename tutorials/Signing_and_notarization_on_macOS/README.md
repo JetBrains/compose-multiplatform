@@ -101,7 +101,7 @@ without the need to write the password itself.
 ### Gradle DSL
 
 DSL properties should be specified in `macOS` DSL block of Compose Desktop DSL:
-```kotlin
+``` kotlin
 import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
@@ -147,7 +147,7 @@ You can load custom properties from it manually in a script, if you want.
 
 ### Configuring bundle ID
 
-```
+``` kotlin
 macOS {
     bundleID = "com.example-company.example-app"
 }
@@ -163,7 +163,7 @@ uniquely identifies an application in Apple's ecosystem.
 
 ### Configuring signing settings
 
-```
+``` kotlin
 macOS {
     signing { 
          sign.set(true)
@@ -189,7 +189,7 @@ The following Gradle properties can be used instead of DSL properties:
 
 ### Configuring notarization settings
 
-```
+``` kotlin
 macOS {
     notarization { 
          appleID.set("john.doe@example.com")
