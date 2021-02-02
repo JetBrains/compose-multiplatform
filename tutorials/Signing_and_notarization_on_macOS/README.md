@@ -175,7 +175,7 @@ macOS {
 
 * Set the `sign` DSL property or  to `true`.
     * Alternatively, the `compose.desktop.mac.sign` Gradle property can be used.
-* Set the `identity` DSL property to the certificate's name, e.g. `"John Doe"`, `"Developer ID Application: John Doe"`.
+* Set the `identity` DSL property to the certificate's name, e.g. `"John Doe"`.
     *  Alternatively,  the `compose.desktop.mac.signing.identity` Gradle property can be  used.
 * Optionally, set the `keychain` DSL property to the path to the specific keychain, containing your certificate.
     * Alternatively, the `compose.desktop.mac.signing.keychain` Gradle property can be used.

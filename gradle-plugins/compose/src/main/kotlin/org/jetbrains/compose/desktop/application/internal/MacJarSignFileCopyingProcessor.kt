@@ -20,7 +20,7 @@ internal class MacJarSignFileCopyingProcessor(
             PrintStream(baos).use { ps ->
                 execOperations.exec { exec ->
                     exec.executable = MacUtils.security.absolutePath
-                    val args = arrayListOf("find-certificate", "-a", "-c", signing.identity)
+                    val args = arrayListOf("find-certificate", "-a", "-c", signing.fullDeveloperID)
                     signing.keychain?.let { args.add(it.absolutePath) }
                     exec.args(*args.toTypedArray())
                     exec.standardOutput = ps
@@ -39,7 +39,7 @@ internal class MacJarSignFileCopyingProcessor(
         }
 
         signKey = m.group(1)
-        if (m.find()) error("Multiple matching certificates are found for '${signing.identity}'. " +
+        if (m.find()) error("Multiple matching certificates are found for '${signing.fullDeveloperID}'. " +
                 "Please specify keychain containing unique matching certificate.")
     }
 

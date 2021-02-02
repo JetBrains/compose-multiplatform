@@ -167,7 +167,6 @@ internal fun AbstractUploadAppForNotarizationTask.configureUploadForNotarization
 ) {
     dependsOn(packageFormat)
     inputDir.set(packageFormat.flatMap { it.destinationDir })
-    nonValidatedBundleID.set(provider { app.nativeDistributions.macOS.bundleID })
     requestIDFile.set(project.layout.buildDirectory.file("compose/notarization/${app.name}-${targetFormat.id}-request-id.txt"))
     configureCommonNotarizationSettings(app)
 }
@@ -183,6 +182,7 @@ internal fun AbstractCheckNotarizationStatusTask.configureCheckNotarizationStatu
 internal fun AbstractNotarizationTask.configureCommonNotarizationSettings(
     app: Application
 ) {
+    nonValidatedBundleID.set(app.nativeDistributions.macOS.bundleID)
     nonValidatedNotarizationSettings = app.nativeDistributions.macOS.notarization
 }
 

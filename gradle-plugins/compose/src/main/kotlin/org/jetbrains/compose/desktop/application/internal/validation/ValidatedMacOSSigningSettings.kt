@@ -12,7 +12,18 @@ internal data class ValidatedMacOSSigningSettings(
     val identity: String,
     val keychain: File?,
     val prefix: String,
-)
+) {
+    val fullDeveloperID: String
+        get() {
+            val developerIdPrefix = "Developer ID Application: "
+            val thirdPartyMacDeveloperPrefix = "3rd Party Mac Developer Application: "
+            return when {
+                identity.startsWith(developerIdPrefix) -> identity
+                identity.startsWith(thirdPartyMacDeveloperPrefix) -> identity
+                else -> developerIdPrefix + identity
+            }
+        }
+}
 
 internal fun MacOSSigningSettings.validate(
     bundleIDProvider: Provider<String?>
@@ -34,20 +45,10 @@ internal fun MacOSSigningSettings.validate(
 
     return ValidatedMacOSSigningSettings(
         bundleID = bundleID,
-        identity = fullDeveloperID(signIdentity),
+        identity = signIdentity,
         keychain = keychainFile,
         prefix = signPrefix
     )
-}
-
-private fun fullDeveloperID(identity: String): String {
-    val developerIdPrefix = "Developer ID Application: "
-    val thirdPartyMacDeveloperPrefix = "3rd Party Mac Developer Application: "
-    return when {
-        identity.startsWith(developerIdPrefix) -> identity
-        identity.startsWith(thirdPartyMacDeveloperPrefix) -> identity
-        else -> developerIdPrefix + identity
-    }
 }
 
 private const val ERR_PREFIX = "Signing settings error:"

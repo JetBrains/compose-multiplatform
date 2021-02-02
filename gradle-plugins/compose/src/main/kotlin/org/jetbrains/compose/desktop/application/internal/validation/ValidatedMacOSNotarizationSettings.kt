@@ -14,10 +14,10 @@ internal fun MacOSNotarizationSettings.validate(
     bundleIDProvider: Provider<String?>
 ): ValidatedMacOSNotarizationSettings {
     val bundleID = validateBundleID(bundleIDProvider)
-    check(appleID.orNull.isNullOrEmpty()) {
+    check(!appleID.orNull.isNullOrEmpty()) {
         ERR_APPLE_ID_IS_EMPTY
     }
-    check(password.orNull.isNullOrEmpty()) {
+    check(!password.orNull.isNullOrEmpty()) {
         ERR_PASSWORD_IS_EMPTY
     }
     return ValidatedMacOSNotarizationSettings(
