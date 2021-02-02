@@ -469,11 +469,7 @@ package androidx.compose.material {
 
   @androidx.compose.runtime.Immutable public final class ResistanceConfig {
     ctor public ResistanceConfig(float basis, float factorAtMin, float factorAtMax);
-    method public float component1();
-    method public float component2();
-    method public float component3();
     method public float computeResistance(float overflow);
-    method @androidx.compose.runtime.Immutable public androidx.compose.material.ResistanceConfig copy(float basis, float factorAtMin, float factorAtMax);
     method public float getBasis();
     method public float getFactorAtMax();
     method public float getFactorAtMin();
@@ -573,10 +569,6 @@ package androidx.compose.material {
 
   @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Immutable public final class SwipeProgress<T> {
     ctor public SwipeProgress(T? from, T? to, float fraction);
-    method public T! component1();
-    method public T! component2();
-    method public float component3();
-    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Immutable public androidx.compose.material.SwipeProgress<T> copy(T! from, T! to, float fraction);
     method public float getFraction();
     method public T! getFrom();
     method public T! getTo();

@@ -169,10 +169,6 @@ package androidx.compose.ui.autofill {
 
   @androidx.compose.ui.ExperimentalComposeUiApi public final class AutofillNode {
     ctor public AutofillNode(java.util.List<? extends androidx.compose.ui.autofill.AutofillType> autofillTypes, androidx.compose.ui.geometry.Rect? boundingBox, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit>? onFill);
-    method public java.util.List<androidx.compose.ui.autofill.AutofillType> component1();
-    method public androidx.compose.ui.geometry.Rect? component2();
-    method public kotlin.jvm.functions.Function1<java.lang.String,kotlin.Unit>? component3();
-    method @androidx.compose.ui.ExperimentalComposeUiApi public androidx.compose.ui.autofill.AutofillNode copy(java.util.List<? extends androidx.compose.ui.autofill.AutofillType> autofillTypes, androidx.compose.ui.geometry.Rect? boundingBox, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit>? onFill);
     method public java.util.List<androidx.compose.ui.autofill.AutofillType> getAutofillTypes();
     method public androidx.compose.ui.geometry.Rect? getBoundingBox();
     method public int getId();
@@ -2416,9 +2412,6 @@ package androidx.compose.ui.semantics {
 
   public final class AccessibilityAction<T extends kotlin.Function<? extends java.lang.Boolean>> {
     ctor public AccessibilityAction(CharSequence? label, T action);
-    method public CharSequence? component1();
-    method public T component2();
-    method public androidx.compose.ui.semantics.AccessibilityAction<T> copy(CharSequence? label, T action);
     method public T getAction();
     method public CharSequence? getLabel();
     property public final T action;
@@ -2427,9 +2420,6 @@ package androidx.compose.ui.semantics {
 
   public final class CustomAccessibilityAction {
     ctor public CustomAccessibilityAction(CharSequence label, kotlin.jvm.functions.Function0<java.lang.Boolean> action);
-    method public CharSequence component1();
-    method public kotlin.jvm.functions.Function0<java.lang.Boolean> component2();
-    method public androidx.compose.ui.semantics.CustomAccessibilityAction copy(CharSequence label, kotlin.jvm.functions.Function0<java.lang.Boolean> action);
     method public kotlin.jvm.functions.Function0<java.lang.Boolean> getAction();
     method public CharSequence getLabel();
     property public final kotlin.jvm.functions.Function0<java.lang.Boolean> action;
@@ -2438,10 +2428,6 @@ package androidx.compose.ui.semantics {
 
   public final class ProgressBarRangeInfo {
     ctor public ProgressBarRangeInfo(float current, kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> range, int steps);
-    method public float component1();
-    method public kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> component2();
-    method public int component3();
-    method public androidx.compose.ui.semantics.ProgressBarRangeInfo copy(float current, kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> range, int steps);
     method public float getCurrent();
     method public kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> getRange();
     method public int getSteps();

@@ -39,7 +39,7 @@ import kotlin.math.roundToInt
  * 2) Source size must be greater than zero
  * 3) Source size must be less than or equal to the dimensions of [image]
  */
-data class ImagePainter(
+class ImagePainter(
     private val image: ImageBitmap,
     private val srcOffset: IntOffset = IntOffset.Zero,
     private val srcSize: IntSize = IntSize(image.width, image.height)
@@ -90,5 +90,27 @@ data class ImagePainter(
                 srcSize.height <= image.height
         )
         return srcSize
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ImagePainter) return false
+
+        if (image != other.image) return false
+        if (srcOffset != other.srcOffset) return false
+        if (srcSize != other.srcSize) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = image.hashCode()
+        result = 31 * result + srcOffset.hashCode()
+        result = 31 * result + srcSize.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "ImagePainter(image=$image, srcOffset=$srcOffset, srcSize=$srcSize)"
     }
 }

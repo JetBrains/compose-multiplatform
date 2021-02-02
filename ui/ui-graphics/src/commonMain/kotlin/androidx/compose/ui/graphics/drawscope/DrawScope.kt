@@ -828,7 +828,7 @@ object Fill : DrawStyle()
 /**
  * [DrawStyle] that provides information for drawing content with a stroke
  */
-data class Stroke(
+class Stroke(
     /**
      * Configure the width of the stroke in pixels
      */
@@ -878,5 +878,31 @@ data class Stroke(
          * Default join style used for connections between line and curve segments
          */
         val DefaultJoin = StrokeJoin.Miter
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Stroke) return false
+
+        if (width != other.width) return false
+        if (miter != other.miter) return false
+        if (cap != other.cap) return false
+        if (join != other.join) return false
+        if (pathEffect != other.pathEffect) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = width.hashCode()
+        result = 31 * result + miter.hashCode()
+        result = 31 * result + cap.hashCode()
+        result = 31 * result + join.hashCode()
+        result = 31 * result + (pathEffect?.hashCode() ?: 0)
+        return result
+    }
+
+    override fun toString(): String {
+        return "Stroke(width=$width, miter=$miter, cap=$cap, join=$join, pathEffect=$pathEffect)"
     }
 }
