@@ -245,54 +245,6 @@ class PopupPositionProviderTest {
             .isEqualTo(expectedPosition)
     }
 
-    @Test
-    fun dropdown_positionStart() {
-        /* Expected Dropdown Start Position
-           x = anchorBounds.x + offset.x
-           y = anchorBounds.y + offset.y + parentSize.y
-        */
-        val expectedPosition = IntOffset(60, 160)
-
-        assertThat(calculateDropdownPosition(DropDownAlignment.Start, LayoutDirection.Ltr))
-            .isEqualTo(expectedPosition)
-    }
-
-    @Test
-    fun dropdown_positionStart_rtl() {
-        /* Expected Dropdown Start Position
-           x = anchorBounds.x + parentSize.x - popupSize.x + (-offset.x)
-           y = anchorBounds.y + offset.y + parentSize.y
-        */
-        val expectedPosition = IntOffset(100, 160)
-
-        assertThat(calculateDropdownPosition(DropDownAlignment.Start, LayoutDirection.Rtl))
-            .isEqualTo(expectedPosition)
-    }
-
-    @Test
-    fun dropdown_positionEnd() {
-        /* Expected Dropdown End Position
-           x = anchorBounds.x + offset.x + parentSize.x
-           y = anchorBounds.y + offset.y + parentSize.y
-        */
-        val expectedPosition = IntOffset(160, 160)
-
-        assertThat(calculateDropdownPosition(DropDownAlignment.End, LayoutDirection.Ltr))
-            .isEqualTo(expectedPosition)
-    }
-
-    @Test
-    fun dropdown_positionEnd_rtl() {
-        /* Expected Dropdown End Position
-           x = anchorBounds.x - popupSize.x + (-offset.x)
-           y = anchorBounds.y + offset.y + parentSize.y
-        */
-        val expectedPosition = IntOffset(0, 160)
-
-        assertThat(calculateDropdownPosition(DropDownAlignment.End, LayoutDirection.Rtl))
-            .isEqualTo(expectedPosition)
-    }
-
     private fun calculatePosition(alignment: Alignment, layoutDir: LayoutDirection): IntOffset {
         val anchorBounds = IntRect(50, 50, 150, 150)
         val windowSize = IntSize(1000, 1000)
@@ -300,24 +252,6 @@ class PopupPositionProviderTest {
         val popupSize = IntSize(40, 20)
 
         return AlignmentOffsetPositionProvider(alignment, offset)
-            .calculatePosition(
-                anchorBounds,
-                windowSize,
-                layoutDir,
-                popupSize
-            )
-    }
-
-    private fun calculateDropdownPosition(
-        alignment: DropDownAlignment,
-        layoutDir: LayoutDirection
-    ): IntOffset {
-        val anchorBounds = IntRect(50, 50, 150, 150)
-        val windowSize = IntSize(1000, 1000)
-        val offset = IntOffset(10, 10)
-        val popupSize = IntSize(40, 20)
-
-        return DropdownPositionProvider(alignment, offset)
             .calculatePosition(
                 anchorBounds,
                 windowSize,

@@ -57,7 +57,7 @@ class DialogSecureFlagTest(private val setSecureFlagOnActivity: Boolean) {
     @Test
     fun noFlagSetOnDialog() {
         rule.setContent {
-            TestDialog(null)
+            TestDialog(DialogProperties())
         }
 
         if (setSecureFlagOnActivity) {
@@ -72,7 +72,7 @@ class DialogSecureFlagTest(private val setSecureFlagOnActivity: Boolean) {
     @Test
     fun forcedFlagOnDialogToDisabled() {
         rule.setContent {
-            TestDialog(AndroidDialogProperties(securePolicy = SecureFlagPolicy.SecureOff))
+            TestDialog(DialogProperties(securePolicy = SecureFlagPolicy.SecureOff))
         }
 
         // This tests that we also override the flag from the Activity
@@ -82,7 +82,7 @@ class DialogSecureFlagTest(private val setSecureFlagOnActivity: Boolean) {
     @Test
     fun forcedFlagOnDialogToEnabled() {
         rule.setContent {
-            TestDialog(AndroidDialogProperties(securePolicy = SecureFlagPolicy.SecureOn))
+            TestDialog(DialogProperties(securePolicy = SecureFlagPolicy.SecureOn))
         }
 
         assertThat(isSecureFlagEnabledForDialog()).isTrue()
@@ -90,8 +90,8 @@ class DialogSecureFlagTest(private val setSecureFlagOnActivity: Boolean) {
 
     @Test
     fun toggleFlagOnDialog() {
-        var properties: AndroidDialogProperties?
-        by mutableStateOf(AndroidDialogProperties(securePolicy = SecureFlagPolicy.SecureOff))
+        var properties: DialogProperties
+        by mutableStateOf(DialogProperties(securePolicy = SecureFlagPolicy.SecureOff))
 
         rule.setContent {
             TestDialog(properties)
@@ -100,16 +100,16 @@ class DialogSecureFlagTest(private val setSecureFlagOnActivity: Boolean) {
         assertThat(isSecureFlagEnabledForDialog()).isFalse()
 
         // Toggle flag
-        properties = AndroidDialogProperties(securePolicy = SecureFlagPolicy.SecureOn)
+        properties = DialogProperties(securePolicy = SecureFlagPolicy.SecureOn)
         assertThat(isSecureFlagEnabledForDialog()).isTrue()
 
         // Set to inherit
-        properties = AndroidDialogProperties(securePolicy = SecureFlagPolicy.Inherit)
+        properties = DialogProperties(securePolicy = SecureFlagPolicy.Inherit)
         assertThat(isSecureFlagEnabledForDialog()).isEqualTo(setSecureFlagOnActivity)
     }
 
     @Composable
-    fun TestDialog(dialogProperties: AndroidDialogProperties?) {
+    fun TestDialog(dialogProperties: DialogProperties) {
         SimpleContainer {
             Dialog(
                 onDismissRequest = { },
