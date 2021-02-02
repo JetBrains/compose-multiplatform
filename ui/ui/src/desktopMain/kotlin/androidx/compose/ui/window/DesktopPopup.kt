@@ -20,6 +20,7 @@ import androidx.compose.runtime.rememberCompositionReference
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.tapGestureFilter
@@ -29,16 +30,67 @@ import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.DesktopOwner
 import androidx.compose.ui.platform.DesktopOwnersAmbient
 import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.round
 
+/**
+ * Opens a popup with the given content.
+ *
+ * The popup is positioned relative to its parent, using the [alignment] and [offset].
+ * The popup is visible as long as it is part of the composition hierarchy.
+ *
+ * @sample androidx.compose.ui.samples.PopupSample
+ *
+ * @param alignment The alignment relative to the parent.
+ * @param offset An offset from the original aligned position of the popup. Offset respects the
+ * Ltr/Rtl context, thus in Ltr it will be added to the original aligned position and in Rtl it
+ * will be subtracted from it.
+ * @param isFocusable Indicates if the popup can grab the focus.
+ * @param onDismissRequest Executes when the user clicks outside of the popup.
+ * @param content The content to be displayed inside the popup.
+ */
 @Composable
-internal actual fun ActualPopup(
+fun Popup(
+    alignment: Alignment = Alignment.TopStart,
+    offset: IntOffset = IntOffset(0, 0),
+    isFocusable: Boolean = false,
+    onDismissRequest: (() -> Unit)? = null,
+    content: @Composable () -> Unit
+) {
+    val popupPositioner = remember(alignment, offset) {
+        AlignmentOffsetPositionProvider(
+            alignment,
+            offset
+        )
+    }
+
+    Popup(
+        popupPositionProvider = popupPositioner,
+        isFocusable = isFocusable,
+        onDismissRequest = onDismissRequest,
+        content = content
+    )
+}
+
+/**
+ * Opens a popup with the given content.
+ *
+ * The popup is positioned using a custom [popupPositionProvider].
+ *
+ * @sample androidx.compose.ui.samples.PopupSample
+ *
+ * @param popupPositionProvider Provides the screen position of the popup.
+ * @param isFocusable Indicates if the popup can grab the focus.
+ * @param onDismissRequest Executes when the user clicks outside of the popup.
+ * @param content The content to be displayed inside the popup.
+ */
+@Composable
+fun Popup(
     popupPositionProvider: PopupPositionProvider,
-    isFocusable: Boolean,
-    onDismissRequest: (() -> Unit)?,
-    properties: PopupProperties?,
+    isFocusable: Boolean = false,
+    onDismissRequest: (() -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
     PopupLayout(popupPositionProvider, isFocusable, onDismissRequest, content)

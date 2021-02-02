@@ -21,17 +21,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.style.ResolvedTextDirection
-import androidx.compose.ui.unit.dp
-
-internal val HANDLE_WIDTH = 25.dp
-internal val HANDLE_HEIGHT = 25.dp
 
 /**
  * @suppress
  */
-@InternalTextApi // Used by TextField Selection from foundation
+@InternalTextApi
 @Composable
-expect fun SelectionHandle(
+actual fun SelectionHandle(
     startHandlePosition: Offset?,
     endHandlePosition: Offset?,
     isStartHandle: Boolean,
@@ -39,18 +35,6 @@ expect fun SelectionHandle(
     handlesCrossed: Boolean,
     modifier: Modifier,
     handle: (@Composable () -> Unit)?
-)
-
-/**
- * Adjust coordinates for given text offset.
- *
- * Currently [android.text.Layout.getLineBottom] returns y coordinates of the next
- * line's top offset, which is not included in current line's hit area. To be able to
- * hit current line, move up this y coordinates by 1 pixel.
- *
- * @suppress
- */
-@InternalTextApi // Used by TextField Selection from foundation
-fun getAdjustedCoordinates(position: Offset): Offset {
-    return Offset(position.x, position.y - 1f)
+) {
+    // TODO
 }

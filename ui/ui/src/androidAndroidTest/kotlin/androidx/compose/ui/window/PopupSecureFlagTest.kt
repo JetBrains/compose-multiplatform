@@ -63,7 +63,7 @@ class PopupSecureFlagTest(private val setSecureFlagOnActivity: Boolean) {
     @Test
     fun noFlagSetOnPopup() {
         rule.setContent {
-            TestPopup(null)
+            TestPopup(PopupProperties())
         }
 
         if (setSecureFlagOnActivity) {
@@ -78,7 +78,7 @@ class PopupSecureFlagTest(private val setSecureFlagOnActivity: Boolean) {
     @Test
     fun forcedFlagOnPopupToDisabled() {
         rule.setContent {
-            TestPopup(AndroidPopupProperties(securePolicy = SecureFlagPolicy.SecureOff))
+            TestPopup(PopupProperties(securePolicy = SecureFlagPolicy.SecureOff))
         }
 
         // This tests that we also override the flag from the Activity
@@ -88,7 +88,7 @@ class PopupSecureFlagTest(private val setSecureFlagOnActivity: Boolean) {
     @Test
     fun forcedFlagOnPopupToEnabled() {
         rule.setContent {
-            TestPopup(AndroidPopupProperties(securePolicy = SecureFlagPolicy.SecureOn))
+            TestPopup(PopupProperties(securePolicy = SecureFlagPolicy.SecureOn))
         }
 
         assertThat(isSecureFlagEnabledForPopup()).isTrue()
@@ -96,8 +96,8 @@ class PopupSecureFlagTest(private val setSecureFlagOnActivity: Boolean) {
 
     @Test
     fun toggleFlagOnPopup() {
-        var properties: AndroidPopupProperties?
-        by mutableStateOf(AndroidPopupProperties(securePolicy = SecureFlagPolicy.SecureOff))
+        var properties: PopupProperties
+        by mutableStateOf(PopupProperties(securePolicy = SecureFlagPolicy.SecureOff))
 
         rule.setContent {
             TestPopup(properties)
@@ -106,16 +106,16 @@ class PopupSecureFlagTest(private val setSecureFlagOnActivity: Boolean) {
         assertThat(isSecureFlagEnabledForPopup()).isFalse()
 
         // Toggle flag
-        properties = AndroidPopupProperties(securePolicy = SecureFlagPolicy.SecureOn)
+        properties = PopupProperties(securePolicy = SecureFlagPolicy.SecureOn)
         assertThat(isSecureFlagEnabledForPopup()).isTrue()
 
         // Set to inherit
-        properties = AndroidPopupProperties(securePolicy = SecureFlagPolicy.Inherit)
+        properties = PopupProperties(securePolicy = SecureFlagPolicy.Inherit)
         assertThat(isSecureFlagEnabledForPopup()).isEqualTo(setSecureFlagOnActivity)
     }
 
     @Composable
-    fun TestPopup(popupProperties: AndroidPopupProperties?) {
+    fun TestPopup(popupProperties: PopupProperties) {
         SimpleContainer {
             PopupTestTag(testTag) {
                 Popup(

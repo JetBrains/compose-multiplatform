@@ -31,7 +31,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionReference
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Providers
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,6 +41,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionReference
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.Layout
@@ -57,8 +60,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.height
-import androidx.compose.ui.unit.width
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.ViewTreeViewModelStoreOwner
 import androidx.savedstate.ViewTreeSavedStateRegistryOwner
@@ -66,11 +67,13 @@ import org.jetbrains.annotations.TestOnly
 import kotlin.math.roundToInt
 
 /**
- * Android specific properties to configure a popup.
+ * Properties used to customize the behavior of a [Popup].
  *
+ * @property focusable Whether the popup is focusable. When true, the popup will receive IME
+ * events and key presses, such as when the back button is pressed.
  * @property dismissOnBackPress Whether the popup can be dismissed by pressing the back button.
- * If true, pressing the back button will call onDismissRequest. Note that the popup must be
- * focusable in order to receive key events such as the back button - if the popup is not
+ * If true, pressing the back button will call onDismissRequest. Note that [focusable] must be
+ * set to true in order to receive key events such as the back button - if the popup is not
  * focusable then this property does nothing.
  * @property dismissOnClickOutside Whether the popup can be dismissed by clicking outside the
  * popup's bounds. If true, clicking outside the popup will call onDismissRequest.
@@ -78,15 +81,17 @@ import kotlin.math.roundToInt
  * window.
  */
 @Immutable
-class AndroidPopupProperties(
+class PopupProperties(
+    val focusable: Boolean = false,
     val dismissOnBackPress: Boolean = true,
     val dismissOnClickOutside: Boolean = true,
     val securePolicy: SecureFlagPolicy = SecureFlagPolicy.Inherit
-) : PopupProperties {
+) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is AndroidPopupProperties) return false
+        if (other !is PopupProperties) return false
 
+        if (focusable != other.focusable) return false
         if (dismissOnBackPress != other.dismissOnBackPress) return false
         if (dismissOnClickOutside != other.dismissOnClickOutside) return false
         if (securePolicy != other.securePolicy) return false
@@ -96,10 +101,51 @@ class AndroidPopupProperties(
 
     override fun hashCode(): Int {
         var result = dismissOnBackPress.hashCode()
+        result = 31 * result + focusable.hashCode()
+        result = 31 * result + dismissOnBackPress.hashCode()
         result = 31 * result + dismissOnClickOutside.hashCode()
         result = 31 * result + securePolicy.hashCode()
         return result
     }
+}
+
+/**
+ * Opens a popup with the given content.
+ *
+ * The popup is positioned relative to its parent, using the [alignment] and [offset].
+ * The popup is visible as long as it is part of the composition hierarchy.
+ *
+ * @sample androidx.compose.ui.samples.PopupSample
+ *
+ * @param alignment The alignment relative to the parent.
+ * @param offset An offset from the original aligned position of the popup. Offset respects the
+ * Ltr/Rtl context, thus in Ltr it will be added to the original aligned position and in Rtl it
+ * will be subtracted from it.
+ * @param onDismissRequest Executes when the user clicks outside of the popup.
+ * @param properties [PopupProperties] for further customization of this popup's behavior.
+ * @param content The content to be displayed inside the popup.
+ */
+@Composable
+fun Popup(
+    alignment: Alignment = Alignment.TopStart,
+    offset: IntOffset = IntOffset(0, 0),
+    onDismissRequest: (() -> Unit)? = null,
+    properties: PopupProperties = PopupProperties(),
+    content: @Composable () -> Unit
+) {
+    val popupPositioner = remember(alignment, offset) {
+        AlignmentOffsetPositionProvider(
+            alignment,
+            offset
+        )
+    }
+
+    Popup(
+        popupPositionProvider = popupPositioner,
+        onDismissRequest = onDismissRequest,
+        properties = properties,
+        content = content
+    )
 }
 
 /**
@@ -110,27 +156,33 @@ class AndroidPopupProperties(
  * @sample androidx.compose.ui.samples.PopupSample
  *
  * @param popupPositionProvider Provides the screen position of the popup.
- * @param isFocusable Indicates if the popup can grab the focus.
  * @param onDismissRequest Executes when the user clicks outside of the popup.
- * @param properties Typically a platform specific properties to further configure the popup.
+ * @param properties [PopupProperties] for further customization of this popup's behavior.
  * @param content The content to be displayed inside the popup.
  */
 @Composable
-internal actual fun ActualPopup(
+fun Popup(
     popupPositionProvider: PopupPositionProvider,
-    isFocusable: Boolean,
-    onDismissRequest: (() -> Unit)?,
-    properties: PopupProperties?,
+    onDismissRequest: (() -> Unit)? = null,
+    properties: PopupProperties = PopupProperties(),
     content: @Composable () -> Unit
 ) {
     val view = LocalView.current
     val density = LocalDensity.current
     val testTag = LocalPopupTestTag.current
+    val layoutDirection = LocalLayoutDirection.current
     val parentComposition = rememberCompositionReference()
     val currentContent by rememberUpdatedState(content)
 
     val popupLayout = remember {
-        PopupLayout(view, density, popupPositionProvider).apply {
+        PopupLayout(
+            onDismissRequest = onDismissRequest,
+            properties = properties,
+            testTag = testTag,
+            composeView = view,
+            density = density,
+            initialPositionProvider = popupPositionProvider
+        ).apply {
             setContent(parentComposition) {
                 SimpleStack(
                     Modifier
@@ -151,6 +203,12 @@ internal actual fun ActualPopup(
 
     DisposableEffect(popupLayout) {
         popupLayout.show()
+        popupLayout.updateParameters(
+            onDismissRequest = onDismissRequest,
+            properties = properties,
+            testTag = testTag,
+            layoutDirection = layoutDirection
+        )
         onDispose {
             popupLayout.disposeComposition()
             // Remove the window
@@ -158,20 +216,13 @@ internal actual fun ActualPopup(
         }
     }
 
-    val layoutDirection = LocalLayoutDirection.current
     SideEffect {
-        popupLayout.apply {
-            this.onDismissRequest = onDismissRequest
-            this.testTag = testTag
-            this.superSetLayoutDirection(
-                when (layoutDirection) {
-                    LayoutDirection.Ltr -> android.util.LayoutDirection.LTR
-                    LayoutDirection.Rtl -> android.util.LayoutDirection.RTL
-                }
-            )
-            setIsFocusable(isFocusable)
-            setProperties(properties)
-        }
+        popupLayout.updateParameters(
+            onDismissRequest = onDismissRequest,
+            properties = properties,
+            testTag = testTag,
+            layoutDirection = layoutDirection
+        )
     }
 
     DisposableEffect(popupPositionProvider) {
@@ -200,6 +251,16 @@ internal actual fun ActualPopup(
         popupLayout.parentLayoutDirection = layoutDirection
         layout(0, 0) {}
     }
+}
+
+// TODO(b/142431825): This is a hack to work around Popups not using Semantics for test tags
+//  We should either remove it, or come up with an abstracted general solution that isn't specific
+//  to Popup
+internal val LocalPopupTestTag = compositionLocalOf { "DEFAULT_TEST_TAG" }
+
+@Composable
+internal fun PopupTestTag(tag: String, content: @Composable () -> Unit) {
+    Providers(LocalPopupTestTag provides tag, content = content)
 }
 
 // TODO(soboleva): Look at module dependencies so that we can get code reuse between
@@ -243,6 +304,9 @@ private inline fun SimpleStack(modifier: Modifier, noinline content: @Composable
  */
 @SuppressLint("ViewConstructor")
 private class PopupLayout(
+    private var onDismissRequest: (() -> Unit)?,
+    private var properties: PopupProperties,
+    var testTag: String,
     private val composeView: View,
     density: Density,
     initialPositionProvider: PopupPositionProvider
@@ -251,11 +315,6 @@ private class PopupLayout(
         composeView.context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     private val params = createLayoutParams()
 
-    /** Executed when the popup tries to dismiss itself. */
-    var onDismissRequest: (() -> Unit)? = null
-    /** The test tag used to match the popup in tests. */
-    var testTag: String = ""
-
     /** The logic of positioning the popup relative to its parent. */
     var positionProvider = initialPositionProvider
 
@@ -263,8 +322,6 @@ private class PopupLayout(
     var parentLayoutDirection: LayoutDirection = LayoutDirection.Ltr
     var parentBounds: IntRect? by mutableStateOf(null)
     var popupContentSize: IntSize? by mutableStateOf(null)
-
-    var properties: AndroidPopupProperties = AndroidPopupProperties()
 
     // Track parent bounds and content size; only show popup once we have both
     val canCalculatePosition by derivedStateOf { parentBounds != null && popupContentSize != null }
@@ -341,7 +398,7 @@ private class PopupLayout(
     /**
      * Set whether the popup can grab a focus and support dismissal.
      */
-    fun setIsFocusable(isFocusable: Boolean) = applyNewFlags(
+    private fun setIsFocusable(isFocusable: Boolean) = applyNewFlags(
         if (!isFocusable) {
             params.flags or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
         } else {
@@ -349,21 +406,30 @@ private class PopupLayout(
         }
     )
 
-    fun setSecureFlagEnabled(secureFlagEnabled: Boolean) = applyNewFlags(
-        if (secureFlagEnabled) {
-            params.flags or WindowManager.LayoutParams.FLAG_SECURE
-        } else {
-            params.flags and (WindowManager.LayoutParams.FLAG_SECURE.inv())
-        }
-    )
-
-    fun setProperties(newProperties: PopupProperties?) {
-        if (newProperties is AndroidPopupProperties) {
-            properties = newProperties
-        }
-        setSecureFlagEnabled(
-            properties.securePolicy.shouldApplySecureFlag(composeView.isFlagSecureEnabled())
+    private fun setSecurePolicy(securePolicy: SecureFlagPolicy) {
+        val secureFlagEnabled =
+            securePolicy.shouldApplySecureFlag(composeView.isFlagSecureEnabled())
+        applyNewFlags(
+            if (secureFlagEnabled) {
+                params.flags or WindowManager.LayoutParams.FLAG_SECURE
+            } else {
+                params.flags and (WindowManager.LayoutParams.FLAG_SECURE.inv())
+            }
         )
+    }
+
+    fun updateParameters(
+        onDismissRequest: (() -> Unit)?,
+        properties: PopupProperties,
+        testTag: String,
+        layoutDirection: LayoutDirection
+    ) {
+        this.onDismissRequest = onDismissRequest
+        this.properties = properties
+        this.testTag = testTag
+        setIsFocusable(properties.focusable)
+        setSecurePolicy(properties.securePolicy)
+        superSetLayoutDirection(layoutDirection)
     }
 
     private fun applyNewFlags(flags: Int) {
@@ -435,10 +501,13 @@ private class PopupLayout(
         // from the context's locale, but we have one already from the parent composition.
     }
 
-    // Called by composition side effect to set the "real" layout direction for our content
-    // that we obtain from the parent composition.
-    fun superSetLayoutDirection(layoutDirection: Int) {
-        super.setLayoutDirection(layoutDirection)
+    // Sets the "real" layout direction for our content that we obtain from the parent composition.
+    private fun superSetLayoutDirection(layoutDirection: LayoutDirection) {
+        val direction = when (layoutDirection) {
+            LayoutDirection.Ltr -> android.util.LayoutDirection.LTR
+            LayoutDirection.Rtl -> android.util.LayoutDirection.RTL
+        }
+        super.setLayoutDirection(direction)
     }
 
     /**

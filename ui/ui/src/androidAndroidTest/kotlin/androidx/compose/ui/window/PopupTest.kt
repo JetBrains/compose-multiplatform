@@ -138,14 +138,14 @@ class PopupTest {
         }
 
         val measureLatch = CountDownLatch(1)
-        var isFocusable by mutableStateOf(false)
+        var focusable by mutableStateOf(false)
         rule.setContent {
             Box {
                 PopupTestTag(testTag) {
                     Popup(
                         alignment = Alignment.TopStart,
                         offset = offset,
-                        isFocusable = isFocusable
+                        properties = PopupProperties(focusable = focusable)
                     ) {
                         // This is called after the OnChildPosition method in Popup() which
                         // updates the popup to its final position
@@ -174,7 +174,7 @@ class PopupTest {
         assertSinglePopupExists()
 
         rule.runOnUiThread {
-            isFocusable = true
+            focusable = true
         }
 
         // If we have a leak, this will crash on multiple popups found
@@ -269,8 +269,10 @@ class PopupTest {
             Box(Modifier.fillMaxSize()) {
                 if (showPopup) {
                     Popup(
-                        // Needs to be focusable to intercept back press
-                        isFocusable = true,
+                        properties = PopupProperties(
+                            // Needs to be focusable to intercept back press
+                            focusable = true
+                        ),
                         alignment = Alignment.Center,
                         onDismissRequest = { showPopup = false }
                     ) {
@@ -290,14 +292,14 @@ class PopupTest {
     }
 
     @Test
-    fun isNotDismissedOnTapOutside_customPopupProperties() {
+    fun isNotDismissedOnTapOutside_dismissOnClickOutsideFalse() {
         var showPopup by mutableStateOf(true)
         rule.setContent {
             Box(Modifier.fillMaxSize()) {
                 if (showPopup) {
                     Popup(
                         alignment = Alignment.Center,
-                        properties = AndroidPopupProperties(dismissOnClickOutside = false),
+                        properties = PopupProperties(dismissOnClickOutside = false),
                         onDismissRequest = { showPopup = false }
                     ) {
                         Box(Modifier.preferredSize(50.dp).testTag(testTag))
@@ -321,15 +323,17 @@ class PopupTest {
     }
 
     @Test
-    fun isNotDismissedOnBackPress_customPopupProperties() {
+    fun isNotDismissedOnBackPress_dismissOnBackPressFalse() {
         var showPopup by mutableStateOf(true)
         rule.setContent {
             Box(Modifier.fillMaxSize()) {
                 if (showPopup) {
                     Popup(
-                        // Needs to be focusable to intercept back press
-                        isFocusable = true,
-                        properties = AndroidPopupProperties(dismissOnBackPress = false),
+                        properties = PopupProperties(
+                            // Needs to be focusable to intercept back press
+                            focusable = true,
+                            dismissOnBackPress = false
+                        ),
                         alignment = Alignment.Center,
                         onDismissRequest = { showPopup = false }
                     ) {

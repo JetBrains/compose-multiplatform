@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.IntSize
 import java.awt.image.BufferedImage
 
 /**
- * Desktop specific properties to configure a dialog.
+ * Properties used to customize the behavior of a [Dialog].
  *
  * @param title The title of the dialog window.
  * The title is displayed in the windows's native border.
@@ -49,7 +49,7 @@ import java.awt.image.BufferedImage
  * onResize, onRelocate.
  */
 @Immutable
-data class DesktopDialogProperties(
+data class DialogProperties(
     val title: String = "JetpackDesktopDialog",
     val size: IntSize = IntSize(400, 250),
     val location: IntOffset = IntOffset.Zero,
@@ -59,19 +59,25 @@ data class DesktopDialogProperties(
     val undecorated: Boolean = false,
     val resizable: Boolean = true,
     val events: WindowEvents = WindowEvents()
-) : DialogProperties
+)
 
+/**
+ * Opens a dialog with the given content.
+ *
+ * The dialog is visible as long as it is part of the composition hierarchy.
+ * In order to let the user dismiss the Dialog, the implementation of [onDismissRequest] should
+ * contain a way to remove to remove the dialog from the composition hierarchy.
+ *
+ * @param onDismissRequest Executes when the user tries to dismiss the dialog.
+ * @param properties [DialogProperties] for further customization of this dialog's behavior.
+ * @param content The content to be displayed inside the dialog.
+ */
 @Composable
-internal actual fun ActualDialog(
+fun Dialog(
     onDismissRequest: () -> Unit,
-    properties: DialogProperties?,
+    properties: DialogProperties = DialogProperties(),
     content: @Composable () -> Unit
 ) {
-    var desktopProperties = DesktopDialogProperties()
-    if (properties is DesktopDialogProperties) {
-        desktopProperties = properties
-    }
-
     val attached = AppWindowAmbient.current
     if (attached?.pair != null) {
         return
@@ -81,15 +87,15 @@ internal actual fun ActualDialog(
     val dialog = remember {
         AppWindow(
             attached = attached,
-            title = desktopProperties.title,
-            size = desktopProperties.size,
-            location = desktopProperties.location,
-            centered = desktopProperties.centered,
-            icon = desktopProperties.icon,
-            menuBar = desktopProperties.menuBar,
-            undecorated = desktopProperties.undecorated,
-            resizable = desktopProperties.resizable,
-            events = desktopProperties.events,
+            title = properties.title,
+            size = properties.size,
+            location = properties.location,
+            centered = properties.centered,
+            icon = properties.icon,
+            menuBar = properties.menuBar,
+            undecorated = properties.undecorated,
+            resizable = properties.resizable,
+            events = properties.events,
             onDismissRequest = onDismissRequest
         )
     }

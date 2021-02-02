@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 
 @Composable
 fun FocusInPopupDemo() {
@@ -60,7 +61,7 @@ fun FocusInPopupDemo() {
         if (showPopup) {
             Popup(
                 alignment = Alignment.Center,
-                isFocusable = true,
+                properties = PopupProperties(focusable = true),
                 onDismissRequest = { showPopup = false }
             ) {
                 Column(Modifier.background(White)) {

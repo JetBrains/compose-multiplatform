@@ -598,6 +598,9 @@ package androidx.compose.foundation.text {
 
 package androidx.compose.foundation.text.selection {
 
+  public final class AndroidSelectionHandlesKt {
+  }
+
   public final class MultiWidgetSelectionDelegateKt {
   }
 

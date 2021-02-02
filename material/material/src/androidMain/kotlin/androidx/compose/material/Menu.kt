@@ -54,10 +54,9 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.height
-import androidx.compose.ui.unit.width
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
+import androidx.compose.ui.window.PopupProperties
 import kotlin.math.max
 import kotlin.math.min
 
@@ -99,6 +98,7 @@ fun DropdownMenu(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
     offset: DpOffset = DpOffset(0.dp, 0.dp),
+    properties: PopupProperties = PopupProperties(focusable = true),
     content: @Composable ColumnScope.() -> Unit
 ) {
     val expandedStates = remember { MutableTransitionState(false) }
@@ -115,9 +115,9 @@ fun DropdownMenu(
         }
 
         Popup(
-            isFocusable = true,
             onDismissRequest = onDismissRequest,
-            popupPositionProvider = popupPositionProvider
+            popupPositionProvider = popupPositionProvider,
+            properties = properties
         ) {
             // Menu open/close animation.
             val transition = updateTransition(expandedStates, "DropDownMenu")

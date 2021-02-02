@@ -2827,39 +2827,24 @@ package androidx.compose.ui.viewinterop {
 package androidx.compose.ui.window {
 
   public final class AndroidDialogKt {
-  }
-
-  @androidx.compose.runtime.Immutable public final class AndroidDialogProperties implements androidx.compose.ui.window.DialogProperties {
-    ctor public AndroidDialogProperties(boolean dismissOnBackPress, boolean dismissOnClickOutside, androidx.compose.ui.window.SecureFlagPolicy securePolicy);
-    ctor public AndroidDialogProperties();
-    method public boolean getDismissOnBackPress();
-    method public boolean getDismissOnClickOutside();
-    method public androidx.compose.ui.window.SecureFlagPolicy getSecurePolicy();
-    property public final boolean dismissOnBackPress;
-    property public final boolean dismissOnClickOutside;
-    property public final androidx.compose.ui.window.SecureFlagPolicy securePolicy;
+    method @androidx.compose.runtime.Composable public static void Dialog(kotlin.jvm.functions.Function0<kotlin.Unit> onDismissRequest, optional androidx.compose.ui.window.DialogProperties properties, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
   public final class AndroidPopupKt {
+    method @androidx.compose.runtime.Composable public static void Popup(androidx.compose.ui.window.PopupPositionProvider popupPositionProvider, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onDismissRequest, optional androidx.compose.ui.window.PopupProperties properties, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static void Popup-wO4EaeM(optional androidx.compose.ui.Alignment alignment, optional long offset, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onDismissRequest, optional androidx.compose.ui.window.PopupProperties properties, kotlin.jvm.functions.Function0<kotlin.Unit> content);
     method @org.jetbrains.annotations.TestOnly public static boolean isPopupLayout(android.view.View view, optional String? testTag);
   }
 
-  @androidx.compose.runtime.Immutable public final class AndroidPopupProperties implements androidx.compose.ui.window.PopupProperties {
-    ctor public AndroidPopupProperties(boolean dismissOnBackPress, boolean dismissOnClickOutside, androidx.compose.ui.window.SecureFlagPolicy securePolicy);
-    ctor public AndroidPopupProperties();
+  @androidx.compose.runtime.Immutable public final class DialogProperties {
+    ctor public DialogProperties(boolean dismissOnBackPress, boolean dismissOnClickOutside, androidx.compose.ui.window.SecureFlagPolicy securePolicy);
+    ctor public DialogProperties();
     method public boolean getDismissOnBackPress();
     method public boolean getDismissOnClickOutside();
     method public androidx.compose.ui.window.SecureFlagPolicy getSecurePolicy();
     property public final boolean dismissOnBackPress;
     property public final boolean dismissOnClickOutside;
     property public final androidx.compose.ui.window.SecureFlagPolicy securePolicy;
-  }
-
-  public final class DialogKt {
-    method @androidx.compose.runtime.Composable public static void Dialog(kotlin.jvm.functions.Function0<kotlin.Unit> onDismissRequest, optional androidx.compose.ui.window.DialogProperties? properties, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-  }
-
-  @androidx.compose.runtime.Immutable public interface DialogProperties {
   }
 
   public interface DialogWindowProvider {
@@ -2867,16 +2852,21 @@ package androidx.compose.ui.window {
     property public abstract android.view.Window window;
   }
 
-  public final class PopupKt {
-    method @androidx.compose.runtime.Composable public static void Popup(androidx.compose.ui.window.PopupPositionProvider popupPositionProvider, optional boolean isFocusable, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onDismissRequest, optional androidx.compose.ui.window.PopupProperties? properties, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method @androidx.compose.runtime.Composable public static void Popup-_wmJi10(optional androidx.compose.ui.Alignment alignment, optional long offset, optional boolean isFocusable, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onDismissRequest, optional androidx.compose.ui.window.PopupProperties? properties, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-  }
-
   @androidx.compose.runtime.Immutable public interface PopupPositionProvider {
     method public long calculatePosition-aa5Bd6I(androidx.compose.ui.unit.IntRect anchorBounds, long windowSize, androidx.compose.ui.unit.LayoutDirection layoutDirection, long popupContentSize);
   }
 
-  @androidx.compose.runtime.Immutable public interface PopupProperties {
+  @androidx.compose.runtime.Immutable public final class PopupProperties {
+    ctor public PopupProperties(boolean focusable, boolean dismissOnBackPress, boolean dismissOnClickOutside, androidx.compose.ui.window.SecureFlagPolicy securePolicy);
+    ctor public PopupProperties();
+    method public boolean getDismissOnBackPress();
+    method public boolean getDismissOnClickOutside();
+    method public boolean getFocusable();
+    method public androidx.compose.ui.window.SecureFlagPolicy getSecurePolicy();
+    property public final boolean dismissOnBackPress;
+    property public final boolean dismissOnClickOutside;
+    property public final boolean focusable;
+    property public final androidx.compose.ui.window.SecureFlagPolicy securePolicy;
   }
 
   public enum SecureFlagPolicy {
