@@ -27,6 +27,7 @@ package androidx.compose.ui.test {
     method public static androidx.compose.ui.test.SemanticsNodeInteractionCollection assertAll(androidx.compose.ui.test.SemanticsNodeInteractionCollection, androidx.compose.ui.test.SemanticsMatcher matcher);
     method public static androidx.compose.ui.test.SemanticsNodeInteractionCollection assertAny(androidx.compose.ui.test.SemanticsNodeInteractionCollection, androidx.compose.ui.test.SemanticsMatcher matcher);
     method public static androidx.compose.ui.test.SemanticsNodeInteractionCollection assertCountEquals(androidx.compose.ui.test.SemanticsNodeInteractionCollection, int expectedSize);
+    method public static androidx.compose.ui.test.SemanticsNodeInteraction assertEditableTextEquals(androidx.compose.ui.test.SemanticsNodeInteraction, String value);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction assertHasClickAction(androidx.compose.ui.test.SemanticsNodeInteraction);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction assertHasNoClickAction(androidx.compose.ui.test.SemanticsNodeInteraction);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction assertIsDisplayed(androidx.compose.ui.test.SemanticsNodeInteraction);
@@ -82,6 +83,8 @@ package androidx.compose.ui.test {
     method public static androidx.compose.ui.test.SemanticsMatcher hasAnySibling(androidx.compose.ui.test.SemanticsMatcher matcher);
     method public static androidx.compose.ui.test.SemanticsMatcher hasClickAction();
     method public static androidx.compose.ui.test.SemanticsMatcher hasContentDescription(String label, optional boolean ignoreCase);
+    method public static androidx.compose.ui.test.SemanticsMatcher hasEditableSubstring(String substring, optional boolean ignoreCase);
+    method public static androidx.compose.ui.test.SemanticsMatcher hasEditableText(String text, optional boolean ignoreCase);
     method public static androidx.compose.ui.test.SemanticsMatcher hasImeAction(androidx.compose.ui.text.input.ImeAction actionType);
     method public static androidx.compose.ui.test.SemanticsMatcher hasNoClickAction();
     method public static androidx.compose.ui.test.SemanticsMatcher hasNoScrollAction();

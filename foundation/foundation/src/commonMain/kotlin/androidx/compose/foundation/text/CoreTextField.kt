@@ -57,6 +57,7 @@ import androidx.compose.foundation.text.selection.SimpleLayout
 import androidx.compose.ui.semantics.copyText
 import androidx.compose.ui.semantics.cutText
 import androidx.compose.ui.semantics.disabled
+import androidx.compose.ui.semantics.editableText
 import androidx.compose.ui.semantics.getTextLayoutResult
 import androidx.compose.ui.semantics.imeAction
 import androidx.compose.ui.semantics.onClick
@@ -356,10 +357,10 @@ internal fun CoreTextField(
     }
 
     val isPassword = visualTransformation is PasswordVisualTransformation
-    val semanticsModifier = Modifier.semantics {
+    val semanticsModifier = Modifier.semantics(true) {
         // focused semantics are handled by Modifier.focusable()
         this.imeAction = imeOptions.imeAction
-        this.text = value.annotatedString
+        this.editableText = value.annotatedString
         this.textSelectionRange = value.selection
         if (!enabled) this.disabled()
         if (isPassword) this.password()
@@ -442,8 +443,8 @@ internal fun CoreTextField(
     // Modifiers that should be applied to the outer text field container. Usually those include
     // gesture and semantics modifiers.
     val decorationBoxModifier = modifier
-        .then(pointerModifier)
         .textFieldScrollable(scrollerPosition, interactionState, enabled)
+        .then(pointerModifier)
         .then(semanticsModifier)
         .then(focusModifier)
         .onGloballyPositioned {

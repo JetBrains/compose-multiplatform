@@ -140,6 +140,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             R.id.accessibility_custom_action_31
         )
     }
+
     /** Virtual view id for the currently hovered logical item. */
     private var hoveredVirtualViewId = InvalidId
     private val accessibilityManager: AccessibilityManager =
@@ -153,6 +154,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     private var nodeProvider: AccessibilityNodeProviderCompat =
         AccessibilityNodeProviderCompat(MyNodeProvider())
     private var focusedVirtualViewId = InvalidId
+
     // For actionIdToId and labelToActionId, the keys are the virtualViewIds. The value of
     // actionIdToLabel holds assigned custom action id to custom action label mapping. The
     // value of labelToActionId holds custom action label to assigned custom action id mapping.
@@ -162,6 +164,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     private val subtreeChangedLayoutNodes = ArraySet<LayoutNode>()
     private val boundsUpdateChannel = Channel<Unit>(Channel.CONFLATED)
     private var currentSemanticsNodesInvalidated = true
+
     // Up to date semantics nodes in pruned semantics tree. It always reflects the current
     // semantics tree.
     private var currentSemanticsNodes: Map<Int, SemanticsNode> = mapOf()
@@ -298,12 +301,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             )
         }
 
-        // TODO: we need a AnnotedString to CharSequence conversion function
-        info.text = trimToSize(
-            semanticsNode.config.getOrNull(SemanticsProperties.Text)
-                ?.toAccessibilitySpannableString(density = view.density, view.fontLoader),
-            ParcelSafeTextLength
-        )
+        setText(semanticsNode, info)
         info.stateDescription =
             semanticsNode.config.getOrNull(SemanticsProperties.StateDescription)
         info.contentDescription =
@@ -313,7 +311,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         }
         info.isPassword = semanticsNode.isPassword
         // Note editable is not added to semantics properties api.
-        info.isEditable = semanticsNode.config.contains(SemanticsActions.SetText)
+        info.isEditable = semanticsNode.isTextField
         info.isEnabled = semanticsNode.enabled()
         info.isFocusable = semanticsNode.config.contains(SemanticsProperties.Focused)
         if (info.isFocusable) {
@@ -346,7 +344,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             }
         }
 
-        semanticsNode.config.getOrNull(SemanticsActions.SetText)?.let {
+        if (semanticsNode.isTextField) {
             info.className = "android.widget.EditText"
         }
         // The config will contain this action only if there is a text selection at the moment.
@@ -637,6 +635,35 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 actionIdToLabel.put(virtualViewId, currentActionIdToLabel)
                 labelToActionId.put(virtualViewId, currentLabelToActionId)
             }
+        }
+    }
+
+    private fun setText(
+        node: SemanticsNode,
+        info: AccessibilityNodeInfoCompat
+    ) {
+        val editableTextToAssign = trimToSize(
+            node.config.getOrNull(SemanticsProperties.EditableText)
+                ?.toAccessibilitySpannableString(density = view.density, view.fontLoader),
+            ParcelSafeTextLength
+        )
+        val textToAssign = trimToSize(
+            node.config.getOrNull(SemanticsProperties.Text)
+                ?.toAccessibilitySpannableString(density = view.density, view.fontLoader),
+            ParcelSafeTextLength
+        )
+
+        if (node.isTextField) {
+            if (editableTextToAssign.isNullOrEmpty()) {
+                info.text = textToAssign
+                info.isShowingHintText = true
+            } else {
+                info.text = editableTextToAssign
+                info.hintText = textToAssign
+                info.isShowingHintText = false
+            }
+        } else {
+            info.text = textToAssign
         }
     }
 
@@ -1057,9 +1084,10 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             } else {
                 currentSemanticsNodes[virtualViewId] ?: return
             }
-        // TODO(b/157474582): This only works for single text/text field
-        if (node.config.contains(SemanticsProperties.Text) &&
-            node.config.contains(SemanticsActions.GetTextLayoutResult) &&
+        // TODO(b/157474582): This only works for single text, which means that for text field it
+        //  gets the editable text only and for multiple merged text it gets one text only
+        val text = getIterableTextForAccessibility(node)
+        if (text != null && node.config.contains(SemanticsActions.GetTextLayoutResult) &&
             arguments != null && extraDataKey == EXTRA_DATA_TEXT_CHARACTER_LOCATION_KEY
         ) {
             val positionInfoStartIndex = arguments.getInt(
@@ -1069,7 +1097,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 EXTRA_DATA_TEXT_CHARACTER_LOCATION_ARG_LENGTH, -1
             )
             if ((positionInfoLength <= 0) || (positionInfoStartIndex < 0) ||
-                (positionInfoStartIndex >= node.config[SemanticsProperties.Text].length)
+                (positionInfoStartIndex >= text.length)
             ) {
                 Log.e(LogTag, "Invalid arguments for accessibility character locations")
                 return
@@ -1121,9 +1149,11 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
 
     // TODO: this only works for single text/text field.
     private fun SemanticsNode.findNonEmptyTextChild(): SemanticsNode? {
-        if (this.unmergedConfig.contains(SemanticsProperties.Text) &&
-            this.unmergedConfig[SemanticsProperties.Text].length != 0
-        ) {
+        val containsNonEmptyText =
+            this.unmergedConfig.getOrNull(SemanticsProperties.Text)?.isNotEmpty() == true
+        val containsNonEmptyEditableText =
+            this.unmergedConfig.getOrNull(SemanticsProperties.EditableText)?.isNotEmpty() == true
+        if (containsNonEmptyText || containsNonEmptyEditableText) {
             return this
         }
         unmergedChildren().fastForEach {
@@ -1446,19 +1476,15 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                             AccessibilityEvent.CONTENT_CHANGE_TYPE_CONTENT_DESCRIPTION,
                             entry.value as CharSequence
                         )
-                    SemanticsProperties.Text -> {
+                    SemanticsProperties.EditableText -> {
                         // TODO(b/160184953) Add test for SemanticsProperty Text change event
-                        if (newNode.config.contains(SemanticsActions.SetText)) {
-                            val oldText = (
-                                oldNode.config.getOrElse(
-                                    SemanticsProperties.Text
-                                ) { AnnotatedString("") }
-                                ).text
-                            val newText = (
-                                newNode.config.getOrElse(
-                                    SemanticsProperties.Text
-                                ) { AnnotatedString("") }
-                                ).text
+                        if (newNode.isTextField) {
+                            val oldText = oldNode.config.getOrNull(
+                                SemanticsProperties.EditableText
+                            )?.text ?: ""
+                            val newText = newNode.config.getOrNull(
+                                SemanticsProperties.EditableText
+                            )?.text ?: ""
                             var startCount = 0
                             // endCount records how many characters are the same from the end.
                             var endCount = 0
@@ -1503,11 +1529,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     }
                     // do we need to overwrite TextRange equals?
                     SemanticsProperties.TextSelectionRange -> {
-                        val newText = (
-                            newNode.config.getOrElse(
-                                SemanticsProperties.Text
-                            ) { AnnotatedString("") }
-                            ).text
+                        val newText = getTextForTextField(newNode) ?: ""
                         val event = createEvent(
                             semanticsNodeIdToAccessibilityVirtualNodeId(id),
                             AccessibilityEvent.TYPE_VIEW_TEXT_SELECTION_CHANGED
@@ -1778,7 +1800,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     private fun isAccessibilitySelectionExtendable(node: SemanticsNode): Boolean {
         // Currently only TextField is extendable. Static text may become extendable later.
         return !node.config.contains(SemanticsProperties.ContentDescription) &&
-            node.config.contains(SemanticsProperties.Text)
+            node.config.contains(SemanticsProperties.EditableText)
     }
 
     private fun getIteratorForGranularity(
@@ -1812,9 +1834,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_LINE,
             AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_PAGE -> {
                 // Line and page granularity are only for static text or text field.
-                if (node == null || !node.config.contains(SemanticsProperties.Text) ||
-                    !node.config.contains(SemanticsActions.GetTextLayoutResult)
-                ) {
+                if (node == null || !node.config.contains(SemanticsActions.GetTextLayoutResult)) {
                     return null
                 }
                 // TODO(b/157474582): Note now it only works for single Text/TextField until we
@@ -1854,10 +1874,27 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         if (node.config.contains(SemanticsProperties.ContentDescription)) {
             return node.config[SemanticsProperties.ContentDescription]
         }
-        if (node.config.contains(SemanticsProperties.Text)) {
-            return node.config[SemanticsProperties.Text].text
+
+        if (node.isTextField) {
+            return getTextForTextField(node)
         }
-        return null
+
+        return node.config.getOrNull(SemanticsProperties.Text)?.text
+    }
+
+    /**
+     * If there is an "editable" text inside text field, it is reported as a text. Otherwise
+     * label's text is used
+     */
+    private fun getTextForTextField(node: SemanticsNode?): String? {
+        if (node == null) return null
+
+        val editableText = node.config.getOrNull(SemanticsProperties.EditableText)
+        return if (editableText.isNullOrEmpty()) {
+            node.config.getOrNull(SemanticsProperties.Text)?.text
+        } else {
+            editableText.text
+        }
     }
 
     // TODO(b/160820721): use AccessibilityNodeProviderCompat instead of AccessibilityNodeProvider
@@ -1932,6 +1969,7 @@ private fun SemanticsNode.propertiesDeleted(
 
 private fun SemanticsNode.hasPaneTitle() = config.contains(SemanticsProperties.PaneTitle)
 private val SemanticsNode.isPassword: Boolean get() = config.contains(SemanticsProperties.Password)
+private val SemanticsNode.isTextField get() = this.config.contains(SemanticsActions.SetText)
 
 /**
  * Finds pruned [SemanticsNode]s in the tree owned by this [SemanticsOwner]. A semantics node
