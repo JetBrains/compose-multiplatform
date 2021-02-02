@@ -33,11 +33,14 @@ package androidx.compose.ui.unit {
     method public static boolean equals-impl0(long p1, long p2);
     method public static boolean getHasBoundedHeight-impl(long $this);
     method public static boolean getHasBoundedWidth-impl(long $this);
+    method public static boolean getHasFixedHeight-impl(long $this);
+    method public static boolean getHasFixedWidth-impl(long $this);
     method public static int getMaxHeight-impl(long $this);
     method public static int getMaxWidth-impl(long $this);
     method public static int getMinHeight-impl(long $this);
     method public static int getMinWidth-impl(long $this);
     method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(long p);
+    method public static boolean isZero-impl(long $this);
     method public static String toString-impl(long $this);
     field public static final androidx.compose.ui.unit.Constraints.Companion Companion;
     field public static final int Infinity = 2147483647; // 0x7fffffff
@@ -51,14 +54,12 @@ package androidx.compose.ui.unit {
 
   public final class ConstraintsKt {
     method @androidx.compose.runtime.Stable public static long Constraints(optional int minWidth, optional int maxWidth, optional int minHeight, optional int maxHeight);
+    method public static long constrain-WVSBfsc(long, long otherConstraints);
     method @androidx.compose.runtime.Stable public static long constrain-m9CmiCs(long, long size);
     method @androidx.compose.runtime.Stable public static int constrainHeight-4A1wEdY(long, int height);
     method @androidx.compose.runtime.Stable public static int constrainWidth-4A1wEdY(long, int width);
-    method @androidx.compose.runtime.Stable public static long enforce-WVSBfsc(long, long otherConstraints);
-    method public static boolean getHasFixedHeight-BRTryo0(long);
-    method public static boolean getHasFixedWidth-BRTryo0(long);
+    method @Deprecated @androidx.compose.runtime.Stable public static long enforce-WVSBfsc(long, long otherConstraints);
     method @androidx.compose.runtime.Stable public static boolean isSatisfiedBy-m9CmiCs(long, long size);
-    method public static boolean isZero-BRTryo0(long);
     method @androidx.compose.runtime.Stable public static long offset-dAqVMF8(long, optional int horizontal, optional int vertical);
   }
 
