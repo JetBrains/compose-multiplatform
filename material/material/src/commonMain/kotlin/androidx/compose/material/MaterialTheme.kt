@@ -16,7 +16,6 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.Indication
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.material.ripple.ExperimentalRippleApi
 import androidx.compose.material.ripple.LocalRippleTheme
@@ -67,14 +66,12 @@ fun MaterialTheme(
         // we don't skip the updateColorsFrom call
         colors.copy()
     }.apply { updateColorsFrom(colors) }
-    val indicationFactory: @Composable () -> Indication = remember {
-        @Composable { rememberRipple() }
-    }
+    val rippleIndication = rememberRipple()
     val selectionColors = rememberTextSelectionColors(rememberedColors)
     Providers(
         LocalColors provides rememberedColors,
         LocalContentAlpha provides ContentAlpha.high,
-        LocalIndication provides indicationFactory,
+        LocalIndication provides rippleIndication,
         LocalRippleTheme provides MaterialRippleTheme,
         LocalShapes provides shapes,
         LocalTextSelectionColors provides selectionColors,

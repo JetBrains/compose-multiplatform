@@ -52,7 +52,7 @@ fun IndicationSample() {
             modifier = Modifier
                 // this element doesn't have a click, but will show default indication from the
                 // CompositionLocal as it accepts same interaction state
-                .indication(interactionState, LocalIndication.current())
+                .indication(interactionState, LocalIndication.current)
                 .padding(10.dp)
         )
     }

@@ -99,21 +99,22 @@ fun Surface(
     } else {
         color
     }
-    Box(
-        modifier.graphicsLayer(shadowElevation = elevationPx, shape = shape)
-            .then(if (border != null) Modifier.border(border, shape) else Modifier)
-            .background(
-                color = backgroundColor,
-                shape = shape
-            )
-            .clip(shape),
-        propagateMinConstraints = true
+    Providers(
+        LocalContentColor provides contentColor,
+        LocalAbsoluteElevation provides absoluteElevation
     ) {
-        Providers(
-            LocalContentColor provides contentColor,
-            LocalAbsoluteElevation provides absoluteElevation,
-            content = content
-        )
+        Box(
+            modifier.graphicsLayer(shadowElevation = elevationPx, shape = shape)
+                .then(if (border != null) Modifier.border(border, shape) else Modifier)
+                .background(
+                    color = backgroundColor,
+                    shape = shape
+                )
+                .clip(shape),
+            propagateMinConstraints = true
+        ) {
+            content()
+        }
     }
 }
 

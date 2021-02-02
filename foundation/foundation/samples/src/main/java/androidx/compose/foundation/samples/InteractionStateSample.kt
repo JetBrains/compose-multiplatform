@@ -72,7 +72,7 @@ fun PriorityInteractionStateSample() {
                 .fillMaxSize()
                 .clickable(
                     interactionState = interactionState,
-                    indication = LocalIndication.current()
+                    indication = LocalIndication.current
                 ) { /* do nothing */ }
                 .then(draggable)
                 .border(BorderStroke(3.dp, color))
@@ -98,7 +98,7 @@ fun MultipleInteractionStateSample() {
 
     val clickable = Modifier.clickable(
         interactionState = interactionState,
-        indication = LocalIndication.current()
+        indication = LocalIndication.current
     ) {
         /* update some business state here */
     }
