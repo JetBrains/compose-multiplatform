@@ -149,6 +149,8 @@ abstract class GenerateMediaTestConfigurationTask : DefaultTask() {
             .testRunner(testRunner.get())
             .isClientPrevious(isClientPrevious)
             .isServicePrevious(isServicePrevious)
+            .tag("androidx_unit_tests")
+            .tag("media_compat")
         when (affectedModuleDetectorSubset.get()) {
             ProjectSubset.CHANGED_PROJECTS, ProjectSubset.ALL_AFFECTED_PROJECTS -> {
                 configBuilder.isPostsubmit(true)
