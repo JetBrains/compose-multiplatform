@@ -10,9 +10,13 @@ internal data class ValidatedMacOSNotarizationSettings(
     val password: String
 )
 
-internal fun MacOSNotarizationSettings.validate(
+internal fun MacOSNotarizationSettings?.validate(
     bundleIDProvider: Provider<String?>
 ): ValidatedMacOSNotarizationSettings {
+    checkNotNull(this) {
+        ERR_NOTARIZATION_SETTINGS_ARE_NOT_PROVIDED
+    }
+
     val bundleID = validateBundleID(bundleIDProvider)
     check(!appleID.orNull.isNullOrEmpty()) {
         ERR_APPLE_ID_IS_EMPTY
@@ -28,6 +32,8 @@ internal fun MacOSNotarizationSettings.validate(
 }
 
 private const val ERR_PREFIX = "Notarization settings error:"
+private const val ERR_NOTARIZATION_SETTINGS_ARE_NOT_PROVIDED =
+    "$ERR_PREFIX notarization settings are not provided"
 private val ERR_APPLE_ID_IS_EMPTY =
     """|$ERR_PREFIX appleID is null or empty. To specify:
                |  * Use '${ComposeProperties.MAC_NOTARIZATION_APPLE_ID}' Gradle property;
