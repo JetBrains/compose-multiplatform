@@ -5,7 +5,7 @@ import org.gradle.api.provider.ProviderFactory
 
 internal object ComposeProperties {
     internal const val VERBOSE = "compose.desktop.verbose"
-    internal const val PRESERVE_WD = "compose.desktop.verbose"
+    internal const val PRESERVE_WD = "compose.preserve.working.dir"
     internal const val MAC_SIGN = "compose.desktop.mac.sign"
     internal const val MAC_SIGN_ID = "compose.desktop.mac.signing.identity"
     internal const val MAC_SIGN_KEYCHAIN = "compose.desktop.mac.signing.keychain"
@@ -14,13 +14,13 @@ internal object ComposeProperties {
     internal const val MAC_NOTARIZATION_PASSWORD = "compose.desktop.mac.notarization.password"
 
     fun isVerbose(providers: ProviderFactory): Provider<Boolean> =
-        providers.findProperty(VERBOSE).map { "true" == it }
+        providers.findProperty(VERBOSE).toBoolean()
 
     fun preserveWorkingDir(providers: ProviderFactory): Provider<Boolean> =
-        providers.findProperty(PRESERVE_WD).map { "true" == it }
+        providers.findProperty(PRESERVE_WD).toBoolean()
 
     fun macSign(providers: ProviderFactory): Provider<Boolean> =
-        providers.findProperty(MAC_SIGN).map { "true" == it }
+        providers.findProperty(MAC_SIGN).toBoolean()
 
     fun macSignIdentity(providers: ProviderFactory): Provider<String?> =
         providers.findProperty(MAC_SIGN_ID)
@@ -39,6 +39,17 @@ internal object ComposeProperties {
 
     private fun ProviderFactory.findProperty(prop: String): Provider<String?> =
         provider {
-            gradleProperty(prop).forUseAtConfigurationTime().orNull
+            gradleProperty(prop).forUseAtConfigurationTimeSafe().orNull
         }
+
+    private fun Provider<String?>.forUseAtConfigurationTimeSafe(): Provider<String?> =
+        try {
+            forUseAtConfigurationTime()
+        } catch (e: NoSuchMethodError) {
+            // todo: remove once we drop support for Gradle 6.4
+            this
+        }
+
+    private fun Provider<String?>.toBoolean(): Provider<Boolean> =
+        orElse("false").map { "true" == it }
 }
