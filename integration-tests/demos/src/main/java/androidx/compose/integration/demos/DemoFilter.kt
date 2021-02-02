@@ -44,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -117,7 +118,7 @@ private fun FilterField(
         value = filterText,
         onValueChange = onFilter,
         textStyle = LocalTextStyle.current,
-        cursorColor = LocalContentColor.current
+        cursorBrush = SolidColor(LocalContentColor.current)
     )
     DisposableEffect(focusRequester) {
         focusRequester.requestFocus()

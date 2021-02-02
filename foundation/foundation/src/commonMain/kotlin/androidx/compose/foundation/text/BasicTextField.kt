@@ -24,7 +24,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextLayoutResult
@@ -104,7 +106,8 @@ import androidx.compose.ui.text.input.VisualTransformation
  * present on this TextField. You can create and pass in your own remembered [InteractionState]
  * if you want to read the [InteractionState] and customize the appearance / behavior of this
  * TextField in different [Interaction]s.
- * @param cursorColor Color of the cursor. If [Color.Unspecified], there will be no cursor drawn
+ * @param cursorBrush [Brush] to paint cursor with. If [SolidColor] with [Color.Unspecified]
+ * provided, there will be no cursor drawn
  * @param decorationBox Composable lambda that allows to add decorations around text field, such
  * as icon, placeholder, helper messages or similar, and automatically increase the hit target area
  * of the text field. To allow you to control the placement of the inner text field relative to your
@@ -128,7 +131,7 @@ fun BasicTextField(
     onTextLayout: (TextLayoutResult) -> Unit = {},
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
     interactionState: InteractionState = remember { InteractionState() },
-    cursorColor: Color = Color.Black,
+    cursorBrush: Brush = SolidColor(Color.Black),
     decorationBox: @Composable (innerTextField: @Composable () -> Unit) -> Unit =
         @Composable { innerTextField -> innerTextField() }
 ) {
@@ -153,7 +156,7 @@ fun BasicTextField(
         visualTransformation = visualTransformation,
         onTextLayout = onTextLayout,
         onTextInputStarted = onTextInputStarted,
-        cursorColor = cursorColor,
+        cursorBrush = cursorBrush,
         interactionState = interactionState,
         singleLine = singleLine,
         decorationBox = decorationBox
@@ -365,7 +368,8 @@ fun BasicTextField(
  * present on this TextField. You can create and pass in your own remembered [InteractionState]
  * if you want to read the [InteractionState] and customize the appearance / behavior of this
  * TextField in different [Interaction]s.
- * @param cursorColor Color of the cursor. If [Color.Unspecified], there will be no cursor drawn
+ * @param cursorBrush [Brush] to paint cursor with. If [SolidColor] with [Color.Unspecified]
+ * provided, there will be no cursor drawn
  * @param decorationBox Composable lambda that allows to add decorations around text field, such
  * as icon, placeholder, helper messages or similar, and automatically increase the hit target area
  * of the text field. To allow you to control the placement of the inner text field relative to your
@@ -390,7 +394,7 @@ fun BasicTextField(
     onTextLayout: (TextLayoutResult) -> Unit = {},
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
     interactionState: InteractionState = remember { InteractionState() },
-    cursorColor: Color = Color.Black,
+    cursorBrush: Brush = SolidColor(Color.Black),
     decorationBox: @Composable (innerTextField: @Composable () -> Unit) -> Unit =
         @Composable { innerTextField -> innerTextField() }
 ) {
@@ -403,7 +407,7 @@ fun BasicTextField(
         onTextLayout = onTextLayout,
         interactionState = interactionState,
         onTextInputStarted = onTextInputStarted,
-        cursorColor = cursorColor,
+        cursorBrush = cursorBrush,
         imeOptions = keyboardOptions.toImeOptions(singleLine = singleLine),
         keyboardActions = keyboardActions,
         softWrap = !singleLine,

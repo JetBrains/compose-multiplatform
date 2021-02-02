@@ -50,6 +50,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.platform.LocalTextToolbar
@@ -406,7 +407,7 @@ class TextFieldTest {
                 onValueChange = {},
                 textStyle = TextStyle(color = Color.White),
                 modifier = Modifier.preferredSize(10.dp, 20.dp).background(color = Color.White),
-                cursorColor = Color.Blue
+                cursorBrush = SolidColor(Color.Blue)
             )
         }
 
