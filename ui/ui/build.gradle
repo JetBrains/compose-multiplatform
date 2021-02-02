@@ -165,7 +165,12 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             }
 
             androidMain.dependsOn jvmMain
-            desktopMain.dependsOn jvmMain
+            desktopMain {
+                dependencies {
+                    api(KOTLIN_COROUTINES_SWING)
+                }
+                dependsOn jvmMain
+            }
 
             test.dependencies {
                 implementation(ANDROIDX_TEST_RULES)
