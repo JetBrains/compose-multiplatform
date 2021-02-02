@@ -13,9 +13,7 @@ package androidx.compose.foundation {
   }
 
   @androidx.compose.runtime.Immutable public final class BorderStroke {
-    method public float component1-D9Ej5fM();
-    method public androidx.compose.ui.graphics.Brush component2();
-    method @androidx.compose.runtime.Immutable public androidx.compose.foundation.BorderStroke copy-v_fYJzc(float width, androidx.compose.ui.graphics.Brush brush);
+    method public androidx.compose.foundation.BorderStroke copy-v_fYJzc(optional float width, optional androidx.compose.ui.graphics.Brush brush);
     method public androidx.compose.ui.graphics.Brush getBrush();
     method public float getWidth-D9Ej5fM();
     property public final androidx.compose.ui.graphics.Brush brush;
@@ -164,9 +162,6 @@ package androidx.compose.foundation.animation {
 
   @androidx.compose.runtime.Immutable public final class FlingConfig {
     ctor public FlingConfig(androidx.compose.animation.core.FloatDecayAnimationSpec decayAnimation, kotlin.jvm.functions.Function1<? super java.lang.Float,androidx.compose.animation.core.TargetAnimation> adjustTarget);
-    method public androidx.compose.animation.core.FloatDecayAnimationSpec component1();
-    method public kotlin.jvm.functions.Function1<java.lang.Float,androidx.compose.animation.core.TargetAnimation> component2();
-    method @androidx.compose.runtime.Immutable public androidx.compose.foundation.animation.FlingConfig copy(androidx.compose.animation.core.FloatDecayAnimationSpec decayAnimation, kotlin.jvm.functions.Function1<? super java.lang.Float,androidx.compose.animation.core.TargetAnimation> adjustTarget);
     method public kotlin.jvm.functions.Function1<java.lang.Float,androidx.compose.animation.core.TargetAnimation> getAdjustTarget();
     method public androidx.compose.animation.core.FloatDecayAnimationSpec getDecayAnimation();
     property public final kotlin.jvm.functions.Function1<java.lang.Float,androidx.compose.animation.core.TargetAnimation> adjustTarget;

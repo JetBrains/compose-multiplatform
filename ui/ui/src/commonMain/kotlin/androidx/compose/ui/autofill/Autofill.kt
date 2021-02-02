@@ -68,7 +68,7 @@ interface Autofill {
  * @property id A virtual id that is automatically generated for each node.
  */
 @ExperimentalComposeUiApi
-data class AutofillNode(
+class AutofillNode(
     val autofillTypes: List<AutofillType> = listOf(),
     var boundingBox: Rect? = null,
     val onFill: ((String) -> Unit)?
@@ -83,4 +83,22 @@ data class AutofillNode(
     }
 
     val id: Int = generateId()
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is AutofillNode) return false
+
+        if (autofillTypes != other.autofillTypes) return false
+        if (boundingBox != other.boundingBox) return false
+        if (onFill != other.onFill) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = autofillTypes.hashCode()
+        result = 31 * result + (boundingBox?.hashCode() ?: 0)
+        result = 31 * result + (onFill?.hashCode() ?: 0)
+        return result
+    }
 }

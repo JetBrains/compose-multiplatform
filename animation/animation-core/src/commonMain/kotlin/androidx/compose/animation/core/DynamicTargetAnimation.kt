@@ -23,10 +23,30 @@ package androidx.compose.animation.core
  * @param animation The animation that will be used to animate to the target destination. This
  *                  animation defaults to a Spring Animation unless specified.
  */
-data class TargetAnimation(
+class TargetAnimation(
     val target: Float,
     val animation: AnimationSpec<Float> = SpringSpec()
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is TargetAnimation) return false
+
+        if (target != other.target) return false
+        if (animation != other.animation) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = target.hashCode()
+        result = 31 * result + animation.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "TargetAnimation(target=$target, animation=$animation)"
+    }
+}
 
 /**
  * Possible reasons with which DynamicTargetAnimation can finish

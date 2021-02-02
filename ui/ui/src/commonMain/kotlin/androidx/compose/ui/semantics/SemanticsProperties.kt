@@ -356,7 +356,27 @@ class SemanticsPropertyKey<T>(
  * forward action should return false if the widget is not enabled or has reached the end of the
  * list.
  */
-data class AccessibilityAction<T : Function<Boolean>>(val label: CharSequence?, val action: T)
+class AccessibilityAction<T : Function<Boolean>>(val label: CharSequence?, val action: T) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is AccessibilityAction<*>) return false
+
+        if (label != other.label) return false
+        if (action != other.action) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = label?.hashCode() ?: 0
+        result = 31 * result + action.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "AccessibilityAction(label=$label, action=$action)"
+    }
+}
 
 /**
  * Custom accessibility action.
@@ -365,7 +385,27 @@ data class AccessibilityAction<T : Function<Boolean>>(val label: CharSequence?, 
  * @param action The function to invoke when this action is performed. The function should have no
  * arguments and return a boolean result indicating whether the action is successfully handled.
  */
-data class CustomAccessibilityAction(val label: CharSequence, val action: () -> Boolean)
+class CustomAccessibilityAction(val label: CharSequence, val action: () -> Boolean) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is CustomAccessibilityAction) return false
+
+        if (label != other.label) return false
+        if (action != other.action) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = label.hashCode()
+        result = 31 * result + action.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "CustomAccessibilityAction(label=$label, action=$action)"
+    }
+}
 
 /**
  * Accessibility range information, to represent the status of a progress bar or
@@ -377,7 +417,7 @@ data class CustomAccessibilityAction(val label: CharSequence, val action: () -> 
  * between across the whole value range. If `0`, any value from the range specified can be chosen.
  * Cannot be less than `0`.
  */
-data class ProgressBarRangeInfo(
+class ProgressBarRangeInfo(
     val current: Float,
     val range: ClosedFloatingPointRange<Float>,
     /*@IntRange(from = 0)*/
@@ -388,6 +428,28 @@ data class ProgressBarRangeInfo(
          * Accessibility range information to present indeterminate progress bar
          */
         val Indeterminate = ProgressBarRangeInfo(0f, 0f..0f)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ProgressBarRangeInfo) return false
+
+        if (current != other.current) return false
+        if (range != other.range) return false
+        if (steps != other.steps) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = current.hashCode()
+        result = 31 * result + range.hashCode()
+        result = 31 * result + steps
+        return result
+    }
+
+    override fun toString(): String {
+        return "ProgressBarRangeInfo(current=$current, range=$range, steps=$steps)"
     }
 }
 

@@ -24,8 +24,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 /**
  * [Painter] implementation used to fill the provided bounds with the specified color
  */
-data class ColorPainter(val color: Color) : Painter() {
-
+class ColorPainter(val color: Color) : Painter() {
     private var alpha: Float = 1.0f
 
     private var colorFilter: ColorFilter? = null
@@ -42,6 +41,23 @@ data class ColorPainter(val color: Color) : Painter() {
     override fun applyColorFilter(colorFilter: ColorFilter?): Boolean {
         this.colorFilter = colorFilter
         return true
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ColorPainter) return false
+
+        if (color != other.color) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return color.hashCode()
+    }
+
+    override fun toString(): String {
+        return "ColorPainter(color=$color)"
     }
 
     /**
