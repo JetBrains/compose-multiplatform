@@ -17,7 +17,7 @@ package androidx.compose.ui.platform
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
-import androidx.compose.runtime.CompositionReference
+import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -32,7 +32,7 @@ import androidx.compose.ui.node.LayoutNode
  */
 @OptIn(ExperimentalComposeApi::class)
 internal fun DesktopOwner.setContent(
-    parent: CompositionReference? = null,
+    parent: CompositionContext? = null,
     content: @Composable () -> Unit
 ): Composition {
     GlobalSnapshotManager.ensureStarted()
@@ -71,7 +71,7 @@ private fun ProvideDesktopAmbients(owner: DesktopOwner, content: @Composable () 
 @OptIn(ExperimentalComposeApi::class)
 internal actual fun subcomposeInto(
     container: LayoutNode,
-    parent: CompositionReference,
+    parent: CompositionContext,
     composable: @Composable () -> Unit
 ): Composition = Composition(
     container,

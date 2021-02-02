@@ -22,7 +22,7 @@ import androidx.compose.desktop.WindowEvents
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.rememberCompositionReference
+import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -83,7 +83,7 @@ fun Dialog(
         return
     }
 
-    val parentComposition = rememberCompositionReference()
+    val parentComposition = rememberCompositionContext()
     val dialog = remember {
         AppWindow(
             attached = attached,

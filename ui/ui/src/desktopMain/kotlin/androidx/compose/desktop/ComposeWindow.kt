@@ -16,7 +16,7 @@
 package androidx.compose.desktop
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionReference
+import androidx.compose.runtime.CompositionContext
 import javax.swing.JFrame
 
 class ComposeWindow(val parent: AppFrame) : JFrame() {
@@ -35,7 +35,7 @@ class ComposeWindow(val parent: AppFrame) : JFrame() {
      * @param content Composable content of the ComposeWindow.
      */
     fun setContent(
-        parentComposition: CompositionReference? = null,
+        parentComposition: CompositionContext? = null,
         content: @Composable () -> Unit
     ) {
         layer.setContent(

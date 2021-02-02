@@ -200,7 +200,7 @@ abstract class AppFrame {
 //     * @param content Composable content of the window.
 //     */
 //    abstract fun show(
-//        parentComposition: CompositionReference? = null,
+//        parentComposition: CompositionContext? = null,
 //        content: @Composable () -> Unit
 //    )
 

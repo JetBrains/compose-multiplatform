@@ -18,7 +18,7 @@ package androidx.compose.desktop
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
-import androidx.compose.runtime.CompositionReference
+import androidx.compose.runtime.CompositionContext
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.input.mouse.MouseScrollEvent
 import androidx.compose.ui.input.mouse.MouseScrollUnit
@@ -66,7 +66,7 @@ internal class ComposeLayer {
     private var composition: Composition? = null
 
     private var content: (@Composable () -> Unit)? = null
-    private var parentComposition: CompositionReference? = null
+    private var parentComposition: CompositionContext? = null
 
     private lateinit var density: Density
 
@@ -237,7 +237,7 @@ internal class ComposeLayer {
     }
 
     internal fun setContent(
-        parentComposition: CompositionReference? = null,
+        parentComposition: CompositionContext? = null,
         content: @Composable () -> Unit
     ) {
         check(!isDisposed)

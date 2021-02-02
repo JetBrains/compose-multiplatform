@@ -2642,15 +2642,15 @@ class CompositionTests {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun testCompositionReferenceIsRemembered() = runBlockingTest {
+    fun testCompositionContextIsRemembered() = runBlockingTest {
         localRecomposerTest { recomposer ->
             val composition = Composition(EmptyApplier(), recomposer)
             try {
                 lateinit var scope: RecomposeScope
-                val parentReferences = mutableListOf<CompositionReference>()
+                val parentReferences = mutableListOf<CompositionContext>()
                 composition.setContent {
                     scope = currentRecomposeScope
-                    parentReferences += rememberCompositionReference()
+                    parentReferences += rememberCompositionContext()
                 }
                 scope.invalidate()
                 advanceUntilIdle()
@@ -2780,7 +2780,7 @@ class CompositionTests {
 private fun TestSubcomposition(
     content: @Composable () -> Unit
 ) {
-    val parentRef = rememberCompositionReference()
+    val parentRef = rememberCompositionContext()
     val currentContent by rememberUpdatedState(content)
     DisposableEffect(parentRef) {
         val subcomposition = ControlledComposition(EmptyApplier(), parentRef)

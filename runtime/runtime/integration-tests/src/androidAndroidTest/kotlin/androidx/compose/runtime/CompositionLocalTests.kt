@@ -493,13 +493,13 @@ class CompositionLocalTests : BaseComposeTest() {
         lateinit var value: T
     }
 
-    @Composable fun narrowInvalidateForReference(ref: Ref<CompositionReference>) {
-        ref.value = rememberCompositionReference()
+    @Composable fun narrowInvalidateForReference(ref: Ref<CompositionContext>) {
+        ref.value = rememberCompositionContext()
     }
 
     @Composable fun deferredSubCompose(block: @Composable () -> Unit): () -> Unit {
         val container = remember { View(activity) }
-        val ref = Ref<CompositionReference>()
+        val ref = Ref<CompositionContext>()
         narrowInvalidateForReference(ref = ref)
         return {
             @OptIn(ExperimentalComposeApi::class)

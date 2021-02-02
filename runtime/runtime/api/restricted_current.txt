@@ -82,7 +82,7 @@ package androidx.compose.runtime {
 
   public interface Composer {
     method @androidx.compose.runtime.ComposeCompilerApi public <V, T> void apply(V? value, kotlin.jvm.functions.Function2<? super T,? super V,kotlin.Unit> block);
-    method @androidx.compose.runtime.InternalComposeApi public androidx.compose.runtime.CompositionReference buildReference();
+    method @androidx.compose.runtime.InternalComposeApi public androidx.compose.runtime.CompositionContext buildContext();
     method @androidx.compose.runtime.ComposeCompilerApi public boolean changed(Object? value);
     method @androidx.compose.runtime.ComposeCompilerApi public default boolean changed(boolean value);
     method @androidx.compose.runtime.ComposeCompilerApi public default boolean changed(char value);
@@ -173,6 +173,14 @@ package androidx.compose.runtime {
     property public abstract boolean isDisposed;
   }
 
+  public abstract class CompositionContext {
+  }
+
+  public final class CompositionContextKt {
+    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.CompositionContext rememberCompositionContext();
+    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.runtime.CompositionContext rememberCompositionReference();
+  }
+
   public interface CompositionData {
     method public Iterable<androidx.compose.runtime.CompositionGroup> getCompositionGroups();
     method public boolean isEmpty();
@@ -192,9 +200,9 @@ package androidx.compose.runtime {
   }
 
   public final class CompositionKt {
-    method @androidx.compose.runtime.ExperimentalComposeApi public static androidx.compose.runtime.Composition Composition(Object key, androidx.compose.runtime.Applier<?> applier, androidx.compose.runtime.CompositionReference parent, optional kotlin.jvm.functions.Function0<kotlin.Unit> onCreated);
-    method @androidx.compose.runtime.ExperimentalComposeApi public static androidx.compose.runtime.Composition Composition(androidx.compose.runtime.Applier<?> applier, androidx.compose.runtime.CompositionReference parent);
-    method @org.jetbrains.annotations.TestOnly public static androidx.compose.runtime.ControlledComposition ControlledComposition(androidx.compose.runtime.Applier<?> applier, androidx.compose.runtime.CompositionReference parent);
+    method @androidx.compose.runtime.ExperimentalComposeApi public static androidx.compose.runtime.Composition Composition(Object key, androidx.compose.runtime.Applier<?> applier, androidx.compose.runtime.CompositionContext parent, optional kotlin.jvm.functions.Function0<kotlin.Unit> onCreated);
+    method @androidx.compose.runtime.ExperimentalComposeApi public static androidx.compose.runtime.Composition Composition(androidx.compose.runtime.Applier<?> applier, androidx.compose.runtime.CompositionContext parent);
+    method @org.jetbrains.annotations.TestOnly public static androidx.compose.runtime.ControlledComposition ControlledComposition(androidx.compose.runtime.Applier<?> applier, androidx.compose.runtime.CompositionContext parent);
   }
 
   @androidx.compose.runtime.Stable public abstract sealed class CompositionLocal<T> {
@@ -208,13 +216,6 @@ package androidx.compose.runtime {
     method public static <T> androidx.compose.runtime.ProvidableCompositionLocal<T> compositionLocalOf(optional androidx.compose.runtime.SnapshotMutationPolicy<T> policy, optional kotlin.jvm.functions.Function0<? extends T>? defaultFactory);
     method @Deprecated public static <T> androidx.compose.runtime.ProvidableCompositionLocal<T> staticAmbientOf(optional kotlin.jvm.functions.Function0<? extends T>? defaultFactory);
     method public static <T> androidx.compose.runtime.ProvidableCompositionLocal<T> staticCompositionLocalOf(optional kotlin.jvm.functions.Function0<? extends T>? defaultFactory);
-  }
-
-  public abstract class CompositionReference {
-  }
-
-  public final class CompositionReferenceKt {
-    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.CompositionReference rememberCompositionReference();
   }
 
   @kotlin.PublishedApi internal final class CompositionScopedCoroutineScopeCanceller implements androidx.compose.runtime.RememberObserver {
@@ -393,7 +394,7 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public static androidx.compose.runtime.RecomposeScope getCurrentRecomposeScope();
   }
 
-  public final class Recomposer extends androidx.compose.runtime.CompositionReference {
+  public final class Recomposer extends androidx.compose.runtime.CompositionContext {
     ctor public Recomposer(kotlin.coroutines.CoroutineContext effectCoroutineContext);
     method public androidx.compose.runtime.RecomposerInfo asRecomposerInfo();
     method public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit> p);

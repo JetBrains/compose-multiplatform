@@ -145,7 +145,7 @@ interface ControlledComposition : Composition {
 
 /**
  * This method is the way to initiate a composition. Optionally, a [parent]
- * [CompositionReference] can be provided to make the composition behave as a sub-composition of
+ * [CompositionContext] can be provided to make the composition behave as a sub-composition of
  * the parent or a [Recomposer] can be provided.
  *
  * It is important to call [Composition.dispose] whenever this [key] is no longer needed in
@@ -168,7 +168,7 @@ interface ControlledComposition : Composition {
 fun Composition(
     key: Any,
     applier: Applier<*>,
-    parent: CompositionReference,
+    parent: CompositionContext,
     onCreated: () -> Unit = {}
 ): Composition = Compositions.findOrCreate(key) {
     CompositionImpl(
@@ -182,7 +182,7 @@ fun Composition(
 
 /**
  * This method is the way to initiate a composition. Optionally, a [parent]
- * [CompositionReference] can be provided to make the composition behave as a sub-composition of
+ * [CompositionContext] can be provided to make the composition behave as a sub-composition of
  * the parent or a [Recomposer] can be provided.
  *
  * It is important to call [Composition.dispose] this composer is no longer needed in order to
@@ -200,7 +200,7 @@ fun Composition(
 @ExperimentalComposeApi
 fun Composition(
     applier: Applier<*>,
-    parent: CompositionReference
+    parent: CompositionContext
 ): Composition =
     CompositionImpl(
         parent,
@@ -209,7 +209,7 @@ fun Composition(
 
 /**
  * This method is the way to initiate a composition. Optionally, a [parent]
- * [CompositionReference] can be provided to make the composition behave as a sub-composition of
+ * [CompositionContext] can be provided to make the composition behave as a sub-composition of
  * the parent or a [Recomposer] can be provided.
  *
  * A controlled composition allows direct control of the composition instead of it being
@@ -230,7 +230,7 @@ fun Composition(
 @TestOnly
 fun ControlledComposition(
     applier: Applier<*>,
-    parent: CompositionReference
+    parent: CompositionContext
 ): ControlledComposition =
     CompositionImpl(
         parent,
@@ -243,7 +243,7 @@ fun ControlledComposition(
  * @param onDispose A callback to be triggered when [dispose] is called.
  */
 private class CompositionImpl(
-    private val parent: CompositionReference,
+    private val parent: CompositionContext,
     applier: Applier<*>,
     private val onDispose: (() -> Unit)? = null
 ) : ControlledComposition {

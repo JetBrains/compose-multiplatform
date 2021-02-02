@@ -16,7 +16,7 @@
 package androidx.compose.ui.window
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCompositionReference
+import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -124,7 +124,7 @@ private fun PopupLayout(
         }
     )
 
-    val parentComposition = rememberCompositionReference()
+    val parentComposition = rememberCompositionContext()
     val (owner, composition) = remember {
         val owner = DesktopOwner(owners, density)
         val composition = owner.setContent(parent = parentComposition) {

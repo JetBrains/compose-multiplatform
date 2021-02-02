@@ -20,7 +20,7 @@ import android.content.Context
 import android.os.Looper
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.runtime.CompositionReference
+import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.snapshots.SnapshotStateObserver
 import androidx.compose.ui.Modifier
@@ -35,7 +35,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.platform.AndroidComposeView
-import androidx.compose.ui.platform.compositionReference
+import androidx.compose.ui.platform.compositionContext
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import kotlin.math.roundToInt
@@ -49,7 +49,7 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalComposeApi::class)
 internal abstract class AndroidViewHolder(
     context: Context,
-    parentReference: CompositionReference?
+    parentContext: CompositionContext?
 ) : ViewGroup(context) {
     init {
         clipChildren = false
@@ -57,8 +57,8 @@ internal abstract class AndroidViewHolder(
         // Any [Abstract]ComposeViews that are descendants of this view will host
         // subcompositions of the host composition.
         // UiApplier doesn't supply this, only AndroidView.
-        parentReference?.let {
-            compositionReference = it
+        parentContext?.let {
+            compositionContext = it
         }
     }
 
