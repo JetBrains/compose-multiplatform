@@ -112,6 +112,12 @@ fun Modifier.focusOrder(focusOrderReceiver: FocusOrder.() -> Unit): Modifier {
 }
 
 /**
+ * A modifier that lets you specify a [FocusRequester] for the current composable so that this
+ * [focusRequester] can be used by another composable to specify a custom focus order.
+ */
+fun Modifier.focusOrder(focusRequester: FocusRequester): Modifier = focusRequester(focusRequester)
+
+/**
  * A modifier that lets you specify a [FocusRequester] for the current composable along with
  * [focusOrder].
  */
