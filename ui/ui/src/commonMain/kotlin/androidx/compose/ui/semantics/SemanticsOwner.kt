@@ -23,7 +23,7 @@ import androidx.compose.ui.util.fastForEach
  * Owns [SemanticsNode] objects and notifies listeners of changes to the
  * semantics tree
  */
-class SemanticsOwner internal constructor(val rootNode: LayoutNode) {
+class SemanticsOwner internal constructor(private val rootNode: LayoutNode) {
     /**
      * The root node of the semantics tree.  Does not contain any unmerged data.
      * May contain merged data.

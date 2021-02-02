@@ -18,17 +18,17 @@ package androidx.compose.ui.layout
 
 import androidx.compose.runtime.Applier
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionReference
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.currentComposer
-import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionReference
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.materialize
-import androidx.compose.ui.node.LayoutEmitHelper
+import androidx.compose.ui.node.ComposeUiNode
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNode.LayoutState
 import androidx.compose.ui.node.MeasureBlocks
@@ -70,13 +70,13 @@ fun SubcomposeLayout(
     val density = LocalDensity.current
     val layoutDirection = LocalLayoutDirection.current
     ComposeNode<LayoutNode, Applier<Any>>(
-        factory = LayoutEmitHelper.constructor,
+        factory = LayoutNode.Constructor,
         update = {
             init(state.setRoot)
-            set(materialized, LayoutEmitHelper.setModifier)
+            set(materialized, ComposeUiNode.SetModifier)
             set(measureBlock, state.setMeasureBlock)
-            set(density, LayoutEmitHelper.setDensity)
-            set(layoutDirection, LayoutEmitHelper.setLayoutDirection)
+            set(density, ComposeUiNode.SetDensity)
+            set(layoutDirection, ComposeUiNode.SetLayoutDirection)
         }
     )
 }

@@ -28,7 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.materialize
-import androidx.compose.ui.node.LayoutEmitHelper
+import androidx.compose.ui.node.ComposeUiNode
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.MeasureBlocks
 import androidx.compose.ui.platform.LocalDensity
@@ -227,12 +227,12 @@ fun measureBlocksOf(
     @OptIn(ExperimentalComposeApi::class)
     val density = LocalDensity.current
     val layoutDirection = LocalLayoutDirection.current
-    ComposeNode<LayoutNode, Applier<Any>>(
-        factory = LayoutEmitHelper.constructor,
+    ComposeNode<ComposeUiNode, Applier<Any>>(
+        factory = ComposeUiNode.Constructor,
         update = {
-            set(measureBlocks, LayoutEmitHelper.setMeasureBlocks)
-            set(density, LayoutEmitHelper.setDensity)
-            set(layoutDirection, LayoutEmitHelper.setLayoutDirection)
+            set(measureBlocks, ComposeUiNode.SetMeasureBlocks)
+            set(density, ComposeUiNode.SetDensity)
+            set(layoutDirection, ComposeUiNode.SetLayoutDirection)
         },
         skippableUpdate = materializerOf(modifier),
         content = content
@@ -242,10 +242,10 @@ fun measureBlocksOf(
 @PublishedApi
 internal fun materializerOf(
     modifier: Modifier
-): @Composable SkippableUpdater<LayoutNode>.() -> Unit = {
+): @Composable SkippableUpdater<ComposeUiNode>.() -> Unit = {
     val materialized = currentComposer.materialize(modifier)
     update {
-        set(materialized, LayoutEmitHelper.setModifier)
+        set(materialized, ComposeUiNode.SetModifier)
     }
 }
 
@@ -267,12 +267,12 @@ fun MultiMeasureLayout(
 
     @OptIn(ExperimentalComposeApi::class)
     ComposeNode<LayoutNode, Applier<Any>>(
-        factory = LayoutEmitHelper.constructor,
+        factory = LayoutNode.Constructor,
         update = {
-            set(materialized, LayoutEmitHelper.setModifier)
-            set(measureBlocks, LayoutEmitHelper.setMeasureBlocks)
-            set(density, LayoutEmitHelper.setDensity)
-            set(layoutDirection, LayoutEmitHelper.setLayoutDirection)
+            set(materialized, ComposeUiNode.SetModifier)
+            set(measureBlocks, ComposeUiNode.SetMeasureBlocks)
+            set(density, ComposeUiNode.SetDensity)
+            set(layoutDirection, ComposeUiNode.SetLayoutDirection)
             @Suppress("DEPRECATION")
             init { this.canMultiMeasure = true }
         },

@@ -1850,7 +1850,7 @@ package androidx.compose.ui.layout {
     method @androidx.compose.runtime.Composable public static inline void Layout(kotlin.jvm.functions.Function0<kotlin.Unit> content, androidx.compose.ui.node.MeasureBlocks measureBlocks, optional androidx.compose.ui.Modifier modifier);
     method public static androidx.compose.ui.node.MeasureBlocks MeasuringIntrinsicsMeasureBlocks(kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.MeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.Measurable>,? super androidx.compose.ui.unit.Constraints,? extends androidx.compose.ui.layout.MeasureResult> measureBlock);
     method @Deprecated @androidx.compose.runtime.Composable public static void MultiMeasureLayout(optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function0<kotlin.Unit> children, kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.MeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.Measurable>,? super androidx.compose.ui.unit.Constraints,? extends androidx.compose.ui.layout.MeasureResult> measureBlock);
-    method @kotlin.PublishedApi internal static kotlin.jvm.functions.Function1<androidx.compose.runtime.SkippableUpdater<androidx.compose.ui.node.LayoutNode>,kotlin.Unit> materializerOf(androidx.compose.ui.Modifier modifier);
+    method @kotlin.PublishedApi internal static kotlin.jvm.functions.Function1<androidx.compose.runtime.SkippableUpdater<androidx.compose.ui.node.ComposeUiNode>,kotlin.Unit> materializerOf(androidx.compose.ui.Modifier modifier);
     method public static androidx.compose.ui.node.MeasureBlocks measureBlocksOf(kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.IntrinsicMeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.IntrinsicMeasurable>,? super java.lang.Integer,java.lang.Integer> minIntrinsicWidthMeasureBlock, kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.IntrinsicMeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.IntrinsicMeasurable>,? super java.lang.Integer,java.lang.Integer> minIntrinsicHeightMeasureBlock, kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.IntrinsicMeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.IntrinsicMeasurable>,? super java.lang.Integer,java.lang.Integer> maxIntrinsicWidthMeasureBlock, kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.IntrinsicMeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.IntrinsicMeasurable>,? super java.lang.Integer,java.lang.Integer> maxIntrinsicHeightMeasureBlock, kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.MeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.Measurable>,? super androidx.compose.ui.unit.Constraints,? extends androidx.compose.ui.layout.MeasureResult> measureBlock);
   }
 
@@ -2026,48 +2026,36 @@ package androidx.compose.ui.layout {
 
 package androidx.compose.ui.node {
 
+  @kotlin.PublishedApi internal interface ComposeUiNode {
+    method public androidx.compose.ui.unit.Density getDensity();
+    method public androidx.compose.ui.unit.LayoutDirection getLayoutDirection();
+    method public androidx.compose.ui.node.MeasureBlocks getMeasureBlocks();
+    method public androidx.compose.ui.Modifier getModifier();
+    method public void setDensity(androidx.compose.ui.unit.Density p);
+    method public void setLayoutDirection(androidx.compose.ui.unit.LayoutDirection p);
+    method public void setMeasureBlocks(androidx.compose.ui.node.MeasureBlocks p);
+    method public void setModifier(androidx.compose.ui.Modifier p);
+    property public abstract androidx.compose.ui.unit.Density density;
+    property public abstract androidx.compose.ui.unit.LayoutDirection layoutDirection;
+    property public abstract androidx.compose.ui.node.MeasureBlocks measureBlocks;
+    property public abstract androidx.compose.ui.Modifier modifier;
+    field public static final androidx.compose.ui.node.ComposeUiNode.Companion Companion;
+  }
+
+  public static final class ComposeUiNode.Companion {
+    method public kotlin.jvm.functions.Function0<androidx.compose.ui.node.ComposeUiNode> getConstructor();
+    method public kotlin.jvm.functions.Function2<androidx.compose.ui.node.ComposeUiNode,androidx.compose.ui.unit.Density,kotlin.Unit> getSetDensity();
+    method public kotlin.jvm.functions.Function2<androidx.compose.ui.node.ComposeUiNode,androidx.compose.ui.unit.LayoutDirection,kotlin.Unit> getSetLayoutDirection();
+    method public kotlin.jvm.functions.Function2<androidx.compose.ui.node.ComposeUiNode,androidx.compose.ui.node.MeasureBlocks,kotlin.Unit> getSetMeasureBlocks();
+    method public kotlin.jvm.functions.Function2<androidx.compose.ui.node.ComposeUiNode,androidx.compose.ui.Modifier,kotlin.Unit> getSetModifier();
+    property public final kotlin.jvm.functions.Function0<androidx.compose.ui.node.ComposeUiNode> Constructor;
+    property public final kotlin.jvm.functions.Function2<androidx.compose.ui.node.ComposeUiNode,androidx.compose.ui.unit.Density,kotlin.Unit> SetDensity;
+    property public final kotlin.jvm.functions.Function2<androidx.compose.ui.node.ComposeUiNode,androidx.compose.ui.unit.LayoutDirection,kotlin.Unit> SetLayoutDirection;
+    property public final kotlin.jvm.functions.Function2<androidx.compose.ui.node.ComposeUiNode,androidx.compose.ui.node.MeasureBlocks,kotlin.Unit> SetMeasureBlocks;
+    property public final kotlin.jvm.functions.Function2<androidx.compose.ui.node.ComposeUiNode,androidx.compose.ui.Modifier,kotlin.Unit> SetModifier;
+  }
+
   @kotlin.RequiresOptIn(message="This API is internal to library.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface InternalCoreApi {
-  }
-
-  @kotlin.PublishedApi internal final class LayoutEmitHelper {
-    method public kotlin.jvm.functions.Function0<androidx.compose.ui.node.LayoutNode> getConstructor();
-    method public kotlin.jvm.functions.Function2<androidx.compose.ui.node.LayoutNode,androidx.compose.ui.unit.Density,kotlin.Unit> getSetDensity();
-    method public kotlin.jvm.functions.Function2<androidx.compose.ui.node.LayoutNode,androidx.compose.ui.unit.LayoutDirection,kotlin.Unit> getSetLayoutDirection();
-    method public kotlin.jvm.functions.Function2<androidx.compose.ui.node.LayoutNode,androidx.compose.ui.node.MeasureBlocks,kotlin.Unit> getSetMeasureBlocks();
-    method public kotlin.jvm.functions.Function2<androidx.compose.ui.node.LayoutNode,androidx.compose.ui.Modifier,kotlin.Unit> getSetModifier();
-    method public kotlin.jvm.functions.Function2<androidx.compose.ui.node.LayoutNode,androidx.compose.ui.node.Ref<androidx.compose.ui.node.LayoutNode>,kotlin.Unit> getSetRef();
-    property public final kotlin.jvm.functions.Function0<androidx.compose.ui.node.LayoutNode> constructor;
-    property public final kotlin.jvm.functions.Function2<androidx.compose.ui.node.LayoutNode,androidx.compose.ui.unit.Density,kotlin.Unit> setDensity;
-    property public final kotlin.jvm.functions.Function2<androidx.compose.ui.node.LayoutNode,androidx.compose.ui.unit.LayoutDirection,kotlin.Unit> setLayoutDirection;
-    property public final kotlin.jvm.functions.Function2<androidx.compose.ui.node.LayoutNode,androidx.compose.ui.node.MeasureBlocks,kotlin.Unit> setMeasureBlocks;
-    property public final kotlin.jvm.functions.Function2<androidx.compose.ui.node.LayoutNode,androidx.compose.ui.Modifier,kotlin.Unit> setModifier;
-    property public final kotlin.jvm.functions.Function2<androidx.compose.ui.node.LayoutNode,androidx.compose.ui.node.Ref<androidx.compose.ui.node.LayoutNode>,kotlin.Unit> setRef;
-  }
-
-  public final class LayoutNode implements androidx.compose.ui.layout.LayoutInfo androidx.compose.ui.layout.Measurable androidx.compose.ui.layout.Remeasurement {
-    method public void forceRemeasure();
-    method public androidx.compose.ui.layout.LayoutCoordinates getCoordinates();
-    method public int getHeight();
-    method public java.util.List<androidx.compose.ui.layout.ModifierInfo> getModifierInfo();
-    method public Object? getParentData();
-    method public androidx.compose.ui.layout.LayoutInfo? getParentInfo();
-    method public int getWidth();
-    method public boolean isAttached();
-    method public boolean isPlaced();
-    method public boolean isValid();
-    method public int maxIntrinsicHeight(int width);
-    method public int maxIntrinsicWidth(int height);
-    method public androidx.compose.ui.layout.Placeable measure-BRTryo0(long constraints);
-    method public int minIntrinsicHeight(int width);
-    method public int minIntrinsicWidth(int height);
-    property public androidx.compose.ui.layout.LayoutCoordinates coordinates;
-    property public int height;
-    property public boolean isAttached;
-    property public boolean isPlaced;
-    property public boolean isValid;
-    property public Object? parentData;
-    property public androidx.compose.ui.layout.LayoutInfo? parentInfo;
-    property public int width;
   }
 
   public final class LayoutNodeKt {
@@ -2665,10 +2653,8 @@ package androidx.compose.ui.semantics {
   }
 
   public final class SemanticsOwner {
-    method public androidx.compose.ui.node.LayoutNode getRootNode();
     method public androidx.compose.ui.semantics.SemanticsNode getRootSemanticsNode();
     method public androidx.compose.ui.semantics.SemanticsNode getUnmergedRootSemanticsNode();
-    property public final androidx.compose.ui.node.LayoutNode rootNode;
     property public final androidx.compose.ui.semantics.SemanticsNode rootSemanticsNode;
     property public final androidx.compose.ui.semantics.SemanticsNode unmergedRootSemanticsNode;
   }
