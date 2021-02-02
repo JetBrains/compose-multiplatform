@@ -162,7 +162,7 @@ fun HorizontalTransition(visible: Boolean, content: @Composable () -> Unit) {
             // Set the end width for the shrink animation to a quarter of the full width.
             targetWidth = { fullWidth -> fullWidth / 10 },
             // Overwrites the default animation with tween for this shrink animation.
-            animSpec = tween(durationMillis = 400)
+            animationSpec = tween(durationMillis = 400)
         ) + fadeOut()
     ) {
         content()
@@ -178,15 +178,15 @@ fun SlideTransition(visible: Boolean, content: @Composable () -> Unit) {
             // Offsets the content by 1/3 of its width to the left, and slide towards right
             initialOffsetX = { fullWidth -> -fullWidth / 3 },
             // Overwrites the default animation with tween for this slide animation.
-            animSpec = tween(durationMillis = 200)
+            animationSpec = tween(durationMillis = 200)
         ) + fadeIn(
             // Overwrites the default animation with tween
-            animSpec = tween(durationMillis = 200)
+            animationSpec = tween(durationMillis = 200)
         ),
         exit = slideOutHorizontally(
             // Overwrites the ending position of the slide-out to 200 (pixels) to the right
             targetOffsetX = { 200 },
-            animSpec = spring(stiffness = Spring.StiffnessHigh)
+            animationSpec = spring(stiffness = Spring.StiffnessHigh)
         ) + fadeOut()
     ) {
         content()
@@ -204,7 +204,7 @@ fun FadeTransition(visible: Boolean, content: @Composable () -> Unit) {
         ),
         exit = fadeOut(
             // Overwrites the default animation with tween
-            animSpec = tween(durationMillis = 250)
+            animationSpec = tween(durationMillis = 250)
         )
     ) {
         content()
