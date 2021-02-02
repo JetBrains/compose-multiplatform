@@ -26,6 +26,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.integration.demos.common.Demo
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
@@ -128,6 +129,7 @@ private fun FilterField(
  * [ListItem] that displays a [demo] and highlights any matches for [filterText] inside [Demo.title]
  */
 @Composable
+@OptIn(ExperimentalMaterialApi::class)
 private fun FilteredDemoListItem(
     demo: Demo,
     filterText: String,

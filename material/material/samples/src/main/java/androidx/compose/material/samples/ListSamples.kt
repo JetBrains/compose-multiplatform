@@ -40,8 +40,8 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.dp
 
 @Sampled
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
+@OptIn(ExperimentalMaterialApi::class)
 fun ClickableListItems() {
     Column {
         var switched by remember { mutableStateOf(false) }
@@ -89,6 +89,7 @@ fun ClickableListItems() {
 
 @Sampled
 @Composable
+@OptIn(ExperimentalMaterialApi::class)
 fun OneLineListItems() {
     Column {
         ListItem(text = { Text("One line list item with no icon") })
@@ -169,6 +170,7 @@ fun OneLineListItems() {
 
 @Sampled
 @Composable
+@OptIn(ExperimentalMaterialApi::class)
 fun TwoLineListItems() {
     Column {
         ListItem(
@@ -222,6 +224,7 @@ fun TwoLineListItems() {
 
 @Sampled
 @Composable
+@OptIn(ExperimentalMaterialApi::class)
 fun ThreeLineListItems() {
     Column {
         ListItem(
@@ -289,6 +292,7 @@ fun ThreeLineListItems() {
 // Demos for mixing RTL and LTR ListItems:
 
 @Composable
+@OptIn(ExperimentalMaterialApi::class)
 fun OneLineRtlLtrListItems() {
     Column {
         ListItem(text = { Text("One line list item with no icon") })
@@ -328,6 +332,7 @@ fun OneLineRtlLtrListItems() {
 }
 
 @Composable
+@OptIn(ExperimentalMaterialApi::class)
 fun TwoLineRtlLtrListItems() {
     Column {
         ListItem(
@@ -375,6 +380,7 @@ fun TwoLineRtlLtrListItems() {
 }
 
 @Composable
+@OptIn(ExperimentalMaterialApi::class)
 fun ThreeLineRtlLtrListItems() {
     Column {
         ListItem(
