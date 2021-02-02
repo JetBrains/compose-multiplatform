@@ -412,8 +412,8 @@ private fun Modifier.scroll(
         val semantics = Modifier.semantics {
             if (isScrollable) {
                 val accessibilityScrollState = ScrollAxisRange(
-                    value = state.value,
-                    maxValue = state.maxValue,
+                    value = { state.value },
+                    maxValue = { state.maxValue },
                     reverseScrolling = reverseScrolling
                 )
                 if (isVertical) {

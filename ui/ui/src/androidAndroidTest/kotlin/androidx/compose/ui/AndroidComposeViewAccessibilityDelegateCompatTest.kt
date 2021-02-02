@@ -201,7 +201,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
         val semanticsNode = createSemanticsNodeWithProperties(1, true) {
             disabled()
             text = AnnotatedString("text")
-            horizontalScrollAxisRange = ScrollAxisRange(0f, 5f)
+            horizontalScrollAxisRange = ScrollAxisRange({ 0f }, { 5f })
             onClick { true }
             onLongClick { true }
             copyText { true }
@@ -487,7 +487,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
     @Test
     fun notSendScrollEvent_whenOnlyScrollAxisRangeMaxValueChanges() {
         val oldSemanticsNode = createSemanticsNodeWithProperties(1, true) {
-            this.verticalScrollAxisRange = ScrollAxisRange(0f, 0f, false)
+            this.verticalScrollAxisRange = ScrollAxisRange({ 0f }, { 0f }, false)
         }
         accessibilityDelegate.previousSemanticsNodes[1] =
             AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(
@@ -495,7 +495,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
                 mapOf()
             )
         val newSemanticsNode = createSemanticsNodeWithProperties(1, true) {
-            this.verticalScrollAxisRange = ScrollAxisRange(0f, 5f, false)
+            this.verticalScrollAxisRange = ScrollAxisRange({ 0f }, { 5f }, false)
         }
         val newNodes = mutableMapOf<Int, SemanticsNode>()
         newNodes[1] = newSemanticsNode
@@ -514,7 +514,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
     @Test
     fun sendScrollEvent_whenScrollAxisRangeValueChanges() {
         val oldSemanticsNode = createSemanticsNodeWithProperties(2, false) {
-            this.verticalScrollAxisRange = ScrollAxisRange(0f, 5f, false)
+            this.verticalScrollAxisRange = ScrollAxisRange({ 0f }, { 5f }, false)
         }
         accessibilityDelegate.previousSemanticsNodes[2] =
             AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(
@@ -522,7 +522,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
                 mapOf()
             )
         val newSemanticsNode = createSemanticsNodeWithProperties(2, false) {
-            this.verticalScrollAxisRange = ScrollAxisRange(2f, 5f, false)
+            this.verticalScrollAxisRange = ScrollAxisRange({ 2f }, { 5f }, false)
         }
         val newNodes = mutableMapOf<Int, SemanticsNode>()
         newNodes[2] = newSemanticsNode

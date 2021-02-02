@@ -469,17 +469,20 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             semanticsNode.config.getOrNull(SemanticsProperties.HorizontalScrollAxisRange)
         val scrollAction = semanticsNode.config.getOrNull(SemanticsActions.ScrollBy)
         if (xScrollState != null && scrollAction != null) {
+            val value = xScrollState.value()
+            val maxValue = xScrollState.maxValue()
+            val reverseScrolling = xScrollState.reverseScrolling
             // Talkback defines SCROLLABLE_ROLE_FILTER_FOR_DIRECTION_NAVIGATION, so we need to
             // assign a role for auto scroll to work.
             info.className = "android.widget.HorizontalScrollView"
-            if (xScrollState.maxValue > 0f) {
+            if (maxValue > 0f) {
                 info.isScrollable = true
             }
-            if (semanticsNode.enabled() && xScrollState.value < xScrollState.maxValue) {
+            if (semanticsNode.enabled() && value < maxValue) {
                 info.addAction(
                     AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_FORWARD
                 )
-                if (!xScrollState.reverseScrolling) {
+                if (!reverseScrolling) {
                     info.addAction(
                         AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_RIGHT
                     )
@@ -489,11 +492,11 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     )
                 }
             }
-            if (semanticsNode.enabled() && xScrollState.value > 0f) {
+            if (semanticsNode.enabled() && value > 0f) {
                 info.addAction(
                     AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_BACKWARD
                 )
-                if (!xScrollState.reverseScrolling) {
+                if (!reverseScrolling) {
                     info.addAction(
                         AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_LEFT
                     )
@@ -507,17 +510,20 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         val yScrollState =
             semanticsNode.config.getOrNull(SemanticsProperties.VerticalScrollAxisRange)
         if (yScrollState != null && scrollAction != null) {
+            val value = yScrollState.value()
+            val maxValue = yScrollState.maxValue()
+            val reverseScrolling = yScrollState.reverseScrolling
             // Talkback defines SCROLLABLE_ROLE_FILTER_FOR_DIRECTION_NAVIGATION, so we need to
             // assign a role for auto scroll to work.
             info.className = "android.widget.ScrollView"
-            if (yScrollState.maxValue > 0f) {
+            if (maxValue > 0f) {
                 info.isScrollable = true
             }
-            if (semanticsNode.enabled() && yScrollState.value < yScrollState.maxValue) {
+            if (semanticsNode.enabled() && value < maxValue) {
                 info.addAction(
                     AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_FORWARD
                 )
-                if (!yScrollState.reverseScrolling) {
+                if (!reverseScrolling) {
                     info.addAction(
                         AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_DOWN
                     )
@@ -527,11 +533,11 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     )
                 }
             }
-            if (semanticsNode.enabled() && yScrollState.value > 0f) {
+            if (semanticsNode.enabled() && value > 0f) {
                 info.addAction(
                     AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_BACKWARD
                 )
-                if (!yScrollState.reverseScrolling) {
+                if (!reverseScrolling) {
                     info.addAction(
                         AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_UP
                     )
@@ -907,7 +913,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                                 ) ||
                             (action == AccessibilityNodeInfoCompat.ACTION_SCROLL_FORWARD)
                         ) &&
-                        xScrollState.value < xScrollState.maxValue
+                        xScrollState.value() < xScrollState.maxValue()
                     ) {
                         return scrollAction.action(
                             node.globalBounds.right - node.globalBounds.left,
@@ -925,7 +931,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                                 ) ||
                             (action == AccessibilityNodeInfoCompat.ACTION_SCROLL_BACKWARD)
                         ) &&
-                        xScrollState.value > 0
+                        xScrollState.value() > 0
                     ) {
                         return scrollAction.action(
                             -(node.globalBounds.right - node.globalBounds.left),
@@ -947,7 +953,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                                 ) ||
                             (action == AccessibilityNodeInfoCompat.ACTION_SCROLL_FORWARD)
                         ) &&
-                        yScrollState.value < yScrollState.maxValue
+                        yScrollState.value() < yScrollState.maxValue()
                     ) {
                         return scrollAction.action(
                             0f,
@@ -965,7 +971,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                                 ) ||
                             (action == AccessibilityNodeInfoCompat.ACTION_SCROLL_BACKWARD)
                         ) &&
-                        yScrollState.value > 0
+                        yScrollState.value() > 0
                     ) {
                         return scrollAction.action(
                             0f,
@@ -1530,12 +1536,12 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                         )
                         notifySubtreeAccessibilityStateChangedIfNeeded(newNode.layoutNode)
                         val deltaX = if (newXState != null && oldXState != null) {
-                            newXState.value - oldXState.value
+                            newXState.value() - oldXState.value()
                         } else {
                             0f
                         }
                         val deltaY = if (newYState != null && oldYState != null) {
-                            newYState.value - oldYState.value
+                            newYState.value() - oldYState.value()
                         } else {
                             0f
                         }
@@ -1545,12 +1551,12 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                                 AccessibilityEvent.TYPE_VIEW_SCROLLED
                             )
                             if (newXState != null) {
-                                event.scrollX = newXState.value.toInt()
-                                event.maxScrollX = newXState.maxValue.toInt()
+                                event.scrollX = newXState.value().toInt()
+                                event.maxScrollX = newXState.maxValue().toInt()
                             }
                             if (newYState != null) {
-                                event.scrollY = newYState.value.toInt()
-                                event.maxScrollY = newYState.maxValue.toInt()
+                                event.scrollY = newYState.value().toInt()
+                                event.maxScrollY = newYState.maxValue().toInt()
                             }
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                                 Api28Impl.setScrollEventDelta(event, deltaX.toInt(), deltaY.toInt())
