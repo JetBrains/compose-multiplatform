@@ -39,8 +39,8 @@ import androidx.compose.ui.test.doubleClick
 import androidx.compose.ui.test.down
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.longClick
-import androidx.compose.ui.test.onNodeWithSubstring
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.performSemanticsAction
@@ -182,16 +182,16 @@ class ClickableTest {
             }
         }
 
-        rule.onNodeWithSubstring("Foo").assertExists()
-        rule.onNodeWithSubstring("Bar").assertExists()
+        rule.onNodeWithText("Foo", substring = true).assertExists()
+        rule.onNodeWithText("Bar", substring = true).assertExists()
 
-        rule.onNodeWithSubstring("Foo").performClick()
+        rule.onNodeWithText("Foo", substring = true).performClick()
 
         rule.runOnIdle {
             assertThat(counter).isEqualTo(1)
         }
 
-        rule.onNodeWithSubstring("Bar").performClick()
+        rule.onNodeWithText("Bar", substring = true).performClick()
 
         rule.runOnIdle {
             assertThat(counter).isEqualTo(2)
