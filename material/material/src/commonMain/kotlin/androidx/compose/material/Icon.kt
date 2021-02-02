@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toolingGraphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
@@ -128,7 +129,11 @@ fun Icon(
     }
     Box(
         modifier.toolingGraphicsLayer().defaultSizeFor(painter)
-            .paint(painter, colorFilter = colorFilter)
+            .paint(
+                painter,
+                colorFilter = colorFilter,
+                contentScale = ContentScale.Fit
+            )
             .then(semantics)
     )
 }
