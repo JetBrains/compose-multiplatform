@@ -650,10 +650,7 @@ package androidx.compose.ui.graphics {
   }
 
   @androidx.compose.runtime.Immutable public final class Shadow {
-    method public long component1-0d7_KjU();
-    method public long component2-F1C5BW0();
-    method public float component3();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.graphics.Shadow copy-vQQzcCI(long color, long offset, float blurRadius);
+    method public androidx.compose.ui.graphics.Shadow copy-vQQzcCI(optional long color, optional long offset, optional float blurRadius);
     method public float getBlurRadius();
     method public long getColor-0d7_KjU();
     method public long getOffset-F1C5BW0();
@@ -1061,12 +1058,6 @@ package androidx.compose.ui.graphics.drawscope {
   public final class Stroke extends androidx.compose.ui.graphics.drawscope.DrawStyle {
     ctor public Stroke(float width, float miter, androidx.compose.ui.graphics.StrokeCap cap, androidx.compose.ui.graphics.StrokeJoin join, androidx.compose.ui.graphics.PathEffect? pathEffect);
     ctor public Stroke();
-    method public float component1();
-    method public float component2();
-    method public androidx.compose.ui.graphics.StrokeCap component3();
-    method public androidx.compose.ui.graphics.StrokeJoin component4();
-    method public androidx.compose.ui.graphics.PathEffect? component5();
-    method public androidx.compose.ui.graphics.drawscope.Stroke copy(float width, float miter, androidx.compose.ui.graphics.StrokeCap cap, androidx.compose.ui.graphics.StrokeJoin join, androidx.compose.ui.graphics.PathEffect? pathEffect);
     method public androidx.compose.ui.graphics.StrokeCap getCap();
     method public androidx.compose.ui.graphics.StrokeJoin getJoin();
     method public float getMiter();
@@ -1094,8 +1085,6 @@ package androidx.compose.ui.graphics.drawscope {
 package androidx.compose.ui.graphics.painter {
 
   public final class ColorPainter extends androidx.compose.ui.graphics.painter.Painter {
-    method public long component1-0d7_KjU();
-    method public androidx.compose.ui.graphics.painter.ColorPainter copy-8_81llA(long color);
     method public long getColor-0d7_KjU();
     method public long getIntrinsicSize-NH-jbRc();
     method protected void onDraw(androidx.compose.ui.graphics.drawscope.DrawScope);
@@ -1104,7 +1093,6 @@ package androidx.compose.ui.graphics.painter {
   }
 
   public final class ImagePainter extends androidx.compose.ui.graphics.painter.Painter {
-    method public androidx.compose.ui.graphics.painter.ImagePainter copy-MHcbwps(androidx.compose.ui.graphics.ImageBitmap image, long srcOffset, long srcSize);
     method public long getIntrinsicSize-NH-jbRc();
     method protected void onDraw(androidx.compose.ui.graphics.drawscope.DrawScope);
     property public long intrinsicSize;

@@ -390,12 +390,34 @@ open class SwipeableState<T>(
  */
 @Immutable
 @ExperimentalMaterialApi
-data class SwipeProgress<T>(
+class SwipeProgress<T>(
     val from: T,
     val to: T,
     /*@FloatRange(from = 0.0, to = 1.0)*/
     val fraction: Float
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is SwipeProgress<*>) return false
+
+        if (from != other.from) return false
+        if (to != other.to) return false
+        if (fraction != other.fraction) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = from?.hashCode() ?: 0
+        result = 31 * result + (to?.hashCode() ?: 0)
+        result = 31 * result + fraction.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "SwipeProgress(from=$from, to=$to, fraction=$fraction)"
+    }
+}
 
 /**
  * Create and [remember] a [SwipeableState] with the default animation clock.
@@ -629,7 +651,7 @@ data class FractionalThreshold(
  * Must not be negative.
  */
 @Immutable
-data class ResistanceConfig(
+class ResistanceConfig(
     /*@FloatRange(from = 0.0, fromInclusive = false)*/
     val basis: Float,
     /*@FloatRange(from = 0.0)*/
@@ -642,6 +664,28 @@ data class ResistanceConfig(
         if (factor == 0f) return 0f
         val progress = (overflow / basis).coerceIn(-1f, 1f)
         return basis / factor * sin(progress * PI.toFloat() / 2)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ResistanceConfig) return false
+
+        if (basis != other.basis) return false
+        if (factorAtMin != other.factorAtMin) return false
+        if (factorAtMax != other.factorAtMax) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = basis.hashCode()
+        result = 31 * result + factorAtMin.hashCode()
+        result = 31 * result + factorAtMax.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "ResistanceConfig(basis=$basis, factorAtMin=$factorAtMin, factorAtMax=$factorAtMax)"
     }
 }
 

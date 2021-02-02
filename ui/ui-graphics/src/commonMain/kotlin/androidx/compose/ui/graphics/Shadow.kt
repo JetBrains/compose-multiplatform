@@ -26,7 +26,7 @@ import androidx.compose.ui.util.lerp
  * A single shadow.
  */
 @Immutable
-data class Shadow(
+class Shadow(
     @Stable
     val color: Color = Color(0xFF000000),
     @Stable
@@ -40,6 +40,40 @@ data class Shadow(
          */
         @Stable
         val None = Shadow()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Shadow) return false
+
+        if (color != other.color) return false
+        if (offset != other.offset) return false
+        if (blurRadius != other.blurRadius) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = color.hashCode()
+        result = 31 * result + offset.hashCode()
+        result = 31 * result + blurRadius.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "Shadow(color=$color, offset=$offset, blurRadius=$blurRadius)"
+    }
+
+    fun copy(
+        color: Color = this.color,
+        offset: Offset = this.offset,
+        blurRadius: Float = this.blurRadius
+    ): Shadow {
+        return Shadow(
+            color = color,
+            offset = offset,
+            blurRadius = blurRadius
+        )
     }
 }
 
