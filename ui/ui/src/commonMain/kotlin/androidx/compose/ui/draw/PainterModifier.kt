@@ -40,8 +40,6 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
-import androidx.compose.ui.unit.hasFixedHeight
-import androidx.compose.ui.unit.hasFixedWidth
 import kotlin.math.max
 import kotlin.math.roundToInt
 

@@ -35,8 +35,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.constrain
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.enforce
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.After
@@ -1556,10 +1556,12 @@ class SizeTest : LayoutTest() {
                     },
                     measureBlock = { measurables, incomingConstraints ->
                         val measurable = measurables.first()
-                        val constraints = Constraints(
-                            minWidth = doubleSizeDp.roundToPx(),
-                            minHeight = doubleSizeDp.roundToPx()
-                        ).enforce(incomingConstraints)
+                        val constraints = incomingConstraints.constrain(
+                            Constraints(
+                                minWidth = doubleSizeDp.roundToPx(),
+                                minHeight = doubleSizeDp.roundToPx()
+                            )
+                        )
                         val placeable = measurable.measure(constraints)
                         layout(placeable.width, placeable.height) {
                             placeable.placeRelative(IntOffset.Zero)

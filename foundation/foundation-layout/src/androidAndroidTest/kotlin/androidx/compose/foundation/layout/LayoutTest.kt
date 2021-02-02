@@ -42,12 +42,10 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.constrain
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.enforce
-import androidx.compose.ui.unit.hasFixedHeight
-import androidx.compose.ui.unit.hasFixedWidth
 import androidx.compose.ui.unit.isFinite
 import androidx.compose.ui.unit.offset
 import kotlinx.coroutines.flow.first
@@ -236,7 +234,7 @@ open class LayoutTest {
                 }
             ) { measurables, incomingConstraints ->
                 val measurable = measurables.firstOrNull()
-                val childConstraints = Constraints(constraints).enforce(incomingConstraints)
+                val childConstraints = incomingConstraints.constrain(Constraints(constraints))
                 val placeable = measurable?.measure(childConstraints)
 
                 val layoutWidth = placeable?.width ?: childConstraints.minWidth
@@ -374,13 +372,15 @@ open class LayoutTest {
         content: @Composable () -> Unit
     ) {
         Layout(content, modifier) { measurables, incomingConstraints ->
-            val containerConstraints = Constraints(constraints)
-                .copy(
-                    width?.roundToPx() ?: constraints.minWidth.roundToPx(),
-                    width?.roundToPx() ?: constraints.maxWidth.roundToPx(),
-                    height?.roundToPx() ?: constraints.minHeight.roundToPx(),
-                    height?.roundToPx() ?: constraints.maxHeight.roundToPx()
-                ).enforce(incomingConstraints)
+            val containerConstraints = incomingConstraints.constrain(
+                Constraints(constraints)
+                    .copy(
+                        width?.roundToPx() ?: constraints.minWidth.roundToPx(),
+                        width?.roundToPx() ?: constraints.maxWidth.roundToPx(),
+                        height?.roundToPx() ?: constraints.minHeight.roundToPx(),
+                        height?.roundToPx() ?: constraints.maxHeight.roundToPx()
+                    )
+            )
             val totalHorizontal = padding.start.roundToPx() + padding.end.roundToPx()
             val totalVertical = padding.top.roundToPx() + padding.bottom.roundToPx()
             val childConstraints = containerConstraints

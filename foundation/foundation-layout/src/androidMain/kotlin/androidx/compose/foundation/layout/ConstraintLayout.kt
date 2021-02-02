@@ -38,8 +38,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.hasFixedHeight
-import androidx.compose.ui.unit.hasFixedWidth
 import androidx.compose.ui.util.fastForEach
 import androidx.constraintlayout.core.state.ConstraintReference
 import androidx.constraintlayout.core.state.Dimension.SPREAD_DIMENSION
