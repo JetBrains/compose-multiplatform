@@ -16,6 +16,7 @@
 package androidx.compose.material
 
 import android.os.Build
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.testutils.assertPixels
@@ -40,6 +41,7 @@ import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -150,11 +152,50 @@ class IconTest {
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
+    fun iconScalesToFitSize() {
+        // Image with intrinsic size of 24dp
+        val width = 24.dp
+        val height = 24.dp
+        val testTag = "testTag"
+        var expectedIntSize: IntSize? = null
+        rule.setMaterialContent {
+            val image: ImageBitmap
+            with(LocalDensity.current) {
+                image = createBitmapWithColor(
+                    this,
+                    width.roundToPx(),
+                    height.roundToPx(),
+                    Color.Red
+                )
+            }
+            Icon(
+                image,
+                null,
+                // Force Icon to be 50dp
+                modifier = Modifier.size(50.dp).testTag(testTag),
+                tint = Color.Unspecified
+            )
+            with(LocalDensity.current) {
+                val dimension = 50.dp.roundToPx()
+                expectedIntSize = IntSize(dimension, dimension)
+            }
+        }
+
+        rule.onNodeWithTag(testTag)
+            .captureToImage()
+            // The icon should be 50x50 and fill the whole size with red pixels
+            .assertPixels(expectedSize = expectedIntSize!!) {
+                Color.Red
+            }
+    }
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
     fun iconUnspecifiedTintColorIgnored() {
         val width = 35.dp
         val height = 83.dp
         val testTag = "testTag"
-        rule.setMaterialContentForSizeAssertions {
+        rule.setMaterialContent {
             val image: ImageBitmap
             with(LocalDensity.current) {
                 image = createBitmapWithColor(
@@ -177,7 +218,7 @@ class IconTest {
         val width = 35.dp
         val height = 83.dp
         val testTag = "testTag"
-        rule.setMaterialContentForSizeAssertions {
+        rule.setMaterialContent {
             val image: ImageBitmap
             with(LocalDensity.current) {
                 image = createBitmapWithColor(
