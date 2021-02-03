@@ -31,7 +31,7 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Modifier
@@ -691,7 +691,7 @@ class ScrollTest {
         with(rule.density) {
             rule.setContent {
                 val direction = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
-                Providers(LocalLayoutDirection provides direction) {
+                CompositionLocalProvider(LocalLayoutDirection provides direction) {
                     Box {
                         Row(
                             modifier = Modifier
@@ -783,7 +783,7 @@ class ScrollTest {
                         }
                     } else {
                         val direction = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
-                        Providers(LocalLayoutDirection provides direction) {
+                        CompositionLocalProvider(LocalLayoutDirection provides direction) {
                             Row(
                                 Modifier.testTag(scrollerTag)
                                     .horizontalScroll(

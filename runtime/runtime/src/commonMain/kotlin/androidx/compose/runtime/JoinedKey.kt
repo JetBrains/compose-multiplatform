@@ -20,17 +20,3 @@ internal data class JoinedKey(
     val left: Any?,
     val right: Any?
 )
-
-@InternalComposeApi
-fun isJoinedKey(key: Any?) = key is JoinedKey
-@InternalComposeApi
-fun joinedKeyLeft(key: Any?): Any? = when (key) {
-    is JoinedKey -> key.left
-    else -> null
-}
-
-@InternalComposeApi
-fun joinedKeyRight(key: Any?): Any? = when (key) {
-    is JoinedKey -> key.right
-    else -> null
-}

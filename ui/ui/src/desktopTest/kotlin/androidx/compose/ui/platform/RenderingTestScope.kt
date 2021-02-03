@@ -17,7 +17,7 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import kotlinx.coroutines.CompletableDeferred
@@ -82,7 +82,7 @@ internal class RenderingTestScope(
         owner?.dispose()
         val owner = DesktopOwner(owners)
         owner.setContent {
-            Providers(DesktopPlatformAmbient provides platform) {
+            CompositionLocalProvider(DesktopPlatformAmbient provides platform) {
                 content()
             }
         }

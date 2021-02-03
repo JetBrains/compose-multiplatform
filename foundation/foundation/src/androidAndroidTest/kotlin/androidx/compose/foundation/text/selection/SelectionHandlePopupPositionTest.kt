@@ -19,7 +19,7 @@ package androidx.compose.foundation.text.selection
 import android.view.View
 import android.view.WindowManager
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -174,7 +174,7 @@ class SelectionHandlePopupPositionTest {
                 // Align the parent of the popup on the top left corner, this results in the global
                 // position of the parent to be (0, 0)
                 val layoutDirection = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
-                Providers(LocalLayoutDirection provides layoutDirection) {
+                CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
                     SimpleLayout {
                         SimpleContainer(width = parentWidthDp, height = parentHeightDp) {}
                         SelectionHandle(

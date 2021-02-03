@@ -19,7 +19,7 @@ package androidx.compose.foundation.text.selection
 import androidx.compose.foundation.Interaction
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,7 +58,7 @@ fun SelectionContainer(modifier: Modifier = Modifier, content: @Composable () ->
  */
 @Composable
 fun DisableSelection(content: @Composable () -> Unit) {
-    Providers(
+    CompositionLocalProvider(
         LocalSelectionRegistrar provides null,
         content = content
     )
@@ -93,7 +93,7 @@ internal fun SelectionContainer(
     manager.onSelectionChange = onSelectionChange
     manager.selection = selection
 
-    Providers(LocalSelectionRegistrar provides registrarImpl) {
+    CompositionLocalProvider(LocalSelectionRegistrar provides registrarImpl) {
         // Get the layout coordinates of the selection container. This is for hit test of
         // cross-composable selection.
         SimpleLayout(modifier = modifier.then(manager.modifier)) {

@@ -22,7 +22,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.paddingFromBaseline
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -91,7 +91,7 @@ fun Snackbar(
         color = backgroundColor,
         contentColor = contentColor
     ) {
-        Providers(LocalContentAlpha provides ContentAlpha.high) {
+        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
             val textStyle = MaterialTheme.typography.body2
             ProvideTextStyle(value = textStyle) {
                 when {

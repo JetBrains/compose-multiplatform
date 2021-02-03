@@ -17,7 +17,7 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.mouse.MouseScrollEvent
@@ -103,7 +103,7 @@ class TestComposeWindow(
 
         val owner = DesktopOwner(owners, density)
         owner.setContent {
-            Providers(
+            CompositionLocalProvider(
                 DesktopPlatformAmbient provides desktopPlatform
             ) {
                 content()

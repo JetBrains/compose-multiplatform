@@ -24,7 +24,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.background
@@ -461,7 +461,7 @@ class SubcomposeLayoutTest {
             val size = 50.dp
             val density = Density(3f)
             val sizeIpx = with(density) { size.roundToPx() }
-            Providers(LocalDensity provides density) {
+            CompositionLocalProvider(LocalDensity provides density) {
                 SubcomposeLayout(
                     Modifier.size(size).onGloballyPositioned {
                         assertThat(it.size).isEqualTo(IntSize(sizeIpx, sizeIpx))

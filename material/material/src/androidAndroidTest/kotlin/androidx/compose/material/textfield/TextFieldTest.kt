@@ -40,7 +40,7 @@ import androidx.compose.material.TextFieldPadding
 import androidx.compose.material.runOnIdleWithDensity
 import androidx.compose.material.setMaterialContent
 import androidx.compose.material.setMaterialContentForSizeAssertions
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.testutils.assertShape
@@ -810,7 +810,7 @@ class TextFieldTest {
     fun testTextField_imeActionAndKeyboardTypePropagatedDownstream() {
         val textInputService = mock<TextInputService>()
         rule.setContent {
-            Providers(
+            CompositionLocalProvider(
                 LocalTextInputService provides textInputService
             ) {
                 val text = remember { mutableStateOf("") }

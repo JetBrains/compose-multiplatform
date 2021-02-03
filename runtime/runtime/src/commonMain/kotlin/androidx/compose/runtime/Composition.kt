@@ -148,43 +148,6 @@ interface ControlledComposition : Composition {
  * [CompositionContext] can be provided to make the composition behave as a sub-composition of
  * the parent or a [Recomposer] can be provided.
  *
- * It is important to call [Composition.dispose] whenever this [key] is no longer needed in
- * order to release resources.
- *
- * @sample androidx.compose.runtime.samples.CustomTreeComposition
- *
- * @param key The object this composition will be tied to. Only one [Composition] will be created
- * for a given [key]. If the same [key] is passed in subsequent calls, the same [Composition]
- * instance will be returned.
- * @param applier The [Applier] instance to be used in the composition.
- * @param parent The parent composition reference, if applicable. Default is null.
- * @param onCreated A function which will be executed only when the Composition is created.
- *
- * @see Applier
- * @see Composition
- * @see Recomposer
- */
-@ExperimentalComposeApi
-fun Composition(
-    key: Any,
-    applier: Applier<*>,
-    parent: CompositionContext,
-    onCreated: () -> Unit = {}
-): Composition = Compositions.findOrCreate(key) {
-    CompositionImpl(
-        parent,
-        applier,
-        onDispose = { Compositions.onDisposed(key) }
-    ).also {
-        onCreated()
-    }
-}
-
-/**
- * This method is the way to initiate a composition. Optionally, a [parent]
- * [CompositionContext] can be provided to make the composition behave as a sub-composition of
- * the parent or a [Recomposer] can be provided.
- *
  * It is important to call [Composition.dispose] this composer is no longer needed in order to
  * release resources.
  *
@@ -197,7 +160,6 @@ fun Composition(
  * @see Composition
  * @see Recomposer
  */
-@ExperimentalComposeApi
 fun Composition(
     applier: Applier<*>,
     parent: CompositionContext
@@ -242,7 +204,7 @@ fun ControlledComposition(
  * @param applier The applier to use to manage the tree built by the composer.
  * @param onDispose A callback to be triggered when [dispose] is called.
  */
-private class CompositionImpl(
+internal class CompositionImpl(
     private val parent: CompositionContext,
     applier: Applier<*>,
     private val onDispose: (() -> Unit)? = null
@@ -319,35 +281,6 @@ private class CompositionImpl(
 }
 
 /**
- * Keeps all the active compositions.
- * This object is thread-safe.
- */
-private object Compositions {
-    private val holdersMap = WeakHashMap<Any, CompositionImpl>()
-
-    fun findOrCreate(root: Any, create: () -> CompositionImpl): CompositionImpl =
-        synchronized(holdersMap) {
-            holdersMap[root] ?: create().also { holdersMap[root] = it }
-        }
-
-    fun onDisposed(root: Any) {
-        synchronized(holdersMap) {
-            holdersMap.remove(root)
-        }
-    }
-
-    fun clear() {
-        synchronized(holdersMap) {
-            holdersMap.clear()
-        }
-    }
-
-    fun collectAll(): List<CompositionImpl> = synchronized(holdersMap) {
-        holdersMap.values.toList()
-    }
-}
-
-/**
  * Apply Code Changes will invoke the two functions before and after a code swap.
  *
  * This forces the whole view hierarchy to be redrawn to invoke any code change that was
@@ -357,40 +290,21 @@ private object Compositions {
  */
 private class HotReloader {
     companion object {
-        private var state = mutableListOf<Pair<CompositionImpl, @Composable () -> Unit>>()
-
-        @TestOnly
-        fun clearRoots() {
-            Compositions.clear()
-        }
-
         // Called before Dex Code Swap
         @Suppress("UNUSED_PARAMETER")
-        private fun saveStateAndDispose(context: Any) {
-            state.clear()
-            val holders = Compositions.collectAll()
-            holders.mapTo(state) { it to it.composable }
-            holders.filter { it.isRoot }.forEach { it.setContent({}) }
+        private fun saveStateAndDispose(context: Any): Any {
+            return Recomposer.saveStateAndDisposeForHotReload()
         }
 
         // Called after Dex Code Swap
         @Suppress("UNUSED_PARAMETER")
-        private fun loadStateAndCompose(context: Any) {
-            val roots = mutableListOf<CompositionImpl>()
-            state.forEach { (composition, composable) ->
-                composition.composable = composable
-                if (composition.isRoot) {
-                    roots.add(composition)
-                }
-            }
-            roots.forEach { it.setContent(it.composable) }
-            state.clear()
+        private fun loadStateAndCompose(token: Any) {
+            Recomposer.loadStateAndComposeForHotReload(token)
         }
 
         @TestOnly
         internal fun simulateHotReload(context: Any) {
-            saveStateAndDispose(context)
-            loadStateAndCompose(context)
+            loadStateAndCompose(saveStateAndDispose(context))
         }
     }
 }
@@ -400,9 +314,3 @@ private class HotReloader {
  */
 @TestOnly
 fun simulateHotReload(context: Any) = HotReloader.simulateHotReload(context)
-
-/**
- * @suppress
- */
-@TestOnly
-fun clearRoots() = HotReloader.clearRoots()

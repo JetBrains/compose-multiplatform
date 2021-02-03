@@ -3,8 +3,8 @@ CallbackName: androidx.compose.runtime.snapshots.SnapshotStateObserver:
     Class should be named SnapshotStateCallback
 
 
-DocumentExceptions: androidx.compose.runtime.ComposerKt#getCurrentComposer():
-    Method ComposerKt.getCurrentComposer appears to be throwing kotlin.NotImplementedError; this should be listed in the documentation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
+DocumentExceptions: androidx.compose.runtime.ComposablesKt#getCurrentComposer():
+    Method ComposablesKt.getCurrentComposer appears to be throwing kotlin.NotImplementedError; this should be listed in the documentation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
 DocumentExceptions: androidx.compose.runtime.snapshots.SnapshotApplyResult.Failure#check():
     Method Failure.check appears to be throwing androidx.compose.runtime.snapshots.SnapshotApplyConflictException; this should be recorded with a @Throws annotation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
 

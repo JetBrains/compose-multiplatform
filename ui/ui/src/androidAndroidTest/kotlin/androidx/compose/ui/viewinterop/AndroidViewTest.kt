@@ -30,7 +30,7 @@ import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -334,7 +334,7 @@ class AndroidViewTest {
             val size = 50.dp
             val density = Density(3f)
             val sizeIpx = with(density) { size.roundToPx() }
-            Providers(LocalDensity provides density) {
+            CompositionLocalProvider(LocalDensity provides density) {
                 AndroidView(
                     { FrameLayout(it) },
                     Modifier.size(size).onGloballyPositioned {
@@ -371,7 +371,7 @@ class AndroidViewTest {
         val ambient = compositionLocalOf { "unset" }
         var childComposedAmbientValue = "uncomposed"
         rule.setContent {
-            Providers(ambient provides "setByParent") {
+            CompositionLocalProvider(ambient provides "setByParent") {
                 AndroidView(
                     viewBlock = {
                         ComposeView(it).apply {
@@ -393,7 +393,7 @@ class AndroidViewTest {
         var childViewLayoutDirection: Int = Int.MIN_VALUE
         var childCompositionLayoutDirection: LayoutDirection? = null
         rule.setContent {
-            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 AndroidView(
                     viewBlock = {
                         FrameLayout(it).apply {

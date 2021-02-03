@@ -22,7 +22,7 @@ import androidx.compose.foundation.layout.ExperimentalLayout
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.FixedSize
 import androidx.compose.ui.Modifier
@@ -178,7 +178,7 @@ class RtlLayoutTest {
                         layout(100, 100) {}
                     }
                 }
-                Providers(LocalLayoutDirection provides direction.value) {
+                CompositionLocalProvider(LocalLayoutDirection provides direction.value) {
                     Layout(children) { measurables, constraints ->
                         layout(100, 100) {
                             measurables.first().measure(constraints).placeRelative(0, 0)
@@ -203,7 +203,7 @@ class RtlLayoutTest {
 
         activityTestRule.runOnUiThread {
             activity.setContent {
-                Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     Layout(content = {}) { _, _ ->
                         resultLayoutDirection.value = layoutDirection
                         latch.countDown()
@@ -225,7 +225,7 @@ class RtlLayoutTest {
         activityTestRule.runOnUiThread {
             activity.setContent {
                 @OptIn(ExperimentalLayout::class)
-                Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     Layout(
                         content = {},
                         modifier = Modifier.preferredWidth(IntrinsicSize.Max),
@@ -257,9 +257,11 @@ class RtlLayoutTest {
         activityTestRule.runOnUiThread {
             activity.setContent {
                 val initialLayoutDirection = LocalLayoutDirection.current
-                Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     Box {
-                        Providers(LocalLayoutDirection provides initialLayoutDirection) {
+                        CompositionLocalProvider(
+                            LocalLayoutDirection provides initialLayoutDirection
+                        ) {
                             Layout({}) { _, _ ->
                                 resultLayoutDirection.value = layoutDirection
                                 latch.countDown()
@@ -280,7 +282,7 @@ class RtlLayoutTest {
         absolutePositioning: Boolean,
         testLayoutDirection: LayoutDirection
     ) {
-        Providers(LocalLayoutDirection provides testLayoutDirection) {
+        CompositionLocalProvider(LocalLayoutDirection provides testLayoutDirection) {
             Layout(
                 content = {
                     FixedSize(size, modifier = Modifier.saveLayoutInfo(position[0], countDownLatch))

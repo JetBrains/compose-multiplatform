@@ -26,8 +26,6 @@ internal expect open class ThreadLocal<T>(initialValue: () -> T) {
 
 internal fun <T> ThreadLocal() = ThreadLocal<T?> { null }
 
-expect class WeakHashMap<K, V>() : MutableMap<K, V>
-
 internal expect fun identityHashCode(instance: Any?): Int
 
 @PublishedApi

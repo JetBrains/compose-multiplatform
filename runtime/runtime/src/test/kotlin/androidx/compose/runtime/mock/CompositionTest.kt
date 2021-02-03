@@ -48,7 +48,7 @@ fun compositionTest(block: suspend CompositionTestScope.() -> Unit) = runBlockin
                 check(!composed) { "Compose should only be called once" }
                 composed = true
                 root = View().apply { name = "root" }
-                val composition = Composition(root, ViewApplier(root), recomposer)
+                val composition = Composition(ViewApplier(root), recomposer)
                 this.composition = composition
                 composition.setContent(block)
             }

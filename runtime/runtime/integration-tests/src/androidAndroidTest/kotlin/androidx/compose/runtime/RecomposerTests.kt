@@ -32,7 +32,6 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.test.runBlockingTest
-import org.junit.After
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
@@ -42,10 +41,6 @@ import kotlin.test.assertNotNull
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class RecomposerTests : BaseComposeTest() {
-    @After
-    fun teardown() {
-        clearRoots()
-    }
 
     @get:Rule
     override val activityRule = makeTestActivityRule()

@@ -24,7 +24,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
@@ -264,7 +264,7 @@ class BorderTest(val shape: Shape) {
         val direction = mutableStateOf(LayoutDirection.Ltr)
         rule.setContent {
             SemanticParent {
-                Providers(LocalLayoutDirection provides direction.value) {
+                CompositionLocalProvider(LocalLayoutDirection provides direction.value) {
                     Box(
                         Modifier.preferredSize(40.0f.toDp(), 40.0f.toDp())
                             .background(color = Color.Blue)

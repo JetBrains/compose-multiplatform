@@ -20,7 +20,7 @@ import android.os.Build
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.shape.CutCornerShape
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -56,7 +56,7 @@ class CardTest {
             Surface(color = background) {
                 Box {
                     cardColor = MaterialTheme.colors.surface
-                    Providers(LocalShapes provides Shapes(medium = shape)) {
+                    CompositionLocalProvider(LocalShapes provides Shapes(medium = shape)) {
                         Card(
                             modifier = Modifier
                                 .semantics(mergeDescendants = true) {}

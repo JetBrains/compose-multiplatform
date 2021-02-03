@@ -19,7 +19,7 @@ package androidx.compose.ui.draw
 import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -275,7 +275,7 @@ class DrawModifierTest {
         var layoutDirection by mutableStateOf(LayoutDirection.Ltr)
         var realLayoutDirection: LayoutDirection? = null
         rule.setContent {
-            Providers(LocalLayoutDirection provides layoutDirection) {
+            CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
                 AtLeastSize(
                     size = 10,
                     modifier = Modifier.drawWithCache {

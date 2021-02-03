@@ -20,7 +20,7 @@ import android.os.Build
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -158,7 +158,7 @@ class ElevationOverlayTest(private val elevation: Dp?, overlayAlpha: Float?) {
 
         rule.setContent {
             // Turn off overlay behavior
-            Providers(LocalElevationOverlay provides null) {
+            CompositionLocalProvider(LocalElevationOverlay provides null) {
                 TestSurface(elevation!!, colors)
             }
         }
@@ -183,7 +183,7 @@ class ElevationOverlayTest(private val elevation: Dp?, overlayAlpha: Float?) {
         }
 
         rule.setContent {
-            Providers(LocalElevationOverlay provides customOverlay) {
+            CompositionLocalProvider(LocalElevationOverlay provides customOverlay) {
                 TestSurface(elevation!!, lightColors())
             }
         }

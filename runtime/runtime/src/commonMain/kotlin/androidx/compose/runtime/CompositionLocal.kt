@@ -38,7 +38,7 @@ package androidx.compose.runtime
  *
  * @sample androidx.compose.runtime.samples.createCompositionLocal
  *
- * Somewhere up the tree, a [Providers] component can be used, which provides a value for the
+ * Somewhere up the tree, a [CompositionLocalProvider] component can be used, which provides a value for the
  * [CompositionLocal]. This would often be at the "root" of a tree, but could be anywhere, and can
  * also be used in multiple places to override the provided value for a sub-tree.
  *
@@ -64,7 +64,7 @@ sealed class CompositionLocal<T> constructor(defaultFactory: (() -> T)? = null) 
     internal abstract fun provided(value: T): State<T>
 
     /**
-     * Return the value provided by the nearest [Providers] component that invokes, directly or
+     * Return the value provided by the nearest [CompositionLocalProvider] component that invokes, directly or
      * indirectly, the composable function that uses this property.
      *
      * @sample androidx.compose.runtime.samples.consumeCompositionLocal
@@ -77,19 +77,19 @@ sealed class CompositionLocal<T> constructor(defaultFactory: (() -> T)? = null) 
 }
 
 /**
- * A [ProvidableCompositionLocal] can be used in [Providers] to provide values.
+ * A [ProvidableCompositionLocal] can be used in [CompositionLocalProvider] to provide values.
  *
  * @see compositionLocalOf
  * @see staticCompositionLocalOf
  * @see CompositionLocal
- * @see Providers
+ * @see CompositionLocalProvider
  */
 @Stable
 abstract class ProvidableCompositionLocal<T> internal constructor(defaultFactory: (() -> T)?) :
     CompositionLocal<T> (defaultFactory) {
 
     /**
-     * Associates a [CompositionLocal] key to a value in a call to [Providers].
+     * Associates a [CompositionLocal] key to a value in a call to [CompositionLocalProvider].
      *
      * @see CompositionLocal
      * @see ProvidableCompositionLocal
@@ -98,7 +98,7 @@ abstract class ProvidableCompositionLocal<T> internal constructor(defaultFactory
     infix fun provides(value: T) = ProvidedValue(this, value, true)
 
     /**
-     * Associates a [CompositionLocal] key to a value in a call to [Providers] if the key does not
+     * Associates a [CompositionLocal] key to a value in a call to [CompositionLocalProvider] if the key does not
      * already have an associated value.
      *
      * @see CompositionLocal
@@ -141,8 +141,8 @@ internal class StaticProvidableCompositionLocal<T>(defaultFactory: (() -> T)?) :
 }
 
 /**
- * Create a [CompositionLocal] key that can be provided using [Providers]. Changing the value
- * provided during recomposition will invalidate the children of [Providers] that read the value
+ * Create a [CompositionLocal] key that can be provided using [CompositionLocalProvider]. Changing the value
+ * provided during recomposition will invalidate the children of [CompositionLocalProvider] that read the value
  * using [CompositionLocal.current].
  *
  * @param policy a policy to determine when a [CompositionLocal] is considered changed. See
@@ -160,8 +160,8 @@ fun <T> compositionLocalOf(
 ): ProvidableCompositionLocal<T> = DynamicProvidableCompositionLocal(policy, defaultFactory)
 
 /**
- * Create a [CompositionLocal] key that can be provided using [Providers]. Changing the value
- * provided will cause the entire tree below [Providers] to be recomposed, disabling skipping of
+ * Create a [CompositionLocal] key that can be provided using [CompositionLocalProvider]. Changing the value
+ * provided will cause the entire tree below [CompositionLocalProvider] to be recomposed, disabling skipping of
  * composable calls.
  *
  * A static [CompositionLocal] should be only be used when the value provided is highly unlikely to
@@ -174,8 +174,8 @@ fun <T> staticCompositionLocalOf(defaultFactory: (() -> T)? = null): ProvidableC
     StaticProvidableCompositionLocal(defaultFactory)
 
 /**
- * [Providers] binds values to [ProvidableCompositionLocal] keys. Reading the [CompositionLocal]
- * using [CompositionLocal.current] will return the value provided in [Providers]'s [values]
+ * [CompositionLocalProvider] binds values to [ProvidableCompositionLocal] keys. Reading the [CompositionLocal]
+ * using [CompositionLocal.current] will return the value provided in [CompositionLocalProvider]'s [values]
  * parameter for all composable functions called directly or indirectly in the [content] lambda.
  *
  * @sample androidx.compose.runtime.samples.compositionLocalProvider
@@ -186,7 +186,7 @@ fun <T> staticCompositionLocalOf(defaultFactory: (() -> T)? = null): ProvidableC
  */
 @Composable
 @OptIn(InternalComposeApi::class)
-fun Providers(vararg values: ProvidedValue<*>, content: @Composable () -> Unit) {
+fun CompositionLocalProvider(vararg values: ProvidedValue<*>, content: @Composable () -> Unit) {
     currentComposer.startProviders(values)
     content()
     currentComposer.endProviders()

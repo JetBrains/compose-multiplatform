@@ -21,7 +21,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -436,7 +436,7 @@ class DrawerTest {
         rule.setMaterialContent {
             drawerState = rememberDrawerState(DrawerValue.Closed)
             // emulate click on the screen
-            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Box(Modifier.testTag("Drawer")) {
                     ModalDrawer(
                         drawerState = drawerState,

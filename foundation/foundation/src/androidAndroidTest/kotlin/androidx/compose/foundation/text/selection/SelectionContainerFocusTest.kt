@@ -24,7 +24,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.text.CoreText
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -159,7 +159,7 @@ class SelectionContainerFocusTest {
 
         val layoutDirection = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
         rule.setContent {
-            Providers(
+            CompositionLocalProvider(
                 LocalHapticFeedback provides hapticFeedback,
                 LocalLayoutDirection provides layoutDirection
             ) {

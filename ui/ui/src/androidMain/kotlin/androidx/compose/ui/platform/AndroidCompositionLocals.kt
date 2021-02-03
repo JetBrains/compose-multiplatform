@@ -24,7 +24,7 @@ import androidx.compose.animation.core.rootAnimationClockFactory
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -116,7 +116,7 @@ internal fun ProvideAndroidCompositionLocals(
         }
     }
 
-    Providers(
+    CompositionLocalProvider(
         LocalConfiguration provides configuration,
         LocalContext provides context,
         LocalLifecycleOwner provides viewTreeOwners.lifecycleOwner,

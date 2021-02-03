@@ -16,21 +16,11 @@
 
 package androidx.compose.runtime
 
+import androidx.compose.runtime.tooling.CompositionData
 import kotlinx.collections.immutable.persistentHashMapOf
 import kotlin.coroutines.CoroutineContext
 
 private val EmptyCompositionLocalMap: CompositionLocalMap = persistentHashMapOf()
-
-/**
- * An Effect to construct a [CompositionContext] at the current point of composition. This can be
- * used to run a separate composition in the context of the current one, preserving
- * [CompositionLocal]s and propagating invalidations. When this call leaves the composition, the
- * context is invalidated.
- */
-@OptIn(InternalComposeApi::class)
-@Composable fun rememberCompositionContext(): CompositionContext {
-    return currentComposer.buildContext()
-}
 
 @Deprecated(
     "Renamed to rememberCompositionContext",
@@ -58,7 +48,6 @@ typealias CompositionReference = CompositionContext
 @OptIn(InternalComposeApi::class)
 abstract class CompositionContext internal constructor() {
     internal abstract val compoundHashKey: Int
-    internal abstract val collectingKeySources: Boolean
     internal abstract val collectingParameterInformation: Boolean
     internal abstract val effectCoroutineContext: CoroutineContext
     internal abstract fun composeInitial(

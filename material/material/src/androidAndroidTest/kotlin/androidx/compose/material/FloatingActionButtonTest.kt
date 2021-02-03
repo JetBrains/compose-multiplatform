@@ -25,7 +25,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
@@ -178,7 +178,7 @@ class FloatingActionButtonTest {
             Box {
                 surface = MaterialTheme.colors.surface
                 fabColor = MaterialTheme.colors.secondary
-                Providers(LocalShapes provides Shapes(small = themeShape)) {
+                CompositionLocalProvider(LocalShapes provides Shapes(small = themeShape)) {
                     FloatingActionButton(
                         modifier = Modifier.testTag("myButton"),
                         onClick = {},
@@ -215,7 +215,7 @@ class FloatingActionButtonTest {
             Box {
                 surface = MaterialTheme.colors.surface
                 fabColor = MaterialTheme.colors.secondary
-                Providers(LocalShapes provides Shapes(small = themeShape)) {
+                CompositionLocalProvider(LocalShapes provides Shapes(small = themeShape)) {
                     ExtendedFloatingActionButton(
                         modifier = Modifier.testTag("myButton"),
                         onClick = {},

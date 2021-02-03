@@ -16,8 +16,8 @@
 
 package androidx.compose.ui.tooling.data
 
-import androidx.compose.runtime.CompositionData
-import androidx.compose.runtime.CompositionGroup
+import androidx.compose.runtime.tooling.CompositionData
+import androidx.compose.runtime.tooling.CompositionGroup
 import androidx.compose.ui.layout.LayoutInfo
 import androidx.compose.ui.layout.ModifierInfo
 import androidx.compose.ui.layout.positionInWindow

@@ -102,14 +102,13 @@ abstract class BaseComposeTest {
     @Composable
     @Suppress("UNUSED_PARAMETER")
     fun subCompose(block: @Composable () -> Unit) {
-//        val container = remember { View(activity) }
 //        val reference = rememberCompositionContext()
-//        @OptIn(ExperimentalComposeApi::class)
-//        Composition(
-//            container,
-//            UiApplier(container),
-//            reference
-//        ).apply {
+//        remember {
+//            Composition(
+//                UiApplier(View(activity)),
+//                reference
+//            )
+//        }.apply {
 //            setContent {
 //                block()
 //            }
@@ -137,7 +136,7 @@ class ComposeTester(val activity: ComponentActivity, val composable: @Composable
 
     private fun initialComposition(composable: @Composable () -> Unit) {
         activity.show {
-            Providers(
+            CompositionLocalProvider(
                 LocalContext provides activity
             ) {
                 composable()

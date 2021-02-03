@@ -18,7 +18,7 @@ package androidx.compose.foundation.textfield
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.geometry.Offset
@@ -73,7 +73,7 @@ class TextFieldOnValueChangeTextFieldValueTest {
             .thenReturn(inputSessionToken)
 
         rule.setContent {
-            Providers(
+            CompositionLocalProvider(
                 LocalTextInputService provides textInputService
             ) {
                 val state = remember {

@@ -41,7 +41,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -239,7 +239,7 @@ fun DropdownMenuItem(
         val typography = MaterialTheme.typography
         ProvideTextStyle(typography.subtitle1) {
             val contentAlpha = if (enabled) ContentAlpha.high else ContentAlpha.disabled
-            Providers(LocalContentAlpha provides contentAlpha) {
+            CompositionLocalProvider(LocalContentAlpha provides contentAlpha) {
                 content()
             }
         }
