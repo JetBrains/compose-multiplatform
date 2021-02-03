@@ -1084,17 +1084,20 @@ package androidx.compose.ui.graphics.drawscope {
 
 package androidx.compose.ui.graphics.painter {
 
+  public final class BitmapPainter extends androidx.compose.ui.graphics.painter.Painter {
+    method public long getIntrinsicSize-NH-jbRc();
+    method protected void onDraw(androidx.compose.ui.graphics.drawscope.DrawScope);
+    property public long intrinsicSize;
+  }
+
+  public final class BitmapPainterKt {
+  }
+
   public final class ColorPainter extends androidx.compose.ui.graphics.painter.Painter {
     method public long getColor-0d7_KjU();
     method public long getIntrinsicSize-NH-jbRc();
     method protected void onDraw(androidx.compose.ui.graphics.drawscope.DrawScope);
     property public final long color;
-    property public long intrinsicSize;
-  }
-
-  public final class ImagePainter extends androidx.compose.ui.graphics.painter.Painter {
-    method public long getIntrinsicSize-NH-jbRc();
-    method protected void onDraw(androidx.compose.ui.graphics.drawscope.DrawScope);
     property public long intrinsicSize;
   }
 

@@ -25,7 +25,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.imageFromResource
-import androidx.compose.ui.graphics.painter.ImagePainter
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -35,7 +35,7 @@ import androidx.compose.ui.platform.LocalContext
 
 /**
  * Create a [Painter] from an Android resource id. This can load either an instance of
- * [ImagePainter] or [VectorPainter] for [ImageBitmap] based assets or vector based assets
+ * [BitmapPainter] or [VectorPainter] for [ImageBitmap] based assets or vector based assets
  * respectively. The resources with the given id must point to either fully rasterized
  * images (ex. PNG or JPG files) or VectorDrawable xml assets. API based xml Drawables
  * are not supported here.
@@ -71,7 +71,7 @@ fun painterResource(@DrawableRes id: Int): Painter {
         val imageBitmap = remember(path, id) {
             loadImageBitmapResource(res, id)
         }
-        ImagePainter(imageBitmap)
+        BitmapPainter(imageBitmap)
     }
 }
 
