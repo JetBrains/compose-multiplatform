@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DeprecatedCallableAddReplaceWith", "DEPRECATION")
+
 package androidx.compose.ui.viewinterop
 
 import androidx.compose.runtime.Composable
@@ -34,6 +36,11 @@ import androidx.lifecycle.ViewModelStoreOwner
  * @return A [ViewModel] that is an instance of the given [T] type.
  */
 @Composable
+@Deprecated(
+    "It was moved to androidx.lifecycle.viewmodel.compose package. You should add a " +
+        "dependency on androidx.lifecycle:lifecycle-viewmodel.compose:1.0.0-alpha01 in order to " +
+        "use it"
+)
 inline fun <reified T : ViewModel> viewModel(
     key: String? = null,
     factory: ViewModelProvider.Factory? = null
@@ -53,6 +60,11 @@ inline fun <reified T : ViewModel> viewModel(
  * @return A [ViewModel] that is an instance of the given [T] type.
  */
 @Composable
+@Deprecated(
+    "It was moved to androidx.lifecycle.viewmodel.compose package. You should add a " +
+        "dependency on androidx.lifecycle:lifecycle-viewmodel.compose:1.0.0-alpha01 in order to " +
+        "use it"
+)
 fun <T : ViewModel> viewModel(
     modelClass: Class<T>,
     key: String? = null,

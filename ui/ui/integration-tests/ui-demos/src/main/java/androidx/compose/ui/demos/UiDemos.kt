@@ -124,7 +124,6 @@ val CoreDemos = DemoCategory(
         ComposableDemo("Popup") { PopupDemo() },
         GraphicsDemos,
         GestureDemos,
-        ComposableDemo("Views interoperability") { ViewInteropDemo() },
-        ComposableDemo("ViewModel") { ViewModelDemo() }
+        ComposableDemo("Views interoperability") { ViewInteropDemo() }
     )
 )

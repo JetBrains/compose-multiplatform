@@ -40,6 +40,7 @@ dependencies {
     implementation project(":compose:ui:ui-viewbinding")
     implementation project(":navigation:navigation-compose")
     implementation project(":activity:activity-compose")
+    implementation project(":lifecycle:lifecycle-viewmodel-compose")
 
 
     implementation(KOTLIN_STDLIB)
