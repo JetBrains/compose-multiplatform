@@ -78,8 +78,8 @@ private class SaveableStateHolderImpl(
         key(key) {
             val registryHolder = remember {
                 require(parentSaveableStateRegistry?.canBeSaved(key) ?: true) {
-                    "Type of the key used for withRestorableState is not supported. On Android " +
-                        "you can only use types which can be stored inside the Bundle."
+                    "Type of the key $key is not supported. On Android you can only use types " +
+                        "which can be stored inside the Bundle."
                 }
                 RegistryHolder(key)
             }
