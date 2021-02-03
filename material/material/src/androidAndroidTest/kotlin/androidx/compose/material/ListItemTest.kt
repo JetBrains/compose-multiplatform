@@ -44,6 +44,7 @@ import kotlin.math.roundToInt
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
+@OptIn(ExperimentalMaterialApi::class)
 class ListItemTest {
 
     @get:Rule

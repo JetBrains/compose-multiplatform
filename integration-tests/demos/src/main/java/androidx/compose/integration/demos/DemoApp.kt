@@ -30,6 +30,7 @@ import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.integration.demos.common.Demo
 import androidx.compose.integration.demos.common.DemoCategory
 import androidx.compose.integration.demos.common.allLaunchableDemos
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
@@ -125,6 +126,7 @@ private fun DisplayDemo(demo: Demo, onNavigate: (Demo) -> Unit) {
 }
 
 @Composable
+@OptIn(ExperimentalMaterialApi::class)
 private fun DisplayDemoCategory(category: DemoCategory, onNavigate: (Demo) -> Unit) {
     // TODO: migrate to LazyColumn after b/175671850
     Column(Modifier.verticalScroll(rememberScrollState())) {

@@ -453,7 +453,7 @@ fun ModalDrawerLayout(
  * @throws IllegalStateException when parent has [Float.POSITIVE_INFINITY] height
  */
 @Composable
-@OptIn(ExperimentalMaterialApi::class)
+@ExperimentalMaterialApi
 fun BottomDrawerLayout(
     drawerContent: @Composable ColumnScope.() -> Unit,
     modifier: Modifier = Modifier,

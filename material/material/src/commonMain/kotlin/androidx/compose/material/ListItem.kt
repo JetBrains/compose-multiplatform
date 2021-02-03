@@ -65,6 +65,7 @@ import kotlin.math.max
  * @param text The primary text of the list item
  */
 @Composable
+@ExperimentalMaterialApi
 fun ListItem(
     modifier: Modifier = Modifier,
     icon: @Composable (() -> Unit)? = null,
