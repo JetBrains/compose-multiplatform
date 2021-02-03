@@ -41,7 +41,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
 import androidx.compose.ui.graphics.painter.ColorPainter
-import androidx.compose.ui.graphics.painter.ImagePainter
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
@@ -162,7 +162,7 @@ class ImageTest {
                     .wrapContentSize(Alignment.Center)
             ) {
                 Image(
-                    ImagePainter(
+                    BitmapPainter(
                         createImageBitmap(),
                         IntOffset(
                             imageWidth / 2 - subsectionWidth / 2,

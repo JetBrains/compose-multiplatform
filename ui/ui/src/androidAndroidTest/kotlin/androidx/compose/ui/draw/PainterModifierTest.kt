@@ -48,7 +48,7 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.painter.ImagePainter
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.Path
@@ -520,11 +520,11 @@ class PainterModifierTest {
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
-    fun testImagePainterScalesContent() {
-        // ImagePainter should handle scaling its content image up to fill the
+    fun testBitmapPainterScalesContent() {
+        // BitmapPainter should handle scaling its content image up to fill the
         // corresponding content bounds. Because the composable is twice the
         // height of the image and we are providing ContentScale.FillHeight
-        // the ImagePainter should draw the image with twice its original
+        // the BitmapPainter should draw the image with twice its original
         // height and width centered within the bounds of the composable
         val boxWidth = 600
         val boxHeight = 400
@@ -542,7 +542,7 @@ class PainterModifierTest {
                     .background(color = Color.Gray)
                     .width((boxWidth / LocalDensity.current.density).dp)
                     .height((boxHeight / LocalDensity.current.density).dp)
-                    .paint(ImagePainter(srcImage), contentScale = ContentScale.FillHeight)
+                    .paint(BitmapPainter(srcImage), contentScale = ContentScale.FillHeight)
             )
         }
 
@@ -567,7 +567,7 @@ class PainterModifierTest {
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
-    fun testImagePainterScalesNonUniformly() {
+    fun testBitmapPainterScalesNonUniformly() {
         // The composable dimensions are larger than the ImageBitmap. By not passing in
         // a ContentScale parameter to the painter, the ImageBitmap should be stretched
         // non-uniformly to fully occupy the bounds of the composable
@@ -587,7 +587,7 @@ class PainterModifierTest {
                     .background(color = Color.Gray)
                     .width((boxWidth / LocalDensity.current.density).dp)
                     .height((boxHeight / LocalDensity.current.density).dp)
-                    .paint(ImagePainter(srcImage), contentScale = ContentScale.FillBounds)
+                    .paint(BitmapPainter(srcImage), contentScale = ContentScale.FillBounds)
             )
         }
 

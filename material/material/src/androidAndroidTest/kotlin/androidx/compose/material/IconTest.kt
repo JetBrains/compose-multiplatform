@@ -27,7 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
 import androidx.compose.ui.graphics.painter.ColorPainter
-import androidx.compose.ui.graphics.painter.ImagePainter
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
@@ -143,8 +143,8 @@ class IconTest {
                     ImageBitmap(width.roundToPx(), height.roundToPx())
                 }
 
-                val imagePainter = ImagePainter(image)
-                Icon(imagePainter, null)
+                val bitmapPainter = BitmapPainter(image)
+                Icon(bitmapPainter, null)
             }
             .assertWidthIsEqualTo(width)
             .assertHeightIsEqualTo(height)
