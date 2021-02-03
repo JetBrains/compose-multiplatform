@@ -60,7 +60,9 @@ fun FancyScrollingDemo() {
             orientation = Orientation.Horizontal,
             onDrag = { delta: Float ->
                 // Snap to new drag position
-                animScroll.snapTo(animScroll.value + delta)
+                scope.launch {
+                    animScroll.snapTo(animScroll.value + delta)
+                }
             },
 
             onDragStopped = { velocity: Float ->
