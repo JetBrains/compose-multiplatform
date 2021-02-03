@@ -2006,15 +2006,6 @@ package androidx.compose.ui.node {
     property public abstract androidx.compose.ui.text.input.TextInputService textInputService;
   }
 
-  public final class UiApplier extends androidx.compose.runtime.AbstractApplier<java.lang.Object> {
-    ctor public UiApplier(Object root);
-    method public void insertBottomUp(int index, Object instance);
-    method public void insertTopDown(int index, Object instance);
-    method public void move(int from, int to, int count);
-    method protected void onClear();
-    method public void remove(int index, int count);
-  }
-
   public final class ViewInteropKt {
   }
 
@@ -2721,11 +2712,6 @@ package androidx.compose.ui.viewinterop {
   public final class AndroidViewKt {
     method @androidx.compose.runtime.Composable public static <T extends android.view.View> void AndroidView(kotlin.jvm.functions.Function1<? super android.content.Context,? extends T> viewBlock, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function1<? super T,kotlin.Unit> update);
     method public static kotlin.jvm.functions.Function1<android.view.View,kotlin.Unit> getNoOpUpdate();
-  }
-
-  public final class EmitViewKt {
-    method @Deprecated @androidx.compose.runtime.Composable public static <T extends android.view.View> void emitView(kotlin.jvm.functions.Function1<? super android.content.Context,? extends T> ctor, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> update);
-    method @Deprecated @androidx.compose.runtime.Composable public static <T extends android.view.ViewGroup> void emitView(kotlin.jvm.functions.Function1<? super android.content.Context,? extends T> ctor, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> update, kotlin.jvm.functions.Function0<kotlin.Unit> children);
   }
 
   public final class ViewModelKt {

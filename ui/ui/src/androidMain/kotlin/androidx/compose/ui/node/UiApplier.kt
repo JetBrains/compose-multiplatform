@@ -17,136 +17,37 @@
 @file:OptIn(ExperimentalComposeApi::class)
 package androidx.compose.ui.node
 
-import android.view.View
-import android.view.ViewGroup
 import androidx.compose.runtime.AbstractApplier
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.ui.platform.AndroidComposeView
-import androidx.compose.ui.viewinterop.AndroidViewHolder
-import androidx.compose.ui.viewinterop.ViewBlockHolder
 
-class UiApplier(root: Any) : AbstractApplier<Any>(root) {
-    private fun invalidNode(node: Any): Nothing =
-        error("Unsupported node type ${node.javaClass.simpleName}")
+internal class UiApplier(
+    root: LayoutNode
+) : AbstractApplier<LayoutNode>(root) {
 
-    override fun up() {
-        val instance = current
-        super.up()
-        val parent = current
-        if (parent is ViewGroup && instance is View) {
-            instance.getViewAdapterIfExists()?.didUpdate(instance, parent)
-        }
-    }
-
-    override fun insertTopDown(index: Int, instance: Any) {
+    override fun insertTopDown(index: Int, instance: LayoutNode) {
         // Ignored. Insert is performed in [insertBottomUp] to build the tree bottom-up to avoid
         // duplicate notification when the child nodes enter the tree.
     }
 
-    override fun insertBottomUp(index: Int, instance: Any) {
-        val adapter = when (instance) {
-            is View -> instance.getViewAdapterIfExists()
-            else -> null
-        }
-        when (val parent = current) {
-            is ViewGroup ->
-                when (instance) {
-                    is View -> {
-                        adapter?.willInsert(instance, parent)
-                        parent.addView(instance, index)
-                        adapter?.didInsert(instance, parent)
-                    }
-                    is LayoutNode -> {
-                        val composeView = AndroidComposeView(parent.context)
-                        parent.addView(composeView, index)
-                        composeView.root.insertAt(0, instance)
-                    }
-                    else -> invalidNode(instance)
-                }
-            is LayoutNode ->
-                when (instance) {
-                    is View -> {
-                        // Wrap the instance in an AndroidViewHolder, unless the instance
-                        // itself is already one.
-                        val androidViewHolder =
-                            if (instance is AndroidViewHolder) {
-                                instance
-                            } else {
-                                ViewBlockHolder<View>(instance.context).apply {
-                                    view = instance
-                                }
-                            }
-
-                        parent.insertAt(index, androidViewHolder.toLayoutNode())
-                    }
-                    is LayoutNode -> parent.insertAt(index, instance)
-                    else -> invalidNode(instance)
-                }
-            else -> invalidNode(parent)
-        }
+    override fun insertBottomUp(index: Int, instance: LayoutNode) {
+        current.insertAt(index, instance)
     }
 
     override fun remove(index: Int, count: Int) {
-        when (val node = current) {
-            is ViewGroup -> node.removeViews(index, count)
-            is LayoutNode -> node.removeAt(index, count)
-            else -> invalidNode(node)
-        }
+        current.removeAt(index, count)
     }
 
     override fun move(from: Int, to: Int, count: Int) {
-        when (val node = current) {
-            is ViewGroup -> {
-                if (from > to) {
-                    var currentFrom = from
-                    var currentTo = to
-                    repeat(count) {
-                        val view = node.getChildAt(currentFrom)
-                        node.removeViewAt(currentFrom)
-                        node.addView(view, currentTo)
-                        currentFrom++
-                        currentTo++
-                    }
-                } else {
-                    repeat(count) {
-                        val view = node.getChildAt(from)
-                        node.removeViewAt(from)
-                        node.addView(view, to - 1)
-                    }
-                }
-            }
-            is LayoutNode -> {
-                node.move(from, to, count)
-            }
-            else -> invalidNode(node)
-        }
+        current.move(from, to, count)
     }
 
     override fun onClear() {
-        when (root) {
-            is ViewGroup -> root.removeAllViews()
-            is LayoutNode -> root.removeAll()
-            else -> invalidNode(root)
-        }
+        root.removeAll()
     }
 
     override fun onEndChanges() {
         super.onEndChanges()
-        if (root is ViewGroup) {
-            clearInvalidObservations(root)
-        } else if (root is LayoutNode) {
-            (root.owner as? AndroidComposeView)?.clearInvalidObservations()
-        }
-    }
-
-    private fun clearInvalidObservations(viewGroup: ViewGroup) {
-        for (i in 0 until viewGroup.childCount) {
-            val child = viewGroup.getChildAt(i)
-            if (child is AndroidComposeView) {
-                child.clearInvalidObservations()
-            } else if (child is ViewGroup) {
-                clearInvalidObservations(child)
-            }
-        }
+        (root.owner as? AndroidComposeView)?.clearInvalidObservations()
     }
 }
