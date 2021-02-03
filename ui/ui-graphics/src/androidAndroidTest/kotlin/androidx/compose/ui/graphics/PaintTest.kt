@@ -21,6 +21,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import org.junit.Assert.fail
 
 @SmallTest
 @RunWith(AndroidJUnit4::class)
@@ -30,5 +31,23 @@ class PaintTest {
     fun testPaintAntiAlias() {
         val paint = Paint()
         assertTrue(paint.isAntiAlias)
+    }
+
+    @Test
+    fun testNullPathEffectAssignmentDoesNotCrash() {
+        val paint = Paint()
+        try {
+            paint.pathEffect = null
+        } catch (e: NullPointerException) {
+            fail("Null path effect should not throw")
+        }
+    }
+
+    @Test
+    fun testPathGetterSetter() {
+        val paint = Paint()
+        val pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 5f), 20f)
+        paint.pathEffect = pathEffect
+        assertTrue(pathEffect === paint.pathEffect)
     }
 }

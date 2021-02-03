@@ -108,7 +108,7 @@ class DesktopPaint : Paint {
 
     override var pathEffect: PathEffect? = null
         set(value) {
-            skija.pathEffect = (value as DesktopPathEffect).asDesktopPathEffect()
+            skija.pathEffect = (value as DesktopPathEffect?)?.asDesktopPathEffect()
             field = value
         }
 

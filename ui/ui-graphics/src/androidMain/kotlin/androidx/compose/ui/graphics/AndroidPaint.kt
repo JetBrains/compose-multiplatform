@@ -229,5 +229,5 @@ internal fun NativePaint.setNativeShader(value: Shader?) {
 }
 
 internal fun NativePaint.setNativePathEffect(value: PathEffect?) {
-    this.pathEffect = (value as AndroidPathEffect).nativePathEffect
+    this.pathEffect = (value as AndroidPathEffect?)?.nativePathEffect
 }
