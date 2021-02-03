@@ -29,6 +29,7 @@ at https://android.googlesource.com/platform/frameworks/support.
        * [Menu, tray, notifications](tutorials/Tray_Notifications_MenuBar)
        * [Keyboard support](tutorials/Keyboard)
        * [Building native distribution](tutorials/Native_distributions_and_local_execution)
+       * [Signing and notarization](tutorials/Signing_and_notarization_on_macOS)
        * [Window control API](tutorials/Window_API)
        * [Swing interoperability](tutorials/Swing_Integration)
    * [components](components) - custom components of Compose for Desktop
