@@ -6,7 +6,7 @@ package org.jetbrains.codeviewer.ui.editor
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.selection.DisableSelection
 import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Surface
@@ -14,31 +14,23 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawOpacity
-import androidx.compose.ui.platform.DensityAmbient
-import androidx.compose.ui.selection.DisableSelection
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.annotatedString
-import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.*
 import androidx.compose.ui.unit.dp
 import org.jetbrains.codeviewer.platform.SelectionContainer
-import org.jetbrains.codeviewer.platform.VerticalScrollbar
 import org.jetbrains.codeviewer.ui.common.AppTheme
 import org.jetbrains.codeviewer.ui.common.Fonts
 import org.jetbrains.codeviewer.ui.common.Settings
-import org.jetbrains.codeviewer.util.LazyColumnFor
-import org.jetbrains.codeviewer.util.loadable
 import org.jetbrains.codeviewer.util.loadableScoped
 import org.jetbrains.codeviewer.util.withoutWidthConstraints
 import kotlin.text.Regex.Companion.fromLiteral
 
 @Composable
 fun EditorView(model: Editor, settings: Settings) = key(model) {
-    with (DensityAmbient.current) {
+    with (LocalDensity.current) {
         SelectionContainer {
             Surface(
                 Modifier.fillMaxSize(),
@@ -112,7 +104,7 @@ private fun Line(modifier: Modifier, maxNumber: String, line: Editor.Line, setti
     Row(modifier = modifier) {
         DisableSelection {
             Box {
-                LineNumber(maxNumber, Modifier.drawOpacity(0f), settings)
+                LineNumber(maxNumber, Modifier.alpha(0f), settings)
                 LineNumber(line.number.toString(), Modifier.align(Alignment.CenterEnd), settings)
             }
         }
@@ -149,7 +141,7 @@ private fun LineContent(content: Editor.Content, modifier: Modifier, settings: S
     softWrap = false
 )
 
-private fun codeString(str: String) = annotatedString {
+private fun codeString(str: String) = buildAnnotatedString {
     withStyle(AppTheme.code.simple) {
         append(str.replace("\t", "    "))
         addStyle(AppTheme.code.punctuation, ":")

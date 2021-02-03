@@ -3,10 +3,8 @@ package org.jetbrains.codeviewer.ui.editor
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.AmbientContentColor
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.foundation.text.selection.DisableSelection
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -15,7 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.AmbientDensity
-import androidx.compose.ui.selection.DisableSelection
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -33,7 +31,7 @@ import kotlin.text.Regex.Companion.fromLiteral
 
 @Composable
 fun EditorView(model: Editor, settings: Settings) = key(model) {
-    with (AmbientDensity.current) {
+    with (LocalDensity.current) {
         SelectionContainer {
             Surface(
                 Modifier.fillMaxSize(),
@@ -124,7 +122,7 @@ private fun LineNumber(number: String, modifier: Modifier, settings: Settings) =
     text = number,
     fontSize = settings.fontSize,
     fontFamily = Fonts.jetbrainsMono(),
-    color = AmbientContentColor.current.copy(alpha = 0.30f),
+    color = LocalContentColor.current.copy(alpha = 0.30f),
     modifier = modifier.padding(start = 12.dp)
 )
 

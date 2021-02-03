@@ -1,10 +1,10 @@
 package org.jetbrains.codeviewer.ui
 
+import androidx.compose.foundation.text.selection.DisableSelection
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.selection.DisableSelection
 import org.jetbrains.codeviewer.platform.HomeFolder
 import org.jetbrains.codeviewer.platform.PlatformTheme
 import org.jetbrains.codeviewer.ui.common.AppTheme
