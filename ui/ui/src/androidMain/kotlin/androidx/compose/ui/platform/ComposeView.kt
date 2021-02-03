@@ -200,6 +200,14 @@ abstract class AbstractComposeView @JvmOverloads constructor(
      */
     val hasComposition: Boolean get() = composition != null
 
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+
+        if (shouldCreateCompositionOnAttachedToWindow) {
+            ensureCompositionCreated()
+        }
+    }
+
     final override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         ensureCompositionCreated()
         val child = getChildAt(0)
