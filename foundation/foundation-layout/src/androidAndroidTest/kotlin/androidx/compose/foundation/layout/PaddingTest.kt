@@ -130,15 +130,15 @@ class PaddingTest : LayoutTest() {
     }
 
     /**
-     * Tests the top-level [padding] modifier factory with a single [androidx.compose.foundation.layout
-     * .PaddingValues] argument, checking that padding is applied to a child when plenty of space
+     * Tests the top-level [padding] modifier factory with a single [PaddingValues]
+     * argument, checking that padding is applied to a child when plenty of space
      * is available for both content and padding.
      */
     @Test
     fun paddingPaddingValuesAppliedToChild() = with(density) {
         val padding = PaddingValues(start = 1.dp, top = 3.dp, end = 6.dp, bottom = 10.dp)
         testPaddingWithDifferentInsetsImplementation(
-            padding.start, padding.top, padding.end, padding.bottom
+            1.dp, 3.dp, 6.dp, 10.dp
         ) { child: @Composable () -> Unit ->
             TestBox(modifier = Modifier.padding(padding), content = child)
         }
@@ -163,6 +163,21 @@ class PaddingTest : LayoutTest() {
             paddingBottom
         ) { child: @Composable () -> Unit ->
             TestBox(modifier = padding, content = child)
+        }
+    }
+
+    /**
+     * Tests the top-level [absolutePadding] modifier factory with a single [PaddingValues.Absolute]
+     * argument, checking that padding is applied to a child when plenty of space
+     * is available for both content and padding.
+     */
+    @Test
+    fun paddingAbsolutePaddingValuesAppliedToChild() = with(density) {
+        val padding = PaddingValues.Absolute(left = 1.dp, top = 3.dp, right = 6.dp, bottom = 10.dp)
+        testPaddingWithDifferentInsetsImplementation(
+            1.dp, 3.dp, 6.dp, 10.dp
+        ) { child: @Composable () -> Unit ->
+            TestBox(modifier = Modifier.padding(padding), content = child)
         }
     }
 
