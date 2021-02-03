@@ -73,8 +73,6 @@ abstract class CompositionContext internal constructor() {
     internal abstract fun registerComposition(composition: ControlledComposition)
     internal abstract fun unregisterComposition(composition: ControlledComposition)
 
-    internal open fun <T> getCompositionLocal(key: CompositionLocal<T>): T =
-        key.defaultValueHolder.value
     internal open fun getCompositionLocalScope(): CompositionLocalMap = EmptyCompositionLocalMap
     internal open fun startComposing() {}
     internal open fun doneComposing() {}

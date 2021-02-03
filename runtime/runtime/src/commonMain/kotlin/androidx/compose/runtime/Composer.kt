@@ -1798,37 +1798,6 @@ internal class ComposerImpl(
     }
 
     /**
-     * Return the [CompositionLocal] scope for the location provided. If this is while the
-     * composer is composing then this is a query from a sub-composition that is being recomposed
-     * by this compose which might be inserting the sub-composition. In that case the current scope
-     * is the correct scope.
-     */
-    private fun compositionLocalScopeAt(location: Int): CompositionLocalMap {
-        if (isComposing) {
-            // The sub-composer is being composed as part of a nested composition then use the
-            // current CompositionLocal scope as the one in the slot table might be out of date.
-            return currentCompositionLocalScope()
-        }
-
-        if (location >= 0) {
-            slotTable.read { reader ->
-                var current = location
-                while (current > 0) {
-                    if (reader.groupKey(current) == compositionLocalMapKey &&
-                        reader.groupObjectKey(current) == compositionLocalMap
-                    ) {
-                        @Suppress("UNCHECKED_CAST")
-                        return providerUpdates[current]
-                            ?: reader.groupAux(current) as CompositionLocalMap
-                    }
-                    current = reader.parent(current)
-                }
-            }
-        }
-        return parentProvider
-    }
-
-    /**
      * Update (or create) the slots to record the providers. The providers maps are first the
      * scope followed by the map used to augment the parent scope. Both are needed to detect
      * inserts, updates and deletes to the providers.
@@ -1916,11 +1885,8 @@ internal class ComposerImpl(
 
         var ref = nextSlot() as? CompositionContextHolder
         if (ref == null) {
-            val scope = invalidateStack.peek()
-            scope.used = true
             ref = CompositionContextHolder(
                 CompositionContextImpl(
-                    scope,
                     compoundKeyHash,
                     collectKeySources,
                     collectParameterInformation
@@ -1928,6 +1894,7 @@ internal class ComposerImpl(
             )
             updateValue(ref)
         }
+        ref.ref.updateCompositionLocalScope(currentCompositionLocalScope())
         endGroup()
 
         return ref.ref
@@ -1939,14 +1906,8 @@ internal class ComposerImpl(
     ): T = if (scope.contains(key)) {
         scope.getValueOf(key)
     } else {
-        parentContext.getCompositionLocal(key)
+        key.defaultValueHolder.value
     }
-
-    internal fun <T> parentCompositionLocal(key: CompositionLocal<T>): T =
-        resolveCompositionLocal(key, currentCompositionLocalScope())
-
-    private fun <T> parentCompositionLocal(key: CompositionLocal<T>, location: Int): T =
-        resolveCompositionLocal(key, compositionLocalScopeAt(location))
 
     /**
      * The number of changes that have been scheduled to be applied during [applyChanges].
@@ -3046,7 +3007,6 @@ internal class ComposerImpl(
     }
 
     private inner class CompositionContextImpl(
-        val scope: RecomposeScopeImpl,
         override val compoundHashKey: Int,
         override val collectingKeySources: Boolean,
         override val collectingParameterInformation: Boolean
@@ -3108,20 +3068,18 @@ internal class ComposerImpl(
             parentContext.invalidate(composition)
         }
 
-        override fun <T> getCompositionLocal(key: CompositionLocal<T>): T {
-            val anchor = scope.anchor
-            return if (anchor != null && anchor.valid) {
-                parentCompositionLocal(key, anchor.toIndexFor(slotTable))
-            } else {
-                // The composition is composing and the CompositionLocal has not landed in the slot
-                // table yet. This is a synchronous read from a sub-composition so the current
-                // CompositionLocal.
-                parentCompositionLocal(key)
-            }
-        }
+        // This is snapshot state not because we need it to be observable, but because
+        // we need changes made to it in composition to be visible for the rest of the current
+        // composition and not become visible outside of the composition process until composition
+        // succeeds.
+        private var compositionLocalScope by mutableStateOf<CompositionLocalMap>(
+            persistentHashMapOf()
+        )
 
-        override fun getCompositionLocalScope(): CompositionLocalMap {
-            return compositionLocalScopeAt(scope.anchor?.toIndexFor(slotTable) ?: 0)
+        override fun getCompositionLocalScope(): CompositionLocalMap = compositionLocalScope
+
+        fun updateCompositionLocalScope(scope: CompositionLocalMap) {
+            compositionLocalScope = scope
         }
 
         override fun recordInspectionTable(table: MutableSet<CompositionData>) {
