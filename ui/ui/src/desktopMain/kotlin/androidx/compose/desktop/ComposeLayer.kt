@@ -118,7 +118,7 @@ internal class ComposeLayer {
 
     init {
         wrapped.renderer = object : SkiaRenderer {
-            override suspend fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+            override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
                 try {
                     owners.onFrame(canvas, width, height, nanoTime)
                 } catch (e: Throwable) {
