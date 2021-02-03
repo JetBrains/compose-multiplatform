@@ -93,7 +93,7 @@ import kotlin.math.abs
  * @param steps if greater than 0, specifies the amounts of discrete values, evenly distributed
  * between across the whole value range. If 0, slider will behave as a continuous slider and allow
  * to choose any value from the range specified. Must not be negative.
- * @param onValueChangeEnd lambda to be invoked when value change has ended. This callback
+ * @param onValueChangeFinished lambda to be invoked when value change has ended. This callback
  * shouldn't be used to update the slider value (use [onValueChange] for that), but rather to
  * know when the user has completed selecting a new value by ending a drag or a click.
  * @param interactionState the [InteractionState] representing the different [Interaction]s
@@ -118,7 +118,7 @@ fun Slider(
     valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
     /*@IntRange(from = 0)*/
     steps: Int = 0,
-    onValueChangeEnd: () -> Unit = {},
+    onValueChangeFinished: (() -> Unit)? = null,
     interactionState: InteractionState = remember { InteractionState() },
     thumbColor: Color = MaterialTheme.colors.primary,
     activeTrackColor: Color = MaterialTheme.colors.primary,
@@ -141,7 +141,7 @@ fun Slider(
         position.setBounds(minPx, maxPx)
 
         val flingConfig = sliderFlingConfig(position, position.anchorsPx)
-        val gestureEndAction = { velocity: Float ->
+        val gestureEndAction: (Float) -> Unit = { velocity: Float ->
             if (flingConfig != null) {
                 position.holder.fling(
                     velocity,
@@ -150,11 +150,11 @@ fun Slider(
                 ) { reason, endValue, _ ->
                     if (reason != AnimationEndReason.Interrupted) {
                         position.holder.snapTo(endValue)
-                        onValueChangeEnd()
+                        onValueChangeFinished?.invoke()
                     }
                 }
             } else {
-                onValueChangeEnd()
+                onValueChangeFinished?.invoke()
             }
         }
 

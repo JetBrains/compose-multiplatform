@@ -26,7 +26,7 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.material.Button
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ModalDrawerLayout
+import androidx.compose.material.ModalDrawer
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -228,9 +228,9 @@ class LayoutInspectorTreeTest : ToolingTest() {
 
         show {
             Inspectable(slotTableRecord) {
-                ModalDrawerLayout(
+                ModalDrawer(
                     drawerContent = { Text("Something") },
-                    bodyContent = {
+                    content = {
                         Column {
                             Text(text = "Hello World", color = Color.Green)
                             Button(onClick = {}) { Text(text = "OK") }
@@ -247,8 +247,8 @@ class LayoutInspectorTreeTest : ToolingTest() {
 
         if (DEBUG) {
             validate(nodes, builder, checkParameters = false) {
-                node("Box", children = listOf("ModalDrawerLayout"))
-                node("ModalDrawerLayout", children = listOf("Column", "Text"))
+                node("Box", children = listOf("ModalDrawer"))
+                node("ModalDrawer", children = listOf("Column", "Text"))
                 node("Column", children = listOf("Text", "Button"))
                 node("Text")
                 node("Button", children = listOf("Text"))
@@ -265,9 +265,9 @@ class LayoutInspectorTreeTest : ToolingTest() {
 
         show {
             Inspectable(slotTableRecord) {
-                ModalDrawerLayout(
+                ModalDrawer(
                     drawerContent = { Text("Something") },
-                    bodyContent = {
+                    content = {
                         Column {
                             Text(text = "Hello World", color = Color.Green)
                             Button(onClick = {}) { Text(text = "OK") }
@@ -285,8 +285,8 @@ class LayoutInspectorTreeTest : ToolingTest() {
 
         if (DEBUG) {
             validate(nodes, builder, checkParameters = false) {
-                node("Box", children = listOf("ModalDrawerLayout"))
-                node("ModalDrawerLayout", children = listOf("WithConstraints"))
+                node("Box", children = listOf("ModalDrawer"))
+                node("ModalDrawer", children = listOf("WithConstraints"))
                 node("WithConstraints", children = listOf("SubcomposeLayout"))
                 node("SubcomposeLayout", children = listOf("Box"))
                 node("Box", children = listOf("Box", "Canvas", "Surface"))

@@ -87,7 +87,7 @@ fun BottomNavigation(
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.colors.primarySurface,
     contentColor: Color = contentColorFor(backgroundColor),
-    elevation: Dp = BottomNavigationElevation,
+    elevation: Dp = BottomNavigationDefaults.Elevation,
     content: @Composable RowScope.() -> Unit
 ) {
     Surface(
@@ -117,16 +117,16 @@ fun BottomNavigation(
  * use icons, and use text labels if space permits.
  *
  * A BottomNavigationItem always shows text labels (if it exists) when selected. Showing text
- * labels if not selected is controlled by [alwaysShowLabels].
+ * labels if not selected is controlled by [alwaysShowLabel].
  *
- * @param icon icon for this item, typically this will be an [Icon]
  * @param selected whether this item is selected
  * @param onClick the callback to be invoked when this item is selected
+ * @param icon icon for this item, typically this will be an [Icon]
  * @param modifier optional [Modifier] for this item
  * @param enabled controls the enabled state of this item. When `false`, this item will not
  * be clickable and will appear disabled to accessibility services.
  * @param label optional text label for this item
- * @param alwaysShowLabels whether to always show labels for this item. If false, labels will
+ * @param alwaysShowLabel whether to always show the label for this item. If false, the label will
  * only be shown when this item is selected.
  * @param interactionState the [InteractionState] representing the different [Interaction]s
  * present on this BottomNavigationItem. You can create and pass in your own remembered
@@ -138,13 +138,13 @@ fun BottomNavigation(
  */
 @Composable
 fun RowScope.BottomNavigationItem(
-    icon: @Composable () -> Unit,
     selected: Boolean,
     onClick: () -> Unit,
+    icon: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     label: @Composable (() -> Unit)? = null,
-    alwaysShowLabels: Boolean = true,
+    alwaysShowLabel: Boolean = true,
     interactionState: InteractionState = remember { InteractionState() },
     selectedContentColor: Color = LocalContentColor.current,
     unselectedContentColor: Color = selectedContentColor.copy(alpha = ContentAlpha.medium)
@@ -160,7 +160,6 @@ fun RowScope.BottomNavigationItem(
     // provided by BottomNavigationTransition.
     val ripple = rememberRipple(bounded = false, color = selectedContentColor)
 
-    // TODO This composable has magic behavior within a Row; reconsider this behavior later
     Box(
         modifier
             .selectable(
@@ -179,7 +178,7 @@ fun RowScope.BottomNavigationItem(
             unselectedContentColor,
             selected
         ) { progress ->
-            val animationProgress = if (alwaysShowLabels) 1f else progress
+            val animationProgress = if (alwaysShowLabel) 1f else progress
 
             BottomNavigationItemBaselineLayout(
                 icon = icon,
@@ -188,6 +187,16 @@ fun RowScope.BottomNavigationItem(
             )
         }
     }
+}
+
+/**
+ * Contains default values used for [BottomNavigation].
+ */
+object BottomNavigationDefaults {
+    /**
+     * Default elevation used for [BottomNavigation].
+     */
+    val Elevation = 8.dp
 }
 
 /**
@@ -370,11 +379,6 @@ private val BottomNavigationAnimationSpec = TweenSpec<Float>(
  * Height of a [BottomNavigation] component
  */
 private val BottomNavigationHeight = 56.dp
-
-/**
- * Default elevation of a [BottomNavigation] component
- */
-private val BottomNavigationElevation = 8.dp
 
 /**
  * Padding at the start and end of a [BottomNavigationItem]

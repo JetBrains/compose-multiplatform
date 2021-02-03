@@ -114,7 +114,7 @@ private fun DynamicThemeApp(scrollFraction: ScrollFraction, palette: Colors) {
             floatingActionButton = { Fab(scrollFraction) },
             floatingActionButtonPosition = FabPosition.Center,
             isFloatingActionButtonDocked = true,
-            bodyContent = { innerPadding ->
+            content = { innerPadding ->
                 LazyColumn(state = state, contentPadding = innerPadding) {
                     items(20) {
                         Card(it)

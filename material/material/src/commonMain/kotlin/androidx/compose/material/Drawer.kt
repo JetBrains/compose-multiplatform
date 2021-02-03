@@ -90,7 +90,7 @@ enum class BottomDrawerValue {
 }
 
 /**
- * State of the [ModalDrawerLayout] composable.
+ * State of the [ModalDrawer] composable.
  *
  * @param initialValue The initial value of the state.
  * @param clock The animation clock that will be used to drive the animations.
@@ -168,7 +168,7 @@ class DrawerState(
 }
 
 /**
- * State of the [BottomDrawerLayout] composable.
+ * State of the [BottomDrawer] composable.
  *
  * @param initialValue The initial value of the state.
  * @param clock The animation clock that will be used to drive the animations.
@@ -320,7 +320,7 @@ fun rememberBottomDrawerState(
  * Modal navigation drawers block interaction with the rest of an app’s content with a scrim.
  * They are elevated above most of the app’s UI and don’t affect the screen’s layout grid.
  *
- * See [BottomDrawerLayout] for a layout that introduces a bottom drawer, suitable when
+ * See [BottomDrawer] for a layout that introduces a bottom drawer, suitable when
  * using bottom navigation.
  *
  * @sample androidx.compose.material.samples.ModalDrawerSample
@@ -337,13 +337,13 @@ fun rememberBottomDrawerState(
  * either the matching content color for [drawerBackgroundColor], or, if it is not a color from
  * the theme, this will keep the same value set above this Surface.
  * @param scrimColor color of the scrim that obscures content when the drawer is open
- * @param bodyContent content of the rest of the UI
+ * @param content content of the rest of the UI
  *
  * @throws IllegalStateException when parent has [Float.POSITIVE_INFINITY] width
  */
 @Composable
 @OptIn(ExperimentalMaterialApi::class)
-fun ModalDrawerLayout(
+fun ModalDrawer(
     drawerContent: @Composable ColumnScope.() -> Unit,
     modifier: Modifier = Modifier,
     drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
@@ -353,7 +353,7 @@ fun ModalDrawerLayout(
     drawerBackgroundColor: Color = MaterialTheme.colors.surface,
     drawerContentColor: Color = contentColorFor(drawerBackgroundColor),
     scrimColor: Color = DrawerDefaults.scrimColor,
-    bodyContent: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
     BoxWithConstraints(modifier.fillMaxSize()) {
         val modalDrawerConstraints = constraints
@@ -385,7 +385,7 @@ fun ModalDrawerLayout(
             )
         ) {
             Box {
-                bodyContent()
+                content()
             }
             Scrim(
                 open = drawerState.isOpen,
@@ -432,7 +432,7 @@ fun ModalDrawerLayout(
  * These drawers open upon tapping the navigation menu icon in the bottom app bar.
  * They are only for use on mobile.
  *
- * See [ModalDrawerLayout] for a layout that introduces a classic from-the-side drawer.
+ * See [ModalDrawer] for a layout that introduces a classic from-the-side drawer.
  *
  * @sample androidx.compose.material.samples.BottomDrawerSample
  *
@@ -448,13 +448,13 @@ fun ModalDrawerLayout(
  * either the matching content color for [drawerBackgroundColor], or, if it is not a color from
  * the theme, this will keep the same value set above this Surface.
  * @param scrimColor color of the scrim that obscures content when the drawer is open
- * @param bodyContent content of the rest of the UI
+ * @param content content of the rest of the UI
  *
  * @throws IllegalStateException when parent has [Float.POSITIVE_INFINITY] height
  */
 @Composable
 @ExperimentalMaterialApi
-fun BottomDrawerLayout(
+fun BottomDrawer(
     drawerContent: @Composable ColumnScope.() -> Unit,
     modifier: Modifier = Modifier,
     drawerState: BottomDrawerState = rememberBottomDrawerState(BottomDrawerValue.Closed),
@@ -464,7 +464,7 @@ fun BottomDrawerLayout(
     drawerBackgroundColor: Color = MaterialTheme.colors.surface,
     drawerContentColor: Color = contentColorFor(drawerBackgroundColor),
     scrimColor: Color = DrawerDefaults.scrimColor,
-    bodyContent: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
     BoxWithConstraints(modifier.fillMaxSize()) {
         val modalDrawerConstraints = constraints
@@ -513,7 +513,7 @@ fun BottomDrawerLayout(
                 )
         ) {
             Box {
-                bodyContent()
+                content()
             }
             Scrim(
                 open = drawerState.isOpen,
@@ -551,7 +551,7 @@ fun BottomDrawerLayout(
 }
 
 /**
- * Object to hold default values for [ModalDrawerLayout] and [BottomDrawerLayout]
+ * Object to hold default values for [ModalDrawer] and [BottomDrawer]
  */
 object DrawerDefaults {
 

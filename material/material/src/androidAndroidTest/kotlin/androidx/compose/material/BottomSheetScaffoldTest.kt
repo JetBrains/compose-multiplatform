@@ -189,7 +189,7 @@ class BottomSheetScaffoldTest {
                     Box(Modifier.fillMaxWidth().height(300.dp).testTag(sheetContent))
                 },
                 sheetPeekHeight = peekHeight,
-                bodyContent = { Text("Content") }
+                content = { Text("Content") }
             )
         }
 
@@ -226,7 +226,7 @@ class BottomSheetScaffoldTest {
                     Box(Modifier.fillMaxWidth().height(300.dp).testTag(sheetContent))
                 },
                 sheetPeekHeight = peekHeight,
-                bodyContent = { Text("Content") }
+                content = { Text("Content") }
             )
         }
 
@@ -265,7 +265,7 @@ class BottomSheetScaffoldTest {
                 },
                 sheetGesturesEnabled = false,
                 sheetPeekHeight = peekHeight,
-                bodyContent = { Text("Content") }
+                content = { Text("Content") }
             )
         }
 
@@ -389,7 +389,7 @@ class BottomSheetScaffoldTest {
                         Icon(Icons.Filled.Favorite, null)
                     }
                 },
-                bodyContent = { Text("Content") }
+                content = { Text("Content") }
             )
         }
         with(rule.density) {

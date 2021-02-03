@@ -102,7 +102,7 @@ class PreviewActivity : ComponentActivity() {
                 val index = remember { mutableStateOf(0) }
 
                 Scaffold(
-                    bodyContent = {
+                    content = {
                         invokeComposableViaReflection(
                             className,
                             methodName,

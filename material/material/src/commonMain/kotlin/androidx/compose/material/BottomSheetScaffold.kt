@@ -271,7 +271,7 @@ fun rememberBottomSheetScaffoldState(
  * children. Defaults to the matching content color for [drawerBackgroundColor], or if that is
  * not a color from the theme, this will keep the same content color set above the drawer sheet.
  * @param drawerScrimColor The color of the scrim that is applied when the drawer is open.
- * @param bodyContent The main content of the screen. You should use the provided [PaddingValues]
+ * @param content The main content of the screen. You should use the provided [PaddingValues]
  * to properly offset the content, so that it is not obstructed by the bottom sheet when collapsed.
  */
 @Composable
@@ -300,7 +300,7 @@ fun BottomSheetScaffold(
     drawerScrimColor: Color = DrawerDefaults.scrimColor,
     backgroundColor: Color = MaterialTheme.colors.background,
     contentColor: Color = contentColorFor(backgroundColor),
-    bodyContent: @Composable (PaddingValues) -> Unit
+    content: @Composable (PaddingValues) -> Unit
 ) {
     BoxWithConstraints(modifier) {
         val fullHeight = constraints.maxHeight.toFloat()
@@ -336,7 +336,7 @@ fun BottomSheetScaffold(
                     ) {
                         Column(Modifier.fillMaxSize()) {
                             topBar?.invoke()
-                            bodyContent(PaddingValues(bottom = sheetPeekHeight))
+                            content(PaddingValues(bottom = sheetPeekHeight))
                         }
                     }
                 },
@@ -372,7 +372,7 @@ fun BottomSheetScaffold(
         if (drawerContent == null) {
             child()
         } else {
-            ModalDrawerLayout(
+            ModalDrawer(
                 drawerContent = drawerContent,
                 drawerState = scaffoldState.drawerState,
                 gesturesEnabled = drawerGesturesEnabled,
@@ -381,7 +381,7 @@ fun BottomSheetScaffold(
                 drawerBackgroundColor = drawerBackgroundColor,
                 drawerContentColor = drawerContentColor,
                 scrimColor = drawerScrimColor,
-                bodyContent = child
+                content = child
             )
         }
     }

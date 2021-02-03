@@ -229,7 +229,7 @@ class BottomNavigationTest {
                         },
                         selected = false,
                         onClick = {},
-                        alwaysShowLabels = false
+                        alwaysShowLabel = false
                     )
                 }
             }
