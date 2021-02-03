@@ -16,6 +16,7 @@
 
 package androidx.compose.runtime
 
+import androidx.compose.runtime.collection.IdentityArraySet
 import androidx.compose.runtime.snapshots.MutableSnapshot
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.snapshots.SnapshotApplyResult
@@ -416,9 +417,12 @@ class Recomposer(
                             }
 
                             // Perform recomposition for any invalidated composers
+                            val modifiedValues = IdentityArraySet<Any>()
                             try {
                                 toRecompose.fastForEach { composer ->
-                                    performRecompose(composer)?.let { toApply += it }
+                                    performRecompose(composer, modifiedValues)?.let {
+                                        toApply += it
+                                    }
                                 }
                                 if (toApply.isNotEmpty()) changeCount++
                             } finally {
@@ -494,7 +498,7 @@ class Recomposer(
         content: @Composable () -> Unit
     ) {
         val composerWasComposing = composition.isComposing
-        composing(composition) {
+        composing(composition, null) {
             composition.composeContent(content)
         }
         // TODO(b/143755743)
@@ -518,10 +522,14 @@ class Recomposer(
         }
     }
 
-    private fun performRecompose(composition: ControlledComposition): ControlledComposition? {
+    private fun performRecompose(
+        composition: ControlledComposition,
+        modifiedValues: IdentityArraySet<Any>
+    ): ControlledComposition? {
         if (composition.isComposing || composition.isDisposed) return null
         return if (
-            composing(composition) {
+            composing(composition, modifiedValues) {
+                modifiedValues.forEach { composition.recordWriteOf(it) }
                 composition.recompose()
             }
         ) composition else null
@@ -531,13 +539,23 @@ class Recomposer(
         return { value -> composition.recordReadOf(value) }
     }
 
-    private fun writeObserverOf(composition: ControlledComposition): (Any) -> Unit {
-        return { value -> composition.recordWriteOf(value) }
+    private fun writeObserverOf(
+        composition: ControlledComposition,
+        modifiedValues: IdentityArraySet<Any>?
+    ): (Any) -> Unit {
+        return { value ->
+            composition.recordWriteOf(value)
+            modifiedValues?.add(value)
+        }
     }
 
-    private inline fun <T> composing(composition: ControlledComposition, block: () -> T): T {
+    private inline fun <T> composing(
+        composition: ControlledComposition,
+        modifiedValues: IdentityArraySet<Any>?,
+        block: () -> T
+    ): T {
         val snapshot = Snapshot.takeMutableSnapshot(
-            readObserverOf(composition), writeObserverOf(composition)
+            readObserverOf(composition), writeObserverOf(composition, modifiedValues)
         )
         try {
             return snapshot.enter(block)

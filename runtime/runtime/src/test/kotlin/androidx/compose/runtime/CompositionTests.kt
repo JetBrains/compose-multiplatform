@@ -2608,6 +2608,40 @@ class CompositionTests {
         validate()
     }
 
+    @Test
+    fun testModificationsPropagateToSubcomposition() = compositionTest {
+        var value by mutableStateOf(0)
+        val content: MutableState<@Composable () -> Unit> = mutableStateOf({ })
+        @Suppress("VARIABLE_WITH_REDUNDANT_INITIALIZER")
+        var subCompositionOccurred = false
+
+        @Composable
+        fun ComposeContent() {
+            content.value()
+        }
+
+        fun updateContent(parentValue: Int) {
+            content.value = {
+                subCompositionOccurred = true
+                assertEquals(parentValue, value)
+            }
+        }
+
+        compose {
+            updateContent(value)
+            TestSubcomposition {
+                ComposeContent()
+            }
+        }
+
+        subCompositionOccurred = false
+
+        value = 10
+        expectChanges()
+
+        assertTrue(subCompositionOccurred)
+    }
+
     /**
      * This test checks that an updated ComposableLambda capture used in a subcomposition
      * correctly invalidates that subcomposition and schedules recomposition of that subcomposition.
