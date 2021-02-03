@@ -19,7 +19,6 @@ package androidx.compose.foundation.lazy
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredWidth
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -32,8 +31,8 @@ import androidx.compose.ui.unit.dp
  * same instance of the content lambda.
  */
 internal class CachingItemContentFactory(
-    itemContentFactory: LazyItemScope.(Int) -> @Composable () -> Unit
-) : (Int) -> @Composable () -> Unit {
+    itemContentFactory: LazyItemScope.(Int) -> ItemContent
+) : (Int) -> ItemContent {
 
     /**
      * The cached instance of the scope to be used for composing items.
@@ -43,12 +42,12 @@ internal class CachingItemContentFactory(
     /**
      * Contains the cached lambdas produced by the [itemContentFactory].
      */
-    private val lambdasCache = mutableMapOf<Int, @Composable () -> Unit>()
+    private val lambdasCache = mutableMapOf<Int, ItemContent>()
 
     /**
      * Current factory for creating an item content lambdas.
      */
-    var itemContentFactory: LazyItemScope.(Int) -> @Composable () -> Unit = itemContentFactory
+    var itemContentFactory: LazyItemScope.(Int) -> ItemContent = itemContentFactory
         set(value) {
             if (field !== value) {
                 lambdasCache.clear()
@@ -71,8 +70,15 @@ internal class CachingItemContentFactory(
     /**
      * Return cached item content lambda or creates a new lambda and puts it in the cache.
      */
-    override fun invoke(index: Int) = lambdasCache.getOrPut(index) {
-        itemScope.itemContentFactory(index)
+    override fun invoke(index: Int): ItemContent {
+        val content = itemScope.itemContentFactory(index)
+        val cachedContent = lambdasCache[index]
+        if (cachedContent == null || cachedContent.key != content.key) {
+            lambdasCache[index] = content
+            return content
+        } else {
+            return cachedContent
+        }
     }
 }
 

@@ -79,7 +79,7 @@ fun <T> LazyColumnFor(
         verticalArrangement = verticalArrangement,
         reverseLayout = reverseLayout
     ) {
-        items(items, itemContent)
+        items(items, itemContent = itemContent)
     }
 }
 
@@ -141,7 +141,7 @@ fun <T> LazyColumnForIndexed(
         verticalArrangement = verticalArrangement,
         reverseLayout = reverseLayout
     ) {
-        itemsIndexed(items, itemContent)
+        itemsIndexed(items, itemContent = itemContent)
     }
 }
 
@@ -200,7 +200,7 @@ fun <T> LazyRowFor(
         horizontalArrangement = horizontalArrangement,
         reverseLayout = reverseLayout
     ) {
-        items(items, itemContent)
+        items(items, itemContent = itemContent)
     }
 }
 
@@ -261,6 +261,6 @@ fun <T> LazyRowForIndexed(
         horizontalArrangement = horizontalArrangement,
         reverseLayout = reverseLayout
     ) {
-        itemsIndexed(items, itemContent)
+        itemsIndexed(items, itemContent = itemContent)
     }
 }

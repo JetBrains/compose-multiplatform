@@ -32,6 +32,11 @@ import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 
+internal class ItemContent(
+    val key: Any,
+    val content: @Composable() () -> Unit
+)
+
 @Composable
 internal fun LazyList(
     /** The total size of the list */
@@ -57,7 +62,7 @@ internal fun LazyList(
     /** The list of indexes of the sticky header items */
     headerIndexes: List<Int> = emptyList(),
     /** The factory defining the content for an item on the given position in the list */
-    itemContent: LazyItemScope.(Int) -> @Composable () -> Unit
+    itemContent: LazyItemScope.(Int) -> ItemContent
 ) {
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     // reverse scroll by default, to have "natural" gesture that goes reversed to layout
@@ -101,7 +106,7 @@ internal fun LazyList(
             isVertical,
             this,
             cachingItemContentFactory
-        ) { index, placeables ->
+        ) { index, key, placeables ->
             // we add spaceBetweenItems as an extra spacing for all items apart from the last one so
             // the lazy list measuring logic will take it into account.
             val spacing = if (index.value == itemsCount - 1) 0 else spaceBetweenItems
@@ -114,7 +119,8 @@ internal fun LazyList(
                 layoutDirection = layoutDirection,
                 startContentPadding = startContentPaddingPx,
                 endContentPadding = endContentPaddingPx,
-                spacing = spacing
+                spacing = spacing,
+                key = key
             )
         }
 
@@ -154,16 +160,16 @@ internal fun LazyList(
  */
 @Composable
 internal fun wrapWithStateRestoration(
-    itemContentFactory: LazyItemScope.(Int) -> @Composable () -> Unit
-): LazyItemScope.(Int) -> @Composable () -> Unit {
+    itemContentFactory: LazyItemScope.(Int) -> ItemContent
+): LazyItemScope.(Int) -> ItemContent {
     val saveableStateHolder = rememberSaveableStateHolder()
     return remember(itemContentFactory) {
         { index ->
-            val content = itemContentFactory(index)
+            val content = itemContentFactory.invoke(this, index)
             // we just wrap our original lambda with the one which auto restores the state
-            // currently we use index in the list as a key for the restoration, but in the future
-            // we will use the user provided key
-            (@Composable { saveableStateHolder.SaveableStateProvider(index, content) })
+            ItemContent(content.key) {
+                saveableStateHolder.SaveableStateProvider(content.key, content.content)
+            }
         }
     }
 }
