@@ -148,7 +148,7 @@ interface ComposeTestRule : TestRule, SemanticsNodeInteractionsProvider {
  * If you don't want any host to be started automatically by the test rule on Android, you
  * can use [createEmptyComposeRule]. In such a case, you will have to create a host in your test
  * and set the content using one of Compose UI's setters (like [ComponentActivity
- * .setContent][androidx.compose.ui.platform.setContent]).
+ * .setContent][androidx.activity.compose.setContent]).
  */
 interface ComposeContentTestRule : ComposeTestRule {
     /**

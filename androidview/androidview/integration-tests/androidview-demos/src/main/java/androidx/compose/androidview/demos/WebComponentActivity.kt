@@ -19,6 +19,7 @@ package androidx.compose.androidview.demos
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.compose.androidview.WebComponent
 import androidx.compose.androidview.WebContext
 import androidx.compose.foundation.layout.Column
@@ -34,7 +35,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.setContent
 
 open class WebComponentActivity : ComponentActivity() {
 

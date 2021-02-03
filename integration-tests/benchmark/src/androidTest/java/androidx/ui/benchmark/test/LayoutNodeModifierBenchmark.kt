@@ -19,6 +19,7 @@
 package androidx.ui.benchmark.test
 
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -32,7 +33,6 @@ import androidx.compose.ui.layout.TestModifierUpdater
 import androidx.compose.ui.layout.TestModifierUpdaterLayout
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.test.junit4.DisableTransitionsTestRule

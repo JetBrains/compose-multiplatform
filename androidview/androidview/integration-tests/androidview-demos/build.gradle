@@ -34,5 +34,6 @@ dependencies {
     implementation project(":compose:material:material")
     implementation project(":compose:runtime:runtime")
     implementation project(":compose:ui:ui")
+    implementation projectOrArtifact(":activity:activity-compose")
     implementation "androidx.fragment:fragment-ktx:1.2.5"
 }
