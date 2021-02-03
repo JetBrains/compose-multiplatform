@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
-@file:Suppress("DEPRECATION")
-
 package androidx.compose.foundation.gestures
 
-import androidx.compose.animation.asDisposableClock
-import androidx.compose.animation.core.AnimatedFloat
-import androidx.compose.animation.core.AnimationClockObservable
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -38,14 +33,13 @@ import androidx.compose.ui.input.pointer.anyPositionChangeConsumed
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChanged
-import androidx.compose.ui.platform.LocalAnimationClock
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
 import kotlin.math.abs
 
 /**
- * Create and remember [ZoomableController] with default [AnimationClockObservable].
+ * Create and remember [ZoomableController].
  *
  * @param onZoomDelta callback to be invoked when pinch/smooth zooming occurs. The callback
  * receives the delta as the ratio of the new size compared to the old. Callers should update
@@ -53,21 +47,17 @@ import kotlin.math.abs
  */
 @Composable
 fun rememberZoomableController(onZoomDelta: (Float) -> Unit): ZoomableController {
-    val clocks = LocalAnimationClock.current.asDisposableClock()
-    return remember(clocks) { ZoomableController(clocks, onZoomDelta) }
+    return remember { ZoomableController(onZoomDelta) }
 }
 
 /**
  * Controller to control [zoomable] modifier with. Provides smooth scaling capabilities.
  *
- * @param animationClock clock observable to run animation on. Consider querying
- * [AnimationClockObservable] to get current composition value
  * @param onZoomDelta callback to be invoked when pinch/smooth zooming occurs. The callback
  * receives the delta as the ratio of the new size compared to the old. Callers should update
  * their state and UI in this callback.
  */
 class ZoomableController(
-    animationClock: AnimationClockObservable,
     val onZoomDelta: (Float) -> Unit
 ) {
 
@@ -78,17 +68,19 @@ class ZoomableController(
      * @param spec [AnimationSpec] to be used for smoothScale animation
      * @pram [onEnd] callback invoked when the smooth scaling has ended
      */
-    fun smoothScaleBy(
+    suspend fun smoothScaleBy(
         value: Float,
         spec: AnimationSpec<Float> = SpringSpec(stiffness = Spring.StiffnessLow),
         onEnd: ((endReason: AnimationEndReason, finishValue: Float) -> Unit)? = null
     ) {
-        val to = animatedFloat.value * value
-        animatedFloat.animateTo(
-            to,
-            onEnd = onEnd,
-            anim = spec
-        )
+        val to = animatedScale.value * value
+        var current = animatedScale.value
+        val result = animatedScale.animateTo(to, spec) {
+            val scaleFactor = if (current == 0f) 1f else this.value / current
+            onScale(scaleFactor)
+            current = this.value
+        }
+        onEnd?.invoke(result.endReason, animatedScale.value)
     }
 
     /**
@@ -96,13 +88,13 @@ class ZoomableController(
      *
      * Call this to stop receiving scrollable deltas in [onZoomDelta]
      */
-    fun stopAnimation() {
-        animatedFloat.stop()
+    suspend fun stopAnimation() {
+        animatedScale.stop()
     }
 
     internal fun onScale(scaleFactor: Float) = onZoomDelta(scaleFactor)
 
-    private val animatedFloat = DeltaAnimatedScale(1f, animationClock, ::onScale)
+    private val animatedScale = Animatable(1f)
 }
 
 /**
@@ -127,11 +119,6 @@ fun Modifier.zoomable(
     onZoomStopped: (() -> Unit)? = null
 ) = composed(
     factory = {
-        DisposableEffect(controller) {
-            onDispose {
-                controller.stopAnimation()
-            }
-        }
         val onZoomStartedState = rememberUpdatedState(onZoomStarted)
         val onZoomStoppedState = rememberUpdatedState(onZoomStopped)
         val controllerState = rememberUpdatedState(controller)
@@ -240,19 +227,3 @@ fun Modifier.zoomable(
         properties["onZoomDelta"] = onZoomDelta
     }
 )
-
-private class DeltaAnimatedScale(
-    initial: Float,
-    clock: AnimationClockObservable,
-    private val onDelta: (Float) -> Unit
-) : AnimatedFloat(clock) {
-
-    override var value = initial
-        set(value) {
-            if (isRunning) {
-                val delta = value / field
-                onDelta(delta)
-            }
-            field = value
-        }
-}
