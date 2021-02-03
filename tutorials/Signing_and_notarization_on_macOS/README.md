@@ -187,6 +187,8 @@ The following Gradle properties can be used instead of DSL properties:
 * `compose.desktop.mac.signing.identity` overrides the `identity` DSL property.
 * `compose.desktop.mac.signing.keychain` overrides the `keychain` DSL property.
 
+Those properties could be stored in `$HOME/.gradle/gradle.properties` to use across multiple applications.
+
 ### Configuring notarization settings
 
 ``` kotlin
@@ -211,9 +213,9 @@ macOS {
 ## Using Gradle
 
 The following tasks are available:
-* Use `createDistributable` or `package<PACKAGING_FORMAT>` to get a signed application
+* Use `createDistributable` or `packageDmg` to get a signed application
   (no separate step is required).
-* Use `notarize<PACKAGING_FORMAT>` to upload an application for notarization.
+* Use `notarizeDmg` to upload an application for notarization.
   Once the upload finishes, a `RequestUUID` will be printed. 
   The notarization process takes some time.
   Once the notarization process finishes, an email will be sent to you.
