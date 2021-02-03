@@ -47,12 +47,9 @@ class BroadcastFrameClock(
     private var awaiters = mutableListOf<FrameAwaiter<*>>()
     private var spareList = mutableListOf<FrameAwaiter<*>>()
 
-    @Suppress("DEPRECATION_ERROR")
     val hasAwaiters: Boolean get() = synchronized(lock) { awaiters.isNotEmpty() }
 
-    @Suppress("UNCHECKED_CAST")
     fun sendFrame(timeNanos: Long) {
-        @Suppress("DEPRECATION_ERROR")
         synchronized(lock) {
             // Rotate the lists so that if a resumed continuation on an immediate dispatcher
             // bound to the thread calling sendFrame immediately awaits again we don't disrupt
@@ -72,7 +69,6 @@ class BroadcastFrameClock(
         onFrame: (Long) -> R
     ): R = suspendCancellableCoroutine { co ->
         lateinit var awaiter: FrameAwaiter<R>
-        @Suppress("DEPRECATION_ERROR")
         val hasNewAwaiters = synchronized(lock) {
             val cause = failureCause
             if (cause != null) {
@@ -86,7 +82,6 @@ class BroadcastFrameClock(
         }
 
         co.invokeOnCancellation {
-            @Suppress("DEPRECATION_ERROR")
             synchronized(lock) {
                 awaiters.remove(awaiter)
             }
@@ -105,7 +100,6 @@ class BroadcastFrameClock(
     }
 
     private fun fail(cause: Throwable) {
-        @Suppress("DEPRECATION_ERROR")
         synchronized(lock) {
             if (failureCause != null) return
             failureCause = cause
