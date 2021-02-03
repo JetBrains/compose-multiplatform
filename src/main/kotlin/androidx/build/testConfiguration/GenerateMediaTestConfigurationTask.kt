@@ -152,11 +152,17 @@ abstract class GenerateMediaTestConfigurationTask : DefaultTask() {
             .tag("androidx_unit_tests")
             .tag("media_compat")
         when (affectedModuleDetectorSubset.get()) {
-            ProjectSubset.CHANGED_PROJECTS, ProjectSubset.ALL_AFFECTED_PROJECTS -> {
+            ProjectSubset.CHANGED_PROJECTS -> {
+                configBuilder.isPostsubmit(false)
+                configBuilder.runFullTests(true)
+            }
+            ProjectSubset.ALL_AFFECTED_PROJECTS -> {
                 configBuilder.isPostsubmit(true)
+                configBuilder.runFullTests(true)
             }
             ProjectSubset.DEPENDENT_PROJECTS -> {
                 configBuilder.isPostsubmit(false)
+                configBuilder.runFullTests(false)
             }
             else -> {
                 throw IllegalStateException(

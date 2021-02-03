@@ -100,12 +100,18 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
                 configBuilder.appApkName(appName)
             }
         }
-        val isPostsubmit: Boolean = when (affectedModuleDetectorSubset.get()) {
-            ProjectSubset.CHANGED_PROJECTS, ProjectSubset.ALL_AFFECTED_PROJECTS -> {
-                true
+        when (affectedModuleDetectorSubset.get()) {
+            ProjectSubset.CHANGED_PROJECTS -> {
+                configBuilder.isPostsubmit(false)
+                configBuilder.runFullTests(true)
+            }
+            ProjectSubset.ALL_AFFECTED_PROJECTS -> {
+                configBuilder.isPostsubmit(true)
+                configBuilder.runFullTests(true)
             }
             ProjectSubset.DEPENDENT_PROJECTS -> {
-                false
+                configBuilder.isPostsubmit(false)
+                configBuilder.runFullTests(false)
             }
             else -> {
                 throw IllegalStateException(
@@ -114,10 +120,9 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
                 )
             }
         }
-        configBuilder.isPostsubmit(isPostsubmit)
         if (hasBenchmarkPlugin.get()) {
             configBuilder.isBenchmark(true)
-            if (isPostsubmit) {
+            if (configBuilder.isPostsubmit) {
                 configBuilder.tag("microbenchmarks")
             } else {
                 configBuilder.tag("microbenchmarks_presubmit")

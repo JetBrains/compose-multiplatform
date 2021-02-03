@@ -22,6 +22,7 @@ class ConfigBuilder {
     var isBenchmark: Boolean = false
     var isPostsubmit: Boolean = true
     lateinit var minSdk: String
+    var runFullTests: Boolean = true
     val tags: MutableList<String> = mutableListOf()
     lateinit var testApkName: String
     lateinit var testRunner: String
@@ -31,6 +32,7 @@ class ConfigBuilder {
     fun isBenchmark(isBenchmark: Boolean) = apply { this.isBenchmark = isBenchmark }
     fun isPostsubmit(isPostsubmit: Boolean) = apply { this.isPostsubmit = isPostsubmit }
     fun minSdk(minSdk: String) = apply { this.minSdk = minSdk }
+    fun runFullTests(runFullTests: Boolean) = apply { this.runFullTests = runFullTests }
     fun tag(tag: String) = apply { this.tags.add(tag) }
     fun testApkName(testApkName: String) = apply { this.testApkName = testApkName }
     fun testRunner(testRunner: String) = apply { this.testRunner = testRunner }
@@ -61,13 +63,22 @@ class ConfigBuilder {
             .append(TEST_BLOCK_OPEN)
             .append(RUNNER_OPTION.replace("TEST_RUNNER", testRunner))
             .append(PACKAGE_OPTION.replace("APPLICATION_ID", applicationId))
-        if (isPostsubmit)
+        if (runFullTests) {
+            if (!isPostsubmit) {
+                sb.append(FLAKY_TEST_OPTION)
+            }
             sb.append(TEST_BLOCK_CLOSE)
-        else {
+        } else {
+            if (!isPostsubmit) {
+                sb.append(FLAKY_TEST_OPTION)
+            }
             sb.append(SMALL_TEST_OPTIONS)
                 .append(TEST_BLOCK_CLOSE)
                 .append(TEST_BLOCK_OPEN)
-                .append(RUNNER_OPTION.replace("TEST_RUNNER", testRunner))
+            if (!isPostsubmit) {
+                sb.append(FLAKY_TEST_OPTION)
+            }
+            sb.append(RUNNER_OPTION.replace("TEST_RUNNER", testRunner))
                 .append(PACKAGE_OPTION.replace("APPLICATION_ID", applicationId))
                 .append(MEDIUM_TEST_OPTIONS)
                 .append(TEST_BLOCK_CLOSE)
@@ -84,6 +95,7 @@ class MediaConfigBuilder {
     var isPostsubmit: Boolean = true
     var isServicePrevious: Boolean = true
     lateinit var minSdk: String
+    var runFullTests: Boolean = true
     lateinit var serviceApkName: String
     lateinit var serviceApplicationId: String
     var tags: MutableList<String> = mutableListOf()
@@ -100,6 +112,7 @@ class MediaConfigBuilder {
         this.isServicePrevious = isServicePrevious
     }
     fun minSdk(minSdk: String) = apply { this.minSdk = minSdk }
+    fun runFullTests(runFullTests: Boolean) = apply { this.runFullTests = runFullTests }
     fun serviceApkName(serviceApkName: String) = apply { this.serviceApkName = serviceApkName }
     fun serviceApplicationId(serviceApplicationId: String) =
         apply { this.serviceApplicationId = serviceApplicationId }
@@ -145,15 +158,24 @@ class MediaConfigBuilder {
             .append(RUNNER_OPTION.replace("TEST_RUNNER", testRunner))
             .append(PACKAGE_OPTION.replace("APPLICATION_ID", clientApplicationId))
             .append(mediaInstrumentationArgs())
-        if (isPostsubmit)
+        if (runFullTests) {
+            if (!isPostsubmit) {
+                sb.append(FLAKY_TEST_OPTION)
+            }
             sb.append(TEST_BLOCK_CLOSE)
                 .append(TEST_BLOCK_OPEN)
                 .append(RUNNER_OPTION.replace("TEST_RUNNER", testRunner))
                 .append(PACKAGE_OPTION.replace("APPLICATION_ID", serviceApplicationId))
                 .append(mediaInstrumentationArgs())
-                .append(TEST_BLOCK_CLOSE)
-        else {
+            if (!isPostsubmit) {
+                sb.append(FLAKY_TEST_OPTION)
+            }
+            sb.append(TEST_BLOCK_CLOSE)
+        } else {
             // add the small and medium test runners for both client and service apps
+            if (!isPostsubmit) {
+                sb.append(FLAKY_TEST_OPTION)
+            }
             sb.append(SMALL_TEST_OPTIONS)
                 .append(TEST_BLOCK_CLOSE)
                 .append(TEST_BLOCK_OPEN)
@@ -161,19 +183,28 @@ class MediaConfigBuilder {
                 .append(PACKAGE_OPTION.replace("APPLICATION_ID", clientApplicationId))
                 .append(mediaInstrumentationArgs())
                 .append(MEDIUM_TEST_OPTIONS)
-                .append(TEST_BLOCK_CLOSE)
+            if (!isPostsubmit) {
+                sb.append(FLAKY_TEST_OPTION)
+            }
+            sb.append(TEST_BLOCK_CLOSE)
                 .append(TEST_BLOCK_OPEN)
                 .append(RUNNER_OPTION.replace("TEST_RUNNER", testRunner))
                 .append(PACKAGE_OPTION.replace("APPLICATION_ID", serviceApplicationId))
                 .append(mediaInstrumentationArgs())
                 .append(SMALL_TEST_OPTIONS)
-                .append(TEST_BLOCK_CLOSE)
+            if (!isPostsubmit) {
+                sb.append(FLAKY_TEST_OPTION)
+            }
+            sb.append(TEST_BLOCK_CLOSE)
                 .append(TEST_BLOCK_OPEN)
                 .append(RUNNER_OPTION.replace("TEST_RUNNER", testRunner))
                 .append(PACKAGE_OPTION.replace("APPLICATION_ID", serviceApplicationId))
                 .append(mediaInstrumentationArgs())
                 .append(MEDIUM_TEST_OPTIONS)
-                .append(TEST_BLOCK_CLOSE)
+            if (!isPostsubmit) {
+                sb.append(FLAKY_TEST_OPTION)
+            }
+            sb.append(TEST_BLOCK_CLOSE)
         }
         sb.append(CONFIGURATION_CLOSE)
         return sb.toString()
@@ -283,6 +314,11 @@ private val BENCHMARK_PRESUBMIT_OPTION = """
 private val BENCHMARK_POSTSUBMIT_OPTIONS = """
     <option name="instrumentation-arg" key="androidx.benchmark.output.enable" value="true" />
     <option name="instrumentation-arg" key="listener" value="androidx.benchmark.junit4.InstrumentationResultsRunListener" />
+
+""".trimIndent()
+
+private val FLAKY_TEST_OPTION = """
+    <option name="instrumentation-arg" key="notAnnotation" value="androidx.test.filters.FlakyTest" />
 
 """.trimIndent()
 
