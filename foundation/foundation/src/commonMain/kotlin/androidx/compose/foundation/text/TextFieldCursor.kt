@@ -29,12 +29,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.isSpecified
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 
-@OptIn(InternalTextApi::class)
 @Suppress("ModifierInspectorInfo")
 internal fun Modifier.cursor(
     state: TextFieldState,
@@ -49,11 +47,7 @@ internal fun Modifier.cursor(
 
     if (state.hasFocus && value.selection.collapsed && cursorColor.isSpecified) {
         LaunchedEffect(cursorColor, value.annotatedString) {
-            if (@Suppress("DEPRECATION_ERROR") blinkingCursorEnabled) {
-                cursorAlpha.animateTo(0f, cursorAnimationSpec)
-            } else {
-                cursorAlpha.snapTo(1f)
-            }
+            cursorAlpha.animateTo(0f, cursorAnimationSpec)
         }
         drawWithContent {
             this.drawContent()
@@ -93,11 +87,3 @@ private val cursorAnimationSpec: AnimationSpec<Float>
     )
 
 internal val DefaultCursorThickness = 2.dp
-
-// TODO(b/151940543): Remove this variable when we have a solution for idling animations
-/** @suppress */
-@InternalTextApi // Used by Testing infra
-@Deprecated(level = DeprecationLevel.ERROR, message = "This is internal API and should not be used")
-var blinkingCursorEnabled: Boolean = true
-/*@VisibleForTesting
-set*/
