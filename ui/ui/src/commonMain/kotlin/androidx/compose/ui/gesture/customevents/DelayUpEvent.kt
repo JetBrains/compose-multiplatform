@@ -38,7 +38,8 @@ import androidx.compose.ui.input.pointer.PointerInputFilter
  * @param pointers The pointers whose up events are being requested to be delayed.
  */
 @Suppress("EqualsOrHashCode")
-data class DelayUpEvent(var message: DelayUpMessage, val pointers: Set<PointerId>) : CustomEvent {
+internal data class DelayUpEvent(var message: DelayUpMessage, val pointers: Set<PointerId>) :
+    CustomEvent {
 
     // Only generating hash code with immutable property.
     override fun hashCode(): Int {
@@ -49,7 +50,7 @@ data class DelayUpEvent(var message: DelayUpMessage, val pointers: Set<PointerId
 /**
  * The types of messages that can be dispatched.
  */
-enum class DelayUpMessage {
+internal enum class DelayUpMessage {
     /**
      * Reports that future "up events" should not result in any normally related callbacks at
      * this time.
