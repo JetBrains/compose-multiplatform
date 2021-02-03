@@ -129,29 +129,88 @@ fun SemanticsNodeInteraction.assertIsNotFocused(): SemanticsNodeInteraction =
     assert(isNotFocused())
 
 /**
- * Asserts the node's label equals the given String.
- * For further details please check [SemanticsProperties.ContentDescription].
+ * Asserts that the node's content description equals the given [value].
+ *
  * Throws [AssertionError] if the node's value is not equal to `value`, or if the node has no value
+ *
+ * @param ignoreCase Whether case should be ignored.
+ * @see SemanticsProperties.ContentDescription
  */
-fun SemanticsNodeInteraction.assertLabelEquals(value: String): SemanticsNodeInteraction =
-    assert(hasContentDescription(value))
+fun SemanticsNodeInteraction.assertContentDescriptionEquals(
+    value: String,
+    ignoreCase: Boolean = false
+): SemanticsNodeInteraction = assert(hasContentDescription(value, ignoreCase = ignoreCase))
 
 /**
- * Asserts the node's text equals the given String.
- * For further details please check [SemanticsProperties.Text].
- * Throws [AssertionError] if the node's value is not equal to `value`, or if the node has no value
+ * Asserts that the node's content description contains the given [value] as a substring.
+ *
+ * Throws [AssertionError] if the node's value does not contain `value`, or if the node has no value
+ *
+ * @param ignoreCase Whether case should be ignored.
+ * @see SemanticsProperties.ContentDescription
  */
-fun SemanticsNodeInteraction.assertTextEquals(value: String): SemanticsNodeInteraction =
-    assert(hasText(value))
+fun SemanticsNodeInteraction.assertContentDescriptionContains(
+    value: String,
+    ignoreCase: Boolean = false
+): SemanticsNodeInteraction =
+    assert(hasContentDescription(value, substring = true, ignoreCase = ignoreCase))
 
 /**
- * Asserts the text field's input is equal to the given String.
- * For further details please check [SemanticsProperties.EditableText].
+ * Asserts that the node's text equals the given [value].
+ *
+ * Throws [AssertionError] if the node's value is not equal to `value`, or if the node has no value
+ *
+ * @param ignoreCase Whether case should be ignored.
+ * @see SemanticsProperties.Text
+ */
+fun SemanticsNodeInteraction.assertTextEquals(
+    value: String,
+    ignoreCase: Boolean = false
+): SemanticsNodeInteraction =
+    assert(hasText(value, ignoreCase = ignoreCase))
+
+/**
+ * Asserts that the node's text contains the given [value] as a substring.
+
+ * Throws [AssertionError] if the node's value does not contain `value`, or if the node has no value
+ *
+ * @param ignoreCase Whether case should be ignored.
+ * @see SemanticsProperties.Text
+ */
+fun SemanticsNodeInteraction.assertTextContains(
+    value: String,
+    ignoreCase: Boolean = false
+): SemanticsNodeInteraction = assert(hasText(value, substring = true, ignoreCase = ignoreCase))
+
+/**
+ * Asserts the text field's input is equal to the given [value].
+ *
  * Throws [AssertionError] if the text field node's value is not equal to `value`, or if the node
  * has no value
+ *
+ * @param ignoreCase Whether case should be ignored.
+ * @see SemanticsProperties.EditableText
  */
-fun SemanticsNodeInteraction.assertEditableTextEquals(value: String): SemanticsNodeInteraction =
-    assert(hasEditableText(value))
+fun SemanticsNodeInteraction.assertEditableTextEquals(
+    value: String,
+    ignoreCase: Boolean = false
+): SemanticsNodeInteraction =
+    assert(hasEditableText(value, ignoreCase = ignoreCase))
+
+/**
+ * Asserts the text field's input is equal to the given [value].
+ *
+ * Throws [AssertionError] if the text field node's value does not contain `value`, or if the node
+ * has no value
+ *
+ * @param ignoreCase Whether case should be ignored.
+ * @see SemanticsProperties.EditableText
+ */
+fun SemanticsNodeInteraction.assertEditableTextContains(
+    value: String,
+    ignoreCase: Boolean = false
+): SemanticsNodeInteraction =
+    assert(hasEditableText(value, substring = true, ignoreCase = ignoreCase))
 
 /**
  * Asserts the node's value equals the given value.

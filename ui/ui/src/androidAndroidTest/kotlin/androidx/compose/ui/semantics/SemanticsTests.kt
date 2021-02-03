@@ -29,7 +29,7 @@ import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
-import androidx.compose.ui.test.assertLabelEquals
+import androidx.compose.ui.test.assertContentDescriptionEquals
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.assertValueEquals
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -115,7 +115,7 @@ class SemanticsTests {
             }
         }
 
-        rule.onNodeWithTag(TestTag).assertLabelEquals(
+        rule.onNodeWithTag(TestTag).assertContentDescriptionEquals(
             "$root, $child1, $grandchild1, $grandchild2, $child2"
         )
     }
@@ -135,8 +135,8 @@ class SemanticsTests {
             }
         }
 
-        rule.onNodeWithTag(tag1).assertLabelEquals(label1)
-        rule.onNodeWithTag(tag2).assertLabelEquals(label2)
+        rule.onNodeWithTag(tag1).assertContentDescriptionEquals(label1)
+        rule.onNodeWithTag(tag2).assertContentDescriptionEquals(label2)
     }
 
     @Test
@@ -164,7 +164,7 @@ class SemanticsTests {
             }
         }
 
-        rule.onNodeWithTag(tag1).assertLabelEquals("$label1, $label3")
+        rule.onNodeWithTag(tag1).assertContentDescriptionEquals("$label1, $label3")
         rule.onNodeWithTag(tag2).assertTextEquals(label1)
     }
 
@@ -196,9 +196,9 @@ class SemanticsTests {
             ) {}
         }
 
-        rule.onNodeWithTag(tag1).assertLabelEquals("$label1, $label3")
+        rule.onNodeWithTag(tag1).assertContentDescriptionEquals("$label1, $label3")
         rule.onNodeWithTag(tag1).assertTextEquals(label3)
-        rule.onNodeWithTag(tag2).assertLabelEquals("$label1")
+        rule.onNodeWithTag(tag2).assertContentDescriptionEquals("$label1")
         rule.onNodeWithTag(tag2).assertDoesNotHaveProperty(SemanticsProperties.Text)
     }
 
@@ -214,7 +214,7 @@ class SemanticsTests {
             }
         }
 
-        rule.onNodeWithTag(TestTag).assertLabelEquals(label)
+        rule.onNodeWithTag(TestTag).assertContentDescriptionEquals(label)
 
         rule.runOnIdle { showSubtree.value = false }
 
@@ -239,13 +239,13 @@ class SemanticsTests {
         }
 
         rule.onNodeWithTag(TestTag)
-            .assertLabelEquals(label)
+            .assertContentDescriptionEquals(label)
             .assertDoesNotHaveProperty(SemanticsProperties.StateDescription)
 
         rule.runOnIdle { showNewNode.value = true }
 
         rule.onNodeWithTag(TestTag)
-            .assertLabelEquals(label)
+            .assertContentDescriptionEquals(label)
             .assertValueEquals(value)
     }
 
@@ -283,11 +283,11 @@ class SemanticsTests {
             ) {}
         }
 
-        rule.onNodeWithTag(TestTag).assertLabelEquals(beforeLabel)
+        rule.onNodeWithTag(TestTag).assertContentDescriptionEquals(beforeLabel)
 
         rule.runOnIdle { isAfter.value = true }
 
-        rule.onNodeWithTag(TestTag).assertLabelEquals(afterLabel)
+        rule.onNodeWithTag(TestTag).assertContentDescriptionEquals(afterLabel)
     }
 
     @Test
@@ -306,11 +306,11 @@ class SemanticsTests {
             }
         }
 
-        rule.onNodeWithTag(TestTag).assertLabelEquals(beforeLabel)
+        rule.onNodeWithTag(TestTag).assertContentDescriptionEquals(beforeLabel)
 
         rule.runOnIdle { isAfter.value = true }
 
-        rule.onNodeWithTag(TestTag).assertLabelEquals(afterLabel)
+        rule.onNodeWithTag(TestTag).assertContentDescriptionEquals(afterLabel)
     }
 
     @Test
@@ -331,11 +331,11 @@ class SemanticsTests {
             }
         }
 
-        rule.onNodeWithTag(TestTag).assertLabelEquals(beforeLabel)
+        rule.onNodeWithTag(TestTag).assertContentDescriptionEquals(beforeLabel)
 
         rule.runOnIdle { isAfter.value = true }
 
-        rule.onNodeWithTag(TestTag).assertLabelEquals(afterLabel)
+        rule.onNodeWithTag(TestTag).assertContentDescriptionEquals(afterLabel)
     }
 
     @Test
@@ -354,11 +354,11 @@ class SemanticsTests {
             }
         }
 
-        rule.onNodeWithTag(TestTag).assertLabelEquals(beforeLabel)
+        rule.onNodeWithTag(TestTag).assertContentDescriptionEquals(beforeLabel)
 
         rule.runOnIdle { isAfter.value = true }
 
-        rule.onNodeWithTag(TestTag).assertLabelEquals(afterLabel)
+        rule.onNodeWithTag(TestTag).assertContentDescriptionEquals(afterLabel)
     }
 
     @Test
@@ -397,11 +397,11 @@ class SemanticsTests {
             }
         }
 
-        rule.onNodeWithTag(TestTag).assertLabelEquals(beforeLabel)
+        rule.onNodeWithTag(TestTag).assertContentDescriptionEquals(beforeLabel)
 
         rule.runOnIdle { isAfter.value = true }
 
-        rule.onNodeWithTag(TestTag).assertLabelEquals(afterLabel)
+        rule.onNodeWithTag(TestTag).assertContentDescriptionEquals(afterLabel)
     }
 
     @Test
@@ -436,13 +436,13 @@ class SemanticsTests {
         }
 
         // This isn't the important part, just makes sure everything is behaving as expected
-        rule.onNodeWithTag(TestTag).assertLabelEquals(beforeLabel)
+        rule.onNodeWithTag(TestTag).assertContentDescriptionEquals(beforeLabel)
         assertThat(nodeCount).isEqualTo(1)
 
         rule.runOnIdle { isAfter.value = true }
 
         // Make sure everything is still behaving as expected
-        rule.onNodeWithTag(TestTag).assertLabelEquals(afterLabel)
+        rule.onNodeWithTag(TestTag).assertContentDescriptionEquals(afterLabel)
         // This is the important part: make sure we didn't replace the identity due to unwanted
         // pivotal properties
         assertThat(nodeCount).isEqualTo(1)

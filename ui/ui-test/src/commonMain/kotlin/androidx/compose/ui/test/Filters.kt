@@ -159,15 +159,30 @@ fun hasNoScrollAction(): SemanticsMatcher =
  * Returns whether the node's label matches exactly to the given text.
  *
  * @param label Text to match.
+ * @param substring Whether to use substring matching.
  * @param ignoreCase Whether case should be ignored.
  *
  * @see SemanticsProperties.ContentDescription
  */
-fun hasContentDescription(label: String, ignoreCase: Boolean = false): SemanticsMatcher {
-    return SemanticsMatcher(
-        "${SemanticsProperties.ContentDescription.name} = '$label' (ignoreCase: $ignoreCase)"
-    ) {
-        it.config.getOrNull(SemanticsProperties.ContentDescription).equals(label, ignoreCase)
+fun hasContentDescription(
+    label: String,
+    substring: Boolean = false,
+    ignoreCase: Boolean = false
+): SemanticsMatcher {
+    return if (substring) {
+        SemanticsMatcher(
+            "${SemanticsProperties.ContentDescription.name} contains '$label' " +
+                "(ignoreCase: $ignoreCase)"
+        ) {
+            it.config.getOrNull(SemanticsProperties.ContentDescription)?.contains(label, ignoreCase)
+                ?: false
+        }
+    } else {
+        SemanticsMatcher(
+            "${SemanticsProperties.ContentDescription.name} = '$label' (ignoreCase: $ignoreCase)"
+        ) {
+            it.config.getOrNull(SemanticsProperties.ContentDescription).equals(label, ignoreCase)
+        }
     }
 }
 
@@ -175,34 +190,28 @@ fun hasContentDescription(label: String, ignoreCase: Boolean = false): Semantics
  * Returns whether the node's text matches exactly to the given text.
  *
  * @param text Text to match.
+ * @param substring Whether to use substring matching.
  * @param ignoreCase Whether case should be ignored.
  *
- * @see hasSubstring
  * @see SemanticsProperties.Text
  */
-fun hasText(text: String, ignoreCase: Boolean = false): SemanticsMatcher {
-    return SemanticsMatcher(
-        "${SemanticsProperties.Text.name} = '$text' (ignoreCase: $ignoreCase)"
-    ) {
-        it.config.getOrNull(SemanticsProperties.Text)?.text.equals(text, ignoreCase)
-    }
-}
-
-/**
- * Returns whether the node's text contains the given substring.
- *
- * @param substring Substring to check.
- * @param ignoreCase Whether case should be ignored.
- *
- * @see hasText
- * @see SemanticsProperties.Text
- */
-fun hasSubstring(substring: String, ignoreCase: Boolean = false): SemanticsMatcher {
-    return SemanticsMatcher(
-        "${SemanticsProperties.Text.name}.contains($substring, $ignoreCase)"
-    ) {
-        it.config.getOrNull(SemanticsProperties.Text)?.text?.contains(substring, ignoreCase)
-            ?: false
+fun hasText(
+    text: String,
+    substring: Boolean = false,
+    ignoreCase: Boolean = false
+): SemanticsMatcher {
+    return if (substring) {
+        SemanticsMatcher(
+            "${SemanticsProperties.Text.name} contains '$text' (ignoreCase: $ignoreCase)"
+        ) {
+            it.config.getOrNull(SemanticsProperties.Text)?.text?.contains(text, ignoreCase) ?: false
+        }
+    } else {
+        SemanticsMatcher(
+            "${SemanticsProperties.Text.name} = '$text' (ignoreCase: $ignoreCase)"
+        ) {
+            it.config.getOrNull(SemanticsProperties.Text)?.text.equals(text, ignoreCase)
+        }
     }
 }
 
@@ -212,16 +221,30 @@ fun hasSubstring(substring: String, ignoreCase: Boolean = false): SemanticsMatch
  * If you need to match the text field's label or placeholder, use [hasText] instead.
  *
  * @param text Text to match.
+ * @param substring Whether to use substring matching.
  * @param ignoreCase Whether case should be ignored.
  *
  * @see hasEditableSubstring
  * @see SemanticsProperties.EditableText
  */
-fun hasEditableText(text: String, ignoreCase: Boolean = false): SemanticsMatcher {
-    return SemanticsMatcher(
-        "${SemanticsProperties.EditableText.name} = '$text' (ignoreCase: $ignoreCase)"
-    ) {
-        it.config.getOrNull(SemanticsProperties.EditableText)?.text.equals(text, ignoreCase)
+fun hasEditableText(
+    text: String,
+    substring: Boolean = false,
+    ignoreCase: Boolean = false
+): SemanticsMatcher {
+    return if (substring) {
+        SemanticsMatcher(
+            "${SemanticsProperties.EditableText.name} contains '$text' (ignoreCase: $ignoreCase)"
+        ) {
+            it.config.getOrNull(SemanticsProperties.EditableText)?.text?.contains(text, ignoreCase)
+                ?: false
+        }
+    } else {
+        SemanticsMatcher(
+            "${SemanticsProperties.EditableText.name} = '$text' (ignoreCase: $ignoreCase)"
+        ) {
+            it.config.getOrNull(SemanticsProperties.EditableText)?.text.equals(text, ignoreCase)
+        }
     }
 }
 

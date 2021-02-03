@@ -33,7 +33,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.TestActivity
-import androidx.compose.ui.test.assertLabelEquals
+import androidx.compose.ui.test.assertContentDescriptionEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -152,7 +152,7 @@ class HotReloadTests {
         fun target() = rule.onNodeWithTag("text103")
 
         // Assert that the composition has the correct value
-        target().assertLabelEquals(value)
+        target().assertContentDescriptionEquals(value)
 
         value = "Second value"
 
@@ -167,6 +167,6 @@ class HotReloadTests {
         assertTrue(hotReloadLatch.await(1, TimeUnit.SECONDS))
 
         // Detect that the node changed
-        target().assertLabelEquals(value)
+        target().assertContentDescriptionEquals(value)
     }
 }
