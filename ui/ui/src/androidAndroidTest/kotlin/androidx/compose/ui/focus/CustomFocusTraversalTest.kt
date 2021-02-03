@@ -79,7 +79,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
                 )
                 Box(
                     Modifier
-                        .focusRequester(item3)
+                        .focusOrder(item3)
                         .onFocusChanged { item3Focused = it.isFocused }
                         .focusModifier()
                 )
@@ -115,7 +115,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
             Row {
                 Box(
                     Modifier
-                        .focusRequester(item1)
+                        .focusOrder(item1)
                         .onFocusChanged { item1Focused = it.isFocused }
                         .focusModifier()
                 )
@@ -163,7 +163,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
             Column {
                 Box(
                     Modifier
-                        .focusRequester(item1)
+                        .focusOrder(item1)
                         .onFocusChanged { item1Focused = it.isFocused }
                         .focusModifier()
                 )
@@ -222,7 +222,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
                 )
                 Box(
                     Modifier
-                        .focusRequester(item3)
+                        .focusOrder(item3)
                         .onFocusChanged { item3Focused = it.isFocused }
                         .focusModifier()
                 )
@@ -259,7 +259,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
             Row {
                 Box(
                     Modifier
-                        .focusRequester(item1)
+                        .focusOrder(item1)
                         .onFocusChanged { item1Focused = it.isFocused }
                         .focusModifier()
                 )
@@ -318,7 +318,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
                 )
                 Box(
                     Modifier
-                        .focusRequester(item3)
+                        .focusOrder(item3)
                         .onFocusChanged { item3Focused = it.isFocused }
                         .focusModifier()
                 )
@@ -357,7 +357,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
             Row {
                 Box(
                     Modifier
-                        .focusRequester(item1)
+                        .focusOrder(item1)
                         .onFocusChanged { item1Focused = it.isFocused }
                         .focusModifier()
                 )
@@ -418,7 +418,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
                 )
                 Box(
                     Modifier
-                        .focusRequester(item3)
+                        .focusOrder(item3)
                         .onFocusChanged { item3Focused = it.isFocused }
                         .focusModifier()
                 )
@@ -469,13 +469,13 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
                 )
                 Box(
                     Modifier
-                        .focusRequester(item3)
+                        .focusOrder(item3)
                         .onFocusChanged { item3Focused = it.isFocused }
                         .focusModifier()
                 )
                 Box(
                     Modifier
-                        .focusRequester(item4)
+                        .focusOrder(item4)
                         .onFocusChanged { item4Focused = it.isFocused }
                         .focusModifier()
                 )
@@ -525,7 +525,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
                 )
                 Box(
                     Modifier
-                        .focusRequester(item3)
+                        .focusOrder(item3)
                         .onFocusChanged { item3Focused = it.isFocused }
                         .focusModifier()
                 )
@@ -576,7 +576,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
                 )
                 Box(
                     Modifier
-                        .focusRequester(item3)
+                        .focusOrder(item3)
                         .onFocusChanged { item3Focused = it.isFocused }
                         .focusModifier()
                 )
