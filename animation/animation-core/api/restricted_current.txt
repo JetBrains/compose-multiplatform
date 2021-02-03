@@ -18,8 +18,8 @@ package androidx.compose.animation.core {
     method public T! getVelocity();
     method public V getVelocityVector();
     method public boolean isRunning();
-    method public void snapTo(T? targetValue);
-    method public void stop();
+    method public suspend Object? snapTo(T? targetValue, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? stop(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public void updateBounds(optional T? lowerBound, optional T? upperBound);
     property public final boolean isRunning;
     property public final T? lowerBound;

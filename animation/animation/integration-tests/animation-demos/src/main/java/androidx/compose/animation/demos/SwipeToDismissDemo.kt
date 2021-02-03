@@ -32,7 +32,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -81,11 +81,8 @@ fun SwipeToDismissDemo() {
 private fun Modifier.swipeToDismiss(index: Int): Modifier = composed {
     val animatedOffset = remember { Animatable(0f) }
     val height = remember { mutableStateOf(0) }
-    DisposableEffect(index) {
+    LaunchedEffect(index) {
         animatedOffset.snapTo(0f)
-        onDispose {
-            animatedOffset.stop()
-        }
     }
     this.pointerInput {
         coroutineScope {
@@ -97,7 +94,11 @@ private fun Modifier.swipeToDismiss(index: Int): Modifier = composed {
                 val velocityTracker = VelocityTracker()
                 awaitPointerEventScope {
                     verticalDrag(pointerId) {
-                        animatedOffset.snapTo(animatedOffset.value + it.positionChange().y)
+                        launch {
+                            animatedOffset.snapTo(
+                                animatedOffset.value + it.positionChange().y
+                            )
+                        }
                         velocityTracker.addPosition(
                             it.uptimeMillis,
                             it.position

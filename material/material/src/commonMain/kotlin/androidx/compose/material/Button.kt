@@ -503,7 +503,9 @@ private class DefaultButtonElevation(
 
         if (!enabled) {
             // No transition when moving to a disabled state
-            animatable.snapTo(target)
+            LaunchedEffect(target) {
+                animatable.snapTo(target)
+            }
         } else {
             LaunchedEffect(target) {
                 val lastInteraction = when (animatable.targetValue) {
