@@ -21,7 +21,7 @@ import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.VisibleForTesting
-import androidx.compose.foundation.text.blinkingCursorEnabled
+import androidx.compose.animation.core.InfiniteAnimationPolicy
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Recomposer
 import androidx.compose.ui.InternalComposeUiApi
@@ -52,6 +52,7 @@ import androidx.compose.ui.text.input.textInputServiceFactory
 import androidx.compose.ui.unit.Density
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.rules.ActivityScenarioRule
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -182,13 +183,21 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
         frameCoroutineScope = CoroutineScope(testCoroutineDispatcher)
         @OptIn(ExperimentalCoroutinesApi::class)
         val frameClock = TestMonotonicFrameClock(frameCoroutineScope)
+        mainClockImpl = MainTestClockImpl(testCoroutineDispatcher, frameClock)
+        val infiniteAnimationPolicy = object : InfiniteAnimationPolicy {
+            override suspend fun <R> onInfiniteOperation(block: suspend () -> R): R {
+                if (mainClockImpl.autoAdvance) {
+                    throw CancellationException()
+                }
+                return block()
+            }
+        }
         @OptIn(ExperimentalCoroutinesApi::class)
         recomposerApplyCoroutineScope = CoroutineScope(
-            testCoroutineDispatcher + frameClock + Job()
+            testCoroutineDispatcher + frameClock + infiniteAnimationPolicy + Job()
         )
         recomposer = Recomposer(recomposerApplyCoroutineScope.coroutineContext)
             .also { recomposerApplyCoroutineScope.launch { it.runRecomposeAndApplyChanges() } }
-        mainClockImpl = MainTestClockImpl(testCoroutineDispatcher, frameClock)
         composeIdlingResource = ComposeIdlingResource(
             composeRootRegistry, mainClockImpl, recomposer
         )
@@ -334,8 +343,6 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
             val oldTextInputFactory = textInputServiceFactory
             try {
                 @Suppress("DEPRECATION_ERROR")
-                blinkingCursorEnabled = false
-                @Suppress("DEPRECATION_ERROR")
                 textInputServiceFactory = {
                     TextInputServiceForTests(it)
                 }
@@ -348,8 +355,6 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
                 frameCoroutineScope.cancel()
                 @OptIn(ExperimentalCoroutinesApi::class)
                 testCoroutineDispatcher.cleanupTestCoroutines()
-                @Suppress("DEPRECATION_ERROR")
-                blinkingCursorEnabled = true
                 @Suppress("DEPRECATION_ERROR")
                 textInputServiceFactory = oldTextInputFactory
                 // Dispose the content

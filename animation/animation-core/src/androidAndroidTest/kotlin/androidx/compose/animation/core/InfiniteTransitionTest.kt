@@ -40,6 +40,9 @@ class InfiniteTransitionTest {
 
     @Test
     fun transitionTest() {
+        // Manually advance the clock to prevent the infinite transition from being cancelled
+        rule.mainClock.autoAdvance = false
+
         val colorAnim = TargetBasedAnimation(
             tween(1000),
             Color.VectorConverter(Color.Red.colorSpace),
@@ -103,7 +106,11 @@ class InfiniteTransitionTest {
                 }
             }
         }
-        rule.waitForIdle()
+        // Manually advance the clock
+        while (runAnimation.value) {
+            rule.mainClock.advanceTimeByFrame()
+            rule.waitForIdle()
+        }
         assertFalse(runAnimation.value)
     }
 }
