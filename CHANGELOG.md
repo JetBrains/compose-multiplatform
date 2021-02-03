@@ -3,7 +3,7 @@
    * Fix [Ambients are not transferred across pop ups](https://github.com/JetBrains/compose-jb/issues/135)
    * Fix [Laggy UI on Linux](https://github.com/JetBrains/compose-jb/issues/23)
    * Implement [signing and notarization for macOS](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Signing_and_notarization_on_macOS)
-   * Support [software rendering fallback] (https://github.com/JetBrains/skiko/pull/56)
+   * Support [software rendering fallback](https://github.com/JetBrains/skiko/pull/56)
    * Improve Swing interoperability support [Swing component in Compose hierarchy](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Swing_Integration#adding-a-swing-component-to-cfd-composition-using-swingpanel)
    * Support using [Compose in IntelliJ plugins](https://github.com/JetBrains/compose-jb/tree/master/examples/intelliJPlugin)
    * Skiko native binaries are now signed on macOS (x64 and arm)
