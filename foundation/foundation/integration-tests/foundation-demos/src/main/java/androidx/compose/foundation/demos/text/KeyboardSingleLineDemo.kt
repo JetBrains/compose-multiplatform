@@ -20,6 +20,8 @@ import androidx.compose.foundation.layout.defaultMinSizeConstraints
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActionScope
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -127,17 +129,24 @@ private fun MyTextField(data: ImeOptionsData) {
     val state = rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue())
     }
+    val anyAction: KeyboardActionScope.() -> Unit = { controller.value?.hideSoftwareKeyboard() }
     BasicTextField(
         modifier = demoTextFieldModifiers.defaultMinSizeConstraints(100.dp),
         value = state.value,
         keyboardOptions = data.keyboardOptions,
+        // TODO(b/179226323): Add API to set the same KeyboardAction lambda for all ImeActions.
+        keyboardActions = KeyboardActions(
+            onDone = anyAction,
+            onGo = anyAction,
+            onNext = anyAction,
+            onPrevious = anyAction,
+            onSearch = anyAction,
+            onSend = anyAction,
+        ),
         singleLine = data.singleLine,
         onValueChange = { state.value = it },
         textStyle = TextStyle(fontSize = fontSize8),
         onTextInputStarted = { controller.value = it },
-        onImeActionPerformed = {
-            controller.value?.hideSoftwareKeyboard()
-        },
         cursorColor = Color.Red
     )
 }

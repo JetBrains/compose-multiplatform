@@ -27,6 +27,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
@@ -48,7 +49,6 @@ import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.lerp
@@ -83,8 +83,8 @@ internal fun TextFieldImpl(
     isErrorValue: Boolean,
     visualTransformation: VisualTransformation,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions,
     maxLines: Int = Int.MAX_VALUE,
-    onImeActionPerformed: (ImeAction, SoftwareKeyboardController?) -> Unit,
     onTextInputStarted: (SoftwareKeyboardController) -> Unit,
     interactionState: InteractionState,
     activeColor: Color,
@@ -167,9 +167,6 @@ internal fun TextFieldImpl(
             } else null
 
         val cursorColor = if (isErrorValue) errorColor else activeColor
-        val onImeActionPerformedAction: (ImeAction) -> Unit = {
-            onImeActionPerformed(it, keyboardController.value)
-        }
         val onTextInputStartedAction: (SoftwareKeyboardController) -> Unit = {
             keyboardController.value = it
             onTextInputStarted(it)
@@ -183,10 +180,10 @@ internal fun TextFieldImpl(
                     enabled = enabled,
                     readOnly = readOnly,
                     keyboardOptions = keyboardOptions,
+                    keyboardActions = keyboardActions,
                     textStyle = mergedTextStyle,
                     singleLine = singleLine,
                     maxLines = maxLines,
-                    onImeActionPerformed = onImeActionPerformedAction,
                     visualTransformation = visualTransformation,
                     onTextInputStarted = onTextInputStartedAction,
                     interactionState = interactionState,
@@ -212,10 +209,10 @@ internal fun TextFieldImpl(
                     enabled = enabled,
                     readOnly = readOnly,
                     keyboardOptions = keyboardOptions,
+                    keyboardActions = keyboardActions,
                     textStyle = mergedTextStyle,
                     singleLine = singleLine,
                     maxLines = maxLines,
-                    onImeActionPerformed = onImeActionPerformedAction,
                     visualTransformation = visualTransformation,
                     onTextInputStarted = onTextInputStartedAction,
                     interactionState = interactionState,

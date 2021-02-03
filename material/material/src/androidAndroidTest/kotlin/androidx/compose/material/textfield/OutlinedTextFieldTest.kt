@@ -58,7 +58,6 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performGesture
-import androidx.compose.ui.test.performImeAction
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
@@ -738,32 +737,6 @@ class OutlinedTextFieldTest {
 
         rule.onNodeWithTag(TextfieldTag)
             .performClick()
-
-        rule.runOnIdle {
-            assertThat(controller).isNotNull()
-        }
-    }
-
-    @Test
-    fun testOutlinedTextField_imeActionCallback_withSoftwareKeyboardController() {
-        var controller: SoftwareKeyboardController? = null
-
-        rule.setMaterialContent {
-            OutlinedTextField(
-                modifier = Modifier.testTag(TextfieldTag),
-                value = "",
-                onValueChange = {},
-                label = {},
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Go),
-                onImeActionPerformed = { _, softwareKeyboardController ->
-                    controller = softwareKeyboardController
-                }
-            )
-        }
-        assertThat(controller).isNull()
-
-        rule.onNodeWithTag(TextfieldTag)
-            .performImeAction()
 
         rule.runOnIdle {
             assertThat(controller).isNotNull()

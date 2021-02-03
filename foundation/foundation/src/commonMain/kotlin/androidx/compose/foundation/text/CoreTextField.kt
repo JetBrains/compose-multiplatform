@@ -142,7 +142,7 @@ import kotlin.math.roundToInt
  * @param maxLines The maximum height in terms of maximum number of visible lines. Should be
  * equal or greater than 1.
  * @param imeOptions Contains different IME configuration options.
- * @param keyboardActions When the input service emits an IME action, the corresponding callback
+ * @param keyboardActions when the input service emits an IME action, the corresponding callback
  * is called. Note that this IME action may be different from what you specified in
  * [KeyboardOptions.imeAction].
  * @param enabled controls the enabled state of the text field. When `false`, the text
