@@ -23,6 +23,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActionScope
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
@@ -82,6 +84,7 @@ internal fun EditLine(
 ) {
     val controller = remember { mutableStateOf<SoftwareKeyboardController?>(null) }
     val state = rememberSaveable { mutableStateOf(text) }
+    val anyAction: KeyboardActionScope.() -> Unit = { controller.value?.hideSoftwareKeyboard() }
     BasicTextField(
         modifier = demoTextFieldModifiers,
         value = state.value,
@@ -90,12 +93,18 @@ internal fun EditLine(
             keyboardType = keyboardType,
             imeAction = imeAction
         ),
+        // TODO(b/179226323): Add API to set the same KeyboardAction lambda for all ImeActions.
+        keyboardActions = KeyboardActions(
+            onDone = anyAction,
+            onGo = anyAction,
+            onNext = anyAction,
+            onPrevious = anyAction,
+            onSearch = anyAction,
+            onSend = anyAction,
+        ),
         onValueChange = { state.value = it },
         textStyle = TextStyle(fontSize = fontSize8),
         onTextInputStarted = { controller.value = it },
-        onImeActionPerformed = {
-            controller.value?.hideSoftwareKeyboard()
-        }
     )
 }
 

@@ -19,6 +19,7 @@ package androidx.compose.material.samples
 import androidx.annotation.Sampled
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
@@ -35,6 +36,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -185,17 +187,18 @@ fun OutlinedTextFieldSample() {
 @Composable
 fun TextFieldWithHideKeyboardOnImeAction() {
     var text by rememberSaveable { mutableStateOf("") }
-
+    lateinit var softwareKeyboardController: SoftwareKeyboardController
     TextField(
         value = text,
         onValueChange = { text = it },
         label = { Text("Label") },
+        onTextInputStarted = { softwareKeyboardController = it },
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-        onImeActionPerformed = { action, softwareController ->
-            if (action == ImeAction.Done) {
-                softwareController?.hideSoftwareKeyboard()
+        keyboardActions = KeyboardActions(
+            onDone = {
+                softwareKeyboardController.hideSoftwareKeyboard()
                 // do something here
             }
-        }
+        )
     )
 }
