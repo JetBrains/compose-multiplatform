@@ -381,8 +381,10 @@ open class LayoutTest {
                         height?.roundToPx() ?: constraints.maxHeight.roundToPx()
                     )
             )
-            val totalHorizontal = padding.start.roundToPx() + padding.end.roundToPx()
-            val totalVertical = padding.top.roundToPx() + padding.bottom.roundToPx()
+            val totalHorizontal = padding.calculateLeftPadding(layoutDirection).roundToPx() +
+                padding.calculateRightPadding(layoutDirection).roundToPx()
+            val totalVertical = padding.calculateTopPadding().roundToPx() +
+                padding.calculateBottomPadding().roundToPx()
             val childConstraints = containerConstraints
                 .copy(minWidth = 0, minHeight = 0)
                 .offset(-totalHorizontal, -totalVertical)
@@ -413,9 +415,9 @@ open class LayoutTest {
                         IntSize(containerWidth, containerHeight),
                         layoutDirection
                     )
-                    it.placeRelative(
-                        padding.start.roundToPx() + position.x,
-                        padding.top.roundToPx() + position.y
+                    it.place(
+                        padding.calculateLeftPadding(layoutDirection).roundToPx() + position.x,
+                        padding.calculateTopPadding().roundToPx() + position.y
                     )
                 }
             }

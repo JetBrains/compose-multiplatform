@@ -363,27 +363,30 @@ package androidx.compose.foundation.layout {
   }
 
   public final class PaddingKt {
+    method @androidx.compose.runtime.Stable public static androidx.compose.foundation.layout.PaddingValues PaddingValues-0680j_4(float all);
+    method @androidx.compose.runtime.Stable public static androidx.compose.foundation.layout.PaddingValues PaddingValues-ZmiikuI(optional float start, optional float top, optional float end, optional float bottom);
+    method @androidx.compose.runtime.Stable public static androidx.compose.foundation.layout.PaddingValues PaddingValues-ioHfwGI(float horizontal, float vertical);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier absolutePadding-w2-DAAU(androidx.compose.ui.Modifier, optional float left, optional float top, optional float right, optional float bottom);
-    method public static androidx.compose.ui.Modifier padding(androidx.compose.ui.Modifier, androidx.compose.foundation.layout.PaddingValues padding);
+    method @androidx.compose.runtime.Stable public static float calculateEndPadding(androidx.compose.foundation.layout.PaddingValues, androidx.compose.ui.unit.LayoutDirection layoutDirection);
+    method @androidx.compose.runtime.Stable public static float calculateStartPadding(androidx.compose.foundation.layout.PaddingValues, androidx.compose.ui.unit.LayoutDirection layoutDirection);
+    method public static androidx.compose.ui.Modifier padding(androidx.compose.ui.Modifier, androidx.compose.foundation.layout.PaddingValues paddingValues);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier padding-S2lCeAQ(androidx.compose.ui.Modifier, optional float horizontal, optional float vertical);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier padding-w2-DAAU(androidx.compose.ui.Modifier, optional float start, optional float top, optional float end, optional float bottom);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier padding-wxomhCo(androidx.compose.ui.Modifier, float all);
   }
 
-  @androidx.compose.runtime.Immutable public final class PaddingValues {
-    method public float component1-D9Ej5fM();
-    method public float component2-D9Ej5fM();
-    method public float component3-D9Ej5fM();
-    method public float component4-D9Ej5fM();
-    method @androidx.compose.runtime.Immutable public androidx.compose.foundation.layout.PaddingValues copy-ZmiikuI(float start, float top, float end, float bottom);
-    method public float getBottom-D9Ej5fM();
-    method public float getEnd-D9Ej5fM();
-    method public float getStart-D9Ej5fM();
-    method public float getTop-D9Ej5fM();
-    property public final float bottom;
-    property public final float end;
-    property public final float start;
-    property public final float top;
+  @androidx.compose.runtime.Immutable public interface PaddingValues {
+    method @androidx.compose.runtime.Stable public float calculateBottomPadding-D9Ej5fM();
+    method @androidx.compose.runtime.Stable public float calculateLeftPadding-D9Ej5fM(androidx.compose.ui.unit.LayoutDirection layoutDirection);
+    method @androidx.compose.runtime.Stable public float calculateRightPadding-D9Ej5fM(androidx.compose.ui.unit.LayoutDirection layoutDirection);
+    method @androidx.compose.runtime.Stable public float calculateTopPadding-D9Ej5fM();
+  }
+
+  @androidx.compose.runtime.Immutable public static final class PaddingValues.Absolute implements androidx.compose.foundation.layout.PaddingValues {
+    method public float calculateBottomPadding-D9Ej5fM();
+    method public float calculateLeftPadding-D9Ej5fM(androidx.compose.ui.unit.LayoutDirection layoutDirection);
+    method public float calculateRightPadding-D9Ej5fM(androidx.compose.ui.unit.LayoutDirection layoutDirection);
+    method public float calculateTopPadding-D9Ej5fM();
   }
 
   public final class RowColumnImplKt {
