@@ -53,6 +53,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
@@ -456,6 +457,7 @@ class MaterialRippleThemeTest {
         )
     }
 
+    @FlakyTest(bugId = 179292401)
     @Test
     fun customRippleTheme_dragged() {
         val interactionState = InteractionState()
