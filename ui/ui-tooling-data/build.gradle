@@ -46,6 +46,7 @@ dependencies {
     androidTestImplementation(project(":compose:foundation:foundation-layout"))
     androidTestImplementation(project(":compose:foundation:foundation"))
     androidTestImplementation(project(":compose:material:material"))
+    androidTestImplementation(project(":activity:activity-compose"))
 }
 
 androidx {

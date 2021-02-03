@@ -23,10 +23,10 @@ import android.view.Choreographer
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.node.UiApplier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.setContent
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.test.assertTrue

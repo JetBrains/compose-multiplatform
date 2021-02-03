@@ -20,15 +20,15 @@ package androidx.compose.ui.node
 
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.clearRoots
-import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.simulateHotReload
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics

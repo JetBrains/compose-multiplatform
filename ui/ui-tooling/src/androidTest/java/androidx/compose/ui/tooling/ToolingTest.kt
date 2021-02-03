@@ -18,6 +18,7 @@ package androidx.compose.ui.tooling
 
 import android.os.Handler
 import android.os.Looper
+import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -26,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.R
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.ViewRootForTest
-import androidx.compose.ui.platform.setContent
 import org.junit.Before
 import org.junit.Rule
 import java.util.Collections

@@ -66,6 +66,7 @@ dependencies {
         androidTestImplementation(ANDROIDX_TEST_UIAUTOMATOR)
         androidTestImplementation(ANDROIDX_TEST_RULES)
         androidTestImplementation(ANDROIDX_TEST_RUNNER)
+        androidTestImplementation project(":activity:activity-compose")
         androidTestImplementation(ESPRESSO_CORE)
         androidTestImplementation(JUNIT)
         androidTestImplementation(TRUTH)
@@ -125,6 +126,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation project(":compose:test-utils")
                 implementation project(":compose:ui:ui-test-font")
                 implementation project(":test-screenshot")
+                implementation project(":activity:activity-compose")
 
                 implementation(ANDROIDX_TEST_UIAUTOMATOR)
                 implementation(ANDROIDX_TEST_RULES)

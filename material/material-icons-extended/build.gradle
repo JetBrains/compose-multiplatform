@@ -55,6 +55,7 @@ dependencies {
         androidTestImplementation project(":compose:ui:ui")
         androidTestImplementation project(":test-screenshot")
         androidTestImplementation project(":compose:ui:ui-test-junit4")
+        androidTestImplementation project(":activity:activity-compose")
     }
 }
 
@@ -79,6 +80,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation project(":compose:ui:ui")
                 implementation project(":test-screenshot")
                 implementation project(":compose:ui:ui-test-junit4")
+                implementation project(":activity:activity-compose")
 
                 implementation(ANDROIDX_TEST_RULES)
                 implementation(ANDROIDX_TEST_RUNNER)

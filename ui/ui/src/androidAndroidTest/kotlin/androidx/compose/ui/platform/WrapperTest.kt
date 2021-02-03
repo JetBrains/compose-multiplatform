@@ -16,6 +16,7 @@
 package androidx.compose.ui.platform
 
 import android.widget.FrameLayout
+import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Providers

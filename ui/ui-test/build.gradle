@@ -53,6 +53,7 @@ dependencies {
         androidTestImplementation project(':compose:material:material')
         androidTestImplementation project(':compose:test-utils')
         androidTestImplementation project(':compose:ui:ui-test-junit4')
+        androidTestImplementation project(":activity:activity-compose")
         androidTestImplementation(TRUTH)
         androidTestImplementation(MOCKITO_CORE, libs.exclude_bytebuddy) // DexMaker has it"s own MockMaker
         androidTestImplementation(DEXMAKER_MOCKITO, libs.exclude_bytebuddy) // DexMaker has it"s own MockMaker
@@ -103,6 +104,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation project(':compose:material:material')
                 implementation project(':compose:test-utils')
                 implementation project(':compose:ui:ui-test-junit4')
+                implementation project(":activity:activity-compose")
 
                 implementation(MOCKITO_CORE, libs.exclude_bytebuddy) // DexMaker has it"s own MockMaker
                 implementation(DEXMAKER_MOCKITO, libs.exclude_bytebuddy) // DexMaker has it"s own MockMaker

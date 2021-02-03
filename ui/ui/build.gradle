@@ -51,7 +51,9 @@ dependencies {
         api project(":compose:ui:ui-text")
         api project(":compose:ui:ui-unit")
         api "androidx.annotation:annotation:1.1.0"
-        api "androidx.activity:activity:1.2.0-alpha02"
+
+        // TODO: Remove this when removing the deprecated ComponentActivity.setContent extension
+        api project(":activity:activity-ktx")
 
         // This has stub APIs for access to legacy Android APIs, so we don't want
         // any dependency on this module.
@@ -108,6 +110,7 @@ dependencies {
         androidTestImplementation project(":test-screenshot")
         androidTestImplementation "androidx.recyclerview:recyclerview:1.1.0"
         androidTestImplementation("androidx.core:core-ktx:1.1.0")
+        androidTestImplementation project(":activity:activity-compose")
 
         lintChecks project(":compose:ui:ui-lint")
         lintPublish project(":compose:ui:ui-lint")
@@ -148,7 +151,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 // any dependency on this module.
                 compileOnly project(":compose:ui:ui-android-stubs")
                 api "androidx.annotation:annotation:1.1.0"
-                api "androidx.activity:activity:1.2.0-alpha02"
+                api project(":activity:activity-ktx")
                 implementation "androidx.autofill:autofill:1.0.0"
                 implementation(KOTLIN_COROUTINES_ANDROID)
 
@@ -208,6 +211,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation project(":test-screenshot")
                 implementation "androidx.recyclerview:recyclerview:1.1.0"
                 implementation("androidx.core:core-ktx:1.1.0")
+                implementation project(":activity:activity-compose")
             }
 
             desktopTest.dependencies {

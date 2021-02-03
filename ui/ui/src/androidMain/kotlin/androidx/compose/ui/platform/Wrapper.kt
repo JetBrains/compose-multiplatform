@@ -69,6 +69,14 @@ internal actual fun subcomposeInto(
  * @param parent The parent composition reference to coordinate scheduling of composition updates
  * @param content A `@Composable` function declaring the UI contents
  */
+// TODO: Remove the androidx.activity dependency from this module when removing this
+@Deprecated(
+    "Moved to the androidx.activity:activity-compose artifact",
+    replaceWith = ReplaceWith(
+        "this.setContent(parent, content)",
+        "androidx.activity.compose.setContent"
+    )
+)
 fun ComponentActivity.setContent(
     parent: CompositionReference? = null,
     content: @Composable () -> Unit
@@ -102,9 +110,7 @@ fun ComponentActivity.setContent(
  * @param parent The [Recomposer] or parent composition reference.
  * @param content Composable that will be the content of the view.
  */
-@Suppress("DEPRECATION")
-@Deprecated("Use ComposeView or AbstractComposeView instead.")
-fun ViewGroup.setContent(
+internal fun ViewGroup.setContent(
     parent: CompositionReference,
     content: @Composable () -> Unit
 ): Composition {
