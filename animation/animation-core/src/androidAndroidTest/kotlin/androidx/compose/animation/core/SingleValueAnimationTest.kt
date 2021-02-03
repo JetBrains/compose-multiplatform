@@ -30,7 +30,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.unit.Bounds
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -191,14 +190,6 @@ class SingleValueAnimationTest {
         var enabled by mutableStateOf(false)
         rule.setContent {
             Box {
-                val boundsValue by animateBoundsAsState(
-                    if (enabled)
-                        Bounds.VectorConverter.convertFromVector(endVal)
-                    else
-                        Bounds.VectorConverter.convertFromVector(startVal),
-                    tween()
-                )
-
                 val pxBoundsValue by animateRectAsState(
                     if (enabled)
                         Rect.VectorConverter.convertFromVector(endVal)
@@ -223,63 +214,8 @@ class SingleValueAnimationTest {
                             )
 
                             assertEquals(
-                                Bounds.VectorConverter.convertFromVector(expect),
-                                boundsValue
-                            )
-                            assertEquals(
                                 Rect.VectorConverter.convertFromVector(expect),
                                 pxBoundsValue
-                            )
-                            frameTime = withFrameNanos { it }
-                        } while (frameTime - startTime <= 100_000_000L)
-                    }
-                }
-            }
-        }
-
-        rule.runOnIdle { enabled = true }
-        rule.waitForIdle()
-    }
-
-    @Test
-    fun animate4DTest() {
-        val startVal = AnimationVector(30f, -76f, 280f, 35f)
-        val endVal = AnimationVector(-42f, 89f, 77f, 100f)
-
-        fun <V> tween(): TweenSpec<V> =
-            TweenSpec(
-                easing = LinearOutSlowInEasing,
-                durationMillis = 100
-            )
-
-        var enabled by mutableStateOf(false)
-        rule.setContent {
-            Box {
-
-                val boundsValue by animateBoundsAsState(
-                    if (enabled)
-                        Bounds.VectorConverter.convertFromVector(endVal)
-                    else
-                        Bounds.VectorConverter.convertFromVector(startVal),
-                    tween()
-                )
-                if (enabled) {
-                    LaunchedEffect(Unit) {
-                        val startTime = withFrameNanos { it }
-                        var frameTime = startTime
-                        do {
-                            val playTime = (frameTime - startTime) / 1_000_000L
-                            val fraction = LinearOutSlowInEasing.transform(playTime / 100f)
-                            val expect = AnimationVector(
-                                lerp(startVal.v1, endVal.v1, fraction),
-                                lerp(startVal.v2, endVal.v2, fraction),
-                                lerp(startVal.v3, endVal.v3, fraction),
-                                lerp(startVal.v4, endVal.v4, fraction)
-                            )
-
-                            assertEquals(
-                                Bounds.VectorConverter.convertFromVector(expect),
-                                boundsValue
                             )
                             frameTime = withFrameNanos { it }
                         } while (frameTime - startTime <= 100_000_000L)
@@ -329,7 +265,6 @@ class SingleValueAnimationTest {
 
         val specForFloat = FloatSpringSpec(visibilityThreshold = 0.01f)
         val specForOffset = FloatSpringSpec(visibilityThreshold = 0.5f)
-        val specForBounds = FloatSpringSpec(visibilityThreshold = 0.1f)
 
         var enabled by mutableStateOf(false)
         rule.setContent {
@@ -341,18 +276,10 @@ class SingleValueAnimationTest {
                         Offset(0f, 0f)
                 )
 
-                val boundsValue by animateBoundsAsState(
-                    if (enabled)
-                        Bounds(100.dp, 100.dp, 100.dp, 100.dp)
-                    else
-                        Bounds(0.dp, 0.dp, 0.dp, 0.dp)
-                )
-
                 val floatValue by animateFloatAsState(if (enabled) 100f else 0f)
 
                 val durationForFloat = specForFloat.getDurationNanos(0f, 100f, 0f)
                 val durationForOffset = specForOffset.getDurationNanos(0f, 100f, 0f)
-                val durationForBounds = specForBounds.getDurationNanos(0f, 100f, 0f)
 
                 if (enabled) {
                     LaunchedEffect(Unit) {
@@ -370,25 +297,6 @@ class SingleValueAnimationTest {
                                 assertEquals(Offset(expectOffset, expectOffset), offsetValue)
                             } else {
                                 assertEquals(Offset(100f, 100f), offsetValue)
-                            }
-
-                            if (playTime < durationForBounds) {
-                                val expectBounds =
-                                    specForBounds.getValueFromNanos(playTime, 0f, 100f, 0f)
-                                assertEquals(
-                                    Bounds(
-                                        expectBounds.dp,
-                                        expectBounds.dp,
-                                        expectBounds.dp,
-                                        expectBounds.dp
-                                    ),
-                                    boundsValue
-                                )
-                            } else {
-                                assertEquals(
-                                    Bounds(100.dp, 100.dp, 100.dp, 100.dp),
-                                    boundsValue
-                                )
                             }
 
                             frameTime = withFrameNanos { it }

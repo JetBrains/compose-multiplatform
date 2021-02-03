@@ -62,7 +62,7 @@ package androidx.compose.ui.test {
     method public static androidx.compose.ui.test.SemanticsNodeInteraction assertWidthIsAtLeast-3AN6ZEs(androidx.compose.ui.test.SemanticsNodeInteraction, float expectedMinWidth);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction assertWidthIsEqualTo-3AN6ZEs(androidx.compose.ui.test.SemanticsNodeInteraction, float expectedWidth);
     method public static float getAlignmentLinePosition(androidx.compose.ui.test.SemanticsNodeInteraction, androidx.compose.ui.layout.AlignmentLine line);
-    method public static androidx.compose.ui.unit.Bounds getUnclippedBoundsInRoot(androidx.compose.ui.test.SemanticsNodeInteraction);
+    method public static androidx.compose.ui.unit.DpRect getUnclippedBoundsInRoot(androidx.compose.ui.test.SemanticsNodeInteraction);
   }
 
   public final class ComposeTimeoutException extends java.lang.Throwable {

@@ -33,7 +33,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.unit.Bounds
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -746,38 +745,6 @@ inline fun <S> Transition<S>.animateIntSize(
     targetValueByState: @Composable (state: S) -> IntSize
 ): State<IntSize> =
     animateValue(IntSize.VectorConverter, transitionSpec, label, targetValueByState)
-
-/**
- * Creates a [Bounds] animation as a part of the given [Transition]. This means the states
- * of this animation will be managed by the [Transition].
- *
- * [targetValueByState] is used as a mapping from a target state to the target value of this
- * animation. [Transition] will be using this mapping to determine what value to target this
- * animation towards. __Note__ that [targetValueByState] is a composable function. This means the
- * mapping function could access states, CompositionLocals, themes, etc. If the targetValue changes
- * outside of a [Transition] run (i.e. when the [Transition] already reached its targetState),
- * the [Transition] will start running again to ensure this animation reaches its new target
- * smoothly.
- *
- * An optional [transitionSpec] can be provided to specify (potentially different) animation for
- * each pair of initialState and targetState. [FiniteAnimationSpec] includes any non-infinite
- * animation, such as [tween], [spring], [keyframes] and even [repeatable], but not
- * [infiniteRepeatable]. By default, [transitionSpec] uses a [spring] animation for all transition
- * destinations.
- *
- * [label] is used to differentiate from other animations in the same transition in Android Studio.
- *
- * @return A [State] object, the value of which is updated by animation
- */
-@Composable
-inline fun <S> Transition<S>.animateBounds(
-    noinline transitionSpec: @Composable Transition.Segment<S>.() -> FiniteAnimationSpec<Bounds> = {
-        spring(visibilityThreshold = Bounds.VisibilityThreshold)
-    },
-    label: String = "BoundsAnimation",
-    targetValueByState: @Composable (state: S) -> Bounds
-): State<Bounds> =
-    animateValue(Bounds.VectorConverter, transitionSpec, label, targetValueByState)
 
 /**
  * Creates a [Rect] animation as a part of the given [Transition]. This means the states

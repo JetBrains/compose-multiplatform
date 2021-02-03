@@ -29,9 +29,9 @@ import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.TwoWayConverter
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.VisibilityThreshold
-import androidx.compose.animation.core.animateValueAsState
 import androidx.compose.animation.core.animateDecay
 import androidx.compose.animation.core.animateTo
+import androidx.compose.animation.core.animateValueAsState
 import androidx.compose.animation.core.isFinished
 import androidx.compose.animation.core.spring
 import androidx.compose.runtime.Composable
@@ -48,7 +48,6 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalAnimationClock
-import androidx.compose.ui.unit.Bounds
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -206,45 +205,6 @@ fun animate(
     endListener: ((Size) -> Unit)? = null
 ): Size {
     return animate(target, Size.VectorConverter, animSpec, endListener = endListener)
-}
-
-/**
- * Fire-and-forget animation [Composable] for [Bounds]. Once such an animation is created, it will be
- * positionally memoized, like other @[Composable]s. To trigger the animation, or alter the
- * course of the animation, simply supply a different [target] to the [Composable].
- *
- * Note, [animateTo] is for simple animations that cannot be canceled. For cancellable animations
- * see [animatedValue].
- *
- *    val bounds : Bounds = animate(
- *        if (collapsed) Bounds(0.dp, 0.dp, 10.dp, 20.dp) else Bounds(0.dp, 0.dp, 100.dp, 200.dp))
- *
- * @param target Target value of the animation
- * @param animSpec The animation that will be used to change the value through time. Physics
- *                    animation will be used by default.
- * @param endListener An optional end listener to get notified when the animation is finished.
- */
-@Deprecated(
-    "animate has been replaced with animateBoundsAsState",
-    ReplaceWith(
-        "animateBoundsAsState(target, animSpec, endListener).value",
-        "androidx.compose.animation.core.animateBoundsAsState"
-    )
-)
-@Composable
-fun animate(
-    target: Bounds,
-    animSpec: AnimationSpec<Bounds> = remember {
-        spring(visibilityThreshold = Bounds.VisibilityThreshold)
-    },
-    endListener: ((Bounds) -> Unit)? = null
-): Bounds {
-    return animate(
-        target,
-        Bounds.VectorConverter,
-        animSpec,
-        endListener = endListener
-    )
 }
 
 /**

@@ -19,9 +19,9 @@ package androidx.compose.ui.test
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.semantics.SemanticsNode
-import androidx.compose.ui.unit.Bounds
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpRect
 import androidx.compose.ui.unit.toSize
 import kotlin.math.absoluteValue
 
@@ -75,10 +75,10 @@ fun SemanticsNodeInteraction.assertHeightIsAtLeast(
 /**
 * Returns the bounds of the layout of this node. The bounds are relative to the root composable.
 */
-fun SemanticsNodeInteraction.getUnclippedBoundsInRoot(): Bounds {
-    lateinit var bounds: Bounds
+fun SemanticsNodeInteraction.getUnclippedBoundsInRoot(): DpRect {
+    lateinit var bounds: DpRect
     withUnclippedBoundsInRoot {
-        bounds = Bounds(
+        bounds = DpRect(
             left = it.left.toDp(),
             top = it.top.toDp(),
             right = it.right.toDp(),
