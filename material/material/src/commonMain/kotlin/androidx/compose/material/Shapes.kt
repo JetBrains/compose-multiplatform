@@ -46,7 +46,7 @@ class Shapes(
      */
     val medium: CornerBasedShape = RoundedCornerShape(4.dp),
     /**
-     * Shape used by large components like [ModalDrawerLayout] or [BottomDrawerLayout].
+     * Shape used by large components like [ModalDrawerLayout] or [ModalBottomSheetLayout].
      */
     val large: CornerBasedShape = RoundedCornerShape(0.dp)
 ) {

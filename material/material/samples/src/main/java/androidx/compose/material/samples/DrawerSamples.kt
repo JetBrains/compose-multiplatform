@@ -26,6 +26,7 @@ import androidx.compose.material.BottomDrawerLayout
 import androidx.compose.material.BottomDrawerValue
 import androidx.compose.material.Button
 import androidx.compose.material.DrawerValue
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalDrawerLayout
 import androidx.compose.material.Text
 import androidx.compose.material.rememberBottomDrawerState
@@ -65,6 +66,7 @@ fun ModalDrawerSample() {
 
 @Sampled
 @Composable
+@OptIn(ExperimentalMaterialApi::class)
 fun BottomDrawerSample() {
     val drawerState = rememberBottomDrawerState(BottomDrawerValue.Closed)
     BottomDrawerLayout(

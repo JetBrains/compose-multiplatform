@@ -40,6 +40,7 @@ import org.junit.runner.RunWith
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
+@OptIn(ExperimentalMaterialApi::class)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
 class DrawerScreenshotTest {
 

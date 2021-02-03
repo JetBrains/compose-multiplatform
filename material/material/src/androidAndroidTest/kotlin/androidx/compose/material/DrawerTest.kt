@@ -57,6 +57,7 @@ import org.junit.runner.RunWith
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
+@OptIn(ExperimentalMaterialApi::class)
 class DrawerTest {
 
     @get:Rule
