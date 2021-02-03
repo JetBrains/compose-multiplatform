@@ -83,7 +83,7 @@ fun HorizontalTransitionSample() {
             // Set the end width for the shrink animation to a quarter of the full width.
             targetWidth = { fullWidth -> fullWidth / 4 },
             // Overwrites the default animation with tween for this shrink animation.
-            animSpec = tween()
+            animationSpec = tween()
         )
     ) {
         // Content that needs to appear/disappear goes here:
@@ -102,15 +102,15 @@ fun SlideTransition() {
             // Offsets the content by 1/3 of its width to the left, and slide towards right
             initialOffsetX = { fullWidth -> -fullWidth / 3 },
             // Overwrites the default animation with tween for this slide animation.
-            animSpec = tween(durationMillis = 200)
+            animationSpec = tween(durationMillis = 200)
         ) + fadeIn(
             // Overwrites the default animation with tween
-            animSpec = tween(durationMillis = 200)
+            animationSpec = tween(durationMillis = 200)
         ),
         exit = slideOutHorizontally(
             // Overwrites the ending position of the slide-out to 200 (pixels) to the right
             targetOffsetX = { 200 },
-            animSpec = spring(stiffness = Spring.StiffnessHigh)
+            animationSpec = spring(stiffness = Spring.StiffnessHigh)
         ) + fadeOut()
     ) {
         // Content that needs to appear/disappear goes here:
@@ -131,7 +131,7 @@ fun FadeTransition() {
         ),
         exit = fadeOut(
             // Overwrites the default animation with tween
-            animSpec = tween(durationMillis = 250)
+            animationSpec = tween(durationMillis = 250)
         )
     ) {
         // Content that needs to appear/disappear goes here:
@@ -230,7 +230,7 @@ fun ExpandShrinkVerticallySample() {
         // Shrinks the content to half of its full height via an animation.
         exit = shrinkVertically(
             targetHeight = { fullHeight -> fullHeight / 2 },
-            animSpec = tween()
+            animationSpec = tween()
         )
     ) {
         // Content that needs to appear/disappear goes here:
@@ -252,7 +252,7 @@ fun ExpandInShrinkOutSample() {
             // Overwrites the initial size to 50 pixels by 50 pixels
             initialSize = { IntSize(50, 50) },
             // Overwrites the default spring animation with tween
-            animSpec = tween(100, easing = LinearOutSlowInEasing)
+            animationSpec = tween(100, easing = LinearOutSlowInEasing)
         ),
         exit = shrinkOut(
             // Overwrites the area of the content that the shrink animation will end on. The
@@ -262,7 +262,7 @@ fun ExpandInShrinkOutSample() {
             shrinkTowards = Alignment.CenterStart,
             // Overwrites the target size of the shrinking animation.
             targetSize = { fullSize -> IntSize(fullSize.width / 10, fullSize.height / 5) },
-            animSpec = tween(100, easing = FastOutSlowInEasing)
+            animationSpec = tween(100, easing = FastOutSlowInEasing)
         )
     ) {
         // Content that needs to appear/disappear goes here:
