@@ -13,11 +13,12 @@ Follow individual tutorials to understand how to use particular feature.
 
 ### Limitations
 
-Following limitations apply to Milestone 1 (M1) release.
+Following limitations apply to Milestone 3 (M3) release.
 
-  * Only macOS 10.15 or later is supported
   * Only 64-bit Windows is supported
   * Only JDK 11 or later is supported due to the memory management scheme used in Skia bindings
+  * Some Linux distributions require additional packages to be instaled, see [this issue](https://github.com/JetBrains/compose-jb/issues/273) for more information
+  
 
 [comment]: <> (__SUPPORTED_GRADLE_VERSIONS__)
 
@@ -25,3 +26,4 @@ Following limitations apply to Milestone 1 (M1) release.
 
 * M1 works only with Gradle 6.4 and 6.5;
 * M2 works only with Gradle 6.4 or later (6.7 is the latest tested version).
+* M3 works only with Gradle 6.4 or later (6.8 is the latest tested version).
