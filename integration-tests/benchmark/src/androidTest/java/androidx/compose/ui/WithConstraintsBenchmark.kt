@@ -20,7 +20,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
@@ -74,8 +74,8 @@ private class NoWithConstraintsTestCase : ComposeTestCase, ToggleableTestCase {
     override fun Content() {
         val size = remember { mutableStateOf(200.dp) }
         this.state = size
-        Box(Modifier.preferredSize(300.dp), contentAlignment = Alignment.Center) {
-            Spacer(Modifier.preferredSize(width = size.value, height = size.value))
+        Box(Modifier.size(300.dp), contentAlignment = Alignment.Center) {
+            Spacer(Modifier.size(width = size.value, height = size.value))
         }
     }
 
@@ -93,8 +93,8 @@ private class BoxWithConstraintsTestCase : ComposeTestCase, ToggleableTestCase {
         val size = remember { mutableStateOf(200.dp) }
         this.state = size
         BoxWithConstraints {
-            Box(Modifier.preferredSize(300.dp), contentAlignment = Alignment.Center) {
-                Spacer(Modifier.preferredSize(width = size.value, height = size.value))
+            Box(Modifier.size(300.dp), contentAlignment = Alignment.Center) {
+                Spacer(Modifier.size(width = size.value, height = size.value))
             }
         }
     }

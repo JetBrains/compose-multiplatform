@@ -20,7 +20,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.Sampled
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,7 +43,7 @@ fun AnimatedVectorSample() {
         Image(
             painter = image.painterFor(atEnd),
             contentDescription = "Your content description",
-            modifier = Modifier.preferredSize(64.dp).clickable {
+            modifier = Modifier.size(64.dp).clickable {
                 atEnd = !atEnd
             }
         )

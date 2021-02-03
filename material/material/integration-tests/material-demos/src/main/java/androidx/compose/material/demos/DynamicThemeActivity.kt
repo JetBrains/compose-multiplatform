@@ -24,7 +24,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -142,7 +142,7 @@ private fun Card(index: Int) {
     // colour from the Material theme to work out text colour, so we end up doing a
     // large amount of work here when the top level theme changes
     Box(
-        Modifier.padding(25.dp).fillMaxWidth().preferredHeight(150.dp)
+        Modifier.padding(25.dp).fillMaxWidth().height(150.dp)
             .background(shapeColor, RoundedCornerShape(10.dp)),
         contentAlignment = Alignment.Center
     ) {

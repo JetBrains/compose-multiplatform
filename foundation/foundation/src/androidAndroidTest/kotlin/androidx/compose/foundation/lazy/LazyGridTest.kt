@@ -18,11 +18,11 @@ package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredSize
-import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
@@ -56,7 +56,7 @@ class LazyGridTest {
             ) {
                 item {
                     Spacer(
-                        Modifier.preferredSize(10.dp).testTag(itemTestTag)
+                        Modifier.size(10.dp).testTag(itemTestTag)
                     )
                 }
             }
@@ -73,10 +73,10 @@ class LazyGridTest {
         rule.setContent {
             LazyVerticalGrid(
                 cells = GridCells.Fixed(3),
-                modifier = Modifier.preferredHeight(100.dp).preferredWidth(300.dp)
+                modifier = Modifier.height(100.dp).width(300.dp)
             ) {
                 items(items) {
-                    Spacer(Modifier.preferredHeight(101.dp).testTag(it))
+                    Spacer(Modifier.height(101.dp).testTag(it))
                 }
             }
         }
@@ -104,10 +104,10 @@ class LazyGridTest {
         rule.setContentWithTestViewConfiguration {
             LazyVerticalGrid(
                 cells = GridCells.Fixed(3),
-                modifier = Modifier.preferredHeight(100.dp).testTag(LazyGridTag)
+                modifier = Modifier.height(100.dp).testTag(LazyGridTag)
             ) {
                 items(items) {
-                    Spacer(Modifier.preferredHeight(101.dp).testTag(it))
+                    Spacer(Modifier.height(101.dp).testTag(it))
                 }
             }
         }
@@ -141,10 +141,10 @@ class LazyGridTest {
         rule.setContentWithTestViewConfiguration {
             LazyVerticalGrid(
                 cells = GridCells.Fixed(3),
-                modifier = Modifier.preferredHeight(200.dp).testTag(LazyGridTag)
+                modifier = Modifier.height(200.dp).testTag(LazyGridTag)
             ) {
                 items(items) {
-                    Spacer(Modifier.preferredHeight(101.dp).testTag(it))
+                    Spacer(Modifier.height(101.dp).testTag(it))
                 }
             }
         }
@@ -187,10 +187,10 @@ class LazyGridTest {
         rule.setContent {
             LazyVerticalGrid(
                 cells = GridCells.Adaptive(130.dp),
-                modifier = Modifier.preferredHeight(100.dp).preferredWidth(300.dp)
+                modifier = Modifier.height(100.dp).width(300.dp)
             ) {
                 items(items) {
-                    Spacer(Modifier.preferredHeight(101.dp).testTag(it))
+                    Spacer(Modifier.height(101.dp).testTag(it))
                 }
             }
         }
@@ -218,10 +218,10 @@ class LazyGridTest {
         rule.setContent {
             LazyVerticalGrid(
                 cells = GridCells.Adaptive(301.dp),
-                modifier = Modifier.preferredHeight(100.dp).preferredWidth(300.dp)
+                modifier = Modifier.height(100.dp).width(300.dp)
             ) {
                 items(items) {
-                    Spacer(Modifier.preferredHeight(101.dp).testTag(it))
+                    Spacer(Modifier.height(101.dp).testTag(it))
                 }
             }
         }
@@ -245,10 +245,10 @@ class LazyGridTest {
         rule.setContent {
             LazyVerticalGrid(
                 GridCells.Fixed(2),
-                Modifier.width(itemSize * 2)
+                Modifier.requiredWidth(itemSize * 2)
             ) {
                 items(items) {
-                    Spacer(Modifier.height(itemSize).testTag(it))
+                    Spacer(Modifier.requiredHeight(itemSize).testTag(it))
                 }
             }
         }
@@ -279,10 +279,10 @@ class LazyGridTest {
         rule.setContent {
             LazyVerticalGrid(
                 GridCells.Fixed(2),
-                Modifier.width(itemSize * 2)
+                Modifier.requiredWidth(itemSize * 2)
             ) {
                 itemsIndexed(items) { index, item ->
-                    Spacer(Modifier.height(itemSize).testTag("$index*$item"))
+                    Spacer(Modifier.requiredHeight(itemSize).testTag("$index*$item"))
                 }
             }
         }

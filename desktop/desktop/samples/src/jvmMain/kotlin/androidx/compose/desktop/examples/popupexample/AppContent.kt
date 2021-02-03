@@ -28,8 +28,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
@@ -91,7 +90,7 @@ fun content() {
             Row(
                 modifier = Modifier.background(color = Color(75, 75, 75))
                     .fillMaxWidth()
-                    .preferredHeight(30.dp)
+                    .height(30.dp)
                     .padding(start = 20.dp, end = 10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -236,7 +235,7 @@ fun content() {
         Box(
             modifier = Modifier.background(color = Color(32, 32, 32))
                 .fillMaxWidth()
-                .preferredHeight(30.dp)
+                .height(30.dp)
         ) {
             Row(modifier = Modifier.padding(start = 20.dp)) {
                 TextBox(
@@ -331,7 +330,7 @@ fun PopupSample(displayed: Boolean, onDismiss: () -> Unit) {
 @Composable
 fun PopupContent(onDismiss: () -> Unit) {
     Box(
-        Modifier.preferredSize(300.dp, 150.dp).background(color = Color(65, 65, 65)),
+        Modifier.size(300.dp, 150.dp).background(color = Color(65, 65, 65)),
         contentAlignment = Alignment.Center
     ) {
         Column {
@@ -378,7 +377,7 @@ fun Button(
                     color
         ),
         modifier = Modifier
-            .preferredSize(size.width.dp, size.height.dp)
+            .size(size.width.dp, size.height.dp)
             .hover(
                 onEnter = {
                     buttonHover.value = true
@@ -503,7 +502,7 @@ private fun image(url: String): java.awt.Image {
 fun SwingActionButton(text: String, action: (() -> Unit)? = null) {
     SwingPanel(
         background = Color(55, 55, 55),
-        modifier = Modifier.preferredSize(200.dp, 35.dp),
+        modifier = Modifier.size(200.dp, 35.dp),
         componentBlock = {
             JButton(text).apply {
                 addActionListener(object : ActionListener {

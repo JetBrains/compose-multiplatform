@@ -19,7 +19,7 @@ package androidx.compose.ui.tooling.data
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Button
 import androidx.compose.material.ModalDrawer
 import androidx.compose.material.Text
@@ -53,7 +53,7 @@ class InspectableTests : ToolingTest() {
             Inspectable(slotTableRecord) {
                 Column {
                     Box(
-                        Modifier.preferredSize(100.dp).drawBehind {
+                        Modifier.size(100.dp).drawBehind {
                             drawRect(Color(0xFF))
                         }
                     )
@@ -296,7 +296,7 @@ class InspectableTests : ToolingTest() {
             Inspectable(CompositionDataRecord.create()) {
                 Column {
                     InInspectionModeOnly {
-                        Box(Modifier.preferredSize(100.dp).background(color = Color(0xFF)))
+                        Box(Modifier.size(100.dp).background(color = Color(0xFF)))
                         displayed = true
                     }
                 }
@@ -312,7 +312,7 @@ class InspectableTests : ToolingTest() {
         show {
             Column {
                 InInspectionModeOnly {
-                    Box(Modifier.preferredSize(100.dp).background(color = Color(0xFF)))
+                    Box(Modifier.size(100.dp).background(color = Color(0xFF)))
                     displayed = true
                 }
             }

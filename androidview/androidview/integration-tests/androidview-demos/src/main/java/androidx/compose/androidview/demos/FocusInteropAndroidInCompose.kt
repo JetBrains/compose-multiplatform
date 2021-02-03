@@ -24,7 +24,7 @@ import androidx.compose.foundation.layout.Arrangement.SpaceEvenly
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
@@ -44,7 +44,7 @@ fun EditTextInteropDemo() {
             val text = remember { mutableStateOf("") }
             TextField(text.value, onValueChange = { text.value = it })
         }
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.requiredHeight(20.dp))
         Row(horizontalArrangement = SpaceEvenly, verticalAlignment = CenterVertically) {
             AndroidView({
                 LinearLayout(it).apply {

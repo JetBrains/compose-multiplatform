@@ -17,7 +17,7 @@
 package androidx.compose.foundation.textfield
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.text.CoreTextField
 import androidx.compose.foundation.text.maxLinesHeight
 import androidx.compose.ui.Modifier
@@ -137,7 +137,7 @@ class MaxLinesHeightModifierTest {
                     onValueChange = {},
                     textStyle = TextStyle.Default,
                     modifier = Modifier
-                        .width(100.dp)
+                        .requiredWidth(100.dp)
                         .maxLinesHeight(maxLines, TextStyle.Default),
                     onTextLayout = { textLayoutResult = it }
                 )

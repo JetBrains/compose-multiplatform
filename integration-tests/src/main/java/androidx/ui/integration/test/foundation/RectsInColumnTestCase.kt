@@ -19,7 +19,7 @@ package androidx.ui.integration.test.foundation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
@@ -70,6 +70,6 @@ class RectsInColumnTestCase(
     fun ColoredRectWithModel() {
         val state = remember { mutableStateOf(Color.Black) }
         states.add(state)
-        Box(Modifier.preferredSize(100.dp, 50.dp).background(color = state.value))
+        Box(Modifier.size(100.dp, 50.dp).background(color = state.value))
     }
 }

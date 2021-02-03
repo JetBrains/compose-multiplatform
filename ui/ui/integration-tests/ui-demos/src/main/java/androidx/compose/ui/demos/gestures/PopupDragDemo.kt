@@ -20,7 +20,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -57,7 +57,7 @@ fun PopupDragDemo() {
                                 change.consumeAllChanges()
                             }
                         }
-                        .preferredSize(70.dp)
+                        .size(70.dp)
                         .background(Color.Green, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {

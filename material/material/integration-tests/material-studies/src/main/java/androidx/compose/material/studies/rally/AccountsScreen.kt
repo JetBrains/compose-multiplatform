@@ -21,7 +21,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
@@ -42,7 +42,7 @@ fun AccountsBody(accounts: List<Account>) {
             val accountsProportion = accounts.extractProportions { it.balance }
             val colors = accounts.map { it.color }
             AnimatedCircle(
-                Modifier.preferredHeight(300.dp).align(Alignment.Center).fillMaxWidth(),
+                Modifier.height(300.dp).align(Alignment.Center).fillMaxWidth(),
                 accountsProportion,
                 colors
             )
@@ -59,7 +59,7 @@ fun AccountsBody(accounts: List<Account>) {
                 )
             }
         }
-        Spacer(Modifier.preferredHeight(10.dp))
+        Spacer(Modifier.height(10.dp))
         Card {
             Column(modifier = Modifier.padding(12.dp)) {
                 accounts.forEach { account ->

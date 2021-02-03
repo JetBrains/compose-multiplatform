@@ -18,8 +18,8 @@ package androidx.compose.ui.test
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.preferredSize
-import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -58,7 +58,7 @@ class LayoutCoordinatesHelperTest {
                 }
             ) {
                 Box(
-                    Modifier.preferredSize(10.dp)
+                    Modifier.size(10.dp)
                         .align(Alignment.Start)
                         .onGloballyPositioned { coordinates ->
                             childCoordinates = coordinates
@@ -82,16 +82,16 @@ class LayoutCoordinatesHelperTest {
         var childCoordinates: LayoutCoordinates? = null
         rule.setContent {
             with(LocalDensity.current) {
-                Box(Modifier.preferredWidth(40.toDp()), contentAlignment = Alignment.Center) {
+                Box(Modifier.width(40.toDp()), contentAlignment = Alignment.Center) {
                     Column(
-                        Modifier.preferredWidth(20.toDp())
+                        Modifier.width(20.toDp())
                             .onGloballyPositioned { coordinates: LayoutCoordinates ->
                                 parentCoordinates = coordinates
                                 latch.countDown()
                             }
                     ) {
                         Box(
-                            Modifier.preferredSize(10.toDp())
+                            Modifier.size(10.toDp())
                                 .align(Alignment.CenterHorizontally)
                                 .onGloballyPositioned { coordinates ->
                                     childCoordinates = coordinates

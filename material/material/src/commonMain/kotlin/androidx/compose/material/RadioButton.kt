@@ -25,7 +25,7 @@ import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.ripple.rememberRipple
@@ -96,7 +96,7 @@ fun RadioButton(
             )
             .wrapContentSize(Alignment.Center)
             .padding(RadioButtonPadding)
-            .size(RadioButtonSize)
+            .requiredSize(RadioButtonSize)
     ) {
         drawRadio(radioColor, dotRadius)
     }

@@ -20,8 +20,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
@@ -87,7 +87,7 @@ class ParagraphTest {
                         color = Color.Black,
                         modifier = Modifier
                             .background(Color.Blue)
-                            .preferredHeight(56.dp)
+                            .height(56.dp)
                             .wrapContentSize(Alignment.Center)
                     )
 

@@ -20,8 +20,8 @@ import android.os.Build
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -143,7 +143,7 @@ class FloatingActionButtonTest {
         rule.setMaterialContent {
             Column {
                 Spacer(
-                    Modifier.size(10.dp).weight(1f).onGloballyPositioned {
+                    Modifier.requiredSize(10.dp).weight(1f).onGloballyPositioned {
                         item1Bounds = it.boundsInRoot()
                     }
                 )
@@ -158,7 +158,7 @@ class FloatingActionButtonTest {
                     Text("Button")
                 }
 
-                Spacer(Modifier.size(10.dp).weight(1f))
+                Spacer(Modifier.requiredSize(10.dp).weight(1f))
             }
         }
 
@@ -186,7 +186,7 @@ class FloatingActionButtonTest {
                             defaultElevation = 0.dp
                         )
                     ) {
-                        Box(Modifier.preferredSize(10.dp, 10.dp))
+                        Box(Modifier.size(10.dp, 10.dp))
                     }
                 }
             }
@@ -222,7 +222,7 @@ class FloatingActionButtonTest {
                         elevation = FloatingActionButtonDefaults.elevation(
                             defaultElevation = 0.dp
                         ),
-                        text = { Box(Modifier.preferredSize(10.dp, 50.dp)) }
+                        text = { Box(Modifier.size(10.dp, 50.dp)) }
                     )
                 }
             }
@@ -252,7 +252,7 @@ class FloatingActionButtonTest {
                     }
                 ) {
                     Box(
-                        Modifier.preferredSize(2.dp)
+                        Modifier.size(2.dp)
                             .onGloballyPositioned { contentCoordinates = it }
                     )
                 }
@@ -281,7 +281,7 @@ class FloatingActionButtonTest {
                 ExtendedFloatingActionButton(
                     text = {
                         Box(
-                            Modifier.preferredSize(2.dp)
+                            Modifier.size(2.dp)
                                 .onGloballyPositioned { contentCoordinates = it }
                         )
                     },
@@ -314,13 +314,13 @@ class FloatingActionButtonTest {
                 ExtendedFloatingActionButton(
                     text = {
                         Box(
-                            Modifier.preferredSize(2.dp)
+                            Modifier.size(2.dp)
                                 .onGloballyPositioned { textCoordinates = it }
                         )
                     },
                     icon = {
                         Box(
-                            Modifier.preferredSize(10.dp)
+                            Modifier.size(10.dp)
                                 .onGloballyPositioned { iconCoordinates = it }
                         )
                     },

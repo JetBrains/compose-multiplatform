@@ -19,7 +19,7 @@ package androidx.compose.ui.draw
 import android.os.Build
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -61,7 +61,7 @@ class InvalidatingNotPlacedChildTest {
                     .testTag("node")
             ) {
                 Spacer(
-                    Modifier.size(5.dp)
+                    Modifier.requiredSize(5.dp)
                         .graphicsLayer()
                         .background(Color.Red)
                 )

@@ -22,8 +22,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
@@ -119,7 +119,7 @@ class ScaffoldTest {
                                 appbarSize = positioned.size
                             }
                             .fillMaxWidth()
-                            .preferredHeight(50.dp)
+                            .height(50.dp)
                             .background(color = Color.Red)
                     )
                 }
@@ -128,7 +128,7 @@ class ScaffoldTest {
                     Modifier
                         .onGloballyPositioned { contentPosition = it.localToWindow(Offset.Zero) }
                         .fillMaxWidth()
-                        .preferredHeight(50.dp)
+                        .height(50.dp)
                         .background(Color.Blue)
                 )
             }
@@ -153,7 +153,7 @@ class ScaffoldTest {
                                 appbarSize = positioned.size
                             }
                             .fillMaxWidth()
-                            .preferredHeight(50.dp)
+                            .height(50.dp)
                             .background(color = Color.Red)
                     )
                 }
@@ -165,7 +165,7 @@ class ScaffoldTest {
                             contentSize = positioned.size
                         }
                         .fillMaxSize()
-                        .preferredHeight(50.dp)
+                        .height(50.dp)
                         .background(color = Color.Blue)
                 )
             }
@@ -190,7 +190,7 @@ class ScaffoldTest {
                                     drawerChildPosition = positioned.positionInParent
                                 }
                                 .fillMaxWidth()
-                                .preferredHeight(50.dp)
+                                .height(50.dp)
                                 .background(color = Color.Blue)
                         )
                     },
@@ -199,7 +199,7 @@ class ScaffoldTest {
                     Box(
                         Modifier
                             .fillMaxWidth()
-                            .preferredHeight(50.dp)
+                            .height(50.dp)
                             .background(color = Color.Blue)
                     )
                 }
@@ -246,7 +246,7 @@ class ScaffoldTest {
                                     drawerChildPosition = positioned.positionInParent
                                 }
                                 .fillMaxWidth()
-                                .preferredHeight(50.dp)
+                                .height(50.dp)
                                 .background(color = Color.Blue)
                         )
                     }
@@ -254,7 +254,7 @@ class ScaffoldTest {
                     Box(
                         Modifier
                             .fillMaxWidth()
-                            .preferredHeight(50.dp)
+                            .height(50.dp)
                             .background(color = Color.Blue)
                     )
                 }
@@ -345,14 +345,14 @@ class ScaffoldTest {
         rule.setContent {
             Box(
                 Modifier
-                    .size(10.dp, 20.dp)
+                    .requiredSize(10.dp, 20.dp)
                     .semantics(mergeDescendants = true) {}
                     .testTag("Scaffold")
             ) {
                 Scaffold(
                     topBar = {
                         Box(
-                            Modifier.size(10.dp)
+                            Modifier.requiredSize(10.dp)
                                 .shadow(4.dp)
                                 .zIndex(4f)
                                 .background(color = Color.White)
@@ -360,7 +360,7 @@ class ScaffoldTest {
                     }
                 ) {
                     Box(
-                        Modifier.size(10.dp)
+                        Modifier.requiredSize(10.dp)
                             .background(color = Color.White)
                     )
                 }
@@ -434,7 +434,7 @@ class ScaffoldTest {
                                 bottomBarSize = positioned.size
                             }
                             .fillMaxWidth()
-                            .preferredHeight(100.dp)
+                            .height(100.dp)
                             .background(color = Color.Red)
                     )
                 }

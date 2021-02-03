@@ -27,8 +27,8 @@ import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -499,7 +499,7 @@ class ScrollTest {
             Box {
                 Column(
                     Modifier
-                        .preferredSize(100.dp)
+                        .size(100.dp)
                         .testTag(scrollerTag)
                         .verticalScroll(scrollState)
                 ) {
@@ -584,7 +584,7 @@ class ScrollTest {
             scrollState = rememberScrollState()
             Column(Modifier.verticalScroll(scrollState!!)) {
                 repeat(50) {
-                    Box(Modifier.preferredHeight(100.dp))
+                    Box(Modifier.height(100.dp))
                 }
             }
         }
@@ -658,7 +658,7 @@ class ScrollTest {
                 Box {
                     Column(
                         modifier = Modifier
-                            .preferredSize(width.toDp(), height.toDp())
+                            .size(width.toDp(), height.toDp())
                             .testTag(scrollerTag)
                             .verticalScroll(
                                 resolvedState,
@@ -669,7 +669,7 @@ class ScrollTest {
                         colors.forEach { color ->
                             Box(
                                 Modifier
-                                    .preferredSize(width.toDp(), rowHeight.toDp())
+                                    .size(width.toDp(), rowHeight.toDp())
                                     .background(color)
                             )
                         }
@@ -695,7 +695,7 @@ class ScrollTest {
                     Box {
                         Row(
                             modifier = Modifier
-                                .preferredSize(width.toDp(), height.toDp())
+                                .size(width.toDp(), height.toDp())
                                 .testTag(scrollerTag)
                                 .horizontalScroll(
                                     resolvedState,
@@ -706,7 +706,7 @@ class ScrollTest {
                             colors.forEach { color ->
                                 Box(
                                     Modifier
-                                        .preferredSize(defaultCellSize.toDp(), height.toDp())
+                                        .size(defaultCellSize.toDp(), height.toDp())
                                         .background(color)
                                 )
                             }
@@ -767,7 +767,7 @@ class ScrollTest {
             }
             Box {
                 Box(
-                    Modifier.preferredSize(width, height).background(Color.White)
+                    Modifier.size(width, height).background(Color.White)
                 ) {
                     if (isVertical) {
                         Column(

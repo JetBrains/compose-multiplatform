@@ -35,9 +35,9 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredSize
-import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -200,7 +200,7 @@ open class ComposeTapInAndroidScroll : ComponentActivity() {
                         Modifier
                             .background(color = Color.Gray)
                             .fillMaxWidth()
-                            .preferredHeight(456.dp)
+                            .height(456.dp)
                             .wrapContentSize()
                             .clickable {
                                 currentColor.value = if (currentColor.value == Color.Blue) {
@@ -210,7 +210,7 @@ open class ComposeTapInAndroidScroll : ComponentActivity() {
                                 }
                             }
                             .background(currentColor.value, RectangleShape)
-                            .preferredSize(192.dp)
+                            .size(192.dp)
                     )
                 }
             },
@@ -249,7 +249,7 @@ open class ComposeScrollInAndroidScrollSameOrientation : ComponentActivity() {
                             .padding(48.dp)
                             .background(color = Color.Gray)
                             .fillMaxWidth()
-                            .preferredHeight(456.dp)
+                            .height(456.dp)
                             .verticalScroll(rememberScrollState())
                     ) {
                         Box(
@@ -257,7 +257,7 @@ open class ComposeScrollInAndroidScrollSameOrientation : ComponentActivity() {
                                 .padding(48.dp)
                                 .background(color = Color.LightGray)
                                 .fillMaxWidth()
-                                .preferredHeight(456.dp)
+                                .height(456.dp)
                         )
                     }
                 }
@@ -295,14 +295,14 @@ open class ComposeScrollInAndroidScrollDifferentOrientation : ComponentActivity(
                             .padding(48.dp)
                             .background(color = Color.Gray)
                             .fillMaxWidth()
-                            .preferredHeight(456.dp)
+                            .height(456.dp)
                             .verticalScroll(rememberScrollState())
                     ) {
                         Box(
                             Modifier
                                 .padding(48.dp)
                                 .background(color = Color.LightGray)
-                                .preferredWidth(360.dp)
+                                .width(360.dp)
                                 .fillMaxHeight()
                         )
                     }

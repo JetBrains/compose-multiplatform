@@ -23,7 +23,7 @@ import androidx.compose.foundation.animation.smoothScrollBy
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -385,7 +385,7 @@ class ScrollableTest {
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .preferredSize(300.dp)
+                        .size(300.dp)
                         .scrollable(
                             flingSpec = decayAnimationSpec,
                             state = outerState,
@@ -394,7 +394,7 @@ class ScrollableTest {
                 ) {
                     Box(
                         modifier = Modifier.testTag(scrollableBoxTag)
-                            .preferredSize(300.dp)
+                            .size(300.dp)
                             .scrollable(
                                 flingSpec = FloatExponentialDecaySpec()
                                     .generateDecayAnimationSpec(),
@@ -452,7 +452,7 @@ class ScrollableTest {
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .preferredSize(300.dp)
+                        .size(300.dp)
                         .scrollable(
                             state = outerState,
                             flingSpec = decayAnimationSpec,
@@ -462,7 +462,7 @@ class ScrollableTest {
                     Box(
                         modifier = Modifier
                             .testTag(scrollableBoxTag)
-                            .preferredSize(300.dp)
+                            .size(300.dp)
                             .scrollable(
                                 state = innerState,
                                 flingSpec = FloatExponentialDecaySpec()
@@ -527,11 +527,11 @@ class ScrollableTest {
                     Box(
                         contentAlignment = Alignment.Center,
                         modifier = Modifier
-                            .preferredSize(300.dp)
+                            .size(300.dp)
                             .nestedScroll(preConsumingParent)
                     ) {
                         Box(
-                            modifier = Modifier.preferredSize(300.dp)
+                            modifier = Modifier.size(300.dp)
                                 .testTag(scrollableBoxTag)
                                 .scrollable(
                                     flingSpec = FloatExponentialDecaySpec()
@@ -603,11 +603,11 @@ class ScrollableTest {
                     Box(
                         contentAlignment = Alignment.Center,
                         modifier = Modifier
-                            .preferredSize(300.dp)
+                            .size(300.dp)
                             .nestedScroll(parent)
                     ) {
                         Box(
-                            modifier = Modifier.preferredSize(300.dp)
+                            modifier = Modifier.size(300.dp)
                                 .testTag(scrollableBoxTag)
                                 .scrollable(
                                     flingSpec = decayAnimationSpec,
@@ -652,7 +652,7 @@ class ScrollableTest {
         rule.setContent {
             Box {
                 Box(
-                    modifier = Modifier.preferredSize(300.dp)
+                    modifier = Modifier.size(300.dp)
 
                         .scrollable(
                             flingSpec = decayAnimationSpec,
@@ -661,7 +661,7 @@ class ScrollableTest {
                         )
                 ) {
                     Box(
-                        Modifier.preferredSize(200.dp)
+                        Modifier.size(200.dp)
                             .testTag(scrollableBoxTag)
                             .nestedScroll(child, dispatcher)
                     )
@@ -724,7 +724,7 @@ class ScrollableTest {
             rule.setContent {
                 Box {
                     Box(
-                        modifier = Modifier.preferredSize(300.dp)
+                        modifier = Modifier.size(300.dp)
                             .scrollable(
                                 flingSpec = decayAnimationSpec,
                                 state = parentController,
@@ -732,7 +732,7 @@ class ScrollableTest {
                             )
                     ) {
                         Box(
-                            Modifier.preferredSize(200.dp)
+                            Modifier.size(200.dp)
                                 .testTag(scrollableBoxTag)
                                 .scrollable(
                                     flingSpec = decayAnimationSpec,
@@ -828,7 +828,7 @@ class ScrollableTest {
                     Box(
                         modifier = Modifier
                             .testTag(scrollableBoxTag)
-                            .preferredSize(100.dp)
+                            .size(100.dp)
                             .scrollable(
                                 interactionState = interactionState,
                                 flingSpec = decayAnimationSpec,
@@ -891,7 +891,7 @@ class ScrollableTest {
                 Box(
                     modifier = Modifier
                         .testTag(scrollableBoxTag)
-                        .preferredSize(100.dp).then(scrollable)
+                        .size(100.dp).then(scrollable)
                 )
             }
         }

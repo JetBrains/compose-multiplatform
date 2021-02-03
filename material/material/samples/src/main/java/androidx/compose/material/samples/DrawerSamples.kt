@@ -21,7 +21,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.BottomDrawer
 import androidx.compose.material.BottomDrawerValue
 import androidx.compose.material.Button
@@ -58,7 +58,7 @@ fun ModalDrawerSample() {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(text = if (drawerState.isClosed) ">>> Swipe >>>" else "<<< Swipe <<<")
-                Spacer(Modifier.preferredHeight(20.dp))
+                Spacer(Modifier.height(20.dp))
                 Button(onClick = { scope.launch { drawerState.open() } }) {
                     Text("Click to open")
                 }
@@ -88,7 +88,7 @@ fun BottomDrawerSample() {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(text = if (drawerState.isClosed) "▲▲▲ Pull up ▲▲▲" else "▼▼▼ Drag down ▼▼▼")
-                Spacer(Modifier.preferredHeight(20.dp))
+                Spacer(Modifier.height(20.dp))
                 Button(onClick = { scope.launch { drawerState.open() } }) {
                     Text("Click to open")
                 }

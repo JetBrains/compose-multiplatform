@@ -28,7 +28,7 @@ import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -88,7 +88,7 @@ fun FancyScrollingDemo() {
             }
         )
 
-        Canvas(modifier.fillMaxWidth().preferredHeight(400.dp)) {
+        Canvas(modifier.fillMaxWidth().height(400.dp)) {
             val width = size.width / 2f
             val scroll = animScroll.value + width / 2
             itemWidth.value = width

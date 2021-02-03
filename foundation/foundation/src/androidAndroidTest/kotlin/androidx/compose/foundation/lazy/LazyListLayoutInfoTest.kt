@@ -19,7 +19,7 @@ package androidx.compose.foundation.lazy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -60,10 +60,10 @@ class LazyListLayoutInfoTest {
         rule.setContent {
             LazyColumn(
                 state = rememberLazyListState().also { state = it },
-                modifier = Modifier.size(itemSizeDp * 3.5f)
+                modifier = Modifier.requiredSize(itemSizeDp * 3.5f)
             ) {
                 items((0..5).toList()) {
-                    Box(Modifier.size(itemSizeDp))
+                    Box(Modifier.requiredSize(itemSizeDp))
                 }
             }
         }
@@ -79,10 +79,10 @@ class LazyListLayoutInfoTest {
         rule.setContent {
             LazyColumn(
                 state = rememberLazyListState().also { state = it },
-                modifier = Modifier.size(itemSizeDp * 3.5f)
+                modifier = Modifier.requiredSize(itemSizeDp * 3.5f)
             ) {
                 items((0..5).toList()) {
-                    Box(Modifier.size(itemSizeDp))
+                    Box(Modifier.requiredSize(itemSizeDp))
                 }
             }
         }
@@ -102,10 +102,10 @@ class LazyListLayoutInfoTest {
             LazyColumn(
                 state = rememberLazyListState().also { state = it },
                 verticalArrangement = Arrangement.spacedBy(itemSizeDp),
-                modifier = Modifier.size(itemSizeDp * 3.5f)
+                modifier = Modifier.requiredSize(itemSizeDp * 3.5f)
             ) {
                 items((0..5).toList()) {
-                    Box(Modifier.size(itemSizeDp))
+                    Box(Modifier.requiredSize(itemSizeDp))
                 }
             }
         }
@@ -126,10 +126,10 @@ class LazyListLayoutInfoTest {
         rule.setContent {
             LazyColumn(
                 state = rememberLazyListState().also { state = it },
-                modifier = Modifier.size(itemSizeDp * 3.5f)
+                modifier = Modifier.requiredSize(itemSizeDp * 3.5f)
             ) {
                 items((0..5).toList()) {
-                    Box(Modifier.size(itemSizeDp))
+                    Box(Modifier.requiredSize(itemSizeDp))
                 }
             }
             observingFun()
@@ -163,7 +163,7 @@ class LazyListLayoutInfoTest {
                 state = rememberLazyListState().also { state = it }
             ) {
                 item {
-                    Box(Modifier.size(size))
+                    Box(Modifier.requiredSize(size))
                 }
             }
             observingFun()
@@ -191,7 +191,7 @@ class LazyListLayoutInfoTest {
                 state = rememberLazyListState().also { state = it }
             ) {
                 items((0 until count).toList()) {
-                    Box(Modifier.size(10.dp))
+                    Box(Modifier.requiredSize(10.dp))
                 }
             }
         }
@@ -213,11 +213,11 @@ class LazyListLayoutInfoTest {
         lateinit var state: LazyListState
         rule.setContent {
             LazyColumn(
-                Modifier.size(sizeDp),
+                Modifier.requiredSize(sizeDp),
                 state = rememberLazyListState().also { state = it }
             ) {
                 items((0..3).toList()) {
-                    Box(Modifier.size(sizeDp))
+                    Box(Modifier.requiredSize(sizeDp))
                 }
             }
         }
@@ -239,12 +239,12 @@ class LazyListLayoutInfoTest {
         lateinit var state: LazyListState
         rule.setContent {
             LazyColumn(
-                Modifier.size(sizeDp),
+                Modifier.requiredSize(sizeDp),
                 contentPadding = PaddingValues(top = topPaddingDp, bottom = bottomPaddingDp),
                 state = rememberLazyListState().also { state = it }
             ) {
                 items((0..3).toList()) {
-                    Box(Modifier.size(sizeDp))
+                    Box(Modifier.requiredSize(sizeDp))
                 }
             }
         }

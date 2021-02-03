@@ -17,7 +17,7 @@
 package androidx.compose.material
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -148,4 +148,4 @@ private fun Modifier.defaultSizeFor(painter: Painter) =
 private fun Size.isInfinite() = width.isInfinite() && height.isInfinite()
 
 // Default icon size, for icons with no intrinsic size information
-private val DefaultIconSizeModifier = Modifier.preferredSize(24.dp)
+private val DefaultIconSizeModifier = Modifier.size(24.dp)

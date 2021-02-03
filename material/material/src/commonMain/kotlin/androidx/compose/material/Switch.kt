@@ -27,7 +27,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
@@ -107,7 +107,7 @@ fun Switch(
             )
             .wrapContentSize(Alignment.Center)
             .padding(DefaultSwitchPadding)
-            .size(SwitchWidth, SwitchHeight)
+            .requiredSize(SwitchWidth, SwitchHeight)
     ) {
         SwitchImpl(
             checked = checked,
@@ -178,7 +178,7 @@ private fun BoxScope.SwitchImpl(
                 interactionState = interactionState,
                 indication = rememberRipple(bounded = false, radius = ThumbRippleRadius)
             )
-            .size(ThumbDiameter),
+            .requiredSize(ThumbDiameter),
         content = {}
     )
 }

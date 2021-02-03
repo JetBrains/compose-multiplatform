@@ -20,7 +20,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ExperimentalLayout
 import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
@@ -228,7 +228,7 @@ class RtlLayoutTest {
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     Layout(
                         content = {},
-                        modifier = Modifier.preferredWidth(IntrinsicSize.Max),
+                        modifier = Modifier.width(IntrinsicSize.Max),
                         minIntrinsicWidthMeasureBlock = { _, _ -> 0 },
                         minIntrinsicHeightMeasureBlock = { _, _ -> 0 },
                         maxIntrinsicWidthMeasureBlock = { _, _ ->

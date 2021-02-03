@@ -18,7 +18,7 @@ package androidx.compose.material
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -174,7 +174,7 @@ class TabTest {
                     Modifier
                         .tabIndicatorOffset(tabPositions[state])
                         .fillMaxWidth()
-                        .preferredHeight(indicatorHeight)
+                        .height(indicatorHeight)
                         .background(color = Color.Red)
                         .testTag("indicator")
                 )
@@ -349,7 +349,7 @@ class TabTest {
                     Modifier
                         .tabIndicatorOffset(tabPositions[state])
                         .fillMaxWidth()
-                        .preferredHeight(indicatorHeight)
+                        .height(indicatorHeight)
                         .background(color = Color.Red)
                         .testTag("indicator")
                 )

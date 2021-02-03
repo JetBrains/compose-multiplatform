@@ -20,7 +20,7 @@ import android.os.Build
 import androidx.compose.foundation.ClickableText
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -88,7 +88,7 @@ class PopupDismissTest(private val focusable: Boolean) {
                     properties = PopupProperties(focusable = focusable),
                     onDismissRequest = { dismissCounter++; latch.countDown() }
                 ) {
-                    Box(Modifier.preferredSize(100.dp, 100.dp)) {
+                    Box(Modifier.size(100.dp, 100.dp)) {
                         BasicText(text = "Popup", style = TextStyle(textAlign = TextAlign.Center))
                     }
                 }

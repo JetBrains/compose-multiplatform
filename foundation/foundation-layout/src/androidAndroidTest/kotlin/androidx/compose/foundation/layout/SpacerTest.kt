@@ -49,7 +49,7 @@ class SpacerTest : LayoutTest() {
         show {
             Container(constraints = bigConstraints) {
                 Spacer(
-                    Modifier.preferredSize(width = width, height = height)
+                    Modifier.size(width = width, height = height)
                         .onGloballyPositioned { position: LayoutCoordinates ->
                             size = position.size
                             drawLatch.countDown()
@@ -83,7 +83,7 @@ class SpacerTest : LayoutTest() {
                     )
                 ) {
                     Spacer(
-                        Modifier.preferredSize(width = width, height = height)
+                        Modifier.size(width = width, height = height)
                             .onGloballyPositioned { position: LayoutCoordinates ->
                                 size = position.size
                                 drawLatch.countDown()
@@ -109,7 +109,7 @@ class SpacerTest : LayoutTest() {
         show {
             Container(constraints = bigConstraints) {
                 Spacer(
-                    Modifier.preferredWidth(width).onGloballyPositioned { position ->
+                    Modifier.width(width).onGloballyPositioned { position ->
                         size = position.size
                         drawLatch.countDown()
                     }
@@ -141,7 +141,7 @@ class SpacerTest : LayoutTest() {
                     )
                 ) {
                     Spacer(
-                        Modifier.preferredWidth(width)
+                        Modifier.width(width)
                             .onGloballyPositioned { position: LayoutCoordinates ->
                                 size = position.size
                                 drawLatch.countDown()
@@ -167,7 +167,7 @@ class SpacerTest : LayoutTest() {
         show {
             Container(constraints = bigConstraints) {
                 Spacer(
-                    Modifier.preferredHeight(height)
+                    Modifier.height(height)
                         .onGloballyPositioned { position: LayoutCoordinates ->
                             size = position.size
                             drawLatch.countDown()
@@ -200,7 +200,7 @@ class SpacerTest : LayoutTest() {
                     )
                 ) {
                     Spacer(
-                        Modifier.preferredHeight(height)
+                        Modifier.height(height)
                             .onGloballyPositioned { position: LayoutCoordinates ->
                                 size = position.size
                                 drawLatch.countDown()

@@ -17,7 +17,7 @@
 package androidx.compose.ui.viewinterop
 
 import android.os.Build
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.testutils.assertPixels
@@ -97,7 +97,7 @@ class AndroidViewBindingTest {
             CompositionLocalProvider(LocalDensity provides density) {
                 AndroidViewBinding(
                     TestLayoutBinding::inflate,
-                    Modifier.size(size).onGloballyPositioned {
+                    Modifier.requiredSize(size).onGloballyPositioned {
                         Truth.assertThat(it.size).isEqualTo(IntSize(sizeIpx, sizeIpx))
                     }
                 )

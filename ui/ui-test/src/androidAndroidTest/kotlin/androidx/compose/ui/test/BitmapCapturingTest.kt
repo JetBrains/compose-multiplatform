@@ -24,7 +24,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Text
 import androidx.compose.testutils.assertContainsColor
@@ -202,13 +202,13 @@ class BitmapCapturingTest(val config: TestConfig) {
                                 Box(
                                     Modifier
                                         .testTag(tag11)
-                                        .preferredSize(100.toDp(), 50.toDp())
+                                        .size(100.toDp(), 50.toDp())
                                         .background(color = color11)
                                 )
                                 Box(
                                     Modifier
                                         .testTag(tag12)
-                                        .preferredSize(100.toDp(), 50.toDp())
+                                        .size(100.toDp(), 50.toDp())
                                         .background(color12)
                                 )
                             }
@@ -216,13 +216,13 @@ class BitmapCapturingTest(val config: TestConfig) {
                                 Box(
                                     Modifier
                                         .testTag(tag21)
-                                        .preferredSize(100.toDp(), 50.toDp())
+                                        .size(100.toDp(), 50.toDp())
                                         .background(color21)
                                 )
                                 Box(
                                     Modifier
                                         .testTag(tag22)
-                                        .preferredSize(100.toDp(), 50.toDp())
+                                        .size(100.toDp(), 50.toDp())
                                         .background(color22)
                                 )
                             }

@@ -29,10 +29,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredWidth
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyColumn
@@ -213,7 +213,7 @@ private fun LazyRowItemsDemo() {
 private fun Square(index: Int) {
     val width = remember { Random.nextInt(50, 150).dp }
     Box(
-        Modifier.preferredWidth(width).fillMaxHeight().background(colors[index % colors.size]),
+        Modifier.width(width).fillMaxHeight().background(colors[index % colors.size]),
         contentAlignment = Alignment.Center
     ) {
         Text(index.toString())
@@ -245,7 +245,7 @@ private fun RtlListDemo() {
                 Text(
                     "$it",
                     Modifier
-                        .size(100.dp)
+                        .requiredSize(100.dp)
                         .background(if (it % 2 == 0) Color.LightGray else Color.Transparent)
                         .padding(16.dp)
                 )
@@ -304,7 +304,7 @@ private fun LazyRowScope() {
         val items = listOf(Color.Cyan, Color.Blue, Color.Magenta)
         itemsIndexed(items) { index, item ->
             Box(
-                modifier = Modifier.background(item).size(40.dp),
+                modifier = Modifier.background(item).requiredSize(40.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text("$index", fontSize = 30.sp)
@@ -341,7 +341,7 @@ private fun LazyListArrangements() {
             val item = @Composable {
                 Box(
                     Modifier
-                        .height(200.dp)
+                        .requiredHeight(200.dp)
                         .fillMaxWidth()
                         .background(Color.Red)
                         .border(1.dp, Color.Cyan)
@@ -409,7 +409,7 @@ fun ReverseLayout() {
                 Text(
                     "$index",
                     Modifier
-                        .height(200.dp)
+                        .requiredHeight(200.dp)
                         .fillMaxWidth()
                         .background(Color.Red)
                         .border(1.dp, Color.Cyan)
@@ -455,7 +455,7 @@ fun ReverseLayout() {
 private fun NestedLazyDemo() {
     val item = @Composable { index: Int ->
         Box(
-            Modifier.padding(16.dp).size(200.dp).background(Color.LightGray),
+            Modifier.padding(16.dp).requiredSize(200.dp).background(Color.LightGray),
             contentAlignment = Alignment.Center
         ) {
             var state by rememberSaveable { mutableStateOf(0) }

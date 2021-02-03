@@ -16,9 +16,9 @@
 
 package androidx.compose.foundation.lazy
 
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredSize
-import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -92,14 +92,14 @@ private data class LazyItemScopeImpl(
     val maxWidth: Dp,
     val maxHeight: Dp
 ) : LazyItemScope {
-    override fun Modifier.fillParentMaxSize(fraction: Float) = preferredSize(
+    override fun Modifier.fillParentMaxSize(fraction: Float) = size(
         maxWidth * fraction,
         maxHeight * fraction
     )
 
     override fun Modifier.fillParentMaxWidth(fraction: Float) =
-        preferredWidth(maxWidth * fraction)
+        width(maxWidth * fraction)
 
     override fun Modifier.fillParentMaxHeight(fraction: Float) =
-        preferredHeight(maxHeight * fraction)
+        height(maxHeight * fraction)
 }

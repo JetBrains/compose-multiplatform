@@ -261,7 +261,7 @@ class BoxTest : LayoutTest() {
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     Box(
                         Modifier
-                            .preferredSize(tripleSizeDp)
+                            .size(tripleSizeDp)
                             .onGloballyPositioned { coordinates: LayoutCoordinates ->
                                 stackSize.value = coordinates.size
                                 positionedLatch.countDown()
@@ -269,55 +269,55 @@ class BoxTest : LayoutTest() {
                     ) {
                         Box(
                             Modifier.align(Alignment.TopStart)
-                                .preferredSize(sizeDp, sizeDp)
+                                .size(sizeDp, sizeDp)
                                 .saveLayoutInfo(childSize[0], childPosition[0], positionedLatch)
                         ) {
                         }
                         Box(
                             Modifier.align(Alignment.TopCenter)
-                                .preferredSize(sizeDp)
+                                .size(sizeDp)
                                 .saveLayoutInfo(childSize[1], childPosition[1], positionedLatch)
                         ) {
                         }
                         Box(
                             Modifier.align(Alignment.TopEnd)
-                                .preferredSize(sizeDp)
+                                .size(sizeDp)
                                 .saveLayoutInfo(childSize[2], childPosition[2], positionedLatch)
                         ) {
                         }
                         Box(
                             Modifier.align(Alignment.CenterStart)
-                                .preferredSize(sizeDp)
+                                .size(sizeDp)
                                 .saveLayoutInfo(childSize[3], childPosition[3], positionedLatch)
                         ) {
                         }
                         Box(
                             Modifier.align(Alignment.Center)
-                                .preferredSize(sizeDp)
+                                .size(sizeDp)
                                 .saveLayoutInfo(childSize[4], childPosition[4], positionedLatch)
                         ) {
                         }
                         Box(
                             Modifier.align(Alignment.CenterEnd)
-                                .preferredSize(sizeDp)
+                                .size(sizeDp)
                                 .saveLayoutInfo(childSize[5], childPosition[5], positionedLatch)
                         ) {
                         }
                         Box(
                             Modifier.align(Alignment.BottomStart)
-                                .preferredSize(sizeDp)
+                                .size(sizeDp)
                                 .saveLayoutInfo(childSize[6], childPosition[6], positionedLatch)
                         ) {
                         }
                         Box(
                             Modifier.align(Alignment.BottomCenter)
-                                .preferredSize(sizeDp)
+                                .size(sizeDp)
                                 .saveLayoutInfo(childSize[7], childPosition[7], positionedLatch)
                         ) {
                         }
                         Box(
                             Modifier.align(Alignment.BottomEnd)
-                                .preferredSize(sizeDp)
+                                .size(sizeDp)
                                 .saveLayoutInfo(childSize[8], childPosition[8], positionedLatch)
                         ) {
                         }
@@ -368,7 +368,7 @@ class BoxTest : LayoutTest() {
         show {
             Container(alignment = Alignment.TopStart) {
                 Container(
-                    Modifier.preferredSize(
+                    Modifier.size(
                         sizeDp,
                         sizeDp
                     ).then(
@@ -421,10 +421,10 @@ class BoxTest : LayoutTest() {
         show {
             Box(
                 contentAlignment = Alignment.BottomEnd,
-                modifier = Modifier.size(outerSize)
+                modifier = Modifier.requiredSize(outerSize)
             ) {
                 Box(
-                    Modifier.size(innerSize).onGloballyPositioned {
+                    Modifier.requiredSize(innerSize).onGloballyPositioned {
                         assertEquals(outerSizePx - innerSizePx, it.positionInParent.x)
                         assertEquals(outerSizePx - innerSizePx, it.positionInParent.y)
                         positionedLatch.countDown()
@@ -441,7 +441,7 @@ class BoxTest : LayoutTest() {
         val size = 10f
         val sizeDp = size.toDp()
         show {
-            Box(Modifier.size(sizeDp)) {
+            Box(Modifier.requiredSize(sizeDp)) {
                 Box(
                     Modifier.align(Alignment.BottomEnd).align(Alignment.TopStart)
                         .onGloballyPositioned {
@@ -467,7 +467,7 @@ class BoxTest : LayoutTest() {
                     content = {
                         Box {
                             Box(
-                                Modifier.size(size.value, 10.dp).onGloballyPositioned {
+                                Modifier.requiredSize(size.value, 10.dp).onGloballyPositioned {
                                     layoutLatch.countDown()
                                 }
                             )
@@ -501,11 +501,11 @@ class BoxTest : LayoutTest() {
 
         show {
             Box(
-                Modifier.widthIn(20.dp, 40.dp),
+                Modifier.requiredWidthIn(20.dp, 40.dp),
                 propagateMinConstraints = true
             ) {
                 Box(
-                    Modifier.preferredWidth(10.dp).onSizeChanged {
+                    Modifier.width(10.dp).onSizeChanged {
                         assertEquals(20.dp.roundToPx(), it.width)
                         measuredLatch.countDown()
                     }

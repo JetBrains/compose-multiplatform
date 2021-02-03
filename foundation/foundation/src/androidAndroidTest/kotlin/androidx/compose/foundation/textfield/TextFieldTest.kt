@@ -30,8 +30,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -353,7 +353,7 @@ class TextFieldTest {
         val boxSize = 50.dp
         var size: Int? = null
         rule.setContent {
-            Box(Modifier.preferredSize(parentSize)) {
+            Box(Modifier.size(parentSize)) {
                 Row {
                     BasicTextField(
                         value = "",
@@ -364,7 +364,7 @@ class TextFieldTest {
                                 size = it.size.width
                             }
                     )
-                    Box(Modifier.preferredSize(boxSize))
+                    Box(Modifier.size(boxSize))
                 }
             }
         }
@@ -407,7 +407,7 @@ class TextFieldTest {
                 value = "",
                 onValueChange = {},
                 textStyle = TextStyle(color = Color.White),
-                modifier = Modifier.preferredSize(10.dp, 20.dp).background(color = Color.White),
+                modifier = Modifier.size(10.dp, 20.dp).background(color = Color.White),
                 cursorBrush = SolidColor(Color.Blue)
             )
         }
@@ -684,7 +684,7 @@ class TextFieldTest {
                     value = "test",
                     onValueChange = {},
                     textStyle = TextStyle(fontSize = 2.sp),
-                    modifier = Modifier.height(100.dp).fillMaxWidth(),
+                    modifier = Modifier.requiredHeight(100.dp).fillMaxWidth(),
                     decorationBox = {
                         // the core text field is at the very bottom
                         Column {

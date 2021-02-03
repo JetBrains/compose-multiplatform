@@ -19,7 +19,7 @@ package androidx.compose.foundation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -292,14 +292,14 @@ class DraggableTest {
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .testTag(draggableBoxTag)
-                        .preferredSize(300.dp)
+                        .size(300.dp)
                         .draggable(Orientation.Horizontal) {
                             outerDrag += it
                         }
                 ) {
                     Box(
                         modifier = Modifier
-                            .preferredSize(300.dp)
+                            .size(300.dp)
                             .draggable(Orientation.Horizontal) { delta ->
                                 innerDrag += delta / 2
                             }
@@ -367,7 +367,7 @@ class DraggableTest {
                     Box(
                         modifier = Modifier
                             .testTag(draggableBoxTag)
-                            .preferredSize(100.dp)
+                            .size(100.dp)
                             .draggable(
                                 orientation = Orientation.Horizontal,
                                 interactionState = interactionState
@@ -430,7 +430,7 @@ class DraggableTest {
                 Box(
                     modifier = Modifier
                         .testTag(draggableBoxTag)
-                        .preferredSize(100.dp)
+                        .size(100.dp)
                         .then(draggable)
                 )
             }

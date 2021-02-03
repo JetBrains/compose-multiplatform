@@ -21,7 +21,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -67,7 +67,7 @@ class BoundsAssertionsTest {
                     Box(
                         modifier = Modifier
                             .testTag(tag)
-                            .size(80.dp, 100.dp)
+                            .requiredSize(80.dp, 100.dp)
                             .background(color = Color.Black)
                     )
                 }
@@ -191,7 +191,7 @@ class BoundsAssertionsTest {
                     modifier = Modifier
                         .testTag(tag)
                         .offset((-30).dp, (-10).dp)
-                        .size(80.dp, 100.dp)
+                        .requiredSize(80.dp, 100.dp)
                         .background(color = Color.Black)
                 )
             }

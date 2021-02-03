@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.test
 
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.MeasureBlock
@@ -86,7 +86,7 @@ class ScrollToTest {
         with(LocalDensity.current) {
             Layout(
                 content,
-                modifier.size(crossAxisSize.toDp(), columnHeight.toDp()),
+                modifier.requiredSize(crossAxisSize.toDp(), columnHeight.toDp()),
                 verticalLayout(offset, columnHeight)
             )
         }
@@ -102,7 +102,7 @@ class ScrollToTest {
         with(LocalDensity.current) {
             Layout(
                 content,
-                modifier.size(rowWidth.toDp(), crossAxisSize.toDp()),
+                modifier.requiredSize(rowWidth.toDp(), crossAxisSize.toDp()),
                 horizontalLayout(offset, rowWidth)
             )
         }

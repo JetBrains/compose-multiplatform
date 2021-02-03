@@ -19,7 +19,7 @@ package androidx.compose.foundation.samples
 import androidx.annotation.Sampled
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.progressSemantics
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -34,7 +34,7 @@ fun DeterminateProgressSemanticsSample() {
     Box(
         Modifier
             .progressSemantics(progress)
-            .preferredSize((progress * 100).dp, 4.dp)
+            .size((progress * 100).dp, 4.dp)
             .background(color = Color.Cyan)
     )
 }

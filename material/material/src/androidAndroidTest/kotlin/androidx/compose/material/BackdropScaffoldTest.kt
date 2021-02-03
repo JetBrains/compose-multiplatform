@@ -20,7 +20,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.BackdropValue.Concealed
 import androidx.compose.material.BackdropValue.Revealed
 import androidx.compose.ui.Modifier
@@ -72,8 +72,8 @@ class BackdropScaffoldTest {
                 scaffoldState = rememberBackdropScaffoldState(Concealed),
                 peekHeight = peekHeight,
                 headerHeight = headerHeight,
-                appBar = { Box(Modifier.preferredHeight(peekHeight)) },
-                backLayerContent = { Box(Modifier.preferredHeight(contentHeight)) },
+                appBar = { Box(Modifier.height(peekHeight)) },
+                backLayerContent = { Box(Modifier.height(contentHeight)) },
                 frontLayerContent = { Box(Modifier.fillMaxSize().testTag(frontLayer)) }
             )
         }
@@ -90,8 +90,8 @@ class BackdropScaffoldTest {
                 scaffoldState = rememberBackdropScaffoldState(Concealed),
                 peekHeight = peekHeight,
                 headerHeight = headerHeight,
-                appBar = { Box(Modifier.preferredHeight(peekHeight)) },
-                backLayerContent = { Box(Modifier.preferredHeight(contentHeight)) },
+                appBar = { Box(Modifier.height(peekHeight)) },
+                backLayerContent = { Box(Modifier.height(contentHeight)) },
                 frontLayerContent = { Box(Modifier.fillMaxSize().testTag(frontLayer)) }
             )
         }
@@ -114,8 +114,8 @@ class BackdropScaffoldTest {
                 scaffoldState = rememberBackdropScaffoldState(Revealed),
                 peekHeight = peekHeight,
                 headerHeight = headerHeight,
-                appBar = { Box(Modifier.preferredHeight(peekHeight)) },
-                backLayerContent = { Box(Modifier.preferredHeight(contentHeight)) },
+                appBar = { Box(Modifier.height(peekHeight)) },
+                backLayerContent = { Box(Modifier.height(contentHeight)) },
                 frontLayerContent = { Box(Modifier.fillMaxSize().testTag(frontLayer)) }
             )
         }
@@ -132,8 +132,8 @@ class BackdropScaffoldTest {
                 scaffoldState = rememberBackdropScaffoldState(Revealed),
                 peekHeight = peekHeight,
                 headerHeight = headerHeight,
-                appBar = { Box(Modifier.preferredHeight(peekHeight)) },
-                backLayerContent = { Box(Modifier.preferredHeight(contentHeight)) },
+                appBar = { Box(Modifier.height(peekHeight)) },
+                backLayerContent = { Box(Modifier.height(contentHeight)) },
                 frontLayerContent = { Box(Modifier.fillMaxSize().testTag(frontLayer)) }
             )
         }
@@ -156,7 +156,7 @@ class BackdropScaffoldTest {
                 scaffoldState = rememberBackdropScaffoldState(Revealed),
                 peekHeight = peekHeight,
                 headerHeight = headerHeight,
-                appBar = { Box(Modifier.preferredHeight(peekHeight)) },
+                appBar = { Box(Modifier.height(peekHeight)) },
                 backLayerContent = { Box(Modifier.fillMaxHeight()) },
                 frontLayerContent = { Box(Modifier.fillMaxSize().testTag(frontLayer)) }
             )
@@ -174,8 +174,8 @@ class BackdropScaffoldTest {
                 peekHeight = peekHeight,
                 headerHeight = headerHeight,
                 persistentAppBar = false,
-                appBar = { Box(Modifier.preferredHeight(peekHeight)) },
-                backLayerContent = { Box(Modifier.preferredHeight(contentHeight)) },
+                appBar = { Box(Modifier.height(peekHeight)) },
+                backLayerContent = { Box(Modifier.height(contentHeight)) },
                 frontLayerContent = { Box(Modifier.fillMaxSize().testTag(frontLayer)) }
             )
         }
@@ -192,8 +192,8 @@ class BackdropScaffoldTest {
                 peekHeight = peekHeight,
                 headerHeight = headerHeight,
                 stickyFrontLayer = false,
-                appBar = { Box(Modifier.preferredHeight(peekHeight)) },
-                backLayerContent = { Box(Modifier.preferredHeight(contentHeight)) },
+                appBar = { Box(Modifier.height(peekHeight)) },
+                backLayerContent = { Box(Modifier.height(contentHeight)) },
                 frontLayerContent = { Box(Modifier.fillMaxSize().testTag(frontLayer)) }
             )
         }
@@ -212,8 +212,8 @@ class BackdropScaffoldTest {
                 scaffoldState = scaffoldState,
                 peekHeight = peekHeight,
                 headerHeight = headerHeight,
-                appBar = { Box(Modifier.preferredHeight(peekHeight)) },
-                backLayerContent = { Box(Modifier.preferredHeight(contentHeight)) },
+                appBar = { Box(Modifier.height(peekHeight)) },
+                backLayerContent = { Box(Modifier.height(contentHeight)) },
                 frontLayerContent = { Box(Modifier.fillMaxSize().testTag(frontLayer)) }
             )
         }
@@ -245,8 +245,8 @@ class BackdropScaffoldTest {
                 scaffoldState = scaffoldState,
                 peekHeight = peekHeight,
                 headerHeight = headerHeight,
-                appBar = { Box(Modifier.preferredHeight(peekHeight)) },
-                backLayerContent = { Box(Modifier.preferredHeight(contentHeight)) },
+                appBar = { Box(Modifier.height(peekHeight)) },
+                backLayerContent = { Box(Modifier.height(contentHeight)) },
                 frontLayerContent = { Box(Modifier.fillMaxSize().testTag(frontLayer)) }
             )
         }
@@ -275,8 +275,8 @@ class BackdropScaffoldTest {
                 peekHeight = peekHeight,
                 headerHeight = headerHeight,
                 frontLayerScrimColor = Color.Red,
-                appBar = { Box(Modifier.preferredHeight(peekHeight)) },
-                backLayerContent = { Box(Modifier.preferredHeight(contentHeight)) },
+                appBar = { Box(Modifier.height(peekHeight)) },
+                backLayerContent = { Box(Modifier.height(contentHeight)) },
                 frontLayerContent = { Box(Modifier.fillMaxSize().testTag(frontLayer)) }
             )
         }
@@ -306,8 +306,8 @@ class BackdropScaffoldTest {
                 peekHeight = peekHeight,
                 headerHeight = headerHeight,
                 frontLayerScrimColor = Color.Transparent,
-                appBar = { Box(Modifier.preferredHeight(peekHeight)) },
-                backLayerContent = { Box(Modifier.preferredHeight(contentHeight)) },
+                appBar = { Box(Modifier.height(peekHeight)) },
+                backLayerContent = { Box(Modifier.height(contentHeight)) },
                 frontLayerContent = {
                     Box(
                         Modifier.fillMaxSize().testTag(frontLayer).clickable {

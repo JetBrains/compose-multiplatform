@@ -20,7 +20,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,7 +51,7 @@ fun VectorGraphicsDemo() {
         Image(
             painter = imageVector,
             contentDescription = "Crane",
-            modifier = Modifier.preferredSize(200.dp, 200.dp),
+            modifier = Modifier.size(200.dp, 200.dp),
             contentScale = ContentScale.Inside
         )
 
@@ -59,14 +59,14 @@ fun VectorGraphicsDemo() {
         Image(
             painter = complexImageVector,
             contentDescription = "Hourglass",
-            modifier = Modifier.preferredSize(64.dp, 64.dp),
+            modifier = Modifier.size(64.dp, 64.dp),
             contentScale = ContentScale.Fit
         )
 
         Image(
             painter = vectorShape(120.dp, 120.dp),
             contentDescription = null,
-            modifier = Modifier.preferredSize(200.dp, 150.dp)
+            modifier = Modifier.size(200.dp, 150.dp)
         )
     }
 }

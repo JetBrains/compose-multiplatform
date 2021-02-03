@@ -18,7 +18,7 @@ package androidx.compose.ui
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
@@ -438,7 +438,7 @@ class AccessibilityIteratorsTest {
                         ).toFontFamily()
                     ),
                     text = AnnotatedString(text),
-                    modifier = Modifier.width(width.toDp()),
+                    modifier = Modifier.requiredWidth(width.toDp()),
                     onTextLayout = { textLayoutResult = it }
                 )
             }

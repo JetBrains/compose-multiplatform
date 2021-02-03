@@ -36,8 +36,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.material.LocalTextStyle
@@ -142,18 +142,18 @@ private fun Magnifier(visible: Boolean, position: Offset, color: Color) {
     ) { labelWidth: Dp, selectionDiameter: Dp,
         alpha: Float ->
         Column(
-            offset.preferredSize(width = MagnifierWidth, height = MagnifierHeight)
+            offset.size(width = MagnifierWidth, height = MagnifierHeight)
                 .alpha(alpha)
         ) {
             Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                MagnifierLabel(Modifier.preferredSize(labelWidth, MagnifierLabelHeight), color)
+                MagnifierLabel(Modifier.size(labelWidth, MagnifierLabelHeight), color)
             }
             Spacer(Modifier.weight(1f))
             Box(
-                Modifier.fillMaxWidth().preferredHeight(SelectionCircleDiameter),
+                Modifier.fillMaxWidth().height(SelectionCircleDiameter),
                 contentAlignment = Alignment.Center
             ) {
-                MagnifierSelectionCircle(Modifier.preferredSize(selectionDiameter), color)
+                MagnifierSelectionCircle(Modifier.size(selectionDiameter), color)
             }
         }
     }

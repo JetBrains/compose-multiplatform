@@ -36,7 +36,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.CompositionLocalProvider
@@ -3048,7 +3048,7 @@ class AndroidLayoutDrawTest {
                     Box(
                         Modifier
                             .background(Color.Blue)
-                            .size(30.toDp())
+                            .requiredSize(30.toDp())
                             .padding(10.toDp())
                             .background(Color.White)
                             .drawLatchModifier()
@@ -3092,7 +3092,7 @@ class AndroidLayoutDrawTest {
                     Box(
                         Modifier
                             .background(Color.Blue)
-                            .size(30.toDp())
+                            .requiredSize(30.toDp())
                             .padding(10.toDp())
                             .drawBehind {
                                 drawRect(innerColor)
@@ -3347,7 +3347,7 @@ class AndroidLayoutDrawTest {
                 FixedSize(30, Modifier.background(Color.Blue)) {
                     FixedSize(30, Modifier.graphicsLayer()) {
                         with(LocalDensity.current) {
-                            Canvas(Modifier.size(10.toDp())) {
+                            Canvas(Modifier.requiredSize(10.toDp())) {
                                 drawRect(color)
                                 drawLatch.countDown()
                             }

@@ -23,8 +23,8 @@ import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.preferredSize
-import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,7 +49,7 @@ fun DraggableSample() {
     // seekbar itself
     Box(
         modifier = Modifier
-            .preferredWidth(max)
+            .width(max)
             .draggable(
                 orientation = Orientation.Horizontal,
                 state = rememberDraggableState { delta ->
@@ -61,7 +61,7 @@ fun DraggableSample() {
     ) {
         Box(
             Modifier.offset { IntOffset(offsetPosition.value.roundToInt(), 0) }
-                .preferredSize(50.dp)
+                .size(50.dp)
                 .background(Color.Red)
         )
     }

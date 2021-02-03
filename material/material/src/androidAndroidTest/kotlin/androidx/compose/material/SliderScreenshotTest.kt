@@ -18,7 +18,7 @@ package androidx.compose.material
 
 import android.os.Build
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,7 +52,7 @@ class SliderScreenshotTest {
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL)
 
-    val wrap = Modifier.width(70.dp).wrapContentSize(Alignment.TopStart)
+    val wrap = Modifier.requiredWidth(70.dp).wrapContentSize(Alignment.TopStart)
 
     private val wrapperTestTag = "sliderWrapper"
 

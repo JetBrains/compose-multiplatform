@@ -24,7 +24,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -82,7 +82,7 @@ private object AccessibilitySnippet2 {
             // Specify that this image has no semantic meaning
             contentDescription = null,
             modifier = modifier
-                .preferredSize(40.dp, 40.dp)
+                .size(40.dp, 40.dp)
                 .clip(MaterialTheme.shapes.small)
         )
     }

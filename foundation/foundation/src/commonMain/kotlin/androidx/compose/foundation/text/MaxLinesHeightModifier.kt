@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation.text
 
-import androidx.compose.foundation.layout.preferredHeightIn
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -75,7 +75,7 @@ internal fun Modifier.maxLinesHeight(
     val lineHeight = firstTwoLinesHeight - firstLineHeight
     val precomputedMaxLinesHeight = firstLineHeight + lineHeight * (maxLines - 1)
 
-    Modifier.preferredHeightIn(
+    Modifier.heightIn(
         max = with(density) { precomputedMaxLinesHeight.toDp() }
     )
 }

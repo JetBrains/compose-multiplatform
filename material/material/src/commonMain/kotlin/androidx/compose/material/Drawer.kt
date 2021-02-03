@@ -28,7 +28,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredSizeIn
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
@@ -332,7 +332,7 @@ fun ModalDrawer(
             Surface(
                 modifier = with(LocalDensity.current) {
                     Modifier
-                        .preferredSizeIn(
+                        .sizeIn(
                             minWidth = modalDrawerConstraints.minWidth.toDp(),
                             minHeight = modalDrawerConstraints.minHeight.toDp(),
                             maxWidth = modalDrawerConstraints.maxWidth.toDp(),
@@ -463,7 +463,7 @@ fun BottomDrawer(
             )
             Surface(
                 modifier = with(LocalDensity.current) {
-                    Modifier.preferredSizeIn(
+                    Modifier.sizeIn(
                         minWidth = modalDrawerConstraints.minWidth.toDp(),
                         minHeight = modalDrawerConstraints.minHeight.toDp(),
                         maxWidth = modalDrawerConstraints.maxWidth.toDp(),

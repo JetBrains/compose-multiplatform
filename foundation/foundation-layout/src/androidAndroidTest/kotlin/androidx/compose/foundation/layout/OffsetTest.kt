@@ -108,7 +108,7 @@ class OffsetTest : LayoutTest() {
                 Box(
                     Modifier.testTag("box")
                         .wrapContentSize(Alignment.TopEnd)
-                        .preferredWidth(containerWidth)
+                        .width(containerWidth)
                         .wrapContentSize(Alignment.TopStart)
                         .offset(offsetX, offsetY)
                         .onGloballyPositioned { coordinates: LayoutCoordinates ->
@@ -117,7 +117,7 @@ class OffsetTest : LayoutTest() {
                         }
                 ) {
                     // TODO(soboleva): this box should not be needed after b/154758475 is fixed.
-                    Box(Modifier.size(boxSize.toDp()))
+                    Box(Modifier.requiredSize(boxSize.toDp()))
                 }
             }
         }
@@ -168,7 +168,7 @@ class OffsetTest : LayoutTest() {
                 Box(
                     Modifier.testTag("box")
                         .wrapContentSize(Alignment.TopEnd)
-                        .preferredWidth(containerWidth)
+                        .width(containerWidth)
                         .wrapContentSize(Alignment.TopStart)
                         .absoluteOffset(offsetX, offsetY)
                         .onGloballyPositioned { coordinates: LayoutCoordinates ->
@@ -177,7 +177,7 @@ class OffsetTest : LayoutTest() {
                         }
                 ) {
                     // TODO(soboleva): this box should not be needed after b/154758475 is fixed.
-                    Box(Modifier.size(boxSize.toDp()))
+                    Box(Modifier.requiredSize(boxSize.toDp()))
                 }
             }
         }
@@ -228,7 +228,7 @@ class OffsetTest : LayoutTest() {
                 Box(
                     Modifier.testTag("box")
                         .wrapContentSize(Alignment.TopEnd)
-                        .preferredWidth(containerWidth)
+                        .width(containerWidth)
                         .wrapContentSize(Alignment.TopStart)
                         .offset { IntOffset(offsetX, offsetY) }
                         .onGloballyPositioned { coordinates: LayoutCoordinates ->
@@ -237,7 +237,7 @@ class OffsetTest : LayoutTest() {
                         }
                 ) {
                     // TODO(soboleva): this box should not be needed after b/154758475 is fixed.
-                    Box(Modifier.size(boxSize.toDp()))
+                    Box(Modifier.requiredSize(boxSize.toDp()))
                 }
             }
         }
@@ -291,7 +291,7 @@ class OffsetTest : LayoutTest() {
                 Box(
                     Modifier.testTag("box")
                         .wrapContentSize(Alignment.TopEnd)
-                        .preferredWidth(containerWidth)
+                        .width(containerWidth)
                         .wrapContentSize(Alignment.TopStart)
                         .absoluteOffset { IntOffset(offsetX, offsetY) }
                         .onGloballyPositioned { coordinates: LayoutCoordinates ->
@@ -300,7 +300,7 @@ class OffsetTest : LayoutTest() {
                         }
                 ) {
                     // TODO(soboleva): this box should not be needed after b/154758475 is fixed.
-                    Box(Modifier.size(boxSize.toDp()))
+                    Box(Modifier.requiredSize(boxSize.toDp()))
                 }
             }
         }
@@ -362,7 +362,7 @@ class OffsetTest : LayoutTest() {
         rule.setContent {
             Box(
                 Modifier
-                    .size(10.dp)
+                    .requiredSize(10.dp)
                     .offset { IntOffset(offset.roundToInt(), 0) }
                     .drawBehind {
                         contentRedrawsCount ++

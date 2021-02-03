@@ -29,8 +29,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -104,7 +104,7 @@ private fun DrawerLayout(drawerWidth: Dp, content: @Composable ColumnScope.() ->
         Box(
             Modifier
                 .fillMaxHeight()
-                .width(drawerWidth)
+                .requiredWidth(drawerWidth)
                 .offset { IntOffset(currentOffset.value.roundToInt(), 0) }
                 .background(color = DefaultBackgroundColor)
         ) {
@@ -262,7 +262,7 @@ private fun Pressable(
     Box(
         Modifier
             .fillMaxWidth()
-            .preferredHeight(height)
+            .height(height)
             .border(1.dp, Color.Black)
             .background(color = color.value)
             .then(pressOverlay).then(gestureDetectors)

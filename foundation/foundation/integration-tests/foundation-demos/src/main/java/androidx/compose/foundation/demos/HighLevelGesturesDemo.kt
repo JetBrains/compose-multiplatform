@@ -18,7 +18,7 @@ package androidx.compose.foundation.demos
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.samples.DraggableSample
 import androidx.compose.foundation.samples.FocusableSample
 import androidx.compose.foundation.samples.ScrollableSample
@@ -31,11 +31,11 @@ import androidx.compose.ui.unit.dp
 fun HighLevelGesturesDemo() {
     Column {
         DraggableSample()
-        Spacer(Modifier.preferredHeight(50.dp))
+        Spacer(Modifier.height(50.dp))
         ScrollableSample()
-        Spacer(Modifier.preferredHeight(50.dp))
+        Spacer(Modifier.height(50.dp))
         ZoomableSample()
-        Spacer(Modifier.preferredHeight(50.dp))
+        Spacer(Modifier.height(50.dp))
         FocusableSample()
     }
 }

@@ -19,7 +19,7 @@ package androidx.compose.ui.test.gesturescope
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.Modifier
@@ -126,7 +126,7 @@ class PositionsTest {
             with(LocalDensity.current) {
                 if (isVertical) {
                     Column(
-                        Modifier.size(100.toDp())
+                        Modifier.requiredSize(100.toDp())
                             .testTag("viewport")
                             .verticalScroll(
                                 rememberScrollState(),
@@ -138,7 +138,7 @@ class PositionsTest {
                     }
                 } else {
                     Row(
-                        Modifier.size(100.toDp())
+                        Modifier.requiredSize(100.toDp())
                             .testTag("viewport")
                             .horizontalScroll(
                                 rememberScrollState(),

@@ -16,7 +16,7 @@
 package androidx.compose.material
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.samples.IconButtonSample
 import androidx.compose.material.samples.IconToggleButtonSample
 import androidx.compose.ui.Modifier
@@ -65,7 +65,7 @@ class IconButtonTest {
         rule.setMaterialContent {
             Box {
                 IconButton(onClick = {}) {
-                    Box(Modifier.preferredSize(diameter).testTag("icon"))
+                    Box(Modifier.size(diameter).testTag("icon"))
                 }
             }
         }
@@ -83,7 +83,7 @@ class IconButtonTest {
         rule.setMaterialContent {
             Box {
                 IconButton(onClick = {}) {
-                    Box(Modifier.preferredSize(width, height).testTag("icon"))
+                    Box(Modifier.size(width, height).testTag("icon"))
                 }
             }
         }
@@ -112,7 +112,7 @@ class IconButtonTest {
         rule.setMaterialContent {
             Box {
                 IconToggleButton(checked = false, onCheckedChange = {}) {
-                    Box(Modifier.preferredSize(diameter).testTag("icon"))
+                    Box(Modifier.size(diameter).testTag("icon"))
                 }
             }
         }
@@ -130,7 +130,7 @@ class IconButtonTest {
         rule.setMaterialContent {
             Box {
                 IconToggleButton(checked = false, onCheckedChange = {}) {
-                    Box(Modifier.preferredSize(width, height).testTag("icon"))
+                    Box(Modifier.size(width, height).testTag("icon"))
                 }
             }
         }

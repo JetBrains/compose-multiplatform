@@ -162,9 +162,9 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
 
                 inline class Dp(val value: Float)
 
-                fun Modifier.preferredWidth1(width: Dp) =
+                fun Modifier.width1(width: Dp) =
                     this.then(SizeModifier1(width, inspectorInfo = debugInspectorInfo {
-                        name = "preferredWidth1"
+                        name = "width1"
                         properties["width"] = width
                     }))
 
@@ -203,7 +203,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                     }
                 }
 
-                fun Modifier.preferredWidth1(width: Dp): Modifier {
+                fun Modifier.width1(width: Dp): Modifier {
                     require(width.value > 0.0f) { return "sds" }
 
                     val x = width.value.toInt() * 2
@@ -212,7 +212,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                     }
 
                     return this.then(SizeModifier1(x, inspectorInfo = debugInspectorInfo {
-                        name = "preferredWidth1"
+                        name = "width1"
                         properties["width"] = width
                     }))
                 }
@@ -243,9 +243,9 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 import androidx.compose.ui.platform.InspectorValueInfo
                 import androidx.compose.ui.platform.debugInspectorInfo
 
-                fun Modifier.preferredWidth2(width: Int) =
+                fun Modifier.width2(width: Int) =
                     this.then(SizeModifier2(width, inspectorInfo = debugInspectorInfo {
-                        name = "preferredWidth2"
+                        name = "width2"
                         value = width
                     }))
 
@@ -278,21 +278,21 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
 
                 inline class Dp(val value: Float)
 
-                fun Modifier.preferredWidth1(width: Dp) =
+                fun Modifier.width1(width: Dp) =
                     this.then(SizeModifier1(width, inspectorInfo = debugInspectorInfo {
-                        name = "preferredWidth1"
+                        name = "width1"
                         properties["width"] = width
                     }))
 
-                fun Modifier.preferredWidth2(width: Dp) = preferredWidth1(width)
+                fun Modifier.width2(width: Dp) = width1(width)
 
-                fun Modifier.preferredWidth20() = preferredWidth1(Dp(20.0f))
+                fun Modifier.width20() = width1(Dp(20.0f))
 
                 fun Modifier.preferredIconWidth(x: Int) = this.then(
                     if (x == 7) DefaultIconSizeModifier else Modifier
                 )
 
-                private val DefaultIconSizeModifier = Modifier.preferredWidth1(Dp(24.0f))
+                private val DefaultIconSizeModifier = Modifier.width1(Dp(24.0f))
 
                 private class SizeModifier1(
                     val width: Int,
@@ -598,10 +598,10 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 import androidx.compose.ui.platform.InspectorValueInfo
                 import androidx.compose.ui.platform.debugInspectorInfo
 
-                fun Modifier.preferredWidth1(width: Int) = this.then(
+                fun Modifier.width1(width: Int) = this.then(
                     remember {
                         SizeModifier1(width, inspectorInfo = debugInspectorInfo {
-                            name = "preferredWidth1"
+                            name = "width1"
                             properties["width"] = width
                         })
                     }
@@ -630,7 +630,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 import androidx.compose.runtime.remember
                 import androidx.compose.ui.Modifier
 
-                internal actual fun Modifier.preferredWidth1(width: Int): Modifier = this
+                internal actual fun Modifier.width1(width: Int): Modifier = this
                 """
             ).indented()
         )
@@ -652,7 +652,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 import androidx.compose.ui.platform.InspectorValueInfo
                 import androidx.compose.ui.platform.debugInspectorInfo
 
-                fun Modifier.preferredWidth2(width: Int) = this.then(SizeModifier2(width))
+                fun Modifier.width2(width: Int) = this.then(SizeModifier2(width))
 
                 private data class SizeModifier2(
                     val width: Int,
@@ -750,7 +750,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 /**
                  * Documentation
                  */
-                fun Modifier.preferredSize(width: Int) =
+                fun Modifier.size(width: Int) =
                     this.then(SizeModifier.WithOption(width))
 
                 internal sealed class SizeModifier : Modifier.Element {
@@ -786,7 +786,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 import androidx.compose.ui.platform.InspectorValueInfo
                 import androidx.compose.ui.platform.debugInspectorInfo
 
-                fun Modifier.preferredWidth1(width: Int) =
+                fun Modifier.width1(width: Int) =
                     this.then(SizeModifier1(width, inspectorInfo = debugInspectorInfo {
                         name = "otherName"
                         value = width
@@ -804,7 +804,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
             .run()
             .expect(
                 """
-                    src/androidx/compose/ui/SizeModifier1.kt:10: Error: Expected name of the modifier: "name" = "preferredWidth1" [ModifierInspectorInfo]
+                    src/androidx/compose/ui/SizeModifier1.kt:10: Error: Expected name of the modifier: "name" = "width1" [ModifierInspectorInfo]
                             name = "otherName"
                                     ~~~~~~~~~
                     1 errors, 0 warnings
@@ -826,9 +826,9 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 import androidx.compose.ui.platform.InspectorValueInfo
                 import androidx.compose.ui.platform.debugInspectorInfo
 
-                fun Modifier.preferredWidth1(width: Int) =
+                fun Modifier.width1(width: Int) =
                     this.then(SizeModifier1(width, inspectorInfo = debugInspectorInfo {
-                        name = "preferredWidth1"
+                        name = "width1"
                         value = 3.4
                     }))
 
@@ -866,9 +866,9 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 import androidx.compose.ui.platform.InspectorValueInfo
                 import androidx.compose.ui.platform.debugInspectorInfo
 
-                fun Modifier.preferredWidth1(width: Int, height: Int) =
+                fun Modifier.width1(width: Int, height: Int) =
                     this.then(SizeModifier1(width, inspectorInfo = debugInspectorInfo {
-                        name = "preferredWidth1"
+                        name = "width1"
                         value = "oldWidth"
                     }))
 
@@ -906,9 +906,9 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 import androidx.compose.ui.platform.InspectorValueInfo
                 import androidx.compose.ui.platform.debugInspectorInfo
 
-                fun Modifier.preferredWidth1(width: Int, height: Int) =
+                fun Modifier.width1(width: Int, height: Int) =
                     this.then(SizeModifier1(width, inspectorInfo = debugInspectorInfo {
-                        name = "preferredWidth1"
+                        name = "width1"
                         properties["width"] = width
                         properties["other"] = height
                     }))
@@ -947,9 +947,9 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 import androidx.compose.ui.platform.InspectorValueInfo
                 import androidx.compose.ui.platform.debugInspectorInfo
 
-                fun Modifier.preferredWidth1(width: Int, height: Int) =
+                fun Modifier.width1(width: Int, height: Int) =
                     this.then(SizeModifier1(width, inspectorInfo = debugInspectorInfo {
-                        name = "preferredWidth1"
+                        name = "width1"
                         properties["height"] = width
                         properties["width"] = height
                     }))
@@ -986,9 +986,9 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 import androidx.compose.ui.platform.InspectorInfo
                 import androidx.compose.ui.platform.InspectorValueInfo
 
-                fun Modifier.preferredWidth1(width: Int, height: Int) =
+                fun Modifier.width1(width: Int, height: Int) =
                     this.then(SizeModifier1(width, height, inspectorInfo = {
-                        name = "preferredWidth1"
+                        name = "width1"
                         properties["width"] = width
                         properties["height"] = height
                     }))
@@ -1028,7 +1028,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 import androidx.compose.ui.platform.InspectorValueInfo
                 import androidx.compose.ui.platform.debugInspectorInfo
 
-                fun Modifier.preferredWidth1(width: Int) =
+                fun Modifier.width1(width: Int) =
                     this.then(SizeModifier1(width, inspectorInfo = debugInspectorInfo {
                         value = width
                     }))
@@ -1045,7 +1045,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
             .run()
             .expect(
                 """
-                    src/androidx/compose/ui/SizeModifier1.kt:9: Error: Expected name of the modifier: "name" = "preferredWidth1" [ModifierInspectorInfo]
+                    src/androidx/compose/ui/SizeModifier1.kt:9: Error: Expected name of the modifier: "name" = "width1" [ModifierInspectorInfo]
                         this.then(SizeModifier1(width, inspectorInfo = debugInspectorInfo {
                                                                                           ^
                     1 errors, 0 warnings
