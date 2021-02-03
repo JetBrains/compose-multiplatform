@@ -502,6 +502,10 @@ class AffectedModuleDetectorImpl constructor(
             setOf(
                 ":compose:ui:ui-graphics",
                 ":compose:material:material"
+            ), // Link material and material-ripple
+            setOf(
+                ":compose:material:material-ripple",
+                ":compose:material:material"
             ),
             setOf(
                 ":benchmark:benchmark-macro",
