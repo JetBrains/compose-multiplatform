@@ -84,9 +84,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.viewinterop.AndroidViewBinding
-import androidx.compose.ui.viewinterop.viewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 /**
  * This file lets DevRel track changes to snippets present in
@@ -226,7 +226,8 @@ private object InteropSnippet6 {
     }
 }
 
-@Composable private fun RowScope.InteropSnippet7() {
+@Composable
+private fun RowScope.InteropSnippet7() {
     Text(
         text = stringResource(R.string.ok),
         modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
@@ -270,6 +271,7 @@ private object InteropSnippet9 {
         }
     }
 }
+
 /* ktlint-enable indent */
 private object InteropSnippet10 {
     class ExampleViewModel : ViewModel() { /*...*/ }
@@ -719,21 +721,26 @@ private object R {
     object layout {
         const val fragment_example = 1
     }
+
     object id {
         const val compose_view = 2
         const val compose_view_x = 3
     }
+
     object string {
         const val ok = 4
         const val plane_description = 5
         const val login = 6
     }
+
     object dimen {
         const val padding_small = 7
     }
+
     object drawable {
         const val ic_plane = 8
     }
+
     object color {
         const val Blue700 = 9
     }
@@ -745,12 +752,15 @@ private class CustomView(context: Context) : View(context) {
     val coordinator = Coord()
     lateinit var myView: View
 }
+
 private class DataExample(val title: String = "")
+
 private val data = DataExample()
 private fun startActivity(): Nothing = TODO()
 class ExampleViewModel : ViewModel() {
     val exampleLiveData = MutableLiveData(" ")
 }
+
 private fun ShowData(dataExample: State<String?>): Nothing = TODO()
 private class ExampleImageLoader {
     fun load(url: String): DummyInto = TODO()
@@ -759,21 +769,44 @@ private class ExampleImageLoader {
     open class Listener {
         open fun onSuccess(bitmap: Bitmap): Unit = TODO()
     }
+
     companion object {
         fun get() = ExampleImageLoader()
     }
 }
+
 private class DummyInto {
-    fun into(listener: ExampleImageLoader.Listener) { }
+    fun into(listener: ExampleImageLoader.Listener) {}
 }
-private fun ExampleComposable() { }
-@Composable private fun MdcTheme(content: @Composable () -> Unit) { }
-@Composable private fun AppCompatTheme(content: @Composable () -> Unit) { }
-@Composable private fun BlueTheme(content: @Composable () -> Unit) { }
-@Composable private fun PinkTheme(content: @Composable () -> Unit) { }
-@Composable private fun YourAppTheme(content: @Composable () -> Unit) { }
-@Composable private fun ProvideWindowInsets(content: @Composable () -> Unit) { }
-@Composable private fun Icon() { }
+
+private fun ExampleComposable() {}
+@Composable
+private fun MdcTheme(content: @Composable () -> Unit) {
+}
+
+@Composable
+private fun AppCompatTheme(content: @Composable () -> Unit) {
+}
+
+@Composable
+private fun BlueTheme(content: @Composable () -> Unit) {
+}
+
+@Composable
+private fun PinkTheme(content: @Composable () -> Unit) {
+}
+
+@Composable
+private fun YourAppTheme(content: @Composable () -> Unit) {
+}
+
+@Composable
+private fun ProvideWindowInsets(content: @Composable () -> Unit) {
+}
+
+@Composable
+private fun Icon() {
+}
 
 private open class Fragment {
 
@@ -785,15 +818,17 @@ private open class Fragment {
     ): View {
         TODO("not implemented")
     }
+
     fun requireContext(): Context = TODO()
 }
 
 private class AppCompatActivity {
     val window: Any = Any()
 }
+
 private class WindowCompat {
     companion object {
-        fun setDecorFitsSystemWindows(window: Any, bool: Boolean) { }
+        fun setDecorFitsSystemWindows(window: Any, bool: Boolean) {}
     }
 }
 

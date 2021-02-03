@@ -2161,7 +2161,7 @@ package androidx.compose.ui.platform {
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.lifecycle.LifecycleOwner> getLocalLifecycleOwner();
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.savedstate.SavedStateRegistryOwner> getLocalSavedStateRegistryOwner();
     method public static androidx.compose.runtime.ProvidableCompositionLocal<android.view.View> getLocalView();
-    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.lifecycle.ViewModelStoreOwner> getLocalViewModelStoreOwner();
+    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.lifecycle.ViewModelStoreOwner> getLocalViewModelStoreOwner();
   }
 
   public final class AndroidClipboardManagerKt {
@@ -2804,7 +2804,7 @@ package androidx.compose.ui.viewinterop {
   }
 
   public final class ViewModelKt {
-    method @androidx.compose.runtime.Composable public static <T extends androidx.lifecycle.ViewModel> T viewModel(Class<T> modelClass, optional String? key, optional androidx.lifecycle.ViewModelProvider.Factory? factory);
+    method @Deprecated @androidx.compose.runtime.Composable public static <T extends androidx.lifecycle.ViewModel> T viewModel(Class<T> modelClass, optional String? key, optional androidx.lifecycle.ViewModelProvider.Factory? factory);
     method @androidx.compose.runtime.Composable public static inline <reified T extends androidx.lifecycle.ViewModel> T! viewModel(optional String key, optional androidx.lifecycle.ViewModelProvider.Factory? factory);
   }
 
