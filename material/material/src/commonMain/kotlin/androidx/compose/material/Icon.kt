@@ -26,7 +26,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.painter.ImagePainter
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toolingGraphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -86,7 +86,7 @@ fun Icon(
     modifier: Modifier = Modifier,
     tint: Color = LocalContentColor.current
 ) {
-    val painter = remember(bitmap) { ImagePainter(bitmap) }
+    val painter = remember(bitmap) { BitmapPainter(bitmap) }
     Icon(
         painter = painter,
         contentDescription = contentDescription,

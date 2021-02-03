@@ -25,6 +25,15 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.toSize
 import kotlin.math.roundToInt
 
+@Deprecated(
+    "Use BitmapPainter instead",
+    ReplaceWith(
+        "BitmapPainter",
+        "androidx.compose.ui.graphics.painter.BitmapPainter"
+    )
+)
+typealias ImagePainter = BitmapPainter
+
 /**
  * [Painter] implementation used to draw an [ImageBitmap] into the provided canvas
  * This implementation can handle applying alpha and [ColorFilter] to it's drawn result
@@ -39,7 +48,7 @@ import kotlin.math.roundToInt
  * 2) Source size must be greater than zero
  * 3) Source size must be less than or equal to the dimensions of [image]
  */
-class ImagePainter(
+class BitmapPainter(
     private val image: ImageBitmap,
     private val srcOffset: IntOffset = IntOffset.Zero,
     private val srcSize: IntSize = IntSize(image.width, image.height)
@@ -94,7 +103,7 @@ class ImagePainter(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is ImagePainter) return false
+        if (other !is BitmapPainter) return false
 
         if (image != other.image) return false
         if (srcOffset != other.srcOffset) return false
@@ -111,6 +120,6 @@ class ImagePainter(
     }
 
     override fun toString(): String {
-        return "ImagePainter(image=$image, srcOffset=$srcOffset, srcSize=$srcSize)"
+        return "BitmapPainter(image=$image, srcOffset=$srcOffset, srcSize=$srcSize)"
     }
 }
