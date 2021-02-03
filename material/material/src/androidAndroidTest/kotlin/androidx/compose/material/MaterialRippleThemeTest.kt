@@ -53,7 +53,6 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
@@ -425,14 +424,15 @@ class MaterialRippleThemeTest {
         val contentColor = Color.Black
 
         val rippleColor = Color.Red
-        val rippleAlpha = 0.5f
+        val expectedAlpha = 0.5f
+        val rippleAlpha = RippleAlpha { expectedAlpha }
 
         val rippleTheme = object : RippleTheme {
             @Composable
             override fun defaultColor() = rippleColor
 
             @Composable
-            override fun rippleAlpha() = RippleAlpha { rippleAlpha }
+            override fun rippleAlpha() = rippleAlpha
         }
 
         rule.setContent {
@@ -447,7 +447,10 @@ class MaterialRippleThemeTest {
             }
         }
 
-        val expectedColor = calculateResultingRippleColor(rippleColor, rippleOpacity = rippleAlpha)
+        val expectedColor = calculateResultingRippleColor(
+            rippleColor,
+            rippleOpacity = expectedAlpha
+        )
 
         assertRippleMatches(
             interactionState,
@@ -457,7 +460,6 @@ class MaterialRippleThemeTest {
         )
     }
 
-    @FlakyTest(bugId = 179292401)
     @Test
     fun customRippleTheme_dragged() {
         val interactionState = InteractionState()
@@ -465,14 +467,14 @@ class MaterialRippleThemeTest {
         val contentColor = Color.Black
 
         val rippleColor = Color.Red
-        val rippleAlpha = 0.5f
+        val expectedAlpha = 0.5f
+        val rippleAlpha = RippleAlpha { 0.5f }
 
         val rippleTheme = object : RippleTheme {
             @Composable
             override fun defaultColor() = rippleColor
-
             @Composable
-            override fun rippleAlpha() = RippleAlpha { rippleAlpha }
+            override fun rippleAlpha() = rippleAlpha
         }
 
         rule.setContent {
@@ -487,7 +489,10 @@ class MaterialRippleThemeTest {
             }
         }
 
-        val expectedColor = calculateResultingRippleColor(rippleColor, rippleOpacity = rippleAlpha)
+        val expectedColor = calculateResultingRippleColor(
+            rippleColor,
+            rippleOpacity = expectedAlpha
+        )
 
         assertRippleMatches(
             interactionState,
@@ -502,11 +507,12 @@ class MaterialRippleThemeTest {
         val interactionState = InteractionState()
 
         fun createRippleTheme(color: Color, alpha: Float) = object : RippleTheme {
+            val rippleAlpha = RippleAlpha { alpha }
             @Composable
             override fun defaultColor() = color
 
             @Composable
-            override fun rippleAlpha() = RippleAlpha { alpha }
+            override fun rippleAlpha() = rippleAlpha
         }
 
         val initialColor = Color.Red
@@ -567,6 +573,7 @@ class MaterialRippleThemeTest {
         val interactionState = InteractionState()
 
         val alpha = 0.5f
+        val rippleAlpha = RippleAlpha { 0.5f }
         val expectedRippleColor = Color.Red
 
         val theme = object : RippleTheme {
@@ -574,7 +581,7 @@ class MaterialRippleThemeTest {
             override fun defaultColor() = LocalContentColor.current
 
             @Composable
-            override fun rippleAlpha() = RippleAlpha { alpha }
+            override fun rippleAlpha() = rippleAlpha
         }
 
         rule.setContent {
