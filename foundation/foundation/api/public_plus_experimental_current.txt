@@ -576,6 +576,10 @@ package androidx.compose.foundation.text {
     property public final androidx.compose.foundation.text.KeyboardActions Default;
   }
 
+  public final class KeyboardActionsKt {
+    method public static androidx.compose.foundation.text.KeyboardActions KeyboardActions(kotlin.jvm.functions.Function1<? super androidx.compose.foundation.text.KeyboardActionScope,kotlin.Unit> onAny);
+  }
+
   @androidx.compose.runtime.Immutable public final class KeyboardOptions {
     ctor public KeyboardOptions(androidx.compose.ui.text.input.KeyboardCapitalization capitalization, boolean autoCorrect, androidx.compose.ui.text.input.KeyboardType keyboardType, androidx.compose.ui.text.input.ImeAction imeAction);
     ctor public KeyboardOptions();
