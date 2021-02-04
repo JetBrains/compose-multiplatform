@@ -43,7 +43,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.compose.ui.platform.findViewTreeCompositionReference
+import androidx.compose.ui.platform.findViewTreeCompositionContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.R
 import androidx.compose.ui.test.captureToImage
@@ -347,7 +347,7 @@ class AndroidViewTest {
     }
 
     @Test
-    fun androidView_propagatesViewTreeCompositionReference() {
+    fun androidView_propagatesViewTreeCompositionContext() {
         lateinit var parentComposeView: ComposeView
         lateinit var compositionChildView: View
         rule.activityRule.scenario.onActivity { activity ->
@@ -361,8 +361,8 @@ class AndroidViewTest {
             }
         }
         rule.runOnIdle {
-            assertThat(compositionChildView.findViewTreeCompositionReference())
-                .isNotEqualTo(parentComposeView.findViewTreeCompositionReference())
+            assertThat(compositionChildView.findViewTreeCompositionContext())
+                .isNotEqualTo(parentComposeView.findViewTreeCompositionContext())
         }
     }
 

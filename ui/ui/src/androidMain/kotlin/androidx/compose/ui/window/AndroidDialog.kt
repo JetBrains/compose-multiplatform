@@ -27,14 +27,14 @@ import android.view.ViewOutlineProvider
 import android.view.Window
 import android.view.WindowManager
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionReference
+import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCompositionReference
+import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -115,7 +115,7 @@ fun Dialog(
     val view = LocalView.current
     val density = LocalDensity.current
     val layoutDirection = LocalLayoutDirection.current
-    val composition = rememberCompositionReference()
+    val composition = rememberCompositionContext()
     val currentContent by rememberUpdatedState(content)
     val dialog = remember(view, density) {
         DialogWrapper(
@@ -175,8 +175,8 @@ private class DialogLayout(
     override var shouldCreateCompositionOnAttachedToWindow: Boolean = false
         private set
 
-    fun setContent(parent: CompositionReference, content: @Composable () -> Unit) {
-        setParentCompositionReference(parent)
+    fun setContent(parent: CompositionContext, content: @Composable () -> Unit) {
+        setParentCompositionContext(parent)
         this.content = content
         shouldCreateCompositionOnAttachedToWindow = true
         createComposition()
@@ -264,7 +264,7 @@ private class DialogWrapper(
 
     // TODO(b/159900354): Make the Android Dialog full screen and the scrim fully transparent
 
-    fun setContent(parentComposition: CompositionReference, children: @Composable () -> Unit) {
+    fun setContent(parentComposition: CompositionContext, children: @Composable () -> Unit) {
         dialogLayout.setContent(parentComposition, children)
     }
 

@@ -867,12 +867,12 @@ interface Composer {
     /**
      * A Compose internal function. DO NOT call directly.
      *
-     * Build a composition reference that can be used to created a subcomposition. A composition
+     * Build a composition context that can be used to created a subcomposition. A composition
      * reference is used to communicate information from this composition to the subcompositions
      * such as the all the [CompositionLocal]s provided at the point the reference is created.
      */
     @InternalComposeApi
-    fun buildReference(): CompositionReference
+    fun buildContext(): CompositionContext
 
     /**
      * A Compose internal function. DO NOT call directly.
@@ -946,7 +946,7 @@ internal class ComposerImpl(
     /**
      * Parent of this composition; a [Recomposer] for root-level compositions.
      */
-    private val parentReference: CompositionReference,
+    private val parentContext: CompositionContext,
 
     /**
      * The composition that owns this composer
@@ -996,7 +996,7 @@ internal class ComposerImpl(
     private val insertFixups = mutableListOf<Change>()
 
     override val applyCoroutineContext: CoroutineContext
-        @TestOnly get() = parentReference.effectCoroutineContext
+        @TestOnly get() = parentContext.effectCoroutineContext
 
     /**
      * Inserts a "Replaceable Group" starting marker in the slot table at the current execution
@@ -1136,17 +1136,17 @@ internal class ComposerImpl(
         startGroup(rootKey)
 
         // parent reference management
-        parentReference.startComposing()
-        parentProvider = parentReference.getCompositionLocalScope()
+        parentContext.startComposing()
+        parentProvider = parentContext.getCompositionLocalScope()
         providersInvalidStack.push(providersInvalid.asInt())
         providersInvalid = changed(parentProvider)
-        collectKeySources = parentReference.collectingKeySources
-        collectParameterInformation = parentReference.collectingParameterInformation
+        collectKeySources = parentContext.collectingKeySources
+        collectParameterInformation = parentContext.collectingParameterInformation
         resolveCompositionLocal(LocalInspectionTables, parentProvider)?.let {
             it.add(slotTable)
-            parentReference.recordInspectionTable(it)
+            parentContext.recordInspectionTable(it)
         }
-        startGroup(parentReference.compoundHashKey)
+        startGroup(parentContext.compoundHashKey)
     }
 
     /**
@@ -1156,7 +1156,7 @@ internal class ComposerImpl(
     @OptIn(InternalComposeApi::class)
     private fun endRoot() {
         endGroup()
-        parentReference.doneComposing()
+        parentContext.doneComposing()
 
         endGroup()
         recordEndRoot()
@@ -1448,7 +1448,7 @@ internal class ComposerImpl(
     @OptIn(InternalComposeApi::class)
     internal fun dispose() {
         trace("Compose:Composer.dispose") {
-            parentReference.unregisterComposer(this)
+            parentContext.unregisterComposer(this)
             invalidateStack.clear()
             invalidations.clear()
             changes.clear()
@@ -1909,17 +1909,17 @@ internal class ComposerImpl(
         resolveCompositionLocal(key, currentCompositionLocalScope())
 
     /**
-     * Create or use a memoized `CompositionReference` instance at this position in the slot table.
+     * Create or use a memoized [CompositionContext] instance at this position in the slot table.
      */
-    override fun buildReference(): CompositionReference {
+    override fun buildContext(): CompositionContext {
         startGroup(referenceKey, reference)
 
-        var ref = nextSlot() as? CompositionReferenceHolder
+        var ref = nextSlot() as? CompositionContextHolder
         if (ref == null) {
             val scope = invalidateStack.peek()
             scope.used = true
-            ref = CompositionReferenceHolder(
-                CompositionReferenceImpl(
+            ref = CompositionContextHolder(
+                CompositionContextImpl(
                     scope,
                     compoundKeyHash,
                     collectKeySources,
@@ -1939,7 +1939,7 @@ internal class ComposerImpl(
     ): T = if (scope.contains(key)) {
         scope.getValueOf(key)
     } else {
-        parentReference.getCompositionLocal(key)
+        parentContext.getCompositionLocal(key)
     }
 
     internal fun <T> parentCompositionLocal(key: CompositionLocal<T>): T =
@@ -2551,7 +2551,7 @@ internal class ComposerImpl(
             // composition.
             return InvalidationResult.IMMINENT
         }
-        parentReference.invalidate(composition)
+        parentContext.invalidate(composition)
         return if (isComposing) InvalidationResult.DEFERRED else InvalidationResult.SCHEDULED
     }
 
@@ -3028,13 +3028,13 @@ internal class ComposerImpl(
     }
 
     /**
-     * A holder that will dispose of its [CompositionReference] when it leaves the composition
+     * A holder that will dispose of its [CompositionContext] when it leaves the composition
      * that will not have its reference made visible to user code.
      */
     // This warning becomes an error if its advice is followed since Composer needs its type param
     @Suppress("RemoveRedundantQualifierName")
-    private class CompositionReferenceHolder(
-        val ref: ComposerImpl.CompositionReferenceImpl
+    private class CompositionContextHolder(
+        val ref: ComposerImpl.CompositionContextImpl
     ) : RememberObserver {
         override fun onRemembered() { }
         override fun onAbandoned() {
@@ -3045,12 +3045,12 @@ internal class ComposerImpl(
         }
     }
 
-    private inner class CompositionReferenceImpl(
+    private inner class CompositionContextImpl(
         val scope: RecomposeScopeImpl,
         override val compoundHashKey: Int,
         override val collectingKeySources: Boolean,
         override val collectingParameterInformation: Boolean
-    ) : CompositionReference() {
+    ) : CompositionContext() {
         var inspectionTables: MutableSet<MutableSet<CompositionData>>? = null
         val composers = mutableSetOf<ComposerImpl>()
 
@@ -3077,21 +3077,21 @@ internal class ComposerImpl(
         }
 
         override fun registerComposition(composition: ControlledComposition) {
-            parentReference.registerComposition(composition)
+            parentContext.registerComposition(composition)
         }
 
         override fun unregisterComposition(composition: ControlledComposition) {
-            parentReference.unregisterComposition(composition)
+            parentContext.unregisterComposition(composition)
         }
 
         override val effectCoroutineContext: CoroutineContext
-            get() = parentReference.effectCoroutineContext
+            get() = parentContext.effectCoroutineContext
 
         override fun composeInitial(
             composition: ControlledComposition,
             content: @Composable () -> Unit
         ) {
-            parentReference.composeInitial(composition, content)
+            parentContext.composeInitial(composition, content)
         }
 
         override fun invalidate(composition: ControlledComposition) {
@@ -3104,8 +3104,8 @@ internal class ComposerImpl(
             // This invalidation process could be made more efficient as it's currently N^2 with
             // subcomposition meta-tree depth thanks to the double recursive parent walk
             // performed here, but we currently assume a low N.
-            parentReference.invalidate(this@ComposerImpl.composition)
-            parentReference.invalidate(composition)
+            parentContext.invalidate(this@ComposerImpl.composition)
+            parentContext.invalidate(composition)
         }
 
         override fun <T> getCompositionLocal(key: CompositionLocal<T>): T {

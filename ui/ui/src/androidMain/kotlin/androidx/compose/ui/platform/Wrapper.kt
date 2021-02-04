@@ -23,8 +23,8 @@ import androidx.activity.ComponentActivity
 import androidx.annotation.MainThread
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
+import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.CompositionData
-import androidx.compose.runtime.CompositionReference
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.LaunchedEffect
@@ -50,7 +50,7 @@ private val TAG = "Wrapper"
 @OptIn(ExperimentalComposeApi::class)
 internal actual fun subcomposeInto(
     container: LayoutNode,
-    parent: CompositionReference,
+    parent: CompositionContext,
     composable: @Composable () -> Unit
 ): Composition = Composition(
     container,
@@ -78,7 +78,7 @@ internal actual fun subcomposeInto(
     )
 )
 fun ComponentActivity.setContent(
-    parent: CompositionReference? = null,
+    parent: CompositionContext? = null,
     content: @Composable () -> Unit
 ) {
     val existingComposeView = window.decorView
@@ -86,12 +86,12 @@ fun ComponentActivity.setContent(
         .getChildAt(0) as? ComposeView
 
     if (existingComposeView != null) with(existingComposeView) {
-        setParentCompositionReference(parent)
+        setParentCompositionContext(parent)
         setContent(content)
     } else ComposeView(this).apply {
         // Set content and parent **before** setContentView
         // to have ComposeView create the composition on attach
-        setParentCompositionReference(parent)
+        setParentCompositionContext(parent)
         setContent(content)
         setContentView(this, DefaultLayoutParams)
     }
@@ -111,7 +111,7 @@ fun ComponentActivity.setContent(
  * @param content Composable that will be the content of the view.
  */
 internal fun ViewGroup.setContent(
-    parent: CompositionReference,
+    parent: CompositionContext,
     content: @Composable () -> Unit
 ): Composition {
     GlobalSnapshotManager.ensureStarted()
@@ -127,7 +127,7 @@ internal fun ViewGroup.setContent(
 @OptIn(InternalComposeApi::class)
 private fun doSetContent(
     owner: AndroidComposeView,
-    parent: CompositionReference,
+    parent: CompositionContext,
     content: @Composable () -> Unit
 ): Composition {
     if (inspectionWanted(owner)) {

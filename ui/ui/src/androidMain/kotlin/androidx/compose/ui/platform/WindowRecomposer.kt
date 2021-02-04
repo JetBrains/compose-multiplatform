@@ -18,10 +18,10 @@ package androidx.compose.ui.platform
 
 import android.view.View
 import android.view.ViewParent
-import androidx.compose.runtime.CompositionReference
+import androidx.compose.runtime.CompositionContext
+import androidx.compose.runtime.MonotonicFrameClock
 import androidx.compose.runtime.PausableMonotonicFrameClock
 import androidx.compose.runtime.Recomposer
-import androidx.compose.runtime.MonotonicFrameClock
 import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.R
 import androidx.lifecycle.Lifecycle
@@ -37,36 +37,53 @@ import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.EmptyCoroutineContext
 
 /**
- * The [CompositionReference] that should be used as a parent for compositions at or below
- * this view in the hierarchy. Set to non-`null` to provide a [CompositionReference]
- * for compositions created by child views, or `null` to fall back to any [CompositionReference]
+ * The [CompositionContext] that should be used as a parent for compositions at or below
+ * this view in the hierarchy. Set to non-`null` to provide a [CompositionContext]
+ * for compositions created by child views, or `null` to fall back to any [CompositionContext]
  * provided by ancestor views.
  *
- * See [findViewTreeCompositionReference].
+ * See [findViewTreeCompositionContext].
  */
-var View.compositionReference: CompositionReference?
-    get() = getTag(R.id.androidx_compose_ui_view_composition_reference) as? CompositionReference
+var View.compositionContext: CompositionContext?
+    get() = getTag(R.id.androidx_compose_ui_view_composition_context) as? CompositionContext
     set(value) {
-        setTag(R.id.androidx_compose_ui_view_composition_reference, value)
+        setTag(R.id.androidx_compose_ui_view_composition_context, value)
+    }
+
+@Deprecated("renamed to compositionContext")
+var View.compositionReference: CompositionContext?
+    get() = compositionContext
+    set(value) {
+        compositionContext = value
     }
 
 /**
- * Returns the parent [CompositionReference] for this point in the view hierarchy, or `null`
+ * Returns the parent [CompositionContext] for this point in the view hierarchy, or `null`
  * if none can be found.
  *
- * See [compositionReference] to get or set the parent [CompositionReference] for
+ * See [compositionContext] to get or set the parent [CompositionContext] for
  * a specific view.
  */
-fun View.findViewTreeCompositionReference(): CompositionReference? {
-    var found: CompositionReference? = compositionReference
+fun View.findViewTreeCompositionContext(): CompositionContext? {
+    var found: CompositionContext? = compositionContext
     if (found != null) return found
     var parent: ViewParent? = parent
     while (found == null && parent is View) {
-        found = parent.compositionReference
+        found = parent.compositionContext
         parent = parent.getParent()
     }
     return found
 }
+
+@Deprecated(
+    "renamed to findViewTreeCompositionContext",
+    ReplaceWith(
+        "findViewTreeCompositionContext()",
+        "androidx.compose.ui.platform.findViewTreeCompositionContext"
+    )
+)
+fun View.findViewTreeCompositionReference(): CompositionContext? =
+    findViewTreeCompositionContext()
 
 /**
  * A factory for creating an Android window-scoped [Recomposer]. See [createRecomposer].
@@ -149,7 +166,7 @@ object WindowRecomposerPolicy {
 
     internal fun createAndInstallWindowRecomposer(rootView: View): Recomposer {
         val newRecomposer = factory.get().createRecomposer(rootView)
-        rootView.setTag(R.id.androidx_compose_ui_view_composition_reference, newRecomposer)
+        rootView.compositionContext = newRecomposer
 
         // If the Recomposer shuts down, unregister it so that a future request for a window
         // recomposer will consult the factory for a new one.
@@ -162,10 +179,9 @@ object WindowRecomposerPolicy {
                 // Unset if the view is detached. (See below for the attach state change listener.)
                 // Since this is in a finally in this coroutine, even if this job is cancelled we
                 // will resume on the window's UI thread and perform this manipulation there.
-                val viewTagRecomposer =
-                    rootView.getTag(R.id.androidx_compose_ui_view_composition_reference)
+                val viewTagRecomposer = rootView.compositionContext
                 if (viewTagRecomposer === newRecomposer) {
-                    rootView.setTag(R.id.androidx_compose_ui_view_composition_reference, null)
+                    rootView.compositionContext = null
                 }
             }
         }
@@ -196,10 +212,10 @@ internal val View.windowRecomposer: Recomposer
             "Cannot locate windowRecomposer; View $this is not attached to a window"
         }
         val rootView = rootView
-        return when (val rootParentRef = rootView.compositionReference) {
+        return when (val rootParentRef = rootView.compositionContext) {
             null -> WindowRecomposerPolicy.createAndInstallWindowRecomposer(rootView)
             is Recomposer -> rootParentRef
-            else -> error("root viewTreeParentCompositionReference is not a Recomposer")
+            else -> error("root viewTreeParentCompositionContext is not a Recomposer")
         }
     }
 
