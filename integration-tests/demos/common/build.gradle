@@ -27,6 +27,6 @@ dependencies {
     kotlinPlugin projectOrArtifact(":compose:compiler:compiler")
     implementation(KOTLIN_STDLIB)
 
-    api "androidx.activity:activity:1.2.0-alpha02"
+    api "androidx.activity:activity:1.2.0-rc01"
     implementation projectOrArtifact(":compose:runtime:runtime")
 }
