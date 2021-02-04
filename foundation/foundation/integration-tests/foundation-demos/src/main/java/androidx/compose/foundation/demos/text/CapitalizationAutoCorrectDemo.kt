@@ -28,6 +28,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SoftwareKeyboardController
@@ -115,6 +116,6 @@ private fun MyTextField(data: ImeOptionsData) {
         onValueChange = { state.value = it },
         textStyle = TextStyle(fontSize = fontSize8),
         onTextInputStarted = { controller.value = it },
-        cursorColor = Color.Red
+        cursorBrush = SolidColor(Color.Red)
     )
 }
