@@ -16,7 +16,29 @@
 
 package androidx.compose.ui.geometry
 
-import androidx.compose.ui.util.format
+import kotlin.math.pow
 
 // File of internal utility methods used for the geometry library
-internal fun Float.toStringAsFixed(digits: Int): String = "%.${digits}f".format(this)
+internal fun Float.toStringAsFixed(digits: Int): String {
+    val clampedDigits: Int = kotlin.math.max(digits, 0) // Accept positive numbers and 0 only
+    val pow = 10f.pow(clampedDigits)
+    val shifted = this * pow // shift the given value by the corresponding power of 10
+    val decimal = shifted - shifted.toInt() // obtain the decimal of the shifted value
+    // Manually round up if the decimal value is greater than or equal to 0.5f.
+    // because kotlin.math.round(0.5f) rounds down
+    val roundedShifted = if (decimal >= 0.5f) {
+        shifted.toInt() + 1
+    } else {
+        shifted.toInt()
+    }
+
+    val rounded = roundedShifted / pow // divide off the corresponding power of 10 to shift back
+    return if (clampedDigits > 0) {
+        // If we have any decimal points, convert the float to a string
+        rounded.toString()
+    } else {
+        // If we do not have any decimal points, return the int
+        // based string representation
+        rounded.toInt().toString()
+    }
+}

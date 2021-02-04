@@ -22,7 +22,6 @@ import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.progressBarRangeInfo
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.util.format
 import kotlin.math.roundToInt
 
 /**
@@ -60,7 +59,7 @@ fun Modifier.progressSemantics(
     }
 
     return semantics {
-        stateDescription = Strings.TemplatePercent.format(percent)
+        stateDescription = "$percent percent"
         progressBarRangeInfo =
             ProgressBarRangeInfo(value.coerceIn(valueRange), valueRange, steps)
     }
