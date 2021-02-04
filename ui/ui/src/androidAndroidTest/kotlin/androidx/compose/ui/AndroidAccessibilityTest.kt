@@ -51,7 +51,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.textSelectionRange
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
-import androidx.compose.ui.test.assertEditableTextEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
@@ -453,13 +452,23 @@ class AndroidAccessibilityTest {
 
         rule.onNodeWithTag(TextFieldTag)
             .assertIsDisplayed()
-            .assertEditableTextEquals(InitialText)
+            .assert(
+                SemanticsMatcher.expectValue(
+                    SemanticsProperties.EditableText,
+                    AnnotatedString(InitialText)
+                )
+            )
 
         waitForSubtreeEventToSend()
         rule.onNodeWithTag(TextFieldTag)
             .performSemanticsAction(SemanticsActions.SetText) { it(AnnotatedString(InputText)) }
         rule.onNodeWithTag(TextFieldTag)
-            .assertEditableTextEquals(InputText)
+            .assert(
+                SemanticsMatcher.expectValue(
+                    SemanticsProperties.EditableText,
+                    AnnotatedString(InputText)
+                )
+            )
 
         val textFieldNode = rule.onNodeWithTag(TextFieldTag)
             .fetchSemanticsNode("couldn't find node with tag $TextFieldTag")

@@ -58,9 +58,10 @@ import androidx.compose.ui.platform.TextToolbarStatus
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assert
-import androidx.compose.ui.test.assertEditableTextEquals
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.captureToImage
@@ -711,3 +712,12 @@ class TextFieldTest {
         }
     }
 }
+
+private fun SemanticsNodeInteraction.assertEditableTextEquals(
+    value: String
+): SemanticsNodeInteraction =
+    assert(
+        SemanticsMatcher("${SemanticsProperties.EditableText.name} = '$value'") {
+            it.config.getOrNull(SemanticsProperties.EditableText)?.text.equals(value)
+        }
+    )

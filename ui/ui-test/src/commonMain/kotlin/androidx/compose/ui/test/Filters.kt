@@ -189,11 +189,15 @@ fun hasContentDescription(
 /**
  * Returns whether the node's text matches exactly to the given text.
  *
+ * In case of text field it will compare the given [text] with the input text and other texts like
+ * label or placeholder.
+ *
  * @param text Text to match.
  * @param substring Whether to use substring matching.
  * @param ignoreCase Whether case should be ignored.
  *
  * @see SemanticsProperties.Text
+ * @see SemanticsProperties.EditableText
  */
 fun hasText(
     text: String,
@@ -204,65 +208,18 @@ fun hasText(
         SemanticsMatcher(
             "${SemanticsProperties.Text.name} contains '$text' (ignoreCase: $ignoreCase)"
         ) {
-            it.config.getOrNull(SemanticsProperties.Text)?.text?.contains(text, ignoreCase) ?: false
+            val editableTextValue = it.config.getOrNull(SemanticsProperties.EditableText)?.text
+            val textValue = it.config.getOrNull(SemanticsProperties.Text)?.text
+            (editableTextValue?.contains(text, ignoreCase) == true) or
+                (textValue?.contains(text, ignoreCase) == true)
         }
     } else {
         SemanticsMatcher(
             "${SemanticsProperties.Text.name} = '$text' (ignoreCase: $ignoreCase)"
         ) {
-            it.config.getOrNull(SemanticsProperties.Text)?.text.equals(text, ignoreCase)
+            it.config.getOrNull(SemanticsProperties.EditableText)?.text.equals(text, ignoreCase) or
+                it.config.getOrNull(SemanticsProperties.Text)?.text.equals(text, ignoreCase)
         }
-    }
-}
-
-/**
- * Returns whether the text field's input matches exactly to the given string.
- *
- * If you need to match the text field's label or placeholder, use [hasText] instead.
- *
- * @param text Text to match.
- * @param substring Whether to use substring matching.
- * @param ignoreCase Whether case should be ignored.
- *
- * @see hasEditableSubstring
- * @see SemanticsProperties.EditableText
- */
-fun hasEditableText(
-    text: String,
-    substring: Boolean = false,
-    ignoreCase: Boolean = false
-): SemanticsMatcher {
-    return if (substring) {
-        SemanticsMatcher(
-            "${SemanticsProperties.EditableText.name} contains '$text' (ignoreCase: $ignoreCase)"
-        ) {
-            it.config.getOrNull(SemanticsProperties.EditableText)?.text?.contains(text, ignoreCase)
-                ?: false
-        }
-    } else {
-        SemanticsMatcher(
-            "${SemanticsProperties.EditableText.name} = '$text' (ignoreCase: $ignoreCase)"
-        ) {
-            it.config.getOrNull(SemanticsProperties.EditableText)?.text.equals(text, ignoreCase)
-        }
-    }
-}
-
-/**
- * Returns whether the text field's input contains the given substring.
- *
- * @param substring Substring to check.
- * @param ignoreCase Whether case should be ignored.
- *
- * @see hasEditableText
- * @see SemanticsProperties.EditableText
- */
-fun hasEditableSubstring(substring: String, ignoreCase: Boolean = false): SemanticsMatcher {
-    return SemanticsMatcher(
-        "${SemanticsProperties.EditableText.name}.contains($substring, $ignoreCase)"
-    ) {
-        it.config.getOrNull(SemanticsProperties.EditableText)?.text
-            ?.contains(substring, ignoreCase) ?: false
     }
 }
 
