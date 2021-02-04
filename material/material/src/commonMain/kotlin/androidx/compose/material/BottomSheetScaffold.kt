@@ -17,8 +17,6 @@
 package androidx.compose.material
 
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.asDisposableClock
-import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.foundation.layout.Box
@@ -35,6 +33,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -45,13 +44,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalAnimationClock
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.collapse
 import androidx.compose.ui.semantics.expand
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 /**
@@ -74,7 +73,6 @@ enum class BottomSheetValue {
  * State of the persistent bottom sheet in [BottomSheetScaffold].
  *
  * @param initialValue The initial value of the state.
- * @param clock The animation clock that will be used to drive the animations.
  * @param animationSpec The default animation that will be used to animate to a new state.
  * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
  */
@@ -82,12 +80,10 @@ enum class BottomSheetValue {
 @Stable
 class BottomSheetState(
     initialValue: BottomSheetValue,
-    clock: AnimationClockObservable,
     animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
     confirmStateChange: (BottomSheetValue) -> Boolean = { true }
 ) : SwipeableState<BottomSheetValue>(
     initialValue = initialValue,
-    clock = clock,
     animationSpec = animationSpec,
     confirmStateChange = confirmStateChange
 ) {
@@ -95,62 +91,42 @@ class BottomSheetState(
      * Whether the bottom sheet is expanded.
      */
     val isExpanded: Boolean
-        get() = value == BottomSheetValue.Expanded
+        get() = currentValue == BottomSheetValue.Expanded
 
     /**
      * Whether the bottom sheet is collapsed.
      */
     val isCollapsed: Boolean
-        get() = value == BottomSheetValue.Collapsed
+        get() = currentValue == BottomSheetValue.Collapsed
 
     /**
-     * Expand the bottom sheet, with an animation.
+     * Expand the bottom sheet with animation and suspend until it if fully expanded or animation
+     * has been cancelled.
      *
-     * @param onExpanded Optional callback invoked when the bottom sheet has been expanded.
+     * @return the reason the expand animation ended
      */
-    fun expand(onExpanded: (() -> Unit)? = null) {
-        animateTo(
-            BottomSheetValue.Expanded,
-            onEnd = { endReason, _ ->
-                @Suppress("Deprecation")
-                if (endReason == AnimationEndReason.TargetReached) {
-                    onExpanded?.invoke()
-                }
-            }
-        )
-    }
+    suspend fun expand(): AnimationEndReason = animateTo(BottomSheetValue.Expanded)
 
     /**
-     * Collapse the bottom sheet, with an animation.
+     * Collapse the bottom sheet with animation and suspend until it if fully collapsed or animation
+     * has been cancelled.
      *
-     * @param onCollapsed Optional callback invoked when the bottom sheet has been collapsed.
+     * @return the reason the collapse animation ended
      */
-    fun collapse(onCollapsed: (() -> Unit)? = null) {
-        animateTo(
-            BottomSheetValue.Collapsed,
-            onEnd = { endReason, _ ->
-                @Suppress("Deprecation")
-                if (endReason == AnimationEndReason.TargetReached) {
-                    onCollapsed?.invoke()
-                }
-            }
-        )
-    }
+    suspend fun collapse(): AnimationEndReason = animateTo(BottomSheetValue.Collapsed)
 
     companion object {
         /**
          * The default [Saver] implementation for [BottomSheetState].
          */
         fun Saver(
-            clock: AnimationClockObservable,
             animationSpec: AnimationSpec<Float>,
             confirmStateChange: (BottomSheetValue) -> Boolean
         ): Saver<BottomSheetState, *> = Saver(
-            save = { it.value },
+            save = { it.currentValue },
             restore = {
                 BottomSheetState(
                     initialValue = it,
-                    clock = clock,
                     animationSpec = animationSpec,
                     confirmStateChange = confirmStateChange
                 )
@@ -175,18 +151,15 @@ fun rememberBottomSheetState(
     animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
     confirmStateChange: (BottomSheetValue) -> Boolean = { true }
 ): BottomSheetState {
-    val disposableClock = LocalAnimationClock.current.asDisposableClock()
     return rememberSaveable(
-        disposableClock,
+        animationSpec,
         saver = BottomSheetState.Saver(
-            clock = disposableClock,
             animationSpec = animationSpec,
             confirmStateChange = confirmStateChange
         )
     ) {
         BottomSheetState(
             initialValue = initialValue,
-            clock = disposableClock,
             animationSpec = animationSpec,
             confirmStateChange = confirmStateChange
         )
@@ -302,6 +275,7 @@ fun BottomSheetScaffold(
     contentColor: Color = contentColorFor(backgroundColor),
     content: @Composable (PaddingValues) -> Unit
 ) {
+    val scope = rememberCoroutineScope()
     BoxWithConstraints(modifier) {
         val fullHeight = constraints.maxHeight.toFloat()
         val peekHeightPx = with(LocalDensity.current) { sheetPeekHeight.toPx() }
@@ -321,9 +295,15 @@ fun BottomSheetScaffold(
             )
             .semantics {
                 if (scaffoldState.bottomSheetState.isCollapsed) {
-                    expand { scaffoldState.bottomSheetState.expand(); true }
+                    expand {
+                        scope.launch { scaffoldState.bottomSheetState.expand() }
+                        true
+                    }
                 } else {
-                    collapse { scaffoldState.bottomSheetState.collapse(); true }
+                    collapse {
+                        scope.launch { scaffoldState.bottomSheetState.collapse() }
+                        true
+                    }
                 }
             }
 

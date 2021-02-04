@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -308,7 +309,7 @@ class ModalBottomSheetTest {
     }
 
     @Test
-    fun modalBottomSheet_showAndHide_manually() {
+    fun modalBottomSheet_showAndHide_manually(): Unit = runBlocking {
         lateinit var sheetState: ModalBottomSheetState
         rule.setMaterialContent {
             sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
@@ -331,18 +332,14 @@ class ModalBottomSheetTest {
         rule.onNodeWithTag(sheetTag)
             .assertTopPositionInRootIsEqualTo(height)
 
-        rule.runOnIdle {
-            sheetState.show()
-        }
+        sheetState.show()
 
         advanceClock()
 
         rule.onNodeWithTag(sheetTag)
             .assertTopPositionInRootIsEqualTo(height - sheetHeight)
 
-        rule.runOnIdle {
-            sheetState.hide()
-        }
+        sheetState.hide()
 
         advanceClock()
 
@@ -351,7 +348,7 @@ class ModalBottomSheetTest {
     }
 
     @Test
-    fun modalBottomSheet_showAndHide_manually_tallBottomSheet() {
+    fun modalBottomSheet_showAndHide_manually_tallBottomSheet(): Unit = runBlocking {
         lateinit var sheetState: ModalBottomSheetState
         rule.setMaterialContent {
             sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
@@ -373,18 +370,14 @@ class ModalBottomSheetTest {
         rule.onNodeWithTag(sheetTag)
             .assertTopPositionInRootIsEqualTo(height)
 
-        rule.runOnIdle {
-            sheetState.show()
-        }
+        sheetState.show()
 
         advanceClock()
 
         rule.onNodeWithTag(sheetTag)
             .assertTopPositionInRootIsEqualTo(height / 2)
 
-        rule.runOnIdle {
-            sheetState.hide()
-        }
+        sheetState.hide()
 
         advanceClock()
 
@@ -412,7 +405,7 @@ class ModalBottomSheetTest {
         }
 
         rule.runOnIdle {
-            assertThat(sheetState.value).isEqualTo(ModalBottomSheetValue.Expanded)
+            assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.Expanded)
         }
 
         rule.onNodeWithTag(sheetTag)
@@ -421,7 +414,7 @@ class ModalBottomSheetTest {
         advanceClock()
 
         rule.runOnIdle {
-            assertThat(sheetState.value).isEqualTo(ModalBottomSheetValue.Hidden)
+            assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.Hidden)
         }
     }
 
@@ -444,7 +437,7 @@ class ModalBottomSheetTest {
         }
 
         rule.runOnIdle {
-            assertThat(sheetState.value).isEqualTo(ModalBottomSheetValue.Expanded)
+            assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.Expanded)
         }
 
         rule.onNodeWithTag(sheetTag)
@@ -453,7 +446,7 @@ class ModalBottomSheetTest {
         advanceClock()
 
         rule.runOnIdle {
-            assertThat(sheetState.value).isEqualTo(ModalBottomSheetValue.Hidden)
+            assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.Hidden)
         }
     }
 
@@ -476,7 +469,7 @@ class ModalBottomSheetTest {
         }
 
         rule.runOnIdle {
-            assertThat(sheetState.value).isEqualTo(ModalBottomSheetValue.HalfExpanded)
+            assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.HalfExpanded)
         }
 
         rule.onNodeWithTag(sheetTag)
@@ -485,7 +478,7 @@ class ModalBottomSheetTest {
         advanceClock()
 
         rule.runOnIdle {
-            assertThat(sheetState.value).isEqualTo(ModalBottomSheetValue.Expanded)
+            assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.Expanded)
         }
     }
 }

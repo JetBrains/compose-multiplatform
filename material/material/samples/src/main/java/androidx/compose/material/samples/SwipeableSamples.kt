@@ -69,7 +69,7 @@ fun SwipeableSample() {
                 .background(Color.Red),
             contentAlignment = Alignment.Center
         ) {
-            Text(swipeableState.value, color = Color.White, fontSize = 24.sp)
+            Text(swipeableState.currentValue, color = Color.White, fontSize = 24.sp)
         }
     }
 }

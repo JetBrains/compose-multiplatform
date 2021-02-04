@@ -42,6 +42,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -203,7 +204,7 @@ class BackdropScaffoldTest {
 
     @Test
     @LargeTest
-    fun backdropScaffold_revealAndConceal_manually() {
+    fun backdropScaffold_revealAndConceal_manually(): Unit = runBlocking {
         lateinit var scaffoldState: BackdropScaffoldState
         rule.setContent {
             scaffoldState = rememberBackdropScaffoldState(Concealed)
@@ -220,18 +221,14 @@ class BackdropScaffoldTest {
         rule.onNodeWithTag(frontLayer)
             .assertTopPositionInRootIsEqualTo(peekHeight)
 
-        rule.runOnIdle {
-            scaffoldState.reveal()
-        }
+        scaffoldState.reveal()
 
         advanceClock()
 
         rule.onNodeWithTag(frontLayer)
             .assertTopPositionInRootIsEqualTo(peekHeight + contentHeight)
 
-        rule.runOnIdle {
-            scaffoldState.conceal()
-        }
+        scaffoldState.conceal()
 
         advanceClock()
 
@@ -255,7 +252,7 @@ class BackdropScaffoldTest {
         }
 
         rule.runOnIdle {
-            assertThat(scaffoldState.value).isEqualTo(Concealed)
+            assertThat(scaffoldState.currentValue).isEqualTo(Concealed)
         }
 
         rule.onNodeWithTag(frontLayer)
@@ -264,7 +261,7 @@ class BackdropScaffoldTest {
         advanceClock()
 
         rule.runOnIdle {
-            assertThat(scaffoldState.value).isEqualTo(Revealed)
+            assertThat(scaffoldState.currentValue).isEqualTo(Revealed)
         }
     }
 
@@ -285,7 +282,7 @@ class BackdropScaffoldTest {
         }
 
         rule.runOnIdle {
-            assertThat(scaffoldState.value).isEqualTo(Revealed)
+            assertThat(scaffoldState.currentValue).isEqualTo(Revealed)
         }
 
         rule.onNodeWithTag(frontLayer)
@@ -294,7 +291,7 @@ class BackdropScaffoldTest {
         advanceClock()
 
         rule.runOnIdle {
-            assertThat(scaffoldState.value).isEqualTo(Concealed)
+            assertThat(scaffoldState.currentValue).isEqualTo(Concealed)
         }
     }
 
@@ -323,7 +320,7 @@ class BackdropScaffoldTest {
 
         rule.runOnIdle {
             assertThat(frontLayerClicks).isEqualTo(0)
-            assertThat(scaffoldState.value).isEqualTo(Revealed)
+            assertThat(scaffoldState.currentValue).isEqualTo(Revealed)
         }
 
         rule.onNodeWithTag(frontLayer)
@@ -333,7 +330,7 @@ class BackdropScaffoldTest {
 
         rule.runOnIdle {
             assertThat(frontLayerClicks).isEqualTo(1)
-            assertThat(scaffoldState.value).isEqualTo(Revealed)
+            assertThat(scaffoldState.currentValue).isEqualTo(Revealed)
         }
     }
 }
