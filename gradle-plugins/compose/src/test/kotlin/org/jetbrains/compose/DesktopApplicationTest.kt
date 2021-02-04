@@ -57,7 +57,10 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             OS.Windows -> "msi"
             OS.MacOS -> "dmg"
         }
-        file("build/compose/binaries/main/$ext/TestPackage-1.0.$ext")
+        val fileName =
+            if (currentOS == OS.Linux && ext == "deb") "testpackage_1.0-1_amd64"
+            else "TestPackage-1.0"
+        file("build/compose/binaries/main/$ext/$fileName.$ext")
             .checkExists()
         assertEquals(TaskOutcome.SUCCESS, result.task(":package${ext.capitalize()}")?.outcome)
         assertEquals(TaskOutcome.SUCCESS, result.task(":package")?.outcome)
