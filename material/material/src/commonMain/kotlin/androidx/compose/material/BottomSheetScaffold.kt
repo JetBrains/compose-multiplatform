@@ -35,8 +35,8 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.Saver
-import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.nestedscroll.nestedScroll
@@ -45,8 +45,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.AmbientAnimationClock
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalAnimationClock
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.collapse
+import androidx.compose.ui.semantics.expand
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
@@ -109,6 +112,7 @@ class BottomSheetState(
         animateTo(
             BottomSheetValue.Expanded,
             onEnd = { endReason, _ ->
+                @Suppress("Deprecation")
                 if (endReason == AnimationEndReason.TargetReached) {
                     onExpanded?.invoke()
                 }
@@ -125,6 +129,7 @@ class BottomSheetState(
         animateTo(
             BottomSheetValue.Collapsed,
             onEnd = { endReason, _ ->
+                @Suppress("Deprecation")
                 if (endReason == AnimationEndReason.TargetReached) {
                     onCollapsed?.invoke()
                 }
@@ -170,8 +175,8 @@ fun rememberBottomSheetState(
     animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
     confirmStateChange: (BottomSheetValue) -> Boolean = { true }
 ): BottomSheetState {
-    val disposableClock = AmbientAnimationClock.current.asDisposableClock()
-    return rememberSavedInstanceState(
+    val disposableClock = LocalAnimationClock.current.asDisposableClock()
+    return rememberSaveable(
         disposableClock,
         saver = BottomSheetState.Saver(
             clock = disposableClock,
@@ -254,7 +259,7 @@ fun rememberBottomSheetScaffoldState(
  * @param sheetElevation The elevation of the bottom sheet.
  * @param sheetBackgroundColor The background color of the bottom sheet.
  * @param sheetContentColor The preferred content color provided by the bottom sheet to its
- * children. Defaults to the matching `onFoo` color for [sheetBackgroundColor], or if that is
+ * children. Defaults to the matching content color for [sheetBackgroundColor], or if that is
  * not a color from the theme, this will keep the same content color set above the bottom sheet.
  * @param sheetPeekHeight The height of the bottom sheet when it is collapsed.
  * @param drawerContent The content of the drawer sheet.
@@ -263,7 +268,7 @@ fun rememberBottomSheetScaffoldState(
  * @param drawerElevation The elevation of the drawer sheet.
  * @param drawerBackgroundColor The background color of the drawer sheet.
  * @param drawerContentColor The preferred content color provided by the drawer sheet to its
- * children. Defaults to the matching `onFoo` color for [drawerBackgroundColor], or if that is
+ * children. Defaults to the matching content color for [drawerBackgroundColor], or if that is
  * not a color from the theme, this will keep the same content color set above the drawer sheet.
  * @param drawerScrimColor The color of the scrim that is applied when the drawer is open.
  * @param bodyContent The main content of the screen. You should use the provided [PaddingValues]
@@ -299,7 +304,7 @@ fun BottomSheetScaffold(
 ) {
     BoxWithConstraints(modifier) {
         val fullHeight = constraints.maxHeight.toFloat()
-        val peekHeightPx = with(AmbientDensity.current) { sheetPeekHeight.toPx() }
+        val peekHeightPx = with(LocalDensity.current) { sheetPeekHeight.toPx() }
         var bottomSheetHeight by remember { mutableStateOf(fullHeight) }
 
         val swipeable = Modifier
@@ -314,6 +319,13 @@ fun BottomSheetScaffold(
                 enabled = sheetGesturesEnabled,
                 resistance = null
             )
+            .semantics {
+                if (scaffoldState.bottomSheetState.isCollapsed) {
+                    expand { scaffoldState.bottomSheetState.expand(); true }
+                } else {
+                    collapse { scaffoldState.bottomSheetState.collapse(); true }
+                }
+            }
 
         val child = @Composable {
             BottomSheetScaffoldStack(
@@ -408,7 +420,7 @@ private fun BottomSheetScaffoldStack(
 
             val fabOffsetX = when (floatingActionButtonPosition) {
                 FabPosition.Center -> (placeable.width - fabPlaceable.width) / 2
-                FabPosition.End -> placeable.width - fabPlaceable.width - FabEndSpacing.toIntPx()
+                FabPosition.End -> placeable.width - fabPlaceable.width - FabEndSpacing.roundToPx()
             }
             val fabOffsetY = sheetOffsetY - fabPlaceable.height / 2
 

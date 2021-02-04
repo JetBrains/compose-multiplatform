@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.graphics
 
-import org.jetbrains.skija.ColorFilter as SkijaColorFilter
 import org.jetbrains.skija.FilterQuality as SkijaFilterQuality
 import org.jetbrains.skija.PaintMode as SkijaPaintMode
 import org.jetbrains.skija.PaintStrokeCap as SkijaPaintStrokeCap
@@ -103,30 +102,13 @@ class DesktopPaint : Paint {
 
     override var colorFilter: ColorFilter? = null
         set(value) {
-            skija.colorFilter = if (value != null) {
-                SkijaColorFilter.makeBlend(
-                    value.color.toArgb(),
-                    value.blendMode.toSkija()
-                )
-            } else {
-                null
-            }
+            skija.colorFilter = value?.asDesktopColorFilter()
             field = value
-        }
-
-    override var nativePathEffect: NativePathEffect?
-        get() = pathEffect?.asDesktopPathEffect()
-        set(value) {
-            pathEffect = if (value == null) {
-                null
-            } else {
-                DesktopPathEffect(value)
-            }
         }
 
     override var pathEffect: PathEffect? = null
         set(value) {
-            skija.pathEffect = (value as DesktopPathEffect).asDesktopPathEffect()
+            skija.pathEffect = (value as DesktopPathEffect?)?.asDesktopPathEffect()
             field = value
         }
 

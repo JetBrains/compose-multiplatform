@@ -23,7 +23,6 @@ package androidx.compose.ui {
 
   @androidx.compose.runtime.Immutable public fun interface Alignment {
     method public long align-oYSo38o(long size, long space, androidx.compose.ui.unit.LayoutDirection layoutDirection);
-    method @Deprecated public default long align-rlJ4snA(long size, androidx.compose.ui.unit.LayoutDirection layoutDirection);
     field public static final androidx.compose.ui.Alignment.Companion Companion;
   }
 
@@ -62,12 +61,10 @@ package androidx.compose.ui {
 
   @androidx.compose.runtime.Immutable public static fun interface Alignment.Horizontal {
     method public int align(int size, int space, androidx.compose.ui.unit.LayoutDirection layoutDirection);
-    method @Deprecated public default int align(int size, androidx.compose.ui.unit.LayoutDirection layoutDirection);
   }
 
   @androidx.compose.runtime.Immutable public static fun interface Alignment.Vertical {
     method public int align(int size, int space);
-    method @Deprecated public default int align(int size);
   }
 
   @androidx.compose.runtime.Immutable public final class BiasAbsoluteAlignment implements androidx.compose.ui.Alignment {
@@ -116,27 +113,10 @@ package androidx.compose.ui {
 
   public final class ComposedModifierKt {
     method public static androidx.compose.ui.Modifier composed(androidx.compose.ui.Modifier, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,kotlin.Unit> inspectorInfo, kotlin.jvm.functions.Function1<? super androidx.compose.ui.Modifier,? extends androidx.compose.ui.Modifier> factory);
-    method public static androidx.compose.ui.Modifier materialize(androidx.compose.runtime.Composer<?>, androidx.compose.ui.Modifier modifier);
-  }
-
-  public final class ContentDrawScopeKt {
-  }
-
-  public final class DrawLayerModifierKt {
-    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier drawLayer-i_P0lGk(androidx.compose.ui.Modifier, optional float scaleX, optional float scaleY, optional float alpha, optional float translationX, optional float translationY, optional float shadowElevation, optional float rotationX, optional float rotationY, optional float rotationZ, optional float cameraDistance, optional long transformOrigin, optional androidx.compose.ui.graphics.Shape shape, optional boolean clip);
-  }
-
-  public final class DrawModifierKt {
-    method @Deprecated public static androidx.compose.ui.Modifier drawBehind(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> onDraw);
-    method @Deprecated public static androidx.compose.ui.Modifier drawWithCache(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.draw.CacheDrawScope,androidx.compose.ui.draw.DrawResult> onBuildDrawCache);
-    method @Deprecated public static androidx.compose.ui.Modifier drawWithContent(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.ContentDrawScope,kotlin.Unit> onDraw);
+    method public static androidx.compose.ui.Modifier materialize(androidx.compose.runtime.Composer, androidx.compose.ui.Modifier modifier);
   }
 
   @kotlin.RequiresOptIn(message="This API is experimental and is likely to change in the future.") public @interface ExperimentalComposeUiApi {
-  }
-
-  public final class FocusModifierKt {
-    method @Deprecated public static androidx.compose.ui.Modifier focus(androidx.compose.ui.Modifier);
   }
 
   @kotlin.RequiresOptIn(message="Unstable API for use only between compose-ui modules sharing the same exact version, " + "subject to change without notice in major, minor, or patch releases.") public @interface InternalComposeUiApi {
@@ -189,10 +169,6 @@ package androidx.compose.ui.autofill {
 
   @androidx.compose.ui.ExperimentalComposeUiApi public final class AutofillNode {
     ctor public AutofillNode(java.util.List<? extends androidx.compose.ui.autofill.AutofillType> autofillTypes, androidx.compose.ui.geometry.Rect? boundingBox, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit>? onFill);
-    method public java.util.List<androidx.compose.ui.autofill.AutofillType> component1();
-    method public androidx.compose.ui.geometry.Rect? component2();
-    method public kotlin.jvm.functions.Function1<java.lang.String,kotlin.Unit>? component3();
-    method @androidx.compose.ui.ExperimentalComposeUiApi public androidx.compose.ui.autofill.AutofillNode copy(java.util.List<? extends androidx.compose.ui.autofill.AutofillType> autofillTypes, androidx.compose.ui.geometry.Rect? boundingBox, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit>? onFill);
     method public java.util.List<androidx.compose.ui.autofill.AutofillType> getAutofillTypes();
     method public androidx.compose.ui.geometry.Rect? getBoundingBox();
     method public int getId();
@@ -230,7 +206,6 @@ package androidx.compose.ui.autofill {
     enum_constant public static final androidx.compose.ui.autofill.AutofillType CreditCardSecurityCode;
     enum_constant public static final androidx.compose.ui.autofill.AutofillType EmailAddress;
     enum_constant public static final androidx.compose.ui.autofill.AutofillType Gender;
-    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType Name;
     enum_constant public static final androidx.compose.ui.autofill.AutofillType NewPassword;
     enum_constant public static final androidx.compose.ui.autofill.AutofillType NewUsername;
     enum_constant public static final androidx.compose.ui.autofill.AutofillType Password;
@@ -258,17 +233,27 @@ package androidx.compose.ui.draw {
 
   public final class AlphaKt {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier alpha(androidx.compose.ui.Modifier, float alpha);
-    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier drawOpacity(androidx.compose.ui.Modifier, float opacity);
+  }
+
+  public interface BuildDrawCacheParams {
+    method public androidx.compose.ui.unit.Density getDensity();
+    method public androidx.compose.ui.unit.LayoutDirection getLayoutDirection();
+    method public long getSize-NH-jbRc();
+    property public abstract androidx.compose.ui.unit.Density density;
+    property public abstract androidx.compose.ui.unit.LayoutDirection layoutDirection;
+    property public abstract long size;
   }
 
   public final class CacheDrawScope implements androidx.compose.ui.unit.Density {
     method public float getDensity();
     method public float getFontScale();
+    method public androidx.compose.ui.unit.LayoutDirection getLayoutDirection();
     method public long getSize-NH-jbRc();
     method public androidx.compose.ui.draw.DrawResult onDrawBehind(kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
     method public androidx.compose.ui.draw.DrawResult onDrawWithContent(kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.ContentDrawScope,kotlin.Unit> block);
     property public float density;
     property public float fontScale;
+    property public final androidx.compose.ui.unit.LayoutDirection layoutDirection;
     property public final long size;
   }
 
@@ -278,7 +263,7 @@ package androidx.compose.ui.draw {
   }
 
   public interface DrawCacheModifier extends androidx.compose.ui.draw.DrawModifier {
-    method public void onBuildCache-lwCvPpU(long size, androidx.compose.ui.unit.Density density);
+    method public void onBuildCache(androidx.compose.ui.draw.BuildDrawCacheParams params);
   }
 
   public interface DrawModifier extends androidx.compose.ui.Modifier.Element {
@@ -308,7 +293,6 @@ package androidx.compose.ui.draw {
   }
 
   public final class ShadowKt {
-    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier drawShadow-HfQes2E(androidx.compose.ui.Modifier, float elevation, optional androidx.compose.ui.graphics.Shape shape, optional boolean clip);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier shadow-HfQes2E(androidx.compose.ui.Modifier, float elevation, optional androidx.compose.ui.graphics.Shape shape, optional boolean clip);
   }
 
@@ -383,6 +367,7 @@ package androidx.compose.ui.focus {
 
   public final class FocusOrderModifierKt {
     method public static androidx.compose.ui.Modifier focusOrder(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.focus.FocusOrder,kotlin.Unit> focusOrderReceiver);
+    method public static androidx.compose.ui.Modifier focusOrder(androidx.compose.ui.Modifier, androidx.compose.ui.focus.FocusRequester focusRequester);
     method public static androidx.compose.ui.Modifier focusOrder(androidx.compose.ui.Modifier, androidx.compose.ui.focus.FocusRequester focusRequester, kotlin.jvm.functions.Function1<? super androidx.compose.ui.focus.FocusOrder,kotlin.Unit> focusOrderReceiver);
   }
 
@@ -467,98 +452,71 @@ package androidx.compose.ui.gesture {
   }
 
   public final class DoubleTapGestureFilterKt {
-    method public static androidx.compose.ui.Modifier doubleTapGestureFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onDoubleTap);
+    method @Deprecated public static androidx.compose.ui.Modifier doubleTapGestureFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onDoubleTap);
   }
 
   public final class DragGestureFilterKt {
-    method public static androidx.compose.ui.Modifier dragGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.DragObserver dragObserver, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.gesture.Direction,java.lang.Boolean>? canDrag, optional boolean startDragImmediately);
+    method @Deprecated public static androidx.compose.ui.Modifier dragGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.DragObserver dragObserver, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.gesture.Direction,java.lang.Boolean>? canDrag, optional boolean startDragImmediately);
   }
 
-  public interface DragObserver {
-    method public default void onCancel();
-    method public default long onDrag-k-4lQ0M(long dragDistance);
-    method public default void onStart-k-4lQ0M(long downPosition);
-    method public default void onStop-k-4lQ0M(long velocity);
+  @Deprecated public interface DragObserver {
+    method @Deprecated public default void onCancel();
+    method @Deprecated public default long onDrag-k-4lQ0M(long dragDistance);
+    method @Deprecated public default void onStart-k-4lQ0M(long downPosition);
+    method @Deprecated public default void onStop-k-4lQ0M(long velocity);
   }
 
   public final class DragSlopExceededGestureFilterKt {
-    method public static androidx.compose.ui.Modifier dragSlopExceededGestureFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function0<kotlin.Unit> onDragSlopExceeded, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.gesture.Direction,java.lang.Boolean>? canDrag, optional androidx.compose.ui.gesture.scrollorientationlocking.Orientation? orientation);
+    method @Deprecated public static androidx.compose.ui.Modifier dragSlopExceededGestureFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function0<kotlin.Unit> onDragSlopExceeded, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.gesture.Direction,java.lang.Boolean>? canDrag, optional androidx.compose.ui.gesture.scrollorientationlocking.Orientation? orientation);
   }
 
   public final class GestureUtilsKt {
-    method public static boolean anyPointersInBounds-5eFHUEc(java.util.List<androidx.compose.ui.input.pointer.PointerInputChange>, long bounds);
   }
 
   public final class LongPressDragGestureFilterKt {
-    method public static androidx.compose.ui.Modifier longPressDragGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.LongPressDragObserver longPressDragObserver);
+    method @Deprecated public static androidx.compose.ui.Modifier longPressDragGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.LongPressDragObserver longPressDragObserver);
   }
 
-  public interface LongPressDragObserver {
-    method public default void onCancel();
-    method public default long onDrag-k-4lQ0M(long dragDistance);
-    method public default void onDragStart();
-    method public default void onLongPress-k-4lQ0M(long pxPosition);
-    method public default void onStop-k-4lQ0M(long velocity);
+  @Deprecated public interface LongPressDragObserver {
+    method @Deprecated public default void onCancel();
+    method @Deprecated public default long onDrag-k-4lQ0M(long dragDistance);
+    method @Deprecated public default void onDragStart();
+    method @Deprecated public default void onLongPress-k-4lQ0M(long pxPosition);
+    method @Deprecated public default void onStop-k-4lQ0M(long velocity);
   }
 
   public final class LongPressGestureFilterKt {
-    method public static androidx.compose.ui.Modifier longPressGestureFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onLongPress);
+    method @Deprecated public static androidx.compose.ui.Modifier longPressGestureFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onLongPress);
   }
 
   public final class PressIndicatorGestureFilterKt {
-    method public static androidx.compose.ui.Modifier pressIndicatorGestureFilter(androidx.compose.ui.Modifier, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit>? onStart, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onStop, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onCancel, optional boolean enabled);
+    method @Deprecated public static androidx.compose.ui.Modifier pressIndicatorGestureFilter(androidx.compose.ui.Modifier, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit>? onStart, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onStop, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onCancel, optional boolean enabled);
   }
 
   public final class RawDragGestureFilterKt {
-    method public static androidx.compose.ui.Modifier rawDragGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.DragObserver dragObserver, optional kotlin.jvm.functions.Function0<java.lang.Boolean>? canStartDragging, optional androidx.compose.ui.gesture.scrollorientationlocking.Orientation? orientation);
+    method @Deprecated public static androidx.compose.ui.Modifier rawDragGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.DragObserver dragObserver, optional kotlin.jvm.functions.Function0<java.lang.Boolean>? canStartDragging, optional androidx.compose.ui.gesture.scrollorientationlocking.Orientation? orientation);
   }
 
   public final class RawPressStartGestureFilterKt {
-    method public static androidx.compose.ui.Modifier rawPressStartGestureFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onPressStart, optional boolean enabled, optional androidx.compose.ui.input.pointer.PointerEventPass executionPass);
-  }
-
-  public final class RawScaleGestureFilterKt {
-    method public static androidx.compose.ui.Modifier rawScaleGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.RawScaleObserver scaleObserver, optional kotlin.jvm.functions.Function0<java.lang.Boolean>? canStartScaling);
-  }
-
-  public interface RawScaleObserver {
-    method public default void onCancel();
-    method public default float onScale(float scaleFactor);
-    method public default void onStart();
-    method public default void onStop();
-  }
-
-  public final class ScaleGestureFilterKt {
-    method public static androidx.compose.ui.Modifier scaleGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.ScaleObserver scaleObserver);
-  }
-
-  public interface ScaleObserver {
-    method public default void onCancel();
-    method public void onScale(float scaleFactor);
-    method public default void onStart();
-    method public default void onStop();
-  }
-
-  public final class ScaleSlopExceededGestureFilterKt {
-    method public static androidx.compose.ui.Modifier scaleSlopExceededGestureFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function0<kotlin.Unit> onScaleSlopExceeded);
+    method @Deprecated public static androidx.compose.ui.Modifier rawPressStartGestureFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onPressStart, optional boolean enabled, optional androidx.compose.ui.input.pointer.PointerEventPass executionPass);
   }
 
   public final class ScaleUtilKt {
   }
 
-  public interface ScrollCallback {
-    method public default void onCancel();
-    method public default float onScroll(float scrollDistance);
-    method public default void onStart-k-4lQ0M(long downPosition);
-    method public default void onStop(float velocity);
+  @Deprecated public interface ScrollCallback {
+    method @Deprecated public default void onCancel();
+    method @Deprecated public default float onScroll(float scrollDistance);
+    method @Deprecated public default void onStart-k-4lQ0M(long downPosition);
+    method @Deprecated public default void onStop(float velocity);
   }
 
   public final class ScrollGestureFilterKt {
-    method public static androidx.compose.ui.Modifier scrollGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.ScrollCallback scrollCallback, androidx.compose.ui.gesture.scrollorientationlocking.Orientation orientation, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.gesture.Direction,java.lang.Boolean>? canDrag, optional boolean startDragImmediately);
+    method @Deprecated public static androidx.compose.ui.Modifier scrollGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.ScrollCallback scrollCallback, androidx.compose.ui.gesture.scrollorientationlocking.Orientation orientation, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.gesture.Direction,java.lang.Boolean>? canDrag, optional boolean startDragImmediately);
   }
 
   public final class TapGestureFilterKt {
-    method public static androidx.compose.ui.Modifier tapGestureFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onTap);
+    method @Deprecated public static androidx.compose.ui.Modifier tapGestureFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onTap);
   }
 
 }
@@ -763,8 +721,6 @@ package androidx.compose.ui.graphics.vector {
     method public androidx.compose.ui.graphics.vector.ImageVector.Builder addPath(java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode> pathData, optional androidx.compose.ui.graphics.PathFillType pathFillType, optional String name, optional androidx.compose.ui.graphics.Brush? fill, optional float fillAlpha, optional androidx.compose.ui.graphics.Brush? stroke, optional float strokeAlpha, optional float strokeLineWidth, optional androidx.compose.ui.graphics.StrokeCap strokeLineCap, optional androidx.compose.ui.graphics.StrokeJoin strokeLineJoin, optional float strokeLineMiter, optional float trimPathStart, optional float trimPathEnd, optional float trimPathOffset);
     method public androidx.compose.ui.graphics.vector.ImageVector build();
     method public androidx.compose.ui.graphics.vector.ImageVector.Builder clearGroup();
-    method @Deprecated public androidx.compose.ui.graphics.vector.ImageVector.Builder popGroup();
-    method @Deprecated public androidx.compose.ui.graphics.vector.ImageVector.Builder pushGroup(optional String name, optional float rotate, optional float pivotX, optional float pivotY, optional float scaleX, optional float scaleY, optional float translationX, optional float translationY, optional java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode> clipPathData);
   }
 
   public final class ImageVectorKt {
@@ -851,8 +807,6 @@ package androidx.compose.ui.graphics.vector {
   }
 
   public final class VectorPainterKt {
-    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.VectorPainter VectorPainter(androidx.compose.ui.graphics.vector.ImageVector image);
-    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.VectorPainter VectorPainter-RKTc9UI(float defaultWidth, float defaultHeight, optional float viewportWidth, optional float viewportHeight, optional String name, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,kotlin.Unit> children);
     method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.VectorPainter rememberVectorPainter(androidx.compose.ui.graphics.vector.ImageVector image);
     method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.VectorPainter rememberVectorPainter-u_AqRoo(float defaultWidth, float defaultHeight, optional float viewportWidth, optional float viewportHeight, optional String name, optional long tintColor, optional androidx.compose.ui.graphics.BlendMode tintBlendMode, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,kotlin.Unit> content);
     field public static final String RootGroupName = "VectorRootGroup";
@@ -993,15 +947,6 @@ package androidx.compose.ui.input.key {
     method public long getCtrlRight-EK5gGoQ();
     method public long getCut-EK5gGoQ();
     method public long getD-EK5gGoQ();
-    method @Deprecated public long getDPadCenter-EK5gGoQ();
-    method @Deprecated public long getDPadDown-EK5gGoQ();
-    method @Deprecated public long getDPadDownLeft-EK5gGoQ();
-    method @Deprecated public long getDPadDownRight-EK5gGoQ();
-    method @Deprecated public long getDPadLeft-EK5gGoQ();
-    method @Deprecated public long getDPadRight-EK5gGoQ();
-    method @Deprecated public long getDPadUp-EK5gGoQ();
-    method @Deprecated public long getDPadUpLeft-EK5gGoQ();
-    method @Deprecated public long getDPadUpRight-EK5gGoQ();
     method public long getDelete-EK5gGoQ();
     method public long getDirectionCenter-EK5gGoQ();
     method public long getDirectionDown-EK5gGoQ();
@@ -1289,15 +1234,6 @@ package androidx.compose.ui.input.key {
     property public final long CtrlRight;
     property public final long Cut;
     property public final long D;
-    property @Deprecated public final long DPadCenter;
-    property @Deprecated public final long DPadDown;
-    property @Deprecated public final long DPadDownLeft;
-    property @Deprecated public final long DPadDownRight;
-    property @Deprecated public final long DPadLeft;
-    property @Deprecated public final long DPadRight;
-    property @Deprecated public final long DPadUp;
-    property @Deprecated public final long DPadUpLeft;
-    property @Deprecated public final long DPadUpRight;
     property public final long Delete;
     property public final long DirectionCenter;
     property public final long DirectionDown;
@@ -1688,7 +1624,6 @@ package androidx.compose.ui.input.pointer {
     method public suspend <R> Object? awaitPointerEventScope(kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.AwaitPointerEventScope,? super kotlin.coroutines.Continuation<? super R>,?> block, kotlin.coroutines.Continuation<? super R> p);
     method public long getSize-YbymL2g();
     method public androidx.compose.ui.platform.ViewConfiguration getViewConfiguration();
-    method @Deprecated public default suspend <R> Object? handlePointerInput(kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.AwaitPointerEventScope,? super kotlin.coroutines.Continuation<? super R>,?> handler, kotlin.coroutines.Continuation<? super R> p);
     property public abstract long size;
     property public abstract androidx.compose.ui.platform.ViewConfiguration viewConfiguration;
   }
@@ -1717,7 +1652,10 @@ package androidx.compose.ui.input.pointer {
   }
 
   public final class SuspendingPointerInputFilterKt {
-    method public static androidx.compose.ui.Modifier pointerInput(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
+    method @Deprecated public static androidx.compose.ui.Modifier pointerInput(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
+    method public static androidx.compose.ui.Modifier pointerInput(androidx.compose.ui.Modifier, Object? key1, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
+    method public static androidx.compose.ui.Modifier pointerInput(androidx.compose.ui.Modifier, Object? key1, Object? key2, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
+    method public static androidx.compose.ui.Modifier pointerInput(androidx.compose.ui.Modifier, Object![]? keys, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
   }
 
 }
@@ -1739,7 +1677,6 @@ package androidx.compose.ui.layout {
 
   @androidx.compose.runtime.Stable public interface ContentScale {
     method public long computeScaleFactor-AhF4CD4(long srcSize, long dstSize);
-    method @Deprecated public default float scale-AhF4CD4(long srcSize, long dstSize);
     field public static final androidx.compose.ui.layout.ContentScale.Companion Companion;
   }
 
@@ -1772,6 +1709,11 @@ package androidx.compose.ui.layout {
     property public final float value;
   }
 
+  public interface GraphicLayerInfo {
+    method public long getLayerId();
+    property public abstract long layerId;
+  }
+
   public final class HorizontalAlignmentLine extends androidx.compose.ui.layout.AlignmentLine {
     ctor public HorizontalAlignmentLine(kotlin.jvm.functions.Function2<? super java.lang.Integer,? super java.lang.Integer,java.lang.Integer> merger);
   }
@@ -1798,6 +1740,7 @@ package androidx.compose.ui.layout {
     method @Deprecated public long childToLocal-YJiYy8w(androidx.compose.ui.layout.LayoutCoordinates child, long childLocal);
     method public operator int get(androidx.compose.ui.layout.AlignmentLine line);
     method public androidx.compose.ui.layout.LayoutCoordinates? getParentCoordinates();
+    method public androidx.compose.ui.layout.LayoutCoordinates? getParentLayoutCoordinates();
     method public java.util.Set<androidx.compose.ui.layout.AlignmentLine> getProvidedAlignmentLines();
     method public long getSize-YbymL2g();
     method @Deprecated public long globalToLocal-k-4lQ0M(long global);
@@ -1810,6 +1753,7 @@ package androidx.compose.ui.layout {
     method public long windowToLocal-k-4lQ0M(long relativeToWindow);
     property public abstract boolean isAttached;
     property public abstract androidx.compose.ui.layout.LayoutCoordinates? parentCoordinates;
+    property public abstract androidx.compose.ui.layout.LayoutCoordinates? parentLayoutCoordinates;
     property public abstract java.util.Set<androidx.compose.ui.layout.AlignmentLine> providedAlignmentLines;
     property public abstract long size;
   }
@@ -1828,7 +1772,6 @@ package androidx.compose.ui.layout {
   }
 
   public final class LayoutIdKt {
-    method @Deprecated public static Object! getId(androidx.compose.ui.layout.Measurable);
     method public static Object? getLayoutId(androidx.compose.ui.layout.Measurable);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier layoutId(androidx.compose.ui.Modifier, Object layoutId);
   }
@@ -1860,7 +1803,6 @@ package androidx.compose.ui.layout {
     method @androidx.compose.runtime.Composable public static inline void Layout(kotlin.jvm.functions.Function0<kotlin.Unit> content, androidx.compose.ui.node.MeasureBlocks measureBlocks, optional androidx.compose.ui.Modifier modifier);
     method public static androidx.compose.ui.node.MeasureBlocks MeasuringIntrinsicsMeasureBlocks(kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.MeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.Measurable>,? super androidx.compose.ui.unit.Constraints,? extends androidx.compose.ui.layout.MeasureResult> measureBlock);
     method @Deprecated @androidx.compose.runtime.Composable public static void MultiMeasureLayout(optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function0<kotlin.Unit> children, kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.MeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.Measurable>,? super androidx.compose.ui.unit.Constraints,? extends androidx.compose.ui.layout.MeasureResult> measureBlock);
-    method @Deprecated @androidx.compose.runtime.Composable public static void WithConstraints(optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.WithConstraintsScope,kotlin.Unit> content);
     method public static androidx.compose.ui.node.MeasureBlocks measureBlocksOf(kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.IntrinsicMeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.IntrinsicMeasurable>,? super java.lang.Integer,java.lang.Integer> minIntrinsicWidthMeasureBlock, kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.IntrinsicMeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.IntrinsicMeasurable>,? super java.lang.Integer,java.lang.Integer> minIntrinsicHeightMeasureBlock, kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.IntrinsicMeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.IntrinsicMeasurable>,? super java.lang.Integer,java.lang.Integer> maxIntrinsicWidthMeasureBlock, kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.IntrinsicMeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.IntrinsicMeasurable>,? super java.lang.Integer,java.lang.Integer> maxIntrinsicHeightMeasureBlock, kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.MeasureScope,? super java.util.List<? extends androidx.compose.ui.layout.Measurable>,? super androidx.compose.ui.unit.Constraints,? extends androidx.compose.ui.layout.MeasureResult> measureBlock);
   }
 
@@ -1962,10 +1904,8 @@ package androidx.compose.ui.layout {
     method protected abstract androidx.compose.ui.unit.LayoutDirection getParentLayoutDirection();
     method protected abstract int getParentWidth();
     method public final void place(androidx.compose.ui.layout.Placeable, int x, int y, optional float zIndex);
-    method @Deprecated public final void place-I1SjWws(androidx.compose.ui.layout.Placeable, long position);
     method public final void place-z2mxYZE(androidx.compose.ui.layout.Placeable, long position, optional float zIndex);
     method public final void placeRelative(androidx.compose.ui.layout.Placeable, int x, int y, optional float zIndex);
-    method @Deprecated public final void placeRelative-I1SjWws(androidx.compose.ui.layout.Placeable, long position);
     method public final void placeRelative-z2mxYZE(androidx.compose.ui.layout.Placeable, long position, optional float zIndex);
     method public final void placeRelativeWithLayer(androidx.compose.ui.layout.Placeable, int x, int y, optional float zIndex, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.GraphicsLayerScope,kotlin.Unit> layerBlock);
     method public final void placeRelativeWithLayer-muyPCdA(androidx.compose.ui.layout.Placeable, long position, optional float zIndex, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.GraphicsLayerScope,kotlin.Unit> layerBlock);
@@ -2034,50 +1974,11 @@ package androidx.compose.ui.layout {
     ctor public VerticalAlignmentLine(kotlin.jvm.functions.Function2<? super java.lang.Integer,? super java.lang.Integer,java.lang.Integer> merger);
   }
 
-  @Deprecated @androidx.compose.runtime.Stable public interface WithConstraintsScope {
-    method @Deprecated public long getConstraints-msEJaDk();
-    method @Deprecated public float getMaxHeight-D9Ej5fM();
-    method @Deprecated public float getMaxWidth-D9Ej5fM();
-    method @Deprecated public float getMinHeight-D9Ej5fM();
-    method @Deprecated public float getMinWidth-D9Ej5fM();
-    property public abstract long constraints;
-    property public abstract float maxHeight;
-    property public abstract float maxWidth;
-    property public abstract float minHeight;
-    property public abstract float minWidth;
-  }
-
 }
 
 package androidx.compose.ui.node {
 
   @kotlin.RequiresOptIn(message="This API is internal to library.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface InternalCoreApi {
-  }
-
-  public final class LayoutNode implements androidx.compose.ui.layout.LayoutInfo androidx.compose.ui.layout.Measurable androidx.compose.ui.node.OwnerScope androidx.compose.ui.layout.Remeasurement {
-    method public void forceRemeasure();
-    method public androidx.compose.ui.layout.LayoutCoordinates getCoordinates();
-    method public int getHeight();
-    method public java.util.List<androidx.compose.ui.layout.ModifierInfo> getModifierInfo();
-    method public Object? getParentData();
-    method public androidx.compose.ui.layout.LayoutInfo? getParentInfo();
-    method public int getWidth();
-    method public boolean isAttached();
-    method public boolean isPlaced();
-    method public boolean isValid();
-    method public int maxIntrinsicHeight(int width);
-    method public int maxIntrinsicWidth(int height);
-    method public androidx.compose.ui.layout.Placeable measure-BRTryo0(long constraints);
-    method public int minIntrinsicHeight(int width);
-    method public int minIntrinsicWidth(int height);
-    property public androidx.compose.ui.layout.LayoutCoordinates coordinates;
-    property public int height;
-    property public boolean isAttached;
-    property public boolean isPlaced;
-    property public boolean isValid;
-    property public Object? parentData;
-    property public androidx.compose.ui.layout.LayoutInfo? parentInfo;
-    property public int width;
   }
 
   public final class LayoutNodeKt {
@@ -2089,28 +1990,6 @@ package androidx.compose.ui.node {
     method public androidx.compose.ui.layout.MeasureResult measure-8A2P9vY(androidx.compose.ui.layout.MeasureScope measureScope, java.util.List<? extends androidx.compose.ui.layout.Measurable> measurables, long constraints);
     method public int minIntrinsicHeight(androidx.compose.ui.layout.IntrinsicMeasureScope intrinsicMeasureScope, java.util.List<? extends androidx.compose.ui.layout.IntrinsicMeasurable> measurables, int w);
     method public int minIntrinsicWidth(androidx.compose.ui.layout.IntrinsicMeasureScope intrinsicMeasureScope, java.util.List<? extends androidx.compose.ui.layout.IntrinsicMeasurable> measurables, int h);
-  }
-
-  public interface OwnedLayer {
-    method public void destroy();
-    method public void drawLayer(androidx.compose.ui.graphics.Canvas canvas);
-    method public long getLayerId();
-    method public void getMatrix-58bKbWc(float[] matrix);
-    method public void invalidate();
-    method public void move--gyyYBs(long position);
-    method public void resize-ozmzZPI(long size);
-    method public void updateDisplayList();
-    method public void updateLayerProperties-LsE73-w(float scaleX, float scaleY, float alpha, float translationX, float translationY, float shadowElevation, float rotationX, float rotationY, float rotationZ, float cameraDistance, long transformOrigin, androidx.compose.ui.graphics.Shape shape, boolean clip);
-    property public abstract long layerId;
-  }
-
-  public interface OwnerScope {
-    method public boolean isValid();
-    property public abstract boolean isValid;
-  }
-
-  public final class OwnerSnapshotObserver {
-    ctor public OwnerSnapshotObserver(kotlin.jvm.functions.Function1<? super kotlin.jvm.functions.Function0<kotlin.Unit>,kotlin.Unit> onChangedExecutor);
   }
 
   public final class Ref<T> {
@@ -2130,15 +2009,6 @@ package androidx.compose.ui.node {
     property public abstract androidx.compose.ui.text.input.TextInputService textInputService;
   }
 
-  public final class UiApplier extends androidx.compose.runtime.AbstractApplier<java.lang.Object> {
-    ctor public UiApplier(Object root);
-    method public void insertBottomUp(int index, Object instance);
-    method public void insertTopDown(int index, Object instance);
-    method public void move(int from, int to, int count);
-    method protected void onClear();
-    method public void remove(int index, int count);
-  }
-
   public final class ViewInteropKt {
   }
 
@@ -2155,54 +2025,61 @@ package androidx.compose.ui.platform {
     method public final void disposeComposition();
     method public final boolean getHasComposition();
     method protected boolean getShouldCreateCompositionOnAttachedToWindow();
+    method public final boolean getShowLayoutBounds();
     method protected final void onLayout(boolean changed, int left, int top, int right, int bottom);
     method protected final void onMeasure(int widthMeasureSpec, int heightMeasureSpec);
-    method public final void setParentCompositionReference(androidx.compose.runtime.CompositionReference? parent);
+    method public final void setParentCompositionContext(androidx.compose.runtime.CompositionContext? parent);
+    method @Deprecated public final void setParentCompositionReference(androidx.compose.runtime.CompositionContext? parent);
+    method public final void setShowLayoutBounds(boolean value);
     method public final void setViewCompositionStrategy(androidx.compose.ui.platform.ViewCompositionStrategy strategy);
     property public final boolean hasComposition;
     property protected boolean shouldCreateCompositionOnAttachedToWindow;
+    property public final boolean showLayoutBounds;
   }
 
   public final class AmbientsKt {
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.animation.core.AnimationClockObservable> getAmbientAnimationClock();
-    method @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.autofill.Autofill> getAmbientAutofill();
-    method @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.autofill.AutofillTree> getAmbientAutofillTree();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.ClipboardManager> getAmbientClipboardManager();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.unit.Density> getAmbientDensity();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.focus.FocusManager> getAmbientFocusManager();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.hapticfeedback.HapticFeedback> getAmbientHapticFeedback();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.unit.LayoutDirection> getAmbientLayoutDirection();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.text.input.TextInputService> getAmbientTextInputService();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.TextToolbar> getAmbientTextToolbar();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.UriHandler> getAmbientUriHandler();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.ViewConfiguration> getAmbientViewConfiguration();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.WindowInfo> getAmbientWindowInfo();
-    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.WindowInfo>! getAmbientWindowManager();
-    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.animation.core.AnimationClockObservable>! getAnimationClockAmbient();
-    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.ClipboardManager>! getClipboardManagerAmbient();
-    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.unit.Density>! getDensityAmbient();
-    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.focus.FocusManager>! getFocusManagerAmbient();
-    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.text.font.Font.ResourceLoader>! getFontLoaderAmbient();
-    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.hapticfeedback.HapticFeedback>! getHapticFeedBackAmbient();
-    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.unit.LayoutDirection>! getLayoutDirectionAmbient();
-    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.text.input.TextInputService>! getTextInputServiceAmbient();
-    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.TextToolbar>! getTextToolbarAmbient();
-    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.UriHandler>! getUriHandlerAmbient();
-    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.ViewConfiguration>! getViewConfigurationAmbient();
+    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.animation.core.AnimationClockObservable>! getAmbientAnimationClock();
+    method @Deprecated @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.autofill.Autofill>! getAmbientAutofill();
+    method @Deprecated @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.autofill.AutofillTree>! getAmbientAutofillTree();
+    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.ClipboardManager>! getAmbientClipboardManager();
+    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.unit.Density>! getAmbientDensity();
+    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.focus.FocusManager>! getAmbientFocusManager();
+    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.text.font.Font.ResourceLoader>! getAmbientFontLoader();
+    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.hapticfeedback.HapticFeedback>! getAmbientHapticFeedback();
+    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.unit.LayoutDirection>! getAmbientLayoutDirection();
+    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.text.input.TextInputService>! getAmbientTextInputService();
+    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.TextToolbar>! getAmbientTextToolbar();
+    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.UriHandler>! getAmbientUriHandler();
+    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.ViewConfiguration>! getAmbientViewConfiguration();
+    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.WindowInfo>! getAmbientWindowInfo();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.animation.core.AnimationClockObservable> getLocalAnimationClock();
+    method @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.autofill.Autofill> getLocalAutofill();
+    method @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.autofill.AutofillTree> getLocalAutofillTree();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.ClipboardManager> getLocalClipboardManager();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.unit.Density> getLocalDensity();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.focus.FocusManager> getLocalFocusManager();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.hapticfeedback.HapticFeedback> getLocalHapticFeedback();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.unit.LayoutDirection> getLocalLayoutDirection();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.text.input.TextInputService> getLocalTextInputService();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.TextToolbar> getLocalTextToolbar();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.UriHandler> getLocalUriHandler();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.ViewConfiguration> getLocalViewConfiguration();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.WindowInfo> getLocalWindowInfo();
   }
 
   public final class AndroidAmbientsKt {
-    method public static androidx.compose.runtime.ProvidableAmbient<android.content.res.Configuration> getAmbientConfiguration();
-    method public static androidx.compose.runtime.ProvidableAmbient<android.content.Context> getAmbientContext();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.lifecycle.LifecycleOwner> getAmbientLifecycleOwner();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.savedstate.SavedStateRegistryOwner> getAmbientSavedStateRegistryOwner();
-    method public static androidx.compose.runtime.ProvidableAmbient<android.view.View> getAmbientView();
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.lifecycle.ViewModelStoreOwner> getAmbientViewModelStoreOwner();
-    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<android.content.res.Configuration>! getConfigurationAmbient();
-    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<android.content.Context>! getContextAmbient();
-    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.lifecycle.LifecycleOwner>! getLifecycleOwnerAmbient();
-    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<android.view.View>! getViewAmbient();
-    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.lifecycle.ViewModelStoreOwner>! getViewModelStoreOwnerAmbient();
+    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<android.content.res.Configuration>! getAmbientConfiguration();
+    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<android.content.Context>! getAmbientContext();
+    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.lifecycle.LifecycleOwner>! getAmbientLifecycleOwner();
+    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.savedstate.SavedStateRegistryOwner>! getAmbientSavedStateRegistryOwner();
+    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<android.view.View>! getAmbientView();
+    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.lifecycle.ViewModelStoreOwner>! getAmbientViewModelStoreOwner();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<android.content.res.Configuration> getLocalConfiguration();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<android.content.Context> getLocalContext();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.lifecycle.LifecycleOwner> getLocalLifecycleOwner();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.savedstate.SavedStateRegistryOwner> getLocalSavedStateRegistryOwner();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<android.view.View> getLocalView();
+    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.lifecycle.ViewModelStoreOwner> getLocalViewModelStoreOwner();
   }
 
   public final class AndroidClipboardManagerKt {
@@ -2212,6 +2089,32 @@ package androidx.compose.ui.platform {
   }
 
   public final class AndroidComposeViewKt {
+  }
+
+  public final class AndroidUiDispatcher extends kotlinx.coroutines.CoroutineDispatcher {
+    method public void dispatch(kotlin.coroutines.CoroutineContext context, Runnable block);
+    method public android.view.Choreographer getChoreographer();
+    method public androidx.compose.runtime.MonotonicFrameClock getFrameClock();
+    property public final android.view.Choreographer choreographer;
+    property public final androidx.compose.runtime.MonotonicFrameClock frameClock;
+    field public static final androidx.compose.ui.platform.AndroidUiDispatcher.Companion Companion;
+  }
+
+  public static final class AndroidUiDispatcher.Companion {
+    method public kotlin.coroutines.CoroutineContext getCurrentThread();
+    method public kotlin.coroutines.CoroutineContext getMain();
+    property public final kotlin.coroutines.CoroutineContext CurrentThread;
+    property public final kotlin.coroutines.CoroutineContext Main;
+  }
+
+  public final class AndroidUiDispatcherKt {
+  }
+
+  public final class AndroidUiFrameClock implements androidx.compose.runtime.MonotonicFrameClock {
+    ctor public AndroidUiFrameClock(android.view.Choreographer choreographer);
+    method public android.view.Choreographer getChoreographer();
+    method public suspend <R> Object? withFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
+    property public final android.view.Choreographer choreographer;
   }
 
   public final class AndroidUriHandler implements androidx.compose.ui.platform.UriHandler {
@@ -2248,7 +2151,7 @@ package androidx.compose.ui.platform {
   public final class DebugUtilsKt {
   }
 
-  public final class DisposableUiSavedStateRegistryKt {
+  public final class DisposableSaveableStateRegistryKt {
   }
 
   public interface InspectableValue {
@@ -2268,7 +2171,8 @@ package androidx.compose.ui.platform {
   }
 
   public final class InspectionModeKt {
-    method public static androidx.compose.runtime.ProvidableAmbient<java.lang.Boolean> getInspectionMode();
+    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<java.lang.Boolean>! getInspectionMode();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<java.lang.Boolean> getLocalInspectionMode();
   }
 
   public final class InspectorInfo {
@@ -2394,12 +2298,6 @@ package androidx.compose.ui.platform {
   }
 
   public final class WindowInfoKt {
-    method @Deprecated @androidx.compose.runtime.Composable public static void WindowFocusObserver(kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onWindowFocusChanged);
-  }
-
-  @Deprecated @androidx.compose.runtime.Stable public interface WindowManager {
-    method @Deprecated public boolean isWindowFocused();
-    property public abstract boolean isWindowFocused;
   }
 
   @androidx.compose.ui.InternalComposeUiApi public fun interface WindowRecomposerFactory {
@@ -2408,28 +2306,27 @@ package androidx.compose.ui.platform {
   }
 
   public static final class WindowRecomposerFactory.Companion {
-    method @Deprecated public androidx.compose.ui.platform.WindowRecomposerFactory getGlobal();
     method public androidx.compose.ui.platform.WindowRecomposerFactory getLifecycleAware();
-    property @Deprecated public final androidx.compose.ui.platform.WindowRecomposerFactory Global;
     property public final androidx.compose.ui.platform.WindowRecomposerFactory LifecycleAware;
   }
 
   public final class WindowRecomposerKt {
-    method public static androidx.compose.runtime.CompositionReference? findViewTreeCompositionReference(android.view.View);
-    method public static androidx.compose.runtime.CompositionReference? getCompositionReference(android.view.View);
-    method public static void setCompositionReference(android.view.View, androidx.compose.runtime.CompositionReference? value);
+    method public static androidx.compose.runtime.CompositionContext? findViewTreeCompositionContext(android.view.View);
+    method @Deprecated public static androidx.compose.runtime.CompositionContext? findViewTreeCompositionReference(android.view.View);
+    method public static androidx.compose.runtime.CompositionContext? getCompositionContext(android.view.View);
+    method @Deprecated public static androidx.compose.runtime.CompositionContext? getCompositionReference(android.view.View);
+    method public static void setCompositionContext(android.view.View, androidx.compose.runtime.CompositionContext? value);
+    method @Deprecated public static void setCompositionReference(android.view.View, androidx.compose.runtime.CompositionContext? value);
   }
 
   @androidx.compose.ui.InternalComposeUiApi public final class WindowRecomposerPolicy {
-    method public void setWindowRecomposerFactory(androidx.compose.ui.platform.WindowRecomposerFactory factory);
+    method public void setFactory(androidx.compose.ui.platform.WindowRecomposerFactory factory);
+    method public inline <R> R! withFactory(androidx.compose.ui.platform.WindowRecomposerFactory factory, kotlin.jvm.functions.Function0<? extends R> block);
     field public static final androidx.compose.ui.platform.WindowRecomposerPolicy INSTANCE;
   }
 
   public final class WrapperKt {
-    method public static androidx.compose.runtime.Composition setContent(androidx.activity.ComponentActivity, optional androidx.compose.runtime.CompositionReference parent, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method @Deprecated public static androidx.compose.runtime.Composition setContent(android.view.ViewGroup, optional androidx.compose.runtime.CompositionReference parent, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method @Deprecated public static androidx.compose.runtime.Composition setViewContent(android.view.ViewGroup, optional androidx.compose.runtime.CompositionReference parent, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
-    method @Deprecated public static androidx.compose.runtime.Composition setViewContent(android.app.Activity, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
+    method @Deprecated public static void setContent(androidx.activity.ComponentActivity, optional androidx.compose.runtime.CompositionContext? parent, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
 }
@@ -2447,38 +2344,38 @@ package androidx.compose.ui.res {
     method @androidx.compose.runtime.Composable public static long colorResource(@ColorRes int id);
   }
 
-  @androidx.compose.runtime.Stable public final class DeferredResource<T> {
-    method public androidx.compose.ui.res.Resource<T> getResource();
+  @Deprecated @androidx.compose.runtime.Stable public final class DeferredResource<T> {
+    method @Deprecated public androidx.compose.ui.res.Resource<T> getResource();
     property public final androidx.compose.ui.res.Resource<T> resource;
   }
 
-  public final class FailedResource<T> extends androidx.compose.ui.res.Resource<T> {
-    ctor public FailedResource(T? resource, Throwable? throwable);
-    method public Throwable? getThrowable();
+  @Deprecated public final class FailedResource<T> extends androidx.compose.ui.res.Resource<T> {
+    ctor @Deprecated public FailedResource(T? resource, Throwable? throwable);
+    method @Deprecated public Throwable? getThrowable();
     property public final Throwable? throwable;
   }
 
   public final class FontResourcesKt {
     method @androidx.compose.runtime.Composable public static androidx.compose.ui.text.font.Typeface fontResource(androidx.compose.ui.text.font.FontFamily fontFamily);
-    method @androidx.compose.runtime.Composable public static androidx.compose.ui.res.DeferredResource<androidx.compose.ui.text.font.Typeface> loadFontResource(androidx.compose.ui.text.font.FontFamily fontFamily, optional androidx.compose.ui.text.font.FontFamily? pendingFontFamily, optional androidx.compose.ui.text.font.FontFamily? failedFontFamily);
-    method @androidx.compose.runtime.Composable public static androidx.compose.ui.res.DeferredResource<androidx.compose.ui.text.font.Typeface> loadFontResource(androidx.compose.ui.text.font.FontFamily fontFamily, optional androidx.compose.ui.text.font.Typeface? pendingTypeface, optional androidx.compose.ui.text.font.Typeface? failedTypeface);
+    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.ui.res.DeferredResource<androidx.compose.ui.text.font.Typeface> loadFontResource(androidx.compose.ui.text.font.FontFamily fontFamily, optional androidx.compose.ui.text.font.FontFamily? pendingFontFamily, optional androidx.compose.ui.text.font.FontFamily? failedFontFamily);
+    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.ui.res.DeferredResource<androidx.compose.ui.text.font.Typeface> loadFontResource(androidx.compose.ui.text.font.FontFamily fontFamily, optional androidx.compose.ui.text.font.Typeface? pendingTypeface, optional androidx.compose.ui.text.font.Typeface? failedTypeface);
   }
 
   public final class ImageResourcesKt {
-    method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.ImageBitmap imageResource(@DrawableRes int id);
-    method @androidx.compose.runtime.Composable public static androidx.compose.ui.res.DeferredResource<androidx.compose.ui.graphics.ImageBitmap> loadImageResource(int id, optional androidx.compose.ui.graphics.ImageBitmap? pendingImage, optional androidx.compose.ui.graphics.ImageBitmap? failedImage);
+    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.ImageBitmap imageResource(@DrawableRes int id);
+    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.ui.res.DeferredResource<androidx.compose.ui.graphics.ImageBitmap> loadImageResource(int id, optional androidx.compose.ui.graphics.ImageBitmap? pendingImage, optional androidx.compose.ui.graphics.ImageBitmap? failedImage);
   }
 
-  public final class LoadedResource<T> extends androidx.compose.ui.res.Resource<T> {
-    ctor public LoadedResource(T? resource);
+  @Deprecated public final class LoadedResource<T> extends androidx.compose.ui.res.Resource<T> {
+    ctor @Deprecated public LoadedResource(T? resource);
   }
 
   public final class PainterResourcesKt {
     method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.painter.Painter painterResource(@DrawableRes int id);
   }
 
-  public final class PendingResource<T> extends androidx.compose.ui.res.Resource<T> {
-    ctor public PendingResource(T? resource);
+  @Deprecated public final class PendingResource<T> extends androidx.compose.ui.res.Resource<T> {
+    ctor @Deprecated public PendingResource(T? resource);
   }
 
   public final class PrimitiveResourcesKt {
@@ -2488,8 +2385,8 @@ package androidx.compose.ui.res {
     method @androidx.compose.runtime.Composable public static int integerResource(@IntegerRes int id);
   }
 
-  public abstract sealed class Resource<T> {
-    method public final T? getResource();
+  @Deprecated public abstract sealed class Resource<T> {
+    method @Deprecated public final T? getResource();
     property public final T? resource;
   }
 
@@ -2503,91 +2400,8 @@ package androidx.compose.ui.res {
   }
 
   public final class VectorResourcesKt {
-    method @androidx.compose.runtime.Composable public static androidx.compose.ui.res.DeferredResource<androidx.compose.ui.graphics.vector.ImageVector> loadVectorResource(int id, optional androidx.compose.ui.graphics.vector.ImageVector? pendingResource, optional androidx.compose.ui.graphics.vector.ImageVector? failedResource);
-    method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.ImageVector vectorResource(@DrawableRes int id);
-  }
-
-}
-
-package androidx.compose.ui.selection {
-
-  @androidx.compose.ui.text.ExperimentalTextApi public interface Selectable {
-    method public androidx.compose.ui.geometry.Rect getBoundingBox(int offset);
-    method public long getHandlePosition-F1C5BW0(androidx.compose.ui.selection.Selection selection, boolean isStartHandle);
-    method public androidx.compose.ui.layout.LayoutCoordinates? getLayoutCoordinates();
-    method public androidx.compose.ui.selection.Selection? getSelection-lzk2kLM(long startPosition, long endPosition, androidx.compose.ui.layout.LayoutCoordinates containerLayoutCoordinates, boolean longPress, optional androidx.compose.ui.selection.Selection? previousSelection, optional boolean isStartHandle);
-    method public androidx.compose.ui.text.AnnotatedString getText();
-  }
-
-  @androidx.compose.runtime.Immutable public final class Selection {
-    ctor public Selection(androidx.compose.ui.selection.Selection.AnchorInfo start, androidx.compose.ui.selection.Selection.AnchorInfo end, boolean handlesCrossed);
-    method public androidx.compose.ui.selection.Selection.AnchorInfo component1();
-    method public androidx.compose.ui.selection.Selection.AnchorInfo component2();
-    method public boolean component3();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.selection.Selection copy(androidx.compose.ui.selection.Selection.AnchorInfo start, androidx.compose.ui.selection.Selection.AnchorInfo end, boolean handlesCrossed);
-    method public androidx.compose.ui.selection.Selection.AnchorInfo getEnd();
-    method public boolean getHandlesCrossed();
-    method public androidx.compose.ui.selection.Selection.AnchorInfo getStart();
-    method public androidx.compose.ui.selection.Selection merge(androidx.compose.ui.selection.Selection? other);
-    method public long toTextRange-d9O1mEE();
-    property public final androidx.compose.ui.selection.Selection.AnchorInfo end;
-    property public final boolean handlesCrossed;
-    property public final androidx.compose.ui.selection.Selection.AnchorInfo start;
-  }
-
-  @androidx.compose.runtime.Immutable public static final class Selection.AnchorInfo {
-    ctor public Selection.AnchorInfo(androidx.compose.ui.text.style.ResolvedTextDirection direction, int offset, androidx.compose.ui.selection.Selectable selectable);
-    method public androidx.compose.ui.text.style.ResolvedTextDirection component1();
-    method public int component2();
-    method public androidx.compose.ui.selection.Selectable component3();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.selection.Selection.AnchorInfo copy(androidx.compose.ui.text.style.ResolvedTextDirection direction, int offset, androidx.compose.ui.selection.Selectable selectable);
-    method public androidx.compose.ui.text.style.ResolvedTextDirection getDirection();
-    method public int getOffset();
-    method public androidx.compose.ui.selection.Selectable getSelectable();
-    property public final androidx.compose.ui.text.style.ResolvedTextDirection direction;
-    property public final int offset;
-    property public final androidx.compose.ui.selection.Selectable selectable;
-  }
-
-  public final class SelectionContainerKt {
-    method @androidx.compose.runtime.Composable public static void DisableSelection(kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method @androidx.compose.runtime.Composable public static void SelectionContainer(optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method @Deprecated @androidx.compose.runtime.Composable @androidx.compose.ui.text.InternalTextApi public static void SelectionContainer(optional androidx.compose.ui.Modifier modifier, androidx.compose.ui.selection.Selection? selection, kotlin.jvm.functions.Function1<? super androidx.compose.ui.selection.Selection,kotlin.Unit> onSelectionChange, kotlin.jvm.functions.Function0<kotlin.Unit> children);
-  }
-
-  public final class SelectionHandlesKt {
-  }
-
-  public final class SelectionManagerKt {
-  }
-
-  @androidx.compose.ui.text.ExperimentalTextApi public interface SelectionRegistrar {
-    method public void notifyPositionChange();
-    method public void notifySelectableChange(androidx.compose.ui.selection.Selectable selectable);
-    method public void notifySelectionUpdate-rULFVbc(androidx.compose.ui.layout.LayoutCoordinates layoutCoordinates, long startPosition, long endPosition);
-    method public void notifySelectionUpdateEnd();
-    method public void notifySelectionUpdateStart-YJiYy8w(androidx.compose.ui.layout.LayoutCoordinates layoutCoordinates, long startPosition);
-    method public androidx.compose.ui.selection.Selectable subscribe(androidx.compose.ui.selection.Selectable selectable);
-    method public void unsubscribe(androidx.compose.ui.selection.Selectable selectable);
-  }
-
-  public final class SelectionRegistrarKt {
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.selection.SelectionRegistrar> getAmbientSelectionRegistrar();
-    method @Deprecated public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.selection.SelectionRegistrar>! getSelectionRegistrarAmbient();
-  }
-
-  public final class SimpleLayoutKt {
-  }
-
-  @androidx.compose.runtime.Immutable public final class TextSelectionColors {
-    method public long getBackgroundColor-0d7_KjU();
-    method public long getHandleColor-0d7_KjU();
-    property public final long backgroundColor;
-    property public final long handleColor;
-  }
-
-  public final class TextSelectionColorsKt {
-    method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.selection.TextSelectionColors> getAmbientTextSelectionColors();
+    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.ui.res.DeferredResource<androidx.compose.ui.graphics.vector.ImageVector> loadVectorResource(int id, optional androidx.compose.ui.graphics.vector.ImageVector? pendingResource, optional androidx.compose.ui.graphics.vector.ImageVector? failedResource);
+    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.ImageVector vectorResource(@DrawableRes int id);
   }
 
 }
@@ -2595,69 +2409,63 @@ package androidx.compose.ui.selection {
 package androidx.compose.ui.semantics {
 
   public final class AccessibilityAction<T extends kotlin.Function<? extends java.lang.Boolean>> {
-    ctor public AccessibilityAction(CharSequence? label, T action);
-    method public CharSequence? component1();
-    method public T component2();
-    method public androidx.compose.ui.semantics.AccessibilityAction<T> copy(CharSequence? label, T action);
-    method public T getAction();
-    method public CharSequence? getLabel();
-    property public final T action;
-    property public final CharSequence? label;
+    ctor public AccessibilityAction(String? label, T? action);
+    method public T? getAction();
+    method public String? getLabel();
+    property public final T? action;
+    property public final String? label;
   }
 
   public final class CustomAccessibilityAction {
-    ctor public CustomAccessibilityAction(CharSequence label, kotlin.jvm.functions.Function0<java.lang.Boolean> action);
-    method public CharSequence component1();
-    method public kotlin.jvm.functions.Function0<java.lang.Boolean> component2();
-    method public androidx.compose.ui.semantics.CustomAccessibilityAction copy(CharSequence label, kotlin.jvm.functions.Function0<java.lang.Boolean> action);
+    ctor public CustomAccessibilityAction(String label, kotlin.jvm.functions.Function0<java.lang.Boolean> action);
     method public kotlin.jvm.functions.Function0<java.lang.Boolean> getAction();
-    method public CharSequence getLabel();
+    method public String getLabel();
     property public final kotlin.jvm.functions.Function0<java.lang.Boolean> action;
-    property public final CharSequence label;
+    property public final String label;
   }
 
   public final class ProgressBarRangeInfo {
     ctor public ProgressBarRangeInfo(float current, kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> range, int steps);
-    method public float component1();
-    method public kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> component2();
-    method public int component3();
-    method public androidx.compose.ui.semantics.ProgressBarRangeInfo copy(float current, kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> range, int steps);
     method public float getCurrent();
     method public kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> getRange();
     method public int getSteps();
     property public final float current;
     property public final kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> range;
     property public final int steps;
+    field public static final androidx.compose.ui.semantics.ProgressBarRangeInfo.Companion Companion;
+  }
+
+  public static final class ProgressBarRangeInfo.Companion {
+    method public androidx.compose.ui.semantics.ProgressBarRangeInfo getIndeterminate();
+    property public final androidx.compose.ui.semantics.ProgressBarRangeInfo Indeterminate;
   }
 
   public enum Role {
     enum_constant public static final androidx.compose.ui.semantics.Role Button;
     enum_constant public static final androidx.compose.ui.semantics.Role Checkbox;
+    enum_constant public static final androidx.compose.ui.semantics.Role Image;
     enum_constant public static final androidx.compose.ui.semantics.Role RadioButton;
     enum_constant public static final androidx.compose.ui.semantics.Role Switch;
     enum_constant public static final androidx.compose.ui.semantics.Role Tab;
   }
 
   public final class ScrollAxisRange {
-    ctor public ScrollAxisRange(float value, float maxValue, boolean reverseScrolling);
-    ctor public ScrollAxisRange();
-    method public float component1();
-    method public float component2();
-    method public boolean component3();
-    method public androidx.compose.ui.semantics.ScrollAxisRange copy(float value, float maxValue, boolean reverseScrolling);
-    method public float getMaxValue();
+    ctor public ScrollAxisRange(kotlin.jvm.functions.Function0<java.lang.Float> value, kotlin.jvm.functions.Function0<java.lang.Float> maxValue, boolean reverseScrolling);
+    method public kotlin.jvm.functions.Function0<java.lang.Float> getMaxValue();
     method public boolean getReverseScrolling();
-    method public float getValue();
-    property public final float maxValue;
+    method public kotlin.jvm.functions.Function0<java.lang.Float> getValue();
+    property public final kotlin.jvm.functions.Function0<java.lang.Float> maxValue;
     property public final boolean reverseScrolling;
-    property public final float value;
+    property public final kotlin.jvm.functions.Function0<java.lang.Float> value;
   }
 
   public final class SemanticsActions {
+    method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> getCollapse();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> getCopyText();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.util.List<androidx.compose.ui.semantics.CustomAccessibilityAction>> getCustomActions();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> getCutText();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> getDismiss();
+    method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> getExpand();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function1<java.util.List<androidx.compose.ui.text.TextLayoutResult>,java.lang.Boolean>>> getGetTextLayoutResult();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> getOnClick();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> getOnLongClick();
@@ -2666,10 +2474,12 @@ package androidx.compose.ui.semantics {
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function1<java.lang.Float,java.lang.Boolean>>> getSetProgress();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function3<java.lang.Integer,java.lang.Integer,java.lang.Boolean,java.lang.Boolean>>> getSetSelection();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function1<androidx.compose.ui.text.AnnotatedString,java.lang.Boolean>>> getSetText();
+    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> Collapse;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> CopyText;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.util.List<androidx.compose.ui.semantics.CustomAccessibilityAction>> CustomActions;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> CutText;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> Dismiss;
+    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> Expand;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function1<java.util.List<androidx.compose.ui.text.TextLayoutResult>,java.lang.Boolean>>> GetTextLayoutResult;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> OnClick;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> OnLongClick;
@@ -2748,10 +2558,8 @@ package androidx.compose.ui.semantics {
   }
 
   public final class SemanticsOwner {
-    method public androidx.compose.ui.node.LayoutNode getRootNode();
     method public androidx.compose.ui.semantics.SemanticsNode getRootSemanticsNode();
     method public androidx.compose.ui.semantics.SemanticsNode getUnmergedRootSemanticsNode();
-    property public final androidx.compose.ui.node.LayoutNode rootNode;
     property public final androidx.compose.ui.semantics.SemanticsNode rootSemanticsNode;
     property public final androidx.compose.ui.semantics.SemanticsNode unmergedRootSemanticsNode;
   }
@@ -2763,6 +2571,7 @@ package androidx.compose.ui.semantics {
   public final class SemanticsProperties {
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> getContentDescription();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> getDisabled();
+    method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.text.AnnotatedString> getEditableText();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> getFocused();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> getHeading();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.ScrollAxisRange> getHorizontalScrollAxisRange();
@@ -2770,6 +2579,8 @@ package androidx.compose.ui.semantics {
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> getInvisibleToUser();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> getIsDialog();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> getIsPopup();
+    method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> getPaneTitle();
+    method public androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> getPassword();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.ProgressBarRangeInfo> getProgressBarRangeInfo();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.Role> getRole();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> getSelected();
@@ -2781,6 +2592,7 @@ package androidx.compose.ui.semantics {
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.ScrollAxisRange> getVerticalScrollAxisRange();
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> ContentDescription;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> Disabled;
+    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.text.AnnotatedString> EditableText;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> Focused;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> Heading;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.ScrollAxisRange> HorizontalScrollAxisRange;
@@ -2788,6 +2600,8 @@ package androidx.compose.ui.semantics {
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> InvisibleToUser;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> IsDialog;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> IsPopup;
+    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> PaneTitle;
+    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> Password;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.ProgressBarRangeInfo> ProgressBarRangeInfo;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.Role> Role;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> Selected;
@@ -2801,56 +2615,56 @@ package androidx.compose.ui.semantics {
   }
 
   public final class SemanticsPropertiesKt {
-    method public static void copyText(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean> action);
-    method public static void cutText(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean> action);
+    method public static void collapse(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean>? action);
+    method public static void copyText(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean>? action);
+    method public static void cutText(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean>? action);
     method public static void dialog(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static void disabled(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
-    method public static void dismiss(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean> action);
+    method public static void dismiss(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean>? action);
+    method public static void expand(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean>? action);
     method public static String getContentDescription(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static java.util.List<androidx.compose.ui.semantics.CustomAccessibilityAction> getCustomActions(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
+    method public static androidx.compose.ui.text.AnnotatedString getEditableText(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static boolean getFocused(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
-    method @Deprecated public static androidx.compose.ui.semantics.ScrollAxisRange getHorizontalAccessibilityScrollState(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static androidx.compose.ui.semantics.ScrollAxisRange getHorizontalScrollAxisRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static androidx.compose.ui.text.input.ImeAction getImeAction(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
+    method public static String getPaneTitle(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static androidx.compose.ui.semantics.ProgressBarRangeInfo getProgressBarRangeInfo(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static androidx.compose.ui.semantics.Role getRole(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static boolean getSelected(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static String getStateDescription(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
-    method @Deprecated public static androidx.compose.ui.semantics.ProgressBarRangeInfo getStateDescriptionRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static String getTestTag(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static androidx.compose.ui.text.AnnotatedString getText(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
-    method public static void getTextLayoutResult(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function1<? super java.util.List<androidx.compose.ui.text.TextLayoutResult>,java.lang.Boolean> action);
+    method public static void getTextLayoutResult(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function1<? super java.util.List<androidx.compose.ui.text.TextLayoutResult>,java.lang.Boolean>? action);
     method public static long getTextSelectionRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static androidx.compose.ui.state.ToggleableState getToggleableState(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
-    method @Deprecated public static androidx.compose.ui.semantics.ScrollAxisRange getVerticalAccessibilityScrollState(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static androidx.compose.ui.semantics.ScrollAxisRange getVerticalScrollAxisRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static void heading(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
-    method @Deprecated public static void hidden(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method @androidx.compose.ui.ExperimentalComposeUiApi public static void invisibleToUser(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
-    method public static void onClick(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean> action);
-    method public static void onLongClick(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean> action);
-    method public static void pasteText(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean> action);
+    method public static void onClick(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean>? action);
+    method public static void onLongClick(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean>? action);
+    method public static void password(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
+    method public static void pasteText(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean>? action);
     method public static void popup(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
-    method public static void scrollBy(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,java.lang.Boolean> action);
+    method public static void scrollBy(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,java.lang.Boolean>? action);
     method public static void setContentDescription(androidx.compose.ui.semantics.SemanticsPropertyReceiver, String p);
     method public static void setCustomActions(androidx.compose.ui.semantics.SemanticsPropertyReceiver, java.util.List<androidx.compose.ui.semantics.CustomAccessibilityAction> p);
+    method public static void setEditableText(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.text.AnnotatedString p);
     method public static void setFocused(androidx.compose.ui.semantics.SemanticsPropertyReceiver, boolean p);
-    method @Deprecated public static void setHorizontalAccessibilityScrollState(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.ScrollAxisRange p);
     method public static void setHorizontalScrollAxisRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.ScrollAxisRange p);
     method public static void setImeAction(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.text.input.ImeAction p);
-    method public static void setProgress(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Boolean> action);
+    method public static void setPaneTitle(androidx.compose.ui.semantics.SemanticsPropertyReceiver, String p);
+    method public static void setProgress(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Boolean>? action);
     method public static void setProgressBarRangeInfo(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.ProgressBarRangeInfo p);
     method public static void setRole(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.Role p);
     method public static void setSelected(androidx.compose.ui.semantics.SemanticsPropertyReceiver, boolean p);
-    method public static void setSelection(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function3<? super java.lang.Integer,? super java.lang.Integer,? super java.lang.Boolean,java.lang.Boolean> action);
+    method public static void setSelection(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function3<? super java.lang.Integer,? super java.lang.Integer,? super java.lang.Boolean,java.lang.Boolean>? action);
     method public static void setStateDescription(androidx.compose.ui.semantics.SemanticsPropertyReceiver, String p);
-    method @Deprecated public static void setStateDescriptionRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.ProgressBarRangeInfo p);
     method public static void setTestTag(androidx.compose.ui.semantics.SemanticsPropertyReceiver, String p);
     method public static void setText(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.text.AnnotatedString p);
-    method public static void setText(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.AnnotatedString,java.lang.Boolean> action);
+    method public static void setText(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.AnnotatedString,java.lang.Boolean>? action);
     method public static void setTextSelectionRange-Hy0MoUY(androidx.compose.ui.semantics.SemanticsPropertyReceiver, long p);
     method public static void setToggleableState(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.state.ToggleableState p);
-    method @Deprecated public static void setVerticalAccessibilityScrollState(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.ScrollAxisRange p);
     method public static void setVerticalScrollAxisRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.ScrollAxisRange p);
   }
 
@@ -2895,19 +2709,7 @@ package androidx.compose.ui.text.input {
 
 package androidx.compose.ui.viewinterop {
 
-  @androidx.compose.ui.viewinterop.InternalInteropApi public abstract class AndroidViewHolder extends android.view.ViewGroup {
-    ctor public AndroidViewHolder(android.content.Context context);
-    method public final androidx.compose.ui.unit.Density getDensity();
-    method public final androidx.compose.ui.Modifier getModifier();
-    method public final kotlin.jvm.functions.Function0<kotlin.Unit> getUpdate();
-    method public final android.view.View? getView();
-    method public final void setDensity(androidx.compose.ui.unit.Density value);
-    method public final void setModifier(androidx.compose.ui.Modifier value);
-    method protected final void setUpdate(kotlin.jvm.functions.Function0<kotlin.Unit> value);
-    property public final androidx.compose.ui.unit.Density density;
-    property public final androidx.compose.ui.Modifier modifier;
-    property public final kotlin.jvm.functions.Function0<kotlin.Unit> update;
-    property public final android.view.View? view;
+  public final class AndroidViewHolderKt {
   }
 
   public final class AndroidViewKt {
@@ -2915,16 +2717,8 @@ package androidx.compose.ui.viewinterop {
     method public static kotlin.jvm.functions.Function1<android.view.View,kotlin.Unit> getNoOpUpdate();
   }
 
-  public final class EmitViewKt {
-    method @Deprecated @androidx.compose.runtime.Composable public static <T extends android.view.View> void emitView(kotlin.jvm.functions.Function1<? super android.content.Context,? extends T> ctor, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> update);
-    method @Deprecated @androidx.compose.runtime.Composable public static <T extends android.view.ViewGroup> void emitView(kotlin.jvm.functions.Function1<? super android.content.Context,? extends T> ctor, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> update, kotlin.jvm.functions.Function0<kotlin.Unit> children);
-  }
-
-  @kotlin.RequiresOptIn(level=kotlin.RequiresOptIn.Level, message="This is an experimental API for Compose UI LayoutNode and is likely to change " + "before becoming stable.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface InternalInteropApi {
-  }
-
   public final class ViewModelKt {
-    method @androidx.compose.runtime.Composable public static <T extends androidx.lifecycle.ViewModel> T viewModel(Class<T> modelClass, optional String? key, optional androidx.lifecycle.ViewModelProvider.Factory? factory);
+    method @Deprecated @androidx.compose.runtime.Composable public static <T extends androidx.lifecycle.ViewModel> T viewModel(Class<T> modelClass, optional String? key, optional androidx.lifecycle.ViewModelProvider.Factory? factory);
     method @androidx.compose.runtime.Composable public static inline <reified T extends androidx.lifecycle.ViewModel> T! viewModel(optional String key, optional androidx.lifecycle.ViewModelProvider.Factory? factory);
   }
 
@@ -2933,15 +2727,18 @@ package androidx.compose.ui.viewinterop {
 package androidx.compose.ui.window {
 
   public final class AndroidDialogKt {
+    method @androidx.compose.runtime.Composable public static void Dialog(kotlin.jvm.functions.Function0<kotlin.Unit> onDismissRequest, optional androidx.compose.ui.window.DialogProperties properties, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
-  @androidx.compose.runtime.Immutable public final class AndroidDialogProperties implements androidx.compose.ui.window.DialogProperties {
-    ctor public AndroidDialogProperties(boolean dismissOnBackPress, boolean dismissOnClickOutside, androidx.compose.ui.window.SecureFlagPolicy securePolicy);
-    ctor public AndroidDialogProperties();
-    method public boolean component1();
-    method public boolean component2();
-    method public androidx.compose.ui.window.SecureFlagPolicy component3();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.window.AndroidDialogProperties copy(boolean dismissOnBackPress, boolean dismissOnClickOutside, androidx.compose.ui.window.SecureFlagPolicy securePolicy);
+  public final class AndroidPopupKt {
+    method @androidx.compose.runtime.Composable public static void Popup(androidx.compose.ui.window.PopupPositionProvider popupPositionProvider, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onDismissRequest, optional androidx.compose.ui.window.PopupProperties properties, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static void Popup-wO4EaeM(optional androidx.compose.ui.Alignment alignment, optional long offset, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onDismissRequest, optional androidx.compose.ui.window.PopupProperties properties, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @org.jetbrains.annotations.TestOnly public static boolean isPopupLayout(android.view.View view, optional String? testTag);
+  }
+
+  @androidx.compose.runtime.Immutable public final class DialogProperties {
+    ctor public DialogProperties(boolean dismissOnBackPress, boolean dismissOnClickOutside, androidx.compose.ui.window.SecureFlagPolicy securePolicy);
+    ctor public DialogProperties();
     method public boolean getDismissOnBackPress();
     method public boolean getDismissOnClickOutside();
     method public androidx.compose.ui.window.SecureFlagPolicy getSecurePolicy();
@@ -2950,41 +2747,26 @@ package androidx.compose.ui.window {
     property public final androidx.compose.ui.window.SecureFlagPolicy securePolicy;
   }
 
-  public final class AndroidPopupKt {
-    method @org.jetbrains.annotations.TestOnly public static boolean isPopupLayout(android.view.View view, optional String? testTag);
-  }
-
-  @androidx.compose.runtime.Immutable public final class AndroidPopupProperties implements androidx.compose.ui.window.PopupProperties {
-    ctor public AndroidPopupProperties(androidx.compose.ui.window.SecureFlagPolicy securePolicy);
-    ctor public AndroidPopupProperties();
-    method public androidx.compose.ui.window.SecureFlagPolicy component1();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.window.AndroidPopupProperties copy(androidx.compose.ui.window.SecureFlagPolicy securePolicy);
-    method public androidx.compose.ui.window.SecureFlagPolicy getSecurePolicy();
-    property public final androidx.compose.ui.window.SecureFlagPolicy securePolicy;
-  }
-
-  public final class DialogKt {
-    method @androidx.compose.runtime.Composable public static void Dialog(kotlin.jvm.functions.Function0<kotlin.Unit> onDismissRequest, optional androidx.compose.ui.window.DialogProperties? properties, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-  }
-
-  @androidx.compose.runtime.Immutable public interface DialogProperties {
-  }
-
   public interface DialogWindowProvider {
     method public android.view.Window getWindow();
     property public abstract android.view.Window window;
   }
 
-  public final class PopupKt {
-    method @androidx.compose.runtime.Composable public static void Popup(androidx.compose.ui.window.PopupPositionProvider popupPositionProvider, optional boolean isFocusable, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onDismissRequest, optional androidx.compose.ui.window.PopupProperties? properties, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method @androidx.compose.runtime.Composable public static void Popup-_wmJi10(optional androidx.compose.ui.Alignment alignment, optional long offset, optional boolean isFocusable, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onDismissRequest, optional androidx.compose.ui.window.PopupProperties? properties, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-  }
-
   @androidx.compose.runtime.Immutable public interface PopupPositionProvider {
-    method public long calculatePosition-igXpx9M(androidx.compose.ui.unit.IntBounds anchorBounds, long windowSize, androidx.compose.ui.unit.LayoutDirection layoutDirection, long popupContentSize);
+    method public long calculatePosition-aa5Bd6I(androidx.compose.ui.unit.IntRect anchorBounds, long windowSize, androidx.compose.ui.unit.LayoutDirection layoutDirection, long popupContentSize);
   }
 
-  @androidx.compose.runtime.Immutable public interface PopupProperties {
+  @androidx.compose.runtime.Immutable public final class PopupProperties {
+    ctor public PopupProperties(boolean focusable, boolean dismissOnBackPress, boolean dismissOnClickOutside, androidx.compose.ui.window.SecureFlagPolicy securePolicy);
+    ctor public PopupProperties();
+    method public boolean getDismissOnBackPress();
+    method public boolean getDismissOnClickOutside();
+    method public boolean getFocusable();
+    method public androidx.compose.ui.window.SecureFlagPolicy getSecurePolicy();
+    property public final boolean dismissOnBackPress;
+    property public final boolean dismissOnClickOutside;
+    property public final boolean focusable;
+    property public final androidx.compose.ui.window.SecureFlagPolicy securePolicy;
   }
 
   public enum SecureFlagPolicy {

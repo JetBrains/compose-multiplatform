@@ -45,13 +45,15 @@ dependencies {
         // TODO: b/160602714 create a lower level module to avoid this dependency on the
         // animation group
         api project(":compose:animation:animation-core")
-        api project(":compose:runtime:runtime-saved-instance-state")
+        api project(":compose:runtime:runtime-saveable")
         api project(":compose:ui:ui-geometry")
         api project(":compose:ui:ui-graphics")
         api project(":compose:ui:ui-text")
         api project(":compose:ui:ui-unit")
         api "androidx.annotation:annotation:1.1.0"
-        api "androidx.activity:activity:1.2.0-alpha02"
+
+        // TODO: Remove this when removing the deprecated ComponentActivity.setContent extension
+        api project(":activity:activity-ktx")
 
         // This has stub APIs for access to legacy Android APIs, so we don't want
         // any dependency on this module.
@@ -72,6 +74,7 @@ dependencies {
 
         testImplementation(ANDROIDX_TEST_RULES)
         testImplementation(ANDROIDX_TEST_RUNNER)
+        testImplementation(KOTLIN_COROUTINES_TEST)
         testImplementation(JUNIT)
         testImplementation(TRUTH)
         testImplementation(MOCKITO_CORE)
@@ -87,6 +90,8 @@ dependencies {
         androidTestImplementation(ANDROIDX_TEST_UIAUTOMATOR)
         androidTestImplementation(ANDROIDX_TEST_RULES)
         androidTestImplementation(ANDROIDX_TEST_RUNNER)
+        androidTestImplementation(ANDROIDX_TEST_EXT_KTX)
+        androidTestImplementation(KOTLIN_COROUTINES_TEST)
         androidTestImplementation(ESPRESSO_CORE)
         androidTestImplementation(JUNIT)
         androidTestImplementation(DEXMAKER_MOCKITO, libs.exclude_bytebuddy)
@@ -104,6 +109,8 @@ dependencies {
         androidTestImplementation project(":compose:ui:ui-test-junit4")
         androidTestImplementation project(":test-screenshot")
         androidTestImplementation "androidx.recyclerview:recyclerview:1.1.0"
+        androidTestImplementation("androidx.core:core-ktx:1.1.0")
+        androidTestImplementation project(":activity:activity-compose")
 
         lintChecks project(":compose:ui:ui-lint")
         lintPublish project(":compose:ui:ui-lint")
@@ -129,7 +136,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 // TODO: b/160602714 create a lower level module to avoid this dependency on the
                 // animation group
                 api project(":compose:animation:animation-core")
-                api project(":compose:runtime:runtime-saved-instance-state")
+                api project(":compose:runtime:runtime-saveable")
                 api project(":compose:ui:ui-geometry")
                 api project(":compose:ui:ui-graphics")
                 api project(":compose:ui:ui-text")
@@ -144,7 +151,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 // any dependency on this module.
                 compileOnly project(":compose:ui:ui-android-stubs")
                 api "androidx.annotation:annotation:1.1.0"
-                api "androidx.activity:activity:1.2.0-alpha02"
+                api project(":activity:activity-ktx")
                 implementation "androidx.autofill:autofill:1.0.0"
                 implementation(KOTLIN_COROUTINES_ANDROID)
 
@@ -166,6 +173,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             test.dependencies {
                 implementation(ANDROIDX_TEST_RULES)
                 implementation(ANDROIDX_TEST_RUNNER)
+                implementation(KOTLIN_COROUTINES_TEST)
                 implementation(JUNIT)
                 implementation(TRUTH)
                 implementation(MOCKITO_CORE)
@@ -183,6 +191,8 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation(ANDROIDX_TEST_UIAUTOMATOR)
                 implementation(ANDROIDX_TEST_RULES)
                 implementation(ANDROIDX_TEST_RUNNER)
+                implementation(ANDROIDX_TEST_EXT_KTX)
+                implementation(KOTLIN_COROUTINES_TEST)
                 implementation(ESPRESSO_CORE)
                 implementation(JUNIT)
                 implementation(DEXMAKER_MOCKITO, libs.exclude_bytebuddy)
@@ -200,6 +210,8 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation project(":compose:ui:ui-test-junit4")
                 implementation project(":test-screenshot")
                 implementation "androidx.recyclerview:recyclerview:1.1.0"
+                implementation("androidx.core:core-ktx:1.1.0")
+                implementation project(":activity:activity-compose")
             }
 
             desktopTest.dependencies {

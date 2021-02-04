@@ -28,6 +28,7 @@ import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.progressSemantics
 import androidx.compose.material.ProgressIndicatorDefaults.IndicatorBackgroundOpacity
@@ -40,7 +41,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -75,6 +76,7 @@ fun LinearProgressIndicator(
         modifier
             .progressSemantics(progress)
             .preferredSize(LinearIndicatorWidth, LinearIndicatorHeight)
+            .focusable()
     ) {
         val strokeWidth = ProgressIndicatorDefaults.StrokeWidth.toPx()
         drawLinearIndicatorBackground(backgroundColor, strokeWidth)
@@ -148,6 +150,7 @@ fun LinearProgressIndicator(
         modifier
             .progressSemantics()
             .preferredSize(LinearIndicatorWidth, LinearIndicatorHeight)
+            .focusable()
     ) {
         val strokeWidth = ProgressIndicatorDefaults.StrokeWidth.toPx()
         drawLinearIndicatorBackground(backgroundColor, strokeWidth)
@@ -217,13 +220,14 @@ fun CircularProgressIndicator(
     color: Color = MaterialTheme.colors.primary,
     strokeWidth: Dp = ProgressIndicatorDefaults.StrokeWidth
 ) {
-    val stroke = with(AmbientDensity.current) {
+    val stroke = with(LocalDensity.current) {
         Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Butt)
     }
     Canvas(
         modifier
             .progressSemantics(progress)
             .preferredSize(CircularIndicatorDiameter)
+            .focusable()
     ) {
         // Start at 12 O'clock
         val startAngle = 270f
@@ -245,7 +249,7 @@ fun CircularProgressIndicator(
     color: Color = MaterialTheme.colors.primary,
     strokeWidth: Dp = ProgressIndicatorDefaults.StrokeWidth
 ) {
-    val stroke = with(AmbientDensity.current) {
+    val stroke = with(LocalDensity.current) {
         Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Square)
     }
 
@@ -301,6 +305,7 @@ fun CircularProgressIndicator(
         modifier
             .progressSemantics()
             .preferredSize(CircularIndicatorDiameter)
+            .focusable()
     ) {
 
         val currentRotationAngleOffset = (currentRotation * RotationAngleOffset) % 360f

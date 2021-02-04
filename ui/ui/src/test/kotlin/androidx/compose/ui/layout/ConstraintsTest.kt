@@ -19,10 +19,6 @@ package androidx.compose.ui.layout
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.constrain
-import androidx.compose.ui.unit.enforce
-import androidx.compose.ui.unit.hasFixedHeight
-import androidx.compose.ui.unit.hasFixedWidth
-import androidx.compose.ui.unit.isZero
 import androidx.compose.ui.unit.offset
 import androidx.compose.ui.unit.isSatisfiedBy
 import org.junit.Assert.assertEquals
@@ -130,24 +126,24 @@ class ConstraintsTest {
     }
 
     @Test
-    fun enforce() {
+    fun constrain_constraints() {
         val constraints = Constraints(5, 10, 5, 10)
-        constraints.enforce(Constraints(4, 11, 4, 11)).assertEquals(
+        Constraints(4, 11, 4, 11).constrain(constraints).assertEquals(
             5, 10, 5, 10
         )
-        constraints.enforce(Constraints(7, 9, 7, 9)).assertEquals(
+        Constraints(7, 9, 7, 9).constrain(constraints).assertEquals(
             7, 9, 7, 9
         )
-        constraints.enforce(Constraints(2, 3, 2, 3)).assertEquals(
+        Constraints(2, 3, 2, 3).constrain(constraints).assertEquals(
             3, 3, 3, 3
         )
-        constraints.enforce(Constraints(10, 11, 10, 11)).assertEquals(
+        Constraints(10, 11, 10, 11).constrain(constraints).assertEquals(
             10, 10, 10, 10
         )
     }
 
     @Test
-    fun constrain() {
+    fun constrain_size() {
         val constraints = Constraints(2, 5, 2, 5)
         assertEquals(IntSize(2, 2), constraints.constrain(IntSize(1, 1)))
         assertEquals(IntSize(3, 3), constraints.constrain(IntSize(3, 3)))

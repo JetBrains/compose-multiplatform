@@ -16,13 +16,14 @@
 package androidx.compose.ui.platform
 
 import android.widget.FrameLayout
+import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.ambientOf
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.currentRecomposeScope
-import androidx.compose.runtime.rememberCompositionReference
+import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
@@ -55,7 +56,8 @@ class WrapperTest {
     @Before
     fun setup() {
         activityScenario = ActivityScenario.launch(TestActivity::class.java)
-        activityScenario.moveToState(Lifecycle.State.CREATED)
+        // Default Recomposer will not recompose if the lifecycle state is not at least STARTED
+        activityScenario.moveToState(Lifecycle.State.STARTED)
     }
 
     @Test
@@ -153,14 +155,14 @@ class WrapperTest {
         activityScenario.onActivity {
             val frameLayout = FrameLayout(it)
             it.setContent {
-                val ambient = ambientOf<Float>()
-                Providers(ambient provides 1f) {
-                    val composition = rememberCompositionReference()
+                val compositionLocal = compositionLocalOf<Float>()
+                Providers(compositionLocal provides 1f) {
+                    val composition = rememberCompositionContext()
 
                     AndroidView({ frameLayout })
                     SideEffect {
                         frameLayout.setContent(composition) {
-                            value = ambient.current
+                            value = compositionLocal.current
                             composedLatch.countDown()
                         }
                     }

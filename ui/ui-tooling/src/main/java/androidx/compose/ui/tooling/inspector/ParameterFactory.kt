@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.toArgb
@@ -107,6 +108,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
         )
         valueLookup[textDecorationCombination] = "LineThrough+Underline"
         valueLookup[Color.Unspecified] = "Unspecified"
+        valueLookup[RectangleShape] = "RectangleShape"
         valuesLoaded.add(Enum::class.java)
         valuesLoaded.add(Any::class.java)
 

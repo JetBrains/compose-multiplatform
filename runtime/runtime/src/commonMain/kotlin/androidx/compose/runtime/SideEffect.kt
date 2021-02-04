@@ -39,7 +39,8 @@ import kotlinx.coroutines.launch
  * object lifecycle, see [DisposableEffect].
  */
 @Composable
-@ComposableContract(restartable = false)
+@NonRestartableComposable
+@OptIn(InternalComposeApi::class)
 fun SideEffect(
     effect: () -> Unit
 ) {
@@ -57,23 +58,23 @@ class DisposableEffectScope {
      */
     inline fun onDispose(
         crossinline onDisposeEffect: () -> Unit
-    ): DisposableEffectDisposable = object : DisposableEffectDisposable {
+    ): DisposableEffectResult = object : DisposableEffectResult {
         override fun dispose() {
             onDisposeEffect()
         }
     }
 }
 
-interface DisposableEffectDisposable {
+interface DisposableEffectResult {
     fun dispose()
 }
 
 private val InternalDisposableEffectScope = DisposableEffectScope()
 
 private class DisposableEffectImpl(
-    private val effect: DisposableEffectScope.() -> DisposableEffectDisposable
+    private val effect: DisposableEffectScope.() -> DisposableEffectResult
 ) : RememberObserver {
-    private var onDispose: DisposableEffectDisposable? = null
+    private var onDispose: DisposableEffectResult? = null
 
     override fun onRemembered() {
         onDispose = InternalDisposableEffectScope.effect()
@@ -100,11 +101,11 @@ private const val LaunchedEffectNoParamError =
         "and a new effect launched for the new key."
 
 @Composable
-@ComposableContract(restartable = false)
+@NonRestartableComposable
 @Suppress("DeprecatedCallableAddReplaceWith", "UNUSED_PARAMETER")
 @Deprecated(DisposableEffectNoParamError, level = DeprecationLevel.ERROR)
 fun DisposableEffect(
-    effect: DisposableEffectScope.() -> DisposableEffectDisposable
+    effect: DisposableEffectScope.() -> DisposableEffectResult
 ): Unit = error(DisposableEffectNoParamError)
 
 /**
@@ -137,10 +138,10 @@ fun DisposableEffect(
  * callbacks.
  */
 @Composable
-@ComposableContract(restartable = false)
+@NonRestartableComposable
 fun DisposableEffect(
     key1: Any?,
-    effect: DisposableEffectScope.() -> DisposableEffectDisposable
+    effect: DisposableEffectScope.() -> DisposableEffectResult
 ) {
     remember(key1) { DisposableEffectImpl(effect) }
 }
@@ -176,11 +177,11 @@ fun DisposableEffect(
  * event callbacks.
  */
 @Composable
-@ComposableContract(restartable = false)
+@NonRestartableComposable
 fun DisposableEffect(
     key1: Any?,
     key2: Any?,
-    effect: DisposableEffectScope.() -> DisposableEffectDisposable
+    effect: DisposableEffectScope.() -> DisposableEffectResult
 ) {
     remember(key1, key2) { DisposableEffectImpl(effect) }
 }
@@ -216,12 +217,12 @@ fun DisposableEffect(
  * callbacks.
  */
 @Composable
-@ComposableContract(restartable = false)
+@NonRestartableComposable
 fun DisposableEffect(
     key1: Any?,
     key2: Any?,
     key3: Any?,
-    effect: DisposableEffectScope.() -> DisposableEffectDisposable
+    effect: DisposableEffectScope.() -> DisposableEffectResult
 ) {
     remember(key1, key2, key3) { DisposableEffectImpl(effect) }
 }
@@ -257,11 +258,11 @@ fun DisposableEffect(
  * callbacks.
  */
 @Composable
-@ComposableContract(restartable = false)
+@NonRestartableComposable
 @Suppress("ArrayReturn")
 fun DisposableEffect(
     vararg keys: Any?,
-    effect: DisposableEffectScope.() -> DisposableEffectDisposable
+    effect: DisposableEffectScope.() -> DisposableEffectResult
 ) {
     remember(*keys) { DisposableEffectImpl(effect) }
 }
@@ -315,7 +316,8 @@ fun LaunchedEffect(
  * scoped to the composition in response to event callbacks.
  */
 @Composable
-@ComposableContract(restartable = false)
+@NonRestartableComposable
+@OptIn(InternalComposeApi::class)
 fun LaunchedEffect(
     key1: Any?,
     block: suspend CoroutineScope.() -> Unit
@@ -336,7 +338,8 @@ fun LaunchedEffect(
  * scoped to the composition in response to event callbacks.
  */
 @Composable
-@ComposableContract(restartable = false)
+@NonRestartableComposable
+@OptIn(InternalComposeApi::class)
 fun LaunchedEffect(
     key1: Any?,
     key2: Any?,
@@ -358,7 +361,8 @@ fun LaunchedEffect(
  * scoped to the composition in response to event callbacks.
  */
 @Composable
-@ComposableContract(restartable = false)
+@NonRestartableComposable
+@OptIn(InternalComposeApi::class)
 fun LaunchedEffect(
     key1: Any?,
     key2: Any?,
@@ -381,8 +385,9 @@ fun LaunchedEffect(
  * scoped to the composition in response to event callbacks.
  */
 @Composable
-@ComposableContract(restartable = false)
+@NonRestartableComposable
 @Suppress("ArrayReturn")
+@OptIn(InternalComposeApi::class)
 fun LaunchedEffect(
     vararg keys: Any?,
     block: suspend CoroutineScope.() -> Unit

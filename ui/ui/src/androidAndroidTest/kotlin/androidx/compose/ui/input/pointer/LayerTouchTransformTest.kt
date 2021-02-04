@@ -17,25 +17,24 @@
 package androidx.compose.ui.input.pointer
 
 import android.os.Build
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.pressIndicatorGestureFilter
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.down
@@ -88,11 +87,11 @@ class LayerTouchTransformTest {
 
             val latchDrawModifier = Modifier.drawBehind { latch?.countDown() }
 
-            val containerDp = (200.0f / AmbientDensity.current.density).dp
-            val boxDp = (50.0f / AmbientDensity.current.density).dp
+            val containerDp = (200.0f / LocalDensity.current.density).dp
+            val boxDp = (50.0f / LocalDensity.current.density).dp
 
-            val offsetX = (270.0f / AmbientDensity.current.density).dp
-            val offsetY = (120.0f / AmbientDensity.current.density).dp
+            val offsetX = (270.0f / LocalDensity.current.density).dp
+            val offsetY = (120.0f / LocalDensity.current.density).dp
             Box(Modifier.testTag(testTag)) {
                 SimpleLayout(
                     modifier = Modifier.fillMaxSize().offset(offsetX, offsetY)
@@ -112,7 +111,15 @@ class LayerTouchTransformTest {
                                 }
                                 .then(latchDrawModifier)
                                 .preferredSize(boxDp)
-                                .pressIndicatorGestureFilter(onStart, onStop, onStop)
+                                .pointerInput(Unit) {
+                                    detectTapGestures(
+                                        onPress = {
+                                            onStart.invoke(it)
+                                            val success = tryAwaitRelease()
+                                            if (success) onStop.invoke() else onStop.invoke()
+                                        }
+                                    )
+                                }
                         )
                     }
                 }
@@ -143,7 +150,7 @@ class LayerTouchTransformTest {
 }
 
 @Composable
-fun SimpleLayout(modifier: Modifier, content: @Composable () -> Unit = emptyContent()) {
+fun SimpleLayout(modifier: Modifier, content: @Composable () -> Unit = {}) {
     Layout(
         content,
         modifier

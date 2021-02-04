@@ -14,35 +14,32 @@
  * limitations under the License.
  */
 
-@file:Suppress("DEPRECATION")
-
 package androidx.compose.ui.test.junit4
 
-import androidx.compose.animation.core.FloatPropKey
+import androidx.activity.ComponentActivity
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.snap
-import androidx.compose.animation.core.transitionDefinition
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.transition
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 
 @LargeTest
-@OptIn(ExperimentalTestApi::class)
 class MonotonicFrameClockTestRuleTest {
 
     companion object {
@@ -55,7 +52,7 @@ class MonotonicFrameClockTestRuleTest {
     private var hasRecomposed = false
 
     @get:Rule
-    val rule = createAndroidComposeRule(driveClockByMonotonicFrameClock = true)
+    val rule = createAndroidComposeRule<ComponentActivity>()
 
     /**
      * Tests if advancing the clock manually works when the clock is resumed, and that idleness
@@ -89,40 +86,35 @@ class MonotonicFrameClockTestRuleTest {
         hasRecomposed = true
         Box(modifier = Modifier.background(color = Color.Yellow).fillMaxSize()) {
             hasRecomposed = true
-            val state = transition(
-                definition = animationDefinition,
-                toState = animationState.value,
-                onStateChangeFinished = { animationRunning = false }
-            )
+            val transition = updateTransition(animationState.value)
+            animationRunning = transition.currentState != transition.targetState
+            val x by transition.animateFloat(
+                transitionSpec = {
+                    if (AnimationStates.From isTransitioningTo AnimationStates.To) {
+                        tween(
+                            easing = LinearEasing,
+                            durationMillis = duration.toInt()
+                        )
+                    } else {
+                        snap()
+                    }
+                }
+            ) {
+                if (it == AnimationStates.From) {
+                    startValue
+                } else {
+                    endValue
+                }
+            }
             hasRecomposed = true
             Canvas(modifier = Modifier.fillMaxSize()) {
-                drawRect(Color.Cyan, Offset(state[x], 0.0f), size)
+                drawRect(Color.Cyan, Offset(x, 0.0f), size)
             }
         }
     }
 
-    private val x = FloatPropKey()
-
     private enum class AnimationStates {
         From,
         To
-    }
-
-    private val animationDefinition = transitionDefinition<AnimationStates> {
-        state(AnimationStates.From) {
-            this[x] = startValue
-        }
-        state(AnimationStates.To) {
-            this[x] = endValue
-        }
-        transition(AnimationStates.From to AnimationStates.To) {
-            x using tween(
-                easing = LinearEasing,
-                durationMillis = duration.toInt()
-            )
-        }
-        transition(AnimationStates.To to AnimationStates.From) {
-            x using snap()
-        }
     }
 }

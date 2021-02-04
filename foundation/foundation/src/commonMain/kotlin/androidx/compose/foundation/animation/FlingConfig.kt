@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.foundation.animation
 
 import androidx.compose.animation.core.AnimatedFloat
@@ -45,10 +47,30 @@ import kotlin.math.abs
  * so the final value for fling can be adjusted
  */
 @Immutable
-data class FlingConfig(
+class FlingConfig(
     val decayAnimation: FloatDecayAnimationSpec,
     val adjustTarget: (Float) -> TargetAnimation? = { null }
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is FlingConfig) return false
+
+        if (decayAnimation != other.decayAnimation) return false
+        if (adjustTarget != other.adjustTarget) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = decayAnimation.hashCode()
+        result = 31 * result + adjustTarget.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "FlingConfig(decayAnimation=$decayAnimation, adjustTarget=$adjustTarget)"
+    }
+}
 
 /**
  * Default [FlingConfig] curve.

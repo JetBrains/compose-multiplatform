@@ -21,7 +21,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.staticAmbientOf
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.takeOrElse
@@ -227,19 +227,24 @@ fun darkColors(
 )
 
 /**
- * Tries to match [color] to a color in this Colors, and then returns the corresponding
- * `on` color.
+ * The Material color system contains pairs of colors that are typically used for the background
+ * and content color inside a component. For example, a [Button] typically uses `primary` for its
+ * background, and `onPrimary` for the color of its content (usually text or iconography).
  *
- * For example, when [color] is [Colors.primary], this will return
- * [Colors.onPrimary]. If [color] is not present in the theme, this will return `null`.
+ * This function tries to match the provided [backgroundColor] to a 'background' color in this
+ * [Colors], and then will return the corresponding color used for content. For example, when
+ * [backgroundColor] is [Colors.primary], this will return [Colors.onPrimary].
  *
- * @return the matching `on` color for [color]. If [color] is not part of the theme's
- * [Colors], then returns [Color.Unspecified].
+ * If [backgroundColor] does not match a background color in the theme, this will return
+ * [Color.Unspecified].
+ *
+ * @return the matching content color for [backgroundColor]. If [backgroundColor] is not present in
+ * the theme's [Colors], then returns [Color.Unspecified].
  *
  * @see contentColorFor
  */
-fun Colors.contentColorFor(color: Color): Color {
-    return when (color) {
+fun Colors.contentColorFor(backgroundColor: Color): Color {
+    return when (backgroundColor) {
         primary -> onPrimary
         primaryVariant -> onPrimary
         secondary -> onSecondary
@@ -252,24 +257,34 @@ fun Colors.contentColorFor(color: Color): Color {
 }
 
 /**
- * Tries to match [color] to a color in the current [Colors], and then returns the
- * corresponding `on` color. If [color] can not be matched to the palette, then this will return
- * the existing value for [AmbientContentColor] at this point in the tree.
+ * The Material color system contains pairs of colors that are typically used for the background
+ * and content color inside a component. For example, a [Button] typically uses `primary` for its
+ * background, and `onPrimary` for the color of its content (usually text or iconography).
+ *
+ * This function tries to match the provided [backgroundColor] to a 'background' color in this
+ * [Colors], and then will return the corresponding color used for content. For example, when
+ * [backgroundColor] is [Colors.primary], this will return [Colors.onPrimary].
+ *
+ * If [backgroundColor] does not match a background color in the theme, this will return
+ * the current value of [LocalContentColor] as a best-effort color.
+ *
+ * @return the matching content color for [backgroundColor]. If [backgroundColor] is not present in
+ * the theme's [Colors], then returns the current value of [LocalContentColor].
  *
  * @see Colors.contentColorFor
  */
 @Composable
-fun contentColorFor(color: Color) =
-    MaterialTheme.colors.contentColorFor(color).takeOrElse { AmbientContentColor.current }
+fun contentColorFor(backgroundColor: Color) =
+    MaterialTheme.colors.contentColorFor(backgroundColor).takeOrElse { LocalContentColor.current }
 
 /**
  * Updates the internal values of the given [Colors] with values from the [other] [Colors]. This
  * allows efficiently updating a subset of [Colors], without recomposing every composable that
- * consumes values from [AmbientColors].
+ * consumes values from [LocalColors].
  *
  * Because [Colors] is very wide-reaching, and used by many expensive composables in the
- * hierarchy, providing a new value to [AmbientColors] causes every composable consuming
- * [AmbientColors] to recompose, which is prohibitively expensive in cases such as animating one
+ * hierarchy, providing a new value to [LocalColors] causes every composable consuming
+ * [LocalColors] to recompose, which is prohibitively expensive in cases such as animating one
  * color in the theme. Instead, [Colors] is internally backed by [mutableStateOf], and this
  * function mutates the internal state of [this] to match values in [other]. This means that any
  * changes will mutate the internal state of [this], and only cause composables that are reading
@@ -292,11 +307,11 @@ internal fun Colors.updateColorsFrom(other: Colors) {
 }
 
 /**
- * Ambient used to pass [Colors] down the tree.
+ * CompositionLocal used to pass [Colors] down the tree.
  *
  * Setting the value here is typically done as part of [MaterialTheme], which will
  * automatically handle efficiently updating any changed colors without causing unnecessary
  * recompositions, using [Colors.updateColorsFrom].
- * To retrieve the current value of this ambient, use [MaterialTheme.colors].
+ * To retrieve the current value of this CompositionLocal, use [MaterialTheme.colors].
  */
-internal val AmbientColors = staticAmbientOf { lightColors() }
+internal val LocalColors = staticCompositionLocalOf { lightColors() }

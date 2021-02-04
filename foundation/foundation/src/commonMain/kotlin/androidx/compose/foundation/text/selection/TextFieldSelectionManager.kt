@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION") // gestures
+
 package androidx.compose.foundation.text.selection
 
 import androidx.compose.foundation.text.TextFieldDelegate
@@ -31,19 +33,16 @@ import androidx.compose.ui.gesture.LongPressDragObserver
 import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.TextToolbarStatus
-import androidx.compose.ui.selection.SelectionHandle
-import androidx.compose.ui.selection.getAdjustedCoordinates
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.constrain
 import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.input.getSelectedText
 import androidx.compose.ui.text.input.getTextAfterSelection
 import androidx.compose.ui.text.input.getTextBeforeSelection
@@ -77,6 +76,12 @@ internal class TextFieldSelectionManager {
      * The current [TextFieldValue].
      */
     internal var value: TextFieldValue = TextFieldValue()
+
+    /**
+     * Visual transformation of the text field's text. Used to check if certain toolbar options
+     * are permitted. For example, 'cut' will not be available is it is password transformation.
+     */
+    internal var visualTransformation: VisualTransformation = VisualTransformation.None
 
     /**
      * [ClipboardManager] to perform clipboard features.
@@ -309,11 +314,18 @@ internal class TextFieldSelectionManager {
         setSelectionStatus(false)
     }
 
-    internal fun deselect() {
+    internal fun deselect(position: Offset? = null) {
         if (!value.selection.collapsed) {
             // if selection was not collapsed, set a default cursor location, otherwise
             // don't change the location of the cursor.
-            val newCursorOffset = value.selection.max
+            val layoutResult = state?.layoutResult
+            val newCursorOffset = if (position != null && layoutResult != null) {
+                offsetMapping.transformedToOriginal(
+                    layoutResult.getOffsetForPosition(position)
+                )
+            } else {
+                value.selection.max
+            }
             val newValue = value.copy(selection = TextRange(newCursorOffset))
             onValueChange(newValue)
         }
@@ -427,21 +439,22 @@ internal class TextFieldSelectionManager {
      * the copy, paste and cut method as callbacks when "copy", "cut" or "paste" is clicked.
      */
     internal fun showSelectionToolbar() {
-        val copy: (() -> Unit)? = if (!value.selection.collapsed) {
+        val isPassword = visualTransformation is PasswordVisualTransformation
+        val copy: (() -> Unit)? = if (!value.selection.collapsed && !isPassword) {
             {
                 copy()
                 hideSelectionToolbar()
             }
         } else null
 
-        val cut: (() -> Unit)? = if (!value.selection.collapsed) {
+        val cut: (() -> Unit)? = if (!value.selection.collapsed && editable && !isPassword) {
             {
                 cut()
                 hideSelectionToolbar()
             }
         } else null
 
-        val paste: (() -> Unit)? = if (clipboardManager?.getText() != null) {
+        val paste: (() -> Unit)? = if (editable && clipboardManager?.getText() != null) {
             {
                 paste()
                 hideSelectionToolbar()
@@ -457,8 +470,8 @@ internal class TextFieldSelectionManager {
         textToolbar?.showMenu(
             rect = getContentRect(),
             onCopyRequested = copy,
-            onPasteRequested = if (editable) paste else null,
-            onCutRequested = if (editable) cut else null,
+            onPasteRequested = paste,
+            onCutRequested = cut,
             onSelectAllRequested = selectAll
         )
     }
@@ -581,7 +594,7 @@ internal class TextFieldSelectionManager {
     ): TextFieldValue {
         return TextFieldValue(
             annotatedString = annotatedString,
-            selection = selection.constrain(0, annotatedString.length)
+            selection = selection
         )
     }
 }
@@ -612,21 +625,3 @@ internal fun TextFieldSelectionManager.isSelectionHandleInVisibleBound(
 ): Boolean = state?.layoutCoordinates?.visibleBounds()?.containsInclusive(
     getHandlePosition(isStartHandle)
 ) ?: false
-
-/** Returns the boundary of the visible area in this [LayoutCoordinates]. */
-internal fun LayoutCoordinates.visibleBounds(): Rect {
-    // globalBounds is the global boundaries of this LayoutCoordinates after it's clipped by
-    // parents. We can think it as the global visible bounds of this Layout. Here globalBounds
-    // is convert to local, which is the boundary of the visible area within the LayoutCoordinates.
-    val boundsInWindow = boundsInWindow()
-    return Rect(
-        windowToLocal(boundsInWindow.topLeft),
-        windowToLocal(boundsInWindow.bottomRight)
-    )
-}
-
-/**
- * Returns true is the [offset] is contained by this [Rect]
- */
-internal fun Rect.containsInclusive(offset: Offset): Boolean =
-    offset.x in left..right && offset.y in top..bottom

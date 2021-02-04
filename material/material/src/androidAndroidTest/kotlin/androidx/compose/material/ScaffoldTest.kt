@@ -402,7 +402,7 @@ class ScaffoldTest {
                 floatingActionButton = fab,
                 floatingActionButtonPosition = FabPosition.End,
                 bottomBar = {
-                    fabPlacement = AmbientFabPlacement.current
+                    fabPlacement = LocalFabPlacement.current
                 }
             ) {
                 Text("body")
@@ -448,7 +448,8 @@ class ScaffoldTest {
         }
         rule.runOnIdle {
             with(rule.density) {
-                assertThat(innerPadding.bottom).isEqualTo(bottomBarSize.toSize().height.toDp())
+                assertThat(innerPadding.calculateBottomPadding())
+                    .isEqualTo(bottomBarSize.toSize().height.toDp())
             }
         }
     }

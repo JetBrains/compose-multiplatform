@@ -15,33 +15,46 @@
  */
 package androidx.compose.ui.platform
 
+import androidx.compose.animation.core.MonotonicFrameAnimationClock
+import androidx.compose.runtime.BroadcastFrameClock
 import androidx.compose.runtime.Recomposer
-import androidx.compose.runtime.staticAmbientOf
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.key.KeyEvent as ComposeKeyEvent
 import androidx.compose.ui.input.mouse.MouseScrollEvent
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputEvent
 import androidx.compose.ui.input.pointer.PointerInputEventData
 import androidx.compose.ui.input.pointer.PointerType
-import androidx.compose.ui.node.InternalCoreApi
-import kotlinx.coroutines.yield
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 import org.jetbrains.skija.Canvas
 import java.awt.event.InputMethodEvent
 import java.awt.event.KeyEvent
+import java.awt.event.MouseEvent
+import androidx.compose.ui.input.key.KeyEvent as ComposeKeyEvent
 
-val DesktopOwnersAmbient = staticAmbientOf<DesktopOwners>()
+internal val DesktopOwnersAmbient = staticCompositionLocalOf<DesktopOwners>()
 
-@OptIn(InternalCoreApi::class)
-class DesktopOwners(
+@OptIn(ExperimentalCoroutinesApi::class)
+internal class DesktopOwners(
+    coroutineScope: CoroutineScope,
     component: DesktopComponent = DummyDesktopComponent,
-    invalidate: () -> Unit
+    invalidate: () -> Unit = {},
 ) {
     private val _invalidate = invalidate
+    @Volatile
+    private var hasPendingDraws = false
+
+    private var invalidateScheduled = false
     private var willRenderInThisFrame = false
 
     fun invalidate() {
         if (!willRenderInThisFrame) {
+            invalidateScheduled = true
+            hasPendingDraws = true
             _invalidate()
         }
     }
@@ -52,8 +65,31 @@ class DesktopOwners(
     private var pointerId = 0L
     private var isMousePressed = false
 
-    internal val animationClock = DesktopAnimationClock(::invalidate)
+    private val dispatcher = FlushCoroutineDispatcher(coroutineScope)
+    private val frameClock = BroadcastFrameClock(::invalidate)
+    private val coroutineContext = dispatcher + frameClock
+
+    internal val animationClock = MonotonicFrameAnimationClock(
+        CoroutineScope(coroutineScope.coroutineContext + coroutineContext)
+    )
+    internal val recomposer = Recomposer(coroutineContext)
     internal val platformInputService: DesktopPlatformInput = DesktopPlatformInput(component)
+
+    init {
+        // TODO(demin): Experimental API (CoroutineStart.UNDISPATCHED).
+        //  Decide what to do before release (copy paste or use different approach).
+        coroutineScope.launch(coroutineContext, start = CoroutineStart.UNDISPATCHED) {
+            recomposer.runRecomposeAndApplyChanges()
+        }
+    }
+
+    /**
+     * Returns true if there are pending recompositions, draws or dispatched tasks.
+     * Can be called from any thread.
+     */
+    fun hasInvalidations() = hasPendingDraws ||
+        recomposer.hasPendingWork ||
+        dispatcher.hasTasks()
 
     fun register(desktopOwner: DesktopOwner) {
         list.add(desktopOwner)
@@ -65,17 +101,15 @@ class DesktopOwners(
         invalidate()
     }
 
-    suspend fun onFrame(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+    fun onFrame(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+        invalidateScheduled = false
         willRenderInThisFrame = true
 
         try {
-            animationClock.onFrame(nanoTime)
-
-            // We have to wait recomposition if we want to draw actual animation state
-            // (state can be changed in animationClock.onFrame).
-            // Otherwise there may be a situation when we draw multiple frames with the same
-            // animation state (for example, when FPS always below FPS limit).
-            awaitRecompose()
+            // We must see the actual state before we will render the frame
+            Snapshot.sendApplyNotifications()
+            dispatcher.flush()
+            frameClock.sendFrame(nanoTime)
 
             for (owner in list) {
                 owner.setSize(width, height)
@@ -89,39 +123,31 @@ class DesktopOwners(
             owner.draw(canvas)
         }
 
-        if (animationClock.hasObservers) {
+        if (frameClock.hasAwaiters) {
             _invalidate()
         }
-    }
 
-    private suspend fun awaitRecompose() {
-        // We should wait next dispatcher frame because Recomposer doesn't have
-        // pending changes yet, it will only schedule Recomposer.scheduleRecompose in
-        // FrameManager.schedule
-        yield()
-
-        // we can't stuck in infinite loop (because of double dispatching in FrameManager.schedule)
-        while (Recomposer.current().hasInvalidations()) {
-            yield()
+        if (!invalidateScheduled) {
+            hasPendingDraws = false
         }
     }
 
     val lastOwner: DesktopOwner?
         get() = list.lastOrNull()
 
-    fun onMousePressed(x: Int, y: Int) {
+    fun onMousePressed(x: Int, y: Int, nativeEvent: MouseEvent? = null) {
         isMousePressed = true
-        lastOwner?.processPointerInput(pointerInputEvent(x, y, isMousePressed))
+        lastOwner?.processPointerInput(pointerInputEvent(nativeEvent, x, y, isMousePressed))
     }
 
-    fun onMouseReleased(x: Int, y: Int) {
+    fun onMouseReleased(x: Int, y: Int, nativeEvent: MouseEvent? = null) {
         isMousePressed = false
-        lastOwner?.processPointerInput(pointerInputEvent(x, y, isMousePressed))
+        lastOwner?.processPointerInput(pointerInputEvent(nativeEvent, x, y, isMousePressed))
         pointerId += 1
     }
 
-    fun onMouseDragged(x: Int, y: Int) {
-        lastOwner?.processPointerInput(pointerInputEvent(x, y, isMousePressed))
+    fun onMouseDragged(x: Int, y: Int, nativeEvent: MouseEvent? = null) {
+        lastOwner?.processPointerInput(pointerInputEvent(nativeEvent, x, y, isMousePressed))
     }
 
     fun onMouseScroll(x: Int, y: Int, event: MouseScrollEvent) {
@@ -168,7 +194,12 @@ class DesktopOwners(
         }
     }
 
-    private fun pointerInputEvent(x: Int, y: Int, down: Boolean): PointerInputEvent {
+    private fun pointerInputEvent(
+        nativeEvent: MouseEvent?,
+        x: Int,
+        y: Int,
+        down: Boolean
+    ): PointerInputEvent {
         val time = System.nanoTime() / 1_000_000L
         return PointerInputEvent(
             time,
@@ -180,7 +211,8 @@ class DesktopOwners(
                     down,
                     PointerType.Mouse
                 )
-            )
+            ),
+            nativeEvent
         )
     }
 }

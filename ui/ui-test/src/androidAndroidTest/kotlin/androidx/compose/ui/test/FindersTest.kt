@@ -27,6 +27,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.text.AnnotatedString
 import androidx.test.filters.MediumTest
 import androidx.compose.testutils.expectError
+import androidx.compose.ui.semantics.contentDescription
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -101,7 +102,7 @@ class FindersTest {
             BoundaryNode { text = AnnotatedString("Hello World") }
         }
 
-        rule.onNodeWithSubstring("World").assertExists()
+        rule.onNodeWithText("World", substring = true).assertExists()
     }
 
     @Test
@@ -110,7 +111,7 @@ class FindersTest {
             BoundaryNode { text = AnnotatedString("Hello World") }
         }
 
-        rule.onNodeWithSubstring("world", ignoreCase = true).assertExists()
+        rule.onNodeWithText("world", substring = true, ignoreCase = true).assertExists()
     }
 
     @Test
@@ -121,7 +122,7 @@ class FindersTest {
 
         expectError<AssertionError> {
             // Need to assert exists or it won't fetch nodes
-            rule.onNodeWithSubstring("world").assertExists()
+            rule.onNodeWithText("world", substring = true).assertExists()
         }
     }
 
@@ -132,10 +133,56 @@ class FindersTest {
             BoundaryNode { text = AnnotatedString("Wello Horld") }
         }
 
-        rule.onAllNodesWithSubstring("Yellow World").assertCountEquals(0)
-        rule.onAllNodesWithSubstring("Hello").assertCountEquals(1)
-        rule.onAllNodesWithSubstring("Wello").assertCountEquals(1)
-        rule.onAllNodesWithSubstring("ello").assertCountEquals(2)
+        rule.onAllNodesWithText("Yellow World", substring = true).assertCountEquals(0)
+        rule.onAllNodesWithText("Hello", substring = true).assertCountEquals(1)
+        rule.onAllNodesWithText("Wello", substring = true).assertCountEquals(1)
+        rule.onAllNodesWithText("ello", substring = true).assertCountEquals(2)
+    }
+
+    @Test
+    fun findByContentDescription_matches() {
+        rule.setContent {
+            BoundaryNode { contentDescription = "Hello World" }
+        }
+
+        rule.onNodeWithContentDescription("Hello World").assertExists()
+    }
+
+    @Test(expected = AssertionError::class)
+    fun findByContentDescription_fails() {
+        rule.setContent {
+            BoundaryNode { contentDescription = "Hello World" }
+        }
+
+        rule.onNodeWithContentDescription("Hello").assertExists()
+    }
+
+    @Test
+    fun findByContentDescription_substring_matches() {
+        rule.setContent {
+            BoundaryNode { contentDescription = "Hello World" }
+        }
+
+        rule.onNodeWithContentDescription("World", substring = true).assertExists()
+    }
+
+    fun findByContentDescription_substring_noResult() {
+        rule.setContent {
+            BoundaryNode { contentDescription = "Hello World" }
+        }
+
+        rule.onNodeWithContentDescription("world", substring = true)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun findByContentDescription_substring_ignoreCase_matches() {
+        rule.setContent {
+            BoundaryNode { contentDescription = "Hello World" }
+        }
+
+        rule.onNodeWithContentDescription("world", substring = true, ignoreCase = true)
+            .assertExists()
     }
 
     @Composable

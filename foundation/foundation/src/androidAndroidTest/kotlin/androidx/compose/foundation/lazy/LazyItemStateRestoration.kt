@@ -19,7 +19,10 @@ package androidx.compose.foundation.lazy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -44,14 +47,14 @@ class LazyItemStateRestoration {
         restorationTester.setContent {
             LazyColumn {
                 item {
-                    realState[0] = rememberSavedInstanceState { counter0++ }
+                    realState[0] = rememberSaveable { counter0++ }
                     Box(Modifier.size(1.dp))
                 }
                 items((1..2).toList()) {
                     if (it == 1) {
-                        realState[1] = rememberSavedInstanceState { counter1++ }
+                        realState[1] = rememberSaveable { counter1++ }
                     } else {
-                        realState[2] = rememberSavedInstanceState { counter2++ }
+                        realState[2] = rememberSaveable { counter2++ }
                     }
                     Box(Modifier.size(1.dp))
                 }
@@ -88,7 +91,7 @@ class LazyItemStateRestoration {
             ) {
                 items((0..1).toList()) {
                     if (it == 0) {
-                        realState = rememberSavedInstanceState { counter0++ }
+                        realState = rememberSaveable { counter0++ }
                         DisposableEffect(Unit) {
                             onDispose {
                                 itemDisposed = true
@@ -134,9 +137,9 @@ class LazyItemStateRestoration {
             ) {
                 items((0..1).toList()) {
                     if (it == 0) {
-                        realState[0] = rememberSavedInstanceState { counter0++ }
+                        realState[0] = rememberSaveable { counter0++ }
                     } else {
-                        realState[1] = rememberSavedInstanceState { counter1++ }
+                        realState[1] = rememberSaveable { counter1++ }
                     }
                     Box(Modifier.size(30.dp))
                 }
@@ -185,7 +188,7 @@ class LazyItemStateRestoration {
                     if (it == 0) {
                         LazyRow {
                             item {
-                                realState = rememberSavedInstanceState { counter0++ }
+                                realState = rememberSaveable { counter0++ }
                                 DisposableEffect(Unit) {
                                     onDispose {
                                         itemDisposed = true
@@ -218,6 +221,87 @@ class LazyItemStateRestoration {
 
         rule.runOnIdle {
             assertThat(realState).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun stateRestoredWhenUsedWithCustomKeys() {
+        val restorationTester = StateRestorationTester(rule)
+        var counter0 = 1
+        var counter1 = 10
+        var counter2 = 100
+        var realState = arrayOf(0, 0, 0)
+        restorationTester.setContent {
+            LazyColumn {
+                items(3, key = { "$it" }) {
+                    if (it == 0) {
+                        realState[0] = rememberSaveable { counter0++ }
+                    } else if (it == 1) {
+                        realState[1] = rememberSaveable { counter1++ }
+                    } else {
+                        realState[2] = rememberSaveable { counter2++ }
+                    }
+                    Box(Modifier.size(1.dp))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(realState[0]).isEqualTo(1)
+            assertThat(realState[1]).isEqualTo(10)
+            assertThat(realState[2]).isEqualTo(100)
+            realState = arrayOf(0, 0, 0)
+        }
+
+        restorationTester.emulateSavedInstanceStateRestore()
+
+        rule.runOnIdle {
+            assertThat(realState[0]).isEqualTo(1)
+            assertThat(realState[1]).isEqualTo(10)
+            assertThat(realState[2]).isEqualTo(100)
+        }
+    }
+
+    @Test
+    fun stateRestoredWhenUsedWithCustomKeysAfterReordering() {
+        val restorationTester = StateRestorationTester(rule)
+        var counter0 = 1
+        var counter1 = 10
+        var counter2 = 100
+        var realState = arrayOf(0, 0, 0)
+        var list by mutableStateOf(listOf(0, 1, 2))
+        restorationTester.setContent {
+            LazyColumn {
+                items(list, key = { "$it" }) {
+                    if (it == 0) {
+                        realState[0] = rememberSaveable { counter0++ }
+                    } else if (it == 1) {
+                        realState[1] = rememberSaveable { counter1++ }
+                    } else {
+                        realState[2] = rememberSaveable { counter2++ }
+                    }
+                    Box(Modifier.size(1.dp))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            list = listOf(1, 2)
+        }
+
+        rule.runOnIdle {
+            assertThat(realState[0]).isEqualTo(1)
+            assertThat(realState[1]).isEqualTo(10)
+            assertThat(realState[2]).isEqualTo(100)
+            realState = arrayOf(0, 0, 0)
+        }
+
+        restorationTester.emulateSavedInstanceStateRestore()
+
+        rule.runOnIdle {
+            assertThat(realState[0]).isEqualTo(0)
+            assertThat(realState[1]).isEqualTo(10)
+            assertThat(realState[2]).isEqualTo(100)
         }
     }
 }

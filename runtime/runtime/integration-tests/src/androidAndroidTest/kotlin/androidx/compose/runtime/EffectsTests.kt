@@ -25,6 +25,7 @@ import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
 import org.junit.After
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -102,6 +103,7 @@ class EffectsTests : BaseComposeTest() {
     }
 
     @Test
+    @Ignore("b/179279455")
     fun testState1() {
         val tv1Id = 100
         var inc = 0
@@ -128,6 +130,7 @@ class EffectsTests : BaseComposeTest() {
     }
 
     @Test
+    @Ignore("b/179279455")
     fun testState2() {
         val tv1Id = 100
         val tv2Id = 200
@@ -548,10 +551,11 @@ class EffectsTests : BaseComposeTest() {
     }
 
     @Test
-    fun testAmbient1() {
+    @Ignore("b/179279455")
+    fun testCompositionLocal1() {
         val tv1Id = 100
 
-        val Foo = ambientOf<String>()
+        val Foo = compositionLocalOf<String>()
         var current by mutableStateOf("Hello World")
 
         @Composable
@@ -575,20 +579,21 @@ class EffectsTests : BaseComposeTest() {
     }
 
     @Test
-    fun testAmbient2() {
-        val MyAmbient = ambientOf<Int> { throw Exception("not set") }
+    @Ignore("b/179279455")
+    fun testCompositionLocal2() {
+        val MyCompositionLocal = compositionLocalOf<Int> { throw Exception("not set") }
 
         var scope: RecomposeScope? = null
-        var ambientValue = 1
+        var compositionLocalValue = 1
 
         @Composable fun SimpleComposable2() {
-            val value = MyAmbient.current
+            val value = MyCompositionLocal.current
             TextView(text = "$value")
         }
 
         @Composable fun SimpleComposable() {
             scope = currentRecomposeScope
-            Providers(MyAmbient provides ambientValue++) {
+            Providers(MyCompositionLocal provides compositionLocalValue++) {
                 SimpleComposable2()
                 Button(id = 123)
             }
@@ -616,22 +621,23 @@ class EffectsTests : BaseComposeTest() {
     }
 
     @Test
-    fun testAmbient_RecomposeScope() {
-        val MyAmbient = ambientOf<Int> { throw Exception("not set") }
+    @Ignore("b/179279455")
+    fun testCompositionLocal_RecomposeScope() {
+        val MyCompositionLocal = compositionLocalOf<Int> { throw Exception("not set") }
 
         var scope: RecomposeScope? = null
         var componentComposed = false
-        var ambientValue = 1
+        var compositionLocalValue = 1
 
         @Composable fun SimpleComposable2() {
             componentComposed = true
-            val value = MyAmbient.current
+            val value = MyCompositionLocal.current
             TextView(text = "$value")
         }
 
         @Composable fun SimpleComposable() {
             scope = currentRecomposeScope
-            Providers(MyAmbient provides ambientValue++) {
+            Providers(MyCompositionLocal provides compositionLocalValue++) {
                 SimpleComposable2()
                 Button(id = 123)
             }
@@ -663,6 +669,7 @@ class EffectsTests : BaseComposeTest() {
     }
 
     @Test
+    @Ignore("b/179279455")
     fun testUpdatedComposition() {
         val tv1Id = 100
         var inc = 0
@@ -680,6 +687,7 @@ class EffectsTests : BaseComposeTest() {
     }
 
     @Test // regression test for 165416179
+    @Ignore("b/179279455")
     fun recomposeNewModifiedState() {
         val id = 100
         var enabler by mutableStateOf(false)

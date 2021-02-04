@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.PaintingStyle
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -145,10 +146,18 @@ internal class InnerPlaceable(
             // not add PointerInputFilters on different paths so we should not even go looking.
             val originalSize = hitPointerInputFilters.size
             layoutNode.zSortedChildren.reversedAny { child ->
-                callHitTest(child, pointerPositionRelativeToScreen, hitPointerInputFilters)
-                hitPointerInputFilters.size > originalSize
+                if (child.isPlaced) {
+                    callHitTest(child, pointerPositionRelativeToScreen, hitPointerInputFilters)
+                    hitPointerInputFilters.size > originalSize
+                } else {
+                    false
+                }
             }
         }
+    }
+
+    override fun getWrappedByCoordinates(): LayoutCoordinates {
+        return this
     }
 
     internal companion object {

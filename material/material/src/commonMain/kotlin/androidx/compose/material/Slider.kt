@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.material
 
 import androidx.compose.animation.asDisposableClock
@@ -29,6 +31,7 @@ import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.animation.defaultFlingConfig
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.layout.Box
@@ -50,14 +53,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.lerp
-import androidx.compose.ui.gesture.pressIndicatorGestureFilter
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.platform.AmbientAnimationClock
-import androidx.compose.ui.platform.AmbientDensity
-import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalAnimationClock
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.setProgress
 import androidx.compose.ui.unit.LayoutDirection
@@ -123,7 +126,7 @@ fun Slider(
     activeTickColor: Color = MaterialTheme.colors.onPrimary.copy(alpha = TickColorAlpha),
     inactiveTickColor: Color = activeTrackColor.copy(alpha = TickColorAlpha)
 ) {
-    val clock = AmbientAnimationClock.current.asDisposableClock()
+    val clock = LocalAnimationClock.current.asDisposableClock()
     val position = remember(valueRange, steps) {
         SliderPosition(value, valueRange, steps, clock, onValueChange)
     }
@@ -132,7 +135,7 @@ fun Slider(
     BoxWithConstraints(
         modifier.sliderSemantics(value, position, onValueChange, valueRange, steps)
     ) {
-        val isRtl = AmbientLayoutDirection.current == LayoutDirection.Rtl
+        val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
         val maxPx = constraints.maxWidth.toFloat()
         val minPx = 0f
         position.setBounds(minPx, maxPx)
@@ -155,19 +158,17 @@ fun Slider(
             }
         }
 
-        val press = Modifier.pressIndicatorGestureFilter(
-            onStart = { pos ->
-                position.holder.snapTo(if (isRtl) maxPx - pos.x else pos.x)
-                interactionState.addInteraction(Interaction.Pressed, pos)
-            },
-            onStop = {
-                gestureEndAction(0f)
-                interactionState.removeInteraction(Interaction.Pressed)
-            },
-            onCancel = {
-                interactionState.removeInteraction(Interaction.Pressed)
-            }
-        )
+        val press = Modifier.pointerInput(Unit) {
+            detectTapGestures(
+                onPress = { pos ->
+                    position.holder.snapTo(if (isRtl) maxPx - pos.x else pos.x)
+                    interactionState.addInteraction(Interaction.Pressed, pos)
+                    val success = tryAwaitRelease()
+                    if (success) gestureEndAction(0f)
+                    interactionState.removeInteraction(Interaction.Pressed)
+                }
+            )
+        }
 
         val drag = Modifier.draggable(
             orientation = Orientation.Horizontal,
@@ -222,7 +223,7 @@ private fun SliderImpl(
     interactionState: InteractionState,
     modifier: Modifier
 ) {
-    val widthDp = with(AmbientDensity.current) {
+    val widthDp = with(LocalDensity.current) {
         width.toDp()
     }
     Box(modifier.then(DefaultSliderConstraints)) {
@@ -232,7 +233,7 @@ private fun SliderImpl(
 
         val trackStrokeWidth: Float
         val thumbPx: Float
-        with(AmbientDensity.current) {
+        with(LocalDensity.current) {
             trackStrokeWidth = TrackHeight.toPx()
             thumbPx = ThumbRadius.toPx()
         }

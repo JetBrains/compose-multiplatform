@@ -30,7 +30,37 @@ import androidx.compose.ui.unit.Dp
  * @param brush brush to paint the border with
  */
 @Immutable
-data class BorderStroke(val width: Dp, val brush: Brush)
+class BorderStroke(val width: Dp, val brush: Brush) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is BorderStroke) return false
+
+        if (width != other.width) return false
+        if (brush != other.brush) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = width.hashCode()
+        result = 31 * result + brush.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "BorderStroke(width=$width, brush=$brush)"
+    }
+
+    fun copy(
+        width: Dp = this.width,
+        brush: Brush = this.brush
+    ): BorderStroke {
+        return BorderStroke(
+            width = width,
+            brush = brush
+        )
+    }
+}
 
 /**
  * Create [BorderStroke] class with width and [Color]

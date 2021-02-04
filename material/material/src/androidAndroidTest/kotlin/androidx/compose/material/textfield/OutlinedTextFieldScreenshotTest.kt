@@ -20,16 +20,16 @@ import android.os.Build
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.GOLDEN_MATERIAL
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.setMaterialContent
 import androidx.compose.runtime.Providers
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.SemanticsNodeInteraction
@@ -46,6 +46,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
@@ -105,6 +106,7 @@ class OutlinedTextFieldScreenshotTest {
         assertAgainstGolden("outlined_textField_not_focused")
     }
 
+    @FlakyTest(bugId = 179292401)
     @Test
     fun outlinedTextField_focused() {
         rule.setMaterialContent {
@@ -123,10 +125,11 @@ class OutlinedTextFieldScreenshotTest {
         assertAgainstGolden("outlined_textField_focused")
     }
 
+    @FlakyTest(bugId = 179292401)
     @Test
     fun outlinedTextField_focused_rtl() {
         rule.setMaterialContent {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
                     OutlinedTextField(
                         value = "",
@@ -143,6 +146,7 @@ class OutlinedTextFieldScreenshotTest {
         assertAgainstGolden("outlined_textField_focused_rtl")
     }
 
+    @FlakyTest(bugId = 179292401)
     @Test
     fun outlinedTextField_error_focused() {
         rule.setMaterialContent {
@@ -182,7 +186,7 @@ class OutlinedTextFieldScreenshotTest {
     @Test
     fun outlinedTextField_textColor_fallbackToContentColor() {
         rule.setMaterialContent {
-            Providers(AmbientContentColor provides Color.Magenta) {
+            Providers(LocalContentColor provides Color.Magenta) {
                 OutlinedTextField(
                     value = "Hello, world!",
                     onValueChange = {},
@@ -398,7 +402,13 @@ class OutlinedTextFieldScreenshotTest {
             }
         }
 
+        rule.mainClock.autoAdvance = false
+
         rule.onNodeWithTag(TextFieldTag).performGesture { swipeLeft() }
+
+        // wait for swipe to finish
+        rule.waitForIdle()
+        rule.mainClock.advanceTimeBy(250)
 
         assertAgainstGolden("outlinedTextField_disabled_notScrolled")
     }
@@ -435,6 +445,7 @@ class OutlinedTextFieldScreenshotTest {
         assertAgainstGolden("outlinedTextField_readOnly_focused")
     }
 
+    @FlakyTest(bugId = 178510985)
     @Test
     fun outlinedTextField_readOnly_scrolled() {
         rule.setMaterialContent {
@@ -448,7 +459,13 @@ class OutlinedTextFieldScreenshotTest {
             )
         }
 
+        rule.mainClock.autoAdvance = false
+
         rule.onNodeWithTag(TextFieldTag).performGesture { swipeLeft() }
+
+        // wait for swipe to finish
+        rule.waitForIdle()
+        rule.mainClock.advanceTimeBy(250)
 
         assertAgainstGolden("outlinedTextField_readOnly_scrolled")
     }

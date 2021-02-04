@@ -21,7 +21,7 @@ import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
 
-class DesktopClipboardManager : ClipboardManager {
+internal class DesktopClipboardManager : ClipboardManager {
     internal val systemClipboard = try {
         Toolkit.getDefaultToolkit().getSystemClipboard()
     } catch (e: java.awt.HeadlessException) { null }

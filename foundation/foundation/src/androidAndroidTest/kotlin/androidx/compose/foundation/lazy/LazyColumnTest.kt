@@ -34,6 +34,8 @@ import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -41,7 +43,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.TouchSlop
+import androidx.compose.ui.platform.LocalViewConfiguration
+import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertCountEquals
@@ -55,6 +58,7 @@ import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.center
 import androidx.compose.ui.test.down
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onChildren
@@ -98,7 +102,7 @@ class LazyColumnTest {
         val items = listOf(1, 2).map { it.toString() }
         val indexedItems = listOf(3, 4, 5)
 
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(Modifier.preferredHeight(200.dp)) {
                 item {
                     Spacer(
@@ -140,7 +144,7 @@ class LazyColumnTest {
     fun lazyColumnAllowEmptyListItems() {
         val itemTag = "itemTag"
 
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn {
                 items(emptyList<Any>()) { }
                 item {
@@ -158,7 +162,7 @@ class LazyColumnTest {
         val items = listOf("1", null, "3")
         val nullTestTag = "nullTestTag"
 
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(Modifier.preferredHeight(200.dp)) {
                 items(items) {
                     if (it != null) {
@@ -190,7 +194,7 @@ class LazyColumnTest {
         // Ten 31dp spacers in a 300dp list
         val latch = CountDownLatch(10)
 
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             // Fixed height to eliminate device size as a factor
             Box(Modifier.testTag(LazyListTag).preferredHeight(300.dp)) {
                 LazyColumn(Modifier.fillMaxSize()) {
@@ -244,7 +248,7 @@ class LazyColumnTest {
 
         var part2 by mutableStateOf(false)
 
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(Modifier.testTag(LazyListTag).fillMaxSize()) {
                 items(if (!part2) data1 else data2) {
                     DisposableEffect(NeverEqualObject) {
@@ -285,7 +289,7 @@ class LazyColumnTest {
         var disposeCalledOnFirstItem = false
         var disposeCalledOnSecondItem = false
 
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             if (emitAdapterList) {
                 LazyColumn(Modifier.fillMaxSize()) {
                     items(2) {
@@ -326,7 +330,7 @@ class LazyColumnTest {
         var numItems = startingNumItems
         var numItemsModel by mutableStateOf(numItems)
         val tag = "List"
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(Modifier.testTag(tag)) {
                 items((1..numItemsModel).toList()) {
                     BasicText("$it")
@@ -367,7 +371,7 @@ class LazyColumnTest {
         )
         var dataModel by mutableStateOf(dataLists[0])
         val tag = "List"
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(Modifier.testTag(tag)) {
                 items(dataModel) {
                     BasicText("$it")
@@ -397,7 +401,7 @@ class LazyColumnTest {
         val items = (1..3).toList()
         var thirdHasSize by mutableStateOf(false)
 
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(
                 Modifier.fillMaxWidth()
                     .preferredHeight(100.dp)
@@ -443,7 +447,7 @@ class LazyColumnTest {
         val itemOutsideLazyColumn = "itemOutsideLazyColumn"
         var sameSizeItems by mutableStateOf(true)
 
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             Row {
                 LazyColumn(Modifier.testTag(LazyListTag)) {
                     items(listOf(1, 2)) {
@@ -467,10 +471,10 @@ class LazyColumnTest {
         var lazyColumnBounds = rule.onNodeWithTag(LazyListTag)
             .getUnclippedBoundsInRoot()
 
-        assertThat(lazyColumnBounds.left.toIntPx()).isWithin1PixelFrom(0.dp.toIntPx())
-        assertThat(lazyColumnBounds.right.toIntPx()).isWithin1PixelFrom(50.dp.toIntPx())
-        assertThat(lazyColumnBounds.top.toIntPx()).isWithin1PixelFrom(0.dp.toIntPx())
-        assertThat(lazyColumnBounds.bottom.toIntPx()).isWithin1PixelFrom(100.dp.toIntPx())
+        assertThat(lazyColumnBounds.left.roundToPx()).isWithin1PixelFrom(0.dp.roundToPx())
+        assertThat(lazyColumnBounds.right.roundToPx()).isWithin1PixelFrom(50.dp.roundToPx())
+        assertThat(lazyColumnBounds.top.roundToPx()).isWithin1PixelFrom(0.dp.roundToPx())
+        assertThat(lazyColumnBounds.bottom.roundToPx()).isWithin1PixelFrom(100.dp.roundToPx())
 
         rule.runOnIdle {
             sameSizeItems = false
@@ -487,17 +491,17 @@ class LazyColumnTest {
         lazyColumnBounds = rule.onNodeWithTag(LazyListTag)
             .getUnclippedBoundsInRoot()
 
-        assertThat(lazyColumnBounds.left.toIntPx()).isWithin1PixelFrom(0.dp.toIntPx())
-        assertThat(lazyColumnBounds.right.toIntPx()).isWithin1PixelFrom(70.dp.toIntPx())
-        assertThat(lazyColumnBounds.top.toIntPx()).isWithin1PixelFrom(0.dp.toIntPx())
-        assertThat(lazyColumnBounds.bottom.toIntPx()).isWithin1PixelFrom(120.dp.toIntPx())
+        assertThat(lazyColumnBounds.left.roundToPx()).isWithin1PixelFrom(0.dp.roundToPx())
+        assertThat(lazyColumnBounds.right.roundToPx()).isWithin1PixelFrom(70.dp.roundToPx())
+        assertThat(lazyColumnBounds.top.roundToPx()).isWithin1PixelFrom(0.dp.roundToPx())
+        assertThat(lazyColumnBounds.bottom.roundToPx()).isWithin1PixelFrom(120.dp.roundToPx())
     }
 
     private val firstItemTag = "firstItemTag"
     private val secondItemTag = "secondItemTag"
 
     private fun prepareLazyColumnsItemsAlignment(horizontalGravity: Alignment.Horizontal) {
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(
                 Modifier.testTag(LazyListTag).width(100.dp),
                 horizontalAlignment = horizontalGravity
@@ -523,8 +527,8 @@ class LazyColumnTest {
 
         with(rule.density) {
             // Verify the width of the column
-            assertThat(lazyColumnBounds.left.toIntPx()).isWithin1PixelFrom(0.dp.toIntPx())
-            assertThat(lazyColumnBounds.right.toIntPx()).isWithin1PixelFrom(100.dp.toIntPx())
+            assertThat(lazyColumnBounds.left.roundToPx()).isWithin1PixelFrom(0.dp.roundToPx())
+            assertThat(lazyColumnBounds.right.roundToPx()).isWithin1PixelFrom(100.dp.roundToPx())
         }
     }
 
@@ -563,7 +567,7 @@ class LazyColumnTest {
 
     @Test
     fun itemFillingParentWidth() {
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(Modifier.size(width = 100.dp, height = 150.dp)) {
                 items(listOf(0)) {
                     Spacer(Modifier.fillParentMaxWidth().height(50.dp).testTag(firstItemTag))
@@ -578,7 +582,7 @@ class LazyColumnTest {
 
     @Test
     fun itemFillingParentHeight() {
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(Modifier.size(width = 100.dp, height = 150.dp)) {
                 items(listOf(0)) {
                     Spacer(Modifier.width(50.dp).fillParentMaxHeight().testTag(firstItemTag))
@@ -593,7 +597,7 @@ class LazyColumnTest {
 
     @Test
     fun itemFillingParentSize() {
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(Modifier.size(width = 100.dp, height = 150.dp)) {
                 items(listOf(0)) {
                     Spacer(Modifier.fillParentMaxSize().testTag(firstItemTag))
@@ -608,7 +612,7 @@ class LazyColumnTest {
 
     @Test
     fun itemFillingParentWidthFraction() {
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(Modifier.size(width = 100.dp, height = 150.dp)) {
                 items(listOf(0)) {
                     Spacer(Modifier.fillParentMaxWidth(0.6f).height(50.dp).testTag(firstItemTag))
@@ -623,7 +627,7 @@ class LazyColumnTest {
 
     @Test
     fun itemFillingParentHeightFraction() {
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(Modifier.size(width = 100.dp, height = 150.dp)) {
                 items(listOf(0)) {
                     Spacer(Modifier.width(50.dp).fillParentMaxHeight(0.2f).testTag(firstItemTag))
@@ -638,7 +642,7 @@ class LazyColumnTest {
 
     @Test
     fun itemFillingParentSizeFraction() {
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(Modifier.size(width = 100.dp, height = 150.dp)) {
                 items(listOf(0)) {
                     Spacer(Modifier.fillParentMaxSize(0.1f).testTag(firstItemTag))
@@ -654,7 +658,7 @@ class LazyColumnTest {
     @Test
     fun itemFillingParentSizeParentResized() {
         var parentSize by mutableStateOf(100.dp)
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(Modifier.size(parentSize)) {
                 items(listOf(0)) {
                     Spacer(Modifier.fillParentMaxSize().testTag(firstItemTag))
@@ -674,7 +678,7 @@ class LazyColumnTest {
     @Test
     fun whenNotAnymoreAvailableItemWasDisplayed() {
         var items by mutableStateOf((1..30).toList())
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(Modifier.size(100.dp).testTag(LazyListTag)) {
                 items(items) {
                     Spacer(Modifier.size(20.dp).testTag("$it"))
@@ -698,7 +702,7 @@ class LazyColumnTest {
     @Test
     fun whenFewDisplayedItemsWereRemoved() {
         var items by mutableStateOf((1..10).toList())
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(Modifier.size(100.dp).testTag(LazyListTag)) {
                 items(items) {
                     Spacer(Modifier.size(20.dp).testTag("$it"))
@@ -722,7 +726,7 @@ class LazyColumnTest {
     @Test
     fun whenItemsBecameEmpty() {
         var items by mutableStateOf((1..10).toList())
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(Modifier.sizeIn(maxHeight = 100.dp).testTag(LazyListTag)) {
                 items(items) {
                     Spacer(Modifier.size(20.dp).testTag("$it"))
@@ -753,7 +757,7 @@ class LazyColumnTest {
     @Test
     fun scrollBackAndForth() {
         val items by mutableStateOf((1..20).toList())
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(Modifier.size(100.dp).testTag(LazyListTag)) {
                 items(items) {
                     Spacer(Modifier.size(20.dp).testTag("$it"))
@@ -776,7 +780,7 @@ class LazyColumnTest {
     @Test
     fun tryToScrollBackwardWhenAlreadyOnTop() {
         val items by mutableStateOf((1..20).toList())
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(Modifier.size(100.dp).testTag(LazyListTag)) {
                 items(items) {
                     Spacer(Modifier.size(20.dp).testTag("$it"))
@@ -799,7 +803,7 @@ class LazyColumnTest {
         val items = listOf(NotStable(1), NotStable(2))
         var firstItemRecomposed = 0
         var secondItemRecomposed = 0
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(Modifier.size(100.dp).testTag(LazyListTag)) {
                 items(items) {
                     if (it.count == 1) {
@@ -830,7 +834,7 @@ class LazyColumnTest {
     fun onlyOneMeasurePassForScrollEvent() {
         val items by mutableStateOf((1..20).toList())
         lateinit var state: LazyListState
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             state = rememberLazyListState()
             LazyColumn(
                 Modifier.size(100.dp).testTag(LazyListTag),
@@ -859,7 +863,7 @@ class LazyColumnTest {
     fun stateUpdatedAfterScroll() {
         val items by mutableStateOf((1..20).toList())
         lateinit var state: LazyListState
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             state = rememberLazyListState()
             LazyColumn(
                 Modifier.size(100.dp).testTag(LazyListTag),
@@ -885,8 +889,8 @@ class LazyColumnTest {
             with(rule.density) {
                 // TODO(b/169232491): test scrolling doesn't appear to be scrolling exactly the right
                 //  number of pixels
-                val expectedOffset = 10.dp.toIntPx()
-                val tolerance = 2.dp.toIntPx()
+                val expectedOffset = 10.dp.roundToPx()
+                val tolerance = 2.dp.roundToPx()
                 assertThat(state.firstVisibleItemScrollOffset).isEqualTo(expectedOffset, tolerance)
             }
         }
@@ -900,7 +904,7 @@ class LazyColumnTest {
             flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = clock
         )
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(
                 Modifier.size(100.dp).testTag(LazyListTag),
                 state = state
@@ -937,7 +941,7 @@ class LazyColumnTest {
     fun stateUpdatedAfterScrollWithinTheSameItem() {
         val items by mutableStateOf((1..20).toList())
         lateinit var state: LazyListState
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             state = rememberLazyListState()
             LazyColumn(
                 Modifier.size(100.dp).testTag(LazyListTag),
@@ -955,8 +959,8 @@ class LazyColumnTest {
         rule.runOnIdle {
             assertThat(state.firstVisibleItemIndex).isEqualTo(0)
             with(rule.density) {
-                val expectedOffset = 10.dp.toIntPx()
-                val tolerance = 2.dp.toIntPx()
+                val expectedOffset = 10.dp.roundToPx()
+                val tolerance = 2.dp.roundToPx()
                 assertThat(state.firstVisibleItemScrollOffset)
                     .isEqualTo(expectedOffset, tolerance)
             }
@@ -967,8 +971,8 @@ class LazyColumnTest {
     fun initialScrollIsApplied() {
         val items by mutableStateOf((0..20).toList())
         lateinit var state: LazyListState
-        val expectedOffset = with(rule.density) { 10.dp.toIntPx() }
-        rule.setContent {
+        val expectedOffset = with(rule.density) { 10.dp.roundToPx() }
+        rule.setContentWithTestViewConfiguration {
             state = rememberLazyListState(2, expectedOffset)
             LazyColumn(
                 Modifier.size(100.dp).testTag(LazyListTag),
@@ -1025,7 +1029,7 @@ class LazyColumnTest {
     @Test
     fun scroll_makeListSmaller_scroll() {
         var items by mutableStateOf((1..100).toList())
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(Modifier.size(100.dp).testTag(LazyListTag)) {
                 items(items) {
                     Spacer(Modifier.size(10.dp).testTag("$it"))
@@ -1051,7 +1055,7 @@ class LazyColumnTest {
     @Test
     fun snapToItemIndex() {
         lateinit var state: LazyListState
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             state = rememberLazyListState()
             LazyColumn(
                 Modifier.size(100.dp).testTag(LazyListTag),
@@ -1076,7 +1080,7 @@ class LazyColumnTest {
     fun itemsAreNotRedrawnDuringScroll() {
         val items = (0..20).toList()
         val redrawCount = Array(6) { 0 }
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(Modifier.size(100.dp).testTag(LazyListTag)) {
                 items(items) {
                     Spacer(
@@ -1102,7 +1106,7 @@ class LazyColumnTest {
     fun itemInvalidationIsNotCausingAnotherItemToRedraw() {
         val redrawCount = Array(2) { 0 }
         var stateUsedInDrawScope by mutableStateOf(false)
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(Modifier.size(100.dp).testTag(LazyListTag)) {
                 items(2) {
                     Spacer(
@@ -1135,7 +1139,7 @@ class LazyColumnTest {
         val itemSize = with(rule.density) { 30.toDp() }
         val itemSizeMinusOne = with(rule.density) { 29.toDp() }
         lateinit var state: LazyListState
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(
                 Modifier.height(itemSizeMinusOne).testTag(LazyListTag),
                 state = rememberLazyListState().also { state = it }
@@ -1163,7 +1167,7 @@ class LazyColumnTest {
         val items = (0..2).toList()
         val itemSize = with(rule.density) { 30.toDp() }
         lateinit var state: LazyListState
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(
                 Modifier.height(itemSize * 1.75f).testTag(LazyListTag),
                 state = rememberLazyListState().also { state = it }
@@ -1194,7 +1198,7 @@ class LazyColumnTest {
 
         val itemSize = with(rule.density) { 15.toDp() }
 
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn {
                 items(items) {
                     Spacer(Modifier.size(itemSize).testTag(it))
@@ -1218,7 +1222,7 @@ class LazyColumnTest {
 
         val itemSize = with(rule.density) { 15.toDp() }
 
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn {
                 itemsIndexed(items) { index, item ->
                     Spacer(Modifier.size(itemSize).testTag("$index*$item"))
@@ -1242,7 +1246,7 @@ class LazyColumnTest {
 
     private fun LazyListState.scrollBy(offset: Dp) {
         runBlocking {
-            smoothScrollBy(with(rule.density) { offset.toIntPx().toFloat() }, snap())
+            smoothScrollBy(with(rule.density) { offset.roundToPx().toFloat() }, snap())
         }
     }
 }
@@ -1257,12 +1261,35 @@ internal fun IntegerSubject.isEqualTo(expected: Int, tolerance: Int) {
     isIn(Range.closed(expected - tolerance, expected + tolerance))
 }
 
+internal val TestTouchSlop = 18f
+
+private val FakeViewConfiguration = object : ViewConfiguration {
+    override val longPressTimeoutMillis: Long
+        get() = 500L
+    override val doubleTapTimeoutMillis: Long
+        get() = 300L
+    override val doubleTapMinTimeMillis: Long
+        get() = 40L
+    override val touchSlop: Float
+        get() = TestTouchSlop
+}
+
+internal fun ComposeContentTestRule.setContentWithTestViewConfiguration(
+    composable: @Composable () -> Unit
+) {
+    this.setContent {
+        Providers(LocalViewConfiguration provides FakeViewConfiguration) {
+            composable()
+        }
+    }
+}
+
 internal fun SemanticsNodeInteraction.scrollBy(x: Dp = 0.dp, y: Dp = 0.dp, density: Density) =
     performGesture {
         with(density) {
-            val touchSlop = TouchSlop.toIntPx()
-            val xPx = x.toIntPx()
-            val yPx = y.toIntPx()
+            val touchSlop = TestTouchSlop.toInt()
+            val xPx = x.roundToPx()
+            val yPx = y.roundToPx()
             val offsetX = if (xPx > 0) xPx + touchSlop else if (xPx < 0) xPx - touchSlop else 0
             val offsetY = if (yPx > 0) yPx + touchSlop else if (yPx < 0) yPx - touchSlop else 0
             swipeWithVelocity(

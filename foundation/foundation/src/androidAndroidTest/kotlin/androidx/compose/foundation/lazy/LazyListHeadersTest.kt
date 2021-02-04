@@ -94,7 +94,7 @@ class LazyListHeadersTest {
         val firstHeaderTag = "firstHeaderTag"
         val secondHeaderTag = "secondHeaderTag"
 
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(Modifier.preferredHeight(300.dp).testTag(LazyListTag)) {
                 stickyHeader {
                     Spacer(
@@ -136,7 +136,7 @@ class LazyListHeadersTest {
         val firstHeaderTag = "firstHeaderTag"
         val secondHeaderTag = "secondHeaderTag"
 
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(Modifier.preferredHeight(300.dp).testTag(LazyListTag)) {
                 stickyHeader {
                     Spacer(
@@ -221,7 +221,7 @@ class LazyListHeadersTest {
         val firstHeaderTag = "firstHeaderTag"
         val secondHeaderTag = "secondHeaderTag"
 
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyRow(Modifier.preferredWidth(300.dp).testTag(LazyListTag)) {
                 stickyHeader {
                     Spacer(
@@ -263,7 +263,7 @@ class LazyListHeadersTest {
         val firstHeaderTag = "firstHeaderTag"
         val secondHeaderTag = "secondHeaderTag"
 
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyRow(Modifier.preferredWidth(300.dp).testTag(LazyListTag)) {
                 stickyHeader {
                     Spacer(

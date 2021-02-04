@@ -24,16 +24,16 @@ import androidx.compose.foundation.text.selection.TextFieldSelectionHandle
 import androidx.compose.foundation.text.selection.TextFieldSelectionManager
 import androidx.compose.foundation.text.selection.isSelectionHandleInVisibleBound
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.currentRecomposeScope
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
@@ -47,21 +47,24 @@ import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.AmbientClipboardManager
-import androidx.compose.ui.platform.AmbientDensity
-import androidx.compose.ui.platform.AmbientFontLoader
-import androidx.compose.ui.platform.AmbientHapticFeedback
-import androidx.compose.ui.platform.AmbientTextInputService
-import androidx.compose.ui.platform.AmbientTextToolbar
-import androidx.compose.ui.selection.AmbientTextSelectionColors
-import androidx.compose.ui.selection.SimpleLayout
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalFontLoader
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalTextInputService
+import androidx.compose.ui.platform.LocalTextToolbar
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.SimpleLayout
 import androidx.compose.ui.semantics.copyText
 import androidx.compose.ui.semantics.cutText
 import androidx.compose.ui.semantics.disabled
+import androidx.compose.ui.semantics.editableText
 import androidx.compose.ui.semantics.getTextLayoutResult
 import androidx.compose.ui.semantics.imeAction
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.onLongClick
+import androidx.compose.ui.semantics.password
 import androidx.compose.ui.semantics.pasteText
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.setSelection
@@ -82,6 +85,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.NO_SESSION
 import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.text.input.VisualTransformation
@@ -107,7 +111,6 @@ import kotlin.math.roundToInt
  *
  * It is crucial that the value provided in the [onValueChange] is fed back into [CoreTextField] in
  * order to have the final state of the text being displayed. Example usage:
- * @sample androidx.compose.foundation.samples.CoreTextFieldSample
  *
  * Please keep in mind that [onValueChange] is useful to be informed about the latest state of the
  * text input by users, however it is generally not recommended to modify the values in the
@@ -139,6 +142,9 @@ import kotlin.math.roundToInt
  * @param maxLines The maximum height in terms of maximum number of visible lines. Should be
  * equal or greater than 1.
  * @param imeOptions Contains different IME configuration options.
+ * @param keyboardActions when the input service emits an IME action, the corresponding callback
+ * is called. Note that this IME action may be different from what you specified in
+ * [KeyboardOptions.imeAction].
  * @param enabled controls the enabled state of the text field. When `false`, the text
  * field will be neither editable nor focusable, the input of the text field will not be selectable
  * @param readOnly controls the editable state of the [CoreTextField]. When `true`, the text
@@ -154,14 +160,15 @@ import kotlin.math.roundToInt
 @Composable
 @OptIn(
     ExperimentalTextApi::class,
-    MouseTemporaryApi::class
+    MouseTemporaryApi::class,
+    InternalTextApi::class
 )
-@InternalTextApi
-fun CoreTextField(
+internal fun CoreTextField(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     modifier: Modifier = Modifier,
     textStyle: TextStyle = TextStyle.Default,
+    // TODO(b/179071523): Deprecate and remove onImeActionPerformed.
     onImeActionPerformed: (ImeAction) -> Unit = {},
     visualTransformation: VisualTransformation = VisualTransformation.None,
     onTextLayout: (TextLayoutResult) -> Unit = {},
@@ -171,6 +178,7 @@ fun CoreTextField(
     softWrap: Boolean = true,
     maxLines: Int = Int.MAX_VALUE,
     imeOptions: ImeOptions = ImeOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
     enabled: Boolean = true,
     readOnly: Boolean = false,
     decorationBox: @Composable (innerTextField: @Composable () -> Unit) -> Unit =
@@ -181,17 +189,18 @@ fun CoreTextField(
     val scope = currentRecomposeScope
     val focusRequester = FocusRequester()
 
-    // Ambients
+    // CompositionLocals
     // If the text field is disabled or read-only, we should not deal with the input service
-    val textInputService = if (!enabled || readOnly) null else AmbientTextInputService.current
-    val density = AmbientDensity.current
-    val resourceLoader = AmbientFontLoader.current
-    val selectionBackgroundColor = AmbientTextSelectionColors.current.backgroundColor
+    val textInputService = if (!enabled || readOnly) null else LocalTextInputService.current
+    val density = LocalDensity.current
+    val resourceLoader = LocalFontLoader.current
+    val selectionBackgroundColor = LocalTextSelectionColors.current.backgroundColor
+    val focusManager = LocalFocusManager.current
 
     // Scroll state
     val singleLine = maxLines == 1 && !softWrap && imeOptions.singleLine
     val orientation = if (singleLine) Orientation.Horizontal else Orientation.Vertical
-    val scrollerPosition = rememberSavedInstanceState(
+    val scrollerPosition = rememberSaveable(
         orientation,
         saver = TextFieldScrollerPosition.Saver
     ) { TextFieldScrollerPosition(orientation) }
@@ -226,6 +235,8 @@ fun CoreTextField(
         resourceLoader,
         onValueChange,
         onImeActionPerformed,
+        keyboardActions,
+        focusManager,
         selectionBackgroundColor
     )
 
@@ -233,20 +244,24 @@ fun CoreTextField(
         state.onValueChange(it)
         scope.invalidate()
     }
-    val onImeActionPerformedWrapper: (ImeAction) -> Unit = {
-        state.onImeActionPerformed(it)
+    val onImeActionPerformedWrapper: (ImeAction) -> Unit = { imeAction ->
+        state.keyboardActionRunner.runAction(imeAction)
+
+        // TODO(b/179071523): Deprecate and remove onImeActionPerformed.
+        state.onImeActionPerformed(imeAction)
     }
 
     state.processor.onNewState(value, textInputService, state.inputSession)
 
     val manager = remember { TextFieldSelectionManager() }
     manager.offsetMapping = offsetMapping
+    manager.visualTransformation = visualTransformation
     manager.onValueChange = onValueChangeWrapper
     manager.state = state
     manager.value = value
-    manager.clipboardManager = AmbientClipboardManager.current
-    manager.textToolbar = AmbientTextToolbar.current
-    manager.hapticFeedBack = AmbientHapticFeedback.current
+    manager.clipboardManager = LocalClipboardManager.current
+    manager.textToolbar = LocalTextToolbar.current
+    manager.hapticFeedBack = LocalHapticFeedback.current
     manager.focusRequester = focusRequester
     manager.editable = !readOnly
 
@@ -278,30 +293,21 @@ fun CoreTextField(
 
     val focusRequestTapModifier = Modifier.focusRequestTapModifier(
         enabled = enabled,
-        onTap = {
+        onTap = { offset ->
             tapToFocus(state, focusRequester, textInputService, !readOnly)
-        }
-    )
-
-    val dragPositionGestureModifier = Modifier.dragPositionGestureFilter(
-        interactionState = interactionState,
-        enabled = enabled,
-        onPress = {
             if (state.hasFocus) {
-                state.selectionIsOn = false
-                manager.hideSelectionToolbar()
-            }
-        },
-        onRelease = {
-            if (state.hasFocus && !state.selectionIsOn) {
-                state.layoutResult?.let { layoutResult ->
-                    TextFieldDelegate.setCursorOffset(
-                        it,
-                        layoutResult,
-                        state.processor,
-                        offsetMapping,
-                        onValueChangeWrapper
-                    )
+                if (!state.selectionIsOn) {
+                    state.layoutResult?.let { layoutResult ->
+                        TextFieldDelegate.setCursorOffset(
+                            offset,
+                            layoutResult,
+                            state.processor,
+                            offsetMapping,
+                            onValueChangeWrapper
+                        )
+                    }
+                } else {
+                    manager.deselect(offset)
                 }
             }
         }
@@ -316,7 +322,7 @@ fun CoreTextField(
             enabled = enabled
         )
     } else {
-        dragPositionGestureModifier
+        Modifier.pressGestureFilter(interactionState = interactionState, enabled = enabled)
             .then(selectionModifier)
             .then(focusRequestTapModifier)
     }
@@ -363,12 +369,14 @@ fun CoreTextField(
         state.layoutResult?.innerTextFieldCoordinates = it
     }
 
-    val semanticsModifier = Modifier.semantics {
+    val isPassword = visualTransformation is PasswordVisualTransformation
+    val semanticsModifier = Modifier.semantics(true) {
         // focused semantics are handled by Modifier.focusable()
         this.imeAction = imeOptions.imeAction
-        this.text = value.annotatedString
+        this.editableText = value.annotatedString
         this.textSelectionRange = value.selection
         if (!enabled) this.disabled()
+        if (isPassword) this.password()
         getTextLayoutResult {
             if (state.layoutResult != null) {
                 it.add(state.layoutResult!!.value)
@@ -396,7 +404,12 @@ fun CoreTextField(
                 } else {
                     manager.enterSelectionMode()
                 }
-                onValueChangeWrapper(TextFieldValue(value.annotatedString, TextRange(start, end)))
+                onValueChangeWrapper(
+                    TextFieldValue(
+                        value.annotatedString,
+                        TextRange(start, end)
+                    )
+                )
                 true
             } else {
                 manager.exitSelectionMode()
@@ -413,7 +426,7 @@ fun CoreTextField(
             manager.enterSelectionMode()
             true
         }
-        if (!value.selection.collapsed) {
+        if (!value.selection.collapsed && !isPassword) {
             copyText {
                 manager.copy()
                 true
@@ -443,8 +456,8 @@ fun CoreTextField(
     // Modifiers that should be applied to the outer text field container. Usually those include
     // gesture and semantics modifiers.
     val decorationBoxModifier = modifier
-        .then(pointerModifier)
         .textFieldScrollable(scrollerPosition, interactionState, enabled)
+        .then(pointerModifier)
         .then(semanticsModifier)
         .then(focusModifier)
         .onGloballyPositioned {
@@ -470,7 +483,7 @@ fun CoreTextField(
                 .textFieldKeyboardModifier(manager)
 
             SimpleLayout(coreTextFieldModifier) {
-                Layout(emptyContent()) { _, constraints ->
+                Layout({ }) { _, constraints ->
                     TextFieldDelegate.layout(
                         state.textDelegate,
                         constraints,
@@ -575,12 +588,15 @@ internal class TextFieldState(
     var onImeActionPerformed: (ImeAction) -> Unit = {}
         private set
 
+    val keyboardActionRunner: KeyboardActionRunner = KeyboardActionRunner()
+
     var onValueChange: (TextFieldValue) -> Unit = {}
         private set
 
     /** The paint used to draw highlight background for selected text. */
     val selectionPaint: Paint = Paint()
 
+    // TODO(ralu): Replace this function with a TextFieldState.apply{ ... } at the call site.
     fun update(
         visualText: AnnotatedString,
         textStyle: TextStyle,
@@ -589,11 +605,17 @@ internal class TextFieldState(
         resourceLoader: Font.ResourceLoader,
         onValueChange: (TextFieldValue) -> Unit,
         onImeActionPerformed: (ImeAction) -> Unit,
+        keyboardActions: KeyboardActions,
+        focusManager: FocusManager,
         selectionBackgroundColor: Color
     ) {
         this.onValueChange = onValueChange
         this.onImeActionPerformed = onImeActionPerformed
         this.selectionPaint.color = selectionBackgroundColor
+        this.keyboardActionRunner.apply {
+            this.keyboardActions = keyboardActions
+            this.focusManager = focusManager
+        }
 
         textDelegate = updateTextDelegate(
             current = textDelegate,

@@ -161,4 +161,14 @@ class SizeTest {
     fun testTakeOrElseFalse() {
         Assert.assertTrue(Size.Unspecified.takeOrElse { Size(1f, 1f) }.isSpecified)
     }
+
+    @Test
+    fun testUnspecifiedSizeToString() {
+        Assert.assertEquals("Size(UNSPECIFIED)", Size.Unspecified.toString())
+    }
+
+    @Test
+    fun testSpecifiedSizeToString() {
+        Assert.assertEquals("Size(10.0, 20.0)", Size(10f, 20f).toString())
+    }
 }

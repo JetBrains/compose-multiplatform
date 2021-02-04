@@ -206,7 +206,7 @@ interface PlatformTextInputService {
 }
 
 /** @suppress */
-@InternalTextApi
+@InternalTextApi // "Used by testing infra"
 @Deprecated(level = DeprecationLevel.ERROR, message = "This is internal API")
 var textInputServiceFactory: (PlatformTextInputService) -> TextInputService =
     { TextInputService(it) }

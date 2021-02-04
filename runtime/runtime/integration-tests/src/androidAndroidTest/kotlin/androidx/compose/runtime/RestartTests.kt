@@ -43,6 +43,7 @@ class RestartTests : BaseComposeTest() {
     override val activityRule = makeTestActivityRule()
 
     @Test
+    @Ignore("b/179279455")
     fun restart_PersonModel_lambda() {
         val tvIdName = 90
         val tvIdAge = 91
@@ -73,6 +74,7 @@ class RestartTests : BaseComposeTest() {
     }
 
     @Test
+    @Ignore("b/179279455")
     fun restart_PersonModel_lambda_parameters() {
         val tvIdNameBase = 90
         val tvIdAgeBase = 100
@@ -107,6 +109,7 @@ class RestartTests : BaseComposeTest() {
     }
 
     @Test
+    @Ignore("b/179279455")
     fun restart_PersonModel_function() {
         val tvIdName = 90
         val tvIdAge = 91
@@ -157,6 +160,7 @@ class RestartTests : BaseComposeTest() {
     }
 
     @Test
+    @Ignore("b/179279455")
     fun restart_State_delete() {
         val tvStateId = 101
         val state = mutableStateOf(true)
@@ -193,6 +197,7 @@ class RestartTests : BaseComposeTest() {
     }
 
     @Test
+    @Ignore("b/179279455")
     fun restart_PersonModel_function_parameters() {
         val tvIdNameBase = 90
         val tvIdAgeBase = 100
@@ -248,7 +253,7 @@ fun Nothing() {
 }
 
 @Composable
-@ComposableContract(restartable = false)
+@NonRestartableComposable
 fun DirectNothing() {
 }
 

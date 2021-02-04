@@ -17,11 +17,8 @@
 package androidx.compose.foundation.layout
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.emptyContent
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.hasFixedHeight
-import androidx.compose.ui.unit.hasFixedWidth
 
 /**
  * Component that represents an empty space layout, whose size can be defined using [Modifier.width],
@@ -33,7 +30,7 @@ import androidx.compose.ui.unit.hasFixedWidth
  */
 @Composable
 fun Spacer(modifier: Modifier) {
-    Layout(emptyContent(), modifier) { _, constraints ->
+    Layout({}, modifier) { _, constraints ->
         with(constraints) {
             val width = if (hasFixedWidth) maxWidth else 0
             val height = if (hasFixedHeight) maxHeight else 0

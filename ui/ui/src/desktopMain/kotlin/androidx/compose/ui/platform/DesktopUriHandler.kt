@@ -17,7 +17,7 @@
 package androidx.compose.ui.platform
 
 // TODO(demin): implement UriHandler
-class DesktopUriHandler : UriHandler {
+internal class DesktopUriHandler : UriHandler {
     override fun openUri(uri: String) {
         println("UriHandler.openUri not implemented yet")
     }

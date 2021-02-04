@@ -16,13 +16,14 @@
 
 package androidx.compose.compiler.plugins.kotlin
 
+import org.intellij.lang.annotations.Language
 import org.junit.Test
 
 class StabilityPropagationTransformTests : ComposeIrTransformTest() {
     private fun stabilityPropagation(
-        @org.intellij.lang.annotations.Language("kotlin")
+        @Language("kotlin")
         unchecked: String,
-        @org.intellij.lang.annotations.Language("kotlin")
+        @Language("kotlin")
         checked: String,
         expectedTransformed: String,
         dumpTree: Boolean = false
@@ -60,7 +61,7 @@ class StabilityPropagationTransformTests : ComposeIrTransformTest() {
         """,
         """
         @Composable
-        fun Test(x: Foo, %composer: Composer<*>?, %changed: Int) {
+        fun Test(x: Foo, %composer: Composer?, %changed: Int) {
           %composer.startRestartGroup(<>, "C(Test)<A(x)>,<A(Foo(...>,<rememb...>,<A(reme...>:Test.kt")
           val %dirty = %changed
           if (%changed and 0b1110 === 0) {
@@ -76,7 +77,7 @@ class StabilityPropagationTransformTests : ComposeIrTransformTest() {
           } else {
             %composer.skipToGroupEnd()
           }
-          %composer.endRestartGroup()?.updateScope { %composer: Composer<*>?, %force: Int ->
+          %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
             Test(x, %composer, %changed or 0b0001)
           }
         }
@@ -101,7 +102,7 @@ class StabilityPropagationTransformTests : ComposeIrTransformTest() {
         """,
         """
             @Composable
-            fun Test(x: Foo, %composer: Composer<*>?, %changed: Int) {
+            fun Test(x: Foo, %composer: Composer?, %changed: Int) {
               %composer.startRestartGroup(<>, "C(Test)<A(x)>,<A(Foo(...>,<rememb...>,<A(reme...>:Test.kt")
               A(x, %composer, 0b1000)
               A(Foo(0), %composer, 0b1000)
@@ -109,7 +110,7 @@ class StabilityPropagationTransformTests : ComposeIrTransformTest() {
                 val tmp0_return = Foo(0)
                 tmp0_return
               }, %composer, 0), %composer, 0b1000)
-              %composer.endRestartGroup()?.updateScope { %composer: Composer<*>?, %force: Int ->
+              %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
                 Test(x, %composer, %changed or 0b0001)
               }
             }
@@ -129,14 +130,14 @@ class StabilityPropagationTransformTests : ComposeIrTransformTest() {
         """,
         """
             @Composable
-            fun Example(%composer: Composer<*>?, %changed: Int) {
+            fun Example(%composer: Composer?, %changed: Int) {
               %composer.startRestartGroup(<>, "C(Example)<A(list...>:Test.kt")
               if (%changed !== 0 || !%composer.skipping) {
                 A(listOf("a"), %composer, 0)
               } else {
                 %composer.skipToGroupEnd()
               }
-              %composer.endRestartGroup()?.updateScope { %composer: Composer<*>?, %force: Int ->
+              %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
                 Example(%composer, %changed or 0b0001)
               }
             }

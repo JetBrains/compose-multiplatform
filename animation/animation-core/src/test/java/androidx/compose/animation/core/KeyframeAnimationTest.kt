@@ -131,7 +131,7 @@ class KeyframeAnimationTest {
             }
             assertEquals(
                 AnimationVector(v1, v2),
-                animation.getValue(
+                animation.getValueFromMillis(
                     time.toLong(), start, end,
                     AnimationVector(0f, 0f)
                 )

@@ -18,29 +18,23 @@
 
 package androidx.compose.ui.node
 
-import android.widget.LinearLayout
-import android.widget.TextView
+import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.clearRoots
-import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.simulateHotReload
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.AmbientContext
-import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.TestActivity
-import androidx.compose.ui.test.assertLabelEquals
+import androidx.compose.ui.test.assertContentDescriptionEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -58,65 +52,6 @@ class HotReloadTests {
 
     @get:Rule
     val rule = createAndroidComposeRule<TestActivity>()
-
-    @Test
-    fun composeView() {
-        lateinit var activity: TestActivity
-        rule.activityRule.scenario.onActivity { activity = it }
-        var value = "First value"
-
-        @Composable fun text(text: String, id: Int = -1) {
-            val context = AmbientContext.current
-            ComposeNode<TextView, UiApplier>(
-                factory = { TextView(context) },
-                update = {
-                    set(id) { this.id = it }
-                    set(text) { this.text = it }
-                }
-            )
-        }
-
-        @Composable fun column(content: @Composable () -> Unit) {
-            val context = AmbientContext.current
-            ComposeNode<LinearLayout, UiApplier>(
-                factory = { LinearLayout(context) },
-                update = {},
-                content = content
-            )
-        }
-
-        val composeLatch = CountDownLatch(1)
-
-        rule.runOnUiThread {
-            activity.setContent {
-                column {
-                    text(text = "Hello", id = 101)
-                    text(text = "World", id = 102)
-                    text(text = value, id = 103)
-                }
-                SideEffect {
-                    composeLatch.countDown()
-                }
-            }
-        }
-
-        assertTrue(composeLatch.await(1, TimeUnit.SECONDS))
-
-        assertEquals(activity.findViewById<TextView>(103).text, value)
-        value = "Second value"
-        assertNotEquals(activity.findViewById<TextView>(103).text, value)
-
-        val hotReloadLatch = CountDownLatch(1)
-
-        rule.runOnUiThread {
-            simulateHotReload(activity)
-            hotReloadLatch.countDown()
-        }
-
-        assertTrue(hotReloadLatch.await(1, TimeUnit.SECONDS))
-
-        assertEquals(activity.findViewById<TextView>(103).text, value)
-    }
 
     @Test
     fun composeLayoutNode() {
@@ -152,7 +87,7 @@ class HotReloadTests {
         fun target() = rule.onNodeWithTag("text103")
 
         // Assert that the composition has the correct value
-        target().assertLabelEquals(value)
+        target().assertContentDescriptionEquals(value)
 
         value = "Second value"
 
@@ -167,6 +102,6 @@ class HotReloadTests {
         assertTrue(hotReloadLatch.await(1, TimeUnit.SECONDS))
 
         // Detect that the node changed
-        target().assertLabelEquals(value)
+        target().assertContentDescriptionEquals(value)
     }
 }

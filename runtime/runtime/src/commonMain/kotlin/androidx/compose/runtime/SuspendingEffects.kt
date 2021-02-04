@@ -45,7 +45,7 @@ internal class CompositionScopedCoroutineScopeCanceller(
 @OptIn(ExperimentalComposeApi::class)
 internal fun createCompositionCoroutineScope(
     coroutineContext: CoroutineContext,
-    composer: Composer<*>
+    composer: Composer
 ) = if (coroutineContext[Job] != null) {
     CoroutineScope(
         Job().apply {
@@ -87,7 +87,7 @@ internal fun createCompositionCoroutineScope(
  */
 @Composable
 inline fun rememberCoroutineScope(
-    getContext: () -> CoroutineContext = { EmptyCoroutineContext }
+    getContext: @DisallowComposableCalls () -> CoroutineContext = { EmptyCoroutineContext }
 ): CoroutineScope {
     val composer = currentComposer
     val wrapper = remember {

@@ -19,6 +19,7 @@ package androidx.compose.runtime.collection
 import androidx.compose.runtime.identityHashCode
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNotSame
 import kotlin.test.assertNull
@@ -89,8 +90,9 @@ class IdentityArraySetTest {
         list.forEach { set.add(it) }
 
         // remove a value that doesn't exist:
-        set.remove(Stuff(10))
+        val removed = set.remove(Stuff(10))
         assertEquals(list.size, set.size)
+        assertFalse(removed)
 
         // remove a value in the middle:
         testRemoveValueAtIndex(set.size / 2)
@@ -131,8 +133,9 @@ class IdentityArraySetTest {
     private fun testRemoveValueAtIndex(index: Int) {
         val value = set[index]
         val initialSize = set.size
-        set.remove(value)
+        val removed = set.remove(value)
         assertEquals(initialSize - 1, set.size)
+        assertTrue(removed)
         assertNull(set.values[set.size])
         set.forEach { assertNotSame(value, it) }
     }

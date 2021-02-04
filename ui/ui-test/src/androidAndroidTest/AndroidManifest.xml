@@ -18,9 +18,9 @@
     package="androidx.compose.ui.test">
     <application>
         <activity android:name="androidx.activity.ComponentActivity"
-            android:theme="@style/TestTheme"/>
-        <activity android:name="androidx.compose.ui.test.CustomActivity"
-            android:theme="@android:style/Theme.Material.NoActionBar.Fullscreen"/>
+            android:theme="@style/TestTheme" />
         <activity android:name="androidx.compose.ui.test.ActivityWithActionBar" />
+        <activity android:name="androidx.compose.ui.test.ClickCounterActivity" />
+        <activity android:name="androidx.compose.ui.test.EmptyActivity" />
     </application>
 </manifest>

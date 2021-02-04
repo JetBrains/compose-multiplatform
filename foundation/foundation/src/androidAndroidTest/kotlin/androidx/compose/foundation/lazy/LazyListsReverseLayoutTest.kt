@@ -20,7 +20,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
@@ -52,7 +52,7 @@ class LazyListsReverseLayoutTest {
 
     @Test
     fun column_emitTwoElementsAsOneItem_positionedReversed() {
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(
                 reverseLayout = true
             ) {
@@ -71,7 +71,7 @@ class LazyListsReverseLayoutTest {
 
     @Test
     fun column_emitTwoItems_positionedReversed() {
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(
                 reverseLayout = true
             ) {
@@ -93,7 +93,7 @@ class LazyListsReverseLayoutTest {
     @Test
     fun column_initialScrollPositionIs0() {
         lateinit var state: LazyListState
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(
                 reverseLayout = true,
                 state = rememberLazyListState().also { state = it },
@@ -114,7 +114,7 @@ class LazyListsReverseLayoutTest {
     @Test
     fun column_scrollInWrongDirectionDoesNothing() {
         lateinit var state: LazyListState
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(
                 reverseLayout = true,
                 state = rememberLazyListState().also { state = it },
@@ -144,7 +144,7 @@ class LazyListsReverseLayoutTest {
     @Test
     fun column_scrollForwardHalfWay() {
         lateinit var state: LazyListState
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(
                 reverseLayout = true,
                 state = rememberLazyListState().also { state = it },
@@ -176,7 +176,7 @@ class LazyListsReverseLayoutTest {
     @Test
     fun column_scrollForwardTillTheEnd() {
         lateinit var state: LazyListState
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(
                 reverseLayout = true,
                 state = rememberLazyListState().also { state = it },
@@ -208,7 +208,7 @@ class LazyListsReverseLayoutTest {
 
     @Test
     fun row_emitTwoElementsAsOneItem_positionedReversed() {
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyRow(
                 reverseLayout = true
             ) {
@@ -227,7 +227,7 @@ class LazyListsReverseLayoutTest {
 
     @Test
     fun row_emitTwoItems_positionedReversed() {
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyRow(
                 reverseLayout = true
             ) {
@@ -249,7 +249,7 @@ class LazyListsReverseLayoutTest {
     @Test
     fun row_initialScrollPositionIs0() {
         lateinit var state: LazyListState
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyRow(
                 reverseLayout = true,
                 state = rememberLazyListState().also { state = it },
@@ -270,7 +270,7 @@ class LazyListsReverseLayoutTest {
     @Test
     fun row_scrollInWrongDirectionDoesNothing() {
         lateinit var state: LazyListState
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyRow(
                 reverseLayout = true,
                 state = rememberLazyListState().also { state = it },
@@ -300,7 +300,7 @@ class LazyListsReverseLayoutTest {
     @Test
     fun row_scrollForwardHalfWay() {
         lateinit var state: LazyListState
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyRow(
                 reverseLayout = true,
                 state = rememberLazyListState().also { state = it },
@@ -332,7 +332,7 @@ class LazyListsReverseLayoutTest {
     @Test
     fun row_scrollForwardTillTheEnd() {
         lateinit var state: LazyListState
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyRow(
                 reverseLayout = true,
                 state = rememberLazyListState().also { state = it },
@@ -364,8 +364,8 @@ class LazyListsReverseLayoutTest {
 
     @Test
     fun row_rtl_emitTwoElementsAsOneItem_positionedReversed() {
-        rule.setContent {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+        rule.setContentWithTestViewConfiguration {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 LazyRow(
                     reverseLayout = true
                 ) {
@@ -385,8 +385,8 @@ class LazyListsReverseLayoutTest {
 
     @Test
     fun row_rtl_emitTwoItems_positionedReversed() {
-        rule.setContent {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+        rule.setContentWithTestViewConfiguration {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 LazyRow(
                     reverseLayout = true
                 ) {
@@ -409,8 +409,8 @@ class LazyListsReverseLayoutTest {
     @Test
     fun row_rtl_scrollForwardHalfWay() {
         lateinit var state: LazyListState
-        rule.setContent {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+        rule.setContentWithTestViewConfiguration {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 LazyRow(
                     reverseLayout = true,
                     state = rememberLazyListState().also { state = it },

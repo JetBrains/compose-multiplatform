@@ -66,7 +66,7 @@ import kotlin.math.max
  * @param shape Defines the Snackbar's shape as well as its shadow
  * @param backgroundColor background color of the Snackbar
  * @param contentColor color of the content to use inside the snackbar. Defaults to
- * either the matching `onFoo` color for [backgroundColor], or, if it is not a color from
+ * either the matching content color for [backgroundColor], or, if it is not a color from
  * the theme, this will keep the same value set above this Surface.
  * @param elevation The z-coordinate at which to place the SnackBar. This controls the size
  * of the shadow below the SnackBar
@@ -91,7 +91,7 @@ fun Snackbar(
         color = backgroundColor,
         contentColor = contentColor
     ) {
-        Providers(AmbientContentAlpha provides ContentAlpha.high) {
+        Providers(LocalContentAlpha provides ContentAlpha.high) {
             val textStyle = MaterialTheme.typography.body2
             ProvideTextStyle(value = textStyle) {
                 when {
@@ -134,7 +134,7 @@ fun Snackbar(
  * @param shape Defines the Snackbar's shape as well as its shadow
  * @param backgroundColor background color of the Snackbar
  * @param contentColor color of the content to use inside the snackbar. Defaults to
- * either the matching `onFoo` color for [backgroundColor], or, if it is not a color from
+ * either the matching content color for [backgroundColor], or, if it is not a color from
  * the theme, this will keep the same value set above this Surface.
  * @param actionColor color of the action
  * @param elevation The z-coordinate at which to place the SnackBar. This controls the size
@@ -250,7 +250,7 @@ private fun TextOnlySnackbar(content: @Composable () -> Unit) {
             } else {
                 SnackbarMinHeightTwoLines
             }
-        val containerHeight = max(minHeight.toIntPx(), textPlaceable.height)
+        val containerHeight = max(minHeight.roundToPx(), textPlaceable.height)
         layout(constraints.maxWidth, containerHeight) {
             val textPlaceY = (containerHeight - textPlaceable.height) / 2
             textPlaceable.placeRelative(0, textPlaceY)
@@ -300,7 +300,7 @@ private fun OneRowSnackbar(
     ) { measurables, constraints ->
         val buttonPlaceable = measurables.first { it.layoutId == actionTag }.measure(constraints)
         val textMaxWidth =
-            (constraints.maxWidth - buttonPlaceable.width - TextEndExtraSpacing.toIntPx())
+            (constraints.maxWidth - buttonPlaceable.width - TextEndExtraSpacing.roundToPx())
                 .coerceAtLeast(constraints.minWidth)
         val textPlaceable = measurables.first { it.layoutId == textTag }.measure(
             constraints.copy(minHeight = 0, maxWidth = textMaxWidth)
@@ -317,7 +317,7 @@ private fun OneRowSnackbar(
         val containerHeight: Int
         val buttonPlaceY: Int
         if (isOneLine) {
-            val minContainerHeight = SnackbarMinHeightOneLine.toIntPx()
+            val minContainerHeight = SnackbarMinHeightOneLine.roundToPx()
             val contentHeight = buttonPlaceable.height
             containerHeight = max(minContainerHeight, contentHeight)
             textPlaceY = (containerHeight - textPlaceable.height) / 2
@@ -330,9 +330,9 @@ private fun OneRowSnackbar(
                 }
             }
         } else {
-            val baselineOffset = HeightToFirstLine.toIntPx()
-            textPlaceY = baselineOffset - firstTextBaseline - SnackbarVerticalPadding.toIntPx()
-            val minContainerHeight = SnackbarMinHeightTwoLines.toIntPx()
+            val baselineOffset = HeightToFirstLine.roundToPx()
+            textPlaceY = baselineOffset - firstTextBaseline - SnackbarVerticalPadding.roundToPx()
+            val minContainerHeight = SnackbarMinHeightTwoLines.roundToPx()
             val contentHeight = textPlaceY + textPlaceable.height
             containerHeight = max(minContainerHeight, contentHeight)
             buttonPlaceY = (containerHeight - buttonPlaceable.height) / 2

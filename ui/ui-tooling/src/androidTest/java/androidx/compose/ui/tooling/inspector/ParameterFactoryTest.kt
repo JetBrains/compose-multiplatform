@@ -239,7 +239,9 @@ class ParameterFactoryTest {
 
     @Test
     fun testComposableLambda() = runBlocking {
-        val c: @Composable () -> Unit = { Text(text = "Hello World") }
+        // capture here to force the lambda to not be created as a singleton.
+        val capture = "Hello World"
+        val c: @Composable () -> Unit = { Text(text = capture) }
         val result = lookup(c as Any) ?: error("Lookup of ComposableLambda failed")
         val array = result.second as Array<*>
         assertThat(result.first).isEqualTo(ParameterType.Lambda)
@@ -258,26 +260,26 @@ class ParameterFactoryTest {
             )!!
         ) {
             parameter("corner", ParameterType.String, RoundedCornerShape::class.java.simpleName) {
-                parameter("bottomLeft", ParameterType.DimensionDp, 0.7f)
-                parameter("bottomRight", ParameterType.DimensionDp, 2.5f)
-                parameter("topLeft", ParameterType.DimensionDp, 2.0f)
-                parameter("topRight", ParameterType.DimensionDp, 0.5f)
+                parameter("bottomEnd", ParameterType.DimensionDp, 2.5f)
+                parameter("bottomStart", ParameterType.DimensionDp, 0.7f)
+                parameter("topEnd", ParameterType.DimensionDp, 0.5f)
+                parameter("topStart", ParameterType.DimensionDp, 2.0f)
             }
         }
         validate(factory.create(node, "corner", CutCornerShape(2))!!) {
             parameter("corner", ParameterType.String, CutCornerShape::class.java.simpleName) {
-                parameter("bottomLeft", ParameterType.DimensionDp, 5.0f)
-                parameter("bottomRight", ParameterType.DimensionDp, 5.0f)
-                parameter("topLeft", ParameterType.DimensionDp, 5.0f)
-                parameter("topRight", ParameterType.DimensionDp, 5.0f)
+                parameter("bottomEnd", ParameterType.DimensionDp, 5.0f)
+                parameter("bottomStart", ParameterType.DimensionDp, 5.0f)
+                parameter("topEnd", ParameterType.DimensionDp, 5.0f)
+                parameter("topStart", ParameterType.DimensionDp, 5.0f)
             }
         }
         validate(factory.create(node, "corner", RoundedCornerShape(1.0f, 10.0f, 2.0f, 3.5f))!!) {
             parameter("corner", ParameterType.String, RoundedCornerShape::class.java.simpleName) {
-                parameter("bottomLeft", ParameterType.DimensionDp, 1.75f)
-                parameter("bottomRight", ParameterType.DimensionDp, 1.0f)
-                parameter("topLeft", ParameterType.DimensionDp, 0.5f)
-                parameter("topRight", ParameterType.DimensionDp, 5.0f)
+                parameter("bottomEnd", ParameterType.DimensionDp, 1.0f)
+                parameter("bottomStart", ParameterType.DimensionDp, 1.75f)
+                parameter("topEnd", ParameterType.DimensionDp, 5.0f)
+                parameter("topStart", ParameterType.DimensionDp, 0.5f)
             }
         }
     }

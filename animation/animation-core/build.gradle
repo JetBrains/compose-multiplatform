@@ -33,7 +33,7 @@ AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
 dependencies {
     kotlinPlugin project(":compose:compiler:compiler")
 
-    if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+    if (!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
          * corresponding block below
@@ -42,10 +42,10 @@ dependencies {
         api "androidx.annotation:annotation:1.1.0"
 
         implementation project(":compose:runtime:runtime")
-        implementation project(":compose:runtime:runtime-dispatch")
         implementation project(":compose:ui:ui-unit")
         implementation project(":compose:ui:ui-util")
-        implementation (KOTLIN_STDLIB)
+        implementation(KOTLIN_STDLIB)
+        api(KOTLIN_COROUTINES_CORE)
 
         testImplementation(ANDROIDX_TEST_RULES)
         testImplementation(ANDROIDX_TEST_RUNNER)
@@ -62,7 +62,7 @@ dependencies {
     }
 }
 
-if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+if (AndroidXUiPlugin.isMultiplatformEnabled(project)) {
     kotlin {
         android()
         jvm("desktop")
@@ -74,10 +74,10 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         sourceSets {
             commonMain.dependencies {
                 implementation project(":compose:runtime:runtime")
-                implementation project(":compose:runtime:runtime-dispatch")
                 implementation project(":compose:ui:ui-unit")
                 implementation project(":compose:ui:ui-util")
                 implementation(KOTLIN_STDLIB_COMMON)
+                api(KOTLIN_COROUTINES_CORE)
             }
             androidMain.dependencies {
                 api "androidx.annotation:annotation:1.1.0"
@@ -119,8 +119,7 @@ androidx {
 tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
         freeCompilerArgs += [
-            "-Xuse-experimental=kotlin.Experimental",
-            "-Xallow-jvm-ir-dependencies"
+                "-Xuse-experimental=kotlin.Experimental",
         ]
     }
 }

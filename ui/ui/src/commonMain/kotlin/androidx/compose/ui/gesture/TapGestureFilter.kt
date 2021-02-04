@@ -61,7 +61,15 @@ import androidx.compose.ui.util.fastForEach
  *   @param onTap Called when a tap has occurred.
  */
 // TODO(b/139020678): Probably has shared functionality with other press based detectors.
-
+@Deprecated(
+    "Gesture filters are deprecated. Use Modifier.clickable or Modifier.pointerInput and " +
+        "detectTapGestures instead",
+    replaceWith = ReplaceWith(
+        """pointerInput { detectTapGestures(onTap = onTap)}""",
+        "androidx.compose.ui.input.pointer.pointerInput",
+        "androidx.compose.foundation.gestures.detectTapGestures"
+    )
+)
 fun Modifier.tapGestureFilter(
     onTap: (Offset) -> Unit
 ): Modifier = composed(

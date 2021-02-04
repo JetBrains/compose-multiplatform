@@ -23,15 +23,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActionScope
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.savedInstanceState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -46,7 +48,7 @@ fun InputFieldDemo() {
             TagLine(tag = "LTR Layout")
         }
         item {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Ltr) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Ltr) {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     TagLine(tag = "simple editing single line")
                     EditLine(singleLine = true)
@@ -61,7 +63,7 @@ fun InputFieldDemo() {
             TagLine(tag = "RTL Layout")
         }
         item {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     TagLine(tag = "simple editing RTL")
                     EditLine()
@@ -81,7 +83,8 @@ internal fun EditLine(
     text: String = ""
 ) {
     val controller = remember { mutableStateOf<SoftwareKeyboardController?>(null) }
-    val state = savedInstanceState { text }
+    val state = rememberSaveable { mutableStateOf(text) }
+    val anyAction: KeyboardActionScope.() -> Unit = { controller.value?.hideSoftwareKeyboard() }
     BasicTextField(
         modifier = demoTextFieldModifiers,
         value = state.value,
@@ -90,12 +93,18 @@ internal fun EditLine(
             keyboardType = keyboardType,
             imeAction = imeAction
         ),
+        // TODO(b/179226323): Add API to set the same KeyboardAction lambda for all ImeActions.
+        keyboardActions = KeyboardActions(
+            onDone = anyAction,
+            onGo = anyAction,
+            onNext = anyAction,
+            onPrevious = anyAction,
+            onSearch = anyAction,
+            onSend = anyAction,
+        ),
         onValueChange = { state.value = it },
         textStyle = TextStyle(fontSize = fontSize8),
         onTextInputStarted = { controller.value = it },
-        onImeActionPerformed = {
-            controller.value?.hideSoftwareKeyboard()
-        }
     )
 }
 

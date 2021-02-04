@@ -17,9 +17,9 @@
 package androidx.compose.ui.owners
 
 import androidx.activity.ComponentActivity
-import androidx.compose.ui.platform.AmbientLifecycleOwner
+import androidx.activity.compose.setContent
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.LifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
@@ -54,7 +54,7 @@ class LifecycleOwnerInComponentActivityTest {
 
         activityTestRule.runOnUiThread {
             activity.setContent {
-                owner = AmbientLifecycleOwner.current
+                owner = LocalLifecycleOwner.current
                 latch.countDown()
             }
         }
@@ -72,7 +72,7 @@ class LifecycleOwnerInComponentActivityTest {
             val view = ComposeView(activity)
             activity.setContentView(view)
             view.setContent {
-                owner = AmbientLifecycleOwner.current
+                owner = LocalLifecycleOwner.current
                 latch.countDown()
             }
         }

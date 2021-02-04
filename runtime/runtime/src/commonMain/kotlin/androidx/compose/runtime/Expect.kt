@@ -41,14 +41,6 @@ expect class AtomicReference<V>(value: V) {
 }
 
 @MustBeDocumented
-@Retention(AnnotationRetention.BINARY)
-@Target(
-    AnnotationTarget.FUNCTION,
-    AnnotationTarget.CONSTRUCTOR
-)
-expect annotation class MainThread()
-
-@MustBeDocumented
 @Retention(AnnotationRetention.SOURCE)
 @Target(
     AnnotationTarget.FUNCTION,
@@ -68,3 +60,13 @@ expect annotation class TestOnly()
 expect annotation class CheckResult(
     val suggest: String
 )
+
+/**
+ * The [MonotonicFrameClock] used by [withFrameNanos] and [withFrameMillis] if one is not present
+ * in the calling [kotlin.coroutines.CoroutineContext].
+ */
+// Implementor's note:
+// This frame clock implementation should try to synchronize with the vsync rate of the device's
+// default display. Without this synchronization, any usage of this default clock will result
+// in inconsistent animation frame timing and associated visual artifacts.
+expect val DefaultMonotonicFrameClock: MonotonicFrameClock

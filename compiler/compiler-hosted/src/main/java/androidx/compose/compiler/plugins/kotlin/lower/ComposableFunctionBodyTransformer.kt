@@ -156,6 +156,7 @@ import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.ceil
 import kotlin.math.min
+import kotlin.reflect.KProperty
 
 /**
  * An enum of the different "states" a parameter of a composable function can have relating to
@@ -477,84 +478,116 @@ class ComposableFunctionBodyTransformer(
         else -> null
     }
 
-    private val changedPrimitiveFunctions = composerIrClass.functions
-        .filter { it.name.identifier == "changed" }
-        .mapNotNull { f ->
-            f.valueParameters.first().type.toPrimitiveType()?.let { primitive ->
-                primitive to f
+    private val changedPrimitiveFunctions by guardedLazy {
+        composerIrClass
+            .functions
+            .filter { it.name.identifier == "changed" }
+            .mapNotNull { f ->
+                f.valueParameters.first().type.toPrimitiveType()?.let { primitive ->
+                    primitive to f
+                }
             }
-        }
-        .toMap()
+            .toMap()
+    }
 
-    private val skipToGroupEndFunction = composerIrClass.functions
-        .first {
-            it.name.identifier == "skipToGroupEnd" && it.valueParameters.size == 0
-        }
+    private val skipToGroupEndFunction by guardedLazy {
+        composerIrClass.functions
+            .first {
+                it.name.identifier == "skipToGroupEnd" && it.valueParameters.size == 0
+            }
+    }
 
-    private val skipCurrentGroupFunction = composerIrClass.functions
-        .first {
-            it.name.identifier == "skipCurrentGroup" && it.valueParameters.size == 0
-        }
+    private val skipCurrentGroupFunction by guardedLazy {
+        composerIrClass
+            .functions
+            .first {
+                it.name.identifier == "skipCurrentGroup" && it.valueParameters.size == 0
+            }
+    }
 
-    private val startReplaceableFunction = composerIrClass.functions
-        .first {
-            it.name.identifier == "startReplaceableGroup" && it.valueParameters.size == 1
-        }
+    private val startReplaceableFunction by guardedLazy {
+        composerIrClass.functions
+            .first {
+                it.name.identifier == "startReplaceableGroup" && it.valueParameters.size == 1
+            }
+    }
 
-    private val startReplaceableSourceFunction = composerIrClass.functions
-        .first {
-            it.name.identifier == "startReplaceableGroup" && it.valueParameters.size == 2
-        }
+    private val startReplaceableSourceFunction by guardedLazy {
+        composerIrClass.functions
+            .first {
+                it.name.identifier == "startReplaceableGroup" && it.valueParameters.size == 2
+            }
+    }
 
-    private val endReplaceableFunction = composerIrClass.functions
-        .first {
-            it.name.identifier == "endReplaceableGroup" && it.valueParameters.size == 0
-        }
+    private val endReplaceableFunction by guardedLazy {
+        composerIrClass.functions
+            .first {
+                it.name.identifier == "endReplaceableGroup" && it.valueParameters.size == 0
+            }
+    }
 
-    private val startDefaultsFunction = composerIrClass.functions
-        .first {
-            it.name.identifier == "startDefaults" && it.valueParameters.size == 0
-        }
+    private val startDefaultsFunction by guardedLazy {
+        composerIrClass.functions
+            .first {
+                it.name.identifier == "startDefaults" && it.valueParameters.size == 0
+            }
+    }
 
-    private val endDefaultsFunction = composerIrClass.functions
-        .first {
-            it.name.identifier == "endDefaults" && it.valueParameters.size == 0
-        }
+    private val endDefaultsFunction by guardedLazy {
+        composerIrClass.functions
+            .first {
+                it.name.identifier == "endDefaults" && it.valueParameters.size == 0
+            }
+    }
 
-    private val startMovableFunction = composerIrClass.functions
-        .first {
-            it.name.identifier == "startMovableGroup" && it.valueParameters.size == 2
-        }
+    private val startMovableFunction by guardedLazy {
+        composerIrClass.functions
+            .first {
+                it.name.identifier == "startMovableGroup" && it.valueParameters.size == 2
+            }
+    }
 
-    private val startMovableSourceFunction = composerIrClass.functions
-        .first {
-            it.name.identifier == "startMovableGroup" && it.valueParameters.size == 3
-        }
+    private val startMovableSourceFunction by guardedLazy {
+        composerIrClass.functions
+            .first {
+                it.name.identifier == "startMovableGroup" && it.valueParameters.size == 3
+            }
+    }
 
-    private val endMovableFunction = composerIrClass.functions
-        .first {
-            it.name.identifier == "endMovableGroup" && it.valueParameters.size == 0
-        }
+    private val endMovableFunction by guardedLazy {
+        composerIrClass.functions
+            .first {
+                it.name.identifier == "endMovableGroup" && it.valueParameters.size == 0
+            }
+    }
 
-    private val startRestartGroupFunction = composerIrClass.functions
-        .first {
-            it.name == KtxNameConventions.STARTRESTARTGROUP && it.valueParameters.size == 1
-        }
+    private val startRestartGroupFunction by guardedLazy {
+        composerIrClass
+            .functions
+            .first {
+                it.name == KtxNameConventions.STARTRESTARTGROUP && it.valueParameters.size == 1
+            }
+    }
 
-    private val startRestartGroupSourceFunction = composerIrClass.functions
-        .first {
-            it.name == KtxNameConventions.STARTRESTARTGROUP && it.valueParameters.size == 2
-        }
+    private val startRestartGroupSourceFunction by guardedLazy {
+        composerIrClass.functions
+            .first {
+                it.name == KtxNameConventions.STARTRESTARTGROUP && it.valueParameters.size == 2
+            }
+    }
 
-    private val endRestartGroupFunction = composerIrClass.functions
-        .first {
-            it.name == KtxNameConventions.ENDRESTARTGROUP && it.valueParameters.size == 0
-        }
+    private val endRestartGroupFunction by guardedLazy {
+        composerIrClass
+            .functions
+            .first {
+                it.name == KtxNameConventions.ENDRESTARTGROUP && it.valueParameters.size == 0
+            }
+    }
 
     private val IrType.arguments: List<IrTypeArgument>
         get() = (this as? IrSimpleType)?.arguments.orEmpty()
 
-    private val updateScopeFunction =
+    private val updateScopeFunction by guardedLazy {
         endRestartGroupFunction.returnType
             .classOrNull
             ?.owner
@@ -564,28 +597,42 @@ class ComposableFunctionBodyTransformer(
                     it.valueParameters.first().type.arguments.size == 3
             }
             ?: error("new updateScope not found in result type of endRestartGroup")
+    }
 
-    private val updateScopeBlockType = updateScopeFunction.valueParameters.single().type
+    private val updateScopeBlockType by guardedLazy {
+        updateScopeFunction
+            .valueParameters
+            .single()
+            .type
+    }
 
-    private val isSkippingFunction = composerIrClass.properties
-        .first {
-            it.name.asString() == "skipping"
+    private val isSkippingFunction by guardedLazy {
+        composerIrClass.properties
+            .first {
+                it.name.asString() == "skipping"
+            }
+    }
+
+    private val defaultsInvalidFunction by guardedLazy {
+        composerIrClass
+            .properties
+            .first {
+                it.name.asString() == "defaultsInvalid"
+            }
+    }
+
+    private val joinKeyFunction by guardedLazy {
+        composerIrClass.functions
+            .first {
+                it.name == KtxNameConventions.JOINKEY && it.valueParameters.size == 2
+            }
+    }
+
+    private val cacheFunction by guardedLazy {
+        getTopLevelFunctions(ComposeFqNames.fqNameFor("cache")).map { it.owner }.first {
+            it.valueParameters.size == 2 && it.extensionReceiverParameter != null
         }
-
-    private val defaultsInvalidFunction = composerIrClass.properties
-        .first {
-            it.name.asString() == "defaultsInvalid"
-        }
-
-    private val joinKeyFunction = composerIrClass.functions
-        .first {
-            it.name == KtxNameConventions.JOINKEY && it.valueParameters.size == 2
-        }
-
-    private val cacheFunction = composerIrClass.functions
-        .first {
-            it.name.identifier == "cache" && it.valueParameters.size == 2
-        }
+    }
 
     private var currentScope: Scope = Scope.RootScope()
 
@@ -606,10 +653,14 @@ class ComposableFunctionBodyTransformer(
 
     private val collectSourceInformation = sourceInformationEnabled
 
-    override fun visitClass(declaration: IrClass): IrStatement =
-        inScope(Scope.ClassScope(declaration.name)) {
+    override fun visitClass(declaration: IrClass): IrStatement {
+        if (declaration.isComposableSingletonClass()) {
+            return declaration
+        }
+        return inScope(Scope.ClassScope(declaration.name)) {
             super.visitDeclaration(declaration)
         }
+    }
 
     override fun visitFunction(declaration: IrFunction): IrStatement {
         val scope = Scope.FunctionScope(declaration, this)
@@ -666,7 +717,7 @@ class ComposableFunctionBodyTransformer(
     // 1. They are inline
     // 2. They have a return value (may get relaxed in the future)
     // 3. They are a lambda (we use ComposableLambda<...> class for this instead)
-    // 4. They are annotated as @ComposableContract(restartable = false)
+    // 4. They are annotated as @NonRestartableComposable
     @OptIn(ObsoleteDescriptorBasedAPI::class)
     private fun IrFunction.shouldBeRestartable(): Boolean {
         // Only insert observe scopes in non-empty composable function
@@ -1436,7 +1487,6 @@ class ComposableFunctionBodyTransformer(
                 // }
                 skipPreamble.statements.add(
                     irForLoop(
-                        scope.function.symbol.descriptor,
                         varargElementType,
                         irGet(param)
                     ) { loopVar ->
@@ -1897,9 +1947,11 @@ class ComposableFunctionBodyTransformer(
             startOffset,
             endOffset,
             returnType,
-            symbol as IrSimpleFunctionSymbol
+            symbol as IrSimpleFunctionSymbol,
+            symbol.owner.typeParameters.size,
+            symbol.owner.valueParameters.size
         ).apply {
-            dispatchReceiver = irCurrentComposer()
+            extensionReceiver = irCurrentComposer()
             putValueArgument(0, invalid)
             putValueArgument(1, calculation)
             putTypeArgument(0, returnType)
@@ -2015,7 +2067,9 @@ class ComposableFunctionBodyTransformer(
             startOffset,
             endOffset,
             type,
-            symbol as IrSimpleFunctionSymbol
+            symbol as IrSimpleFunctionSymbol,
+            symbol.owner.typeParameters.size,
+            symbol.owner.valueParameters.size
         )
     }
 
@@ -2044,7 +2098,6 @@ class ComposableFunctionBodyTransformer(
         else
             scope.getNameForTemporary(nameHint)
         return irTemporary(
-            scope.function.symbol.descriptor,
             value,
             name,
             irType,
@@ -2474,6 +2527,23 @@ class ComposableFunctionBodyTransformer(
                 }
                 recordSourceParameter(expression, 3, composableLambdaScope)
                 return expression
+            }
+            expression.isComposableSingletonGetter() -> {
+                // This looks like `ComposableSingletonClass.lambda-123`, which is a static/saved
+                // call of composableLambdaInstance. We want to pass
+                // locations on the top level of the lambda as the startRestartGroup is in the
+                // composable lambda wrapper.
+                val getter = expression.symbol.owner
+                val property = getter.correspondingPropertySymbol?.owner
+                val fieldInitializer = property?.backingField?.initializer?.expression
+                val composableLambdaInstanceCall = fieldInitializer as IrCall
+                val composableLambdaScope = withScope(Scope.ComposableLambdaScope()) {
+                    property.transformChildrenVoid()
+                }
+                if (collectSourceInformation) {
+                    recordSourceParameter(composableLambdaInstanceCall, 2, composableLambdaScope)
+                }
+                return super.visitCall(expression)
             }
             else -> return super.visitCall(expression)
         }
@@ -3958,3 +4028,29 @@ private fun IrType.isNullableClassType(fqName: FqNameUnsafe) =
     isClassType(fqName, hasQuestionMark = true)
 fun IrType.isNullableUnit() = isNullableClassType(StandardNames.FqNames.unit)
 fun IrType.isUnitOrNullableUnit() = this.isUnit() || this.isNullableUnit()
+
+internal object UNINITIALIZED_VALUE
+
+private class GuardedLazy<out T>(initializer: () -> T) {
+    private var _value: Any? = UNINITIALIZED_VALUE
+    private var _initializer: (() -> T)? = initializer
+
+    fun value(name: String): T {
+        if (_value === UNINITIALIZED_VALUE) {
+            try {
+                _value = _initializer!!()
+                _initializer = null
+            } catch (e: Throwable) {
+                throw java.lang.IllegalStateException("Error initializing $name", e)
+            }
+        }
+        @Suppress("UNCHECKED_CAST")
+        return _value as T
+    }
+}
+
+@Suppress("NOTHING_TO_INLINE")
+private inline operator fun <T> GuardedLazy<T>.getValue(thisRef: Any?, property: KProperty<*>) =
+    value(property.name)
+
+private fun <T> guardedLazy(initializer: () -> T) = GuardedLazy<T>(initializer)

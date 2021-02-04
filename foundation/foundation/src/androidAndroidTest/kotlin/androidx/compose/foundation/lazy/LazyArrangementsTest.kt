@@ -21,7 +21,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
@@ -205,7 +205,7 @@ class LazyArrangementsTest {
 
     @Test
     fun column_spacing_scrolledToTheBottom() {
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(itemSize),
                 modifier = Modifier.size(itemSize * 3.5f).testTag(ContainerTag)
@@ -248,7 +248,7 @@ class LazyArrangementsTest {
 
     @Test
     fun row_spacing_scrolledToTheEnd() {
-        rule.setContent {
+        rule.setContentWithTestViewConfiguration {
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(itemSize),
                 modifier = Modifier.size(itemSize * 3.5f).testTag(ContainerTag)
@@ -320,7 +320,7 @@ class LazyArrangementsTest {
 
     fun composeRowWith(arrangement: Arrangement.Horizontal, layoutDirection: LayoutDirection) {
         rule.setContent {
-            Providers(AmbientLayoutDirection provides layoutDirection) {
+            Providers(LocalLayoutDirection provides layoutDirection) {
                 LazyRow(
                     horizontalArrangement = arrangement,
                     modifier = Modifier.size(containerSize)
@@ -338,9 +338,9 @@ class LazyArrangementsTest {
         reversedItemsOrder: Boolean = false
     ) {
         with(rule.density) {
-            val sizes = IntArray(2) { itemSize.toIntPx() }
+            val sizes = IntArray(2) { itemSize.roundToPx() }
             val outPositions = IntArray(2) { 0 }
-            with(arrangement) { arrange(containerSize.toIntPx(), sizes, outPositions) }
+            with(arrangement) { arrange(containerSize.roundToPx(), sizes, outPositions) }
 
             outPositions.forEachIndexed { index, position ->
                 val realIndex = if (reversedItemsOrder) if (index == 0) 1 else 0 else index
@@ -356,10 +356,10 @@ class LazyArrangementsTest {
         reversedItemsOrder: Boolean = false
     ) {
         with(rule.density) {
-            val sizes = IntArray(2) { itemSize.toIntPx() }
+            val sizes = IntArray(2) { itemSize.roundToPx() }
             val outPositions = IntArray(2) { 0 }
             with(arrangement) {
-                arrange(containerSize.toIntPx(), sizes, layoutDirection, outPositions)
+                arrange(containerSize.roundToPx(), sizes, layoutDirection, outPositions)
             }
 
             outPositions.forEachIndexed { index, position ->

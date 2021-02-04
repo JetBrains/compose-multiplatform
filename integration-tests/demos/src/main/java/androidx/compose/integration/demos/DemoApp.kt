@@ -30,6 +30,7 @@ import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.integration.demos.common.Demo
 import androidx.compose.integration.demos.common.DemoCategory
 import androidx.compose.integration.demos.common.allLaunchableDemos
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
@@ -45,11 +46,12 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.savedinstancestate.savedInstanceState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -68,7 +70,7 @@ fun DemoApp(
 ) {
     val navigationIcon = (@Composable { AppBarIcons.Back(onNavigateUp) }).takeIf { canNavigateUp }
 
-    var filterText by savedInstanceState { "" }
+    var filterText by rememberSaveable { mutableStateOf("") }
 
     Scaffold(
         topBar = {
@@ -124,6 +126,7 @@ private fun DisplayDemo(demo: Demo, onNavigate: (Demo) -> Unit) {
 }
 
 @Composable
+@OptIn(ExperimentalMaterialApi::class)
 private fun DisplayDemoCategory(category: DemoCategory, onNavigate: (Demo) -> Unit) {
     // TODO: migrate to LazyColumn after b/175671850
     Column(Modifier.verticalScroll(rememberScrollState())) {
@@ -177,7 +180,7 @@ private fun DemoAppBar(
 private object AppBarIcons {
     @Composable
     fun Back(onClick: () -> Unit) {
-        val icon = when (AmbientLayoutDirection.current) {
+        val icon = when (LocalLayoutDirection.current) {
             LayoutDirection.Ltr -> Icons.Filled.ArrowBack
             LayoutDirection.Rtl -> Icons.Filled.ArrowForward
         }

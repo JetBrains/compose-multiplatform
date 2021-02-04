@@ -13,20 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.ui.gesture
 
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
-import androidx.compose.runtime.emptyContent
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
-import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.TestActivity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -50,6 +52,7 @@ import java.util.concurrent.TimeUnit
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
+
 class LongPressDragGestureFilterTest {
     @Suppress("DEPRECATION")
     @get:Rule
@@ -85,7 +88,7 @@ class LongPressDragGestureFilterTest {
                                 setupLatch.countDown()
                             }
                         },
-                        content = emptyContent()
+                        content = {}
                     )
                 }
             }

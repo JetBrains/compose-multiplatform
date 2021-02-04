@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.setFrom
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 
 /**
  * RenderNode implementation of OwnedLayer.
@@ -80,7 +81,8 @@ internal class RenderNodeLayer(
         cameraDistance: Float,
         transformOrigin: TransformOrigin,
         shape: Shape,
-        clip: Boolean
+        clip: Boolean,
+        layoutDirection: LayoutDirection
     ) {
         this.transformOrigin = transformOrigin
         val wasClippingManually = renderNode.clipToOutline && outlineResolver.clipPath != null
@@ -102,7 +104,8 @@ internal class RenderNodeLayer(
             shape,
             renderNode.alpha,
             renderNode.clipToOutline,
-            renderNode.elevation
+            renderNode.elevation,
+            layoutDirection
         )
         renderNode.setOutline(outlineResolver.outline)
         val isClippingManually = renderNode.clipToOutline && outlineResolver.clipPath != null

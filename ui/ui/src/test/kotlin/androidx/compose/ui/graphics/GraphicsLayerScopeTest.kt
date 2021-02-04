@@ -19,6 +19,7 @@ package androidx.compose.ui.graphics
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.google.common.truth.Truth.assertThat
 import org.junit.Assert.assertEquals
@@ -49,8 +50,11 @@ class GraphicsLayerScopeTest {
         scope.cameraDistance = 5f
         scope.transformOrigin = TransformOrigin(0.7f, 0.1f)
         scope.shape = object : Shape {
-            override fun createOutline(size: Size, density: Density) =
-                Outline.Rectangle(size.toRect())
+            override fun createOutline(
+                size: Size,
+                layoutDirection: LayoutDirection,
+                density: Density
+            ) = Outline.Rectangle(size.toRect())
         }
         scope.clip = true
         scope.reset()

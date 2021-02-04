@@ -134,20 +134,13 @@ fun Modifier.padding(all: Dp) =
  * Example usage:
  * @sample androidx.compose.foundation.layout.samples.PaddingValuesModifier
  */
-fun Modifier.padding(padding: PaddingValues) =
+fun Modifier.padding(paddingValues: PaddingValues) =
     this.then(
-        PaddingModifier(
-            start = padding.start,
-            top = padding.top,
-            end = padding.end,
-            bottom = padding.bottom,
-            rtlAware = true,
+        PaddingValuesModifier(
+            paddingValues = paddingValues,
             inspectorInfo = debugInspectorInfo {
                 name = "padding"
-                properties["start"] = padding.start
-                properties["top"] = padding.top
-                properties["end"] = padding.end
-                properties["bottom"] = padding.bottom
+                properties["paddingValues"] = paddingValues
             }
         )
     )
@@ -186,6 +179,159 @@ fun Modifier.absolutePadding(
     )
 )
 
+/**
+ * Describes a padding to be applied along the edges inside a box.
+ * See the [PaddingValues] factories and [Absolute] for convenient ways to
+ * build [PaddingValues].
+ */
+@Immutable
+interface PaddingValues {
+    /**
+     * The padding to be applied along the left edge inside a box.
+     */
+    @Stable
+    fun calculateLeftPadding(layoutDirection: LayoutDirection): Dp
+    /**
+     * The padding to be applied along the top edge inside a box.
+     */
+    @Stable
+    fun calculateTopPadding(): Dp
+    /**
+     * The padding to be applied along the right edge inside a box.
+     */
+    @Stable
+    fun calculateRightPadding(layoutDirection: LayoutDirection): Dp
+    /**
+     * The padding to be applied along the bottom edge inside a box.
+     */
+    @Stable
+    fun calculateBottomPadding(): Dp
+
+    /**
+     * Describes an absolute (RTL unaware) padding to be applied along the edges inside a box.
+     */
+    @Immutable
+    class Absolute(
+        @Stable
+        private val left: Dp = 0.dp,
+        @Stable
+        private val top: Dp = 0.dp,
+        @Stable
+        private val right: Dp = 0.dp,
+        @Stable
+        private val bottom: Dp = 0.dp
+    ) : PaddingValues {
+        override fun calculateLeftPadding(layoutDirection: LayoutDirection) = left
+
+        override fun calculateTopPadding() = top
+
+        override fun calculateRightPadding(layoutDirection: LayoutDirection) = right
+
+        override fun calculateBottomPadding() = bottom
+
+        override fun equals(other: Any?): Boolean {
+            if (other !is Absolute) return false
+            return left == other.left &&
+                top == other.top &&
+                right == other.right &&
+                bottom == other.bottom
+        }
+
+        override fun hashCode() =
+            ((left.hashCode() * 31 + top.hashCode()) * 31 + right.hashCode()) *
+                31 + bottom.hashCode()
+
+        override fun toString() =
+            "PaddingValues.Absolute(left=$left, top=$top, right=$right, bottom=$bottom"
+    }
+}
+
+/**
+ * The padding to be applied along the start edge inside a box: along the left edge if
+ * the layout direction is LTR, or along the right edge for RTL.
+ */
+@Stable
+fun PaddingValues.calculateStartPadding(layoutDirection: LayoutDirection) =
+    if (layoutDirection == LayoutDirection.Ltr) {
+        calculateLeftPadding(layoutDirection)
+    } else {
+        calculateRightPadding(layoutDirection)
+    }
+
+/**
+ * The padding to be applied along the end edge inside a box: along the right edge if
+ * the layout direction is LTR, or along the left edge for RTL.
+ */
+@Stable
+fun PaddingValues.calculateEndPadding(layoutDirection: LayoutDirection) =
+    if (layoutDirection == LayoutDirection.Ltr) {
+        calculateRightPadding(layoutDirection)
+    } else {
+        calculateLeftPadding(layoutDirection)
+    }
+
+/**
+ * Creates a padding of [all] dp along all 4 edges.
+ */
+@Stable
+fun PaddingValues(all: Dp): PaddingValues = PaddingValuesImpl(all, all, all, all)
+
+/**
+ * Creates a padding of [horizontal] dp along the left and right edges, and of [vertical]
+ * dp along the top and bottom edges.
+ */
+@Stable
+fun PaddingValues(horizontal: Dp, vertical: Dp): PaddingValues =
+    PaddingValuesImpl(horizontal, vertical, horizontal, vertical)
+
+/**
+ * Creates a padding to be applied along the edges inside a box. In LTR contexts [start] will
+ * be applied along the left edge and [end] will be applied along the right edge. In RTL contexts,
+ * [start] will correspond to the right edge and [end] to the left.
+ */
+@Stable
+fun PaddingValues(
+    start: Dp = 0.dp,
+    top: Dp = 0.dp,
+    end: Dp = 0.dp,
+    bottom: Dp = 0.dp
+): PaddingValues = PaddingValuesImpl(start, top, end, bottom)
+
+@Immutable
+internal class PaddingValuesImpl(
+    @Stable
+    val start: Dp = 0.dp,
+    @Stable
+    val top: Dp = 0.dp,
+    @Stable
+    val end: Dp = 0.dp,
+    @Stable
+    val bottom: Dp = 0.dp
+) : PaddingValues {
+    override fun calculateLeftPadding(layoutDirection: LayoutDirection) =
+        if (layoutDirection == LayoutDirection.Ltr) start else end
+
+    override fun calculateTopPadding() = top
+
+    override fun calculateRightPadding(layoutDirection: LayoutDirection) =
+        if (layoutDirection == LayoutDirection.Ltr) end else start
+
+    override fun calculateBottomPadding() = bottom
+
+    override fun equals(other: Any?): Boolean {
+        if (other !is PaddingValuesImpl) return false
+        return start == other.start &&
+            top == other.top &&
+            end == other.end &&
+            bottom == other.bottom
+    }
+
+    override fun hashCode() =
+        ((start.hashCode() * 31 + top.hashCode()) * 31 + end.hashCode()) * 31 + bottom.hashCode()
+
+    override fun toString() = "PaddingValues(start=$start, top=$top, end=$end, bottom=$bottom"
+}
+
 private class PaddingModifier(
     val start: Dp = 0.dp,
     val top: Dp = 0.dp,
@@ -209,8 +355,9 @@ private class PaddingModifier(
         measurable: Measurable,
         constraints: Constraints
     ): MeasureResult {
-        val horizontal = start.toIntPx() + end.toIntPx()
-        val vertical = top.toIntPx() + bottom.toIntPx()
+
+        val horizontal = start.roundToPx() + end.roundToPx()
+        val vertical = top.roundToPx() + bottom.roundToPx()
 
         val placeable = measurable.measure(constraints.offset(-horizontal, -vertical))
 
@@ -218,9 +365,9 @@ private class PaddingModifier(
         val height = constraints.constrainHeight(placeable.height + vertical)
         return layout(width, height) {
             if (rtlAware) {
-                placeable.placeRelative(start.toIntPx(), top.toIntPx())
+                placeable.placeRelative(start.roundToPx(), top.roundToPx())
             } else {
-                placeable.place(start.toIntPx(), top.toIntPx())
+                placeable.place(start.roundToPx(), top.roundToPx())
             }
         }
     }
@@ -244,28 +391,43 @@ private class PaddingModifier(
     }
 }
 
-/**
- * Describes a padding to be applied along the edges inside a box.
- */
-@Immutable
-data class PaddingValues(
-    @Stable
-    val start: Dp = 0.dp,
-    @Stable
-    val top: Dp = 0.dp,
-    @Stable
-    val end: Dp = 0.dp,
-    @Stable
-    val bottom: Dp = 0.dp
-) {
-    /**
-     * Describes a padding of [all] dp along all 4 edges.
-     */
-    constructor(all: Dp) : this(all, all, all, all)
+private class PaddingValuesModifier(
+    val paddingValues: PaddingValues,
+    inspectorInfo: InspectorInfo.() -> Unit
+) : LayoutModifier, InspectorValueInfo(inspectorInfo) {
+    override fun MeasureScope.measure(
+        measurable: Measurable,
+        constraints: Constraints
+    ): MeasureResult {
+        require(
+            paddingValues.calculateLeftPadding(LayoutDirection.Ltr) >= 0.dp &&
+                paddingValues.calculateTopPadding() >= 0.dp &&
+                paddingValues.calculateRightPadding(LayoutDirection.Ltr) >= 0.dp &&
+                paddingValues.calculateBottomPadding() >= 0.dp
+        ) {
+            "Padding must be non-negative"
+        }
+        val horizontal = paddingValues.calculateLeftPadding(LayoutDirection.Ltr).roundToPx() +
+            paddingValues.calculateRightPadding(layoutDirection).roundToPx()
+        val vertical = paddingValues.calculateTopPadding().roundToPx() +
+            paddingValues.calculateBottomPadding().roundToPx()
 
-    /**
-     * Describes a padding of [horizontal] dp along the left and right edges, and of [vertical]
-     * dp along the top and bottom edges.
-     */
-    constructor(horizontal: Dp, vertical: Dp) : this(horizontal, vertical, horizontal, vertical)
+        val placeable = measurable.measure(constraints.offset(-horizontal, -vertical))
+
+        val width = constraints.constrainWidth(placeable.width + horizontal)
+        val height = constraints.constrainHeight(placeable.height + vertical)
+        return layout(width, height) {
+            placeable.place(
+                paddingValues.calculateLeftPadding(layoutDirection).roundToPx(),
+                paddingValues.calculateTopPadding().roundToPx()
+            )
+        }
+    }
+
+    override fun hashCode() = paddingValues.hashCode()
+
+    override fun equals(other: Any?): Boolean {
+        val otherModifier = other as? PaddingValuesModifier ?: return false
+        return paddingValues == otherModifier.paddingValues
+    }
 }

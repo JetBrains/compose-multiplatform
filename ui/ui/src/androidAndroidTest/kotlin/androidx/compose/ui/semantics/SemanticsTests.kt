@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.semantics
 
+import androidx.compose.foundation.clickable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
@@ -29,7 +30,7 @@ import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
-import androidx.compose.ui.test.assertLabelEquals
+import androidx.compose.ui.test.assertContentDescriptionEquals
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.assertValueEquals
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -115,7 +116,7 @@ class SemanticsTests {
             }
         }
 
-        rule.onNodeWithTag(TestTag).assertLabelEquals(
+        rule.onNodeWithTag(TestTag).assertContentDescriptionEquals(
             "$root, $child1, $grandchild1, $grandchild2, $child2"
         )
     }
@@ -135,8 +136,8 @@ class SemanticsTests {
             }
         }
 
-        rule.onNodeWithTag(tag1).assertLabelEquals(label1)
-        rule.onNodeWithTag(tag2).assertLabelEquals(label2)
+        rule.onNodeWithTag(tag1).assertContentDescriptionEquals(label1)
+        rule.onNodeWithTag(tag2).assertContentDescriptionEquals(label2)
     }
 
     @Test
@@ -164,7 +165,7 @@ class SemanticsTests {
             }
         }
 
-        rule.onNodeWithTag(tag1).assertLabelEquals("$label1, $label3")
+        rule.onNodeWithTag(tag1).assertContentDescriptionEquals("$label1, $label3")
         rule.onNodeWithTag(tag2).assertTextEquals(label1)
     }
 
@@ -196,9 +197,9 @@ class SemanticsTests {
             ) {}
         }
 
-        rule.onNodeWithTag(tag1).assertLabelEquals("$label1, $label3")
+        rule.onNodeWithTag(tag1).assertContentDescriptionEquals("$label1, $label3")
         rule.onNodeWithTag(tag1).assertTextEquals(label3)
-        rule.onNodeWithTag(tag2).assertLabelEquals("$label1")
+        rule.onNodeWithTag(tag2).assertContentDescriptionEquals("$label1")
         rule.onNodeWithTag(tag2).assertDoesNotHaveProperty(SemanticsProperties.Text)
     }
 
@@ -214,7 +215,7 @@ class SemanticsTests {
             }
         }
 
-        rule.onNodeWithTag(TestTag).assertLabelEquals(label)
+        rule.onNodeWithTag(TestTag).assertContentDescriptionEquals(label)
 
         rule.runOnIdle { showSubtree.value = false }
 
@@ -239,13 +240,13 @@ class SemanticsTests {
         }
 
         rule.onNodeWithTag(TestTag)
-            .assertLabelEquals(label)
+            .assertContentDescriptionEquals(label)
             .assertDoesNotHaveProperty(SemanticsProperties.StateDescription)
 
         rule.runOnIdle { showNewNode.value = true }
 
         rule.onNodeWithTag(TestTag)
-            .assertLabelEquals(label)
+            .assertContentDescriptionEquals(label)
             .assertValueEquals(value)
     }
 
@@ -283,11 +284,11 @@ class SemanticsTests {
             ) {}
         }
 
-        rule.onNodeWithTag(TestTag).assertLabelEquals(beforeLabel)
+        rule.onNodeWithTag(TestTag).assertContentDescriptionEquals(beforeLabel)
 
         rule.runOnIdle { isAfter.value = true }
 
-        rule.onNodeWithTag(TestTag).assertLabelEquals(afterLabel)
+        rule.onNodeWithTag(TestTag).assertContentDescriptionEquals(afterLabel)
     }
 
     @Test
@@ -306,11 +307,11 @@ class SemanticsTests {
             }
         }
 
-        rule.onNodeWithTag(TestTag).assertLabelEquals(beforeLabel)
+        rule.onNodeWithTag(TestTag).assertContentDescriptionEquals(beforeLabel)
 
         rule.runOnIdle { isAfter.value = true }
 
-        rule.onNodeWithTag(TestTag).assertLabelEquals(afterLabel)
+        rule.onNodeWithTag(TestTag).assertContentDescriptionEquals(afterLabel)
     }
 
     @Test
@@ -331,11 +332,11 @@ class SemanticsTests {
             }
         }
 
-        rule.onNodeWithTag(TestTag).assertLabelEquals(beforeLabel)
+        rule.onNodeWithTag(TestTag).assertContentDescriptionEquals(beforeLabel)
 
         rule.runOnIdle { isAfter.value = true }
 
-        rule.onNodeWithTag(TestTag).assertLabelEquals(afterLabel)
+        rule.onNodeWithTag(TestTag).assertContentDescriptionEquals(afterLabel)
     }
 
     @Test
@@ -354,11 +355,11 @@ class SemanticsTests {
             }
         }
 
-        rule.onNodeWithTag(TestTag).assertLabelEquals(beforeLabel)
+        rule.onNodeWithTag(TestTag).assertContentDescriptionEquals(beforeLabel)
 
         rule.runOnIdle { isAfter.value = true }
 
-        rule.onNodeWithTag(TestTag).assertLabelEquals(afterLabel)
+        rule.onNodeWithTag(TestTag).assertContentDescriptionEquals(afterLabel)
     }
 
     @Test
@@ -397,11 +398,11 @@ class SemanticsTests {
             }
         }
 
-        rule.onNodeWithTag(TestTag).assertLabelEquals(beforeLabel)
+        rule.onNodeWithTag(TestTag).assertContentDescriptionEquals(beforeLabel)
 
         rule.runOnIdle { isAfter.value = true }
 
-        rule.onNodeWithTag(TestTag).assertLabelEquals(afterLabel)
+        rule.onNodeWithTag(TestTag).assertContentDescriptionEquals(afterLabel)
     }
 
     @Test
@@ -436,16 +437,225 @@ class SemanticsTests {
         }
 
         // This isn't the important part, just makes sure everything is behaving as expected
-        rule.onNodeWithTag(TestTag).assertLabelEquals(beforeLabel)
+        rule.onNodeWithTag(TestTag).assertContentDescriptionEquals(beforeLabel)
         assertThat(nodeCount).isEqualTo(1)
 
         rule.runOnIdle { isAfter.value = true }
 
         // Make sure everything is still behaving as expected
-        rule.onNodeWithTag(TestTag).assertLabelEquals(afterLabel)
+        rule.onNodeWithTag(TestTag).assertContentDescriptionEquals(afterLabel)
         // This is the important part: make sure we didn't replace the identity due to unwanted
         // pivotal properties
         assertThat(nodeCount).isEqualTo(1)
+    }
+
+    @Test
+    fun collapseSemanticsActions_prioritizeNonNullAction() {
+        val actionLabel = "copy"
+        rule.setContent {
+            SimpleTestLayout(
+                Modifier
+                    .testTag(TestTag)
+                    .semantics {
+                        copyText(label = actionLabel, action = null)
+                    }
+                    .semantics {
+                        copyText { true }
+                    }
+            ) {}
+        }
+        rule.onNodeWithTag(TestTag)
+            .assert(
+                SemanticsMatcher("collapse copyText") {
+                    it.config.getOrNull(SemanticsActions.CopyText)?.label == actionLabel &&
+                        it.config.getOrNull(SemanticsActions.CopyText)?.action?.invoke() == true
+                }
+            )
+    }
+
+    @Test
+    fun collapseSemanticsActions_prioritizeNonNullLabel() {
+        val actionLabel = "copy"
+        rule.setContent {
+            SimpleTestLayout(
+                Modifier
+                    .testTag(TestTag)
+                    .semantics {
+                        copyText { false }
+                    }
+                    .semantics {
+                        copyText(label = actionLabel, action = { true })
+                    }
+            ) {}
+        }
+        rule.onNodeWithTag(TestTag)
+            .assert(
+                SemanticsMatcher("collapse copyText") {
+                    it.config.getOrNull(SemanticsActions.CopyText)?.label == actionLabel &&
+                        it.config.getOrNull(SemanticsActions.CopyText)?.action?.invoke() == false
+                }
+            )
+    }
+
+    @Test
+    fun collapseSemanticsActions_changeActionLabel_notMergeDescendants() {
+        val actionLabel = "send"
+        rule.setContent {
+            SimpleTestLayout(
+                Modifier
+                    .testTag(TestTag)
+                    .semantics {
+                        onClick(label = actionLabel, action = null)
+                    }
+                    .clickable {}
+            ) {}
+        }
+        rule.onNodeWithTag(TestTag)
+            .assert(
+                SemanticsMatcher("collapse onClick") {
+                    it.config.getOrNull(SemanticsActions.OnClick)?.label == actionLabel &&
+                        it.config.getOrNull(SemanticsActions.OnClick)?.action?.invoke() == true
+                }
+            )
+    }
+
+    @Test
+    fun collapseSemanticsActions_changeActionLabel_mergeDescendants() {
+        val actionLabel = "send"
+        rule.setContent {
+            SimpleTestLayout(
+                Modifier
+                    .testTag(TestTag)
+                    .semantics(mergeDescendants = true) {
+                        onClick(label = actionLabel, action = null)
+                    }
+                    .clickable {}
+            ) {}
+        }
+        rule.onNodeWithTag(TestTag)
+            .assert(
+                SemanticsMatcher("collapse onClick") {
+                    it.config.getOrNull(SemanticsActions.OnClick)?.label == actionLabel &&
+                        it.config.getOrNull(SemanticsActions.OnClick)?.action?.invoke() == true
+                }
+            )
+    }
+
+    @Test
+    fun mergeSemanticsActions_prioritizeNonNullAction_mergeDescendants_descendantMergeable() {
+        val actionLabel = "show more"
+        rule.setContent {
+            SimpleTestLayout(
+                Modifier
+                    .testTag(TestTag)
+                    .semantics(mergeDescendants = true) {
+                        expand(label = actionLabel, action = null)
+                    }
+            ) {
+                SimpleTestLayout(Modifier.semantics { expand { true } }) {}
+            }
+        }
+        rule.onNodeWithTag(TestTag)
+            .assert(
+                SemanticsMatcher("merge expand action") {
+                    it.config.getOrNull(SemanticsActions.Expand)?.label == actionLabel &&
+                        it.config.getOrNull(SemanticsActions.Expand)?.action?.invoke() == true
+                }
+            )
+    }
+
+    @Test
+    fun mergeSemanticsActions_prioritizeNonNullLabel_mergeDescendants_descendantMergeable() {
+        val actionLabel = "show more"
+        rule.setContent {
+            SimpleTestLayout(
+                Modifier
+                    .testTag(TestTag)
+                    .semantics(mergeDescendants = true) {
+                        expand { false }
+                    }
+            ) {
+                SimpleTestLayout(
+                    Modifier.semantics { expand(label = actionLabel, action = { true }) }
+                ) {}
+            }
+        }
+        rule.onNodeWithTag(TestTag)
+            .assert(
+                SemanticsMatcher("merge expand action") {
+                    it.config.getOrNull(SemanticsActions.Expand)?.label == actionLabel &&
+                        it.config.getOrNull(SemanticsActions.Expand)?.action?.invoke() == false
+                }
+            )
+    }
+
+    @Test
+    fun mergeSemanticsActions_changeActionLabelNotWork_notMergeDescendants_descendantMergeable() {
+        val actionLabel = "show less"
+        rule.setContent {
+            SimpleTestLayout(
+                Modifier
+                    .testTag(TestTag)
+                    .semantics {
+                        collapse(label = actionLabel, action = null)
+                    }
+            ) {
+                SimpleTestLayout(Modifier.semantics { collapse { true } }) {}
+            }
+        }
+        rule.onNodeWithTag(TestTag)
+            .assert(
+                SemanticsMatcher("merge collapse action") {
+                    it.config.getOrNull(SemanticsActions.Collapse)?.label == actionLabel &&
+                        it.config.getOrNull(SemanticsActions.OnClick)?.action == null
+                }
+            )
+    }
+
+    @Test
+    fun mergeSemanticsActions_changeActionLabelNotWork_notMergeDescendants_descendantUnmergeable() {
+        val actionLabel = "send"
+        rule.setContent {
+            SimpleTestLayout(
+                Modifier
+                    .testTag(TestTag)
+                    .semantics {
+                        onClick(label = actionLabel, action = null)
+                    }
+            ) {
+                SimpleTestLayout(Modifier.clickable {}) {}
+            }
+        }
+        rule.onNodeWithTag(TestTag)
+            .assert(
+                SemanticsMatcher("merge onClick") {
+                    it.config.getOrNull(SemanticsActions.OnClick)?.label == actionLabel &&
+                        it.config.getOrNull(SemanticsActions.OnClick)?.action == null
+                }
+            )
+    }
+
+    @Test
+    fun mergeSemanticsActions_changeActionLabelNotWork_mergeDescendants_descendantUnmergeable() {
+        val actionLabel = "send"
+        rule.setContent {
+            SimpleTestLayout(
+                Modifier
+                    .testTag(TestTag)
+                    .semantics(mergeDescendants = true) {
+                        onClick(label = actionLabel, action = null)
+                    }
+            ) {
+                SimpleTestLayout(Modifier.clickable {}) {}
+            }
+        }
+        rule.onNodeWithTag(TestTag)
+            .assert(
+                SemanticsMatcher("merge onClick") {
+                    it.config.getOrNull(SemanticsActions.OnClick)?.label == actionLabel &&
+                        it.config.getOrNull(SemanticsActions.OnClick)?.action == null
+                }
+            )
     }
 
     @Test

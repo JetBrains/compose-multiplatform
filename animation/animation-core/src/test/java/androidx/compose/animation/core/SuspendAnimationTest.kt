@@ -16,9 +16,8 @@
 
 package androidx.compose.animation.core
 
-import androidx.compose.runtime.dispatch.MonotonicFrameClock
+import androidx.compose.runtime.MonotonicFrameClock
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.unit.Uptime
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
@@ -52,8 +51,8 @@ class SuspendAnimationTest {
                     0f, 1f, 0f,
                     spring(dampingRatio = Spring.DampingRatioMediumBouncy)
                 ) { value, velocity ->
-                    assertEquals(anim.getValue(playTimeMillis), value, 0.001f)
-                    assertEquals(anim.getVelocity(playTimeMillis), velocity, 0.001f)
+                    assertEquals(anim.getValueFromMillis(playTimeMillis), value, 0.001f)
+                    assertEquals(anim.getVelocityFromMillis(playTimeMillis), velocity, 0.001f)
                     playTimeMillis += interval
                 }
             }
@@ -85,7 +84,7 @@ class SuspendAnimationTest {
                     from, to,
                     animationSpec = tween(500)
                 ) { value, _ ->
-                    val expectedValue = anim.getValue(playTimeMillis)
+                    val expectedValue = anim.getValueFromMillis(playTimeMillis)
                     assertEquals(expectedValue.x, value.x, 0.001f)
                     assertEquals(expectedValue.y, value.y, 0.001f)
                     playTimeMillis += interval
@@ -114,8 +113,8 @@ class SuspendAnimationTest {
                     from, velocity,
                     animationSpec = FloatExponentialDecaySpec()
                 ) { value, velocity ->
-                    assertEquals(anim.getValue(playTimeMillis), value, 0.001f)
-                    assertEquals(anim.getVelocity(playTimeMillis), velocity, 0.001f)
+                    assertEquals(anim.getValueFromMillis(playTimeMillis), value, 0.001f)
+                    assertEquals(anim.getVelocityFromMillis(playTimeMillis), velocity, 0.001f)
                     playTimeMillis += interval
                 }
             }
@@ -139,7 +138,7 @@ class SuspendAnimationTest {
             val animationState = AnimationState(
                 initialValue = from,
                 typeConverter = offsetToVector,
-                lastFrameTime = Uptime(0)
+                lastFrameTimeNanos = 0
             )
             withContext(clock) {
                 // Put in a bunch of frames 50 milliseconds apart
@@ -155,7 +154,7 @@ class SuspendAnimationTest {
                 ) {
                     assertTrue(animationState.isRunning)
                     assertTrue(isRunning)
-                    val expectedValue = anim.getValue(playTimeMillis)
+                    val expectedValue = anim.getValueFromMillis(playTimeMillis)
                     assertEquals(expectedValue.x, value.x, 0.001f)
                     assertEquals(expectedValue.y, value.y, 0.001f)
                     if (playTimeMillis == 0L) {
@@ -202,8 +201,8 @@ class SuspendAnimationTest {
                 state.animateDecay(
                     FloatExponentialDecaySpec().generateDecayAnimationSpec()
                 ) {
-                    assertEquals(anim.getValue(playTimeMillis), value, 0.001f)
-                    assertEquals(anim.getVelocity(playTimeMillis), velocity, 0.001f)
+                    assertEquals(anim.getValueFromMillis(playTimeMillis), value, 0.001f)
+                    assertEquals(anim.getVelocityFromMillis(playTimeMillis), velocity, 0.001f)
                     playTimeMillis += interval
                     assertEquals(value, state.value, 0.0001f)
                     assertEquals(velocity, state.velocity, 0.0001f)

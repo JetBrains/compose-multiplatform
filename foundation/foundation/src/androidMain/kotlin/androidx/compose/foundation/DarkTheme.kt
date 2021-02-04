@@ -18,8 +18,8 @@ package androidx.compose.foundation
 
 import android.content.res.Configuration
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ComposableContract
-import androidx.compose.ui.platform.AmbientConfiguration
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.ui.platform.LocalConfiguration
 
 /**
  * This function should be used to help build responsive UIs that follow the system setting, to
@@ -31,9 +31,9 @@ import androidx.compose.ui.platform.AmbientConfiguration
  *
  * It is also recommended to provide user accessible overrides in your application, so users can
  * choose to force an always-light or always-dark theme. To do this, you should provide the current
- * theme value in an ambient or similar to components further down your hierarchy, only calling
- * this effect once at the top level if no user override has been set. This also helps avoid
- * multiple calls to this effect, which can be expensive as it queries system configuration.
+ * theme value in a CompositionLocal or similar to components further down your hierarchy, only
+ * calling this effect once at the top level if no user override has been set. This also helps
+ * avoid multiple calls to this effect, which can be expensive as it queries system configuration.
  *
  * For example, to draw a white rectangle when in dark theme, and a black rectangle when in light
  * theme:
@@ -43,8 +43,8 @@ import androidx.compose.ui.platform.AmbientConfiguration
  * @return `true` if the system is considered to be in 'dark theme'.
  */
 @Composable
-@ComposableContract(readonly = true)
+@ReadOnlyComposable
 fun isSystemInDarkTheme(): Boolean {
-    val uiMode = AmbientConfiguration.current.uiMode
+    val uiMode = LocalConfiguration.current.uiMode
     return (uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,15 @@
 
 package androidx.compose.ui.platform
 
-import androidx.compose.runtime.staticAmbientOf
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.plus
+import androidx.compose.ui.text.AnnotatedString
 
-val SelectionManagerTrackerAmbient = staticAmbientOf<SelectionManagerTracker>()
+val SelectionTrackerAmbient = staticCompositionLocalOf<SelectionTracker>()
 
-class SelectionManagerTracker {
-    internal var recentManager: DesktopSelectionManager? = null
+class SelectionTracker {
+    var getSelectedText: (() -> AnnotatedString?)? = null
 }
 
 val copyToClipboardKeySet by lazy {

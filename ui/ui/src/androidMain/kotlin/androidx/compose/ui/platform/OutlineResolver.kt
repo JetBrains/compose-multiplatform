@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.asAndroidPath
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 import kotlin.math.roundToInt
 import android.graphics.Outline as AndroidOutline
 
@@ -108,10 +109,18 @@ internal class OutlineResolver(private val density: Density) {
      */
     private var outlineNeeded = false
 
+    private var layoutDirection = LayoutDirection.Ltr
+
     /**
      * Updates the values of the outline. Returns `true` when the shape has changed.
      */
-    fun update(shape: Shape, alpha: Float, clipToOutline: Boolean, elevation: Float): Boolean {
+    fun update(
+        shape: Shape,
+        alpha: Float,
+        clipToOutline: Boolean,
+        elevation: Float,
+        layoutDirection: LayoutDirection
+    ): Boolean {
         cachedOutline.alpha = alpha
         val shapeChanged = this.shape != shape
         if (shapeChanged) {
@@ -121,6 +130,10 @@ internal class OutlineResolver(private val density: Density) {
         val outlineNeeded = clipToOutline || elevation > 0f
         if (this.outlineNeeded != outlineNeeded) {
             this.outlineNeeded = outlineNeeded
+            cacheIsDirty = true
+        }
+        if (this.layoutDirection != layoutDirection) {
+            this.layoutDirection = layoutDirection
             cacheIsDirty = true
         }
         return shapeChanged
@@ -145,7 +158,7 @@ internal class OutlineResolver(private val density: Density) {
                 // The methods to configure the outline will determine/update the flag
                 // if it not supported on the API level
                 isSupportedOutline = true
-                when (val outline = shape.createOutline(size, density)) {
+                when (val outline = shape.createOutline(size, layoutDirection, density)) {
                     is Outline.Rectangle -> updateCacheWithRect(outline.rect)
                     is Outline.Rounded -> updateCacheWithRoundRect(outline.roundRect)
                     is Outline.Generic -> updateCacheWithPath(outline.path)

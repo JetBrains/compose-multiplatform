@@ -65,6 +65,7 @@ import kotlin.math.max
  * @param text The primary text of the list item
  */
 @Composable
+@ExperimentalMaterialApi
 fun ListItem(
     modifier: Modifier = Modifier,
     icon: @Composable (() -> Unit)? = null,
@@ -360,7 +361,7 @@ private fun BaselinesOffsetColumn(
             } else 0
             val topPadding = max(
                 0,
-                offsets[index].toIntPx() - placeable[FirstBaseline] - toPreviousBaseline
+                offsets[index].roundToPx() - placeable[FirstBaseline] - toPreviousBaseline
             )
             y[index] = topPadding + containerHeight
             containerHeight += topPadding + placeable.height
@@ -393,7 +394,7 @@ private fun OffsetToBaselineOrCenter(
         val y: Int
         val containerHeight: Int
         if (baseline != AlignmentLine.Unspecified) {
-            y = offset.toIntPx() - baseline
+            y = offset.roundToPx() - baseline
             containerHeight = max(constraints.minHeight, y + placeable.height)
         } else {
             containerHeight = max(constraints.minHeight, placeable.height)
@@ -416,7 +417,7 @@ private fun applyTextStyle(
 ): @Composable (() -> Unit)? {
     if (icon == null) return null
     return {
-        Providers(AmbientContentAlpha provides contentAlpha) {
+        Providers(LocalContentAlpha provides contentAlpha) {
             ProvideTextStyle(textStyle, icon)
         }
     }

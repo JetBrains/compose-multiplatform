@@ -51,7 +51,7 @@ class AlertDialogTest {
                 onDismissRequest = {},
                 modifier = Modifier.border(10.dp, Color.Blue),
                 text = {
-                    contentColor = AmbientContentColor.current
+                    contentColor = LocalContentColor.current
                     Text("Text")
                 },
                 confirmButton = {},

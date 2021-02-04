@@ -25,10 +25,17 @@ import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.anyPositionChangeConsumed
 import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
+import androidx.compose.ui.input.pointer.isOutOfBounds
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.input.pointer.positionChangeIgnoreConsumed
 import androidx.compose.ui.input.pointer.positionChangedIgnoreConsumed
 import androidx.compose.ui.platform.ViewConfiguration
+import androidx.compose.ui.util.fastAll
+import androidx.compose.ui.util.fastAny
+import androidx.compose.ui.util.fastFirstOrNull
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.withTimeout
 import kotlin.math.abs
 import kotlin.math.sign
 
@@ -186,7 +193,7 @@ suspend fun PointerInputScope.detectDragGestures(
 ) {
     forEachGesture {
         awaitPointerEventScope {
-            val down = awaitFirstDown()
+            val down = awaitFirstDown(requireUnconsumed = false)
             var drag: PointerInputChange?
             do {
                 drag = awaitTouchSlopOrCancellation(down.id, onDrag)
@@ -202,6 +209,50 @@ suspend fun PointerInputScope.detectDragGestures(
                     onDragEnd()
                 }
             }
+        }
+    }
+}
+
+/**
+ * Gesture detector that waits for pointer down and long press, after which it calls [onDrag] for
+ * each drag event. [onDrag] must consume the position change if it wants to accept the drag
+ * motion. [onDragStart] will be called when long press in detected with the last known pointer
+ * position provided. [onDragEnd] is called after all pointers are up and [onDragCancel] is
+ * called if another gesture has consumed pointer input, canceling this gesture.
+ *
+ * Example Usage:
+ * @sample androidx.compose.foundation.samples.DetectDragWithLongPressGesturesSample
+ *
+ * @see detectVerticalDragGestures
+ * @see detectHorizontalDragGestures
+ * @see detectDragGestures
+ */
+suspend fun PointerInputScope.detectDragGesturesAfterLongPress(
+    onDragEnd: () -> Unit = { },
+    onDragCancel: () -> Unit = { },
+    onDragStart: (Offset) -> Unit = { },
+    onDrag: (change: PointerInputChange, dragAmount: Offset) -> Unit
+) {
+    forEachGesture {
+        val down = awaitPointerEventScope {
+            awaitFirstDown(requireUnconsumed = false)
+        }
+        try {
+            val drag = awaitLongPressOrCancellation(down)
+            if (drag != null) {
+                onDragStart.invoke(drag.position)
+
+                awaitPointerEventScope {
+                    if (!drag(drag.id) { onDrag(it, it.positionChange()) }) {
+                        onDragCancel()
+                    } else {
+                        onDragEnd()
+                    }
+                }
+            }
+        } catch (c: CancellationException) {
+            onDragCancel()
+            throw c
         }
     }
 }
@@ -316,7 +367,7 @@ suspend fun PointerInputScope.detectVerticalDragGestures(
 ) {
     forEachGesture {
         awaitPointerEventScope {
-            val down = awaitFirstDown()
+            val down = awaitFirstDown(requireUnconsumed = false)
             val drag = awaitVerticalTouchSlopOrCancellation(down.id, onVerticalDrag)
             if (drag != null) {
                 if (
@@ -439,7 +490,7 @@ suspend fun PointerInputScope.detectHorizontalDragGestures(
 ) {
     forEachGesture {
         awaitPointerEventScope {
-            val down = awaitFirstDown()
+            val down = awaitFirstDown(requireUnconsumed = false)
             val drag = awaitHorizontalTouchSlopOrCancellation(down.id, onHorizontalDrag)
             if (drag != null) {
                 if (
@@ -592,6 +643,58 @@ private suspend inline fun AwaitPointerEventScope.awaitTouchSlopOrCancellation(
                 }
             }
         }
+    }
+}
+
+private suspend fun PointerInputScope.awaitLongPressOrCancellation(
+    initialDown: PointerInputChange
+): PointerInputChange? {
+    var longPress: PointerInputChange? = null
+    var currentDown = initialDown
+    val longPressTimeout = viewConfiguration.longPressTimeoutMillis
+    return try {
+        // wait for first tap up or long press
+        withTimeout(longPressTimeout) {
+            awaitPointerEventScope {
+                var finished = false
+                while (!finished) {
+                    val event = awaitPointerEvent(PointerEventPass.Main)
+                    if (event.changes.fastAll { it.changedToUpIgnoreConsumed() }) {
+                        // All pointers are up
+                        finished = true
+                    }
+
+                    if (
+                        event.changes.fastAny { it.consumed.downChange || it.isOutOfBounds(size) }
+                    ) {
+                        finished = true // Canceled
+                    }
+
+                    // Check for cancel by position consumption. We can look on the Final pass of
+                    // the existing pointer event because it comes after the Main pass we checked
+                    // above.
+                    val consumeCheck = awaitPointerEvent(PointerEventPass.Final)
+                    if (consumeCheck.changes.fastAny { it.anyPositionChangeConsumed() }) {
+                        finished = true
+                    }
+                    if (!event.isPointerUp(currentDown.id)) {
+                        longPress = event.changes.firstOrNull { it.id == currentDown.id }
+                    } else {
+                        val newPressed = event.changes.fastFirstOrNull { it.pressed }
+                        if (newPressed != null) {
+                            currentDown = newPressed
+                            longPress = currentDown
+                        } else {
+                            // should technically never happen as we checked it above
+                            finished = true
+                        }
+                    }
+                }
+            }
+        }
+        null
+    } catch (_: TimeoutCancellationException) {
+        longPress ?: initialDown
     }
 }
 

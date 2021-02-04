@@ -17,6 +17,8 @@
 package androidx.compose.ui.demos.gestures
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,15 +32,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.Direction
-import androidx.compose.ui.gesture.DragObserver
-import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.input.pointer.consumeAllChanges
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 
 /**
- * Simple [dragGestureFilter] demo.
+ * Simple [detectVerticalDragGestures] and [detectHorizontalDragGestures] demo.
  */
 @Composable
 fun DragGestureFilterDemo() {
@@ -49,54 +50,6 @@ fun DragGestureFilterDemo() {
     val offset = remember { mutableStateOf(Offset.Zero) }
     val canStartVertically = remember { mutableStateOf(true) }
 
-    val dragObserver =
-        if (canStartVertically.value) {
-            object : DragObserver {
-                override fun onDrag(dragDistance: Offset): Offset {
-                    offset.value =
-                        Offset(x = offset.value.x, y = offset.value.y + dragDistance.y)
-                    return dragDistance
-                }
-
-                override fun onStop(velocity: Offset) {
-                    canStartVertically.value = !canStartVertically.value
-                    super.onStop(velocity)
-                }
-            }
-        } else {
-            object : DragObserver {
-                override fun onDrag(dragDistance: Offset): Offset {
-                    offset.value =
-                        Offset(x = offset.value.x + dragDistance.x, y = offset.value.y)
-                    return dragDistance
-                }
-
-                override fun onStop(velocity: Offset) {
-                    canStartVertically.value = !canStartVertically.value
-                    super.onStop(velocity)
-                }
-            }
-        }
-
-    val canDrag =
-        if (canStartVertically.value) {
-            { direction: Direction ->
-                when (direction) {
-                    Direction.DOWN -> true
-                    Direction.UP -> true
-                    else -> false
-                }
-            }
-        } else {
-            { direction: Direction ->
-                when (direction) {
-                    Direction.LEFT -> true
-                    Direction.RIGHT -> true
-                    else -> false
-                }
-            }
-        }
-
     val color =
         if (canStartVertically.value) {
             verticalColor
@@ -105,7 +58,7 @@ fun DragGestureFilterDemo() {
         }
 
     val (offsetX, offsetY) =
-        with(AmbientDensity.current) { offset.value.x.toDp() to offset.value.y.toDp() }
+        with(LocalDensity.current) { offset.value.x.toDp() to offset.value.y.toDp() }
 
     Column {
         Text(
@@ -121,7 +74,25 @@ fun DragGestureFilterDemo() {
                 .fillMaxSize()
                 .wrapContentSize(Alignment.Center)
                 .preferredSize(192.dp)
-                .dragGestureFilter(dragObserver, canDrag)
+                .pointerInput(Unit) {
+                    if (canStartVertically.value) {
+                        detectVerticalDragGestures(
+                            onDragEnd = { canStartVertically.value = !canStartVertically.value }
+                        ) { change, dragDistance ->
+                            offset.value =
+                                Offset(x = offset.value.x, y = offset.value.y + dragDistance)
+                            change.consumeAllChanges()
+                        }
+                    } else {
+                        detectHorizontalDragGestures(
+                            onDragEnd = { canStartVertically.value = !canStartVertically.value }
+                        ) { change, dragDistance ->
+                            offset.value =
+                                Offset(x = offset.value.x + dragDistance, y = offset.value.y)
+                            change.consumeAllChanges()
+                        }
+                    }
+                }
                 .background(color)
         )
     }

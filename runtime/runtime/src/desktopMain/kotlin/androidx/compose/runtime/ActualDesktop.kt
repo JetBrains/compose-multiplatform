@@ -16,23 +16,7 @@
 
 package androidx.compose.runtime
 
-import androidx.compose.runtime.dispatch.DefaultMonotonicFrameClock
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.swing.Swing
-import javax.swing.SwingUtilities
-import kotlin.coroutines.CoroutineContext
-
-class SwingEmbeddingContext : EmbeddingContext {
-    override fun isMainThread(): Boolean {
-        return SwingUtilities.isEventDispatchThread()
-    }
-
-    override fun mainThreadCompositionContext(): CoroutineContext {
-        return Dispatchers.Swing + DefaultMonotonicFrameClock
-    }
-}
-
-actual fun EmbeddingContext(): EmbeddingContext = SwingEmbeddingContext()
+import kotlinx.coroutines.delay
 
 internal actual object Trace {
     actual fun beginSection(name: String): Any? {
@@ -103,5 +87,44 @@ actual fun resetSourceInfo() {
 }
 
 // TODO(igotti): do we need actual processing for those?
-actual annotation class MainThread()
 actual annotation class CheckResult(actual val suggest: String)
+
+/**
+ * Clock with fixed delay between frames (16ms), independent from any display/window.
+ *
+ * It is used by [withFrameNanos] and [withFrameMillis] if one is not present
+ * in the calling [kotlin.coroutines.CoroutineContext].
+ *
+ * Use it only where you don't need to show animation in a window.
+ *
+ * If you need a frame clock for changing the state of an animation that should be displayed to
+ * user, use [MonotonicFrameClock] that is bound to the current window. You can access it using
+ * [LaunchedEffect]:
+ * ```
+ * LaunchedEffect {
+ *   val frameClock = coroutineContext[MonotonicFrameClock]
+ * }
+ * ```
+ *
+ * Or using [rememberCoroutineScope]:
+ * ```
+ * val scope = rememberCoroutineScope()
+ * val frameClock = scope.coroutineContext[MonotonicFrameClock]
+ * ```
+ *
+ * If [withFrameNanos] / [withFrameMillis] runs inside the coroutine scope
+ * obtained using [LaunchedEffect] or [rememberCoroutineScope] they also use
+ * [MonotonicFrameClock] which is bound to the current window.
+ */
+actual val DefaultMonotonicFrameClock: MonotonicFrameClock get() = SixtyFpsMonotonicFrameClock
+
+private object SixtyFpsMonotonicFrameClock : MonotonicFrameClock {
+    private const val fps = 60
+
+    override suspend fun <R> withFrameNanos(
+        onFrame: (Long) -> R
+    ): R {
+        delay(1000L / fps)
+        return onFrame(System.nanoTime())
+    }
+}

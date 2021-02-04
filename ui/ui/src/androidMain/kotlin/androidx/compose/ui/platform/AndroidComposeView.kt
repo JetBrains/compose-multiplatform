@@ -34,6 +34,9 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.ExperimentalComposeApi
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.AndroidAutofill
@@ -92,7 +95,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.util.trace
 import androidx.compose.ui.viewinterop.AndroidViewHolder
-import androidx.compose.ui.viewinterop.InternalInteropApi
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -179,15 +181,15 @@ internal class AndroidComposeView(context: Context) :
     // private val ownerScope = CoroutineScope(Dispatchers.Main.immediate + Job())
 
     /**
-     * Used for updating the ConfigurationAmbient when configuration changes - consume the
-     * configuration ambient instead of changing this observer if you are writing a component
-     * that adapts to configuration changes.
+     * Used for updating LocalConfiguration when configuration changes - consume LocalConfiguration
+     * instead of changing this observer if you are writing a component that adapts to
+     * configuration changes.
      */
     var configurationChangeObserver: (Configuration) -> Unit = {}
 
     private val _autofill = if (autofillSupported()) AndroidAutofill(this, autofillTree) else null
 
-    // Used as an ambient for performing autofill.
+    // Used as a CompositionLocal for performing autofill.
     override val autofill: Autofill? get() = _autofill
 
     private var observationClearRequested = false
@@ -279,7 +281,10 @@ internal class AndroidComposeView(context: Context) :
 
     override val fontLoader: Font.ResourceLoader = AndroidFontResourceLoader(context)
 
-    override var layoutDirection = context.resources.configuration.localeLayoutDirection
+    // Backed by mutableStateOf so that the ambient provider recomposes when it changes
+    override var layoutDirection by mutableStateOf(
+        context.resources.configuration.localeLayoutDirection
+    )
         private set
 
     /**
@@ -376,7 +381,6 @@ internal class AndroidComposeView(context: Context) :
      * Called to inform the owner that a new Android [View] was [attached][Owner.onAttach]
      * to the hierarchy.
      */
-    @OptIn(InternalInteropApi::class)
     fun addAndroidView(view: AndroidViewHolder, layoutNode: LayoutNode) {
         androidViewsHandler.layoutNode[view] = layoutNode
         androidViewsHandler.addView(view)
@@ -386,7 +390,6 @@ internal class AndroidComposeView(context: Context) :
      * Called to inform the owner that an Android [View] was [detached][Owner.onDetach]
      * from the hierarchy.
      */
-    @OptIn(InternalInteropApi::class)
     fun removeAndroidView(view: AndroidViewHolder) {
         androidViewsHandler.removeView(view)
         androidViewsHandler.layoutNode.remove(view)
@@ -395,7 +398,6 @@ internal class AndroidComposeView(context: Context) :
     /**
      * Called to ask the owner to draw a child Android [View] to [canvas].
      */
-    @OptIn(InternalInteropApi::class)
     fun drawAndroidView(view: AndroidViewHolder, canvas: android.graphics.Canvas) {
         androidViewsHandler.drawView(view, canvas)
     }
@@ -715,8 +717,11 @@ internal class AndroidComposeView(context: Context) :
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         density = Density(context)
-        layoutDirection = context.resources.configuration.localeLayoutDirection
         configurationChangeObserver(newConfig)
+    }
+
+    override fun onRtlPropertiesChanged(layoutDirection: Int) {
+        this.layoutDirection = layoutDirectionFromInt(layoutDirection)
     }
 
     private fun autofillSupported() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
@@ -780,10 +785,10 @@ internal val Configuration.localeLayoutDirection: LayoutDirection
     // be resolved since the composables may be composed without attaching to the RootViewImpl.
     // In Jetpack Compose, use the locale layout direction (i.e. layoutDirection came from
     // configuration) as a default layout direction.
-    get() = when (layoutDirection) {
-        android.util.LayoutDirection.LTR -> LayoutDirection.Ltr
-        android.util.LayoutDirection.RTL -> LayoutDirection.Rtl
-        // Configuration#getLayoutDirection should only return a resolved layout direction, LTR
-        // or RTL. Fallback to LTR for unexpected return value.
-        else -> LayoutDirection.Ltr
-    }
+    get() = layoutDirectionFromInt(layoutDirection)
+
+private fun layoutDirectionFromInt(layoutDirection: Int): LayoutDirection = when (layoutDirection) {
+    android.util.LayoutDirection.LTR -> LayoutDirection.Ltr
+    android.util.LayoutDirection.RTL -> LayoutDirection.Rtl
+    else -> LayoutDirection.Ltr
+}

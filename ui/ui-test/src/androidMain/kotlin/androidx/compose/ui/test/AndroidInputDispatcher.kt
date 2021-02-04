@@ -25,7 +25,7 @@ import android.view.MotionEvent.ACTION_POINTER_DOWN
 import android.view.MotionEvent.ACTION_POINTER_INDEX_SHIFT
 import android.view.MotionEvent.ACTION_POINTER_UP
 import android.view.MotionEvent.ACTION_UP
-import androidx.compose.runtime.dispatch.AndroidUiDispatcher
+import androidx.compose.ui.platform.AndroidUiDispatcher
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.platform.ViewRootForTest
@@ -189,7 +189,7 @@ internal class AndroidInputDispatcher(
     private fun pumpClock(millis: Long) {
         // Don't bother calling the method if there's nothing to advance
         if (millis > 0) {
-            testContext.testOwner.advanceTimeBy(millis)
+            testContext.testOwner.mainClock.advanceTimeBy(millis)
         }
     }
 

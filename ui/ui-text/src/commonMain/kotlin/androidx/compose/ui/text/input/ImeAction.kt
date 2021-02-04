@@ -18,18 +18,9 @@ package androidx.compose.ui.text.input
 
 /**
  * Signals the keyboard what type of action should be displayed. It is not guaranteed if
- * the keyboard will show the requested action. Apart from the visuals on the keyboard, when the
- * user performs the action onImeActionPerformed callback will be triggered with the action.
+ * the keyboard will show the requested action.
  */
 enum class ImeAction {
-    /**
-     * Use the platform and keyboard defaults and let the keyboard to decide the action. The
-     * keyboards will mostly show one of [Done] or [None] actions based on the single/multi
-     * line configuration.
-     */
-    @Deprecated("Use Default instead", ReplaceWith("Default"))
-    Unspecified,
-
     /**
      * Use the platform and keyboard defaults and let the keyboard to decide the action. The
      * keyboards will mostly show one of [Done] or [None] actions based on the single/multi
@@ -38,16 +29,9 @@ enum class ImeAction {
     Default,
 
     /**
-     * Represents that no IME action is available in editor. The keyboards will mostly show new line
-     * action.
-     */
-    @Deprecated("Use None instead", ReplaceWith("None"))
-    NoAction,
-
-    /**
      * Represents that no action is expected from the keyboard. Keyboard might choose to show an
      * action which mostly will be newline, however this action is not carried into the app via
-     * onImeActionPerformed.
+     * any [Keyboard Action][androidx.compose.foundation.text.KeyboardAction].
      */
     None,
 

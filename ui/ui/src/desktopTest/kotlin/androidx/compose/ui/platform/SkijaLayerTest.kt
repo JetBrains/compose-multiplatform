@@ -22,8 +22,10 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.round
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -314,12 +316,12 @@ class SkijaLayerTest {
     }
 
     private fun TestSkijaLayer() = SkijaLayer(
-        owner = DesktopOwner(DesktopOwners(invalidate = {})),
+        { Density(1f, 1f) },
         invalidateParentLayer = {},
         drawBlock = {}
     )
 
-    fun SkijaLayer.updateProperties(
+    private fun SkijaLayer.updateProperties(
         scaleX: Float = 1f,
         scaleY: Float = 1f,
         alpha: Float = 1f,
@@ -336,7 +338,7 @@ class SkijaLayerTest {
     ) {
         updateLayerProperties(
             scaleX, scaleY, alpha, translationX, translationY, shadowElevation, rotationX,
-            rotationY, rotationZ, cameraDistance, transformOrigin, shape, clip
+            rotationY, rotationZ, cameraDistance, transformOrigin, shape, clip, LayoutDirection.Ltr
         )
     }
 }

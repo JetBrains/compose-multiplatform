@@ -16,14 +16,11 @@
 
 package androidx.compose.ui.res
 
-import androidx.compose.runtime.Providers
-import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontListFontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.Typeface
 import androidx.compose.ui.text.font.test.R
 import androidx.compose.ui.text.font.toFontFamily
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -40,67 +37,6 @@ class FontResourcesTest {
 
     @get:Rule
     val rule = createComposeRule()
-
-    @Test
-    fun loadFontResource_systemFontFamily() {
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
-
-        var result: DeferredResource<Typeface>? = null
-        var syncLoadedTypeface: Typeface? = null
-
-        rule.setContent {
-            Providers(AmbientContext provides context) {
-
-                // async API
-                result = loadFontResource(
-                    fontFamily = FontFamily.Monospace,
-                    pendingFontFamily = FontFamily.Serif,
-                    failedFontFamily = FontFamily.SansSerif
-                )
-
-                // sync API
-                syncLoadedTypeface = fontResource(FontFamily.Monospace)
-            }
-        }
-
-        rule.runOnIdle {
-            assertThat(result).isNotNull()
-            assertThat(result!!.state).isEqualTo(LoadingState.LOADED)
-            assertThat(result!!.resource.resource).isEqualTo(
-                syncLoadedTypeface
-            )
-        }
-    }
-
-    @Test(expected = IllegalArgumentException::class)
-    fun loadFontResource_systemFontFamily_FileListFamily_as_pendingFontFamily() {
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
-
-        rule.setContent {
-            Providers(AmbientContext provides context) {
-                loadFontResource(
-                    fontFamily = Font(R.font.sample_font).toFontFamily(),
-                    pendingFontFamily = Font(R.font.sample_font).toFontFamily(),
-                    failedFontFamily = FontFamily.SansSerif
-                )
-            }
-        }
-    }
-
-    @Test(expected = IllegalArgumentException::class)
-    fun loadFontResource_systemFontFamily_FileListFamily_as_failedFontFamily() {
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
-
-        rule.setContent {
-            Providers(AmbientContext provides context) {
-                loadFontResource(
-                    fontFamily = Font(R.font.sample_font).toFontFamily(),
-                    pendingFontFamily = FontFamily.Serif,
-                    failedFontFamily = Font(R.font.sample_font).toFontFamily()
-                )
-            }
-        }
-    }
 
     @Test
     fun FontListFontFamily_cacheKey() {

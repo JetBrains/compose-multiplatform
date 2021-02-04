@@ -20,9 +20,9 @@ import android.content.Context
 import android.view.MotionEvent
 import android.view.ViewGroup
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,7 +34,6 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.PointerCoords
 import androidx.compose.ui.gesture.PointerProperties
-import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.AndroidComposeView
@@ -424,11 +423,11 @@ class AndroidPointerInputTest {
             container.setContent {
                 FillLayout(
                     Modifier
-                        .tapGestureFilter {
-                            tapLatch.countDown()
+                        .pointerInput(Unit) {
+                            detectTapGestures { tapLatch.countDown() }
                         }.then(
-                            if (tap2Enabled) Modifier.tapGestureFilter {
-                                tapLatch2.countDown()
+                            if (tap2Enabled) Modifier.pointerInput(Unit) {
+                                detectTapGestures { tapLatch2.countDown() }
                             } else Modifier
                         ).onGloballyPositioned { positionedLatch.countDown() }
                 )
@@ -591,7 +590,7 @@ private class LogEventsGestureFilter(val log: MutableList<List<PointerInputChang
 @Suppress("TestFunctionName")
 @Composable
 private fun FillLayout(modifier: Modifier = Modifier) {
-    Layout(emptyContent(), modifier) { _, constraints ->
+    Layout({}, modifier) { _, constraints ->
         layout(constraints.maxWidth, constraints.maxHeight) {}
     }
 }

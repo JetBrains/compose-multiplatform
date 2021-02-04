@@ -44,15 +44,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.savedInstanceState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.viewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 /**
  * This file lets DevRel track changes to snippets present in
@@ -313,7 +313,7 @@ private object StateSnippet12 {
 private object StateSnippet13 {
     @Composable
     fun ExpandingCard(title: String, body: String) {
-        var expanded by savedInstanceState { false }
+        var expanded by rememberSaveable { mutableStateOf(false) }
         ExpandingCard(
             title = title,
             body = body,

@@ -20,10 +20,8 @@
 
     <!--
       ~ Important: disable debuggable for accurate performance results
-      ~ requestLegacyExternalStorage to enable legacy JSON reporting when targeting Q
       -->
     <application
-            android:requestLegacyExternalStorage="true"
             android:debuggable="false"
             tools:replace="android:debuggable">
         <!-- enable profileableByShell for non-intrusive profiling tools -->

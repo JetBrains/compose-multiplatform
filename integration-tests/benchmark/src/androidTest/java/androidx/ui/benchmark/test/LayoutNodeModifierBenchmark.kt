@@ -19,19 +19,20 @@
 package androidx.ui.benchmark.test
 
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.gesture.pressIndicatorGestureFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.TestModifierUpdater
 import androidx.compose.ui.layout.TestModifierUpdaterLayout
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.test.junit4.DisableTransitionsTestRule
@@ -77,7 +78,9 @@ class LayoutNodeModifierBenchmark(
             Modifier.graphicsLayer(),
             Modifier.onKeyEvent { true },
             Modifier.semantics { },
-            Modifier.pressIndicatorGestureFilter(),
+            Modifier.pointerInput(Unit) {
+                detectTapGestures(onPress = {})
+            },
             Modifier.layoutId("Hello"),
             Modifier.padding(10.dp),
             Modifier.onGloballyPositioned { _ -> },

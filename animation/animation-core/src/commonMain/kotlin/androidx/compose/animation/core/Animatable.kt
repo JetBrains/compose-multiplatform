@@ -18,16 +18,11 @@ package androidx.compose.animation.core
 
 import androidx.compose.animation.core.AnimationEndReason.BoundReached
 import androidx.compose.animation.core.AnimationEndReason.Finished
-import androidx.compose.animation.core.AnimationEndReason.Interrupted
-import androidx.compose.runtime.AtomicReference
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.unit.Uptime
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.coroutineScope
 
 /**
  * [Animatable] is a value holder that automatically animates its value when the value is
@@ -81,8 +76,8 @@ class Animatable<T, V : AnimationVector>(
     /**
      * Indicates whether the animation is running.
      */
-    val isRunning: Boolean
-        get() = currentJob.get() != null
+    var isRunning: Boolean by mutableStateOf(false)
+        private set
 
     /**
      * The target of the current animation. If the animation finishes un-interrupted, it will
@@ -113,7 +108,7 @@ class Animatable<T, V : AnimationVector>(
     var upperBound: T? = null
         private set
 
-    private var currentJob = AtomicReference<Job?>(null)
+    private val mutatorMutex = MutatorMutex()
     internal val defaultSpringSpec: SpringSpec<T> =
         SpringSpec(visibilityThreshold = visibilityThreshold)
 
@@ -190,14 +185,15 @@ class Animatable<T, V : AnimationVector>(
      * be invoked on each animation frame.
      *
      * Returns an [AnimationResult] object. It contains: 1) the reason for ending the animation,
-     * and 2) an end state of the animation. The reason for ending the animation can be any of the
-     * following three:
+     * and 2) an end state of the animation. The reason for ending the animation can be either of
+     * the following two:
      * -  [Finished], when the animation finishes successfully without any interruption,
-     * -  [Interrupted], if/when the animation gets interrupted by 1) another call to start an
-     *    animation (i.e. [animateTo]/[animateDecay]), 2) [Animatable.stop], or 3)
-     *    [Animatable.snapTo].
      * -  [BoundReached] If the animation reaches the either [lowerBound] or [upperBound] in any
      *    dimension, the animation will end with [BoundReached] being the end reason.
+     *
+     * If the animation gets interrupted by 1) another call to start an animation
+     * (i.e. [animateTo]/[animateDecay]), 2) [Animatable.stop], or 3)[Animatable.snapTo], it will
+     * throw a [CancellationException] as the job gets canceled.
      *
      * __Note__: once the animation ends, its velocity will be reset to 0. The animation state at
      * the point of interruption/reaching bound is captured in the returned [AnimationResult].
@@ -214,7 +210,6 @@ class Animatable<T, V : AnimationVector>(
         initialVelocity: T = velocity,
         block: (Animatable<T, V>.() -> Unit)? = null
     ): AnimationResult<T, V> {
-        internalState.velocityVector = typeConverter.convertToVector(initialVelocity)
         val anim = TargetBasedAnimation(
             animationSpec = animationSpec,
             initialValue = value,
@@ -222,7 +217,7 @@ class Animatable<T, V : AnimationVector>(
             typeConverter = typeConverter,
             initialVelocity = initialVelocity
         )
-        return runAnimation(anim, block)
+        return runAnimation(anim, initialVelocity, block)
     }
 
     /**
@@ -238,14 +233,15 @@ class Animatable<T, V : AnimationVector>(
      *
      * Returns an [AnimationResult] object, that contains the [reason][AnimationEndReason] for
      * ending the animation, and an end state of the animation. The reason for ending the animation
-     * will be [Finished], when the animation finishes successfully without any interruption,
-     * If/when the animation gets interrupted by 1) another call to start an animation
-     * (i.e. [animateTo]/[animateDecay]), 2) [stop], or 3) [snapTo]
-     * [Interrupted] will be returned. If the animation reaches the either [lowerBound] or
-     * [upperBound] in any dimension, the animation will end with [BoundReached] being the
-     * end reason.
+     * will be [Finished], when the animation finishes successfully without any interruption.
+     * If the animation reaches the either [lowerBound] or [upperBound] in any dimension, the
+     * animation will end with [BoundReached] being the end reason.
      *
-     * Note, once the animation ends, its velocity will be reset to 0. If there's a need to
+     * If the animation gets interrupted by 1) another call to start an animation
+     * (i.e. [animateTo]/[animateDecay]), 2) [Animatable.stop], or 3)[Animatable.snapTo], it will
+     * throw a [CancellationException] as the job gets canceled.
+     *
+     * __Note__, once the animation ends, its velocity will be reset to 0. If there's a need to
      * continue the momentum before the animation gets interrupted or reaches the bound, it's
      * recommended to use the velocity in the returned [AnimationResult.endState] to start
      * another animation.
@@ -257,74 +253,58 @@ class Animatable<T, V : AnimationVector>(
         animationSpec: DecayAnimationSpec<T>,
         block: (Animatable<T, V>.() -> Unit)? = null
     ): AnimationResult<T, V> {
-        internalState.velocityVector = typeConverter.convertToVector(initialVelocity)
         val anim = DecayAnimation(
             animationSpec = animationSpec,
             initialValue = value,
-            initialVelocityVector = velocityVector.copy(),
+            initialVelocityVector = typeConverter.convertToVector(initialVelocity),
             typeConverter = typeConverter
         )
-        return runAnimation(anim, block)
+        return runAnimation(anim, initialVelocity, block)
     }
 
     // All the different types of animation code paths eventually converge to this method.
     private suspend fun runAnimation(
         animation: Animation<T, V>,
+        initialVelocity: T,
         block: (Animatable<T, V>.() -> Unit)?
     ): AnimationResult<T, V> {
-        targetValue = animation.targetValue
-        return coroutineScope {
-            // Update current job, and cancel old job (i.e. existing animation)
-            val oldJob = currentJob.getAndSet(coroutineContext[Job])
-            oldJob?.also { it.cancelAnimation() } != null
 
-            val startState = internalState.copy(finishedTime = Uptime.Unspecified)
-            val endReason = try {
+        // Store the start time before it's reset during job cancellation.
+        val startTime = internalState.lastFrameTimeNanos
+        return mutatorMutex.mutate {
+            try {
+                internalState.velocityVector = typeConverter.convertToVector(initialVelocity)
+                targetValue = animation.targetValue
+                isRunning = true
+
+                val endState = internalState.copy(
+                    finishedTimeNanos = AnimationConstants.UnspecifiedTime
+                )
                 var clampingNeeded = false
-                startState.animate(
+                endState.animate(
                     animation,
-                    internalState.lastFrameTime
+                    startTime
                 ) {
-                    if (currentJob.get() == coroutineContext[Job]) {
-                        updateState(internalState)
-                        val clamped = clampToBounds(value)
-                        if (clamped != value) {
-                            internalState.value = clamped
-                            startState.value = clamped
-                            block?.invoke(this@Animatable)
-                            cancelAnimation()
-                            clampingNeeded = true
-                        } else {
-                            block?.invoke(this@Animatable)
-                        }
-                    } else {
-                        // Cancelled by another job *initiated by* Animatable
+                    updateState(internalState)
+                    val clamped = clampToBounds(value)
+                    if (clamped != value) {
+                        internalState.value = clamped
+                        endState.value = clamped
+                        block?.invoke(this@Animatable)
                         cancelAnimation()
+                        clampingNeeded = true
+                    } else {
+                        block?.invoke(this@Animatable)
                     }
                 }
-                if (startState.isFinished) {
-                    Finished
-                } else {
-                    if (clampingNeeded) BoundReached else Interrupted
-                }
-            } catch (e: CancellationException) {
-                if (e is AnimationCancellationException) {
-                    Interrupted
-                } else {
-                    // External cancellation. Clean up internal states first, then throw.
-                    if (currentJob.compareAndSet(coroutineContext[Job], null)) {
-                        endAnimation()
-                    }
-                    throw e
-                }
-            }
-
-            // Reset the animation if it wasn't interrupted
-            if (currentJob.compareAndSet(coroutineContext[Job], null)) {
+                val endReason = if (clampingNeeded) BoundReached else Finished
                 endAnimation()
+                AnimationResult(endState, endReason)
+            } catch (e: CancellationException) {
+                // Clean up internal states first, then throw.
+                endAnimation()
+                throw e
             }
-
-            AnimationResult(startState, endReason)
         }
     }
 
@@ -356,8 +336,9 @@ class Animatable<T, V : AnimationVector>(
         // Reset velocity
         internalState.apply {
             velocityVector.reset()
-            lastFrameTime = Uptime.Unspecified
+            lastFrameTimeNanos = AnimationConstants.UnspecifiedTime
         }
+        isRunning = false
     }
 
     /**
@@ -366,10 +347,12 @@ class Animatable<T, V : AnimationVector>(
      *
      * @param targetValue The new target value to set [value] to.
      */
-    fun snapTo(targetValue: T) {
-        stop()
-        internalState.value = targetValue
-        this.targetValue = targetValue
+    suspend fun snapTo(targetValue: T) {
+        mutatorMutex.mutate {
+            endAnimation()
+            internalState.value = targetValue
+            this.targetValue = targetValue
+        }
     }
 
     /**
@@ -377,9 +360,10 @@ class Animatable<T, V : AnimationVector>(
      * not skip the animation value to its target value. Rather the animation will be stopped in its
      * track.
      */
-    fun stop() {
-        currentJob.getAndSet(null)?.cancelAnimation()
-        endAnimation()
+    suspend fun stop() {
+        mutatorMutex.mutate {
+            endAnimation()
+        }
     }
 
     /**
@@ -388,14 +372,6 @@ class Animatable<T, V : AnimationVector>(
      * when the value changes.
      */
     fun asState(): State<T> = internalState
-
-    private fun Job.cancelAnimation() {
-        cancel(AnimationCancellationException())
-    }
-
-    private class AnimationCancellationException : CancellationException(
-        "Interrupted by another animation, or stopped."
-    )
 }
 
 /**
@@ -431,11 +407,8 @@ fun Animatable(
  * AnimationResult contains information about an animation at the end of the animation. [endState]
  * captures the value/velocity/frame time, etc of the animation at its last frame. It can be
  * useful for starting another animation to continue the velocity from the previously interrupted
- * animation. [endReason] describes why the animation ended, it could be one of the following three:
+ * animation. [endReason] describes why the animation ended, it could be either of the following:
  * -  [Finished], when the animation finishes successfully without any interruption
- * -  [Interrupted], if/when the animation gets interrupted by 1) another call to start an
- *    animation (i.e. [animateTo]/[animateDecay]), 2) [Animatable.stop], or 3)
- *    [Animatable.snapTo].
  * -  [BoundReached] If the animation reaches the either [lowerBound][Animatable.lowerBound] or
  *    [upperBound][Animatable.upperBound] in any dimension, the animation will end with
  *    [BoundReached] being the end reason.

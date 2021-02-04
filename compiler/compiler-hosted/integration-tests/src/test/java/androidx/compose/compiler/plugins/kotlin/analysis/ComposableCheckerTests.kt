@@ -180,7 +180,7 @@ class ComposableCheckerTests : AbstractComposeDiagnosticsTest() {
         import androidx.compose.runtime.*
 
         @Composable inline fun A(
-            lambda: @ComposableContract(preventCapture=true) () -> Unit
+            lambda: @DisallowComposableCalls () -> Unit
         ) { if (Math.random() > 0.5) lambda() }
         @Composable fun B() {}
 
@@ -1075,4 +1075,20 @@ class ComposableCheckerTests : AbstractComposeDiagnosticsTest() {
         """
         )
     }
+
+    fun testDisallowComposableCallPropagation() = check(
+        """
+        import androidx.compose.runtime.*
+        class Foo
+        @Composable inline fun a(block1: @DisallowComposableCalls () -> Foo): Foo {
+            return block1()
+        }
+        @Composable inline fun b(<!MISSING_DISALLOW_COMPOSABLE_CALLS_ANNOTATION!>block2: () -> Foo<!>): Foo {
+          return a { block2() }
+        }
+        @Composable inline fun c(block2: @DisallowComposableCalls () -> Foo): Foo {
+          return a { block2() }
+        }
+    """
+    )
 }

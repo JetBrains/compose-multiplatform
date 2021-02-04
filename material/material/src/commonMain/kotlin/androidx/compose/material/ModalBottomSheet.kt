@@ -23,6 +23,7 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -32,16 +33,20 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.Saver
-import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.nestedscroll.nestedScroll
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
-import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.SubcomposeLayout
-import androidx.compose.ui.platform.AmbientAnimationClock
+import androidx.compose.ui.platform.LocalAnimationClock
+import androidx.compose.ui.semantics.collapse
+import androidx.compose.ui.semantics.dismiss
+import androidx.compose.ui.semantics.expand
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -97,11 +102,12 @@ class ModalBottomSheetState(
     val isVisible: Boolean
         get() = value != ModalBottomSheetValue.Hidden
 
-    private val isHalfExpandedEnabled: Boolean
+    internal val isHalfExpandedEnabled: Boolean
         get() = anchors.values.contains(ModalBottomSheetValue.HalfExpanded)
 
     /**
-     * Show the bottom sheet, with an animation.
+     * Show the bottom sheet, with an animation. If half expand is enabled, the bottom sheet will
+     * be half expanded. Otherwise it will be fully expanded.
      *
      * @param onShown Optional callback invoked when the bottom sheet has been shown.
      */
@@ -112,8 +118,46 @@ class ModalBottomSheetState(
         animateTo(
             targetValue = targetValue,
             onEnd = { endReason, _ ->
+                @Suppress("Deprecation")
                 if (endReason == AnimationEndReason.TargetReached) {
                     onShown?.invoke()
+                }
+            }
+        )
+    }
+
+    /**
+     * Half expand the bottom sheet if half expand is enabled, with an animation.
+     *
+     * @param onHalfExpand Optional callback invoked when the bottom sheet has been half-expanded.
+     */
+    internal fun halfExpand(onHalfExpand: (() -> Unit)? = null) {
+        if (!isHalfExpandedEnabled) {
+            return
+        }
+        animateTo(
+            targetValue = ModalBottomSheetValue.HalfExpanded,
+            onEnd = { endReason, _ ->
+                @Suppress("Deprecation")
+                if (endReason == AnimationEndReason.TargetReached) {
+                    onHalfExpand?.invoke()
+                }
+            }
+        )
+    }
+
+    /**
+     * Fully expand the bottom sheet, with an animation.
+     *
+     * @param onExpand Optional callback invoked when the bottom sheet has been expanded.
+     */
+    internal fun expand(onExpand: (() -> Unit)? = null) {
+        animateTo(
+            targetValue = ModalBottomSheetValue.Expanded,
+            onEnd = { endReason, _ ->
+                @Suppress("Deprecation")
+                if (endReason == AnimationEndReason.TargetReached) {
+                    onExpand?.invoke()
                 }
             }
         )
@@ -128,6 +172,7 @@ class ModalBottomSheetState(
         animateTo(
             targetValue = ModalBottomSheetValue.Hidden,
             onEnd = { endReason, _ ->
+                @Suppress("Deprecation")
                 if (endReason == AnimationEndReason.TargetReached) {
                     onHidden?.invoke()
                 }
@@ -161,7 +206,7 @@ class ModalBottomSheetState(
 
 /**
  * Create a [ModalBottomSheetState] and [remember] it against the [clock]. If a clock is not
- * specified, the default animation clock will be used, as provided by [AnimationClockAmbient].
+ * specified, the default animation clock will be used, as provided by [LocalAnimationClock].
  *
  * @param initialValue The initial value of the state.
  * @param clock The animation clock that will be used to drive the animations.
@@ -172,12 +217,12 @@ class ModalBottomSheetState(
 @ExperimentalMaterialApi
 fun rememberModalBottomSheetState(
     initialValue: ModalBottomSheetValue,
-    clock: AnimationClockObservable = AmbientAnimationClock.current,
+    clock: AnimationClockObservable = LocalAnimationClock.current,
     animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
     confirmStateChange: (ModalBottomSheetValue) -> Boolean = { true }
 ): ModalBottomSheetState {
     val disposableClock = clock.asDisposableClock()
-    return rememberSavedInstanceState(
+    return rememberSaveable(
         disposableClock,
         saver = ModalBottomSheetState.Saver(
             clock = disposableClock,
@@ -210,7 +255,7 @@ fun rememberModalBottomSheetState(
  * @param sheetElevation The elevation of the bottom sheet.
  * @param sheetBackgroundColor The background color of the bottom sheet.
  * @param sheetContentColor The preferred content color provided by the bottom sheet to its
- * children. Defaults to the matching `onFoo` color for [sheetBackgroundColor], or if that is not
+ * children. Defaults to the matching content color for [sheetBackgroundColor], or if that is not
  * a color from the theme, this will keep the same content color set above the bottom sheet.
  * @param scrimColor The color of the scrim that is applied to the rest of the screen when the
  * bottom sheet is visible. If you set this to `Color.Transparent`, then a scrim will no longer be
@@ -237,7 +282,17 @@ fun ModalBottomSheetLayout(
             Modifier
                 .fillMaxWidth()
                 .nestedScroll(sheetState.nestedScrollConnection)
-                .offset { IntOffset(0, sheetState.offset.value.roundToInt()) },
+                .offset { IntOffset(0, sheetState.offset.value.roundToInt()) }
+                .semantics {
+                    if (sheetState.isVisible) {
+                        dismiss { sheetState.hide(); true }
+                        if (sheetState.value == ModalBottomSheetValue.HalfExpanded) {
+                            expand { sheetState.expand(); true }
+                        } else if (sheetState.isHalfExpandedEnabled) {
+                            collapse { sheetState.halfExpand(); true }
+                        }
+                    }
+                },
             shape = sheetShape,
             elevation = sheetElevation,
             color = sheetBackgroundColor,
@@ -291,7 +346,11 @@ private fun Scrim(
             targetValue = if (visible) 1f else 0f,
             animationSpec = TweenSpec()
         )
-        val dismissModifier = if (visible) Modifier.tapGestureFilter { onDismiss() } else Modifier
+        val dismissModifier = if (visible) {
+            Modifier.pointerInput(onDismiss) { detectTapGestures { onDismiss() } }
+        } else {
+            Modifier
+        }
 
         Canvas(
             Modifier

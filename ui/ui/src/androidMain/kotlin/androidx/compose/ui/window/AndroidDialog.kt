@@ -19,34 +19,35 @@ package androidx.compose.ui.window
 import android.app.Dialog
 import android.content.Context
 import android.graphics.Outline
+import android.view.ContextThemeWrapper
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewOutlineProvider
 import android.view.Window
 import android.view.WindowManager
-import androidx.appcompat.view.ContextThemeWrapper
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionReference
+import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCompositionReference
+import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.R
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.AbstractComposeView
-import androidx.compose.ui.platform.AmbientDensity
-import androidx.compose.ui.platform.AmbientView
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.semantics.dialog
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
@@ -56,7 +57,7 @@ import androidx.lifecycle.ViewTreeViewModelStoreOwner
 import androidx.savedstate.ViewTreeSavedStateRegistryOwner
 
 /**
- * Android specific properties to configure a dialog.
+ * Properties used to customize the behavior of a [Dialog].
  *
  * @property dismissOnClickOutside whether the dialog can be dismissed by pressing the back button.
  * If true, pressing the back button will call onDismissRequest.
@@ -66,11 +67,29 @@ import androidx.savedstate.ViewTreeSavedStateRegistryOwner
  * dialog's window.
  */
 @Immutable
-data class AndroidDialogProperties(
+class DialogProperties(
     val dismissOnBackPress: Boolean = true,
     val dismissOnClickOutside: Boolean = true,
     val securePolicy: SecureFlagPolicy = SecureFlagPolicy.Inherit
-) : DialogProperties
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is DialogProperties) return false
+
+        if (dismissOnBackPress != other.dismissOnBackPress) return false
+        if (dismissOnClickOutside != other.dismissOnClickOutside) return false
+        if (securePolicy != other.securePolicy) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = dismissOnBackPress.hashCode()
+        result = 31 * result + dismissOnClickOutside.hashCode()
+        result = 31 * result + securePolicy.hashCode()
+        return result
+    }
+}
 
 /**
  * Opens a dialog with the given content.
@@ -83,24 +102,29 @@ data class AndroidDialogProperties(
  *
  * @sample androidx.compose.ui.samples.DialogSample
  *
- * @param onDismissRequest Executes when the user tries to dismiss the Dialog.
- * @param properties Typically platform specific properties to further configure the dialog.
+ * @param onDismissRequest Executes when the user tries to dismiss the dialog.
+ * @param properties [DialogProperties] for further customization of this dialog's behavior.
  * @param content The content to be displayed inside the dialog.
  */
 @Composable
-internal actual fun ActualDialog(
+fun Dialog(
     onDismissRequest: () -> Unit,
-    properties: DialogProperties?,
+    properties: DialogProperties = DialogProperties(),
     content: @Composable () -> Unit
 ) {
-    val view = AmbientView.current
-    val density = AmbientDensity.current
-    val composition = rememberCompositionReference()
+    val view = LocalView.current
+    val density = LocalDensity.current
+    val layoutDirection = LocalLayoutDirection.current
+    val composition = rememberCompositionContext()
     val currentContent by rememberUpdatedState(content)
     val dialog = remember(view, density) {
-        DialogWrapper(view, density).apply {
-            this.onDismissRequest = onDismissRequest
-            setProperties(properties)
+        DialogWrapper(
+            onDismissRequest,
+            properties,
+            view,
+            layoutDirection,
+            density
+        ).apply {
             setContent(composition) {
                 // TODO(b/159900354): draw a scrim and add margins around the Compose Dialog, and
                 //  consume clicks so they can't pass through to the underlying UI
@@ -123,8 +147,11 @@ internal actual fun ActualDialog(
     }
 
     SideEffect {
-        dialog.onDismissRequest = onDismissRequest
-        dialog.setProperties(properties)
+        dialog.updateParameters(
+            onDismissRequest = onDismissRequest,
+            properties = properties,
+            layoutDirection = layoutDirection
+        )
     }
 }
 
@@ -143,13 +170,13 @@ private class DialogLayout(
     override val window: Window
 ) : AbstractComposeView(context), DialogWindowProvider {
 
-    private var content: @Composable () -> Unit by mutableStateOf(emptyContent())
+    private var content: @Composable () -> Unit by mutableStateOf({})
 
-    protected override var shouldCreateCompositionOnAttachedToWindow: Boolean = false
+    override var shouldCreateCompositionOnAttachedToWindow: Boolean = false
         private set
 
-    fun setContent(parent: CompositionReference, content: @Composable () -> Unit) {
-        setParentCompositionReference(parent)
+    fun setContent(parent: CompositionContext, content: @Composable () -> Unit) {
+        setParentCompositionContext(parent)
         this.content = content
         shouldCreateCompositionOnAttachedToWindow = true
         createComposition()
@@ -162,7 +189,10 @@ private class DialogLayout(
 }
 
 private class DialogWrapper(
+    private var onDismissRequest: () -> Unit,
+    private var properties: DialogProperties,
     private val composeView: View,
+    layoutDirection: LayoutDirection,
     density: Density
 ) : Dialog(
     /**
@@ -171,10 +201,7 @@ private class DialogWrapper(
      */
     ContextThemeWrapper(composeView.context, R.style.DialogWindowTheme)
 ) {
-    lateinit var onDismissRequest: () -> Unit
-
     private val dialogLayout: DialogLayout
-    private var properties: AndroidDialogProperties = AndroidDialogProperties()
 
     private val maxSupportedElevation = 30.dp
 
@@ -223,15 +250,27 @@ private class DialogWrapper(
             dialogLayout,
             ViewTreeSavedStateRegistryOwner.get(composeView)
         )
+
+        // Initial setup
+        updateParameters(onDismissRequest, properties, layoutDirection)
+    }
+
+    private fun setLayoutDirection(layoutDirection: LayoutDirection) {
+        dialogLayout.layoutDirection = when (layoutDirection) {
+            LayoutDirection.Ltr -> android.util.LayoutDirection.LTR
+            LayoutDirection.Rtl -> android.util.LayoutDirection.RTL
+        }
     }
 
     // TODO(b/159900354): Make the Android Dialog full screen and the scrim fully transparent
 
-    fun setContent(parentComposition: CompositionReference, children: @Composable () -> Unit) {
+    fun setContent(parentComposition: CompositionContext, children: @Composable () -> Unit) {
         dialogLayout.setContent(parentComposition, children)
     }
 
-    private fun setSecureFlagEnabled(secureFlagEnabled: Boolean) {
+    private fun setSecurePolicy(securePolicy: SecureFlagPolicy) {
+        val secureFlagEnabled =
+            securePolicy.shouldApplySecureFlag(composeView.isFlagSecureEnabled())
         window!!.setFlags(
             if (secureFlagEnabled) {
                 WindowManager.LayoutParams.FLAG_SECURE
@@ -242,13 +281,15 @@ private class DialogWrapper(
         )
     }
 
-    fun setProperties(newProperties: DialogProperties?) {
-        if (newProperties is AndroidDialogProperties) {
-            properties = newProperties
-        }
-        setSecureFlagEnabled(
-            properties.securePolicy.shouldApplySecureFlag(composeView.isFlagSecureEnabled())
-        )
+    fun updateParameters(
+        onDismissRequest: () -> Unit,
+        properties: DialogProperties,
+        layoutDirection: LayoutDirection
+    ) {
+        this.onDismissRequest = onDismissRequest
+        this.properties = properties
+        setSecurePolicy(properties.securePolicy)
+        setLayoutDirection(layoutDirection)
     }
 
     fun disposeComposition() {

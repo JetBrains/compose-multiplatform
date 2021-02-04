@@ -44,19 +44,23 @@ fun FlingGame() {
         Text("Throw me around, see what happens", Modifier.align(Alignment.Center))
         val anim = remember { Animatable(Offset(100f, 100f), Offset.VectorConverter) }
         Box(
-            Modifier.fillMaxSize().pointerInput {
+            Modifier.fillMaxSize().pointerInput(Unit) {
                 coroutineScope {
                     while (true) {
                         val pointerId = awaitPointerEventScope {
                             awaitFirstDown().run {
-                                anim.snapTo(position)
+                                launch {
+                                    anim.snapTo(position)
+                                }
                                 id
                             }
                         }
                         val velocityTracker = VelocityTracker()
                         awaitPointerEventScope {
                             drag(pointerId) {
-                                anim.snapTo(anim.value + it.positionChange())
+                                launch {
+                                    anim.snapTo(anim.value + it.positionChange())
+                                }
                                 velocityTracker.addPosition(
                                     it.uptimeMillis,
                                     it.position

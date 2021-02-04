@@ -51,6 +51,7 @@ import androidx.compose.ui.util.fastForEach
  * @param executionPass The [PointerEventPass] during which this GestureDetector will attempt to
  * react to and consume down changes.  Defaults to [PointerEventPass.Main].
  */
+@Deprecated("Use Modifier.pointerInput{} with custom gesture detection code")
 fun Modifier.rawPressStartGestureFilter(
     onPressStart: (Offset) -> Unit,
     enabled: Boolean = false,

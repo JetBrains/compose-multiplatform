@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.animation.core
 
 import androidx.compose.animation.core.AnimationEndReason.BoundReached
@@ -37,6 +39,7 @@ import androidx.compose.animation.core.AnimationEndReason.TargetReached
  *      for t > duration, value < visibilityThreshold. Null value defaults to [SpringSpec]
  *      default.
  */
+@Deprecated("Please use Animatable instead")
 sealed class BaseAnimatedValue<T, V : AnimationVector>(
     internal val typeConverter: TwoWayConverter<T, V>,
     private val clock: AnimationClockObservable,
@@ -102,6 +105,7 @@ sealed class BaseAnimatedValue<T, V : AnimationVector>(
     internal var onEnd: ((AnimationEndReason, T) -> Unit)? = null
     private lateinit var anim: Animation<T, V>
     private var startTime: Long = Unset
+
     // last frame time only gets updated during the animation pulse. It will be reset at the
     // end of the animation.
     private var lastFrameTime: Long = Unset
@@ -185,21 +189,21 @@ sealed class BaseAnimatedValue<T, V : AnimationVector>(
         }
 
         lastFrameTime = timeMillis
-        velocityVector = anim.getVelocityVector(playtime)
-        value = anim.getValue(playtime)
+        velocityVector = anim.getVelocityVectorFromNanos(playtime * MillisToNanos)
+        value = anim.getValueFromNanos(playtime * MillisToNanos)
 
         checkFinished(playtime)
     }
 
     protected open fun checkFinished(playtime: Long) {
-        val animationFinished = anim.isFinished(playtime)
+        val animationFinished = anim.isFinishedFromNanos(playtime * MillisToNanos)
         if (animationFinished) endAnimation()
     }
 
     internal fun startAnimation(anim: Animation<T, V>) {
         this.anim = anim
         // Quick check before officially starting
-        if (anim.isFinished(0)) {
+        if (anim.isFinishedFromNanos(0)) {
             // If the animation value & velocity is already meeting the finished condition before
             // the animation even starts, end it now.
             endAnimation()
@@ -238,6 +242,7 @@ sealed class BaseAnimatedValue<T, V : AnimationVector>(
  * @param clock The animation clock used to drive the animation.
  * @param visibilityThreshold Threshold at which the animation may round off to its target value.
  */
+@Deprecated("Please use Animatable instead")
 abstract class AnimatedValue<T, V : AnimationVector>(
     typeConverter: TwoWayConverter<T, V>,
     clock: AnimationClockObservable,
@@ -256,6 +261,7 @@ abstract class AnimatedValue<T, V : AnimationVector>(
  * @param clock An animation clock observable controlling the progression of the animated value
  * @param visibilityThreshold Threshold at which the animation may round off to its target value.
  */
+@Deprecated("Please use Animatable instead")
 abstract class AnimatedFloat(
     clock: AnimationClockObservable,
     visibilityThreshold: Float = Spring.DefaultDisplacementThreshold
@@ -270,6 +276,7 @@ abstract class AnimatedFloat(
      */
     var min: Float = Float.NEGATIVE_INFINITY
         private set
+
     /**
      * Upper bound of the animation value. When animations reach this upper bound, it will
      * automatically stop with [AnimationEndReason] being [AnimationEndReason.BoundReached].
@@ -332,6 +339,7 @@ abstract class AnimatedFloat(
  * Unlike [AnimatedValue.animateTo] onEnd, this lambda includes 3rd param remainingVelocity,
  * that represents velocity that wasn't consumed after fling finishes.
  */
+@Deprecated("Please use Animatable instead")
 // TODO: Consolidate onAnimationEnd and onEnd
 typealias OnAnimationEnd =
     (endReason: AnimationEndReason, endValue: Float, remainingVelocity: Float) -> Unit
@@ -346,6 +354,7 @@ typealias OnAnimationEnd =
  *                   finished.
  */
 // TODO: Figure out an API for customizing the type of decay & the friction
+@Deprecated("Please use Animatable.animateDecay instead")
 fun AnimatedFloat.fling(
     startVelocity: Float,
     decay: FloatDecayAnimationSpec = FloatExponentialDecaySpec(),
@@ -360,7 +369,7 @@ fun AnimatedFloat.fling(
     }
 
     // start from current value with the given velocity
-    targetValue = decay.getTarget(value, startVelocity)
+    targetValue = decay.getTargetValue(value, startVelocity)
     startAnimation(DecayAnimation(decay, value, startVelocity))
 }
 
@@ -379,6 +388,7 @@ fun AnimatedFloat.fling(
  * @param onEnd An optional callback that will be invoked when the animation
  *              finished by any reason.
  */
+@Deprecated("Please use Animatable.animateDecay instead")
 fun AnimatedFloat.fling(
     startVelocity: Float,
     decay: FloatDecayAnimationSpec = FloatExponentialDecaySpec(),
@@ -394,7 +404,7 @@ fun AnimatedFloat.fling(
     }
 
     // start from current value with the given velocity
-    targetValue = decay.getTarget(value, startVelocity)
+    targetValue = decay.getTargetValue(value, startVelocity)
     val targetAnimation = adjustTarget(targetValue)
     if (targetAnimation == null) {
         val animWrapper = decay.createAnimation(value, startVelocity)
@@ -423,6 +433,13 @@ private const val Unset: Long = -1
  * @param clock The animation clock used to drive the animation.
  * @param visibilityThreshold Threshold at which the animation may round off to its target value.
  */
+@Deprecated(
+    "AnimatedValue has been deprecated. Please use Animatable instead",
+    replaceWith = ReplaceWith(
+        "Animatable(initVal, typeConverter, visibilityThreshold)",
+        "androidx.compose.animation.Animatable",
+    )
+)
 fun <T, V : AnimationVector> AnimatedValue(
     initVal: T,
     typeConverter: TwoWayConverter<T, V>,
@@ -439,6 +456,13 @@ fun <T, V : AnimationVector> AnimatedValue(
  * @param clock The animation clock used to drive the animation.
  * @param visibilityThreshold Threshold at which the animation may round off to its target value.
  */
+@Deprecated(
+    "AnimatedVector has been deprecated. Please use Animatable instead",
+    replaceWith = ReplaceWith(
+        "Animatable(initVal, TwoWayConverter({ it }, { it }), visibilityThreshold)",
+        "androidx.compose.animation.Animatable",
+    )
+)
 fun <V : AnimationVector> AnimatedVector(
     initVal: V,
     clock: AnimationClockObservable,
@@ -454,6 +478,13 @@ fun <V : AnimationVector> AnimatedVector(
  * @param clock The animation clock used to drive the animation.
  * @param visibilityThreshold Threshold at which the animation may round off to its target value.
  */
+@Deprecated(
+    "AnimatedFloat has been deprecated. Please use Animatable instead",
+    replaceWith = ReplaceWith(
+        "Animatable(initVal, visibilityThreshold)",
+        "androidx.compose.animation.Animatable",
+    )
+)
 fun AnimatedFloat(
     initVal: Float,
     clock: AnimationClockObservable,

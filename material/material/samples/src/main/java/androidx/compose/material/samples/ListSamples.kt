@@ -17,11 +17,10 @@
 package androidx.compose.material.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.toggleable
-import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
@@ -29,20 +28,20 @@ import androidx.compose.material.Icon
 import androidx.compose.material.ListItem
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.unit.dp
 
 @Sampled
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
+@OptIn(ExperimentalMaterialApi::class)
 fun ClickableListItems() {
     Column {
         var switched by remember { mutableStateOf(false) }
@@ -90,22 +89,17 @@ fun ClickableListItems() {
 
 @Sampled
 @Composable
-fun OneLineListItems(
-    icon24x24: ImageBitmap,
-    icon40x40: ImageBitmap,
-    icon56x56: ImageBitmap,
-    vectorIcon: ImageVector
-) {
+@OptIn(ExperimentalMaterialApi::class)
+fun OneLineListItems() {
     Column {
         ListItem(text = { Text("One line list item with no icon") })
         Divider()
         ListItem(
             text = { Text("One line list item with 24x24 icon") },
             icon = {
-                Image(
-                    icon24x24,
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                Icon(
+                    Icons.Filled.Favorite,
+                    contentDescription = null
                 )
             }
         )
@@ -113,10 +107,10 @@ fun OneLineListItems(
         ListItem(
             text = { Text("One line list item with 40x40 icon") },
             icon = {
-                Image(
-                    icon40x40,
+                Icon(
+                    Icons.Filled.Favorite,
                     contentDescription = null,
-                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                    modifier = Modifier.size(40.dp)
                 )
             }
         )
@@ -124,10 +118,10 @@ fun OneLineListItems(
         ListItem(
             text = { Text("One line list item with 56x56 icon") },
             icon = {
-                Image(
-                    icon56x56,
+                Icon(
+                    Icons.Filled.Favorite,
                     contentDescription = null,
-                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                    modifier = Modifier.size(56.dp)
                 )
             }
         )
@@ -135,10 +129,10 @@ fun OneLineListItems(
         ListItem(
             text = { Text("One line clickable list item") },
             icon = {
-                Image(
-                    icon56x56,
+                Icon(
+                    Icons.Filled.Favorite,
                     contentDescription = null,
-                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                    modifier = Modifier.size(56.dp)
                 )
             },
             modifier = Modifier.clickable { }
@@ -146,19 +140,29 @@ fun OneLineListItems(
         Divider()
         ListItem(
             text = { Text("One line list item with trailing icon") },
-            trailing = { Icon(vectorIcon, contentDescription = "Localized description") }
+            trailing = {
+                Icon(
+                    Icons.Filled.Favorite,
+                    contentDescription = "Localized Description"
+                )
+            }
         )
         Divider()
         ListItem(
             text = { Text("One line list item") },
             icon = {
-                Image(
-                    icon40x40,
+                Icon(
+                    Icons.Filled.Favorite,
                     contentDescription = null,
-                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                    modifier = Modifier.size(40.dp)
                 )
             },
-            trailing = { Icon(vectorIcon, contentDescription = "Localized description") }
+            trailing = {
+                Icon(
+                    Icons.Filled.Favorite,
+                    contentDescription = "Localized description"
+                )
+            }
         )
         Divider()
     }
@@ -166,8 +170,8 @@ fun OneLineListItems(
 
 @Sampled
 @Composable
-// TODO(popam, b/159689286): material icons instead of ImageBitmap when they can have custom sizes
-fun TwoLineListItems(icon24x24: ImageBitmap, icon40x40: ImageBitmap) {
+@OptIn(ExperimentalMaterialApi::class)
+fun TwoLineListItems() {
     Column {
         ListItem(
             text = { Text("Two line list item") },
@@ -183,10 +187,9 @@ fun TwoLineListItems(icon24x24: ImageBitmap, icon40x40: ImageBitmap) {
             text = { Text("Two line list item with 24x24 icon") },
             secondaryText = { Text("Secondary text") },
             icon = {
-                Image(
-                    icon24x24,
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                Icon(
+                    Icons.Filled.Favorite,
+                    contentDescription = null
                 )
             }
         )
@@ -195,10 +198,10 @@ fun TwoLineListItems(icon24x24: ImageBitmap, icon40x40: ImageBitmap) {
             text = { Text("Two line list item with 40x40 icon") },
             secondaryText = { Text("Secondary text") },
             icon = {
-                Image(
-                    icon40x40,
+                Icon(
+                    Icons.Filled.Favorite,
                     contentDescription = null,
-                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                    modifier = Modifier.size(40.dp)
                 )
             }
         )
@@ -208,10 +211,10 @@ fun TwoLineListItems(icon24x24: ImageBitmap, icon40x40: ImageBitmap) {
             secondaryText = { Text("Secondary text") },
             trailing = { Text("meta") },
             icon = {
-                Image(
-                    icon40x40,
+                Icon(
+                    Icons.Filled.Favorite,
                     contentDescription = null,
-                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                    modifier = Modifier.size(40.dp)
                 )
             }
         )
@@ -221,7 +224,8 @@ fun TwoLineListItems(icon24x24: ImageBitmap, icon40x40: ImageBitmap) {
 
 @Sampled
 @Composable
-fun ThreeLineListItems(icon24x24: ImageBitmap, vectorIcon: ImageVector) {
+@OptIn(ExperimentalMaterialApi::class)
+fun ThreeLineListItems() {
     Column {
         ListItem(
             text = { Text("Three line list item") },
@@ -251,10 +255,9 @@ fun ThreeLineListItems(icon24x24: ImageBitmap, vectorIcon: ImageVector) {
             },
             singleLineSecondaryText = false,
             icon = {
-                Image(
-                    icon24x24,
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                Icon(
+                    Icons.Filled.Favorite,
+                    contentDescription = null
                 )
             }
         )
@@ -268,7 +271,12 @@ fun ThreeLineListItems(icon24x24: ImageBitmap, vectorIcon: ImageVector) {
                 )
             },
             singleLineSecondaryText = false,
-            trailing = { Icon(vectorIcon, "Localized description") }
+            trailing = {
+                Icon(
+                    Icons.Filled.Favorite,
+                    contentDescription = "Localized description"
+                )
+            }
         )
         Divider()
         ListItem(
@@ -284,17 +292,18 @@ fun ThreeLineListItems(icon24x24: ImageBitmap, vectorIcon: ImageVector) {
 // Demos for mixing RTL and LTR ListItems:
 
 @Composable
-fun OneLineRtlLtrListItems(icon24x24: ImageBitmap, icon40x40: ImageBitmap) {
+@OptIn(ExperimentalMaterialApi::class)
+fun OneLineRtlLtrListItems() {
     Column {
         ListItem(text = { Text("One line list item with no icon") })
         Divider()
         ListItem(
             text = { Text("פריט ברשימה אחת עם תמונה.") },
             icon = {
-                Image(
-                    icon40x40,
+                Icon(
+                    Icons.Filled.Favorite,
                     contentDescription = null,
-                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                    modifier = Modifier.size(40.dp)
                 )
             }
         )
@@ -302,10 +311,9 @@ fun OneLineRtlLtrListItems(icon24x24: ImageBitmap, icon40x40: ImageBitmap) {
         ListItem(
             text = { Text("One line list item with 24x24 icon") },
             icon = {
-                Image(
-                    icon40x40,
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                Icon(
+                    Icons.Filled.Favorite,
+                    contentDescription = null
                 )
             }
         )
@@ -313,10 +321,9 @@ fun OneLineRtlLtrListItems(icon24x24: ImageBitmap, icon40x40: ImageBitmap) {
         ListItem(
             text = { Text("عنصر قائمة واحد مع رمز زائدة") },
             trailing = {
-                Image(
-                    icon24x24,
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                Icon(
+                    Icons.Filled.Favorite,
+                    contentDescription = null
                 )
             }
         )
@@ -325,7 +332,8 @@ fun OneLineRtlLtrListItems(icon24x24: ImageBitmap, icon40x40: ImageBitmap) {
 }
 
 @Composable
-fun TwoLineRtlLtrListItems(icon40x40: ImageBitmap) {
+@OptIn(ExperimentalMaterialApi::class)
+fun TwoLineRtlLtrListItems() {
     Column {
         ListItem(
             text = { Text("Two line list item") },
@@ -347,10 +355,10 @@ fun TwoLineRtlLtrListItems(icon40x40: ImageBitmap) {
             text = { Text("عنصر قائمة مكون من سطرين مع رمز") },
             overlineText = { Text("فوق الخط") },
             icon = {
-                Image(
-                    icon40x40,
+                Icon(
+                    Icons.Filled.Favorite,
                     contentDescription = null,
-                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                    modifier = Modifier.size(40.dp)
                 )
             }
         )
@@ -359,10 +367,10 @@ fun TwoLineRtlLtrListItems(icon40x40: ImageBitmap) {
             text = { Text("بندان قابلان للنقر") },
             secondaryText = { Text("نص ثانوي") },
             icon = {
-                Image(
-                    icon40x40,
+                Icon(
+                    Icons.Filled.Favorite,
                     contentDescription = null,
-                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                    modifier = Modifier.size(40.dp)
                 )
             },
             modifier = Modifier.clickable { }
@@ -372,7 +380,8 @@ fun TwoLineRtlLtrListItems(icon40x40: ImageBitmap) {
 }
 
 @Composable
-fun ThreeLineRtlLtrListItems(icon40x40: ImageBitmap) {
+@OptIn(ExperimentalMaterialApi::class)
+fun ThreeLineRtlLtrListItems() {
     Column {
         ListItem(
             text = { Text("Three line list item") },
@@ -397,10 +406,10 @@ fun ThreeLineRtlLtrListItems(icon40x40: ImageBitmap) {
             overlineText = { Text("فوق الخط") },
             secondaryText = { Text("نص ثانوي") },
             icon = {
-                Image(
-                    icon40x40,
+                Icon(
+                    Icons.Filled.Favorite,
                     contentDescription = null,
-                    colorFilter = ColorFilter.tint(AmbientContentColor.current)
+                    modifier = Modifier.size(40.dp)
                 )
             }
         )

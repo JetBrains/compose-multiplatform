@@ -18,12 +18,12 @@ package androidx.compose.runtime
 
 import androidx.compose.runtime.snapshots.MutableSnapshot
 import androidx.compose.runtime.snapshots.Snapshot
+import androidx.compose.runtime.snapshots.SnapshotMutableState
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.runtime.snapshots.StateObject
 import androidx.compose.runtime.snapshots.StateRecord
 import androidx.compose.runtime.snapshots.readable
-import androidx.compose.runtime.snapshots.takeSnapshot
 import androidx.compose.runtime.snapshots.withCurrent
 import androidx.compose.runtime.snapshots.writable
 import kotlin.reflect.KProperty
@@ -49,7 +49,7 @@ import kotlin.reflect.KProperty
 fun <T> mutableStateOf(
     value: T,
     policy: SnapshotMutationPolicy<T> = structuralEqualityPolicy()
-): MutableState<T> = SnapshotMutableState(value, policy)
+): MutableState<T> = SnapshotMutableStateImpl(value, policy)
 
 /**
  * A value holder where reads to the [value] property during the execution of a [Composable]
@@ -99,11 +99,9 @@ inline operator fun <T> MutableState<T>.setValue(thisObj: Any?, property: KPrope
 }
 
 /**
- * The ModelMutableState class is a single value holder whose reads and writes are observed by
- * Compose.
+ * A single value holder whose reads and writes are observed by Compose.
  *
  * Additionally, writes to it are transacted as part of the [Snapshot] system.
- * `state` and `stateFor` composables.
  *
  * @property value the wrapped value
  * @property policy a policy to control how changes are handled in a mutable snapshot.
@@ -111,11 +109,11 @@ inline operator fun <T> MutableState<T>.setValue(thisObj: Any?, property: KPrope
  * @see mutableStateOf
  * @see SnapshotMutationPolicy
  */
-@OptIn(androidx.compose.runtime.ExperimentalComposeApi::class)
-private class SnapshotMutableState<T>(
+@OptIn(ExperimentalComposeApi::class)
+private class SnapshotMutableStateImpl<T>(
     value: T,
-    val policy: SnapshotMutationPolicy<T>
-) : StateObject, MutableState<T> {
+    override val policy: SnapshotMutationPolicy<T>
+) : StateObject, SnapshotMutableState<T> {
     @Suppress("UNCHECKED_CAST")
     override var value: T
         get() = next.readable(this).value
@@ -190,7 +188,7 @@ private class SnapshotMutableState<T>(
  * A policy to control how the result of [mutableStateOf] report and merge changes to
  * the state object.
  *
- * A mutation policy can be passed as an parameter to [mutableStateOf], and [ambientOf].
+ * A mutation policy can be passed as an parameter to [mutableStateOf], and [compositionLocalOf].
  *
  * Typically, one of the stock policies should be used such as [referentialEqualityPolicy],
  * [structuralEqualityPolicy], or [neverEqualPolicy]. However, a custom mutation policy can be
@@ -273,7 +271,7 @@ private object NeverEqualPolicy : SnapshotMutationPolicy<Any?> {
  * @see mutableStateOf
  * @see mutableListOf
  * @see MutableList
- * @see takeSnapshot
+ * @see Snapshot.takeSnapshot
  */
 fun <T> mutableStateListOf() = SnapshotStateList<T>()
 
@@ -283,7 +281,7 @@ fun <T> mutableStateListOf() = SnapshotStateList<T>()
  * @see mutableStateOf
  * @see mutableListOf
  * @see MutableList
- * @see takeSnapshot
+ * @see Snapshot.takeSnapshot
  */
 fun <T> mutableStateListOf(vararg elements: T) =
     SnapshotStateList<T>().also { it.addAll(elements.toList()) }
@@ -301,7 +299,7 @@ fun <T> Collection<T>.toMutableStateList() = SnapshotStateList<T>().also { it.ad
  * @see mutableStateOf
  * @see mutableMapOf
  * @see MutableMap
- * @see takeSnapshot
+ * @see Snapshot.takeSnapshot
  */
 fun <K, V> mutableStateMapOf() = SnapshotStateMap<K, V>()
 
@@ -311,7 +309,7 @@ fun <K, V> mutableStateMapOf() = SnapshotStateMap<K, V>()
  * @see mutableStateOf
  * @see mutableMapOf
  * @see MutableMap
- * @see takeSnapshot
+ * @see Snapshot.takeSnapshot
  */
 fun <K, V> mutableStateMapOf(vararg pairs: Pair<K, V>) =
     SnapshotStateMap<K, V>().apply { putAll(pairs.toMap()) }

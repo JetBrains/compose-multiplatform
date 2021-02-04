@@ -16,23 +16,18 @@
 
 package androidx.compose.runtime.benchmark
 
+import android.view.View
+import androidx.activity.compose.setContent
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Composer
-import androidx.compose.runtime.Composition
+import androidx.compose.runtime.ControlledComposition
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.snapshots.Snapshot
-import androidx.compose.runtime.snapshots.SnapshotReadObserver
-import androidx.compose.runtime.snapshots.SnapshotWriteObserver
-import androidx.compose.runtime.snapshots.takeMutableSnapshot
-import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.TestMonotonicFrameClock
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -40,9 +35,11 @@ import kotlinx.coroutines.test.DelayController
 import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.withContext
-import org.junit.Assert.assertTrue
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 @OptIn(ExperimentalComposeApi::class, InternalComposeApi::class)
 abstract class ComposeBenchmarkBase {
@@ -55,49 +52,48 @@ abstract class ComposeBenchmarkBase {
 
     @ExperimentalCoroutinesApi
     suspend fun DelayController.measureCompose(block: @Composable () -> Unit) = coroutineScope {
-        var composition: Composition? = null
         val activity = activityRule.activity
         val recomposer = Recomposer(coroutineContext)
+        val emptyView = View(activity)
 
         try {
             benchmarkRule.measureRepeatedSuspendable {
-                composition = activity.setContent(recomposer) {
+                activity.setContent(recomposer) {
                     block()
                 }
 
                 runWithTimingDisabled {
-                    composition?.dispose()
+                    activity.setContentView(emptyView)
                     advanceUntilIdle()
-                    Runtime.getRuntime().let {
-                        it.gc()
-                    }
+                    Runtime.getRuntime().gc()
                 }
             }
         } finally {
-            composition?.dispose()
+            activity.setContentView(emptyView)
             advanceUntilIdle()
-            recomposer.shutDown()
+            recomposer.cancel()
         }
     }
 
     fun measureRecompose(block: RecomposeReceiver.() -> Unit) {
         val receiver = RecomposeReceiver()
         receiver.block()
-        var activeComposer: Composer<*>? = null
+        var activeComposition: ControlledComposition? = null
 
         val activity = activityRule.activity
+        val emptyView = View(activity)
 
-        val composition = activity.setContent {
-            activeComposer = currentComposer
+        activity.setContent {
+            activeComposition = currentComposer.composition
             receiver.composeCb()
         }
 
-        val composer = activeComposer
-        require(composer != null) { "Composer was null" }
-        val readObserver: SnapshotReadObserver = { composer.recordReadOf(it) }
-        val writeObserver: SnapshotWriteObserver = { composer.recordWriteOf(it) }
+        val composition = activeComposition
+        require(composition != null) { "Composition was null" }
+        val readObserver = { value: Any -> composition.recordReadOf(value) }
+        val writeObserver = { value: Any -> composition.recordWriteOf(value) }
         val unregisterApplyObserver = Snapshot.registerApplyObserver { changed, _ ->
-            composer.recordModificationsOf(changed)
+            composition.recordModificationsOf(changed)
         }
         try {
             benchmarkRule.measureRepeated {
@@ -105,17 +101,17 @@ abstract class ComposeBenchmarkBase {
                     receiver.updateModelCb()
                     Snapshot.sendApplyNotifications()
                 }
-                val didSomething = composer.performRecompose(readObserver, writeObserver)
+                val didSomething = composition.performRecompose(readObserver, writeObserver)
                 assertTrue(didSomething)
                 runWithTimingDisabled {
                     receiver.resetCb()
                     Snapshot.sendApplyNotifications()
-                    composer.performRecompose(readObserver, writeObserver)
+                    composition.performRecompose(readObserver, writeObserver)
                 }
             }
         } finally {
-            unregisterApplyObserver()
-            composition.dispose()
+            unregisterApplyObserver.dispose()
+            activity.setContentView(emptyView)
         }
     }
 
@@ -127,11 +123,12 @@ abstract class ComposeBenchmarkBase {
         receiver.block()
 
         val activity = activityRule.activity
+        val emptyView = View(activity)
 
         val recomposer = Recomposer(coroutineContext)
         launch { recomposer.runRecomposeAndApplyChanges() }
 
-        val composition = activity.setContent(recomposer) {
+        activity.setContent(recomposer) {
             receiver.composeCb()
         }
 
@@ -143,12 +140,12 @@ abstract class ComposeBenchmarkBase {
             }
             assertTrue(
                 "recomposer does not have invalidations for frame",
-                recomposer.hasInvalidations()
+                recomposer.hasPendingWork
             )
             advanceUntilIdle()
             assertFalse(
                 "recomposer has invalidations for frame",
-                recomposer.hasInvalidations()
+                recomposer.hasPendingWork
             )
             runWithTimingDisabled {
                 receiver.resetCb()
@@ -158,8 +155,8 @@ abstract class ComposeBenchmarkBase {
             iterations++
         }
 
-        composition.dispose()
-        recomposer.shutDown()
+        activity.setContentView(emptyView)
+        recomposer.cancel()
     }
 }
 
@@ -187,12 +184,11 @@ inline fun BenchmarkRule.measureRepeatedSuspendable(block: BenchmarkRule.Scope.(
     }
 }
 
-@OptIn(ExperimentalComposeApi::class, InternalComposeApi::class)
-fun Composer<*>.performRecompose(
-    readObserver: SnapshotReadObserver,
-    writeObserver: SnapshotWriteObserver
+fun ControlledComposition.performRecompose(
+    readObserver: (Any) -> Unit,
+    writeObserver: (Any) -> Unit
 ): Boolean {
-    val snapshot = takeMutableSnapshot(readObserver, writeObserver)
+    val snapshot = Snapshot.takeMutableSnapshot(readObserver, writeObserver)
     val result = snapshot.enter {
         recompose().also { applyChanges() }
     }

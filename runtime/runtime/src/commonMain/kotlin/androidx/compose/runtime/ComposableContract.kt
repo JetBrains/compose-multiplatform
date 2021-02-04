@@ -43,6 +43,13 @@ package androidx.compose.runtime
  */
 @MustBeDocumented
 @Retention(AnnotationRetention.BINARY)
+@Deprecated(
+    "ComposableContract has been replaced with several different annotations.\n" +
+        "@ComposableContract(restartable = false) has become @NonRestartableComposable\n" +
+        "@ComposableContract(readonly = true) has become @ReadOnlyComposable\n" +
+        "@ComposableContract(preventCapture = true) has become @DisallowComposableCalls\n" +
+        "@ComposableContract(tracked = true) has been removed."
+)
 @Target(
     AnnotationTarget.FUNCTION,
     AnnotationTarget.PROPERTY, // (DEPRECATED)

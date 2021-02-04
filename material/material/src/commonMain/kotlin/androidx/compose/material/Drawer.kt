@@ -33,19 +33,19 @@ import androidx.compose.foundation.layout.preferredSizeIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.Saver
-import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.nestedscroll.nestedScroll
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
-import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.AmbientAnimationClock
-import androidx.compose.ui.platform.AmbientDensity
-import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.LocalAnimationClock
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.dismiss
+import androidx.compose.ui.semantics.paneTitle
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -285,8 +285,8 @@ fun rememberDrawerState(
     initialValue: DrawerValue,
     confirmStateChange: (DrawerValue) -> Boolean = { true }
 ): DrawerState {
-    val clock = AmbientAnimationClock.current.asDisposableClock()
-    return rememberSavedInstanceState(
+    val clock = LocalAnimationClock.current.asDisposableClock()
+    return rememberSaveable(
         clock,
         saver = DrawerState.Saver(clock, confirmStateChange)
     ) {
@@ -305,8 +305,8 @@ fun rememberBottomDrawerState(
     initialValue: BottomDrawerValue,
     confirmStateChange: (BottomDrawerValue) -> Boolean = { true }
 ): BottomDrawerState {
-    val clock = AmbientAnimationClock.current.asDisposableClock()
-    return rememberSavedInstanceState(
+    val clock = LocalAnimationClock.current.asDisposableClock()
+    return rememberSaveable(
         clock,
         saver = BottomDrawerState.Saver(clock, confirmStateChange)
     ) {
@@ -334,7 +334,7 @@ fun rememberBottomDrawerState(
  * drawer sheet
  * @param drawerBackgroundColor background color to be used for the drawer sheet
  * @param drawerContentColor color of the content to use inside the drawer sheet. Defaults to
- * either the matching `onFoo` color for [drawerBackgroundColor], or, if it is not a color from
+ * either the matching content color for [drawerBackgroundColor], or, if it is not a color from
  * the theme, this will keep the same value set above this Surface.
  * @param scrimColor color of the scrim that obscures content when the drawer is open
  * @param bodyContent content of the rest of the UI
@@ -366,9 +366,9 @@ fun ModalDrawerLayout(
         val maxValue = 0f
 
         val anchors = mapOf(minValue to DrawerValue.Closed, maxValue to DrawerValue.Open)
-        val isRtl = AmbientLayoutDirection.current == LayoutDirection.Rtl
+        val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
         val blockClicks = if (drawerState.isOpen) {
-            Modifier.pointerInput { detectTapGestures {} }
+            Modifier.pointerInput(Unit) { detectTapGestures {} }
         } else {
             Modifier
         }
@@ -394,7 +394,7 @@ fun ModalDrawerLayout(
                 color = scrimColor
             )
             Surface(
-                modifier = with(AmbientDensity.current) {
+                modifier = with(LocalDensity.current) {
                     Modifier
                         .preferredSizeIn(
                             minWidth = modalDrawerConstraints.minWidth.toDp(),
@@ -404,6 +404,7 @@ fun ModalDrawerLayout(
                         )
                 }
                     .semantics {
+                        paneTitle = Strings.NavigationMenu
                         if (drawerState.isOpen) {
                             dismiss(action = { drawerState.close(); true })
                         }
@@ -444,7 +445,7 @@ fun ModalDrawerLayout(
  * @param drawerContent composable that represents content inside the drawer
  * @param drawerBackgroundColor background color to be used for the drawer sheet
  * @param drawerContentColor color of the content to use inside the drawer sheet. Defaults to
- * either the matching `onFoo` color for [drawerBackgroundColor], or, if it is not a color from
+ * either the matching content color for [drawerBackgroundColor], or, if it is not a color from
  * the theme, this will keep the same value set above this Surface.
  * @param scrimColor color of the scrim that obscures content when the drawer is open
  * @param bodyContent content of the rest of the UI
@@ -452,7 +453,7 @@ fun ModalDrawerLayout(
  * @throws IllegalStateException when parent has [Float.POSITIVE_INFINITY] height
  */
 @Composable
-@OptIn(ExperimentalMaterialApi::class)
+@ExperimentalMaterialApi
 fun BottomDrawerLayout(
     drawerContent: @Composable ColumnScope.() -> Unit,
     modifier: Modifier = Modifier,
@@ -498,7 +499,7 @@ fun BottomDrawerLayout(
         val blockClicks = if (drawerState.isClosed) {
             Modifier
         } else {
-            Modifier.pointerInput { detectTapGestures {} }
+            Modifier.pointerInput(Unit) { detectTapGestures {} }
         }
         Box(
             Modifier
@@ -524,7 +525,7 @@ fun BottomDrawerLayout(
                 color = scrimColor
             )
             Surface(
-                modifier = with(AmbientDensity.current) {
+                modifier = with(LocalDensity.current) {
                     Modifier.preferredSizeIn(
                         minWidth = modalDrawerConstraints.minWidth.toDp(),
                         minHeight = modalDrawerConstraints.minHeight.toDp(),
@@ -533,6 +534,7 @@ fun BottomDrawerLayout(
                     )
                 }
                     .semantics {
+                        paneTitle = Strings.NavigationMenu
                         if (drawerState.isOpen) {
                             dismiss(action = { drawerState.close(); true })
                         }
@@ -579,7 +581,7 @@ private fun Scrim(
     color: Color
 ) {
     val dismissDrawer = if (open) {
-        Modifier.tapGestureFilter { onClose() }
+        Modifier.pointerInput(onClose) { detectTapGestures { onClose() } }
     } else {
         Modifier
     }

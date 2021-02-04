@@ -16,55 +16,77 @@
  */
 
 // Ignore lint warnings in documentation snippets
-@file:Suppress("unused", "UNUSED_PARAMETER", "UNUSED_VARIABLE")
+@file:Suppress(
+    "unused", "UNUSED_PARAMETER", "UNUSED_VARIABLE", "UNUSED_ANONYMOUS_PARAMETER",
+    "RedundantSuspendModifier", "CascadeIf", "ClassName", "RemoveExplicitTypeArguments"
+)
 
 package androidx.compose.integration.docs.interoperability
 
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
+import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.OnBackPressedDispatcher
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.integration.docs.databinding.ExampleLayoutBinding
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.listSaver
-import androidx.compose.runtime.savedinstancestate.mapSaver
-import androidx.compose.runtime.savedinstancestate.savedInstanceState
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.mapSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.viewinterop.AndroidViewBinding
-import androidx.compose.ui.viewinterop.viewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 /**
  * This file lets DevRel track changes to snippets present in
@@ -162,26 +184,28 @@ private object InteropSnippet5 {
     fun CustomView() {
         val selectedItem = remember { mutableStateOf(0) }
 
-        val context = AmbientContext.current
-        val customView = remember {
-            // Creates custom view
-            CustomView(context).apply {
-                // Sets up listeners for View -> Compose communication
-                myView.setOnClickListener {
-                    selectedItem.value = 1
-                }
-            }
-        }
-
         // Adds view to Compose
-        AndroidView({ customView }) { view ->
-            // View's been inflated - add logic here if necessary
+        AndroidView(
+            modifier = Modifier.fillMaxSize(), // Occupy the max size in the Compose UI tree
+            viewBlock = { context ->
+                // Creates custom view
+                CustomView(context).apply {
+                    // Sets up listeners for View -> Compose communication
+                    myView.setOnClickListener {
+                        selectedItem.value = 1
+                    }
+                }
+            },
+            update = { view ->
+                // View's been inflated or state read in this block has been updated
+                // Add logic here if necessary
 
-            // As selectedItem is read here, AndroidView will recompose
-            // whenever the state changes
-            // Example of Compose -> View communication
-            view.coordinator.selectedItem = selectedItem.value
-        }
+                // As selectedItem is read here, AndroidView will recompose
+                // whenever the state changes
+                // Example of Compose -> View communication
+                view.coordinator.selectedItem = selectedItem.value
+            }
+        )
     }
 
     @Composable
@@ -202,14 +226,15 @@ private object InteropSnippet6 {
     }
 }
 
-@Composable private fun RowScope.InteropSnippet7() {
+@Composable
+private fun RowScope.InteropSnippet7() {
     Text(
         text = stringResource(R.string.ok),
         modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
     )
 
     Icon(
-        imageVector = vectorResource(R.drawable.ic_plane),
+        painter = painterResource(R.drawable.ic_plane),
         contentDescription = stringResource(R.string.plane_description),
         tint = colorResource(R.color.Blue700)
     )
@@ -218,7 +243,7 @@ private object InteropSnippet6 {
 private object InteropSnippet8 {
     @Composable
     fun rememberCustomView(): CustomView {
-        val context = AmbientContext.current
+        val context = LocalContext.current
         return remember { CustomView(context).apply { /*...*/ } }
     }
 }
@@ -246,9 +271,10 @@ private object InteropSnippet9 {
         }
     }
 }
+
 /* ktlint-enable indent */
 private object InteropSnippet10 {
-    class ExampleViewModel() : ViewModel() { /*...*/ }
+    class ExampleViewModel : ViewModel() { /*...*/ }
 
     @Composable
     fun MyExample() {
@@ -343,7 +369,7 @@ private object InteropSnippet14 {
 private object InteropSnippet15 {
     @Composable
     fun MyExample() {
-        var selectedId by savedInstanceState<String?> { null }
+        var selectedId by rememberSaveable { mutableStateOf<String?>(null) }
         /*...*/
     }
 }
@@ -356,7 +382,7 @@ private object InteropSnippet16 {
 
     @Composable
     fun MyExample() {
-        var selectedCity = savedInstanceState { City("Madrid", "Spain") }
+        var selectedCity = rememberSaveable { mutableStateOf(City("Madrid", "Spain")) }
     }
      */
 }
@@ -375,7 +401,9 @@ private object InteropSnippet17 {
 
     @Composable
     fun MyExample() {
-        var selectedCity = savedInstanceState(CitySaver) { City("Madrid", "Spain") }
+        var selectedCity = rememberSaveable(stateSaver = CitySaver) {
+            mutableStateOf(City("Madrid", "Spain"))
+        }
     }
 }
 
@@ -389,7 +417,9 @@ private object InteropSnippet18 {
 
     @Composable
     fun MyExample() {
-        var selectedCity = savedInstanceState(CitySaver) { City("Madrid", "Spain") }
+        var selectedCity = rememberSaveable(stateSaver = CitySaver) {
+            mutableStateOf(City("Madrid", "Spain"))
+        }
         /*...*/
     }
 }
@@ -408,6 +438,281 @@ private object InteropSnippet19 {
         }
     }
 }
+
+private object BetaSnippets {
+    private object InteropSnippet1 {
+        @Composable
+        fun rememberCustomView(): CustomView {
+            val context = LocalContext.current
+            return remember { CustomView(context).apply { /*...*/ } }
+        }
+    }
+
+    private object InteropSnippet2 {
+        class ExampleActivity : AppCompatActivity() {
+            override fun onCreate(savedInstanceState: Bundle?) {
+                super.onCreate(savedInstanceState)
+
+                setContent {
+                    MdcTheme {
+                        // Colors, typography, and shape have been read from the
+                        // View-based theme used in this Activity
+                        ExampleComposable(/*...*/)
+                    }
+                }
+            }
+        }
+    }
+
+    private object InteropSnippet3 {
+        class ExampleActivity : AppCompatActivity() {
+            override fun onCreate(savedInstanceState: Bundle?) {
+                super.onCreate(savedInstanceState)
+
+                setContent {
+                    AppCompatTheme {
+                        // Colors, typography, and shape have been read from the
+                        // View-based theme used in this Activity
+                        ExampleComposable(/*...*/)
+                    }
+                }
+            }
+        }
+    }
+
+    private object InteropSnippet4 {
+        @Composable
+        fun DetailsScreen(/* ... */) {
+            PinkTheme {
+                // other content
+                RelatedSection()
+            }
+        }
+
+        @Composable
+        fun RelatedSection(/* ... */) {
+            BlueTheme {
+                // content
+            }
+        }
+    }
+
+    private object InteropSnippet5 {
+        class ExampleActivity : AppCompatActivity() {
+            override fun onCreate(savedInstanceState: Bundle?) {
+                super.onCreate(savedInstanceState)
+
+                WindowCompat.setDecorFitsSystemWindows(window, false)
+
+                setContent {
+                    MaterialTheme {
+                        ProvideWindowInsets {
+                            MyScreen()
+                        }
+                    }
+                }
+            }
+        }
+
+        @Composable
+        fun MyScreen() {
+            Box {
+                FloatingActionButton(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(16.dp) // normal 16dp of padding for FABs
+                        .navigationBarsPadding(), // Move it out from under the nav bar
+                    onClick = { }
+                ) {
+                    Icon( /* ... */)
+                }
+            }
+        }
+    }
+
+    @Suppress("ControlFlowWithEmptyBody")
+    private object InteropSnippet6 {
+        @Composable
+        fun MyComposable() {
+            val isPortrait = LocalConfiguration.current.orientation == ORIENTATION_PORTRAIT
+            if (isPortrait) {
+                /* Portrait-displayed content */
+            } else {
+                /* Landscape-displayed content */
+            }
+        }
+    }
+
+    @Suppress("ControlFlowWithEmptyBody")
+    private object InteropSnippet7 {
+        @Composable
+        fun MyComposable() {
+            BoxWithConstraints {
+                if (minWidth < 480.dp) {
+                    /* Show grid with 4 columns */
+                } else if (minWidth < 720.dp) {
+                    /* Show grid with 8 columns */
+                } else {
+                    /* Show grid with 12 columns */
+                }
+            }
+        }
+    }
+
+    private object InteropSnippet8 {
+        @Composable
+        fun BackHandler(
+            enabled: Boolean,
+            backDispatcher: OnBackPressedDispatcher,
+            onBack: () -> Unit
+        ) {
+
+            // Safely update the current `onBack` lambda when a new one is provided
+            val currentOnBack by rememberUpdatedState(onBack)
+
+            // Remember in Composition a back callback that calls the `onBack` lambda
+            val backCallback = remember {
+                // Always intercept back events. See the SideEffect for a more complete version
+                object : OnBackPressedCallback(true) {
+                    override fun handleOnBackPressed() {
+                        currentOnBack()
+                    }
+                }
+            }
+
+            // On every successful composition, update the callback with the `enabled` value
+            // to tell `backCallback` whether back events should be intercepted or not
+            SideEffect {
+                backCallback.isEnabled = enabled
+            }
+
+            // If `backDispatcher` changes, dispose and reset the effect
+            DisposableEffect(backDispatcher) {
+                // Add callback to the backDispatcher
+                backDispatcher.addCallback(backCallback)
+
+                // When the effect leaves the Composition, remove the callback
+                onDispose {
+                    backCallback.remove()
+                }
+            }
+        }
+    }
+
+    private object InteropSnippet9 {
+        class CustomViewGroup @JvmOverloads constructor(
+            context: Context,
+            attrs: AttributeSet? = null,
+            defStyle: Int = 0
+        ) : LinearLayout(context, attrs, defStyle) {
+
+            // Source of truth in the View system as mutableStateOf
+            // to make it thread-safe for Compose
+            private var text by mutableStateOf("")
+
+            private val textView: TextView
+
+            init {
+                orientation = VERTICAL
+
+                textView = TextView(context)
+                val composeView = ComposeView(context).apply {
+                    setContent {
+                        MaterialTheme {
+                            TextField(value = text, onValueChange = { updateState(it) })
+                        }
+                    }
+                }
+
+                addView(textView)
+                addView(composeView)
+            }
+
+            // Update both the source of truth and the TextView
+            private fun updateState(newValue: String) {
+                text = newValue
+                textView.text = newValue
+            }
+        }
+    }
+
+    private object InteropSnippet10 {
+        @Composable
+        fun LoginButton(
+            onClick: () -> Unit,
+            modifier: Modifier = Modifier,
+        ) {
+            Button(
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = MaterialTheme.colors.secondary
+                ),
+                onClick = onClick,
+                modifier = modifier,
+            ) {
+                Text(stringResource(R.string.login))
+            }
+        }
+
+        class LoginViewButton @JvmOverloads constructor(
+            context: Context,
+            attrs: AttributeSet? = null,
+            defStyle: Int = 0
+        ) : AbstractComposeView(context, attrs, defStyle) {
+
+            var onClick by mutableStateOf<() -> Unit>({})
+
+            @Composable
+            override fun Content() {
+                YourAppTheme {
+                    LoginButton(onClick)
+                }
+            }
+        }
+    }
+
+    private object InteropSnippet11 {
+        @Composable
+        fun SystemBroadcastReceiver(
+            systemAction: String,
+            onSystemEvent: (intent: Intent?) -> Unit
+        ) {
+            // Grab the current context in this part of the UI tree
+            val context = LocalContext.current
+
+            // Safely use the latest onSystemEvent lambda passed to the function
+            val currentOnSystemEvent by rememberUpdatedState(onSystemEvent)
+
+            // If either context or systemAction changes, unregister and register again
+            DisposableEffect(context, systemAction) {
+                val intentFilter = IntentFilter(systemAction)
+                val broadcast = object : BroadcastReceiver() {
+                    override fun onReceive(context: Context?, intent: Intent?) {
+                        onSystemEvent(intent)
+                    }
+                }
+
+                context.registerReceiver(broadcast, intentFilter)
+
+                // When the effect leaves the Composition, remove the callback
+                onDispose {
+                    context.unregisterReceiver(broadcast)
+                }
+            }
+        }
+
+        @Composable
+        fun HomeScreen() {
+
+            SystemBroadcastReceiver(Intent.ACTION_BATTERY_CHANGED) { batteryStatus ->
+                val isCharging = /* Get from batteryStatus ... */ true
+                /* Do something if the device is charging */
+            }
+
+            /* Rest of the HomeScreen */
+        }
+    }
+}
+
 /*
 Fakes needed for snippets to build:
  */
@@ -416,22 +721,28 @@ private object R {
     object layout {
         const val fragment_example = 1
     }
+
     object id {
         const val compose_view = 2
         const val compose_view_x = 3
     }
+
     object string {
         const val ok = 4
         const val plane_description = 5
+        const val login = 6
     }
+
     object dimen {
-        const val padding_small = 6
+        const val padding_small = 7
     }
+
     object drawable {
-        const val ic_plane = 7
+        const val ic_plane = 8
     }
+
     object color {
-        const val Blue700 = 8
+        const val Blue700 = 9
     }
 }
 
@@ -441,12 +752,15 @@ private class CustomView(context: Context) : View(context) {
     val coordinator = Coord()
     lateinit var myView: View
 }
+
 private class DataExample(val title: String = "")
+
 private val data = DataExample()
 private fun startActivity(): Nothing = TODO()
-class ExampleViewModel() : ViewModel() {
-    val exampleLiveData = MutableLiveData<String>(" ")
+class ExampleViewModel : ViewModel() {
+    val exampleLiveData = MutableLiveData(" ")
 }
+
 private fun ShowData(dataExample: State<String?>): Nothing = TODO()
 private class ExampleImageLoader {
     fun load(url: String): DummyInto = TODO()
@@ -455,15 +769,44 @@ private class ExampleImageLoader {
     open class Listener {
         open fun onSuccess(bitmap: Bitmap): Unit = TODO()
     }
+
     companion object {
         fun get() = ExampleImageLoader()
     }
 }
+
 private class DummyInto {
-    fun into(listener: ExampleImageLoader.Listener) { }
+    fun into(listener: ExampleImageLoader.Listener) {}
 }
-private fun ExampleComposable() { }
-@Composable private fun MdcTheme(content: @Composable () -> Unit) { }
+
+private fun ExampleComposable() {}
+@Composable
+private fun MdcTheme(content: @Composable () -> Unit) {
+}
+
+@Composable
+private fun AppCompatTheme(content: @Composable () -> Unit) {
+}
+
+@Composable
+private fun BlueTheme(content: @Composable () -> Unit) {
+}
+
+@Composable
+private fun PinkTheme(content: @Composable () -> Unit) {
+}
+
+@Composable
+private fun YourAppTheme(content: @Composable () -> Unit) {
+}
+
+@Composable
+private fun ProvideWindowInsets(content: @Composable () -> Unit) {
+}
+
+@Composable
+private fun Icon() {
+}
 
 private open class Fragment {
 
@@ -475,5 +818,18 @@ private open class Fragment {
     ): View {
         TODO("not implemented")
     }
+
     fun requireContext(): Context = TODO()
 }
+
+private class AppCompatActivity {
+    val window: Any = Any()
+}
+
+private class WindowCompat {
+    companion object {
+        fun setDecorFitsSystemWindows(window: Any, bool: Boolean) {}
+    }
+}
+
+private fun Modifier.navigationBarsPadding(): Modifier = this

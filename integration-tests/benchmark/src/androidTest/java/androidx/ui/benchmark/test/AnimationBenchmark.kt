@@ -51,7 +51,7 @@ class AnimationBenchmark {
 
         benchmarkRule.measureRepeated {
             for (time in 0..1000 step 20) {
-                anim.getValue(time.toLong(), start, end, start)
+                anim.getValueFromNanos(time * 1_000_000L, start, end, start)
             }
         }
     }
@@ -65,7 +65,7 @@ class AnimationBenchmark {
 
         benchmarkRule.measureRepeated {
             for (time in 0..1000 step 20) {
-                fixedAnimation.getValue(time.toLong())
+                fixedAnimation.getValueFromNanos(time * 1_000_000L)
             }
         }
     }
@@ -78,7 +78,7 @@ class AnimationBenchmark {
 
         benchmarkRule.measureRepeated {
             for (time in 0..1000 step 20) {
-                anim.getValue(time.toLong(), start, end, start)
+                anim.getValueFromNanos(time * 1_000_000L, start, end, start)
             }
         }
     }
@@ -92,7 +92,7 @@ class AnimationBenchmark {
 
         benchmarkRule.measureRepeated {
             for (time in 0..1000 step 20) {
-                fixedAnimation.getValue(time.toLong())
+                fixedAnimation.getValueFromNanos(time * 1_000_000L)
             }
         }
     }
@@ -105,7 +105,7 @@ class AnimationBenchmark {
 
         benchmarkRule.measureRepeated {
             for (time in 0..1) {
-                anim.getValue(time.toLong(), start, end, start)
+                anim.getValueFromNanos(time * 1_000_000L, start, end, start)
             }
         }
     }
@@ -119,7 +119,7 @@ class AnimationBenchmark {
 
         benchmarkRule.measureRepeated {
             for (time in 0..1) {
-                fixedAnimation.getValue(time.toLong())
+                fixedAnimation.getValueFromNanos(time * 1_000_000L)
             }
         }
     }
@@ -138,7 +138,7 @@ class AnimationBenchmark {
 
         benchmarkRule.measureRepeated {
             for (time in 0..1000 step 20) {
-                anim.getValue(time.toLong(), start, end, start)
+                anim.getValueFromNanos(time * 1_000_000L, start, end, start)
             }
         }
     }
@@ -158,7 +158,7 @@ class AnimationBenchmark {
 
         benchmarkRule.measureRepeated {
             for (time in 0..1000 step 20) {
-                fixedAnimation.getValue(time.toLong())
+                fixedAnimation.getValueFromNanos(time * 1_000_000L)
             }
         }
     }

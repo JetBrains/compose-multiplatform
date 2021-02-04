@@ -28,6 +28,7 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
@@ -41,7 +42,6 @@ import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -77,25 +77,22 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.VerticalAlignmentLine
-import androidx.compose.ui.layout.id
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
-import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.platform.AmbientDensity
-import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.RenderNodeApi23
 import androidx.compose.ui.platform.RenderNodeApi29
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.ViewLayer
 import androidx.compose.ui.platform.ViewLayerContainer
-import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -139,6 +136,7 @@ class AndroidLayoutDrawTest {
     val activityTestRule = androidx.test.rule.ActivityTestRule<TestActivity>(
         TestActivity::class.java
     )
+
     @get:Rule
     val excessiveAssertions = AndroidOwnerExtraAssertionsRule()
     private lateinit var activity: TestActivity
@@ -252,7 +250,8 @@ class AndroidLayoutDrawTest {
                 cameraDistance = cameraDistance,
                 transformOrigin = TransformOrigin.Center,
                 shape = RectangleShape,
-                clip = true
+                clip = true,
+                layoutDirection = LayoutDirection.Ltr
             )
         }
         // Verify that the camera distance is applied properly even after accounting for
@@ -365,12 +364,9 @@ class AndroidLayoutDrawTest {
         activityTestRule.runOnUiThreadIR {
             // there isn't going to be a normal draw because we are just moving the repaint
             // boundary, but we should have a draw cycle
-            activityTestRule.findAndroidComposeView().viewTreeObserver.addOnDrawListener(object :
-                    ViewTreeObserver.OnDrawListener {
-                    override fun onDraw() {
-                        drawLatch.countDown()
-                    }
-                })
+            activityTestRule.findAndroidComposeView().viewTreeObserver.addOnDrawListener {
+                drawLatch.countDown()
+            }
             offset.value = 20
         }
 
@@ -537,7 +533,7 @@ class AndroidLayoutDrawTest {
                             assertEquals(childConstraints[0], constraints)
                             layout(0, 0) {}
                         },
-                        content = emptyContent(), modifier = Modifier.layoutId("header")
+                        content = {}, modifier = Modifier.layoutId("header")
                     )
                 }
                 val footer = @Composable {
@@ -546,14 +542,14 @@ class AndroidLayoutDrawTest {
                             assertEquals(childConstraints[1], constraints)
                             layout(0, 0) {}
                         },
-                        content = emptyContent(), modifier = Modifier.layoutId("footer")
+                        content = {}, modifier = Modifier.layoutId("footer")
                     )
                     Layout(
                         measureBlock = { _, constraints ->
                             assertEquals(childConstraints[2], constraints)
                             layout(0, 0) {}
                         },
-                        content = emptyContent(), modifier = Modifier.layoutId("footer")
+                        content = {}, modifier = Modifier.layoutId("footer")
                     )
                 }
 
@@ -562,8 +558,8 @@ class AndroidLayoutDrawTest {
                     measurables.forEachIndexed { index, measurable ->
                         measurable.measure(childConstraints[index])
                     }
-                    val measurablesHeader = measurables.filter { it.id == "header" }
-                    val measurablesFooter = measurables.filter { it.id == "footer" }
+                    val measurablesHeader = measurables.filter { it.layoutId == "header" }
+                    val measurablesFooter = measurables.filter { it.layoutId == "footer" }
                     assertEquals(headerChildrenCount, measurablesHeader.size)
                     assertSame(measurables[0], measurablesHeader[0])
                     assertEquals(footerChildrenCount, measurablesFooter.size)
@@ -1815,7 +1811,7 @@ class AndroidLayoutDrawTest {
             activity.setContent {
                 Layout(
                     content = {
-                        Layout(content = emptyContent()) { _, _ ->
+                        Layout(content = {}) { _, _ ->
                             latch.countDown()
                             layout(model.size, model.size) {}
                         }
@@ -1847,7 +1843,7 @@ class AndroidLayoutDrawTest {
                     content = {
                         Layout(
                             modifier = Modifier.graphicsLayer(),
-                            content = emptyContent()
+                            content = {}
                         ) { _, _ ->
                             latch.countDown()
                             layout(model.size, model.size) {}
@@ -2003,7 +1999,7 @@ class AndroidLayoutDrawTest {
         val layoutDirection = Ref<LayoutDirection>()
         activityTestRule.runOnUiThreadIR {
             activity.setContent {
-                Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+                Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     FixedSize(
                         size = 50,
                         modifier = Modifier.drawBehind {
@@ -2036,7 +2032,7 @@ class AndroidLayoutDrawTest {
         }
         activityTestRule.runOnUiThreadIR {
             activity.setContent {
-                Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+                Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     FixedSize(
                         size = 50,
                         modifier = layoutModifier
@@ -2329,7 +2325,7 @@ class AndroidLayoutDrawTest {
     // Tests that show layout bounds draws outlines around content and modifiers
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
-    @OptIn(InternalCoreApi::class)
+    @OptIn(InternalComposeUiApi::class)
     fun showLayoutBounds_content() {
         activityTestRule.runOnUiThreadIR {
             activity.setContent {
@@ -2343,8 +2339,8 @@ class AndroidLayoutDrawTest {
                 }
             }
             val content = activity.findViewById<ViewGroup>(android.R.id.content)
-            val owner = content.getChildAt(0) as Owner
-            owner.showLayoutBounds = true
+            val composeView = content.getChildAt(0) as ComposeView
+            composeView.showLayoutBounds = true
         }
         activityTestRule.waitAndScreenShot().apply {
             assertRect(Color.White, size = 8)
@@ -2382,7 +2378,7 @@ class AndroidLayoutDrawTest {
                             }
                             layout(100, 100) {}
                         }
-                        FixedSize(30, content = emptyContent())
+                        FixedSize(30, content = {})
                     }
                 ) { measurables, constraints ->
                     val (first, second) = measurables
@@ -2465,15 +2461,18 @@ class AndroidLayoutDrawTest {
     @Test
     fun layerModifier_noClip() {
         val triangleShape = object : Shape {
-            override fun createOutline(size: Size, density: Density): Outline =
-                Outline.Generic(
-                    Path().apply {
-                        moveTo(size.width / 2f, 0f)
-                        lineTo(size.width, size.height)
-                        lineTo(0f, size.height)
-                        close()
-                    }
-                )
+            override fun createOutline(
+                size: Size,
+                layoutDirection: LayoutDirection,
+                density: Density
+            ) = Outline.Generic(
+                Path().apply {
+                    moveTo(size.width / 2f, 0f)
+                    lineTo(size.width, size.height)
+                    lineTo(0f, size.height)
+                    close()
+                }
+            )
         }
         activityTestRule.runOnUiThread {
             activity.setContent {
@@ -2581,12 +2580,12 @@ class AndroidLayoutDrawTest {
     @Test
     fun detachChildWithLayer() {
         activityTestRule.runOnUiThread {
-            val composition = activity.setContent {
+            activity.setContent {
                 FixedSize(10, Modifier.graphicsLayer()) {
                     FixedSize(8)
                 }
             }
-            composition.dispose()
+            activity.setContentView(View(activity)) // Replace content view with empty
         }
     }
 
@@ -2821,7 +2820,7 @@ class AndroidLayoutDrawTest {
         var zIndex by mutableStateOf(0f)
         activityTestRule.runOnUiThread {
             activity.setContent {
-                with(AmbientDensity.current) {
+                with(LocalDensity.current) {
                     FixedSize(
                         size = 30,
                         modifier = Modifier.background(color = Color.Blue).drawLatchModifier()
@@ -3045,7 +3044,7 @@ class AndroidLayoutDrawTest {
                 ViewCompositionStrategy.DisposeOnLifecycleDestroyed(activity)
             )
             view.setContent {
-                with(AmbientDensity.current) {
+                with(LocalDensity.current) {
                     Box(
                         Modifier
                             .background(Color.Blue)
@@ -3089,7 +3088,7 @@ class AndroidLayoutDrawTest {
         activityTestRule.runOnUiThread {
             view = ComposeView(activity)
             view.setContent {
-                with(AmbientDensity.current) {
+                with(LocalDensity.current) {
                     Box(
                         Modifier
                             .background(Color.Blue)
@@ -3142,7 +3141,7 @@ class AndroidLayoutDrawTest {
         val sizeModifier = Modifier.layout { measurable, constraints ->
             measuredSize = size
             layoutLatch.countDown()
-            val pxSize = size.toIntPx()
+            val pxSize = size.roundToPx()
             layout(pxSize, pxSize) {
                 measurable.measure(constraints).place(0, 0)
             }
@@ -3339,6 +3338,7 @@ class AndroidLayoutDrawTest {
     /**
      * invalidateDescendants should invalidate all layout layers.
      */
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun invalidateDescendants() {
         var color = Color.White
@@ -3346,7 +3346,7 @@ class AndroidLayoutDrawTest {
             activity.setContent {
                 FixedSize(30, Modifier.background(Color.Blue)) {
                     FixedSize(30, Modifier.graphicsLayer()) {
-                        with(AmbientDensity.current) {
+                        with(LocalDensity.current) {
                             Canvas(Modifier.size(10.toDp())) {
                                 drawRect(color)
                                 drawLatch.countDown()
@@ -3598,7 +3598,7 @@ fun assertColorsEqual(
 fun AtLeastSize(
     size: Int,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit = emptyContent()
+    content: @Composable () -> Unit = {}
 ) {
     Layout(
         measureBlock = { measurables, constraints ->
@@ -3640,7 +3640,7 @@ fun AtLeastSize(
 fun FixedSize(
     size: Int,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit = emptyContent()
+    content: @Composable () -> Unit = {}
 ) {
     Layout(content = content, modifier = modifier) { measurables, _ ->
         val newConstraints = Constraints.fixed(size, size)

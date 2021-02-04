@@ -22,10 +22,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSize
-import androidx.compose.runtime.emptyContent
+import androidx.compose.runtime.Providers
 import androidx.compose.testutils.assertPixels
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asAndroidBitmap
@@ -81,14 +82,14 @@ class SurfaceTest {
     }
 
     @Test
-    fun absoluteElevationAmbientIsSet() {
+    fun absoluteElevationCompositionLocalIsSet() {
         var outerElevation: Dp? = null
         var innerElevation: Dp? = null
         rule.setMaterialContent {
             Surface(elevation = 2.dp) {
-                outerElevation = AmbientAbsoluteElevation.current
+                outerElevation = LocalAbsoluteElevation.current
                 Surface(elevation = 4.dp) {
-                    innerElevation = AmbientAbsoluteElevation.current
+                    innerElevation = LocalAbsoluteElevation.current
                 }
             }
         }
@@ -115,7 +116,7 @@ class SurfaceTest {
                         Modifier.fillMaxSize().padding(2.dp),
                         elevation = 2.dp,
                         color = Color.Blue,
-                        content = emptyContent()
+                        content = {}
                     )
                 }
 
@@ -132,7 +133,7 @@ class SurfaceTest {
                             Modifier.fillMaxSize().padding(2.dp),
                             elevation = 2.dp,
                             color = Color.Blue,
-                            content = emptyContent()
+                            content = {}
                         )
                     }
                 }
@@ -145,6 +146,33 @@ class SurfaceTest {
 
         topLevelSurfaceBitmap.assertPixels {
             Color(nestedSurfaceBitmap.getPixel(it.x, it.y))
+        }
+    }
+
+    /**
+     * Tests that composed modifiers applied to Surface are applied within the changes to
+     * [LocalContentColor], so they can consume the updated values.
+     */
+    @Test
+    fun contentColorSetBeforeModifier() {
+        var contentColor: Color = Color.Unspecified
+        val expectedColor = Color.Blue
+        rule.setMaterialContent {
+            Providers(LocalContentColor provides Color.Red) {
+                Surface(
+                    Modifier.composed {
+                        contentColor = LocalContentColor.current
+                        Modifier
+                    },
+                    elevation = 2.dp,
+                    contentColor = expectedColor,
+                    content = {}
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            Truth.assertThat(contentColor).isEqualTo(expectedColor)
         }
     }
 }

@@ -27,12 +27,12 @@ import android.view.View
 import android.view.ViewTreeObserver
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -48,7 +48,7 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -615,8 +615,10 @@ class BoxWithConstraintsTest : LayoutTest() {
             if (emit) {
                 BoxWithConstraints {
                     composedLatch.countDown()
-                    onDispose {
-                        disposedLatch.countDown()
+                    DisposableEffect(Unit) {
+                        onDispose {
+                            disposedLatch.countDown()
+                        }
                     }
                 }
             }
@@ -641,11 +643,11 @@ class BoxWithConstraintsTest : LayoutTest() {
             Layout(
                 content = @Composable {
                     BoxWithConstraints {
-                        with(AmbientDensity.current) {
-                            assertEquals(minWidthConstraint.toIntPx(), minWidth.toIntPx())
-                            assertEquals(maxWidthConstraint.toIntPx(), maxWidth.toIntPx())
-                            assertEquals(minHeightConstraint.toIntPx(), minHeight.toIntPx())
-                            assertEquals(maxHeightConstraint.toIntPx(), maxHeight.toIntPx())
+                        with(LocalDensity.current) {
+                            assertEquals(minWidthConstraint.roundToPx(), minWidth.roundToPx())
+                            assertEquals(maxWidthConstraint.roundToPx(), maxWidth.roundToPx())
+                            assertEquals(minHeightConstraint.roundToPx(), minHeight.roundToPx())
+                            assertEquals(maxHeightConstraint.roundToPx(), maxHeight.roundToPx())
                         }
                         latch.countDown()
                     }
@@ -654,10 +656,10 @@ class BoxWithConstraintsTest : LayoutTest() {
                 layout(0, 0) {
                     m.first().measure(
                         Constraints(
-                            minWidth = minWidthConstraint.toIntPx(),
-                            maxWidth = maxWidthConstraint.toIntPx(),
-                            minHeight = minHeightConstraint.toIntPx(),
-                            maxHeight = maxHeightConstraint.toIntPx()
+                            minWidth = minWidthConstraint.roundToPx(),
+                            maxWidth = maxWidthConstraint.roundToPx(),
+                            minHeight = minHeightConstraint.roundToPx(),
+                            maxHeight = maxHeightConstraint.roundToPx()
                         )
                     ).place(IntOffset.Zero)
                 }

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.foundation
 
 import androidx.compose.animation.animateColorAsState
@@ -28,7 +30,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.staticAmbientOf
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
@@ -42,7 +44,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.MeasuringIntrinsicsMeasureBlocks
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.constrainHeight
@@ -57,7 +59,7 @@ import kotlin.math.sign
  * This value is typically set in some "Theme" composable function
  * (DesktopTheme, MaterialTheme)
  */
-val ScrollbarStyleAmbient = staticAmbientOf { defaultScrollbarStyle() }
+val ScrollbarStyleAmbient = staticCompositionLocalOf { defaultScrollbarStyle() }
 
 /**
  * Defines visual style of scrollbars (thickness, shapes, colors, etc).
@@ -174,7 +176,7 @@ private fun Scrollbar(
     style: ScrollbarStyle,
     interactionState: InteractionState,
     isVertical: Boolean
-) = with(AmbientDensity.current) {
+) = with(LocalDensity.current) {
     DisposableEffect(interactionState) {
         onDispose {
             interactionState.removeInteraction(Interaction.Dragged)
@@ -189,7 +191,7 @@ private fun Scrollbar(
         SliderAdapter(adapter, containerSize, minimalHeight)
     }
 
-    val scrollThickness = style.thickness.toIntPx()
+    val scrollThickness = style.thickness.roundToPx()
     val measureBlocks = if (isVertical) {
         remember(sliderAdapter, scrollThickness) {
             verticalMeasureBlocks(sliderAdapter, { containerSize = it }, scrollThickness)
@@ -244,6 +246,7 @@ private fun Scrollbar(
     )
 }
 
+@Suppress("DEPRECATION") // press gesture filter
 private fun Modifier.scrollOnPressOutsideSlider(
     isVertical: Boolean,
     sliderAdapter: SliderAdapter,
@@ -304,7 +307,7 @@ fun rememberScrollbarAdapter(
     itemCount: Int,
     averageItemSize: Dp
 ): ScrollbarAdapter {
-    val averageItemSizePx = with(AmbientDensity.current) {
+    val averageItemSizePx = with(LocalDensity.current) {
         averageItemSize.toPx()
     }
     return remember(scrollState, itemCount, averageItemSizePx) {

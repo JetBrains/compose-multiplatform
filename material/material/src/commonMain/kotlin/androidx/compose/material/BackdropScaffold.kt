@@ -23,6 +23,7 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,19 +36,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.Saver
-import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.nestedscroll.nestedScroll
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
-import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.SubcomposeLayout
-import androidx.compose.ui.platform.AmbientAnimationClock
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalAnimationClock
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.collapse
+import androidx.compose.ui.semantics.expand
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -181,13 +185,13 @@ class BackdropScaffoldState(
 @ExperimentalMaterialApi
 fun rememberBackdropScaffoldState(
     initialValue: BackdropValue,
-    clock: AnimationClockObservable = AmbientAnimationClock.current,
+    clock: AnimationClockObservable = LocalAnimationClock.current,
     animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
     confirmStateChange: (BackdropValue) -> Boolean = { true },
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ): BackdropScaffoldState {
     val disposableClock = clock.asDisposableClock()
-    return rememberSavedInstanceState(
+    return rememberSaveable(
         disposableClock,
         animationSpec,
         confirmStateChange,
@@ -249,13 +253,13 @@ fun rememberBackdropScaffoldState(
  * @param stickyFrontLayer Whether the front layer should stick to the height of the back layer.
  * @param backLayerBackgroundColor The background color of the back layer.
  * @param backLayerContentColor The preferred content color provided by the back layer to its
- * children. Defaults to the matching `onFoo` color for [backLayerBackgroundColor], or if that
+ * children. Defaults to the matching content color for [backLayerBackgroundColor], or if that
  * is not a color from the theme, this will keep the same content color set above the back layer.
  * @param frontLayerShape The shape of the front layer.
  * @param frontLayerElevation The elevation of the front layer.
  * @param frontLayerBackgroundColor The background color of the front layer.
  * @param frontLayerContentColor The preferred content color provided by the back front to its
- * children. Defaults to the matching `onFoo` color for [frontLayerBackgroundColor], or if that
+ * children. Defaults to the matching content color for [frontLayerBackgroundColor], or if that
  * is not a color from the theme, this will keep the same content color set above the front layer.
  * @param frontLayerScrimColor The color of the scrim applied to the front layer when the back
  * layer is revealed. If you set this to `Color.Transparent`, then a scrim will not be applied
@@ -289,8 +293,8 @@ fun BackdropScaffold(
     backLayerContent: @Composable () -> Unit,
     frontLayerContent: @Composable () -> Unit
 ) {
-    val peekHeightPx = with(AmbientDensity.current) { peekHeight.toPx() }
-    val headerHeightPx = with(AmbientDensity.current) { headerHeight.toPx() }
+    val peekHeightPx = with(LocalDensity.current) { peekHeight.toPx() }
+    val headerHeightPx = with(LocalDensity.current) { headerHeight.toPx() }
 
     val backLayer = @Composable {
         if (persistentAppBar) {
@@ -333,6 +337,13 @@ fun BackdropScaffold(
                     orientation = Orientation.Vertical,
                     enabled = gesturesEnabled
                 )
+                .semantics {
+                    if (scaffoldState.isConcealed) {
+                        collapse { scaffoldState.reveal(); true }
+                    } else {
+                        expand { scaffoldState.conceal(); true }
+                    }
+                }
 
             // Front layer
             Surface(
@@ -382,8 +393,11 @@ private fun Scrim(
             targetValue = if (visible) 1f else 0f,
             animationSpec = TweenSpec()
         )
-        val dismissModifier = if (visible) Modifier.tapGestureFilter { onDismiss() } else Modifier
-
+        val dismissModifier = if (visible) {
+            Modifier.pointerInput(Unit) { detectTapGestures { onDismiss() } }
+        } else {
+            Modifier
+        }
         Canvas(
             Modifier
                 .fillMaxSize()
@@ -410,7 +424,7 @@ private fun BackLayerTransition(
     val animationProgress by animateFloatAsState(
         targetValue = if (target == Revealed) 0f else 2f, animationSpec = TweenSpec()
     )
-    val animationSlideOffset = with(AmbientDensity.current) { AnimationSlideOffset.toPx() }
+    val animationSlideOffset = with(LocalDensity.current) { AnimationSlideOffset.toPx() }
 
     val appBarFloat = (animationProgress - 1).coerceIn(0f, 1f)
     val contentFloat = (1 - animationProgress).coerceIn(0f, 1f)
@@ -491,7 +505,7 @@ object BackdropScaffoldDefaults {
     val frontLayerShape: Shape
         @Composable
         get() = MaterialTheme.shapes.large
-            .copy(topLeft = CornerSize(16.dp), topRight = CornerSize(16.dp))
+            .copy(topStart = CornerSize(16.dp), topEnd = CornerSize(16.dp))
 
     /**
      * The default elevation of the front layer.

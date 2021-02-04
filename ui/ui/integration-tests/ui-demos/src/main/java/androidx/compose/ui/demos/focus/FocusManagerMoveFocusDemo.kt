@@ -17,6 +17,7 @@
 package androidx.compose.ui.demos.focus
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement.SpaceEvenly
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,22 +36,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection.Next
-import androidx.compose.ui.focus.FocusDirection.Previous
-import androidx.compose.ui.focus.FocusDirection.Up
 import androidx.compose.ui.focus.FocusDirection.Down
 import androidx.compose.ui.focus.FocusDirection.Left
+import androidx.compose.ui.focus.FocusDirection.Next
+import androidx.compose.ui.focus.FocusDirection.Previous
 import androidx.compose.ui.focus.FocusDirection.Right
+import androidx.compose.ui.focus.FocusDirection.Up
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.focus.focusOrder
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Green
-import androidx.compose.ui.platform.AmbientFocusManager
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -58,7 +59,7 @@ import androidx.compose.ui.unit.sp
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun FocusManagerMoveFocusDemo() {
-    val focusManager = AmbientFocusManager.current
+    val focusManager = LocalFocusManager.current
     Column {
         Text(
             text = "Use the buttons to move focus",
@@ -143,7 +144,7 @@ private fun FocusableText(text: String, modifier: Modifier = Modifier) {
             .focusRequester(focusRequester)
             .onFocusChanged { color = if (it.isFocused) Green else Black }
             .focusModifier()
-            .tapGestureFilter { focusRequester.requestFocus() },
+            .pointerInput(Unit) { detectTapGestures { focusRequester.requestFocus() } },
         text = text,
         fontSize = 40.sp,
         textAlign = TextAlign.Center,

@@ -18,6 +18,7 @@ package androidx.ui.pointerinput
 
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.compose.setContent
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
 import androidx.compose.foundation.layout.Column
@@ -27,8 +28,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.tapGestureFilter
-import androidx.compose.ui.platform.AmbientDensity
-import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -93,7 +93,7 @@ class ComposeTapIntegrationBenchmark {
 
         activityTestRule.runOnUiThreadIR {
             activity.setContent {
-                with(AmbientDensity.current) {
+                with(LocalDensity.current) {
                     itemHeightDp = ItemHeightPx.toDp()
                 }
                 App()
@@ -172,6 +172,7 @@ class ComposeTapIntegrationBenchmark {
     }
 
     @Composable
+    @Suppress("DEPRECATION")
     fun Email(label: String) {
         Text(
             text = label,

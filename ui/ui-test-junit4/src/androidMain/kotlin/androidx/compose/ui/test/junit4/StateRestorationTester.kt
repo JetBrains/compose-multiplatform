@@ -21,9 +21,9 @@ import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.AmbientUiSavedStateRegistry
+import androidx.compose.runtime.saveable.LocalSaveableStateRegistry
+import androidx.compose.runtime.saveable.SaveableStateRegistry
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.savedinstancestate.UiSavedStateRegistry
 
 /**
  * Helps to test the state restoration for your Composable component.
@@ -33,7 +33,7 @@ import androidx.compose.runtime.savedinstancestate.UiSavedStateRegistry
  * [emulateSavedInstanceStateRestore] and assert your state is restored properly.
  *
  * Note that this tests only the restoration of the local state of the composable you passed to
- * [setContent] and useful for testing [savedInstanceState] or [rememberSavedInstanceState]
+ * [setContent] and useful for testing [androidx.compose.runtime.saveable.rememberSaveable]
  * integration. It is not testing the integration with any other life cycles or Activity callbacks.
  */
 class StateRestorationTester(private val composeTestRule: ComposeContentTestRule) {
@@ -56,7 +56,7 @@ class StateRestorationTester(private val composeTestRule: ComposeContentTestRule
     }
 
     /**
-     * Saves all the state stored via [savedInstanceState] or [rememberSavedInstanceState],
+     * Saves all the state stored via [savedInstanceState] or [rememberSaveable],
      * disposes current composition, and composes again the content passed to [setContent].
      * Allows to test how your component behaves when the state restoration is happening.
      * Note that the state stored via regular state() or remember() will be lost.
@@ -78,24 +78,24 @@ class StateRestorationTester(private val composeTestRule: ComposeContentTestRule
 
     @Composable
     private fun InjectRestorationRegistry(content: @Composable (RestorationRegistry) -> Unit) {
-        val original = requireNotNull(AmbientUiSavedStateRegistry.current) {
+        val original = requireNotNull(LocalSaveableStateRegistry.current) {
             "StateRestorationTester requires composeTestRule.setContent() to provide " +
-                "an UiSavedStateRegistry implementation via UiSavedStateRegistryAmbient"
+                "a SaveableStateRegistry implementation via LocalSaveableStateRegistry"
         }
         val restorationRegistry = remember { RestorationRegistry(original) }
-        Providers(AmbientUiSavedStateRegistry provides restorationRegistry) {
+        Providers(LocalSaveableStateRegistry provides restorationRegistry) {
             if (restorationRegistry.shouldEmitChildren) {
                 content(restorationRegistry)
             }
         }
     }
 
-    private class RestorationRegistry(private val original: UiSavedStateRegistry) :
-        UiSavedStateRegistry {
+    private class RestorationRegistry(private val original: SaveableStateRegistry) :
+        SaveableStateRegistry {
 
         var shouldEmitChildren by mutableStateOf(true)
             private set
-        private var currentRegistry: UiSavedStateRegistry = original
+        private var currentRegistry: SaveableStateRegistry = original
         private var savedMap: Map<String, List<Any?>> = emptyMap()
 
         fun saveStateAndDisposeChildren() {
@@ -104,7 +104,7 @@ class StateRestorationTester(private val composeTestRule: ComposeContentTestRule
         }
 
         fun emitChildrenWithRestoredState() {
-            currentRegistry = UiSavedStateRegistry(
+            currentRegistry = SaveableStateRegistry(
                 restoredValues = savedMap,
                 canBeSaved = { original.canBeSaved(it) }
             )
@@ -115,9 +115,6 @@ class StateRestorationTester(private val composeTestRule: ComposeContentTestRule
 
         override fun registerProvider(key: String, valueProvider: () -> Any?) =
             currentRegistry.registerProvider(key, valueProvider)
-
-        override fun unregisterProvider(key: String, valueProvider: () -> Any?) =
-            currentRegistry.unregisterProvider(key, valueProvider)
 
         override fun canBeSaved(value: Any) = currentRegistry.canBeSaved(value)
 

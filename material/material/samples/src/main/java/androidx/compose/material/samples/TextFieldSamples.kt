@@ -19,6 +19,7 @@ package androidx.compose.material.samples
 import androidx.annotation.Sampled
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
@@ -31,9 +32,11 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.savedinstancestate.savedInstanceState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -44,7 +47,7 @@ import androidx.compose.ui.unit.dp
 @Sampled
 @Composable
 fun SimpleTextFieldSample() {
-    var text by savedInstanceState { "" }
+    var text by rememberSaveable { mutableStateOf("") }
 
     TextField(
         value = text,
@@ -57,7 +60,7 @@ fun SimpleTextFieldSample() {
 @Sampled
 @Composable
 fun SimpleOutlinedTextFieldSample() {
-    var text by savedInstanceState { "" }
+    var text by rememberSaveable { mutableStateOf("") }
 
     OutlinedTextField(
         value = text,
@@ -69,7 +72,7 @@ fun SimpleOutlinedTextFieldSample() {
 @Sampled
 @Composable
 fun TextFieldWithIcons() {
-    var text by savedInstanceState { "" }
+    var text by rememberSaveable { mutableStateOf("") }
 
     TextField(
         value = text,
@@ -83,7 +86,7 @@ fun TextFieldWithIcons() {
 @Sampled
 @Composable
 fun TextFieldWithPlaceholder() {
-    var text by savedInstanceState { "" }
+    var text by rememberSaveable { mutableStateOf("") }
 
     TextField(
         value = text,
@@ -96,7 +99,7 @@ fun TextFieldWithPlaceholder() {
 @Sampled
 @Composable
 fun TextFieldWithErrorState() {
-    var text by savedInstanceState { "" }
+    var text by rememberSaveable { mutableStateOf("") }
     val isValid = text.count() > 5 && '@' in text
 
     TextField(
@@ -113,7 +116,7 @@ fun TextFieldWithErrorState() {
 @Sampled
 @Composable
 fun TextFieldWithHelperMessage() {
-    var text by savedInstanceState { "" }
+    var text by rememberSaveable { mutableStateOf("") }
     val invalidInput = text.count() < 5 || '@' !in text
 
     Column {
@@ -142,7 +145,7 @@ fun TextFieldWithHelperMessage() {
 @Sampled
 @Composable
 fun PasswordTextField() {
-    var password by savedInstanceState { "" }
+    var password by rememberSaveable { mutableStateOf("") }
     TextField(
         value = password,
         onValueChange = { password = it },
@@ -155,8 +158,8 @@ fun PasswordTextField() {
 @Sampled
 @Composable
 fun TextFieldSample() {
-    var text by savedInstanceState(saver = TextFieldValue.Saver) {
-        TextFieldValue("example", TextRange(0, 7))
+    var text by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        mutableStateOf(TextFieldValue("example", TextRange(0, 7)))
     }
 
     TextField(
@@ -169,8 +172,8 @@ fun TextFieldSample() {
 @Sampled
 @Composable
 fun OutlinedTextFieldSample() {
-    var text by savedInstanceState(saver = TextFieldValue.Saver) {
-        TextFieldValue("example", TextRange(0, 7))
+    var text by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        mutableStateOf(TextFieldValue("example", TextRange(0, 7)))
     }
 
     OutlinedTextField(
@@ -183,18 +186,19 @@ fun OutlinedTextFieldSample() {
 @Sampled
 @Composable
 fun TextFieldWithHideKeyboardOnImeAction() {
-    var text by savedInstanceState { "" }
-
+    var text by rememberSaveable { mutableStateOf("") }
+    lateinit var softwareKeyboardController: SoftwareKeyboardController
     TextField(
         value = text,
         onValueChange = { text = it },
         label = { Text("Label") },
+        onTextInputStarted = { softwareKeyboardController = it },
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-        onImeActionPerformed = { action, softwareController ->
-            if (action == ImeAction.Done) {
-                softwareController?.hideSoftwareKeyboard()
+        keyboardActions = KeyboardActions(
+            onDone = {
+                softwareKeyboardController.hideSoftwareKeyboard()
                 // do something here
             }
-        }
+        )
     )
 }

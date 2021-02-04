@@ -41,7 +41,6 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.math.sign
 
-@PublishedApi
 internal fun rowColumnMeasureBlocks(
     orientation: LayoutOrientation,
     arrangement: (Int, IntArray, LayoutDirection, Density, IntArray) -> Unit,
@@ -62,7 +61,7 @@ internal fun rowColumnMeasureBlocks(
         maxIntrinsicHeightMeasureBlock = MaxIntrinsicHeightMeasureBlock(orientation)
     ) { measurables, outerConstraints ->
         val constraints = OrientationIndependentConstraints(outerConstraints, orientation)
-        val arrangementSpacingPx = arrangementSpacing.toIntPx()
+        val arrangementSpacingPx = arrangementSpacing.roundToPx()
 
         var totalWeight = 0f
         var fixedSpace = 0

@@ -18,7 +18,6 @@ package androidx.compose.desktop.examples.popupexample
 import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.AppWindow
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,13 +29,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Checkbox
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.RadioButton
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -74,8 +69,6 @@ fun content() {
             tray.remove()
         }
     }
-
-    val dialogState = remember { mutableStateOf(false) }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -130,8 +123,6 @@ fun content() {
                 Column(modifier = Modifier.padding(start = 30.dp, top = 50.dp)) {
                     Button("Show Popup", { AppState.popupState.value = true }, Color(232, 182, 109))
                     Spacer(modifier = Modifier.height(30.dp))
-                    Button("Open dialog", { dialogState.value = true })
-                    Spacer(modifier = Modifier.height(30.dp))
                     Button(
                         text = "New window...",
                         onClick = {
@@ -183,8 +174,6 @@ fun content() {
                         .background(color = Color(255, 255, 255, 10))
                         .fillMaxWidth()
                 ) {
-                    ContextMenu()
-                    Spacer(modifier = Modifier.height(100.dp))
                     Row {
                         Checkbox(
                             checked = AppState.undecorated.value,
@@ -251,37 +240,6 @@ fun content() {
         // To make sure the popup is displayed on the top.
         Box(
             Modifier.fillMaxSize().background(color = Color(0, 0, 0, 200))
-        )
-    }
-
-    if (dialogState.value) {
-        val dismiss = {
-            dialogState.value = false
-            println("Dialog window is dismissed.")
-        }
-        AlertDialog(
-            onDismissRequest = dismiss,
-            confirmButton = {
-                Button(text = "OK", onClick = { AppState.amount.value++ })
-            },
-            dismissButton = {
-                Button(text = "Cancel", onClick = dismiss)
-            },
-            title = {
-                TextBox(text = "Alert Dialog")
-            },
-            text = {
-                println("Ambient value is ${AmbientTest.current}.")
-                TextBox(text = "Increment amount?")
-                DisposableEffect(Unit) {
-                    onDispose {
-                        println("onDispose inside AlertDialog is called.")
-                    }
-                }
-            },
-            shape = RoundedCornerShape(0.dp),
-            backgroundColor = Color(70, 70, 70),
-            modifier = Modifier.fillMaxSize()
         )
     }
 }
@@ -387,45 +345,6 @@ fun TextBox(text: String = "", modifier: Modifier = Modifier.height(30.dp)) {
             text = text,
             color = Color(200, 200, 200)
         )
-    }
-}
-
-@Composable
-fun ContextMenu() {
-    val items = listOf("Item A", "Item B", "Item C", "Item D", "Item E", "Item F")
-    val showMenu = remember { mutableStateOf(false) }
-    val selectedIndex = remember { mutableStateOf(0) }
-
-    Surface(
-        modifier = Modifier
-            .padding(start = 4.dp, top = 2.dp)
-            .clickable(onClick = { showMenu.value = true }),
-        color = Color(255, 255, 255, 40),
-        shape = RoundedCornerShape(4.dp)
-    ) {
-        DropdownMenu(
-            toggle = {
-                TextBox(
-                    text = "Selected: ${items[selectedIndex.value]}",
-                    modifier = Modifier
-                        .height(35.dp)
-                        .padding(start = 4.dp, end = 4.dp)
-                )
-            },
-            expanded = showMenu.value,
-            onDismissRequest = { showMenu.value = false }
-        ) {
-            items.forEachIndexed { index, name ->
-                DropdownMenuItem(
-                    onClick = {
-                        selectedIndex.value = index
-                        showMenu.value = false
-                    }
-                ) {
-                    Text(text = name)
-                }
-            }
-        }
     }
 }
 

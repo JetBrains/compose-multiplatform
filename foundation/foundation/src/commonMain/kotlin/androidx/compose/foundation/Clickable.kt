@@ -35,10 +35,113 @@ import androidx.compose.ui.semantics.semantics
 /**
  * Configure component to receive clicks via input or accessibility "click" event.
  *
- * Add this modifier to the element to make it clickable within its bounds.
+ * Add this modifier to the element to make it clickable within its bounds and show a default
+ * indication when it's pressed.
  *
  * This version has no [InteractionState] or [Indication] parameters, default indication from
- * [AmbientIndication] will be used. To specify [InteractionState] or [Indication], use another
+ * [LocalIndication] will be used. To specify [InteractionState] or [Indication], use another
+ * overload.
+ *
+ * If you need to support double click or long click alongside the single click, consider
+ * using [combinedClickable].
+ *
+ * @sample androidx.compose.foundation.samples.ClickableSample
+ *
+ * @param enabled Controls the enabled state. When `false`, [onClick], and this modifier will
+ * appear disabled for accessibility services
+ * @param onClickLabel semantic / accessibility label for the [onClick] action
+ * @param role the type of user interface element. Accessibility services might use this
+ * to describe the element or do customizations
+ * @param onClick will be called when user clicks on the element
+ */
+fun Modifier.clickable(
+    enabled: Boolean = true,
+    onClickLabel: String? = null,
+    role: Role? = null,
+    onClick: () -> Unit
+) = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "clickable"
+        properties["enabled"] = enabled
+        properties["onClickLabel"] = onClickLabel
+        properties["role"] = role
+        properties["onClick"] = onClick
+    }
+) {
+    Modifier.clickable(
+        enabled = enabled,
+        onClickLabel = onClickLabel,
+        onClick = onClick,
+        role = role,
+        indication = LocalIndication.current,
+        interactionState = remember { InteractionState() }
+    )
+}
+
+/**
+ * Configure component to receive clicks via input or accessibility "click" event.
+ *
+ * Add this modifier to the element to make it clickable within its bounds and show an indication
+ * as specified in [indication] parameter.
+ *
+ * If you need to support double click or long click alongside the single click, consider
+ * using [combinedClickable].
+ *
+ * @sample androidx.compose.foundation.samples.ClickableSample
+ *
+ * @param interactionState [InteractionState] that will be updated when this Clickable is
+ * pressed, using [Interaction.Pressed]. Only initial (first) press will be recorded and added to
+ * [InteractionState]
+ * @param indication indication to be shown when modified element is pressed. Be default,
+ * indication from [LocalIndication] will be used. Pass `null` to show no indication, or
+ * current value from [LocalIndication] to show theme default
+ * @param enabled Controls the enabled state. When `false`, [onClick], and this modifier will
+ * appear disabled for accessibility services
+ * @param onClickLabel semantic / accessibility label for the [onClick] action
+ * @param role the type of user interface element. Accessibility services might use this
+ * to describe the element or do customizations
+ * @param onClick will be called when user clicks on the element
+ */
+@OptIn(ExperimentalFoundationApi::class)
+fun Modifier.clickable(
+    interactionState: InteractionState,
+    indication: Indication?,
+    enabled: Boolean = true,
+    onClickLabel: String? = null,
+    role: Role? = null,
+    onClick: () -> Unit
+) = composed(
+    factory = {
+        Modifier.combinedClickable(
+            enabled = enabled,
+            onClickLabel = onClickLabel,
+            onClick = onClick,
+            role = role,
+            indication = indication,
+            interactionState = interactionState
+        )
+    },
+    inspectorInfo = debugInspectorInfo {
+        name = "clickable"
+        properties["enabled"] = enabled
+        properties["onClickLabel"] = onClickLabel
+        properties["role"] = role
+        properties["onClick"] = onClick
+        properties["indication"] = indication
+        properties["interactionState"] = interactionState
+    }
+)
+
+/**
+ * Configure component to receive clicks, double clicks and long clicks via input or accessibility
+ * "click" event.
+ *
+ * Add this modifier to the element to make it clickable within its bounds.
+ *
+ * If you need only click handling, and no double or long clicks, consider using [clickable]
+ *
+ * This version has no [InteractionState] or [Indication] parameters, default indication from
+ * [LocalIndication] will be used. To specify [InteractionState] or [Indication], use another
  * overload.
  *
  * @sample androidx.compose.foundation.samples.ClickableSample
@@ -48,11 +151,13 @@ import androidx.compose.ui.semantics.semantics
  * @param onClickLabel semantic / accessibility label for the [onClick] action
  * @param role the type of user interface element. Accessibility services might use this
  * to describe the element or do customizations
+ * @param onLongClickLabel semantic / accessibility label for the [onLongClick] action
  * @param onLongClick will be called when user long presses on the element
  * @param onDoubleClick will be called when user double clicks on the element
  * @param onClick will be called when user clicks on the element
  */
-fun Modifier.clickable(
+@ExperimentalFoundationApi
+fun Modifier.combinedClickable(
     enabled: Boolean = true,
     onClickLabel: String? = null,
     role: Role? = null,
@@ -62,7 +167,7 @@ fun Modifier.clickable(
     onClick: () -> Unit
 ) = composed(
     inspectorInfo = debugInspectorInfo {
-        name = "clickable"
+        name = "combinedClickable"
         properties["enabled"] = enabled
         properties["onClickLabel"] = onClickLabel
         properties["role"] = role
@@ -72,7 +177,7 @@ fun Modifier.clickable(
         properties["onLongClickLabel"] = onLongClickLabel
     }
 ) {
-    Modifier.clickable(
+    Modifier.combinedClickable(
         enabled = enabled,
         onClickLabel = onClickLabel,
         onLongClickLabel = onLongClickLabel,
@@ -80,38 +185,45 @@ fun Modifier.clickable(
         onDoubleClick = onDoubleClick,
         onClick = onClick,
         role = role,
-        indication = AmbientIndication.current(),
+        indication = LocalIndication.current,
         interactionState = remember { InteractionState() }
     )
 }
 
 /**
- * Configure component to receive clicks via input or accessibility "click" event.
+ * Configure component to receive clicks, double clicks and long clicks via input or accessibility
+ * "click" event.
+ *
+ * Add this modifier to the element to make it clickable within its bounds.
+ *
+ * If you need only click handling, and no double or long clicks, consider using [clickable].
  *
  * Add this modifier to the element to make it clickable within its bounds.
  *
  * @sample androidx.compose.foundation.samples.ClickableSample
  *
- * @param enabled Controls the enabled state. When `false`, [onClick], [onLongClick] or
- * [onDoubleClick] won't be invoked
  * @param interactionState [InteractionState] that will be updated when this Clickable is
  * pressed, using [Interaction.Pressed]. Only initial (first) press will be recorded and added to
  * [InteractionState]
  * @param indication indication to be shown when modified element is pressed. Be default,
- * indication from [AmbientIndication] will be used. Pass `null` to show no indication, or
- * current value from [AmbientIndication] to show theme default
+ * indication from [LocalIndication] will be used. Pass `null` to show no indication, or
+ * current value from [LocalIndication] to show theme default
+ * @param enabled Controls the enabled state. When `false`, [onClick], [onLongClick] or
+ * [onDoubleClick] won't be invoked
  * @param onClickLabel semantic / accessibility label for the [onClick] action
  * @param role the type of user interface element. Accessibility services might use this
  * to describe the element or do customizations
+ * @param onLongClickLabel semantic / accessibility label for the [onLongClick] action
  * @param onLongClick will be called when user long presses on the element
  * @param onDoubleClick will be called when user double clicks on the element
  * @param onClick will be called when user clicks on the element
  */
 @Suppress("DEPRECATION")
-fun Modifier.clickable(
-    enabled: Boolean = true,
+@ExperimentalFoundationApi
+fun Modifier.combinedClickable(
     interactionState: InteractionState,
     indication: Indication?,
+    enabled: Boolean = true,
     onClickLabel: String? = null,
     role: Role? = null,
     onLongClickLabel: String? = null,
@@ -168,7 +280,7 @@ fun Modifier.clickable(
             .then(doubleTap)
     },
     inspectorInfo = debugInspectorInfo {
-        name = "clickable"
+        name = "combinedClickable"
         properties["enabled"] = enabled
         properties["onClickLabel"] = onClickLabel
         properties["role"] = role

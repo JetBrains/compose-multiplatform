@@ -19,9 +19,8 @@ package androidx.compose.ui.graphics.vector
 import androidx.compose.runtime.AbstractApplier
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
-import androidx.compose.runtime.CompositionReference
+import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.compositionFor
 import androidx.compose.runtime.ComposeNode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.PathFillType
@@ -100,9 +99,9 @@ fun Path(
 @Suppress("NAME_SHADOWING")
 internal fun composeVector(
     container: VectorComponent,
-    parent: CompositionReference,
+    parent: CompositionContext,
     composable: @Composable (viewportWidth: Float, viewportHeight: Float) -> Unit
-): Composition = compositionFor(
+): Composition = Composition(
     container,
     VectorApplier(container.root),
     parent

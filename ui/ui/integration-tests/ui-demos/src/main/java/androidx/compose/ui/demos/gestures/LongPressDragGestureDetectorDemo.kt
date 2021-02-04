@@ -17,6 +17,7 @@
 package androidx.compose.ui.demos.gestures
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,13 +31,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.LongPressDragObserver
-import androidx.compose.ui.gesture.longPressDragGestureFilter
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.input.pointer.consumeAllChanges
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 
 /**
- * Simple [longPressDragGestureFilter] demo.
+ * Simple [detectDragGesturesAfterLongPress] demo.
  */
 @Composable
 fun LongPressDragGestureFilterDemo() {
@@ -44,30 +45,8 @@ fun LongPressDragGestureFilterDemo() {
     val offset = remember { mutableStateOf(Offset.Zero) }
     val color = remember { mutableStateOf(Grey) }
 
-    val longPressDragObserver =
-        object : LongPressDragObserver {
-
-            override fun onLongPress(pxPosition: Offset) {
-                color.value = Red
-            }
-
-            override fun onDragStart() {
-                super.onDragStart()
-                color.value = Blue
-            }
-
-            override fun onDrag(dragDistance: Offset): Offset {
-                offset.value += dragDistance
-                return dragDistance
-            }
-
-            override fun onStop(velocity: Offset) {
-                color.value = Grey
-            }
-        }
-
     val (offsetX, offsetY) =
-        with(AmbientDensity.current) { offset.value.x.toDp() to offset.value.y.toDp() }
+        with(LocalDensity.current) { offset.value.x.toDp() to offset.value.y.toDp() }
 
     Column {
         Text("Demonstrates dragging that only begins once a long press has occurred!")
@@ -77,7 +56,16 @@ fun LongPressDragGestureFilterDemo() {
                 .fillMaxSize()
                 .wrapContentSize(Alignment.Center)
                 .preferredSize(192.dp)
-                .longPressDragGestureFilter(longPressDragObserver)
+                .pointerInput(Unit) {
+                    detectDragGesturesAfterLongPress(
+                        onDragStart = { color.value = Blue },
+                        onDragEnd = { color.value = Grey },
+                        onDragCancel = { color.value = Grey }
+                    ) { change, dragAmount ->
+                        offset.value += dragAmount
+                        change.consumeAllChanges()
+                    }
+                }
                 .background(color.value)
         )
     }

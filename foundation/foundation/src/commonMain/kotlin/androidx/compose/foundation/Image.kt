@@ -17,7 +17,6 @@
 package androidx.compose.foundation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.Layout
@@ -28,12 +27,14 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.ColorPainter
-import androidx.compose.ui.graphics.painter.ImagePainter
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 
 /**
@@ -49,7 +50,7 @@ import androidx.compose.ui.semantics.semantics
  *
  * For use cases that require drawing a rectangular subset of the [ImageBitmap] consumers can use
  * overload that consumes a [Painter] parameter shown in this sample
- * @sample androidx.compose.foundation.samples.ImagePainterSubsectionSample
+ * @sample androidx.compose.foundation.samples.BitmapPainterSubsectionSample
  *
  * @param bitmap The [ImageBitmap] to draw
  * @param contentDescription text used by accessibility services to describe what this image
@@ -77,9 +78,9 @@ inline fun Image(
     alpha: Float = DefaultAlpha,
     colorFilter: ColorFilter? = null
 ) {
-    val imagePainter = remember(bitmap) { ImagePainter(bitmap) }
+    val bitmapPainter = remember(bitmap) { BitmapPainter(bitmap) }
     Image(
-        painter = imagePainter,
+        painter = bitmapPainter,
         contentDescription = contentDescription,
         modifier = modifier,
         alignment = alignment,
@@ -95,8 +96,6 @@ inline fun Image(
  * optional [Modifier] parameter can be provided to adjust sizing or draw additional content (ex.
  * background). Any unspecified dimension will leverage the [ImageVector]'s size as a minimum
  * constraint.
- *
- * @sample androidx.compose.foundation.samples.ImageVectorSample
  *
  * @param imageVector The [ImageVector] to draw
  * @param contentDescription text used by accessibility services to describe what this image
@@ -143,7 +142,7 @@ inline fun Image(
  * of zero and will not draw any content. This can happen for Painter implementations that
  * always attempt to fill the bounds like [ColorPainter]
  *
- * @sample androidx.compose.foundation.samples.ImagePainterSample
+ * @sample androidx.compose.foundation.samples.BitmapPainterSample
  *
  * @param painter to draw
  * @param contentDescription text used by accessibility services to describe what this image
@@ -171,7 +170,10 @@ fun Image(
     colorFilter: ColorFilter? = null
 ) {
     val semantics = if (contentDescription != null) {
-        Modifier.semantics { this.contentDescription = contentDescription }
+        Modifier.semantics {
+            this.contentDescription = contentDescription
+            this.role = Role.Image
+        }
     } else {
         Modifier
     }
@@ -179,7 +181,7 @@ fun Image(
     // Explicitly use a simple Layout implementation here as Spacer squashes any non fixed
     // constraint with zero
     Layout(
-        emptyContent(),
+        {},
         modifier.then(semantics).clipToBounds().paint(
             painter,
             alignment = alignment,

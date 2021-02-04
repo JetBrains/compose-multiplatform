@@ -17,8 +17,3 @@
 package androidx.compose.ui.util
 
 actual fun String.format(vararg args: Any?): String = java.lang.String.format(this, *args)
-
-actual fun StringBuilder.deleteAt(index: Int): StringBuilder {
-    this.deleteCharAt(index)
-    return this
-}

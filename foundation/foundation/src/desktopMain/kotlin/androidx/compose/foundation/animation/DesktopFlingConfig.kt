@@ -19,13 +19,13 @@ package androidx.compose.foundation.animation
 import androidx.compose.animation.core.TargetAnimation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 
 @Composable
 internal actual fun actualFlingConfig(adjustTarget: (Float) -> TargetAnimation?): FlingConfig {
     // This function will internally update the calculation of fling decay when the density changes,
     // but the reference to the returned FlingConfig will not change across calls.
-    val density = AmbientDensity.current
+    val density = LocalDensity.current
     return remember(density.density) {
         val decayAnimation = DesktopFlingDecaySpec(density)
         FlingConfig(

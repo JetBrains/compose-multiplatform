@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.foundation.gestures
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.gesture.Direction
 import androidx.compose.ui.gesture.ScrollCallback
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.input.mouse.MouseScrollUnit
 import androidx.compose.ui.input.mouse.mouseScrollFilter
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.DesktopPlatform
 import androidx.compose.ui.platform.DesktopPlatformAmbient
 import androidx.compose.ui.unit.Density
@@ -33,7 +34,7 @@ import kotlin.math.sqrt
 internal actual fun Modifier.touchScrollable(
     scrollCallback: ScrollCallback,
     orientation: Orientation,
-    canScroll: ((Direction) -> Boolean)?,
+    enabled: Boolean,
     startScrollImmediately: Boolean
 ): Modifier = this
 
@@ -45,7 +46,7 @@ internal actual fun Modifier.mouseScrollable(
     scrollCallback: ScrollCallback,
     orientation: Orientation
 ): Modifier = composed {
-    val density = AmbientDensity.current
+    val density = LocalDensity.current
     val desktopPlatform = DesktopPlatformAmbient.current
     val config = PlatformScrollConfig(density, desktopPlatform)
 

@@ -24,9 +24,9 @@ import androidx.autofill.HintConstants.AUTOFILL_HINT_PERSON_NAME
 import androidx.compose.testutils.fake.FakeViewStructure
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.platform.AmbientAutofill
-import androidx.compose.ui.platform.AmbientAutofillTree
-import androidx.compose.ui.platform.AmbientView
+import androidx.compose.ui.platform.LocalAutofill
+import androidx.compose.ui.platform.LocalAutofillTree
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SdkSuppress
@@ -51,27 +51,27 @@ class AndroidAutoFillTest {
     @Before
     fun setup() {
         rule.setContent {
-            ownerView = AmbientView.current
-            autofill = AmbientAutofill.current
-            autofillTree = AmbientAutofillTree.current
+            ownerView = LocalView.current
+            autofill = LocalAutofill.current
+            autofillTree = LocalAutofillTree.current
         }
     }
 
     @SdkSuppress(maxSdkVersion = 25)
     @Test
-    fun autofillAmbient_belowApi26_isNull() {
+    fun autofillCompositionLocal_belowApi26_isNull() {
         assertThat(autofill).isNull()
     }
 
     @SdkSuppress(minSdkVersion = 26)
     @Test
-    fun autofillAmbient_isNotNull() {
+    fun autofillCompositionLocal_isNotNull() {
         assertThat(autofill).isNotNull()
     }
 
     @SdkSuppress(minSdkVersion = 26)
     @Test
-    fun autofillAmbient_returnsAnInstanceOfAndroidAutofill() {
+    fun autofillCompositionLocal_returnsAnInstanceOfAndroidAutofill() {
         assertThat(autofill).isInstanceOf(AndroidAutofill::class.java)
     }
 

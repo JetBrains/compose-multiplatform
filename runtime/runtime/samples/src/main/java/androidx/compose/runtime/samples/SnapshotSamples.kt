@@ -21,8 +21,8 @@ import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.snapshots.snapshotFlow
-import androidx.compose.runtime.snapshots.withMutableSnapshot
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -54,7 +54,7 @@ fun snapshotFlowSample() {
     // ...
 
     // Change snapshot state; greetPersonFlow will emit a new greeting
-    withMutableSnapshot {
+    Snapshot.withMutableSnapshot {
         greeting = "Ahoy"
         person = "Sean"
     }

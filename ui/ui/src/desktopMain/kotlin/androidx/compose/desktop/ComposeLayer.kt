@@ -18,24 +18,23 @@ package androidx.compose.desktop
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
-import androidx.compose.runtime.CompositionReference
+import androidx.compose.runtime.CompositionContext
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.input.mouse.MouseScrollEvent
 import androidx.compose.ui.input.mouse.MouseScrollUnit
 import androidx.compose.ui.platform.DesktopComponent
 import androidx.compose.ui.platform.DesktopOwner
 import androidx.compose.ui.platform.DesktopOwners
-import androidx.compose.ui.platform.FrameDispatcher
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.unit.Density
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skija.Canvas
-import org.jetbrains.skija.Picture
-import org.jetbrains.skija.PictureRecorder
-import org.jetbrains.skija.Rect
 import org.jetbrains.skiko.HardwareLayer
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaRenderer
-import java.awt.DisplayMode
 import java.awt.Point
 import java.awt.event.FocusEvent
 import java.awt.event.InputMethodEvent
@@ -49,48 +48,50 @@ import java.awt.event.MouseWheelEvent
 import java.awt.im.InputMethodRequests
 
 internal class ComposeLayer {
+    private var isDisposed = false
 
-    private var composition: Composition? = null
+    private val coroutineScope = CoroutineScope(Dispatchers.Swing)
+    // TODO(demin): maybe pass CoroutineScope into AWTDebounceEventQueue and get rid of [cancel]
+    //  method?
     private val events = AWTDebounceEventQueue()
 
-    var owners: DesktopOwners? = null
-        set(value) {
-            field = value
-            renderer = value?.let(::OwnersRenderer)
-        }
-
-    var renderer: Renderer? = null
-
-    private var isDisposed = false
-    private var frameNanoTime = 0L
-    private val frameDispatcher = FrameDispatcher(
-        onFrame = { onFrame(it) },
-        framesPerSecond = ::getFramesPerSecond
+    internal val wrapped = Wrapped()
+    internal val owners: DesktopOwners = DesktopOwners(
+        coroutineScope,
+        wrapped,
+        wrapped::needRedraw
     )
 
-    private val picture = MutableResource<Picture>()
-    private val pictureRecorder = PictureRecorder()
+    private var owner: DesktopOwner? = null
+    private var composition: Composition? = null
 
-    private suspend fun onFrame(nanoTime: Long) {
-        this.frameNanoTime = nanoTime
-        preparePicture(frameNanoTime)
-        wrapped.redrawLayer()
-    }
+    private var content: (@Composable () -> Unit)? = null
+    private var parentComposition: CompositionContext? = null
 
-    var onDensityChanged: ((Density) -> Unit)? = null
-
-    fun onDensityChanged(action: ((Density) -> Unit)?) {
-        onDensityChanged = action
-    }
-
-    private var _density: Density? = null
-    val density
-        get() = _density ?: detectCurrentDensity().also {
-            _density = it
-        }
+    private lateinit var density: Density
 
     inner class Wrapped : SkiaLayer(), DesktopComponent {
         var currentInputMethodRequests: InputMethodRequests? = null
+
+        var isInit = false
+            private set
+
+        override fun init() {
+            super.init()
+            isInit = true
+            resetDensity()
+            initOwner()
+        }
+
+        override fun contentScaleChanged() {
+            super.contentScaleChanged()
+            resetDensity()
+        }
+
+        private fun resetDensity() {
+            this@ComposeLayer.density = detectCurrentDensity()
+            owner?.density = density
+        }
 
         override fun getInputMethodRequests() = currentInputMethodRequests
 
@@ -110,33 +111,22 @@ internal class ComposeLayer {
 
         override val density: Density
             get() = this@ComposeLayer.density
-
-        override fun scaleCanvas(dpi: Float) {}
     }
-
-    internal val wrapped = Wrapped()
 
     val component: HardwareLayer
         get() = wrapped
 
     init {
         wrapped.renderer = object : SkiaRenderer {
-            override fun onRender(canvas: Canvas, width: Int, height: Int) {
+            override suspend fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
                 try {
-                    picture.useWithoutClosing {
-                        it?.also(canvas::drawPicture)
-                    }
+                    owners.onFrame(canvas, width, height, nanoTime)
                 } catch (e: Throwable) {
-                    e.printStackTrace(System.err)
                     if (System.getProperty("compose.desktop.render.ignore.errors") == null) {
-                        System.exit(1)
+                        throw e
                     }
                 }
             }
-
-            override fun onDispose() = Unit
-            override fun onInit() = Unit
-            override fun onReshape(width: Int, height: Int) = Unit
         }
         initCanvas()
     }
@@ -145,12 +135,12 @@ internal class ComposeLayer {
         wrapped.addInputMethodListener(object : InputMethodListener {
             override fun caretPositionChanged(event: InputMethodEvent?) {
                 if (event != null) {
-                    owners?.onInputMethodEvent(event)
+                    owners.onInputMethodEvent(event)
                 }
             }
 
             override fun inputMethodTextChanged(event: InputMethodEvent) = events.post {
-                owners?.onInputMethodEvent(event)
+                owners.onInputMethodEvent(event)
             }
         })
 
@@ -158,29 +148,32 @@ internal class ComposeLayer {
             override fun mouseClicked(event: MouseEvent) = Unit
 
             override fun mousePressed(event: MouseEvent) = events.post {
-                owners?.onMousePressed(
+                owners.onMousePressed(
                     (event.x * density.density).toInt(),
-                    (event.y * density.density).toInt()
+                    (event.y * density.density).toInt(),
+                    event
                 )
             }
 
             override fun mouseReleased(event: MouseEvent) = events.post {
-                owners?.onMouseReleased(
+                owners.onMouseReleased(
                     (event.x * density.density).toInt(),
-                    (event.y * density.density).toInt()
+                    (event.y * density.density).toInt(),
+                    event
                 )
             }
         })
         wrapped.addMouseMotionListener(object : MouseMotionAdapter() {
             override fun mouseDragged(event: MouseEvent) = events.post {
-                owners?.onMouseDragged(
+                owners.onMouseDragged(
                     (event.x * density.density).toInt(),
-                    (event.y * density.density).toInt()
+                    (event.y * density.density).toInt(),
+                    event
                 )
             }
 
             override fun mouseMoved(event: MouseEvent) = events.post {
-                owners?.onMouseMoved(
+                owners.onMouseMoved(
                     (event.x * density.density).toInt(),
                     (event.y * density.density).toInt()
                 )
@@ -188,7 +181,7 @@ internal class ComposeLayer {
         })
         wrapped.addMouseWheelListener { event ->
             events.post {
-                owners?.onMouseScroll(
+                owners.onMouseScroll(
                     (event.x * density.density).toInt(),
                     (event.y * density.density).toInt(),
                     event.toComposeEvent()
@@ -197,23 +190,17 @@ internal class ComposeLayer {
         }
         wrapped.addKeyListener(object : KeyAdapter() {
             override fun keyPressed(event: KeyEvent) = events.post {
-                owners?.onKeyPressed(event)
+                owners.onKeyPressed(event)
             }
 
             override fun keyReleased(event: KeyEvent) = events.post {
-                owners?.onKeyReleased(event)
+                owners.onKeyReleased(event)
             }
 
             override fun keyTyped(event: KeyEvent) = events.post {
-                owners?.onKeyTyped(event)
+                owners.onKeyTyped(event)
             }
         })
-    }
-
-    private class OwnersRenderer(private val owners: DesktopOwners) : ComposeLayer.Renderer {
-        override suspend fun onFrame(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
-            owners.onFrame(canvas, width, height, nanoTime)
-        }
     }
 
     private fun MouseWheelEvent.toComposeEvent() = MouseScrollEvent(
@@ -231,90 +218,42 @@ internal class ComposeLayer {
         }
     )
 
-    // We draw into picture, because SkiaLayer.draw can be called from the other thread,
-    // but onRender should be called in AWT thread. Picture doesn't add any visible overhead on
-    // CPU/RAM.
-    private suspend fun preparePicture(frameTimeNanos: Long) {
-        val bounds = Rect.makeWH(wrapped.width * density.density, wrapped.height * density.density)
-        val pictureCanvas = pictureRecorder.beginRecording(bounds)
-        renderer?.onFrame(
-            pictureCanvas,
-            (wrapped.width * density.density).toInt(),
-            (wrapped.height * density.density).toInt(),
-            frameTimeNanos
-        )
-        picture.set(pictureRecorder.finishRecordingAsPicture())
-    }
-
-    fun reinit() {
-        val currentDensity = detectCurrentDensity()
-        if (_density != currentDensity) {
-            _density = currentDensity
-            onDensityChanged?.invoke(density)
-        }
-        check(!isDisposed)
-        wrapped.reinit()
-    }
-
     // TODO(demin): detect OS fontScale
     //  font size can be changed on Windows 10 in Settings - Ease of Access,
     //  on Ubuntu in Settings - Universal Access
     //  on macOS there is no such setting
     private fun detectCurrentDensity(): Density {
-        val density = wrapped.graphicsConfiguration.defaultTransform.scaleX.toFloat()
-        return Density(density, 1f)
-    }
-
-    private fun getFramesPerSecond(): Float {
-        val refreshRate = wrapped.graphicsConfiguration.device.displayMode.refreshRate
-        return if (refreshRate != DisplayMode.REFRESH_RATE_UNKNOWN) refreshRate.toFloat() else 60f
-    }
-
-    fun updateLayer() {
-        check(!isDisposed)
-        wrapped.updateLayer()
+        return Density(wrapped.contentScale, 1f)
     }
 
     fun dispose() {
-        composition?.dispose()
-        events.cancel()
         check(!isDisposed)
-        frameDispatcher.cancel()
-        wrapped.disposeLayer()
-        picture.close()
-        pictureRecorder.close()
+        composition?.dispose()
+        owner?.dispose()
+        events.cancel()
+        coroutineScope.cancel()
+        wrapped.dispose()
         isDisposed = true
     }
 
-    internal fun needRedrawLayer() {
-        check(!isDisposed)
-        frameDispatcher.scheduleFrame()
-    }
-
-    interface Renderer {
-        suspend fun onFrame(canvas: Canvas, width: Int, height: Int, nanoTime: Long)
-    }
-
     internal fun setContent(
-        parent: Any? = null,
-        invalidate: () -> Unit = this::needRedrawLayer,
-        parentComposition: CompositionReference? = null,
+        parentComposition: CompositionContext? = null,
         content: @Composable () -> Unit
     ) {
-        check(owners == null) {
-            "Cannot setContent twice."
-        }
-        val desktopOwners = DesktopOwners(wrapped, invalidate)
-        val desktopOwner = DesktopOwner(desktopOwners, density)
+        check(!isDisposed)
+        check(this.content == null) { "Cannot set content twice" }
+        this.content = content
+        this.parentComposition = parentComposition
+        // We can't create DesktopOwner now, because we don't know density yet.
+        // We will know density only after SkiaLayer will be visible.
+        initOwner()
+    }
 
-        owners = desktopOwners
-        composition = desktopOwner.setContent(parent = parentComposition, content = content)
-
-        onDensityChanged(desktopOwner::density::set)
-
-        when (parent) {
-            is AppFrame -> parent.onDispose = desktopOwner::dispose
-            is ComposePanel -> parent.onDispose = desktopOwner::dispose
+    private fun initOwner() {
+        check(!isDisposed)
+        if (wrapped.isInit && owner == null && content != null) {
+            owner = DesktopOwner(owners, density)
+            composition = owner!!.setContent(parent = parentComposition, content = content!!)
         }
     }
 }

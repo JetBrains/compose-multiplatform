@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.addOutline
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import kotlin.math.sqrt
 
@@ -57,6 +58,7 @@ import kotlin.math.sqrt
  * @sample androidx.compose.material.samples.SimpleTopAppBar
  *
  * @param title The title to be displayed in the center of the TopAppBar
+ * @param modifier The [Modifier] to be applied to this TopAppBar
  * @param navigationIcon The navigation icon displayed at the start of the TopAppBar. This should
  * typically be an [IconButton] or [IconToggleButton].
  * @param actions The actions displayed at the end of the TopAppBar. This should typically be
@@ -64,7 +66,7 @@ import kotlin.math.sqrt
  * @param backgroundColor The background color for the TopAppBar. Use [Color.Transparent] to have
  * no color.
  * @param contentColor The preferred content color provided by this TopAppBar to its children.
- * Defaults to either the matching `onFoo` color for [backgroundColor], or if [backgroundColor]
+ * Defaults to either the matching content color for [backgroundColor], or if [backgroundColor]
  * is not a color from the theme, this will keep the same value set above this TopAppBar.
  * @param elevation the elevation of this TopAppBar.
  */
@@ -84,7 +86,7 @@ fun TopAppBar(
         } else {
             Row(TitleIconModifier, verticalAlignment = Alignment.CenterVertically) {
                 Providers(
-                    AmbientContentAlpha provides ContentAlpha.high,
+                    LocalContentAlpha provides ContentAlpha.high,
                     content = navigationIcon
                 )
             }
@@ -95,11 +97,11 @@ fun TopAppBar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             ProvideTextStyle(value = MaterialTheme.typography.h6) {
-                Providers(AmbientContentAlpha provides ContentAlpha.high, content = title)
+                Providers(LocalContentAlpha provides ContentAlpha.high, content = title)
             }
         }
 
-        Providers(AmbientContentAlpha provides ContentAlpha.medium) {
+        Providers(LocalContentAlpha provides ContentAlpha.medium) {
             Row(
                 Modifier.fillMaxHeight(),
                 horizontalArrangement = Arrangement.End,
@@ -117,10 +119,11 @@ fun TopAppBar(
  * This TopAppBar has no pre-defined slots for content, allowing you to customize the layout of
  * content inside.
  *
+ * @param modifier The [Modifier] to be applied to this TopAppBar
  * @param backgroundColor The background color for the TopAppBar. Use [Color.Transparent] to have
  * no color.
  * @param contentColor The preferred content color provided by this TopAppBar to its children.
- * Defaults to either the matching `onFoo` color for [backgroundColor], or if [backgroundColor] is
+ * Defaults to either the matching content color for [backgroundColor], or if [backgroundColor] is
  * not a color from the theme, this will keep the same value set above this TopAppBar.
  * @param elevation the elevation of this TopAppBar.
  * @param content the content of this TopAppBar.The default layout here is a [Row],
@@ -154,10 +157,11 @@ fun TopAppBar(
  *
  * @sample androidx.compose.material.samples.SimpleBottomAppBar
  *
+ * @param modifier The [Modifier] to be applied to this BottomAppBar
  * @param backgroundColor The background color for the BottomAppBar. Use [Color.Transparent] to
  * have no color.
  * @param contentColor The preferred content color provided by this BottomAppBar to its children.
- * Defaults to either the matching `onFoo` color for [backgroundColor], or if [backgroundColor] is
+ * Defaults to either the matching content color for [backgroundColor], or if [backgroundColor] is
  * not a color from the theme, this will keep the same value set above this BottomAppBar.
  * @param cutoutShape the shape of the cutout that will be added to the BottomAppBar - this
  * should typically be the same shape used inside the [FloatingActionButton], when [BottomAppBar]
@@ -176,7 +180,7 @@ fun BottomAppBar(
     elevation: Dp = BottomAppBarElevation,
     content: @Composable RowScope.() -> Unit
 ) {
-    val fabPlacement = AmbientFabPlacement.current
+    val fabPlacement = LocalFabPlacement.current
     val shape = if (cutoutShape != null && fabPlacement?.isDocked == true) {
         BottomAppBarCutoutShape(cutoutShape, fabPlacement)
     } else {
@@ -203,12 +207,16 @@ private data class BottomAppBarCutoutShape(
     val fabPlacement: FabPlacement
 ) : Shape {
 
-    override fun createOutline(size: Size, density: Density): Outline {
+    override fun createOutline(
+        size: Size,
+        layoutDirection: LayoutDirection,
+        density: Density
+    ): Outline {
         val boundingRectangle = Path().apply {
             addRect(Rect(0f, 0f, size.width, size.height))
         }
         val path = Path().apply {
-            addCutoutShape(density)
+            addCutoutShape(layoutDirection, density)
             // Subtract this path from the bounding rectangle
             op(boundingRectangle, this, PathOperation.difference)
         }
@@ -219,7 +227,7 @@ private data class BottomAppBarCutoutShape(
      * Adds the filled [cutoutShape] to the [Path]. The path can the be subtracted from the main
      * rectangle path used for the app bar, to create the resulting cutout shape.
      */
-    private fun Path.addCutoutShape(density: Density) {
+    private fun Path.addCutoutShape(layoutDirection: LayoutDirection, density: Density) {
         // The gap on all sides between the FAB and the cutout
         val cutoutOffset = with(density) { BottomAppBarCutoutOffset.toPx() }
 
@@ -236,7 +244,7 @@ private data class BottomAppBarCutoutShape(
         // cut into the app bar
         val cutoutStartY = -cutoutRadius
 
-        addOutline(cutoutShape.createOutline(cutoutSize, density))
+        addOutline(cutoutShape.createOutline(cutoutSize, layoutDirection, density))
         translate(Offset(cutoutStartX, cutoutStartY))
 
         // TODO: consider exposing the custom cutout shape instead of just replacing circle shapes?

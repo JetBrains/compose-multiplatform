@@ -39,8 +39,8 @@ import androidx.compose.ui.test.doubleClick
 import androidx.compose.ui.test.down
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.longClick
-import androidx.compose.ui.test.onNodeWithSubstring
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.performSemanticsAction
@@ -57,6 +57,7 @@ import org.junit.runner.RunWith
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
+@OptIn(ExperimentalFoundationApi::class)
 class ClickableTest {
 
     @get:Rule
@@ -117,7 +118,7 @@ class ClickableTest {
                     "ClickableText",
                     modifier = Modifier
                         .testTag("myClickable")
-                        .clickable(onLongClick = onClick) {}
+                        .combinedClickable(onLongClick = onClick) {}
                 )
             }
         }
@@ -181,16 +182,16 @@ class ClickableTest {
             }
         }
 
-        rule.onNodeWithSubstring("Foo").assertExists()
-        rule.onNodeWithSubstring("Bar").assertExists()
+        rule.onNodeWithText("Foo", substring = true).assertExists()
+        rule.onNodeWithText("Bar", substring = true).assertExists()
 
-        rule.onNodeWithSubstring("Foo").performClick()
+        rule.onNodeWithText("Foo", substring = true).performClick()
 
         rule.runOnIdle {
             assertThat(counter).isEqualTo(1)
         }
 
-        rule.onNodeWithSubstring("Bar").performClick()
+        rule.onNodeWithText("Bar", substring = true).performClick()
 
         rule.runOnIdle {
             assertThat(counter).isEqualTo(2)
@@ -209,7 +210,7 @@ class ClickableTest {
                     "ClickableText",
                     modifier = Modifier
                         .testTag("myClickable")
-                        .clickable(onLongClick = onClick) {}
+                        .combinedClickable(onLongClick = onClick) {}
                 )
             }
         }
@@ -246,7 +247,7 @@ class ClickableTest {
                     "ClickableText",
                     modifier = Modifier
                         .testTag("myClickable")
-                        .clickable(
+                        .combinedClickable(
                             onLongClick = onLongClick,
                             onClick = onClick
                         )
@@ -288,7 +289,7 @@ class ClickableTest {
                     "ClickableText",
                     modifier = Modifier
                         .testTag("myClickable")
-                        .clickable(
+                        .combinedClickable(
                             onDoubleClick = onDoubleClick,
                             onClick = onClick
                         )
@@ -332,7 +333,7 @@ class ClickableTest {
                     "ClickableText",
                     modifier = Modifier
                         .testTag("myClickable")
-                        .clickable(
+                        .combinedClickable(
                             onDoubleClick = onDoubleClick,
                             onLongClick = onLongClick,
                             onClick = onClick
@@ -387,7 +388,7 @@ class ClickableTest {
                     "ClickableText",
                     modifier = Modifier
                         .testTag("myClickable")
-                        .clickable(onDoubleClick = onClick) {}
+                        .combinedClickable(onDoubleClick = onClick) {}
                 )
             }
         }
@@ -417,7 +418,7 @@ class ClickableTest {
                     "ClickableText",
                     modifier = Modifier
                         .testTag("myClickable")
-                        .clickable(
+                        .combinedClickable(
                             interactionState = interactionState,
                             indication = null
                         ) {}
@@ -456,7 +457,7 @@ class ClickableTest {
                         "ClickableText",
                         modifier = Modifier
                             .testTag("myClickable")
-                            .clickable(
+                            .combinedClickable(
                                 interactionState = interactionState,
                                 indication = null
                             ) {}
@@ -503,7 +504,7 @@ class ClickableTest {
                     "ClickableText",
                     modifier = Modifier
                         .testTag("myClickable")
-                        .clickable(
+                        .combinedClickable(
                             enabled = enabled.value,
                             onDoubleClick = onDoubleClick,
                             onLongClick = onLongClick,
@@ -596,8 +597,8 @@ class ClickableTest {
     fun clickable_testInspectorValue_noIndicationOverload() {
         val onClick: () -> Unit = { }
         rule.setContent {
-            val modifier = Modifier.clickable(onClick = onClick) as InspectableValue
-            assertThat(modifier.nameFallback).isEqualTo("clickable")
+            val modifier = Modifier.combinedClickable(onClick = onClick) as InspectableValue
+            assertThat(modifier.nameFallback).isEqualTo("combinedClickable")
             assertThat(modifier.valueOverride).isNull()
             assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
                 "enabled",
@@ -615,12 +616,12 @@ class ClickableTest {
     fun clickable_testInspectorValue_fullParamsOverload() {
         val onClick: () -> Unit = { }
         rule.setContent {
-            val modifier = Modifier.clickable(
+            val modifier = Modifier.combinedClickable(
                 onClick = onClick,
                 interactionState = remember { InteractionState() },
                 indication = null
             ) as InspectableValue
-            assertThat(modifier.nameFallback).isEqualTo("clickable")
+            assertThat(modifier.nameFallback).isEqualTo("combinedClickable")
             assertThat(modifier.valueOverride).isNull()
             assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
                 "enabled",

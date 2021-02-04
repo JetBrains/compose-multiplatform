@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:Suppress("DEPRECATION_ERROR")
+@file:Suppress("DEPRECATION_ERROR", "DEPRECATION")
 
 package androidx.compose.foundation.text
 
 import androidx.compose.foundation.text.selection.MultiWidgetSelectionDelegate
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.DisposableEffectDisposable
+import androidx.compose.runtime.DisposableEffectResult
 import androidx.compose.runtime.DisposableEffectScope
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,12 +43,12 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.MeasureBlock
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
-import androidx.compose.ui.platform.AmbientDensity
-import androidx.compose.ui.platform.AmbientFontLoader
-import androidx.compose.ui.selection.AmbientSelectionRegistrar
-import androidx.compose.ui.selection.AmbientTextSelectionColors
-import androidx.compose.ui.selection.Selectable
-import androidx.compose.ui.selection.SelectionRegistrar
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFontLoader
+import androidx.compose.foundation.text.selection.LocalSelectionRegistrar
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.Selectable
+import androidx.compose.foundation.text.selection.SelectionRegistrar
 import androidx.compose.ui.semantics.getTextLayoutResult
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
@@ -94,9 +93,9 @@ private typealias InlineContentRange = AnnotatedString.Range<@Composable (String
  * @param onTextLayout Callback that is executed when a new text layout is calculated.
  */
 @Composable
-@InternalTextApi
-@OptIn(ExperimentalTextApi::class)
-fun CoreText(
+@OptIn(ExperimentalTextApi::class, InternalTextApi::class)
+@Suppress("DEPRECATION") // longPressDragGestureFilter
+internal fun CoreText(
     text: AnnotatedString,
     modifier: Modifier = Modifier,
     style: TextStyle,
@@ -109,10 +108,10 @@ fun CoreText(
     require(maxLines > 0) { "maxLines should be greater than 0" }
 
     // selection registrar, if no SelectionContainer is added ambient value will be null
-    val selectionRegistrar = AmbientSelectionRegistrar.current
-    val density = AmbientDensity.current
-    val resourceLoader = AmbientFontLoader.current
-    val selectionBackgroundColor = AmbientTextSelectionColors.current.backgroundColor
+    val selectionRegistrar = LocalSelectionRegistrar.current
+    val density = LocalDensity.current
+    val resourceLoader = LocalFontLoader.current
+    val selectionBackgroundColor = LocalTextSelectionColors.current.backgroundColor
 
     val (placeholders, inlineComposables) = resolveInlineContent(text, inlineContent)
 
@@ -149,7 +148,7 @@ fun CoreText(
 
     Layout(
         content = if (inlineComposables.isEmpty()) {
-            emptyContent()
+            {}
         } else {
             { InlineChildren(text, inlineComposables) }
         },
@@ -328,7 +327,7 @@ private class TextController(val state: TextState) {
         }
     }
 
-    val commit: DisposableEffectScope.() -> DisposableEffectDisposable = {
+    val commit: DisposableEffectScope.() -> DisposableEffectResult = {
         // if no SelectionContainer is added as parent selectionRegistrar will be null
         state.selectable = selectionRegistrar?.let { selectionRegistrar ->
             selectionRegistrar.subscribe(
@@ -454,6 +453,7 @@ private fun resolveInlineContent(
     ExperimentalTextApi::class
 )
 /*@VisibleForTesting*/
+@Suppress("DEPRECATION") // LongPressDragObserver
 internal fun longPressDragObserver(
     state: TextState,
     selectionRegistrar: SelectionRegistrar?

@@ -30,7 +30,7 @@ import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
 import androidx.compose.ui.input.pointer.positionChange
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.IntSize
 import kotlin.math.abs
@@ -57,6 +57,7 @@ import kotlin.math.abs
  * those that are included in the given orientation and does not consider pointers that are locked
  * to other orientations.
  */
+@Deprecated("Use Modifier.pointerInput{ } and awaitTouchSlopOrCancellation function")
 fun Modifier.dragSlopExceededGestureFilter(
     onDragSlopExceeded: () -> Unit,
     canDrag: ((Direction) -> Boolean)? = null,
@@ -69,7 +70,7 @@ fun Modifier.dragSlopExceededGestureFilter(
         properties["orientation"] = orientation
     }
 ) {
-    val touchSlop = with(AmbientDensity.current) { TouchSlop.toPx() }
+    val touchSlop = with(LocalDensity.current) { TouchSlop.toPx() }
     val filter = remember {
         DragSlopExceededGestureFilter(touchSlop)
     }

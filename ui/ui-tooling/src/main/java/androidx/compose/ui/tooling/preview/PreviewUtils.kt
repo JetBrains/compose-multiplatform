@@ -96,7 +96,7 @@ private fun Class<*>.getDefaultValue(): Any? = when (name) {
  */
 private fun Method.invokeComposableMethod(
     instance: Any?,
-    composer: Composer<*>,
+    composer: Composer,
     vararg args: Any?
 ): Any? {
     val composerIndex = parameterTypes.indexOfLast { it == Composer::class.java }
@@ -166,7 +166,7 @@ private fun defaultParamCount(realValueParams: Int): Int {
 internal fun invokeComposableViaReflection(
     className: String,
     methodName: String,
-    composer: Composer<*>,
+    composer: Composer,
     vararg args: Any?
 ) {
     try {

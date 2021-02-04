@@ -43,7 +43,7 @@ class ComponentWithTwoLayoutNodesTestCase : SimpleComponentImplenentationTestCas
             val innerSize = getInnerSize().value
             Canvas(Modifier.preferredSize(innerSize)) {
                 drawOutline(
-                    CircleShape.createOutline(size, this),
+                    CircleShape.createOutline(size, layoutDirection, this),
                     Color.Cyan
                 )
             }

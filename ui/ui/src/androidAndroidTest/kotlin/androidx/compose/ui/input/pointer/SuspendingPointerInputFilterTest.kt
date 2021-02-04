@@ -16,19 +16,19 @@
 
 package androidx.compose.ui.input.pointer
 
+import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.withMutableSnapshot
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
-import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.unit.IntSize
 import androidx.lifecycle.Lifecycle
@@ -52,7 +52,6 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
@@ -231,11 +230,12 @@ class SuspendingPointerInputFilterTest {
     fun testInspectorValue() = runBlocking<Unit> {
         isDebugInspectorInfoEnabled = true
         val block: suspend PointerInputScope.() -> Unit = {}
-        val modifier = Modifier.pointerInput(block) as InspectableValue
+        val modifier = Modifier.pointerInput(Unit, block) as InspectableValue
 
         assertThat(modifier.nameFallback).isEqualTo("pointerInput")
         assertThat(modifier.valueOverride).isNull()
         assertThat(modifier.inspectableElements.asIterable()).containsExactly(
+            ValueElement("key1", Unit),
             ValueElement("block", block)
         )
     }
@@ -243,8 +243,7 @@ class SuspendingPointerInputFilterTest {
     @OptIn(ExperimentalComposeApi::class)
     @Test
     @MediumTest
-    @Ignore // ignored due to a bug b/178013220
-    fun testRestartPointerInput() = runBlocking<Unit> {
+    fun testRestartPointerInput() = runBlocking {
         var toAdd by mutableStateOf("initial")
         val result = mutableListOf<String>()
         val latch = CountDownLatch(2)
@@ -255,7 +254,7 @@ class SuspendingPointerInputFilterTest {
                     // Read the value in composition to change the lambda capture below
                     val toCapture = toAdd
                     Box(
-                        Modifier.pointerInput {
+                        Modifier.pointerInput(toCapture) {
                             result += toCapture
                             latch.countDown()
                             suspendCancellableCoroutine<Unit> {}
@@ -264,10 +263,10 @@ class SuspendingPointerInputFilterTest {
                 }
             }
             scenario.moveToState(Lifecycle.State.STARTED)
-            withMutableSnapshot {
+            Snapshot.withMutableSnapshot {
                 toAdd = "secondary"
             }
-            assertTrue("waiting for relaunch timed out", latch.await(1, TimeUnit.SECONDS))
+            assertTrue("waiting for relaunch timed out", latch.await(3, TimeUnit.SECONDS))
             assertEquals(
                 listOf("initial", "secondary"),
                 result

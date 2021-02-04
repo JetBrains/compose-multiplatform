@@ -41,7 +41,6 @@ dependencies {
         api "androidx.annotation:annotation:1.1.0"
         api project(':compose:animation:animation')
         api project(':compose:runtime:runtime')
-        api project(':compose:runtime:runtime-saved-instance-state')
         api project(':compose:ui:ui')
 
         implementation(KOTLIN_STDLIB_COMMON)
@@ -63,9 +62,11 @@ dependencies {
 
         androidTestImplementation project(":compose:test-utils")
         androidTestImplementation project(":compose:ui:ui-test-font")
+        androidTestImplementation project(":test-screenshot")
         androidTestImplementation(ANDROIDX_TEST_UIAUTOMATOR)
         androidTestImplementation(ANDROIDX_TEST_RULES)
         androidTestImplementation(ANDROIDX_TEST_RUNNER)
+        androidTestImplementation project(":activity:activity-compose")
         androidTestImplementation(ESPRESSO_CORE)
         androidTestImplementation(JUNIT)
         androidTestImplementation(TRUTH)
@@ -92,7 +93,6 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation(KOTLIN_STDLIB_COMMON)
                 api project(':compose:animation:animation')
                 api project(':compose:runtime:runtime')
-                api project(':compose:runtime:runtime-saved-instance-state')
                 api project(':compose:ui:ui')
                 implementation project(":compose:ui:ui-text")
                 implementation project(":compose:ui:ui-util")
@@ -125,6 +125,8 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             androidAndroidTest.dependencies {
                 implementation project(":compose:test-utils")
                 implementation project(":compose:ui:ui-test-font")
+                implementation project(":test-screenshot")
+                implementation project(":activity:activity-compose")
 
                 implementation(ANDROIDX_TEST_UIAUTOMATOR)
                 implementation(ANDROIDX_TEST_RULES)
@@ -154,6 +156,13 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         }
     }
 }
+
+// Screenshot tests related setup
+android {
+    sourceSets.androidTest.assets.srcDirs +=
+            project.rootDir.absolutePath + "/../../golden/compose/foundation/foundation"
+}
+
 androidx {
     name = "Compose Foundation"
     publish = Publish.SNAPSHOT_AND_RELEASE

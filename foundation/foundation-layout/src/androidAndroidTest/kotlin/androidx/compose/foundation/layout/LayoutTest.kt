@@ -22,34 +22,34 @@ import android.os.Looper
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
+import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.layout.AlignmentLine
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.node.Ref
+import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.node.Ref
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.ViewRootForTest
-import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.constrain
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.enforce
-import androidx.compose.ui.unit.hasFixedHeight
-import androidx.compose.ui.unit.hasFixedWidth
 import androidx.compose.ui.unit.isFinite
 import androidx.compose.ui.unit.offset
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
@@ -89,10 +89,16 @@ open class LayoutTest {
     internal fun show(composable: @Composable () -> Unit) {
         val runnable: Runnable = object : Runnable {
             override fun run() {
-                activity.setContent(Recomposer.current(), composable)
+                activity.setContent(content = composable)
             }
         }
         activityTestRule.runOnUiThread(runnable)
+        // Wait for the frame to complete before continuing
+        runBlocking {
+            Recomposer.runningRecomposers.value.forEach { recomposer ->
+                recomposer.state.first { it <= Recomposer.State.Idle }
+            }
+        }
     }
 
     internal fun findComposeView(): View {
@@ -205,7 +211,7 @@ open class LayoutTest {
         modifier: Modifier = Modifier,
         content: @Composable () -> Unit
     ) {
-        with(AmbientDensity.current) {
+        with(LocalDensity.current) {
             val pxConstraints = Constraints(constraints)
             Layout(
                 content,
@@ -228,7 +234,7 @@ open class LayoutTest {
                 }
             ) { measurables, incomingConstraints ->
                 val measurable = measurables.firstOrNull()
-                val childConstraints = Constraints(constraints).enforce(incomingConstraints)
+                val childConstraints = incomingConstraints.constrain(Constraints(constraints))
                 val placeable = measurable?.measure(childConstraints)
 
                 val layoutWidth = placeable?.width ?: childConstraints.minWidth
@@ -287,10 +293,10 @@ open class LayoutTest {
      */
     @Stable
     fun Density.Constraints(dpConstraints: DpConstraints) = Constraints(
-        minWidth = dpConstraints.minWidth.toIntPx(),
-        maxWidth = dpConstraints.maxWidth.toIntPx(),
-        minHeight = dpConstraints.minHeight.toIntPx(),
-        maxHeight = dpConstraints.maxHeight.toIntPx()
+        minWidth = dpConstraints.minWidth.roundToPx(),
+        maxWidth = dpConstraints.maxWidth.roundToPx(),
+        minHeight = dpConstraints.minHeight.roundToPx(),
+        maxHeight = dpConstraints.maxHeight.roundToPx()
     )
 
     internal fun assertEquals(expected: Size?, actual: Size?) {
@@ -366,15 +372,19 @@ open class LayoutTest {
         content: @Composable () -> Unit
     ) {
         Layout(content, modifier) { measurables, incomingConstraints ->
-            val containerConstraints = Constraints(constraints)
-                .copy(
-                    width?.toIntPx() ?: constraints.minWidth.toIntPx(),
-                    width?.toIntPx() ?: constraints.maxWidth.toIntPx(),
-                    height?.toIntPx() ?: constraints.minHeight.toIntPx(),
-                    height?.toIntPx() ?: constraints.maxHeight.toIntPx()
-                ).enforce(incomingConstraints)
-            val totalHorizontal = padding.start.toIntPx() + padding.end.toIntPx()
-            val totalVertical = padding.top.toIntPx() + padding.bottom.toIntPx()
+            val containerConstraints = incomingConstraints.constrain(
+                Constraints(constraints)
+                    .copy(
+                        width?.roundToPx() ?: constraints.minWidth.roundToPx(),
+                        width?.roundToPx() ?: constraints.maxWidth.roundToPx(),
+                        height?.roundToPx() ?: constraints.minHeight.roundToPx(),
+                        height?.roundToPx() ?: constraints.maxHeight.roundToPx()
+                    )
+            )
+            val totalHorizontal = padding.calculateLeftPadding(layoutDirection).roundToPx() +
+                padding.calculateRightPadding(layoutDirection).roundToPx()
+            val totalVertical = padding.calculateTopPadding().roundToPx() +
+                padding.calculateBottomPadding().roundToPx()
             val childConstraints = containerConstraints
                 .copy(minWidth = 0, minHeight = 0)
                 .offset(-totalHorizontal, -totalVertical)
@@ -405,9 +415,9 @@ open class LayoutTest {
                         IntSize(containerWidth, containerHeight),
                         layoutDirection
                     )
-                    it.placeRelative(
-                        padding.start.toIntPx() + position.x,
-                        padding.top.toIntPx() + position.y
+                    it.place(
+                        padding.calculateLeftPadding(layoutDirection).roundToPx() + position.x,
+                        padding.calculateTopPadding().roundToPx() + position.y
                     )
                 }
             }

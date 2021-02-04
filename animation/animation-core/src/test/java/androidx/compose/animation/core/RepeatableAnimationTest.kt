@@ -51,8 +51,8 @@ class RepeatableAnimationTest {
         assertThat(repeat.at(Duration + 1)).isLessThan(0.1f)
         assertThat(repeat.at(Duration * 2 - 1)).isGreaterThan(0.9f)
         assertThat(repeat.at(Duration * 2)).isEqualTo(1f)
-        assertThat(animationWrapper.isFinished(Duration * 2L - 1L)).isFalse()
-        assertThat(animationWrapper.isFinished(Duration * 2L)).isTrue()
+        assertThat(animationWrapper.isFinishedFromMillis(Duration * 2L - 1L)).isFalse()
+        assertThat(animationWrapper.isFinishedFromMillis(Duration * 2L)).isTrue()
     }
 
     @Test
@@ -90,18 +90,18 @@ class RepeatableAnimationTest {
         )
 
         for (playtime in 0..100L) {
-            assertEquals(playtime.toFloat(), repeatAnim.getValue(playtime), 0.01f)
+            assertEquals(playtime.toFloat(), repeatAnim.getValueFromMillis(playtime), 0.01f)
         }
         for (playtime in 100..200L) {
-            assertEquals(200f - playtime.toFloat(), repeatAnim.getValue(playtime), 0.01f)
+            assertEquals(200f - playtime.toFloat(), repeatAnim.getValueFromMillis(playtime), 0.01f)
         }
-        assertEquals(100f, repeatAnim.getValue(100))
-        assertEquals(99f, repeatAnim.getValue(101))
-        assertEquals(0f, repeatAnim.getValue(200))
-        assertEquals(100f, repeatAnim.getValue(300))
-        assertEquals(80f, repeatAnim.getValue(880))
-        assertEquals(100f, repeatAnim.getValue(900))
-        assertEquals(100f, repeatAnim.getValue(901))
+        assertEquals(100f, repeatAnim.getValueFromMillis(100))
+        assertEquals(99f, repeatAnim.getValueFromMillis(101))
+        assertEquals(0f, repeatAnim.getValueFromMillis(200))
+        assertEquals(100f, repeatAnim.getValueFromMillis(300))
+        assertEquals(80f, repeatAnim.getValueFromMillis(880))
+        assertEquals(100f, repeatAnim.getValueFromMillis(900))
+        assertEquals(100f, repeatAnim.getValueFromMillis(901))
     }
 
     @Test

@@ -17,6 +17,7 @@
 package androidx.compose.compiler.plugins.kotlin
 
 import androidx.compose.compiler.plugins.kotlin.lower.dumpSrc
+import org.intellij.lang.annotations.Language
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContextImpl
@@ -120,7 +121,9 @@ abstract class AbstractIrTransformTest : AbstractCodegenTest() {
     )
 
     fun verifyCrossModuleComposeIrTransform(
+        @Language("kotlin")
         dependencySource: String,
+        @Language("kotlin")
         source: String,
         expectedTransformed: String,
         dumpTree: Boolean = false,
@@ -155,6 +158,7 @@ abstract class AbstractIrTransformTest : AbstractCodegenTest() {
     }
 
     fun verifyComposeIrTransform(
+        @Language("kotlin")
         source: String,
         expectedTransformed: String,
         extra: String = "",
@@ -220,13 +224,16 @@ abstract class AbstractIrTransformTest : AbstractCodegenTest() {
             ) {
                 "${it.groupValues[1]}<>"
             }
-            // composableLambdaInstance(<>, true)
+            // composableLambdaInstance(<>, true, )
             .replace(
                 Regex(
-                    "(composableLambdaInstance\\()([-\\d]+)"
+                    "(composableLambdaInstance\\()([-\\d]+, (true|false), (null|\"(.*)\")\\))"
                 )
             ) {
-                "${it.groupValues[1]}<>"
+                val callStart = it.groupValues[1]
+                val tracked = it.groupValues[3]
+                val sourceInfo = it.groupValues[5]
+                "$callStart<>, $tracked, \"${generateSourceInfo(sourceInfo, source)}\")"
             }
             // composableLambda(%composer, <>, true)
             .replace(

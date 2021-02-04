@@ -52,6 +52,15 @@ import kotlinx.coroutines.launch
  * to interoperate well with forthcoming behavior related to disambiguation between multi-tap
  * (double tap, triple tap) and tap.
  */
+@Deprecated(
+    "Gesture filters are deprecated. Use Modifier.clickable or Modifier.pointerInput and " +
+        "detectTapGestures instead",
+    replaceWith = ReplaceWith(
+        """pointerInput { detectTapGestures(onLongPress = onLongPress) }""",
+        "androidx.compose.ui.input.pointer.pointerInput",
+        "androidx.compose.foundation.gestures.detectTapGestures"
+    )
+)
 fun Modifier.longPressGestureFilter(
     onLongPress: (Offset) -> Unit
 ): Modifier = composed(

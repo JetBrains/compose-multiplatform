@@ -48,13 +48,14 @@ import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import javax.swing.JButton
 import javax.swing.JFrame
+import javax.swing.SwingUtilities
 import javax.swing.WindowConstants
 
 val northClicks = mutableStateOf(0)
 val westClicks = mutableStateOf(0)
 val eastClicks = mutableStateOf(0)
 
-fun main() {
+fun main() = SwingUtilities.invokeLater {
     // explicitly clear the application events
     AppManager.setEvents(
         onAppStart = null,

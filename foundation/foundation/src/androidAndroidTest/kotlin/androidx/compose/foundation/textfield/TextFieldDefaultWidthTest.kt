@@ -25,7 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -89,7 +89,7 @@ class BaseTextFieldDefaultWidthTest {
         }
 
         with(density) {
-            assertThat(size).isEqualTo(minWidth.toIntPx())
+            assertThat(size).isEqualTo(minWidth.roundToPx())
         }
     }
 
@@ -111,7 +111,7 @@ class BaseTextFieldDefaultWidthTest {
         }
 
         with(density) {
-            assertThat(size).isEqualTo(width.toIntPx())
+            assertThat(size).isEqualTo(width.roundToPx())
         }
     }
 
@@ -168,7 +168,7 @@ class BaseTextFieldDefaultWidthTest {
         }
 
         with(density) {
-            assertThat(size).isEqualTo(textFieldWidth.toIntPx())
+            assertThat(size).isEqualTo(textFieldWidth.roundToPx())
         }
     }
 
@@ -194,7 +194,7 @@ private fun DefaultWidthTextField(
         style = FontStyle.Normal
     )
 
-    Providers(AmbientDensity provides density) {
+    Providers(LocalDensity provides density) {
         androidx.compose.foundation.layout.Box {
             BasicTextField(
                 value = text,

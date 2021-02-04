@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.blinkingCursorEnabled
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.testutils.assertPixels
@@ -33,13 +32,11 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextReplacement
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
@@ -47,24 +44,15 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
 @LargeTest
-@OptIn(ExperimentalTestApi::class)
 class TextFieldCursorTest {
 
     @get:Rule
     val rule = createComposeRule().also {
         it.mainClock.autoAdvance = false
-    }
-
-    @Before
-    fun enableBlinkingCursor() {
-        @Suppress("DEPRECATION_ERROR")
-        @OptIn(InternalTextApi::class)
-        blinkingCursorEnabled = true
     }
 
     @Test
@@ -245,7 +233,7 @@ class TextFieldCursorTest {
     }
 
     private fun ImageBitmap.assertCursor(cursorWidth: Dp, density: Density) {
-        val cursorWidthPx = (with(density) { cursorWidth.toIntPx() })
+        val cursorWidthPx = (with(density) { cursorWidth.roundToPx() })
         val width = width
         val height = height
         this.assertPixels(

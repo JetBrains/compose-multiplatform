@@ -16,8 +16,8 @@
 
 package androidx.compose.integration.macrobenchmark
 
-import androidx.benchmark.macro.MacrobenchmarkRule
 import androidx.benchmark.macro.StartupMode
+import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.test.filters.LargeTest
 import org.junit.Rule
 import org.junit.Test

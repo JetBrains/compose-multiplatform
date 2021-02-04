@@ -19,9 +19,9 @@ package androidx.compose.ui.input.pointer
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.emptyContent
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
@@ -29,8 +29,7 @@ import androidx.compose.ui.gesture.MotionEvent
 import androidx.compose.ui.gesture.PointerCoords
 import androidx.compose.ui.gesture.PointerProperties
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.platform.AmbientDensity
-import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.runOnUiThreadIR
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.unit.IntSize
@@ -224,7 +223,7 @@ class ClipPointerInputTest {
         rule.runOnUiThreadIR {
             activity.setContent {
 
-                with(AmbientDensity.current) {
+                with(LocalDensity.current) {
 
                     val children = @Composable {
                         Child(Modifier.offset((-1f).toDp(), (-1f).toDp()).then(loggingPim1))
@@ -316,7 +315,7 @@ class ClipPointerInputTest {
 
     @Composable
     fun Child(modifier: Modifier) {
-        Layout(content = emptyContent(), modifier = modifier) { _, _ ->
+        Layout(content = {}, modifier = modifier) { _, _ ->
             layout(2, 2) {}
         }
     }

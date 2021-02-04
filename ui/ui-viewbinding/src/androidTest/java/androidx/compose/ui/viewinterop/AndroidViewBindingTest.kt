@@ -25,7 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -58,7 +58,7 @@ class AndroidViewBindingTest {
         }
 
         val size = 50.dp
-        val sizePx = with(rule.density) { size.toIntPx() }
+        val sizePx = with(rule.density) { size.roundToPx() }
         rule.onNodeWithTag("layout").captureToImage().assertPixels(IntSize(sizePx, sizePx * 2)) {
             if (it.y < sizePx) Color.Blue else Color.Black
         }
@@ -75,7 +75,7 @@ class AndroidViewBindingTest {
         }
 
         val size = 50.dp
-        val sizePx = with(rule.density) { size.toIntPx() }
+        val sizePx = with(rule.density) { size.roundToPx() }
         rule.onNodeWithTag("layout").captureToImage()
             .assertPixels(IntSize(sizePx, sizePx * 2)) {
                 if (it.y < sizePx) Color.Blue else color.value
@@ -93,8 +93,8 @@ class AndroidViewBindingTest {
         rule.setContent {
             val size = 50.dp
             val density = Density(3f)
-            val sizeIpx = with(density) { size.toIntPx() }
-            Providers(AmbientDensity provides density) {
+            val sizeIpx = with(density) { size.roundToPx() }
+            Providers(LocalDensity provides density) {
                 AndroidViewBinding(
                     TestLayoutBinding::inflate,
                     Modifier.size(size).onGloballyPositioned {

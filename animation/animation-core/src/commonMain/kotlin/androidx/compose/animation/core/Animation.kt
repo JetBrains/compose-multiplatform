@@ -27,18 +27,19 @@ package androidx.compose.animation.core
  *
  * __Note__: [Animation] does not track the lifecycle of an animation. It merely reacts to play time
  * change and returns the new value/velocity as a result. It can be used as a building block for
- * more lifecycle aware animations. In contrast, [Animatable] and [TransitionAnimation] are
+ * more lifecycle aware animations. In contrast, [Animatable] and [Transition] are
  * stateful and manage their own lifecycles, and subscribe/unsubscribe from an
  * [AnimationClockObservable] as needed.
  *
  * @see [Animatable]
- * @see [androidx.compose.animation.transition]
+ * @see [updateTransition]
  */
 interface Animation<T, V : AnimationVector> {
     /**
-     * This amount of time in milliseconds that the animation will run before it finishes
+     * This amount of time in nanoseconds that the animation will run before it finishes
      */
-    val durationMillis: Long
+    @get:Suppress("MethodNameUnits")
+    val durationNanos: Long
 
     /**
      * The [TwoWayConverter] that will be used to convert value/velocity from any arbitrary data
@@ -47,47 +48,54 @@ interface Animation<T, V : AnimationVector> {
      */
     val typeConverter: TwoWayConverter<T, V>
 
-    @Deprecated("Renamed to typeConverter", ReplaceWith("typeConverter"))
-    val converter: TwoWayConverter<T, V>
-        get() = typeConverter
-
     /**
      * This is the value that the [Animation] will reach when it finishes uninterrupted.
      */
     val targetValue: T
 
     /**
+     * Whether or not the [Animation] represents an infinite animation. That is, one that will
+     * not finish by itself, one that needs an external action to stop. For examples, an
+     * indeterminate progress bar, which will only stop when it is removed from the composition.
+     */
+    val isInfinite: Boolean
+
+    /**
      * Returns the value of the animation at the given play time.
      *
-     * @param playTime the play time that is used to determine the value of the animation.
+     * @param playTimeNanos the play time that is used to determine the value of the animation.
      */
-    fun getValue(playTime: Long): T
+    fun getValueFromNanos(playTimeNanos: Long): T
 
     /**
      * Returns the velocity (in [AnimationVector] form) of the animation at the given play time.
      *
-     * @param playTime the play time that is used to calculate the velocity of the animation.
+     * @param playTimeNanos the play time that is used to calculate the velocity of the animation.
      */
-    fun getVelocityVector(playTime: Long): V
+    fun getVelocityVectorFromNanos(playTimeNanos: Long): V
 
     /**
      * Returns whether the animation is finished at the given play time.
      *
-     * @param playTime the play time used to determine whether the animation is finished.
+     * @param playTimeNanos the play time used to determine whether the animation is finished.
      */
-    fun isFinished(playTime: Long): Boolean {
-        return playTime >= durationMillis
+    fun isFinishedFromNanos(playTimeNanos: Long): Boolean {
+        return playTimeNanos >= durationNanos
     }
 }
+
+internal val Animation<*, *>.durationMillis: Long
+    get() = durationNanos / MillisToNanos
+
+internal const val MillisToNanos: Long = 1_000_000L
 
 /**
  * Returns the velocity of the animation at the given play time.
  *
- * @param playTime the play time that is used to calculate the velocity of the animation.
+ * @param playTimeNanos the play time that is used to calculate the velocity of the animation.
  */
-fun <T, V : AnimationVector> Animation<T, V>.getVelocity(playTime: Long): T =
-    typeConverter.convertFromVector(getVelocityVector(playTime))
-
+fun <T, V : AnimationVector> Animation<T, V>.getVelocityFromNanos(playTimeNanos: Long): T =
+    typeConverter.convertFromVector(getVelocityVectorFromNanos(playTimeNanos))
 /**
  * Creates a [TargetBasedAnimation] from a given [VectorizedAnimationSpec] of [AnimationVector] type. This
  * convenient method is intended for when the value being animated (i.e. start value, end value,
@@ -124,7 +132,7 @@ fun <V : AnimationVector> VectorizedAnimationSpec<V>.createAnimation(
  * __Note__: When interruptions happen to the [TargetBasedAnimation], a new instance should
  * be created that use the current value and velocity as the starting conditions. This type of
  * interruption handling is the default behavior for both [Animatable] and
- * [TransitionAnimation]. Consider using those APIs for the interruption handling, as well as
+ * [Transition]. Consider using those APIs for the interruption handling, as well as
  * built-in animation lifecycle management.
  *
  * @param animationSpec the [AnimationSpec] that will be used to calculate value/velocity
@@ -158,7 +166,7 @@ fun <T, V : AnimationVector> TargetBasedAnimation(
  * __Note__: When interruptions happen to the [TargetBasedAnimation], a new instance should
  * be created that use the current value and velocity as the starting conditions. This type of
  * interruption handling is the default behavior for both [Animatable] and
- * [TransitionAnimation]. Consider using those APIs for the interruption handling, as well as
+ * [Transition]. Consider using those APIs for the interruption handling, as well as
  * built-in animation lifecycle management.
  *
  * @param animationSpec the [VectorizedAnimationSpec] that will be used to calculate value/velocity
@@ -167,8 +175,8 @@ fun <T, V : AnimationVector> TargetBasedAnimation(
  * @param typeConverter the [TwoWayConverter] that is used to convert animation type [T] from/to [V]
  * @param initialVelocityVector the start velocity of the animation in the form of [AnimationVector]
  *
- * @see [TransitionAnimation]
- * @see [androidx.compose.animation.transition]
+ * @see [Transition]
+ * @see [updateTransition]
  * @see [Animatable]
  */
 class TargetBasedAnimation<T, V : AnimationVector> internal constructor(
@@ -191,7 +199,7 @@ class TargetBasedAnimation<T, V : AnimationVector> internal constructor(
      * __Note__: When interruptions happen to the [TargetBasedAnimation], a new instance should
      * be created that use the current value and velocity as the starting conditions. This type of
      * interruption handling is the default behavior for both [Animatable] and
-     * [TransitionAnimation]. Consider using those APIs for the interruption handling, as well as
+     * [Transition]. Consider using those APIs for the interruption handling, as well as
      * built-in animation lifecycle management.
      *
      * @param animationSpec the [AnimationSpec] that will be used to calculate value/velocity
@@ -220,11 +228,12 @@ class TargetBasedAnimation<T, V : AnimationVector> internal constructor(
         initialVelocityVector?.copy() ?: typeConverter.convertToVector(initialValue)
             .newInstance()
 
-    override fun getValue(playTime: Long): T {
-        return if (playTime < durationMillis) {
+    override val isInfinite: Boolean get() = animationSpec.isInfinite
+    override fun getValueFromNanos(playTimeNanos: Long): T {
+        return if (!isFinishedFromNanos(playTimeNanos)) {
             typeConverter.convertFromVector(
-                animationSpec.getValue(
-                    playTime, initialValueVector,
+                animationSpec.getValueFromNanos(
+                    playTimeNanos, initialValueVector,
                     targetValueVector, initialVelocityVector
                 )
             )
@@ -233,10 +242,11 @@ class TargetBasedAnimation<T, V : AnimationVector> internal constructor(
         }
     }
 
-    override val durationMillis: Long = animationSpec.getDurationMillis(
-        start = initialValueVector,
-        end = targetValueVector,
-        startVelocity = this.initialVelocityVector
+    @get:Suppress("MethodNameUnits")
+    override val durationNanos: Long = animationSpec.getDurationNanos(
+        initialValue = initialValueVector,
+        targetValue = targetValueVector,
+        initialVelocity = this.initialVelocityVector
     )
 
     private val endVelocity = animationSpec.getEndVelocity(
@@ -245,10 +255,10 @@ class TargetBasedAnimation<T, V : AnimationVector> internal constructor(
         this.initialVelocityVector
     )
 
-    override fun getVelocityVector(playTime: Long): V {
-        return if (playTime < durationMillis) {
-            animationSpec.getVelocity(
-                playTime,
+    override fun getVelocityVectorFromNanos(playTimeNanos: Long): V {
+        return if (!isFinishedFromNanos(playTimeNanos)) {
+            animationSpec.getVelocityFromNanos(
+                playTimeNanos,
                 initialValueVector,
                 targetValueVector,
                 initialVelocityVector
@@ -284,9 +294,13 @@ class DecayAnimation<T, V : AnimationVector> /*@VisibleForTesting*/ constructor(
     private val endVelocity: V
 
     override val targetValue: T = typeConverter.convertFromVector(
-        animationSpec.getTarget(initialValueVector, initialVelocityVector)
+        animationSpec.getTargetValue(initialValueVector, initialVelocityVector)
     )
-    override val durationMillis: Long
+    @get:Suppress("MethodNameUnits")
+    override val durationNanos: Long
+
+    // DecayAnimation finishes by design
+    override val isInfinite: Boolean = false
 
     /**
      * [DecayAnimation] is an animation that slows down from [initialVelocityVector] as time goes
@@ -351,11 +365,11 @@ class DecayAnimation<T, V : AnimationVector> /*@VisibleForTesting*/ constructor(
     )
 
     init {
-        durationMillis = animationSpec.getDurationMillis(
+        durationNanos = animationSpec.getDurationNanos(
             initialValueVector, initialVelocityVector
         )
-        endVelocity = animationSpec.getVelocity(
-            durationMillis,
+        endVelocity = animationSpec.getVelocityFromNanos(
+            durationNanos,
             initialValueVector,
             initialVelocityVector
         ).copy()
@@ -367,19 +381,27 @@ class DecayAnimation<T, V : AnimationVector> /*@VisibleForTesting*/ constructor(
         }
     }
 
-    override fun getValue(playTime: Long): T {
-        if (!isFinished(playTime)) {
+    override fun getValueFromNanos(playTimeNanos: Long): T {
+        if (!isFinishedFromNanos(playTimeNanos)) {
             return typeConverter.convertFromVector(
-                animationSpec.getValue(playTime, initialValueVector, initialVelocityVector)
+                animationSpec.getValueFromNanos(
+                    playTimeNanos,
+                    initialValueVector,
+                    initialVelocityVector
+                )
             )
         } else {
             return targetValue
         }
     }
 
-    override fun getVelocityVector(playTime: Long): V {
-        if (!isFinished(playTime)) {
-            return animationSpec.getVelocity(playTime, initialValueVector, initialVelocityVector)
+    override fun getVelocityVectorFromNanos(playTimeNanos: Long): V {
+        if (!isFinishedFromNanos(playTimeNanos)) {
+            return animationSpec.getVelocityFromNanos(
+                playTimeNanos,
+                initialValueVector,
+                initialVelocityVector
+            )
         } else {
             return endVelocity
         }

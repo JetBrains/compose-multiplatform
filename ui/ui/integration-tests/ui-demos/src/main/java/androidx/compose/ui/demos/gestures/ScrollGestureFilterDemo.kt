@@ -17,6 +17,8 @@
 package androidx.compose.ui.demos.gestures
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.rememberScrollableController
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,17 +27,13 @@ import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.ScrollCallback
-import androidx.compose.ui.gesture.scrollGestureFilter
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -65,35 +63,15 @@ fun ScrollableBox(
     orientation: Orientation,
     activeColor: Color,
     idleColor: Color,
-    content: @Composable () -> Unit = emptyContent()
+    content: @Composable () -> Unit = {}
 ) {
 
     val color = remember { mutableStateOf(idleColor) }
     val offsetPx = remember { mutableStateOf(0f) }
 
-    val offsetDp = with(AmbientDensity.current) {
+    val offsetDp = with(LocalDensity.current) {
         offsetPx.value.toDp()
     }
-
-    val scrollCallback: ScrollCallback = object : ScrollCallback {
-        override fun onStart(downPosition: Offset) {
-            color.value = activeColor
-        }
-
-        override fun onScroll(scrollDistance: Float): Float {
-            offsetPx.value += scrollDistance
-            return scrollDistance
-        }
-
-        override fun onStop(velocity: Float) {
-            color.value = idleColor
-        }
-
-        override fun onCancel() {
-            color.value = idleColor
-        }
-    }
-
     val (offsetX, offsetY) = when (orientation) {
         Orientation.Horizontal -> offsetDp to Dp.Hairline
         Orientation.Vertical -> Dp.Hairline to offsetDp
@@ -103,7 +81,19 @@ fun ScrollableBox(
         Modifier.offset(offsetX, offsetY)
             .fillMaxSize()
             .wrapContentSize(Alignment.Center)
-            .scrollGestureFilter(scrollCallback, orientation)
+            .scrollable(
+                orientation = orientation,
+                onScrollStarted = {
+                    color.value = activeColor
+                },
+                onScrollStopped = {
+                    color.value = idleColor
+                },
+                controller = rememberScrollableController { scrollDistance ->
+                    offsetPx.value += scrollDistance
+                    scrollDistance
+                }
+            )
             .preferredSize(size)
             .background(color.value)
     ) {

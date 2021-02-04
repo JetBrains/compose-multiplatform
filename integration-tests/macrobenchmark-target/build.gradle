@@ -26,6 +26,7 @@ dependencies {
     implementation project(":compose:runtime:runtime")
     implementation project(":compose:ui:ui")
     implementation project(":compose:ui:ui-tooling")
+    implementation project(":activity:activity-compose")
 }
 
 android.defaultConfig.minSdkVersion 21

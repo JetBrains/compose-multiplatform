@@ -1956,17 +1956,18 @@ class CompositionTests {
         var innerScope: RecomposeScope? = null
 
         @Composable
+        @OptIn(ComposeCompilerApi::class)
         fun Test() {
             outerScope = currentRecomposeScope
-            outerKeys.add(currentComposer.currentCompoundKeyHash)
+            outerKeys.add(currentComposer.compoundKeyHash)
             Container {
                 Linear {
                     innerScope = currentRecomposeScope
-                    innerKeys.add(currentComposer.currentCompoundKeyHash)
+                    innerKeys.add(currentComposer.compoundKeyHash)
                 }
             }
             // asserts that the key is correctly rolled back after start and end of Observe
-            assertEquals(outerKeys.last(), currentComposer.currentCompoundKeyHash)
+            assertEquals(outerKeys.last(), currentComposer.compoundKeyHash)
         }
 
         compose {
@@ -2496,11 +2497,11 @@ class CompositionTests {
             }
 
             // Memo to future self:
-            // Without the explicit generic definition of CompositionLifecycleObserver here,
-            // the type of this remember call is inferred to be `Unit` thanks to the call's position
-            // as the last expression in a unit lambda (the argument to `compose {}`). The remember
-            // lambda is in turn interpreted as returning Unit, the object expression is dropped
-            // on the floor for the gc, and Unit is written into the slot table.
+            // Without the explicit generic definition of RememberObserver here, the type of this
+            // remember call is inferred to be `Unit` thanks to the call's position as the last
+            // expression in a unit lambda (the argument to `compose {}`). The remember lambda is in
+            // turn interpreted as returning Unit, the object expression is dropped on the floor for
+            // the gc, and Unit is written into the slot table.
             remember<RememberObserver> {
                 object : RememberObserver {
                     override fun onRemembered() {
@@ -2607,6 +2608,40 @@ class CompositionTests {
         validate()
     }
 
+    @Test
+    fun testModificationsPropagateToSubcomposition() = compositionTest {
+        var value by mutableStateOf(0)
+        val content: MutableState<@Composable () -> Unit> = mutableStateOf({ })
+        @Suppress("VARIABLE_WITH_REDUNDANT_INITIALIZER")
+        var subCompositionOccurred = false
+
+        @Composable
+        fun ComposeContent() {
+            content.value()
+        }
+
+        fun updateContent(parentValue: Int) {
+            content.value = {
+                subCompositionOccurred = true
+                assertEquals(parentValue, value)
+            }
+        }
+
+        compose {
+            updateContent(value)
+            TestSubcomposition {
+                ComposeContent()
+            }
+        }
+
+        subCompositionOccurred = false
+
+        value = 10
+        expectChanges()
+
+        assertTrue(subCompositionOccurred)
+    }
+
     /**
      * This test checks that an updated ComposableLambda capture used in a subcomposition
      * correctly invalidates that subcomposition and schedules recomposition of that subcomposition.
@@ -2615,43 +2650,42 @@ class CompositionTests {
     @Test
     fun testComposableLambdaSubcompositionInvalidation() = runBlockingTest {
         localRecomposerTest { recomposer ->
-            val composer = Composer(EmptyApplier(), recomposer)
+            val composition = ControlledComposition(EmptyApplier(), recomposer)
             try {
                 var rootState by mutableStateOf(false)
                 val composedResults = mutableListOf<Boolean>()
                 Snapshot.notifyObjectsInitialized()
-                recomposer.composeInitial(composer) {
+                recomposer.composeInitial(composition) {
                     // Read into local variable, local will be captured below
                     val capturedValue = rootState
                     TestSubcomposition {
                         composedResults.add(capturedValue)
                     }
                 }
-                composer.applyChanges()
+                composition.applyChanges()
                 assertEquals(listOf(false), composedResults)
                 rootState = true
                 Snapshot.sendApplyNotifications()
                 advanceUntilIdle()
                 assertEquals(listOf(false, true), composedResults)
             } finally {
-                composer.dispose()
+                composition.dispose()
             }
         }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun testCompositionReferenceIsRemembered() = runBlockingTest {
+    fun testCompositionContextIsRemembered() = runBlockingTest {
         localRecomposerTest { recomposer ->
-            val composer = Composer(EmptyApplier(), recomposer)
+            val composition = Composition(EmptyApplier(), recomposer)
             try {
                 lateinit var scope: RecomposeScope
-                val parentReferences = mutableListOf<CompositionReference>()
-                recomposer.composeInitial(composer) {
+                val parentReferences = mutableListOf<CompositionContext>()
+                composition.setContent {
                     scope = currentRecomposeScope
-                    parentReferences += rememberCompositionReference()
+                    parentReferences += rememberCompositionContext()
                 }
-                composer.applyChanges()
                 scope.invalidate()
                 advanceUntilIdle()
                 assert(parentReferences.size > 1) { "expected to be composed more than once" }
@@ -2659,7 +2693,7 @@ class CompositionTests {
                     "expected all parentReferences to be the same; saw $parentReferences"
                 }
             } finally {
-                composer.dispose()
+                composition.dispose()
             }
         }
     }
@@ -2668,13 +2702,13 @@ class CompositionTests {
     @Test
     fun testParentCompositionRecomposesFirst() = runBlockingTest {
         localRecomposerTest { recomposer ->
-            val composer = Composer(EmptyApplier(), recomposer)
+            val composition = Composition(EmptyApplier(), recomposer)
             val results = mutableListOf<String>()
             try {
                 var firstState by mutableStateOf("firstInitial")
                 var secondState by mutableStateOf("secondInitial")
                 Snapshot.notifyObjectsInitialized()
-                recomposer.composeInitial(composer) {
+                composition.setContent {
                     results += firstState
                     TestSubcomposition {
                         results += secondState
@@ -2691,7 +2725,7 @@ class CompositionTests {
                     "Expected call ordering during recomposition of subcompositions"
                 )
             } finally {
-                composer.dispose()
+                composition.dispose()
             }
         }
     }
@@ -2742,9 +2776,9 @@ class CompositionTests {
             var compositionCount = 0
             Snapshot.notifyObjectsInitialized()
             val applier = MutateOnRemoveApplier(stateMutatedOnRemove)
-            val composer = Composer(applier, recomposer)
+            val composition = Composition(applier, recomposer)
             try {
-                recomposer.composeInitial(composer) {
+                composition.setContent {
                     compositionCount++
                     // Read the state here so that the emit removal will invalidate it
                     stateMutatedOnRemove.value
@@ -2769,7 +2803,7 @@ class CompositionTests {
                 advanceUntilIdle()
                 assertEquals(3, compositionCount, "expected number of (re)compositions performed")
             } finally {
-                composer.dispose()
+                composition.dispose()
             }
         }
     }
@@ -2780,16 +2814,16 @@ class CompositionTests {
 private fun TestSubcomposition(
     content: @Composable () -> Unit
 ) {
-    val parentRef = rememberCompositionReference()
+    val parentRef = rememberCompositionContext()
     val currentContent by rememberUpdatedState(content)
     DisposableEffect(parentRef) {
-        val subcomposer = Composer(EmptyApplier(), parentRef)
-        parentRef.composeInitial(subcomposer) {
+        val subcomposition = ControlledComposition(EmptyApplier(), parentRef)
+        parentRef.composeInitial(subcomposition) {
             currentContent()
         }
-        subcomposer.applyChanges()
+        subcomposition.applyChanges()
         onDispose {
-            subcomposer.dispose()
+            subcomposition.dispose()
         }
     }
 }
@@ -2806,7 +2840,7 @@ private suspend fun <R> localRecomposerTest(
     block(recomposer)
     // This call doesn't need to be in a finally; everything it does will be torn down
     // in exceptional cases by the coroutineScope failure
-    recomposer.shutDown()
+    recomposer.cancel()
 }
 
 @Composable fun Wrap(content: @Composable () -> Unit) {

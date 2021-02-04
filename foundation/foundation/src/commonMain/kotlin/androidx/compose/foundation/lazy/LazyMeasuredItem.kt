@@ -38,7 +38,8 @@ internal class LazyMeasuredItem(
      * Extra spacing to be added to [size] aside from the sum of the [placeables] size. It
      * is usually representing the spacing after the item.
      */
-    private val spacing: Int
+    private val spacing: Int,
+    override val key: Any
 ) : LazyListItemInfo {
     /**
      * Sum of the main axis sizes of all the inner placeables.

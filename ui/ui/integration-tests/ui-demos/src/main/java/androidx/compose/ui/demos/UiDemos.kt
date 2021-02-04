@@ -29,7 +29,6 @@ import androidx.compose.ui.demos.gestures.LongPressDragGestureFilterDemo
 import androidx.compose.ui.demos.gestures.LongPressGestureDetectorDemo
 import androidx.compose.ui.demos.gestures.NestedLongPressDemo
 import androidx.compose.ui.demos.gestures.NestedPressingDemo
-import androidx.compose.ui.demos.gestures.NestedScalingDemo
 import androidx.compose.ui.demos.gestures.NestedScrollingDemo
 import androidx.compose.ui.demos.gestures.PointerInputDuringSubComp
 import androidx.compose.ui.demos.gestures.PopupDragDemo
@@ -37,7 +36,7 @@ import androidx.compose.ui.demos.gestures.PressIndicatorGestureFilterDemo
 import androidx.compose.ui.demos.gestures.RawDragGestureFilterDemo
 import androidx.compose.ui.demos.gestures.ScaleGestureFilterDemo
 import androidx.compose.ui.demos.gestures.ScrollGestureFilterDemo
-import androidx.compose.ui.demos.gestures.TapGestureFilterDemo
+import androidx.compose.ui.demos.gestures.DetectTapGesturesDemo
 import androidx.compose.ui.demos.gestures.VerticalScrollerInDrawerDemo
 import androidx.compose.ui.demos.keyinput.KeyInputDemo
 import androidx.compose.ui.demos.viewinterop.ViewInteropDemo
@@ -56,7 +55,7 @@ private val GestureDemos = DemoCategory(
             "Common Gestures",
             listOf(
                 ComposableDemo("Press Indication") { PressIndicatorGestureFilterDemo() },
-                ComposableDemo("Tap") { TapGestureFilterDemo() },
+                ComposableDemo("Tap") { DetectTapGesturesDemo() },
                 ComposableDemo("Double Tap") { DoubleTapGestureFilterDemo() },
                 ComposableDemo("Long Press") { LongPressGestureDetectorDemo() },
                 ComposableDemo("Scroll") { ScrollGestureFilterDemo() },
@@ -83,7 +82,6 @@ private val GestureDemos = DemoCategory(
                     VerticalScrollerInDrawerDemo()
                 },
                 ComposableDemo("Nested Scrolling") { NestedScrollingDemo() },
-                ComposableDemo("Nested Scaling") { NestedScalingDemo() },
                 ComposableDemo("Drag and Scale") { DragAndScaleGestureFilterDemo() },
                 ComposableDemo("Popup Drag") { PopupDragDemo() },
                 ComposableDemo("Double Tap in Tap") { DoubleTapInTapDemo() },
@@ -126,7 +124,6 @@ val CoreDemos = DemoCategory(
         ComposableDemo("Popup") { PopupDemo() },
         GraphicsDemos,
         GestureDemos,
-        ComposableDemo("Views interoperability") { ViewInteropDemo() },
-        ComposableDemo("ViewModel") { ViewModelDemo() }
+        ComposableDemo("Views interoperability") { ViewInteropDemo() }
     )
 )

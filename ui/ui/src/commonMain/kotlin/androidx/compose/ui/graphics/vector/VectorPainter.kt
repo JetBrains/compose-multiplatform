@@ -22,7 +22,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCompositionReference
+import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
@@ -30,7 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 
 /**
@@ -66,7 +66,7 @@ fun rememberVectorPainter(
     tintBlendMode: BlendMode = BlendMode.SrcIn,
     content: @Composable (viewportWidth: Float, viewportHeight: Float) -> Unit
 ): VectorPainter {
-    val density = AmbientDensity.current
+    val density = LocalDensity.current
     val widthPx = with(density) { defaultWidth.toPx() }
     val heightPx = with(density) { defaultHeight.toPx() }
 
@@ -84,82 +84,13 @@ fun rememberVectorPainter(
         // vector itself. Note this tint can be overridden by an explicit ColorFilter
         // provided on the Modifier.paint call
         painter.intrinsicColorFilter = if (tintColor != Color.Unspecified) {
-            ColorFilter(tintColor, tintBlendMode)
+            ColorFilter.tint(tintColor, tintBlendMode)
         } else {
             null
         }
     }
     return painter
 }
-
-/**
- * Create a [VectorPainter] with the Vector defined by the provided
- * sub-composition
- *
- * @param [defaultWidth] Intrinsic width of the Vector in [Dp]
- * @param [defaultHeight] Intrinsic height of the Vector in [Dp]
- * @param [viewportWidth] Width of the viewport space. The viewport is the virtual canvas where
- * paths are drawn on.
- *  This parameter is optional. Not providing it will use the [defaultWidth] converted to pixels
- * @param [viewportHeight] Height of the viewport space. The viewport is the virtual canvas where
- * paths are drawn on.
- *  This parameter is optional. Not providing it will use the [defaultHeight] converted to pixels
- * @param [name] optional identifier used to identify the root of this vector graphic
- * @param [children] Composable used to define the structure and contents of the vector graphic
- */
-@Suppress("ComposableNaming")
-@Deprecated(
-    "Use rememberVectorPainter instead as the composable implementation already invokes " +
-        "remember to persist data across compositions and callers do not need to do so themselves",
-    ReplaceWith(
-        "rememberVectorPainter(defaultWidth, defaultHeight, viewportWidth, " +
-            "viewportHeight, name, children)",
-        "androidx.compose.ui.graphics.vector"
-    )
-)
-@Composable
-fun VectorPainter(
-    defaultWidth: Dp,
-    defaultHeight: Dp,
-    viewportWidth: Float = Float.NaN,
-    viewportHeight: Float = Float.NaN,
-    name: String = RootGroupName,
-    children: @Composable (viewportWidth: Float, viewportHeight: Float) -> Unit
-): VectorPainter =
-    rememberVectorPainter(
-        defaultWidth = defaultWidth,
-        defaultHeight = defaultHeight,
-        viewportWidth = viewportWidth,
-        viewportHeight = viewportHeight,
-        name = name,
-        content = children
-    )
-
-/**
- * Create a [VectorPainter] with the given [ImageVector]. This will create a
- * sub-composition of the vector hierarchy given the tree structure in [ImageVector]
- *
- * @param [image] ImageVector used to create a vector graphic sub-composition
- */
-@Suppress("ComposableNaming")
-@Deprecated(
-    "Use rememberVectorPainter instead as the composable implementation already invokes " +
-        "remember to persist data across compositions and callers do not need to do so themselves",
-    ReplaceWith(
-        "rememberVectorPainter(asset)",
-        "androidx.compose.ui.graphics.vector"
-    )
-)
-@Composable
-fun VectorPainter(image: ImageVector): VectorPainter =
-    rememberVectorPainter(
-        defaultWidth = image.defaultWidth,
-        defaultHeight = image.defaultHeight,
-        viewportWidth = image.viewportWidth,
-        viewportHeight = image.viewportHeight,
-        name = image.name,
-        content = { _, _ -> RenderVectorGroup(group = image.root) }
-    )
 
 /**
  * Create a [VectorPainter] with the given [ImageVector]. This will create a
@@ -220,7 +151,7 @@ class VectorPainter internal constructor() : Painter() {
         }
         val composition = composeVector(
             vector,
-            rememberCompositionReference(),
+            rememberCompositionContext(),
             content
         )
 

@@ -19,6 +19,7 @@ package androidx.compose.animation.core
 import androidx.compose.animation.core.AnimationConstants.DefaultDurationMillis
 import androidx.compose.animation.core.KeyframesSpec.KeyframesSpecConfig
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.unit.IntOffset
 
 object AnimationConstants {
@@ -28,14 +29,9 @@ object AnimationConstants {
     const val DefaultDurationMillis: Int = 300
 
     /**
-     * Used as a iterations count for [VectorizedRepeatableSpec] to create an infinity repeating
-     * animation.
+     * The value that is used when the animation time is not yet set.
      */
-    @Deprecated(
-        "Using Infinite to specify repeatable animation iterations has been " +
-            "deprecated. Please use [InfiniteRepeatableSpec] or [infiniteRepeatable] instead."
-    )
-    const val Infinite: Int = Int.MAX_VALUE
+    const val UnspecifiedTime: Long = Long.MIN_VALUE
 }
 
 /**
@@ -400,3 +396,96 @@ class KeyframesSpec<T>(val config: KeyframesSpecConfig<T>) : DurationBasedAnimat
         }
     }
 }
+
+/**
+ * Creates a [TweenSpec] configured with the given duration, delay and easing curve.
+ *
+ * @param durationMillis duration of the animation spec
+ * @param delayMillis the amount of time in milliseconds that animation waits before starting
+ * @param easing the easing curve that will be used to interpolate between start and end
+ */
+@Stable
+fun <T> tween(
+    durationMillis: Int = DefaultDurationMillis,
+    delayMillis: Int = 0,
+    easing: Easing = FastOutSlowInEasing
+): TweenSpec<T> = TweenSpec(durationMillis, delayMillis, easing)
+
+/**
+ * Creates a [SpringSpec] that uses the given spring constants (i.e. [dampingRatio] and
+ * [stiffness]. The optional [visibilityThreshold] defines when the animation
+ * should be considered to be visually close enough to round off to its target.
+ *
+ * @param dampingRatio damping ratio of the spring. [Spring.DampingRatioNoBouncy] by default.
+ * @param stiffness stiffness of the spring. [Spring.StiffnessMedium] by default.
+ * @param visibilityThreshold optionally specifies the visibility threshold.
+ */
+@Stable
+fun <T> spring(
+    dampingRatio: Float = Spring.DampingRatioNoBouncy,
+    stiffness: Float = Spring.StiffnessMedium,
+    visibilityThreshold: T? = null
+): SpringSpec<T> =
+    SpringSpec(dampingRatio, stiffness, visibilityThreshold)
+
+/**
+ * Creates a [KeyframesSpec] animation, initialized with [init]. For example:
+ *
+ * @param init Initialization function for the [KeyframesSpec] animation
+ * @See KeyframesSpec.KeyframesSpecConfig
+ */
+@Stable
+fun <T> keyframes(
+    init: KeyframesSpec.KeyframesSpecConfig<T>.() -> Unit
+): KeyframesSpec<T> {
+    return KeyframesSpec(KeyframesSpec.KeyframesSpecConfig<T>().apply(init))
+}
+
+/**
+ * Creates a [RepeatableSpec] that plays a [DurationBasedAnimationSpec] (e.g.
+ * [TweenSpec], [KeyframesSpec]) the amount of iterations specified by [iterations].
+ *
+ * The iteration count describes the amount of times the animation will run.
+ * 1 means no repeat. Recommend [infiniteRepeatable] for creating an infinity repeating animation.
+ *
+ * __Note__: When repeating in the [RepeatMode.Reverse] mode, it's highly recommended to have an
+ * __odd__ number of iterations. Otherwise, the animation may jump to the end value when it finishes
+ * the last iteration.
+ *
+ * @param iterations the total count of iterations, should be greater than 1 to repeat.
+ * @param animation animation that will be repeated
+ * @param repeatMode whether animation should repeat by starting from the beginning (i.e.
+ *                  [RepeatMode.Restart]) or from the end (i.e. [RepeatMode.Reverse])
+ */
+@Stable
+fun <T> repeatable(
+    iterations: Int,
+    animation: DurationBasedAnimationSpec<T>,
+    repeatMode: RepeatMode = RepeatMode.Restart
+): RepeatableSpec<T> =
+    RepeatableSpec(iterations, animation, repeatMode)
+
+/**
+ * Creates a [InfiniteRepeatableSpec] that plays a [DurationBasedAnimationSpec] (e.g.
+ * [TweenSpec], [KeyframesSpec]) infinite amount of iterations.
+ *
+ * For non-infinitely repeating animations, consider [repeatable].
+ *
+ * @param animation animation that will be repeated
+ * @param repeatMode whether animation should repeat by starting from the beginning (i.e.
+ *                  [RepeatMode.Restart]) or from the end (i.e. [RepeatMode.Reverse])
+ */
+@Stable
+fun <T> infiniteRepeatable(
+    animation: DurationBasedAnimationSpec<T>,
+    repeatMode: RepeatMode = RepeatMode.Restart
+): InfiniteRepeatableSpec<T> =
+    InfiniteRepeatableSpec(animation, repeatMode)
+
+/**
+ * Creates a Snap animation for immediately switching the animating value to the end value.
+ *
+ * @param delayMillis the number of milliseconds to wait before the animation runs. 0 by default.
+ */
+@Stable
+fun <T> snap(delayMillis: Int = 0) = SnapSpec<T>(delayMillis)

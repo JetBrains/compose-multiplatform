@@ -21,20 +21,24 @@ import android.os.Bundle
 import android.os.Looper.getMainLooper
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composer
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Recomposer
-import androidx.compose.runtime.compositionFor
-import androidx.compose.ui.node.UiApplier
-import androidx.compose.ui.platform.AmbientContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.launch
 import org.robolectric.Robolectric
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.Shadows.shadowOf
 
 const val ROOT_ID = 18284847
 
-private class TestActivity : Activity() {
+private class TestActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(LinearLayout(this).apply { id = ROOT_ID })
@@ -43,13 +47,13 @@ private class TestActivity : Activity() {
 
 private val Activity.root get() = findViewById(ROOT_ID) as ViewGroup
 
-fun compose(composable: (Composer<*>, Int) -> Unit) =
+fun compose(composable: (Composer, Int) -> Unit) =
     RobolectricComposeTester(composable)
-fun composeMulti(composable: (Composer<*>, Int) -> Unit, advance: () -> Unit) =
+fun composeMulti(composable: (Composer, Int) -> Unit, advance: () -> Unit) =
     RobolectricComposeTester(composable, advance)
 
 class RobolectricComposeTester internal constructor(
-    val composable: (Composer<*>, Int) -> Unit,
+    val composable: (Composer, Int) -> Unit,
     val advance: (() -> Unit)? = null
 ) {
     inner class ActiveTest(
@@ -76,7 +80,7 @@ class RobolectricComposeTester internal constructor(
         scheduler.pause()
         val controller = Robolectric.buildActivity(TestActivity::class.java)
         val activity = controller.create().get()
-        val root = activity.root
+//        val root = activity.root
         scheduler.advanceToLastPostedRunnable()
 
         val startProviders = Composer::class.java.methods.first {
@@ -90,25 +94,45 @@ class RobolectricComposeTester internal constructor(
         endProviders.isAccessible = true
         setContentMethod.isAccessible = true
 
-        val realComposable: (Composer<*>, Int) -> Unit = { composer, _ ->
-            startProviders.invoke(
-                composer,
-                listOf(AmbientContext provides root.context).toTypedArray()
-            )
-            composable(composer, 0)
-            endProviders.invoke(composer)
-        }
+//        val realComposable: (Composer, Int) -> Unit = { composer, _ ->
+//            startProviders.invoke(
+//                composer,
+//                listOf(LocalContext provides root.context).toTypedArray()
+//            )
+//            composable(composer, 0)
+//            endProviders.invoke(composer)
+//        }
 
+        @Suppress("DEPRECATION")
         @OptIn(ExperimentalComposeApi::class)
-        val composition = compositionFor(root, UiApplier(root), Recomposer.current())
-        fun setContent() {
-            setContentMethod.invoke(composition, realComposable)
-        }
+//        val composition = Composition(root, UiApplier(root), recomposer)
+//        fun setContent() {
+//            setContentMethod.invoke(composition, realComposable)
+//        }
         scheduler.advanceToLastPostedRunnable()
-        setContent()
+//        setContent()
         scheduler.advanceToLastPostedRunnable()
         block(activity)
-        val advanceFn = advance ?: { setContent() }
+        val advanceFn = advance ?: { /* setContent() */ }
         return ActiveTest(activity, advanceFn)
+    }
+
+    companion object {
+        @OptIn(ExperimentalCoroutinesApi::class)
+        private val recomposer = run {
+            val mainScope = CoroutineScope(
+                NonCancellable + Dispatchers.Main
+            )
+
+            Recomposer(mainScope.coroutineContext).also {
+                // NOTE: Launching undispatched so that compositions created with the
+                // singleton instance can assume the recomposer is running
+                // when they perform initial composition. The relevant Recomposer code is
+                // appropriately thread-safe for this.
+                mainScope.launch(start = CoroutineStart.UNDISPATCHED) {
+                    it.runRecomposeAndApplyChanges()
+                }
+            }
+        }
     }
 }

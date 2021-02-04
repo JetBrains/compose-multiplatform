@@ -18,12 +18,9 @@ package androidx.compose.ui.test.junit4
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.node.RootForTest
-import androidx.compose.ui.platform.DesktopOwner
-import androidx.compose.ui.platform.DesktopOwners
-import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.platform.TestComposeWindow
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.IdlingResource
@@ -38,11 +35,11 @@ import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import org.jetbrains.skija.Surface
+import kotlinx.coroutines.swing.Swing
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
-import java.util.LinkedList
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.FutureTask
 import javax.swing.SwingUtilities.invokeAndWait
@@ -57,26 +54,15 @@ class DesktopComposeTestRule : ComposeContentTestRule {
         var current: DesktopComposeTestRule? = null
     }
 
-    var owners: DesktopOwners? = null
-    private var owner: DesktopOwner? = null
-
-    @ExperimentalTestApi
-    override val clockTestRule: AnimationClockTestRule = DesktopAnimationClockTestRule()
-
     override val density: Density
-        get() = TODO()
+        get() = Density(1f, 1f)
 
     override val mainClock: MainTestClock
         get() = TODO()
 
-    @Deprecated(
-        "This utility was deprecated without replacement. It is recommend to use " +
-            "the root size for any assertions."
-    )
-    override val displaySize: IntSize get() = testDisplaySize
     internal val testDisplaySize: IntSize get() = IntSize(1024, 768)
 
-    val executionQueue = LinkedList<() -> Unit>()
+    lateinit var window: TestComposeWindow
 
     private val testOwner = DesktopTestOwner(this)
     private val testContext = createTestContext(testOwner)
@@ -85,30 +71,32 @@ class DesktopComposeTestRule : ComposeContentTestRule {
         current = this
         return object : Statement() {
             override fun evaluate() {
-                base.evaluate()
-                runExecutionQueue()
-                runOnUiThread {
-                    owner?.dispose()
-                    owner = null
+                window = runOnUiThread(::createWindow)
+
+                try {
+                    base.evaluate()
+                } finally {
+                    runOnUiThread(window::dispose)
                 }
             }
         }
     }
 
-    private fun runExecutionQueue() {
-        while (executionQueue.isNotEmpty()) {
-            executionQueue.removeFirst()()
-        }
-    }
+    private fun createWindow() = TestComposeWindow(
+        width = testDisplaySize.width,
+        height = testDisplaySize.height,
+        density = density,
+        nanoTime = System::nanoTime, // TODO(demin): use mainClock?
+        coroutineContext = Dispatchers.Swing
+    )
 
     @OptIn(ExperimentalComposeApi::class)
     private fun isIdle() =
         !Snapshot.current.hasPendingChanges() &&
-            !Recomposer.current().hasInvalidations()
+            !window.hasInvalidations()
 
     override fun waitForIdle() {
         while (!isIdle()) {
-            runExecutionQueue()
             Thread.sleep(10)
         }
     }
@@ -116,18 +104,21 @@ class DesktopComposeTestRule : ComposeContentTestRule {
     @ExperimentalTestApi
     override suspend fun awaitIdle() {
         while (!isIdle()) {
-            runExecutionQueue()
             delay(10)
         }
     }
 
     override fun <T> runOnUiThread(action: () -> T): T {
-        val task: FutureTask<T> = FutureTask(action)
-        invokeAndWait(task)
-        try {
-            return task.get()
-        } catch (e: ExecutionException) { // Expose the original exception
-            throw e.cause!!
+        return if (isEventDispatchThread()) {
+            action()
+        } else {
+            val task: FutureTask<T> = FutureTask(action)
+            invokeAndWait(task)
+            try {
+                return task.get()
+            } catch (e: ExecutionException) { // Expose the original exception
+                throw e.cause!!
+            }
         }
     }
 
@@ -153,15 +144,11 @@ class DesktopComposeTestRule : ComposeContentTestRule {
     }
 
     override fun setContent(composable: @Composable () -> Unit) {
-        check(owner == null) {
-            "Cannot call setContent twice per test!"
-        }
-
         if (isEventDispatchThread()) {
-            performSetContent(composable)
+            window.setContent(composable)
         } else {
             runOnUiThread {
-                performSetContent(composable)
+                window.setContent(composable)
             }
 
             // Only wait for idleness if not on the UI thread. If we are on the UI thread, the
@@ -169,20 +156,6 @@ class DesktopComposeTestRule : ComposeContentTestRule {
             // executing future tasks on the main thread.
             waitForIdle()
         }
-    }
-
-    private fun performSetContent(composable: @Composable() () -> Unit) {
-        val surface = Surface.makeRasterN32Premul(testDisplaySize.width, testDisplaySize.height)!!
-        val canvas = surface.canvas
-        val owners = DesktopOwners(invalidate = {}).also {
-            owners = it
-        }
-        val owner = DesktopOwner(owners)
-        owner.setContent(content = composable)
-        owner.setSize(testDisplaySize.width, testDisplaySize.height)
-        owner.measureAndLayout()
-        owner.draw(canvas)
-        this.owner = owner
     }
 
     override fun onNode(
@@ -213,11 +186,10 @@ class DesktopComposeTestRule : ComposeContentTestRule {
         }
 
         override fun getRoots(): Set<RootForTest> {
-            return rule.owners!!.list
+            return rule.window.roots
         }
 
-        override fun advanceTimeBy(millis: Long) {
-            TODO()
-        }
+        override val mainClock: MainTestClock
+            get() = TODO()
     }
 }

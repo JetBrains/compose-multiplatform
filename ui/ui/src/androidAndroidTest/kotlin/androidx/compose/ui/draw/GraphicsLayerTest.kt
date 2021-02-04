@@ -46,7 +46,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.padding
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.captureToImage
@@ -54,6 +54,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -297,7 +298,7 @@ class GraphicsLayerTest {
         var coords1: LayoutCoordinates? = null
         var coords2: LayoutCoordinates? = null
         rule.setContent {
-            with(AmbientDensity.current) {
+            with(LocalDensity.current) {
                 Box(
                     Modifier.size(25.toDp())
                         .graphicsLayer(
@@ -382,8 +383,11 @@ class GraphicsLayerTest {
     @Test
     fun testEmptyClip() {
         val EmptyRectangle = object : Shape {
-            override fun createOutline(size: Size, density: Density): Outline =
-                Outline.Rectangle(Rect.Zero)
+            override fun createOutline(
+                size: Size,
+                layoutDirection: LayoutDirection,
+                density: Density
+            ) = Outline.Rectangle(Rect.Zero)
         }
         val tag = "testTag"
         rule.setContent {
@@ -456,7 +460,7 @@ class GraphicsLayerTest {
         var testDpConversion = 0f
         var testFontScaleConversion = 0f
         rule.setContent {
-            density = AmbientDensity.current
+            density = LocalDensity.current
             // Verify that the current density is passed to the graphics layer
             // implementation and that density dependent methods are consuming it
             Box(

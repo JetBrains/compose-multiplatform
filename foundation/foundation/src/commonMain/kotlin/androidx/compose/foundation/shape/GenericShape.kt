@@ -21,20 +21,35 @@ import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 
 /**
  * Creates [Shape] defined by applying the provided [builder] on a [Path].
  *
  * @param builder the builder lambda to apply on a [Path]
  */
-data class GenericShape(
-    private val builder: Path.(size: Size) -> Unit
+class GenericShape(
+    private val builder: Path.(size: Size, layoutDirection: LayoutDirection) -> Unit
 ) : Shape {
-    override fun createOutline(size: Size, density: Density): Outline {
+
+    override fun createOutline(
+        size: Size,
+        layoutDirection: LayoutDirection,
+        density: Density
+    ): Outline {
         val path = Path().apply {
-            builder(size)
+            builder(size, layoutDirection)
             close()
         }
         return Outline.Generic(path)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        return (other as? GenericShape)?.builder == builder
+    }
+
+    override fun hashCode(): Int {
+        return builder.hashCode()
     }
 }

@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.blinkingCursorEnabled
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.testutils.LayeredComposeTestCase
@@ -82,9 +81,6 @@ class TextFieldToggleTextTestCase(
         textInputServiceFactory = {
             textInputService
         }
-        @Suppress("DEPRECATION_ERROR")
-        @OptIn(InternalTextApi::class)
-        blinkingCursorEnabled = false
         Column(
             modifier = Modifier.preferredWidth(width)
         ) {

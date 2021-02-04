@@ -21,7 +21,6 @@ import androidx.compose.runtime.Composition
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.Recomposer
-import androidx.compose.runtime.compositionFor
 import androidx.compose.runtime.snapshots.Snapshot
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -49,7 +48,7 @@ fun compositionTest(block: suspend CompositionTestScope.() -> Unit) = runBlockin
                 check(!composed) { "Compose should only be called once" }
                 composed = true
                 root = View().apply { name = "root" }
-                val composition = compositionFor(root, ViewApplier(root), recomposer)
+                val composition = Composition(root, ViewApplier(root), recomposer)
                 this.composition = composition
                 composition.setContent(block)
             }
@@ -57,9 +56,9 @@ fun compositionTest(block: suspend CompositionTestScope.() -> Unit) = runBlockin
             override fun advance(): Boolean {
                 val changeCount = recomposer.changeCount
                 Snapshot.sendApplyNotifications()
-                if (recomposer.hasInvalidations()) {
+                if (recomposer.hasPendingWork) {
                     advanceTimeBy(5_000)
-                    check(!recomposer.hasInvalidations()) {
+                    check(!recomposer.hasPendingWork) {
                         "Potentially infinite recomposition, still recomposing after advancing"
                     }
                 }
@@ -68,7 +67,7 @@ fun compositionTest(block: suspend CompositionTestScope.() -> Unit) = runBlockin
         }
         scope.block()
         scope.composition?.dispose()
-        recomposer.shutDown()
+        recomposer.cancel()
         recomposer.join()
     }
 }

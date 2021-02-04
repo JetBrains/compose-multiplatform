@@ -16,7 +16,8 @@
 
 package androidx.compose.ui.platform
 
-import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.DesktopCanvas
@@ -24,32 +25,34 @@ import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.asDesktopPath
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.toSkijaRect
 import androidx.compose.ui.node.OwnedLayer
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.toBounds
-import androidx.compose.ui.unit.toRect
+import androidx.compose.ui.unit.toSize
 import org.jetbrains.skija.Picture
 import org.jetbrains.skija.PictureRecorder
 import org.jetbrains.skija.Point3
 import org.jetbrains.skija.ShadowUtils
 
-class SkijaLayer(
-    private val owner: DesktopOwner,
+internal class SkijaLayer(
+    private val getDensity: () -> Density,
     private val invalidateParentLayer: () -> Unit,
     private val drawBlock: (Canvas) -> Unit
 ) : OwnedLayer {
     private var size = IntSize.Zero
     private var position = IntOffset.Zero
-    private var outlineCache = OutlineCache(owner.density, size, RectangleShape)
+    private var outlineCache =
+        OutlineCache(getDensity(), size, RectangleShape, LayoutDirection.Ltr)
     private val matrix = Matrix()
     private val pictureRecorder = PictureRecorder()
     private var picture: Picture? = null
@@ -108,7 +111,8 @@ class SkijaLayer(
         cameraDistance: Float,
         transformOrigin: TransformOrigin,
         shape: Shape,
-        clip: Boolean
+        clip: Boolean,
+        layoutDirection: LayoutDirection
     ) {
         this.transformOrigin = transformOrigin
         this.translationX = translationX
@@ -122,6 +126,7 @@ class SkijaLayer(
         this.clip = clip
         this.shadowElevation = shadowElevation
         outlineCache.shape = shape
+        outlineCache.layoutDirection = layoutDirection
         updateMatrix()
         invalidate()
     }
@@ -159,9 +164,9 @@ class SkijaLayer(
     }
 
     override fun drawLayer(canvas: Canvas) {
-        outlineCache.density = owner.density
+        outlineCache.density = getDensity()
         if (picture == null) {
-            val bounds = size.toBounds().toRect()
+            val bounds = size.toSize().toRect()
             val pictureCanvas = pictureRecorder.beginRecording(bounds.toSkijaRect())
             performDrawLayer(DesktopCanvas(pictureCanvas), bounds)
             picture = pictureRecorder.finishRecordingAsPicture()
@@ -170,7 +175,7 @@ class SkijaLayer(
         canvas.save()
         canvas.concat(matrix)
         canvas.translate(position.x.toFloat(), position.y.toFloat())
-        canvas.nativeCanvas.drawPicture(picture, null, null)
+        canvas.nativeCanvas.drawPicture(picture!!, null, null)
         canvas.restore()
     }
 
@@ -205,7 +210,7 @@ class SkijaLayer(
     override fun updateDisplayList() = Unit
 
     @OptIn(ExperimentalUnsignedTypes::class)
-    fun drawShadow(canvas: DesktopCanvas) = with(owner.density) {
+    fun drawShadow(canvas: DesktopCanvas) = with(getDensity()) {
         val path = when (val outline = outlineCache.outline) {
             is Outline.Rectangle -> Path().apply { addRect(outline.rect) }
             is Outline.Rounded -> Path().apply { addRoundRect(outline.roundRect) }

@@ -37,7 +37,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.textFieldScrollable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -45,6 +45,7 @@ import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.captureToImage
@@ -326,7 +327,7 @@ class TextFieldScrollTest {
         var scrollerPosition: TextFieldScrollerPosition? = null
 
         restorationTester.setContent {
-            scrollerPosition = rememberSavedInstanceState(
+            scrollerPosition = rememberSaveable(
                 saver = TextFieldScrollerPosition.Saver
             ) {
                 TextFieldScrollerPosition(Orientation.Horizontal)
@@ -392,8 +393,10 @@ class TextFieldScrollTest {
             FlingConfig(FloatExponentialDecaySpec()),
             ManualAnimationClock(0)
         )
+        var touchSlop = 0f
 
         rule.setContent {
+            touchSlop = LocalViewConfiguration.current.touchSlop
             Column(
                 Modifier
                     .preferredSize(size)
@@ -419,11 +422,14 @@ class TextFieldScrollTest {
         with(rule.density) {
             val x = 10.dp.toPx()
             val start = Offset(x, 40.dp.toPx())
+            // not to exceed 50dp
+            val slopStartY = minOf(40.dp.toPx() + touchSlop, 49.dp.toPx())
+            val slopStart = Offset(x, slopStartY)
             val end = Offset(x, 0f)
             rule.onNodeWithTag(TextfieldTag)
                 .performGesture {
                     // scroll first two lines
-                    swipe(start, end)
+                    swipe(slopStart, end)
                     // scroll last two lines
                     swipe(start, end)
                     // scroll Scrollable column

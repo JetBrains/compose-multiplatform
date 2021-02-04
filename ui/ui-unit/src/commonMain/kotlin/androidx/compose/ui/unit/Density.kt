@@ -66,10 +66,17 @@ interface Density {
      * Convert [Dp] to [Int] by rounding
      */
     @Stable
-    fun Dp.toIntPx(): Int {
+    fun Dp.roundToPx(): Int {
         val px = toPx()
         return if (px.isInfinite()) Constraints.Infinity else px.roundToInt()
     }
+
+    @Stable
+    @Deprecated(
+        "toIntPx was renamed to roundToPx.",
+        ReplaceWith("roundToPx()", "androidx.compose.ui.unit.roundToPx")
+    )
+    fun Dp.toIntPx() = roundToPx()
 
     /**
      * Convert [Dp] to Sp. Sp is used for font size, etc.
@@ -91,7 +98,7 @@ interface Density {
      * Convert Sp to [Int] by rounding
      */
     @Stable
-    fun TextUnit.toIntPx(): Int = toPx().roundToInt()
+    fun TextUnit.roundToPx(): Int = toPx().roundToInt()
 
     /**
      * Convert Sp to [Dp].
@@ -124,10 +131,10 @@ interface Density {
     fun Float.toSp(): TextUnit = (this / (fontScale * density)).sp
 
     /**
-     * Convert a [Bounds] to a [Rect].
+     * Convert a [DpRect] to a [Rect].
      */
     @Stable
-    fun Bounds.toRect(): Rect {
+    fun DpRect.toRect(): Rect {
         return Rect(
             left.toPx(),
             top.toPx(),

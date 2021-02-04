@@ -20,7 +20,7 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.gestures.Scrollable
-import androidx.compose.runtime.dispatch.withFrameMillis
+import androidx.compose.runtime.withFrameNanos
 
 /**
  * Smooth scroll by [value] pixels.
@@ -44,16 +44,16 @@ suspend fun Scrollable.smoothScrollBy(
     var previousValue = 0f
 
     scroll {
-        val startTimeMillis = withFrameMillis { it }
+        val startTimeNanos = withFrameNanos { it }
         do {
-            val finished = withFrameMillis { frameTimeMillis ->
+            val finished = withFrameNanos { frameTimeNanos ->
                 val newValue = conv.convertFromVector(
-                    animSpec.getValue(
-                        playTime = frameTimeMillis - startTimeMillis,
-                        start = zeroVector,
-                        end = targetVector,
+                    animSpec.getValueFromNanos(
+                        playTimeNanos = frameTimeNanos - startTimeNanos,
+                        initialValue = zeroVector,
+                        targetValue = targetVector,
                         // TODO: figure out if/how we should incorporate existing velocity
-                        startVelocity = zeroVector
+                        initialVelocity = zeroVector
                     )
                 )
                 val delta = newValue - previousValue

@@ -91,9 +91,3 @@ androidx {
     inceptionYear = "2020"
     description = "Material ripple used to build interactive components"
 }
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += ["-Xallow-jvm-ir-dependencies"]
-    }
-}

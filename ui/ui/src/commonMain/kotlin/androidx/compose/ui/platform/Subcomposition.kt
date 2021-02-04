@@ -17,12 +17,12 @@ package androidx.compose.ui.platform
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
-import androidx.compose.runtime.CompositionReference
+import androidx.compose.runtime.CompositionContext
 import androidx.compose.ui.node.LayoutNode
 
 /*@MainThread*/
 internal expect fun subcomposeInto(
     container: LayoutNode,
-    parent: CompositionReference,
+    parent: CompositionContext,
     composable: @Composable () -> Unit
 ): Composition

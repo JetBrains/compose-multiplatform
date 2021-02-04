@@ -65,7 +65,7 @@ fun SemanticsNodeInteraction.performScrollTo(): SemanticsNodeInteraction {
     // root coordinates. We only want the clipping from the direct parent on the scrollable, not
     // from any other ancestors.
     val viewPortInParent = scrollableNode.layoutInfo.coordinates.boundsInParent
-    val parentInRoot = scrollableNode.layoutInfo.coordinates.parentCoordinates
+    val parentInRoot = scrollableNode.layoutInfo.coordinates.parentLayoutCoordinates
         ?.positionInRoot() ?: Offset.Zero
 
     val viewPort = viewPortInParent.translate(parentInRoot)
@@ -100,7 +100,7 @@ fun SemanticsNodeInteraction.performScrollTo(): SemanticsNodeInteraction {
 
     @OptIn(InternalTestApi::class)
     testContext.testOwner.runOnUiThread {
-        scrollableNode.config[SemanticsActions.ScrollBy].action(dx, dy)
+        scrollableNode.config[SemanticsActions.ScrollBy].action?.invoke(dx, dy)
     }
 
     return this
@@ -181,10 +181,9 @@ fun <T : Function<Boolean>> SemanticsNodeInteraction.performSemanticsAction(
         )
     }
 
-    @Suppress("DEPRECATION")
     @OptIn(InternalTestApi::class)
     testContext.testOwner.runOnUiThread {
-        invocation(node.config[key].action)
+        node.config[key].action?.let { invocation(it) }
     }
 }
 

@@ -325,7 +325,7 @@ class ComposeCallLoweringTests : AbstractLoweringTests() {
             """
                 import androidx.compose.runtime.*
 
-                val x = ambientOf<Int> { 123 }
+                val x = compositionLocalOf<Int> { 123 }
 
                 @Composable
                 fun test() {
@@ -358,14 +358,14 @@ class ComposeCallLoweringTests : AbstractLoweringTests() {
 
                 class Density
 
-                val DensityAmbient = ambientOf<Density>()
+                val LocalDensity = compositionLocalOf<Density>()
 
                 @Composable
-                fun ambientDensity() = DensityAmbient.current
+                fun compositionLocalDensity() = LocalDensity.current
 
                 @Composable
                 fun WithDensity(block: @Composable DensityScope.() -> Unit) {
-                    DensityScope(ambientDensity()).block()
+                    DensityScope(compositionLocalDensity()).block()
                 }
             """
         )
@@ -1159,7 +1159,7 @@ fun <T> B(foo: T, bar: String) { }
                 a++
                 val c = remember { mutableStateOf(0) }
                 val d = remember(c.value) { b++; b }
-                val recompose = invalidate
+                val scope = currentRecomposeScope
                 Button(
                   text=listOf(a, b, c.value, d).joinToString(", "),
                   onClick={ c.value += 1 },
@@ -1167,7 +1167,7 @@ fun <T> B(foo: T, bar: String) { }
                 )
                 Button(
                   text="Recompose",
-                  onClick={ recompose() },
+                  onClick={ scope.invalidate() },
                   id=43
                 )
             }
@@ -1403,21 +1403,21 @@ fun <T> B(foo: T, bar: String) { }
     }
 
     @Test
-    fun testAmbientConsumedFromDefaultParameter(): Unit = ensureSetup {
+    fun testCompositionLocalConsumedFromDefaultParameter(): Unit = ensureSetup {
         val initialText = "no text"
         val helloWorld = "Hello World!"
         compose(
             """
-            val TextAmbient = ambientOf { "$initialText" }
+            val LocalText = compositionLocalOf { "$initialText" }
 
             @Composable
             fun Main() {
                 var text = remember { mutableStateOf("$initialText") }
-                Providers(TextAmbient provides text.value) {
+                Providers(LocalText provides text.value) {
                     LinearLayout {
-                        ConsumesAmbientFromDefaultParameter()
+                        ConsumesCompositionLocalFromDefaultParameter()
                         Button(
-                            text = "Change ambient value",
+                            text = "Change CompositionLocal value",
                             onClick={ text.value = "$helloWorld" },
                             id=101
                         )
@@ -1426,7 +1426,7 @@ fun <T> B(foo: T, bar: String) { }
             }
 
             @Composable
-            fun ConsumesAmbientFromDefaultParameter(text: String = TextAmbient.current) {
+            fun ConsumesCompositionLocalFromDefaultParameter(text: String = LocalText.current) {
                 TextView(text = text, id = 42)
             }
         """,

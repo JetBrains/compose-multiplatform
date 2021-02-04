@@ -16,22 +16,22 @@
 package androidx.compose.desktop
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.unit.Density
-import java.awt.Graphics
 import java.awt.GridLayout
-import java.awt.event.ComponentAdapter
-import java.awt.event.ComponentEvent
 import javax.swing.JPanel
+import javax.swing.SwingUtilities.isEventDispatchThread
 
 /**
  * ComposePanel is panel for building UI using Compose for Desktop.
  */
-class ComposePanel : JPanel {
-    constructor() : super() {
-        setLayout(GridLayout(1, 1))
+class ComposePanel : JPanel() {
+    init {
+        check(isEventDispatchThread()) {
+            "ComposePanel should be created inside AWT Event Dispatch Thread" +
+                " (use SwingUtilities.invokeLater).\n" +
+                "Creating from another thread isn't supported."
+        }
+        layout = GridLayout(1, 1)
     }
-
-    private var init: Boolean = false
 
     private var layer: ComposeLayer? = null
     private var content: (@Composable () -> Unit)? = null
@@ -53,29 +53,8 @@ class ComposePanel : JPanel {
     private fun initContent() {
         if (layer != null && content != null) {
             layer!!.setContent(
-                parent = this,
-                invalidate = this::needRedrawLayer,
                 content = content!!
             )
-        }
-    }
-
-    val density: Density
-        get() = if (layer == null) {
-            Density(graphicsConfiguration.defaultTransform.scaleX.toFloat(), 1f)
-        } else {
-            layer!!.density
-        }
-
-    internal var onDispose: (() -> Unit)? = null
-
-    private fun needRedrawLayer() {
-        if (isShowing) {
-            if (!init) {
-                layer!!.updateLayer()
-                init = true
-            }
-            layer!!.needRedrawLayer()
         }
     }
 
@@ -85,37 +64,23 @@ class ComposePanel : JPanel {
         // After [super.addNotify] is called we can safely initialize the layer and composable
         // content.
         layer = ComposeLayer()
-        add(layer!!.wrapped)
-        addComponentListener(object : ComponentAdapter() {
-            override fun componentResized(e: ComponentEvent) {
-                layer?.reinit()
-                needRedrawLayer()
-            }
-        })
+        add(layer!!.component)
 
         initContent()
     }
 
     override fun removeNotify() {
-        super.removeNotify()
-
-        onDispose?.invoke()
         if (layer != null) {
-            remove(layer!!.wrapped)
             layer!!.dispose()
+            remove(layer!!.component)
         }
-        init = false
+
+        super.removeNotify()
     }
 
     override fun requestFocus() {
         if (layer != null) {
-            layer!!.wrapped.requestFocus()
+            layer!!.component.requestFocus()
         }
-    }
-
-    override fun paint(g: Graphics?) {
-        super.paint(g)
-        layer?.reinit()
-        needRedrawLayer()
     }
 }

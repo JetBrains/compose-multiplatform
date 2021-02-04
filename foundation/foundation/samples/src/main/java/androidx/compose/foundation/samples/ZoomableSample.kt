@@ -17,10 +17,9 @@
 package androidx.compose.foundation.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.rememberZoomableController
 import androidx.compose.foundation.gestures.zoomable
 import androidx.compose.foundation.layout.Box
@@ -37,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -51,12 +51,9 @@ fun ZoomableSample() {
         Box(
             Modifier
                 .zoomable(zoomableController)
-                .clickable(
-                    indication = null,
-                    interactionState = remember { InteractionState() },
-                    onDoubleClick = { zoomableController.smoothScaleBy(4f) },
-                    onClick = {}
-                )
+                .pointerInput(Unit) {
+                    detectTapGestures(onDoubleTap = { zoomableController.smoothScaleBy(4f) })
+                }
                 .fillMaxSize()
                 .border(1.dp, Color.Green),
             contentAlignment = Alignment.Center

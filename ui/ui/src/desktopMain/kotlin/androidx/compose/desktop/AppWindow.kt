@@ -16,10 +16,9 @@
 package androidx.compose.desktop
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionReference
+import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.Providers
-import androidx.compose.runtime.ambientOf
-import androidx.compose.runtime.emptyContent
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.platform.Keyboard
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -35,7 +34,7 @@ import javax.swing.JMenuBar
 import javax.swing.SwingUtilities
 import javax.swing.WindowConstants
 
-val AppWindowAmbient = ambientOf<AppWindow?>()
+val AppWindowAmbient = compositionLocalOf<AppWindow?>()
 
 /**
  * Opens a window with the given content.
@@ -69,7 +68,7 @@ fun Window(
     resizable: Boolean = true,
     events: WindowEvents = WindowEvents(),
     onDismissRequest: (() -> Unit)? = null,
-    content: @Composable () -> Unit = emptyContent()
+    content: @Composable () -> Unit = { }
 ) = SwingUtilities.invokeLater {
     AppWindow(
         title = title,
@@ -400,7 +399,7 @@ class AppWindow : AppFrame {
     }
 
     private fun onCreate(
-        parentComposition: CompositionReference? = null,
+        parentComposition: CompositionContext? = null,
         content: @Composable () -> Unit
     ) {
         window.setContent(parentComposition) {
@@ -420,7 +419,7 @@ class AppWindow : AppFrame {
      * @param content Composable content of the window.
      */
     fun show(
-        parentComposition: CompositionReference? = null,
+        parentComposition: CompositionContext? = null,
         content: @Composable () -> Unit
     ) {
         if (invoker != null) {
@@ -429,7 +428,7 @@ class AppWindow : AppFrame {
         }
 
         onCreate(parentComposition) {
-            window.layer.owners?.keyboard = keyboard
+            window.layer.owners.keyboard = keyboard
             content()
         }
 

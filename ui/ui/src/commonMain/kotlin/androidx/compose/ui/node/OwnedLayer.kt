@@ -16,22 +16,19 @@
 
 package androidx.compose.ui.node
 
-import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.layout.GraphicLayerInfo
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 
 /**
  * A layer returned by [Owner.createLayer] to separate drawn content.
  */
-interface OwnedLayer {
-    /**
-     * The ID of the layer. This is used by tooling to match a layer to the associated
-     * LayoutNode.
-     */
-    val layerId: Long
+internal interface OwnedLayer : GraphicLayerInfo {
 
     /**
      * Applies the new layer properties and causing this layer to be redrawn.
@@ -49,7 +46,8 @@ interface OwnedLayer {
         cameraDistance: Float,
         transformOrigin: TransformOrigin,
         shape: Shape,
-        clip: Boolean
+        clip: Boolean,
+        layoutDirection: LayoutDirection
     )
 
     /**

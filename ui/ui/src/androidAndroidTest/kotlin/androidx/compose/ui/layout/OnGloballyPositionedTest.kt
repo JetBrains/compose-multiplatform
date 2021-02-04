@@ -20,13 +20,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.ScrollView
+import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -38,9 +38,8 @@ import androidx.compose.ui.Wrap
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.padding
-import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.runOnUiThreadIR
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.unit.Constraints
@@ -265,8 +264,8 @@ class OnGloballyPositionedTest {
             assertEquals(Offset(5f, 5f), coordinates!!.positionInParent)
 
             var root = coordinates!!
-            while (root.parentCoordinates != null) {
-                root = root.parentCoordinates!!
+            while (root.parentLayoutCoordinates != null) {
+                root = root.parentLayoutCoordinates!!
             }
 
             assertEquals(Offset.Zero, root.positionInParent)
@@ -298,8 +297,8 @@ class OnGloballyPositionedTest {
             assertEquals(Rect(5f, 5f, 15f, 15f), coordinates!!.boundsInParent)
 
             var root = coordinates!!
-            while (root.parentCoordinates != null) {
-                root = root.parentCoordinates!!
+            while (root.parentLayoutCoordinates != null) {
+                root = root.parentLayoutCoordinates!!
             }
 
             assertEquals(Rect(0f, 0f, 20f, 20f), root.boundsInParent)
@@ -400,7 +399,7 @@ class OnGloballyPositionedTest {
 
         rule.runOnUiThread {
             activity.setContent {
-                with(AmbientDensity.current) {
+                with(LocalDensity.current) {
                     DelayedMeasure(50) {
                         Box(Modifier.size(25.toDp())) {
                             Box(
@@ -446,7 +445,7 @@ class OnGloballyPositionedTest {
         val positionedLatch = CountDownLatch(1)
         rule.runOnUiThread {
             activity.setContent {
-                with(AmbientDensity.current) {
+                with(LocalDensity.current) {
                     Box(
                         Modifier.fillMaxSize()
                             .padding(start = paddingLeftPx.toDp(), top = paddingTopPx.toDp())
@@ -475,7 +474,7 @@ class OnGloballyPositionedTest {
         val positionedLatch = CountDownLatch(2)
         rule.runOnUiThread {
             activity.setContent {
-                with(AmbientDensity.current) {
+                with(LocalDensity.current) {
                     Box(
                         Modifier.padding(start = firstPaddingPx.toDp()).then(
                             Modifier.onGloballyPositioned {
@@ -576,7 +575,7 @@ class OnGloballyPositionedTest {
         var positionedLatch = CountDownLatch(1)
         rule.runOnUiThread {
             activity.setContent {
-                with(AmbientDensity.current) {
+                with(LocalDensity.current) {
                     Box {
                         Box(
                             Modifier.onGloballyPositioned {
@@ -609,7 +608,7 @@ class OnGloballyPositionedTest {
         var positionedLatch = CountDownLatch(1)
         rule.runOnUiThread {
             activity.setContent {
-                with(AmbientDensity.current) {
+                with(LocalDensity.current) {
                     Box {
                         Offset(left) {
                             Box(Modifier.size(10.toDp())) {
@@ -661,7 +660,7 @@ class OnGloballyPositionedTest {
 fun DelayedMeasure(
     size: Int,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit = emptyContent()
+    content: @Composable () -> Unit = {}
 ) {
     Layout(content = content, modifier = modifier) { measurables, _ ->
         layout(size, size) {

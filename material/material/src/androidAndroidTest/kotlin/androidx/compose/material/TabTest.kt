@@ -19,7 +19,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.material.TabDefaults.tabIndicatorOffset
+import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.samples.ScrollingTextTabs
@@ -39,8 +39,11 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertHeightIsEqualTo
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsEqualTo
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.assertPositionInRootIsEqualTo
@@ -99,6 +102,29 @@ class TabTest {
         rule.onNodeWithTag("tab")
             .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Tab))
             .assertIsSelected()
+            .assertIsEnabled()
+            .assertHasClickAction()
+    }
+
+    @Test
+    fun disabledSemantics() {
+        rule.setMaterialContent {
+            Box {
+                Tab(
+                    enabled = false,
+                    text = { Text("Text") },
+                    modifier = Modifier.testTag("tab"),
+                    selected = true,
+                    onClick = {}
+                )
+            }
+        }
+
+        rule.onNodeWithTag("tab")
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Tab))
+            .assertIsSelected()
+            .assertIsNotEnabled()
+            .assertHasClickAction()
     }
 
     @Test
@@ -352,7 +378,7 @@ class TabTest {
         rule.onNodeWithTag("indicator")
             .assertPositionInRootIsEqualTo(
                 // Tabs in a scrollable tab row are offset 52.dp from each end
-                expectedLeft = TabDefaults.ScrollableTabRowPadding,
+                expectedLeft = TabRowDefaults.ScrollableTabRowPadding,
                 expectedTop = tabRowBounds.height - indicatorHeight
             )
 
@@ -363,7 +389,7 @@ class TabTest {
         // should be in the middle of the TabRow
         rule.onNodeWithTag("indicator")
             .assertPositionInRootIsEqualTo(
-                expectedLeft = TabDefaults.ScrollableTabRowPadding + minimumTabWidth,
+                expectedLeft = TabRowDefaults.ScrollableTabRowPadding + minimumTabWidth,
                 expectedTop = tabRowBounds.height - indicatorHeight
             )
     }
@@ -472,6 +498,29 @@ class TabTest {
             assertThat(modifier.nameFallback).isEqualTo("tabIndicatorOffset")
             assertThat(modifier.valueOverride).isEqualTo(pos)
             assertThat(modifier.inspectableElements.asIterable()).isEmpty()
+        }
+    }
+
+    @Test
+    fun disabled_noClicks() {
+        var clicks = 0
+        rule.setMaterialContent {
+            Box {
+                Tab(
+                    enabled = false,
+                    text = { Text("Text") },
+                    modifier = Modifier.testTag("tab"),
+                    selected = true,
+                    onClick = { clicks++ }
+                )
+            }
+        }
+
+        rule.onNodeWithTag("tab")
+            .performClick()
+
+        rule.runOnIdle {
+            assertThat(clicks).isEqualTo(0)
         }
     }
 }

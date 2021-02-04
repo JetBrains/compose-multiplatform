@@ -18,6 +18,7 @@ package androidx.compose.ui.draw
 
 import android.graphics.Bitmap
 import android.os.Build
+import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -29,17 +30,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
-import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.runOnUiThreadIR
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.waitAndScreenShot
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -69,8 +70,11 @@ class ShadowTest {
     private lateinit var drawLatch: CountDownLatch
 
     private val rectShape = object : Shape {
-        override fun createOutline(size: Size, density: Density): Outline =
-            Outline.Rectangle(size.toRect())
+        override fun createOutline(
+            size: Size,
+            layoutDirection: LayoutDirection,
+            density: Density
+        ) = Outline.Rectangle(size.toRect())
     }
 
     @Before
@@ -164,7 +168,7 @@ class ShadowTest {
         rule.runOnUiThreadIR {
             activity.setContent {
                 AtLeastSize(size = 12, modifier = Modifier.background(Color.White)) {
-                    val elevation = with(AmbientDensity.current) { 4.dp.toPx() }
+                    val elevation = with(LocalDensity.current) { 4.dp.toPx() }
                     AtLeastSize(
                         size = 10,
                         modifier = Modifier.graphicsLayer(

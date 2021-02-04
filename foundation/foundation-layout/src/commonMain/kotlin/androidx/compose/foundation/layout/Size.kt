@@ -34,9 +34,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.constrain
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
-import androidx.compose.ui.unit.enforce
 import kotlin.math.roundToInt
 
 /**
@@ -667,11 +667,12 @@ private class SizeModifier(
 ) : LayoutModifier, InspectorValueInfo(inspectorInfo) {
     private val Density.targetConstraints
         get() = Constraints(
-            minWidth = if (minWidth != Dp.Unspecified) minWidth.toIntPx() else 0,
-            minHeight = if (minHeight != Dp.Unspecified) minHeight.toIntPx() else 0,
-            maxWidth = if (maxWidth != Dp.Unspecified) maxWidth.toIntPx() else Constraints.Infinity,
+            minWidth = if (minWidth != Dp.Unspecified) minWidth.roundToPx() else 0,
+            minHeight = if (minHeight != Dp.Unspecified) minHeight.roundToPx() else 0,
+            maxWidth =
+                if (maxWidth != Dp.Unspecified) maxWidth.roundToPx() else Constraints.Infinity,
             maxHeight = if (maxHeight != Dp.Unspecified) {
-                maxHeight.toIntPx()
+                maxHeight.roundToPx()
             } else {
                 Constraints.Infinity
             }
@@ -683,7 +684,7 @@ private class SizeModifier(
     ): MeasureResult {
         val wrappedConstraints = targetConstraints.let { targetConstraints ->
             if (enforceIncoming) {
-                targetConstraints.enforce(constraints)
+                constraints.constrain(targetConstraints)
             } else {
                 val resolvedMinWidth = if (minWidth != Dp.Unspecified) {
                     targetConstraints.minWidth
@@ -803,13 +804,13 @@ private class UnspecifiedConstraintsModifier(
     ): MeasureResult {
         val wrappedConstraints = Constraints(
             if (minWidth != Dp.Unspecified && constraints.minWidth == 0) {
-                minWidth.toIntPx().coerceAtMost(constraints.maxWidth)
+                minWidth.roundToPx().coerceAtMost(constraints.maxWidth)
             } else {
                 constraints.minWidth
             },
             constraints.maxWidth,
             if (minHeight != Dp.Unspecified && constraints.minHeight == 0) {
-                minHeight.toIntPx().coerceAtMost(constraints.maxHeight)
+                minHeight.roundToPx().coerceAtMost(constraints.maxHeight)
             } else {
                 constraints.minHeight
             },
@@ -825,28 +826,28 @@ private class UnspecifiedConstraintsModifier(
         measurable: IntrinsicMeasurable,
         height: Int
     ) = measurable.minIntrinsicWidth(height).coerceAtLeast(
-        if (minWidth != Dp.Unspecified) minWidth.toIntPx() else 0
+        if (minWidth != Dp.Unspecified) minWidth.roundToPx() else 0
     )
 
     override fun IntrinsicMeasureScope.maxIntrinsicWidth(
         measurable: IntrinsicMeasurable,
         height: Int
     ) = measurable.maxIntrinsicWidth(height).coerceAtLeast(
-        if (minWidth != Dp.Unspecified) minWidth.toIntPx() else 0
+        if (minWidth != Dp.Unspecified) minWidth.roundToPx() else 0
     )
 
     override fun IntrinsicMeasureScope.minIntrinsicHeight(
         measurable: IntrinsicMeasurable,
         width: Int
     ) = measurable.minIntrinsicHeight(width).coerceAtLeast(
-        if (minHeight != Dp.Unspecified) minHeight.toIntPx() else 0
+        if (minHeight != Dp.Unspecified) minHeight.roundToPx() else 0
     )
 
     override fun IntrinsicMeasureScope.maxIntrinsicHeight(
         measurable: IntrinsicMeasurable,
         width: Int
     ) = measurable.maxIntrinsicHeight(width).coerceAtLeast(
-        if (minHeight != Dp.Unspecified) minHeight.toIntPx() else 0
+        if (minHeight != Dp.Unspecified) minHeight.roundToPx() else 0
     )
 }
 

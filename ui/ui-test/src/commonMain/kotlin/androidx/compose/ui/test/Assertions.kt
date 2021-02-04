@@ -22,34 +22,6 @@ import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsProperties
 
 /**
- * Asserts that the current semantics node has hidden property set to true. A hidden node is a
- * node that is not visible for accessibility. It will still be shown, but it will be skipped by
- * accessibility services.
- *
- * Note that this does not verify parents of the node. For stronger guarantees of visibility
- * see [assertIsNotDisplayed]. If you want to assert that the node is not even in the hierarchy
- * use [SemanticsNodeInteraction.assertDoesNotExist].
- *
- * Throws [AssertionError] if the node is not hidden.
- */
-@Deprecated("SemanticsMatcher.assertIsHidden is deprecated without a replacement.")
-@Suppress("DEPRECATION")
-fun SemanticsNodeInteraction.assertIsHidden(): SemanticsNodeInteraction = assert(isHidden())
-
-/**
- * Asserts that the current semantics node has hidden property set to false.
- *
- * Note that this does not verify parents of the node. For stronger guarantees of visibility
- * see [assertIsDisplayed]. If you only want to assert that the node is in the hierarchy use
- * [SemanticsNodeInteraction.assertExists]
- *
- * Throws [AssertionError] if the node is hidden.
- */
-@Deprecated("SemanticsMatcher.assertIsNotHidden is deprecated without a replacement.")
-@Suppress("DEPRECATION")
-fun SemanticsNodeInteraction.assertIsNotHidden(): SemanticsNodeInteraction = assert(isNotHidden())
-
-/**
  * Asserts that the current semantics node is displayed on screen.
  *
  * Throws [AssertionError] if the node is not displayed.
@@ -157,33 +129,64 @@ fun SemanticsNodeInteraction.assertIsNotFocused(): SemanticsNodeInteraction =
     assert(isNotFocused())
 
 /**
- * Asserts the semantics node is in a mutually exclusive group. This is used by radio groups to
- * assert only one is selected at a given time.
+ * Asserts that the node's content description equals the given [value].
  *
- * @Deprecated Replaced with androidx.compose.ui.test.assertIsSelectable
+ * Throws [AssertionError] if the node's value is not equal to `value`, or if the node has no value
+ *
+ * @param ignoreCase Whether case should be ignored.
+ * @see SemanticsProperties.ContentDescription
  */
-@Deprecated(
-    "Replaced with androidx.compose.ui.test.assertIsSelectable",
-    ReplaceWith("assertIsSelectable()", "androidx.compose.ui.test")
-)
-fun SemanticsNodeInteraction.assertIsInMutuallyExclusiveGroup(): SemanticsNodeInteraction =
-    assertIsSelectable()
+fun SemanticsNodeInteraction.assertContentDescriptionEquals(
+    value: String,
+    ignoreCase: Boolean = false
+): SemanticsNodeInteraction = assert(hasContentDescription(value, ignoreCase = ignoreCase))
 
 /**
- * Asserts the node's label equals the given String.
- * For further details please check [SemanticsProperties.ContentDescription].
- * Throws [AssertionError] if the node's value is not equal to `value`, or if the node has no value
+ * Asserts that the node's content description contains the given [value] as a substring.
+ *
+ * Throws [AssertionError] if the node's value does not contain `value`, or if the node has no value
+ *
+ * @param ignoreCase Whether case should be ignored.
+ * @see SemanticsProperties.ContentDescription
  */
-fun SemanticsNodeInteraction.assertLabelEquals(value: String): SemanticsNodeInteraction =
-    assert(hasContentDescription(value))
+fun SemanticsNodeInteraction.assertContentDescriptionContains(
+    value: String,
+    ignoreCase: Boolean = false
+): SemanticsNodeInteraction =
+    assert(hasContentDescription(value, substring = true, ignoreCase = ignoreCase))
 
 /**
- * Asserts the node's text equals the given String.
- * For further details please check [SemanticsProperties.Text].
+ * Asserts that the node's text equals the given [value].
+ *
+ * If the node is a text field, it will compare input text and other texts that the text field
+ * might have, for example label or placeholder.
+ *
  * Throws [AssertionError] if the node's value is not equal to `value`, or if the node has no value
+ *
+ * @param ignoreCase Whether case should be ignored.
+ * @see SemanticsProperties.Text
  */
-fun SemanticsNodeInteraction.assertTextEquals(value: String): SemanticsNodeInteraction =
-    assert(hasText(value))
+fun SemanticsNodeInteraction.assertTextEquals(
+    value: String,
+    ignoreCase: Boolean = false
+): SemanticsNodeInteraction =
+    assert(hasText(value, ignoreCase = ignoreCase))
+
+/**
+ * Asserts that the node's text contains the given [value] as a substring.
+ *
+ * If the node is a text field, it will compare input text and other texts that the text field
+ * might have, for example label or placeholder.
+
+ * Throws [AssertionError] if the node's value does not contain `value`, or if the node has no value
+ *
+ * @param ignoreCase Whether case should be ignored.
+ * @see SemanticsProperties.Text
+ */
+fun SemanticsNodeInteraction.assertTextContains(
+    value: String,
+    ignoreCase: Boolean = false
+): SemanticsNodeInteraction = assert(hasText(value, substring = true, ignoreCase = ignoreCase))
 
 /**
  * Asserts the node's value equals the given value.

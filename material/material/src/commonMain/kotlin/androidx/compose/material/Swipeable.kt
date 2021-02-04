@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.material
 
 import androidx.compose.animation.asDisposableClock
@@ -38,8 +40,8 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.Saver
-import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -47,8 +49,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.gesture.nestedscroll.NestedScrollSource
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
-import androidx.compose.ui.platform.AmbientAnimationClock
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalAnimationClock
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
@@ -388,12 +390,34 @@ open class SwipeableState<T>(
  */
 @Immutable
 @ExperimentalMaterialApi
-data class SwipeProgress<T>(
+class SwipeProgress<T>(
     val from: T,
     val to: T,
     /*@FloatRange(from = 0.0, to = 1.0)*/
     val fraction: Float
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is SwipeProgress<*>) return false
+
+        if (from != other.from) return false
+        if (to != other.to) return false
+        if (fraction != other.fraction) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = from?.hashCode() ?: 0
+        result = 31 * result + (to?.hashCode() ?: 0)
+        result = 31 * result + fraction.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "SwipeProgress(from=$from, to=$to, fraction=$fraction)"
+    }
+}
 
 /**
  * Create and [remember] a [SwipeableState] with the default animation clock.
@@ -409,8 +433,8 @@ fun <T : Any> rememberSwipeableState(
     animationSpec: AnimationSpec<Float> = AnimationSpec,
     confirmStateChange: (newValue: T) -> Boolean = { true }
 ): SwipeableState<T> {
-    val clock = AmbientAnimationClock.current.asDisposableClock()
-    return rememberSavedInstanceState(
+    val clock = LocalAnimationClock.current.asDisposableClock()
+    return rememberSaveable(
         clock,
         saver = SwipeableState.Saver(
             clock = clock,
@@ -530,7 +554,7 @@ fun <T> Modifier.swipeable(
     require(anchors.values.distinct().count() == anchors.size) {
         "You cannot have two anchors mapped to the same state."
     }
-    val density = AmbientDensity.current
+    val density = LocalDensity.current
     DisposableEffect(anchors) {
         state.anchors = anchors
         state.thresholds = { a, b ->
@@ -627,7 +651,7 @@ data class FractionalThreshold(
  * Must not be negative.
  */
 @Immutable
-data class ResistanceConfig(
+class ResistanceConfig(
     /*@FloatRange(from = 0.0, fromInclusive = false)*/
     val basis: Float,
     /*@FloatRange(from = 0.0)*/
@@ -640,6 +664,28 @@ data class ResistanceConfig(
         if (factor == 0f) return 0f
         val progress = (overflow / basis).coerceIn(-1f, 1f)
         return basis / factor * sin(progress * PI.toFloat() / 2)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ResistanceConfig) return false
+
+        if (basis != other.basis) return false
+        if (factorAtMin != other.factorAtMin) return false
+        if (factorAtMax != other.factorAtMax) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = basis.hashCode()
+        result = 31 * result + factorAtMin.hashCode()
+        result = 31 * result + factorAtMax.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "ResistanceConfig(basis=$basis, factorAtMin=$factorAtMin, factorAtMax=$factorAtMax)"
     }
 }
 

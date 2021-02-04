@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION") // gestures
+
 package androidx.compose.foundation.text
 
 import androidx.compose.foundation.InteractionState
@@ -45,14 +47,10 @@ internal fun Modifier.textFieldFocusModifier(
     focusRequester: FocusRequester,
     interactionState: InteractionState?,
     onFocusChanged: (FocusState) -> Unit
-): Modifier {
-    if (!enabled) return this
-
-    return this
-        .focusRequester(focusRequester)
-        .onFocusChanged(onFocusChanged)
-        .focusable(interactionState = interactionState)
-}
+) = this
+    .focusRequester(focusRequester)
+    .onFocusChanged(onFocusChanged)
+    .focusable(interactionState = interactionState, enabled = enabled)
 
 // Mouse
 internal fun Modifier.mouseDragGestureFilter(

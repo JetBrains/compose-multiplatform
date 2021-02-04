@@ -17,29 +17,12 @@
 package androidx.compose.runtime
 
 import android.os.Looper
-import androidx.compose.runtime.dispatch.AndroidUiDispatcher
+import android.view.Choreographer
 import kotlinx.coroutines.Dispatchers
-import kotlin.coroutines.CoroutineContext
-
-private object AndroidEmbeddingContext : EmbeddingContext {
-
-    override fun isMainThread(): Boolean {
-        return Looper.myLooper() == Looper.getMainLooper()
-    }
-
-    override fun mainThreadCompositionContext(): CoroutineContext {
-        return MainAndroidUiContext
-    }
-}
-
-actual fun EmbeddingContext(): EmbeddingContext = AndroidEmbeddingContext
-
-// TODO: Our host-side tests still grab the Android actuals based on SDK stubs that return null.
-// Satisfy their dependencies.
-private val MainAndroidUiContext: CoroutineContext by lazy {
-    if (Looper.getMainLooper() != null) AndroidUiDispatcher.Main
-    else Dispatchers.Main
-}
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 
 internal actual object Trace {
     actual fun beginSection(name: String): Any? {
@@ -52,6 +35,48 @@ internal actual object Trace {
     }
 }
 
-internal actual typealias MainThread = androidx.annotation.MainThread
-
 internal actual typealias CheckResult = androidx.annotation.CheckResult
+
+/**
+ * This is an inaccurate implementation that will only be used when running linked against
+ * Android SDK stubs in host-side tests. A real implementation should synchronize with the
+ * device's default display's vsync rate.
+ */
+private object SdkStubsFallbackFrameClock : MonotonicFrameClock {
+    private const val DefaultFrameDelay = 16L // milliseconds
+
+    override suspend fun <R> withFrameNanos(onFrame: (frameTimeNanos: Long) -> R): R =
+        withContext(Dispatchers.Main) {
+            delay(DefaultFrameDelay)
+            onFrame(System.nanoTime())
+        }
+}
+
+private object DefaultChoreographerFrameClock : MonotonicFrameClock {
+    private val choreographer = runBlocking(Dispatchers.Main.immediate) {
+        Choreographer.getInstance()
+    }
+
+    override suspend fun <R> withFrameNanos(
+        onFrame: (frameTimeNanos: Long) -> R
+    ): R = suspendCancellableCoroutine<R> { co ->
+        val callback = Choreographer.FrameCallback { frameTimeNanos ->
+            co.resumeWith(runCatching { onFrame(frameTimeNanos) })
+        }
+        choreographer.postFrameCallback(callback)
+        co.invokeOnCancellation { choreographer.removeFrameCallback(callback) }
+    }
+}
+
+// For local testing
+private const val DisallowDefaultMonotonicFrameClock = false
+
+actual val DefaultMonotonicFrameClock: MonotonicFrameClock by lazy {
+    if (DisallowDefaultMonotonicFrameClock) error("Disallowed use of DefaultMonotonicFrameClock")
+
+    // When linked against Android SDK stubs and running host-side tests, APIs such as
+    // Looper.getMainLooper() that will never return null on a real device will return null.
+    // This branch offers an alternative solution.
+    if (Looper.getMainLooper() != null) DefaultChoreographerFrameClock
+    else SdkStubsFallbackFrameClock
+}

@@ -25,7 +25,7 @@ import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -158,7 +158,7 @@ class ElevationOverlayTest(private val elevation: Dp?, overlayAlpha: Float?) {
 
         rule.setContent {
             // Turn off overlay behavior
-            Providers(AmbientElevationOverlay provides null) {
+            Providers(LocalElevationOverlay provides null) {
                 TestSurface(elevation!!, colors)
             }
         }
@@ -183,7 +183,7 @@ class ElevationOverlayTest(private val elevation: Dp?, overlayAlpha: Float?) {
         }
 
         rule.setContent {
-            Providers(AmbientElevationOverlay provides customOverlay) {
+            Providers(LocalElevationOverlay provides customOverlay) {
                 TestSurface(elevation!!, lightColors())
             }
         }
@@ -210,7 +210,7 @@ private fun TestSurface(elevation: Dp, colors: Colors) {
     MaterialTheme(colors) {
         Box {
             Surface(elevation = elevation) {
-                with(AmbientDensity.current) {
+                with(LocalDensity.current) {
                     // Make the surface size small so we compare less pixels
                     Box(
                         Modifier.preferredSize(

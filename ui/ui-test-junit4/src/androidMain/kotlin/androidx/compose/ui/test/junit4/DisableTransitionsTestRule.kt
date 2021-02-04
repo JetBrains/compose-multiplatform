@@ -17,15 +17,14 @@
 package androidx.compose.ui.test.junit4
 
 import androidx.compose.animation.core.InternalAnimationApi
-import androidx.compose.animation.transition
-import androidx.compose.animation.transitionsEnabled
+import androidx.compose.animation.core.transitionsEnabled
 import androidx.compose.ui.test.InternalTestApi
 import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
 
 /**
- * This rule will disable all [transition] animations for the test. As a convenience, the rule
+ * This rule will disable all Transition animations for the test. As a convenience, the rule
  * can be turned into a no-op by setting [disableTransitions] to `false`, allowing you to put it
  * into a rule chain without branching logic.
  */
@@ -49,14 +48,3 @@ class DisableTransitionsTestRule(private val disableTransitions: Boolean = false
         }
     }
 }
-
-@Deprecated(
-    message = "Renamed to DisableTransitionsTestRule",
-    replaceWith = ReplaceWith(
-        "DisableTransitionsTestRule",
-        "androidx.ui.test.DisableTransitionsTestRule"
-    )
-)
-@Suppress("unused")
-@OptIn(InternalTestApi::class)
-typealias DisableTransitions = DisableTransitionsTestRule

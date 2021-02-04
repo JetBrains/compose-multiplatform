@@ -22,14 +22,19 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Providers
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
@@ -37,6 +42,7 @@ import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
@@ -56,6 +62,18 @@ class BackgroundTest {
     val rule = createComposeRule()
 
     private val contentTag = "Content"
+
+    private val rtlAwareShape = object : Shape {
+        override fun createOutline(
+            size: Size,
+            layoutDirection: LayoutDirection,
+            density: Density
+        ) = if (layoutDirection == LayoutDirection.Ltr) {
+            RectangleShape.createOutline(size, layoutDirection, density)
+        } else {
+            CircleShape.createOutline(size, layoutDirection, density)
+        }
+    }
 
     @Before
     fun before() {
@@ -162,6 +180,62 @@ class BackgroundTest {
     }
 
     @Test
+    fun background_rtl_initially() {
+        rule.setContent {
+            SemanticParent {
+                Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                    Box(
+                        Modifier.preferredSize(40f.toDp())
+                            .background(Color.Magenta)
+                            .background(
+                                brush = SolidColor(Color.White),
+                                shape = rtlAwareShape
+                            )
+                    )
+                }
+            }
+        }
+        val bitmap = rule.onNodeWithTag(contentTag).captureToImage()
+        bitmap.assertShape(
+            density = rule.density,
+            backgroundColor = Color.Magenta,
+            shape = CircleShape,
+            shapeColor = Color.White,
+            shapeOverlapPixelCount = 2.0f
+        )
+    }
+
+    @Test
+    fun background_rtl_after_switch() {
+        val direction = mutableStateOf(LayoutDirection.Ltr)
+        rule.setContent {
+            SemanticParent {
+                Providers(LocalLayoutDirection provides direction.value) {
+                    Box(
+                        Modifier.preferredSize(40f.toDp())
+                            .background(Color.Magenta)
+                            .background(
+                                brush = SolidColor(Color.White),
+                                shape = rtlAwareShape
+                            )
+                    )
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            direction.value = LayoutDirection.Rtl
+        }
+        rule.onNodeWithTag(contentTag).captureToImage().assertShape(
+            density = rule.density,
+            backgroundColor = Color.Magenta,
+            shape = CircleShape,
+            shapeColor = Color.White,
+            shapeOverlapPixelCount = 2.0f
+        )
+    }
+
+    @Test
     fun testInspectableParameter1() {
         val modifier = Modifier.background(Color.Magenta) as InspectableValue
         assertThat(modifier.nameFallback).isEqualTo("background")
@@ -193,7 +267,7 @@ class BackgroundTest {
     @Composable
     private fun SemanticParent(content: @Composable Density.() -> Unit) {
         Box(Modifier.testTag(contentTag)) {
-            AmbientDensity.current.content()
+            LocalDensity.current.content()
         }
     }
 }

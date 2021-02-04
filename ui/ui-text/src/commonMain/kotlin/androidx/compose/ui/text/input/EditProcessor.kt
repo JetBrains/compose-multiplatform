@@ -28,7 +28,7 @@ import androidx.compose.ui.text.emptyAnnotatedString
  *
  * @suppress
  */
-@InternalTextApi
+@InternalTextApi // Used by CoreTextTextField in foundation
 class EditProcessor {
 
     // The last known state of the EditingBuffer

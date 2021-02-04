@@ -23,10 +23,9 @@ import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.RecomposeScope
-import androidx.compose.runtime.compositionFor
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.currentRecomposeScope
-import androidx.compose.runtime.dispatch.MonotonicFrameClock
+import androidx.compose.runtime.MonotonicFrameClock
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.withRunningRecomposer
 import kotlinx.coroutines.channels.Channel
@@ -211,7 +210,7 @@ fun compose(
     recomposer: Recomposer,
     block: @Composable () -> Unit
 ): Composition {
-    return compositionFor(
+    return Composition(
         Any(),
         EmptyApplier(),
         recomposer

@@ -37,12 +37,17 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onParent
 import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.unit.IntSize
@@ -117,6 +122,60 @@ class BottomSheetScaffoldTest {
 
         rule.onNodeWithTag(sheetContent)
             .assertTopPositionInRootIsEqualTo(rule.rootHeight() - 300.dp)
+    }
+
+    @Test
+    fun bottomSheetScaffold_testExpandAction_whenCollapsed() {
+        val bottomSheetState = BottomSheetState(BottomSheetValue.Collapsed, clock = clock)
+        rule.setContent {
+            BottomSheetScaffold(
+                scaffoldState =
+                    rememberBottomSheetScaffoldState(bottomSheetState = bottomSheetState),
+                sheetContent = {
+                    Box(Modifier.fillMaxWidth().height(300.dp).testTag(sheetContent))
+                },
+                sheetPeekHeight = peekHeight
+            ) {
+                Text("Content")
+            }
+        }
+
+        rule.onNodeWithTag(sheetContent).onParent()
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.Collapse))
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.Expand))
+            .performSemanticsAction(SemanticsActions.Expand)
+
+        advanceClock()
+
+        rule.onNodeWithTag(sheetContent)
+            .assertTopPositionInRootIsEqualTo(rule.rootHeight() - 300.dp)
+    }
+
+    @Test
+    fun bottomSheetScaffold_testCollapseAction_whenExpanded() {
+        val bottomSheetState = BottomSheetState(BottomSheetValue.Expanded, clock = clock)
+        rule.setContent {
+            BottomSheetScaffold(
+                scaffoldState =
+                    rememberBottomSheetScaffoldState(bottomSheetState = bottomSheetState),
+                sheetContent = {
+                    Box(Modifier.fillMaxWidth().height(300.dp).testTag(sheetContent))
+                },
+                sheetPeekHeight = peekHeight
+            ) {
+                Text("Content")
+            }
+        }
+
+        rule.onNodeWithTag(sheetContent).onParent()
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.Expand))
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.Collapse))
+            .performSemanticsAction(SemanticsActions.Collapse)
+
+        advanceClock()
+
+        rule.onNodeWithTag(sheetContent)
+            .assertTopPositionInRootIsEqualTo(rule.rootHeight() - peekHeight)
     }
 
     @Test
@@ -407,7 +466,7 @@ class BottomSheetScaffoldTest {
             }
         }
         rule.runOnIdle {
-            Truth.assertThat(innerPadding.bottom).isEqualTo(peekHeight)
+            Truth.assertThat(innerPadding.calculateBottomPadding()).isEqualTo(peekHeight)
         }
     }
 }

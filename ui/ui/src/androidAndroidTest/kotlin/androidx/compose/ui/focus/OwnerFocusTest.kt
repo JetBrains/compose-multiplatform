@@ -21,7 +21,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusState.Active
 import androidx.compose.ui.focus.FocusState.Inactive
-import androidx.compose.ui.platform.AmbientView
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -46,7 +46,7 @@ class OwnerFocusTest {
         lateinit var ownerView: View
         val focusRequester = FocusRequester()
         rule.setFocusableContent {
-            ownerView = AmbientView.current
+            ownerView = LocalView.current
             Box(
                 modifier = Modifier
                     .focusRequester(focusRequester)
@@ -73,7 +73,7 @@ class OwnerFocusTest {
         var focusState = Inactive
         val focusRequester = FocusRequester()
         rule.setFocusableContent {
-            ownerView = AmbientView.current
+            ownerView = LocalView.current
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
@@ -101,7 +101,7 @@ class OwnerFocusTest {
         var focusState = Inactive
         val focusRequester = FocusRequester()
         rule.setFocusableContent {
-            ownerView = AmbientView.current
+            ownerView = LocalView.current
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
@@ -128,7 +128,7 @@ class OwnerFocusTest {
         var focusState = Inactive
         val focusRequester = FocusRequester()
         rule.setFocusableContent {
-            ownerView = AmbientView.current
+            ownerView = LocalView.current
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
@@ -158,7 +158,7 @@ class OwnerFocusTest {
         var focusState = Inactive
         val focusRequester = FocusRequester()
         rule.setFocusableContent {
-            ownerView = AmbientView.current
+            ownerView = LocalView.current
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
@@ -188,7 +188,7 @@ class OwnerFocusTest {
         var didViewFocusChange = false
         lateinit var ownerView: View
         rule.setFocusableContent {
-            ownerView = AmbientView.current
+            ownerView = LocalView.current
             Box(Modifier.testTag(nonClickable))
         }
         rule.runOnIdle {
@@ -218,7 +218,7 @@ class OwnerFocusTest {
         var didViewFocusChange = false
         lateinit var ownerView: View
         rule.setFocusableContent {
-            ownerView = AmbientView.current
+            ownerView = LocalView.current
             Box(Modifier.testTag(nonClickable))
         }
         rule.runOnIdle { assertThat(ownerView.isFocused).isFalse() }

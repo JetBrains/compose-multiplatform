@@ -24,6 +24,7 @@ import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -39,12 +40,11 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.GenericShape
-import androidx.compose.material.AmbientTextStyle
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,8 +55,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.RoundRect
-import androidx.compose.ui.gesture.DragObserver
-import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
@@ -66,7 +64,8 @@ import androidx.compose.ui.graphics.SweepGradientShader
 import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.toPixelMap
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -100,9 +99,10 @@ private fun ColorPicker(onColorChange: (Color) -> Unit) {
         val colorWheel = remember(diameter) { ColorWheel(diameter) }
 
         var isDragging by remember { mutableStateOf(false) }
-        val inputModifier = Modifier.simplePointerInput(
-            position = position,
-            onPositionChange = { newPosition ->
+        val inputModifier = Modifier.pointerInput(Unit) {
+            detectDragGestures { change, _ ->
+                isDragging = true
+                val newPosition = change.position
                 // Work out if the new position is inside the circle we are drawing, and has a
                 // valid color associated to it. If not, keep the current position
                 val newColor = colorWheel.colorForPosition(newPosition)
@@ -110,9 +110,8 @@ private fun ColorPicker(onColorChange: (Color) -> Unit) {
                     position = newPosition
                     onColorChange(newColor)
                 }
-            },
-            onDragStateChange = { isDragging = it }
-        )
+            }
+        }
 
         Box(Modifier.fillMaxSize()) {
             Image(modifier = inputModifier, contentDescription = null, bitmap = colorWheel.image)
@@ -124,49 +123,12 @@ private fun ColorPicker(onColorChange: (Color) -> Unit) {
     }
 }
 
-// TODO: b/152046065 dragging has the wrong semantics here, and it's possible to continue dragging
-// outside the bounds of the layout. Use a higher level, simple input wrapper when it's available
-// to just get the current position of the pointer, without needing to care about drag behavior /
-// relative positions.
-/**
- * [dragGestureFilter] that only cares about raw positions, where [position] is the position of
- * the current / last input event, [onPositionChange] is called with the new position when the
- * pointer moves, and [onDragStateChange] is called when dragging starts / stops.
- */
-private fun Modifier.simplePointerInput(
-    position: Offset,
-    onPositionChange: (Offset) -> Unit,
-    onDragStateChange: (Boolean) -> Unit
-): Modifier {
-    val observer = object : DragObserver {
-        override fun onStart(downPosition: Offset) {
-            onDragStateChange(true)
-            onPositionChange(downPosition)
-        }
-
-        override fun onDrag(dragDistance: Offset): Offset {
-            onPositionChange(position + dragDistance)
-            return dragDistance
-        }
-
-        override fun onCancel() {
-            onDragStateChange(false)
-        }
-
-        override fun onStop(velocity: Offset) {
-            onDragStateChange(false)
-        }
-    }
-
-    return dragGestureFilter(observer, startDragImmediately = true)
-}
-
 /**
  * Magnifier displayed on top of [position] with the currently selected [color].
  */
 @Composable
 private fun Magnifier(visible: Boolean, position: Offset, color: Color) {
-    val offset = with(AmbientDensity.current) {
+    val offset = with(LocalDensity.current) {
         Modifier.offset(
             position.x.toDp() - MagnifierWidth / 2,
             // Align with the center of the selection circle
@@ -245,7 +207,7 @@ private fun MagnifierLabel(modifier: Modifier, color: Color) {
             Box(Modifier.weight(0.25f).fillMaxHeight().background(color))
             // Add `#` and drop alpha characters
             val text = "#" + Integer.toHexString(color.toArgb()).toUpperCase(Locale.ROOT).drop(2)
-            val textStyle = AmbientTextStyle.current.copy(textAlign = TextAlign.Center)
+            val textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center)
             Text(
                 text = text,
                 modifier = Modifier.weight(0.75f).padding(top = 10.dp, bottom = 20.dp),
@@ -267,14 +229,14 @@ private fun MagnifierSelectionCircle(modifier: Modifier, color: Color) {
         elevation = 4.dp,
         color = color,
         border = BorderStroke(2.dp, SolidColor(Color.Black.copy(alpha = 0.75f))),
-        content = emptyContent()
+        content = {}
     )
 }
 
 /**
  * A [GenericShape] that draws a box with a triangle at the bottom center to indicate a popup.
  */
-private val MagnifierPopupShape = GenericShape { size ->
+private val MagnifierPopupShape = GenericShape { size, _ ->
     val width = size.width
     val height = size.height
 

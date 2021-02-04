@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-@file:OptIn(ExperimentalComposeApi::class)
+@file:OptIn(InternalComposeApi::class)
 package androidx.compose.runtime
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -32,6 +33,7 @@ class CompoundHashKeyTests : BaseComposeTest() {
     override val activityRule = makeTestActivityRule()
 
     @Test // b/157905524
+    @Ignore("b/179279455")
     fun testWithSubCompose() {
         val outerKeys = mutableListOf<Int>()
         val innerKeys = mutableListOf<Int>()
@@ -43,10 +45,10 @@ class CompoundHashKeyTests : BaseComposeTest() {
         @Composable
         fun recordHashKeys() {
             invalidates.add(currentRecomposeScope)
-            outerKeys.add(currentComposer.currentCompoundKeyHash)
+            outerKeys.add(currentComposer.compoundKeyHash)
             subCompose {
                 invalidates.add(currentRecomposeScope)
-                innerKeys.add(currentComposer.currentCompoundKeyHash)
+                innerKeys.add(currentComposer.compoundKeyHash)
             }
         }
 

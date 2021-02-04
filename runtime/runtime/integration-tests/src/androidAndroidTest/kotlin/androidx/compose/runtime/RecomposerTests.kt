@@ -27,7 +27,13 @@ import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertNotSame
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -45,6 +51,7 @@ class RecomposerTests : BaseComposeTest() {
     override val activityRule = makeTestActivityRule()
 
     @Test
+    @Ignore("b/179279455")
     fun testNativeViewWithAttributes() {
         compose {
             TextView(id = 456, text = "some text")
@@ -54,11 +61,12 @@ class RecomposerTests : BaseComposeTest() {
             val tv = activity.findViewById(456) as TextView
             assertEquals("some text", tv.text)
 
-            assertEquals(tv, activity.root.getChildAt(0))
+            assertEquals(tv, activity.root.traversal().first { it is TextView })
         }
     }
 
     @Test
+    @Ignore("b/179279455")
     fun testSlotKeyChangeCausesRecreate() {
         var i = 1
         var tv1: TextView? = null
@@ -93,6 +101,7 @@ class RecomposerTests : BaseComposeTest() {
     }
 
     @Test
+    @Ignore("b/179279455")
     fun testViewWithViewChildren() {
         compose {
             LinearLayout(id = 345) {
@@ -121,6 +130,7 @@ class RecomposerTests : BaseComposeTest() {
     }
 
     @Test
+    @Ignore("b/179279455")
     fun testForLoop() {
         val items = listOf(1, 2, 3, 4, 5, 6)
         compose {
@@ -147,6 +157,7 @@ class RecomposerTests : BaseComposeTest() {
     }
 
     @Test
+    @Ignore("b/179279455")
     fun testRecompose() {
         val counter = Counter()
 
@@ -191,6 +202,7 @@ class RecomposerTests : BaseComposeTest() {
     }
 
     @Test
+    @Ignore("b/179279455")
     fun testRootRecompose() {
         val counter = Counter()
         val trigger = Trigger()
@@ -289,6 +301,7 @@ class RecomposerTests : BaseComposeTest() {
     }
 
     @Test
+    @Ignore("b/179279455")
     fun testCorrectViewTree() {
         compose {
             LinearLayout {
@@ -297,7 +310,7 @@ class RecomposerTests : BaseComposeTest() {
             }
             LinearLayout { }
         }.then { activity ->
-            assertChildHierarchy(activity.root) {
+            assertChildHierarchy(activity.root.viewBlockHolders()) {
                 """
                     <LinearLayout>
                         <LinearLayout />
@@ -310,6 +323,7 @@ class RecomposerTests : BaseComposeTest() {
     }
 
     @Test
+    @Ignore("b/179279455")
     fun testCorrectViewTreeWithComponents() {
 
         @Composable fun B() {
@@ -327,7 +341,7 @@ class RecomposerTests : BaseComposeTest() {
             }
         }.then { activity ->
 
-            assertChildHierarchy(activity.root) {
+            assertChildHierarchy(activity.root.firstViewBlockHolder()) {
                 """
                 <LinearLayout>
                     <LinearLayout>
@@ -343,6 +357,7 @@ class RecomposerTests : BaseComposeTest() {
     }
 
     @Test
+    @Ignore("b/179279455")
     fun testCorrectViewTreeWithComponentWithMultipleRoots() {
 
         @Composable fun B() {
@@ -361,7 +376,7 @@ class RecomposerTests : BaseComposeTest() {
             }
         }.then {
 
-            assertChildHierarchy(activity.root) {
+            assertChildHierarchy(activity.root.firstViewBlockHolder()) {
                 """
                 <LinearLayout>
                     <LinearLayout>
@@ -472,6 +487,23 @@ class RecomposerTests : BaseComposeTest() {
             assertNotSame(snapshotId, Snapshot.current.id)
         }
     }
+
+    @Test
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun runningRecomposerFlow() = runBlockingTest {
+        lateinit var recomposer: RecomposerInfo
+        val recomposerJob = launch {
+            withRunningRecomposer {
+                recomposer = it.asRecomposerInfo()
+                suspendCancellableCoroutine<Unit> { }
+            }
+        }
+        val afterLaunch = Recomposer.runningRecomposers.value
+        assertTrue("recomposer in running list", recomposer in afterLaunch)
+        recomposerJob.cancelAndJoin()
+        val afterCancel = Recomposer.runningRecomposers.value
+        assertFalse("recomposer no longer in running list", recomposer in afterCancel)
+    }
 }
 
 @Composable
@@ -479,8 +511,27 @@ fun Wrapper(content: @Composable () -> Unit) {
     content()
 }
 
+private fun View.firstViewBlockHolder(): ViewGroup = traversal()
+    .filterIsInstance<ViewGroup>()
+    // NOTE: Implementation dependence on Compose UI implementation detail
+    .first { it.javaClass.simpleName == "ViewBlockHolder" }
+
+private fun View.viewBlockHolders(): Sequence<ViewGroup> = traversal()
+    .filterIsInstance<ViewGroup>()
+    // NOTE: Implementation dependence on Compose UI implementation detail
+    .filter { it.javaClass.simpleName == "ViewBlockHolder" }
+
 fun assertChildHierarchy(root: ViewGroup, getHierarchy: () -> String) {
     val realHierarchy = printChildHierarchy(root)
+
+    assertEquals(
+        normalizeString(getHierarchy()),
+        realHierarchy.trim()
+    )
+}
+
+fun assertChildHierarchy(roots: Sequence<ViewGroup>, getHierarchy: () -> String) {
+    val realHierarchy = roots.map { printChildHierarchy(it).trim() }.joinToString("\n")
 
     assertEquals(
         normalizeString(getHierarchy()),

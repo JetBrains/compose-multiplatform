@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.PaintingStyle
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.HorizontalAlignmentLine
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
@@ -80,6 +81,10 @@ internal class ModifiedLayoutNode(
         if (layoutNode.requireOwner().showLayoutBounds) {
             drawBorder(canvas, modifierBoundsPaint)
         }
+    }
+
+    override fun getWrappedByCoordinates(): LayoutCoordinates {
+        return this
     }
 
     internal companion object {

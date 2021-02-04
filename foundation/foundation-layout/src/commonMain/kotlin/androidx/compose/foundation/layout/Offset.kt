@@ -183,9 +183,9 @@ private class OffsetModifier(
         val placeable = measurable.measure(constraints)
         return layout(placeable.width, placeable.height) {
             if (rtlAware) {
-                placeable.placeRelative(x.toIntPx(), y.toIntPx())
+                placeable.placeRelative(x.roundToPx(), y.roundToPx())
             } else {
-                placeable.place(x.toIntPx(), y.toIntPx())
+                placeable.place(x.roundToPx(), y.roundToPx())
             }
         }
     }

@@ -1,18 +1,18 @@
- /*
- * Copyright 2020 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+/*
+* Copyright 2020 The Android Open Source Project
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*      http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 
 // TODO(b/160821157): Replace FocusState with FocusState2.isFocused
 @file:Suppress("DEPRECATION")
@@ -41,7 +41,7 @@ import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.savedInstanceState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
@@ -51,14 +51,16 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.AmbientTextInputService
-import androidx.compose.ui.platform.AmbientTextToolbar
+import androidx.compose.ui.platform.LocalTextInputService
+import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.TextToolbarStatus
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertTextEquals
@@ -83,6 +85,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.CommitTextCommand
 import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextFieldValue.Companion.Saver
 import androidx.compose.ui.text.input.TextInputService
@@ -122,7 +125,7 @@ class TextFieldTest {
         rule.setContent {
             val state = remember { mutableStateOf("") }
             Providers(
-                AmbientTextInputService provides inputService
+                LocalTextInputService provides inputService
             ) {
                 BasicTextField(
                     value = state.value,
@@ -161,7 +164,7 @@ class TextFieldTest {
 
         rule.setContent {
             Providers(
-                AmbientTextInputService provides textInputService
+                LocalTextInputService provides textInputService
             ) {
                 TextFieldApp()
             }
@@ -232,7 +235,7 @@ class TextFieldTest {
 
         rule.setContent {
             Providers(
-                AmbientTextInputService provides textInputService
+                LocalTextInputService provides textInputService
             ) {
                 OnlyDigitsApp()
             }
@@ -291,7 +294,7 @@ class TextFieldTest {
         val onTextLayout: (TextLayoutResult) -> Unit = mock()
         rule.setContent {
             Providers(
-                AmbientTextInputService provides textInputService
+                LocalTextInputService provides textInputService
             ) {
                 val state = remember { mutableStateOf("") }
                 BasicTextField(
@@ -366,7 +369,7 @@ class TextFieldTest {
         }
 
         with(rule.density) {
-            assertThat(size).isEqualTo(parentSize.toIntPx() - boxSize.toIntPx())
+            assertThat(size).isEqualTo(parentSize.roundToPx() - boxSize.roundToPx())
         }
     }
 
@@ -376,7 +379,7 @@ class TextFieldTest {
 
         val restorationTester = StateRestorationTester(rule)
         restorationTester.setContent {
-            state = savedInstanceState(saver = Saver) { TextFieldValue() }
+            state = rememberSaveable(stateSaver = Saver) { mutableStateOf(TextFieldValue()) }
         }
 
         rule.runOnIdle {
@@ -425,12 +428,19 @@ class TextFieldTest {
             BasicTextField(
                 modifier = Modifier.testTag("textField"),
                 value = "",
-                onValueChange = {}
+                onValueChange = {},
+                decorationBox = {
+                    Column {
+                        BasicText("label")
+                        it()
+                    }
+                }
             )
         }
 
         rule.onNodeWithTag("textField")
-            .assertTextEquals("")
+            .assertEditableTextEquals("")
+            .assertTextEquals("label")
             .assertHasClickAction()
             .assert(hasSetTextAction())
             .assert(hasImeAction(ImeAction.Default))
@@ -482,10 +492,10 @@ class TextFieldTest {
 
         val hello = AnnotatedString("Hello")
         rule.onNodeWithTag("textField")
-            .assertTextEquals("")
+            .assertEditableTextEquals("")
             .performSemanticsAction(SemanticsActions.SetText) { it(hello) }
         rule.onNodeWithTag("textField")
-            .assertTextEquals(hello.text)
+            .assertEditableTextEquals(hello.text)
             .assert(
                 SemanticsMatcher.expectValue(
                     SemanticsProperties.TextSelectionRange,
@@ -590,6 +600,22 @@ class TextFieldTest {
         }
     }
 
+    @Test
+    fun semantics_passwordTextField_noCopyCutActions() {
+        rule.setContent {
+            BasicTextField(
+                modifier = Modifier.testTag(Tag),
+                value = TextFieldValue("Hello", TextRange(0, 3)),
+                onValueChange = {},
+                visualTransformation = PasswordVisualTransformation()
+            )
+        }
+
+        rule.onNodeWithTag(Tag)
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.CopyText))
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.CutText))
+    }
+
     @LargeTest
     @Test
     fun semantics_longClick() {
@@ -598,7 +624,7 @@ class TextFieldTest {
         var toolbar: TextToolbar? = null
 
         rule.setContent {
-            toolbar = AmbientTextToolbar.current
+            toolbar = LocalTextToolbar.current
             BasicTextField(
                 modifier = Modifier.testTag(Tag),
                 value = value,
@@ -676,7 +702,7 @@ class TextFieldTest {
         }
 
         // click outside core text field area
-        rule.onNodeWithTag("label")
+        rule.onNodeWithTag("label", useUnmergedTree = true)
             .performGesture {
                 click(Offset.Zero)
             }
@@ -686,3 +712,12 @@ class TextFieldTest {
         }
     }
 }
+
+private fun SemanticsNodeInteraction.assertEditableTextEquals(
+    value: String
+): SemanticsNodeInteraction =
+    assert(
+        SemanticsMatcher("${SemanticsProperties.EditableText.name} = '$value'") {
+            it.config.getOrNull(SemanticsProperties.EditableText)?.text.equals(value)
+        }
+    )

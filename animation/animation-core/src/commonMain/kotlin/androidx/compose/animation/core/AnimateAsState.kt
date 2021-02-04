@@ -25,7 +25,6 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.unit.Bounds
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -86,27 +85,6 @@ fun animateFloatAsState(
     return animationState
 }
 
-@Composable
-@Deprecated(
-    "animateAsState has been yet again renamed",
-    ReplaceWith(
-        "animateFloatAsState(targetValue, animationSpec, visibilityThreshold, " +
-            "finishedListener)",
-        "androidx.compose.animation.core.animateFloatAsState"
-    )
-)
-fun animateAsState(
-    targetValue: Float,
-    animationSpec: AnimationSpec<Float> = defaultAnimation,
-    visibilityThreshold: Float = 0.01f,
-    finishedListener: ((Float) -> Unit)? = null
-): State<Float> = animateFloatAsState(
-    targetValue,
-    animationSpec,
-    visibilityThreshold,
-    finishedListener
-)
-
 /**
  * Fire-and-forget animation function for [Dp]. This Composable function is overloaded for
  * different parameter types such as [Float], [Color][androidx.compose.ui.graphics.Color], [Offset],
@@ -144,20 +122,6 @@ fun animateDpAsState(
 }
 
 private val dpDefaultSpring = spring<Dp>(visibilityThreshold = Dp.VisibilityThreshold)
-
-@Deprecated(
-    "animateAsState has been yet again renamed",
-    ReplaceWith(
-        "animateDpAsState(targetValue, animationSpec, finishedListener)",
-        "androidx.compose.animation.core.animateDpAsState"
-    )
-)
-@Composable
-fun animateAsState(
-    targetValue: Dp,
-    animationSpec: AnimationSpec<Dp> = dpDefaultSpring,
-    finishedListener: ((Dp) -> Unit)? = null
-): State<Dp> = animateDpAsState(targetValue, animationSpec, finishedListener)
 
 /**
  * Fire-and-forget animation function for [Size]. This Composable function is overloaded for
@@ -198,74 +162,6 @@ fun animateSizeAsState(
 
 private val sizeDefaultSpring = spring(visibilityThreshold = Size.VisibilityThreshold)
 
-@Deprecated(
-    "animateAsState has been yet again renamed",
-    ReplaceWith(
-        "animateSizeAsState(targetValue, animationSpec, finishedListener)",
-        "androidx.compose.animation.core.animateSizeAsState"
-    )
-)
-@Composable
-fun animateAsState(
-    targetValue: Size,
-    animationSpec: AnimationSpec<Size> = sizeDefaultSpring,
-    finishedListener: ((Size) -> Unit)? = null
-): State<Size> = animateSizeAsState(targetValue, animationSpec, finishedListener)
-
-/**
- * Fire-and-forget animation function for [Bounds]. This Composable function is overloaded for
- * different parameter types such as [Dp], [Color][androidx.compose.ui.graphics.Color], [Offset],
- * etc. When the provided [targetValue] is changed, the animation will run automatically. If there
- * is already an animation in-flight whe [targetValue] changes, the on-going animation will adjust
- * course to animate towards the new target value.
- *
- * [animateBoundsAsState] returns a [State] object. The value of the state object will
- * continuously be
- * updated by the animation until the animation finishes.
- *
- * Note, [animateBoundsAsState] cannot be canceled/stopped without removing this composable function
- * from the tree. See [animatedValue][androidx.compose.animation.animatedValue] for cancelable
- * animations.
- *
- *    val bounds: Bounds by animateBoundsAsState(
- *        if (collapsed) Bounds(0.dp, 0.dp, 10.dp, 20.dp) else Bounds(0.dp, 0.dp, 100.dp, 200.dp))
- *
- * @param targetValue Target value of the animation
- * @param animationSpec The animation that will be used to change the value through time. Physics
- *                    animation will be used by default.
- * @param finishedListener An optional end listener to get notified when the animation is finished.
- * @return A [State] object, the value of which is updated by animation.
- */
-@Composable
-fun animateBoundsAsState(
-    targetValue: Bounds,
-    animationSpec: AnimationSpec<Bounds> = boundsDefaultSpring,
-    finishedListener: ((Bounds) -> Unit)? = null
-): State<Bounds> {
-    return animateValueAsState(
-        targetValue,
-        Bounds.VectorConverter,
-        animationSpec,
-        finishedListener = finishedListener
-    )
-}
-
-private val boundsDefaultSpring = spring(visibilityThreshold = Bounds.VisibilityThreshold)
-
-@Deprecated(
-    "animateAsState has been yet again renamed",
-    ReplaceWith(
-        "animateBoundsAsState(targetValue, animationSpec, finishedListener)",
-        "androidx.compose.animation.core.animateBoundsAsState"
-    )
-)
-@Composable
-fun animateAsState(
-    targetValue: Bounds,
-    animationSpec: AnimationSpec<Bounds> = boundsDefaultSpring,
-    finishedListener: ((Bounds) -> Unit)? = null
-): State<Bounds> = animateBoundsAsState(targetValue, animationSpec, finishedListener)
-
 /**
  * Fire-and-forget animation function for [Offset]. This Composable function is overloaded for
  * different parameter types such as [Dp], [Color][androidx.compose.ui.graphics.Color], [Float],
@@ -300,20 +196,6 @@ fun animateOffsetAsState(
 }
 
 private val offsetDefaultSpring = spring(visibilityThreshold = Offset.VisibilityThreshold)
-
-@Deprecated(
-    "animateAsState has been yet again renamed",
-    ReplaceWith(
-        "animateOffsetAsState(targetValue, animationSpec, finishedListener)",
-        "androidx.compose.animation.core.animateOffsetAsState"
-    )
-)
-@Composable
-fun animateAsState(
-    targetValue: Offset,
-    animationSpec: AnimationSpec<Offset> = offsetDefaultSpring,
-    finishedListener: ((Offset) -> Unit)? = null
-): State<Offset> = animateOffsetAsState(targetValue, animationSpec, finishedListener)
 
 /**
  * Fire-and-forget animation function for [Rect]. This Composable function is overloaded for
@@ -351,20 +233,6 @@ fun animateRectAsState(
 
 private val rectDefaultSpring = spring(visibilityThreshold = Rect.VisibilityThreshold)
 
-@Deprecated(
-    "animateAsState has been yet again renamed",
-    ReplaceWith(
-        "animateRectAsState(targetValue, animationSpec, finishedListener)",
-        "androidx.compose.animation.core.animateRectAsState"
-    )
-)
-@Composable
-fun animateAsState(
-    targetValue: Rect,
-    animationSpec: AnimationSpec<Rect> = rectDefaultSpring,
-    finishedListener: ((Rect) -> Unit)? = null
-): State<Rect> = animateRectAsState(targetValue, animationSpec, finishedListener)
-
 /**
  * Fire-and-forget animation function for [Int]. This Composable function is overloaded for
  * different parameter types such as [Dp], [Color][androidx.compose.ui.graphics.Color], [Offset],
@@ -397,20 +265,6 @@ fun animateIntAsState(
 }
 
 private val intDefaultSpring = spring(visibilityThreshold = Int.VisibilityThreshold)
-
-@Deprecated(
-    "animateAsState has been yet again renamed",
-    ReplaceWith(
-        "animateIntAsState(targetValue, animationSpec, finishedListener)",
-        "androidx.compose.animation.core.animateIntAsState"
-    )
-)
-@Composable
-fun animateAsState(
-    targetValue: Int,
-    animationSpec: AnimationSpec<Int> = intDefaultSpring,
-    finishedListener: ((Int) -> Unit)? = null
-): State<Int> = animateIntAsState(targetValue, animationSpec, finishedListener)
 
 /**
  * Fire-and-forget animation function for [IntOffset]. This Composable function is overloaded for
@@ -447,20 +301,6 @@ fun animateIntOffsetAsState(
 
 private val intOffsetDefaultSpring = spring(visibilityThreshold = IntOffset.VisibilityThreshold)
 
-@Deprecated(
-    "animateAsState has been yet again renamed",
-    ReplaceWith(
-        "animateIntOffsetAsState(targetValue, animationSpec, finishedListener)",
-        "androidx.compose.animation.core.animateIntOffsetAsState"
-    )
-)
-@Composable
-fun animateAsState(
-    targetValue: IntOffset,
-    animationSpec: AnimationSpec<IntOffset> = intOffsetDefaultSpring,
-    finishedListener: ((IntOffset) -> Unit)? = null
-): State<IntOffset> = animateIntOffsetAsState(targetValue, animationSpec, finishedListener)
-
 /**
  * Fire-and-forget animation function for [IntSize]. This Composable function is overloaded for
  * different parameter types such as [Dp], [Color][androidx.compose.ui.graphics.Color], [Offset],
@@ -468,8 +308,8 @@ fun animateAsState(
  * is already an animation in-flight whe [targetValue] changes, the on-going animation will adjust
  * course to animate towards the new target value.
  *
- * [animateIntSizeAsState] returns a [State] object. The value of the state object will continuously be
- * updated by the animation until the animation finishes.
+ * [animateIntSizeAsState] returns a [State] object. The value of the state object will continuously
+ * be updated by the animation until the animation finishes.
  *
  * Note, [animateIntSizeAsState] cannot be canceled/stopped without removing this composable function
  * from the tree. See [animatedValue][androidx.compose.animation.animatedValue] for cancelable
@@ -493,20 +333,6 @@ fun animateIntSizeAsState(
 }
 
 private val intSizeDefaultSpring = spring(visibilityThreshold = IntSize.VisibilityThreshold)
-
-@Deprecated(
-    "animateAsState has been yet again renamed",
-    ReplaceWith(
-        "animateIntSizeAsState(targetValue, animationSpec, finishedListener)",
-        "androidx.compose.animation.core.animateIntSizeAsState"
-    )
-)
-@Composable
-fun animateAsState(
-    targetValue: IntSize,
-    animationSpec: AnimationSpec<IntSize> = intSizeDefaultSpring,
-    finishedListener: ((IntSize) -> Unit)? = null
-): State<IntSize> = animateIntSizeAsState(targetValue, animationSpec, finishedListener)
 
 /**
  * Fire-and-forget animation function for any value. This Composable function is overloaded for
@@ -560,24 +386,3 @@ fun <T, V : AnimationVector> animateValueAsState(
     }
     return animationState
 }
-
-@Deprecated(
-    "animateAsState has been yet again renamed",
-    ReplaceWith(
-        "animateValueAsState(targetValue, typeConverter, animationSpec, visibilityThreshold, " +
-            "finishedListener)",
-        "androidx.compose.animation.core.animateValueAsState"
-    )
-)
-@Composable
-fun <T, V : AnimationVector> animateAsState(
-    targetValue: T,
-    typeConverter: TwoWayConverter<T, V>,
-    animationSpec: AnimationSpec<T> = remember {
-        spring(visibilityThreshold = visibilityThreshold)
-    },
-    visibilityThreshold: T? = null,
-    finishedListener: ((T) -> Unit)? = null
-): State<T> = animateValueAsState(
-    targetValue, typeConverter, animationSpec, visibilityThreshold, finishedListener
-)

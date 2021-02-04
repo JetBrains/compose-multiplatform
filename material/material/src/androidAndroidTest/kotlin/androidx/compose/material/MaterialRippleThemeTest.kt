@@ -27,8 +27,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ripple.AmbientRippleTheme
 import androidx.compose.material.ripple.ExperimentalRippleApi
+import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material.ripple.RippleAlpha
 import androidx.compose.material.ripple.RippleTheme
 import androidx.compose.material.ripple.rememberRipple
@@ -53,6 +53,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
@@ -436,7 +437,7 @@ class MaterialRippleThemeTest {
 
         rule.setContent {
             MaterialTheme {
-                Providers(AmbientRippleTheme provides rippleTheme) {
+                Providers(LocalRippleTheme provides rippleTheme) {
                     Surface(contentColor = contentColor) {
                         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             RippleBox(interactionState, rememberRipple())
@@ -456,6 +457,7 @@ class MaterialRippleThemeTest {
         )
     }
 
+    @FlakyTest(bugId = 179292401)
     @Test
     fun customRippleTheme_dragged() {
         val interactionState = InteractionState()
@@ -475,7 +477,7 @@ class MaterialRippleThemeTest {
 
         rule.setContent {
             MaterialTheme {
-                Providers(AmbientRippleTheme provides rippleTheme) {
+                Providers(LocalRippleTheme provides rippleTheme) {
                     Surface(contentColor = contentColor) {
                         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             RippleBox(interactionState, rememberRipple())
@@ -514,7 +516,7 @@ class MaterialRippleThemeTest {
 
         rule.setContent {
             MaterialTheme {
-                Providers(AmbientRippleTheme provides rippleTheme) {
+                Providers(LocalRippleTheme provides rippleTheme) {
                     Surface(contentColor = Color.Black) {
                         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             RippleBox(interactionState, rememberRipple())
@@ -555,6 +557,56 @@ class MaterialRippleThemeTest {
 
             val expectedColor =
                 calculateResultingRippleColor(newColor, rippleOpacity = newAlpha)
+
+            Truth.assertThat(Color(centerPixel)).isEqualTo(expectedColor)
+        }
+    }
+
+    @Test
+    fun contentColorProvidedAfterRememberRipple() {
+        val interactionState = InteractionState()
+
+        val alpha = 0.5f
+        val expectedRippleColor = Color.Red
+
+        val theme = object : RippleTheme {
+            @Composable
+            override fun defaultColor() = LocalContentColor.current
+
+            @Composable
+            override fun rippleAlpha() = RippleAlpha { alpha }
+        }
+
+        rule.setContent {
+            MaterialTheme {
+                Providers(LocalRippleTheme provides theme) {
+                    Surface(contentColor = Color.Black) {
+                        // Create ripple where contentColor is black
+                        val ripple = rememberRipple()
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Surface(contentColor = expectedRippleColor) {
+                                // Ripple is used where contentColor is red, so the instance
+                                // should get the red color when it is created
+                                RippleBox(interactionState, ripple)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        rule.runOnUiThread {
+            interactionState.addInteraction(Interaction.Pressed, Offset(10f, 10f))
+        }
+
+        with(rule.onNodeWithTag(Tag)) {
+            val centerPixel = captureToImage().asAndroidBitmap()
+                .run {
+                    getPixel(width / 2, height / 2)
+                }
+
+            val expectedColor =
+                calculateResultingRippleColor(expectedRippleColor, rippleOpacity = alpha)
 
             Truth.assertThat(Color(centerPixel)).isEqualTo(expectedColor)
         }

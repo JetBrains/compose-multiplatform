@@ -26,7 +26,7 @@ package androidx.compose.runtime
  * @sample androidx.compose.runtime.samples.CustomTreeComposition
  *
  * @see AbstractApplier
- * @see compositionFor
+ * @see Composition
  * @see Composer
  * @see ComposeNode
  */
@@ -185,7 +185,7 @@ interface Applier<N> {
  * @sample androidx.compose.runtime.samples.CustomTreeComposition
  *
  * @see Applier
- * @see compositionFor
+ * @see Composition
  * @see Composer
  * @see ComposeNode
  */

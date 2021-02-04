@@ -17,12 +17,12 @@ package androidx.compose.ui.window
 
 import android.view.View
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Providers
-import androidx.compose.runtime.ambientOf
-import androidx.compose.runtime.emptyContent
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -30,12 +30,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.node.Owner
-import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.test.isRoot
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onFirst
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.height
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.Root
@@ -44,6 +51,8 @@ import androidx.test.espresso.matcher.BoundedMatcher
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import androidx.test.uiautomator.UiDevice
 import com.google.common.truth.Truth.assertThat
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.Description
@@ -71,7 +80,7 @@ class PopupTest {
             SimpleContainer {
                 PopupTestTag(testTag) {
                     Popup(alignment = Alignment.Center) {
-                        SimpleContainer(Modifier.preferredSize(50.dp), content = emptyContent())
+                        SimpleContainer(Modifier.preferredSize(50.dp), content = {})
                     }
                 }
             }
@@ -96,7 +105,7 @@ class PopupTest {
                         SimpleContainer(
                             width = popupWidthDp,
                             height = popupHeightDp,
-                            content = emptyContent()
+                            content = {}
                         )
                     }
                 }
@@ -129,14 +138,14 @@ class PopupTest {
         }
 
         val measureLatch = CountDownLatch(1)
-        var isFocusable by mutableStateOf(false)
+        var focusable by mutableStateOf(false)
         rule.setContent {
             Box {
                 PopupTestTag(testTag) {
                     Popup(
                         alignment = Alignment.TopStart,
                         offset = offset,
-                        isFocusable = isFocusable
+                        properties = PopupProperties(focusable = focusable)
                     ) {
                         // This is called after the OnChildPosition method in Popup() which
                         // updates the popup to its final position
@@ -165,7 +174,7 @@ class PopupTest {
         assertSinglePopupExists()
 
         rule.runOnUiThread {
-            isFocusable = true
+            focusable = true
         }
 
         // If we have a leak, this will crash on multiple popups found
@@ -196,13 +205,13 @@ class PopupTest {
     }
 
     @Test
-    fun preservesAmbients() {
-        val ambient = ambientOf<Float>()
+    fun preservesCompositionLocals() {
+        val compositionLocal = compositionLocalOf<Float>()
         var value = 0f
         rule.setContent {
-            Providers(ambient provides 1f) {
+            Providers(compositionLocal provides 1f) {
                 Popup {
-                    value = ambient.current
+                    value = compositionLocal.current
                 }
             }
         }
@@ -215,15 +224,132 @@ class PopupTest {
     fun preservesLayoutDirection() {
         var value = LayoutDirection.Ltr
         rule.setContent {
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Popup {
-                    value = AmbientLayoutDirection.current
+                    value = LocalLayoutDirection.current
                 }
             }
         }
         rule.runOnIdle {
             assertThat(value).isEqualTo(LayoutDirection.Rtl)
         }
+    }
+
+    @Test
+    fun isDismissedOnTapOutside() {
+        var showPopup by mutableStateOf(true)
+        rule.setContent {
+            Box(Modifier.fillMaxSize()) {
+                if (showPopup) {
+                    Popup(alignment = Alignment.Center, onDismissRequest = { showPopup = false }) {
+                        Box(Modifier.preferredSize(50.dp).testTag(testTag))
+                    }
+                }
+            }
+        }
+
+        // Popup should be visible
+        rule.onNodeWithTag(testTag).assertIsDisplayed()
+
+        // Click outside the popup
+        val outsideX = 0
+        val outsideY = with(rule.density) {
+            rule.onAllNodes(isRoot()).onFirst().getUnclippedBoundsInRoot().height.roundToPx() / 2
+        }
+        UiDevice.getInstance(getInstrumentation()).click(outsideX, outsideY)
+
+        // Popup should not exist
+        rule.onNodeWithTag(testTag).assertDoesNotExist()
+    }
+
+    @Test
+    fun isDismissedOnBackPress() {
+        var showPopup by mutableStateOf(true)
+        rule.setContent {
+            Box(Modifier.fillMaxSize()) {
+                if (showPopup) {
+                    Popup(
+                        properties = PopupProperties(
+                            // Needs to be focusable to intercept back press
+                            focusable = true
+                        ),
+                        alignment = Alignment.Center,
+                        onDismissRequest = { showPopup = false }
+                    ) {
+                        Box(Modifier.preferredSize(50.dp).testTag(testTag))
+                    }
+                }
+            }
+        }
+
+        // Popup should be visible
+        rule.onNodeWithTag(testTag).assertIsDisplayed()
+
+        Espresso.pressBack()
+
+        // Popup should not exist
+        rule.onNodeWithTag(testTag).assertDoesNotExist()
+    }
+
+    @Test
+    fun isNotDismissedOnTapOutside_dismissOnClickOutsideFalse() {
+        var showPopup by mutableStateOf(true)
+        rule.setContent {
+            Box(Modifier.fillMaxSize()) {
+                if (showPopup) {
+                    Popup(
+                        alignment = Alignment.Center,
+                        properties = PopupProperties(dismissOnClickOutside = false),
+                        onDismissRequest = { showPopup = false }
+                    ) {
+                        Box(Modifier.preferredSize(50.dp).testTag(testTag))
+                    }
+                }
+            }
+        }
+
+        // Popup should be visible
+        rule.onNodeWithTag(testTag).assertIsDisplayed()
+
+        // Click outside the popup
+        val outsideX = 0
+        val outsideY = with(rule.density) {
+            rule.onAllNodes(isRoot()).onFirst().getUnclippedBoundsInRoot().height.roundToPx() / 2
+        }
+        UiDevice.getInstance(getInstrumentation()).click(outsideX, outsideY)
+
+        // Popup should still be visible
+        rule.onNodeWithTag(testTag).assertIsDisplayed()
+    }
+
+    @Test
+    fun isNotDismissedOnBackPress_dismissOnBackPressFalse() {
+        var showPopup by mutableStateOf(true)
+        rule.setContent {
+            Box(Modifier.fillMaxSize()) {
+                if (showPopup) {
+                    Popup(
+                        properties = PopupProperties(
+                            // Needs to be focusable to intercept back press
+                            focusable = true,
+                            dismissOnBackPress = false
+                        ),
+                        alignment = Alignment.Center,
+                        onDismissRequest = { showPopup = false }
+                    ) {
+                        Box(Modifier.preferredSize(50.dp).testTag(testTag))
+                    }
+                }
+            }
+        }
+
+        // Popup should be visible
+        rule.onNodeWithTag(testTag).assertIsDisplayed()
+
+        Espresso.pressBack()
+
+        // Popup should still be visible
+        rule.onNodeWithTag(testTag).assertIsDisplayed()
     }
 
     private fun matchesSize(width: Int, height: Int): BoundedMatcher<View, View> {

@@ -20,7 +20,7 @@ import androidx.compose.animation.VectorConverter
 import androidx.compose.animation.animateColor
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
-import androidx.compose.runtime.dispatch.withFrameNanos
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -152,15 +152,15 @@ class TransitionTest {
             if (transition.isRunning) {
                 if (transition.targetState == AnimStates.To) {
                     assertEquals(
-                        floatAnim1.getValue(transition.playTimeNanos / 1_000_000L),
+                        floatAnim1.getValueFromNanos(transition.playTimeNanos),
                         animFloat.value, 0.00001f
                     )
                     assertEquals(
-                        colorAnim1.getValue(transition.playTimeNanos / 1_000_000L),
+                        colorAnim1.getValueFromNanos(transition.playTimeNanos),
                         animColor.value
                     )
                     assertEquals(
-                        keyframesAnim1.getValue(transition.playTimeNanos / 1_000_000L),
+                        keyframesAnim1.getValueFromNanos(transition.playTimeNanos),
                         animFloatWithKeyframes.value, 0.00001f
                     )
 
@@ -168,15 +168,15 @@ class TransitionTest {
                     assertEquals(AnimStates.From, transition.segment.initialState)
                 } else {
                     assertEquals(
-                        floatAnim2.getValue(transition.playTimeNanos / 1_000_000L),
+                        floatAnim2.getValueFromNanos(transition.playTimeNanos),
                         animFloat.value, 0.00001f
                     )
                     assertEquals(
-                        colorAnim2.getValue(transition.playTimeNanos / 1_000_000L),
+                        colorAnim2.getValueFromNanos(transition.playTimeNanos),
                         animColor.value
                     )
                     assertEquals(
-                        keyframesAnim2.getValue(transition.playTimeNanos / 1_000_000L),
+                        keyframesAnim2.getValueFromNanos(transition.playTimeNanos),
                         animFloatWithKeyframes.value, 0.00001f
                     )
                     assertEquals(AnimStates.From, transition.segment.targetState)
@@ -225,9 +225,9 @@ class TransitionTest {
 
                     assertEquals(0f, actual.value)
                     do {
-                        playTime = (withFrameNanos { it } - startTime) / 1_000_000L
-                        assertEquals(anim.getValue(playTime), actual.value)
-                    } while (playTime <= 200)
+                        playTime = withFrameNanos { it } - startTime
+                        assertEquals(anim.getValueFromNanos(playTime), actual.value)
+                    } while (playTime <= 200 * MillisToNanos)
                 }
             }
         }
@@ -236,7 +236,7 @@ class TransitionTest {
             target.value = AnimStates.To
         }
         rule.waitForIdle()
-        assertTrue(playTime > 200)
+        assertTrue(playTime > 200 * MillisToNanos)
     }
 
     @Test
@@ -260,8 +260,8 @@ class TransitionTest {
                     if (it == AnimStates.From) 0f else 1000f
                 }
                 val anim = TargetBasedAnimation(tween(800), Float.VectorConverter, 0f, 1000f)
-                playTime = (transition.playTimeNanos - startTime) / 1_000_000L
-                assertEquals(anim.getValue(playTime), laterAdded.value)
+                playTime = transition.playTimeNanos - startTime
+                assertEquals(anim.getValueFromNanos(playTime), laterAdded.value)
             }
         }
 
@@ -269,7 +269,7 @@ class TransitionTest {
             target.value = AnimStates.To
         }
         rule.waitForIdle()
-        assertTrue(playTime > 800)
+        assertTrue(playTime > 800 * MillisToNanos)
     }
 
     @Test
@@ -289,14 +289,14 @@ class TransitionTest {
             LaunchedEffect(transition) {
                 val startTime = withFrameNanos { it }
                 val anim = TargetBasedAnimation(tween(800), Float.VectorConverter, 0f, 1000f)
-                while (!anim.isFinished(playTime)) {
-                    playTime = (withFrameNanos { it } - startTime) / 1_000_000L
-                    assertEquals(anim.getValue(playTime), floatAnim?.value)
+                while (!anim.isFinishedFromNanos(playTime)) {
+                    playTime = withFrameNanos { it } - startTime
+                    assertEquals(anim.getValueFromNanos(playTime), floatAnim?.value)
                 }
             }
         }
         rule.waitForIdle()
-        assertTrue(playTime >= 800)
+        assertTrue(playTime >= 800 * MillisToNanos)
         assertEquals(1000f, floatAnim?.value)
     }
 
@@ -327,9 +327,9 @@ class TransitionTest {
 
                     val startTime = withFrameNanos { it }
                     val anim = TargetBasedAnimation(tween(800), Float.VectorConverter, 0f, 1000f)
-                    while (!anim.isFinished(playTime)) {
-                        playTime = (withFrameNanos { it } - startTime) / 1_000_000L
-                        assertEquals(anim.getValue(playTime), floatAnim.value)
+                    while (!anim.isFinishedFromNanos(playTime)) {
+                        playTime = withFrameNanos { it } - startTime
+                        assertEquals(anim.getValueFromNanos(playTime), floatAnim.value)
                     }
                 }
             }
@@ -337,6 +337,6 @@ class TransitionTest {
 
         rule.waitForIdle()
         assertTrue(targetRecreated)
-        assertTrue(playTime >= 800)
+        assertTrue(playTime >= 800 * MillisToNanos)
     }
 }

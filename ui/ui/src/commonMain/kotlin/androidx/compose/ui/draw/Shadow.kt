@@ -22,7 +22,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -61,7 +61,7 @@ fun Modifier.shadow(
         }
     ) {
         graphicsLayer(
-            shadowElevation = with(AmbientDensity.current) { elevation.toPx() },
+            shadowElevation = with(LocalDensity.current) { elevation.toPx() },
             shape = shape,
             clip = clip
         )
@@ -69,32 +69,3 @@ fun Modifier.shadow(
 } else {
     this
 }
-
-/**
- * Creates a [GraphicsLayerModifier] that draws the shadow. The [elevation] defines the visual
- * depth of the physical object. The physical object has a shape specified by [shape].
- *
- * Note that [elevation] is only affecting the shadow size and doesn't change the drawing order.
- * Use [zIndex] modifier if you want to draw the elements with larger [elevation] after all the
- * elements with a smaller one.
- *
- * Example usage:
- *
- * @sample androidx.compose.ui.samples.ShadowSample
- *
- * @param elevation The elevation for the shadow in pixels
- * @param shape Defines a shape of the physical object
- * @param clip When active, the content drawing clips to the shape.
- */
-@Deprecated(
-    "Use shadow instead",
-    ReplaceWith(
-        "shadow(elevation, shape, clip)", "androidx.compose.ui.draw"
-    )
-)
-@Stable
-fun Modifier.drawShadow(
-    elevation: Dp,
-    shape: Shape = RectangleShape,
-    clip: Boolean = elevation > 0.dp
-) = Modifier.shadow(elevation, shape, clip)

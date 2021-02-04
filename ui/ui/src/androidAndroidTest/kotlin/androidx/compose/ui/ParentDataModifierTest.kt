@@ -15,15 +15,14 @@
  */
 package androidx.compose.ui
 
+import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.emptyContent
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LayoutIdParentData
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.TestActivity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
@@ -116,13 +115,13 @@ class ParentDataModifierTest {
                 val header = @Composable {
                     Layout(
                         modifier = Modifier.layoutId(0),
-                        content = emptyContent()
+                        content = {}
                     ) { _, _ -> layout(0, 0) {} }
                 }
                 val footer = @Composable {
                     Layout(
                         modifier = Modifier.layoutId(1),
-                        content = emptyContent()
+                        content = {}
                     ) { _, _ -> layout(0, 0) {} }
                 }
 

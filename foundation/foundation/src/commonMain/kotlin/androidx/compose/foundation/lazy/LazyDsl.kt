@@ -31,17 +31,27 @@ interface LazyListScope {
     /**
      * Adds a single item.
      *
+     * @param key a stable and unique key representing the item. Using the same key
+     * for multiple items in the list is not allowed. Type of the key should be saveable
+     * via Bundle on Android. If null is passed the position in the list will represent the key.
      * @param content the content of the item
      */
-    fun item(content: @Composable LazyItemScope.() -> Unit)
+    fun item(key: Any? = null, content: @Composable LazyItemScope.() -> Unit)
 
     /**
      * Adds a [count] of items.
      *
      * @param count the items count
+     * @param key a factory of stable and unique keys representing the item. Using the same key
+     * for multiple items in the list is not allowed. Type of the key should be saveable
+     * via Bundle on Android. If null is passed the position in the list will represent the key.
      * @param itemContent the content displayed by a single item
      */
-    fun items(count: Int, itemContent: @Composable LazyItemScope.(index: Int) -> Unit)
+    fun items(
+        count: Int,
+        key: ((index: Int) -> Any)? = null,
+        itemContent: @Composable LazyItemScope.(index: Int) -> Unit
+    )
 
     /**
      * Adds a sticky header item, which will remain pinned even when scrolling after it.
@@ -49,22 +59,29 @@ interface LazyListScope {
      *
      * @sample androidx.compose.foundation.samples.StickyHeaderSample
      *
+     * @param key a stable and unique key representing the item. Using the same key
+     * for multiple items in the list is not allowed. Type of the key should be saveable
+     * via Bundle on Android. If null is passed the position in the list will represent the key.
      * @param content the content of the header
      */
     @ExperimentalFoundationApi
-    fun stickyHeader(content: @Composable LazyItemScope.() -> Unit)
+    fun stickyHeader(key: Any? = null, content: @Composable LazyItemScope.() -> Unit)
 }
 
 /**
  * Adds a list of items.
  *
  * @param items the data list
+ * @param key a factory of stable and unique keys representing the item. Using the same key
+ * for multiple items in the list is not allowed. Type of the key should be saveable
+ * via Bundle on Android. If null is passed the position in the list will represent the key.
  * @param itemContent the content displayed by a single item
  */
 inline fun <T> LazyListScope.items(
     items: List<T>,
+    noinline key: ((item: T) -> Any)? = null,
     crossinline itemContent: @Composable LazyItemScope.(item: T) -> Unit
-) = items(items.size) {
+) = items(items.size, if (key != null) { index: Int -> key(items[index]) } else null) {
     itemContent(items[it])
 }
 
@@ -72,12 +89,16 @@ inline fun <T> LazyListScope.items(
  * Adds a list of items where the content of an item is aware of its index.
  *
  * @param items the data list
+ * @param key a factory of stable and unique keys representing the item. Using the same key
+ * for multiple items in the list is not allowed. Type of the key should be saveable
+ * via Bundle on Android. If null is passed the position in the list will represent the key.
  * @param itemContent the content displayed by a single item
  */
 inline fun <T> LazyListScope.itemsIndexed(
     items: List<T>,
+    noinline key: ((index: Int, item: T) -> Any)? = null,
     crossinline itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
-) = items(items.size) {
+) = items(items.size, if (key != null) { index: Int -> key(index, items[index]) } else null) {
     itemContent(it, items[it])
 }
 
@@ -85,12 +106,16 @@ inline fun <T> LazyListScope.itemsIndexed(
  * Adds an array of items.
  *
  * @param items the data array
+ * @param key a factory of stable and unique keys representing the item. Using the same key
+ * for multiple items in the list is not allowed. Type of the key should be saveable
+ * via Bundle on Android. If null is passed the position in the list will represent the key.
  * @param itemContent the content displayed by a single item
  */
 inline fun <T> LazyListScope.items(
     items: Array<T>,
+    noinline key: ((item: T) -> Any)? = null,
     crossinline itemContent: @Composable LazyItemScope.(item: T) -> Unit
-) = items(items.size) {
+) = items(items.size, if (key != null) { index: Int -> key(items[index]) } else null) {
     itemContent(items[it])
 }
 
@@ -98,46 +123,73 @@ inline fun <T> LazyListScope.items(
  * Adds an array of items where the content of an item is aware of its index.
  *
  * @param items the data array
+ * @param key a factory of stable and unique keys representing the item. Using the same key
+ * for multiple items in the list is not allowed. Type of the key should be saveable
+ * via Bundle on Android. If null is passed the position in the list will represent the key.
  * @param itemContent the content displayed by a single item
  */
 inline fun <T> LazyListScope.itemsIndexed(
     items: Array<T>,
+    noinline key: ((index: Int, item: T) -> Any)? = null,
     crossinline itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
-) = items(items.size) {
+) = items(items.size, if (key != null) { index: Int -> key(index, items[index]) } else null) {
     itemContent(it, items[it])
 }
 
-internal class LazyListScopeImpl : LazyListScope {
-    private val intervals = IntervalList<LazyItemScope.(Int) -> (@Composable () -> Unit)>()
+private class IntervalContent(
+    val key: ((index: Int) -> Any)?,
+    val content: LazyItemScope.(index: Int) -> @Composable() () -> Unit
+)
+
+private class LazyListScopeImpl : LazyListScope {
+    private val intervals = IntervalList<IntervalContent>()
     val totalSize get() = intervals.totalSize
     var headersIndexes: MutableList<Int>? = null
         private set
 
-    fun contentFor(index: Int, scope: LazyItemScope): @Composable () -> Unit {
+    fun contentFor(index: Int, scope: LazyItemScope): ItemContent {
         val interval = intervals.intervalForIndex(index)
         val localIntervalIndex = index - interval.startIndex
+        val key = interval.content.key?.invoke(localIntervalIndex)
 
-        return interval.content(scope, localIntervalIndex)
+        return ItemContent(
+            key = key ?: "[DefaultKeyForIndex=$index]",
+            content = interval.content.content.invoke(scope, localIntervalIndex)
+        )
     }
 
-    override fun items(count: Int, itemContent: @Composable LazyItemScope.(index: Int) -> Unit) {
-        intervals.add(count) { index ->
-            @Composable { itemContent(index) }
-        }
+    override fun items(
+        count: Int,
+        key: ((index: Int) -> Any)?,
+        itemContent: @Composable LazyItemScope.(index: Int) -> Unit
+    ) {
+        intervals.add(
+            count,
+            IntervalContent(
+                key = key,
+                content = { index -> @Composable { itemContent(index) } }
+            )
+        )
     }
 
-    override fun item(content: @Composable LazyItemScope.() -> Unit) {
-        intervals.add(1) { @Composable { content() } }
+    override fun item(key: Any?, content: @Composable LazyItemScope.() -> Unit) {
+        intervals.add(
+            1,
+            IntervalContent(
+                key = if (key != null) { _: Int -> key } else null,
+                content = { @Composable { content() } }
+            )
+        )
     }
 
     @ExperimentalFoundationApi
-    override fun stickyHeader(content: @Composable LazyItemScope.() -> Unit) {
+    override fun stickyHeader(key: Any?, content: @Composable LazyItemScope.() -> Unit) {
         val headersIndexes = headersIndexes ?: mutableListOf<Int>().also {
             headersIndexes = it
         }
         headersIndexes.add(totalSize)
 
-        item(content)
+        item(key, content)
     }
 }
 

@@ -101,8 +101,12 @@ class SemanticsConfiguration :
      * Absorb the semantic information from a peer modifier into this configuration.
      *
      * This is repeatedly called for each semantics {} modifier on one LayoutNode to collapse
-     * them into one SemanticsConfiguration.  Values with a key already seen are ignored
-     * (the semantics value of the outermost modifier with a given semantics key is the one used).
+     * them into one SemanticsConfiguration. If a key is already seen and the value is
+     * AccessibilityAction, the resulting AccessibilityAction's label/action will be the
+     * label/action of the outermost modifier with this key and nonnull label/action, or null if no
+     * nonnull label/action is found. If the value is not AccessibilityAction, values with a key
+     * already seen are ignored (the semantics value of the outermost modifier with a given
+     * semantics key is the one used).
      */
     internal fun collapsePeer(peer: SemanticsConfiguration) {
         if (peer.isMergingSemanticsOfDescendants) {
@@ -114,6 +118,12 @@ class SemanticsConfiguration :
         for ((key, nextValue) in peer.props) {
             if (!props.contains(key)) {
                 props[key] = nextValue
+            } else if (nextValue is AccessibilityAction<*>) {
+                val value = props[key] as AccessibilityAction<*>
+                props[key] = AccessibilityAction(
+                    value.label ?: nextValue.label,
+                    value.action ?: nextValue.action
+                )
             }
         }
     }

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.ui.gesture
 
 import androidx.compose.runtime.remember
@@ -28,6 +30,10 @@ import androidx.compose.ui.platform.debugInspectorInfo
 /**
  * Defines the callbacks associated with scrolling.
  */
+@Deprecated(
+    "Use Modifier.scrollable instead. Alternatively, use Modifier.pointerInput with " +
+        "detectDragGestures function and calculate velocity by hand"
+)
 interface ScrollCallback {
 
     /**
@@ -113,6 +119,10 @@ interface ScrollCallback {
  */
 // TODO(shepshapard): Consider breaking up ScrollCallback such that the onScroll lambda can be
 //  the final parameter.
+@Deprecated(
+    "Use Modifier.scrollable instead. Alternatively, use Modifier.pointerInput with " +
+        "detectDragGestures function and calculate velocity by hand"
+)
 fun Modifier.scrollGestureFilter(
     scrollCallback: ScrollCallback,
     orientation: Orientation,

@@ -17,21 +17,19 @@
 package androidx.compose.ui.test.junit4
 
 import android.annotation.SuppressLint
-import android.content.Context
+import android.view.View
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.annotation.VisibleForTesting
-import androidx.compose.foundation.text.blinkingCursorEnabled
+import androidx.compose.animation.core.InfiniteAnimationPolicy
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Recomposer
 import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.platform.ViewRootForTest
-import androidx.compose.ui.platform.WindowRecomposerFactory
 import androidx.compose.ui.platform.WindowRecomposerPolicy
-import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.test.ComposeTimeoutException
-import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.IdlingResource
 import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.test.MainTestClock
@@ -42,7 +40,6 @@ import androidx.compose.ui.test.TestMonotonicFrameClock
 import androidx.compose.ui.test.TestOwner
 import androidx.compose.ui.test.createTestContext
 import androidx.compose.ui.test.junit4.android.ComposeIdlingResource
-import androidx.compose.ui.test.junit4.android.ComposeIdlingResourceNew
 import androidx.compose.ui.test.junit4.android.ComposeRootRegistry
 import androidx.compose.ui.test.junit4.android.EspressoLink
 import androidx.compose.ui.test.junit4.android.awaitComposeRoots
@@ -53,9 +50,9 @@ import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.textInputServiceFactory
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.IntSize
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.rules.ActivityScenarioRule
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -68,27 +65,6 @@ import org.junit.rules.RuleChain
 import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
-
-/**
- * Factory method to provide implementation of [ComposeContentTestRule].
- *
- * This is a legacy version of [createComposeRule] that does not use the new test clock. With this
- * version you can still use [ComposeTestRule.clockTestRule] instead of [ComposeTestRule.mainClock].
- */
-@Deprecated(
-    "createComposeRuleLegacy is only for temporary migration",
-    ReplaceWith(
-        "createComposeRule()",
-        "androidx.compose.ui.test.junit4.createComposeRule"
-    )
-)
-fun createComposeRuleLegacy(): ComposeContentTestRule {
-    @OptIn(ExperimentalTestApi::class)
-    return createAndroidComposeRule<ComponentActivity>(
-        ComponentActivity::class.java,
-        driveClockByMonotonicFrameClock = false
-    )
-}
 
 actual fun createComposeRule(): ComposeContentTestRule =
     createAndroidComposeRule<ComponentActivity>()
@@ -119,32 +95,6 @@ inline fun <reified A : ComponentActivity> createAndroidComposeRule():
 
 /**
  * Factory method to provide android specific implementation of [createComposeRule], for a given
- * activity class type [A].
- *
- * This is a legacy version of [createAndroidComposeRule] that does not use the new test clock. With
- * this version you can still use [ComposeTestRule.clockTestRule] instead of
- * [ComposeTestRule.mainClock].
- */
-@Deprecated(
-    "createComposeRuleLegacy is only for temporary migration",
-    ReplaceWith(
-        "createAndroidComposeRule()",
-        "androidx.compose.ui.test.junit4.createComposeRule"
-    )
-)
-@SuppressWarnings("MissingNullability")
-inline fun <reified A : ComponentActivity> createAndroidComposeRuleLegacy():
-    AndroidComposeTestRule<ActivityScenarioRule<A>, A> {
-        // TODO(b/138993381): By launching custom activities we are losing control over what content is
-        //  already there. This is issue in case the user already set some compose content and decides
-        //  to set it again via our API. In such case we won't be able to dispose the old composition.
-        //  Other option would be to provide a smaller interface that does not expose these methods.
-        @Suppress("DEPRECATION")
-        return createAndroidComposeRuleLegacy(A::class.java)
-    }
-
-/**
- * Factory method to provide android specific implementation of [createComposeRule], for a given
  * [activityClass].
  *
  * This method is useful for tests that require a custom Activity. This is usually the case for
@@ -160,58 +110,9 @@ inline fun <reified A : ComponentActivity> createAndroidComposeRuleLegacy():
  */
 fun <A : ComponentActivity> createAndroidComposeRule(
     activityClass: Class<A>
-): AndroidComposeTestRule<ActivityScenarioRule<A>, A> =
-    @OptIn(ExperimentalTestApi::class)
-    createAndroidComposeRule(
-        activityClass = activityClass,
-        driveClockByMonotonicFrameClock = true
-    )
-
-/**
- * Factory method to provide android specific implementation of [createComposeRule], for a given
- * [activityClass].
- *
- * This is a legacy version of [createAndroidComposeRule] that does not use the new test clock. With
- * this version you can still use [ComposeTestRule.clockTestRule] instead of
- * [ComposeTestRule.mainClock].
- */
-@Deprecated(
-    "createComposeRuleLegacy is only for temporary migration",
-    ReplaceWith(
-        "createAndroidComposeRule(activityClass)",
-        "androidx.compose.ui.test.junit4.createComposeRule"
-    )
-)
-fun <A : ComponentActivity> createAndroidComposeRuleLegacy(
-    activityClass: Class<A>
-): AndroidComposeTestRule<ActivityScenarioRule<A>, A> =
-    @OptIn(ExperimentalTestApi::class)
-    createAndroidComposeRule(
-        activityClass = activityClass,
-        driveClockByMonotonicFrameClock = false
-    )
-
-/**
- * Factory method to provide an implementation of [createComposeRule] that installs an animation
- * clock that is driven by the MonotonicFrameClock instead of the Choreographer. This is highly
- * experimental and _will_ be removed in the future. See the other overloads of
- * [createAndroidComposeRule] for the recommended way of creating a [ComposeTestRule].
- */
-@ExperimentalTestApi
-internal fun createAndroidComposeRule(
-    driveClockByMonotonicFrameClock: Boolean
-): AndroidComposeTestRule<ActivityScenarioRule<ComponentActivity>, ComponentActivity> {
-    return createAndroidComposeRule(ComponentActivity::class.java, driveClockByMonotonicFrameClock)
-}
-
-@ExperimentalTestApi
-private fun <A : ComponentActivity> createAndroidComposeRule(
-    activityClass: Class<A>,
-    driveClockByMonotonicFrameClock: Boolean
 ): AndroidComposeTestRule<ActivityScenarioRule<A>, A> = AndroidComposeTestRule(
     activityRule = ActivityScenarioRule(activityClass),
-    activityProvider = { it.getActivity() },
-    driveClockByMonotonicFrameClock = driveClockByMonotonicFrameClock
+    activityProvider = { it.getActivity() }
 )
 
 /**
@@ -221,7 +122,6 @@ private fun <A : ComponentActivity> createAndroidComposeRule(
  * instead of before the test.
  */
 fun createEmptyComposeRule(): ComposeTestRule =
-    @OptIn(ExperimentalTestApi::class)
     AndroidComposeTestRule<TestRule, ComponentActivity>(
         activityRule = TestRule { base, _ -> base },
         activityProvider = {
@@ -244,19 +144,10 @@ fun createEmptyComposeRule(): ComposeTestRule =
  * function.
  */
 @OptIn(InternalTestApi::class)
-class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>
-@ExperimentalTestApi
-internal constructor(
+class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
     val activityRule: R,
     private val activityProvider: (R) -> A,
-    private val driveClockByMonotonicFrameClock: Boolean = true
 ) : ComposeContentTestRule {
-
-    @OptIn(ExperimentalTestApi::class)
-    constructor(
-        activityRule: R,
-        activityProvider: (R) -> A
-    ) : this(activityRule, activityProvider, false)
 
     /**
      * Provides the current activity.
@@ -271,64 +162,46 @@ internal constructor(
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     internal val composeRootRegistry = ComposeRootRegistry()
 
-    private val mainClockImpl: MainTestClockImpl?
+    private val mainClockImpl: MainTestClockImpl
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     internal val composeIdlingResource: IdlingResource
 
-    @ExperimentalTestApi
-    override val clockTestRule: AnimationClockTestRule
-        @SuppressWarnings("DocumentExceptions")
-        get() {
-            if (driveClockByMonotonicFrameClock) {
-                throw IllegalStateException(
-                    "Cannot retrieve animation test clock in the new mode. Please use MainClock " +
-                        "or switch to Legacy mode if needed."
-                )
-            }
-            return _clockTestRule
-        }
-    @ExperimentalTestApi
-    private val _clockTestRule: AnimationClockTestRule
+    private val clockTestRule: MonotonicFrameClockTestRule
 
-    // TODO: Make these non-nulls once we migrate to new synchronization entirely
-    private val recomposer: Recomposer?
+    private val recomposer: Recomposer
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val testCoroutineDispatcher: TestCoroutineDispatcher?
-    private val recomposerApplyCoroutineScope: CoroutineScope?
-    private val frameCoroutineScope: CoroutineScope?
+    private val testCoroutineDispatcher: TestCoroutineDispatcher
+    private val recomposerApplyCoroutineScope: CoroutineScope
+    private val frameCoroutineScope: CoroutineScope
 
     override val mainClock: MainTestClock
-        get() = checkNotNull(mainClockImpl) {
-            "Cannot retrieve main test clock as the test is running in legacy mode."
-        }
+        get() = mainClockImpl
 
     init {
-        @OptIn(ExperimentalTestApi::class, ExperimentalCoroutinesApi::class)
-        if (driveClockByMonotonicFrameClock) {
-            testCoroutineDispatcher = TestCoroutineDispatcher()
-            frameCoroutineScope = CoroutineScope(testCoroutineDispatcher)
-            val frameClock = TestMonotonicFrameClock(frameCoroutineScope)
-            recomposerApplyCoroutineScope = CoroutineScope(
-                testCoroutineDispatcher + frameClock + Job()
-            )
-            recomposer = Recomposer(recomposerApplyCoroutineScope.coroutineContext)
-                .also { recomposerApplyCoroutineScope.launch { it.runRecomposeAndApplyChanges() } }
-            mainClockImpl = MainTestClockImpl(testCoroutineDispatcher, frameClock)
-            composeIdlingResource = ComposeIdlingResourceNew(
-                composeRootRegistry, mainClockImpl, recomposer
-            )
-            _clockTestRule = MonotonicFrameClockTestRule()
-        } else {
-            mainClockImpl = null
-            recomposer = null
-            testCoroutineDispatcher = null
-            recomposerApplyCoroutineScope = null
-            frameCoroutineScope = null
-
-            composeIdlingResource = ComposeIdlingResource(composeRootRegistry)
-            _clockTestRule = AndroidAnimationClockTestRule(composeIdlingResource)
+        @OptIn(ExperimentalCoroutinesApi::class)
+        testCoroutineDispatcher = TestCoroutineDispatcher()
+        frameCoroutineScope = CoroutineScope(testCoroutineDispatcher)
+        @OptIn(ExperimentalCoroutinesApi::class)
+        val frameClock = TestMonotonicFrameClock(frameCoroutineScope)
+        mainClockImpl = MainTestClockImpl(testCoroutineDispatcher, frameClock)
+        val infiniteAnimationPolicy = object : InfiniteAnimationPolicy {
+            override suspend fun <R> onInfiniteOperation(block: suspend () -> R): R {
+                if (mainClockImpl.autoAdvance) {
+                    throw CancellationException()
+                }
+                return block()
+            }
         }
-
+        @OptIn(ExperimentalCoroutinesApi::class)
+        recomposerApplyCoroutineScope = CoroutineScope(
+            testCoroutineDispatcher + frameClock + infiniteAnimationPolicy + Job()
+        )
+        recomposer = Recomposer(recomposerApplyCoroutineScope.coroutineContext)
+            .also { recomposerApplyCoroutineScope.launch { it.runRecomposeAndApplyChanges() } }
+        composeIdlingResource = ComposeIdlingResource(
+            composeRootRegistry, mainClockImpl, recomposer
+        )
+        clockTestRule = MonotonicFrameClockTestRule()
         registerIdlingResource(composeIdlingResource)
     }
 
@@ -341,24 +214,13 @@ internal constructor(
         Density(ApplicationProvider.getApplicationContext())
     }
 
-    @Deprecated(
-        "This utility was deprecated without replacement. It is recommend to use " +
-            "the root size for any assertions."
-    )
-    override val displaySize by lazy {
-        ApplicationProvider.getApplicationContext<Context>().resources.displayMetrics.let {
-            IntSize(it.widthPixels, it.heightPixels)
-        }
-    }
-
     override fun apply(base: Statement, description: Description): Statement {
         @Suppress("NAME_SHADOWING")
-        @OptIn(ExperimentalTestApi::class)
         return RuleChain
             .outerRule { base, _ -> composeRootRegistry.getStatementFor(base) }
             .around { base, _ -> idlingResourceRegistry.getStatementFor(base) }
             .around { base, _ -> espressoLink.getStatementFor(base) }
-            .around(_clockTestRule)
+            .around(clockTestRule)
             .around { base, _ -> AndroidComposeStatement(base) }
             .around(activityRule)
             .apply(base, description)
@@ -377,12 +239,11 @@ internal constructor(
         val currentActivity = activity
 
         runOnUiThread {
-            val composition = currentActivity.setContent(
-                recomposer ?: Recomposer.current(),
-                composable
-            )
+            currentActivity.setContent(recomposer, composable)
             disposeContentHook = {
-                composition.dispose()
+                // Removing a default ComposeView from the view hierarchy will
+                // dispose its composition.
+                activity.setContentView(View(activity))
             }
         }
 
@@ -414,7 +275,6 @@ internal constructor(
         //  waitForComposeRoots() suggests that we are now guaranteed one.
     }
 
-    @ExperimentalTestApi
     override suspend fun awaitIdle() {
         // TODO(b/169038516): when we can query compose roots for measure or layout, remove
         //  runEspressoOnIdle() and replace it with a suspend fun that loops while the
@@ -443,10 +303,6 @@ internal constructor(
 
     @SuppressWarnings("DocumentExceptions") // The interface doc already documents this
     override fun waitUntil(timeoutMillis: Long, condition: () -> Boolean) {
-        checkNotNull(mainClockImpl) {
-            "The waitUntil API is not available in the legacy mode."
-        }
-
         val startTime = System.nanoTime()
         while (!condition()) {
             if (mainClockImpl.autoAdvance) {
@@ -473,43 +329,32 @@ internal constructor(
     inner class AndroidComposeStatement(
         private val base: Statement
     ) : Statement() {
-        @OptIn(InternalTextApi::class)
+
+        @OptIn(InternalComposeUiApi::class)
         override fun evaluate() {
+            WindowRecomposerPolicy.withFactory({ recomposer }) {
+                evaluateInner()
+            }
+        }
+
+        @OptIn(InternalTextApi::class)
+        private fun evaluateInner() {
             @Suppress("DEPRECATION_ERROR")
             val oldTextInputFactory = textInputServiceFactory
             try {
                 @Suppress("DEPRECATION_ERROR")
-                blinkingCursorEnabled = false
-                @Suppress("DEPRECATION_ERROR")
                 textInputServiceFactory = {
                     TextInputServiceForTests(it)
                 }
-                if (recomposer != null) {
-                    @OptIn(InternalComposeUiApi::class)
-                    WindowRecomposerPolicy.setWindowRecomposerFactory {
-                        recomposer
-                    }
-                }
                 base.evaluate()
             } finally {
-                if (driveClockByMonotonicFrameClock) {
-                    recomposer?.shutDown()
-                    // FYI: Not canceling these scope below would end up cleanupTestCoroutines
-                    // throwing errors on active coroutines
-                    recomposerApplyCoroutineScope!!.cancel()
-                    frameCoroutineScope!!.cancel()
-                    @OptIn(ExperimentalCoroutinesApi::class)
-                    testCoroutineDispatcher?.cleanupTestCoroutines()
-                }
-                if (recomposer != null) {
-                    @Suppress("DEPRECATION")
-                    @OptIn(InternalComposeUiApi::class)
-                    WindowRecomposerPolicy.setWindowRecomposerFactory(
-                        WindowRecomposerFactory.Global
-                    )
-                }
-                @Suppress("DEPRECATION_ERROR")
-                blinkingCursorEnabled = true
+                recomposer.cancel()
+                // FYI: Not canceling these scope below would end up cleanupTestCoroutines
+                // throwing errors on active coroutines
+                recomposerApplyCoroutineScope.cancel()
+                frameCoroutineScope.cancel()
+                @OptIn(ExperimentalCoroutinesApi::class)
+                testCoroutineDispatcher.cleanupTestCoroutines()
                 @Suppress("DEPRECATION_ERROR")
                 textInputServiceFactory = oldTextInputFactory
                 // Dispose the content
@@ -550,11 +395,13 @@ internal constructor(
     @OptIn(InternalTestApi::class)
     internal inner class AndroidTestOwner : TestOwner {
 
+        override val mainClock: MainTestClock
+            get() = mainClockImpl
+
         @SuppressLint("DocumentExceptions")
         override fun sendTextInputCommand(node: SemanticsNode, command: List<EditCommand>) {
             val owner = node.root as ViewRootForTest
 
-            @Suppress("DEPRECATION")
             runOnUiThread {
                 val textInputService = owner.getTextInputServiceOrDie()
                 val onEditCommand = textInputService.onEditCommand
@@ -567,7 +414,6 @@ internal constructor(
         override fun sendImeAction(node: SemanticsNode, actionSpecified: ImeAction) {
             val owner = node.root as ViewRootForTest
 
-            @Suppress("DEPRECATION")
             runOnUiThread {
                 val textInputService = owner.getTextInputServiceOrDie()
                 val onImeActionPerformed = textInputService.onImeActionPerformed
@@ -586,7 +432,7 @@ internal constructor(
             //  structure. In case of multiple AndroidOwners, add a fake root
             waitForIdle()
 
-            return composeRootRegistry.getComposeRoots().also {
+            return composeRootRegistry.getRegisteredComposeRoots().also {
                 // TODO(b/153632210): This check should be done by callers of getOwners()
                 check(it.isNotEmpty()) {
                     "No compose views found in the app. Is your Activity resumed?"
@@ -599,10 +445,6 @@ internal constructor(
                 ?: throw IllegalStateException(
                     "Text input service wrapper not set up! Did you use ComposeTestRule?"
                 )
-        }
-
-        override fun advanceTimeBy(millis: Long) {
-            mainClockImpl?.advanceDispatcher(millis)
         }
     }
 }

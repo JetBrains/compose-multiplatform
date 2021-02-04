@@ -27,8 +27,8 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
-import androidx.compose.ui.platform.AmbientLayoutDirection
 import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
@@ -90,8 +90,8 @@ class OffsetTest : LayoutTest() {
 
         rule.onNodeWithTag("box").assertExists()
         rule.runOnIdle {
-            assertEquals(offsetX.toIntPx(), positionX)
-            assertEquals(offsetY.toIntPx(), positionY)
+            assertEquals(offsetX.roundToPx(), positionX)
+            assertEquals(offsetY.roundToPx(), positionY)
         }
     }
 
@@ -104,7 +104,7 @@ class OffsetTest : LayoutTest() {
         var positionX = 0
         var positionY = 0
         rule.setContent {
-            Providers((AmbientLayoutDirection provides LayoutDirection.Rtl)) {
+            Providers((LocalLayoutDirection provides LayoutDirection.Rtl)) {
                 Box(
                     Modifier.testTag("box")
                         .wrapContentSize(Alignment.TopEnd)
@@ -124,8 +124,8 @@ class OffsetTest : LayoutTest() {
 
         rule.onNodeWithTag("box").assertExists()
         rule.runOnIdle {
-            assertEquals(containerWidth.toIntPx() - offsetX.toIntPx() - boxSize, positionX)
-            assertEquals(offsetY.toIntPx(), positionY)
+            assertEquals(containerWidth.roundToPx() - offsetX.roundToPx() - boxSize, positionX)
+            assertEquals(offsetY.roundToPx(), positionY)
         }
     }
 
@@ -150,8 +150,8 @@ class OffsetTest : LayoutTest() {
 
         rule.onNodeWithTag("box").assertExists()
         rule.runOnIdle {
-            assertEquals(offsetX.toIntPx(), positionX)
-            assertEquals(offsetY.toIntPx(), positionY)
+            assertEquals(offsetX.roundToPx(), positionX)
+            assertEquals(offsetY.roundToPx(), positionY)
         }
     }
 
@@ -164,7 +164,7 @@ class OffsetTest : LayoutTest() {
         var positionX = 0
         var positionY = 0
         rule.setContent {
-            Providers((AmbientLayoutDirection provides LayoutDirection.Rtl)) {
+            Providers((LocalLayoutDirection provides LayoutDirection.Rtl)) {
                 Box(
                     Modifier.testTag("box")
                         .wrapContentSize(Alignment.TopEnd)
@@ -184,8 +184,8 @@ class OffsetTest : LayoutTest() {
 
         rule.onNodeWithTag("box").assertExists()
         rule.runOnIdle {
-            assertEquals(containerWidth.toIntPx() - boxSize + offsetX.toIntPx(), positionX)
-            assertEquals(offsetY.toIntPx(), positionY)
+            assertEquals(containerWidth.roundToPx() - boxSize + offsetX.roundToPx(), positionX)
+            assertEquals(offsetY.roundToPx(), positionY)
         }
     }
 
@@ -224,7 +224,7 @@ class OffsetTest : LayoutTest() {
         var positionX = 0
         var positionY = 0
         rule.setContent {
-            Providers((AmbientLayoutDirection provides LayoutDirection.Rtl)) {
+            Providers((LocalLayoutDirection provides LayoutDirection.Rtl)) {
                 Box(
                     Modifier.testTag("box")
                         .wrapContentSize(Alignment.TopEnd)
@@ -245,7 +245,7 @@ class OffsetTest : LayoutTest() {
         rule.onNodeWithTag("box").assertExists()
         rule.runOnIdle {
             Assert.assertEquals(
-                containerWidth.toIntPx() - offsetX - boxSize,
+                containerWidth.roundToPx() - offsetX - boxSize,
                 positionX
             )
             Assert.assertEquals(offsetY, positionY)
@@ -287,7 +287,7 @@ class OffsetTest : LayoutTest() {
         var positionX = 0
         var positionY = 0
         rule.setContent {
-            Providers((AmbientLayoutDirection provides LayoutDirection.Rtl)) {
+            Providers((LocalLayoutDirection provides LayoutDirection.Rtl)) {
                 Box(
                     Modifier.testTag("box")
                         .wrapContentSize(Alignment.TopEnd)
@@ -308,7 +308,7 @@ class OffsetTest : LayoutTest() {
         rule.onNodeWithTag("box").assertExists()
         rule.runOnIdle {
             Assert.assertEquals(
-                containerWidth.toIntPx() - boxSize + offsetX,
+                containerWidth.roundToPx() - boxSize + offsetX,
                 positionX
             )
             Assert.assertEquals(offsetY, positionY)

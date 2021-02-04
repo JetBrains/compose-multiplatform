@@ -20,10 +20,25 @@ import android.content.Context
 import android.os.Looper
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.snapshots.SnapshotStateObserver
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.input.pointer.pointerInteropFilter
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.node.LayoutNode
+import androidx.compose.ui.platform.AndroidComposeView
+import androidx.compose.ui.platform.compositionContext
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
+import kotlin.math.roundToInt
 
 /**
  * A base class used to host a [View] inside Compose.
@@ -32,10 +47,19 @@ import androidx.compose.ui.unit.Density
  */
 // Opt in snapshot observing APIs.
 @OptIn(ExperimentalComposeApi::class)
-@InternalInteropApi
-abstract class AndroidViewHolder(context: Context) : ViewGroup(context) {
+internal abstract class AndroidViewHolder(
+    context: Context,
+    parentContext: CompositionContext?
+) : ViewGroup(context) {
     init {
         clipChildren = false
+
+        // Any [Abstract]ComposeViews that are descendants of this view will host
+        // subcompositions of the host composition.
+        // UiApplier doesn't supply this, only AndroidView.
+        parentContext?.let {
+            compositionContext = it
+        }
     }
 
     /**
@@ -106,9 +130,7 @@ abstract class AndroidViewHolder(context: Context) : ViewGroup(context) {
     @OptIn(ExperimentalComposeApi::class)
     private val runUpdate: () -> Unit = {
         if (hasUpdateBlock) {
-            snapshotObserver.observeReads(this, onCommitAffectingUpdate) {
-                update()
-            }
+            snapshotObserver.observeReads(this, onCommitAffectingUpdate, update)
         }
     }
 
@@ -144,16 +166,115 @@ abstract class AndroidViewHolder(context: Context) : ViewGroup(context) {
         // remove all observations:
         snapshotObserver.clear()
     }
+
+    /**
+     * Builds a [LayoutNode] tree representation for this Android [View] holder.
+     * The [LayoutNode] will proxy the Compose core calls to the [View].
+     */
+    fun toLayoutNode(): LayoutNode {
+        // TODO(soboleva): add layout direction here?
+        // TODO(popam): forward pointer input, accessibility, focus
+        // Prepare layout node that proxies measure and layout passes to the View.
+        val layoutNode = LayoutNode()
+
+        val coreModifier = Modifier
+            .pointerInteropFilter(this)
+            .drawBehind {
+                drawIntoCanvas { canvas ->
+                    (layoutNode.owner as? AndroidComposeView)
+                        ?.drawAndroidView(this@AndroidViewHolder, canvas.nativeCanvas)
+                }
+            }.onGloballyPositioned {
+                // The global position of this LayoutNode can change with it being replaced. For
+                // these cases, we need to inform the View.
+                layoutAccordingTo(layoutNode)
+            }
+        layoutNode.modifier = modifier.then(coreModifier)
+        onModifierChanged = { layoutNode.modifier = it.then(coreModifier) }
+
+        layoutNode.density = density
+        onDensityChanged = { layoutNode.density = it }
+
+        var viewRemovedOnDetach: View? = null
+        layoutNode.onAttach = { owner ->
+            (owner as? AndroidComposeView)?.addAndroidView(this, layoutNode)
+            if (viewRemovedOnDetach != null) view = viewRemovedOnDetach
+        }
+        layoutNode.onDetach = { owner ->
+            (owner as? AndroidComposeView)?.removeAndroidView(this)
+            viewRemovedOnDetach = view
+            view = null
+        }
+
+        layoutNode.measureBlocks = object : LayoutNode.NoIntrinsicsMeasureBlocks(
+            "Intrinsics not supported for Android views"
+        ) {
+            override fun measure(
+                measureScope: MeasureScope,
+                measurables: List<Measurable>,
+                constraints: Constraints
+            ): MeasureResult {
+                if (constraints.minWidth != 0) {
+                    getChildAt(0).minimumWidth = constraints.minWidth
+                }
+                if (constraints.minHeight != 0) {
+                    getChildAt(0).minimumHeight = constraints.minHeight
+                }
+                // TODO (soboleva): native view should get LD value from Compose?
+
+                // TODO(shepshapard): !! necessary?
+                measure(
+                    obtainMeasureSpec(
+                        constraints.minWidth,
+                        constraints.maxWidth,
+                        layoutParams!!.width
+                    ),
+                    obtainMeasureSpec(
+                        constraints.minHeight,
+                        constraints.maxHeight,
+                        layoutParams!!.height
+                    )
+                )
+                return measureScope.layout(measuredWidth, measuredHeight) {
+                    layoutAccordingTo(layoutNode)
+                }
+            }
+        }
+        return layoutNode
+    }
+
+    /**
+     * Intersects [Constraints] and [View] LayoutParams to obtain the suitable [View.MeasureSpec]
+     * for measuring the [View].
+     */
+    private fun obtainMeasureSpec(
+        min: Int,
+        max: Int,
+        preferred: Int
+    ): Int = when {
+        preferred >= 0 || min == max -> {
+            // Fixed size due to fixed size layout param or fixed constraints.
+            MeasureSpec.makeMeasureSpec(preferred.coerceIn(min, max), MeasureSpec.EXACTLY)
+        }
+        preferred == LayoutParams.WRAP_CONTENT && max != Constraints.Infinity -> {
+            // Wrap content layout param with finite max constraint. If max constraint is infinite,
+            // we will measure the child with UNSPECIFIED.
+            MeasureSpec.makeMeasureSpec(max, MeasureSpec.AT_MOST)
+        }
+        preferred == LayoutParams.MATCH_PARENT && max != Constraints.Infinity -> {
+            // Match parent layout param, so we force the child to fill the available space.
+            MeasureSpec.makeMeasureSpec(max, MeasureSpec.EXACTLY)
+        }
+        else -> {
+            // max constraint is infinite and layout param is WRAP_CONTENT or MATCH_PARENT.
+            MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
+        }
+    }
 }
 
-@RequiresOptIn(
-    level = RequiresOptIn.Level.ERROR,
-    message = "This is an experimental API for Compose UI LayoutNode and is likely to change " +
-        "before becoming stable."
-)
-@Target(
-    AnnotationTarget.CLASS,
-    AnnotationTarget.FUNCTION,
-    AnnotationTarget.PROPERTY
-)
-annotation class InternalInteropApi
+private fun View.layoutAccordingTo(layoutNode: LayoutNode) {
+    val position = layoutNode.coordinates.positionInRoot()
+    val x = position.x.roundToInt()
+    val y = position.y.roundToInt()
+    layout(x, y, x + measuredWidth, y + measuredHeight)
+}

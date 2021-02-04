@@ -28,17 +28,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.structuralEqualityPolicy
-import androidx.compose.ui.graphics.drawscope.ContentDrawScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.clipRect
-import androidx.compose.ui.graphics.takeOrElse
+import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.isUnspecified
 import androidx.compose.ui.util.fastForEach
@@ -58,7 +57,7 @@ import kotlinx.coroutines.launch
  * If you are using MaterialTheme in your hierarchy, a Ripple will be used as the default
  * [Indication] inside components such as [androidx.compose.foundation.clickable] and
  * [androidx.compose.foundation.indication]. You can also manually provide Ripples through
- * [androidx.compose.foundation.AmbientIndication] for the same effect if you are not using
+ * [androidx.compose.foundation.LocalIndication] for the same effect if you are not using
  * MaterialTheme.
  *
  * You can also explicitly create a Ripple and provide it to components in order to change the
@@ -81,14 +80,9 @@ public fun rememberRipple(
     radius: Dp = Dp.Unspecified,
     color: Color = Color.Unspecified
 ): Indication {
-    val theme = AmbientRippleTheme.current
-    val scope = rememberCoroutineScope()
-    val resolvedColor = color.takeOrElse { theme.defaultColor() }
-    val colorState = remember { mutableStateOf(resolvedColor, structuralEqualityPolicy()) }
-    colorState.value = resolvedColor
-    val rippleAlpha = theme.rippleAlpha()
-    return remember(bounded, radius, theme, scope) {
-        Ripple(bounded, radius, colorState, rippleAlpha, scope)
+    val colorState = rememberUpdatedState(color)
+    return remember(bounded, radius) {
+        Ripple(bounded, radius, colorState)
     }
 }
 
@@ -103,7 +97,7 @@ public fun rememberRipple(
  * If you are using MaterialTheme in your hierarchy, a Ripple will be used as the default
  * [Indication] inside components such as [androidx.compose.foundation.clickable] and
  * [androidx.compose.foundation.indication]. You can also manually provide Ripples through
- * [androidx.compose.foundation.AmbientIndication] for the same effect if you are not using
+ * [androidx.compose.foundation.LocalIndication] for the same effect if you are not using
  * MaterialTheme.
  *
  * You can also explicitly create a Ripple and provide it to components in order to change the
@@ -115,11 +109,22 @@ private class Ripple(
     private val bounded: Boolean,
     private val radius: Dp,
     private val color: State<Color>,
-    private val rippleAlpha: RippleAlpha,
-    private val scope: CoroutineScope
 ) : Indication {
+    @Composable
     override fun createInstance(): IndicationInstance {
-        return RippleIndicationInstance(bounded, radius, color, rippleAlpha, scope)
+        val theme = LocalRippleTheme.current
+        val color = rememberUpdatedState(
+            if (color.value.isSpecified) {
+                color.value
+            } else {
+                theme.defaultColor()
+            }
+        )
+        val rippleAlpha = theme.rippleAlpha()
+        val scope = rememberCoroutineScope()
+        return remember(this, rippleAlpha, scope) {
+            RippleIndicationInstance(bounded, radius, color, rippleAlpha, scope)
+        }
     }
 
     // to force stability on this indication we need equals and hashcode, there's no value in
@@ -131,8 +136,6 @@ private class Ripple(
         if (bounded != other.bounded) return false
         if (radius != other.radius) return false
         if (color != other.color) return false
-        if (rippleAlpha != other.rippleAlpha) return false
-        if (scope != other.scope) return false
 
         return true
     }
@@ -141,8 +144,6 @@ private class Ripple(
         var result = bounded.hashCode()
         result = 31 * result + radius.hashCode()
         result = 31 * result + color.hashCode()
-        result = 31 * result + rippleAlpha.hashCode()
-        result = 31 * result + scope.hashCode()
         return result
     }
 }

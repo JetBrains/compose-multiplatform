@@ -37,17 +37,18 @@ import androidx.compose.runtime.resetSourceInfo
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.node.OwnedLayer
+import androidx.compose.ui.layout.GraphicLayerInfo
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.CompositionDataRecord
-import androidx.compose.ui.tooling.Group
 import androidx.compose.ui.tooling.Inspectable
 import androidx.compose.ui.tooling.R
 import androidx.compose.ui.tooling.ToolingTest
-import androidx.compose.ui.tooling.asTree
-import androidx.compose.ui.tooling.position
+import androidx.compose.ui.tooling.data.Group
+import androidx.compose.ui.tooling.data.UiToolingDataApi
+import androidx.compose.ui.tooling.data.asTree
+import androidx.compose.ui.tooling.data.position
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -67,6 +68,7 @@ private const val DEBUG = false
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 @SdkSuppress(minSdkVersion = 29) // Render id is not returned for api < 29
+@OptIn(UiToolingDataApi::class)
 class LayoutInspectorTreeTest : ToolingTest() {
     private lateinit var density: Density
     private lateinit var view: View
@@ -110,6 +112,12 @@ class LayoutInspectorTreeTest : ToolingTest() {
         dumpNodes(nodes, builder)
 
         validate(nodes, builder, checkParameters = false) {
+            node(
+                name = "Content",
+                fileName = "",
+                left = 0.0.dp, top = 0.0.dp, width = viewWidth, height = viewHeight,
+                children = listOf("Box")
+            )
             node(
                 name = "Box",
                 isRenderNode = true,
@@ -185,6 +193,12 @@ class LayoutInspectorTreeTest : ToolingTest() {
 
         validate(nodes, builder, checkParameters = false) {
             node(
+                name = "Content",
+                fileName = "",
+                left = 0.0.dp, top = 0.0.dp, width = viewWidth, height = viewHeight,
+                children = listOf("Box")
+            )
+            node(
                 name = "Box",
                 isRenderNode = true,
                 fileName = "",
@@ -195,7 +209,7 @@ class LayoutInspectorTreeTest : ToolingTest() {
                 name = "MaterialTheme",
                 hasTransformations = true,
                 fileName = "LayoutInspectorTreeTest.kt",
-                left = 65.8.dp, top = 48.7.dp, width = 86.2.dp, height = 21.4.dp,
+                left = 68.0.dp, top = 49.7.dp, width = 88.5.dp, height = 21.7.dp,
                 children = listOf("Text")
             )
             node(
@@ -203,7 +217,7 @@ class LayoutInspectorTreeTest : ToolingTest() {
                 isRenderNode = true,
                 hasTransformations = true,
                 fileName = "LayoutInspectorTreeTest.kt",
-                left = 65.8.dp, top = 48.7.dp, width = 86.2.dp, height = 21.4.dp,
+                left = 68.0.dp, top = 49.7.dp, width = 88.5.dp, height = 21.7.dp,
             )
         }
     }
@@ -330,11 +344,13 @@ class LayoutInspectorTreeTest : ToolingTest() {
 
         view.setTag(R.id.inspection_slot_table_set, slotTableRecord.store)
         show {
-            Column {
-                BasicText(
-                    text = "Some text",
-                    style = TextStyle(textDecoration = TextDecoration.Underline)
-                )
+            Inspectable(slotTableRecord) {
+                Column {
+                    BasicText(
+                        text = "Some text",
+                        style = TextStyle(textDecoration = TextDecoration.Underline)
+                    )
+                }
             }
         }
 
@@ -551,7 +567,7 @@ class LayoutInspectorTreeTest : ToolingTest() {
     private fun dumpGroup(group: Group, indent: Int) {
         val position = group.position?.let { "\"$it\"" } ?: "null"
         val box = group.box
-        val id = group.modifierInfo.mapNotNull { (it.extra as? OwnedLayer)?.layerId }
+        val id = group.modifierInfo.mapNotNull { (it.extra as? GraphicLayerInfo)?.layerId }
             .singleOrNull() ?: 0
         println(
             "\"${"  ".repeat(indent)}\", ${group.javaClass.simpleName}, \"${group.name}\", " +

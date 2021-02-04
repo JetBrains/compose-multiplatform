@@ -27,11 +27,16 @@ import androidx.compose.material.BackdropValue.Revealed
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onParent
 import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -86,6 +91,32 @@ class BackdropScaffoldTest {
     }
 
     @Test
+    @LargeTest
+    fun backdropScaffold_testCollapseAction_whenConcealed() {
+        val scaffoldState = BackdropScaffoldState(Concealed, clock = clock)
+        rule.setContent {
+            BackdropScaffold(
+                scaffoldState = scaffoldState,
+                peekHeight = peekHeight,
+                headerHeight = headerHeight,
+                appBar = { Box(Modifier.preferredHeight(peekHeight)) },
+                backLayerContent = { Box(Modifier.preferredHeight(contentHeight)) },
+                frontLayerContent = { Box(Modifier.fillMaxSize().testTag(frontLayer)) }
+            )
+        }
+
+        rule.onNodeWithTag(frontLayer).onParent()
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.Expand))
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.Collapse))
+            .performSemanticsAction(SemanticsActions.Collapse)
+
+        advanceClock()
+
+        rule.onNodeWithTag(frontLayer)
+            .assertTopPositionInRootIsEqualTo(peekHeight + contentHeight)
+    }
+
+    @Test
     fun backdropScaffold_testOffset_whenRevealed() {
         rule.setContent {
             BackdropScaffold(
@@ -100,6 +131,32 @@ class BackdropScaffoldTest {
 
         rule.onNodeWithTag(frontLayer)
             .assertTopPositionInRootIsEqualTo(peekHeight + contentHeight)
+    }
+
+    @Test
+    @LargeTest
+    fun backdropScaffold_testExpandAction_whenRevealed() {
+        val scaffoldState = BackdropScaffoldState(Revealed, clock = clock)
+        rule.setContent {
+            BackdropScaffold(
+                scaffoldState = scaffoldState,
+                peekHeight = peekHeight,
+                headerHeight = headerHeight,
+                appBar = { Box(Modifier.preferredHeight(peekHeight)) },
+                backLayerContent = { Box(Modifier.preferredHeight(contentHeight)) },
+                frontLayerContent = { Box(Modifier.fillMaxSize().testTag(frontLayer)) }
+            )
+        }
+
+        rule.onNodeWithTag(frontLayer).onParent()
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.Collapse))
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.Expand))
+            .performSemanticsAction(SemanticsActions.Expand)
+
+        advanceClock()
+
+        rule.onNodeWithTag(frontLayer)
+            .assertTopPositionInRootIsEqualTo(peekHeight)
     }
 
     @Test

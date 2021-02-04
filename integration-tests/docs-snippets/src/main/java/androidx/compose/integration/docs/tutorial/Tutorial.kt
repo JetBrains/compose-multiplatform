@@ -18,6 +18,7 @@
 package androidx.compose.integration.docs.tutorial
 
 import android.os.Bundle
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -32,8 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.setContent
-import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -154,7 +154,7 @@ private object TutorialSnippet6 {
 private object TutorialSnippet7 {
     @Composable
     fun NewsStory() {
-        val image = imageResource(R.drawable.header)
+        val image = painterResource(R.drawable.header)
 
         Column(
             modifier = Modifier.padding(16.dp)
@@ -171,7 +171,7 @@ private object TutorialSnippet7 {
 private object TutorialSnippet8 {
     @Composable
     fun NewsStory() {
-        val image = imageResource(R.drawable.header)
+        val image = painterResource(R.drawable.header)
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
@@ -199,7 +199,7 @@ Lesson 3
 private object TutorialSnippet9 {
     @Composable
     fun NewsStory() {
-        val image = imageResource(R.drawable.header)
+        val image = painterResource(R.drawable.header)
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
@@ -226,7 +226,7 @@ private object TutorialSnippet9 {
 private object TutorialSnippet10 {
     @Composable
     fun NewsStory() {
-        val image = imageResource(R.drawable.header)
+        val image = painterResource(R.drawable.header)
         MaterialTheme {
             Column(
                 modifier = Modifier.padding(16.dp)
@@ -255,7 +255,7 @@ private object TutorialSnippet10 {
 private object TutorialSnippet11 {
     @Composable
     fun NewsStory() {
-        val image = imageResource(R.drawable.header)
+        val image = painterResource(R.drawable.header)
         MaterialTheme {
             val typography = MaterialTheme.typography
             Column(
@@ -288,7 +288,7 @@ private object TutorialSnippet11 {
 private object TutorialSnippet12 {
     @Composable
     fun NewsStory() {
-        val image = imageResource(R.drawable.header)
+        val image = painterResource(R.drawable.header)
         MaterialTheme {
             val typography = MaterialTheme.typography
             Column(
@@ -325,7 +325,7 @@ private object TutorialSnippet12 {
 private object TutorialSnippet13 {
     @Composable
     fun NewsStory() {
-        val image = imageResource(R.drawable.header)
+        val image = painterResource(R.drawable.header)
         MaterialTheme {
             val typography = MaterialTheme.typography
             Column(

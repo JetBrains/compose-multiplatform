@@ -24,7 +24,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.bottom
 import androidx.compose.ui.test.bottomCenter
@@ -123,7 +123,7 @@ class PositionsTest {
 
     private fun testPositionsInViewport(isVertical: Boolean, reverseScrollDirection: Boolean) {
         rule.setContent {
-            with(AmbientDensity.current) {
+            with(LocalDensity.current) {
                 if (isVertical) {
                     Column(
                         Modifier.size(100.toDp())

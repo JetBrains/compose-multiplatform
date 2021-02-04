@@ -28,8 +28,8 @@ import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
-import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -100,7 +100,7 @@ class AnimationModifierTest {
                     }
                     .size(width.dp, height.dp)
             )
-            density = AmbientDensity.current.density
+            density = LocalDensity.current.density
         }
 
         rule.runOnUiThread {
@@ -150,7 +150,7 @@ class AnimationModifierTest {
             assertThat(modifier.valueOverride, nullValue())
             assertThat(
                 modifier.inspectableElements.map { it.name }.toList(),
-                `is`(listOf("animSpec", "clip", "endListener"))
+                `is`(listOf("animationSpec", "finishedListener"))
             )
         }
     }

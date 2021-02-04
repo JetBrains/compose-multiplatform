@@ -46,6 +46,7 @@ import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompa
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.paneTitle
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.textSelectionRange
 import androidx.compose.ui.test.SemanticsMatcher
@@ -53,7 +54,6 @@ import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
-import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -61,6 +61,7 @@ import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.core.view.ViewCompat
@@ -74,6 +75,7 @@ import com.nhaarman.mockitokotlin2.atLeastOnce
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.spy
+import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -97,7 +99,6 @@ import org.mockito.internal.matchers.apachecommons.ReflectionEquals
     ExperimentalComposeApi::class
 )
 class AndroidAccessibilityTest {
-    @Suppress("DEPRECATION")
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>()
 
@@ -110,6 +111,9 @@ class AndroidAccessibilityTest {
     private val argument = ArgumentCaptor.forClass(AccessibilityEvent::class.java)
     private var isTextFieldVisible by mutableStateOf(true)
     private var textFieldSelectionOne = false
+    private var isPaneVisible by mutableStateOf(false)
+    private var paneTestTitle by mutableStateOf(PaneTitleOne)
+    private var textFieldValue = mutableStateOf(TextFieldValue(InitialText))
 
     companion object {
         private const val TimeOutInitialization: Long = 5000
@@ -121,6 +125,9 @@ class AndroidAccessibilityTest {
         private const val ParentForOverlappedChildrenTag = "parentForOverlappedChildren"
         private const val OverlappedChildOneTag = "overlappedChildOne"
         private const val OverlappedChildTwoTag = "overlappedChildTwo"
+        private const val PaneTag = "pane"
+        private const val PaneTitleOne = "pane title one"
+        private const val PaneTitleTwo = "pane title two"
         private const val InputText = "hello"
         private const val InitialText = "h"
     }
@@ -143,7 +150,7 @@ class AndroidAccessibilityTest {
             activity.setContentView(container)
             container.setContent {
                 var checked by remember { mutableStateOf(true) }
-                var value by remember { mutableStateOf(TextFieldValue(InitialText)) }
+                var value by remember { textFieldValue }
                 Column(Modifier.testTag(TopColTag)) {
                     Box(
                         Modifier
@@ -195,9 +202,21 @@ class AndroidAccessibilityTest {
                                 .testTag(TextFieldTag),
                             value = value,
                             onValueChange = { value = it },
-                            onTextLayout = { textLayoutResult = it }
+                            onTextLayout = { textLayoutResult = it },
+                            visualTransformation = PasswordVisualTransformation(),
+                            decorationBox = {
+                                BasicText("Label")
+                                it()
+                            }
                         )
                     }
+                }
+                if (isPaneVisible) {
+                    Box(
+                        Modifier
+                            .testTag(PaneTag)
+                            .semantics { paneTitle = paneTestTitle }
+                    ) {}
                 }
             }
             androidComposeView = container.getChildAt(0) as AndroidComposeView
@@ -213,7 +232,7 @@ class AndroidAccessibilityTest {
     fun testCreateAccessibilityNodeInfo() {
         val toggleableNode = rule.onNodeWithTag(ToggleableTag)
             .fetchSemanticsNode("couldn't find node with tag $ToggleableTag")
-        var accessibilityNodeInfo = provider.createAccessibilityNodeInfo(toggleableNode.id)
+        val accessibilityNodeInfo = provider.createAccessibilityNodeInfo(toggleableNode.id)
         assertEquals("android.view.View", accessibilityNodeInfo.className)
         val stateDescription = when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
@@ -236,10 +255,15 @@ class AndroidAccessibilityTest {
                 AccessibilityNodeInfo.AccessibilityAction(ACTION_CLICK, null)
             )
         )
+    }
 
+    @Test
+    fun testCreateAccessibilityNodeInfo_forTextField() {
+        textFieldValue.value = TextFieldValue(InitialText)
         val textFieldNode = rule.onNodeWithTag(TextFieldTag)
             .fetchSemanticsNode("couldn't find node with tag $TextFieldTag")
-        accessibilityNodeInfo = provider.createAccessibilityNodeInfo(textFieldNode.id)
+        val accessibilityNodeInfo = provider.createAccessibilityNodeInfo(textFieldNode.id)
+
         assertEquals("android.widget.EditText", accessibilityNodeInfo.className)
         assertEquals(InitialText, accessibilityNodeInfo.text.toString())
         assertTrue(accessibilityNodeInfo.isFocusable)
@@ -285,14 +309,34 @@ class AndroidAccessibilityTest {
     }
 
     @Test
+    fun reportedTexts_inTextFieldWithLabel_whenEditableTextNotEmpty() {
+        textFieldValue.value = TextFieldValue(InitialText)
+        val textFieldNode = rule.onNodeWithTag(TextFieldTag)
+            .fetchSemanticsNode("couldn't find node with tag $TextFieldTag")
+        val accessibilityNodeInfo = provider.createAccessibilityNodeInfo(textFieldNode.id)
+
+        assertEquals(InitialText, accessibilityNodeInfo.text.toString())
+        assertEquals("Label", accessibilityNodeInfo.hintText.toString())
+    }
+
+    @Test
+    fun reportedText_inTextFieldWithLabel_whenEditableTextEmpty() {
+        textFieldValue.value = TextFieldValue()
+        val textFieldNode = rule.onNodeWithTag(TextFieldTag)
+            .fetchSemanticsNode("couldn't find node with tag $TextFieldTag")
+        val accessibilityNodeInfo = provider.createAccessibilityNodeInfo(textFieldNode.id)
+
+        assertEquals("Label", accessibilityNodeInfo.text.toString())
+        assertEquals(true, accessibilityNodeInfo.isShowingHintText)
+    }
+
+    @Test
     fun testPerformAction_succeedOnEnabledNodes() {
         rule.onNodeWithTag(ToggleableTag)
             .assertIsDisplayed()
             .assertIsOn()
 
-        rule.mainClock.advanceTimeBy(TimeOutInitialization)
-        rule.waitForIdle()
-
+        waitForSubtreeEventToSend()
         val toggleableNode = rule.onNodeWithTag(ToggleableTag)
             .fetchSemanticsNode("couldn't find node with tag $ToggleableTag")
         rule.runOnUiThread {
@@ -334,9 +378,7 @@ class AndroidAccessibilityTest {
             .assertIsDisplayed()
             .assertIsOn()
 
-        rule.mainClock.advanceTimeBy(TimeOutInitialization)
-        rule.waitForIdle()
-
+        waitForSubtreeEventToSend()
         val toggleableNode = rule.onNodeWithTag(DisabledToggleableTag)
             .fetchSemanticsNode("couldn't find node with tag $DisabledToggleableTag")
         rule.runOnUiThread {
@@ -381,8 +423,7 @@ class AndroidAccessibilityTest {
             .assertIsDisplayed()
             .assertIsOn()
 
-        rule.mainClock.advanceTimeBy(TimeOutInitialization)
-        rule.waitForIdle()
+        waitForSubtreeEventToSend()
         rule.onNodeWithTag(ToggleableTag)
             .performClick()
             .assertIsOff()
@@ -407,16 +448,27 @@ class AndroidAccessibilityTest {
 
     @Test
     fun sendTextEvents_whenSetText() {
+        textFieldValue.value = TextFieldValue(InitialText)
+
         rule.onNodeWithTag(TextFieldTag)
             .assertIsDisplayed()
-            .assertTextEquals(InitialText)
+            .assert(
+                SemanticsMatcher.expectValue(
+                    SemanticsProperties.EditableText,
+                    AnnotatedString(InitialText)
+                )
+            )
 
-        rule.mainClock.advanceTimeBy(TimeOutInitialization)
-        rule.waitForIdle()
+        waitForSubtreeEventToSend()
         rule.onNodeWithTag(TextFieldTag)
             .performSemanticsAction(SemanticsActions.SetText) { it(AnnotatedString(InputText)) }
         rule.onNodeWithTag(TextFieldTag)
-            .assertTextEquals(InputText)
+            .assert(
+                SemanticsMatcher.expectValue(
+                    SemanticsProperties.EditableText,
+                    AnnotatedString(InputText)
+                )
+            )
 
         val textFieldNode = rule.onNodeWithTag(TextFieldTag)
             .fetchSemanticsNode("couldn't find node with tag $TextFieldTag")
@@ -491,14 +543,13 @@ class AndroidAccessibilityTest {
     }
 
     @Test
+    @Ignore("b/178524529")
     fun traverseEventBeforeSelectionEvent_whenTraverseTextField() {
         val textFieldNode = rule.onNodeWithTag(TextFieldTag)
             .assertIsDisplayed()
             .fetchSemanticsNode("couldn't find node with tag $TextFieldTag")
 
-        rule.mainClock.advanceTimeBy(TimeOutInitialization)
-        rule.waitForIdle()
-
+        waitForSubtreeEventToSend()
         val args = Bundle()
         args.putInt(
             AccessibilityNodeInfoCompat.ACTION_ARGUMENT_MOVEMENT_GRANULARITY_INT,
@@ -684,6 +735,114 @@ class AndroidAccessibilityTest {
         assertNull(provider.createAccessibilityNodeInfo(overlappedChildTwoNode.id))
     }
 
+    @Test
+    fun testPaneAppear() {
+        rule.onNodeWithTag(PaneTag).assertDoesNotExist()
+        isPaneVisible = true
+        rule.onNodeWithTag(PaneTag)
+            .assert(
+                SemanticsMatcher.expectValue(
+                    SemanticsProperties.PaneTitle,
+                    PaneTitleOne
+                )
+            )
+            .assertIsDisplayed()
+        waitForSubtreeEventToSend()
+        val paneNode = rule.onNodeWithTag(PaneTag).fetchSemanticsNode()
+        rule.runOnIdle {
+            verify(container, times(1)).requestSendAccessibilityEvent(
+                eq(androidComposeView),
+                argThat(
+                    ArgumentMatcher {
+                        getAccessibilityEventSourceSemanticsNodeId(it) == paneNode.id &&
+                            it.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED &&
+                            it.contentChangeTypes ==
+                            AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_APPEARED
+                    }
+                )
+            )
+        }
+    }
+
+    @Test
+    fun testPaneTitleChange() {
+        rule.onNodeWithTag(PaneTag).assertDoesNotExist()
+        isPaneVisible = true
+        rule.onNodeWithTag(PaneTag)
+            .assert(
+                SemanticsMatcher.expectValue(
+                    SemanticsProperties.PaneTitle,
+                    PaneTitleOne
+                )
+            )
+            .assertIsDisplayed()
+        waitForSubtreeEventToSend()
+        val paneNode = rule.onNodeWithTag(PaneTag).fetchSemanticsNode()
+        paneTestTitle = PaneTitleTwo
+        rule.onNodeWithTag(PaneTag)
+            .assert(
+                SemanticsMatcher.expectValue(
+                    SemanticsProperties.PaneTitle,
+                    PaneTitleTwo
+                )
+            )
+        rule.runOnIdle {
+            verify(container, times(1)).requestSendAccessibilityEvent(
+                eq(androidComposeView),
+                argThat(
+                    ArgumentMatcher {
+                        getAccessibilityEventSourceSemanticsNodeId(it) == paneNode.id &&
+                            it.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED &&
+                            it.contentChangeTypes ==
+                            AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_TITLE
+                    }
+                )
+            )
+        }
+    }
+
+    @Test
+    fun testPaneDisappear() {
+        rule.onNodeWithTag(PaneTag).assertDoesNotExist()
+        isPaneVisible = true
+        rule.onNodeWithTag(PaneTag)
+            .assert(
+                SemanticsMatcher.expectValue(
+                    SemanticsProperties.PaneTitle,
+                    PaneTitleOne
+                )
+            )
+            .assertIsDisplayed()
+        waitForSubtreeEventToSend()
+        isPaneVisible = false
+        rule.onNodeWithTag(PaneTag).assertDoesNotExist()
+        rule.runOnIdle {
+            verify(container, times(1)).requestSendAccessibilityEvent(
+                eq(androidComposeView),
+                argThat(
+                    ArgumentMatcher {
+                        it.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED &&
+                            it.contentChangeTypes ==
+                            AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED
+                    }
+                )
+            )
+        }
+    }
+
+    @Test
+    fun testEventForPasswordTextField() {
+        val textFieldNode = rule.onNodeWithTag(TextFieldTag)
+            .fetchSemanticsNode("Couldn't fetch node with tag $TextFieldTag")
+
+        val event = delegate.createEvent(
+            textFieldNode.id,
+            AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED
+        )
+
+        assertTrue(event.isPassword)
+    }
+
     private fun eventIndex(list: List<AccessibilityEvent>, event: AccessibilityEvent): Int {
         for (i in list.indices) {
             if (ReflectionEquals(list[i], null).matches(event)) {
@@ -708,5 +867,12 @@ class AndroidAccessibilityTest {
         // TODO(aelias): Make this wait after the 100ms delay to check the second batch is also correct
         rule.waitForIdle()
         verify()
+    }
+
+    private fun waitForSubtreeEventToSend() {
+        // When the subtree events are sent, we will also update our previousSemanticsNodes,
+        // which will affect our next accessibility events from semantics tree comparison.
+        rule.mainClock.advanceTimeBy(TimeOutInitialization)
+        rule.waitForIdle()
     }
 }

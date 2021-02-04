@@ -20,7 +20,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextLayoutResult
@@ -67,7 +67,7 @@ class CoreTextFieldSoftWrapTest {
         var width: Int? = null
 
         rule.setContent {
-            Providers(AmbientDensity provides density) {
+            Providers(LocalDensity provides density) {
                 CoreTextField(
                     value = TextFieldValue(string),
                     onValueChange = {},
@@ -87,7 +87,7 @@ class CoreTextFieldSoftWrapTest {
         with(density) {
             assertThat(textLayout).isNotNull()
             assertThat(width).isNotNull()
-            assertThat(width).isEqualTo(composableWidth.toIntPx())
+            assertThat(width).isEqualTo(composableWidth.roundToPx())
             assertThat(textLayout?.lineCount).isEqualTo(1)
         }
     }
@@ -104,7 +104,7 @@ class CoreTextFieldSoftWrapTest {
         var width: Int? = null
 
         rule.setContent {
-            Providers(AmbientDensity provides density) {
+            Providers(LocalDensity provides density) {
                 CoreTextField(
                     value = TextFieldValue(string),
                     onValueChange = {},
@@ -124,7 +124,7 @@ class CoreTextFieldSoftWrapTest {
         with(density) {
             assertThat(textLayout).isNotNull()
             assertThat(width).isNotNull()
-            assertThat(width).isEqualTo(composableWidth.toIntPx())
+            assertThat(width).isEqualTo(composableWidth.roundToPx())
             // each character has the same width as composable width
             // therefore the string.length is the line count
             assertThat(textLayout?.lineCount).isEqualTo(string.length)

@@ -17,8 +17,6 @@
 package androidx.compose.runtime
 
 import android.view.Choreographer
-import androidx.compose.runtime.dispatch.MonotonicFrameClock
-import androidx.compose.runtime.dispatch.withFrameNanos
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import kotlinx.coroutines.CoroutineScope
@@ -129,16 +127,12 @@ class SuspendingEffectsTests : BaseComposeTest() {
     @Test
     fun testRememberCoroutineScopeActiveWithComposition() {
         lateinit var coroutineScope: CoroutineScope
-        val tester = compose {
+        compose {
             coroutineScope = rememberCoroutineScope()
         }.then {
             assertTrue(coroutineScope.isActive, "coroutine scope was active before dispose")
-        }
-        val composition = tester.composition
-        tester.then {
-            composition.dispose()
-            assertFalse(coroutineScope.isActive, "coroutine scope was inactive after dispose")
-        }
+        }.done()
+        assertFalse(coroutineScope.isActive, "coroutine scope was inactive after dispose")
     }
 
     @Test
@@ -164,7 +158,7 @@ class SuspendingEffectsTests : BaseComposeTest() {
         }
     }
 
-    @OptIn(ExperimentalComposeApi::class)
+    @OptIn(ExperimentalComposeApi::class, InternalComposeApi::class)
     @Test
     fun testCoroutineScopesHaveCorrectFrameClock() {
         var recomposerClock: MonotonicFrameClock? = null

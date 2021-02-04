@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.ui.window
 
 import androidx.compose.desktop.AppFrame
 import androidx.compose.desktop.AppManager
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -30,7 +32,7 @@ import java.awt.MouseInfo
 @Composable
 fun WindowDraggableArea(
     modifier: Modifier = Modifier,
-    content: @Composable() () -> Unit = emptyContent()
+    content: @Composable() () -> Unit = {}
 ) {
     Box(
         modifier = modifier.dragGestureFilter(

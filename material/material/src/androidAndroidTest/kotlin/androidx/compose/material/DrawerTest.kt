@@ -22,10 +22,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Providers
-import androidx.compose.runtime.emptyContent
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.SemanticsMatcher
@@ -58,6 +57,7 @@ import org.junit.runner.RunWith
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
+@OptIn(ExperimentalMaterialApi::class)
 class DrawerTest {
 
     @get:Rule
@@ -72,7 +72,7 @@ class DrawerTest {
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag("content"))
                 },
-                bodyContent = emptyContent()
+                bodyContent = {}
             )
         }
 
@@ -89,7 +89,7 @@ class DrawerTest {
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag("content"))
                 },
-                bodyContent = emptyContent()
+                bodyContent = {}
             )
         }
 
@@ -107,7 +107,7 @@ class DrawerTest {
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag("content"))
                 },
-                bodyContent = emptyContent()
+                bodyContent = {}
             )
         }
 
@@ -124,7 +124,7 @@ class DrawerTest {
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag("content"))
                 },
-                bodyContent = emptyContent()
+                bodyContent = {}
             )
         }
 
@@ -144,7 +144,7 @@ class DrawerTest {
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag("content"))
                 },
-                bodyContent = emptyContent()
+                bodyContent = {}
             )
         }
 
@@ -164,7 +164,7 @@ class DrawerTest {
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag("drawer"))
                 },
-                bodyContent = emptyContent()
+                bodyContent = {}
             )
         }
 
@@ -326,7 +326,7 @@ class DrawerTest {
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag("drawer"))
                 },
-                bodyContent = emptyContent()
+                bodyContent = {}
             )
         }
 
@@ -436,7 +436,7 @@ class DrawerTest {
         rule.setMaterialContent {
             drawerState = rememberDrawerState(DrawerValue.Closed)
             // emulate click on the screen
-            Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Box(Modifier.testTag("Drawer")) {
                     ModalDrawerLayout(
                         drawerState = drawerState,
@@ -515,7 +515,7 @@ class DrawerTest {
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag("drawer"))
                 },
-                bodyContent = emptyContent()
+                bodyContent = {}
             )
         }
 
@@ -554,7 +554,7 @@ class DrawerTest {
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag("drawer"))
                 },
-                bodyContent = emptyContent()
+                bodyContent = {}
             )
         }
 

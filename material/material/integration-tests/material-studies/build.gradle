@@ -36,4 +36,5 @@ dependencies {
     implementation project(":compose:ui:ui")
     implementation project(":compose:ui:ui-text")
     implementation project(':compose:material:material')
+    implementation project(":activity:activity-compose")
 }

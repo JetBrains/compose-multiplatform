@@ -16,8 +16,7 @@
 
 package androidx.compose.animation.core
 
-import androidx.compose.runtime.dispatch.withFrameNanos
-import androidx.compose.ui.unit.Uptime
+import androidx.compose.runtime.withFrameNanos
 import kotlinx.coroutines.CancellationException
 
 /**
@@ -119,10 +118,10 @@ suspend fun <T, V : AnimationVector> animate(
  * frame time, etc.
  *
  * [sequentialAnimation] indicates whether the animation should use the
- * [AnimationState.lastFrameTime] as the starting time (if true), or start in a new frame. By
+ * [AnimationState.lastFrameTimeNanos] as the starting time (if true), or start in a new frame. By
  * default, [sequentialAnimation] is false, to start the animation in a few frame. In cases where
  * an on-going animation is interrupted and a new animation is started to carry over the
- * momentum, using the interruption time (captured in [AnimationState.lastFrameTime] creates
+ * momentum, using the interruption time (captured in [AnimationState.lastFrameTimeNanos] creates
  * a smoother animation.
  *
  * [block] will be invoked on every frame, and the [AnimationScope] will be checked against
@@ -147,53 +146,10 @@ suspend fun <T, V : AnimationVector> AnimationState<T, V>.animateTo(
         typeConverter = typeConverter,
         initialVelocityVector = velocityVector
     )
-    animate(anim, if (sequentialAnimation) lastFrameTime else Uptime.Unspecified, block)
-}
-
-/**
- * Decay animation that slows down from the current velocity and value captured in [AnimationState]
- * until the velocity reaches 0. During the animation, the given [AnimationState] will be updated
- * with the up-to-date value/velocity, frame time, etc. This is often used to animate the result
- * of a fling gesture.
- *
- * [animationSpec] defines the decay animation that will be used for this animation. Some options
- * for [animationSpec] include: [androidFlingDecay][androidx.compose.foundation.animation
- * .androidFlingDecay] and [exponentialDecay].
- *
- * During the animation, [block] will be invoked on every frame, and the [AnimationScope] will be
- * checked against cancellation before the animation continues. To cancel the animation from the
- * [block], simply call [AnimationScope.cancelAnimation].  After [AnimationScope.cancelAnimation] is
- * called, [block] will not be invoked again. The animation loop will exit after the [block]
- * returns. All the animation related info can be accessed via [AnimationScope].
- *
- * [sequentialAnimation] indicates whether the animation should use the
- * [AnimationState.lastFrameTime] as the starting time (if true), or start in a new frame. By
- * default, [sequentialAnimation] is false, to start the animation in a few frame. In cases where
- * an on-going animation is interrupted and a new animation is started to carry over the
- * momentum, using the interruption time (captured in [AnimationState.lastFrameTime] creates
- * a smoother animation.
- */
-@Deprecated(
-    "Please use animateDecay that takes a [DecayAnimationSpec] instead",
-    ReplaceWith(
-        "animateDecay(animationSpec.generateDecayAnimationSpec(), sequentialAnimation, block)"
-    )
-)
-suspend fun AnimationState<Float, AnimationVector1D>.animateDecay(
-    animationSpec: FloatDecayAnimationSpec,
-    // Indicates whether the animation should start from last frame
-    sequentialAnimation: Boolean = false,
-    block: AnimationScope<Float, AnimationVector1D>.() -> Unit = {}
-) {
-    val anim = DecayAnimation(
-        animationSpec = animationSpec,
-        initialValue = value,
-        initialVelocity = velocityVector.value
-    )
     animate(
         anim,
-        startTime = if (sequentialAnimation) lastFrameTime else Uptime.Unspecified,
-        block = block
+        if (sequentialAnimation) lastFrameTimeNanos else AnimationConstants.UnspecifiedTime,
+        block
     )
 }
 
@@ -214,10 +170,10 @@ suspend fun AnimationState<Float, AnimationVector1D>.animateDecay(
  * returns. All the animation related info can be accessed via [AnimationScope].
  *
  * [sequentialAnimation] indicates whether the animation should use the
- * [AnimationState.lastFrameTime] as the starting time (if true), or start in a new frame. By
+ * [AnimationState.lastFrameTimeNanos] as the starting time (if true), or start in a new frame. By
  * default, [sequentialAnimation] is false, to start the animation in a few frame. In cases where
  * an on-going animation is interrupted and a new animation is started to carry over the
- * momentum, using the interruption time (captured in [AnimationState.lastFrameTime] creates
+ * momentum, using the interruption time (captured in [AnimationState.lastFrameTimeNanos] creates
  * a smoother animation.
  */
 suspend fun <T, V : AnimationVector> AnimationState<T, V>.animateDecay(
@@ -232,7 +188,11 @@ suspend fun <T, V : AnimationVector> AnimationState<T, V>.animateDecay(
         initialVelocityVector = velocityVector,
         typeConverter = typeConverter
     )
-    animate(anim, if (sequentialAnimation) lastFrameTime else Uptime.Unspecified, block)
+    animate(
+        anim,
+        if (sequentialAnimation) lastFrameTimeNanos else AnimationConstants.UnspecifiedTime,
+        block
+    )
 }
 
 /**
@@ -240,8 +200,8 @@ suspend fun <T, V : AnimationVector> AnimationState<T, V>.animateDecay(
  * finish. During the animation, the [AnimationState] will be updated with the up-to-date
  * value/velocity, frame time, etc.
  *
- * If [startTime] is provided, it will be used as the time that the animation was started. By
- * default, [startTime] is [Uptime.Unspecified], meaning the animation will start in the next frame.
+ * If [startTimeNanos] is provided, it will be used as the time that the animation was started. By
+ * default, [startTimeNanos] is [AnimationConstants.UnspecifiedTime], meaning the animation will start in the next frame.
  *
  * For [Animation]s that use [AnimationSpec], consider using these more convenient APIs:
  * [animate], [AnimationState.animateTo], [animateDecay],
@@ -258,41 +218,59 @@ suspend fun <T, V : AnimationVector> AnimationState<T, V>.animateDecay(
 // some suspend fun differently.
 internal suspend fun <T, V : AnimationVector> AnimationState<T, V>.animate(
     animation: Animation<T, V>,
-    startTime: Uptime = Uptime.Unspecified,
+    startTimeNanos: Long = AnimationConstants.UnspecifiedTime,
     block: AnimationScope<T, V>.() -> Unit = {}
 ) {
-    val initialValue = animation.getValue(0)
-    val initialVelocityVector = animation.getVelocityVector(0)
+    val initialValue = animation.getValueFromNanos(0)
+    val initialVelocityVector = animation.getVelocityVectorFromNanos(0)
     var lateInitScope: AnimationScope<T, V>? = null
     try {
-        val startTimeSpecified =
-            if (startTime == Uptime.Unspecified) Uptime(withFrameNanos { it }) else startTime
+        val startTimeNanosSpecified =
+            if (startTimeNanos == AnimationConstants.UnspecifiedTime) {
+                animation.callWithFrameNanos { it }
+            } else {
+                startTimeNanos
+            }
         lateInitScope = AnimationScope(
             initialValue = initialValue,
             typeConverter = animation.typeConverter,
             initialVelocityVector = initialVelocityVector,
-            lastFrameTime = startTimeSpecified,
+            lastFrameTimeNanos = startTimeNanosSpecified,
             targetValue = animation.targetValue,
-            startTime = startTimeSpecified,
+            startTimeNanos = startTimeNanosSpecified,
             isRunning = true,
             onCancel = { isRunning = false }
         )
         // First frame
-        lateInitScope.doAnimationFrame(startTimeSpecified.nanoseconds, animation, this, block)
+        lateInitScope.doAnimationFrame(startTimeNanosSpecified, animation, this, block)
         // Subsequent frames
         while (lateInitScope.isRunning) {
-            withFrameNanos {
+            animation.callWithFrameNanos {
                 lateInitScope.doAnimationFrame(it, animation, this, block)
             }
         }
         // End of animation
     } catch (e: CancellationException) {
         lateInitScope?.isRunning = false
-        if (lateInitScope?.lastFrameTime == lastFrameTime) {
+        if (lateInitScope?.lastFrameTimeNanos == lastFrameTimeNanos) {
             // There hasn't been another animation.
             isRunning = false
         }
         throw e
+    }
+}
+
+/**
+ * Calls the [finite][withFrameNanos] or [infinite][withInfiniteAnimationFrameNanos]
+ * variant of `withFrameNanos`, depending on the value of [Animation.isInfinite].
+ */
+private suspend fun <R, T, V : AnimationVector> Animation<T, V>.callWithFrameNanos(
+    onFrame: (frameTimeNanos: Long) -> R
+): R {
+    return if (isInfinite) {
+        withInfiniteAnimationFrameNanos(onFrame)
+    } else {
+        withFrameNanos(onFrame)
     }
 }
 
@@ -301,8 +279,8 @@ internal fun <T, V : AnimationVector> AnimationScope<T, V>.updateState(
 ) {
     state.value = value
     state.velocityVector.copyFrom(velocityVector)
-    state.finishedTime = finishedTime
-    state.lastFrameTime = lastFrameTime
+    state.finishedTimeNanos = finishedTimeNanos
+    state.lastFrameTimeNanos = lastFrameTimeNanos
     state.isRunning = isRunning
 }
 
@@ -313,16 +291,15 @@ private fun <T, V : AnimationVector> AnimationScope<T, V>.doAnimationFrame(
     state: AnimationState<T, V>,
     block: AnimationScope<T, V>.() -> Unit
 ) {
-    lastFrameTime = Uptime(frameTimeNanos)
-    val playTimeMillis = (frameTimeNanos - startTime.nanoseconds) / 1_000_000L
-    // TODO: [Animation] should use nanos for all the value/velocity queries
-    value = anim.getValue(playTimeMillis)
-    velocityVector = anim.getVelocityVector(playTimeMillis)
-    val isLastFrame = anim.isFinished(playTimeMillis)
+    lastFrameTimeNanos = frameTimeNanos
+    val playTimeNanos = frameTimeNanos - startTimeNanos
+    value = anim.getValueFromNanos(playTimeNanos)
+    velocityVector = anim.getVelocityVectorFromNanos(playTimeNanos)
+    val isLastFrame = anim.isFinishedFromNanos(playTimeNanos)
     if (isLastFrame) {
         // TODO: This could probably be a little more granular
         // TODO: end time isn't necessarily last frame time
-        finishedTime = lastFrameTime
+        finishedTimeNanos = lastFrameTimeNanos
         isRunning = false
     }
     updateState(state)

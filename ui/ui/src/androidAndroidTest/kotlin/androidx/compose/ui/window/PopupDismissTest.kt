@@ -49,7 +49,7 @@ import java.util.concurrent.TimeUnit
 
 @LargeTest
 @RunWith(Parameterized::class)
-class PopupDismissTest(private val isFocusable: Boolean) {
+class PopupDismissTest(private val focusable: Boolean) {
 
     companion object {
         @JvmStatic
@@ -85,7 +85,7 @@ class PopupDismissTest(private val isFocusable: Boolean) {
 
                 Popup(
                     alignment = Alignment.Center,
-                    isFocusable = isFocusable,
+                    properties = PopupProperties(focusable = focusable),
                     onDismissRequest = { dismissCounter++; latch.countDown() }
                 ) {
                     Box(Modifier.preferredSize(100.dp, 100.dp)) {
@@ -106,8 +106,8 @@ class PopupDismissTest(private val isFocusable: Boolean) {
         with(rule.density) {
             // Need to click via UiDevice as this click has to propagate to multiple windows
             device.click(
-                btnPos.x.toInt() + btnBounds.width.toIntPx() / 2,
-                btnPos.y.toInt() + btnBounds.height.toIntPx() / 2
+                btnPos.x.toInt() + btnBounds.width.roundToPx() / 2,
+                btnPos.y.toInt() + btnBounds.height.roundToPx() / 2
             )
         }
 
@@ -118,7 +118,7 @@ class PopupDismissTest(private val isFocusable: Boolean) {
 
         rule.runOnIdle {
             assertThat(dismissCounter).isEqualTo(1)
-            if (isFocusable) {
+            if (focusable) {
                 // Focusable popup consumes touch events => button receives none
                 assertThat(btnClicksCounter).isEqualTo(0)
             } else {

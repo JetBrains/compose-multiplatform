@@ -22,7 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.imageFromResource
-import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.util.trace
 
 /**
@@ -36,8 +36,22 @@ import androidx.compose.ui.util.trace
  * @return the decoded image data associated with the resource
  */
 @Composable
-fun imageResource(@DrawableRes id: Int): ImageBitmap {
-    val context = AmbientContext.current
+@Deprecated("imageResource has been deprecated.  Use painterResource instead")
+fun imageResource(@DrawableRes id: Int): ImageBitmap = lowLevelImageResource(id)
+
+/**
+ * Load an ImageBitmap from an image resource.
+ *
+ * This function is intended to be used for when low-level ImageBitmap-specific
+ * functionality is required.  For simply displaying onscreen, the vector/bitmap-agnostic
+ * [painterResource] is recommended instead.
+ *
+ * @param id the resource identifier
+ * @return the decoded image data associated with the resource
+ */
+@Composable
+internal fun lowLevelImageResource(@DrawableRes id: Int): ImageBitmap {
+    val context = LocalContext.current
     val value = remember { TypedValue() }
     context.resources.getValue(id, value, true)
     // We use the file path as a key of the request cache.
@@ -59,12 +73,14 @@ fun imageResource(@DrawableRes id: Int): ImageBitmap {
  * @return the deferred image resource.
  */
 @Composable
+@Suppress("DEPRECATION")
+@Deprecated("loadImageResource has been deprecated.  Use painterResource instead")
 fun loadImageResource(
     id: Int,
     pendingImage: ImageBitmap? = null,
     failedImage: ImageBitmap? = null
 ): DeferredResource<ImageBitmap> {
-    val context = AmbientContext.current
+    val context = LocalContext.current
     val res = context.resources
     val value = remember { TypedValue() }
     res.getValue(id, value, true)

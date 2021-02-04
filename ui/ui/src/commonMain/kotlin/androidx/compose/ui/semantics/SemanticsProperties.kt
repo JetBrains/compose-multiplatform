@@ -59,6 +59,18 @@ object SemanticsProperties {
         SemanticsPropertyKey<ProgressBarRangeInfo>("ProgressBarRangeInfo")
 
     /**
+     * @see SemanticsPropertyReceiver.paneTitle
+     */
+    val PaneTitle = SemanticsPropertyKey<String>(
+        name = "PaneTitle",
+        mergePolicy = { _, _ ->
+            throw IllegalStateException(
+                "merge function called on unmergeable property PaneTitle."
+            )
+        }
+    )
+
+    /**
      * The node is marked as heading for accessibility.
      *
      * @see SemanticsPropertyReceiver.heading
@@ -164,6 +176,12 @@ object SemanticsProperties {
         }
     )
 
+    // TODO(b/178121203) might need to be transformed text
+    /**
+     * @see SemanticsPropertyReceiver.editableText
+     */
+    val EditableText = SemanticsPropertyKey<AnnotatedString>(name = "EditableText")
+
     /**
      * @see SemanticsPropertyReceiver.textSelectionRange
      */
@@ -183,6 +201,11 @@ object SemanticsProperties {
      * @see SemanticsPropertyReceiver.toggleableState
      */
     val ToggleableState = SemanticsPropertyKey<ToggleableState>("ToggleableState")
+
+    /**
+     * @see SemanticsPropertyReceiver.password
+     */
+    val Password = SemanticsPropertyKey<Unit>("Password")
 }
 
 /**
@@ -197,62 +220,68 @@ object SemanticsActions {
     /**
      * @see SemanticsPropertyReceiver.getTextLayoutResult
      */
-    val GetTextLayoutResult = SemanticsPropertyKey<AccessibilityAction<
-            (MutableList<TextLayoutResult>) -> Boolean>>("GetTextLayoutResult")
+    val GetTextLayoutResult =
+        ActionPropertyKey<(MutableList<TextLayoutResult>) -> Boolean>("GetTextLayoutResult")
 
     /**
      * @see SemanticsPropertyReceiver.onClick
      */
-    val OnClick = SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>("OnClick")
+    val OnClick = ActionPropertyKey<() -> Boolean>("OnClick")
 
     /**
      * @see SemanticsPropertyReceiver.onLongClick
      */
-    val OnLongClick = SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>("OnLongClick")
+    val OnLongClick = ActionPropertyKey<() -> Boolean>("OnLongClick")
 
     /**
      * @see SemanticsPropertyReceiver.scrollBy
      */
-    val ScrollBy =
-        SemanticsPropertyKey<AccessibilityAction<(x: Float, y: Float) -> Boolean>>("ScrollBy")
+    val ScrollBy = ActionPropertyKey<(x: Float, y: Float) -> Boolean>("ScrollBy")
 
     /**
      * @see SemanticsPropertyReceiver.setProgress
      */
-    val SetProgress =
-        SemanticsPropertyKey<AccessibilityAction<(progress: Float) -> Boolean>>("SetProgress")
+    val SetProgress = ActionPropertyKey<(progress: Float) -> Boolean>("SetProgress")
 
     /**
      * @see SemanticsPropertyReceiver.setSelection
      */
-    val SetSelection = SemanticsPropertyKey<
-        AccessibilityAction<(Int, Int, Boolean) -> Boolean>>("SetSelection")
+    val SetSelection = ActionPropertyKey<(Int, Int, Boolean) -> Boolean>("SetSelection")
 
     /**
      * @see SemanticsPropertyReceiver.setText
      */
-    val SetText = SemanticsPropertyKey<
-        AccessibilityAction<(AnnotatedString) -> Boolean>>("SetText")
+    val SetText = ActionPropertyKey<(AnnotatedString) -> Boolean>("SetText")
 
     /**
      * @see SemanticsPropertyReceiver.copyText
      */
-    val CopyText = SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>("CopyText")
+    val CopyText = ActionPropertyKey<() -> Boolean>("CopyText")
 
     /**
      * @see SemanticsPropertyReceiver.cutText
      */
-    val CutText = SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>("CutText")
+    val CutText = ActionPropertyKey<() -> Boolean>("CutText")
 
     /**
      * @see SemanticsPropertyReceiver.pasteText
      */
-    val PasteText = SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>("PasteText")
+    val PasteText = ActionPropertyKey<() -> Boolean>("PasteText")
+
+    /**
+     * @see SemanticsPropertyReceiver.expand
+     */
+    val Expand = ActionPropertyKey<() -> Boolean>("Expand")
+
+    /**
+     * @see SemanticsPropertyReceiver.collapse
+     */
+    val Collapse = ActionPropertyKey<() -> Boolean>("Collapse")
 
     /**
      * @see SemanticsPropertyReceiver.dismiss
      */
-    val Dismiss = SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>("Dismiss")
+    val Dismiss = ActionPropertyKey<() -> Boolean>("Dismiss")
 
     /**
      * @see SemanticsPropertyReceiver.customActions
@@ -315,27 +344,83 @@ class SemanticsPropertyKey<T>(
 }
 
 /**
- * Data class for standard accessibility action.
+ * Standard accessibility action.
  *
  * @param label The description of this action
  * @param action The function to invoke when this action is performed. The function should return
  * a boolean result indicating whether the action is successfully handled. For example, a scroll
  * forward action should return false if the widget is not enabled or has reached the end of the
- * list.
+ * list. If multiple semantics blocks with the same AccessibilityAction are provided, the
+ * resulting AccessibilityAction's label/action will be the label/action of the outermost
+ * modifier with this key and nonnull label/action, or null if no nonnull label/action is found.
  */
-data class AccessibilityAction<T : Function<Boolean>>(val label: CharSequence?, val action: T)
+class AccessibilityAction<T : Function<Boolean>>(val label: String?, val action: T?) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is AccessibilityAction<*>) return false
+
+        if (label != other.label) return false
+        if (action != other.action) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = label?.hashCode() ?: 0
+        result = 31 * result + action.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "AccessibilityAction(label=$label, action=$action)"
+    }
+}
+
+internal fun <T : Function<Boolean>> ActionPropertyKey(
+    name: String
+): SemanticsPropertyKey<AccessibilityAction<T>> {
+    return SemanticsPropertyKey(
+        name = name,
+        mergePolicy = { parentValue, childValue ->
+            AccessibilityAction(
+                parentValue?.label ?: childValue.label,
+                parentValue?.action ?: childValue.action
+            )
+        }
+    )
+}
 
 /**
- * Data class for custom accessibility action.
+ * Custom accessibility action.
  *
  * @param label The description of this action
  * @param action The function to invoke when this action is performed. The function should have no
  * arguments and return a boolean result indicating whether the action is successfully handled.
  */
-data class CustomAccessibilityAction(val label: CharSequence, val action: () -> Boolean)
+class CustomAccessibilityAction(val label: String, val action: () -> Boolean) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is CustomAccessibilityAction) return false
+
+        if (label != other.label) return false
+        if (action != other.action) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = label.hashCode()
+        result = 31 * result + action.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "CustomAccessibilityAction(label=$label, action=$action)"
+    }
+}
 
 /**
- * Data class for accessibility range information, to represent the status of a progress bar or
+ * Accessibility range information, to represent the status of a progress bar or
  * seekable progress bar.
  *
  * @param current current value in the range
@@ -344,25 +429,54 @@ data class CustomAccessibilityAction(val label: CharSequence, val action: () -> 
  * between across the whole value range. If `0`, any value from the range specified can be chosen.
  * Cannot be less than `0`.
  */
-data class ProgressBarRangeInfo(
+class ProgressBarRangeInfo(
     val current: Float,
     val range: ClosedFloatingPointRange<Float>,
     /*@IntRange(from = 0)*/
     val steps: Int = 0
-)
+) {
+    companion object {
+        /**
+         * Accessibility range information to present indeterminate progress bar
+         */
+        val Indeterminate = ProgressBarRangeInfo(0f, 0f..0f)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ProgressBarRangeInfo) return false
+
+        if (current != other.current) return false
+        if (range != other.range) return false
+        if (steps != other.steps) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = current.hashCode()
+        result = 31 * result + range.hashCode()
+        result = 31 * result + steps
+        return result
+    }
+
+    override fun toString(): String {
+        return "ProgressBarRangeInfo(current=$current, range=$range, steps=$steps)"
+    }
+}
 
 /**
  * The scroll state of one axis if this node is scrollable.
  *
- * @param value current scroll position value in pixels
+ * @param value current 0-based scroll position value (either in pixels, or lazy-item count)
  * @param maxValue maximum bound for [value], or [Float.POSITIVE_INFINITY] if still unknown
  * @param reverseScrolling for horizontal scroll, when this is `true`, 0 [value] will mean right,
  * when`false`, 0 [value] will mean left. For vertical scroll, when this is `true`, 0 [value] will
  * mean bottom, when `false`, 0 [value] will mean top
  */
-data class ScrollAxisRange(
-    val value: Float = 0f,
-    val maxValue: Float = 0f,
+class ScrollAxisRange(
+    val value: () -> Float,
+    val maxValue: () -> Float,
     val reverseScrolling: Boolean = false
 )
 
@@ -405,7 +519,12 @@ enum class Role {
      * for accessibility: [SemanticsProperties.Disabled], [SemanticsProperties.StateDescription],
      * [SemanticsActions.OnClick]
      */
-    Tab
+    Tab,
+    /**
+     * This element is an image. Associated semantics properties for accessibility:
+     * [SemanticsProperties.ContentDescription]
+     */
+    Image
 }
 
 /**
@@ -440,12 +559,6 @@ var SemanticsPropertyReceiver.stateDescription by SemanticsProperties.StateDescr
  */
 var SemanticsPropertyReceiver.progressBarRangeInfo by SemanticsProperties.ProgressBarRangeInfo
 
-@Deprecated(
-    "stateDescriptionRange was renamed to progressBarRangeInfo",
-    ReplaceWith("progressBarRangeInfo", "androidx.compose.ui.semantics")
-)
-var SemanticsPropertyReceiver.stateDescriptionRange by SemanticsProperties.ProgressBarRangeInfo
-
 /**
  * The node is marked as heading for accessibility.
  *
@@ -454,6 +567,17 @@ var SemanticsPropertyReceiver.stateDescriptionRange by SemanticsProperties.Progr
 fun SemanticsPropertyReceiver.heading() {
     this[SemanticsProperties.Heading] = Unit
 }
+
+/**
+ * Accessibility-friendly title for a screen's pane. For accessibility purposes, a pane is a
+ * visually distinct portion of a window, such as the contents of a open drawer. In order for
+ * accessibility services to understand a pane's window-like behavior, you should give
+ * descriptive titles to your app's panes. Accessibility services can then provide more granular
+ * information to users when a pane's appearance or content changes.
+ *
+ * @see SemanticsProperties.PaneTitle
+ */
+var SemanticsPropertyReceiver.paneTitle by SemanticsProperties.PaneTitle
 
 /**
  * Whether this semantics node is disabled. Note that proper [SemanticsActions] should still
@@ -488,29 +612,6 @@ var SemanticsPropertyReceiver.focused by SemanticsProperties.Focused
 fun SemanticsPropertyReceiver.invisibleToUser() {
     this[SemanticsProperties.InvisibleToUser] = Unit
 }
-
-@Deprecated(
-    "hidden was renamed to invisibleToUser",
-    ReplaceWith("invisibleToUser", "androidx.compose.ui.semantics")
-)
-@OptIn(ExperimentalComposeUiApi::class)
-fun SemanticsPropertyReceiver.hidden() {
-    this[SemanticsProperties.InvisibleToUser] = Unit
-}
-
-@Deprecated(
-    "horizontalAccessibilityScrollState was renamed to horizontalScrollAxisRange",
-    ReplaceWith("horizontalScrollAxisRange", "androidx.compose.ui.semantics")
-)
-var SemanticsPropertyReceiver.horizontalAccessibilityScrollState
-by SemanticsProperties.HorizontalScrollAxisRange
-
-@Deprecated(
-    "verticalAccessibilityScrollState was renamed to verticalScrollAxisRange",
-    ReplaceWith("verticalScrollAxisRange", "androidx.compose.ui.semantics")
-)
-var SemanticsPropertyReceiver.verticalAccessibilityScrollState
-by SemanticsProperties.VerticalScrollAxisRange
 
 /**
  * The horizontal scroll state of this node if this node is scrollable.
@@ -558,11 +659,19 @@ var SemanticsPropertyReceiver.testTag by SemanticsProperties.TestTag
 
 /**
  * Text of the semantics node. It must be real text instead of developer-set content description.
+ *
+ * @see SemanticsPropertyReceiver.editableText
  */
 var SemanticsPropertyReceiver.text by SemanticsProperties.Text
 
 /**
- * Text selection range for edit text.
+ * Input text of the text field. It must be real text entered by the user instead of
+ * developer-set content description.
+ */
+var SemanticsPropertyReceiver.editableText by SemanticsProperties.EditableText
+
+/**
+ * Text selection range for the text field.
  */
 var SemanticsPropertyReceiver.textSelectionRange by SemanticsProperties.TextSelectionRange
 
@@ -589,6 +698,13 @@ var SemanticsPropertyReceiver.toggleableState
 by SemanticsProperties.ToggleableState
 
 /**
+ * The node is marked as a password.
+ */
+fun SemanticsPropertyReceiver.password() {
+    this[SemanticsProperties.Password] = Unit
+}
+
+/**
  * Custom actions which are defined by app developers.
  */
 var SemanticsPropertyReceiver.customActions by SemanticsActions.CustomActions
@@ -602,7 +718,7 @@ var SemanticsPropertyReceiver.customActions by SemanticsActions.CustomActions
  */
 fun SemanticsPropertyReceiver.getTextLayoutResult(
     label: String? = null,
-    action: (MutableList<TextLayoutResult>) -> Boolean
+    action: ((MutableList<TextLayoutResult>) -> Boolean)?
 ) {
     this[SemanticsActions.GetTextLayoutResult] = AccessibilityAction(label, action)
 }
@@ -613,7 +729,7 @@ fun SemanticsPropertyReceiver.getTextLayoutResult(
  * @param label Optional label for this action.
  * @param action Action to be performed when the [SemanticsActions.OnClick] is called.
  */
-fun SemanticsPropertyReceiver.onClick(label: String? = null, action: () -> Boolean) {
+fun SemanticsPropertyReceiver.onClick(label: String? = null, action: (() -> Boolean)?) {
     this[SemanticsActions.OnClick] = AccessibilityAction(label, action)
 }
 
@@ -623,7 +739,7 @@ fun SemanticsPropertyReceiver.onClick(label: String? = null, action: () -> Boole
  * @param label Optional label for this action.
  * @param action Action to be performed when the [SemanticsActions.OnLongClick] is called.
  */
-fun SemanticsPropertyReceiver.onLongClick(label: String? = null, action: () -> Boolean) {
+fun SemanticsPropertyReceiver.onLongClick(label: String? = null, action: (() -> Boolean)?) {
     this[SemanticsActions.OnLongClick] = AccessibilityAction(label, action)
 }
 
@@ -637,7 +753,7 @@ fun SemanticsPropertyReceiver.onLongClick(label: String? = null, action: () -> B
  */
 fun SemanticsPropertyReceiver.scrollBy(
     label: String? = null,
-    action: (x: Float, y: Float) -> Boolean
+    action: ((x: Float, y: Float) -> Boolean)?
 ) {
     this[SemanticsActions.ScrollBy] = AccessibilityAction(label, action)
 }
@@ -650,7 +766,7 @@ fun SemanticsPropertyReceiver.scrollBy(
  * @param label Optional label for this action.
  * @param action Action to be performed when the [SemanticsActions.SetProgress] is called.
  */
-fun SemanticsPropertyReceiver.setProgress(label: String? = null, action: (Float) -> Boolean) {
+fun SemanticsPropertyReceiver.setProgress(label: String? = null, action: ((Float) -> Boolean)?) {
     this[SemanticsActions.SetProgress] = AccessibilityAction(label, action)
 }
 
@@ -662,7 +778,10 @@ fun SemanticsPropertyReceiver.setProgress(label: String? = null, action: (Float)
  * @param label Optional label for this action.
  * @param action Action to be performed when the [SemanticsActions.SetText] is called.
  */
-fun SemanticsPropertyReceiver.setText(label: String? = null, action: (AnnotatedString) -> Boolean) {
+fun SemanticsPropertyReceiver.setText(
+    label: String? = null,
+    action: ((AnnotatedString) -> Boolean)?
+) {
     this[SemanticsActions.SetText] = AccessibilityAction(label, action)
 }
 
@@ -677,11 +796,7 @@ fun SemanticsPropertyReceiver.setText(label: String? = null, action: (AnnotatedS
  */
 fun SemanticsPropertyReceiver.setSelection(
     label: String? = null,
-    action: (
-        startIndex: Int,
-        endIndex: Int,
-        traversalMode: Boolean
-    ) -> Boolean
+    action: ((startIndex: Int, endIndex: Int, traversalMode: Boolean) -> Boolean)?
 ) {
     this[SemanticsActions.SetSelection] = AccessibilityAction(label, action)
 }
@@ -694,7 +809,7 @@ fun SemanticsPropertyReceiver.setSelection(
  */
 fun SemanticsPropertyReceiver.copyText(
     label: String? = null,
-    action: () -> Boolean
+    action: (() -> Boolean)?
 ) {
     this[SemanticsActions.CopyText] = AccessibilityAction(label, action)
 }
@@ -707,7 +822,7 @@ fun SemanticsPropertyReceiver.copyText(
  */
 fun SemanticsPropertyReceiver.cutText(
     label: String? = null,
-    action: () -> Boolean
+    action: (() -> Boolean)?
 ) {
     this[SemanticsActions.CutText] = AccessibilityAction(label, action)
 }
@@ -726,9 +841,35 @@ fun SemanticsPropertyReceiver.cutText(
  */
 fun SemanticsPropertyReceiver.pasteText(
     label: String? = null,
-    action: () -> Boolean
+    action: (() -> Boolean)?
 ) {
     this[SemanticsActions.PasteText] = AccessibilityAction(label, action)
+}
+
+/**
+ * Action to expand an expandable node.
+ *
+ * @param label Optional label for this action.
+ * @param action Action to be performed when the [SemanticsActions.Expand] is called.
+ */
+fun SemanticsPropertyReceiver.expand(
+    label: String? = null,
+    action: (() -> Boolean)?
+) {
+    this[SemanticsActions.Expand] = AccessibilityAction(label, action)
+}
+
+/**
+ * Action to collapse an expandable node.
+ *
+ * @param label Optional label for this action.
+ * @param action Action to be performed when the [SemanticsActions.Collapse] is called.
+ */
+fun SemanticsPropertyReceiver.collapse(
+    label: String? = null,
+    action: (() -> Boolean)?
+) {
+    this[SemanticsActions.Collapse] = AccessibilityAction(label, action)
 }
 
 /**
@@ -739,7 +880,7 @@ fun SemanticsPropertyReceiver.pasteText(
  */
 fun SemanticsPropertyReceiver.dismiss(
     label: String? = null,
-    action: () -> Boolean
+    action: (() -> Boolean)?
 ) {
     this[SemanticsActions.Dismiss] = AccessibilityAction(label, action)
 }

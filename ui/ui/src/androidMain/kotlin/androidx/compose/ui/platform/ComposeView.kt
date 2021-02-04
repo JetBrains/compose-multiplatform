@@ -22,8 +22,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
-import androidx.compose.runtime.CompositionReference
+import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.InternalComposeUiApi
+import androidx.compose.ui.node.InternalCoreApi
+import androidx.compose.ui.node.Owner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewTreeLifecycleOwner
 
@@ -54,7 +57,7 @@ abstract class AbstractComposeView @JvmOverloads constructor(
 
     private var composition: Composition? = null
 
-    private var parentReference: CompositionReference? = null
+    private var parentContext: CompositionContext? = null
         set(value) {
             if (field !== value) {
                 field = value
@@ -72,12 +75,20 @@ abstract class AbstractComposeView @JvmOverloads constructor(
         }
 
     /**
-     * Set the [CompositionReference] that should be the parent of this view's composition.
+     * Set the [CompositionContext] that should be the parent of this view's composition.
      * If [parent] is `null` it will be determined automatically from the window the view is
      * attached to.
      */
-    fun setParentCompositionReference(parent: CompositionReference?) {
-        parentReference = parent
+    fun setParentCompositionContext(parent: CompositionContext?) {
+        parentContext = parent
+    }
+
+    @Deprecated(
+        "renamed to setParentCompositionContext",
+        ReplaceWith("setParentCompositionContext(parent)")
+    )
+    fun setParentCompositionReference(parent: CompositionContext?) {
+        setParentCompositionContext(parent)
     }
 
     // Leaking `this` during init is generally dangerous, but we know that the implementation of
@@ -112,6 +123,20 @@ abstract class AbstractComposeView @JvmOverloads constructor(
         get() = true
 
     /**
+     * Enables the display of visual layout bounds for the Compose UI content of this view.
+     * This is typically managed
+     */
+    @OptIn(InternalCoreApi::class)
+    @InternalComposeUiApi
+    var showLayoutBounds: Boolean = false
+        set(value) {
+            field = value
+            getChildAt(0)?.let {
+                (it as Owner).showLayoutBounds = value
+            }
+        }
+
+    /**
      * The Jetpack Compose UI content for this view.
      * Subclasses must implement this method to provide content. Initial composition will
      * occur when the view becomes attached to a window or when [createComposition] is called,
@@ -130,10 +155,10 @@ abstract class AbstractComposeView @JvmOverloads constructor(
      * If this method is called when the composition has already been created it has no effect.
      *
      * This method should only be called if this view [isAttachedToWindow] or if a parent
-     * [CompositionReference] has been [set][setParentCompositionReference] explicitly.
+     * [CompositionContext] has been [set][setParentCompositionContext] explicitly.
      */
     fun createComposition() {
-        check(parentReference != null || isAttachedToWindow) {
+        check(parentContext != null || isAttachedToWindow) {
             "createComposition requires either a parent reference or the View to be attached" +
                 "to a window. Attach the View or call setParentCompositionReference."
         }
@@ -156,7 +181,7 @@ abstract class AbstractComposeView @JvmOverloads constructor(
             try {
                 creatingComposition = true
                 composition = setContent(
-                    parentReference ?: findViewTreeCompositionReference() ?: windowRecomposer
+                    parentContext ?: findViewTreeCompositionContext() ?: windowRecomposer
                 ) {
                     Content()
                 }
@@ -218,6 +243,14 @@ abstract class AbstractComposeView @JvmOverloads constructor(
             right - left - paddingRight,
             bottom - top - paddingBottom
         )
+    }
+
+    override fun onRtlPropertiesChanged(layoutDirection: Int) {
+        // Force the single child for our composition to have the same LayoutDirection
+        // that we do. We will get onRtlPropertiesChanged eagerly as the value changes,
+        // but the composition child view won't until it measures. This can be too late
+        // to catch the composition pass for that frame, so propagate it eagerly.
+        getChildAt(0)?.layoutDirection = layoutDirection
     }
 
     // Below: enforce restrictions on adding child views to this ViewGroup

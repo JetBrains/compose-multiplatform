@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-@file:Suppress("DEPRECATION")
-
 package androidx.compose.ui.tooling.preview
 
 import android.app.Activity
 import android.os.Bundle
 import androidx.compose.animation.core.InternalAnimationApi
-import androidx.compose.animation.core.TransitionAnimation
 import androidx.compose.ui.tooling.compositionCount
+import androidx.compose.ui.tooling.data.UiToolingDataApi
 import androidx.compose.ui.tooling.preview.animation.PreviewAnimationClock
 import androidx.compose.ui.tooling.test.R
 import org.junit.Assert.assertArrayEquals
@@ -37,6 +35,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
+@OptIn(UiToolingDataApi::class)
 class ComposeViewAdapterTest {
     @Suppress("DEPRECATION")
     @get:Rule
@@ -125,7 +124,7 @@ class ComposeViewAdapterTest {
             )
             composeViewAdapter.clock = clock
             assertFalse(composeViewAdapter.hasAnimations())
-            assertTrue(clock.observersToAnimations.isEmpty())
+            assertTrue(clock.trackedTransitions.isEmpty())
         }
 
         waitFor("Composable to have animations", 1, TimeUnit.SECONDS) {
@@ -136,10 +135,8 @@ class ComposeViewAdapterTest {
         }
 
         activityTestRule.runOnUiThread {
-            val observer = clock.observersToAnimations.keys.single()
-            val transitionAnimation =
-                (observer as TransitionAnimation<*>.TransitionAnimationClockObserver).animation
-            assertEquals("checkBoxAnim", transitionAnimation.label)
+            val animation = clock.trackedTransitions.keys.single()
+            assertEquals("checkBoxAnim", animation.label)
         }
     }
 
@@ -243,10 +240,10 @@ class ComposeViewAdapterTest {
     }
 
     @Test
-    fun uiSavedStateRegistryUsedInsidePreview() {
+    fun saveableStateRegistryUsedInsidePreview() {
         assertRendersCorrectly(
             "androidx.compose.ui.tooling.SimpleComposablePreviewKt",
-            "UiSavedStateRegistryPreview"
+            "SaveableStateRegistryPreview"
         )
     }
 

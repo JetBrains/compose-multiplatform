@@ -23,8 +23,9 @@ import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.Recomposer
+import androidx.compose.runtime.ControlledComposition
 import androidx.compose.runtime.currentComposer
-import androidx.compose.runtime.dispatch.MonotonicFrameClock
+import androidx.compose.runtime.MonotonicFrameClock
 import androidx.compose.runtime.withRunningRecomposer
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -37,8 +38,8 @@ import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.materialize
-import androidx.compose.ui.platform.AmbientDensity
-import androidx.compose.ui.platform.AmbientViewConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
@@ -95,16 +96,18 @@ internal class SuspendingGestureTestUtil(
         withRunningRecomposer { recomposer ->
             compose(recomposer) {
                 Providers(
-                    AmbientDensity provides Density(1f),
-                    AmbientViewConfiguration provides TestViewConfiguration()
+                    LocalDensity provides Density(1f),
+                    LocalViewConfiguration provides TestViewConfiguration()
                 ) {
                     pointerInputFilter = currentComposer
-                        .materialize(Modifier.pointerInput(gestureDetector)) as
+                        .materialize(Modifier.pointerInput(Unit, gestureDetector)) as
                         PointerInputFilter
                 }
             }
             yield()
             block()
+            // Pointer input effects will loop indefinitely; fully cancel them.
+            recomposer.cancel()
         }
     }
 
@@ -298,15 +301,15 @@ internal class SuspendingGestureTestUtil(
     private fun compose(
         recomposer: Recomposer,
         block: @Composable () -> Unit
-    ): Composer<Unit> {
-        return Composer(
+    ) {
+        ControlledComposition(
             EmptyApplier(),
             recomposer
         ).apply {
-            composeInitial {
+            composeContent {
                 @Suppress("UNCHECKED_CAST")
-                val fn = block as (Composer<*>, Int) -> Unit
-                fn(this, 0)
+                val fn = block as (Composer, Int) -> Unit
+                fn(currentComposer, 0)
             }
             applyChanges()
             verifyConsistent()

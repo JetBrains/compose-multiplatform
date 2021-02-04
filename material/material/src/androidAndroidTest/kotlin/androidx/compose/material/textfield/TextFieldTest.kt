@@ -30,9 +30,9 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.AmbientContentAlpha
-import androidx.compose.material.AmbientContentColor
-import androidx.compose.material.AmbientTextStyle
+import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.LocalContentColor
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
@@ -56,8 +56,8 @@ import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.platform.AmbientTextInputService
-import androidx.compose.ui.platform.AmbientView
+import androidx.compose.ui.platform.LocalTextInputService
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertHeightIsEqualTo
@@ -68,7 +68,6 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performGesture
-import androidx.compose.ui.test.performImeAction
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
@@ -219,7 +218,7 @@ class TextFieldTest {
         val (focusRequester, parentFocusRequester) = FocusRequester.createRefs()
         lateinit var hostView: View
         rule.setMaterialContent {
-            hostView = AmbientView.current
+            hostView = LocalView.current
             Box {
                 TextField(
                     modifier = Modifier
@@ -250,7 +249,7 @@ class TextFieldTest {
         lateinit var softwareKeyboardController: SoftwareKeyboardController
         lateinit var hostView: View
         rule.setMaterialContent {
-            hostView = AmbientView.current
+            hostView = LocalView.current
             Box {
                 TextField(
                     modifier = Modifier
@@ -311,10 +310,10 @@ class TextFieldTest {
             assertThat(labelSize.value?.width).isGreaterThan(0)
             // centered position
             assertThat(labelPosition.value?.x).isEqualTo(
-                ExpectedPadding.toIntPx().toFloat()
+                ExpectedPadding.roundToPx().toFloat()
             )
             assertThat(labelPosition.value?.y).isEqualTo(
-                ((ExpectedDefaultTextFieldHeight.toIntPx() - labelSize.value!!.height) / 2f)
+                ((ExpectedDefaultTextFieldHeight.roundToPx() - labelSize.value!!.height) / 2f)
                     .roundToInt().toFloat()
             )
         }
@@ -352,10 +351,10 @@ class TextFieldTest {
             assertThat(labelSize.value?.width).isGreaterThan(0)
             // centered position
             assertThat(labelPosition.value?.x).isEqualTo(
-                ExpectedPadding.toIntPx().toFloat()
+                ExpectedPadding.roundToPx().toFloat()
             )
             assertThat(labelPosition.value?.y).isEqualTo(
-                TextFieldPadding.toIntPx()
+                TextFieldPadding.roundToPx()
             )
         }
     }
@@ -391,10 +390,10 @@ class TextFieldTest {
             assertThat(labelSize.value?.width).isGreaterThan(0)
             // centered position
             assertThat(labelPosition.value?.x).isEqualTo(
-                ExpectedPadding.toIntPx().toFloat()
+                ExpectedPadding.roundToPx().toFloat()
             )
             assertThat(labelPosition.value?.y).isEqualTo(
-                TextFieldPadding.toIntPx()
+                TextFieldPadding.roundToPx()
             )
         }
     }
@@ -435,10 +434,10 @@ class TextFieldTest {
             assertThat(labelSize.value?.width).isGreaterThan(0)
             // label's top position
             assertThat(labelPosition.value?.x).isEqualTo(
-                ExpectedPadding.toIntPx().toFloat()
+                ExpectedPadding.roundToPx().toFloat()
             )
             assertThat(baseline.value).isEqualTo(
-                ExpectedBaselineOffset.toIntPx().toFloat()
+                ExpectedBaselineOffset.roundToPx().toFloat()
             )
         }
     }
@@ -475,10 +474,10 @@ class TextFieldTest {
             assertThat(labelSize.value?.width).isGreaterThan(0)
             // label's top position
             assertThat(labelPosition.value?.x).isEqualTo(
-                ExpectedPadding.toIntPx().toFloat()
+                ExpectedPadding.roundToPx().toFloat()
             )
             assertThat(baseline.value).isEqualTo(
-                ExpectedBaselineOffset.toIntPx().toFloat()
+                ExpectedBaselineOffset.roundToPx().toFloat()
             )
         }
     }
@@ -518,11 +517,11 @@ class TextFieldTest {
             assertThat(placeholderSize.value?.width).isGreaterThan(0)
             // placeholder's position
             assertThat(placeholderPosition.value?.x).isEqualTo(
-                ExpectedPadding.toIntPx().toFloat()
+                ExpectedPadding.roundToPx().toFloat()
             )
             assertThat(placeholderPosition.value?.y)
                 .isEqualTo(
-                    (ExpectedBaselineOffset.toIntPx() + TopPaddingFilledTextfield.toIntPx())
+                    (ExpectedBaselineOffset.roundToPx() + TopPaddingFilledTextfield.roundToPx())
                         .toFloat()
                 )
         }
@@ -559,14 +558,14 @@ class TextFieldTest {
         rule.runOnIdleWithDensity {
             // size
             assertThat(placeholderSize.value).isNotNull()
-            assertThat(placeholderSize.value?.height).isEqualTo(20.dp.toIntPx())
+            assertThat(placeholderSize.value?.height).isEqualTo(20.dp.roundToPx())
             assertThat(placeholderSize.value?.width).isGreaterThan(0)
             // centered position
             assertThat(placeholderPosition.value?.x).isEqualTo(
-                ExpectedPadding.toIntPx().toFloat()
+                ExpectedPadding.roundToPx().toFloat()
             )
             assertThat(placeholderPosition.value?.y).isEqualTo(
-                TextFieldPadding.toIntPx()
+                TextFieldPadding.roundToPx()
             )
         }
     }
@@ -615,8 +614,8 @@ class TextFieldTest {
                 placeholder = {
                     Text("placeholder")
                     assertThat(
-                        AmbientContentColor.current.copy(
-                            alpha = AmbientContentAlpha.current
+                        LocalContentColor.current.copy(
+                            alpha = LocalContentAlpha.current
                         )
                     )
                         .isEqualTo(
@@ -624,7 +623,7 @@ class TextFieldTest {
                                 alpha = 0.6f
                             )
                         )
-                    assertThat(AmbientTextStyle.current)
+                    assertThat(LocalTextStyle.current)
                         .isEqualTo(MaterialTheme.typography.subtitle1)
                 }
             )
@@ -671,21 +670,21 @@ class TextFieldTest {
 
         rule.runOnIdleWithDensity {
             // leading
-            assertThat(leadingSize.value).isEqualTo(IntSize(size.toIntPx(), size.toIntPx()))
-            assertThat(leadingPosition.value?.x).isEqualTo(IconPadding.toIntPx().toFloat())
+            assertThat(leadingSize.value).isEqualTo(IntSize(size.roundToPx(), size.roundToPx()))
+            assertThat(leadingPosition.value?.x).isEqualTo(IconPadding.roundToPx().toFloat())
             assertThat(leadingPosition.value?.y).isEqualTo(
-                ((textFieldHeight.toIntPx() - leadingSize.value!!.height) / 2f).roundToInt()
+                ((textFieldHeight.roundToPx() - leadingSize.value!!.height) / 2f).roundToInt()
                     .toFloat()
             )
             // trailing
-            assertThat(trailingSize.value).isEqualTo(IntSize(size.toIntPx(), size.toIntPx()))
+            assertThat(trailingSize.value).isEqualTo(IntSize(size.roundToPx(), size.roundToPx()))
             assertThat(trailingPosition.value?.x).isEqualTo(
-                (textFieldWidth.toIntPx() - IconPadding.toIntPx() - trailingSize.value!!.width)
+                (textFieldWidth.roundToPx() - IconPadding.roundToPx() - trailingSize.value!!.width)
                     .toFloat()
             )
             assertThat(trailingPosition.value?.y)
                 .isEqualTo(
-                    ((textFieldHeight.toIntPx() - trailingSize.value!!.height) / 2f)
+                    ((textFieldHeight.roundToPx() - trailingSize.value!!.height) / 2f)
                         .roundToInt().toFloat()
                 )
         }
@@ -718,7 +717,7 @@ class TextFieldTest {
 
         rule.runOnIdleWithDensity {
             assertThat(labelPosition.value?.x).isEqualTo(
-                (ExpectedPadding.toIntPx() + IconPadding.toIntPx() + iconSize.toIntPx())
+                (ExpectedPadding.roundToPx() + IconPadding.roundToPx() + iconSize.roundToPx())
                     .toFloat()
             )
         }
@@ -750,7 +749,7 @@ class TextFieldTest {
 
         rule.runOnIdleWithDensity {
             assertThat(labelPosition.value?.x).isEqualTo(
-                ExpectedPadding.toIntPx().toFloat()
+                ExpectedPadding.roundToPx().toFloat()
             )
         }
     }
@@ -764,7 +763,7 @@ class TextFieldTest {
                 label = {},
                 isErrorValue = false,
                 leadingIcon = {
-                    assertThat(AmbientContentColor.current)
+                    assertThat(LocalContentColor.current)
                         .isEqualTo(
                             MaterialTheme.colors.onSurface.copy(
                                 IconColorAlpha
@@ -772,7 +771,7 @@ class TextFieldTest {
                         )
                 },
                 trailingIcon = {
-                    assertThat(AmbientContentColor.current)
+                    assertThat(LocalContentColor.current)
                         .isEqualTo(
                             MaterialTheme.colors.onSurface.copy(
                                 IconColorAlpha
@@ -792,7 +791,7 @@ class TextFieldTest {
                 label = {},
                 isErrorValue = true,
                 leadingIcon = {
-                    assertThat(AmbientContentColor.current)
+                    assertThat(LocalContentColor.current)
                         .isEqualTo(
                             MaterialTheme.colors.onSurface.copy(
                                 IconColorAlpha
@@ -800,7 +799,7 @@ class TextFieldTest {
                         )
                 },
                 trailingIcon = {
-                    assertThat(AmbientContentColor.current).isEqualTo(MaterialTheme.colors.error)
+                    assertThat(LocalContentColor.current).isEqualTo(MaterialTheme.colors.error)
                 }
             )
         }
@@ -812,7 +811,7 @@ class TextFieldTest {
         val textInputService = mock<TextInputService>()
         rule.setContent {
             Providers(
-                AmbientTextInputService provides textInputService
+                LocalTextInputService provides textInputService
             ) {
                 val text = remember { mutableStateOf("") }
                 TextField(
@@ -942,32 +941,6 @@ class TextFieldTest {
 
         rule.onNodeWithTag(TextfieldTag)
             .performClick()
-
-        rule.runOnIdle {
-            assertThat(controller).isNotNull()
-        }
-    }
-
-    @Test
-    fun testTextField_imeActionCallback_withSoftwareKeyboardController() {
-        var controller: SoftwareKeyboardController? = null
-
-        rule.setMaterialContent {
-            TextField(
-                modifier = Modifier.testTag(TextfieldTag),
-                value = "",
-                onValueChange = {},
-                label = {},
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Go),
-                onImeActionPerformed = { _, softwareKeyboardController ->
-                    controller = softwareKeyboardController
-                }
-            )
-        }
-        assertThat(controller).isNull()
-
-        rule.onNodeWithTag(TextfieldTag)
-            .performImeAction()
 
         rule.runOnIdle {
             assertThat(controller).isNotNull()

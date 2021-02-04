@@ -15,11 +15,14 @@
  */
 
 package androidx.compose.ui.inspection.proto
+
+import androidx.compose.ui.inspection.LambdaLocation
 import androidx.compose.ui.tooling.inspector.InspectorNode
 import androidx.compose.ui.tooling.inspector.NodeParameter
 import androidx.compose.ui.tooling.inspector.ParameterType
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Bounds
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.ComposableNode
+import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.LambdaValue
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Parameter
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Quad
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Rect
@@ -112,11 +115,29 @@ private fun Parameter.Builder.setValue(stringTable: StringTable, value: Any?) {
         Parameter.Type.RESOURCE -> {
             // TODO: handle resource type
         }
-        Parameter.Type.LAMBDA -> {
-            // TODO: Use environment tooling to query data so we can extract lambda information
-        }
+        Parameter.Type.LAMBDA -> setFunctionType(value, stringTable)
+        Parameter.Type.FUNCTION_REFERENCE -> setFunctionType(value, stringTable)
         else -> error("Unknown Composable parameter type: $type")
     }
+}
+
+private fun Parameter.Builder.setFunctionType(value: Any?, stringTable: StringTable) {
+    if (value !is Array<*> || value.size > 2 || value.size == 0) {
+        return
+    }
+    val lambdaInstance = value[0] ?: return
+    val location = LambdaLocation.resolve(lambdaInstance) ?: return
+    val lambdaClass = lambdaInstance::class.java
+    val lambdaClassName = lambdaClass.name
+    lambdaValue = LambdaValue.newBuilder().apply {
+        packageName = stringTable.put(lambdaClassName.substringBeforeLast("."))
+        functionName = if (value.size == 2 && value[1] != null && value[1] is String)
+            stringTable.put(value[1] as String) else 0
+        lambdaName = stringTable.put(lambdaClassName.substringAfterLast("$"))
+        fileName = stringTable.put(location.fileName)
+        startLineNumber = location.startLine
+        endLineNumber = location.endLine
+    }.build()
 }
 
 fun NodeParameter.convert(stringTable: StringTable): Parameter {

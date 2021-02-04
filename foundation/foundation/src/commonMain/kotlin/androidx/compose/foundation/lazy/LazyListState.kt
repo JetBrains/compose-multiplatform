@@ -30,12 +30,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.Saver
-import androidx.compose.runtime.savedinstancestate.listSaver
-import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.layout.Remeasurement
 import androidx.compose.ui.layout.RemeasurementModifier
-import androidx.compose.ui.platform.AmbientAnimationClock
+import androidx.compose.ui.platform.LocalAnimationClock
 import kotlin.math.abs
 
 /**
@@ -57,7 +57,7 @@ fun rememberLazyListState(
     initialFirstVisibleItemScrollOffset: Int = 0,
     interactionState: InteractionState? = null
 ): LazyListState {
-    val clock = AmbientAnimationClock.current.asDisposableClock()
+    val clock = LocalAnimationClock.current.asDisposableClock()
     val config = defaultFlingConfig()
 
     // Avoid creating a new instance every invocation
@@ -65,7 +65,7 @@ fun rememberLazyListState(
         LazyListState.Saver(config, clock, interactionState)
     }
 
-    return rememberSavedInstanceState(config, clock, interactionState, saver = saver) {
+    return rememberSaveable(config, clock, interactionState, saver = saver) {
         LazyListState(
             initialFirstVisibleItemIndex,
             initialFirstVisibleItemScrollOffset,
@@ -237,7 +237,7 @@ class LazyListState constructor(
         ) {
             return 0f
         }
-        check(abs(scrollToBeConsumed) < 0.5f) {
+        check(abs(scrollToBeConsumed) <= 0.5f) {
             "entered drag with non-zero pending scroll: $scrollToBeConsumed"
         }
         scrollToBeConsumed += distance
@@ -245,12 +245,12 @@ class LazyListState constructor(
         // scrollToBeConsumed will be consumed synchronously during the forceRemeasure invocation
         // inside measuring we do scrollToBeConsumed.roundToInt() so there will be no scroll if
         // we have less than 0.5 pixels
-        if (abs(scrollToBeConsumed) >= 0.5f) {
+        if (abs(scrollToBeConsumed) > 0.5f) {
             remeasurement.forceRemeasure()
         }
 
         // here scrollToBeConsumed is already consumed during the forceRemeasure invocation
-        if (abs(scrollToBeConsumed) < 0.5f) {
+        if (abs(scrollToBeConsumed) <= 0.5f) {
             // We consumed all of it - we'll hold onto the fractional scroll for later, so report
             // that we consumed the whole thing
             return distance

@@ -235,7 +235,7 @@ class ButtonTest {
     fun containedButtonPropagateDefaultTextStyle() {
         rule.setMaterialContent {
             Button(onClick = {}) {
-                assertThat(AmbientTextStyle.current).isEqualTo(MaterialTheme.typography.button)
+                assertThat(LocalTextStyle.current).isEqualTo(MaterialTheme.typography.button)
             }
         }
     }
@@ -244,7 +244,7 @@ class ButtonTest {
     fun outlinedButtonPropagateDefaultTextStyle() {
         rule.setMaterialContent {
             OutlinedButton(onClick = {}) {
-                assertThat(AmbientTextStyle.current).isEqualTo(MaterialTheme.typography.button)
+                assertThat(LocalTextStyle.current).isEqualTo(MaterialTheme.typography.button)
             }
         }
     }
@@ -253,7 +253,7 @@ class ButtonTest {
     fun textButtonPropagateDefaultTextStyle() {
         rule.setMaterialContent {
             TextButton(onClick = {}) {
-                assertThat(AmbientTextStyle.current).isEqualTo(MaterialTheme.typography.button)
+                assertThat(LocalTextStyle.current).isEqualTo(MaterialTheme.typography.button)
             }
         }
     }
@@ -289,7 +289,7 @@ class ButtonTest {
         rule.setMaterialContent {
             surface = MaterialTheme.colors.surface
             primary = MaterialTheme.colors.primary
-            Providers(AmbientShapes provides Shapes(small = shape)) {
+            Providers(LocalShapes provides Shapes(small = shape)) {
                 Button(modifier = Modifier.testTag("myButton"), onClick = {}, elevation = null) {
                     Box(Modifier.preferredSize(10.dp, 10.dp))
                 }
@@ -314,7 +314,7 @@ class ButtonTest {
         rule.setMaterialContent {
             onPrimary = MaterialTheme.colors.onPrimary
             Button(onClick = {}) {
-                content = AmbientContentColor.current
+                content = LocalContentColor.current
             }
         }
 
@@ -328,7 +328,7 @@ class ButtonTest {
         rule.setMaterialContent {
             primary = MaterialTheme.colors.primary
             OutlinedButton(onClick = {}) {
-                content = AmbientContentColor.current
+                content = LocalContentColor.current
             }
         }
 
@@ -342,7 +342,7 @@ class ButtonTest {
         rule.setMaterialContent {
             primary = MaterialTheme.colors.primary
             TextButton(onClick = {}) {
-                content = AmbientContentColor.current
+                content = LocalContentColor.current
             }
         }
 
@@ -485,7 +485,7 @@ class ButtonTest {
             onSurface = MaterialTheme.colors.onSurface
             disabledAlpha = ContentAlpha.disabled
             Button(onClick = {}, enabled = false) {
-                content = AmbientContentColor.current.copy(alpha = AmbientContentAlpha.current)
+                content = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
             }
         }
 
@@ -501,7 +501,7 @@ class ButtonTest {
             onSurface = MaterialTheme.colors.onSurface
             disabledAlpha = ContentAlpha.disabled
             OutlinedButton(onClick = {}, enabled = false) {
-                content = AmbientContentColor.current.copy(alpha = AmbientContentAlpha.current)
+                content = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
             }
         }
 
@@ -517,7 +517,7 @@ class ButtonTest {
             onSurface = MaterialTheme.colors.onSurface
             disabledAlpha = ContentAlpha.disabled
             TextButton(onClick = {}, enabled = false) {
-                content = AmbientContentColor.current.copy(alpha = AmbientContentAlpha.current)
+                content = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
             }
         }
 
@@ -545,8 +545,8 @@ class ButtonTest {
             assertThat(contentBounds.width).isLessThan(buttonBounds.width)
             assertThat(contentBounds.height).isLessThan(buttonBounds.height)
             with(rule.density) {
-                assertThat(contentBounds.width).isEqualTo(2.dp.toIntPx().toFloat())
-                assertThat(contentBounds.height).isEqualTo(2.dp.toIntPx().toFloat())
+                assertThat(contentBounds.width).isEqualTo(2.dp.roundToPx().toFloat())
+                assertThat(contentBounds.height).isEqualTo(2.dp.roundToPx().toFloat())
             }
             assertWithinOnePixel(buttonBounds.center, contentBounds.center)
         }
@@ -650,7 +650,7 @@ class ButtonTest {
             val topLeft = childCoordinates!!.localToWindow(Offset.Zero).x -
                 parentCoordinates!!.localToWindow(Offset.Zero).x
             val currentPadding = with(rule.density) {
-                padding.toIntPx().toFloat()
+                padding.roundToPx().toFloat()
             }
             assertThat(currentPadding).isEqualTo(topLeft)
         }

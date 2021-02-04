@@ -26,12 +26,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Providers
 import androidx.compose.testutils.MockAnimationClock
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.TouchSlop
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalViewConfiguration
+import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.bottomCenter
 import androidx.compose.ui.test.bottomRight
@@ -163,23 +165,25 @@ class SendSwipeTest {
 
     @Test
     fun swipeScrollable() {
-        val touchSlop = with(rule.density) { TouchSlop.toPx() }
+        val touchSlop = TestTouchSlop
         val scrollState = ScrollState(
             initial = 0f,
             flingConfig = FlingConfig(FloatExponentialDecaySpec()),
             animationClock = MockAnimationClock()
         )
         rule.setContent {
-            with(AmbientDensity.current) {
-                // Scrollable with a viewport the size of 10 boxes
-                Column(
-                    Modifier
-                        .testTag("scrollable")
-                        .size(100.toDp(), 1000.toDp())
-                        .verticalScroll(scrollState)
-                ) {
-                    repeat(100) {
-                        ClickableTestBox()
+            Providers(LocalViewConfiguration provides FakeViewConfiguration) {
+                with(LocalDensity.current) {
+                    // Scrollable with a viewport the size of 10 boxes
+                    Column(
+                        Modifier
+                            .testTag("scrollable")
+                            .size(100.toDp(), 1000.toDp())
+                            .verticalScroll(scrollState)
+                    ) {
+                        repeat(100) {
+                            ClickableTestBox()
+                        }
                     }
                 }
             }
@@ -247,5 +251,18 @@ class SendSwipeTest {
         // All events in between only move to the right
         events.map { it.position.x }.assertIncreasing()
         events.map { it.position.y }.assertSame(tolerance = 0.001f)
+    }
+
+    internal val TestTouchSlop = 18f
+
+    private val FakeViewConfiguration = object : ViewConfiguration {
+        override val longPressTimeoutMillis: Long
+            get() = 500L
+        override val doubleTapTimeoutMillis: Long
+            get() = 300L
+        override val doubleTapMinTimeMillis: Long
+            get() = 40L
+        override val touchSlop: Float
+            get() = TestTouchSlop
     }
 }

@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.takeOrElse
-import androidx.compose.ui.selection.TextSelectionColors
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import kotlin.math.max
 import kotlin.math.min
 
@@ -41,7 +41,7 @@ internal fun rememberTextSelectionColors(colors: Colors): TextSelectionColors {
     // text shouldn't be selectable / is noted as disabled for accessibility purposes.
     val textColorWithLowestAlpha = colors.contentColorFor(backgroundColor)
         .takeOrElse {
-            AmbientContentColor.current
+            LocalContentColor.current
         }.copy(
             alpha = ContentAlpha.medium
         )

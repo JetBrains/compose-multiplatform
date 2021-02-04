@@ -122,7 +122,7 @@ fun Button(
             indication = null
         )
     ) {
-        Providers(AmbientContentAlpha provides contentColor.alpha) {
+        Providers(LocalContentAlpha provides contentColor.alpha) {
             ProvideTextStyle(
                 value = MaterialTheme.typography.button
             ) {
@@ -469,9 +469,11 @@ object ButtonDefaults {
     /**
      * The default content padding used by [TextButton]
      */
-    val TextButtonContentPadding = ContentPadding.copy(
+    val TextButtonContentPadding = PaddingValues(
         start = TextButtonHorizontalPadding,
-        end = TextButtonHorizontalPadding
+        top = ContentPadding.calculateTopPadding(),
+        end = TextButtonHorizontalPadding,
+        bottom = ContentPadding.calculateBottomPadding()
     )
 }
 
@@ -503,7 +505,9 @@ private class DefaultButtonElevation(
 
         if (!enabled) {
             // No transition when moving to a disabled state
-            animatable.snapTo(target)
+            LaunchedEffect(target) {
+                animatable.snapTo(target)
+            }
         } else {
             LaunchedEffect(target) {
                 val lastInteraction = when (animatable.targetValue) {

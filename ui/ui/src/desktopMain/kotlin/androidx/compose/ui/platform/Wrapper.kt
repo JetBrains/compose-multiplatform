@@ -17,11 +17,9 @@ package androidx.compose.ui.platform
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
-import androidx.compose.runtime.CompositionReference
+import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Providers
-import androidx.compose.runtime.Recomposer
-import androidx.compose.runtime.compositionFor
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.node.LayoutNode
 
@@ -33,24 +31,22 @@ import androidx.compose.ui.node.LayoutNode
  * @param content A `@Composable` function declaring the UI contents
  */
 @OptIn(ExperimentalComposeApi::class)
-fun DesktopOwner.setContent(
-    parent: CompositionReference? = null,
+internal fun DesktopOwner.setContent(
+    parent: CompositionContext? = null,
     content: @Composable () -> Unit
 ): Composition {
     GlobalSnapshotManager.ensureStarted()
 
-    val composition = compositionFor(root, DesktopUiApplier(root), parent ?: Recomposer.current())
+    val composition = Composition(root, DesktopUiApplier(root), parent ?: container.recomposer)
     composition.setContent {
         ProvideDesktopAmbients(this) {
-            DesktopSelectionContainer(content)
+            content()
         }
     }
 
     keyboard?.setShortcut(copyToClipboardKeySet) {
-        selectionManager.recentManager?.let { selector ->
-            selector.getSelectedText()?.let {
-                clipboardManager.setText(it)
-            }
+        selectionTracker.getSelectedText?.invoke()?.let {
+            clipboardManager.setText(it)
         }
     }
 
@@ -61,9 +57,9 @@ fun DesktopOwner.setContent(
 private fun ProvideDesktopAmbients(owner: DesktopOwner, content: @Composable () -> Unit) {
     Providers(
         DesktopOwnersAmbient provides owner.container,
-        SelectionManagerTrackerAmbient provides owner.selectionManager
+        SelectionTrackerAmbient provides owner.selectionTracker
     ) {
-        ProvideCommonAmbients(
+        ProvideCommonCompositionLocals(
             owner = owner,
             animationClock = owner.container.animationClock,
             uriHandler = DesktopUriHandler(),
@@ -75,9 +71,9 @@ private fun ProvideDesktopAmbients(owner: DesktopOwner, content: @Composable () 
 @OptIn(ExperimentalComposeApi::class)
 internal actual fun subcomposeInto(
     container: LayoutNode,
-    parent: CompositionReference,
+    parent: CompositionContext,
     composable: @Composable () -> Unit
-): Composition = compositionFor(
+): Composition = Composition(
     container,
     DesktopUiApplier(container),
     parent

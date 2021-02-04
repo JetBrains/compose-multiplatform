@@ -32,12 +32,12 @@ package androidx.compose.runtime
  *
  * @see Updater
  * @see Applier
- * @see compositionFor
+ * @see Composition
  */
 @OptIn(ComposeCompilerApi::class)
 @Composable inline fun <T : Any, reified E : Applier<*>> ComposeNode(
     noinline factory: () -> T,
-    update: @ComposableContract(preventCapture = true) Updater<T>.() -> Unit
+    update: @DisallowComposableCalls Updater<T>.() -> Unit
 ) {
     if (currentComposer.applier !is E) invalidApplier()
     currentComposer.startNode()
@@ -67,13 +67,13 @@ package androidx.compose.runtime
  *
  * @see Updater
  * @see Applier
- * @see compositionFor
+ * @see Composition
  */
 @OptIn(ComposeCompilerApi::class)
 @Composable
 inline fun <T : Any?, reified E : Applier<*>> ComposeNode(
     noinline factory: () -> T,
-    update: @ComposableContract(preventCapture = true) Updater<T>.() -> Unit,
+    update: @DisallowComposableCalls Updater<T>.() -> Unit,
     content: @Composable () -> Unit
 ) {
     if (currentComposer.applier !is E) invalidApplier()
@@ -111,13 +111,13 @@ inline fun <T : Any?, reified E : Applier<*>> ComposeNode(
  * @see Updater
  * @see SkippableUpdater
  * @see Applier
- * @see compositionFor
+ * @see Composition
  */
 @OptIn(ComposeCompilerApi::class)
-@Composable @ComposableContract(readonly = true)
+@Composable @ReadOnlyComposable
 inline fun <T, reified E : Applier<*>> ComposeNode(
     noinline factory: () -> T,
-    update: @ComposableContract(preventCapture = true) Updater<T>.() -> Unit,
+    update: @DisallowComposableCalls Updater<T>.() -> Unit,
     noinline skippableUpdate: @Composable SkippableUpdater<T>.() -> Unit,
     content: @Composable () -> Unit
 ) {

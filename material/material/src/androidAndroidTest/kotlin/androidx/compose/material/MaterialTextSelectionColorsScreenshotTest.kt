@@ -24,8 +24,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.selection.SelectionContainer
-import androidx.compose.ui.selection.TextSelectionColors
+import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.height
@@ -37,6 +37,7 @@ import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.width
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
@@ -122,6 +123,7 @@ class MaterialTextSelectionColorsScreenshotTest {
             .assertAgainstGolden(screenshotRule, "text_darkThemeSelectionColors")
     }
 
+    @FlakyTest(bugId = 179292401)
     @Test
     fun filledTextField_lightThemeSelectionColors() {
         rule.setContent {
@@ -150,6 +152,7 @@ class MaterialTextSelectionColorsScreenshotTest {
             .assertAgainstGolden(screenshotRule, "filledTextField_lightThemeSelectionColors")
     }
 
+    @FlakyTest(bugId = 179292401)
     @Test
     fun filledTextField_darkThemeSelectionColors() {
         rule.setContent {
@@ -178,6 +181,7 @@ class MaterialTextSelectionColorsScreenshotTest {
             .assertAgainstGolden(screenshotRule, "filledTextField_darkThemeSelectionColors")
     }
 
+    @FlakyTest(bugId = 179292401)
     @Test
     fun outlinedTextField_lightThemeSelectionColors() {
         rule.setContent {
@@ -206,6 +210,7 @@ class MaterialTextSelectionColorsScreenshotTest {
             .assertAgainstGolden(screenshotRule, "outlinedTextField_lightThemeSelectionColors")
     }
 
+    @FlakyTest(bugId = 179292401)
     @Test
     fun outlinedTextField_darkThemeSelectionColors() {
         rule.setContent {

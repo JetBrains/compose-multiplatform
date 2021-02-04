@@ -39,8 +39,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.toComposeRect
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.AmbientAutofill
-import androidx.compose.ui.platform.AmbientAutofillTree
+import androidx.compose.ui.platform.LocalAutofill
+import androidx.compose.ui.platform.LocalAutofillTree
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -51,7 +51,7 @@ fun ExplicitAutofillTypesDemo() {
     Column {
         val nameState = remember { mutableStateOf("Enter name here") }
         val emailState = remember { mutableStateOf("Enter email here") }
-        val autofill = AmbientAutofill.current
+        val autofill = LocalAutofill.current
         val labelStyle = MaterialTheme.typography.subtitle1
         val textStyle = MaterialTheme.typography.h6
 
@@ -118,7 +118,7 @@ private fun Autofill(
 ) {
     val autofillNode = AutofillNode(onFill = onFill, autofillTypes = autofillTypes)
 
-    val autofillTree = AmbientAutofillTree.current
+    val autofillTree = LocalAutofillTree.current
     autofillTree += autofillNode
 
     Box(

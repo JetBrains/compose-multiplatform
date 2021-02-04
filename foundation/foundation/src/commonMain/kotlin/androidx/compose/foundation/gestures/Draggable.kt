@@ -119,7 +119,7 @@ fun Modifier.draggable(
             }
         }
     }
-    Modifier.pointerInput(dragBlock)
+    Modifier.pointerInput(Unit, dragBlock)
 }
 
 private suspend fun PointerInputScope.dragForEachGesture(

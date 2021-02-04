@@ -16,9 +16,9 @@
 
 package androidx.compose.animation.core
 
-import androidx.compose.runtime.dispatch.DefaultMonotonicFrameClock
-import androidx.compose.runtime.dispatch.MonotonicFrameClock
-import androidx.compose.runtime.dispatch.withFrameMillis
+import androidx.compose.runtime.DefaultMonotonicFrameClock
+import androidx.compose.runtime.MonotonicFrameClock
+import androidx.compose.runtime.withFrameMillis
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.ExperimentalCoroutinesApi

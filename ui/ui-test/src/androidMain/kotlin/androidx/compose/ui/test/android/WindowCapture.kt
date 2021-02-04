@@ -31,11 +31,16 @@ import android.view.Window
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.test.ComposeTimeoutException
+import androidx.compose.ui.test.InternalTestApi
+import androidx.compose.ui.test.MainTestClock
+import androidx.compose.ui.test.TestContext
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @RequiresApi(Build.VERSION_CODES.O)
 internal fun captureRegionToImage(
+    testContext: TestContext,
     captureRectInWindow: Rect,
     view: View,
     window: Window? = null
@@ -52,12 +57,12 @@ internal fun captureRegionToImage(
     val handler = Handler(Looper.getMainLooper())
 
     // first we wait for the drawing to happen
-    val drawLatch = CountDownLatch(1)
+    var drawDone = false
     val decorView = windowToCapture.decorView
     handler.post {
         if (Build.VERSION.SDK_INT >= 29 && decorView.isHardwareAccelerated()) {
             decorView.viewTreeObserver.registerFrameCommitCallback {
-                drawLatch.countDown()
+                drawDone = true
             }
         } else {
             decorView.viewTreeObserver.addOnDrawListener(object : ViewTreeObserver.OnDrawListener {
@@ -66,7 +71,7 @@ internal fun captureRegionToImage(
                     if (!handled) {
                         handled = true
                         handler.post {
-                            drawLatch.countDown()
+                            drawDone = true
                             decorView.viewTreeObserver.removeOnDrawListener(this)
                         }
                     }
@@ -75,9 +80,9 @@ internal fun captureRegionToImage(
         }
         decorView.invalidate()
     }
-    if (!drawLatch.await(1, TimeUnit.SECONDS)) {
-        throw AssertionError("Failed waiting for DecorView redraw!")
-    }
+
+    @OptIn(InternalTestApi::class)
+    testContext.testOwner.mainClock.waitUntil(timeoutMillis = 2_000) { drawDone }
 
     // and then request the pixel copy of the drawn buffer
     val destBitmap = Bitmap.createBitmap(
@@ -101,4 +106,22 @@ internal fun captureRegionToImage(
         throw AssertionError("PixelCopy failed!")
     }
     return destBitmap.asImageBitmap()
+}
+
+// Unfortunately this is a copy paste from AndroidComposeTestRule. At this moment it is a bit
+// tricky to share this method. We can expose it on TestOwner in theory.
+private fun MainTestClock.waitUntil(timeoutMillis: Long, condition: () -> Boolean) {
+    val startTime = System.nanoTime()
+    while (!condition()) {
+        if (autoAdvance) {
+            advanceTimeByFrame()
+        }
+        // Let Android run measure, draw and in general any other async operations.
+        Thread.sleep(10)
+        if (System.nanoTime() - startTime > timeoutMillis * 1_000_000) {
+            throw ComposeTimeoutException(
+                "Condition still not satisfied after $timeoutMillis ms"
+            )
+        }
+    }
 }

@@ -16,8 +16,8 @@
 
 package androidx.compose.animation.core
 
-import androidx.compose.runtime.dispatch.BroadcastFrameClock
-import androidx.compose.runtime.dispatch.MonotonicFrameClock
+import androidx.compose.runtime.BroadcastFrameClock
+import androidx.compose.runtime.MonotonicFrameClock
 
 /**
  * A [MonotonicFrameClock] built on a [BroadcastFrameClock] that keeps track of the current time.

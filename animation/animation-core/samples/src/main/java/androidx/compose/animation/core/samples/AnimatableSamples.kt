@@ -62,7 +62,7 @@ fun AnimatableAnimateToGenericsType() {
     val animatedOffset = remember { Animatable(Offset(0f, 0f), Offset.VectorConverter) }
 
     Box(
-        Modifier.fillMaxSize().background(Color(0xffb99aff)).pointerInput {
+        Modifier.fillMaxSize().background(Color(0xffb99aff)).pointerInput(Unit) {
             coroutineScope {
                 while (true) {
                     val offset = awaitPointerEventScope {
@@ -101,7 +101,7 @@ fun AnimatableDecayAndAnimateToSample() {
     fun Modifier.swipeToDismiss(): Modifier = composed {
         // Creates a Float type `Animatable` and `remember`s it
         val animatedOffset = remember { Animatable(0f) }
-        this.pointerInput {
+        this.pointerInput(Unit) {
             coroutineScope {
                 while (true) {
                     val pointerId = awaitPointerEventScope {
@@ -111,7 +111,9 @@ fun AnimatableDecayAndAnimateToSample() {
                     awaitPointerEventScope {
                         verticalDrag(pointerId) {
                             // Snaps the value by the amount of finger movement
-                            animatedOffset.snapTo(animatedOffset.value + it.positionChange().y)
+                            launch {
+                                animatedOffset.snapTo(animatedOffset.value + it.positionChange().y)
+                            }
                             velocityTracker.addPosition(
                                 it.uptimeMillis,
                                 it.position

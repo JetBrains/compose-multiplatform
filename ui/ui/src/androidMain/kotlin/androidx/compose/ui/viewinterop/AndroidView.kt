@@ -19,13 +19,20 @@ package androidx.compose.ui.viewinterop
 import android.content.Context
 import android.view.View
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.ComposeNode
+import androidx.compose.runtime.CompositionContext
+import androidx.compose.runtime.currentComposer
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.materialize
+import androidx.compose.ui.node.LayoutNode
+import androidx.compose.ui.node.Ref
 import androidx.compose.ui.node.UiApplier
-import androidx.compose.ui.platform.AmbientContext
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 
 /**
  * Composes an Android [View] obtained from [viewBlock]. The [viewBlock] block will be called
@@ -49,16 +56,30 @@ fun <T : View> AndroidView(
     modifier: Modifier = Modifier,
     update: (T) -> Unit = NoOpUpdate
 ) {
-    val context = AmbientContext.current
+    val context = LocalContext.current
     val materialized = currentComposer.materialize(modifier)
-    val density = AmbientDensity.current
-    ComposeNode<ViewBlockHolder<T>, UiApplier>(
-        factory = { ViewBlockHolder(context) },
+    val density = LocalDensity.current
+    val layoutDirection = LocalLayoutDirection.current
+    val parentReference = rememberCompositionContext()
+    val viewBlockHolderRef = remember { Ref<ViewBlockHolder<T>>() }
+    ComposeNode<LayoutNode, UiApplier>(
+        factory = {
+            val viewBlockHolder = ViewBlockHolder<T>(context, parentReference)
+            viewBlockHolder.viewBlock = viewBlock
+            viewBlockHolderRef.value = viewBlockHolder
+            viewBlockHolder.toLayoutNode()
+        },
         update = {
-            set(viewBlock) { this.viewBlock = it }
-            set(materialized) { this.modifier = it }
-            set(density) { this.density = it }
-            set(update) { this.updateBlock = it }
+            set(viewBlock) { viewBlockHolderRef.value!!.viewBlock = it }
+            set(materialized) { viewBlockHolderRef.value!!.modifier = it }
+            set(density) { viewBlockHolderRef.value!!.density = it }
+            set(update) { viewBlockHolderRef.value!!.updateBlock = it }
+            set(layoutDirection) {
+                viewBlockHolderRef.value!!.layoutDirection = when (it) {
+                    LayoutDirection.Ltr -> android.util.LayoutDirection.LTR
+                    LayoutDirection.Rtl -> android.util.LayoutDirection.RTL
+                }
+            }
         }
     )
 }
@@ -68,10 +89,11 @@ fun <T : View> AndroidView(
  */
 val NoOpUpdate: View.() -> Unit = {}
 
-@OptIn(InternalInteropApi::class)
 internal class ViewBlockHolder<T : View>(
-    context: Context
-) : AndroidViewHolder(context) {
+    context: Context,
+    parentContext: CompositionContext? = null
+) : AndroidViewHolder(context, parentContext) {
+
     private var typedView: T? = null
 
     var viewBlock: ((Context) -> T)? = null

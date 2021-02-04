@@ -18,36 +18,24 @@
 package androidx.compose.runtime
 
 import android.app.Activity
-import android.os.Bundle
 import android.os.Looper
 import android.view.Choreographer
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.compose.runtime.snapshots.Snapshot
-import androidx.compose.ui.node.UiApplier
-import androidx.compose.ui.platform.AmbientContext
-import androidx.compose.ui.platform.setViewContent
+import androidx.compose.ui.platform.LocalContext
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.test.assertTrue
 
-class TestActivity : Activity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(
-            LinearLayout(this).apply {
-                id = ROOT_ID
-            }
-        )
-    }
-}
+class TestActivity : ComponentActivity()
+
 @Suppress("DEPRECATION")
 fun makeTestActivityRule() = androidx.test.rule.ActivityTestRule(TestActivity::class.java)
 
-private val ROOT_ID = 18284847
-
-internal val Activity.root get() = findViewById(ROOT_ID) as ViewGroup
+internal val Activity.root get() = findViewById<ViewGroup>(android.R.id.content)
 
 internal fun Activity.uiThread(block: () -> Unit) {
     val latch = CountDownLatch(1)
@@ -78,15 +66,12 @@ internal fun Activity.uiThread(block: () -> Unit) {
     }
 }
 
-internal fun Activity.show(block: @Composable () -> Unit): Composition {
-    var composition: Composition? = null
+internal fun ComponentActivity.show(block: @Composable () -> Unit) {
     uiThread {
         @OptIn(ExperimentalComposeApi::class)
         Snapshot.sendApplyNotifications()
-        @Suppress("DEPRECATION")
-        composition = setViewContent(block)
+        setContent(content = block)
     }
-    return composition!!
 }
 
 internal fun Activity.waitForAFrame() {
@@ -115,25 +100,25 @@ abstract class BaseComposeTest {
     )
 
     @Composable
+    @Suppress("UNUSED_PARAMETER")
     fun subCompose(block: @Composable () -> Unit) {
-        val container = remember { View(activity) }
-        val reference = rememberCompositionReference()
-        // TODO(b/150390669): Review use of @ComposableContract(tracked = false)
-        @OptIn(ExperimentalComposeApi::class)
-        compositionFor(
-            container,
-            UiApplier(container),
-            reference
-        ).apply {
-            setContent @ComposableContract(tracked = false) {
-                block()
-            }
-        }
+//        val container = remember { View(activity) }
+//        val reference = rememberCompositionContext()
+//        @OptIn(ExperimentalComposeApi::class)
+//        Composition(
+//            container,
+//            UiApplier(container),
+//            reference
+//        ).apply {
+//            setContent {
+//                block()
+//            }
+//        }
     }
 }
 
-class ComposeTester(val activity: Activity, val composable: @Composable () -> Unit) {
-    inner class ActiveTest(val activity: Activity, val composition: Composition) {
+class ComposeTester(val activity: ComponentActivity, val composable: @Composable () -> Unit) {
+    inner class ActiveTest(val activity: Activity) {
         fun then(block: ActiveTest.(activity: Activity) -> Unit): ActiveTest {
             activity.waitForAFrame()
             activity.uiThread {
@@ -143,14 +128,17 @@ class ComposeTester(val activity: Activity, val composable: @Composable () -> Un
         }
 
         fun done() {
+            activity.uiThread {
+                activity.setContentView(View(activity))
+            }
             activity.waitForAFrame()
         }
     }
 
-    private fun initialComposition(composable: @Composable () -> Unit): Composition {
-        return activity.show {
+    private fun initialComposition(composable: @Composable () -> Unit) {
+        activity.show {
             Providers(
-                AmbientContext provides activity
+                LocalContext provides activity
             ) {
                 composable()
             }
@@ -158,11 +146,20 @@ class ComposeTester(val activity: Activity, val composable: @Composable () -> Un
     }
 
     fun then(block: ComposeTester.(activity: Activity) -> Unit): ActiveTest {
-        val composition = initialComposition(composable)
+        initialComposition(composable)
         activity.waitForAFrame()
         activity.uiThread {
             block(activity)
         }
-        return ActiveTest(activity, composition)
+        return ActiveTest(activity)
+    }
+}
+
+fun View.traversal(): Sequence<View> = sequence {
+    yield(this@traversal)
+    if (this@traversal is ViewGroup) {
+        for (i in 0 until childCount) {
+            yieldAll(getChildAt(i).traversal())
+        }
     }
 }

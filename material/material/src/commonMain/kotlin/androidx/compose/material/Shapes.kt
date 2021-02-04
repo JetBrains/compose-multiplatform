@@ -19,7 +19,7 @@ package androidx.compose.material
 import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.staticAmbientOf
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.unit.dp
 
 /**
@@ -46,7 +46,7 @@ class Shapes(
      */
     val medium: CornerBasedShape = RoundedCornerShape(4.dp),
     /**
-     * Shape used by large components like [ModalDrawerLayout] or [BottomDrawerLayout].
+     * Shape used by large components like [ModalDrawerLayout] or [ModalBottomSheetLayout].
      */
     val large: CornerBasedShape = RoundedCornerShape(0.dp)
 ) {
@@ -88,6 +88,6 @@ class Shapes(
 }
 
 /**
- * Ambient used to specify the default shapes for the surfaces.
+ * CompositionLocal used to specify the default shapes for the surfaces.
  */
-internal val AmbientShapes = staticAmbientOf { Shapes() }
+internal val LocalShapes = staticCompositionLocalOf { Shapes() }

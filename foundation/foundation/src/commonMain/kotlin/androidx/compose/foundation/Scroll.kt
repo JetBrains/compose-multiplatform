@@ -19,7 +19,6 @@ package androidx.compose.foundation
 
 import androidx.compose.animation.asDisposableClock
 import androidx.compose.animation.core.AnimationClockObservable
-import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.foundation.animation.FlingConfig
@@ -43,8 +42,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.savedinstancestate.Saver
-import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Alignment
@@ -56,8 +55,8 @@ import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
-import androidx.compose.ui.platform.AmbientAnimationClock
-import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.LocalAnimationClock
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.semantics.ScrollAxisRange
 import androidx.compose.ui.semantics.horizontalScrollAxisRange
@@ -87,9 +86,9 @@ fun rememberScrollState(
     initial: Float = 0f,
     interactionState: InteractionState? = null
 ): ScrollState {
-    val clock = AmbientAnimationClock.current.asDisposableClock()
+    val clock = LocalAnimationClock.current.asDisposableClock()
     val config = defaultFlingConfig()
-    return rememberSavedInstanceState(
+    return rememberSaveable(
         clock, config, interactionState,
         saver = ScrollState.Saver(config, clock, interactionState)
     ) {
@@ -204,54 +203,12 @@ class ScrollState(
      * @param value target value in pixels to smooth scroll to, value will be coerced to
      * 0..maxPosition
      * @param spec animation curve for smooth scroll animation
-     * @param onEnd callback to be invoked when smooth scroll has finished
-     */
-    @Suppress("DeprecatedCallableAddReplaceWith") // Methods have the same name
-    @Deprecated(
-        "Use suspend fun smoothScrollTo instead"
-    )
-    fun smoothScrollTo(
-        value: Float,
-        spec: AnimationSpec<Float> = SpringSpec(),
-        onEnd: (endReason: AnimationEndReason, finishValue: Float) -> Unit = { _, _ -> }
-    ) {
-        smoothScrollBy(value - this.value, spec, onEnd)
-    }
-    /**
-     * Smooth scroll to position in pixels
-     *
-     * @param value target value in pixels to smooth scroll to, value will be coerced to
-     * 0..maxPosition
-     * @param spec animation curve for smooth scroll animation
      */
     suspend fun smoothScrollTo(
         value: Float,
         spec: AnimationSpec<Float> = SpringSpec()
     ) {
         (this as Scrollable).smoothScrollBy(value - this.value, spec)
-    }
-
-    /**
-     * Smooth scroll by some amount of pixels
-     *
-     * @param value delta in pixels to scroll by, total value will be coerced to 0..maxPosition
-     * @param spec animation curve for smooth scroll animation
-     * @param onEnd callback to be invoked when smooth scroll has finished
-     */
-    @Deprecated(
-        "Use suspend fun smoothScrollBy instead",
-        ReplaceWith(
-            "(this as Scrollable).smoothScrollBy(value, spec)",
-            "androidx.compose.foundation.animation.smoothScrollBy",
-            "androidx.compose.foundation.gestures.Scrollable"
-        )
-    )
-    fun smoothScrollBy(
-        value: Float,
-        spec: AnimationSpec<Float> = SpringSpec(),
-        onEnd: (endReason: AnimationEndReason, finishValue: Float) -> Unit = { _, _ -> }
-    ) {
-        scrollableController.smoothScrollBy(value, spec, onEnd)
     }
 
     /**
@@ -269,16 +226,6 @@ class ScrollState(
         value: Float
     ): Float {
         return (this as Scrollable).scrollBy(value - this.value)
-    }
-
-    /**
-     * Instantly jump by some amount of pixels
-     *
-     * @param value delta in pixels to jump by, total value will be coerced to 0..maxPosition
-     */
-    @Deprecated("Use suspend version") // TODO(DO NOT MERGE): add ReplaceWith
-    fun scrollBy(value: Float) {
-        this.value = (this.value + value).coerceIn(0f, maxValue)
     }
 
     companion object {
@@ -465,8 +412,8 @@ private fun Modifier.scroll(
         val semantics = Modifier.semantics {
             if (isScrollable) {
                 val accessibilityScrollState = ScrollAxisRange(
-                    value = state.value,
-                    maxValue = state.maxValue,
+                    value = { state.value },
+                    maxValue = { state.maxValue },
                     reverseScrolling = reverseScrolling
                 )
                 if (isVertical) {
@@ -489,7 +436,7 @@ private fun Modifier.scroll(
                 )
             }
         }
-        val isRtl = AmbientLayoutDirection.current == LayoutDirection.Rtl
+        val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
         val scrolling = Modifier.scrollable(
             orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
             // reverse scroll by default, to have "natural" gesture that goes reversed to layout

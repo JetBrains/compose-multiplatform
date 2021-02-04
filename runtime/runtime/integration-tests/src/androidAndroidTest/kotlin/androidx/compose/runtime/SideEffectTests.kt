@@ -17,8 +17,6 @@
 package androidx.compose.runtime
 
 import android.view.Choreographer
-import androidx.compose.runtime.dispatch.MonotonicFrameClock
-import androidx.compose.runtime.dispatch.withFrameNanos
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import kotlinx.coroutines.channels.Channel
@@ -353,7 +351,7 @@ class SideEffectTests : BaseComposeTest() {
         }
     }
 
-    @OptIn(ExperimentalComposeApi::class)
+    @OptIn(ExperimentalComposeApi::class, InternalComposeApi::class)
     @Test
     fun testCoroutineScopesHaveCorrectFrameClock() {
         var recomposerClock: MonotonicFrameClock? = null

@@ -27,7 +27,7 @@ import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
@@ -42,6 +42,7 @@ import androidx.compose.ui.test.up
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
@@ -83,7 +84,7 @@ class SwitchScreenshotTest {
     fun switchTest_checked_rtl() {
         rule.setMaterialContent {
             Box(wrapperModifier) {
-                Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+                Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     Switch(checked = true, onCheckedChange = { })
                 }
             }
@@ -119,7 +120,7 @@ class SwitchScreenshotTest {
     fun switchTest_unchecked_rtl() {
         rule.setMaterialContent {
             Box(wrapperModifier) {
-                Providers(AmbientLayoutDirection provides LayoutDirection.Rtl) {
+                Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     Switch(checked = false, onCheckedChange = { })
                 }
             }
@@ -172,6 +173,7 @@ class SwitchScreenshotTest {
     }
 
     @Test
+    @FlakyTest // b/178409086 Fails on Cuttlefish API 29 consistently
     fun switchTest_unchecked_animateToChecked() {
         rule.setMaterialContent {
             val isChecked = remember { mutableStateOf(false) }
@@ -197,6 +199,7 @@ class SwitchScreenshotTest {
     }
 
     @Test
+    @FlakyTest // b/178409086 Fails on Cuttlefish API 29 consistently
     @Suppress("DEPRECATION") // Due to clockTestRule
     fun switchTest_checked_animateToUnchecked() {
         rule.setMaterialContent {

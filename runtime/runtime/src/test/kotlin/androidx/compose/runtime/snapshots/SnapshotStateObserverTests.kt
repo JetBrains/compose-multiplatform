@@ -197,7 +197,7 @@ class SnapshotStateObserverTests {
             stateObserver.observeReads(info, onChangeListener) {
                 // Create a sub-snapshot
                 // this will be done by subcomposition, for example.
-                val snapshot = takeMutableSnapshot()
+                val snapshot = Snapshot.takeMutableSnapshot()
                 try {
                     // read the value
                     snapshot.enter { state.value }

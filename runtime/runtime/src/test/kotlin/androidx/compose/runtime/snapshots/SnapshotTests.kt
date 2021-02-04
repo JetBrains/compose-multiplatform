@@ -39,7 +39,7 @@ import kotlin.test.assertTrue
 class SnapshotTests {
     @Test
     fun aSnapshotCanBeCreated() {
-        val snapshot = takeSnapshot()
+        val snapshot = Snapshot.takeSnapshot()
         snapshot.dispose()
     }
 
@@ -65,7 +65,7 @@ class SnapshotTests {
     @Test
     fun snapshotsAreIsolatedFromGlobalChanges() {
         var state by mutableStateOf(0)
-        val snapshot = takeSnapshot()
+        val snapshot = Snapshot.takeSnapshot()
         try {
             state = 1
             assertEquals(1, state)
@@ -78,7 +78,7 @@ class SnapshotTests {
     @Test
     fun mutableSnapshotsCanBeApplied() {
         var state by mutableStateOf(0)
-        val snapshot = takeMutableSnapshot()
+        val snapshot = Snapshot.takeMutableSnapshot()
         try {
             snapshot.enter {
                 assertEquals(0, state)
@@ -107,9 +107,9 @@ class SnapshotTests {
         val state = MutableList(count) { mutableStateOf(0) }
 
         // Create count snapshots
-        val snapshots = MutableList(count) { takeMutableSnapshot() }
+        val snapshots = MutableList(count) { Snapshot.takeMutableSnapshot() }
         try {
-            snapshots.forEachIndexed() { index, snapshot ->
+            snapshots.forEachIndexed { index, snapshot ->
                 snapshot.enter { state[index].value = index }
             }
 
@@ -179,7 +179,7 @@ class SnapshotTests {
         val state = mutableStateOf(0)
 
         val readStates = mutableListOf<Any>()
-        val snapshot = takeSnapshot {
+        val snapshot = Snapshot.takeSnapshot {
             readStates.add(it)
         }
         try {
@@ -198,7 +198,7 @@ class SnapshotTests {
     fun stateWritesCanBeObserved() {
         val state = mutableStateOf(0)
         val writtenStates = mutableListOf<Any>()
-        val snapshot = takeMutableSnapshot { write ->
+        val snapshot = Snapshot.takeMutableSnapshot { write ->
             writtenStates.add(write)
         }
         try {
@@ -222,7 +222,7 @@ class SnapshotTests {
             assertTrue(state in changed)
             observedSnapshot = snapshot
         }
-        val snapshot = takeMutableSnapshot()
+        val snapshot = Snapshot.takeMutableSnapshot()
         try {
             snapshot.enter {
                 state.value = 2
@@ -232,7 +232,7 @@ class SnapshotTests {
             assertEquals(snapshot, observedSnapshot)
         } finally {
             snapshot.dispose()
-            unregister()
+            unregister.dispose()
         }
     }
 
@@ -258,7 +258,7 @@ class SnapshotTests {
 
             assertTrue(applyObserved)
         } finally {
-            unregister()
+            unregister.dispose()
         }
     }
 
@@ -266,7 +266,7 @@ class SnapshotTests {
     fun aNestedSnapshotCanBeTaken() {
         val state = mutableStateOf(0)
 
-        val snapshot = takeSnapshot()
+        val snapshot = Snapshot.takeSnapshot()
         try {
             val nested = snapshot.takeNestedSnapshot()
             try {
@@ -284,7 +284,7 @@ class SnapshotTests {
     @Test
     fun aNestedMutableSnapshotCanBeTaken() {
         val state = mutableStateOf(0)
-        val snapshot = takeMutableSnapshot()
+        val snapshot = Snapshot.takeMutableSnapshot()
         try {
             snapshot.enter { state.value = 1 }
             val nested = snapshot.takeNestedMutableSnapshot()
@@ -305,7 +305,7 @@ class SnapshotTests {
     @Test
     fun aNestedSnapshotOfAMutableSnapshotCanBeTaken() {
         val state = mutableStateOf(0)
-        val snapshot = takeMutableSnapshot()
+        val snapshot = Snapshot.takeMutableSnapshot()
         try {
             snapshot.enter { state.value = 1 }
             val nested = snapshot.takeNestedSnapshot()
@@ -326,7 +326,7 @@ class SnapshotTests {
     @Test
     fun aNestedMutableSnapshotCanBeAppliedToItsParent() {
         val state = mutableStateOf(0)
-        val snapshot = takeMutableSnapshot()
+        val snapshot = Snapshot.takeMutableSnapshot()
         try {
             snapshot.enter { state.value = 1 }
             val nested = snapshot.takeNestedMutableSnapshot()
@@ -354,7 +354,7 @@ class SnapshotTests {
 
     @Test
     fun aParentSnapshotCanAccessAStatObjectedCreateByANestedSnapshot() {
-        val snapshot = takeMutableSnapshot()
+        val snapshot = Snapshot.takeMutableSnapshot()
         val state = try {
             val nested = snapshot.takeNestedMutableSnapshot()
             val state = try {
@@ -394,7 +394,7 @@ class SnapshotTests {
     @Test
     fun siblingNestedMutableSnapshotsAreIsolatedFromEachOther() {
         val state = mutableStateOf(0)
-        val snapshot = takeMutableSnapshot()
+        val snapshot = Snapshot.takeMutableSnapshot()
         try {
             snapshot.enter { state.value = 10 }
 
@@ -425,7 +425,7 @@ class SnapshotTests {
     fun readingInANestedSnapshotNotifiesTheParent() {
         val state = mutableStateOf(0)
         val read = HashSet<Any>()
-        val snapshot = takeSnapshot { read.add(it) }
+        val snapshot = Snapshot.takeSnapshot { read.add(it) }
         try {
             val nested = snapshot.takeNestedSnapshot()
             try {
@@ -444,7 +444,7 @@ class SnapshotTests {
         val state = mutableStateOf(0)
         val parentRead = HashSet<Any>()
         val nestedRead = HashSet<Any>()
-        val snapshot = takeSnapshot { parentRead.add(it) }
+        val snapshot = Snapshot.takeSnapshot { parentRead.add(it) }
         try {
             val nested = snapshot.takeNestedSnapshot { nestedRead.add(it) }
             try {
@@ -463,7 +463,7 @@ class SnapshotTests {
     fun writingToANestedSnapshotNotifiesTheParent() {
         val state = mutableStateOf(0)
         val written = HashSet<Any>()
-        val snapshot = takeMutableSnapshot { written.add(it) }
+        val snapshot = Snapshot.takeMutableSnapshot { written.add(it) }
         try {
             val nested = snapshot.takeNestedMutableSnapshot()
             try {
@@ -481,10 +481,10 @@ class SnapshotTests {
     fun writingToANestedSnapshotNotifiesNestedAndItsParent() {
         val state = mutableStateOf(0)
         val parentWritten = HashSet<Any>()
-        val nestedWritted = HashSet<Any>()
-        val snapshot = takeMutableSnapshot { parentWritten.add(it) }
+        val nestedWritten = HashSet<Any>()
+        val snapshot = Snapshot.takeMutableSnapshot { parentWritten.add(it) }
         try {
-            val nested = snapshot.takeNestedMutableSnapshot { nestedWritted.add(it) }
+            val nested = snapshot.takeNestedMutableSnapshot { nestedWritten.add(it) }
             try {
                 nested.enter { state.value = 2 }
             } finally {
@@ -494,13 +494,13 @@ class SnapshotTests {
             snapshot.dispose()
         }
         assertTrue(parentWritten.contains(state))
-        assertTrue(nestedWritted.contains(state))
+        assertTrue(nestedWritten.contains(state))
     }
 
     @Test
     fun creatingAStateInANestedSnapshotAndMutatingInParentApplies() {
         val states = mutableListOf<MutableState<Int>>()
-        val snapshot = takeMutableSnapshot()
+        val snapshot = Snapshot.takeMutableSnapshot()
         try {
             val nested = snapshot.takeNestedMutableSnapshot()
             try {
@@ -529,8 +529,8 @@ class SnapshotTests {
     @Test
     fun snapshotsChangesCanMerge() {
         val state = mutableStateOf(0)
-        val snapshot1 = takeMutableSnapshot()
-        val snapshot2 = takeMutableSnapshot()
+        val snapshot1 = Snapshot.takeMutableSnapshot()
+        val snapshot2 = Snapshot.takeMutableSnapshot()
         try {
             // Change the state to the same value in both snapshots
             snapshot1.enter { state.value = 1 }
@@ -555,8 +555,8 @@ class SnapshotTests {
     @Test
     fun mergedSnapshotsDoNotRepeatChangeNotifications() {
         val state = mutableStateOf(0)
-        val snapshot1 = takeMutableSnapshot()
-        val snapshot2 = takeMutableSnapshot()
+        val snapshot1 = Snapshot.takeMutableSnapshot()
+        val snapshot2 = Snapshot.takeMutableSnapshot()
         try {
             val changes = changesOf(state) {
                 snapshot1.enter { state.value = 1 }
@@ -575,8 +575,8 @@ class SnapshotTests {
     fun statesWithStructuralEqualityPolicyMerge() {
         data class Value(val v1: Int, val v2: Int)
         val state = mutableStateOf(Value(1, 2), structuralEqualityPolicy())
-        val snapshot1 = takeMutableSnapshot()
-        val snapshot2 = takeMutableSnapshot()
+        val snapshot1 = Snapshot.takeMutableSnapshot()
+        val snapshot2 = Snapshot.takeMutableSnapshot()
         try {
             snapshot1.enter { state.value = Value(3, 4) }
             snapshot2.enter { state.value = Value(3, 4) }
@@ -591,8 +591,8 @@ class SnapshotTests {
     @Test(expected = SnapshotApplyConflictException::class)
     fun stateUsingNeverEqualPolicyCannotBeMerged() {
         val state = mutableStateOf(0, neverEqualPolicy())
-        val snapshot1 = takeMutableSnapshot()
-        val snapshot2 = takeMutableSnapshot()
+        val snapshot1 = Snapshot.takeMutableSnapshot()
+        val snapshot2 = Snapshot.takeMutableSnapshot()
         try {
             snapshot1.enter { state.value = 1 }
             snapshot2.enter { state.value = 1 }
@@ -645,13 +645,13 @@ internal fun <T> changesOf(state: State<T>, block: () -> Unit): Int {
         block()
         Snapshot.sendApplyNotifications()
     } finally {
-        removeObserver()
+        removeObserver.dispose()
     }
     return changes
 }
 
 internal inline fun <T> atomic(block: () -> T): T {
-    val snapshot = takeMutableSnapshot()
+    val snapshot = Snapshot.takeMutableSnapshot()
     val result: T
     try {
         result = snapshot.enter {
@@ -665,7 +665,7 @@ internal inline fun <T> atomic(block: () -> T): T {
 }
 
 internal inline fun snapshot(block: () -> Unit): MutableSnapshot {
-    val snapshot = takeMutableSnapshot()
+    val snapshot = Snapshot.takeMutableSnapshot()
     snapshot.enter(block)
     return snapshot
 }

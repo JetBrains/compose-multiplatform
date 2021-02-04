@@ -54,7 +54,6 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.yield
 import org.jetbrains.skija.Surface
 import org.junit.Assert.assertEquals
 import org.junit.Ignore
@@ -68,7 +67,7 @@ class ScrollbarTest {
     val rule = createComposeRule()
 
     // don't inline, surface controls canvas life time
-    private val surface = Surface.makeRasterN32Premul(100, 100)!!
+    private val surface = Surface.makeRasterN32Premul(100, 100)
     private val canvas = surface.canvas
 
     @Test
@@ -82,7 +81,7 @@ class ScrollbarTest {
             rule.onNodeWithTag("scrollbar").performGesture {
                 swipe(start = Offset(0f, 25f), end = Offset(0f, 50f))
             }
-            onFrame()
+            rule.awaitIdle()
             rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(-50.dp)
         }
     }
@@ -98,13 +97,13 @@ class ScrollbarTest {
             rule.onNodeWithTag("scrollbar").performGesture {
                 swipe(start = Offset(0f, 25f), end = Offset(0f, 500f))
             }
-            onFrame()
+            rule.awaitIdle()
             rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(-100.dp)
 
             rule.onNodeWithTag("scrollbar").performGesture {
                 swipe(start = Offset(0f, 99f), end = Offset(0f, -500f))
             }
-            onFrame()
+            rule.awaitIdle()
             rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(0.dp)
         }
     }
@@ -120,7 +119,7 @@ class ScrollbarTest {
             rule.onNodeWithTag("scrollbar").performGesture {
                 swipe(start = Offset(10f, 25f), end = Offset(0f, 50f))
             }
-            onFrame()
+            rule.awaitIdle()
             rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(0.dp)
         }
     }
@@ -136,7 +135,7 @@ class ScrollbarTest {
             rule.awaitIdle()
 
             rule.performMouseScroll(0, 25, 1f)
-            onFrame()
+            rule.awaitIdle()
             rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(-10.dp)
         }
     }
@@ -152,7 +151,7 @@ class ScrollbarTest {
             rule.awaitIdle()
 
             rule.performMouseScroll(0, 99, 1f)
-            onFrame()
+            rule.awaitIdle()
             rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(-10.dp)
         }
     }
@@ -178,13 +177,13 @@ class ScrollbarTest {
             rule.awaitIdle()
 
             rule.performMouseScroll(20, 25, 10f)
-            onFrame()
+            rule.awaitIdle()
             rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(-100.dp)
 
             rule.onNodeWithTag("scrollbar").performGesture {
                 swipe(start = Offset(0f, 99f), end = Offset(0f, -500f))
             }
-            onFrame()
+            rule.awaitIdle()
             rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(0.dp)
         }
     }
@@ -202,7 +201,7 @@ class ScrollbarTest {
             }
 
             tryUntilSucceeded {
-                onFrame()
+                rule.awaitIdle()
                 rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(-100.dp)
             }
         }
@@ -221,7 +220,7 @@ class ScrollbarTest {
             }
 
             tryUntilSucceeded {
-                onFrame()
+                rule.awaitIdle()
                 rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(-300.dp)
             }
         }
@@ -243,15 +242,15 @@ class ScrollbarTest {
                     }
                 }
             }
-            onFrame()
+            rule.awaitIdle()
 
             isContentVisible.value = true
-            onFrame()
+            rule.awaitIdle()
 
             rule.onNodeWithTag("scrollbar").performGesture {
                 swipe(start = Offset(0f, 25f), end = Offset(0f, 500f))
             }
-            onFrame()
+            rule.awaitIdle()
             rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(-100.dp)
         }
     }
@@ -278,7 +277,7 @@ class ScrollbarTest {
             rule.onNodeWithTag("scrollbar").performGesture {
                 swipe(start = Offset(0f, 0f), end = Offset(0f, 11f), durationMillis = 1)
             }
-            onFrame()
+            rule.awaitIdle()
             assertEquals(2, state.firstVisibleItemIndex)
             assertEquals(4, state.firstVisibleItemScrollOffset)
         }
@@ -306,7 +305,7 @@ class ScrollbarTest {
             rule.onNodeWithTag("scrollbar").performGesture {
                 swipe(start = Offset(0f, 0f), end = Offset(0f, 26f), durationMillis = 1)
             }
-            onFrame()
+            rule.awaitIdle()
             assertEquals(5, state.firstVisibleItemIndex)
             assertEquals(4, state.firstVisibleItemScrollOffset)
         }
@@ -334,14 +333,14 @@ class ScrollbarTest {
             rule.onNodeWithTag("scrollbar").performGesture {
                 swipe(start = Offset(0f, 0f), end = Offset(0f, 10000f), durationMillis = 1)
             }
-            onFrame()
+            rule.awaitIdle()
             assertEquals(15, state.firstVisibleItemIndex)
             assertEquals(0, state.firstVisibleItemScrollOffset)
 
             rule.onNodeWithTag("scrollbar").performGesture {
                 swipe(start = Offset(0f, 99f), end = Offset(0f, -10000f), durationMillis = 1)
             }
-            onFrame()
+            rule.awaitIdle()
             assertEquals(0, state.firstVisibleItemIndex)
             assertEquals(0, state.firstVisibleItemScrollOffset)
         }
@@ -358,16 +357,8 @@ class ScrollbarTest {
         }
     }
 
-    // TODO(demin): move to DesktopComposeTestRule?
-    private suspend fun onFrame() {
-        // TODO(demin): probably we don't need `yield` after we fix https://github.com/JetBrains/compose-jb/issues/137
-        yield()
-        (rule as DesktopComposeTestRule).owners?.onFrame(canvas, 100, 100, 0)
-        rule.awaitIdle()
-    }
-
     private fun ComposeTestRule.performMouseScroll(x: Int, y: Int, delta: Float) {
-        (this as DesktopComposeTestRule).owners!!.onMouseScroll(
+        (this as DesktopComposeTestRule).window.onMouseScroll(
             x, y, MouseScrollEvent(MouseScrollUnit.Line(delta), Orientation.Vertical)
         )
     }

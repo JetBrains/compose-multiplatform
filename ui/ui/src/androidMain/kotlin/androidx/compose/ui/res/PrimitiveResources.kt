@@ -21,8 +21,8 @@ import androidx.annotation.BoolRes
 import androidx.annotation.DimenRes
 import androidx.annotation.IntegerRes
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.AmbientContext
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 
 /**
@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.Dp
  */
 @Composable
 fun integerResource(@IntegerRes id: Int): Int {
-    val context = AmbientContext.current
+    val context = LocalContext.current
     return context.resources.getInteger(id)
 }
 
@@ -45,7 +45,7 @@ fun integerResource(@IntegerRes id: Int): Int {
  */
 @Composable
 fun integerArrayResource(@ArrayRes id: Int): IntArray {
-    val context = AmbientContext.current
+    val context = LocalContext.current
     return context.resources.getIntArray(id)
 }
 
@@ -57,7 +57,7 @@ fun integerArrayResource(@ArrayRes id: Int): IntArray {
  */
 @Composable
 fun booleanResource(@BoolRes id: Int): Boolean {
-    val context = AmbientContext.current
+    val context = LocalContext.current
     return context.resources.getBoolean(id)
 }
 
@@ -69,8 +69,8 @@ fun booleanResource(@BoolRes id: Int): Boolean {
  */
 @Composable
 fun dimensionResource(@DimenRes id: Int): Dp {
-    val context = AmbientContext.current
-    val density = AmbientDensity.current
+    val context = LocalContext.current
+    val density = LocalDensity.current
     val pxValue = context.resources.getDimension(id)
     return Dp(pxValue / density.density)
 }

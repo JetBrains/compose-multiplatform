@@ -165,15 +165,6 @@ class LoadedFontFamily internal constructor(val typeface: Typeface) : FontFamily
  *
  * @param fonts list of font files
  */
-@Deprecated("Use FontFamily() instead", ReplaceWith("FontFamily(fonts)"))
-@Stable
-fun fontFamily(fonts: List<Font>) = FontListFontFamily(fonts)
-
-/**
- * Construct a font family that contains list of custom font files.
- *
- * @param fonts list of font files
- */
 @Stable
 fun FontFamily(fonts: List<Font>): FontFamily = FontListFontFamily(fonts)
 
@@ -182,26 +173,8 @@ fun FontFamily(fonts: List<Font>): FontFamily = FontListFontFamily(fonts)
  *
  * @param fonts list of font files
  */
-@Deprecated("Use FontFamily() instead", ReplaceWith("FontFamily(fonts)"))
-@Stable
-fun fontFamily(vararg fonts: Font) = FontListFontFamily(fonts.asList())
-
-/**
- * Construct a font family that contains list of custom font files.
- *
- * @param fonts list of font files
- */
 @Stable
 fun FontFamily(vararg fonts: Font): FontFamily = FontListFontFamily(fonts.asList())
-
-/**
- * Construct a font family that contains loaded font family: Typeface.
- *
- * @param typeface A typeface instance.
- */
-@Deprecated("Use FontFamily() instead", ReplaceWith("FontFamily(typeface)"))
-@Stable
-fun fontFamily(typeface: Typeface) = LoadedFontFamily(typeface)
 
 /**
  * Construct a font family that contains loaded font family: Typeface.

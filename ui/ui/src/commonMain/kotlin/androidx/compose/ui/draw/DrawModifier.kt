@@ -27,6 +27,7 @@ import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 
 /**
  * A [Modifier.Element] that draws into the space of the layout.
@@ -49,11 +50,31 @@ interface DrawCacheModifier : DrawModifier {
      * to objects change. This method is guaranteed to be called before
      * [DrawModifier.draw].
      *
-     * @param size The current size of the drawing environment
-     * @param density The current screen density to provide the ability to convert between
-     * density independent and raw pixel values
+     * @param params The params to be used to build the cache.
      */
-    fun onBuildCache(size: Size, density: Density)
+    fun onBuildCache(params: BuildDrawCacheParams)
+}
+
+/**
+ * The set of parameters which could be used to build the drawing cache.
+ *
+ * @see DrawCacheModifier.onBuildCache
+ */
+interface BuildDrawCacheParams {
+    /**
+     * The current size of the drawing environment
+     */
+    val size: Size
+
+    /**
+     * The current layout direction.
+     */
+    val layoutDirection: LayoutDirection
+
+    /**
+     * The current screen density to provide the ability to convert between
+     */
+    val density: Density
 }
 
 /**
@@ -116,16 +137,19 @@ fun Modifier.drawWithCache(
  * [onDrawBehind] will draw behind the layout's drawing contents however, [onDrawWithContent] will
  * provide the ability to draw before or after the layout's contents
  */
-class CacheDrawScope internal constructor(
-    internal var cachedDrawDensity: Density? = null
-) : Density {
+class CacheDrawScope internal constructor() : Density {
+    internal var cacheParams: BuildDrawCacheParams = EmptyBuildDrawCacheParams
     internal var drawResult: DrawResult? = null
 
     /**
      * Provides the dimensions of the current drawing environment
      */
-    var size: Size = Size.Unspecified
-        internal set
+    val size: Size get() = cacheParams.size
+
+    /**
+     * Provides the [LayoutDirection].
+     */
+    val layoutDirection: LayoutDirection get() = cacheParams.layoutDirection
 
     /**
      * Issue drawing commands to be executed before the layout content is drawn
@@ -143,10 +167,16 @@ class CacheDrawScope internal constructor(
     }
 
     override val density: Float
-        get() = cachedDrawDensity!!.density
+        get() = cacheParams.density.density
 
     override val fontScale: Float
-        get() = cachedDrawDensity!!.density
+        get() = cacheParams.density.fontScale
+}
+
+private object EmptyBuildDrawCacheParams : BuildDrawCacheParams {
+    override val size: Size = Size.Unspecified
+    override val layoutDirection: LayoutDirection = LayoutDirection.Ltr
+    override val density: Density = Density(1f, 1f)
 }
 
 /**
@@ -158,10 +188,9 @@ private data class DrawContentCacheModifier(
     val onBuildDrawCache: CacheDrawScope.() -> DrawResult
 ) : DrawCacheModifier {
 
-    override fun onBuildCache(size: Size, density: Density) {
+    override fun onBuildCache(params: BuildDrawCacheParams) {
         cacheDrawScope.apply {
-            cachedDrawDensity = density
-            this.size = size
+            cacheParams = params
             drawResult = null
             onBuildDrawCache()
             checkNotNull(drawResult) {

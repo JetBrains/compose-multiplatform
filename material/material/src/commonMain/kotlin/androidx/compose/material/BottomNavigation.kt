@@ -33,7 +33,6 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -47,6 +46,7 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
@@ -75,7 +75,7 @@ import kotlin.math.roundToInt
  * @param modifier optional [Modifier] for this BottomNavigation
  * @param backgroundColor The background color for this BottomNavigation
  * @param contentColor The preferred content color provided by this BottomNavigation to its
- * children. Defaults to either the matching `onFoo` color for [backgroundColor], or if
+ * children. Defaults to either the matching content color for [backgroundColor], or if
  * [backgroundColor] is not a color from the theme, this will keep the same value set above this
  * BottomNavigation.
  * @param elevation elevation for this BottomNavigation
@@ -119,10 +119,12 @@ fun BottomNavigation(
  * A BottomNavigationItem always shows text labels (if it exists) when selected. Showing text
  * labels if not selected is controlled by [alwaysShowLabels].
  *
- * @param icon icon for this item, typically this will be a [Icon]
+ * @param icon icon for this item, typically this will be an [Icon]
  * @param selected whether this item is selected
  * @param onClick the callback to be invoked when this item is selected
  * @param modifier optional [Modifier] for this item
+ * @param enabled controls the enabled state of this item. When `false`, this item will not
+ * be clickable and will appear disabled to accessibility services.
  * @param label optional text label for this item
  * @param alwaysShowLabels whether to always show labels for this item. If false, labels will
  * only be shown when this item is selected.
@@ -135,20 +137,23 @@ fun BottomNavigation(
  * @param unselectedContentColor the color of the text label and icon when this item is not selected
  */
 @Composable
-fun BottomNavigationItem(
+fun RowScope.BottomNavigationItem(
     icon: @Composable () -> Unit,
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    label: @Composable () -> Unit = emptyContent(),
+    enabled: Boolean = true,
+    label: @Composable (() -> Unit)? = null,
     alwaysShowLabels: Boolean = true,
     interactionState: InteractionState = remember { InteractionState() },
-    selectedContentColor: Color = AmbientContentColor.current,
+    selectedContentColor: Color = LocalContentColor.current,
     unselectedContentColor: Color = selectedContentColor.copy(alpha = ContentAlpha.medium)
 ) {
-    val styledLabel = @Composable {
-        val style = MaterialTheme.typography.caption.copy(textAlign = TextAlign.Center)
-        ProvideTextStyle(style, content = label)
+    val styledLabel: @Composable (() -> Unit)? = label?.let {
+        @Composable {
+            val style = MaterialTheme.typography.caption.copy(textAlign = TextAlign.Center)
+            ProvideTextStyle(style, content = label)
+        }
     }
     // The color of the Ripple should always the selected color, as we want to show the color
     // before the item is considered selected, and hence before the new contentColor is
@@ -157,16 +162,16 @@ fun BottomNavigationItem(
 
     // TODO This composable has magic behavior within a Row; reconsider this behavior later
     Box(
-        with(RowScope) {
-            modifier
-                .selectable(
-                    selected = selected,
-                    onClick = onClick,
-                    interactionState = interactionState,
-                    indication = ripple
-                )
-                .weight(1f)
-        },
+        modifier
+            .selectable(
+                selected = selected,
+                onClick = onClick,
+                enabled = enabled,
+                role = Role.Tab,
+                interactionState = interactionState,
+                indication = ripple
+            )
+            .weight(1f),
         contentAlignment = Alignment.Center
     ) {
         BottomNavigationTransition(
@@ -186,15 +191,15 @@ fun BottomNavigationItem(
 }
 
 /**
- * Transition that animates [AmbientContentColor] between [inactiveColor] and [activeColor], depending
+ * Transition that animates [LocalContentColor] between [inactiveColor] and [activeColor], depending
  * on [selected]. This component also provides the animation fraction as a parameter to [content],
  * to allow animating the position of the icon and the scale of the label alongside this color
  * animation.
  *
- * @param activeColor [AmbientContentColor] when this item is [selected]
- * @param inactiveColor [AmbientContentColor] when this item is not [selected]
+ * @param activeColor [LocalContentColor] when this item is [selected]
+ * @param inactiveColor [LocalContentColor] when this item is not [selected]
  * @param selected whether this item is selected
- * @param content the content of the [BottomNavigationItem] to animate [AmbientContentColor] for,
+ * @param content the content of the [BottomNavigationItem] to animate [LocalContentColor] for,
  * where the animationProgress is the current progress of the animation from 0f to 1f.
  */
 @Composable
@@ -212,8 +217,8 @@ private fun BottomNavigationTransition(
     val color = lerp(inactiveColor, activeColor, animationProgress)
 
     Providers(
-        AmbientContentColor provides color.copy(alpha = 1f),
-        AmbientContentAlpha provides color.alpha,
+        LocalContentColor provides color.copy(alpha = 1f),
+        LocalContentAlpha provides color.alpha,
     ) {
         content(animationProgress)
     }
@@ -232,37 +237,39 @@ private fun BottomNavigationTransition(
 @Composable
 private fun BottomNavigationItemBaselineLayout(
     icon: @Composable () -> Unit,
-    label: @Composable () -> Unit,
+    label: @Composable (() -> Unit)?,
     /*@FloatRange(from = 0.0, to = 1.0)*/
     iconPositionAnimationProgress: Float
 ) {
     Layout(
         {
             Box(Modifier.layoutId("icon")) { icon() }
-            Box(
-                Modifier
-                    .layoutId("label")
-                    .alpha(iconPositionAnimationProgress)
-                    .padding(horizontal = BottomNavigationItemHorizontalPadding)
-            ) { label() }
+            if (label != null) {
+                Box(
+                    Modifier
+                        .layoutId("label")
+                        .alpha(iconPositionAnimationProgress)
+                        .padding(horizontal = BottomNavigationItemHorizontalPadding)
+                ) { label() }
+            }
         }
     ) { measurables, constraints ->
         val iconPlaceable = measurables.first { it.layoutId == "icon" }.measure(constraints)
 
-        val labelPlaceable = measurables.first { it.layoutId == "label" }.measure(
-            // Measure with loose constraints for height as we don't want the label to take up more
-            // space than it needs
-            constraints.copy(minHeight = 0)
-        )
+        val labelPlaceable = label?.let {
+            measurables.first { it.layoutId == "label" }.measure(
+                // Measure with loose constraints for height as we don't want the label to take up more
+                // space than it needs
+                constraints.copy(minHeight = 0)
+            )
+        }
 
-        // If the label is empty, just place the icon.
-        if (labelPlaceable.width <= BottomNavigationItemHorizontalPadding.toIntPx() * 2 &&
-            labelPlaceable.height == 0
-        ) {
+        // If there is no label, just place the icon.
+        if (label == null) {
             placeIcon(iconPlaceable, constraints)
         } else {
             placeLabelAndIcon(
-                labelPlaceable,
+                labelPlaceable!!,
                 iconPlaceable,
                 constraints,
                 iconPositionAnimationProgress
@@ -318,7 +325,7 @@ private fun MeasureScope.placeLabelAndIcon(
     // have a better strategy than overlapping the icon and label
     val baseline = labelPlaceable[LastBaseline]
 
-    val baselineOffset = CombinedItemTextBaseline.toIntPx()
+    val baselineOffset = CombinedItemTextBaseline.roundToPx()
 
     // Label should be [baselineOffset] from the bottom
     val labelY = height - baseline - baselineOffset

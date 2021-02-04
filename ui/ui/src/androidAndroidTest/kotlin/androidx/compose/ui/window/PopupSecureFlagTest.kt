@@ -20,7 +20,6 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -64,7 +63,7 @@ class PopupSecureFlagTest(private val setSecureFlagOnActivity: Boolean) {
     @Test
     fun noFlagSetOnPopup() {
         rule.setContent {
-            TestPopup(null)
+            TestPopup(PopupProperties())
         }
 
         if (setSecureFlagOnActivity) {
@@ -79,7 +78,7 @@ class PopupSecureFlagTest(private val setSecureFlagOnActivity: Boolean) {
     @Test
     fun forcedFlagOnPopupToDisabled() {
         rule.setContent {
-            TestPopup(AndroidPopupProperties(SecureFlagPolicy.SecureOff))
+            TestPopup(PopupProperties(securePolicy = SecureFlagPolicy.SecureOff))
         }
 
         // This tests that we also override the flag from the Activity
@@ -89,7 +88,7 @@ class PopupSecureFlagTest(private val setSecureFlagOnActivity: Boolean) {
     @Test
     fun forcedFlagOnPopupToEnabled() {
         rule.setContent {
-            TestPopup(AndroidPopupProperties(SecureFlagPolicy.SecureOn))
+            TestPopup(PopupProperties(securePolicy = SecureFlagPolicy.SecureOn))
         }
 
         assertThat(isSecureFlagEnabledForPopup()).isTrue()
@@ -97,8 +96,8 @@ class PopupSecureFlagTest(private val setSecureFlagOnActivity: Boolean) {
 
     @Test
     fun toggleFlagOnPopup() {
-        var properties: AndroidPopupProperties?
-        by mutableStateOf(AndroidPopupProperties(SecureFlagPolicy.SecureOff))
+        var properties: PopupProperties
+        by mutableStateOf(PopupProperties(securePolicy = SecureFlagPolicy.SecureOff))
 
         rule.setContent {
             TestPopup(properties)
@@ -107,23 +106,23 @@ class PopupSecureFlagTest(private val setSecureFlagOnActivity: Boolean) {
         assertThat(isSecureFlagEnabledForPopup()).isFalse()
 
         // Toggle flag
-        properties = AndroidPopupProperties(SecureFlagPolicy.SecureOn)
+        properties = PopupProperties(securePolicy = SecureFlagPolicy.SecureOn)
         assertThat(isSecureFlagEnabledForPopup()).isTrue()
 
         // Set to inherit
-        properties = AndroidPopupProperties(SecureFlagPolicy.Inherit)
+        properties = PopupProperties(securePolicy = SecureFlagPolicy.Inherit)
         assertThat(isSecureFlagEnabledForPopup()).isEqualTo(setSecureFlagOnActivity)
     }
 
     @Composable
-    fun TestPopup(popupProperties: AndroidPopupProperties?) {
+    fun TestPopup(popupProperties: PopupProperties) {
         SimpleContainer {
             PopupTestTag(testTag) {
                 Popup(
                     alignment = Alignment.Center,
                     properties = popupProperties
                 ) {
-                    SimpleContainer(Modifier.preferredSize(50.dp), content = emptyContent())
+                    SimpleContainer(Modifier.preferredSize(50.dp), content = {})
                 }
             }
         }

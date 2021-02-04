@@ -20,7 +20,7 @@ import android.content.Context
 import android.util.TypedValue
 import androidx.annotation.GuardedBy
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Typeface
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontListFontFamily
@@ -46,7 +46,7 @@ private val syncLoadedTypefaces = mutableMapOf<FontFamily, Typeface>()
  */
 @Composable
 fun fontResource(fontFamily: FontFamily): Typeface {
-    return fontResourceFromContext(AmbientContext.current, fontFamily)
+    return fontResourceFromContext(LocalContext.current, fontFamily)
 }
 
 internal fun fontResourceFromContext(context: Context, fontFamily: FontFamily): Typeface {
@@ -75,16 +75,16 @@ internal fun fontResourceFromContext(context: Context, fontFamily: FontFamily): 
  * [FontFamily] that can be loaded synchronously can be used as a failedFontFamily.
  * @throws IllegalArgumentException if [FontFamily] other than synchronously loadable ones are
  * passed as an argument of pendingFontFamily or failedFontFamily.
- *
- * @sample androidx.compose.ui.samples.FontResourcesFontFamily
  */
 @Composable
+@Suppress("DEPRECATION")
+@Deprecated("loadFontResource has been deprecated.  Use fontResource instead")
 fun loadFontResource(
     fontFamily: FontFamily,
     pendingFontFamily: FontFamily? = null,
     failedFontFamily: FontFamily? = null
 ): DeferredResource<Typeface> {
-    val context = AmbientContext.current
+    val context = LocalContext.current
     val pendingTypeface = if (pendingFontFamily == null) {
         null
     } else if (!pendingFontFamily.canLoadSynchronously) {
@@ -128,16 +128,16 @@ fun loadFontResource(
  * @param failedTypeface an optional resource to be used during loading instead.
  * @throws IllegalArgumentException if [FontFamily] other than synchronously loadable ones are
  * passed as an argument of pendingFontFamily or failedFontFamily.
- *
- * @sample androidx.compose.ui.samples.FontResourcesTypeface
  */
 @Composable
+@Suppress("DEPRECATION")
+@Deprecated("loadFontResource has been deprecated.  Use fontResource instead")
 fun loadFontResource(
     fontFamily: FontFamily,
     pendingTypeface: Typeface? = null,
     failedTypeface: Typeface? = null
 ): DeferredResource<Typeface> {
-    val context = AmbientContext.current
+    val context = LocalContext.current
     if (fontFamily.canLoadSynchronously) {
         val typeface = synchronized(cacheLock) {
             syncLoadedTypefaces.getOrPut(fontFamily) {

@@ -296,15 +296,6 @@ internal class AndroidParagraph constructor(
             layout.getLineEnd(lineIndex)
         }
 
-    @Deprecated(
-        "This function will be removed.",
-        replaceWith = ReplaceWith(
-            "getLineEnd(lineIndex, true)",
-            "androidx.compose.ui.text.platform"
-        )
-    )
-    override fun getLineVisibleEnd(lineIndex: Int): Int = layout.getLineVisibleEnd(lineIndex)
-
     override fun isLineEllipsized(lineIndex: Int): Boolean = layout.isLineEllipsized(lineIndex)
 
     override fun getLineForOffset(offset: Int): Int = layout.getLineForOffset(offset)

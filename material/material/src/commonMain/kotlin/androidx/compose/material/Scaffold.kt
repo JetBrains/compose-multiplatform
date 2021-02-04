@@ -22,9 +22,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.staticAmbientOf
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -132,12 +131,12 @@ enum class FabPosition {
  * below the drawer sheet (if set)
  * @param drawerBackgroundColor background color to be used for the drawer sheet
  * @param drawerContentColor color of the content to use inside the drawer sheet. Defaults to
- * either the matching `onFoo` color for [drawerBackgroundColor], or, if it is not a color from
+ * either the matching content color for [drawerBackgroundColor], or, if it is not a color from
  * the theme, this will keep the same value set above this Surface.
  * @param drawerScrimColor color of the scrim that obscures content when the drawer is open
  * @param backgroundColor background of the scaffold body
  * @param contentColor color of the content in scaffold body. Defaults to either the matching
- * `onFoo` color for [backgroundColor], or, if it is not a color from the theme, this will keep
+ * content color for [backgroundColor], or, if it is not a color from the theme, this will keep
  * the same value set above this Surface.
  * @param bodyContent content of your screen. The lambda receives an [PaddingValues] that should be
  * applied to the content root via Modifier.padding to properly offset top and bottom bars. If
@@ -148,10 +147,10 @@ enum class FabPosition {
 fun Scaffold(
     modifier: Modifier = Modifier,
     scaffoldState: ScaffoldState = rememberScaffoldState(),
-    topBar: @Composable () -> Unit = emptyContent(),
-    bottomBar: @Composable () -> Unit = emptyContent(),
+    topBar: @Composable () -> Unit = {},
+    bottomBar: @Composable () -> Unit = {},
     snackbarHost: @Composable (SnackbarHostState) -> Unit = { SnackbarHost(it) },
-    floatingActionButton: @Composable () -> Unit = emptyContent(),
+    floatingActionButton: @Composable () -> Unit = {},
     floatingActionButtonPosition: FabPosition = FabPosition.End,
     isFloatingActionButtonDocked: Boolean = false,
     drawerContent: @Composable (ColumnScope.() -> Unit)? = null,
@@ -252,9 +251,9 @@ private fun ScaffoldLayout(
             val fabLeftOffset = if (fabWidth != 0 && fabHeight != 0) {
                 if (fabPosition == FabPosition.End) {
                     if (layoutDirection == LayoutDirection.Ltr) {
-                        layoutWidth - FabSpacing.toIntPx() - fabWidth
+                        layoutWidth - FabSpacing.roundToPx() - fabWidth
                     } else {
-                        FabSpacing.toIntPx()
+                        FabSpacing.roundToPx()
                     }
                 } else {
                     (layoutWidth - fabWidth) / 2
@@ -276,7 +275,7 @@ private fun ScaffoldLayout(
 
             val bottomBarPlaceables = subcompose(ScaffoldLayoutContent.BottomBar) {
                 Providers(
-                    AmbientFabPlacement provides fabPlacement,
+                    LocalFabPlacement provides fabPlacement,
                     content = bottomBar
                 )
             }.fastMap { it.measure(looseConstraints) }
@@ -285,7 +284,7 @@ private fun ScaffoldLayout(
 
             val fabOffsetFromBottom = if (fabWidth != 0 && fabHeight != 0) {
                 if (bottomBarHeight == 0) {
-                    fabHeight + FabSpacing.toIntPx()
+                    fabHeight + FabSpacing.roundToPx()
                 } else {
                     if (isFabDocked) {
                         // Total height is the bottom bar height + half the FAB height
@@ -293,7 +292,7 @@ private fun ScaffoldLayout(
                     } else {
                         // Total height is the bottom bar height + the FAB height + the padding
                         // between the FAB and bottom bar
-                        bottomBarHeight + fabHeight + FabSpacing.toIntPx()
+                        bottomBarHeight + fabHeight + FabSpacing.roundToPx()
                     }
                 }
             } else {
@@ -358,9 +357,10 @@ internal class FabPlacement(
 )
 
 /**
- * Ambient containing a [FabPlacement] that is read by [BottomAppBar] to calculate notch location.
+ * CompositionLocal containing a [FabPlacement] that is read by [BottomAppBar] to calculate notch
+ * location.
  */
-internal val AmbientFabPlacement = staticAmbientOf<FabPlacement?> { null }
+internal val LocalFabPlacement = staticCompositionLocalOf<FabPlacement?> { null }
 
 // FAB spacing above the bottom bar / bottom of the Scaffold
 private val FabSpacing = 16.dp

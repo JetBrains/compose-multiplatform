@@ -48,6 +48,7 @@ kotlin {
 task run1(type: JavaExec) {
     dependsOn(":compose:desktop:desktop:jar")
     main = 'androidx.compose.desktop.examples.example1.MainKt'
+    systemProperty("skiko.fps.enabled", "true")
     def compilation = kotlin.jvm().compilations["main"]
     classpath =
         compilation.output.allOutputs +
@@ -75,6 +76,16 @@ task run3(type: JavaExec) {
 task run4(type: JavaExec) {
     dependsOn(":compose:desktop:desktop:jar")
     main = 'androidx.compose.desktop.examples.swingexample.MainKt'
+    def compilation = kotlin.jvm().compilations["main"]
+    classpath =
+        compilation.output.allOutputs +
+        compilation.runtimeDependencyFiles
+}
+
+task runVsync(type: JavaExec) {
+    dependsOn(":compose:desktop:desktop:jar")
+    main = 'androidx.compose.desktop.examples.vsynctest.MainKt'
+    jvmArgs("-verbose:gc")
     def compilation = kotlin.jvm().compilations["main"]
     classpath =
         compilation.output.allOutputs +

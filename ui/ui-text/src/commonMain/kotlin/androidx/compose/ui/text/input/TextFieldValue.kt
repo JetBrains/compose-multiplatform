@@ -17,8 +17,8 @@
 package androidx.compose.ui.text.input
 
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.savedinstancestate.Saver
-import androidx.compose.runtime.savedinstancestate.listSaver
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextRange
@@ -176,11 +176,11 @@ class TextFieldValue internal constructor(
          */
         val Saver = listSaver<TextFieldValue, Any>(
             save = {
-                listOf(it.annotatedString, it.selection.start, it.selection.end)
+                listOf(it.annotatedString.toString(), it.selection.start, it.selection.end)
             },
             restore = {
                 TextFieldValue(
-                    annotatedString = it[0] as AnnotatedString,
+                    text = it[0] as String,
                     selection = TextRange(it[1] as Int, it[2] as Int)
                 )
             }
@@ -211,7 +211,7 @@ fun TextFieldValue.getSelectedText(): AnnotatedString = annotatedString.subSeque
  *
  * @suppress
  */
-@InternalTextApi
+@InternalTextApi // Used by tests in foundation since constructor is not accessible
 fun buildTextFieldValue(
     text: String,
     selection: TextRange,

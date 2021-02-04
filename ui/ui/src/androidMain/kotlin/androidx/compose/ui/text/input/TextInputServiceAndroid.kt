@@ -27,7 +27,6 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import android.view.inputmethod.InputMethodManager
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextRange
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
@@ -36,7 +35,6 @@ import kotlin.math.roundToInt
 /**
  * Provide Android specific input service with the Operating System.
  */
-@OptIn(ExperimentalTextApi::class)
 internal class TextInputServiceAndroid(val view: View) : PlatformTextInputService {
     /** True if the currently editable composable has connected */
     private var editorHasFocus = false
@@ -210,7 +208,7 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
      */
     private fun fillEditorInfo(outInfo: EditorInfo) {
         outInfo.imeOptions = when (imeOptions.imeAction) {
-            ImeAction.Default, @Suppress("DEPRECATION") ImeAction.Unspecified -> {
+            ImeAction.Default -> {
                 if (imeOptions.singleLine) {
                     // this is the last resort to enable single line
                     // Android IME still show return key even if multi line is not send
@@ -220,17 +218,15 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
                     EditorInfo.IME_ACTION_UNSPECIFIED
                 }
             }
-            ImeAction.None, @Suppress("DEPRECATION") ImeAction.NoAction ->
-                EditorInfo.IME_ACTION_NONE
+            ImeAction.None -> EditorInfo.IME_ACTION_NONE
             ImeAction.Go -> EditorInfo.IME_ACTION_GO
             ImeAction.Next -> EditorInfo.IME_ACTION_NEXT
             ImeAction.Previous -> EditorInfo.IME_ACTION_PREVIOUS
             ImeAction.Search -> EditorInfo.IME_ACTION_SEARCH
             ImeAction.Send -> EditorInfo.IME_ACTION_SEND
             ImeAction.Done -> EditorInfo.IME_ACTION_DONE
-            else -> throw IllegalArgumentException(
-                "Unknown ImeAction: ${imeOptions.imeAction}"
-            )
+            // Note: Don't use an else in this when block. These are specified explicitly so
+            // that we don't forget to update this when imeActions are added/removed.
         }
         when (imeOptions.keyboardType) {
             KeyboardType.Text -> outInfo.inputType = InputType.TYPE_CLASS_TEXT
@@ -253,9 +249,8 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
                 outInfo.inputType =
                     InputType.TYPE_CLASS_NUMBER or EditorInfo.TYPE_NUMBER_VARIATION_PASSWORD
             }
-            else -> throw IllegalArgumentException(
-                "Unknown KeyboardType: ${imeOptions.keyboardType}"
-            )
+            // Note: Don't use an else in this when block. These are specified explicitly so
+            // that we don't forget to update this when keyboardTypes are added/removed.
         }
 
         if (!imeOptions.singleLine) {

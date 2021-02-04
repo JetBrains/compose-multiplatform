@@ -22,6 +22,7 @@ import com.intellij.openapi.vfs.CharsetToolkit
 import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.impl.PsiFileFactoryImpl
 import com.intellij.testFramework.LightVirtualFile
+import org.intellij.lang.annotations.Language
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.cli.jvm.config.addJvmClasspathRoots
@@ -67,6 +68,7 @@ abstract class AbstractCodegenTest : AbstractCompilerTest() {
     }
 
     protected fun validateBytecode(
+        @Language("kotlin")
         src: String,
         dumpClasses: Boolean = false,
         validate: (String) -> Unit
@@ -101,6 +103,7 @@ abstract class AbstractCodegenTest : AbstractCompilerTest() {
     }
 
     protected fun classLoader(
+        @Language("kotlin")
         source: String,
         fileName: String,
         dumpClasses: Boolean = false
@@ -159,7 +162,6 @@ abstract class AbstractCodegenTest : AbstractCompilerTest() {
         import android.view.Gravity
         import android.widget.LinearLayout
         import androidx.compose.runtime.Composable
-        import androidx.compose.ui.viewinterop.emitView
     """.trimIndent()
 
     protected val COMPOSE_VIEW_STUBS = """

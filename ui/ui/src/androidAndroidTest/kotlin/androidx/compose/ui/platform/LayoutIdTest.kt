@@ -16,8 +16,8 @@
 
 package androidx.compose.ui.platform
 
+import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
-import androidx.compose.runtime.emptyContent
 import androidx.compose.ui.AtLeastSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
@@ -63,15 +63,15 @@ class LayoutIdTest {
             activity.setContent {
                 Layout(
                     {
-                        AtLeastSize(0, Modifier.layoutId("first"), content = emptyContent())
+                        AtLeastSize(0, Modifier.layoutId("first"), content = {})
                         Box(Modifier.layoutId("second")) {
                             AtLeastSize(
                                 0,
-                                content = emptyContent()
+                                content = {}
                             )
                         }
                         Box(Modifier.layoutId("third")) {
-                            AtLeastSize(0, content = emptyContent())
+                            AtLeastSize(0, content = {})
                         }
                     }
                 ) { measurables, _ ->

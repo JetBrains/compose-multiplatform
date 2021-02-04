@@ -24,7 +24,7 @@ import androidx.compose.runtime.synchronized
 
 @ExperimentalComposeApi
 class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit) -> Unit) {
-    private val applyObserver: SnapshotApplyObserver = { applied, _ ->
+    private val applyObserver: (Set<Any>, Snapshot) -> Unit = { applied, _ ->
         var hasValues = false
 
         synchronized(applyMaps) {
@@ -50,9 +50,9 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
     }
 
     /**
-     * The [SnapshotReadObserver] used by this [SnapshotStateObserver] during [observeReads].
+     * The observer used by this [SnapshotStateObserver] during [observeReads].
      */
-    private val readObserver: SnapshotReadObserver = { state ->
+    private val readObserver: (Any) -> Unit = { state ->
         if (!isPaused) {
             currentMap!!.addValue(state)
         }
@@ -67,7 +67,7 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
     /**
      * Method to call when unsubscribing from the apply observer.
      */
-    private var applyUnsubscribe: (() -> Unit)? = null
+    private var applyUnsubscribe: ObserverHandle? = null
 
     /**
      * `true` when an [observeReads] is in progress and [readObserver] is active and `false` when
@@ -186,7 +186,7 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
         applyUnsubscribe = if (enabled) {
             Snapshot.registerApplyObserver(applyObserver)
         } else {
-            applyUnsubscribe?.invoke()
+            applyUnsubscribe?.dispose()
             null
         }
     }

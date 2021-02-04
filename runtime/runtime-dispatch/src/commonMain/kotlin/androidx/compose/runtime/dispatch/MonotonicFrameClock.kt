@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,91 +16,29 @@
 
 package androidx.compose.runtime.dispatch
 
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.coroutineContext
-
-/**
- * Provides a time source for display frames and the ability to perform an action on the next frame.
- * This may be used for matching timing with the refresh rate of a display or otherwise
- * synchronizing work with a desired frame rate.
- */
-interface MonotonicFrameClock : CoroutineContext.Element {
-    /**
-     * Suspends until a new frame is requested, immediately invokes [onFrame] with the frame time
-     * in nanoseconds in the calling context of frame dispatch, then resumes with the result from
-     * [onFrame].
-     *
-     * `frameTimeNanos` should be used when calculating animation time deltas from frame to frame
-     * as it may be normalized to the target time for the frame, not necessarily a direct,
-     * "now" value.
-     *
-     * The time base of the value provided by [withFrameNanos] is implementation defined.
-     * Time values provided are monotonically increasing; after a call to [withFrameNanos]
-     * completes it must not provide the same value again for a subsequent call.
-     */
-    suspend fun <R> withFrameNanos(onFrame: (frameTimeNanos: Long) -> R): R
-
-    override val key: CoroutineContext.Key<*> get() = Key
-
-    companion object Key : CoroutineContext.Key<MonotonicFrameClock>
-}
+@Deprecated("Moved to androidx.compose.runtime in the compose:runtime artifact")
+typealias MonotonicFrameClock = androidx.compose.runtime.MonotonicFrameClock
 
 /**
  * Suspends until a new frame is requested, immediately invokes [onFrame] with the frame time
  * in nanoseconds in the calling context of frame dispatch, then resumes with the result from
  * [onFrame].
- *
- * `frameTimeNanos` should be used when calculating animation time deltas from frame to frame
- * as it may be normalized to the target time for the frame, not necessarily a direct,
- * "now" value.
- *
- * The time base of the value provided by [MonotonicFrameClock.withFrameMillis] is
- * implementation defined. Time values provided are monotonically increasing; after a call to
- * [MonotonicFrameClock.withFrameMillis] completes it must not provide the same value again for
- * a subsequent call.
  */
-@Suppress("UnnecessaryLambdaCreation")
-suspend inline fun <R> MonotonicFrameClock.withFrameMillis(
-    crossinline onFrame: (frameTimeMillis: Long) -> R
-): R = withFrameNanos { onFrame(it / 1_000_000L) }
-
-/**
- * Suspends until a new frame is requested, immediately invokes [onFrame] with the frame time
- * in nanoseconds in the calling context of frame dispatch, then resumes with the result from
- * [onFrame].
- *
- * `frameTimeNanos` should be used when calculating animation time deltas from frame to frame
- * as it may be normalized to the target time for the frame, not necessarily a direct,
- * "now" value.
- *
- * The time base of the value provided by [withFrameNanos] is implementation defined.
- * Time values provided are monotonically increasing; after a call to [withFrameNanos]
- * completes it must not provide the same value again for a subsequent call.
- *
- * This function will invoke [MonotonicFrameClock.withFrameNanos] using the calling
- * [CoroutineContext]'s [MonotonicFrameClock] or a default frame clock if one is not present
- * in the [CoroutineContext].
- */
+@Deprecated(
+    "Moved to androidx.compose.runtime",
+    ReplaceWith("androidx.compose.runtime.withFrameNanos(onFrame)")
+)
 suspend fun <R> withFrameNanos(onFrame: (frameTimeMillis: Long) -> R): R =
-    (coroutineContext[MonotonicFrameClock] ?: DefaultMonotonicFrameClock).withFrameNanos(onFrame)
+    androidx.compose.runtime.withFrameNanos(onFrame)
 
 /**
  * Suspends until a new frame is requested, immediately invokes [onFrame] with the frame time
  * in nanoseconds in the calling context of frame dispatch, then resumes with the result from
  * [onFrame].
- *
- * `frameTimeNanos` should be used when calculating animation time deltas from frame to frame
- * as it may be normalized to the target time for the frame, not necessarily a direct,
- * "now" value.
- *
- * The time base of the value provided by [MonotonicFrameClock.withFrameMillis] is
- * implementation defined. Time values provided are monotonically increasing; after a call to
- * [MonotonicFrameClock.withFrameMillis] completes it must not provide the same value again for
- * a subsequent call.
- *
- * This function will invoke [MonotonicFrameClock.withFrameNanos] using the calling
- * [CoroutineContext]'s [MonotonicFrameClock] or a default frame clock if one is not present
- * in the [CoroutineContext].
  */
+@Deprecated(
+    "Moved to androidx.compose.runtime",
+    ReplaceWith("androidx.compose.runtime.withFrameMillis(onFrame)")
+)
 suspend fun <R> withFrameMillis(onFrame: (frameTimeMillis: Long) -> R): R =
-    (coroutineContext[MonotonicFrameClock] ?: DefaultMonotonicFrameClock).withFrameMillis(onFrame)
+    androidx.compose.runtime.withFrameMillis(onFrame)

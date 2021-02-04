@@ -19,12 +19,12 @@ package androidx.compose.animation.core
 import androidx.compose.animation.core.AnimationConstants.DefaultDurationMillis
 
 /**
- * [FloatAnimationSpec] interface is similar to [VectorizedAnimationSpec], except it deals exclusively with
- * floats.
+ * [FloatAnimationSpec] interface is similar to [VectorizedAnimationSpec], except it deals
+ * exclusively with floats.
  *
- * Like [VectorizedAnimationSpec], [FloatAnimationSpec] is entirely stateless as well. It requires start/end
- * values and start velocity to be passed in for the query of velocity and value of the animation.
- * The [FloatAnimationSpec] itself stores only the animation configuration (such as the
+ * Like [VectorizedAnimationSpec], [FloatAnimationSpec] is entirely stateless as well. It requires
+ * start/end values and start velocity to be passed in for the query of velocity and value of the
+ * animation. The [FloatAnimationSpec] itself stores only the animation configuration (such as the
  * delay, duration and easing curve for [FloatTweenSpec], or spring constants for
  * [FloatSpringSpec].
  *
@@ -37,32 +37,32 @@ interface FloatAnimationSpec : AnimationSpec<Float> {
      * Calculates the value of the animation at given the playtime, with the provided start/end
      * values, and start velocity.
      *
-     * @param playTime time since the start of the animation
-     * @param start start value of the animation
-     * @param end end value of the animation
-     * @param startVelocity start velocity of the animation
+     * @param playTimeNanos time since the start of the animation
+     * @param initialValue start value of the animation
+     * @param targetValue end value of the animation
+     * @param initialVelocity start velocity of the animation
      */
-    fun getValue(
-        playTime: Long,
-        start: Float,
-        end: Float,
-        startVelocity: Float
+    fun getValueFromNanos(
+        playTimeNanos: Long,
+        initialValue: Float,
+        targetValue: Float,
+        initialVelocity: Float
     ): Float
 
     /**
      * Calculates the velocity of the animation at given the playtime, with the provided start/end
      * values, and start velocity.
      *
-     * @param playTime time since the start of the animation
-     * @param start start value of the animation
-     * @param end end value of the animation
-     * @param startVelocity start velocity of the animation
+     * @param playTimeNanos time since the start of the animation
+     * @param initialValue start value of the animation
+     * @param targetValue end value of the animation
+     * @param initialVelocity start velocity of the animation
      */
-    fun getVelocity(
-        playTime: Long,
-        start: Float,
-        end: Float,
-        startVelocity: Float
+    fun getVelocityFromNanos(
+        playTimeNanos: Long,
+        initialValue: Float,
+        targetValue: Float,
+        initialVelocity: Float
     ): Float
 
     /**
@@ -71,33 +71,40 @@ interface FloatAnimationSpec : AnimationSpec<Float> {
      * animation at the duration time. This is also the default assumption. However, for
      * spring animations, the transient trailing velocity will be snapped to zero.
      *
-     * @param start start value of the animation
-     * @param end end value of the animation
-     * @param startVelocity start velocity of the animation
+     * @param initialValue start value of the animation
+     * @param targetValue end value of the animation
+     * @param initialVelocity start velocity of the animation
      */
     fun getEndVelocity(
-        start: Float,
-        end: Float,
-        startVelocity: Float
-    ): Float = getVelocity(getDurationMillis(start, end, startVelocity), start, end, startVelocity)
+        initialValue: Float,
+        targetValue: Float,
+        initialVelocity: Float
+    ): Float =
+        getVelocityFromNanos(
+            getDurationNanos(initialValue, targetValue, initialVelocity),
+            initialValue,
+            targetValue,
+            initialVelocity
+        )
 
     /**
      * Calculates the duration of an animation. For duration-based animations, this will return the
      * pre-defined duration. For physics-based animations, the duration will be estimated based on
      * the physics configuration (such as spring stiffness, damping ratio, visibility threshold)
-     * as well as the [start], [end] values, and [startVelocity].
+     * as well as the [initialValue], [targetValue] values, and [initialVelocity].
      *
      * __Note__: this may be a computation that is expensive - especially with spring based
      * animations
      *
-     * @param start start value of the animation
-     * @param end end value of the animation
-     * @param startVelocity start velocity of the animation
+     * @param initialValue start value of the animation
+     * @param targetValue end value of the animation
+     * @param initialVelocity start velocity of the animation
      */
-    fun getDurationMillis(
-        start: Float,
-        end: Float,
-        startVelocity: Float
+    @Suppress("MethodNameUnits")
+    fun getDurationNanos(
+        initialValue: Float,
+        targetValue: Float,
+        initialVelocity: Float
     ): Long
 
     /**
@@ -130,42 +137,51 @@ class FloatSpringSpec(
         it.stiffness = stiffness
     }
 
-    override fun getValue(
-        playTime: Long,
-        start: Float,
-        end: Float,
-        startVelocity: Float
+    override fun getValueFromNanos(
+        playTimeNanos: Long,
+        initialValue: Float,
+        targetValue: Float,
+        initialVelocity: Float
     ): Float {
-        spring.finalPosition = end
-        val value = spring.updateValues(start, startVelocity, playTime).value
+        // TODO: Properly support Nanos in the spring impl
+        val playTimeMillis = playTimeNanos / MillisToNanos
+        spring.finalPosition = targetValue
+        val value = spring.updateValues(initialValue, initialVelocity, playTimeMillis).value
         return value
     }
 
-    override fun getVelocity(
-        playTime: Long,
-        start: Float,
-        end: Float,
-        startVelocity: Float
+    override fun getVelocityFromNanos(
+        playTimeNanos: Long,
+        initialValue: Float,
+        targetValue: Float,
+        initialVelocity: Float
     ): Float {
-        spring.finalPosition = end
-        val velocity = spring.updateValues(start, startVelocity, playTime).velocity
+        // TODO: Properly support Nanos in the spring impl
+        val playTimeMillis = playTimeNanos / MillisToNanos
+        spring.finalPosition = targetValue
+        val velocity = spring.updateValues(initialValue, initialVelocity, playTimeMillis).velocity
         return velocity
     }
 
     override fun getEndVelocity(
-        start: Float,
-        end: Float,
-        startVelocity: Float
+        initialValue: Float,
+        targetValue: Float,
+        initialVelocity: Float
     ): Float = 0f
 
-    override fun getDurationMillis(start: Float, end: Float, startVelocity: Float): Long =
+    @Suppress("MethodNameUnits")
+    override fun getDurationNanos(
+        initialValue: Float,
+        targetValue: Float,
+        initialVelocity: Float
+    ): Long =
         estimateAnimationDurationMillis(
             stiffness = spring.stiffness,
             dampingRatio = spring.dampingRatio,
-            initialDisplacement = (start - end) / visibilityThreshold,
-            initialVelocity = startVelocity / visibilityThreshold,
+            initialDisplacement = (initialValue - targetValue) / visibilityThreshold,
+            initialVelocity = initialVelocity / visibilityThreshold,
             delta = 1f
-        )
+        ) * MillisToNanos
 }
 
 /**
@@ -184,43 +200,62 @@ class FloatTweenSpec(
     val delay: Int = 0,
     private val easing: Easing = FastOutSlowInEasing
 ) : FloatAnimationSpec {
-    override fun getValue(
-        playTime: Long,
-        start: Float,
-        end: Float,
-        startVelocity: Float
+    override fun getValueFromNanos(
+        playTimeNanos: Long,
+        initialValue: Float,
+        targetValue: Float,
+        initialVelocity: Float
     ): Float {
-        val clampedPlayTime = clampPlayTime(playTime)
+        // TODO: Properly support Nanos in the impl
+        val playTimeMillis = playTimeNanos / MillisToNanos
+        val clampedPlayTime = clampPlayTime(playTimeMillis)
         val rawFraction = if (duration == 0) 1f else clampedPlayTime / duration.toFloat()
         val fraction = easing.transform(rawFraction.coerceIn(0f, 1f))
-        return lerp(start, end, fraction)
+        return lerp(initialValue, targetValue, fraction)
     }
 
     private fun clampPlayTime(playTime: Long): Long {
         return (playTime - delay).coerceIn(0, duration.toLong())
     }
 
-    override fun getDurationMillis(start: Float, end: Float, startVelocity: Float): Long {
-        return delay + duration.toLong()
+    @Suppress("MethodNameUnits")
+    override fun getDurationNanos(
+        initialValue: Float,
+        targetValue: Float,
+        initialVelocity: Float
+    ): Long {
+        return (delay + duration) * MillisToNanos
     }
 
     // Calculate velocity by difference between the current value and the value 1 ms ago. This is a
     // preliminary way of calculating velocity used by easing curve based animations, and keyframe
     // animations. Physics-based animations give a much more accurate velocity.
-    override fun getVelocity(
-        playTime: Long,
-        start: Float,
-        end: Float,
-        startVelocity: Float
+    override fun getVelocityFromNanos(
+        playTimeNanos: Long,
+        initialValue: Float,
+        targetValue: Float,
+        initialVelocity: Float
     ): Float {
-        val clampedPlayTime = clampPlayTime(playTime)
+        // TODO: Properly support Nanos in the impl
+        val playTimeMillis = playTimeNanos / MillisToNanos
+        val clampedPlayTime = clampPlayTime(playTimeMillis)
         if (clampedPlayTime < 0) {
             return 0f
         } else if (clampedPlayTime == 0L) {
-            return startVelocity
+            return initialVelocity
         }
-        val startNum = getValue(clampedPlayTime - 1, start, end, startVelocity)
-        val endNum = getValue(clampedPlayTime, start, end, startVelocity)
+        val startNum = getValueFromNanos(
+            (clampedPlayTime - 1) * MillisToNanos,
+            initialValue,
+            targetValue,
+            initialVelocity
+        )
+        val endNum = getValueFromNanos(
+            clampedPlayTime * MillisToNanos,
+            initialValue,
+            targetValue,
+            initialVelocity
+        )
         return (endNum - startNum) * 1000f
     }
 }

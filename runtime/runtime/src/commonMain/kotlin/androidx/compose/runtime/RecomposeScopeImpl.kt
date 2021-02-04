@@ -32,10 +32,11 @@ interface RecomposeScope {
  * This object can be used to manually cause recompositions.
  */
 val currentRecomposeScope: RecomposeScope
-    @ComposableContract(readonly = true)
+    @ReadOnlyComposable
+    @OptIn(InternalComposeApi::class)
     @Composable get() {
-        val scope = currentComposer.currentRecomposeScope ?: error("no recompose scope found")
-        scope.used = true
+        val scope = currentComposer.recomposeScope ?: error("no recompose scope found")
+        currentComposer.recordUsed(scope)
         return scope
     }
 
@@ -46,7 +47,7 @@ val currentRecomposeScope: RecomposeScope
  * [Composer.startRestartGroup] and is used to track how to restart the group.
  */
 @OptIn(ComposeCompilerApi::class)
-internal class RecomposeScopeImpl(var composer: Composer<*>?) : ScopeUpdateScope, RecomposeScope {
+internal class RecomposeScopeImpl(var composer: Composer?) : ScopeUpdateScope, RecomposeScope {
     /**
      * An anchor to the location in the slot table that start the group associated with this
      * recompose scope.
@@ -91,7 +92,7 @@ internal class RecomposeScopeImpl(var composer: Composer<*>?) : ScopeUpdateScope
     /**
      * The lambda to call to restart the scopes composition.
      */
-    private var block: ((Composer<*>, Int) -> Unit)? = null
+    private var block: ((Composer, Int) -> Unit)? = null
 
     /**
      * Restart the scope's composition. It is an error if [block] was not updated. The code
@@ -99,7 +100,7 @@ internal class RecomposeScopeImpl(var composer: Composer<*>?) : ScopeUpdateScope
      * be set but it might occur if the compiler is out-of-date (or ahead of the runtime) or
      * incorrect direct calls to [Composer.startRestartGroup] and [Composer.endRestartGroup].
      */
-    fun <N> compose(composer: Composer<N>) {
+    fun compose(composer: Composer) {
         block?.invoke(composer, 1) ?: error("Invalid restart scope")
     }
 
@@ -108,7 +109,7 @@ internal class RecomposeScopeImpl(var composer: Composer<*>?) : ScopeUpdateScope
      * and an [InvalidationResult] will be returned.
      */
     fun invalidateForResult(): InvalidationResult =
-        composer?.invalidate(this) ?: InvalidationResult.IGNORED
+        (composer as? ComposerImpl)?.invalidate(this) ?: InvalidationResult.IGNORED
 
     /**
      * Invalidate the group which will cause [composer] to request this scope be recomposed.
@@ -121,5 +122,5 @@ internal class RecomposeScopeImpl(var composer: Composer<*>?) : ScopeUpdateScope
      * Update [block]. The scope is returned by [Composer.endRestartGroup] when [used] is true
      * and implements [ScopeUpdateScope].
      */
-    override fun updateScope(block: (Composer<*>, Int) -> Unit) { this.block = block }
+    override fun updateScope(block: (Composer, Int) -> Unit) { this.block = block }
 }

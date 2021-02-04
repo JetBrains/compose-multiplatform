@@ -22,14 +22,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collection.mutableVectorOf
-import androidx.compose.runtime.dispatch.withFrameNanos
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.Uptime
 
 /**
  * Creates a [InfiniteTransition] that runs infinite child animations. Child animations can be
@@ -107,15 +105,15 @@ class InfiniteTransition internal constructor() {
                 startOnTheNextFrame = false
                 playTimeNanosOffset = playTimeNanos
             }
-            val playTimeMillis = (playTimeNanos - playTimeNanosOffset) / 1_000_000L
-            value = animation.getValue(playTimeMillis)
-            isFinished = animation.isFinished(playTimeMillis)
+            val playTime = playTimeNanos - playTimeNanosOffset
+            value = animation.getValueFromNanos(playTime)
+            isFinished = animation.isFinishedFromNanos(playTime)
         }
     }
 
     internal val animations = mutableVectorOf<TransitionAnimationState<*, *>>()
     private var refreshChildNeeded by mutableStateOf(false)
-    private var startTime = Uptime.Unspecified
+    private var startTimeNanos = AnimationConstants.UnspecifiedTime
     private var isRunning by mutableStateOf(true)
 
     internal fun addAnimation(animation: TransitionAnimationState<*, *>) {
@@ -133,19 +131,17 @@ class InfiniteTransition internal constructor() {
         if (isRunning || refreshChildNeeded) {
             LaunchedEffect(this) {
                 while (true) {
-                    withFrameNanos {
-                        onFrame(it)
-                    }
+                    withInfiniteAnimationFrameNanos(::onFrame)
                 }
             }
         }
     }
 
     private fun onFrame(frameTimeNanos: Long) {
-        if (startTime == Uptime.Unspecified) {
-            startTime = Uptime(frameTimeNanos)
+        if (startTimeNanos == AnimationConstants.UnspecifiedTime) {
+            startTimeNanos = frameTimeNanos
         }
-        val playTimeNanos = frameTimeNanos - startTime.nanoseconds
+        val playTimeNanos = frameTimeNanos - startTimeNanos
         var allFinished = true
         // Pulse new playtime
         animations.forEach {

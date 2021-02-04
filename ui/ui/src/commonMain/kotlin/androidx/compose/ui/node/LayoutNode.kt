@@ -19,10 +19,10 @@ import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.DrawModifier
-import androidx.compose.ui.focus.FocusModifier
-import androidx.compose.ui.focus.FocusRequesterModifier
 import androidx.compose.ui.focus.FocusEventModifier
+import androidx.compose.ui.focus.FocusModifier
 import androidx.compose.ui.focus.FocusOrderModifier
+import androidx.compose.ui.focus.FocusRequesterModifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.nestedscroll.NestedScrollDelegatingWrapper
 import androidx.compose.ui.gesture.nestedscroll.NestedScrollModifier
@@ -61,7 +61,6 @@ import androidx.compose.ui.semantics.outerSemantics
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.util.deleteAt
 import kotlin.math.roundToInt
 
 /**
@@ -76,7 +75,7 @@ internal val sharedDrawScope = LayoutNodeDrawScope()
 /**
  * An element in the layout hierarchy, built with compose UI.
  */
-class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
+internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, ComposeUiNode {
 
     internal constructor() : this(false)
 
@@ -410,11 +409,13 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
             tree.append(child.debugTreeToString(depth + 1))
         }
 
+        var treeString = tree.toString()
         if (depth == 0) {
             // Delete trailing newline
-            tree.deleteAt(tree.length - 1)
+            treeString = treeString.substring(0, treeString.length - 1)
         }
-        return tree.toString()
+
+        return treeString
     }
 
     internal abstract class NoIntrinsicsMeasureBlocks(private val error: String) : MeasureBlocks {
@@ -446,7 +447,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
     /**
      * Blocks that define the measurement and intrinsic measurement of the layout.
      */
-    internal var measureBlocks: MeasureBlocks = ErrorMeasureBlocks
+    override var measureBlocks: MeasureBlocks = ErrorMeasureBlocks
         set(value) {
             if (field != value) {
                 field = value
@@ -457,7 +458,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
     /**
      * The screen density to be used by this layout.
      */
-    internal var density: Density = Density(1f)
+    override var density: Density = Density(1f)
 
     /**
      * The scope used to run the [MeasureBlocks.measure]
@@ -472,7 +473,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
     /**
      * The layout direction of the layout node.
      */
-    internal var layoutDirection: LayoutDirection = LayoutDirection.Ltr
+    override var layoutDirection: LayoutDirection = LayoutDirection.Ltr
         set(value) {
             if (field != value) {
                 field = value
@@ -621,7 +622,7 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
     /**
      * The [Modifier] currently applied to this node.
      */
-    internal var modifier: Modifier = Modifier
+    override var modifier: Modifier = Modifier
         set(value) {
             if (value == field) return
             if (modifier != Modifier) {
@@ -1287,6 +1288,11 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
          * Constant used by [placeOrder].
          */
         private const val NotPlacedPlaceOrder = Int.MAX_VALUE
+
+        /**
+         * Pre-allocated constructor to be used with ComposeNode
+         */
+        internal val Constructor: () -> LayoutNode = { LayoutNode() }
     }
 
     /**
@@ -1321,20 +1327,6 @@ class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo {
         InLayoutBlock,
         NotUsed,
     }
-}
-
-/**
- * Object of pre-allocated lambdas used to make emits to LayoutNodes allocation-less.
- */
-@PublishedApi
-internal object LayoutEmitHelper {
-    val constructor: () -> LayoutNode = { LayoutNode() }
-    val setModifier: LayoutNode.(Modifier) -> Unit = { this.modifier = it }
-    val setDensity: LayoutNode.(Density) -> Unit = { this.density = it }
-    val setMeasureBlocks: LayoutNode.(MeasureBlocks) -> Unit =
-        { this.measureBlocks = it }
-    val setRef: LayoutNode.(Ref<LayoutNode>) -> Unit = { it.value = this }
-    val setLayoutDirection: LayoutNode.(LayoutDirection) -> Unit = { this.layoutDirection = it }
 }
 
 /**

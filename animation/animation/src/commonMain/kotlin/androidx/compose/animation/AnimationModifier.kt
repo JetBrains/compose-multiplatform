@@ -16,25 +16,28 @@
 
 package androidx.compose.animation
 
-import androidx.compose.animation.core.AnimationClockObservable
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.AnimationVector2D
+import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.spring
 import androidx.compose.runtime.remember
-import androidx.compose.ui.layout.LayoutModifier
-import androidx.compose.ui.layout.Measurable
-import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.layout.LayoutModifier
+import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
-import androidx.compose.ui.platform.AmbientAnimationClock
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 /**
  * This modifier animates its own size when its child modifier (or the child composable if it
@@ -45,42 +48,36 @@ import androidx.compose.ui.unit.IntSize
  * [SpringSpec] will be used. Clipping defaults to true, such that the content outside of animated
  * size will not be shown.
  *
- * An optional [endListener] can be supplied to get notified when the size change animation is
- * finished. Since the content size change can be dynamic in many cases, both start size and end
- * size will be passed to the [endListener]. __Note:__ if the animation is interrupted, the start
- * size will be the size at the point of interruption. This is intended to help determine the
- * direction of the size change (i.e. expand or collapse in x and y dimensions).
+ * An optional [finishedListener] can be supplied to get notified when the size change animation is
+ * finished. Since the content size change can be dynamic in many cases, both initial value and
+ * target value (i.e. final size) will be passed to the [finishedListener]. __Note:__ if the
+ * animation is interrupted, the initial value will be the size at the point of interruption. This
+ * is intended to help determine the direction of the size change (i.e. expand or collapse in x and
+ * y dimensions).
  *
  * @sample androidx.compose.animation.samples.AnimateContent
  *
- * @param animSpec the animation that will be used to animate size change
- * @param clip whether content outside of animated size should be clipped
- * @param endListener optional listener to be called when the content change animation is completed.
+ * @param animationSpec the animation that will be used to animate size change
+ * @param finishedListener optional listener to be called when the content change animation is
+ *                         completed.
  */
 fun Modifier.animateContentSize(
-    animSpec: AnimationSpec<IntSize> = spring(),
-    clip: Boolean = true,
-    endListener: ((startSize: IntSize, endSize: IntSize) -> Unit)? = null
+    animationSpec: FiniteAnimationSpec<IntSize> = spring(),
+    finishedListener: ((initialValue: IntSize, targetValue: IntSize) -> Unit)? = null
 ): Modifier = composed(
     inspectorInfo = debugInspectorInfo {
         name = "animateContentSize"
-        properties["animSpec"] = animSpec
-        properties["clip"] = clip
-        properties["endListener"] = endListener
+        properties["animationSpec"] = animationSpec
+        properties["finishedListener"] = finishedListener
     }
 ) {
     // TODO: Listener could be a fun interface after 1.4
-    val clock = AmbientAnimationClock.current.asDisposableClock()
-    val animModifier = remember {
-        SizeAnimationModifier(animSpec, clock)
+    val scope = rememberCoroutineScope()
+    val animModifier = remember(scope) {
+        SizeAnimationModifier(animationSpec, scope)
     }
-    animModifier.listener = endListener
-
-    if (clip) {
-        this.clipToBounds().then(animModifier)
-    } else {
-        this.then(animModifier)
-    }
+    animModifier.listener = finishedListener
+    this.clipToBounds().then(animModifier)
 }
 
 /**
@@ -89,12 +86,12 @@ fun Modifier.animateContentSize(
  */
 private class SizeAnimationModifier(
     val animSpec: AnimationSpec<IntSize>,
-    val clock: AnimationClockObservable
+    val scope: CoroutineScope,
 ) : LayoutModifier {
     var listener: ((startSize: IntSize, endSize: IntSize) -> Unit)? = null
 
     data class AnimData(
-        val anim: AnimatedValueModel<IntSize, AnimationVector2D>,
+        val anim: Animatable<IntSize, AnimationVector2D>,
         var startSize: IntSize
     )
 
@@ -119,15 +116,16 @@ private class SizeAnimationModifier(
         val data = animData?.apply {
             if (targetSize != anim.targetValue) {
                 startSize = anim.value
-                anim.animateTo(targetSize, animSpec) { reason, endSize ->
-                    if (reason == AnimationEndReason.TargetReached) {
-                        listener?.invoke(startSize, endSize)
+                scope.launch {
+                    val result = anim.animateTo(targetSize, animSpec)
+                    if (result.endReason == AnimationEndReason.Finished) {
+                        listener?.invoke(startSize, result.endState.value)
                     }
                 }
             }
         } ?: AnimData(
-            AnimatedValueModel(
-                targetSize, IntSize.VectorConverter, clock, IntSize(1, 1)
+            Animatable(
+                targetSize, IntSize.VectorConverter, IntSize(1, 1)
             ),
             targetSize
         )

@@ -36,7 +36,7 @@ import androidx.compose.ui.graphics.vector.PathBuilder
 import androidx.compose.ui.graphics.vector.PathData
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.loadVectorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -47,25 +47,21 @@ fun VectorGraphicsDemo() {
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val imageVector = loadVectorResource(R.drawable.ic_crane)
-        imageVector.resource.resource?.let {
-            Image(
-                imageVector = it,
-                contentDescription = "Crane",
-                modifier = Modifier.preferredSize(200.dp, 200.dp),
-                contentScale = ContentScale.Inside
-            )
-        }
+        val imageVector = painterResource(R.drawable.ic_crane)
+        Image(
+            painter = imageVector,
+            contentDescription = "Crane",
+            modifier = Modifier.preferredSize(200.dp, 200.dp),
+            contentScale = ContentScale.Inside
+        )
 
-        val complexImageVector = loadVectorResource(R.drawable.ic_hourglass)
-        complexImageVector.resource.resource?.let {
-            Image(
-                imageVector = it,
-                contentDescription = "Hourglass",
-                modifier = Modifier.preferredSize(64.dp, 64.dp),
-                contentScale = ContentScale.Fit
-            )
-        }
+        val complexImageVector = painterResource(R.drawable.ic_hourglass)
+        Image(
+            painter = complexImageVector,
+            contentDescription = "Hourglass",
+            modifier = Modifier.preferredSize(64.dp, 64.dp),
+            contentScale = ContentScale.Fit
+        )
 
         Image(
             painter = vectorShape(120.dp, 120.dp),

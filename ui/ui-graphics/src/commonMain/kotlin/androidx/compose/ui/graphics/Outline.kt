@@ -38,16 +38,29 @@ sealed class Outline {
      * Rectangular area.
      */
     @Immutable
-    data class Rectangle(val rect: Rect) : Outline() {
+    class Rectangle(val rect: Rect) : Outline() {
 
         override val bounds: Rect
             get() = rect
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other !is Rectangle) return false
+
+            if (rect != other.rect) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            return rect.hashCode()
+        }
     }
     /**
      * Rectangular area with rounded corners.
      */
     @Immutable
-    data class Rounded(val roundRect: RoundRect) : Outline() {
+    class Rounded(val roundRect: RoundRect) : Outline() {
 
         /**
          * Optional Path to be created for the RoundRect if the corner radii are not identical
@@ -67,15 +80,41 @@ sealed class Outline {
 
         override val bounds: Rect
             get() = roundRect.boundingRect
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other !is Rounded) return false
+
+            if (roundRect != other.roundRect) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            return roundRect.hashCode()
+        }
     }
     /**
      * An area defined as a path.
      *
      * Note that only convex paths can be used for drawing the shadow. See [Path.isConvex].
      */
-    data class Generic(val path: Path) : Outline() {
+    class Generic(val path: Path) : Outline() {
         override val bounds: Rect
             get() = path.getBounds()
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other !is Generic) return false
+
+            if (path != other.path) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            return path.hashCode()
+        }
     }
 
     /**

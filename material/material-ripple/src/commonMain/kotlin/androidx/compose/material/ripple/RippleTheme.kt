@@ -19,14 +19,14 @@ package androidx.compose.material.ripple
 import androidx.compose.foundation.Interaction
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.ProvidableAmbient
-import androidx.compose.runtime.staticAmbientOf
+import androidx.compose.runtime.ProvidableCompositionLocal
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 
 /**
  * Defines the appearance for Ripples. You can define a new theme and apply it using
- * [AmbientRippleTheme]. See [defaultRippleColor] and [defaultRippleAlpha] for default values
+ * [LocalRippleTheme]. See [defaultRippleColor] and [defaultRippleAlpha] for default values
  * that can be used when creating your own [RippleTheme].
  *
  * @see rememberRipple
@@ -114,14 +114,32 @@ public fun interface RippleAlpha {
 }
 
 /**
- * Ambient used for providing [RippleTheme] down the tree.
+ * CompositionLocal used for providing [RippleTheme] down the tree.
  *
  * See [RippleTheme.defaultRippleColor] and [RippleTheme.defaultRippleAlpha] functions for the
  * default implementations for color and alpha.
  */
 @get:ExperimentalRippleApi
 @ExperimentalRippleApi
-public val AmbientRippleTheme: ProvidableAmbient<RippleTheme> = staticAmbientOf { DebugRippleTheme }
+@Deprecated(
+    "Renamed to LocalRippleTheme",
+    replaceWith = ReplaceWith(
+        "LocalRippleTheme",
+        "androidx.compose.material.ripple.LocalRippleTheme"
+    )
+)
+public val AmbientRippleTheme: ProvidableCompositionLocal<RippleTheme> get() = LocalRippleTheme
+
+/**
+ * CompositionLocal used for providing [RippleTheme] down the tree.
+ *
+ * See [RippleTheme.defaultRippleColor] and [RippleTheme.defaultRippleAlpha] functions for the
+ * default implementations for color and alpha.
+ */
+@get:ExperimentalRippleApi
+@ExperimentalRippleApi
+public val LocalRippleTheme: ProvidableCompositionLocal<RippleTheme> =
+    staticCompositionLocalOf { DebugRippleTheme }
 
 @Suppress("unused")
 @OptIn(ExperimentalRippleApi::class)

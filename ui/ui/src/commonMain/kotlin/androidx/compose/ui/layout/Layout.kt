@@ -23,28 +23,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.SkippableUpdater
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.currentComposer
-import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.materialize
-import androidx.compose.ui.node.LayoutEmitHelper
+import androidx.compose.ui.node.ComposeUiNode
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.MeasureBlocks
-import androidx.compose.ui.platform.AmbientDensity
-import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.simpleIdentityToString
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.util.fastForEach
-import androidx.compose.ui.util.fastMap
-import kotlin.math.max
 
 /**
  * [Layout] is the main core component for layout. It can be used to measure and position
@@ -231,14 +225,14 @@ fun measureBlocksOf(
     modifier: Modifier = Modifier
 ) {
     @OptIn(ExperimentalComposeApi::class)
-    val density = AmbientDensity.current
-    val layoutDirection = AmbientLayoutDirection.current
-    ComposeNode<LayoutNode, Applier<Any>>(
-        factory = LayoutEmitHelper.constructor,
+    val density = LocalDensity.current
+    val layoutDirection = LocalLayoutDirection.current
+    ComposeNode<ComposeUiNode, Applier<Any>>(
+        factory = ComposeUiNode.Constructor,
         update = {
-            set(measureBlocks, LayoutEmitHelper.setMeasureBlocks)
-            set(density, LayoutEmitHelper.setDensity)
-            set(layoutDirection, LayoutEmitHelper.setLayoutDirection)
+            set(measureBlocks, ComposeUiNode.SetMeasureBlocks)
+            set(density, ComposeUiNode.SetDensity)
+            set(layoutDirection, ComposeUiNode.SetLayoutDirection)
         },
         skippableUpdate = materializerOf(modifier),
         content = content
@@ -248,10 +242,10 @@ fun measureBlocksOf(
 @PublishedApi
 internal fun materializerOf(
     modifier: Modifier
-): @Composable SkippableUpdater<LayoutNode>.() -> Unit = {
+): @Composable SkippableUpdater<ComposeUiNode>.() -> Unit = {
     val materialized = currentComposer.materialize(modifier)
     update {
-        set(materialized, LayoutEmitHelper.setModifier)
+        set(materialized, ComposeUiNode.SetModifier)
     }
 }
 
@@ -268,17 +262,17 @@ fun MultiMeasureLayout(
 ) {
     val measureBlocks = remember(measureBlock) { MeasuringIntrinsicsMeasureBlocks(measureBlock) }
     val materialized = currentComposer.materialize(modifier)
-    val density = AmbientDensity.current
-    val layoutDirection = AmbientLayoutDirection.current
+    val density = LocalDensity.current
+    val layoutDirection = LocalLayoutDirection.current
 
     @OptIn(ExperimentalComposeApi::class)
     ComposeNode<LayoutNode, Applier<Any>>(
-        factory = LayoutEmitHelper.constructor,
+        factory = LayoutNode.Constructor,
         update = {
-            set(materialized, LayoutEmitHelper.setModifier)
-            set(measureBlocks, LayoutEmitHelper.setMeasureBlocks)
-            set(density, LayoutEmitHelper.setDensity)
-            set(layoutDirection, LayoutEmitHelper.setLayoutDirection)
+            set(materialized, ComposeUiNode.SetModifier)
+            set(measureBlocks, ComposeUiNode.SetMeasureBlocks)
+            set(density, ComposeUiNode.SetDensity)
+            set(layoutDirection, ComposeUiNode.SetLayoutDirection)
             @Suppress("DEPRECATION")
             init { this.canMultiMeasure = true }
         },
@@ -514,89 +508,4 @@ private inline fun Density.MeasuringMaxIntrinsicHeight(
     val layoutReceiver = IntrinsicsMeasureScope(this, layoutDirection)
     val layoutResult = layoutReceiver.measureBlock(mapped, constraints)
     return layoutResult.height
-}
-
-@Deprecated(
-    "WithConstraints was reworked as BoxWithConstraints.",
-    ReplaceWith(
-        "BoxWithConstraints(modifier, content)",
-        "androidx.compose.foundation.layout.BoxWithConstraints"
-    )
-)
-@Composable
-fun WithConstraints(
-    modifier: Modifier = Modifier,
-    content: @Composable WithConstraintsScope.() -> Unit
-) {
-    SubcomposeLayout(modifier) { constraints ->
-        val scope = WithConstraintsScopeImpl(this, constraints)
-        val placeables = subcompose(Unit) { scope.content() }
-            .fastMap { it.measure(constraints) }
-
-        var maxWidth: Int = constraints.minWidth
-        var maxHeight: Int = constraints.minHeight
-        placeables.fastForEach {
-            maxWidth = max(maxWidth, it.width)
-            maxHeight = max(maxHeight, it.height)
-        }
-
-        layout(maxWidth, maxHeight) {
-            placeables.fastForEach { it.placeRelative(0, 0) }
-        }
-    }
-}
-
-@Deprecated(
-    "WithConstraints was reworked as BoxWithConstraints.",
-    ReplaceWith(
-        "BoxWithConstraintsScope",
-        "androidx.compose.foundation.layout.BoxWithConstraintsScope"
-    )
-)
-@Stable
-interface WithConstraintsScope {
-    /**
-     * The constraints given by the parent layout in pixels.
-     *
-     * Use [minWidth], [maxWidth], [minHeight] or [maxHeight] if you need value in [Dp].
-     */
-    val constraints: Constraints
-    /**
-     * The minimum width in [Dp].
-     *
-     * @see constraints for the values in pixels.
-     */
-    val minWidth: Dp
-    /**
-     * The maximum width in [Dp].
-     *
-     * @see constraints for the values in pixels.
-     */
-    val maxWidth: Dp
-    /**
-     * The minimum height in [Dp].
-     *
-     * @see constraints for the values in pixels.
-     */
-    val minHeight: Dp
-    /**
-     * The minimum height in [Dp].
-     *
-     * @see constraints for the values in pixels.
-     */
-    val maxHeight: Dp
-}
-
-private data class WithConstraintsScopeImpl(
-    private val density: Density,
-    override val constraints: Constraints
-) : WithConstraintsScope {
-    override val minWidth: Dp
-        get() = with(density) { constraints.minWidth.toDp() }
-    override val maxWidth: Dp
-        get() = with(density) { constraints.maxWidth.toDp() }
-    override val minHeight: Dp
-        get() = with(density) { constraints.minHeight.toDp() }
-    override val maxHeight: Dp
-        get() = with(density) { constraints.maxHeight.toDp() }
 }

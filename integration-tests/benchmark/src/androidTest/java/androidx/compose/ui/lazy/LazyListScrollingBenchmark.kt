@@ -29,7 +29,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.emptyContent
 import androidx.compose.testutils.assertNoPendingChanges
 import androidx.compose.testutils.benchmark.ComposeBenchmarkRule
 import androidx.compose.testutils.doFramesUntilNoChangesPending
@@ -237,14 +236,14 @@ class ListRemeasureTestCase(
     @Composable
     fun RemeasurableItem() {
         Layout(
-            emptyContent(),
+            {},
             modifier = object : RemeasurementModifier {
                 override fun onRemeasurementAvailable(remeasurement: Remeasurement) {
                     this@ListRemeasureTestCase.remeasurement = remeasurement
                 }
             }
         ) { _, _ ->
-            val size = size.toIntPx()
+            val size = size.roundToPx()
             layout(size, size) {}
         }
     }

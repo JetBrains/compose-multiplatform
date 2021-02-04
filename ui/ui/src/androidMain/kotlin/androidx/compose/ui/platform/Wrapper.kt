@@ -15,27 +15,23 @@
  */
 package androidx.compose.ui.platform
 
-import android.app.Activity
 import android.os.Build
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.annotation.MainThread
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
+import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.CompositionData
-import androidx.compose.runtime.CompositionReference
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.Recomposer
-import androidx.compose.runtime.compositionFor
 import androidx.compose.runtime.currentComposer
-import androidx.compose.runtime.emptyContent
-import androidx.compose.runtime.tooling.InspectionTables
+import androidx.compose.runtime.tooling.LocalInspectionTables
 import androidx.compose.ui.R
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.UiApplier
@@ -47,69 +43,6 @@ import java.util.WeakHashMap
 
 private val TAG = "Wrapper"
 
-/**
- * Composes the children of the view with the passed in [composable].
- *
- * @see setViewContent
- * @see Composition.dispose
- */
-// TODO: Remove this API when View/LayoutNode mixed trees work
-@OptIn(ExperimentalComposeApi::class)
-@Deprecated(
-    "setViewContent was deprecated - use setContent instead",
-    ReplaceWith(
-        "setContent(parent, composable)",
-        "androidx.compose.ui.platform.setContent"
-    )
-)
-fun ViewGroup.setViewContent(
-    parent: CompositionReference = Recomposer.current(),
-    composable: @Composable () -> Unit
-): Composition = compositionFor(
-    this,
-    UiApplier(this),
-    parent,
-    onCreated = {
-        removeAllViews()
-    }
-).apply {
-    setContent {
-        Providers(AmbientContext provides this@setViewContent.context) {
-            composable()
-        }
-    }
-}
-
-/**
- * Sets the contentView of an activity to a FrameLayout, and composes the contents of the layout
- * with the passed in [composable].
- *
- * @see setContent
- * @see Activity.setContentView
- */
-// TODO: Remove this API when View/LayoutNode mixed trees work
-@Deprecated(
-    "setViewContent was deprecated - use setContent instead",
-    ReplaceWith(
-        "setContent(composable)",
-        "androidx.compose.ui.platform.setContent"
-    )
-)
-fun Activity.setViewContent(composable: @Composable () -> Unit): Composition {
-    // TODO(lmr): add ambients here, or remove API entirely if we can
-    // If there is already a FrameLayout in the root, we assume we want to compose
-    // into it instead of create a new one. This allows for `setContent` to be
-    // called multiple times.
-    GlobalSnapshotManager.ensureStarted()
-    val root = window
-        .decorView
-        .findViewById<ViewGroup>(android.R.id.content)
-        .getChildAt(0) as? ViewGroup
-        ?: FrameLayout(this).also { setContentView(it) }
-    @Suppress("DEPRECATION")
-    return root.setViewContent(composable = composable)
-}
-
 // TODO(chuckj): This is a temporary work-around until subframes exist so that
 // nextFrame() inside recompose() doesn't really start a new frame, but a new subframe
 // instead.
@@ -117,9 +50,9 @@ fun Activity.setViewContent(composable: @Composable () -> Unit): Composition {
 @OptIn(ExperimentalComposeApi::class)
 internal actual fun subcomposeInto(
     container: LayoutNode,
-    parent: CompositionReference,
+    parent: CompositionContext,
     composable: @Composable () -> Unit
-): Composition = compositionFor(
+): Composition = Composition(
     container,
     UiApplier(container),
     parent
@@ -136,27 +69,39 @@ internal actual fun subcomposeInto(
  * @param parent The parent composition reference to coordinate scheduling of composition updates
  * @param content A `@Composable` function declaring the UI contents
  */
+// TODO: Remove the androidx.activity dependency from this module when removing this
+@Deprecated(
+    "Moved to the androidx.activity:activity-compose artifact",
+    replaceWith = ReplaceWith(
+        "this.setContent(parent, content)",
+        "androidx.activity.compose.setContent"
+    )
+)
 fun ComponentActivity.setContent(
-    // Note: Recomposer.current() is the default here since all Activity view trees are hosted
-    // on the main thread.
-    parent: CompositionReference = Recomposer.current(),
+    parent: CompositionContext? = null,
     content: @Composable () -> Unit
-): Composition {
-    GlobalSnapshotManager.ensureStarted()
-    val composeView: AndroidComposeView = window.decorView
+) {
+    val existingComposeView = window.decorView
         .findViewById<ViewGroup>(android.R.id.content)
-        .getChildAt(0) as? AndroidComposeView
-        ?: AndroidComposeView(this).also {
-            setContentView(it.view, DefaultLayoutParams)
-        }
-    return doSetContent(composeView, parent, content)
+        .getChildAt(0) as? ComposeView
+
+    if (existingComposeView != null) with(existingComposeView) {
+        setParentCompositionContext(parent)
+        setContent(content)
+    } else ComposeView(this).apply {
+        // Set content and parent **before** setContentView
+        // to have ComposeView create the composition on attach
+        setParentCompositionContext(parent)
+        setContent(content)
+        setContentView(this, DefaultLayoutParams)
+    }
 }
 
 /**
  * Composes the given composable into the given view.
  *
  * The new composition can be logically "linked" to an existing one, by providing a
- * [parent]. This will ensure that invalidations and ambients will flow through
+ * [parent]. This will ensure that invalidations and CompositionLocals will flow through
  * the two compositions as if they were not separate.
  *
  * Note that this [ViewGroup] should have an unique id for the saved instance state mechanism to
@@ -165,9 +110,8 @@ fun ComponentActivity.setContent(
  * @param parent The [Recomposer] or parent composition reference.
  * @param content Composable that will be the content of the view.
  */
-@Deprecated("Use ComposeView or AbstractComposeView instead.")
-fun ViewGroup.setContent(
-    parent: CompositionReference = Recomposer.current(),
+internal fun ViewGroup.setContent(
+    parent: CompositionContext,
     content: @Composable () -> Unit
 ): Composition {
     GlobalSnapshotManager.ensureStarted()
@@ -183,7 +127,7 @@ fun ViewGroup.setContent(
 @OptIn(InternalComposeApi::class)
 private fun doSetContent(
     owner: AndroidComposeView,
-    parent: CompositionReference,
+    parent: CompositionContext,
     content: @Composable () -> Unit
 ): Composition {
     if (inspectionWanted(owner)) {
@@ -194,7 +138,7 @@ private fun doSetContent(
         enableDebugInspectorInfo()
     }
     @OptIn(ExperimentalComposeApi::class)
-    val original = compositionFor(owner.root, UiApplier(owner.root), parent)
+    val original = Composition(owner.root, UiApplier(owner.root), parent)
     val wrapped = owner.view.getTag(R.id.wrapped_composition_tag)
         as? WrappedComposition
         ?: WrappedComposition(owner, original).also {
@@ -227,7 +171,7 @@ private class WrappedComposition(
 
     private var disposed = false
     private var addedToLifecycle: Lifecycle? = null
-    private var lastContent: @Composable () -> Unit = emptyContent()
+    private var lastContent: @Composable () -> Unit = {}
 
     @OptIn(InternalComposeApi::class)
     override fun setContent(content: @Composable () -> Unit) {
@@ -257,8 +201,8 @@ private class WrappedComposition(
                         LaunchedEffect(owner) { owner.keyboardVisibilityEventLoop() }
                         LaunchedEffect(owner) { owner.boundsUpdatesEventLoop() }
 
-                        Providers(InspectionTables provides inspectionTable) {
-                            ProvideAndroidAmbients(owner, content)
+                        Providers(LocalInspectionTables provides inspectionTable) {
+                            ProvideAndroidCompositionLocals(owner, content)
                         }
                     }
                 }
@@ -275,7 +219,8 @@ private class WrappedComposition(
         original.dispose()
     }
 
-    override fun hasInvalidations() = original.hasInvalidations()
+    override val hasInvalidations get() = original.hasInvalidations
+    override val isDisposed: Boolean get() = original.isDisposed
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         if (event == Lifecycle.Event.ON_DESTROY) {

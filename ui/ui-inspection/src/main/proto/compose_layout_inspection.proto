@@ -101,8 +101,9 @@ message LambdaValue {
   int32 package_name = 1;       // the package part of the containing class name
   int32 file_name = 2;          // the file name of the containing class
   int32 lambda_name = 3;        // the name of the lambda class
-  int32 start_line_number = 4;  // the line number of the start of the lambda
-  int32 end_line_number = 5;    // the line number of the end of the lambda
+  int32 function_name = 4;      // the function name if this is a function reference
+  int32 start_line_number = 5;  // the line number of the start of the lambda
+  int32 end_line_number = 6;    // the line number of the end of the lambda
 }
 
 // Parameters to a @Composable function
@@ -139,11 +140,19 @@ message Parameter {
     }
 }
 
+// A collection of all parameters associated with a single composable
+message ParameterGroup {
+  sint64 composable_id = 1;
+  repeated Parameter parameter = 3;
+}
+
 // ======= COMMANDS, RESPONSES, AND EVENTS =======
 
 // Request all composables found under a layout tree rooted under the specified view
 message GetComposablesCommand {
    int64 root_view_id = 1;
+  // If true, only show composable nodes created by the user's own app
+  bool skip_system_composables = 2;
 }
 message GetComposablesResponse {
     // A collection of all text referenced by other fields in this message
@@ -152,20 +161,36 @@ message GetComposablesResponse {
 }
 
 message GetParametersCommand {
-  sint64 composable_id = 1;
+  int64 root_view_id = 1; // Used for filtering out composables from unrelated layout trees
+  sint64 composable_id = 2;
+  // As an optimization, we can skip over searching system composables if we know we don't care
+  // about them.
+  bool skip_system_composables = 3;
 }
 
 message GetParametersResponse {
-  sint64 composable_id = 1; // Echoed from GetParametersCommand
   // A collection of all text referenced by other fields in this message
+  repeated StringEntry strings = 1;
+  ParameterGroup parameter_group = 2;
+}
+
+// Request all parameters for all composables under a particular layout tree
+message GetAllParametersCommand {
+  int64 root_view_id = 1;
+  bool skip_system_composables = 2;
+}
+
+message GetAllParametersResponse {
+  int64 root_view_id = 1; // Echoed from GetAllParametersCommand
   repeated StringEntry strings = 2;
-  repeated Parameter parameters = 3;
+  repeated ParameterGroup parameter_groups = 3;
 }
 
 message Command {
   oneof specialized {
     GetComposablesCommand get_composables_command = 1;
     GetParametersCommand get_parameters_command = 2;
+    GetAllParametersCommand get_all_parameters_command = 3;
   }
 }
 
@@ -173,5 +198,6 @@ message Response {
   oneof specialized {
     GetComposablesResponse get_composables_response = 1;
     GetParametersResponse get_parameters_response = 2;
+    GetAllParametersResponse get_all_parameters_response = 3;
   }
 }

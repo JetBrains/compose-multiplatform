@@ -175,7 +175,7 @@ private fun IconToggleButtonDisabled() {
     }
 }
 
-private val TriangleShape = GenericShape { size ->
+private val TriangleShape = GenericShape { size, _ ->
     moveTo(size.width / 2f, 0f)
     lineTo(size.width, size.height)
     lineTo(0f, size.height)

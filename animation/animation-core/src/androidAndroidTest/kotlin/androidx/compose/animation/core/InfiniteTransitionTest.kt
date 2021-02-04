@@ -19,7 +19,7 @@ package androidx.compose.animation.core
 import androidx.compose.animation.VectorConverter
 import androidx.compose.animation.animateColor
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.dispatch.withFrameNanos
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -40,6 +40,9 @@ class InfiniteTransitionTest {
 
     @Test
     fun transitionTest() {
+        // Manually advance the clock to prevent the infinite transition from being cancelled
+        rule.mainClock.autoAdvance = false
+
         val colorAnim = TargetBasedAnimation(
             tween(1000),
             Color.VectorConverter(Color.Red.colorSpace),
@@ -87,13 +90,15 @@ class InfiniteTransitionTest {
                     val startTime = withFrameNanos { it }
                     var playTime = 0L
                     while (playTime < 2100L) {
-                        playTime = (withFrameNanos { it } - startTime) / 1_000_000L
-                        var iterationTime = playTime % 2000
-                        if (iterationTime > 1000L) {
-                            iterationTime = 2000L - iterationTime
+                        playTime = withFrameNanos { it } - startTime
+                        var iterationTime = playTime % (2000 * MillisToNanos)
+                        if (iterationTime > 1000 * MillisToNanos) {
+                            iterationTime = 2000L * MillisToNanos - iterationTime
                         }
-                        val expectedFloat = keyframesAnim.getValue(iterationTime)
-                        val expectedColor = colorAnim.getValue(playTime % 1000)
+                        val expectedFloat = keyframesAnim.getValueFromNanos(iterationTime)
+                        val expectedColor = colorAnim.getValueFromNanos(
+                            playTime % (1000 * MillisToNanos)
+                        )
                         assertEquals(expectedFloat, animFloat.value, 0.01f)
                         assertEquals(expectedColor, animColor.value)
                     }
@@ -101,7 +106,11 @@ class InfiniteTransitionTest {
                 }
             }
         }
-        rule.waitForIdle()
+        // Manually advance the clock
+        while (runAnimation.value) {
+            rule.mainClock.advanceTimeByFrame()
+            rule.waitForIdle()
+        }
         assertFalse(runAnimation.value)
     }
 }

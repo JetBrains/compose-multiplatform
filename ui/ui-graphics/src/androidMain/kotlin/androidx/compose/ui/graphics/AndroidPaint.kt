@@ -108,16 +108,6 @@ class AndroidPaint : Paint {
             internalPaint.setNativeColorFilter(value)
         }
 
-    override var nativePathEffect: NativePathEffect?
-        get() = pathEffect?.asAndroidPathEffect()
-        set(value) {
-            pathEffect = if (value == null) {
-                null
-            } else {
-                AndroidPathEffect(value)
-            }
-        }
-
     override var pathEffect: PathEffect? = null
         set(value) {
             internalPaint.setNativePathEffect(value)
@@ -139,14 +129,7 @@ internal fun NativePaint.setNativeBlendMode(mode: BlendMode) {
 }
 
 internal fun NativePaint.setNativeColorFilter(value: ColorFilter?) {
-    if (value != null) {
-        this.colorFilter = android.graphics.PorterDuffColorFilter(
-            value.color.toArgb(),
-            value.blendMode.toPorterDuffMode()
-        )
-    } else {
-        this.colorFilter = null
-    }
+    colorFilter = value?.asAndroidColorFilter()
 }
 
 internal fun NativePaint.getNativeAlpha() = this.alpha / 255f
@@ -246,5 +229,5 @@ internal fun NativePaint.setNativeShader(value: Shader?) {
 }
 
 internal fun NativePaint.setNativePathEffect(value: PathEffect?) {
-    this.pathEffect = (value as AndroidPathEffect).nativePathEffect
+    this.pathEffect = (value as AndroidPathEffect?)?.nativePathEffect
 }
