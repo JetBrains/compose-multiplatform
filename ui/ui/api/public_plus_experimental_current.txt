@@ -1965,51 +1965,6 @@ package androidx.compose.ui.platform {
     property public final boolean showLayoutBounds;
   }
 
-  public final class AmbientsKt {
-    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.animation.core.AnimationClockObservable>! getAmbientAnimationClock();
-    method @Deprecated @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.autofill.Autofill>! getAmbientAutofill();
-    method @Deprecated @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.autofill.AutofillTree>! getAmbientAutofillTree();
-    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.ClipboardManager>! getAmbientClipboardManager();
-    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.unit.Density>! getAmbientDensity();
-    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.focus.FocusManager>! getAmbientFocusManager();
-    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.text.font.Font.ResourceLoader>! getAmbientFontLoader();
-    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.hapticfeedback.HapticFeedback>! getAmbientHapticFeedback();
-    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.unit.LayoutDirection>! getAmbientLayoutDirection();
-    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.text.input.TextInputService>! getAmbientTextInputService();
-    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.TextToolbar>! getAmbientTextToolbar();
-    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.UriHandler>! getAmbientUriHandler();
-    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.ViewConfiguration>! getAmbientViewConfiguration();
-    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.WindowInfo>! getAmbientWindowInfo();
-    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.animation.core.AnimationClockObservable> getLocalAnimationClock();
-    method @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.autofill.Autofill> getLocalAutofill();
-    method @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.autofill.AutofillTree> getLocalAutofillTree();
-    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.ClipboardManager> getLocalClipboardManager();
-    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.unit.Density> getLocalDensity();
-    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.focus.FocusManager> getLocalFocusManager();
-    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.hapticfeedback.HapticFeedback> getLocalHapticFeedback();
-    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.unit.LayoutDirection> getLocalLayoutDirection();
-    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.text.input.TextInputService> getLocalTextInputService();
-    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.TextToolbar> getLocalTextToolbar();
-    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.UriHandler> getLocalUriHandler();
-    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.ViewConfiguration> getLocalViewConfiguration();
-    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.WindowInfo> getLocalWindowInfo();
-  }
-
-  public final class AndroidAmbientsKt {
-    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<android.content.res.Configuration>! getAmbientConfiguration();
-    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<android.content.Context>! getAmbientContext();
-    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.lifecycle.LifecycleOwner>! getAmbientLifecycleOwner();
-    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.savedstate.SavedStateRegistryOwner>! getAmbientSavedStateRegistryOwner();
-    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<android.view.View>! getAmbientView();
-    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.lifecycle.ViewModelStoreOwner>! getAmbientViewModelStoreOwner();
-    method public static androidx.compose.runtime.ProvidableCompositionLocal<android.content.res.Configuration> getLocalConfiguration();
-    method public static androidx.compose.runtime.ProvidableCompositionLocal<android.content.Context> getLocalContext();
-    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.lifecycle.LifecycleOwner> getLocalLifecycleOwner();
-    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.savedstate.SavedStateRegistryOwner> getLocalSavedStateRegistryOwner();
-    method public static androidx.compose.runtime.ProvidableCompositionLocal<android.view.View> getLocalView();
-    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.lifecycle.ViewModelStoreOwner> getLocalViewModelStoreOwner();
-  }
-
   public final class AndroidClipboardManagerKt {
   }
 
@@ -2017,6 +1972,15 @@ package androidx.compose.ui.platform {
   }
 
   public final class AndroidComposeViewKt {
+  }
+
+  public final class AndroidCompositionLocalsKt {
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<android.content.res.Configuration> getLocalConfiguration();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<android.content.Context> getLocalContext();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.lifecycle.LifecycleOwner> getLocalLifecycleOwner();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.savedstate.SavedStateRegistryOwner> getLocalSavedStateRegistryOwner();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<android.view.View> getLocalView();
+    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.lifecycle.ViewModelStoreOwner> getLocalViewModelStoreOwner();
   }
 
   public final class AndroidUiDispatcher extends kotlinx.coroutines.CoroutineDispatcher {
@@ -2076,6 +2040,22 @@ package androidx.compose.ui.platform {
     property protected boolean shouldCreateCompositionOnAttachedToWindow;
   }
 
+  public final class CompositionLocalsKt {
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.animation.core.AnimationClockObservable> getLocalAnimationClock();
+    method @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.autofill.Autofill> getLocalAutofill();
+    method @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.autofill.AutofillTree> getLocalAutofillTree();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.ClipboardManager> getLocalClipboardManager();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.unit.Density> getLocalDensity();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.focus.FocusManager> getLocalFocusManager();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.hapticfeedback.HapticFeedback> getLocalHapticFeedback();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.unit.LayoutDirection> getLocalLayoutDirection();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.text.input.TextInputService> getLocalTextInputService();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.TextToolbar> getLocalTextToolbar();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.UriHandler> getLocalUriHandler();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.ViewConfiguration> getLocalViewConfiguration();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.WindowInfo> getLocalWindowInfo();
+  }
+
   public final class DebugUtilsKt {
   }
 
@@ -2099,7 +2079,6 @@ package androidx.compose.ui.platform {
   }
 
   public final class InspectionModeKt {
-    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<java.lang.Boolean>! getInspectionMode();
     method public static androidx.compose.runtime.ProvidableCompositionLocal<java.lang.Boolean> getLocalInspectionMode();
   }
 

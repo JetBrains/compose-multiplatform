@@ -6,7 +6,6 @@ package androidx.compose.foundation.layout {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier paddingFrom-x1H7Rps(androidx.compose.ui.Modifier, androidx.compose.ui.layout.AlignmentLine alignmentLine, optional float before, optional float after);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier paddingFromBaseline-S2lCeAQ(androidx.compose.ui.Modifier, optional float top, optional float bottom);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier paddingFromBaseline-zCFLmh4(androidx.compose.ui.Modifier, optional long top, optional long bottom);
-    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier relativePaddingFrom-x1H7Rps(androidx.compose.ui.Modifier, androidx.compose.ui.layout.AlignmentLine alignmentLine, optional float before, optional float after);
   }
 
   @androidx.compose.runtime.Immutable public final class Arrangement {
@@ -105,20 +104,6 @@ package androidx.compose.foundation.layout {
     property public abstract float minWidth;
   }
 
-  @Deprecated public final class ChainStyle {
-    field @Deprecated public static final androidx.compose.foundation.layout.ChainStyle.Companion Companion;
-  }
-
-  @Deprecated public static final class ChainStyle.Companion {
-    method @Deprecated public androidx.compose.foundation.layout.ChainStyle Packed(float bias);
-    method @Deprecated public androidx.compose.foundation.layout.ChainStyle getPacked();
-    method @Deprecated public androidx.compose.foundation.layout.ChainStyle getSpread();
-    method @Deprecated public androidx.compose.foundation.layout.ChainStyle getSpreadInside();
-    property @Deprecated public final androidx.compose.foundation.layout.ChainStyle Packed;
-    property @Deprecated public final androidx.compose.foundation.layout.ChainStyle Spread;
-    property @Deprecated public final androidx.compose.foundation.layout.ChainStyle SpreadInside;
-  }
-
   public final class ColumnKt {
     method @androidx.compose.runtime.Composable public static inline void Column(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.layout.Arrangement.Vertical verticalArrangement, optional androidx.compose.ui.Alignment.Horizontal horizontalAlignment, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit> content);
   }
@@ -127,8 +112,6 @@ package androidx.compose.foundation.layout {
     method @androidx.compose.runtime.Stable public default androidx.compose.ui.Modifier align(androidx.compose.ui.Modifier, androidx.compose.ui.Alignment.Horizontal alignment);
     method @androidx.compose.runtime.Stable public default androidx.compose.ui.Modifier alignBy(androidx.compose.ui.Modifier, androidx.compose.ui.layout.VerticalAlignmentLine alignmentLine);
     method @androidx.compose.runtime.Stable public default androidx.compose.ui.Modifier alignBy(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.Measured,java.lang.Integer> alignmentLineBlock);
-    method @Deprecated public default androidx.compose.ui.Modifier alignWithSiblings(androidx.compose.ui.Modifier, androidx.compose.ui.layout.VerticalAlignmentLine alignmentLine);
-    method @Deprecated public default androidx.compose.ui.Modifier alignWithSiblings(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.Measured,java.lang.Integer> alignmentLineBlock);
     method @androidx.compose.runtime.Stable public default androidx.compose.ui.Modifier weight(androidx.compose.ui.Modifier, float weight, optional boolean fill);
     field public static final androidx.compose.foundation.layout.ColumnScope.Companion Companion;
   }
@@ -136,196 +119,7 @@ package androidx.compose.foundation.layout {
   public static final class ColumnScope.Companion implements androidx.compose.foundation.layout.ColumnScope {
   }
 
-  @Deprecated @androidx.compose.foundation.layout.LayoutScopeMarker public final class ConstrainScope {
-    method @Deprecated public void centerAround(androidx.compose.foundation.layout.ConstraintLayoutBaseScope.VerticalAnchor anchor);
-    method @Deprecated public void centerAround(androidx.compose.foundation.layout.ConstraintLayoutBaseScope.HorizontalAnchor anchor);
-    method @Deprecated public void centerHorizontallyTo(androidx.compose.foundation.layout.ConstrainedLayoutReference other);
-    method @Deprecated public void centerTo(androidx.compose.foundation.layout.ConstrainedLayoutReference other);
-    method @Deprecated public void centerVerticallyTo(androidx.compose.foundation.layout.ConstrainedLayoutReference other);
-    method @Deprecated public androidx.compose.foundation.layout.ConstrainScope.VerticalAnchorable getAbsoluteLeft();
-    method @Deprecated public androidx.compose.foundation.layout.ConstrainScope.VerticalAnchorable getAbsoluteRight();
-    method @Deprecated public androidx.compose.foundation.layout.ConstrainScope.BaselineAnchorable getBaseline();
-    method @Deprecated public androidx.compose.foundation.layout.ConstrainScope.HorizontalAnchorable getBottom();
-    method @Deprecated public androidx.compose.foundation.layout.ConstrainScope.VerticalAnchorable getEnd();
-    method @Deprecated public androidx.compose.foundation.layout.Dimension getHeight();
-    method @Deprecated public androidx.compose.foundation.layout.ConstrainedLayoutReference getParent();
-    method @Deprecated public androidx.compose.foundation.layout.ConstrainScope.VerticalAnchorable getStart();
-    method @Deprecated public androidx.compose.foundation.layout.ConstrainScope.HorizontalAnchorable getTop();
-    method @Deprecated public androidx.compose.foundation.layout.Dimension getWidth();
-    method @Deprecated public void linkTo-6izaRyI(androidx.compose.foundation.layout.ConstraintLayoutBaseScope.VerticalAnchor start, androidx.compose.foundation.layout.ConstraintLayoutBaseScope.HorizontalAnchor top, androidx.compose.foundation.layout.ConstraintLayoutBaseScope.VerticalAnchor end, androidx.compose.foundation.layout.ConstraintLayoutBaseScope.HorizontalAnchor bottom, optional float startMargin, optional float topMargin, optional float endMargin, optional float bottomMargin, optional @FloatRange(from=0.0, to=1.0) float horizontalBias, optional @FloatRange(from=0.0, to=1.0) float verticalBias);
-    method @Deprecated public void linkTo-KSLczBc(androidx.compose.foundation.layout.ConstraintLayoutBaseScope.HorizontalAnchor top, androidx.compose.foundation.layout.ConstraintLayoutBaseScope.HorizontalAnchor bottom, optional float topMargin, optional float bottomMargin, optional @FloatRange(from=0.0, to=1.0) float bias);
-    method @Deprecated public void linkTo-tOGOrBo(androidx.compose.foundation.layout.ConstraintLayoutBaseScope.VerticalAnchor start, androidx.compose.foundation.layout.ConstraintLayoutBaseScope.VerticalAnchor end, optional float startMargin, optional float endMargin, optional @FloatRange(from=0.0, to=1.0) float bias);
-    method @Deprecated public void setHeight(androidx.compose.foundation.layout.Dimension value);
-    method @Deprecated public void setWidth(androidx.compose.foundation.layout.Dimension value);
-    property @Deprecated public final androidx.compose.foundation.layout.ConstrainScope.VerticalAnchorable absoluteLeft;
-    property @Deprecated public final androidx.compose.foundation.layout.ConstrainScope.VerticalAnchorable absoluteRight;
-    property @Deprecated public final androidx.compose.foundation.layout.ConstrainScope.BaselineAnchorable baseline;
-    property @Deprecated public final androidx.compose.foundation.layout.ConstrainScope.HorizontalAnchorable bottom;
-    property @Deprecated public final androidx.compose.foundation.layout.ConstrainScope.VerticalAnchorable end;
-    property @Deprecated public final androidx.compose.foundation.layout.Dimension height;
-    property @Deprecated public final androidx.compose.foundation.layout.ConstrainedLayoutReference parent;
-    property @Deprecated public final androidx.compose.foundation.layout.ConstrainScope.VerticalAnchorable start;
-    property @Deprecated public final androidx.compose.foundation.layout.ConstrainScope.HorizontalAnchorable top;
-    property @Deprecated public final androidx.compose.foundation.layout.Dimension width;
-  }
-
-  @Deprecated public final class ConstrainScope.BaselineAnchorable {
-    method @Deprecated public void linkTo-CqewBRU(androidx.compose.foundation.layout.ConstraintLayoutBaseScope.BaselineAnchor anchor, optional float margin);
-  }
-
-  @Deprecated public final class ConstrainScope.HorizontalAnchorable {
-    method @Deprecated public void linkTo-TilihPk(androidx.compose.foundation.layout.ConstraintLayoutBaseScope.HorizontalAnchor anchor, optional float margin);
-  }
-
-  @Deprecated public final class ConstrainScope.VerticalAnchorable {
-    method @Deprecated public void linkTo-n6KZxjU(androidx.compose.foundation.layout.ConstraintLayoutBaseScope.VerticalAnchor anchor, optional float margin);
-  }
-
-  @Deprecated public final class ConstrainedLayoutReference {
-    ctor @Deprecated public ConstrainedLayoutReference(Object id);
-    method @Deprecated public androidx.compose.foundation.layout.ConstraintLayoutBaseScope.VerticalAnchor getAbsoluteLeft();
-    method @Deprecated public androidx.compose.foundation.layout.ConstraintLayoutBaseScope.VerticalAnchor getAbsoluteRight();
-    method @Deprecated public androidx.compose.foundation.layout.ConstraintLayoutBaseScope.BaselineAnchor getBaseline();
-    method @Deprecated public androidx.compose.foundation.layout.ConstraintLayoutBaseScope.HorizontalAnchor getBottom();
-    method @Deprecated public androidx.compose.foundation.layout.ConstraintLayoutBaseScope.VerticalAnchor getEnd();
-    method @Deprecated public Object getId();
-    method @Deprecated public androidx.compose.foundation.layout.ConstraintLayoutBaseScope.VerticalAnchor getStart();
-    method @Deprecated public androidx.compose.foundation.layout.ConstraintLayoutBaseScope.HorizontalAnchor getTop();
-    property @Deprecated public final androidx.compose.foundation.layout.ConstraintLayoutBaseScope.VerticalAnchor absoluteLeft;
-    property @Deprecated public final androidx.compose.foundation.layout.ConstraintLayoutBaseScope.VerticalAnchor absoluteRight;
-    property @Deprecated public final androidx.compose.foundation.layout.ConstraintLayoutBaseScope.BaselineAnchor baseline;
-    property @Deprecated public final androidx.compose.foundation.layout.ConstraintLayoutBaseScope.HorizontalAnchor bottom;
-    property @Deprecated public final androidx.compose.foundation.layout.ConstraintLayoutBaseScope.VerticalAnchor end;
-    property public final Object id;
-    property @Deprecated public final androidx.compose.foundation.layout.ConstraintLayoutBaseScope.VerticalAnchor start;
-    property @Deprecated public final androidx.compose.foundation.layout.ConstraintLayoutBaseScope.HorizontalAnchor top;
-  }
-
-  @Deprecated public abstract class ConstraintLayoutBaseScope {
-    ctor @Deprecated public ConstraintLayoutBaseScope();
-    method @Deprecated public final void applyTo(androidx.compose.foundation.layout.State state);
-    method @Deprecated public final androidx.compose.foundation.layout.ConstraintLayoutBaseScope.VerticalAnchor createAbsoluteLeftBarrier-GB4eHDc(androidx.compose.foundation.layout.ConstrainedLayoutReference![] elements, optional float margin);
-    method @Deprecated public final androidx.compose.foundation.layout.ConstraintLayoutBaseScope.VerticalAnchor createAbsoluteRightBarrier-GB4eHDc(androidx.compose.foundation.layout.ConstrainedLayoutReference![] elements, optional float margin);
-    method @Deprecated public final androidx.compose.foundation.layout.ConstraintLayoutBaseScope.HorizontalAnchor createBottomBarrier-GB4eHDc(androidx.compose.foundation.layout.ConstrainedLayoutReference![] elements, optional float margin);
-    method @Deprecated public final androidx.compose.foundation.layout.ConstraintLayoutBaseScope.VerticalAnchor createEndBarrier-GB4eHDc(androidx.compose.foundation.layout.ConstrainedLayoutReference![] elements, optional float margin);
-    method @Deprecated public final androidx.compose.foundation.layout.ConstraintLayoutBaseScope.VerticalAnchor createGuidelineFromAbsoluteLeft(float fraction);
-    method @Deprecated public final androidx.compose.foundation.layout.ConstraintLayoutBaseScope.VerticalAnchor createGuidelineFromAbsoluteLeft-0680j_4(float offset);
-    method @Deprecated public final androidx.compose.foundation.layout.ConstraintLayoutBaseScope.VerticalAnchor createGuidelineFromAbsoluteRight(float fraction);
-    method @Deprecated public final androidx.compose.foundation.layout.ConstraintLayoutBaseScope.VerticalAnchor createGuidelineFromAbsoluteRight-0680j_4(float offset);
-    method @Deprecated public final androidx.compose.foundation.layout.ConstraintLayoutBaseScope.HorizontalAnchor createGuidelineFromBottom(float fraction);
-    method @Deprecated public final androidx.compose.foundation.layout.ConstraintLayoutBaseScope.HorizontalAnchor createGuidelineFromBottom-0680j_4(float offset);
-    method @Deprecated public final androidx.compose.foundation.layout.ConstraintLayoutBaseScope.VerticalAnchor createGuidelineFromEnd(float fraction);
-    method @Deprecated public final androidx.compose.foundation.layout.ConstraintLayoutBaseScope.VerticalAnchor createGuidelineFromEnd-0680j_4(float offset);
-    method @Deprecated public final androidx.compose.foundation.layout.ConstraintLayoutBaseScope.VerticalAnchor createGuidelineFromStart(float fraction);
-    method @Deprecated public final androidx.compose.foundation.layout.ConstraintLayoutBaseScope.VerticalAnchor createGuidelineFromStart-0680j_4(float offset);
-    method @Deprecated public final androidx.compose.foundation.layout.ConstraintLayoutBaseScope.HorizontalAnchor createGuidelineFromTop(float fraction);
-    method @Deprecated public final androidx.compose.foundation.layout.ConstraintLayoutBaseScope.HorizontalAnchor createGuidelineFromTop-0680j_4(float offset);
-    method @Deprecated public final void createHorizontalChain(androidx.compose.foundation.layout.ConstrainedLayoutReference![] elements, optional androidx.compose.foundation.layout.ChainStyle chainStyle);
-    method @Deprecated public final androidx.compose.foundation.layout.ConstraintLayoutBaseScope.VerticalAnchor createStartBarrier-GB4eHDc(androidx.compose.foundation.layout.ConstrainedLayoutReference![] elements, optional float margin);
-    method @Deprecated public final androidx.compose.foundation.layout.ConstraintLayoutBaseScope.HorizontalAnchor createTopBarrier-GB4eHDc(androidx.compose.foundation.layout.ConstrainedLayoutReference![] elements, optional float margin);
-    method @Deprecated public final void createVerticalChain(androidx.compose.foundation.layout.ConstrainedLayoutReference![] elements, optional androidx.compose.foundation.layout.ChainStyle chainStyle);
-    method @Deprecated protected final java.util.List<kotlin.jvm.functions.Function1<androidx.compose.foundation.layout.State,kotlin.Unit>> getTasks();
-    method @Deprecated public final void reset();
-    property protected final java.util.List<kotlin.jvm.functions.Function1<androidx.compose.foundation.layout.State,kotlin.Unit>> tasks;
-  }
-
-  @Deprecated public static final class ConstraintLayoutBaseScope.BaselineAnchor {
-    method @Deprecated public androidx.compose.foundation.layout.ConstraintLayoutBaseScope.BaselineAnchor copy(Object id);
-  }
-
-  @Deprecated public static final class ConstraintLayoutBaseScope.HorizontalAnchor {
-    method @Deprecated public androidx.compose.foundation.layout.ConstraintLayoutBaseScope.HorizontalAnchor copy(Object id, int index);
-  }
-
-  @Deprecated public static final class ConstraintLayoutBaseScope.VerticalAnchor {
-    method @Deprecated public androidx.compose.foundation.layout.ConstraintLayoutBaseScope.VerticalAnchor copy(Object id, int index);
-  }
-
-  public final class ConstraintLayoutKt {
-    method @Deprecated @androidx.compose.runtime.Composable public static void ConstraintLayout(optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ConstraintLayoutScope,kotlin.Unit> content);
-    method @Deprecated @androidx.compose.runtime.Composable public static void ConstraintLayout(androidx.compose.foundation.layout.ConstraintSet constraintSet, optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method @Deprecated public static androidx.compose.foundation.layout.ConstraintSet ConstraintSet(kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ConstraintSetScope,kotlin.Unit> description);
-    method @Deprecated public static androidx.compose.foundation.layout.Dimension.MaxCoercible atLeast-mVwPmw8(androidx.compose.foundation.layout.Dimension.Coercible, float dp);
-    method @Deprecated public static androidx.compose.foundation.layout.Dimension atLeastWrapContent-wkvWzeM(androidx.compose.foundation.layout.Dimension.MinCoercible, float dp);
-    method @Deprecated public static androidx.compose.foundation.layout.Dimension atMost-abS_yDw(androidx.compose.foundation.layout.Dimension.MaxCoercible, float dp);
-    method @Deprecated public static androidx.compose.foundation.layout.Dimension.MinCoercible atMost-mVwPmw8(androidx.compose.foundation.layout.Dimension.Coercible, float dp);
-    method @Deprecated public static androidx.compose.foundation.layout.Dimension.MaxCoercible getAtLeastWrapContent(androidx.compose.foundation.layout.Dimension.Coercible);
-    method @Deprecated public static androidx.compose.foundation.layout.Dimension getAtLeastWrapContent(androidx.compose.foundation.layout.Dimension.MinCoercible);
-    method @Deprecated public static androidx.compose.foundation.layout.Dimension.MinCoercible getAtMostWrapContent(androidx.compose.foundation.layout.Dimension.Coercible);
-    method @Deprecated public static androidx.compose.foundation.layout.Dimension getAtMostWrapContent(androidx.compose.foundation.layout.Dimension.MaxCoercible);
-  }
-
-  @Deprecated @androidx.compose.foundation.layout.LayoutScopeMarker public final class ConstraintLayoutScope extends androidx.compose.foundation.layout.ConstraintLayoutBaseScope {
-    method @Deprecated public androidx.compose.ui.Modifier constrainAs(androidx.compose.ui.Modifier, androidx.compose.foundation.layout.ConstrainedLayoutReference ref, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ConstrainScope,kotlin.Unit> constrainBlock);
-    method @Deprecated public androidx.compose.foundation.layout.ConstrainedLayoutReference createRef();
-    method @Deprecated public androidx.compose.foundation.layout.ConstraintLayoutScope.ConstrainedLayoutReferences createRefs();
-  }
-
-  @Deprecated public final class ConstraintLayoutScope.ConstrainedLayoutReferences {
-    method @Deprecated public operator androidx.compose.foundation.layout.ConstrainedLayoutReference component1();
-    method @Deprecated public operator androidx.compose.foundation.layout.ConstrainedLayoutReference component10();
-    method @Deprecated public operator androidx.compose.foundation.layout.ConstrainedLayoutReference component11();
-    method @Deprecated public operator androidx.compose.foundation.layout.ConstrainedLayoutReference component12();
-    method @Deprecated public operator androidx.compose.foundation.layout.ConstrainedLayoutReference component13();
-    method @Deprecated public operator androidx.compose.foundation.layout.ConstrainedLayoutReference component14();
-    method @Deprecated public operator androidx.compose.foundation.layout.ConstrainedLayoutReference component15();
-    method @Deprecated public operator androidx.compose.foundation.layout.ConstrainedLayoutReference component16();
-    method @Deprecated public operator androidx.compose.foundation.layout.ConstrainedLayoutReference component2();
-    method @Deprecated public operator androidx.compose.foundation.layout.ConstrainedLayoutReference component3();
-    method @Deprecated public operator androidx.compose.foundation.layout.ConstrainedLayoutReference component4();
-    method @Deprecated public operator androidx.compose.foundation.layout.ConstrainedLayoutReference component5();
-    method @Deprecated public operator androidx.compose.foundation.layout.ConstrainedLayoutReference component6();
-    method @Deprecated public operator androidx.compose.foundation.layout.ConstrainedLayoutReference component7();
-    method @Deprecated public operator androidx.compose.foundation.layout.ConstrainedLayoutReference component8();
-    method @Deprecated public operator androidx.compose.foundation.layout.ConstrainedLayoutReference component9();
-  }
-
-  @Deprecated @androidx.compose.runtime.Immutable public interface ConstraintSet {
-    method @Deprecated public void applyTo(androidx.compose.foundation.layout.State state, java.util.List<? extends androidx.compose.ui.layout.Measurable> measurables);
-  }
-
-  @Deprecated @androidx.compose.foundation.layout.LayoutScopeMarker public final class ConstraintSetScope extends androidx.compose.foundation.layout.ConstraintLayoutBaseScope {
-    method @Deprecated public androidx.compose.foundation.layout.ConstrainScope constrain(androidx.compose.foundation.layout.ConstrainedLayoutReference ref, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ConstrainScope,kotlin.Unit> constrainBlock);
-    method @Deprecated public androidx.compose.foundation.layout.ConstrainedLayoutReference createRefFor(Object id);
-  }
-
-  @Deprecated public interface Dimension {
-    field @Deprecated public static final androidx.compose.foundation.layout.Dimension.Companion Companion;
-  }
-
-  @Deprecated public static interface Dimension.Coercible extends androidx.compose.foundation.layout.Dimension {
-  }
-
-  @Deprecated public static final class Dimension.Companion {
-    method @Deprecated public androidx.compose.foundation.layout.Dimension getFillToConstraints();
-    method @Deprecated public androidx.compose.foundation.layout.Dimension.Coercible getPreferredWrapContent();
-    method @Deprecated public androidx.compose.foundation.layout.Dimension getWrapContent();
-    method @Deprecated public androidx.compose.foundation.layout.Dimension percent(float percent);
-    method @Deprecated public androidx.compose.foundation.layout.Dimension.Coercible preferredValue-0680j_4(float dp);
-    method @Deprecated public androidx.compose.foundation.layout.Dimension value-0680j_4(float dp);
-    property @Deprecated public final androidx.compose.foundation.layout.Dimension fillToConstraints;
-    property @Deprecated public final androidx.compose.foundation.layout.Dimension.Coercible preferredWrapContent;
-    property @Deprecated public final androidx.compose.foundation.layout.Dimension wrapContent;
-  }
-
-  @Deprecated public static interface Dimension.MaxCoercible extends androidx.compose.foundation.layout.Dimension {
-  }
-
-  @Deprecated public static interface Dimension.MinCoercible extends androidx.compose.foundation.layout.Dimension {
-  }
-
   @kotlin.RequiresOptIn(message="The API of this layout is experimental and is likely to change in the future.") public @interface ExperimentalLayout {
-  }
-
-  @Deprecated public enum FlowCrossAxisAlignment {
-    enum_constant @Deprecated public static final androidx.compose.foundation.layout.FlowCrossAxisAlignment Center;
-    enum_constant @Deprecated public static final androidx.compose.foundation.layout.FlowCrossAxisAlignment End;
-    enum_constant @Deprecated public static final androidx.compose.foundation.layout.FlowCrossAxisAlignment Start;
-  }
-
-  public final class FlowKt {
-    method @Deprecated @androidx.compose.foundation.layout.ExperimentalLayout @androidx.compose.runtime.Composable public static void FlowColumn-4CIokMg(optional androidx.compose.foundation.layout.SizeMode mainAxisSize, optional androidx.compose.foundation.layout.MainAxisAlignment mainAxisAlignment, optional float mainAxisSpacing, optional androidx.compose.foundation.layout.FlowCrossAxisAlignment crossAxisAlignment, optional float crossAxisSpacing, optional androidx.compose.foundation.layout.MainAxisAlignment lastLineMainAxisAlignment, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method @Deprecated @androidx.compose.foundation.layout.ExperimentalLayout @androidx.compose.runtime.Composable public static void FlowRow-4CIokMg(optional androidx.compose.foundation.layout.SizeMode mainAxisSize, optional androidx.compose.foundation.layout.MainAxisAlignment mainAxisAlignment, optional float mainAxisSpacing, optional androidx.compose.foundation.layout.FlowCrossAxisAlignment crossAxisAlignment, optional float crossAxisSpacing, optional androidx.compose.foundation.layout.MainAxisAlignment lastLineMainAxisAlignment, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
   public final class IntrinsicKt {
@@ -341,22 +135,11 @@ package androidx.compose.foundation.layout {
   @kotlin.DslMarker public @interface LayoutScopeMarker {
   }
 
-  public enum MainAxisAlignment {
-    enum_constant public static final androidx.compose.foundation.layout.MainAxisAlignment Center;
-    enum_constant public static final androidx.compose.foundation.layout.MainAxisAlignment End;
-    enum_constant public static final androidx.compose.foundation.layout.MainAxisAlignment SpaceAround;
-    enum_constant public static final androidx.compose.foundation.layout.MainAxisAlignment SpaceBetween;
-    enum_constant public static final androidx.compose.foundation.layout.MainAxisAlignment SpaceEvenly;
-    enum_constant public static final androidx.compose.foundation.layout.MainAxisAlignment Start;
-  }
-
   public final class OffsetKt {
     method public static androidx.compose.ui.Modifier absoluteOffset(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.Density,androidx.compose.ui.unit.IntOffset> offset);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier absoluteOffset-S2lCeAQ(androidx.compose.ui.Modifier, optional float x, optional float y);
-    method @Deprecated public static androidx.compose.ui.Modifier absoluteOffsetPx(androidx.compose.ui.Modifier, optional androidx.compose.runtime.State<java.lang.Float> x, optional androidx.compose.runtime.State<java.lang.Float> y);
     method public static androidx.compose.ui.Modifier offset(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.Density,androidx.compose.ui.unit.IntOffset> offset);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier offset-S2lCeAQ(androidx.compose.ui.Modifier, optional float x, optional float y);
-    method @Deprecated public static androidx.compose.ui.Modifier offsetPx(androidx.compose.ui.Modifier, optional androidx.compose.runtime.State<java.lang.Float> x, optional androidx.compose.runtime.State<java.lang.Float> y);
   }
 
   public final class PaddingKt {
@@ -398,8 +181,6 @@ package androidx.compose.foundation.layout {
     method @androidx.compose.runtime.Stable public default androidx.compose.ui.Modifier alignBy(androidx.compose.ui.Modifier, androidx.compose.ui.layout.HorizontalAlignmentLine alignmentLine);
     method @androidx.compose.runtime.Stable public default androidx.compose.ui.Modifier alignBy(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.Measured,java.lang.Integer> alignmentLineBlock);
     method @androidx.compose.runtime.Stable public default androidx.compose.ui.Modifier alignByBaseline(androidx.compose.ui.Modifier);
-    method @Deprecated public default androidx.compose.ui.Modifier alignWithSiblings(androidx.compose.ui.Modifier, androidx.compose.ui.layout.HorizontalAlignmentLine alignmentLine);
-    method @Deprecated public default androidx.compose.ui.Modifier alignWithSiblings(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.Measured,java.lang.Integer> alignmentLineBlock);
     method @androidx.compose.runtime.Stable public default androidx.compose.ui.Modifier weight(androidx.compose.ui.Modifier, float weight, optional boolean fill);
     field public static final androidx.compose.foundation.layout.RowScope.Companion Companion;
   }
@@ -431,26 +212,8 @@ package androidx.compose.foundation.layout {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier wrapContentWidth(androidx.compose.ui.Modifier, optional androidx.compose.ui.Alignment.Horizontal align, optional boolean unbounded);
   }
 
-  public enum SizeMode {
-    enum_constant public static final androidx.compose.foundation.layout.SizeMode Expand;
-    enum_constant public static final androidx.compose.foundation.layout.SizeMode Wrap;
-  }
-
   public final class SpacerKt {
     method @androidx.compose.runtime.Composable public static void Spacer(androidx.compose.ui.Modifier modifier);
-  }
-
-  @Deprecated public final class State extends androidx.constraintlayout.core.state.State {
-    ctor @Deprecated public State(androidx.compose.ui.unit.Density density);
-    method @Deprecated public androidx.compose.ui.unit.Density getDensity();
-    method @Deprecated public androidx.compose.ui.unit.LayoutDirection getLayoutDirection();
-    method @Deprecated public long getRootIncomingConstraints-msEJaDk();
-    method @Deprecated public void setLayoutDirection(androidx.compose.ui.unit.LayoutDirection p);
-    method @Deprecated public void setRootIncomingConstraints-BRTryo0(long p);
-    property public final androidx.compose.ui.unit.Density density;
-    property public final androidx.compose.ui.unit.LayoutDirection layoutDirection;
-    property public final long rootIncomingConstraints;
-    field @Deprecated public androidx.compose.ui.unit.LayoutDirection layoutDirection;
   }
 
 }

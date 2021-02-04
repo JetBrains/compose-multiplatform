@@ -116,21 +116,6 @@ fun Modifier.indication(
 )
 
 /**
- * CompositionLocal that provides an [IndicationInstance] to draw visual indication for press and
- * other events.
- *
- * By default this will provide [DefaultDebugIndication].
- */
-@Deprecated(
-    "Renamed to LocalIndication",
-    replaceWith = ReplaceWith(
-        "LocalIndication",
-        "androidx.compose.foundation.LocalIndication"
-    )
-)
-val AmbientIndication get() = LocalIndication
-
-/**
  * CompositionLocal that provides an [Indication] through the hierarchy. This [Indication] will
  * be used by default to draw visual effects for interactions such as press and drag in components
  * such as [clickable].

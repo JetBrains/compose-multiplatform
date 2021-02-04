@@ -31,8 +31,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.AmbientHapticFeedback
-import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.hasTestTag
@@ -63,7 +63,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 
-@Suppress("DEPRECATION")
 @OptIn(InternalTextApi::class)
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -161,8 +160,8 @@ class SelectionContainerFocusTest {
         val layoutDirection = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
         rule.setContent {
             Providers(
-                AmbientHapticFeedback provides hapticFeedback,
-                AmbientLayoutDirection provides layoutDirection
+                LocalHapticFeedback provides hapticFeedback,
+                LocalLayoutDirection provides layoutDirection
             ) {
                 Column {
                     SelectionContainer(

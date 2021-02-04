@@ -21,10 +21,7 @@
 package androidx.compose.integration.docs.layout
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ConstraintLayout
-import androidx.compose.foundation.layout.ConstraintSet
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,7 +33,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.integration.docs.layout.LayoutSnippet12.firstBaselineToTop
-import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
@@ -48,7 +44,6 @@ import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layout
-import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -182,7 +177,9 @@ private object LayoutSnippet8 {
     }
 }
 
-/* ktlint-disable indent */
+// TODO: uncomment when constraint layout for compose releases, and add that dependency
+/* ktlint-disable indent *//*
+
 @Suppress("Deprecation")
 private object LayoutSnippet9 {
     @Composable
@@ -192,7 +189,9 @@ private object LayoutSnippet9 {
             val (button, text) = createRefs()
 
             Button(
-                onClick = { /* Do something */ },
+                onClick = { */
+/* Do something *//*
+ },
                 // Assign reference "button" to the Button composable
                 // and constrain it to the top of the ConstraintLayout
                 modifier = Modifier.constrainAs(button) {
@@ -210,11 +209,15 @@ private object LayoutSnippet9 {
         }
     }
 }
-/* ktlint-enable indent */
+*/
+/* ktlint-enable indent *//*
 
+
+*/
 /**
  * Decoupled API
- */
+ *//*
+
 @Suppress("Deprecation")
 private object LayoutSnippet10 {
     @Composable
@@ -228,7 +231,9 @@ private object LayoutSnippet10 {
 
             ConstraintLayout(constraints) {
                 Button(
-                    onClick = { /* Do something */ },
+                    onClick = { */
+/* Do something *//*
+ },
                     modifier = Modifier.layoutId("button")
                 ) {
                     Text("Button")
@@ -253,6 +258,7 @@ private object LayoutSnippet10 {
         }
     }
 }
+*/
 
 private object LayoutSnippet11 {
     /* Can't be compiled without returning layout() from Modifier.layout. See next snippet for

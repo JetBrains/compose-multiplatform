@@ -17,8 +17,6 @@
 package androidx.compose.foundation.layout
 
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
@@ -32,7 +30,6 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import kotlin.math.roundToInt
 
 /**
  * Offset the content by ([x] dp, [y] dp). The offsets can be positive as well as non-positive.
@@ -113,20 +110,6 @@ fun Modifier.offset(offset: Density.() -> IntOffset) = this.then(
     )
 )
 
-@Deprecated(
-    "offsetPx was deprecated. Please use offset with lambda parameters instead.",
-    ReplaceWith(
-        "offset({x.value}, {y.value})",
-        "androidx.compose.foundation.layout.offset",
-        "kotlin.math.roundToInt()"
-    )
-)
-@Suppress("ModifierInspectorInfo")
-fun Modifier.offsetPx(
-    x: State<Float> = mutableStateOf(0f),
-    y: State<Float> = mutableStateOf(0f)
-) = this.offset { IntOffset(x.value.roundToInt(), y.value.roundToInt()) }
-
 /**
  * Offset the content by [offset] px. The offsets can be positive as well as non-positive.
  * Applying an offset only changes the position of the content, without interfering with
@@ -155,20 +138,6 @@ fun Modifier.absoluteOffset(
         }
     )
 )
-
-@Deprecated(
-    "absoluteOffsetPx was deprecated. Please use absoluteOffset with lambda parameters instead.",
-    ReplaceWith(
-        "absoluteOffset({x.value.roundToInt()}, {y.value.roundToInt()})",
-        "androidx.compose.foundation.layout.absoluteOffset",
-        "kotlin.math.roundToInt"
-    )
-)
-@Suppress("ModifierInspectorInfo")
-fun Modifier.absoluteOffsetPx(
-    x: State<Float> = mutableStateOf(0f),
-    y: State<Float> = mutableStateOf(0f)
-) = this.absoluteOffset { IntOffset(x.value.roundToInt(), y.value.roundToInt()) }
 
 private class OffsetModifier(
     val x: Dp,

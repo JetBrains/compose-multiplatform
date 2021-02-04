@@ -22,12 +22,10 @@ import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.animation.smoothScrollBy
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayout
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -46,11 +44,9 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.samples.StickyHeaderSample
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.material.Button
-import androidx.compose.material.LocalContentColor
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -141,8 +137,7 @@ private fun ListHoistedStateDemo() {
     val state = rememberLazyListState(interactionState = interactionState)
     var lastScrollDescription: String by remember { mutableStateOf("") }
     Column {
-        @Suppress("DEPRECATION")
-        FlowRow {
+        Row {
             val buttonModifier = Modifier.padding(8.dp)
             val density = LocalDensity.current
             val coroutineScope = rememberCoroutineScope()
@@ -204,18 +199,6 @@ private fun ListHoistedStateDemo() {
                 Text("$it", style = LocalTextStyle.current.copy(fontSize = 40.sp))
             }
         }
-    }
-}
-
-@Composable
-fun Button(modifier: Modifier = Modifier, onClick: () -> Unit, content: @Composable () -> Unit) {
-    Box(
-        modifier
-            .clickable(onClick = onClick)
-            .background(Color(0xFF6200EE), RoundedCornerShape(4.dp))
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-    ) {
-        Providers(LocalContentColor provides Color.White, content = content)
     }
 }
 

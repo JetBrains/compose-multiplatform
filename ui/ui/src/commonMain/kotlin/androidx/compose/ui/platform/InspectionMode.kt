@@ -22,17 +22,4 @@ import androidx.compose.runtime.staticCompositionLocalOf
  * Inspectable mode CompositionLocal. True if the composition is composed inside a Inspectable
  * component.
  */
-@Deprecated(
-    "Renamed to LocalInspectionMode",
-    replaceWith = ReplaceWith(
-        "LocalInspectionMode",
-        "androidx.compose.ui.platform.LocalInspectionMode"
-    )
-)
-val InspectionMode get() = LocalInspectionMode
-
-/**
- * Inspectable mode CompositionLocal. True if the composition is composed inside a Inspectable
- * component.
- */
 val LocalInspectionMode = staticCompositionLocalOf { false }
