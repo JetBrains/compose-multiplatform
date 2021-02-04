@@ -479,8 +479,6 @@ package androidx.compose.ui.graphics {
 
   public static final class Outline.Generic extends androidx.compose.ui.graphics.Outline {
     ctor public Outline.Generic(androidx.compose.ui.graphics.Path path);
-    method public androidx.compose.ui.graphics.Path component1();
-    method public androidx.compose.ui.graphics.Outline.Generic copy(androidx.compose.ui.graphics.Path path);
     method public androidx.compose.ui.geometry.Rect getBounds();
     method public androidx.compose.ui.graphics.Path getPath();
     property public androidx.compose.ui.geometry.Rect bounds;
@@ -489,8 +487,6 @@ package androidx.compose.ui.graphics {
 
   @androidx.compose.runtime.Immutable public static final class Outline.Rectangle extends androidx.compose.ui.graphics.Outline {
     ctor public Outline.Rectangle(androidx.compose.ui.geometry.Rect rect);
-    method public androidx.compose.ui.geometry.Rect component1();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.graphics.Outline.Rectangle copy(androidx.compose.ui.geometry.Rect rect);
     method public androidx.compose.ui.geometry.Rect getBounds();
     method public androidx.compose.ui.geometry.Rect getRect();
     property public androidx.compose.ui.geometry.Rect bounds;
@@ -499,8 +495,6 @@ package androidx.compose.ui.graphics {
 
   @androidx.compose.runtime.Immutable public static final class Outline.Rounded extends androidx.compose.ui.graphics.Outline {
     ctor public Outline.Rounded(androidx.compose.ui.geometry.RoundRect roundRect);
-    method public androidx.compose.ui.geometry.RoundRect component1();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.graphics.Outline.Rounded copy(androidx.compose.ui.geometry.RoundRect roundRect);
     method public androidx.compose.ui.geometry.Rect getBounds();
     method public androidx.compose.ui.geometry.RoundRect getRoundRect();
     property public androidx.compose.ui.geometry.Rect bounds;
