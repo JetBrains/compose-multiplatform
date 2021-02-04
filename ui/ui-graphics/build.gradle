@@ -136,8 +136,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
         freeCompilerArgs += [
-            "-XXLanguage:+InlineClasses",
-            "-Xallow-jvm-ir-dependencies"
+            "-XXLanguage:+InlineClasses"
         ]
     }
 }
