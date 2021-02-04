@@ -16,14 +16,13 @@
 
 package androidx.compose.ui.inspection.compose
 
+import androidx.compose.ui.inspection.inspector.InspectorNode
+import androidx.compose.ui.inspection.inspector.LayoutInspectorTree
+import androidx.compose.ui.inspection.inspector.NodeParameter
 import androidx.compose.ui.inspection.util.ThreadUtils
-import androidx.compose.ui.tooling.inspector.InspectorNode
-import androidx.compose.ui.tooling.inspector.LayoutInspectorTree
-import androidx.compose.ui.tooling.inspector.NodeParameter
-import androidx.compose.ui.tooling.inspector.RawParameter
 
 /**
- * Convert a node's [RawParameter]s into [NodeParameter]s.
+ * Convert [InspectorNode] into [NodeParameter]s.
  *
  * This method can take a long time, especially the first time, and should be called off the main
  * thread.

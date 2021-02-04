@@ -22,7 +22,7 @@ import androidx.compose.ui.inspection.testdata.ParametersTestActivity
 import androidx.compose.ui.inspection.util.GetComposablesCommand
 import androidx.compose.ui.inspection.util.GetParametersCommand
 import androidx.compose.ui.inspection.util.toMap
-import androidx.test.filters.MediumTest
+import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetParametersResponse
@@ -30,7 +30,7 @@ import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Paramet
 import org.junit.Rule
 import org.junit.Test
 
-@MediumTest
+@LargeTest
 class ParametersTest {
     @get:Rule
     val rule = ComposeInspectionRule(ParametersTestActivity::class)
