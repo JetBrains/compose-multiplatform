@@ -16,7 +16,6 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.core.ManualAnimationClock
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.preferredSize
@@ -35,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -52,15 +50,8 @@ class SwipeToDismissTest {
     private val dismissContentTag = "dismissContent"
     private val swipeToDismissTag = "swipeToDismiss"
 
-    private lateinit var clock: ManualAnimationClock
-
     private fun advanceClock() {
-        clock.clockTimeMillis += 100000L
-    }
-
-    @Before
-    fun init() {
-        clock = ManualAnimationClock(initTimeMillis = 0L)
+        rule.mainClock.advanceTimeBy(100_000L)
     }
 
     @Test
@@ -123,8 +114,9 @@ class SwipeToDismissTest {
 
     @Test
     fun swipeToDismiss_dismissAndReset() {
-        val dismissState = DismissState(DismissValue.Default, clock)
+        lateinit var dismissState: DismissState
         rule.setContent {
+            dismissState = rememberDismissState(DismissValue.Default)
             SwipeToDismiss(
                 state = dismissState,
                 background = { },
@@ -176,8 +168,9 @@ class SwipeToDismissTest {
 
     @Test
     fun swipeToDismiss_dismissBySwipe_toEnd() {
-        val dismissState = DismissState(DismissValue.Default, clock)
+        lateinit var dismissState: DismissState
         rule.setContent {
+            dismissState = rememberDismissState(DismissValue.Default)
             SwipeToDismiss(
                 modifier = Modifier.testTag(swipeToDismissTag),
                 state = dismissState,
@@ -198,8 +191,9 @@ class SwipeToDismissTest {
 
     @Test
     fun swipeToDismiss_dismissBySwipe_toStart() {
-        val dismissState = DismissState(DismissValue.Default, clock)
+        lateinit var dismissState: DismissState
         rule.setContent {
+            dismissState = rememberDismissState(DismissValue.Default)
             SwipeToDismiss(
                 modifier = Modifier.testTag(swipeToDismissTag),
                 state = dismissState,
@@ -220,8 +214,9 @@ class SwipeToDismissTest {
 
     @Test
     fun swipeToDismiss_dismissBySwipe_toEnd_rtl() {
-        val dismissState = DismissState(DismissValue.Default, clock)
+        lateinit var dismissState: DismissState
         rule.setContent {
+            dismissState = rememberDismissState(DismissValue.Default)
             Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 SwipeToDismiss(
                     modifier = Modifier.testTag(swipeToDismissTag),
@@ -244,8 +239,9 @@ class SwipeToDismissTest {
 
     @Test
     fun swipeToDismiss_dismissBySwipe_toStart_rtl() {
-        val dismissState = DismissState(DismissValue.Default, clock)
+        lateinit var dismissState: DismissState
         rule.setContent {
+            dismissState = rememberDismissState(DismissValue.Default)
             Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 SwipeToDismiss(
                     modifier = Modifier.testTag(swipeToDismissTag),
@@ -268,8 +264,9 @@ class SwipeToDismissTest {
 
     @Test
     fun swipeToDismiss_dismissBySwipe_disabled() {
-        val dismissState = DismissState(DismissValue.Default, clock)
+        lateinit var dismissState: DismissState
         rule.setContent {
+            dismissState = rememberDismissState(DismissValue.Default)
             SwipeToDismiss(
                 modifier = Modifier.testTag(swipeToDismissTag),
                 state = dismissState,
