@@ -44,7 +44,7 @@ enum class Orientation {
  * [onCancel] to use
  * this correctly.
  */
-class ScrollOrientationLocker(private val customEventDispatcher: CustomEventDispatcher) {
+internal class ScrollOrientationLocker(private val customEventDispatcher: CustomEventDispatcher) {
 
     private var locker: InternalScrollOrientationLocker? = null
     private var lockerOwner = false

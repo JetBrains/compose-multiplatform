@@ -47,12 +47,10 @@ class ScrollGestureFilterComposeTest {
     @Test
     fun testInspectorValue() {
         val scrollCallback = object : ScrollCallback {}
-        val canDrag: (Direction) -> Boolean = { true }
         rule.setContent {
             val modifier = Modifier.scrollGestureFilter(
                 scrollCallback,
                 Orientation.Vertical,
-                canDrag,
                 true
             ) as InspectableValue
 
@@ -61,7 +59,6 @@ class ScrollGestureFilterComposeTest {
             assertThat(modifier.inspectableElements.asIterable()).containsExactly(
                 ValueElement("scrollCallback", scrollCallback),
                 ValueElement("orientation", Orientation.Vertical),
-                ValueElement("canDrag", canDrag),
                 ValueElement("startDragImmediately", true),
             )
         }

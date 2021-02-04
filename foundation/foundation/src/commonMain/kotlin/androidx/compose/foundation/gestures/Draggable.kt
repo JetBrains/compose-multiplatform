@@ -25,7 +25,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.gesture.util.VelocityTracker
 import androidx.compose.ui.input.pointer.PointerInputChange
@@ -45,7 +44,8 @@ import kotlin.math.sign
  * The common usecase for this component is when you need to be able to drag something
  * inside the component on the screen and represent this state via one float value
  *
- * If you need to control the whole dragging flow, consider using [dragGestureFilter] instead.
+ * If you need to control the whole dragging flow, consider using [pointerInput] instead with the
+ * helper functions like [detectDragGestures].
  *
  * If you are implementing scroll/fling behavior, consider using [scrollable].
  *
