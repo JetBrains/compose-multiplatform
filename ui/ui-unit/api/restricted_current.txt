@@ -96,7 +96,7 @@ package androidx.compose.ui.unit {
   }
 
   public final class DpKt {
-    method @androidx.compose.runtime.Stable public static inline long DpOffset-ioHfwGI(float x, float y);
+    method @androidx.compose.runtime.Stable public static long DpOffset-ioHfwGI(float x, float y);
     method @androidx.compose.runtime.Stable public static inline float coerceAtLeast-ioHfwGI(float, float minimumValue);
     method @androidx.compose.runtime.Stable public static inline float coerceAtMost-ioHfwGI(float, float maximumValue);
     method @androidx.compose.runtime.Stable public static inline float coerceIn-qYQSm_w(float, float minimumValue, float maximumValue);
@@ -120,7 +120,6 @@ package androidx.compose.ui.unit {
 
   @androidx.compose.runtime.Immutable public final inline class DpOffset {
     ctor public DpOffset();
-    method public static long constructor-impl(long packedValue);
     method public static long copy-ioHfwGI(long $this, optional float x, optional float y);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
     method public static boolean equals-impl0(long p1, long p2);
@@ -162,7 +161,6 @@ package androidx.compose.ui.unit {
     ctor public IntOffset();
     method @androidx.compose.runtime.Stable public static operator int component1-impl(long $this);
     method @androidx.compose.runtime.Stable public static operator int component2-impl(long $this);
-    method public static long constructor-impl(long packedValue);
     method public static long copy-nOcc-ac(long $this, optional int x, optional int y);
     method @androidx.compose.runtime.Stable public static operator long div-nOcc-ac(long $this, float operand);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
@@ -185,7 +183,7 @@ package androidx.compose.ui.unit {
   }
 
   public final class IntOffsetKt {
-    method @androidx.compose.runtime.Stable public static inline long IntOffset(int x, int y);
+    method @androidx.compose.runtime.Stable public static long IntOffset(int x, int y);
     method @androidx.compose.runtime.Stable public static long lerp-t0UgTr0(long start, long stop, float fraction);
     method @androidx.compose.runtime.Stable public static operator long minus-k5bmQ1s(long, long offset);
     method @androidx.compose.runtime.Stable public static operator long minus-tRj9Ofw(long, long offset);
@@ -266,7 +264,6 @@ package androidx.compose.ui.unit {
     ctor public IntSize();
     method @androidx.compose.runtime.Stable public static inline operator int component1-impl(long $this);
     method @androidx.compose.runtime.Stable public static inline operator int component2-impl(long $this);
-    method public static long constructor-impl(long packedValue);
     method @androidx.compose.runtime.Stable public static operator long div-YbymL2g(long $this, int other);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
     method public static boolean equals-impl0(long p1, long p2);
@@ -299,7 +296,6 @@ package androidx.compose.ui.unit {
   @androidx.compose.runtime.Immutable public final inline class TextUnit {
     ctor public TextUnit();
     method public static inline operator int compareTo--R2X_6o(long $this, long other);
-    method public static long constructor-impl(long packedValue);
     method public static inline operator long div-XSAIIZE(long $this, float other);
     method public static inline operator long div-XSAIIZE(long $this, double other);
     method public static inline operator long div-XSAIIZE(long $this, int other);
@@ -338,7 +334,7 @@ package androidx.compose.ui.unit {
     method public static inline boolean isSpecified--R2X_6o(long);
     method public static boolean isUnspecified--R2X_6o(long);
     method @androidx.compose.runtime.Stable public static long lerp-KeuwX78(long start, long stop, float fraction);
-    method @kotlin.PublishedApi internal static inline long pack(long unitType, float v);
+    method @kotlin.PublishedApi internal static long pack(long unitType, float v);
     method public static inline long takeOrElse-bAewZlA(long, kotlin.jvm.functions.Function0<androidx.compose.ui.unit.TextUnit> block);
     method @androidx.compose.runtime.Stable public static inline operator long times-0PRCd3Q(double, long other);
     method @androidx.compose.runtime.Stable public static inline operator long times-Ew26DjI(float, long other);
@@ -355,7 +351,6 @@ package androidx.compose.ui.unit {
     ctor public Velocity();
     method @androidx.compose.runtime.Stable public static operator float component1-impl(long $this);
     method @androidx.compose.runtime.Stable public static operator float component2-impl(long $this);
-    method public static long constructor-impl(long packedValue);
     method public static long copy-9UxMQ8M(long $this, optional float x, optional float y);
     method @androidx.compose.runtime.Stable public static operator long div-9UxMQ8M(long $this, float operand);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
@@ -380,7 +375,7 @@ package androidx.compose.ui.unit {
   }
 
   public final class VelocityKt {
-    method @androidx.compose.runtime.Stable public static inline long Velocity(float x, float y);
+    method @androidx.compose.runtime.Stable public static long Velocity(float x, float y);
   }
 
 }

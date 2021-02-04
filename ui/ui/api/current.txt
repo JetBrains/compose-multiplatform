@@ -493,7 +493,6 @@ package androidx.compose.ui.graphics {
     ctor public TransformOrigin();
     method @androidx.compose.runtime.Stable public static inline operator float component1-impl(long $this);
     method @androidx.compose.runtime.Stable public static inline operator float component2-impl(long $this);
-    method public static long constructor-impl(long packedValue);
     method public static long copy-SzJe1aQ(long $this, optional float pivotFractionX, optional float pivotFractionY);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
     method public static boolean equals-impl0(long p1, long p2);
@@ -510,7 +509,7 @@ package androidx.compose.ui.graphics {
   }
 
   public final class TransformOriginKt {
-    method public static inline long TransformOrigin(float pivotFractionX, float pivotFractionY);
+    method public static long TransformOrigin(float pivotFractionX, float pivotFractionY);
   }
 
 }
@@ -1812,7 +1811,6 @@ package androidx.compose.ui.layout {
     ctor public ScaleFactor();
     method @androidx.compose.runtime.Stable public static inline operator float component1-impl(long $this);
     method @androidx.compose.runtime.Stable public static inline operator float component2-impl(long $this);
-    method public static long constructor-impl(long packedValue);
     method public static long copy-_hLwfpc(long $this, optional float scaleX, optional float scaleY);
     method @androidx.compose.runtime.Stable public static operator long div-_hLwfpc(long $this, float operand);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
