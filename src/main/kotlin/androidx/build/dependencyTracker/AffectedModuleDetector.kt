@@ -105,7 +105,8 @@ abstract class AffectedModuleDetector(
         const val BASE_COMMIT_ARG = "androidx.affectedModuleDetector.baseCommit"
         @JvmStatic
         fun configure(gradle: Gradle, rootProject: Project) {
-            val enabled = rootProject.hasProperty(ENABLE_ARG)
+            val enabled = rootProject.hasProperty(ENABLE_ARG) &&
+                rootProject.findProperty(ENABLE_ARG) != "false"
             val subset = when {
                 rootProject.hasProperty(DEPENDENT_PROJECTS_ARG) -> ProjectSubset.DEPENDENT_PROJECTS
                 rootProject.hasProperty(CHANGED_PROJECTS_ARG) -> ProjectSubset.CHANGED_PROJECTS
@@ -500,6 +501,10 @@ class AffectedModuleDetectorImpl constructor(
             ), // Link graphics and material to always run @Large in presubmit per b/160624022
             setOf(
                 ":compose:ui:ui-graphics",
+                ":compose:material:material"
+            ), // Link material and material-ripple
+            setOf(
+                ":compose:material:material-ripple",
                 ":compose:material:material"
             ),
             setOf(

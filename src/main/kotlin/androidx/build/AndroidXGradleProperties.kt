@@ -38,6 +38,11 @@ const val DISPLAY_TEST_OUTPUT = "androidx.displayTestOutput"
 const val ALL_WARNINGS_AS_ERRORS = "androidx.allWarningsAsErrors"
 
 /**
+ * Setting this property changes "url" property in publishing maven artifact metadata
+ */
+const val ALTERNATIVE_PROJECT_URL = "androidx.alternativeProjectUrl"
+
+/**
  * Check that version extra meets the specified rules
  * (version is in format major.minor.patch-extra)
  */
@@ -62,6 +67,12 @@ const val ENABLE_DOCUMENTATION = "androidx.enableDocumentation"
  * Setting this property puts a summary of the relevant failure messages into standard error
  */
 const val SUMMARIZE_STANDARD_ERROR = "androidx.summarizeStderr"
+
+/**
+ * Setting this property indicates that a build is being performed to check for forward
+ * compatibility.
+ */
+const val USE_MAX_DEP_VERSIONS = "androidx.useMaxDepVersions"
 
 /**
  * Setting this property enables writing versioned API files
@@ -98,6 +109,7 @@ const val EXPERIMENTAL_KOTLIN_BACKEND_ENABLED = "androidx.experimentalKotlinBack
 
 val ALL_ANDROIDX_PROPERTIES = setOf(
     ALL_WARNINGS_AS_ERRORS,
+    ALTERNATIVE_PROJECT_URL,
     VERSION_EXTRA_CHECK_ENABLED,
     COMPOSE_MPP_ENABLED,
     COVERAGE_ENABLED,
@@ -105,6 +117,7 @@ val ALL_ANDROIDX_PROPERTIES = setOf(
     ENABLE_DOCUMENTATION,
     STUDIO_TYPE,
     SUMMARIZE_STANDARD_ERROR,
+    USE_MAX_DEP_VERSIONS,
     TEST_FAILURES_DO_NOT_FAIL_TEST_TASK,
     VALIDATE_NO_UNRECOGNIZED_MESSAGES,
     WRITE_VERSIONED_API_FILES,
@@ -118,6 +131,15 @@ val ALL_ANDROIDX_PROPERTIES = setOf(
     PLAYGROUND_DOKKA_BUILD_ID,
     EXPERIMENTAL_KOTLIN_BACKEND_ENABLED
 )
+
+/**
+ * Returns alternative project url that will be used as "url" property
+ * in publishing maven artifact metadata.
+ *
+ * Returns null if there is no alternative project url.
+ */
+fun Project.getAlternativeProjectUrl(): String? =
+    project.findProperty(ALTERNATIVE_PROJECT_URL) as? String
 
 /**
  * Check that version extra meets the specified rules
@@ -177,10 +199,21 @@ fun Project.isDocumentationEnabled(): Boolean {
 }
 
 /**
+ * Returns whether the build is for checking forward compatibility across projets
+ */
+fun Project.usingMaxDepVersions(): Boolean {
+    return project.hasProperty(USE_MAX_DEP_VERSIONS)
+}
+
+/**
  * Returns whether the project has coverage enabled.
  */
-fun Project.isCoverageEnabled(): Boolean =
-    (project.findProperty(COVERAGE_ENABLED) as? String)?.toBoolean() ?: false
+fun Project.isCoverageEnabled(): Boolean {
+    if (project.usingMaxDepVersions()) {
+        return false
+    }
+    return (project.findProperty(COVERAGE_ENABLED) as? String)?.toBoolean() ?: false
+}
 
 /**
  * Returns the Studio type for the project's studio task

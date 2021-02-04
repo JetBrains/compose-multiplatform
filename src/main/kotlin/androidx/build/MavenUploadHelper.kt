@@ -174,10 +174,11 @@ private fun Project.addInformativeMetadata(pom: MavenPom, extension: AndroidXExt
     pom.description.set(provider { extension.description })
     pom.url.set(
         provider {
-            "https://developer.android.com/jetpack/androidx/releases/" +
+            fun defaultUrl() = "https://developer.android.com/jetpack/androidx/releases/" +
                 extension.mavenGroup!!.group.removePrefix("androidx.")
                     .replace(".", "-") +
                 "#" + extension.project.version()
+            getAlternativeProjectUrl() ?: defaultUrl()
         }
     )
     pom.inceptionYear.set(provider { extension.inceptionYear })

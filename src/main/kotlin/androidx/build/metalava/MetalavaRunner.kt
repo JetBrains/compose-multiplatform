@@ -77,7 +77,7 @@ abstract class MetalavaWorkAction @Inject constructor (
 
 fun Project.getMetalavaClasspath(): FileCollection {
     val configuration = configurations.findByName("metalava") ?: configurations.create("metalava") {
-        val dependency = dependencies.create("com.android.tools.metalava:metalava:1.0.0-alpha02")
+        val dependency = dependencies.create("com.android.tools.metalava:metalava:1.0.0-alpha03")
         it.dependencies.add(dependency)
     }
     return project.files(configuration)
@@ -108,9 +108,7 @@ fun getApiLintArgs(targetsJavaConsumers: Boolean): List<String> {
             "ParcelableList", // This check is only relevant to android platform that has managers.
 
             // List of checks that have bugs, but should be enabled once fixed.
-            "GetterSetterNames", // b/135498039
             "StaticUtils", // b/135489083
-            "AllUpper", // b/135708486
             "StartWithLower", // b/135710527
 
             // The list of checks that are API lint warnings and are yet to be enabled
@@ -123,6 +121,8 @@ fun getApiLintArgs(targetsJavaConsumers: Boolean): List<String> {
         ).joinToString(),
         "--error",
         listOf(
+            "AllUpper",
+            "GetterSetterNames",
             "MinMaxConstant",
             "TopLevelBuilder",
             "BuilderSetStyle",
@@ -322,8 +322,9 @@ fun getGenerateApiArgs(
                     """
     ${TERMINAL_RED}Your change has API lint issues. Fix the code according to the messages above.$TERMINAL_RESET
 
-    If a check is broken, suppress it in code with @Suppress("id")/@SuppressWarnings("id")
-    and file bug to https://issuetracker.google.com/issues/new?component=739152&template=1344623
+    If a check is broken, suppress it in code in Kotlin with @Suppress("id")/@get:Suppress("id")
+    and in Java with @SuppressWarnings("id") and file bug to
+    https://issuetracker.google.com/issues/new?component=739152&template=1344623
 
     If you are doing a refactoring or suppression above does not work, use ./gradlew updateApiLintBaseline
 """

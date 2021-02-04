@@ -160,7 +160,7 @@ open class AndroidXExtension(val project: Project) {
             shouldConfigureApiTasks()
     }
 
-    fun license(closure: Closure<*>): License {
+    fun license(closure: Closure<Any>): License {
         val license = project.configure(License(), closure) as License
         licenses.add(license)
         return license

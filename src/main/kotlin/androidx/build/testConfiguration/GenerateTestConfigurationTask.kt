@@ -46,11 +46,18 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
     @get:Internal
     abstract val appLoader: Property<BuiltArtifactsLoader>
 
+    @get:Input
+    @get:Optional
+    abstract val appProjectPath: Property<String>
+
     @get:InputFiles
     abstract val testFolder: DirectoryProperty
 
     @get:Internal
     abstract val testLoader: Property<BuiltArtifactsLoader>
+
+    @get:Input
+    abstract val testProjectPath: Property<String>
 
     @get:Input
     abstract val minSdk: Property<Int>
@@ -60,9 +67,6 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
 
     @get:Input
     abstract val testRunner: Property<String>
-
-    @get:Input
-    abstract val projectPath: Property<String>
 
     @get:Input
     abstract val affectedModuleDetectorSubset: Property<ProjectSubset>
@@ -86,16 +90,28 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
         if (appLoader.isPresent) {
             val appApk = appLoader.get().load(appFolder.get())
                 ?: throw RuntimeException("Cannot load required APK for task: $name")
+            // We don't need to check hasBenchmarkPlugin because benchmarks shouldn't have test apps
             val appName = appApk.elements.single().outputFile.substringAfterLast("/")
-                .renameApkForTesting(projectPath.get(), hasBenchmarkPlugin.get())
-            configBuilder.appApkName(appName)
+                .renameApkForTesting(appProjectPath.get(), hasBenchmarkPlugin = false)
+            // TODO(b/178776319)
+            if (appProjectPath.get().contains("macrobenchmark-target")) {
+                configBuilder.appApkName(appName.replace("debug-androidTest", "release"))
+            } else {
+                configBuilder.appApkName(appName)
+            }
         }
-        val isPostsubmit: Boolean = when (affectedModuleDetectorSubset.get()) {
-            ProjectSubset.CHANGED_PROJECTS, ProjectSubset.ALL_AFFECTED_PROJECTS -> {
-                true
+        when (affectedModuleDetectorSubset.get()) {
+            ProjectSubset.CHANGED_PROJECTS -> {
+                configBuilder.isPostsubmit(false)
+                configBuilder.runFullTests(true)
+            }
+            ProjectSubset.ALL_AFFECTED_PROJECTS -> {
+                configBuilder.isPostsubmit(true)
+                configBuilder.runFullTests(true)
             }
             ProjectSubset.DEPENDENT_PROJECTS -> {
-                false
+                configBuilder.isPostsubmit(false)
+                configBuilder.runFullTests(false)
             }
             else -> {
                 throw IllegalStateException(
@@ -104,22 +120,26 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
                 )
             }
         }
-        configBuilder.isPostsubmit(isPostsubmit)
         if (hasBenchmarkPlugin.get()) {
             configBuilder.isBenchmark(true)
-            if (isPostsubmit) {
+            if (configBuilder.isPostsubmit) {
                 configBuilder.tag("microbenchmarks")
             } else {
                 configBuilder.tag("microbenchmarks_presubmit")
             }
-        } else if (projectPath.get().endsWith("macrobenchmark")) {
+        } else if (testProjectPath.get().endsWith("macrobenchmark")) {
             configBuilder.tag("macrobenchmarks")
+        } else {
+            configBuilder.tag("androidx_unit_tests")
+            if (project.path.contains(":compose:")) {
+                configBuilder.tag("compose")
+            }
         }
         val testApk = testLoader.get().load(testFolder.get())
             ?: throw RuntimeException("Cannot load required APK for task: $name")
         val testName = testApk.elements.single().outputFile
             .substringAfterLast("/")
-            .renameApkForTesting(projectPath.get(), hasBenchmarkPlugin.get())
+            .renameApkForTesting(testProjectPath.get(), hasBenchmarkPlugin.get())
         configBuilder.testApkName(testName)
             .applicationId(testApk.applicationId)
             .minSdk(minSdk.get().toString())
