@@ -46,6 +46,7 @@ dependencies {
     implementation(KOTLIN_STDLIB)
     implementation(KOTLIN_REFLECT)
     implementation(ANDROIDX_TEST_RULES)
+    implementation(ESPRESSO_CORE)
     implementation(JUNIT)
     implementation(TRUTH)
 }
