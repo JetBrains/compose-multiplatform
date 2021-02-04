@@ -33,6 +33,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -50,6 +51,7 @@ class RecomposerTests : BaseComposeTest() {
     override val activityRule = makeTestActivityRule()
 
     @Test
+    @Ignore("b/179279455")
     fun testNativeViewWithAttributes() {
         compose {
             TextView(id = 456, text = "some text")
@@ -64,6 +66,7 @@ class RecomposerTests : BaseComposeTest() {
     }
 
     @Test
+    @Ignore("b/179279455")
     fun testSlotKeyChangeCausesRecreate() {
         var i = 1
         var tv1: TextView? = null
@@ -98,6 +101,7 @@ class RecomposerTests : BaseComposeTest() {
     }
 
     @Test
+    @Ignore("b/179279455")
     fun testViewWithViewChildren() {
         compose {
             LinearLayout(id = 345) {
@@ -126,6 +130,7 @@ class RecomposerTests : BaseComposeTest() {
     }
 
     @Test
+    @Ignore("b/179279455")
     fun testForLoop() {
         val items = listOf(1, 2, 3, 4, 5, 6)
         compose {
@@ -152,6 +157,7 @@ class RecomposerTests : BaseComposeTest() {
     }
 
     @Test
+    @Ignore("b/179279455")
     fun testRecompose() {
         val counter = Counter()
 
@@ -196,6 +202,7 @@ class RecomposerTests : BaseComposeTest() {
     }
 
     @Test
+    @Ignore("b/179279455")
     fun testRootRecompose() {
         val counter = Counter()
         val trigger = Trigger()
@@ -294,6 +301,7 @@ class RecomposerTests : BaseComposeTest() {
     }
 
     @Test
+    @Ignore("b/179279455")
     fun testCorrectViewTree() {
         compose {
             LinearLayout {
@@ -315,6 +323,7 @@ class RecomposerTests : BaseComposeTest() {
     }
 
     @Test
+    @Ignore("b/179279455")
     fun testCorrectViewTreeWithComponents() {
 
         @Composable fun B() {
@@ -348,6 +357,7 @@ class RecomposerTests : BaseComposeTest() {
     }
 
     @Test
+    @Ignore("b/179279455")
     fun testCorrectViewTreeWithComponentWithMultipleRoots() {
 
         @Composable fun B() {

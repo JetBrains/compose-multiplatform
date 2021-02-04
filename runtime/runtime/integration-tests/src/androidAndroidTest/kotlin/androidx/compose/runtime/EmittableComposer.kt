@@ -16,54 +16,29 @@
 package androidx.compose.runtime
 
 import android.view.View
-import android.widget.Button
 import android.widget.LinearLayout
-import android.widget.TextView
-import androidx.compose.ui.viewinterop.emitView
 
+@Suppress("UNUSED_PARAMETER")
 @Composable
 fun TextView(
     id: Int = 0,
     text: String = "",
     onClickListener: View.OnClickListener? = null
-) {
-    @Suppress("Deprecation")
-    emitView(::TextView) {
-        if (id != 0) it.id = id
-        it.text = text
-        if (onClickListener != null) it.setOnClickListener(onClickListener)
-    }
-}
+) {}
 
+@Suppress("UNUSED_PARAMETER")
 @Composable
 fun Button(
     id: Int = 0,
     text: String = "",
     onClickListener: View.OnClickListener? = null
-) {
-    @Suppress("Deprecation")
-    emitView(::Button) {
-        if (id != 0) it.id = id
-        it.text = text
-        if (onClickListener != null) it.setOnClickListener(onClickListener)
-    }
-}
+) {}
 
+@Suppress("UNUSED_PARAMETER")
 @Composable
 fun LinearLayout(
     id: Int = 0,
     orientation: Int = LinearLayout.VERTICAL,
     onClickListener: View.OnClickListener? = null,
     content: @Composable () -> Unit
-) {
-    @Suppress("Deprecation")
-    emitView(
-        ::LinearLayout,
-        {
-            if (id != 0) it.id = id
-            if (onClickListener != null) it.setOnClickListener(onClickListener)
-            it.orientation = orientation
-        },
-        content
-    )
-}
+) {}

@@ -23,6 +23,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import junit.framework.TestCase
 import org.junit.After
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -40,6 +41,7 @@ class NewCodeGenTests : BaseComposeTest() {
     override val activityRule = makeTestActivityRule()
 
     @Test
+    @Ignore("b/179279455")
     fun testStaticComposition() {
         val tv1Id = 100
         val tv2Id = 200
@@ -61,6 +63,7 @@ class NewCodeGenTests : BaseComposeTest() {
     }
 
     @Test
+    @Ignore("b/179279455")
     fun testUpdatedComposition() {
         val tv1Id = 100
         val tv2Id = 200
@@ -91,6 +94,7 @@ class NewCodeGenTests : BaseComposeTest() {
     }
 
     @Test
+    @Ignore("b/179279455")
     fun testSingleView() {
         val tvId = 237
         var text by mutableStateOf("Hello world")
@@ -110,6 +114,7 @@ class NewCodeGenTests : BaseComposeTest() {
     }
 
     @Test
+    @Ignore("b/179279455")
     fun testViewGroup() {
         val tvId = 258
         val llId = 260
@@ -142,6 +147,7 @@ class NewCodeGenTests : BaseComposeTest() {
     }
 
     @Test
+    @Ignore("b/179279455")
     fun testComposableFunctionInvocationOneParameter() {
         data class Phone(val area: String, val prefix: String, val number: String)
 
@@ -178,6 +184,7 @@ class NewCodeGenTests : BaseComposeTest() {
     }
 
     @Test
+    @Ignore("b/179279455")
     fun testComposableFunctionInvocationTwoParameters() {
         val tvId = 279
         var left by mutableStateOf(0)
@@ -245,6 +252,7 @@ class NewCodeGenTests : BaseComposeTest() {
     }
 
     @Test
+    @Ignore("b/179279455")
     fun testMoveComponents() {
         var data by mutableStateOf(listOf(1, 2, 3, 4, 5))
         compose {
