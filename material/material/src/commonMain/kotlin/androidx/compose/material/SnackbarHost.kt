@@ -14,23 +14,19 @@
  * limitations under the License.
  */
 
-@file:Suppress("DEPRECATION")
-
 package androidx.compose.material
 
-import androidx.compose.animation.animatedFloat
-import androidx.compose.animation.core.AnimatedFloat
-import androidx.compose.animation.core.AnimationEndReason
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.RecomposeScope
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -319,36 +315,28 @@ private fun animatedOpacity(
     animation: AnimationSpec<Float>,
     visible: Boolean,
     onAnimationFinish: () -> Unit = {}
-): AnimatedFloat {
-    val animatedFloat = animatedFloat(if (!visible) 1f else 0f)
-    DisposableEffect(visible) {
-        animatedFloat.animateTo(
+): State<Float> {
+    val alpha = remember { Animatable(if (!visible) 1f else 0f) }
+    LaunchedEffect(visible) {
+        alpha.animateTo(
             if (visible) 1f else 0f,
-            anim = animation,
-            onEnd = { reason, _ ->
-                if (reason == AnimationEndReason.TargetReached) onAnimationFinish()
-            }
+            animationSpec = animation
         )
-        onDispose {
-            animatedFloat.stop()
-        }
+        onAnimationFinish()
     }
-    return animatedFloat
+    return alpha.asState()
 }
 
 @Composable
-private fun animatedScale(animation: AnimationSpec<Float>, visible: Boolean): AnimatedFloat {
-    val animatedFloat = animatedFloat(if (!visible) 1f else 0.8f)
-    DisposableEffect(visible) {
-        animatedFloat.animateTo(
+private fun animatedScale(animation: AnimationSpec<Float>, visible: Boolean): State<Float> {
+    val scale = remember { Animatable(if (!visible) 1f else 0.8f) }
+    LaunchedEffect(visible) {
+        scale.animateTo(
             if (visible) 1f else 0.8f,
-            anim = animation
+            animationSpec = animation
         )
-        onDispose {
-            animatedFloat.stop()
-        }
     }
-    return animatedFloat
+    return scale.asState()
 }
 
 private const val SnackbarFadeInMillis = 150
