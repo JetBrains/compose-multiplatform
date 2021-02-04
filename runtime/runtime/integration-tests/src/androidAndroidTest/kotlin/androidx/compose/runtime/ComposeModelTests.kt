@@ -26,6 +26,7 @@ import androidx.test.filters.MediumTest
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import org.junit.After
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -90,6 +91,7 @@ class ModelViewTests : BaseComposeTest() {
     override val activityRule = makeTestActivityRule()
 
     @Test
+    @Ignore("b/179279455")
     fun testModelView_Simple() {
         val tvId = 67
         compose {
@@ -101,6 +103,7 @@ class ModelViewTests : BaseComposeTest() {
     }
 
     @Test
+    @Ignore("b/179279455")
     fun testModelView_Simple_Recompose() {
         val tvId = 71
         compose {
@@ -115,6 +118,7 @@ class ModelViewTests : BaseComposeTest() {
     }
 
     @Test
+    @Ignore("b/179279455")
     fun testModelView_PersonModel() {
         val tvIdName = 90
         val tvIdAge = 91
@@ -143,6 +147,7 @@ class ModelViewTests : BaseComposeTest() {
     }
 
     @Test
+    @Ignore("b/179279455")
     fun testModelView_RecomposeScopeCleanup() {
         val washington = Person(
             PRESIDENT_NAME_1,
@@ -177,6 +182,7 @@ class ModelViewTests : BaseComposeTest() {
 
     // b/122548164
     @Test
+    @Ignore("b/179279455")
     fun testObserverEntering() {
         val president = Person(
             PRESIDENT_NAME_1,
@@ -204,6 +210,7 @@ class ModelViewTests : BaseComposeTest() {
     }
 
     @Test
+    @Ignore("b/179279455")
     fun testModelUpdatesNextFrameVisibility() {
         val president = Person(
             PRESIDENT_NAME_1,
