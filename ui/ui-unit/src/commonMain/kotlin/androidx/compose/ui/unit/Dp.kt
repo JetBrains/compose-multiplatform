@@ -326,7 +326,7 @@ fun lerp(start: DpOffset, stop: DpOffset, fraction: Float): DpOffset =
  * A four dimensional bounds using [Dp] for units
  */
 @Immutable
-data class Bounds(
+data class DpRect(
     @Stable
     val left: Dp,
     @Stable
@@ -343,10 +343,10 @@ data class Bounds(
  * A width of this Bounds in [Dp].
  */
 @Stable
-inline val Bounds.width: Dp get() = right - left
+inline val DpRect.width: Dp get() = right - left
 
 /**
  * A height of this Bounds in [Dp].
  */
 @Stable
-inline val Bounds.height: Dp get() = bottom - top
+inline val DpRect.height: Dp get() = bottom - top

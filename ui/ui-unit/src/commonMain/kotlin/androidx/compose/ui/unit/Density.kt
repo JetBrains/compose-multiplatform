@@ -131,10 +131,10 @@ interface Density {
     fun Float.toSp(): TextUnit = (this / (fontScale * density)).sp
 
     /**
-     * Convert a [Bounds] to a [Rect].
+     * Convert a [DpRect] to a [Rect].
      */
     @Stable
-    fun Bounds.toRect(): Rect {
+    fun DpRect.toRect(): Rect {
         return Rect(
             left.toPx(),
             top.toPx(),

@@ -187,15 +187,15 @@ class DpTest {
     }
 
     @Test
-    fun boundsWidth() {
-        val bounds = Bounds(10.dp, 5.dp, 25.dp, 15.dp)
-        assertEquals(15.dp, bounds.width)
+    fun dpRectWidth() {
+        val dpRect = DpRect(10.dp, 5.dp, 25.dp, 15.dp)
+        assertEquals(15.dp, dpRect.width)
     }
 
     @Test
-    fun boundsHeight() {
-        val bounds = Bounds(10.dp, 5.dp, 25.dp, 15.dp)
-        assertEquals(10.dp, bounds.height)
+    fun dpRectHeight() {
+        val dpRect = DpRect(10.dp, 5.dp, 25.dp, 15.dp)
+        assertEquals(10.dp, dpRect.height)
     }
 
     @Test

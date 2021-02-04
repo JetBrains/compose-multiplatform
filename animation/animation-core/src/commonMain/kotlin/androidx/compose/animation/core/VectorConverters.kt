@@ -19,7 +19,6 @@ package androidx.compose.animation.core
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.unit.Bounds
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -112,12 +111,6 @@ val Size.Companion.VectorConverter: TwoWayConverter<Size, AnimationVector2D>
     get() = SizeToVector
 
 /**
- * A type converter that converts a [Bounds] to a [AnimationVector4D], and vice versa.
- */
-val Bounds.Companion.VectorConverter: TwoWayConverter<Bounds, AnimationVector4D>
-    get() = BoundsToVector
-
-/**
  * A type converter that converts a [Offset] to a [AnimationVector2D], and vice versa.
  */
 val Offset.Companion.VectorConverter: TwoWayConverter<Offset, AnimationVector2D>
@@ -159,17 +152,6 @@ private val SizeToVector: TwoWayConverter<Size, AnimationVector2D> =
     TwoWayConverter(
         convertToVector = { AnimationVector2D(it.width, it.height) },
         convertFromVector = { Size(it.v1, it.v2) }
-    )
-
-/**
- * A type converter that converts a [Bounds] to a [AnimationVector4D], and vice versa.
- */
-private val BoundsToVector: TwoWayConverter<Bounds, AnimationVector4D> =
-    TwoWayConverter(
-        convertToVector = {
-            AnimationVector4D(it.left.value, it.top.value, it.right.value, it.bottom.value)
-        },
-        convertFromVector = { Bounds(it.v1.dp, it.v2.dp, it.v3.dp, it.v4.dp) }
     )
 
 /**

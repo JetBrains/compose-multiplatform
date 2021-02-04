@@ -19,7 +19,6 @@ package androidx.compose.animation.core
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.unit.Bounds
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -28,13 +27,6 @@ import androidx.compose.ui.unit.dp
 
 private const val DpVisibilityThreshold = 0.1f
 private const val PxVisibilityThreshold = 0.5f
-
-private val boundsVisibilityThreshold = Bounds(
-    Dp.VisibilityThreshold,
-    Dp.VisibilityThreshold,
-    Dp.VisibilityThreshold,
-    Dp.VisibilityThreshold
-)
 
 private val rectVisibilityThreshold = Rect(
     PxVisibilityThreshold,
@@ -106,13 +98,5 @@ val IntSize.Companion.VisibilityThreshold: IntSize
  */
 val Rect.Companion.VisibilityThreshold: Rect
     get() = rectVisibilityThreshold
-
-/**
- * Visibility threshold for [Bounds]. This defines the amount of value change that is
- * considered to be no longer visible. The animation system uses this to signal to some default
- * [spring] animations to stop when the value is close enough to the target.
- */
-val Bounds.Companion.VisibilityThreshold: Bounds
-    get() = boundsVisibilityThreshold
 
 // TODO: Add Dp.DefaultAnimation = spring<Dp>(visibilityThreshold = Dp.VisibilityThreshold)

@@ -5,26 +5,6 @@ package androidx.compose.ui.unit {
     method public static androidx.compose.ui.unit.Density Density(android.content.Context context);
   }
 
-  @androidx.compose.runtime.Immutable public final class Bounds {
-    method public float component1-D9Ej5fM();
-    method public float component2-D9Ej5fM();
-    method public float component3-D9Ej5fM();
-    method public float component4-D9Ej5fM();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.unit.Bounds copy-ZmiikuI(float left, float top, float right, float bottom);
-    method public float getBottom-D9Ej5fM();
-    method public float getLeft-D9Ej5fM();
-    method public float getRight-D9Ej5fM();
-    method public float getTop-D9Ej5fM();
-    property public final float bottom;
-    property public final float left;
-    property public final float right;
-    property public final float top;
-    field public static final androidx.compose.ui.unit.Bounds.Companion Companion;
-  }
-
-  public static final class Bounds.Companion {
-  }
-
   @androidx.compose.runtime.Immutable public final inline class Constraints {
     ctor public Constraints();
     method public static long constructor-impl(long value);
@@ -74,7 +54,7 @@ package androidx.compose.ui.unit {
     method @Deprecated @androidx.compose.runtime.Stable public default int toIntPx-0680j_4(float);
     method @androidx.compose.runtime.Stable public default float toPx--R2X_6o(long);
     method @androidx.compose.runtime.Stable public default float toPx-0680j_4(float);
-    method @androidx.compose.runtime.Stable public default androidx.compose.ui.geometry.Rect toRect(androidx.compose.ui.unit.Bounds);
+    method @androidx.compose.runtime.Stable public default androidx.compose.ui.geometry.Rect toRect(androidx.compose.ui.unit.DpRect);
     method @androidx.compose.runtime.Stable public default long toSp-0680j_4(float);
     method @androidx.compose.runtime.Stable public default long toSp-XSAIIZE(int);
     method @androidx.compose.runtime.Stable public default long toSp-XSAIIZE(float);
@@ -125,8 +105,8 @@ package androidx.compose.ui.unit {
     method public static inline float getDp(int);
     method public static inline float getDp(double);
     method public static inline float getDp(float);
-    method public static inline float getHeight(androidx.compose.ui.unit.Bounds);
-    method public static inline float getWidth(androidx.compose.ui.unit.Bounds);
+    method public static inline float getHeight(androidx.compose.ui.unit.DpRect);
+    method public static inline float getWidth(androidx.compose.ui.unit.DpRect);
     method public static inline boolean isFinite-0680j_4(float);
     method public static inline boolean isSpecified-0680j_4(float);
     method public static inline boolean isUnspecified-0680j_4(float);
@@ -158,6 +138,26 @@ package androidx.compose.ui.unit {
   public static final class DpOffset.Companion {
     method public long getZero-RKDOV3M();
     property public final long Zero;
+  }
+
+  @androidx.compose.runtime.Immutable public final class DpRect {
+    method public float component1-D9Ej5fM();
+    method public float component2-D9Ej5fM();
+    method public float component3-D9Ej5fM();
+    method public float component4-D9Ej5fM();
+    method @androidx.compose.runtime.Immutable public androidx.compose.ui.unit.DpRect copy-ZmiikuI(float left, float top, float right, float bottom);
+    method public float getBottom-D9Ej5fM();
+    method public float getLeft-D9Ej5fM();
+    method public float getRight-D9Ej5fM();
+    method public float getTop-D9Ej5fM();
+    property public final float bottom;
+    property public final float left;
+    property public final float right;
+    property public final float top;
+    field public static final androidx.compose.ui.unit.DpRect.Companion Companion;
+  }
+
+  public static final class DpRect.Companion {
   }
 
   @androidx.compose.runtime.Immutable public final inline class IntOffset {
