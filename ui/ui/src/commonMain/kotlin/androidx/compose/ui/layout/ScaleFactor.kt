@@ -20,7 +20,6 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.isSpecified
-import androidx.compose.ui.util.format
 import androidx.compose.ui.util.packFloats
 import androidx.compose.ui.util.unpackFloat1
 import androidx.compose.ui.util.unpackFloat2
@@ -96,7 +95,7 @@ inline class ScaleFactor(@PublishedApi internal val packedValue: Long) {
     @Stable
     operator fun div(operand: Float) = ScaleFactor(scaleX / operand, scaleY / operand)
 
-    override fun toString() = "ScaleFactor(${"%.1f".format(scaleX)}, ${"%.1f".format(scaleY)})"
+    override fun toString() = "ScaleFactor(${scaleX.roundToTenths()}, ${scaleY.roundToTenths()})"
 
     companion object {
 
@@ -108,6 +107,19 @@ inline class ScaleFactor(@PublishedApi internal val packedValue: Long) {
         @Stable
         val Unspecified = ScaleFactor(Float.NaN, Float.NaN)
     }
+}
+
+private fun Float.roundToTenths(): Float {
+    val shifted = this * 10
+    val decimal = shifted - shifted.toInt()
+    // Kotlin's round operator rounds 0.5f down to 0. Manually compare against
+    // 0.5f and round up if necessary
+    val roundedShifted = if (decimal >= 0.5f) {
+        shifted.toInt() + 1
+    } else {
+        shifted.toInt()
+    }
+    return roundedShifted.toFloat() / 10
 }
 
 /**

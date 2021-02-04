@@ -14,10 +14,6 @@ package androidx.compose.ui.util {
     method public static inline int unpackInt2(long value);
   }
 
-  public final class JvmMiscHelpersKt {
-    method public static String format(String, java.lang.Object?... args);
-  }
-
   public final class ListUtilsKt {
     method public static inline <T> boolean fastAll(java.util.List<? extends T>, kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> predicate);
     method public static inline <T> boolean fastAny(java.util.List<? extends T>, kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> predicate);
