@@ -103,7 +103,7 @@ abstract class BaseComposeTest {
     @Composable
     fun subCompose(block: @Composable () -> Unit) {
         val container = remember { View(activity) }
-        val reference = rememberCompositionReference()
+        val reference = rememberCompositionContext()
         @OptIn(ExperimentalComposeApi::class)
         Composition(
             container,

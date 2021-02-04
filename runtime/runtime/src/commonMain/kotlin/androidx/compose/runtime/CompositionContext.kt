@@ -22,29 +22,41 @@ import kotlin.coroutines.CoroutineContext
 private val EmptyCompositionLocalMap: CompositionLocalMap = persistentHashMapOf()
 
 /**
- * An Effect to construct a CompositionReference at the current point of composition. This can be used
- * to run a separate composition in the context of the current one, preserving [CompositionLocal]s
- * and propagating invalidations. When this call leaves the composition, the reference is
- * invalidated.
+ * An Effect to construct a [CompositionContext] at the current point of composition. This can be
+ * used to run a separate composition in the context of the current one, preserving
+ * [CompositionLocal]s and propagating invalidations. When this call leaves the composition, the
+ * context is invalidated.
  */
 @OptIn(InternalComposeApi::class)
-@Composable fun rememberCompositionReference(): CompositionReference {
-    return currentComposer.buildReference()
+@Composable fun rememberCompositionContext(): CompositionContext {
+    return currentComposer.buildContext()
 }
 
+@Deprecated(
+    "Renamed to rememberCompositionContext",
+    ReplaceWith(
+        "rememberCompositionContext()",
+        "androidx.compose.runtime.rememberCompositionContext"
+    )
+)
+@Composable fun rememberCompositionReference() = rememberCompositionContext()
+
+@Deprecated("Renamed to CompositionContext")
+typealias CompositionReference = CompositionContext
+
 /**
- * A [CompositionReference] is an opaque type that is used to logically "link" two compositions
- * together. The [CompositionReference] instance represents a reference to the "parent" composition
+ * A [CompositionContext] is an opaque type that is used to logically "link" two compositions
+ * together. The [CompositionContext] instance represents a reference to the "parent" composition
  * in a specific position of that composition's tree, and the instance can then be given to a new
  * "child" composition. This reference ensures that invalidations and [CompositionLocal]s flow
  * logically through the two compositions as if they were not separate.
  *
  * The "parent" of a root composition is a [Recomposer].
  *
- * @see rememberCompositionReference
+ * @see rememberCompositionContext
  */
 @OptIn(InternalComposeApi::class)
-abstract class CompositionReference internal constructor() {
+abstract class CompositionContext internal constructor() {
     internal abstract val compoundHashKey: Int
     internal abstract val collectingKeySources: Boolean
     internal abstract val collectingParameterInformation: Boolean

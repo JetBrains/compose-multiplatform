@@ -20,10 +20,10 @@ import android.content.Context
 import android.view.View
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
-import androidx.compose.runtime.CompositionReference
+import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCompositionReference
+import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.materialize
 import androidx.compose.ui.node.LayoutNode
@@ -60,7 +60,7 @@ fun <T : View> AndroidView(
     val materialized = currentComposer.materialize(modifier)
     val density = LocalDensity.current
     val layoutDirection = LocalLayoutDirection.current
-    val parentReference = rememberCompositionReference()
+    val parentReference = rememberCompositionContext()
     val viewBlockHolderRef = remember { Ref<ViewBlockHolder<T>>() }
     ComposeNode<LayoutNode, UiApplier>(
         factory = {
@@ -91,8 +91,8 @@ val NoOpUpdate: View.() -> Unit = {}
 
 internal class ViewBlockHolder<T : View>(
     context: Context,
-    parentReference: CompositionReference? = null
-) : AndroidViewHolder(context, parentReference) {
+    parentContext: CompositionContext? = null
+) : AndroidViewHolder(context, parentContext) {
 
     private var typedView: T? = null
 

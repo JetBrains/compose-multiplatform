@@ -99,7 +99,7 @@ interface RecomposerInfo {
 )
 class Recomposer(
     effectCoroutineContext: CoroutineContext
-) : CompositionReference() {
+) : CompositionContext() {
     /**
      * This is a running count of the number of times the recomposer awoke and applied changes to
      * one or more composers. This count is unaffected if the composer awakes and recomposed but

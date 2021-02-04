@@ -20,12 +20,12 @@ import androidx.compose.runtime.Applier
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.Composition
-import androidx.compose.runtime.CompositionReference
+import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCompositionReference
+import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.materialize
 import androidx.compose.ui.node.ComposeUiNode
@@ -64,7 +64,7 @@ fun SubcomposeLayout(
     measureBlock: SubcomposeMeasureScope.(Constraints) -> MeasureResult
 ) {
     val state = remember { SubcomposeLayoutState() }
-    state.compositionRef = rememberCompositionReference()
+    state.compositionContext = rememberCompositionContext()
 
     val materialized = currentComposer.materialize(modifier)
     val density = LocalDensity.current
@@ -103,7 +103,7 @@ interface SubcomposeMeasureScope : MeasureScope {
 private class SubcomposeLayoutState :
     SubcomposeMeasureScope,
     RememberObserver {
-    var compositionRef: CompositionReference? = null
+    var compositionContext: CompositionContext? = null
 
     // MeasureScope delegation
     override var layoutDirection: LayoutDirection = LayoutDirection.Rtl
@@ -162,7 +162,7 @@ private class SubcomposeLayoutState :
             val content = nodeState.content
             nodeState.composition = subcomposeInto(
                 container = node,
-                parent = compositionRef ?: error("parent composition reference not set"),
+                parent = compositionContext ?: error("parent composition reference not set"),
                 // Do not optimize this by passing nodeState.content directly; the additional
                 // composable function call from the lambda expression affects the scope of
                 // recomposition and recomposition of siblings.

@@ -16,7 +16,7 @@
 package androidx.compose.desktop
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionReference
+import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.platform.Keyboard
@@ -399,7 +399,7 @@ class AppWindow : AppFrame {
     }
 
     private fun onCreate(
-        parentComposition: CompositionReference? = null,
+        parentComposition: CompositionContext? = null,
         content: @Composable () -> Unit
     ) {
         window.setContent(parentComposition) {
@@ -419,7 +419,7 @@ class AppWindow : AppFrame {
      * @param content Composable content of the window.
      */
     fun show(
-        parentComposition: CompositionReference? = null,
+        parentComposition: CompositionContext? = null,
         content: @Composable () -> Unit
     ) {
         if (invoker != null) {
