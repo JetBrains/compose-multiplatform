@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-@file:Suppress("DEPRECATION")
-
 package androidx.compose.material
 
-import androidx.compose.animation.asDisposableClock
-import androidx.compose.animation.core.AnimatedFloat
-import androidx.compose.animation.core.AnimationClockObservable
-import androidx.compose.animation.core.AnimationEndReason
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.TargetAnimation
 import androidx.compose.animation.core.TweenSpec
-import androidx.compose.animation.core.fling
+import androidx.compose.animation.core.calculateTargetValue
+import androidx.compose.animation.core.generateDecayAnimationSpec
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
@@ -49,6 +45,7 @@ import androidx.compose.material.SliderDefaults.TickColorAlpha
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -58,7 +55,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalAnimationClock
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.semantics
@@ -66,6 +62,8 @@ import androidx.compose.ui.semantics.setProgress
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlin.math.abs
 
 /**
@@ -126,9 +124,9 @@ fun Slider(
     activeTickColor: Color = MaterialTheme.colors.onPrimary.copy(alpha = TickColorAlpha),
     inactiveTickColor: Color = activeTrackColor.copy(alpha = TickColorAlpha)
 ) {
-    val clock = LocalAnimationClock.current.asDisposableClock()
-    val position = remember(valueRange, steps) {
-        SliderPosition(value, valueRange, steps, clock, onValueChange)
+    val scope = rememberCoroutineScope()
+    val position = remember(valueRange, steps, scope) {
+        SliderPosition(value, valueRange, steps, scope, onValueChange)
     }
     position.onValueChange = onValueChange
     position.scaledValue = value
@@ -143,15 +141,27 @@ fun Slider(
         val flingConfig = sliderFlingConfig(position, position.anchorsPx)
         val gestureEndAction: (Float) -> Unit = { velocity: Float ->
             if (flingConfig != null) {
-                position.holder.fling(
-                    velocity,
-                    flingConfig.decayAnimation,
-                    flingConfig.adjustTarget
-                ) { reason, endValue, _ ->
-                    if (reason != AnimationEndReason.Interrupted) {
-                        position.holder.snapTo(endValue)
-                        onValueChangeFinished?.invoke()
+                scope.launch {
+                    val decaySpec = flingConfig.decayAnimation.generateDecayAnimationSpec<Float>()
+                    val projectedTarget = decaySpec.calculateTargetValue(
+                        position.holder.value,
+                        velocity
+                    )
+                    val targetAnimation = flingConfig.adjustTarget(projectedTarget)
+                    if (targetAnimation != null) {
+                        position.holder.animateTo(
+                            targetAnimation.target,
+                            targetAnimation.animation,
+                            initialVelocity = velocity
+                        ) {
+                            position.onHolderValueUpdated(this.value)
+                        }
+                    } else {
+                        position.holder.animateDecay(velocity, decaySpec) {
+                            position.onHolderValueUpdated(this.value)
+                        }
                     }
+                    onValueChangeFinished?.invoke()
                 }
             } else {
                 onValueChangeFinished?.invoke()
@@ -161,7 +171,7 @@ fun Slider(
         val press = Modifier.pointerInput(Unit) {
             detectTapGestures(
                 onPress = { pos ->
-                    position.holder.snapTo(if (isRtl) maxPx - pos.x else pos.x)
+                    position.snapTo(if (isRtl) maxPx - pos.x else pos.x)
                     interactionState.addInteraction(Interaction.Pressed, pos)
                     val success = tryAwaitRelease()
                     if (success) gestureEndAction(0f)
@@ -174,9 +184,11 @@ fun Slider(
             orientation = Orientation.Horizontal,
             reverseDirection = isRtl,
             interactionState = interactionState,
-            onDragStopped = gestureEndAction,
+            onDragStopped = { velocity -> gestureEndAction(velocity) },
             startDragImmediately = position.holder.isRunning,
-            onDrag = { position.holder.snapTo(position.holder.value + it) }
+            onDrag = {
+                position.snapTo(position.holder.value + it)
+            }
         )
         val coerced = value.coerceIn(position.startValue, position.endValue)
         val fraction = calcFraction(position.startValue, position.endValue, coerced)
@@ -395,7 +407,7 @@ private class SliderPosition(
     val valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
     /*@IntRange(from = 0)*/
     steps: Int = 0,
-    animatedClock: AnimationClockObservable,
+    val scope: CoroutineScope,
     var onValueChange: (Float) -> Unit
 ) {
 
@@ -413,7 +425,7 @@ private class SliderPosition(
             val scaled = scale(startValue, endValue, value, startPx, endPx)
             // floating point error due to rescaling
             if ((scaled - holder.value) > floatPointMistakeCorrection) {
-                holder.snapTo(scaled)
+                snapTo(scaled)
             }
         }
 
@@ -427,11 +439,11 @@ private class SliderPosition(
         val newValue = scale(startPx, endPx, holder.value, min, max)
         startPx = min
         endPx = max
-        holder.setBounds(min, max)
+        holder.updateBounds(min, max)
         anchorsPx = tickFractions.map {
             lerp(startPx, endPx, it)
         }
-        holder.snapTo(newValue)
+        snapTo(newValue)
     }
 
     internal val tickFractions: List<Float> =
@@ -440,25 +452,18 @@ private class SliderPosition(
     internal var anchorsPx: List<Float> = emptyList()
         private set
 
-    @Suppress("UnnecessaryLambdaCreation")
-    internal val holder =
-        CallbackBasedAnimatedFloat(
-            scale(startValue, endValue, initial, startPx, endPx),
-            animatedClock
-        ) { onValueChange(scale(startPx, endPx, it, startValue, endValue)) }
-}
+    internal val holder = Animatable(scale(startValue, endValue, initial, startPx, endPx))
 
-private class CallbackBasedAnimatedFloat(
-    initial: Float,
-    clock: AnimationClockObservable,
-    var onValue: (Float) -> Unit
-) : AnimatedFloat(clock) {
-
-    override var value = initial
-        set(value) {
-            onValue(value)
-            field = value
+    internal fun snapTo(newValue: Float) {
+        scope.launch {
+            holder.snapTo(newValue)
+            onHolderValueUpdated(holder.value)
         }
+    }
+
+    internal val onHolderValueUpdated: (value: Float) -> Unit = {
+        onValueChange(scale(startPx, endPx, it, startValue, endValue))
+    }
 }
 
 // Internal to be referred to in tests

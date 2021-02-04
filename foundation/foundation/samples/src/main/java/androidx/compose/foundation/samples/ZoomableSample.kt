@@ -30,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,6 +40,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 
 @Sampled
 @Composable
@@ -48,11 +50,18 @@ fun ZoomableSample() {
     ) {
         var scale by remember { mutableStateOf(1f) }
         val zoomableController = rememberZoomableController { scale *= it }
+        val coroutineScope = rememberCoroutineScope()
         Box(
             Modifier
                 .zoomable(zoomableController)
                 .pointerInput(Unit) {
-                    detectTapGestures(onDoubleTap = { zoomableController.smoothScaleBy(4f) })
+                    detectTapGestures(
+                        onDoubleTap = {
+                            coroutineScope.launch {
+                                zoomableController.smoothScaleBy(4f)
+                            }
+                        }
+                    )
                 }
                 .fillMaxSize()
                 .border(1.dp, Color.Green),

@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.InspectableValue
@@ -40,6 +41,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -268,6 +271,7 @@ class ZoomableTest {
         var callbackCount = 0
 
         lateinit var state: ZoomableController
+        lateinit var coroutineScope: CoroutineScope
         setZoomableContent {
             state = rememberZoomableController(
                 onZoomDelta = {
@@ -275,11 +279,16 @@ class ZoomableTest {
                     callbackCount += 1
                 }
             )
+            coroutineScope = rememberCoroutineScope()
 
             Modifier.zoomable(state)
         }
 
-        rule.runOnUiThread { state.smoothScaleBy(4f) }
+        rule.runOnUiThread {
+            coroutineScope.launch {
+                state.smoothScaleBy(4f)
+            }
+        }
 
         rule.mainClock.advanceTimeBy(milliseconds = 10)
 
