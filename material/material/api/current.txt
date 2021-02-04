@@ -414,8 +414,6 @@ package androidx.compose.material {
 
   @androidx.compose.material.ExperimentalMaterialApi public final class ModalBottomSheetState extends androidx.compose.material.SwipeableState<androidx.compose.material.ModalBottomSheetValue> {
     ctor public ModalBottomSheetState(androidx.compose.material.ModalBottomSheetValue initialValue, androidx.compose.animation.core.AnimationClockObservable clock, androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, kotlin.jvm.functions.Function1<? super androidx.compose.material.ModalBottomSheetValue,java.lang.Boolean> confirmStateChange);
-    method public void expand(optional kotlin.jvm.functions.Function0<kotlin.Unit>? onExpand);
-    method public void halfExpand(optional kotlin.jvm.functions.Function0<kotlin.Unit>? onHalfExpand);
     method public void hide(optional kotlin.jvm.functions.Function0<kotlin.Unit>? onHidden);
     method public boolean isVisible();
     method public void show(optional kotlin.jvm.functions.Function0<kotlin.Unit>? onShown);
