@@ -120,7 +120,6 @@ tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
         freeCompilerArgs += [
                 "-Xuse-experimental=kotlin.Experimental",
-                "-Xallow-jvm-ir-dependencies"
         ]
     }
 }
