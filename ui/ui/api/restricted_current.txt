@@ -436,27 +436,10 @@ package androidx.compose.ui.focus {
 
 package androidx.compose.ui.gesture {
 
-  public final class ConstantsKt {
-    method public static float getScaleSlop();
-    method public static float getTouchSlop();
-    field public static final long DoubleTapTimeoutMillis = 300L; // 0x12cL
-    field public static final long LongPressTimeoutMillis = 500L; // 0x1f4L
-    field public static final long PressTimeoutMillis = 100L; // 0x64L
-  }
-
-  public enum Direction {
-    enum_constant public static final androidx.compose.ui.gesture.Direction DOWN;
-    enum_constant public static final androidx.compose.ui.gesture.Direction LEFT;
-    enum_constant public static final androidx.compose.ui.gesture.Direction RIGHT;
-    enum_constant public static final androidx.compose.ui.gesture.Direction UP;
-  }
-
-  public final class DoubleTapGestureFilterKt {
-    method @Deprecated public static androidx.compose.ui.Modifier doubleTapGestureFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onDoubleTap);
-  }
-
   public final class DragGestureFilterKt {
-    method @Deprecated public static androidx.compose.ui.Modifier dragGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.DragObserver dragObserver, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.gesture.Direction,java.lang.Boolean>? canDrag, optional boolean startDragImmediately);
+    method @Deprecated public static androidx.compose.ui.Modifier dragGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.DragObserver dragObserver, optional boolean startDragImmediately);
+    method @Deprecated public static androidx.compose.ui.Modifier rawDragGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.DragObserver dragObserver, optional kotlin.jvm.functions.Function0<java.lang.Boolean>? canStartDragging, optional androidx.compose.ui.gesture.scrollorientationlocking.Orientation? orientation);
+    method @Deprecated public static androidx.compose.ui.Modifier rawPressStartGestureFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onPressStart, optional boolean enabled, optional androidx.compose.ui.input.pointer.PointerEventPass executionPass);
   }
 
   @Deprecated public interface DragObserver {
@@ -464,10 +447,6 @@ package androidx.compose.ui.gesture {
     method @Deprecated public default long onDrag-k-4lQ0M(long dragDistance);
     method @Deprecated public default void onStart-k-4lQ0M(long downPosition);
     method @Deprecated public default void onStop-k-4lQ0M(long velocity);
-  }
-
-  public final class DragSlopExceededGestureFilterKt {
-    method @Deprecated public static androidx.compose.ui.Modifier dragSlopExceededGestureFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function0<kotlin.Unit> onDragSlopExceeded, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.gesture.Direction,java.lang.Boolean>? canDrag, optional androidx.compose.ui.gesture.scrollorientationlocking.Orientation? orientation);
   }
 
   public final class GestureUtilsKt {
@@ -485,23 +464,8 @@ package androidx.compose.ui.gesture {
     method @Deprecated public default void onStop-k-4lQ0M(long velocity);
   }
 
-  public final class LongPressGestureFilterKt {
-    method @Deprecated public static androidx.compose.ui.Modifier longPressGestureFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onLongPress);
-  }
-
   public final class PressIndicatorGestureFilterKt {
     method @Deprecated public static androidx.compose.ui.Modifier pressIndicatorGestureFilter(androidx.compose.ui.Modifier, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit>? onStart, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onStop, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onCancel, optional boolean enabled);
-  }
-
-  public final class RawDragGestureFilterKt {
-    method @Deprecated public static androidx.compose.ui.Modifier rawDragGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.DragObserver dragObserver, optional kotlin.jvm.functions.Function0<java.lang.Boolean>? canStartDragging, optional androidx.compose.ui.gesture.scrollorientationlocking.Orientation? orientation);
-  }
-
-  public final class RawPressStartGestureFilterKt {
-    method @Deprecated public static androidx.compose.ui.Modifier rawPressStartGestureFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onPressStart, optional boolean enabled, optional androidx.compose.ui.input.pointer.PointerEventPass executionPass);
-  }
-
-  public final class ScaleUtilKt {
   }
 
   @Deprecated public interface ScrollCallback {
@@ -512,37 +476,11 @@ package androidx.compose.ui.gesture {
   }
 
   public final class ScrollGestureFilterKt {
-    method @Deprecated public static androidx.compose.ui.Modifier scrollGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.ScrollCallback scrollCallback, androidx.compose.ui.gesture.scrollorientationlocking.Orientation orientation, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.gesture.Direction,java.lang.Boolean>? canDrag, optional boolean startDragImmediately);
+    method @Deprecated public static androidx.compose.ui.Modifier scrollGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.ScrollCallback scrollCallback, androidx.compose.ui.gesture.scrollorientationlocking.Orientation orientation, optional boolean startDragImmediately);
   }
 
   public final class TapGestureFilterKt {
     method @Deprecated public static androidx.compose.ui.Modifier tapGestureFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onTap);
-  }
-
-}
-
-package androidx.compose.ui.gesture.customevents {
-
-  public final class DelayUpEvent implements androidx.compose.ui.input.pointer.CustomEvent {
-    ctor public DelayUpEvent(androidx.compose.ui.gesture.customevents.DelayUpMessage message, java.util.Set<androidx.compose.ui.input.pointer.PointerId> pointers);
-    method public androidx.compose.ui.gesture.customevents.DelayUpMessage component1();
-    method public java.util.Set<androidx.compose.ui.input.pointer.PointerId> component2();
-    method public androidx.compose.ui.gesture.customevents.DelayUpEvent copy(androidx.compose.ui.gesture.customevents.DelayUpMessage message, java.util.Set<androidx.compose.ui.input.pointer.PointerId> pointers);
-    method public androidx.compose.ui.gesture.customevents.DelayUpMessage getMessage();
-    method public java.util.Set<androidx.compose.ui.input.pointer.PointerId> getPointers();
-    method public void setMessage(androidx.compose.ui.gesture.customevents.DelayUpMessage p);
-    property public final androidx.compose.ui.gesture.customevents.DelayUpMessage message;
-    property public final java.util.Set<androidx.compose.ui.input.pointer.PointerId> pointers;
-  }
-
-  public enum DelayUpMessage {
-    enum_constant public static final androidx.compose.ui.gesture.customevents.DelayUpMessage DelayUp;
-    enum_constant public static final androidx.compose.ui.gesture.customevents.DelayUpMessage DelayedUpConsumed;
-    enum_constant public static final androidx.compose.ui.gesture.customevents.DelayUpMessage DelayedUpNotConsumed;
-  }
-
-  public final class LongPressFiredEvent implements androidx.compose.ui.input.pointer.CustomEvent {
-    field public static final androidx.compose.ui.gesture.customevents.LongPressFiredEvent INSTANCE;
   }
 
 }
@@ -583,16 +521,6 @@ package androidx.compose.ui.gesture.scrollorientationlocking {
   public enum Orientation {
     enum_constant public static final androidx.compose.ui.gesture.scrollorientationlocking.Orientation Horizontal;
     enum_constant public static final androidx.compose.ui.gesture.scrollorientationlocking.Orientation Vertical;
-  }
-
-  public final class ScrollOrientationLocker {
-    ctor public ScrollOrientationLocker(androidx.compose.ui.input.pointer.CustomEventDispatcher customEventDispatcher);
-    method public void attemptToLockPointers(java.util.List<androidx.compose.ui.input.pointer.PointerInputChange> changes, androidx.compose.ui.gesture.scrollorientationlocking.Orientation orientation);
-    method public java.util.List<androidx.compose.ui.input.pointer.PointerInputChange> getPointersFor(java.util.List<androidx.compose.ui.input.pointer.PointerInputChange> changes, androidx.compose.ui.gesture.scrollorientationlocking.Orientation orientation);
-    method public void onCancel();
-    method public void onCustomEvent(androidx.compose.ui.input.pointer.CustomEvent customEvent, androidx.compose.ui.input.pointer.PointerEventPass pass);
-    method public void onPointerInputSetup(java.util.List<androidx.compose.ui.input.pointer.PointerInputChange> changes, androidx.compose.ui.input.pointer.PointerEventPass pass);
-    method public void onPointerInputTearDown(java.util.List<androidx.compose.ui.input.pointer.PointerInputChange> changes, androidx.compose.ui.input.pointer.PointerEventPass pass);
   }
 
 }

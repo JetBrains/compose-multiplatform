@@ -18,8 +18,6 @@ package androidx.compose.ui.test
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.lerp
-import androidx.compose.ui.gesture.DoubleTapTimeoutMillis
-import androidx.compose.ui.gesture.LongPressTimeoutMillis
 import androidx.compose.ui.layout.globalBounds
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriodMillis
@@ -44,6 +42,17 @@ private const val edgeFuzzFactor = 0.083f
  * a double click gesture. 145 milliseconds: both median and average of empirical data (33 samples)
  */
 private const val doubleClickDelayMillis = 145L
+
+/** The time before a long press gesture attempts to win. */
+// remove after b/179281066
+private const val LongPressTimeoutMillis: Long = 500L
+
+/**
+ * The maximum time from the start of the first tap to the start of the second
+ * tap in a double-tap gesture.
+ */
+// remove after b/179281066
+private const val DoubleTapTimeoutMillis: Long = 300L
 
 /**
  * The receiver scope for injecting gestures on the [semanticsNode] identified by the

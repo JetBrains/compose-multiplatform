@@ -24,4 +24,4 @@ import androidx.compose.ui.input.pointer.PointerInputFilter
  * region of the UI for a period of time has fired it's associated callback such that any other
  * [PointerInputFilter] that may be waiting to fire, should no longer do so.
  */
-object LongPressFiredEvent : CustomEvent
+internal object LongPressFiredEvent : CustomEvent

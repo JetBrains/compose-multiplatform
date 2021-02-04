@@ -16,8 +16,6 @@
 
 package androidx.compose.foundation.gestures
 
-import androidx.compose.ui.gesture.DoubleTapTimeoutMillis
-import androidx.compose.ui.gesture.LongPressTimeoutMillis
 import androidx.compose.ui.input.pointer.consumeDownChange
 import androidx.compose.ui.input.pointer.consumePositionChange
 import kotlinx.coroutines.delay
@@ -36,6 +34,17 @@ class TapGestureDetectorTest {
     private var tapped = false
     private var doubleTapped = false
     private var longPressed = false
+
+    /** The time before a long press gesture attempts to win. */
+    private val LongPressTimeoutMillis: Long = 500L
+
+    /**
+     * The maximum time from the start of the first tap to the start of the second
+     * tap in a double-tap gesture.
+     */
+// TODO(shepshapard): In Android, this is actually the time from the first's up event
+// to the second's down event, according to the ViewConfiguration docs.
+    private val DoubleTapTimeoutMillis: Long = 300L
 
     private val util = SuspendingGestureTestUtil {
         detectTapGestures(

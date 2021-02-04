@@ -35,7 +35,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.DragObserver
-import androidx.compose.ui.gesture.PressTimeoutMillis
 import androidx.compose.ui.gesture.pressIndicatorGestureFilter
 import androidx.compose.ui.gesture.rawDragGestureFilter
 import androidx.compose.ui.graphics.Color
@@ -509,3 +508,9 @@ private fun horizontalMeasureBlocks(
         placeable.place(sliderAdapter.position.toInt(), 0)
     }
 }
+
+/**
+ * The time that must elapse before a tap gesture sends onTapDown, if there's
+ * any doubt that the gesture is a tap.
+ */
+private const val PressTimeoutMillis: Long = 100L
