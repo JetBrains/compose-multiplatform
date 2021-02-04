@@ -112,20 +112,3 @@ private val HoveredOutgoingSpec = TweenSpec<Dp>(
     durationMillis = 120,
     easing = CubicBezierEasing(0.40f, 0.00f, 0.60f, 1.00f)
 )
-
-/**
- * CompositionLocal containing the current absolute elevation provided by [Surface] components. This
- * absolute elevation is a sum of all the previous elevations. Absolute elevation is only
- * used for calculating elevation overlays in dark theme, and is *not* used for drawing the
- * shadow in a [Surface]. See [ElevationOverlay] for more information on elevation overlays.
- *
- * @sample androidx.compose.material.samples.AbsoluteElevationSample
- */
-@Deprecated(
-    "Renamed to LocalAbsoluteElevation",
-    replaceWith = ReplaceWith(
-        "LocalAbsoluteElevation",
-        "androidx.compose.material.LocalAbsoluteElevation"
-    )
-)
-val AmbientAbsoluteElevation get() = LocalAbsoluteElevation

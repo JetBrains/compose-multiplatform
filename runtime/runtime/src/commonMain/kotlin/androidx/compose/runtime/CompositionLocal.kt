@@ -16,27 +16,6 @@
 
 package androidx.compose.runtime
 
-@Deprecated(
-    message = "Ambient has been renamed to CompositionLocal. Instances of CompositionLocal should" +
-        " use the prefix `Local` in their naming to convey that values retrieved through a " +
-        "CompositionLocal are local to the composition.",
-    replaceWith = ReplaceWith(
-        "CompositionLocal<T>", "androidx.compose.runtime.CompositionLocal"
-    )
-)
-typealias Ambient<T> = CompositionLocal<T>
-
-@Deprecated(
-    message = "Ambient has been renamed to CompositionLocal. Instances of CompositionLocal should" +
-        " use the prefix `Local` in their naming to convey that values retrieved through a " +
-        "CompositionLocal are local to the composition.",
-    replaceWith = ReplaceWith(
-        "ProvidableCompositionLocal<T>",
-        "androidx.compose.runtime.ProvidableCompositionLocal"
-    )
-)
-typealias ProvidableAmbient<T> = ProvidableCompositionLocal<T>
-
 /**
  * Compose passes data through the composition tree explicitly through means of parameters to
  * composable functions. This is often times the simplest and best way to have data flow through
@@ -192,56 +171,6 @@ fun <T> compositionLocalOf(
  * @see compositionLocalOf
  */
 fun <T> staticCompositionLocalOf(defaultFactory: (() -> T)? = null): ProvidableCompositionLocal<T> =
-    StaticProvidableCompositionLocal(defaultFactory)
-
-/**
- * Create an ambient key that can be provided using [Providers]. Changing the value provided
- * during recomposition will invalidate the children of [Providers] that read the value using
- * [CompositionLocal.current].
- *
- * @param policy a policy to determine when an ambient is considered changed. See
- * [SnapshotMutationPolicy] for details.
- *
- * @see CompositionLocal
- * @see staticAmbientOf
- * @see mutableStateOf
- */
-@Deprecated(
-    message = "Ambient has been renamed to CompositionLocal. Instances of CompositionLocal should" +
-        " use the prefix `Local` in their naming to convey that values retrieved through a " +
-        "CompositionLocal are local to the composition.",
-    replaceWith = ReplaceWith(
-        "compositionLocalOf(policy, defaultFactory)",
-        "androidx.compose.runtime.compositionLocalOf"
-    )
-)
-fun <T> ambientOf(
-    policy: SnapshotMutationPolicy<T> =
-        @OptIn(ExperimentalComposeApi::class)
-        structuralEqualityPolicy(),
-    defaultFactory: (() -> T)? = null
-): ProvidableCompositionLocal<T> = DynamicProvidableCompositionLocal(policy, defaultFactory)
-
-/**
- * Create an ambient key that can be provided using [Providers]. Changing the value provided
- * will cause the entire tree below [Providers] to be recomposed, disabling skipping of composable
- * calls.
- *
- * A static ambient should be only be used when the value provided is highly unlikely to change.
- *
- * @see CompositionLocal
- * @see ambientOf
- */
-@Deprecated(
-    message = "Ambient has been renamed to CompositionLocal. Instances of CompositionLocal should" +
-        " use the prefix `Local` in their naming to convey that values retrieved through a " +
-        "CompositionLocal are local to the composition.",
-    replaceWith = ReplaceWith(
-        "staticCompositionLocalOf(defaultFactory)",
-        "androidx.compose.runtime.staticCompositionLocalOf"
-    )
-)
-fun <T> staticAmbientOf(defaultFactory: (() -> T)? = null): ProvidableCompositionLocal<T> =
     StaticProvidableCompositionLocal(defaultFactory)
 
 /**

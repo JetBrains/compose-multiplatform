@@ -173,12 +173,6 @@ interface RowScope {
         )
     )
 
-    @Deprecated(
-        "alignWithSiblings was renamed to alignBy.",
-        ReplaceWith("alignBy(alignmentLine)")
-    )
-    fun Modifier.alignWithSiblings(alignmentLine: HorizontalAlignmentLine) = alignBy(alignmentLine)
-
     /**
      * Position the element vertically such that its first baseline aligns with sibling elements
      * also configured to [alignByBaseline] or [alignBy]. This modifier is a form
@@ -254,13 +248,6 @@ interface RowScope {
             }
         )
     )
-
-    @Deprecated(
-        "alignWithSiblings was renamed to alignBy.",
-        ReplaceWith("alignBy(alignmentLineBlock)")
-    )
-    fun Modifier.alignWithSiblings(alignmentLineBlock: (Measured) -> Int) =
-        alignBy(alignmentLineBlock)
 
     companion object : RowScope
 }

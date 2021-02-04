@@ -43,35 +43,10 @@ import androidx.savedstate.SavedStateRegistryOwner
  * The Android [Configuration]. The [Configuration] is useful for determining how to organize the
  * UI.
  */
-@Deprecated(
-    "Renamed to LocalConfiguration",
-    replaceWith = ReplaceWith(
-        "LocalConfiguration",
-        "androidx.compose.ui.platform.LocalConfiguration"
-    )
-)
-val AmbientConfiguration get() = LocalConfiguration
-
-/**
- * The Android [Configuration]. The [Configuration] is useful for determining how to organize the
- * UI.
- */
 val LocalConfiguration = compositionLocalOf<Configuration>(
     @OptIn(ExperimentalComposeApi::class)
     neverEqualPolicy()
 )
-
-/**
- * Provides a [Context] that can be used by Android applications.
- */
-@Deprecated(
-    "Renamed to LocalContext",
-    replaceWith = ReplaceWith(
-        "LocalContext",
-        "androidx.compose.ui.platform.LocalContext"
-    )
-)
-val AmbientContext get() = LocalContext
 
 /**
  * Provides a [Context] that can be used by Android applications.
@@ -81,31 +56,7 @@ val LocalContext = staticCompositionLocalOf<Context>()
 /**
  * The CompositionLocal containing the current [LifecycleOwner].
  */
-@Deprecated(
-    "Renamed to LocalLifecycleOwner",
-    replaceWith = ReplaceWith(
-        "LocalLifecycleOwner",
-        "androidx.compose.ui.platform.LocalLifecycleOwner"
-    )
-)
-val AmbientLifecycleOwner get() = LocalLifecycleOwner
-
-/**
- * The CompositionLocal containing the current [LifecycleOwner].
- */
 val LocalLifecycleOwner = staticCompositionLocalOf<LifecycleOwner>()
-
-/**
- * The CompositionLocal containing the current [SavedStateRegistryOwner].
- */
-@Deprecated(
-    "Renamed to LocalSavedStateRegistryOwner",
-    replaceWith = ReplaceWith(
-        "LocalSavedStateRegistryOwner",
-        "androidx.compose.ui.platform.LocalSavedStateRegistryOwner"
-    )
-)
-val AmbientSavedStateRegistryOwner get() = LocalSavedStateRegistryOwner
 
 /**
  * The CompositionLocal containing the current [SavedStateRegistryOwner].
@@ -115,32 +66,7 @@ val LocalSavedStateRegistryOwner = staticCompositionLocalOf<SavedStateRegistryOw
 /**
  * The CompositionLocal containing the current Compose [View].
  */
-@Deprecated(
-    "Renamed to LocalView",
-    replaceWith = ReplaceWith(
-        "LocalView",
-        "androidx.compose.ui.platform.LocalView"
-    )
-)
-val AmbientView get() = LocalView
-
-/**
- * The CompositionLocal containing the current Compose [View].
- */
 val LocalView = staticCompositionLocalOf<View>()
-
-/**
- * The CompositionLocal containing the current [ViewModelStoreOwner].
- */
-@Suppress("DEPRECATION")
-@Deprecated(
-    "Renamed to LocalViewModelStoreOwner",
-    replaceWith = ReplaceWith(
-        "LocalViewModelStoreOwner",
-        "androidx.compose.ui.platform.LocalViewModelStoreOwner"
-    )
-)
-val AmbientViewModelStoreOwner get() = LocalViewModelStoreOwner
 
 /**
  * The CompositionLocal containing the current [ViewModelStoreOwner].
