@@ -15,7 +15,7 @@
  */
 package androidx.compose.desktop.examples.vsynctest
 
-import androidx.compose.desktop.AppWindowAmbient
+import androidx.compose.desktop.LocalAppWindow
 import androidx.compose.desktop.Window
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
@@ -75,7 +75,7 @@ fun window() {
     }
 
     Window(size = IntSize(800, 200)) {
-        val window = AppWindowAmbient.current!!
+        val window = LocalAppWindow.current
         val width = (LocalDensity.current.density * window.window.width).toInt()
         val singleFrameMillis = remember {
             1000 / window.window.graphicsConfiguration.device.displayMode.refreshRate
