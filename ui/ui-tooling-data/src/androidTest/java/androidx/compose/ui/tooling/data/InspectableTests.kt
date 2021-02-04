@@ -21,7 +21,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.material.Button
-import androidx.compose.material.ModalDrawerLayout
+import androidx.compose.material.ModalDrawer
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.InternalComposeApi
@@ -30,8 +30,6 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.height
-import androidx.compose.ui.unit.width
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import org.junit.Assert.assertEquals
@@ -350,12 +348,12 @@ class InspectableTests : ToolingTest() {
 
     @OptIn(InternalComposeApi::class)
     @Test // regression test for b/162092315
-    fun inspectingModalDrawerLayout() {
+    fun inspectingModalDrawer() {
         val positioned = CountDownLatch(1)
         val tables = showAndRecord {
-            ModalDrawerLayout(
+            ModalDrawer(
                 drawerContent = { Text("Something") },
-                bodyContent = {
+                content = {
                     Column(
                         Modifier.onGloballyPositioned {
                             positioned.countDown()

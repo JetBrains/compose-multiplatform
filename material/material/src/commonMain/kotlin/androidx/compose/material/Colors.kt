@@ -194,12 +194,16 @@ fun lightColors(
  * [Material color specification](https://material.io/design/color/the-color-system.html#color-theme-creation)
  * using the default dark theme values.
  *
+ * Note: [secondaryVariant] is typically the same as [secondary] in dark theme since contrast
+ * levels are higher, and hence there is less need for a separate secondary color.
+ *
  * @see lightColors
  */
 fun darkColors(
     primary: Color = Color(0xFFBB86FC),
     primaryVariant: Color = Color(0xFF3700B3),
     secondary: Color = Color(0xFF03DAC6),
+    secondaryVariant: Color = secondary,
     background: Color = Color(0xFF121212),
     surface: Color = Color(0xFF121212),
     error: Color = Color(0xFFCF6679),
@@ -212,9 +216,7 @@ fun darkColors(
     primary,
     primaryVariant,
     secondary,
-    // Secondary and secondary variant are the same in dark mode, as contrast should be
-    // higher so there is no need for the variant.
-    secondary,
+    secondaryVariant,
     background,
     surface,
     error,
@@ -225,6 +227,17 @@ fun darkColors(
     onError,
     false
 )
+
+/**
+ * primarySurface represents the background color of components that are [Colors.primary]
+ * in light theme, and [Colors.surface] in dark theme, such as [androidx.compose.material.TabRow]
+ * and [androidx.compose.material.TopAppBar]. This is to reduce brightness of large surfaces in dark
+ * theme, aiding contrast and readability. See
+ * [Dark Theme](https://material.io/design/color/dark-theme.html#custom-application).
+ *
+ * @return [Colors.primary] if in light theme, else [Colors.surface]
+ */
+val Colors.primarySurface: Color get() = if (isLight) primary else surface
 
 /**
  * The Material color system contains pairs of colors that are typically used for the background

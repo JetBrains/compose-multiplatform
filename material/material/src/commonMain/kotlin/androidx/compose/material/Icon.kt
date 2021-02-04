@@ -84,7 +84,7 @@ fun Icon(
     bitmap: ImageBitmap,
     contentDescription: String?,
     modifier: Modifier = Modifier,
-    tint: Color = LocalContentColor.current
+    tint: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
 ) {
     val painter = remember(bitmap) { BitmapPainter(bitmap) }
     Icon(
@@ -115,8 +115,6 @@ fun Icon(
     modifier: Modifier = Modifier,
     tint: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
 ) {
-    // TODO: consider allowing developers to override the intrinsic size, and specify their own
-    // size that this icon will be forced to take up.
     // TODO: b/149735981 semantics for content description
     val colorFilter = if (tint == Color.Unspecified) null else ColorFilter.tint(tint)
     val semantics = if (contentDescription != null) {

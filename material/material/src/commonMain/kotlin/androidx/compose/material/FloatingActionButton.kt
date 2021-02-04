@@ -139,7 +139,6 @@ fun FloatingActionButton(
  * @param elevation [FloatingActionButtonElevation] used to resolve the elevation for this FAB
  * in different states. This controls the size of the shadow below the FAB.
  */
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ExtendedFloatingActionButton(
     text: @Composable () -> Unit,

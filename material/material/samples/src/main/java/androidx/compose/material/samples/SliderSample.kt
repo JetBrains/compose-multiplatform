@@ -43,7 +43,7 @@ fun StepsSliderSample() {
         value = sliderPosition,
         onValueChange = { sliderPosition = it },
         valueRange = 0f..100f,
-        onValueChangeEnd = {
+        onValueChangeFinished = {
             // launch some business logic update with the state you hold
             // viewModel.updateSelectedSliderValue(sliderPosition)
         },

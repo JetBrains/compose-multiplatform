@@ -69,7 +69,7 @@ class SnackbarTest {
         rule.setMaterialContent {
             Box {
                 Snackbar(
-                    text = { Text("Message") },
+                    content = { Text("Message") },
                     action = {
                         TextButton(onClick = { clicked = true }) {
                             Text("UNDO")
@@ -96,7 +96,7 @@ class SnackbarTest {
             parentMaxWidth = 300.dp
         ) {
             Snackbar(
-                text = {
+                content = {
                     Text("Message")
                 }
             )
@@ -124,7 +124,7 @@ class SnackbarTest {
             parentMaxWidth = 300.dp
         ) {
             Snackbar(
-                text = {
+                content = {
                     Text("Message", fontSize = 30.sp)
                 }
             )
@@ -151,7 +151,7 @@ class SnackbarTest {
             parentMaxWidth = 300.dp
         ) {
             Snackbar(
-                text = {
+                content = {
                     Text("Message")
                 },
                 action = {
@@ -191,7 +191,7 @@ class SnackbarTest {
         ) {
             val fontSize = 30.sp
             Snackbar(
-                text = {
+                content = {
                     Text("Message", fontSize = fontSize)
                 },
                 action = {
@@ -228,7 +228,7 @@ class SnackbarTest {
             parentMaxWidth = 300.dp
         ) {
             Snackbar(
-                text = {
+                content = {
                     Text(longText, Modifier.testTag("text"), maxLines = 2)
                 }
             )
@@ -258,7 +258,7 @@ class SnackbarTest {
             parentMaxWidth = 300.dp
         ) {
             Snackbar(
-                text = {
+                content = {
                     Text(longText, Modifier.testTag("text"), maxLines = 2)
                 },
                 action = {
@@ -297,7 +297,7 @@ class SnackbarTest {
             parentMaxWidth = 300.dp
         ) {
             Snackbar(
-                text = {
+                content = {
                     Text("Message")
                 },
                 action = {
@@ -347,7 +347,7 @@ class SnackbarTest {
                         modifier = Modifier
                             .semantics(mergeDescendants = true) {}
                             .testTag("snackbar"),
-                        text = { Text("") }
+                        content = { Text("") }
                     )
                 }
             }

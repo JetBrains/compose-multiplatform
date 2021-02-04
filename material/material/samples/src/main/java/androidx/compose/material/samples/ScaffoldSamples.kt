@@ -103,7 +103,7 @@ fun SimpleScaffoldWithTopBar() {
                 onClick = { /* fab click handler */ }
             )
         },
-        bodyContent = { innerPadding ->
+        content = { innerPadding ->
             LazyColumn(contentPadding = innerPadding) {
                 items(100) {
                     Box(
@@ -178,7 +178,7 @@ fun ScaffoldWithBottomBarAndCutout() {
         },
         floatingActionButtonPosition = FabPosition.Center,
         isFloatingActionButtonDocked = true,
-        bodyContent = { innerPadding ->
+        content = { innerPadding ->
             LazyColumn(contentPadding = innerPadding) {
                 items(100) {
                     Box(
@@ -212,7 +212,7 @@ fun ScaffoldWithSimpleSnackbar() {
                 }
             )
         },
-        bodyContent = { innerPadding ->
+        content = { innerPadding ->
             Text(
                 text = "Body content",
                 modifier = Modifier.padding(innerPadding).fillMaxSize().wrapContentSize()
@@ -249,7 +249,7 @@ fun ScaffoldWithCustomSnackbar() {
                 }
             )
         },
-        bodyContent = { innerPadding ->
+        content = { innerPadding ->
             Text(
                 text = "Custom Snackbar Demo",
                 modifier = Modifier.padding(innerPadding).fillMaxSize().wrapContentSize()
@@ -296,7 +296,7 @@ fun ScaffoldWithCoroutinesSnackbar() {
                 }
             )
         },
-        bodyContent = { innerPadding ->
+        content = { innerPadding ->
             Text(
                 "Snackbar demo",
                 modifier = Modifier.padding(innerPadding).fillMaxSize().wrapContentSize()

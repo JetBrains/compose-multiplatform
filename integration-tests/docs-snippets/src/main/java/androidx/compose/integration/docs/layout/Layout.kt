@@ -177,7 +177,7 @@ private object LayoutSnippet8 {
         Scaffold(
             drawerContent = { /*...*/ },
             topBar = { /*...*/ },
-            bodyContent = { /*...*/ }
+            content = { /*...*/ }
         )
     }
 }

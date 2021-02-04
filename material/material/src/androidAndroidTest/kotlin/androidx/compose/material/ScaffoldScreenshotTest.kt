@@ -668,7 +668,7 @@ private fun ScreenshotScaffold(
                 floatingActionButton = fab,
                 floatingActionButtonPosition = fabPosition,
                 isFloatingActionButtonDocked = dockedFab,
-                bodyContent = { innerPadding ->
+                content = { innerPadding ->
                     Box(
                         modifier = Modifier
                             .padding(innerPadding)

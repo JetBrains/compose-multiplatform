@@ -16,6 +16,7 @@
 package androidx.compose.material
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -78,9 +79,16 @@ fun TopAppBar(
     actions: @Composable RowScope.() -> Unit = {},
     backgroundColor: Color = MaterialTheme.colors.primarySurface,
     contentColor: Color = contentColorFor(backgroundColor),
-    elevation: Dp = TopAppBarElevation
+    elevation: Dp = AppBarDefaults.TopAppBarElevation
 ) {
-    AppBar(backgroundColor, contentColor, elevation, RectangleShape, modifier) {
+    AppBar(
+        backgroundColor,
+        contentColor,
+        elevation,
+        AppBarDefaults.ContentPadding,
+        RectangleShape,
+        modifier
+    ) {
         if (navigationIcon == null) {
             Spacer(TitleInsetWithoutIcon)
         } else {
@@ -126,6 +134,7 @@ fun TopAppBar(
  * Defaults to either the matching content color for [backgroundColor], or if [backgroundColor] is
  * not a color from the theme, this will keep the same value set above this TopAppBar.
  * @param elevation the elevation of this TopAppBar.
+ * @param contentPadding the padding applied to the content of this TopAppBar
  * @param content the content of this TopAppBar.The default layout here is a [Row],
  * so content inside will be placed horizontally.
  */
@@ -134,13 +143,15 @@ fun TopAppBar(
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.colors.primarySurface,
     contentColor: Color = contentColorFor(backgroundColor),
-    elevation: Dp = TopAppBarElevation,
+    elevation: Dp = AppBarDefaults.TopAppBarElevation,
+    contentPadding: PaddingValues = AppBarDefaults.ContentPadding,
     content: @Composable RowScope.() -> Unit
 ) {
     AppBar(
         backgroundColor,
         contentColor,
         elevation,
+        contentPadding,
         RectangleShape,
         modifier = modifier,
         content = content
@@ -168,6 +179,7 @@ fun TopAppBar(
  * and [FloatingActionButton] are being used together in [Scaffold]. This shape will be drawn with
  * an offset around all sides. If null, where will be no cutout.
  * @param elevation the elevation of this BottomAppBar.
+ * @param contentPadding the padding applied to the content of this BottomAppBar
  * @param content the content of this BottomAppBar. The default layout here is a [Row],
  * so content inside will be placed horizontally.
  */
@@ -177,7 +189,8 @@ fun BottomAppBar(
     backgroundColor: Color = MaterialTheme.colors.primarySurface,
     contentColor: Color = contentColorFor(backgroundColor),
     cutoutShape: Shape? = null,
-    elevation: Dp = BottomAppBarElevation,
+    elevation: Dp = AppBarDefaults.BottomAppBarElevation,
+    contentPadding: PaddingValues = AppBarDefaults.ContentPadding,
     content: @Composable RowScope.() -> Unit
 ) {
     val fabPlacement = LocalFabPlacement.current
@@ -186,7 +199,14 @@ fun BottomAppBar(
     } else {
         RectangleShape
     }
-    AppBar(backgroundColor, contentColor, elevation, shape, modifier) {
+    AppBar(
+        backgroundColor,
+        contentColor,
+        elevation,
+        contentPadding,
+        shape,
+        modifier
+    ) {
         // TODO: b/150609566 clarify emphasis for children
         Row(
             Modifier.fillMaxSize(),
@@ -194,6 +214,31 @@ fun BottomAppBar(
             content = content
         )
     }
+}
+
+/**
+ * Contains default values used for [TopAppBar] and [BottomAppBar].
+ */
+object AppBarDefaults {
+    // TODO: clarify elevation in surface mapping - spec says 0.dp but it appears to have an
+    //  elevation overlay applied in dark theme examples.
+    /**
+     * Default elevation used for [TopAppBar].
+     */
+    val TopAppBarElevation = 4.dp
+
+    /**
+     * Default elevation used for [BottomAppBar].
+     */
+    val BottomAppBarElevation = 8.dp
+
+    /**
+     * Default padding used for [TopAppBar] and [BottomAppBar].
+     */
+    val ContentPadding = PaddingValues(
+        start = AppBarHorizontalPadding,
+        end = AppBarHorizontalPadding
+    )
 }
 
 // TODO: consider exposing this in the shape package, for a generic cutout shape - might be useful
@@ -438,6 +483,7 @@ private fun AppBar(
     backgroundColor: Color,
     contentColor: Color,
     elevation: Dp,
+    contentPadding: PaddingValues,
     shape: Shape,
     modifier: Modifier = Modifier,
     content: @Composable RowScope.() -> Unit
@@ -451,7 +497,7 @@ private fun AppBar(
     ) {
         Row(
             Modifier.fillMaxWidth()
-                .padding(start = AppBarHorizontalPadding, end = AppBarHorizontalPadding)
+                .padding(contentPadding)
                 .preferredHeight(AppBarHeight),
             horizontalArrangement = Arrangement.SpaceBetween,
             content = content
@@ -467,11 +513,6 @@ private val TitleInsetWithoutIcon = Modifier.preferredWidth(16.dp - AppBarHorizo
 // Start inset for the title when there is a navigation icon provided
 private val TitleIconModifier = Modifier.fillMaxHeight()
     .preferredWidth(72.dp - AppBarHorizontalPadding)
-
-private val BottomAppBarElevation = 8.dp
-// TODO: clarify elevation in surface mapping - spec says 0.dp but it appears to have an
-//  elevation overlay applied in dark theme examples.
-private val TopAppBarElevation = 4.dp
 
 // The gap on all sides between the FAB and the cutout
 private val BottomAppBarCutoutOffset = 8.dp

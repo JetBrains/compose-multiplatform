@@ -22,12 +22,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.material.BottomDrawerLayout
+import androidx.compose.material.BottomDrawer
 import androidx.compose.material.BottomDrawerValue
 import androidx.compose.material.Button
 import androidx.compose.material.DrawerValue
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalDrawerLayout
+import androidx.compose.material.ModalDrawer
 import androidx.compose.material.Text
 import androidx.compose.material.rememberBottomDrawerState
 import androidx.compose.material.rememberDrawerState
@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ModalDrawerSample() {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
-    ModalDrawerLayout(
+    ModalDrawer(
         drawerState = drawerState,
         drawerContent = {
             Button(
@@ -49,7 +49,7 @@ fun ModalDrawerSample() {
                 content = { Text("Close Drawer") }
             )
         },
-        bodyContent = {
+        content = {
             Column(
                 modifier = Modifier.fillMaxSize().padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -69,7 +69,7 @@ fun ModalDrawerSample() {
 @OptIn(ExperimentalMaterialApi::class)
 fun BottomDrawerSample() {
     val drawerState = rememberBottomDrawerState(BottomDrawerValue.Closed)
-    BottomDrawerLayout(
+    BottomDrawer(
         drawerState = drawerState,
         drawerContent = {
             Button(
@@ -78,7 +78,7 @@ fun BottomDrawerSample() {
                 content = { Text("Close Drawer") }
             )
         },
-        bodyContent = {
+        content = {
             Column(
                 modifier = Modifier.fillMaxSize().padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
