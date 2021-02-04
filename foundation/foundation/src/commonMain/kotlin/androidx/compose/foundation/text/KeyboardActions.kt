@@ -77,6 +77,18 @@ class KeyboardActions(
 }
 
 /**
+ * Creates an instance of [KeyboardActions] that uses the specified lambda for all [ImeAction]s.
+ */
+fun KeyboardActions(onAny: KeyboardActionScope.() -> Unit): KeyboardActions = KeyboardActions(
+    onDone = onAny,
+    onGo = onAny,
+    onNext = onAny,
+    onPrevious = onAny,
+    onSearch = onAny,
+    onSend = onAny
+)
+
+/**
  * This scope can be used to execute the default action implementation.
  */
 interface KeyboardActionScope {

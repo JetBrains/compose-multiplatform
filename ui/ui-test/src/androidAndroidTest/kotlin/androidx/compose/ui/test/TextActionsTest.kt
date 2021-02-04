@@ -18,7 +18,6 @@ package androidx.compose.ui.test
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActionScope
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
@@ -192,20 +191,10 @@ class TextActionsTest {
     @Test
     fun sendImeAction_actionNotDefined_shouldFail() {
         var actionPerformed = false
-        val anyAction: KeyboardActionScope.() -> Unit = { actionPerformed = true }
         rule.setContent {
             TextFieldUi(
                 imeAction = ImeAction.Default,
-                // TODO(b/179226323): Add API to set the same KeyboardAction lambda for all
-                //  ImeActions.
-                keyboardActions = KeyboardActions(
-                    onDone = anyAction,
-                    onGo = anyAction,
-                    onNext = anyAction,
-                    onPrevious = anyAction,
-                    onSearch = anyAction,
-                    onSend = anyAction,
-                )
+                keyboardActions = KeyboardActions { actionPerformed = true }
             )
         }
         assertThat(actionPerformed).isFalse()
