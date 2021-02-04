@@ -51,7 +51,7 @@ fun DoubleTapGestureFilterDemo() {
             Modifier.fillMaxSize()
                 .wrapContentSize(Alignment.Center)
                 .preferredSize(192.dp)
-                .pointerInput { detectTapGestures(onDoubleTap = onDoubleTap) }
+                .pointerInput(Unit) { detectTapGestures(onDoubleTap = onDoubleTap) }
                 .border(2.dp, BorderColor)
                 .background(color = color.value)
         )

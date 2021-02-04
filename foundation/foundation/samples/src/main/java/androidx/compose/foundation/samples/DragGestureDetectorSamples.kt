@@ -74,7 +74,7 @@ fun AwaitHorizontalDragOrCancellationSample() {
                 .fillMaxHeight()
                 .width(50.dp)
                 .background(Color.Blue)
-                .pointerInput {
+                .pointerInput(Unit) {
                     forEachGesture {
                         awaitPointerEventScope {
                             val down = awaitFirstDown()
@@ -118,7 +118,7 @@ fun HorizontalDragSample() {
                 .fillMaxHeight()
                 .width(50.dp)
                 .background(Color.Blue)
-                .pointerInput {
+                .pointerInput(Unit) {
                     forEachGesture {
                         awaitPointerEventScope {
                             val down = awaitFirstDown()
@@ -161,7 +161,7 @@ fun DetectHorizontalDragGesturesSample() {
                 .fillMaxHeight()
                 .width(50.dp)
                 .background(Color.Blue)
-                .pointerInput {
+                .pointerInput(Unit) {
                     detectHorizontalDragGestures { change, dragAmount ->
                         val originalX = offsetX.value
                         val newValue = (originalX + dragAmount).coerceIn(0f, width - 50.dp.toPx())
@@ -188,7 +188,7 @@ fun AwaitVerticalDragOrCancellationSample() {
                 .fillMaxWidth()
                 .height(50.dp)
                 .background(Color.Blue)
-                .pointerInput {
+                .pointerInput(Unit) {
                     forEachGesture {
                         awaitPointerEventScope {
                             val down = awaitFirstDown()
@@ -232,7 +232,7 @@ fun VerticalDragSample() {
                 .fillMaxWidth()
                 .height(50.dp)
                 .background(Color.Blue)
-                .pointerInput {
+                .pointerInput(Unit) {
                     forEachGesture {
                         awaitPointerEventScope {
                             val down = awaitFirstDown()
@@ -275,7 +275,7 @@ fun DetectVerticalDragGesturesSample() {
                 .fillMaxWidth()
                 .height(50.dp)
                 .background(Color.Blue)
-                .pointerInput {
+                .pointerInput(Unit) {
                     detectVerticalDragGestures { change, dragAmount ->
                         val originalY = offsetY.value
                         val newValue = (originalY + dragAmount).coerceIn(0f, height - 50.dp.toPx())
@@ -301,7 +301,7 @@ fun AwaitDragOrCancellationSample() {
             Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .size(50.dp)
                 .background(Color.Blue)
-                .pointerInput {
+                .pointerInput(Unit) {
                     forEachGesture {
                         awaitPointerEventScope {
                             val down = awaitFirstDown()
@@ -357,7 +357,7 @@ fun DragSample() {
             Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .size(50.dp)
                 .background(Color.Blue)
-                .pointerInput {
+                .pointerInput(Unit) {
                     forEachGesture {
                         awaitPointerEventScope {
                             val down = awaitFirstDown()
@@ -412,7 +412,7 @@ fun DetectDragGesturesSample() {
             Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .size(50.dp)
                 .background(Color.Blue)
-                .pointerInput {
+                .pointerInput(Unit) {
                     detectDragGestures { change, dragAmount ->
                         val original = Offset(offsetX.value, offsetY.value)
                         val summed = original + dragAmount
@@ -446,7 +446,7 @@ fun DetectDragWithLongPressGesturesSample() {
             Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .size(50.dp)
                 .background(Color.Blue)
-                .pointerInput {
+                .pointerInput(Unit) {
                     detectDragGesturesAfterLongPress { change, dragAmount ->
                         val original = Offset(offsetX.value, offsetY.value)
                         val summed = original + dragAmount

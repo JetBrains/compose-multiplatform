@@ -55,7 +55,7 @@ fun LongClickableText(
     onLongClick: (offset: Int) -> Unit
 ) {
     val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
-    val gesture = Modifier.pointerInput {
+    val gesture = Modifier.pointerInput(Unit) {
         detectTapGestures(
             onLongPress = { pos ->
                 layoutResult.value?.let { layout ->

@@ -78,7 +78,7 @@ class LayoutNodeModifierBenchmark(
             Modifier.graphicsLayer(),
             Modifier.onKeyEvent { true },
             Modifier.semantics { },
-            Modifier.pointerInput {
+            Modifier.pointerInput(Unit) {
                 detectTapGestures(onPress = {})
             },
             Modifier.layoutId("Hello"),

@@ -66,7 +66,7 @@ private fun FocusableText(text: String) {
             .focusRequester(focusRequester)
             .onFocusChanged { color = if (it.isFocused) Green else Black }
             .focusModifier()
-            .pointerInput { detectTapGestures { focusRequester.requestFocus() } },
+            .pointerInput(Unit) { detectTapGestures { focusRequester.requestFocus() } },
         text = text,
         color = color
     )

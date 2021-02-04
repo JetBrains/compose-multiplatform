@@ -67,7 +67,7 @@ fun SpringBackScrollingDemo() {
         val mutatorMutex = remember { MutatorMutex() }
         var animation by remember { mutableStateOf(AnimationState(scrollPosition)) }
 
-        val gesture = Modifier.pointerInput {
+        val gesture = Modifier.pointerInput(Unit) {
             coroutineScope {
                 while (true) {
                     val pointerId = awaitPointerEventScope {

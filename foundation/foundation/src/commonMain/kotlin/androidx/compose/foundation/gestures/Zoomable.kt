@@ -142,7 +142,7 @@ fun Modifier.zoomable(
                 }
             }
         }
-        if (enabled) Modifier.pointerInput(block) else Modifier
+        if (enabled) Modifier.pointerInput(Unit, block) else Modifier
     },
     inspectorInfo = debugInspectorInfo {
         name = "zoomable"

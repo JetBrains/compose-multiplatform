@@ -58,7 +58,7 @@ fun DetectTransformGestures() {
                 rotationZ = angle
             )
             .background(Color.Blue)
-            .pointerInput {
+            .pointerInput(Unit) {
                 detectTransformGestures(
                     onGesture = { _, pan, gestureZoom, gestureRotate ->
                         angle += gestureRotate
@@ -80,7 +80,7 @@ fun CalculateRotation() {
         Modifier
             .graphicsLayer(rotationZ = angle)
             .background(Color.Blue)
-            .pointerInput {
+            .pointerInput(Unit) {
                 forEachGesture {
                     awaitPointerEventScope {
                         awaitFirstDown()
@@ -104,7 +104,7 @@ fun CalculateZoom() {
         Modifier
             .graphicsLayer(scaleX = zoom, scaleY = zoom)
             .background(Color.Blue)
-            .pointerInput {
+            .pointerInput(Unit) {
                 forEachGesture {
                     awaitPointerEventScope {
                         awaitFirstDown()
@@ -129,7 +129,7 @@ fun CalculatePan() {
             .offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
             .graphicsLayer()
             .background(Color.Blue)
-            .pointerInput {
+            .pointerInput(Unit) {
                 forEachGesture {
                     awaitPointerEventScope {
                         awaitFirstDown()
@@ -157,7 +157,7 @@ fun CalculateCentroidSize() {
                 // Draw a circle where the gesture is
                 drawCircle(Color.Blue, centroidSize, center = position)
             }
-            .pointerInput {
+            .pointerInput(Unit) {
                 forEachGesture {
                     awaitPointerEventScope {
                         awaitFirstDown().also {

@@ -88,7 +88,7 @@ class SendLongClickTest(private val config: TestConfig) {
             Box(Modifier.fillMaxSize().wrapContentSize(Alignment.BottomEnd)) {
                 ClickableTestBox(
                     Modifier
-                        .pointerInput {
+                        .pointerInput(Unit) {
                             detectTapGestures(onLongPress = ::recordLongPress)
                         }
                         .then(recorder)
