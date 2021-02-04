@@ -18,7 +18,8 @@
 // Ignore lint warnings in documentation snippets
 @file:Suppress(
     "unused", "UNUSED_PARAMETER", "UNUSED_VARIABLE", "UNUSED_ANONYMOUS_PARAMETER",
-    "RedundantSuspendModifier", "CascadeIf", "ClassName", "RemoveExplicitTypeArguments"
+    "RedundantSuspendModifier", "CascadeIf", "ClassName", "RemoveExplicitTypeArguments",
+    "ControlFlowWithEmptyBody"
 )
 
 package androidx.compose.integration.docs.interoperability
@@ -530,7 +531,6 @@ private object BetaSnippets {
         }
     }
 
-    @Suppress("ControlFlowWithEmptyBody")
     private object InteropSnippet6 {
         @Composable
         fun MyComposable() {
@@ -543,7 +543,6 @@ private object BetaSnippets {
         }
     }
 
-    @Suppress("ControlFlowWithEmptyBody")
     private object InteropSnippet7 {
         @Composable
         fun MyComposable() {
@@ -820,10 +819,6 @@ private open class Fragment {
     }
 
     fun requireContext(): Context = TODO()
-}
-
-private class AppCompatActivity {
-    val window: Any = Any()
 }
 
 private class WindowCompat {
