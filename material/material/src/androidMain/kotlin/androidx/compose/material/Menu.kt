@@ -29,6 +29,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayout
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSizeIn
@@ -199,6 +202,7 @@ fun DropdownMenu(
  * @param modifier The modifier to be applied to the menu item
  * @param enabled Controls the enabled state of the menu item - when `false`, the menu item
  * will not be clickable and [onClick] will not be invoked
+ * @param contentPadding the padding applied to the content of this menu item
  * @param interactionState the [InteractionState] representing the different [Interaction]s
  * present on this DropdownMenuItem. You can create and pass in your own remembered
  * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
@@ -209,11 +213,12 @@ fun DropdownMenuItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    contentPadding: PaddingValues = MenuDefaults.DropdownMenuItemContentPadding,
     interactionState: InteractionState = remember { InteractionState() },
-    content: @Composable () -> Unit
+    content: @Composable RowScope.() -> Unit
 ) {
-    // TODO(popam, b/156911853): investigate replacing this Box with ListItem
-    Box(
+    // TODO(popam, b/156911853): investigate replacing this Row with ListItem
+    Row(
         modifier = modifier
             .clickable(
                 enabled = enabled,
@@ -228,21 +233,36 @@ fun DropdownMenuItem(
                 maxWidth = DropdownMenuItemDefaultMaxWidth,
                 minHeight = DropdownMenuItemDefaultMinHeight
             )
-            .padding(horizontal = DropdownMenuHorizontalPadding),
-        contentAlignment = Alignment.CenterStart
+            .padding(contentPadding),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         val typography = MaterialTheme.typography
         ProvideTextStyle(typography.subtitle1) {
             val contentAlpha = if (enabled) ContentAlpha.high else ContentAlpha.disabled
-            Providers(LocalContentAlpha provides contentAlpha, content = content)
+            Providers(LocalContentAlpha provides contentAlpha) {
+                content()
+            }
         }
     }
+}
+
+/**
+ * Contains default values used for [DropdownMenuItem].
+ */
+object MenuDefaults {
+    /**
+     * Default padding used for [DropdownMenuItem].
+     */
+    val DropdownMenuItemContentPadding = PaddingValues(
+        horizontal = DropdownMenuItemHorizontalPadding,
+        vertical = 0.dp
+    )
 }
 
 // Size defaults.
 private val MenuElevation = 8.dp
 private val MenuVerticalMargin = 32.dp
-private val DropdownMenuHorizontalPadding = 16.dp
+private val DropdownMenuItemHorizontalPadding = 16.dp
 internal val DropdownMenuVerticalPadding = 8.dp
 private val DropdownMenuItemDefaultMinWidth = 112.dp
 private val DropdownMenuItemDefaultMaxWidth = 280.dp

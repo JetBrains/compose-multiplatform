@@ -379,7 +379,11 @@ class ParameterFactoryTest {
     @Test
     fun testPaddingValues() {
         validate(factory.create(node, "padding", PaddingValues(2.0.dp, 0.5.dp, 2.5.dp, 0.7.dp))!!) {
-            parameter("padding", ParameterType.String, PaddingValues::class.java.simpleName) {
+            parameter(
+                "padding",
+                ParameterType.String,
+                "PaddingValuesImpl"
+            ) {
                 parameter("bottom", ParameterType.DimensionDp, 0.7f)
                 parameter("end", ParameterType.DimensionDp, 2.5f)
                 parameter("start", ParameterType.DimensionDp, 2.0f)

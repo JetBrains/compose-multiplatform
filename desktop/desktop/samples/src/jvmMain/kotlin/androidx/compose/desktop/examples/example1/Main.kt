@@ -145,7 +145,7 @@ private fun App() {
                     }
                 }
             },
-            bodyContent = {
+            content = {
                 Row(Modifier.padding(bottom = 56.dp)) {
                     LeftColumn(Modifier.weight(1f))
                     RightColumn(Modifier.width(200.dp))
